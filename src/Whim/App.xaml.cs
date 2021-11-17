@@ -26,6 +26,8 @@ namespace Whim
     /// </summary>
     public partial class App : Application
     {
+        private Window? m_window = null;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -45,7 +47,5 @@ namespace Whim
             m_window = new MainWindow();
             m_window.Activate();
         }
-
-        private Window m_window;
     }
 }

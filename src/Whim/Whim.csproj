@@ -18,4 +18,8 @@
     <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="1.0.0-experimental1" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Whim.Core\Whim.Core.csproj" />
+  </ItemGroup>
 </Project>
