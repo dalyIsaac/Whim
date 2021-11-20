@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Whim.Core.Commands;
 
 namespace Whim.Core
 {

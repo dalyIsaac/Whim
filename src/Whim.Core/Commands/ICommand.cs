@@ -1,4 +1,4 @@
-namespace Whim.Core
+namespace Whim.Core.Commands
 {
     public interface ICommand {
         public CommandType Type { get; }
