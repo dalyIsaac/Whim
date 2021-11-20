@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace Whim.Core
+namespace Whim.Core.Monitor
 {
     public class Monitor : IMonitor
     {

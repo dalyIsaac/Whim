@@ -1,4 +1,4 @@
-namespace Whim.Core.Commands
+namespace Whim.Core.Command
 {
     public interface ICommandable
     {

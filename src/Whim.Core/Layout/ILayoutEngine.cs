@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Whim.Core.Commands;
 
-namespace Whim.Core
+namespace Whim.Core.Layout
 {
     /// <summary>
     /// Layout engines dictate how windows are laid out.

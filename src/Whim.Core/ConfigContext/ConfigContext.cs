@@ -1,4 +1,4 @@
-namespace Whim.Core
+namespace Whim.Core.ConfigContext
 {
     public class ConfigContext : IConfigContext
     {

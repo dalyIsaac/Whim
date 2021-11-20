@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Whim.Core.Commands;
 
-namespace Whim.Core
+namespace Whim.Core.Workspace
 {
     /// <summary>
     /// Workspaces contain windows to be organized by layout engines.

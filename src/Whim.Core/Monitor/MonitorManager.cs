@@ -3,9 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using Whim.Core.Commands;
 
-namespace Whim.Core
+namespace Whim.Core.Monitor
 {
     public class MonitorManager : IMonitorManager
     {
@@ -13,7 +12,7 @@ namespace Whim.Core
         private Monitor[] _monitors;
         public IMonitor FocusedMonitor { get; private set; }
         public int Length => _monitors.Length;
-        
+
         public IEnumerator<IMonitor> GetEnumerator() => (IEnumerator<IMonitor>)_monitors.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

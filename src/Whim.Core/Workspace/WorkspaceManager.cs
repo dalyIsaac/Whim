@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using Whim.Core.Commands;
 
-namespace Whim.Core
+namespace Whim.Core.Workspace
 {
     public class WorkspaceManager : IWorkspaceManager
     {

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Whim.Core.Commands;
 
-namespace Whim.Core
+namespace Whim.Core.Workspace
 {
     public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
     {
