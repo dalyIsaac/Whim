@@ -7,18 +7,12 @@ namespace Whim.Core
 {
     public class WorkspaceManager : IWorkspaceManager
     {
-        private List<IWorkspace> _workspaces = new();
         public Commander Commander { get; } = new();
-        public IWorkspace ActiveWorkspace { get; private set; }
+        private List<IWorkspace> _workspaces = new();
+        public IWorkspace? ActiveWorkspace { get; private set; }
 
         public WorkspaceManager(params IWorkspace[] workspaces)
         {
-            _workspaces.AddRange(workspaces);
-
-            if (workspaces.Length == 0)
-                throw new Exception("No workspaces provided");
-
-            ActiveWorkspace = workspaces[0];
         }
 
         public void Add(IWorkspace workspaces)

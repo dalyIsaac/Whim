@@ -8,7 +8,7 @@ namespace Whim.Core
         /// <summary>
         /// The active workspace.
         /// </summary>
-        public IWorkspace ActiveWorkspace { get; }
+        public IWorkspace? ActiveWorkspace { get; }
 
         public void Add(IWorkspace workspaces);
 
