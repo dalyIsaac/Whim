@@ -7,6 +7,5 @@ namespace Whim.Core.Window
         public int Width { get; }
         public int Height { get; }
         public WindowState WindowState { get; }
-        public IWindow Window { get; }
     }
 }

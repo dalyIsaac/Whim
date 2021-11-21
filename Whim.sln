@@ -5,7 +5,9 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim", "src\Whim\Whim.csproj", "{ABF80620-02C5-4932-9E52-1EE4FEF29DD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.Core", "src\Whim.Core\Whim.Core.csproj", "{40AB47E1-E4F7-49EC-99ED-873261B36A69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Core", "src\Whim.Core\Whim.Core.csproj", "{40AB47E1-E4F7-49EC-99ED-873261B36A69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.Native", "src\Whim.Native\Whim.Native.csproj", "{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,22 @@ Global
 		{40AB47E1-E4F7-49EC-99ED-873261B36A69}.Release|x64.Build.0 = Release|Any CPU
 		{40AB47E1-E4F7-49EC-99ED-873261B36A69}.Release|x86.ActiveCfg = Release|Any CPU
 		{40AB47E1-E4F7-49EC-99ED-873261B36A69}.Release|x86.Build.0 = Release|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Debug|arm64.Build.0 = Debug|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Debug|x64.Build.0 = Debug|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Debug|x86.Build.0 = Debug|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Release|arm64.ActiveCfg = Release|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Release|arm64.Build.0 = Release|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Release|x64.ActiveCfg = Release|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Release|x64.Build.0 = Release|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Release|x86.ActiveCfg = Release|Any CPU
+		{3CC1A743-5C40-418D-A58D-09F96F8B7C2E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
