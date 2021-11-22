@@ -2,22 +2,28 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
-using Whim.Native;
+using Windows.Win32;
+using Windows.Win32.Foundation;
 
 namespace Whim.Core.Window
 {
     public class Window : IWindow
     {
-        private readonly IntPtr _handle;
+        private const int _bufferCapacity = 255;
+        private readonly HWND _handle;
 
         public string Title
         {
             get
             {
-                var buffer = new StringBuilder(255);
-                Win32.GetWindowText(_handle, buffer, buffer.Capacity + 1);
-                return buffer.ToString();
+                unsafe
+                {
+                    fixed (char* buffer = new char[_bufferCapacity])
+                    {
+                        PInvoke.GetWindowText(_handle, buffer, _bufferCapacity + 1);
+                        return new string(buffer);
+                    }
+                }
             }
         }
 
@@ -25,9 +31,14 @@ namespace Whim.Core.Window
         {
             get
             {
-                var buffer = new StringBuilder(255);
-                Win32.GetClassName(_handle, buffer, buffer.Capacity + 1);
-                return buffer.ToString();
+                unsafe
+                {
+                    fixed(char* buffer = new char[_bufferCapacity])
+                    {
+                        PInvoke.GetClassName(_handle, buffer, _bufferCapacity + 1);
+                        return new string(buffer);
+                    }
+                }
             }
         }
 
@@ -35,8 +46,7 @@ namespace Whim.Core.Window
         {
             get
             {
-                Win32.Rect rect = new Win32.Rect();
-                Win32.GetWindowRect(_handle, ref rect);
+                PInvoke.GetWindowRect(_handle, out RECT rect);
 
                 WindowState state = WindowState.Normal;
                 if (IsMinimized)
@@ -48,7 +58,7 @@ namespace Whim.Core.Window
                     state = WindowState.Maximized;
                 }
 
-                return new WindowLocation(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top, state);
+                return new WindowLocation(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, state);
             }
         }
 
@@ -58,11 +68,11 @@ namespace Whim.Core.Window
 
         public string ProcessName { get; }
 
-        public bool IsFocused => Win32.GetForegroundWindow() == _handle;
+        public bool IsFocused => PInvoke.GetForegroundWindow() == _handle;
 
-        public bool IsMinimized => Win32.IsIconic(_handle);
+        public bool IsMinimized => PInvoke.IsIconic(_handle);
 
-        public bool IsMaximized => Win32.IsZoomed(_handle);
+        public bool IsMaximized => PInvoke.IsZoomed(_handle);
 
         public bool IsMouseMoving { get; internal set; }
 
@@ -75,7 +85,7 @@ namespace Whim.Core.Window
 
         public void BringToTop()
         {
-            Win32.BringWindowToTop(_handle);
+            PInvoke.BringWindowToTop(_handle);
         }
 
         public void Close()
@@ -87,7 +97,7 @@ namespace Whim.Core.Window
         {
             if (!IsFocused)
             {
-                Win32.SetForegroundWindow(_handle);
+                PInvoke.SetForegroundWindow(_handle);
                 WindowFocused?.Invoke(this);
             }
         }
@@ -128,14 +138,17 @@ namespace Whim.Core.Window
             Win32Helper.ShowNormalWindow(_handle);
         }
 
-        private Window(IntPtr handle, IWindowManager windowManager)
+        private Window(HWND handle, IWindowManager windowManager)
         {
             _handle = handle;
             WindowManager = windowManager;
 
-            uint pid;
-            Win32.GetWindowThreadProcessId(_handle, out pid);
-            ProcessId = (int)pid;
+            unsafe
+            {
+                uint pid;
+                PInvoke.GetWindowThreadProcessId(_handle, &pid);
+                ProcessId = (int)pid;
+            }
 
             var process = Process.GetProcessById(ProcessId);
             ProcessName = process.ProcessName;
@@ -153,11 +166,8 @@ namespace Whim.Core.Window
             }
         }
 
-        public static Window? RegisterWindow(IntPtr handle, IWindowManager windowManager)
+        private static Window? RegisterWindow(HWND handle, IWindowManager windowManager)
         {
-            if (handle == IntPtr.Zero)
-                return null;
-
             try
             {
                 return new Window(handle, windowManager);
