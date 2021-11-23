@@ -1,12 +1,11 @@
+using System;
+
 namespace Whim.Core.Window
 {
-    public interface IWindowManager : ICommandable
+    public interface IWindowManager : ICommandable, IDisposable
     {
-        public void Initialize();
+        public bool Initialize();
 
         public event WindowAddDelegate WindowAdded;
-        public event WindowUpdateDelegate WindowUpdated;
-        public event WindowFocusDelegate WindowFocused;
-        public event WindowDestroyDelegate WindowDestroyed;
     }
 }

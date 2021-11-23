@@ -1,28 +1,162 @@
+using System.Collections.Generic;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.Accessibility;
+using Windows.Win32.UI.WindowsAndMessaging;
+
 namespace Whim.Core.Window
 {
     public class WindowManager : IWindowManager
     {
         public Commander Commander { get; } = new();
 
-        public event WindowAddDelegate WindowAdded;
-        public event WindowUpdateDelegate WindowUpdated;
-        public event WindowFocusDelegate WindowFocused;
-        public event WindowDestroyDelegate WindowDestroyed;
+        public event WindowAddDelegate? WindowAdded;
+
+        private readonly Dictionary<HWND, IWindow> _windows = new();
+
+        private const int _registeredHookCount = 6;
+        private readonly UnhookWinEventSafeHandle[] _registeredHooks = new UnhookWinEventSafeHandle[_registeredHookCount];
+        private readonly WINEVENTPROC _hookDelegate;
+        private bool disposedValue;
 
         public WindowManager()
         {
-            // TODO
+            _hookDelegate = new WINEVENTPROC(WindowsEventHook);
         }
 
-        ~WindowManager()
+        public bool Initialize()
         {
-            // TODO: unhook events
+            // Each of the following hooks register just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
+            _registeredHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_SHOW, _hookDelegate);
+            _registeredHooks[1] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);
+            _registeredHooks[2] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, _hookDelegate);
+            _registeredHooks[3] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
+            _registeredHooks[4] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
+            _registeredHooks[5] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, _hookDelegate);
+
+            // If any of the above hooks are invalid, we dispose the WindowManager instance and return false.
+            for (var i = 0; i < _registeredHooks.Length; i++)
+            {
+                if (_registeredHooks[i].IsInvalid)
+                {
+                    Logger.Error($"Failed to register hook {i}");
+                    Dispose();
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        public void Initialize()
+        protected virtual void Dispose(bool disposing)
         {
-            throw new System.NotImplementedException();
-            // TODO: hook and unhook events
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    foreach (var hook in _registeredHooks)
+                    {
+                        if (hook == null || hook.IsClosed || !hook.IsInvalid)
+                            continue;
+
+                        hook.Dispose();
+                    }
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~WindowManager()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            System.GC.SuppressFinalize(this);
+        }
+
+        private static bool EventWindowIsValid(int idChild, int idObject, HWND? hwnd) =>
+            // When idChild is CHILDID_SELF (0), the event was triggered
+            // by the object.
+            idChild == PInvoke.CHILDID_SELF
+                   // When idObject == OBJID_WINDOW (0), the event is
+                   // associated with the window (not a child object).
+                   && idObject == (int)OBJECT_IDENTIFIER.OBJID_WINDOW
+                   // The handle is not null.
+                   && hwnd != null;
+
+        private void WindowsEventHook(HWINEVENTHOOK hWinEventHook, uint eventType, HWND hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime)
+        {
+            Logger.Verbose($"WindowsEventHook: {hwnd}, {eventType}, {idObject}, {idChild}, {idEventThread}, {dwmsEventTime}");
+            if (!EventWindowIsValid(idChild, idObject, hwnd)) { return; }
+
+            // Get the window from the dictionary. If it doesn't exist, create it.
+            IWindow? window;
+            if (!_windows.TryGetValue(hwnd, out window))
+            {
+                Logger.Debug($"Window {hwnd} is not registered and is being created");
+                window = RegisterWindow(hwnd);
+            }
+
+            // If the window is null, we can't do anything with it.
+            if (window == null) { return; }
+
+            if (eventType == PInvoke.EVENT_OBJECT_SHOW)
+            {
+                // We've already registered the window, so we don't need to do anything.
+                return;
+            }
+            else if (eventType == PInvoke.EVENT_OBJECT_DESTROY)
+            {
+                UnregisterWindow(hwnd);
+                return;
+            }
+
+            window.HandleEvent(eventType);
+        }
+
+        private IWindow? RegisterWindow(HWND hwnd)
+        {
+            Logger.Debug($"WindowManager.RegisterWindow: {hwnd}");
+            Window? window = Window.RegisterWindow(hwnd, this);
+
+            if (window == null) { return null; }
+
+            // Try add the window to the dictionary.
+            if (!_windows.TryAdd(hwnd, window))
+            {
+                Logger.Debug($"WindowManager.RegisterWindow: {hwnd} failed to register");
+                return null;
+            }
+
+            Logger.Debug($"WindowManager.RegisterWindow: {hwnd} registered");
+            WindowAdded?.Invoke(window);
+            return window;
+        }
+
+        private void UnregisterWindow(HWND hwnd)
+        {
+            Logger.Debug($"WindowManager.UnregisterWindow: {hwnd}");
+
+            IWindow? window;
+            if (!_windows.TryGetValue(hwnd, out window) || window == null)
+            {
+                Logger.Error($"Window {hwnd} is not registered");
+                return;
+            }
+
+            if (window is Window win)
+            {
+                win.UnregisterWindow();
+            }
         }
     }
 }
