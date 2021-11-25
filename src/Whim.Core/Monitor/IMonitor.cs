@@ -1,11 +1,12 @@
-namespace Whim.Core.Monitor
+namespace Whim.Core.Monitor;
+
+/// <summary>
+/// Represents a single display device.
+/// </summary>
+public interface IMonitor : ILocation
 {
-    public interface IMonitor
-    {
-        public string Name { get; }
-        public int Width { get; }
-        public int Height { get; }
-        public int X { get; }
-        public int Y { get; }
-    }
+	/// <summary>
+	/// The name of the monitor.
+	/// </summary>
+	public string Name { get; }
 }

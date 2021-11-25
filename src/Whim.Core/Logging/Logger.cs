@@ -1,54 +1,195 @@
 using System;
+using System.IO;
 using Serilog;
 
-namespace Whim.Core.Logging
+namespace Whim.Core.Logging;
+
+/// <summary>
+/// Logger used throughout Whim. It is accessed according to the singleton pattern.
+/// </summary>
+public class Logger
 {
-    public class Logger
-    {
-        private static Logger? instance;
-        private readonly ILogger _logger;
-        private readonly LoggerConfiguration _loggerConfiguration;
+	/// <summary>
+	/// Logger instance.
+	/// </summary>
+	private static Logger? instance;
 
-        private Logger(LoggerConfig config)
-        {
-            var fileSink = config.FileSink;
-            var debugSink = config.DebugSink;
+	/// <summary>
+	/// Serilog <see cref="ILogger"/> instance.
+	/// </summary>
+	private readonly ILogger _logger;
 
-            _loggerConfiguration = new LoggerConfiguration().WriteTo.File(config.FileSink.FilePath, restrictedToMinimumLevel: fileSink.GetLogLevel());
-            if (debugSink != null)
-            {
-                _loggerConfiguration = _loggerConfiguration.WriteTo.Debug(restrictedToMinimumLevel: debugSink.GetLogLevel());
-            }
+	/// <summary>
+	/// Serilog <see cref="LoggerConfiguration"/> instance.
+	/// </summary>
+	private readonly LoggerConfiguration _loggerConfiguration;
 
-            _logger = _loggerConfiguration.CreateLogger();
-        }
+	private Logger(string whimPath, LoggerConfig config)
+	{
+		FileSinkConfig fileSink = config.FileSink;
+		SinkConfig? debugSink = config.DebugSink;
 
-        public static Logger Initialize(LoggerConfig config)
-        {
-            if (instance == null)
-            {
-                instance = new Logger(config);
-            }
-            return instance;
-        }
+		string loggerFilePath = Path.Combine(whimPath, config.FileSink.FileName);
+		_loggerConfiguration = new LoggerConfiguration().WriteTo.File(
+			loggerFilePath,
+			restrictedToMinimumLevel: fileSink.GetLogLevel()
+		);
 
-        public static void Verbose(string message, params object[] args) => instance?._logger.Verbose(message, args);
-        public static void Verbose(Exception exception, string message, params object[] args) => instance?._logger.Verbose(exception, message, args);
+		if (debugSink != null)
+		{
+			_loggerConfiguration = _loggerConfiguration.WriteTo.Debug(restrictedToMinimumLevel: debugSink.GetLogLevel());
+		}
 
-        public static void Debug(string message, params object[] args) => instance?._logger.Debug(message, args);
-        public static void Debug(Exception exception, string message, params object[] args) => instance?._logger.Debug(exception, message, args);
+		_logger = _loggerConfiguration.CreateLogger();
+		Logger.Debug("Created logger!");
+	}
 
-        public static void Information(string message, params object[] args) => instance?._logger.Information(message, args);
-        public static void Information(Exception exception, string message, params object[] args) => instance?._logger.Information(exception, message, args);
+	/// <summary>
+	/// Initialize the <see cref="Logger"/> with the <see cref="IConfigContext.WhimPath"/> and
+	/// <see cref="LoggerConfig"/>.
+	/// </summary>
+	/// <param name="whimPath"><see cref="IConfigContext.WhimPath"/></param>
+	/// <param name="config"><see cref="LoggerConfig"/></param>
+	/// <returns>The <see cref="Logger"/> singleton instance.</returns>
+	public static Logger Initialize(string whimPath, LoggerConfig config)
+	{
+		if (instance == null)
+		{
+			instance = new Logger(whimPath, config);
+		}
+		return instance;
+	}
 
-        public static void Warning(string message, params object[] args) => instance?._logger.Warning(message, args);
-        public static void Warning(Exception exception, string message, params object[] args) => instance?._logger.Warning(exception, message, args);
+	/// <summary>
+	/// Initialize the <see cref="Logger"/> with just the path to just the
+	/// <see cref="IConfigContext.WhimPath"/>.
+	/// </summary>
+	/// <param name="whimPath"><see cref="IConfigContext.WhimPath"/></param>
+	/// <returns>The <see cref="Logger"/> singleton instance.</returns>
+	public static Logger Initialize(string whimPath) => Initialize(whimPath, new LoggerConfig());
 
-        public static void Error(string message, params object[] args) => instance?._logger.Error(message, args);
-        public static void Error(Exception exception, string message, params object[] args) => instance?._logger.Error(exception, message, args);
+	public static void Verbose(string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
 
-        public static void Fatal(string message, params object[] args) => instance?._logger.Fatal(message, args);
-        public static void Fatal(Exception exception, string message, params object[] args) => instance?._logger.Fatal(exception, message, args);
+		instance._logger.Verbose(message, args);
+	}
 
-    }
+	public static void Verbose(Exception exception, string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Verbose(exception, message, args);
+	}
+
+
+	public static void Debug(string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Debug(message, args);
+	}
+
+	public static void Debug(Exception exception, string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Debug(exception, message, args);
+	}
+
+
+	public static void Information(string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Information(message, args);
+	}
+
+	public static void Information(Exception exception, string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Information(exception, message, args);
+	}
+
+
+	public static void Warning(string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Warning(message, args);
+	}
+
+	public static void Warning(Exception exception, string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Warning(exception, message, args);
+	}
+
+
+	public static void Error(string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Error(message, args);
+	}
+
+	public static void Error(Exception exception, string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Error(exception, message, args);
+	}
+
+
+	public static void Fatal(string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Fatal(message, args);
+	}
+
+	public static void Fatal(Exception exception, string message, params object[] args)
+	{
+		if (instance == null)
+		{
+			throw new LoggerUninitializedException();
+		}
+
+		instance._logger.Fatal(exception, message, args);
+	}
 }

@@ -1,12 +1,14 @@
-namespace Whim.Core.Logging
+namespace Whim.Core.Logging;
+
+/// <summary>
+/// The log levels available to <see cref="Logger"/>.
+/// </summary>
+public enum SinkLogLevel
 {
-    public enum SinkLogLevel
-    {
-        Verbose,
-        Debug,
-        Information,
-        Warning,
-        Error,
-        Fatal,
-    }
+	Verbose,
+	Debug,
+	Information,
+	Warning,
+	Error,
+	Fatal,
 }

@@ -1,7 +1,12 @@
-namespace Whim.Core.Command
+namespace Whim.Core.Command;
+
+/// <summary>
+/// Specification for classes to handle and expose command functionality.
+/// </summary>
+public interface ICommandable
 {
-    public interface ICommandable
-    {
-        public Commander Commander { get; }
-    }
+	/// <summary>
+	/// <see cref="Commander"/> exposes command functionality.
+	/// </summary>
+	public Commander Commander { get; }
 }

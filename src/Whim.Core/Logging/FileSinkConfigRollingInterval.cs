@@ -1,9 +1,14 @@
-namespace Whim.Core.Logging
+namespace Whim.Core.Logging;
+
+/// <summary>
+/// The file sink's rolling interval for the file logs.
+/// </summary>
+public enum FileSinkConfigRollingInterval
 {
-    public enum FileSinkConfigRollingInterval
-    {
-        Infinite,
-        Month,
-        Day
-    }
+	/// <summary>
+	/// Never rolls over the file log.
+	/// </summary>
+	Infinite,
+	Month,
+	Day
 }

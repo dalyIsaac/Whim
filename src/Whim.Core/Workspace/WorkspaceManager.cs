@@ -1,35 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Whim.Core.Workspace
+namespace Whim.Core.Workspace;
+
+/// <summary>
+/// Implementation of <see cref="IWorkspaceManager"/>.
+/// </summary>
+public class WorkspaceManager : IWorkspaceManager
 {
-    public class WorkspaceManager : IWorkspaceManager
-    {
-        public Commander Commander { get; } = new();
-        private List<IWorkspace> _workspaces = new();
-        public IWorkspace? ActiveWorkspace { get; private set; }
+	public Commander Commander { get; } = new();
 
-        public WorkspaceManager(params IWorkspace[] workspaces)
-        {
-        }
+	/// <summary>
+	/// The <see cref="IWorkspace"/>s stored by this manager.
+	/// </summary>
+	private readonly List<IWorkspace> _workspaces = new();
 
-        public void Add(IWorkspace workspaces)
-        {
-            _workspaces.Add(workspaces);
-        }
+	/// <summary>
+	/// The active workspace.
+	/// </summary>
+	public IWorkspace? ActiveWorkspace { get; private set; }
 
-        public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+	public void Add(IWorkspace workspace)
+	{
+		_workspaces.Add(workspace);
+	}
 
-        public bool Remove(IWorkspace workspace) => _workspaces.Remove(workspace);
+	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public bool Remove(string workspaceName)
-        {
-            var workspace = _workspaces.Find(w => w.Name == workspaceName);
-            if (workspace == null)
-                return false;
+	public bool Remove(IWorkspace workspace) => _workspaces.Remove(workspace);
 
-            return _workspaces.Remove(workspace);
-        }
-    }
+	public bool Remove(string workspaceName)
+	{
+		IWorkspace? workspace = _workspaces.Find(w => w.Name == workspaceName);
+		return workspace != null && _workspaces.Remove(workspace);
+	}
 }
