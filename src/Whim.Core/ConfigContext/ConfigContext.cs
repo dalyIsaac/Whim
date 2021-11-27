@@ -7,15 +7,10 @@ namespace Whim.Core.ConfigContext;
 /// functionality. <br/>
 ///
 /// <c>ConfigContext</c> also contains other associated state and functionality, like the
-/// <see cref="WhimPath"/> and the <see cref="Logger"/>
+/// <see cref="Logger"/>.
 /// </summary>
 public class ConfigContext : IConfigContext
 {
-	/// <summary>
-	/// The path where the Whim config and plugins are stored.
-	/// </summary>
-	public string WhimPath { get; }
-
 	public Logger Logger { get; }
 	public IWorkspaceManager WorkspaceManager { get; }
 	public IWindowManager WindowManager { get; }
@@ -23,8 +18,7 @@ public class ConfigContext : IConfigContext
 
 	public ConfigContext()
 	{
-		WhimPath = Files.FileHelper.GetUserWhimPath();
-		Logger = Logger.Initialize(WhimPath);
+		Logger = Logger.Initialize();
 		WorkspaceManager = new WorkspaceManager();
 		WindowManager = new WindowManager();
 		MonitorManager = new MonitorManager();

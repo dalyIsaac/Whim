@@ -7,11 +7,10 @@ namespace Whim.Core.ConfigContext;
 /// functionality. <br/>
 ///
 /// <c>IConfigContext</c> also contains other associated state and functionality, like the
-/// <see cref="WhimPath"/> and the <see cref="Logger"/>
+/// <see cref="Logger"/>
 /// </summary>
 public interface IConfigContext
 {
-	public string WhimPath { get; }
 	public Logger Logger { get; }
 	public IWorkspaceManager WorkspaceManager { get; }
 	public IWindowManager WindowManager { get; }

@@ -25,6 +25,7 @@
 
 		<Using Include="Whim.Core.Command" />
 		<Using Include="Whim.Core.ConfigContext" />
+		<Using Include="Whim.Core.Files" />
 		<Using Include="Whim.Core.Layout" />
 		<Using Include="Whim.Core.Location" />
 		<Using Include="Whim.Core.Logging" />

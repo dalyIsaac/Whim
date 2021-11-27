@@ -24,12 +24,14 @@ public class Logger
 	/// </summary>
 	private readonly LoggerConfiguration _loggerConfiguration;
 
-	private Logger(string whimPath, LoggerConfig config)
+	private Logger(LoggerConfig config)
 	{
 		FileSinkConfig fileSink = config.FileSink;
 		SinkConfig? debugSink = config.DebugSink;
 
-		string loggerFilePath = Path.Combine(whimPath, config.FileSink.FileName);
+		string loggerFilePath = Path.Combine(FileHelper.GetUserWhimPath(),
+									   config.FileSink.FileName);
+
 		_loggerConfiguration = new LoggerConfiguration().WriteTo.File(
 			loggerFilePath,
 			restrictedToMinimumLevel: fileSink.GetLogLevel()
@@ -41,7 +43,7 @@ public class Logger
 		}
 
 		_logger = _loggerConfiguration.CreateLogger();
-		Logger.Debug("Created logger!");
+		_logger.Debug("Created logger!");
 	}
 
 	/// <summary>
@@ -51,22 +53,20 @@ public class Logger
 	/// <param name="whimPath"><see cref="IConfigContext.WhimPath"/></param>
 	/// <param name="config"><see cref="LoggerConfig"/></param>
 	/// <returns>The <see cref="Logger"/> singleton instance.</returns>
-	public static Logger Initialize(string whimPath, LoggerConfig config)
+	public static Logger Initialize(LoggerConfig config)
 	{
 		if (instance == null)
 		{
-			instance = new Logger(whimPath, config);
+			instance = new Logger(config);
 		}
 		return instance;
 	}
 
 	/// <summary>
-	/// Initialize the <see cref="Logger"/> with just the path to just the
-	/// <see cref="IConfigContext.WhimPath"/>.
+	/// Initialize the <see cref="Logger"/> with the defaults.
 	/// </summary>
-	/// <param name="whimPath"><see cref="IConfigContext.WhimPath"/></param>
 	/// <returns>The <see cref="Logger"/> singleton instance.</returns>
-	public static Logger Initialize(string whimPath) => Initialize(whimPath, new LoggerConfig());
+	public static Logger Initialize() => Initialize(new LoggerConfig());
 
 	public static void Verbose(string message, params object[] args)
 	{
