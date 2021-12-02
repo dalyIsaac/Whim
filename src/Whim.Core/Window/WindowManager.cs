@@ -69,7 +69,7 @@ public class WindowManager : IWindowManager
 			{
 				foreach (UnhookWinEventSafeHandle? hook in _registeredHooks)
 				{
-					if (hook == null || hook.IsClosed || !hook.IsInvalid)
+					if (hook == null || hook.IsClosed || hook.IsInvalid)
 					{
 						continue;
 					}
@@ -162,7 +162,7 @@ public class WindowManager : IWindowManager
 			return;
 		}
 
-		// window.HandleEvent(eventType);
+		window.HandleEvent(eventType);
 	}
 
 	/// <summary>

@@ -166,6 +166,8 @@ public class Window : IWindow
 			// Win32Exception is thrown when it's not possible to get
 			// information about the process. See
 			// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process?view=net-6.0#remarks
+			// The exception will usually have a message of:
+			// "Unable to enumerate the process modules."
 			ProcessFileName = "--NA--";
 			Logger.Debug("Failed to get process filename");
 		};

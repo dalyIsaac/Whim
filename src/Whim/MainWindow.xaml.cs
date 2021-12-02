@@ -19,8 +19,11 @@ namespace Whim;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow()
-    {
-        InitializeComponent();
-    }
+	private readonly WhimManager _whim;
+
+	public MainWindow(WhimManager whim)
+	{
+		_whim = whim;
+		InitializeComponent();
+	}
 }
