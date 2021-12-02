@@ -44,10 +44,10 @@ public class LoggerConfig
 	/// </summary>
 	/// <param name="logFileName"></param>
 	/// <param name="baseMinLogLevel">Sets <see cref="LoggerConfig.BaseMinLogLevel"/></param>
-	public LoggerConfig(string logFileName, LogLevel baseMinLogLevel = LogLevel.Verbose)
+	public LoggerConfig(string logFileName, LogLevel baseMinLogLevel = LogLevel.Debug)
 	{
-		FileSink = new FileSinkConfig(logFileName, LogLevel.Verbose);
-		DebugSink = new SinkConfig(LogLevel.Verbose);
+		FileSink = new FileSinkConfig(logFileName, LogLevel.Debug);
+		DebugSink = new SinkConfig(LogLevel.Debug);
 		BaseMinLogLevel = baseMinLogLevel;
 	}
 

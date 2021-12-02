@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0-windows</TargetFramework>
@@ -28,6 +28,7 @@
 		<Using Include="Whim.Core.Location" />
 		<Using Include="Whim.Core.Logging" />
 		<Using Include="Whim.Core.Monitor" />
+		<Using Include="Whim.Core.Native" />
 		<Using Include="Whim.Core.Window" />
 		<Using Include="Whim.Core.Workspace" />
 	</ItemGroup>

@@ -3,7 +3,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.UI.Accessibility;
 
-namespace Whim.Core;
+namespace Whim.Core.Native;
 
 // This is scoped to internal until https://github.com/microsoft/CsWin32/issues/213 is resolved
 internal static class Win32Helper

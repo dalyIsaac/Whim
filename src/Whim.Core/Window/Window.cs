@@ -10,7 +10,7 @@ namespace Whim.Core.Window;
 public class Window : IWindow
 {
 	private const int _bufferCapacity = 255;
-	private readonly HWND _handle;
+	private readonly Pointer _pointer;
 
 	public string Title
 	{
@@ -20,7 +20,7 @@ public class Window : IWindow
 			{
 				fixed (char* buffer = new char[_bufferCapacity])
 				{
-					int length = PInvoke.GetWindowText(_handle, buffer, _bufferCapacity + 1);
+					int length = PInvoke.GetWindowText(_pointer.Handle, buffer, _bufferCapacity + 1);
 					return length > 0 ? new string(buffer) : "🛑Couldn't retrieve title🛑";
 				}
 			}
@@ -35,7 +35,7 @@ public class Window : IWindow
 			{
 				fixed (char* buffer = new char[_bufferCapacity])
 				{
-					int length = PInvoke.GetClassName(_handle, buffer, _bufferCapacity + 1);
+					int length = PInvoke.GetClassName(_pointer.Handle, buffer, _bufferCapacity + 1);
 					return length > 0 ? new string(buffer) : "🛑Couldn't retrieve class name🛑";
 				}
 			}
@@ -46,7 +46,7 @@ public class Window : IWindow
 	{
 		get
 		{
-			PInvoke.GetWindowRect(_handle, out RECT rect);
+			PInvoke.GetWindowRect(_pointer.Handle, out RECT rect);
 			return new Location.Location(rect.left,
 										 rect.top,
 										 rect.right - rect.left,
@@ -60,11 +60,11 @@ public class Window : IWindow
 
 	public string ProcessName { get; }
 
-	public bool IsFocused => PInvoke.GetForegroundWindow() == _handle;
+	public bool IsFocused => PInvoke.GetForegroundWindow() == _pointer.Handle;
 
-	public bool IsMinimized => PInvoke.IsIconic(_handle);
+	public bool IsMinimized => PInvoke.IsIconic(_pointer.Handle);
 
-	public bool IsMaximized => PInvoke.IsZoomed(_handle);
+	public bool IsMaximized => PInvoke.IsZoomed(_pointer.Handle);
 
 	public bool IsMouseMoving { get; internal set; }
 
@@ -76,39 +76,39 @@ public class Window : IWindow
 
 	public void BringToTop()
 	{
-		Logger.Debug("Window.BringToTop: {Title}", Title);
-		PInvoke.BringWindowToTop(_handle);
+		Logger.Debug("Window.BringToTop: {Pointer}, {Title}", _pointer, Title);
+		PInvoke.BringWindowToTop(_pointer.Handle);
 	}
 
 	public void Close()
 	{
-		Logger.Debug("Window.Close: {Title}", Title);
-		Win32Helper.QuitApplication(_handle);
+		Logger.Debug("Window.Close: {Pointer}, {Title}", _pointer, Title);
+		Win32Helper.QuitApplication(_pointer.Handle);
 		WindowUnregistered?.Invoke(this);
 	}
 
 	public void Focus()
 	{
-		Logger.Debug("Window.Focusing: {Title}", Title);
+		Logger.Debug("Window.Focusing: {Pointer}, {Title}", _pointer, Title);
 		if (IsFocused)
 		{
-			Logger.Debug("Window.Already focused: {Title}", Title);
+			Logger.Debug("Window.Already focused: {Pointer}, {Title}", _pointer, Title);
 		}
 
-		PInvoke.SetForegroundWindow(_handle);
+		PInvoke.SetForegroundWindow(_pointer.Handle);
 		WindowFocused?.Invoke(this);
 	}
 
 	public void Hide()
 	{
-		Logger.Debug("Window.Hide: {Title}", Title);
-		Win32Helper.HideWindow(_handle);
+		Logger.Debug("Window.Hide: {Pointer}, {Title}", _pointer, Title);
+		Win32Helper.HideWindow(_pointer.Handle);
 		WindowUpdated?.Invoke(this, WindowUpdateType.Hide);
 	}
 
 	public void ShowInCurrentState()
 	{
-		Logger.Debug("Window.ShowInCurrentState: {Title}", Title);
+		Logger.Debug("Window.ShowInCurrentState: {Pointer}, {Title}", _pointer, Title);
 		if (IsMinimized)
 		{
 			ShowMinimized();
@@ -125,32 +125,32 @@ public class Window : IWindow
 
 	public void ShowMaximized()
 	{
-		Logger.Debug("Window.ShowMaximized: {Title}", Title);
-		Win32Helper.ShowMaximizedWindow(_handle);
+		Logger.Debug("Window.ShowMaximized: {Pointer}, {Title}", _pointer, Title);
+		Win32Helper.ShowMaximizedWindow(_pointer.Handle);
 	}
 
 	public void ShowMinimized()
 	{
-		Logger.Debug("Window.ShowMinimized: {Title}", Title);
-		Win32Helper.ShowMinimizedWindow(_handle);
+		Logger.Debug("Window.ShowMinimized: {Pointer}, {Title}", _pointer, Title);
+		Win32Helper.ShowMinimizedWindow(_pointer.Handle);
 	}
 
 	public void ShowNormal()
 	{
-		Logger.Debug("Window.ShowNormal: {Title}", Title);
-		Win32Helper.ShowNormalWindow(_handle);
+		Logger.Debug("Window.ShowNormal: {Pointer}, {Title}", _pointer, Title);
+		Win32Helper.ShowNormalWindow(_pointer.Handle);
 	}
 
-	private Window(HWND handle, IWindowManager windowManager)
+	private Window(Pointer pointer, IWindowManager windowManager)
 	{
-		Logger.Debug("Window.ctor: {Title}", Title);
-		_handle = handle;
+		Logger.Debug("Window.ctor: {Pointer}", pointer);
 		WindowManager = windowManager;
+		_pointer = pointer;
 
 		unsafe
 		{
 			uint pid;
-			_ = PInvoke.GetWindowThreadProcessId(_handle, &pid);
+			_ = PInvoke.GetWindowThreadProcessId(_pointer.Handle, &pid);
 			ProcessId = (int)pid;
 		}
 
@@ -172,13 +172,13 @@ public class Window : IWindow
 	}
 
 	// This is scoped to internal until https://github.com/microsoft/CsWin32/issues/213 is resolved
-	internal static Window? RegisterWindow(HWND handle, IWindowManager windowManager)
+	internal static Window? RegisterWindow(Pointer pointer, IWindowManager windowManager)
 	{
-		Logger.Debug("Window.RegisterWindow: {handle}", handle);
+		Logger.Debug("Window.RegisterWindow: {Pointer}", pointer);
 
 		try
 		{
-			return new Window(handle, windowManager);
+			return new Window(pointer, windowManager);
 		}
 		catch (Exception e)
 		{
@@ -189,15 +189,15 @@ public class Window : IWindow
 
 	internal void UnregisterWindow()
 	{
-		Logger.Debug("Window.UnregisterWindow: {Title}", Title);
+		Logger.Debug("Window.UnregisterWindow: {Pointer}, {Title}", _pointer, Title);
 		WindowUnregistered?.Invoke(this);
 	}
 
 	// NOTE: when writing docs, make a note that register and unregister are handled
 	// separately here.
-	public void HandleEvent(uint eventType)
+	void IWindow.HandleEvent(uint eventType)
 	{
-		Logger.Debug("Window.HandleEvent: {Title}", Title);
+		Logger.Debug("Window.HandleEvent: {Pointer}, {Title}", _pointer, Title);
 		switch (eventType)
 		{
 			// For cloaking, see https://devblogs.microsoft.com/oldnewthing/20200302-00/?p=103507
@@ -238,18 +238,15 @@ public class Window : IWindow
 	private void WindowMove()
 	{
 		// TODO: mouse handlers
-		throw new NotImplementedException();
 	}
 
 	private void EndWindowMove()
 	{
 		// TODO: mouse handlers
-		throw new NotImplementedException();
 	}
 
 	private void StartWindowMove()
 	{
 		// TODO: mouse handlers
-		throw new NotImplementedException();
 	}
 }

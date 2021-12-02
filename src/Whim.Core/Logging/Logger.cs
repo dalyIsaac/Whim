@@ -32,11 +32,11 @@ public class Logger
 		string loggerFilePath = Path.Combine(FileHelper.GetUserWhimPath(), fileSink.FileName);
 
 		_loggerConfiguration = new LoggerConfiguration()
-		.MinimumLevel.ControlledBy(config.BaseMinLogLevelSwitch)
-		.WriteTo.File(
-			loggerFilePath,
-			levelSwitch: fileSink.MinLogLevelSwitch
-		);
+			.MinimumLevel.ControlledBy(config.BaseMinLogLevelSwitch)
+			.WriteTo.File(
+				loggerFilePath,
+				levelSwitch: fileSink.MinLogLevelSwitch
+			);
 
 		if (debugSink != null)
 		{

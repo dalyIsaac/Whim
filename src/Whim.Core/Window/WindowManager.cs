@@ -138,12 +138,13 @@ public class WindowManager : IWindowManager
 			"WindowsEventHook: {hwnd}, {eventType}, {idObject}, {idChild}, {idEventThread}, {dwmsEventTime}",
 			hwnd, eventType, idObject, idChild, idEventThread, dwmsEventTime
 		);
+
 		if (!EventWindowIsValid(idChild, idObject, hwnd)) { return; }
 
 		// Get the window from the dictionary. If it doesn't exist, create it.
 		if (!_windows.TryGetValue(hwnd, out IWindow? window))
 		{
-			Logger.Debug("Window {hwnd} is not registered and is being created", hwnd);
+			Logger.Debug("Window {hwnd} is not registered and is being instantiated", hwnd);
 			window = RegisterWindow(hwnd);
 		}
 
@@ -161,7 +162,7 @@ public class WindowManager : IWindowManager
 			return;
 		}
 
-		window.HandleEvent(eventType);
+		// window.HandleEvent(eventType);
 	}
 
 	/// <summary>
@@ -172,8 +173,10 @@ public class WindowManager : IWindowManager
 	/// <returns></returns>
 	private IWindow? RegisterWindow(HWND hwnd)
 	{
-		Logger.Debug("WindowManager.RegisterWindow: {hwnd}", hwnd);
-		Window? window = Window.RegisterWindow(hwnd, this);
+		Pointer pointer = new(hwnd);
+		Logger.Debug("WindowManager.RegisterWindow: {Pointer}", pointer);
+
+		Window? window = Window.RegisterWindow(pointer, this);
 
 		if (window == null) { return null; }
 
@@ -196,7 +199,7 @@ public class WindowManager : IWindowManager
 	/// <param name="hwnd"></param>
 	private void TryUnregisterWindow(HWND hwnd)
 	{
-		Logger.Debug("WindowManager.TryUnregisterWindow: {hwnd}", hwnd);
+		Logger.Debug("WindowManager.TryUnregisterWindow: {hwnd}", hwnd.Value);
 
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
