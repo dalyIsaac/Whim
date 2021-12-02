@@ -29,17 +29,18 @@ public class Logger
 		FileSinkConfig fileSink = config.FileSink;
 		SinkConfig? debugSink = config.DebugSink;
 
-		string loggerFilePath = Path.Combine(FileHelper.GetUserWhimPath(),
-									   config.FileSink.FileName);
+		string loggerFilePath = Path.Combine(FileHelper.GetUserWhimPath(), fileSink.FileName);
 
-		_loggerConfiguration = new LoggerConfiguration().WriteTo.File(
+		_loggerConfiguration = new LoggerConfiguration()
+		.MinimumLevel.ControlledBy(config.BaseMinLogLevelSwitch)
+		.WriteTo.File(
 			loggerFilePath,
-			restrictedToMinimumLevel: fileSink.GetLogLevel()
+			levelSwitch: fileSink.MinLogLevelSwitch
 		);
 
 		if (debugSink != null)
 		{
-			_loggerConfiguration = _loggerConfiguration.WriteTo.Debug(restrictedToMinimumLevel: debugSink.GetLogLevel());
+			_loggerConfiguration.WriteTo.Debug(levelSwitch: debugSink.MinLogLevelSwitch);
 		}
 
 		_logger = _loggerConfiguration.CreateLogger();

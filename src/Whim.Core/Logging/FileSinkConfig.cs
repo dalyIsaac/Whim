@@ -25,7 +25,7 @@ public class FileSinkConfig : SinkConfig
 	/// </param>
 	public FileSinkConfig(
 		string fileName,
-		SinkLogLevel logLevel,
+		LogLevel logLevel,
 		FileSinkConfigRollingInterval rollingInterval = FileSinkConfigRollingInterval.Day
 	) : base(logLevel)
 	{
