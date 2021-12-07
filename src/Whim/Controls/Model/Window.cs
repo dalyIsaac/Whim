@@ -4,7 +4,6 @@ using Whim.Core.Window;
 
 namespace Whim.Controls.Model;
 
-internal delegate void WindowUnregisteredDelegate(Window window);
 
 /// <summary>
 /// Window model used by <see cref="ViewModel.RegisteredWindowsViewModel"/> and <see cref="RegisteredWindows"/>.
@@ -47,9 +46,9 @@ internal class Window : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	internal void OnWindowFocused(IWindow window) => RegisterEvent(window, "Focused");
+	internal void OnWindowFocused(object sender, Core.Window.WindowEventArgs args) => RegisterEvent(args.Window, "Focused");
 
-	internal void OnWindowUpdated(IWindow window, WindowUpdateType updateType) => RegisterEvent(window, updateType.ToString());
+	internal void OnWindowUpdated(object sender, WindowUpdateEventArgs args) => RegisterEvent(args.Window, args.UpdateType.ToString());
 
 	/// <summary>
 	/// Handles the <see cref="Whim.Core.Window.WindowUnregisterDelegate"/> event. This calls
@@ -57,12 +56,13 @@ internal class Window : INotifyPropertyChanged
 	/// <see cref="WindowUnregistered"/> event.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void OnWindowUnregistered(IWindow window) {
-		RegisterEvent(window, "Unregistered");
-		window.WindowUpdated -= OnWindowUpdated;
-		window.WindowFocused -= OnWindowFocused;
-		window.WindowUnregistered -= OnWindowUnregistered;
-		WindowUnregistered?.Invoke(this);
+	internal void OnWindowUnregistered(object sender, Core.Window.WindowEventArgs args)
+	{
+		RegisterEvent(args.Window, "Unregistered");
+		args.Window.WindowUpdated -= OnWindowUpdated;
+		args.Window.WindowFocused -= OnWindowFocused;
+		args.Window.WindowUnregistered -= OnWindowUnregistered;
+		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
 	}
 
 	/// <summary>

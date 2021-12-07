@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using CommanderValues = System.Collections.Generic.KeyValuePair<Whim.Core.Command.CommandType, Whim.Core.Command.CommandHandler>;
 
 namespace Whim.Core.Command;
-public delegate void CommandHandler(ICommand command);
 
 /// <summary>
 /// Commander contains the commands and associated handlers for a given class instance, and the
@@ -64,7 +63,7 @@ public class Commander : IEnumerable<CommanderValues>
 		Logger.Debug("Executing command {CommandType}", command.CommandType);
 		if (_ownerCommand.TryGetValue(command.CommandType, out CommandHandler? commandHandler))
 		{
-			commandHandler(command);
+			commandHandler(this, new CommandEventArgs(command));
 		}
 
 		// Check PreventCascade

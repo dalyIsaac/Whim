@@ -188,7 +188,7 @@ public class WindowManager : IWindowManager
 		}
 
 		Logger.Debug("WindowManager.RegisterWindow: {hwnd} registered", hwnd.Value);
-		WindowRegistered?.Invoke(window);
+		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
 		return window;
 	}
 

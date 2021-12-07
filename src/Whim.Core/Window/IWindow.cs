@@ -1,31 +1,6 @@
 namespace Whim.Core.Window;
 
 /// <summary>
-/// Delegate for the <see cref="IWindowManager.WindowRegistered"/> event.
-/// </summary>
-/// <param name="window">The newly added <see cref="IWindow"/>.</param>
-public delegate void WindowRegisterDelegate(IWindow window);
-
-/// <summary>
-/// Delegate for the <see cref="IWindow.WindowFocused"/> event.
-/// </summary>
-/// <param name="window">The focused <see cref="IWindow"/>.</param>
-public delegate void WindowFocusDelegate(IWindow window);
-
-/// <summary>
-/// Delegate for the <see cref="IWindow.WindowUpdated"/> event.
-/// </summary>
-/// <param name="window">The updated <see cref="IWindow"/>.</param>
-/// <param name="updateType">A description of the update type.</param>
-public delegate void WindowUpdateDelegate(IWindow window, WindowUpdateType updateType);
-
-/// <summary>
-/// Delegate for the see <see cref="IWindow.WindowUnregistered"/> event.
-/// </summary>
-/// <param name="window">The <see cref="IWindow"/> being unregistered.</param>
-public delegate void WindowUnregisterDelegate(IWindow window);
-
-/// <summary>
 /// Represents a single window.
 /// </summary>
 public interface IWindow
@@ -33,7 +8,7 @@ public interface IWindow
 	/// <summary>
 	/// The handle of the window.
 	/// </summary>
-	public int Handle { get;}
+	public int Handle { get; }
 
 	/// <summary>
 	/// The title of the window.

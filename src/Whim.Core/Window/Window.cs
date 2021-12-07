@@ -86,7 +86,7 @@ public class Window : IWindow
 	{
 		Logger.Debug("Window.Close: {Pointer}, {Title}", _pointer, Title);
 		Win32Helper.QuitApplication(_pointer.Handle);
-		WindowUnregistered?.Invoke(this);
+		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
 	}
 
 	public void Focus()
@@ -98,14 +98,14 @@ public class Window : IWindow
 		}
 
 		PInvoke.SetForegroundWindow(_pointer.Handle);
-		WindowFocused?.Invoke(this);
+		WindowFocused?.Invoke(this, new WindowEventArgs(this));
 	}
 
 	public void Hide()
 	{
 		Logger.Debug("Window.Hide: {Pointer}, {Title}", _pointer, Title);
 		Win32Helper.HideWindow(_pointer.Handle);
-		WindowUpdated?.Invoke(this, WindowUpdateType.Hide);
+		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(this, WindowUpdateType.Hide));
 	}
 
 	public void ShowInCurrentState()
@@ -202,7 +202,7 @@ public class Window : IWindow
 	internal void UnregisterWindow()
 	{
 		Logger.Debug("Window.UnregisterWindow: {Pointer}, {Title}", _pointer, Title);
-		WindowUnregistered?.Invoke(this);
+		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
 	}
 
 	// NOTE: when writing docs, make a note that register and unregister are handled
@@ -243,7 +243,7 @@ public class Window : IWindow
 	private void UpdateWindow(WindowUpdateType type)
 	{
 		Logger.Debug("Window.UpdateWindow: {Title}, {type}", Title, type);
-		WindowUpdated?.Invoke(this, type);
+		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(this, type));
 	}
 
 
