@@ -9,7 +9,7 @@ namespace Whim.Core.Window;
 /// <param name="args">
 /// The <see cref="WindowEventArgs"/> containing the newly added <see cref="IWindow"/>.
 /// </param>
-public delegate void WindowRegisterDelegate(object sender, WindowEventArgs args);
+public delegate void WindowRegisterEventHandler(object sender, WindowEventArgs args);
 
 /// <summary>
 /// Delegate for the <see cref="IWindow.WindowFocused"/> event.
@@ -18,7 +18,7 @@ public delegate void WindowRegisterDelegate(object sender, WindowEventArgs args)
 /// <param name="args">
 /// The <see cref="WindowEventArgs"/> containing the focused <see cref="IWindow"/>.
 /// </param>
-public delegate void WindowFocusDelegate(object sender, WindowEventArgs args);
+public delegate void WindowFocusEventHandler(object sender, WindowEventArgs args);
 
 /// <summary>
 /// Delegate for the <see cref="IWindow.WindowUpdated"/> event.
@@ -28,7 +28,7 @@ public delegate void WindowFocusDelegate(object sender, WindowEventArgs args);
 /// The <see cref="WindowEventArgs"/> containing the updated <see cref="IWindow"/>, and the
 /// description of the update type.
 /// </param>
-public delegate void WindowUpdateDelegate(object sender, WindowUpdateEventArgs args);
+public delegate void WindowUpdateEventHandler(object sender, WindowUpdateEventArgs args);
 
 /// <summary>
 /// Delegate for the see <see cref="IWindow.WindowUnregistered"/> event.
@@ -37,7 +37,7 @@ public delegate void WindowUpdateDelegate(object sender, WindowUpdateEventArgs a
 /// <param name="args">
 /// The <see cref="WindowEventArgs"/> containing the <see cref="IWindow"/> being unregistered.
 /// </param>
-public delegate void WindowUnregisterDelegate(object sender, WindowEventArgs args);
+public delegate void WindowUnregisterEventHandler(object sender, WindowEventArgs args);
 
 public class WindowEventArgs : EventArgs
 {

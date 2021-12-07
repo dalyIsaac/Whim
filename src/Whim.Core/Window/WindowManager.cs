@@ -10,7 +10,7 @@ public class WindowManager : IWindowManager
 {
 	public Commander Commander { get; } = new();
 
-	public event WindowRegisterDelegate? WindowRegistered;
+	public event WindowRegisterEventHandler? WindowRegistered;
 
 	/// <summary>
 	/// Map of <see cref="HWND"/> to <see cref="IWindow"/> for easy <see cref="IWindow"/> lookup.

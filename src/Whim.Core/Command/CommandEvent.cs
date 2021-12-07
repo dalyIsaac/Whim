@@ -2,7 +2,7 @@ using System;
 
 namespace Whim.Core.Command;
 
-public delegate void CommandHandler(object sender, CommandEventArgs args);
+public delegate void CommandHandlerDelegate(object sender, CommandEventArgs args);
 
 public class CommandEventArgs : EventArgs
 {

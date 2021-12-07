@@ -22,7 +22,7 @@ internal class Window : INotifyPropertyChanged
 	public string LastEventTime { get; private set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;
-	public event WindowUnregisteredDelegate? WindowUnregistered;
+	public event EventHandler<WindowEventArgs>? WindowUnregistered;
 
 	internal Window(IWindow window)
 	{
@@ -51,7 +51,7 @@ internal class Window : INotifyPropertyChanged
 	internal void OnWindowUpdated(object sender, WindowUpdateEventArgs args) => RegisterEvent(args.Window, args.UpdateType.ToString());
 
 	/// <summary>
-	/// Handles the <see cref="Whim.Core.Window.WindowUnregisterDelegate"/> event. This calls
+	/// Handles the <see cref="Whim.Core.Window.WindowUnregisterEventHandler"/> event. This calls
 	/// <see cref="RegisterEvent(IWindow, string)"/> to register the event, and triggers its own
 	/// <see cref="WindowUnregistered"/> event.
 	/// </summary>

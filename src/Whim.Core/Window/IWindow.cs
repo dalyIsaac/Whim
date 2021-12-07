@@ -68,17 +68,17 @@ public interface IWindow
 	/// <summary>
 	/// Event for when this window is updated.
 	/// </summary>
-	public event WindowUpdateDelegate WindowUpdated;
+	public event WindowUpdateEventHandler WindowUpdated;
 
 	/// <summary>
 	/// Event for when this window is focused.
 	/// </summary>
-	public event WindowFocusDelegate WindowFocused;
+	public event WindowFocusEventHandler WindowFocused;
 
 	/// <summary>
 	/// Event for when this window is unregistered.
 	/// </summary>
-	public event WindowUnregisterDelegate WindowUnregistered;
+	public event WindowUnregisterEventHandler WindowUnregistered;
 
 	/// <summary>
 	/// Moves the focus to this window.

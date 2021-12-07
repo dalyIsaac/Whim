@@ -72,9 +72,9 @@ public class Window : IWindow
 
 	public IWindowManager WindowManager { get; }
 
-	public event WindowUpdateDelegate? WindowUpdated;
-	public event WindowFocusDelegate? WindowFocused;
-	public event WindowUnregisterDelegate? WindowUnregistered;
+	public event WindowUpdateEventHandler? WindowUpdated;
+	public event WindowFocusEventHandler? WindowFocused;
+	public event WindowUnregisterEventHandler? WindowUnregistered;
 
 	public void BringToTop()
 	{

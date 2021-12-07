@@ -35,7 +35,7 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
 	}
 
-	private void OnWindowUnregistered(object sender, WindowEventArgs args)
+	private void OnWindowUnregistered(object? sender, WindowEventArgs args)
 	{
 		Windows.Remove(args.Window);
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.

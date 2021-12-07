@@ -19,5 +19,5 @@ public interface IWindowManager : ICommandable, IDisposable
 	/// <summary>
 	/// Event for when a window is registered.
 	/// </summary>
-	public event WindowRegisterDelegate WindowRegistered;
+	public event WindowRegisterEventHandler WindowRegistered;
 }
