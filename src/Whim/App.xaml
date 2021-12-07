@@ -4,7 +4,10 @@
              xmlns:local="clr-namespace:Whim"
              Startup="Application_Startup"
              Exit="Application_Exit">
-    <Application.Resources>
+	<Application.Resources>
+		<Style TargetType="{x:Type Window}">
+			<Setter Property="FontFamily" Value="Segoe UI Variable" />
+		</Style>
 
-    </Application.Resources>
+	</Application.Resources>
 </Application>

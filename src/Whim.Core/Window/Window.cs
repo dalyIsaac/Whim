@@ -143,6 +143,12 @@ public class Window : IWindow
 		Win32Helper.ShowNormalWindow(_pointer.Handle);
 	}
 
+	/// <summary>
+	/// Constructor for the <see cref="IWindow"/> implementation.
+	/// </summary>
+	/// <param name="pointer"></param>
+	/// <param name="windowManager"></param>
+	/// <exception cref="Win32Exception"></exception>
 	private Window(Pointer pointer, IWindowManager windowManager)
 	{
 		Logger.Debug("Window.ctor: {Pointer}", pointer);
@@ -163,15 +169,17 @@ public class Window : IWindow
 		{
 			ProcessFileName = Path.GetFileName(process.MainModule?.FileName) ?? "--NA--";
 		}
-		catch (Win32Exception)
+		catch (Win32Exception ex)
 		{
-			// Win32Exception is thrown when it's not possible to get
-			// information about the process. See
+			// Win32Exception is thrown when it's not possible to get information about the process.
 			// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process?view=net-6.0#remarks
 			// The exception will usually have a message of:
 			// "Unable to enumerate the process modules."
 			ProcessFileName = "--NA--";
-			Logger.Debug("Failed to get process filename");
+			Logger.Debug("Failed to get process filename for process {ProcessId}", ProcessId);
+
+			// We throw the exception here to implicitly ignore this process.
+			throw ex;
 		};
 	}
 

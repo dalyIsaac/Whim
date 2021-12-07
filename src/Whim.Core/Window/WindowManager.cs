@@ -144,7 +144,7 @@ public class WindowManager : IWindowManager
 		// Get the window from the dictionary. If it doesn't exist, create it.
 		if (!_windows.TryGetValue(hwnd, out IWindow? window))
 		{
-			Logger.Debug("Window {hwnd} is not registered and is being instantiated", hwnd);
+			Logger.Debug("Window {hwnd} is not registered and is being instantiated", hwnd.Value);
 			window = RegisterWindow(hwnd);
 		}
 
@@ -183,11 +183,11 @@ public class WindowManager : IWindowManager
 		// Try add the window to the dictionary.
 		if (!_windows.TryAdd(hwnd, window))
 		{
-			Logger.Debug("WindowManager.RegisterWindow: {hwnd} failed to register", hwnd);
+			Logger.Debug("WindowManager.RegisterWindow: {hwnd} failed to register", hwnd.Value);
 			return null;
 		}
 
-		Logger.Debug("WindowManager.RegisterWindow: {hwnd} registered", hwnd);
+		Logger.Debug("WindowManager.RegisterWindow: {hwnd} registered", hwnd.Value);
 		WindowRegistered?.Invoke(window);
 		return window;
 	}
@@ -203,7 +203,7 @@ public class WindowManager : IWindowManager
 
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			Logger.Error("Window {hwnd} is not registered", hwnd);
+			Logger.Error("Window {hwnd} is not registered", hwnd.Value);
 			return;
 		}
 

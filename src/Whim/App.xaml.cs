@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Whim.Core.ConfigContext;
 using Whim.Core.Logging;
 
 namespace Whim;
@@ -13,14 +14,14 @@ namespace Whim;
 /// </summary>
 public partial class App : Application
 {
-	private readonly WhimManager _whim;
+	private readonly WhimManager _whimManager;
 	private readonly MainWindow _mainWindow;
 
 	internal App(WhimManager whim) : base()
 	{
 		Logger.Debug("App.ctor()");
-		_whim = whim;
-		_mainWindow = new MainWindow(whim);
+		_whimManager = whim;
+		_mainWindow = new MainWindow(_whimManager.ConfigContext);
 	}
 
 	private void Application_Startup(object sender, StartupEventArgs e)
@@ -32,7 +33,7 @@ public partial class App : Application
 	private void Application_Exit(object sender, ExitEventArgs e)
 	{
 		Logger.Information("Application exiting");
-		_whim.Dispose();
+		_whimManager.Dispose();
 		Logger.Information("Application disposed");
 	}
 }

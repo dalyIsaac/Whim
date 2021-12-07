@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="Whim.Controls.RegisteredWindows" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:vm="clr-namespace:Whim.Controls.ViewModel" d:DataContext="{d:DesignInstance Type=vm:RegisteredWindowsViewModel}" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+
+		<!--Number of registered windows-->
+		<TextBlock Text="{Binding Path=Count, StringFormat='Registered Windows: {0}'}" />
+
+		<!--List of registered windows-->
+		<ListView Name="RegisteredWindowsListView" ItemsSource="{Binding Path=Windows}" Grid.Row="1">
+			<ListView.Resources>
+				<Style TargetType="{x:Type GridViewColumnHeader}">
+					<Setter Property="HorizontalContentAlignment" Value="Left" />
+				</Style>
+			</ListView.Resources>
+
+			<ListView.View>
+				<GridView>
+					<!-- Header -->
+					<GridViewColumn Width="80" DisplayMemberBinding="{Binding Path=Handle, StringFormat='0x{0:X}'}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="Handle" Click="GridViewColumnHeader_Click">
+								Handle
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
+					<!-- Title -->
+					<GridViewColumn Width="200" DisplayMemberBinding="{Binding Path=Title}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="Title" Click="GridViewColumnHeader_Click">
+								Title
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
+					<!-- Process Id -->
+					<GridViewColumn Width="80" DisplayMemberBinding="{Binding Path=ProcessId}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="ProcessId" Click="GridViewColumnHeader_Click">
+								Process Id
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
+					<!-- Process File Name -->
+					<GridViewColumn Width="200" DisplayMemberBinding="{Binding Path=ProcessFileName}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="ProcessFileName" Click="GridViewColumnHeader_Click">
+								Process File Name
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
+					<!-- Process Name -->
+					<GridViewColumn Width="200" DisplayMemberBinding="{Binding Path=ProcessName}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="ProcessName" Click="GridViewColumnHeader_Click">
+								Process Name
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
+					<!-- Time Registered -->
+					<GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=TimeRegistered}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="Time Registered" Click="GridViewColumnHeader_Click">
+								TimeRegistered
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
+					<!-- Last Event -->
+					<GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=LastEvent}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="Last Event" Click="GridViewColumnHeader_Click">
+								LastEvent
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
+					<!-- Last Event Time -->
+					<GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=LastEventTime}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="LastEventTime" Click="GridViewColumnHeader_Click">
+								Last Event Time
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+				</GridView>
+			</ListView.View>
+		</ListView>
+	</Grid>
+</UserControl>

@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Whim.Controls;
+using Whim.Core.ConfigContext;
 
 namespace Whim;
 /// <summary>
@@ -19,11 +21,15 @@ namespace Whim;
 /// </summary>
 public partial class MainWindow : Window
 {
-	private readonly WhimManager _whim;
+	private readonly IConfigContext _configContext;
 
-	public MainWindow(WhimManager whim)
+	public MainWindow(IConfigContext configContext)
 	{
-		_whim = whim;
+		_configContext = configContext;
+
 		InitializeComponent();
+
+		RegisteredWindows windows = new(configContext);
+		Grid.Children.Add(windows);
 	}
 }
