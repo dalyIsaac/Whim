@@ -31,6 +31,11 @@ public delegate void WindowUnregisterDelegate(IWindow window);
 public interface IWindow
 {
 	/// <summary>
+	/// The handle of the window.
+	/// </summary>
+	public int Handle { get;}
+
+	/// <summary>
 	/// The title of the window.
 	/// </summary>
 	public string Title { get; }
