@@ -1,3 +1,5 @@
+using System;
+
 namespace Whim.Core.ConfigContext;
 
 /// <summary>
@@ -9,7 +11,7 @@ namespace Whim.Core.ConfigContext;
 /// <c>IConfigContext</c> also contains other associated state and functionality, like the
 /// <see cref="Logger"/>
 /// </summary>
-public interface IConfigContext
+public interface IConfigContext : IDisposable
 {
 	public Logger Logger { get; }
 	public IWorkspaceManager WorkspaceManager { get; }

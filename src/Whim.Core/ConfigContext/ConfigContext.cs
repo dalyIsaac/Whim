@@ -11,6 +11,8 @@ namespace Whim.Core.ConfigContext;
 /// </summary>
 public class ConfigContext : IConfigContext
 {
+	private bool disposedValue;
+
 	public Logger Logger { get; }
 	public IWorkspaceManager WorkspaceManager { get; }
 	public IWindowManager WindowManager { get; }
@@ -22,5 +24,28 @@ public class ConfigContext : IConfigContext
 		WorkspaceManager = new WorkspaceManager();
 		WindowManager = new WindowManager();
 		MonitorManager = new MonitorManager();
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				WindowManager.Dispose();
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		System.GC.SuppressFinalize(this);
 	}
 }
