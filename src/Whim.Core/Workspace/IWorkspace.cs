@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim.Core.Workspace;
@@ -8,7 +9,13 @@ namespace Whim.Core.Workspace;
 public interface IWorkspace : IEnumerable<IWindow>, ICommandable
 {
 	/// <summary>
-	/// The name of the workspace.
+	/// Triggered when the workspace is renamed.
+	/// </summary>
+	public event EventHandler<WorkspaceRenameEventArgs> WorkspaceRenamed;
+
+	/// <summary>
+	/// The name of the workspace. When the <c>Name</c> is set, the
+	/// <see cref="WorkspaceRenamed"/> event is triggered.
 	/// </summary>
 	public string Name { get; set; }
 
