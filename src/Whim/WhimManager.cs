@@ -3,20 +3,24 @@ using Whim.Core.ConfigContext;
 
 namespace Whim;
 
+/// <summary>
+/// <c>WhimManager</c> contains the <see cref="IConfigContext"/> and application logic (like how to
+/// start up, etc.), which are not provided to the context.
+/// </summary>
 public class WhimManager : IDisposable
 {
 	private bool _disposedValue;
-	private readonly IConfigContext _configContext;
+	public IConfigContext ConfigContext { get; }
 
 	public WhimManager(IConfigContext configContext)
 	{
-		_configContext = configContext;
+		ConfigContext = configContext;
 	}
 
 	public bool Initialize()
 	{
 		// Initialize the window manager
-		if (!_configContext.WindowManager.Initialize())
+		if (!ConfigContext.WindowManager.Initialize())
 		{
 			return false;
 		}
@@ -31,7 +35,7 @@ public class WhimManager : IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_configContext.WindowManager.Dispose();
+				ConfigContext.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
