@@ -29,6 +29,7 @@
 		<Using Include="Whim.Core.Logging" />
 		<Using Include="Whim.Core.Monitor" />
 		<Using Include="Whim.Core.Native" />
+		<Using Include="Whim.Core.Router" />
 		<Using Include="Whim.Core.Window" />
 		<Using Include="Whim.Core.Workspace" />
 	</ItemGroup>

@@ -17,6 +17,7 @@ public class ConfigContext : IConfigContext
 	public IWorkspaceManager WorkspaceManager { get; }
 	public IWindowManager WindowManager { get; }
 	public IMonitorManager MonitorManager { get; }
+	public IRouterManager RouterManager { get; }
 
 	public ConfigContext()
 	{
@@ -24,6 +25,7 @@ public class ConfigContext : IConfigContext
 		WorkspaceManager = new WorkspaceManager();
 		WindowManager = new WindowManager();
 		MonitorManager = new MonitorManager();
+		RouterManager = new RouterManager(WorkspaceManager);
 	}
 
 	protected virtual void Dispose(bool disposing)
