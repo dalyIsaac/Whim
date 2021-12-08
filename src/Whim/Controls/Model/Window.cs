@@ -14,9 +14,9 @@ internal class Window : INotifyPropertyChanged
 
 	public int Handle { get; }
 	public string Title { get; private set; }
-	public int ProcessId { get; private set; }
-	public string ProcessFileName { get; private set; }
-	public string ProcessName { get; private set; }
+	public int ProcessId { get; }
+	public string ProcessFileName { get; }
+	public string ProcessName { get; }
 	public string TimeRegistered { get; }
 	public string LastEvent { get; private set; }
 	public string LastEventTime { get; private set; }
@@ -79,8 +79,8 @@ internal class Window : INotifyPropertyChanged
 		LastEvent = updateType;
 		Title = window.Title;
 
-		// two thirds of the properties have changed, so might as well say they're all changed 🤷
-		OnPropertyChanged(null);
+		OnPropertyChanged(nameof(LastEventTime));
+		OnPropertyChanged(nameof(LastEvent));
+		OnPropertyChanged(nameof(Title));
 	}
-
 }
