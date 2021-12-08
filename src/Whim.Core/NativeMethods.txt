@@ -34,3 +34,6 @@ GetWindowThreadProcessId
 GetWindowText
 GetClassName
 GetWindowRect
+
+SetWindowsHookEx
+VIRTUAL_KEY

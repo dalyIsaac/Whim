@@ -183,7 +183,6 @@ public class Window : IWindow
 		};
 	}
 
-	// This is scoped to internal until https://github.com/microsoft/CsWin32/issues/213 is resolved
 	internal static Window? RegisterWindow(Pointer pointer, IWindowManager windowManager)
 	{
 		Logger.Debug("Window.RegisterWindow: {Pointer}", pointer);
