@@ -22,20 +22,20 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// Tries to remove the given workspace.
 	/// </summary>
 	/// <param name="workspace">The workspace to remove.</param>
-	public bool TryRemoveWorkspace(IWorkspace workspace);
+	public bool Remove(IWorkspace workspace);
 
 	/// <summary>
 	/// Try remove a workspace, by the workspace name.
 	/// </summary>
 	/// <param name="workspaceName">The workspace name to try and remove.</param>
 	/// <returns><c>true</c> when the workspace has been removed.</returns>
-	public bool TryRemoveWorkspace(string workspaceName);
+	public bool Remove(string workspaceName);
 
 	/// <summary>
 	/// Tries to get a workspace by the given name.
 	/// </summary>
 	/// <param name="workspaceName">The workspace name to try and get.</param>
-	public IWorkspace? TryGetWorkspace(string workspaceName);
+	public IWorkspace? TryGet(string workspaceName);
 
 	/// <summary>
 	/// Tries to get a workspace by the given name.

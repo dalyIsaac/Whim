@@ -20,7 +20,7 @@ public class WorkspaceManager : IWorkspaceManager
 	/// </summary>
 	public IWorkspace? ActiveWorkspace { get; private set; }
 
-	public IWorkspace? this[string workspaceName] => TryGetWorkspace(workspaceName);
+	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
 	public void Add(IWorkspace workspace)
 	{
@@ -30,19 +30,19 @@ public class WorkspaceManager : IWorkspaceManager
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	public bool TryRemoveWorkspace(IWorkspace workspace) {
+	public bool Remove(IWorkspace workspace) {
 		Logger.Debug("Removing workspace {0}", workspace.Name);
 		return _workspaces.Remove(workspace);
 	}
 
-	public bool TryRemoveWorkspace(string workspaceName)
+	public bool Remove(string workspaceName)
 	{
 		Logger.Debug("Removing workspace {0}", workspaceName);
 		IWorkspace? workspace = _workspaces.Find(w => w.Name == workspaceName);
 		return workspace != null && _workspaces.Remove(workspace);
 	}
 
-	public IWorkspace? TryGetWorkspace(string workspaceName)
+	public IWorkspace? TryGet(string workspaceName)
 	{
 		Logger.Debug("Trying to get workspace {0}", workspaceName);
 		return _workspaces.Find(w => w.Name == workspaceName);

@@ -96,7 +96,7 @@ public class RouterManager : IRouterManager
 		{
 			if (window.ProcessName.ToLower() == processName)
 			{
-				return _workspaceManager.TryGetWorkspace(workspaceName);
+				return _workspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -124,7 +124,7 @@ public class RouterManager : IRouterManager
 		{
 			if (window.Title.ToLower() == title)
 			{
-				return _workspaceManager.TryGetWorkspace(workspaceName);
+				return _workspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -152,7 +152,7 @@ public class RouterManager : IRouterManager
 		{
 			if (regex.IsMatch(window.Title))
 			{
-				return _workspaceManager.TryGetWorkspace(workspaceName);
+				return _workspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -205,7 +205,7 @@ public class RouterManager : IRouterManager
 		{
 			if (window.Class.ToLower() == windowClass)
 			{
-				return _workspaceManager.TryGetWorkspace(workspaceName);
+				return _workspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
