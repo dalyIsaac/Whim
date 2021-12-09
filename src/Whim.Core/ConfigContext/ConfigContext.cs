@@ -18,6 +18,7 @@ public class ConfigContext : IConfigContext
 	public IWindowManager WindowManager { get; }
 	public IMonitorManager MonitorManager { get; }
 	public IRouterManager RouterManager { get; }
+	public IKeybindManager KeybindManager { get; }
 
 	public ConfigContext()
 	{
@@ -26,6 +27,7 @@ public class ConfigContext : IConfigContext
 		WindowManager = new WindowManager();
 		MonitorManager = new MonitorManager();
 		RouterManager = new RouterManager(WorkspaceManager);
+		KeybindManager = new KeybindManager();
 	}
 
 	protected virtual void Dispose(bool disposing)
