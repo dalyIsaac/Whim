@@ -1,3 +1,4 @@
+using System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.Core.Binds;
@@ -27,7 +28,7 @@ public class Keybind : IKeybind
 			   Key == keybind.Key;
 	}
 
-	public override int GetHashCode() => System.HashCode.Combine(Modifiers, Key);
+	public override int GetHashCode() => HashCode.Combine(Modifiers, Key);
 
 	public override string ToString() => $"{Modifiers} + {Key}";
 }

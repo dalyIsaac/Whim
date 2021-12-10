@@ -36,4 +36,9 @@ GetClassName
 GetWindowRect
 
 SetWindowsHookEx
+CallNextHookEx
+GetKeyState
 VIRTUAL_KEY
+WM_KEYDOWN
+WM_SYSKEYDOWN
+KBDLLHOOKSTRUCT

@@ -193,7 +193,7 @@ public class Window : IWindow
 		}
 		catch (Exception e)
 		{
-			Logger.Error(e, "could not create a Window instance");
+			Logger.Error("Could not create a Window instance for {Pointer}, {Exception}", pointer, e.Message);
 			return null;
 		}
 	}

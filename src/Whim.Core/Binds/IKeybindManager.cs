@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Whim.Core.Binds;
 
 /// <summary>
 /// The manager for bindings.
 /// </summary>
-public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, KeybindHandler>>
+public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, KeybindHandler>>, IDisposable
 {
 	/// <summary>
 	/// Number of keybinds stored by the manager.
