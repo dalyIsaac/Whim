@@ -17,7 +17,7 @@ public interface IWindowManager : ICommandable, IDisposable
 	public bool Initialize();
 
 	/// <summary>
-	/// Event for when a window is registered.
+	/// Event for when a window is registered by the <see cref="IWindowManager"/>.
 	/// </summary>
 	public event WindowRegisterEventHandler WindowRegistered;
 }
