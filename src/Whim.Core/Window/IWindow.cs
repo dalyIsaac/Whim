@@ -1,3 +1,5 @@
+using System;
+
 namespace Whim.Core.Window;
 
 /// <summary>
@@ -19,11 +21,6 @@ public interface IWindow
 	/// The name of the class to which the window belongs.
 	/// </summary>
 	public string Class { get; }
-
-	/// <summary>
-	/// Retrieves the dimensions of the bounding rectangle of the specified window.
-	/// </summary>
-	public ILocation Location { get; }
 
 	/// <summary>
 	/// The process ID of the window.
