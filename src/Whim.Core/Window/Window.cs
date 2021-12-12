@@ -259,4 +259,20 @@ public class Window : IWindow
 	{
 		// TODO: mouse handlers
 	}
+
+	public override bool Equals(object? obj)
+	{
+		if (obj == null || GetType() != obj.GetType())
+		{
+			return false;
+		}
+
+		return obj is Window window &&
+			window.Handle == Handle;
+	}
+
+	public override int GetHashCode()
+	{
+		return Handle.GetHashCode();
+	}
 }
