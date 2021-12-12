@@ -105,7 +105,7 @@ public class Window : IWindow
 	{
 		Logger.Debug("Window.Hide: {Pointer}, {Title}", _pointer, Title);
 		Win32Helper.HideWindow(_pointer.Handle);
-		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(this, WindowUpdateType.Hide));
+		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
 	}
 
 	public void ShowInCurrentState()
@@ -211,12 +211,11 @@ public class Window : IWindow
 		Logger.Debug("Window.HandleEvent: {Pointer}, {Title}", _pointer, Title);
 		switch (eventType)
 		{
-			// For cloaking, see https://devblogs.microsoft.com/oldnewthing/20200302-00/?p=103507
 			case PInvoke.EVENT_OBJECT_CLOAKED:
-				UpdateWindow(WindowUpdateType.Hide);
+				UpdateWindow(WindowUpdateType.Cloaked);
 				break;
 			case PInvoke.EVENT_OBJECT_UNCLOAKED:
-				UpdateWindow(WindowUpdateType.Show);
+				UpdateWindow(WindowUpdateType.Uncloaked);
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
 				UpdateWindow(WindowUpdateType.MinimizeStart);
