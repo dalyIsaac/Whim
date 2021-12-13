@@ -10,9 +10,14 @@ public class Program
 	public static void Main()
 	{
 		WhimManager whim = new(new ConfigContext());
-		if (!whim.Initialize())
+		try
 		{
-			Logger.Fatal("Initialization failed");
+			whim.Initialize();
+		}
+		catch (Exception e)
+		{
+			Logger.Fatal(e.Message);
+			whim.Dispose();
 			return;
 		}
 

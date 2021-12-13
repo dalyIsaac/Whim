@@ -14,6 +14,11 @@ public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, KeybindHan
 	public int Count { get; }
 
 	/// <summary>
+	/// Initialize the keyboard hook.
+	/// </summary>
+	public void Initialize();
+
+	/// <summary>
 	/// Adds the keybind and handler to the manager. If the keybind already exists, the handler
 	/// is overriden.
 	/// </summary>

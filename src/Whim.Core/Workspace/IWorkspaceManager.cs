@@ -3,7 +3,8 @@ using System.Collections.Generic;
 namespace Whim.Core.Workspace;
 
 /// <summary>
-/// The manager for <see cref="IWorkspace"/>s.
+/// The manager for <see cref="IWorkspace"/>s. This is responsible for routing
+/// windows between workspaces.
 /// </summary>
 public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 {
@@ -11,6 +12,11 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// The active workspace.
 	/// </summary>
 	public IWorkspace? ActiveWorkspace { get; }
+
+	/// <summary>
+	/// Initialize the event listeners.
+	/// </summary>
+	public void Initialize();
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/> to add.

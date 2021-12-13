@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -8,6 +9,8 @@ namespace Whim.Core.Window;
 
 public class WindowManager : IWindowManager
 {
+	private readonly IConfigContext _configContext;
+
 	public Commander Commander { get; } = new();
 
 	public event WindowRegisterEventHandler? WindowRegistered;
@@ -32,12 +35,13 @@ public class WindowManager : IWindowManager
 	/// </summary>
 	private bool disposedValue;
 
-	public WindowManager()
+	public WindowManager(IConfigContext configContext)
 	{
+		_configContext = configContext;
 		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
 	}
 
-	public bool Initialize()
+	public void Initialize()
 	{
 		// Each of the following hooks register just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
 		_registeredHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_SHOW, _hookDelegate);
@@ -52,13 +56,10 @@ public class WindowManager : IWindowManager
 		{
 			if (_registeredHooks[i].IsInvalid)
 			{
-				Logger.Error("Failed to register hook {hookNumber}", i);
-				Dispose();
-				return false;
+				// Disposing is handled by the caller.
+				throw new InvalidOperationException($"Failed to register hook {i}");
 			}
 		}
-
-		return true;
 	}
 
 	protected virtual void Dispose(bool disposing)

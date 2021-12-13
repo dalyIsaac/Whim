@@ -23,11 +23,18 @@ public class ConfigContext : IConfigContext
 	public ConfigContext()
 	{
 		Logger = Logger.Initialize();
-		WorkspaceManager = new WorkspaceManager();
-		WindowManager = new WindowManager();
-		MonitorManager = new MonitorManager();
-		RouterManager = new RouterManager(WorkspaceManager);
-		KeybindManager = new KeybindManager();
+		WindowManager = new WindowManager(this);
+		MonitorManager = new MonitorManager(this);
+		WorkspaceManager = new WorkspaceManager(this);
+		RouterManager = new RouterManager(this);
+		KeybindManager = new KeybindManager(this);
+	}
+
+	public void Initialize()
+	{
+		WindowManager.Initialize();
+		WorkspaceManager.Initialize();
+		KeybindManager.Initialize();
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -38,6 +45,7 @@ public class ConfigContext : IConfigContext
 			{
 				// dispose managed state (managed objects)
 				WindowManager.Dispose();
+				KeybindManager.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

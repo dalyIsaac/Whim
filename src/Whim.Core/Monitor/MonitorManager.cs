@@ -11,6 +11,8 @@ namespace Whim.Core.Monitor;
 /// </summary>
 public class MonitorManager : IMonitorManager
 {
+	private readonly IConfigContext _configContext;
+
 	public Commander Commander { get; } = new();
 
 	/// <summary>
@@ -38,8 +40,11 @@ public class MonitorManager : IMonitorManager
 	/// <exception cref="Exception">
 	/// When no monitors are found, or there is no primary monitor.
 	/// </exception>
-	public MonitorManager()
+	public MonitorManager(IConfigContext configContext)
 	{
+		_configContext = configContext;
+
+		// Initialize the monitors.
 		Screen[] screens = Screen.AllScreens;
 
 		_monitors = new Monitor[screens.Length];

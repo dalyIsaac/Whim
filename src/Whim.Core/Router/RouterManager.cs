@@ -12,13 +12,13 @@ using Router = Func<IWindow, IWorkspace?>;
 
 public class RouterManager : IRouterManager
 {
+	private readonly IConfigContext _configContext;
 	private readonly List<Filter> _filters = new();
 	private readonly List<Router> _routers = new();
-	private readonly IWorkspaceManager _workspaceManager;
 
-	public RouterManager(IWorkspaceManager workspaceManager)
+	public RouterManager(IConfigContext configContext)
 	{
-		_workspaceManager = workspaceManager;
+		_configContext = configContext;
 		AddDefaultFilters(this);
 	}
 
@@ -96,7 +96,7 @@ public class RouterManager : IRouterManager
 		{
 			if (window.ProcessName.ToLower() == processName)
 			{
-				return _workspaceManager.TryGet(workspaceName);
+				return _configContext.WorkspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -124,7 +124,7 @@ public class RouterManager : IRouterManager
 		{
 			if (window.Title.ToLower() == title)
 			{
-				return _workspaceManager.TryGet(workspaceName);
+				return _configContext.WorkspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -152,7 +152,7 @@ public class RouterManager : IRouterManager
 		{
 			if (regex.IsMatch(window.Title))
 			{
-				return _workspaceManager.TryGet(workspaceName);
+				return _configContext.WorkspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -205,7 +205,7 @@ public class RouterManager : IRouterManager
 		{
 			if (window.Class.ToLower() == windowClass)
 			{
-				return _workspaceManager.TryGet(workspaceName);
+				return _configContext.WorkspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});

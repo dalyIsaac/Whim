@@ -12,16 +12,21 @@ namespace Whim.Core.Binds;
 
 public class KeybindManager : IKeybindManager
 {
+	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IKeybind, KeybindHandler> _keybinds = new();
 
 	private readonly HOOKPROC _keyboardHook;
-	private readonly UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
+	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool disposedValue;
 
-	public KeybindManager()
+	public KeybindManager(IConfigContext configContext)
 	{
+		_configContext = configContext;
 		_keyboardHook = KeyboardHook;
+	}
 
+	public void Initialize()
+	{
 		_unhookKeyboardHook = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _keyboardHook, null, 0);
 		// TODO: mouse
 	}

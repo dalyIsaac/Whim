@@ -14,7 +14,7 @@ public interface IWindowManager : ICommandable, IDisposable
 	/// <see langword="true"/> when the hooks have all been registered successfully, otherwise
 	/// <see langword="false"/>
 	/// </returns>
-	public bool Initialize();
+	public void Initialize();
 
 	/// <summary>
 	/// Event for when a window is registered by the <see cref="IWindowManager"/>.

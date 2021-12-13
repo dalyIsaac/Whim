@@ -1,4 +1,5 @@
-﻿using System.Collections;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Whim.Core.Workspace;
@@ -8,6 +9,7 @@ namespace Whim.Core.Workspace;
 /// </summary>
 public class WorkspaceManager : IWorkspaceManager
 {
+	private readonly IConfigContext _configContext;
 	public Commander Commander { get; } = new();
 
 	/// <summary>
@@ -16,9 +18,24 @@ public class WorkspaceManager : IWorkspaceManager
 	private readonly List<IWorkspace> _workspaces = new();
 
 	/// <summary>
+	/// Maps windows to their workspace.
+	/// </summary>
+	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
+
+	/// <summary>
 	/// The active workspace.
 	/// </summary>
 	public IWorkspace? ActiveWorkspace { get; private set; }
+
+	public WorkspaceManager(IConfigContext configContext)
+	{
+		_configContext = configContext;
+	}
+
+	public void Initialize()
+	{
+		_configContext.WindowManager.WindowRegistered += OnWindowRegistered;
+	}
 
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 

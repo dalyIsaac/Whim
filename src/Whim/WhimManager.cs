@@ -17,15 +17,9 @@ public class WhimManager : IDisposable
 		ConfigContext = configContext;
 	}
 
-	public bool Initialize()
+	public void Initialize()
 	{
-		// Initialize the window manager
-		if (!ConfigContext.WindowManager.Initialize())
-		{
-			return false;
-		}
-
-		return true;
+		ConfigContext.Initialize();
 	}
 
 	protected virtual void Dispose(bool disposing)
