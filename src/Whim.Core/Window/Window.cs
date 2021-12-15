@@ -128,19 +128,19 @@ public class Window : IWindow
 	public void ShowMaximized()
 	{
 		Logger.Debug("Window.ShowMaximized: {Pointer}, {Title}", _pointer, Title);
-		Win32Helper.ShowMaximizedWindow(_pointer.Handle);
+		Win32Helper.ShowWindowMaximized(_pointer.Handle);
 	}
 
 	public void ShowMinimized()
 	{
 		Logger.Debug("Window.ShowMinimized: {Pointer}, {Title}", _pointer, Title);
-		Win32Helper.ShowMinimizedWindow(_pointer.Handle);
+		Win32Helper.ShowWindowMinimized(_pointer.Handle);
 	}
 
 	public void ShowNormal()
 	{
 		Logger.Debug("Window.ShowNormal: {Pointer}, {Title}", _pointer, Title);
-		Win32Helper.ShowNormalWindow(_pointer.Handle);
+		Win32Helper.ShowWindowNoActivate(_pointer.Handle);
 	}
 
 	/// <summary>
