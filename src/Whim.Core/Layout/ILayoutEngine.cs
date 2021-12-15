@@ -13,11 +13,21 @@ public interface ILayoutEngine : ICommandable
 	public string Name { get; }
 
 	/// <summary>
-	/// Calculate the layout of the workspace, for the given windows.
+	/// Performs a layout inside the available <see cref="IArea"/> region.
 	/// </summary>
-	/// <param name="windows">Windows to be organized</param>
-	/// <param name="spaceWidth">Width of the available space</param>
-	/// <param name="spaceHeight">Height of the available space</param>
+	/// <param name="area">The available area to do a layout inside.</param>
 	/// <returns></returns>
-	public IEnumerable<ILocation> CalcLayout(IEnumerable<IWindow> windows, int spaceWidth, int spaceHeight);
+	public IEnumerable<IWindowLocation> DoLayout(IArea area);
+
+	/// <summary>
+	/// Adds the window to the layout engine.
+	/// </summary>
+	/// <param name="window"></param>
+	public void AddWindow(IWindow window);
+
+	/// <summary>
+	/// Removes the window from the layout engine.
+	/// </summary>
+	/// <param name="window"></param>
+	public void RemoveWindow(IWindow window);
 }

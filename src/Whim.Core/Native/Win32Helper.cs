@@ -40,7 +40,7 @@ public static class Win32Helper
 	/// <summary>
 	/// Activates the window and displays it as a maximized window.
 	/// </summary>
-	public static void ShowMaximizedWindow(HWND hwnd)
+	public static void ShowWindowMaximized(HWND hwnd)
 	{
 		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMAXIMIZED);
 	}
@@ -48,15 +48,23 @@ public static class Win32Helper
 	/// <summary>
 	/// Activates the window and displays it as a minimized window.
 	/// </summary>
-	public static void ShowMinimizedWindow(HWND hwnd)
+	public static void ShowWindowMinimized(HWND hwnd)
 	{
 		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMINIMIZED);
 	}
 
 	/// <summary>
+	/// Minimizes the specified window and activates the next top-level window in the Z order.
+	/// </summary>
+	public static void MinimizeWindow(HWND hwnd)
+	{
+		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_MINIMIZE);
+	}
+
+	/// <summary>
 	/// Displays a window in its most recent size and position. The window is not activated.
 	/// </summary>
-	public static void ShowNormalWindow(HWND hwnd)
+	public static void ShowWindowNoActivate(HWND hwnd)
 	{
 		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
 	}

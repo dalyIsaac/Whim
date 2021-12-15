@@ -6,12 +6,12 @@ namespace Whim.Core.Workspace;
 /// <summary>
 /// Workspaces contain windows to be organized by layout engines.
 /// </summary>
-public interface IWorkspace : IEnumerable<IWindow>, ICommandable
+public interface IWorkspace : ICommandable
 {
 	/// <summary>
 	/// Triggered when the workspace is renamed.
 	/// </summary>
-	public event EventHandler<WorkspaceRenameEventArgs> WorkspaceRenamed;
+	public event EventHandler<WorkspaceRenameEventArgs>? WorkspaceRenamed;
 
 	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the
@@ -41,11 +41,26 @@ public interface IWorkspace : IEnumerable<IWindow>, ICommandable
 	/// <param name="name">The name of the layout engine to make active.</param>
 	/// <returns></returns>
 	public bool TrySetLayoutEngine(string name);
-	#endregion
 
 	/// <summary>
-	/// The currently focused window in the workspace. <c>null</c>
-	/// if no windows are focused in the workspace.
+	/// Trigger a layout.
 	/// </summary>
-	public IWindow? FocusedWindow { get; }
+	public void DoLayout();
+	#endregion
+
+	#region Windows
+	public IEnumerable<IWindow> Windows { get; }
+
+	/// <summary>
+	/// Adds the window to the workspace.
+	/// </summary>
+	/// <param name="window"></param>
+	protected internal void AddWindow(IWindow window);
+
+	/// <summary>
+	/// Removes the window from the workspace.
+	/// </summary>
+	/// <param name="window"></param>
+	protected internal void RemoveWindow(IWindow window);
+	#endregion
 }

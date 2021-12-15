@@ -42,3 +42,7 @@ VIRTUAL_KEY
 WM_KEYDOWN
 WM_SYSKEYDOWN
 KBDLLHOOKSTRUCT
+
+BeginDeferWindowPos
+DeferWindowPos
+EndDeferWindowPos
