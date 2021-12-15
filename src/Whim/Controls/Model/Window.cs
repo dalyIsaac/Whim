@@ -26,7 +26,7 @@ internal class Window : INotifyPropertyChanged
 
 	internal Window(IWindow window)
 	{
-		Handle = window.Handle;
+		Handle = (int)window.Handle.Value;
 		Title = window.Title;
 		ProcessId = window.ProcessId;
 		ProcessFileName = window.ProcessFileName;

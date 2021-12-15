@@ -12,7 +12,7 @@ public class Window : IWindow
 	private const int _bufferCapacity = 255;
 	private readonly Pointer _pointer;
 
-	public int Handle { get => (int)_pointer.Handle.Value; }
+	public HWND Handle { get => _pointer.Handle; }
 
 	public string Title
 	{

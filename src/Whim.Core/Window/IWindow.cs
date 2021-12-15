@@ -1,4 +1,4 @@
-using System;
+using Windows.Win32.Foundation;
 
 namespace Whim.Core.Window;
 
@@ -10,7 +10,7 @@ public interface IWindow
 	/// <summary>
 	/// The handle of the window.
 	/// </summary>
-	public int Handle { get; }
+	public HWND Handle { get; }
 
 	/// <summary>
 	/// The title of the window.
