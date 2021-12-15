@@ -1,6 +1,6 @@
 using Serilog.Core;
 
-namespace Whim.Core.Logging;
+namespace Whim.Core;
 
 /// <summary>
 /// The user-configurable settings for <see cref="Logger"/>.

@@ -1,4 +1,4 @@
-namespace Whim.Core.Command;
+namespace Whim.Core;
 
 /// <summary>
 /// Specification for classes to handle and expose command functionality.

@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core.Window;
+namespace Whim.Core;
 
 /// <summary>
 /// The manager for <see cref="IWindow"/>s.

@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Whim.Controls.Model;
-using Whim.Core.ConfigContext;
+using Whim.Core;
 
 namespace Whim.Controls.ViewModel;
 
@@ -27,7 +27,7 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	private void OnWindowRegistered(object sender, Core.Window.WindowEventArgs args)
+	private void OnWindowRegistered(object sender, Core.WindowEventArgs args)
 	{
 		Model.Window model = new(args.Window);
 		model.WindowUnregistered += OnWindowUnregistered;
@@ -35,7 +35,7 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
 	}
 
-	private void OnWindowUnregistered(object? sender, WindowEventArgs args)
+	private void OnWindowUnregistered(object? sender, Model.WindowEventArgs args)
 	{
 		Windows.Remove(args.Window);
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.

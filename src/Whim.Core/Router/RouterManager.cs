@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Whim.Core.Router;
+namespace Whim.Core;
 
 using Filter = Func<IWindow, bool>;
 using Router = Func<IWindow, IWorkspace?>;

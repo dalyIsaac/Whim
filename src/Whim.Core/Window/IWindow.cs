@@ -1,6 +1,6 @@
 using Windows.Win32.Foundation;
 
-namespace Whim.Core.Window;
+namespace Whim.Core;
 
 /// <summary>
 /// Represents a single window.

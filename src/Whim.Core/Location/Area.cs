@@ -1,4 +1,4 @@
-namespace Whim.Core.Location;
+namespace Whim.Core;
 
 public class Area : IArea
 {

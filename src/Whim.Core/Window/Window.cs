@@ -5,7 +5,7 @@ using System.IO;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 
-namespace Whim.Core.Window;
+namespace Whim.Core;
 
 public class Window : IWindow
 {
@@ -49,7 +49,7 @@ public class Window : IWindow
 		get
 		{
 			PInvoke.GetWindowRect(_pointer.Handle, out RECT rect);
-			return new Location.Location(rect.left,
+			return new Location(rect.left,
 										 rect.top,
 										 rect.right - rect.left,
 										 rect.bottom - rect.top);

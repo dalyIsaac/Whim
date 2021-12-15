@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core.Native;
+namespace Whim.Core;
 
 public interface IWindowDeferPosHandle : IDisposable
 {

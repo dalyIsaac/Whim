@@ -1,4 +1,4 @@
-namespace Whim.Core.Logging;
+namespace Whim.Core;
 
 /// <summary>
 /// <see cref="SinkConfig"/> with custom functionality for the file sink.

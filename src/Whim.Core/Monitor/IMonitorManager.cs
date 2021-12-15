@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Whim.Core.Monitor;
+namespace Whim.Core;
 
 /// <summary>
 /// The manager for <see cref="IMonitor"/>s.

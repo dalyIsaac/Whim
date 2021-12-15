@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Whim.Core.Workspace;
+namespace Whim.Core;
 
 public class Workspace : IWorkspace
 {
@@ -29,7 +29,7 @@ public class Workspace : IWorkspace
 		foreach (IWindowLocation loc in locations)
 		{
 			// Adjust the window location to the monitor's coordinates
-			loc.Location = new Location.Location(x: loc.Location.X + focusedMonitor.X,
+			loc.Location = new Location(x: loc.Location.X + focusedMonitor.X,
 										y: loc.Location.Y + focusedMonitor.Y,
 										width: loc.Location.Width,
 										height: loc.Location.Height);

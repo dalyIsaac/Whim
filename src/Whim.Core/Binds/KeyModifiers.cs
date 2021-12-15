@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core.Binds;
+namespace Whim.Core;
 
 [Flags]
 public enum KeyModifiers

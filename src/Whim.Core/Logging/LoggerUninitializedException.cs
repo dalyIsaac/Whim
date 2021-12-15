@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Whim.Core.Logging;
+namespace Whim.Core;
 
 internal class LoggerUninitializedException : Exception
 {

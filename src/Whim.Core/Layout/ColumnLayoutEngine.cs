@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Whim.Core.Layout;
+namespace Whim.Core;
 
 public class ColumnLayoutEngine : BaseStackLayoutEngine
 {
@@ -16,7 +16,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		foreach (IWindow window in _stack)
 		{
 			yield return new WindowLocation(window,
-											new Location.Location(x, y, width, height),
+											new Location(x, y, width, height),
 											WindowState.Normal);
 			x += width;
 		}

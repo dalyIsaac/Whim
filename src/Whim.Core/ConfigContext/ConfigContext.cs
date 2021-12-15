@@ -1,4 +1,4 @@
-namespace Whim.Core.ConfigContext;
+namespace Whim.Core;
 
 /// <summary>
 /// Implementation of <see cref="IConfigContext"/>. This is the core of Whim. <br/>
@@ -25,7 +25,12 @@ public class ConfigContext : IConfigContext
 		Logger = Logger.Initialize();
 		WindowManager = new WindowManager(this);
 		MonitorManager = new MonitorManager(this);
-		WorkspaceManager = new WorkspaceManager(this);
+		WorkspaceManager = new WorkspaceManager(this)
+		{
+			new Workspace(this, "1"),
+			new Workspace(this, "2"),
+			new Workspace(this, "3")
+		};
 		RouterManager = new RouterManager(this);
 		KeybindManager = new KeybindManager(this);
 	}

@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using CommanderValues = System.Collections.Generic.KeyValuePair<Whim.Core.Command.CommandType, Whim.Core.Command.CommandHandlerDelegate>;
+namespace Whim.Core;
 
-namespace Whim.Core.Command;
+using CommanderValues = KeyValuePair<CommandType, CommandHandlerDelegate>;
 
 /// <summary>
 /// Commander contains the commands and associated handlers for a given class instance, and the

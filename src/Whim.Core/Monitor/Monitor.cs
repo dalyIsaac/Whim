@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace Whim.Core.Monitor;
+namespace Whim.Core;
 
 /// <summary>
 /// Implementation of <see cref="IMonitor"/>.
@@ -30,5 +30,5 @@ public class Monitor : IMonitor
 	public int X => Screen.WorkingArea.X;
 	public int Y => Screen.WorkingArea.Y;
 
-	public bool IsPointInside(int x, int y) => Location.Location.IsPointInside(this, x, y);
+	public bool IsPointInside(int x, int y) => Location.IsPointInside(this, x, y);
 }

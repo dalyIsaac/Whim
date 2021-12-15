@@ -20,19 +20,6 @@
 		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
 		<PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-
-		<Using Include="Whim.Core.Binds" />
-		<Using Include="Whim.Core.Command" />
-		<Using Include="Whim.Core.ConfigContext" />
-		<Using Include="Whim.Core.Files" />
-		<Using Include="Whim.Core.Layout" />
-		<Using Include="Whim.Core.Location" />
-		<Using Include="Whim.Core.Logging" />
-		<Using Include="Whim.Core.Monitor" />
-		<Using Include="Whim.Core.Native" />
-		<Using Include="Whim.Core.Router" />
-		<Using Include="Whim.Core.Window" />
-		<Using Include="Whim.Core.Workspace" />
 	</ItemGroup>
 
 </Project>

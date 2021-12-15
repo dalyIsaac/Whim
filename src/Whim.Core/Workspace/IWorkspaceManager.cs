@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Whim.Core.Workspace;
+namespace Whim.Core;
 
 /// <summary>
 /// The manager for <see cref="IWorkspace"/>s. This is responsible for routing

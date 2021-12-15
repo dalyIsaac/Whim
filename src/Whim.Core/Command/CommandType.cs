@@ -1,4 +1,4 @@
-namespace Whim.Core.Command;
+namespace Whim.Core;
 
 /// <summary>
 /// All the possible command types.

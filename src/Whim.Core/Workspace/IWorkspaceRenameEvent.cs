@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core.Workspace;
+namespace Whim.Core;
 
 public class WorkspaceRenameEventArgs : EventArgs
 {

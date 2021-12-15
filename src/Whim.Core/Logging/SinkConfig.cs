@@ -1,7 +1,7 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Whim.Core.Logging;
+namespace Whim.Core;
 
 /// <summary>
 /// Default configuration options for a logging sink.

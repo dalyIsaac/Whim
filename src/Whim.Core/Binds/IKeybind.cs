@@ -1,6 +1,6 @@
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
-namespace Whim.Core.Binds;
+namespace Whim.Core;
 
 public interface IKeybind
 {

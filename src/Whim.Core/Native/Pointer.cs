@@ -1,6 +1,6 @@
 ﻿using Windows.Win32.Foundation;
 
-namespace Whim.Core.Native;
+namespace Whim.Core;
 
 /// <summary>
 /// A simple wrapper for <see cref="HWND"/>, which includes a <see cref="ToString"/> implementation.

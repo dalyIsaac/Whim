@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Whim.Core.Router;
+namespace Whim.Core;
 
 using Filter = Func<IWindow, bool>;
 using Router = Func<IWindow, IWorkspace?>;

@@ -1,4 +1,4 @@
-namespace Whim.Core.Window;
+namespace Whim.Core;
 
 /// <summary>
 /// The window update type. Based on event constants from

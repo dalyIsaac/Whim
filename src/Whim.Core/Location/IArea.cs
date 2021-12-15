@@ -1,4 +1,4 @@
-namespace Whim.Core.Location;
+namespace Whim.Core;
 
 /// <summary>
 /// The width and height of an item.

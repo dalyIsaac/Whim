@@ -1,4 +1,4 @@
-namespace Whim.Core.Binds;
+namespace Whim.Core;
 
 using KeybindHandlerArgs = Keybind;
 

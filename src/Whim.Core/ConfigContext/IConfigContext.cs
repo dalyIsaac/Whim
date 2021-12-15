@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core.ConfigContext;
+namespace Whim.Core;
 
 /// <summary>
 /// This is the core of Whim. <br/>

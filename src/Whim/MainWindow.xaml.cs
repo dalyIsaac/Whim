@@ -13,13 +13,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Whim.Controls;
-using Whim.Core.ConfigContext;
+using Whim.Core;
 
 namespace Whim;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainWindow : System.Windows.Window
 {
 	private readonly IConfigContext _configContext;
 

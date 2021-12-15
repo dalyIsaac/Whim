@@ -8,7 +8,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace Whim.Core.Binds;
+namespace Whim.Core;
 
 public class KeybindManager : IKeybindManager
 {

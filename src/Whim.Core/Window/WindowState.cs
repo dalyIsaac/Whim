@@ -1,4 +1,4 @@
-namespace Whim.Core.Window;
+namespace Whim.Core;
 
 public enum WindowState
 {

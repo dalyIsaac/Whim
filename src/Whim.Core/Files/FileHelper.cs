@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Whim.Core.Files;
+namespace Whim.Core;
 
 /// <summary>
 /// Utility file methods.

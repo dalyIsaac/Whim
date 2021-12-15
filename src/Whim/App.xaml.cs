@@ -5,8 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Whim.Core.ConfigContext;
-using Whim.Core.Logging;
+using Whim.Core;
 
 namespace Whim;
 /// <summary>

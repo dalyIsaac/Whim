@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Serilog;
 
-namespace Whim.Core.Logging;
+namespace Whim.Core;
 
 /// <summary>
 /// Logger used throughout Whim. It is accessed according to the singleton pattern.

@@ -1,6 +1,5 @@
 using System;
-using Whim.Core.ConfigContext;
-using Whim.Core.Logging;
+using Whim.Core;
 
 namespace Whim;
 

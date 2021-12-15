@@ -1,4 +1,4 @@
-namespace Whim.Core.Monitor;
+namespace Whim.Core;
 
 /// <summary>
 /// Represents a single display device.

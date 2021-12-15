@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Whim.Core.Workspace;
+namespace Whim.Core;
 
 /// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
