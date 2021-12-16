@@ -25,12 +25,7 @@ public class ConfigContext : IConfigContext
 		Logger = Logger.Initialize();
 		WindowManager = new WindowManager(this);
 		MonitorManager = new MonitorManager(this);
-		WorkspaceManager = new WorkspaceManager(this)
-		{
-			new Workspace(this, "1"),
-			new Workspace(this, "2"),
-			new Workspace(this, "3")
-		};
+		WorkspaceManager = new WorkspaceManager(this);
 		RouterManager = new RouterManager(this);
 		KeybindManager = new KeybindManager(this);
 	}

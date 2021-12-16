@@ -27,10 +27,7 @@ public class MonitorManager : IMonitorManager
 
 	public int Length => _monitors.Length;
 
-	public IEnumerator<IMonitor> GetEnumerator()
-	{
-		return (IEnumerator<IMonitor>)_monitors.GetEnumerator();
-	}
+	public IEnumerator<IMonitor> GetEnumerator() => _monitors.AsEnumerable().GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

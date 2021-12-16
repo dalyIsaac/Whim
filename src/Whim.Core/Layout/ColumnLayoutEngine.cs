@@ -8,6 +8,11 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 
 	public override IEnumerable<IWindowLocation> DoLayout(IArea area)
 	{
+		if (_stack.Count == 0)
+		{
+			yield break;
+		}
+
 		int x = 0;
 		int y = 0;
 		int width = area.Width / _stack.Count;
