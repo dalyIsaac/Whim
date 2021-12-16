@@ -29,5 +29,5 @@ public interface ILayoutEngine : ICommandable
 	/// Removes the window from the layout engine.
 	/// </summary>
 	/// <param name="window"></param>
-	public void RemoveWindow(IWindow window);
+	public bool RemoveWindow(IWindow window);
 }

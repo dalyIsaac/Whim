@@ -19,10 +19,10 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 		_stack.Add(window);
 	}
 
-	public void RemoveWindow(IWindow window)
+	public bool RemoveWindow(IWindow window)
 	{
 		Logger.Debug("Removing window {title} from layout engine {engine}", window.Title, Name);
-		_stack.RemoveAll(x => x.Handle == window.Handle);
+		return _stack.RemoveAll(x => x.Handle == window.Handle) > 0;
 	}
 
 	public abstract IEnumerable<IWindowLocation> DoLayout(IArea area);
