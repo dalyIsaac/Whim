@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -34,6 +34,8 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void Initialize()
 	{
+		Logger.Debug("Initializing workspace manager...");
+
 		_configContext.WindowManager.WindowRegistered += OnWindowRegistered;
 	}
 

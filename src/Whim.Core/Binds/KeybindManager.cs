@@ -27,6 +27,7 @@ public class KeybindManager : IKeybindManager
 
 	public void Initialize()
 	{
+		Logger.Debug("Initializing keybind manager...");
 		_unhookKeyboardHook = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _keyboardHook, null, 0);
 		// TODO: mouse
 	}

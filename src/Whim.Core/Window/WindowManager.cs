@@ -43,6 +43,8 @@ public class WindowManager : IWindowManager
 
 	public void Initialize()
 	{
+		Logger.Debug("Initializing window manager...");
+
 		// Each of the following hooks register just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
 		_registeredHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_SHOW, _hookDelegate);
 		_registeredHooks[1] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);

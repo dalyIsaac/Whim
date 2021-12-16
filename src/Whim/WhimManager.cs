@@ -19,6 +19,7 @@ public class WhimManager : IDisposable
 
 	public void Initialize()
 	{
+		Logger.Debug("Initializing Whim...");
 		ConfigContext.Initialize();
 	}
 
