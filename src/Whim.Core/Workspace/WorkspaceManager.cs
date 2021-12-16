@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,6 +23,11 @@ public class WorkspaceManager : IWorkspaceManager
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 
 	/// <summary>
+	/// Maps monitors to their workspace.
+	/// </summary>
+	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
+
+	/// <summary>
 	/// The active workspace.
 	/// </summary>
 	public IWorkspace? ActiveWorkspace { get; private set; }
@@ -36,9 +41,25 @@ public class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug("Initializing workspace manager...");
 
+		// Ensure there's at least n workspaces, for n monitors.
+		if (_configContext.MonitorManager.Length > _workspaces.Count)
+		{
+			throw new InvalidOperationException("There must be at least as many workspaces as monitors.");
+		}
+
+		// Assign workspaces to monitors.
+		int idx = 0;
+		foreach (IMonitor monitor in _configContext.MonitorManager)
+		{
+			Activate(_workspaces[idx], monitor);
+			idx++;
+		}
+
+		// Subscribe to WindowRegistered event.
 		_configContext.WindowManager.WindowRegistered += OnWindowRegistered;
 	}
 
+	#region Workspaces
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
 	public void Add(IWorkspace workspace)
@@ -91,6 +112,36 @@ public class WorkspaceManager : IWorkspaceManager
 		Logger.Debug("Trying to get workspace {0}", workspaceName);
 		return _workspaces.Find(w => w.Name == workspaceName);
 	}
+
+	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
+	{
+		Logger.Debug("Activating workspace {0}", workspace.Name);
+
+		if (monitor == null)
+		{
+			monitor = _configContext.MonitorManager.FocusedMonitor;
+		}
+
+		_monitorWorkspaceMap[monitor] = workspace;
+		workspace.DoLayout();
+	}
+
+	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
+	{
+		Logger.Debug("Getting monitor for active workspace {0}", workspace.Name);
+
+		// Linear search for the monitor that contains the workspace.
+		foreach (IMonitor monitor in _configContext.MonitorManager)
+		{
+			if (_monitorWorkspaceMap[monitor] == workspace)
+			{
+				return monitor;
+			}
+		}
+
+		return null;
+	}
+	#endregion
 
 	#region Windows
 	internal void OnWindowRegistered(object sender, WindowEventArgs args)

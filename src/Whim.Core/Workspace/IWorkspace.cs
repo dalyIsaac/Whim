@@ -25,6 +25,26 @@ public interface IWorkspace : ICommandable
 	/// </summary>
 	public ILayoutEngine ActiveLayoutEngine { get; }
 
+	// Methods to add and remove layout engines
+
+	/// <summary>
+	/// Adds a layout engine to the workspace.
+	/// </summary>
+	/// <param name="layoutEngine">The layout engine to add.</param>
+	public void AddLayoutEngine(ILayoutEngine layoutEngine);
+
+	/// <summary>
+	/// Removes a layout engine from the workspace.
+	/// </summary>
+	/// <param name="layoutEngine">The layout engine to remove.</param>
+	public bool RemoveLayoutEngine(ILayoutEngine layoutEngine);
+
+	/// <summary>
+	/// Removes the layout engine with name <paramref name="name"/> from the workspace.
+	/// </summary>
+	/// <param name="name">The name of the layout engine to remove.</param>
+	public bool RemoveLayoutEngine(string name);
+
 	/// <summary>
 	/// Rotate to the next layout engine.
 	/// </summary>
@@ -55,12 +75,12 @@ public interface IWorkspace : ICommandable
 	/// Adds the window to the workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	protected internal void AddWindow(IWindow window);
+	public void AddWindow(IWindow window);
 
 	/// <summary>
 	/// Removes the window from the workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	protected internal void RemoveWindow(IWindow window);
+	public bool RemoveWindow(IWindow window);
 	#endregion
 }

@@ -48,4 +48,21 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// </summary>
 	/// <param name="workspaceName">The workspace name to try and get.</param>
 	public IWorkspace? this[string workspaceName] { get; }
+
+	/// <summary>
+	/// Activates the given workspace in the focused monitor, or the given monitor (if provided).
+	/// </summary>
+	/// <param name="workspace">The workspace to activate.</param>
+	/// <param name="monitor">
+	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
+	/// the focused monitor.
+	/// </param>
+	public void Activate(IWorkspace workspace, IMonitor? monitor = null);
+
+	/// <summary>
+	/// Retrieves the monitor for the active workspace.
+	/// </summary>
+	/// <param name="workspace"></param>
+	/// <returns><see langword="null"/> if the workspace is not active.</returns>
+	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
 }
