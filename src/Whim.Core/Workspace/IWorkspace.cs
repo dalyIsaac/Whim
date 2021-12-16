@@ -25,6 +25,11 @@ public interface IWorkspace : ICommandable
 	/// </summary>
 	public ILayoutEngine ActiveLayoutEngine { get; }
 
+	/// <summary>
+	/// Event for when the active layout engine has changed.
+	/// </summary>
+	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+
 	// Methods to add and remove layout engines
 
 	/// <summary>
@@ -44,6 +49,16 @@ public interface IWorkspace : ICommandable
 	/// </summary>
 	/// <param name="name">The name of the layout engine to remove.</param>
 	public bool RemoveLayoutEngine(string name);
+
+	/// <summary>
+	/// Event for when a layout engine has been added to the workspace.
+	/// </summary>
+	public event EventHandler<LayoutEngineEventArgs>? LayoutEngineAdded;
+
+	/// <summary>
+	/// Event for when a layout engine has been removed from the workspace.
+	/// </summary>
+	public event EventHandler<LayoutEngineEventArgs>? LayoutEngineRemoved;
 
 	/// <summary>
 	/// Rotate to the next layout engine.

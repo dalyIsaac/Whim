@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim.Core;
@@ -17,6 +18,11 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// Initialize the event listeners.
 	/// </summary>
 	public void Initialize();
+
+	/// <summary>
+	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
+	/// </summary>
+	public event EventHandler<RouteEventArgs>? Routed;
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/> to add.

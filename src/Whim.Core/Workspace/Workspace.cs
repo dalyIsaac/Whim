@@ -7,7 +7,17 @@ namespace Whim.Core;
 public class Workspace : IWorkspace
 {
 	private readonly IConfigContext _configContext;
-	public string Name { get; set; }
+
+	private string _name;
+	public string Name
+	{
+		get => _name;
+		set
+		{
+			WorkspaceRenamed?.Invoke(this, new WorkspaceRenameEventArgs(this, _name, value));
+			_name = value;
+		}
+	}
 
 	private readonly List<ILayoutEngine> _layoutEngines = new();
 	private int _activeLayoutEngineIndex = 0;
@@ -55,18 +65,25 @@ public class Workspace : IWorkspace
 	}
 
 	public event EventHandler<WorkspaceRenameEventArgs>? WorkspaceRenamed;
+	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+	public event EventHandler<LayoutEngineEventArgs>? LayoutEngineAdded;
+	public event EventHandler<LayoutEngineEventArgs>? LayoutEngineRemoved;
 
 	public Workspace(IConfigContext configContext, string name)
 	{
 		_configContext = configContext;
-		Name = name;
+		_name = name;
 	}
 
 	public void NextLayoutEngine()
 	{
 		Logger.Debug("Switching to next layout engine for workspace {Name}", Name);
 
+		int prevIdx = _activeLayoutEngineIndex;
 		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + 1) % _layoutEngines.Count;
+
+		ActiveLayoutEngineChanged?.Invoke(this, new ActiveLayoutEngineChangedEventArgs(_layoutEngines[prevIdx], _layoutEngines[_activeLayoutEngineIndex]));
+
 		DoLayout();
 	}
 
@@ -74,7 +91,11 @@ public class Workspace : IWorkspace
 	{
 		Logger.Debug("Switching to previous layout engine for workspace {Name}", Name);
 
+		int prevIdx = _activeLayoutEngineIndex;
 		_activeLayoutEngineIndex = (_activeLayoutEngineIndex - 1) % _layoutEngines.Count;
+
+		ActiveLayoutEngineChanged?.Invoke(this, new ActiveLayoutEngineChangedEventArgs(_layoutEngines[prevIdx], _layoutEngines[_activeLayoutEngineIndex]));
+
 		DoLayout();
 	}
 
@@ -88,7 +109,22 @@ public class Workspace : IWorkspace
 			return false;
 		}
 
+		int prevIdx = _activeLayoutEngineIndex;
 		_activeLayoutEngineIndex = _layoutEngines.IndexOf(layoutEngine);
+
+		if (_activeLayoutEngineIndex == -1)
+		{
+			Logger.Error("Layout engine {name} not found for workspace {workspace}", name, Name);
+			return false;
+		}
+		else if (_activeLayoutEngineIndex == prevIdx)
+		{
+			Logger.Debug("Layout engine {name} is already active for workspace {workspace}", name, Name);
+			return true;
+		}
+
+		ActiveLayoutEngineChanged?.Invoke(this, new ActiveLayoutEngineChangedEventArgs(_layoutEngines[prevIdx], _layoutEngines[_activeLayoutEngineIndex]));
+
 		DoLayout();
 		return true;
 	}
@@ -98,13 +134,21 @@ public class Workspace : IWorkspace
 		Logger.Debug("Adding layout engine {name} to workspace {workspace}", layoutEngine.Name, Name);
 
 		_layoutEngines.Add(layoutEngine);
+
+		LayoutEngineAdded?.Invoke(this, new LayoutEngineEventArgs(this, layoutEngine));
 	}
 
 	public bool RemoveLayoutEngine(ILayoutEngine layoutEngine)
 	{
 		Logger.Debug("Removing layout engine {name} from workspace {workspace}", layoutEngine.Name, Name);
 
-		return _layoutEngines.Remove(layoutEngine);
+		if (_layoutEngines.Remove(layoutEngine))
+		{
+			LayoutEngineRemoved?.Invoke(this, new LayoutEngineEventArgs(this, layoutEngine));
+			return true;
+		}
+
+		return false;
 	}
 
 	public bool RemoveLayoutEngine(string name)
