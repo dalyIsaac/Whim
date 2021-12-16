@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Whim.Core;
 
-using CommanderValues = KeyValuePair<CommandType, CommandHandlerDelegate>;
+using CommanderValues = KeyValuePair<CommandType, CommandEventHandler>;
 
 /// <summary>
 /// Commander contains the commands and associated handlers for a given class instance, and the
@@ -13,9 +13,9 @@ using CommanderValues = KeyValuePair<CommandType, CommandHandlerDelegate>;
 public class Commander : IEnumerable<CommanderValues>
 {
 	/// <summary>
-	/// Map of <see cref="CommandType"/> to <see cref="CommandHandlerDelegate"/>.
+	/// Map of <see cref="CommandType"/> to <see cref="CommandEventHandler"/>.
 	/// </summary>
-	private readonly Dictionary<CommandType, CommandHandlerDelegate> _ownerCommand = new();
+	private readonly Dictionary<CommandType, CommandEventHandler> _ownerCommand = new();
 
 	/// <summary>
 	/// The child commanders.
@@ -31,7 +31,7 @@ public class Commander : IEnumerable<CommanderValues>
 	/// <param name="commandType"></param>
 	/// <param name="commandHandler"></param>
 	/// <exception cref="System.Exception"></exception>
-	public void Add(CommandType commandType, CommandHandlerDelegate commandHandler)
+	public void Add(CommandType commandType, CommandEventHandler commandHandler)
 	{
 		Logger.Debug("Adding command {CommandType}", commandType);
 		if (_ownerCommand.ContainsKey(commandType))
@@ -61,7 +61,7 @@ public class Commander : IEnumerable<CommanderValues>
 	public void ExecuteCommand(ICommand command, int depth = 0)
 	{
 		Logger.Debug("Executing command {CommandType}", command.CommandType);
-		if (_ownerCommand.TryGetValue(command.CommandType, out CommandHandlerDelegate? commandHandler))
+		if (_ownerCommand.TryGetValue(command.CommandType, out CommandEventHandler? commandHandler))
 		{
 			commandHandler(this, new CommandEventArgs(command));
 		}

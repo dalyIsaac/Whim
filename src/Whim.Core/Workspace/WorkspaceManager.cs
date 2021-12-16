@@ -56,7 +56,7 @@ public class WorkspaceManager : IWorkspaceManager
 		}
 
 		// Subscribe to WindowRegistered event.
-		_configContext.WindowManager.WindowRegistered += OnWindowRegistered;
+		_configContext.WindowManager.WindowRegistered += WindowRegisteredEventHandler;
 	}
 
 	#region Workspaces
@@ -144,18 +144,18 @@ public class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Windows
-	internal void OnWindowRegistered(object sender, WindowEventArgs args)
+	internal void WindowRegisteredEventHandler(object sender, WindowEventArgs args)
 	{
 		IWindow window = args.Window;
-		window.WindowUnregistered += OnWindowUnregistered;
+		window.WindowUnregistered += WindowUnregisteredEventHandler;
 
 		ActiveWorkspace?.AddWindow(window);
 	}
 
-	internal void OnWindowUnregistered(object sender, WindowEventArgs args)
+	internal void WindowUnregisteredEventHandler(object sender, WindowEventArgs args)
 	{
 		IWindow window = args.Window;
-		window.WindowUnregistered -= OnWindowUnregistered;
+		window.WindowUnregistered -= WindowUnregisteredEventHandler;
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{

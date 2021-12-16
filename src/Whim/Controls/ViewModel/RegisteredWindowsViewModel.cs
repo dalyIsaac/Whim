@@ -17,7 +17,7 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 
 	public RegisteredWindowsViewModel(IConfigContext configContext)
 	{
-		configContext.WindowManager.WindowRegistered += OnWindowRegistered;
+		configContext.WindowManager.WindowRegistered += WindowRegisteredEventHandler;
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -27,7 +27,7 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	private void OnWindowRegistered(object sender, Core.WindowEventArgs args)
+	private void WindowRegisteredEventHandler(object sender, Core.WindowEventArgs args)
 	{
 		Model.Window model = new(args.Window);
 		model.WindowUnregistered += OnWindowUnregistered;

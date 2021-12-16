@@ -13,7 +13,7 @@ namespace Whim.Core;
 public class KeybindManager : IKeybindManager
 {
 	private readonly IConfigContext _configContext;
-	private readonly Dictionary<IKeybind, KeybindHandler> _keybinds = new();
+	private readonly Dictionary<IKeybind, KeybindEventHandler> _keybinds = new();
 
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
@@ -126,17 +126,17 @@ public class KeybindManager : IKeybindManager
 			return false;
 		}
 
-		if (!_keybinds.TryGetValue(keybind, out KeybindHandler? handler) || handler == null)
+		if (!_keybinds.TryGetValue(keybind, out KeybindEventHandler? handler) || handler == null)
 		{
 			Logger.Debug("DoKeyboardEvent: no handler for {keybind}", keybind);
 			return false;
 		}
 
-		handler.Invoke(keybind);
+		handler.Invoke(new KeybindEventArgs(keybind));
 		return true;
 	}
 
-	public KeybindHandler? this[IKeybind keybind]
+	public KeybindEventHandler? this[IKeybind keybind]
 	{
 		get
 		{
@@ -161,7 +161,7 @@ public class KeybindManager : IKeybindManager
 
 	public int Count => _keybinds.Count;
 
-	public void Add(IKeybind keybind, KeybindHandler handler, bool throwIfExists = false)
+	public void Add(IKeybind keybind, KeybindEventHandler handler, bool throwIfExists = false)
 	{
 		Logger.Debug("Adding keybind {0}", keybind);
 		if (_keybinds.ContainsKey(keybind))
@@ -182,7 +182,7 @@ public class KeybindManager : IKeybindManager
 		_keybinds.Clear();
 	}
 
-	public IEnumerator<KeyValuePair<IKeybind, KeybindHandler>> GetEnumerator() => _keybinds.GetEnumerator();
+	public IEnumerator<KeyValuePair<IKeybind, KeybindEventHandler>> GetEnumerator() => _keybinds.GetEnumerator();
 
 	public bool Remove(IKeybind keybind)
 	{
@@ -190,10 +190,10 @@ public class KeybindManager : IKeybindManager
 		return _keybinds.Remove(keybind);
 	}
 
-	public KeybindHandler? TryGet(IKeybind keybind)
+	public KeybindEventHandler? TryGet(IKeybind keybind)
 	{
 		Logger.Debug("Trying to get keybind handler for keybind {0}", keybind);
-		return _keybinds.TryGetValue(keybind, out KeybindHandler? handler) ? handler : null;
+		return _keybinds.TryGetValue(keybind, out KeybindEventHandler? handler) ? handler : null;
 	}
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
