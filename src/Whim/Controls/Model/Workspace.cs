@@ -9,7 +9,7 @@ namespace Whim.Controls.Model;
 /// </summary>
 internal class Workspace : INotifyPropertyChanged, IDisposable
 {
-	private IWorkspace _workspace;
+	private readonly IWorkspace _workspace;
 	private bool disposedValue;
 
 	public string Name => _workspace.Name;
@@ -31,11 +31,12 @@ internal class Workspace : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	public ILayoutEngine? LayoutEngine { get; private set; }
+	public ILayoutEngine? LayoutEngine => _workspace.ActiveLayoutEngine;
 
 	public Workspace(IWorkspace workspace, IMonitor? monitor = null)
 	{
 		_workspace = workspace;
+		_monitor = monitor;
 		workspace.ActiveLayoutEngineChanged += Workspace_ActiveLayoutEngineChanged;
 	}
 
@@ -48,7 +49,6 @@ internal class Workspace : INotifyPropertyChanged, IDisposable
 
 	private void Workspace_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs args)
 	{
-		LayoutEngine = args.CurrentLayoutEngine;
 		OnPropertyChanged(nameof(Monitor));
 	}
 
