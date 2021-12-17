@@ -200,4 +200,6 @@ public class Workspace : IWorkspace
 		}
 		return success;
 	}
+
+	public override string ToString() => Name;
 }

@@ -6,6 +6,10 @@
         mc:Ignorable="d"
         Title="Whim Dashboard" Height="450" Width="800">
 	<Grid Name="Grid">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="300" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
 		<!--NOTE: Add child elements in the code-behind.-->
 	</Grid>
 </Window>

@@ -29,7 +29,12 @@ public partial class MainWindow : System.Windows.Window
 
 		InitializeComponent();
 
+		WorkspaceDashboard dashboard = new(configContext);
+		Grid.Children.Add(dashboard);
+		Grid.SetRow(dashboard, 0);
+
 		RegisteredWindows windows = new(configContext);
 		Grid.Children.Add(windows);
+		Grid.SetRow(windows, 1);
 	}
 }
