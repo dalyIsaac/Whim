@@ -22,7 +22,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// <summary>
 	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
 	/// </summary>
-	public event EventHandler<RouteEventArgs>? Routed;
+	public event EventHandler<RouteEventArgs>? WorkspaceRouted;
 
 	/// <summary>
 	/// Event for when a workspace is added.

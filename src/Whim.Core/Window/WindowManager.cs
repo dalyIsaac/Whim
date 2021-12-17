@@ -179,7 +179,7 @@ public class WindowManager : IWindowManager
 		Pointer pointer = new(hwnd);
 		Logger.Debug("WindowManager.RegisterWindow: {Pointer}", pointer);
 
-		Window? window = Window.RegisterWindow(pointer, this);
+		Window? window = Window.RegisterWindow(pointer, _configContext);
 
 		if (window == null) { return null; }
 

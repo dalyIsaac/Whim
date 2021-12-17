@@ -21,6 +21,17 @@ internal class Window : INotifyPropertyChanged
 	public string LastEvent { get; private set; }
 	public string LastEventTime { get; private set; }
 
+	private string _workspaceName = "🔃";
+	public string WorkspaceName
+	{
+		get => _workspaceName;
+		set
+		{
+			_workspaceName = value;
+			OnPropertyChanged(nameof(WorkspaceName));
+		}
+	}
+
 	public event PropertyChangedEventHandler? PropertyChanged;
 	public event EventHandler<WindowEventArgs>? WindowUnregistered;
 

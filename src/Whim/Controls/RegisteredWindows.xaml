@@ -63,6 +63,15 @@
 						</GridViewColumn.Header>
 					</GridViewColumn>
 
+					<!-- Workspace Name -->
+					<GridViewColumn Width="200" DisplayMemberBinding="{Binding Path=WorkspaceName}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="WorkspaceName" Click="GridViewColumnHeader_Click">
+								Workspace Name
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
 					<!-- Time Registered -->
 					<GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=TimeRegistered}">
 						<GridViewColumn.Header>

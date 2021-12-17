@@ -58,11 +58,6 @@ public interface IWindow
 	public bool IsMouseMoving { get; }
 
 	/// <summary>
-	/// The <see cref="IWindowManager"/> which is managing this window.
-	/// </summary>
-	public IWindowManager WindowManager { get; }
-
-	/// <summary>
 	/// Event for when this window is updated.
 	/// </summary>
 	public event WindowUpdateEventHandler WindowUpdated;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Whim.Controls.Model;
+using System.Linq;
 using Whim.Core;
 
 namespace Whim.Controls.ViewModel;
@@ -17,7 +17,8 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 
 	public RegisteredWindowsViewModel(IConfigContext configContext)
 	{
-		configContext.WindowManager.WindowRegistered += WindowRegisteredEventHandler;
+		configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
+		configContext.WorkspaceManager.WorkspaceRouted += WorkspaceManager_Routed;
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -27,17 +28,44 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	private void WindowRegisteredEventHandler(object sender, Core.WindowEventArgs args)
+	/// <summary>
+	/// Overload of <see cref="WindowManager_WindowRegistered(object, WindowEventArgs)"/> which
+	/// returns the <see cref="Model.Window"/> created.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	private Model.Window WindowManager_WindowRegistered(IWindow window)
 	{
-		Model.Window model = new(args.Window);
-		model.WindowUnregistered += OnWindowUnregistered;
+		Model.Window? model = Windows.FirstOrDefault(w => w.Handle == window.Handle.Value);
+		if (model != null)
+		{
+			return model;
+		}
+
+		model = new(window);
+		model.WindowUnregistered += ModelWindow_WindowUnregistered;
 		Windows.Add(model);
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
+		return model;
 	}
 
-	private void OnWindowUnregistered(object? sender, Model.WindowEventArgs args)
+	private void WindowManager_WindowRegistered(object sender, WindowEventArgs args)
+	{
+		WindowManager_WindowRegistered(args.Window);
+	}
+
+	private void ModelWindow_WindowUnregistered(object? sender, Model.WindowEventArgs args)
 	{
 		Windows.Remove(args.Window);
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
+	}
+
+	private void WorkspaceManager_Routed(object? sender, RouteEventArgs args)
+	{
+		// Find the Model.Window that corresponds to the routed window.
+		Model.Window model = WindowManager_WindowRegistered(args.Window);
+
+		// Update the workspace name.
+		model.WorkspaceName = args.ToWorkspace?.Name ?? "🔃";
 	}
 }

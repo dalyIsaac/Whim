@@ -27,7 +27,7 @@ public class WorkspaceManager : IWorkspaceManager
 	/// </summary>
 	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
 
-	public event EventHandler<RouteEventArgs>? Routed;
+	public event EventHandler<RouteEventArgs>? WorkspaceRouted;
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
 
@@ -60,6 +60,9 @@ public class WorkspaceManager : IWorkspaceManager
 			Activate(_workspaces[idx], monitor);
 			idx++;
 		}
+
+		// Set the active workspace.
+		ActiveWorkspace = _workspaces[0];
 
 		// Subscribe to WindowRegistered event.
 		_configContext.WindowManager.WindowRegistered += WindowRegisteredEventHandler;
@@ -168,7 +171,7 @@ public class WorkspaceManager : IWorkspaceManager
 		if (ActiveWorkspace != null)
 		{
 			ActiveWorkspace?.AddWindow(window);
-			Routed?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
+			WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 		}
 	}
 
@@ -185,7 +188,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 		workspace.RemoveWindow(window);
 		_windowWorkspaceMap.Remove(window);
-		Routed?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
+		WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
 	}
 	#endregion
 }

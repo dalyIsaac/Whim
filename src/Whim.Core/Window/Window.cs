@@ -9,6 +9,7 @@ namespace Whim.Core;
 
 public class Window : IWindow
 {
+	private readonly IConfigContext _configContext;
 	private const int _bufferCapacity = 255;
 	private readonly Pointer _pointer;
 
@@ -69,8 +70,6 @@ public class Window : IWindow
 	public bool IsMaximized => PInvoke.IsZoomed(_pointer.Handle);
 
 	public bool IsMouseMoving { get; internal set; }
-
-	public IWindowManager WindowManager { get; }
 
 	public event WindowUpdateEventHandler? WindowUpdated;
 	public event WindowFocusEventHandler? WindowFocused;
@@ -147,12 +146,12 @@ public class Window : IWindow
 	/// Constructor for the <see cref="IWindow"/> implementation.
 	/// </summary>
 	/// <param name="pointer"></param>
-	/// <param name="windowManager"></param>
+	/// <param name="configContext"></param>
 	/// <exception cref="Win32Exception"></exception>
-	private Window(Pointer pointer, IWindowManager windowManager)
+	private Window(Pointer pointer, IConfigContext configContext)
 	{
 		Logger.Debug("Window.ctor: {Pointer}", pointer);
-		WindowManager = windowManager;
+		_configContext = configContext;
 		_pointer = pointer;
 
 		unsafe
@@ -183,13 +182,13 @@ public class Window : IWindow
 		};
 	}
 
-	internal static Window? RegisterWindow(Pointer pointer, IWindowManager windowManager)
+	internal static Window? RegisterWindow(Pointer pointer, IConfigContext configContext)
 	{
 		Logger.Debug("Window.RegisterWindow: {Pointer}", pointer);
 
 		try
 		{
-			return new Window(pointer, windowManager);
+			return new Window(pointer, configContext);
 		}
 		catch (Exception e)
 		{
