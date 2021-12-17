@@ -35,6 +35,11 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
 
 	/// <summary>
+	/// Event for when a monitor's workspace has changed.
+	/// </summary>
+	public event EventHandler<WorkspaceMonitorChangedEventArgs>? WorkspaceMonitorChanged;
+
+	/// <summary>
 	/// The <see cref="IWorkspace"/> to add.
 	/// </summary>
 	/// <param name="workspaces"></param>

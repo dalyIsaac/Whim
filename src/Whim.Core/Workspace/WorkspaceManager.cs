@@ -27,6 +27,8 @@ public class WorkspaceManager : IWorkspaceManager
 	/// </summary>
 	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
 
+	public event EventHandler<WorkspaceMonitorChangedEventArgs>? WorkspaceMonitorChanged;
+
 	public event EventHandler<RouteEventArgs>? WorkspaceRouted;
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
@@ -141,8 +143,17 @@ public class WorkspaceManager : IWorkspaceManager
 			monitor = _configContext.MonitorManager.FocusedMonitor;
 		}
 
+		// Get the old workspace for the event.
+		_monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? oldWorkspace);
+
+		// Change the workspace.
 		_monitorWorkspaceMap[monitor] = workspace;
+
+		// Update the layout.
 		workspace.DoLayout();
+
+		// Fire the event.
+		WorkspaceMonitorChanged?.Invoke(this, new WorkspaceMonitorChangedEventArgs(monitor, oldWorkspace, workspace));
 	}
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
