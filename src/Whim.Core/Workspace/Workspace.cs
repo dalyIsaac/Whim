@@ -177,6 +177,7 @@ public class Workspace : IWorkspace
 		{
 			layoutEngine.AddWindow(window);
 		}
+		DoLayout();
 	}
 
 	public bool RemoveWindow(IWindow window)
@@ -198,6 +199,13 @@ public class Workspace : IWorkspace
 				success = false;
 			}
 		}
+
+		if (success)
+		{
+			_windows.Remove(window);
+			DoLayout();
+		}
+
 		return success;
 	}
 
