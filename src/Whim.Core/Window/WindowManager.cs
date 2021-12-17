@@ -113,7 +113,7 @@ public class WindowManager : IWindowManager
 	/// event. For example, the mouse pointer is not associated with a window.
 	/// </param>
 	/// <returns></returns>
-	private static bool EventWindowIsValid(int idChild, int idObject, HWND? hwnd) =>
+	private static bool IsEventWindowValid(int idChild, int idObject, HWND? hwnd) =>
 		// When idChild is CHILDID_SELF (0), the event was triggered
 		// by the object.
 		idChild == PInvoke.CHILDID_SELF
@@ -142,21 +142,12 @@ public class WindowManager : IWindowManager
 			hwnd, eventType, idObject, idChild, idEventThread, dwmsEventTime
 		);
 
-		if (!EventWindowIsValid(idChild, idObject, hwnd)) { return; }
+		if (!IsEventWindowValid(idChild, idObject, hwnd)) { return; }
 
-		// Get the window from the dictionary. If it doesn't exist, create it.
-		if (!_windows.TryGetValue(hwnd, out IWindow? window))
-		{
-			Logger.Debug("Window {hwnd} is not registered and is being instantiated", hwnd.Value);
-			window = RegisterWindow(hwnd);
-		}
-
-		// If the window is null, we can't do anything with it.
-		if (window == null) { return; }
-
+		// Handle registering and unregistering of windows.
 		if (eventType == PInvoke.EVENT_OBJECT_SHOW)
 		{
-			// We've already registered the window, so we don't need to do anything.
+			RegisterWindow(hwnd);
 			return;
 		}
 		else if (eventType == PInvoke.EVENT_OBJECT_DESTROY)
@@ -165,7 +156,11 @@ public class WindowManager : IWindowManager
 			return;
 		}
 
-		window.HandleEvent(eventType);
+		// Handle other events within the window.
+		if (_windows.TryGetValue(hwnd, out IWindow? window) && window != null)
+		{
+			window.HandleEvent(eventType);
+		}
 	}
 
 	/// <summary>
@@ -206,7 +201,7 @@ public class WindowManager : IWindowManager
 
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			Logger.Error("Window {hwnd} is not registered", hwnd.Value);
+			Logger.Debug("Window {hwnd} is not registered", hwnd.Value);
 			return;
 		}
 
