@@ -50,8 +50,7 @@ public class Workspace : IWorkspace
 
 		using IWindowDeferPosHandle handle = WindowDeferPosHandle.Initialize(Windows.Count());
 
-		IEnumerable<IWindowLocation> locations = ActiveLayoutEngine.DoLayout(new Area(width: monitor.Width,
-																				height: monitor.Height));
+		IEnumerable<IWindowLocation> locations = ActiveLayoutEngine.DoLayout(new Area(monitor.Width, monitor.Height));
 		foreach (IWindowLocation loc in locations)
 		{
 			// Adjust the window location to the monitor's coordinates

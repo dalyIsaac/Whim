@@ -29,6 +29,10 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public event EventHandler<RouteEventArgs>? Routed;
 
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
@@ -66,7 +70,9 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void Add(IWorkspace workspace)
 	{
+		Logger.Debug("Adding workspace {workspace}", workspace);
 		_workspaces.Add(workspace);
+		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs(workspace));
 	}
 
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
@@ -82,6 +88,14 @@ public class WorkspaceManager : IWorkspaceManager
 		}
 
 		bool wasFound = _workspaces.Remove(workspace);
+
+		if (!wasFound)
+		{
+			Logger.Debug("Workspace {workspace} was not found.", workspace.Name);
+			return false;
+		}
+
+		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs(workspace));
 
 		// Remap windows to the last workspace
 		IWorkspace lastWorkspace = _workspaces[^1];

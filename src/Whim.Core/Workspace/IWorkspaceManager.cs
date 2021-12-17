@@ -25,6 +25,16 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public event EventHandler<RouteEventArgs>? Routed;
 
 	/// <summary>
+	/// Event for when a workspace is added.
+	/// </summary>
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+
+	/// <summary>
+	/// Event for when a workspace is removed.
+	/// </summary>
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+
+	/// <summary>
 	/// The <see cref="IWorkspace"/> to add.
 	/// </summary>
 	/// <param name="workspaces"></param>
