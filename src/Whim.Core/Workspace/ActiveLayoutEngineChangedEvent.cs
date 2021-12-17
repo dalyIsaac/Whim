@@ -7,12 +7,12 @@ namespace Whim.Core;
 /// </summary>
 public class ActiveLayoutEngineChangedEventArgs : EventArgs
 {
-	public ILayoutEngine Previous { get; }
-	public ILayoutEngine Current { get; }
+	public ILayoutEngine PreviousLayoutEngine { get; }
+	public ILayoutEngine CurrentLayoutEngine { get; }
 
 	public ActiveLayoutEngineChangedEventArgs(ILayoutEngine previous, ILayoutEngine current)
 	{
-		Previous = previous;
-		Current = current;
+		PreviousLayoutEngine = previous;
+		CurrentLayoutEngine = current;
 	}
 }

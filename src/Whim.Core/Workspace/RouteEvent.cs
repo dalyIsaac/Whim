@@ -15,18 +15,19 @@ public class RouteEventArgs : EventArgs
 	/// The workspace that the window was routed from. If the window has just
 	/// been registered, this will be null.
 	/// </summary>
-	public IWorkspace? FromWorkspace { get; }
+	public IWorkspace? PreviousWorkspace { get; }
 
 	/// <summary>
 	/// The workspace that the window was routed to. If the window has just
 	/// been unregistered, this will be null.
-	public IWorkspace? ToWorkspace { get; }
+	/// </summary>
+	public IWorkspace? CurrentWorkspace { get; }
 
-	private RouteEventArgs(IWindow window, IWorkspace? fromWorkspace, IWorkspace? toWorkspace)
+	private RouteEventArgs(IWindow window, IWorkspace? previousWorkspace, IWorkspace? currentWorkspace)
 	{
 		Window = window;
-		FromWorkspace = fromWorkspace;
-		ToWorkspace = toWorkspace;
+		PreviousWorkspace = previousWorkspace;
+		CurrentWorkspace = currentWorkspace;
 	}
 
 	public static RouteEventArgs WindowAdded(IWindow window, IWorkspace workspace) => new(window, null, workspace);

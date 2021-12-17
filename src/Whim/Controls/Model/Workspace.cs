@@ -48,7 +48,7 @@ internal class Workspace : INotifyPropertyChanged, IDisposable
 
 	private void Workspace_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs args)
 	{
-		LayoutEngine = args.Current;
+		LayoutEngine = args.CurrentLayoutEngine;
 		OnPropertyChanged(nameof(Monitor));
 	}
 

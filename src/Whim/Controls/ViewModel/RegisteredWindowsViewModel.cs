@@ -66,6 +66,6 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 		Model.Window model = WindowManager_WindowRegistered(args.Window);
 
 		// Update the workspace name.
-		model.WorkspaceName = args.ToWorkspace?.Name ?? "🔃";
+		model.WorkspaceName = args.CurrentWorkspace?.Name ?? "🔃";
 	}
 }
