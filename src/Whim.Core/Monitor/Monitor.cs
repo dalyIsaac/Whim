@@ -29,6 +29,7 @@ public class Monitor : IMonitor
 	public int Height => Screen.WorkingArea.Height;
 	public int X => Screen.WorkingArea.X;
 	public int Y => Screen.WorkingArea.Y;
+	public bool IsPrimary => Screen.Primary;
 
 	public bool IsPointInside(int x, int y) => Location.IsPointInside(this, x, y);
 }
