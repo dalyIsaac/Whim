@@ -137,10 +137,7 @@ public class WindowManager : IWindowManager
 	/// <param name="dwmsEventTime"></param>
 	private void WindowsEventHook(HWINEVENTHOOK hWinEventHook, uint eventType, HWND hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime)
 	{
-		Logger.Verbose(
-			"WindowsEventHook: {hwnd}, {eventType}, {idObject}, {idChild}, {idEventThread}, {dwmsEventTime}",
-			hwnd, eventType, idObject, idChild, idEventThread, dwmsEventTime
-		);
+		Logger.Verbose($"{hwnd}, {eventType}, {idObject}, {idChild}, {idEventThread}, {dwmsEventTime}");
 
 		if (!IsEventWindowValid(idChild, idObject, hwnd)) { return; }
 
@@ -172,7 +169,7 @@ public class WindowManager : IWindowManager
 	private IWindow? RegisterWindow(HWND hwnd)
 	{
 		Pointer pointer = new(hwnd);
-		Logger.Debug("WindowManager.RegisterWindow: {Pointer}", pointer);
+		Logger.Debug(pointer.ToString());
 
 		Window? window = Window.RegisterWindow(pointer, _configContext);
 
@@ -181,11 +178,11 @@ public class WindowManager : IWindowManager
 		// Try add the window to the dictionary.
 		if (!_windows.TryAdd(hwnd, window))
 		{
-			Logger.Debug("WindowManager.RegisterWindow: {hwnd} failed to register", hwnd.Value);
+			Logger.Debug($"{hwnd.Value} failed to register");
 			return null;
 		}
 
-		Logger.Debug("WindowManager.RegisterWindow: {hwnd} registered", hwnd.Value);
+		Logger.Debug($"{hwnd.Value} registered");
 		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
 		return window;
 	}
@@ -197,11 +194,11 @@ public class WindowManager : IWindowManager
 	/// <param name="hwnd"></param>
 	private void TryUnregisterWindow(HWND hwnd)
 	{
-		Logger.Debug("WindowManager.TryUnregisterWindow: {hwnd}", hwnd.Value);
+		Logger.Debug(hwnd.Value.ToString());
 
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			Logger.Debug("Window {hwnd} is not registered", hwnd.Value);
+			Logger.Debug($"Window {hwnd.Value} is not registered");
 			return;
 		}
 

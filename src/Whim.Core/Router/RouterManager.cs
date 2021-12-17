@@ -46,7 +46,7 @@ public class RouterManager : IRouterManager
 
 	public void ClearFilters(bool clearDefaults = false)
 	{
-		Logger.Debug("Clearing filters. Defaults being cleared: {0}", clearDefaults);
+		Logger.Debug($"Clearing filters. Defaults being cleared: {clearDefaults}");
 		_filters.Clear();
 		if (!clearDefaults)
 		{
@@ -63,20 +63,20 @@ public class RouterManager : IRouterManager
 	public void IgnoreProcessName(string processName)
 	{
 		processName = processName.ToLower();
-		Logger.Debug("Ignoring process name: {0}", processName);
+		Logger.Debug($"Ignoring process name: {processName}");
 		AddFilter(window => window.ProcessName.ToLower() != processName);
 	}
 
 	public void IgnoreTitle(string title)
 	{
 		title = title.ToLower();
-		Logger.Debug("Ignoring title: {0}", title);
+		Logger.Debug($"Ignoring title: {title}");
 		AddFilter(window => window.Title.ToLower() != title);
 	}
 
 	public void IgnoreTitleMatch(string match)
 	{
-		Logger.Debug("Ignoring title match: {0}", match);
+		Logger.Debug($"Ignoring title match: {match}");
 		Regex regex = new(match);
 		AddFilter(window => !regex.IsMatch(window.Title));
 	}
@@ -84,14 +84,14 @@ public class RouterManager : IRouterManager
 	public void IgnoreWindowClass(string windowClass)
 	{
 		windowClass = windowClass.ToLower();
-		Logger.Debug("Ignoring window class: {0}", windowClass);
+		Logger.Debug($"Ignoring window class: {windowClass}");
 		AddFilter(window => window.Class.ToLower() != windowClass);
 	}
 
 	public void RouteProcessName(string processName, string workspaceName)
 	{
 		processName = processName.ToLower();
-		Logger.Debug("Routing process name: {0} to workspace: {1}", processName, workspaceName);
+		Logger.Debug($"Routing process name: {processName} to workspace {workspaceName}");
 		AddRouter(window =>
 		{
 			if (window.ProcessName.ToLower() == processName)
@@ -105,7 +105,7 @@ public class RouterManager : IRouterManager
 	public void RouteProcessName(string processName, IWorkspace workspace)
 	{
 		processName = processName.ToLower();
-		Logger.Debug("Routing process name: {0} to workspace: {1}", processName, workspace.Name);
+		Logger.Debug($"Routing process name: {processName} to workspace {workspace.Name}");
 		AddRouter(window =>
 		{
 			if (window.ProcessName.ToLower() == processName)
@@ -119,7 +119,7 @@ public class RouterManager : IRouterManager
 	public void RouteTitle(string title, string workspaceName)
 	{
 		title = title.ToLower();
-		Logger.Debug("Routing title: {0} to workspace: {1}", title, workspaceName);
+		Logger.Debug($"Routing title: {title} to workspace {workspaceName}");
 		AddRouter(window =>
 		{
 			if (window.Title.ToLower() == title)
@@ -133,7 +133,7 @@ public class RouterManager : IRouterManager
 	public void RouteTitle(string title, IWorkspace workspace)
 	{
 		title = title.ToLower();
-		Logger.Debug("Routing title: {0} to workspace: {1}", title, workspace.Name);
+		Logger.Debug($"Routing title: {title} to workspace {workspace.Name}");
 		AddRouter(window =>
 		{
 			if (window.Title.ToLower() == title)
@@ -146,7 +146,7 @@ public class RouterManager : IRouterManager
 
 	public void RouteTitleMatch(string match, string workspaceName)
 	{
-		Logger.Debug("Routing title match: {0} to workspace: {1}", match, workspaceName);
+		Logger.Debug($"Routing title match: {match} to workspace {workspaceName}");
 		Regex regex = new(match);
 		AddRouter(window =>
 		{
@@ -160,7 +160,7 @@ public class RouterManager : IRouterManager
 
 	public void RouteTitleMatch(string match, IWorkspace workspace)
 	{
-		Logger.Debug("Routing title match: {0} to workspace: {1}", match, workspace.Name);
+		Logger.Debug($"Routing title match: {match} to workspace {workspace.Name}");
 		Regex regex = new(match);
 		AddRouter(window =>
 		{
@@ -174,12 +174,12 @@ public class RouterManager : IRouterManager
 
 	public IWorkspace? RouteWindow(IWindow window)
 	{
-		Logger.Debug("Routing window {window}", window);
+		Logger.Debug($"Routing window {window}");
 		foreach (Filter filter in _filters)
 		{
 			if (!filter(window))
 			{
-				Logger.Debug("Window {window} filtered out", window);
+				Logger.Debug($"Window {window} filtered out");
 				return null;
 			}
 		}
@@ -189,18 +189,18 @@ public class RouterManager : IRouterManager
 			IWorkspace? workspace = router(window);
 			if (workspace != null)
 			{
-				Logger.Debug("Window {window} routed to workspace: {workspace}", window, workspace);
+				Logger.Debug($"Window {window} routed to workspace: {workspace}");
 				return workspace;
 			}
 		}
-		Logger.Debug("Window {window} not routed", window);
+		Logger.Debug($"Window {window} not routed");
 		return null;
 	}
 
 	public void RouteWindowClass(string windowClass, string workspaceName)
 	{
 		windowClass = windowClass.ToLower();
-		Logger.Debug("Routing window class: {0} to workspace: {1}", windowClass, workspaceName);
+		Logger.Debug($"Routing window class: {windowClass} to workspace {workspaceName}");
 		AddRouter(window =>
 		{
 			if (window.Class.ToLower() == windowClass)
@@ -214,7 +214,7 @@ public class RouterManager : IRouterManager
 	public void RouteWindowClass(string windowClass, IWorkspace workspace)
 	{
 		windowClass = windowClass.ToLower();
-		Logger.Debug("Routing window class: {0} to workspace: {1}", windowClass, workspace.Name);
+		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace.Name}");
 		AddRouter(window =>
 		{
 			if (window.Class.ToLower() == windowClass)

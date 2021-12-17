@@ -75,7 +75,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void Add(IWorkspace workspace)
 	{
-		Logger.Debug("Adding workspace {workspace}", workspace);
+		Logger.Debug($"Adding workspace {workspace}");
 		_workspaces.Add(workspace);
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs(workspace));
 	}
@@ -85,7 +85,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public bool Remove(IWorkspace workspace)
 	{
-		Logger.Debug("Removing workspace {0}", workspace.Name);
+		Logger.Debug($"Removing workspace {workspace}");
 
 		if (_workspaces.Count <= _configContext.MonitorManager.Length)
 		{
@@ -96,7 +96,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 		if (!wasFound)
 		{
-			Logger.Debug("Workspace {workspace} was not found.", workspace.Name);
+			Logger.Debug($"Workspace {workspace} was not found");
 			return false;
 		}
 
@@ -116,12 +116,12 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public bool Remove(string workspaceName)
 	{
-		Logger.Debug("Trying to remove workspace {0}", workspaceName);
+		Logger.Debug($"Trying to remove workspace {workspaceName}");
 
 		IWorkspace? workspace = _workspaces.Find(w => w.Name == workspaceName);
 		if (workspace == null)
 		{
-			Logger.Debug("Workspace {0} not found", workspaceName);
+			Logger.Debug($"Workspace {workspaceName} not found");
 			return false;
 		}
 
@@ -130,13 +130,13 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? TryGet(string workspaceName)
 	{
-		Logger.Debug("Trying to get workspace {0}", workspaceName);
+		Logger.Debug($"Trying to get workspace {workspaceName}");
 		return _workspaces.Find(w => w.Name == workspaceName);
 	}
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
 	{
-		Logger.Debug("Activating workspace {0}", workspace.Name);
+		Logger.Debug($"Activating workspace {workspace.Name}");
 
 		if (monitor == null)
 		{
@@ -158,7 +158,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
 	{
-		Logger.Debug("Getting monitor for active workspace {0}", workspace.Name);
+		Logger.Debug($"Getting monitor for active workspace {workspace.Name}");
 
 		// Linear search for the monitor that contains the workspace.
 		foreach (IMonitor monitor in _configContext.MonitorManager)
@@ -193,7 +193,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
-			Logger.Error("Window {0} was not found in any workspace", window.Title);
+			Logger.Error($"Window {window} was not found in any workspace");
 			return;
 		}
 

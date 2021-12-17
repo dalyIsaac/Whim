@@ -33,10 +33,10 @@ public class Commander : IEnumerable<CommanderValues>
 	/// <exception cref="System.Exception"></exception>
 	public void Add(CommandType commandType, CommandEventHandler commandHandler)
 	{
-		Logger.Debug("Adding command {CommandType}", commandType);
+		Logger.Debug($"Adding command {commandType}");
 		if (_ownerCommand.ContainsKey(commandType))
 		{
-			Logger.Error("Command {CommandType} already exists", commandType);
+			Logger.Error($"Command {commandType} already exists");
 			throw new System.Exception($"Command {commandType} already exists");
 		}
 
@@ -49,7 +49,7 @@ public class Commander : IEnumerable<CommanderValues>
 	/// <param name="childCommanders"></param>
 	public void Add(params Commander[] childCommanders)
 	{
-		Logger.Debug("Adding child commanders");
+		Logger.Debug($"Adding child commanders");
 		_children.AddRange(childCommanders);
 	}
 
@@ -60,7 +60,7 @@ public class Commander : IEnumerable<CommanderValues>
 	/// <param name="command"></param>
 	public void ExecuteCommand(ICommand command, int depth = 0)
 	{
-		Logger.Debug("Executing command {CommandType}", command.CommandType);
+		Logger.Debug($"Executing command {command}");
 		if (_ownerCommand.TryGetValue(command.CommandType, out CommandEventHandler? commandHandler))
 		{
 			commandHandler(this, new CommandEventArgs(command));
@@ -69,18 +69,18 @@ public class Commander : IEnumerable<CommanderValues>
 		// Check PreventCascade
 		if (command.PreventCascade == true)
 		{
-			Logger.Debug("Command {CommandType} prevented cascade", command.CommandType);
+			Logger.Debug($"Command {command} prevented cascade");
 			return;
 		}
 
 		// Check the depth
 		if (command.MaxDepth >= depth)
 		{
-			Logger.Debug("Command's max depth {MaxDepth} reached", command.MaxDepth);
+			Logger.Debug($"Command's max depth {command.MaxDepth} reached");
 			return;
 		}
 
-		Logger.Debug("Searching children.", command.CommandType);
+		Logger.Debug($"Searching children for {command}");
 		foreach (Commander? childCommander in _children)
 		{
 			childCommander.ExecuteCommand(command, depth + 1);

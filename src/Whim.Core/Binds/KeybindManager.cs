@@ -41,7 +41,7 @@ public class KeybindManager : IKeybindManager
 	/// <returns></returns>
 	private LRESULT KeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 	{
-		Logger.Verbose("KeyboardHook: {nCode} {wParam} {lParam}", nCode, wParam, lParam);
+		Logger.Verbose($"{nCode} {wParam} {lParam}");
 		if (nCode != 0 || (wParam != (nuint)PInvoke.WM_KEYDOWN && wParam != (nuint)PInvoke.WM_SYSKEYDOWN))
 		{
 			return PInvoke.CallNextHookEx(null, nCode, wParam, lParam);
@@ -119,16 +119,16 @@ public class KeybindManager : IKeybindManager
 
 	private bool DoKeyboardEvent(Keybind keybind)
 	{
-		Logger.Debug("DoKeyboardEvent: {keybind}", keybind);
+		Logger.Debug(keybind.ToString());
 		if (keybind.Modifiers == KeyModifiers.None)
 		{
-			Logger.Debug("DoKeyboardEvent: no modifiers");
+			Logger.Debug("No modifiers");
 			return false;
 		}
 
 		if (!_keybinds.TryGetValue(keybind, out KeybindEventHandler? handler) || handler == null)
 		{
-			Logger.Debug("DoKeyboardEvent: no handler for {keybind}", keybind);
+			Logger.Debug($"No handler for {keybind}");
 			return false;
 		}
 
@@ -140,16 +140,16 @@ public class KeybindManager : IKeybindManager
 	{
 		get
 		{
-			Logger.Debug("Getting keybind handler for keybind {0}", keybind);
+			Logger.Debug($"Getting keybind handler for keybind {keybind}");
 			return TryGet(keybind);
 		}
 		set
 		{
-			Logger.Debug("Setting keybind handler for keybind {0}", keybind);
+			Logger.Debug($"Setting keybind handler for keybind {keybind}");
 			if (value == null)
 			{
 				// This really isn't ideal, but just in case.
-				Logger.Warning("Tried to set keybind handler to null. Removing keybind {0}", keybind);
+				Logger.Warning($"Tried to set keybind handler to null. Removing keybind {keybind}");
 				_keybinds.Remove(keybind);
 			}
 			else
@@ -163,10 +163,10 @@ public class KeybindManager : IKeybindManager
 
 	public void Add(IKeybind keybind, KeybindEventHandler handler, bool throwIfExists = false)
 	{
-		Logger.Debug("Adding keybind {0}", keybind);
+		Logger.Debug($"Adding keybind {keybind}");
 		if (_keybinds.ContainsKey(keybind))
 		{
-			Logger.Warning("Keybind {0} already exists", keybind);
+			Logger.Warning($"Keybind {keybind} already exists");
 			if (throwIfExists)
 			{
 				throw new ArgumentException("Keybind already exists");
@@ -186,13 +186,13 @@ public class KeybindManager : IKeybindManager
 
 	public bool Remove(IKeybind keybind)
 	{
-		Logger.Debug("Removing keybind {0}", keybind);
+		Logger.Debug($"Removing keybind {keybind}");
 		return _keybinds.Remove(keybind);
 	}
 
 	public KeybindEventHandler? TryGet(IKeybind keybind)
 	{
-		Logger.Debug("Trying to get keybind handler for keybind {0}", keybind);
+		Logger.Debug($"Trying to get keybind handler for keybind {keybind}");
 		return _keybinds.TryGetValue(keybind, out KeybindEventHandler? handler) ? handler : null;
 	}
 

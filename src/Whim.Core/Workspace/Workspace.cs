@@ -31,20 +31,20 @@ public class Workspace : IWorkspace
 
 	public void DoLayout()
 	{
-		Logger.Debug("Doing layout of workspace {Name}", Name);
+		Logger.Debug(Name);
 
 		// Get the monitor for this workspace
 		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWorkspace(this);
 		if (monitor == null)
 		{
-			Logger.Debug("No active monitors found for workspace {Name}.", Name);
+			Logger.Debug($"No active monitors found for workspace {Name}.");
 			return;
 		}
 
 		// Ensure there's at least one layout engine
 		if (_layoutEngines.Count == 0)
 		{
-			Logger.Fatal("No layout engines found for workspace {Name}.", Name);
+			Logger.Fatal($"No layout engines found for workspace {Name}");
 			throw new InvalidOperationException("No layout engines found for workspace " + Name);
 		}
 
@@ -76,7 +76,7 @@ public class Workspace : IWorkspace
 
 	public void NextLayoutEngine()
 	{
-		Logger.Debug("Switching to next layout engine for workspace {Name}", Name);
+		Logger.Debug(Name);
 
 		int prevIdx = _activeLayoutEngineIndex;
 		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + 1) % _layoutEngines.Count;
@@ -88,7 +88,7 @@ public class Workspace : IWorkspace
 
 	public void PreviousLayoutEngine()
 	{
-		Logger.Debug("Switching to previous layout engine for workspace {Name}", Name);
+		Logger.Debug(Name);
 
 		int prevIdx = _activeLayoutEngineIndex;
 		_activeLayoutEngineIndex = (_activeLayoutEngineIndex - 1) % _layoutEngines.Count;
@@ -100,7 +100,7 @@ public class Workspace : IWorkspace
 
 	public bool TrySetLayoutEngine(string name)
 	{
-		Logger.Debug("Trying to set layout engine {name} for workspace {workspace}", name, Name);
+		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
 		ILayoutEngine? layoutEngine = _layoutEngines.FirstOrDefault(x => x.Name == name);
 		if (layoutEngine == null)
@@ -113,12 +113,12 @@ public class Workspace : IWorkspace
 
 		if (_activeLayoutEngineIndex == -1)
 		{
-			Logger.Error("Layout engine {name} not found for workspace {workspace}", name, Name);
+			Logger.Error($"Layout engine {name} not found for workspace {Name}");
 			return false;
 		}
 		else if (_activeLayoutEngineIndex == prevIdx)
 		{
-			Logger.Debug("Layout engine {name} is already active for workspace {workspace}", name, Name);
+			Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
 			return true;
 		}
 
@@ -130,7 +130,7 @@ public class Workspace : IWorkspace
 
 	public void AddLayoutEngine(ILayoutEngine layoutEngine)
 	{
-		Logger.Debug("Adding layout engine {name} to workspace {workspace}", layoutEngine.Name, Name);
+		Logger.Debug($"Adding layout engine {layoutEngine.Name} to workspace {Name}");
 
 		_layoutEngines.Add(layoutEngine);
 
@@ -139,7 +139,7 @@ public class Workspace : IWorkspace
 
 	public bool RemoveLayoutEngine(ILayoutEngine layoutEngine)
 	{
-		Logger.Debug("Removing layout engine {name} from workspace {workspace}", layoutEngine.Name, Name);
+		Logger.Debug($"Removing layout engine {layoutEngine.Name} from workspace {Name}" );
 
 		if (_layoutEngines.Remove(layoutEngine))
 		{
@@ -152,7 +152,7 @@ public class Workspace : IWorkspace
 
 	public bool RemoveLayoutEngine(string name)
 	{
-		Logger.Debug("Removing layout engine {name} from workspace {workspace}", name, Name);
+		Logger.Debug($"Removing layout engine {name} from workspace {Name}");
 
 		ILayoutEngine? layoutEngine = _layoutEngines.FirstOrDefault(x => x.Name == name);
 		if (layoutEngine == null)
@@ -165,11 +165,11 @@ public class Workspace : IWorkspace
 
 	public void AddWindow(IWindow window)
 	{
-		Logger.Debug("Adding window {window} to workspace {Name}", window, Name);
+		Logger.Debug($"Adding window {window} to workspace {Name}");
 
 		if (_windows.Contains(window))
 		{
-			Logger.Debug("Window {window} already exists in workspace {Name}", window, Name);
+			Logger.Debug($"Window {window} already exists in workspace {Name}");
 			return;
 		}
 
@@ -182,11 +182,11 @@ public class Workspace : IWorkspace
 
 	public bool RemoveWindow(IWindow window)
 	{
-		Logger.Debug("Removing window {window} from workspace {Name}", window, Name);
+		Logger.Debug($"Removing window {window} from workspace {Name}");
 
 		if (!_windows.Contains(window))
 		{
-			Logger.Debug("Window {window} already does not exist in workspace {Name}", window, Name);
+			Logger.Debug($"Window {window} already does not exist in workspace {Name}");
 			return false;
 		}
 
@@ -195,7 +195,7 @@ public class Workspace : IWorkspace
 		{
 			if (!layoutEngine.RemoveWindow(window))
 			{
-				Logger.Debug("Window {window} could not be removed from layout engine {layoutEngine}", window, layoutEngine);
+				Logger.Debug($"Window {window} could not be removed from layout engine {layoutEngine}");
 				success = false;
 			}
 		}

@@ -15,13 +15,13 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 
 	public void AddWindow(IWindow window)
 	{
-		Logger.Debug("Adding window {title} to layout engine {engine}", window.Title, Name);
+		Logger.Debug($"Adding window {window.Title} to layout engine {Name}");
 		_stack.Add(window);
 	}
 
 	public bool RemoveWindow(IWindow window)
 	{
-		Logger.Debug("Removing window {title} from layout engine {engine}", window.Title, Name);
+		Logger.Debug($"Removing window {window.Title} from layout engine {Name}");
 		return _stack.RemoveAll(x => x.Handle == window.Handle) > 0;
 	}
 

@@ -77,23 +77,23 @@ public class Window : IWindow
 
 	public void BringToTop()
 	{
-		Logger.Debug("Window.BringToTop: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		PInvoke.BringWindowToTop(_pointer.Handle);
 	}
 
 	public void Close()
 	{
-		Logger.Debug("Window.Close: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		Win32Helper.QuitApplication(_pointer.Handle);
 		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
 	}
 
 	public void Focus()
 	{
-		Logger.Debug("Window.Focusing: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		if (IsFocused)
 		{
-			Logger.Debug("Window.Already focused: {Pointer}, {Title}", _pointer, Title);
+			Logger.Debug($"Already focused {this}");
 		}
 
 		PInvoke.SetForegroundWindow(_pointer.Handle);
@@ -102,14 +102,14 @@ public class Window : IWindow
 
 	public void Hide()
 	{
-		Logger.Debug("Window.Hide: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		Win32Helper.HideWindow(_pointer.Handle);
 		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
 	}
 
 	public void ShowInCurrentState()
 	{
-		Logger.Debug("Window.ShowInCurrentState: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		if (IsMinimized)
 		{
 			ShowMinimized();
@@ -126,19 +126,19 @@ public class Window : IWindow
 
 	public void ShowMaximized()
 	{
-		Logger.Debug("Window.ShowMaximized: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		Win32Helper.ShowWindowMaximized(_pointer.Handle);
 	}
 
 	public void ShowMinimized()
 	{
-		Logger.Debug("Window.ShowMinimized: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		Win32Helper.ShowWindowMinimized(_pointer.Handle);
 	}
 
 	public void ShowNormal()
 	{
-		Logger.Debug("Window.ShowNormal: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		Win32Helper.ShowWindowNoActivate(_pointer.Handle);
 	}
 
@@ -150,7 +150,7 @@ public class Window : IWindow
 	/// <exception cref="Win32Exception"></exception>
 	private Window(Pointer pointer, IConfigContext configContext)
 	{
-		Logger.Debug("Window.ctor: {Pointer}", pointer);
+		Logger.Debug(pointer.ToString());
 		_configContext = configContext;
 		_pointer = pointer;
 
@@ -175,7 +175,7 @@ public class Window : IWindow
 			// The exception will usually have a message of:
 			// "Unable to enumerate the process modules."
 			ProcessFileName = "--NA--";
-			Logger.Debug("Failed to get process filename for process {ProcessId}", ProcessId);
+			Logger.Debug($"Failed to get process filename for process {ProcessId}");
 
 			// We throw the exception here to implicitly ignore this process.
 			throw ex;
@@ -184,7 +184,7 @@ public class Window : IWindow
 
 	internal static Window? RegisterWindow(Pointer pointer, IConfigContext configContext)
 	{
-		Logger.Debug("Window.RegisterWindow: {Pointer}", pointer);
+		Logger.Debug(pointer.ToString());
 
 		try
 		{
@@ -192,14 +192,14 @@ public class Window : IWindow
 		}
 		catch (Exception e)
 		{
-			Logger.Error("Could not create a Window instance for {Pointer}, {Exception}", pointer, e.Message);
+			Logger.Error($"Could not create a Window instance for {pointer}, {e.Message}");
 			return null;
 		}
 	}
 
 	internal void UnregisterWindow()
 	{
-		Logger.Debug("Window.UnregisterWindow: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug(ToString());
 		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
 	}
 
@@ -207,7 +207,7 @@ public class Window : IWindow
 	// separately here.
 	void IWindow.HandleEvent(uint eventType)
 	{
-		Logger.Debug("Window.HandleEvent: {Pointer}, {Title}", _pointer, Title);
+		Logger.Debug($"{this}, {eventType}");
 		switch (eventType)
 		{
 			case PInvoke.EVENT_OBJECT_CLOAKED:
@@ -239,7 +239,7 @@ public class Window : IWindow
 
 	private void UpdateWindow(WindowUpdateType type)
 	{
-		Logger.Debug("Window.UpdateWindow: {Title}, {type}", Title, type);
+		Logger.Debug($"{this}, {type}");
 		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(this, type));
 	}
 
@@ -274,4 +274,6 @@ public class Window : IWindow
 	{
 		return Handle.GetHashCode();
 	}
+
+	public override string ToString() => $"{Title} ({ProcessName}) [{Handle}]";
 }

@@ -68,7 +68,7 @@ public class MonitorManager : IMonitorManager
 
 	public IMonitor GetMonitorAtPoint(int x, int y)
 	{
-		Logger.Debug("Getting monitor at point ({x}, {y})", x, y);
+		Logger.Debug($"Getting monitor at point ({x}, {y})");
 		Screen screen = Screen.FromPoint(new System.Drawing.Point(x, y));
 		return _monitors.FirstOrDefault(m => m.Name == screen.DeviceName) ?? _monitors[0];
 	}
