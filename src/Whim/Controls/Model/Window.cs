@@ -14,6 +14,7 @@ internal class Window : INotifyPropertyChanged
 
 	public int Handle { get; }
 	public string Title { get; private set; }
+	public string Class { get; }
 	public int ProcessId { get; }
 	public string ProcessFileName { get; }
 	public string ProcessName { get; }
@@ -39,6 +40,7 @@ internal class Window : INotifyPropertyChanged
 	{
 		Handle = (int)window.Handle.Value;
 		Title = window.Title;
+		Class = window.Class;
 		ProcessId = window.ProcessId;
 		ProcessFileName = window.ProcessFileName;
 		ProcessName = window.ProcessName;

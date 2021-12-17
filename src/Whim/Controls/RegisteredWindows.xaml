@@ -63,8 +63,17 @@
 						</GridViewColumn.Header>
 					</GridViewColumn>
 
+					<!-- Class -->
+					<GridViewColumn Width="200" DisplayMemberBinding="{Binding Path=Class}">
+						<GridViewColumn.Header>
+							<GridViewColumnHeader Tag="Class" Click="GridViewColumnHeader_Click">
+								Class
+							</GridViewColumnHeader>
+						</GridViewColumn.Header>
+					</GridViewColumn>
+
 					<!-- Workspace Name -->
-					<GridViewColumn Width="200" DisplayMemberBinding="{Binding Path=WorkspaceName}">
+					<GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=WorkspaceName}">
 						<GridViewColumn.Header>
 							<GridViewColumnHeader Tag="WorkspaceName" Click="GridViewColumnHeader_Click">
 								Workspace Name
