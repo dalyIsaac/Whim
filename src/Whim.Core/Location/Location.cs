@@ -24,4 +24,6 @@ public class Location : ILocation
 	{
 		return location.X <= x && location.Y <= y && location.X + location.Width >= x && location.Y + location.Height >= y;
 	}
+
+	public override string ToString() => $"(X: {X}, Y: {Y}, Width: {Width}, Height: {Height})";
 }

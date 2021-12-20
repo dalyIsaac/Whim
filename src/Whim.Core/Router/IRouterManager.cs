@@ -12,7 +12,7 @@ using Router = Func<IWindow, IWorkspace?>;
 public interface IRouterManager
 {
 	/// <summary>
-	///
+	/// Routes a window to a workspace.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns>
@@ -20,6 +20,16 @@ public interface IRouterManager
 	/// <see cref="IWorkspace"/> to route the window to.
 	/// </returns>
 	public IWorkspace? RouteWindow(IWindow window);
+
+	/// <summary>
+	/// Indicates whether the window should be ignored.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns>
+	/// <see langword="true"/> when the window should be ignored, otherwise
+	/// <see langword="false"/>.
+	/// </returns>
+	public bool FilterWindow(IWindow window);
 
 	/// <summary>
 	/// Clears all the filters.
@@ -49,37 +59,37 @@ public interface IRouterManager
 	/// Ignores the window class. Case insensitive.
 	/// </summary>
 	/// <param name="windowClass"></param>
-	public void IgnoreWindowClass(string windowClass);
+	public IRouterManager IgnoreWindowClass(string windowClass);
 
 	/// <summary>
 	/// Ignores the process name. Case insensitive.
 	/// </summary>
 	/// <param name="processName"></param>
-	public void IgnoreProcessName(string processName);
+	public IRouterManager IgnoreProcessName(string processName);
 
 	/// <summary>
 	/// Ignores the title. Case insensitive.
 	/// </summary>
 	/// <param name="title"></param>
-	public void IgnoreTitle(string title);
+	public IRouterManager IgnoreTitle(string title);
 
 	/// <summary>
 	/// Filter the title according to the regex pattern.
 	/// </summary>
 	/// <param name="match"></param>
-	public void IgnoreTitleMatch(string match);
+	public IRouterManager IgnoreTitleMatch(string match);
 	#endregion
 
 	#region Routers helper methods
-	public void RouteWindowClass(string windowClass, string workspaceName);
-	public void RouteWindowClass(string windowClass, IWorkspace workspace);
+	public IRouterManager RouteWindowClass(string windowClass, string workspaceName);
+	public IRouterManager RouteWindowClass(string windowClass, IWorkspace workspace);
 
-	public void RouteProcessName(string processName, string workspaceName);
-	public void RouteProcessName(string processName, IWorkspace workspace);
+	public IRouterManager RouteProcessName(string processName, string workspaceName);
+	public IRouterManager RouteProcessName(string processName, IWorkspace workspace);
 
-	public void RouteTitle(string title, string workspaceName);
-	public void RouteTitle(string title, IWorkspace workspace);
-	public void RouteTitleMatch(string match, string workspaceName);
-	public void RouteTitleMatch(string match, IWorkspace workspace);
+	public IRouterManager RouteTitle(string title, string workspaceName);
+	public IRouterManager RouteTitle(string title, IWorkspace workspace);
+	public IRouterManager RouteTitleMatch(string match, string workspaceName);
+	public IRouterManager RouteTitleMatch(string match, IWorkspace workspace);
 	#endregion
 }

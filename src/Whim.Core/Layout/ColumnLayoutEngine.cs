@@ -8,6 +8,8 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 
 	public override IEnumerable<IWindowLocation> DoLayout(IArea area)
 	{
+		Logger.Debug("Performing a column layout");
+
 		if (_stack.Count == 0)
 		{
 			yield break;

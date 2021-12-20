@@ -181,6 +181,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 		if (ActiveWorkspace != null)
 		{
+			_windowWorkspaceMap[window] = ActiveWorkspace;
 			ActiveWorkspace?.AddWindow(window);
 			WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 		}

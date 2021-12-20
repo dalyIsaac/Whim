@@ -24,7 +24,7 @@ public class Window : IWindow
 				fixed (char* buffer = new char[_bufferCapacity])
 				{
 					int length = PInvoke.GetWindowText(_pointer.Handle, buffer, _bufferCapacity + 1);
-					return length > 0 ? new string(buffer) : "🛑Couldn't retrieve title🛑";
+					return length > 0 ? new string(buffer) : "";
 				}
 			}
 		}
@@ -39,7 +39,7 @@ public class Window : IWindow
 				fixed (char* buffer = new char[_bufferCapacity])
 				{
 					int length = PInvoke.GetClassName(_pointer.Handle, buffer, _bufferCapacity + 1);
-					return length > 0 ? new string(buffer) : "🛑Couldn't retrieve class name🛑";
+					return length > 0 ? new string(buffer) : "";
 				}
 			}
 		}
@@ -150,7 +150,6 @@ public class Window : IWindow
 	/// <exception cref="Win32Exception"></exception>
 	private Window(Pointer pointer, IConfigContext configContext)
 	{
-		Logger.Debug(pointer.ToString());
 		_configContext = configContext;
 		_pointer = pointer;
 
@@ -184,7 +183,7 @@ public class Window : IWindow
 
 	internal static Window? RegisterWindow(Pointer pointer, IConfigContext configContext)
 	{
-		Logger.Debug(pointer.ToString());
+		Logger.Debug($"Registering window {pointer}");
 
 		try
 		{
@@ -275,5 +274,5 @@ public class Window : IWindow
 		return Handle.GetHashCode();
 	}
 
-	public override string ToString() => $"{Title} ({ProcessName}) [{Handle}]";
+	public override string ToString() => $"{Title} ({ProcessName}) [{_pointer}]";
 }

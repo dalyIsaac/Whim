@@ -31,7 +31,7 @@ public class Workspace : IWorkspace
 
 	public void DoLayout()
 	{
-		Logger.Debug(Name);
+		Logger.Debug($"Workspace {Name}");
 
 		// Get the monitor for this workspace
 		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWorkspace(this);
@@ -59,6 +59,7 @@ public class Workspace : IWorkspace
 										width: loc.Location.Width,
 										height: loc.Location.Height);
 
+			Logger.Debug($"[{loc.Window.Title}] at {loc.Location}");
 			handle.DeferWindowPos(loc);
 		}
 	}
@@ -173,6 +174,7 @@ public class Workspace : IWorkspace
 			return;
 		}
 
+		_windows.Add(window);
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
 			layoutEngine.AddWindow(window);

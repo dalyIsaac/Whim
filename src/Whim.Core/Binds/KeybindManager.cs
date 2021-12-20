@@ -119,16 +119,16 @@ public class KeybindManager : IKeybindManager
 
 	private bool DoKeyboardEvent(Keybind keybind)
 	{
-		Logger.Debug(keybind.ToString());
+		Logger.Verbose(keybind.ToString());
 		if (keybind.Modifiers == KeyModifiers.None)
 		{
-			Logger.Debug("No modifiers");
+			Logger.Verbose("No modifiers");
 			return false;
 		}
 
 		if (!_keybinds.TryGetValue(keybind, out KeybindEventHandler? handler) || handler == null)
 		{
-			Logger.Debug($"No handler for {keybind}");
+			Logger.Verbose($"No handler for {keybind}");
 			return false;
 		}
 

@@ -6,7 +6,7 @@ namespace Whim.Core;
 
 public class WindowDeferPosHandle : IWindowDeferPosHandle
 {
-	private readonly nint _hWinPosInfo;
+	private nint _hWinPosInfo;
 	private readonly List<IWindow> _toMinimize;
 	private readonly List<IWindow> _toMaximize;
 	private readonly List<IWindow> _toNormal;
@@ -70,15 +70,14 @@ public class WindowDeferPosHandle : IWindowDeferPosHandle
 			_toNormal.Add(window);
 		}
 
-		PInvoke.DeferWindowPos(_hWinPosInfo,
-						 window.Handle,
-						 new Windows.Win32.Foundation.HWND(0),
-						 location.X,
-						 location.Y,
-						 location.Width,
-						 location.Height,
-						 flags
-		);
+		_hWinPosInfo = PInvoke.DeferWindowPos(_hWinPosInfo,
+										window.Handle,
+										new Windows.Win32.Foundation.HWND(0), // HWND_TOP
+										location.X,
+										location.Y,
+										location.Width,
+										location.Height,
+										flags);
 	}
 
 	public static IWindowDeferPosHandle Initialize(int count)

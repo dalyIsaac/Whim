@@ -60,35 +60,39 @@ public class RouterManager : IRouterManager
 		_routers.Clear();
 	}
 
-	public void IgnoreProcessName(string processName)
+	public IRouterManager IgnoreProcessName(string processName)
 	{
 		processName = processName.ToLower();
 		Logger.Debug($"Ignoring process name: {processName}");
 		AddFilter(window => window.ProcessName.ToLower() != processName);
+		return this;
 	}
 
-	public void IgnoreTitle(string title)
+	public IRouterManager IgnoreTitle(string title)
 	{
 		title = title.ToLower();
 		Logger.Debug($"Ignoring title: {title}");
 		AddFilter(window => window.Title.ToLower() != title);
+		return this;
 	}
 
-	public void IgnoreTitleMatch(string match)
+	public IRouterManager IgnoreTitleMatch(string match)
 	{
 		Logger.Debug($"Ignoring title match: {match}");
 		Regex regex = new(match);
 		AddFilter(window => !regex.IsMatch(window.Title));
+		return this;
 	}
 
-	public void IgnoreWindowClass(string windowClass)
+	public IRouterManager IgnoreWindowClass(string windowClass)
 	{
 		windowClass = windowClass.ToLower();
 		Logger.Debug($"Ignoring window class: {windowClass}");
 		AddFilter(window => window.Class.ToLower() != windowClass);
+		return this;
 	}
 
-	public void RouteProcessName(string processName, string workspaceName)
+	public IRouterManager RouteProcessName(string processName, string workspaceName)
 	{
 		processName = processName.ToLower();
 		Logger.Debug($"Routing process name: {processName} to workspace {workspaceName}");
@@ -100,9 +104,10 @@ public class RouterManager : IRouterManager
 			}
 			return null;
 		});
+		return this;
 	}
 
-	public void RouteProcessName(string processName, IWorkspace workspace)
+	public IRouterManager RouteProcessName(string processName, IWorkspace workspace)
 	{
 		processName = processName.ToLower();
 		Logger.Debug($"Routing process name: {processName} to workspace {workspace.Name}");
@@ -114,9 +119,10 @@ public class RouterManager : IRouterManager
 			}
 			return null;
 		});
+		return this;
 	}
 
-	public void RouteTitle(string title, string workspaceName)
+	public IRouterManager RouteTitle(string title, string workspaceName)
 	{
 		title = title.ToLower();
 		Logger.Debug($"Routing title: {title} to workspace {workspaceName}");
@@ -128,9 +134,10 @@ public class RouterManager : IRouterManager
 			}
 			return null;
 		});
+		return this;
 	}
 
-	public void RouteTitle(string title, IWorkspace workspace)
+	public IRouterManager RouteTitle(string title, IWorkspace workspace)
 	{
 		title = title.ToLower();
 		Logger.Debug($"Routing title: {title} to workspace {workspace.Name}");
@@ -142,9 +149,10 @@ public class RouterManager : IRouterManager
 			}
 			return null;
 		});
+		return this;
 	}
 
-	public void RouteTitleMatch(string match, string workspaceName)
+	public IRouterManager RouteTitleMatch(string match, string workspaceName)
 	{
 		Logger.Debug($"Routing title match: {match} to workspace {workspaceName}");
 		Regex regex = new(match);
@@ -156,9 +164,10 @@ public class RouterManager : IRouterManager
 			}
 			return null;
 		});
+		return this;
 	}
 
-	public void RouteTitleMatch(string match, IWorkspace workspace)
+	public IRouterManager RouteTitleMatch(string match, IWorkspace workspace)
 	{
 		Logger.Debug($"Routing title match: {match} to workspace {workspace.Name}");
 		Regex regex = new(match);
@@ -170,18 +179,15 @@ public class RouterManager : IRouterManager
 			}
 			return null;
 		});
+		return this;
 	}
 
 	public IWorkspace? RouteWindow(IWindow window)
 	{
 		Logger.Debug($"Routing window {window}");
-		foreach (Filter filter in _filters)
+		if (!FilterWindow(window))
 		{
-			if (!filter(window))
-			{
-				Logger.Debug($"Window {window} filtered out");
-				return null;
-			}
+			return null;
 		}
 
 		foreach (Router router in _routers)
@@ -197,7 +203,22 @@ public class RouterManager : IRouterManager
 		return null;
 	}
 
-	public void RouteWindowClass(string windowClass, string workspaceName)
+	public bool FilterWindow(IWindow window)
+	{
+		Logger.Debug($"Filtering window \"{window}\"");
+		foreach (Filter filter in _filters)
+		{
+			if (!filter(window))
+			{
+				Logger.Debug($"Window {window} filtered out");
+				return true;
+			}
+		}
+		Logger.Debug($"Window {window} not filtered");
+		return false;
+	}
+
+	public IRouterManager RouteWindowClass(string windowClass, string workspaceName)
 	{
 		windowClass = windowClass.ToLower();
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspaceName}");
@@ -209,9 +230,10 @@ public class RouterManager : IRouterManager
 			}
 			return null;
 		});
+		return this;
 	}
 
-	public void RouteWindowClass(string windowClass, IWorkspace workspace)
+	public IRouterManager RouteWindowClass(string windowClass, IWorkspace workspace)
 	{
 		windowClass = windowClass.ToLower();
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace.Name}");
@@ -223,6 +245,7 @@ public class RouterManager : IRouterManager
 			}
 			return null;
 		});
+		return this;
 	}
 
 	/// <summary>
@@ -231,6 +254,12 @@ public class RouterManager : IRouterManager
 	/// <returns></returns>
 	public static void AddDefaultFilters(IRouterManager router)
 	{
-		router.IgnoreWindowClass("TaskManagerWindow");
+		router.IgnoreWindowClass("TaskManagerWindow")
+			  .IgnoreProcessName("ShellExperienceHost")
+			  .IgnoreProcessName("SearchHost") // Windows 11 search
+			  .IgnoreWindowClass("Shell_TrayWnd") // Windows 11 start
+			  .IgnoreProcessName("ScreenClippingHost") // Windows 10 screen clipping
+              .IgnoreWindowClass("MSCTFIME UI") // Windows 10 IME
+			  .IgnoreWindowClass("Xaml_WindowedPopupClass");
 	}
 }
