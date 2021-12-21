@@ -59,7 +59,7 @@ public class Workspace : IWorkspace
 										width: loc.Location.Width,
 										height: loc.Location.Height);
 
-			Logger.Debug($"[{loc.Window.Title}] at {loc.Location}");
+			Logger.Debug($"{loc.Window} at {loc.Location}");
 			handle.DeferWindowPos(loc);
 		}
 	}

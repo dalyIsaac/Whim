@@ -274,5 +274,5 @@ public class Window : IWindow
 		return Handle.GetHashCode();
 	}
 
-	public override string ToString() => $"{Title} ({ProcessName}) [{_pointer}]";
+	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{Class}> {{{_pointer}}}";
 }
