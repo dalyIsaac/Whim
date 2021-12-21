@@ -179,12 +179,14 @@ public class WorkspaceManager : IWorkspaceManager
 		IWindow window = args.Window;
 		window.WindowUnregistered += WindowUnregisteredEventHandler;
 
-		if (ActiveWorkspace != null)
+		if (ActiveWorkspace == null || !window.IsFocused)
 		{
-			_windowWorkspaceMap[window] = ActiveWorkspace;
-			ActiveWorkspace?.AddWindow(window);
-			WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
+			return;
 		}
+
+		_windowWorkspaceMap[window] = ActiveWorkspace;
+		ActiveWorkspace?.AddWindow(window);
+		WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 	}
 
 	internal void WindowUnregisteredEventHandler(object sender, WindowEventArgs args)
