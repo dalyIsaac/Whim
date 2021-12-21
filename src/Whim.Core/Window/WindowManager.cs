@@ -171,7 +171,7 @@ public class WindowManager : IWindowManager
 
 		Window? window = Window.RegisterWindow(pointer, _configContext);
 
-		if (window == null || _configContext.RouterManager.FilterWindow(window))
+		if (window == null || _configContext.FilterManager.FilterWindow(window))
 		{
 			return null;
 		}

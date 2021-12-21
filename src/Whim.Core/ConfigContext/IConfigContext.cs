@@ -18,6 +18,7 @@ public interface IConfigContext : IDisposable
 	public IWindowManager WindowManager { get; }
 	public IMonitorManager MonitorManager { get; }
 	public IRouterManager RouterManager { get; }
+	public IFilterManager FilterManager { get; }
 	public IKeybindManager KeybindManager { get; }
 	public void Initialize();
 }

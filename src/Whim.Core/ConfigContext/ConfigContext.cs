@@ -18,15 +18,17 @@ public class ConfigContext : IConfigContext
 	public IWindowManager WindowManager { get; }
 	public IMonitorManager MonitorManager { get; }
 	public IRouterManager RouterManager { get; }
+	public IFilterManager FilterManager { get; }
 	public IKeybindManager KeybindManager { get; }
 
 	public ConfigContext()
 	{
 		Logger = Logger.Initialize();
+		RouterManager = new RouterManager(this);
+		FilterManager = new FilterManager(this);
 		WindowManager = new WindowManager(this);
 		MonitorManager = new MonitorManager(this);
 		WorkspaceManager = new WorkspaceManager(this);
-		RouterManager = new RouterManager(this);
 		KeybindManager = new KeybindManager(this);
 	}
 
