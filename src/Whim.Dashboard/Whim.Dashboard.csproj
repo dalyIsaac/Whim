@@ -17,7 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Whim.Core\Whim.Core.csproj" />
+		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
 </Project>
