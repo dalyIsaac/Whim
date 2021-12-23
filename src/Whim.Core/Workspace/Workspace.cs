@@ -66,13 +66,12 @@ public class Workspace : IWorkspace
 
 	public event EventHandler<WorkspaceRenameEventArgs>? WorkspaceRenamed;
 	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
-	public event EventHandler<LayoutEngineEventArgs>? LayoutEngineAdded;
-	public event EventHandler<LayoutEngineEventArgs>? LayoutEngineRemoved;
 
-	public Workspace(IConfigContext configContext, string name)
+	public Workspace(IConfigContext configContext, string name, params ILayoutEngine[] layoutEngines)
 	{
 		_configContext = configContext;
 		_name = name;
+		_layoutEngines.AddRange(layoutEngines);
 	}
 
 	public void NextLayoutEngine()
@@ -127,41 +126,6 @@ public class Workspace : IWorkspace
 
 		DoLayout();
 		return true;
-	}
-
-	public void AddLayoutEngine(ILayoutEngine layoutEngine)
-	{
-		Logger.Debug($"Adding layout engine {layoutEngine.Name} to workspace {Name}");
-
-		_layoutEngines.Add(layoutEngine);
-
-		LayoutEngineAdded?.Invoke(this, new LayoutEngineEventArgs(this, layoutEngine));
-	}
-
-	public bool RemoveLayoutEngine(ILayoutEngine layoutEngine)
-	{
-		Logger.Debug($"Removing layout engine {layoutEngine.Name} from workspace {Name}" );
-
-		if (_layoutEngines.Remove(layoutEngine))
-		{
-			LayoutEngineRemoved?.Invoke(this, new LayoutEngineEventArgs(this, layoutEngine));
-			return true;
-		}
-
-		return false;
-	}
-
-	public bool RemoveLayoutEngine(string name)
-	{
-		Logger.Debug($"Removing layout engine {name} from workspace {Name}");
-
-		ILayoutEngine? layoutEngine = _layoutEngines.FirstOrDefault(x => x.Name == name);
-		if (layoutEngine == null)
-		{
-			return false;
-		}
-
-		return _layoutEngines.Remove(layoutEngine);
 	}
 
 	public void AddWindow(IWindow window)

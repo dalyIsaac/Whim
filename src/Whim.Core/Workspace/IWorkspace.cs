@@ -30,36 +30,6 @@ public interface IWorkspace : ICommandable
 	/// </summary>
 	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
 
-	// Methods to add and remove layout engines
-
-	/// <summary>
-	/// Adds a layout engine to the workspace.
-	/// </summary>
-	/// <param name="layoutEngine">The layout engine to add.</param>
-	public void AddLayoutEngine(ILayoutEngine layoutEngine);
-
-	/// <summary>
-	/// Removes a layout engine from the workspace.
-	/// </summary>
-	/// <param name="layoutEngine">The layout engine to remove.</param>
-	public bool RemoveLayoutEngine(ILayoutEngine layoutEngine);
-
-	/// <summary>
-	/// Removes the layout engine with name <paramref name="name"/> from the workspace.
-	/// </summary>
-	/// <param name="name">The name of the layout engine to remove.</param>
-	public bool RemoveLayoutEngine(string name);
-
-	/// <summary>
-	/// Event for when a layout engine has been added to the workspace.
-	/// </summary>
-	public event EventHandler<LayoutEngineEventArgs>? LayoutEngineAdded;
-
-	/// <summary>
-	/// Event for when a layout engine has been removed from the workspace.
-	/// </summary>
-	public event EventHandler<LayoutEngineEventArgs>? LayoutEngineRemoved;
-
 	/// <summary>
 	/// Rotate to the next layout engine.
 	/// </summary>

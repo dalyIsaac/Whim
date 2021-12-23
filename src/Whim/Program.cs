@@ -31,8 +31,7 @@ public class Program
 
 		for (int i = 0; i < 4; i++)
 		{
-			Workspace workspace = new(configContext, i.ToString());
-			workspace.AddLayoutEngine(new ColumnLayoutEngine());
+			Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine());
 			configContext.WorkspaceManager.Add(workspace);
 		}
 
