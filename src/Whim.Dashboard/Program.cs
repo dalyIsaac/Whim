@@ -1,7 +1,7 @@
 using System;
 using Whim.Core;
 
-namespace Whim;
+namespace Whim.Dashboard;
 
 public class Program
 {

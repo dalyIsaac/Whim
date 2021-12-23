@@ -1,7 +1,7 @@
 using System;
 using Whim.Core;
 
-namespace Whim;
+namespace Whim.Dashboard;
 
 /// <summary>
 /// <c>WhimManager</c> contains the <see cref="IConfigContext"/> and application logic (like how to

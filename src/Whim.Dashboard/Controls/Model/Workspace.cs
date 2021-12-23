@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using Whim.Core;
 
-namespace Whim.Controls.Model;
+namespace Whim.Dashboard.Controls.Model;
 
 /// <summary>
 /// Workspace model used by <see cref="ViewModel.WorkspaceDashboardViewModel"/> and <see cref="WorkspaceDashboard"/>.

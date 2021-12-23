@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using Whim.Core;
 
-namespace Whim.Controls.ViewModel;
+namespace Whim.Dashboard.Controls.ViewModel;
 
 /// <summary>
 /// View model used for for <see cref="RegisteredWindows"/>'s <c>DataContext</c>. This wraps the

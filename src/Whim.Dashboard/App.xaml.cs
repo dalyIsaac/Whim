@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Whim.Core;
 
-namespace Whim;
+namespace Whim.Dashboard;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>

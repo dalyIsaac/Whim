@@ -14,10 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Whim.Controls.ViewModel;
+using Whim.Dashboard.Controls.ViewModel;
 using Whim.Core;
 
-namespace Whim.Controls;
+namespace Whim.Dashboard.Controls;
 
 /// <summary>
 /// Interaction logic for WorkspaceDashboard.xaml

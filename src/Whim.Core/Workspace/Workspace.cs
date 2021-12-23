@@ -72,7 +72,7 @@ public class Workspace : IWorkspace
 		_configContext = configContext;
 		_name = name;
 
-		if (layoutEngines.Count() == 0)
+		if (layoutEngines.Length == 0)
 		{
 			throw new ArgumentException("At least one layout engine must be provided.");
 		}

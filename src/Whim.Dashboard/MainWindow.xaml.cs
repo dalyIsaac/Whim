@@ -12,10 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Whim.Controls;
+using Whim.Dashboard.Controls;
 using Whim.Core;
 
-namespace Whim;
+namespace Whim.Dashboard;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using Whim.Core;
 
-namespace Whim.Controls.Model;
+namespace Whim.Dashboard.Controls.Model;
 
 
 /// <summary>
