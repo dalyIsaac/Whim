@@ -1,4 +1,4 @@
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// The file sink's rolling interval for the file logs.

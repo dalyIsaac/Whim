@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Windows.Win32;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace Whim.Core;
+namespace Whim;
 
 public class WindowDeferPosHandle : IWindowDeferPosHandle
 {

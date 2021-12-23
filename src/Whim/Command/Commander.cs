@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Whim.Core;
+namespace Whim;
 
 using CommanderValues = KeyValuePair<CommandType, CommandEventHandler>;
 

@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Whim.Core;
+namespace Whim;
 
 public static class LoggerStringExtensions
 {

@@ -1,4 +1,4 @@
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// Implementation of <see cref="IConfigContext"/>. This is the core of Whim. <br/>

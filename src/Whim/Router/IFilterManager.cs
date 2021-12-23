@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core;
+namespace Whim;
 
 using Filter = Func<IWindow, bool>;
 

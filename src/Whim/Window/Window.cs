@@ -5,7 +5,7 @@ using System.IO;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 
-namespace Whim.Core;
+namespace Whim;
 
 public class Window : IWindow
 {

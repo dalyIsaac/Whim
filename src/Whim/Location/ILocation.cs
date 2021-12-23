@@ -1,4 +1,4 @@
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// The location of an item, where the origin is in the top-left of the primary monitor.

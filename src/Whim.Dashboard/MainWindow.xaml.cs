@@ -13,7 +13,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Whim.Dashboard.Controls;
-using Whim.Core;
 
 namespace Whim.Dashboard;
 /// <summary>

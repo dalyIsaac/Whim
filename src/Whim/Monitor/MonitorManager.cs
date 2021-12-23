@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// Implementation of <see cref="IMonitorManager"/>.

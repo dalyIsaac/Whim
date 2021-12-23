@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Whim.Core;
+namespace Whim;
 
 using Filter = Func<IWindow, bool>;
 using Router = Func<IWindow, IWorkspace?>;

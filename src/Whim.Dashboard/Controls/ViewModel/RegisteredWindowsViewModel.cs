@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using Whim.Core;
 
 namespace Whim.Dashboard.Controls.ViewModel;
 

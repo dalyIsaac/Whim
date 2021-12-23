@@ -5,7 +5,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Whim.Core;
 
 namespace Whim.Dashboard;
 /// <summary>

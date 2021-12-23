@@ -1,7 +1,7 @@
 using System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
-namespace Whim.Core;
+namespace Whim;
 
 public class Keybind : IKeybind
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// Describes how an <see cref="IWindow"/> has been routed between workspaces.

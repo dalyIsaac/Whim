@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// Delegate for the <see cref="IWindowManager.WindowRegistered"/> event.

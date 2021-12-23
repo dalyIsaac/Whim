@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// Abstract layout engine with a stack data structure.

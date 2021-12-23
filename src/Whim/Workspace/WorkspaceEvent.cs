@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// Event arguments for when an argument is added or removed from the workspace

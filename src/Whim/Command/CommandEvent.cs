@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core;
+namespace Whim;
 
 public delegate void CommandEventHandler(object sender, CommandEventArgs args);
 

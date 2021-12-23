@@ -1,6 +1,6 @@
 using Serilog.Events;
 
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// The log levels available to <see cref="Logger"/>.

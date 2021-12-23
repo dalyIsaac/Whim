@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.Core;
+namespace Whim;
 
 public delegate void KeybindEventHandler(KeybindEventArgs args);
 

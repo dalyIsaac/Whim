@@ -1,4 +1,4 @@
-namespace Whim.Core;
+namespace Whim;
 
 public interface IWindowLocation
 {

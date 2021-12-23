@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// The manager for bindings.

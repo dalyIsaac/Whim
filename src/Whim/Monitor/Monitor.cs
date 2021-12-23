@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace Whim.Core;
+namespace Whim;
 
 /// <summary>
 /// Implementation of <see cref="IMonitor"/>.

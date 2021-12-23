@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using Whim.Core;
 
 namespace Whim.Dashboard.Controls.Model;
 

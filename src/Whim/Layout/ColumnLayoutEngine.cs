@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Whim.Core;
+namespace Whim;
 
 public class ColumnLayoutEngine : BaseStackLayoutEngine
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using Whim.Core;
 
 namespace Whim.Dashboard.Controls.Model;
 
@@ -64,7 +63,7 @@ internal class Window : INotifyPropertyChanged
 	internal void WindowUpdatedEventHandler(object sender, Core.WindowUpdateEventArgs args) => RegisterEvent(args.Window, args.UpdateType.ToString());
 
 	/// <summary>
-	/// Handles the <see cref="Whim.Core.Window.WindowUnregisterEventHandler"/> event. This calls
+	/// Handles the <see cref="Whim.Window.WindowUnregisterEventHandler"/> event. This calls
 	/// <see cref="RegisterEvent(IWindow, string)"/> to register the event, and triggers its own
 	/// <see cref="WindowUnregistered"/> event.
 	/// </summary>

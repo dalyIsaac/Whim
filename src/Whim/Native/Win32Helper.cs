@@ -3,7 +3,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.UI.Accessibility;
 
-namespace Whim.Core;
+namespace Whim;
 
 public static class Win32Helper
 {

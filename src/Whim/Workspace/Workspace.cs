@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Whim.Core;
+namespace Whim;
 
 public class Workspace : IWorkspace
 {
