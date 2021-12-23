@@ -20,6 +20,7 @@ public class ConfigContext : IConfigContext
 	public IRouterManager RouterManager { get; }
 	public IFilterManager FilterManager { get; }
 	public IKeybindManager KeybindManager { get; }
+	public IPluginManager PluginManager { get; }
 
 	public ConfigContext()
 	{
@@ -30,6 +31,7 @@ public class ConfigContext : IConfigContext
 		MonitorManager = new MonitorManager(this);
 		WorkspaceManager = new WorkspaceManager(this);
 		KeybindManager = new KeybindManager(this);
+		PluginManager = new PluginManager(this);
 	}
 
 	public void Initialize()
@@ -38,6 +40,7 @@ public class ConfigContext : IConfigContext
 		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
 		KeybindManager.Initialize();
+		PluginManager.Initialize();
 	}
 
 	protected virtual void Dispose(bool disposing)

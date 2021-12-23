@@ -20,5 +20,6 @@ public interface IConfigContext : IDisposable
 	public IRouterManager RouterManager { get; }
 	public IFilterManager FilterManager { get; }
 	public IKeybindManager KeybindManager { get; }
+	public IPluginManager PluginManager { get; }
 	public void Initialize();
 }
