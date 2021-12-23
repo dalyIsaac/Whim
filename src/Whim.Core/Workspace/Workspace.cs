@@ -71,7 +71,22 @@ public class Workspace : IWorkspace
 	{
 		_configContext = configContext;
 		_name = name;
-		_layoutEngines.AddRange(layoutEngines);
+
+		if (layoutEngines.Count() == 0)
+		{
+			throw new ArgumentException("At least one layout engine must be provided.");
+		}
+
+		_layoutEngines = layoutEngines.ToList();
+
+		// Apply the proxy layout engines
+		foreach (Func<ILayoutEngine, ILayoutEngine> proxyLayout in _configContext.WorkspaceManager.ProxyLayoutEngines)
+		{
+			for (int i = 0; i < _layoutEngines.Count; i++)
+			{
+				_layoutEngines[i] = proxyLayout(_layoutEngines[i]);
+			}
+		}
 	}
 
 	public void NextLayoutEngine()

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace Whim.Core;
 
+using ProxyLayoutEngine = Func<ILayoutEngine, ILayoutEngine>;
+
 /// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
 /// </summary>
@@ -39,6 +41,9 @@ public class WorkspaceManager : IWorkspaceManager
 	/// The active workspace.
 	/// </summary>
 	public IWorkspace? ActiveWorkspace { get; private set; }
+
+	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
+	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get => _proxyLayoutEngines; }
 
 	public WorkspaceManager(IConfigContext configContext)
 	{
@@ -205,4 +210,9 @@ public class WorkspaceManager : IWorkspaceManager
 		WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
 	}
 	#endregion
+
+	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
+	{
+		_proxyLayoutEngines.Add(proxyLayoutEngine);
+	}
 }

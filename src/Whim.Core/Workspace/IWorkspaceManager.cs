@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace Whim.Core;
 
+using ProxyLayoutEngine = Func<ILayoutEngine, ILayoutEngine>;
+
 /// <summary>
 /// The manager for <see cref="IWorkspace"/>s. This is responsible for routing
 /// windows between workspaces.
@@ -86,4 +88,17 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// <param name="workspace"></param>
 	/// <returns><see langword="null"/> if the workspace is not active.</returns>
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
+
+	/// <summary>
+	/// Adds a proxy layout engine to the workspace manager.
+	/// A proxy layout engine is used by plugins to add layout functionality to
+	/// all workspaces.
+	/// </summary>
+	/// <param name="proxyLayoutEngine">The proxy layout engine to add.</param>
+	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine);
+
+	/// <summary>
+	/// The proxy layout engines.
+	/// </summary>
+	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get; }
 }
