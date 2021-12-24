@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -9,13 +10,16 @@ namespace Whim.Dashboard.Controls.ViewModel;
 /// <see cref="Workspaces"/> <see cref="ObservableCollection{T}"/> and <see cref="Count"/> properties,
 /// exposing them for data binding.
 /// </summary>
-internal class WorkspaceDashboardViewModel : INotifyPropertyChanged
+internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 {
+	private bool disposedValue;
+	private readonly IConfigContext _configContext;
 	public ObservableCollection<Model.Workspace> Workspaces { get; } = new();
 	public int Count { get => Workspaces.Count; }
 
 	public WorkspaceDashboardViewModel(IConfigContext configContext)
 	{
+		_configContext = configContext;
 		configContext.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
 		configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
 		configContext.WorkspaceManager.WorkspaceMonitorChanged += WorkspaceManager_WorkspaceMonitorChanged;
@@ -78,5 +82,32 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged
 		{
 			newWorkspace.Monitor = args.Monitor;
 		}
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				_configContext.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
+				_configContext.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
+				_configContext.WorkspaceManager.WorkspaceMonitorChanged -= WorkspaceManager_WorkspaceMonitorChanged;
+
+				foreach (Model.Workspace workspace in Workspaces)
+				{
+					workspace.Dispose();
+				}
+			}
+
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

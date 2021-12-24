@@ -21,9 +21,10 @@ namespace Whim.Dashboard.Controls;
 /// <summary>
 /// Interaction logic for RegisteredWindows.xaml
 /// </summary>
-public partial class RegisteredWindows : UserControl
+public partial class RegisteredWindows : UserControl, IDisposable
 {
 	private readonly RegisteredWindowsViewModel _viewModel;
+	private bool disposedValue;
 
 	public RegisteredWindows(IConfigContext configContext)
 	{
@@ -58,5 +59,25 @@ public partial class RegisteredWindows : UserControl
 			sdc.Clear();
 		}
 		sdc.Add(new SortDescription(sortBy, sortDirection));
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				_viewModel.Dispose();
+			}
+
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

@@ -18,9 +18,14 @@ namespace Whim.Dashboard;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class MainWindow : System.Windows.Window
+public partial class MainWindow : System.Windows.Window, IDisposable
 {
 	private readonly IConfigContext _configContext;
+
+	private readonly WorkspaceDashboard? _workspaceDashboard;
+	private readonly RegisteredWindows? _registeredWindows;
+
+	private bool disposedValue;
 
 	public MainWindow(IConfigContext configContext)
 	{
@@ -28,12 +33,40 @@ public partial class MainWindow : System.Windows.Window
 
 		InitializeComponent();
 
-		WorkspaceDashboard dashboard = new(configContext);
-		Grid.Children.Add(dashboard);
-		Grid.SetRow(dashboard, 0);
+		_workspaceDashboard = new(configContext);
+		Grid.Children.Add(_workspaceDashboard);
+		Grid.SetRow(_workspaceDashboard, 0);
 
-		RegisteredWindows windows = new(configContext);
-		Grid.Children.Add(windows);
-		Grid.SetRow(windows, 1);
+		_registeredWindows = new(configContext);
+		Grid.Children.Add(_registeredWindows);
+		Grid.SetRow(_registeredWindows, 1);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				_workspaceDashboard?.Dispose();
+				_registeredWindows?.Dispose();
+			}
+
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+
+	private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+	{
+		Logger.Debug("Closing Dashboard window");
+		e.Cancel = true;
+		Hide();
 	}
 }

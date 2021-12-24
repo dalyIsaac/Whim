@@ -1,38 +1,29 @@
 using System;
+using Whim.Dashboard;
 
-namespace Whim.Dashboard;
+namespace Whim.App;
 
 public class Program
 {
 	[STAThread]
 	public static void Main()
 	{
-		WhimManager whim = new(CreateConfigContext());
-		try
-		{
-			whim.Initialize();
-		}
-		catch (Exception e)
-		{
-			Logger.Fatal(e.ToString());
-			whim.Dispose();
-			return;
-		}
-
-		App application = new(whim);
-		application.InitializeComponent();
-		application.Run();
+		_ = new App(CreateConfigContext());
 	}
 
 	private static ConfigContext CreateConfigContext()
 	{
 		ConfigContext configContext = new();
 
+		// Add workspaces
 		for (int i = 0; i < 4; i++)
 		{
 			Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine());
 			configContext.WorkspaceManager.Add(workspace);
 		}
+
+		// Add plugins
+		configContext.PluginManager.RegisterPlugin(new DashboardPlugin(configContext));
 
 		return configContext;
 	}

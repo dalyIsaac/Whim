@@ -1,3 +1,5 @@
+using System;
+
 namespace Whim;
 
 /// <summary>
@@ -11,8 +13,6 @@ namespace Whim;
 /// </summary>
 public class ConfigContext : IConfigContext
 {
-	private bool disposedValue;
-
 	public Logger Logger { get; }
 	public IWorkspaceManager WorkspaceManager { get; }
 	public IWindowManager WindowManager { get; }
@@ -21,6 +21,8 @@ public class ConfigContext : IConfigContext
 	public IFilterManager FilterManager { get; }
 	public IKeybindManager KeybindManager { get; }
 	public IPluginManager PluginManager { get; }
+
+	public event EventHandler<ShutdownEventArgs>? Shutdown;
 
 	public ConfigContext()
 	{
@@ -43,27 +45,14 @@ public class ConfigContext : IConfigContext
 		PluginManager.Initialize();
 	}
 
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				WindowManager.Dispose();
-				KeybindManager.Dispose();
-			}
 
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			disposedValue = true;
-		}
-	}
-
-	public void Dispose()
+	public void Quit(ShutdownEventArgs? args = null)
 	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		System.GC.SuppressFinalize(this);
+		Logger.Debug("Disposing config context...");
+		WindowManager.Dispose();
+		KeybindManager.Dispose();
+		PluginManager.Dispose();
+
+		Shutdown?.Invoke(this, args ?? new ShutdownEventArgs(ShutdownReason.User));
 	}
 }

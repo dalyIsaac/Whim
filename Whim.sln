@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim", "src\Whim\Whim.csproj", "{81F6ADB0-5053-46E7-81C6-1F04E243FB1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim", "src\Whim\Whim.csproj", "{81F6ADB0-5053-46E7-81C6-1F04E243FB1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.Dashboard", "src\Whim.Dashboard\Whim.Dashboard.csproj", "{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Dashboard", "src\Whim.Dashboard\Whim.Dashboard.csproj", "{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.App", "src\Whim.App\Whim.App.csproj", "{42B300E2-06B3-4671-A11F-25875BAB658C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81F6ADB0-5053-46E7-81C6-1F04E243FB1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{81F6ADB0-5053-46E7-81C6-1F04E243FB1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81F6ADB0-5053-46E7-81C6-1F04E243FB1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81F6ADB0-5053-46E7-81C6-1F04E243FB1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F8A72C-8FD4-49C5-B547-74DCFAB9587D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42B300E2-06B3-4671-A11F-25875BAB658C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42B300E2-06B3-4671-A11F-25875BAB658C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42B300E2-06B3-4671-A11F-25875BAB658C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42B300E2-06B3-4671-A11F-25875BAB658C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

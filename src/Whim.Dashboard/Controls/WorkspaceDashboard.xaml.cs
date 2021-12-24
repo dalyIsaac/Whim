@@ -21,9 +21,10 @@ namespace Whim.Dashboard.Controls;
 /// <summary>
 /// Interaction logic for WorkspaceDashboard.xaml
 /// </summary>
-public partial class WorkspaceDashboard : UserControl
+public partial class WorkspaceDashboard : UserControl, IDisposable
 {
 	private readonly WorkspaceDashboardViewModel _viewModel;
+	private bool disposedValue;
 
 	public WorkspaceDashboard(IConfigContext configContext)
 	{
@@ -58,5 +59,24 @@ public partial class WorkspaceDashboard : UserControl
 			sdc.Clear();
 		}
 		sdc.Add(new SortDescription(sortBy, sortDirection));
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				_viewModel.Dispose();
+			}
+
+			disposedValue = true;
+		}
+	}
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

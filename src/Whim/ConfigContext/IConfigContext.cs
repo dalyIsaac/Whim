@@ -11,7 +11,7 @@ namespace Whim;
 /// <c>IConfigContext</c> also contains other associated state and functionality, like the
 /// <see cref="Logger"/>
 /// </summary>
-public interface IConfigContext : IDisposable
+public interface IConfigContext
 {
 	public Logger Logger { get; }
 	public IWorkspaceManager WorkspaceManager { get; }
@@ -22,4 +22,18 @@ public interface IConfigContext : IDisposable
 	public IKeybindManager KeybindManager { get; }
 	public IPluginManager PluginManager { get; }
 	public void Initialize();
+
+	/// <summary>
+	/// This event is fired when the config context is shutting down.
+	/// </summary>
+	public event EventHandler<ShutdownEventArgs>? Shutdown;
+
+	/// <summary>
+	/// This is called to shutdown the config context.
+	/// </summary>
+	/// <param name="args">
+	/// The shutdown event arguments. If this is not provided, we assume
+	/// <see cref="ShutdownReason.User"/>.
+	/// </param>
+	public void Quit(ShutdownEventArgs? args = null);
 }

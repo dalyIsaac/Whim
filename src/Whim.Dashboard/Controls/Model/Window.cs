@@ -58,9 +58,9 @@ internal class Window : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	internal void WindowUpdatedEventHandler(object sender, Core.WindowEventArgs args) => RegisterEvent(args.Window, "Focused");
+	internal void WindowUpdatedEventHandler(object sender, Whim.WindowEventArgs args) => RegisterEvent(args.Window, "Focused");
 
-	internal void WindowUpdatedEventHandler(object sender, Core.WindowUpdateEventArgs args) => RegisterEvent(args.Window, args.UpdateType.ToString());
+	internal void WindowUpdatedEventHandler(object sender, Whim.WindowUpdateEventArgs args) => RegisterEvent(args.Window, args.UpdateType.ToString());
 
 	/// <summary>
 	/// Handles the <see cref="Whim.Window.WindowUnregisterEventHandler"/> event. This calls
@@ -68,7 +68,7 @@ internal class Window : INotifyPropertyChanged
 	/// <see cref="WindowUnregistered"/> event.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void WindowUnregisteredEventHandler(object sender, Core.WindowEventArgs args)
+	internal void WindowUnregisteredEventHandler(object sender, Whim.WindowEventArgs args)
 	{
 		RegisterEvent(args.Window, "Unregistered");
 		args.Window.WindowUpdated -= WindowUpdatedEventHandler;

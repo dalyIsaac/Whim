@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim;
 
-public interface IPluginManager
+public interface IPluginManager : IDisposable
 {
 	public IEnumerable<IPlugin> AvailablePlugins { get; }
 

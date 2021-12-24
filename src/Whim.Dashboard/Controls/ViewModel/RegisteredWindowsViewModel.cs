@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
@@ -9,13 +10,17 @@ namespace Whim.Dashboard.Controls.ViewModel;
 /// <see cref="Windows"/> <see cref="ObservableCollection{T}"/> and <see cref="Count"/> properties,
 /// exposing them for data binding.
 /// </summary>
-internal class RegisteredWindowsViewModel : INotifyPropertyChanged
+internal class RegisteredWindowsViewModel : INotifyPropertyChanged, IDisposable
 {
+	private bool disposedValue;
+	private readonly IConfigContext _configContext;
+
 	public ObservableCollection<Model.Window> Windows { get; } = new();
 	public int Count { get => Windows.Count; }
 
 	public RegisteredWindowsViewModel(IConfigContext configContext)
 	{
+		_configContext = configContext;
 		configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
 		configContext.WorkspaceManager.WorkspaceRouted += WorkspaceManager_Routed;
 	}
@@ -66,5 +71,26 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged
 
 		// Update the workspace name.
 		model.WorkspaceName = args.CurrentWorkspace?.Name ?? "🔃";
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				_configContext.WindowManager.WindowRegistered -= WindowManager_WindowRegistered;
+				_configContext.WorkspaceManager.WorkspaceRouted -= WorkspaceManager_Routed;
+			}
+
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }
