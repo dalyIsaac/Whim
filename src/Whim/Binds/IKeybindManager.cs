@@ -41,6 +41,8 @@ public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, KeybindEve
 
 	/// <summary>
 	/// Tries to get the keybind handler by keybind.
+	/// Asking for <see cref="KeyModifiers.LWin"/> will also yield handlers for <see cref="KeyModifiers.Win"/>.
+	/// This applies similarly to other left/right modifiers.
 	/// </summary>
 	/// <param name="keybind"></param>
 	/// <returns></returns>
