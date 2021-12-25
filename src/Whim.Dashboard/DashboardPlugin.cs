@@ -22,4 +22,26 @@ public class DashboardPlugin : IPlugin
 	{
 		_mainWindow?.Dispose();
 	}
+
+	public void Show()
+	{
+		_mainWindow?.Show();
+	}
+
+	public void Hide()
+	{
+		_mainWindow?.Hide();
+	}
+
+	public void Toggle()
+	{
+		if (_mainWindow?.IsVisible == true)
+		{
+			Hide();
+		}
+		else
+		{
+			Show();
+		}
+	}
 }

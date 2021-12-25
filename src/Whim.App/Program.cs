@@ -1,4 +1,5 @@
 using System;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Whim.Dashboard;
 
 namespace Whim.App;
@@ -23,7 +24,10 @@ public class Program
 		}
 
 		// Add plugins
-		configContext.PluginManager.RegisterPlugin(new DashboardPlugin(configContext));
+		DashboardPlugin dashboardPlugin = new(configContext);
+
+		configContext.PluginManager.RegisterPlugin(dashboardPlugin);
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_F12), (args) => dashboardPlugin.Toggle());
 
 		return configContext;
 	}
