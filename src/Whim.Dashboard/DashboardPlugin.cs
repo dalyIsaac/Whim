@@ -1,4 +1,3 @@
-
 namespace Whim.Dashboard;
 
 public class DashboardPlugin : IPlugin
