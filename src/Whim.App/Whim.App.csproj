@@ -9,8 +9,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Whim.Dashboard\Whim.Dashboard.csproj" />
-	  <ProjectReference Include="..\Whim\Whim.csproj" />
+		<ProjectReference Include="..\Whim.Dashboard\Whim.Dashboard.csproj" />
+		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
 </Project>
