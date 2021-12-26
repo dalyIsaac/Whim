@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -126,7 +125,8 @@ public class KeybindManager : IKeybindManager
 			return false;
 		}
 
-		if (!_keybinds.TryGetValue(keybind, out KeybindEventHandler? handler) || handler == null)
+		KeybindEventHandler? handler = TryGet(keybind);
+		if (handler == null)
 		{
 			Logger.Verbose($"No handler for {keybind}");
 			return false;
