@@ -4,7 +4,7 @@ namespace Whim.Dashboard;
 public class DashboardPlugin : IPlugin
 {
 	private readonly IConfigContext _configContext;
-	private MainWindow? _mainWindow;
+	private DashboardWindow? _mainWindow;
 
 	public DashboardPlugin(IConfigContext configContext)
 	{
@@ -14,7 +14,7 @@ public class DashboardPlugin : IPlugin
 
 	public void Initialize()
 	{
-		_mainWindow = new MainWindow(_configContext);
+		_mainWindow = new DashboardWindow(_configContext);
 		_mainWindow.Show();
 	}
 

@@ -15,10 +15,11 @@ using System.Windows.Shapes;
 using Whim.Dashboard.Controls;
 
 namespace Whim.Dashboard;
+
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// Interaction logic for DashboardWindow.xaml
 /// </summary>
-public partial class MainWindow : System.Windows.Window, IDisposable
+public partial class DashboardWindow : System.Windows.Window, IDisposable
 {
 	private readonly IConfigContext _configContext;
 
@@ -27,7 +28,7 @@ public partial class MainWindow : System.Windows.Window, IDisposable
 
 	private bool disposedValue;
 
-	public MainWindow(IConfigContext configContext)
+	public DashboardWindow(IConfigContext configContext)
 	{
 		_configContext = configContext;
 
