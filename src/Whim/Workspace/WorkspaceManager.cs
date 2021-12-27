@@ -72,7 +72,7 @@ public class WorkspaceManager : IWorkspaceManager
 		ActiveWorkspace = _workspaces[0];
 
 		// Subscribe to WindowRegistered event.
-		_configContext.WindowManager.WindowRegistered += WindowRegisteredEventHandler;
+		_configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
 	}
 
 	#region Workspaces
@@ -179,10 +179,10 @@ public class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Windows
-	internal void WindowRegisteredEventHandler(object sender, WindowEventArgs args)
+	internal void WindowManager_WindowRegistered(object sender, WindowEventArgs args)
 	{
 		IWindow window = args.Window;
-		window.WindowUnregistered += WindowUnregisteredEventHandler;
+		window.WindowUnregistered += Window_WindowUnregistered;
 
 		if (ActiveWorkspace == null || !window.IsFocused)
 		{
@@ -194,10 +194,10 @@ public class WorkspaceManager : IWorkspaceManager
 		WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 	}
 
-	internal void WindowUnregisteredEventHandler(object sender, WindowEventArgs args)
+	internal void Window_WindowUnregistered(object sender, WindowEventArgs args)
 	{
 		IWindow window = args.Window;
-		window.WindowUnregistered -= WindowUnregisteredEventHandler;
+		window.WindowUnregistered -= Window_WindowUnregistered;
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{

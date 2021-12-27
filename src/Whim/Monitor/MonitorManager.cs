@@ -59,10 +59,10 @@ public class MonitorManager : IMonitorManager
 		FocusedMonitor = primaryMonitor;
 
 		// Listen for changes in the monitors.
-		SystemEvents.DisplaySettingsChanging += DisplaySettingsEventHandler;
+		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;
 	}
 
-	private void DisplaySettingsEventHandler(object? sender, EventArgs e)
+	private void SystemEvents_DisplaySettingsChanging(object? sender, EventArgs e)
 	{
 		// Get the new monitors.
 		IMonitor[] previousMonitors = _monitors;
@@ -109,7 +109,7 @@ public class MonitorManager : IMonitorManager
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				SystemEvents.DisplaySettingsChanging -= DisplaySettingsEventHandler;
+				SystemEvents.DisplaySettingsChanging -= SystemEvents_DisplaySettingsChanging;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

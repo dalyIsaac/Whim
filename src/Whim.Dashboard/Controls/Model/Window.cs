@@ -48,9 +48,9 @@ internal class Window : INotifyPropertyChanged
 		LastEventTime = TimeRegistered;
 
 		// register WindowUpdated, WindowFocused, and WindowUnregistered
-		window.WindowUpdated += WindowUpdatedEventHandler;
-		window.WindowFocused += WindowUpdatedEventHandler;
-		window.WindowUnregistered += WindowUnregisteredEventHandler;
+		window.WindowUpdated += Window_Updated;
+		window.WindowFocused += Window_Focused;
+		window.WindowUnregistered += Window_Unregistered;
 	}
 
 	protected virtual void OnPropertyChanged(string? propertyName)
@@ -58,9 +58,9 @@ internal class Window : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	internal void WindowUpdatedEventHandler(object sender, Whim.WindowEventArgs args) => RegisterEvent(args.Window, "Focused");
+	internal void Window_Focused(object sender, Whim.WindowEventArgs args) => RegisterEvent(args.Window, "Focused");
 
-	internal void WindowUpdatedEventHandler(object sender, Whim.WindowUpdateEventArgs args) => RegisterEvent(args.Window, args.UpdateType.ToString());
+	internal void Window_Updated(object sender, Whim.WindowUpdateEventArgs args) => RegisterEvent(args.Window, args.UpdateType.ToString());
 
 	/// <summary>
 	/// Handles the <see cref="Whim.Window.WindowUnregisterEventHandler"/> event. This calls
@@ -68,12 +68,12 @@ internal class Window : INotifyPropertyChanged
 	/// <see cref="WindowUnregistered"/> event.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void WindowUnregisteredEventHandler(object sender, Whim.WindowEventArgs args)
+	internal void Window_Unregistered(object sender, Whim.WindowEventArgs args)
 	{
 		RegisterEvent(args.Window, "Unregistered");
-		args.Window.WindowUpdated -= WindowUpdatedEventHandler;
-		args.Window.WindowFocused -= WindowUpdatedEventHandler;
-		args.Window.WindowUnregistered -= WindowUnregisteredEventHandler;
+		args.Window.WindowUpdated -= Window_Updated;
+		args.Window.WindowFocused -= Window_Focused;
+		args.Window.WindowUnregistered -= Window_Unregistered;
 		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
 	}
 
