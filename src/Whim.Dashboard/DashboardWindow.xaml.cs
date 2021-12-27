@@ -12,7 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Whim.Dashboard.Controls;
+using Whim.Dashboard;
+using Whim.Dashboard.Windows;
+using Whim.Dashboard.Workspaces;
 
 namespace Whim.Dashboard;
 
@@ -24,7 +26,7 @@ public partial class DashboardWindow : System.Windows.Window, IDisposable
 	private readonly IConfigContext _configContext;
 
 	private readonly WorkspaceDashboard? _workspaceDashboard;
-	private readonly RegisteredWindows? _registeredWindows;
+	private readonly WindowsDashboard? _registeredWindows;
 
 	private bool disposedValue;
 

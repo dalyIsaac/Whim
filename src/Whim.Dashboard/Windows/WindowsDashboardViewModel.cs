@@ -3,22 +3,22 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Whim.Dashboard.Controls.ViewModel;
+namespace Whim.Dashboard.Windows;
 
 /// <summary>
-/// View model used for for <see cref="RegisteredWindows"/>'s <c>DataContext</c>. This wraps the
+/// View model used for for <see cref="WindowsDashboardView"/>'s <c>DataContext</c>. This wraps the
 /// <see cref="Windows"/> <see cref="ObservableCollection{T}"/> and <see cref="Count"/> properties,
 /// exposing them for data binding.
 /// </summary>
-internal class RegisteredWindowsViewModel : INotifyPropertyChanged, IDisposable
+internal class WindowsDashboardViewModel : INotifyPropertyChanged, IDisposable
 {
 	private bool disposedValue;
 	private readonly IConfigContext _configContext;
 
-	public ObservableCollection<Model.Window> Windows { get; } = new();
+	public ObservableCollection<Window> Windows { get; } = new();
 	public int Count { get => Windows.Count; }
 
-	public RegisteredWindowsViewModel(IConfigContext configContext)
+	public WindowsDashboardViewModel(IConfigContext configContext)
 	{
 		_configContext = configContext;
 		configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
@@ -34,13 +34,13 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged, IDisposable
 
 	/// <summary>
 	/// Overload of <see cref="WindowManager_WindowRegistered(object, WindowEventArgs)"/> which
-	/// returns the <see cref="Model.Window"/> created.
+	/// returns the <see cref="Window"/> created.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private Model.Window WindowManager_WindowRegistered(IWindow window)
+	private Window WindowManager_WindowRegistered(IWindow window)
 	{
-		Model.Window? model = Windows.FirstOrDefault(w => w.Handle == window.Handle.Value);
+		Window? model = Windows.FirstOrDefault(w => w.Handle == window.Handle.Value);
 		if (model != null)
 		{
 			return model;
@@ -53,12 +53,12 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged, IDisposable
 		return model;
 	}
 
-	private void WindowManager_WindowRegistered(object sender, WindowEventArgs args)
+	private void WindowManager_WindowRegistered(object sender, Whim.WindowEventArgs args)
 	{
 		WindowManager_WindowRegistered(args.Window);
 	}
 
-	private void ModelWindow_WindowUnregistered(object? sender, Model.WindowEventArgs args)
+	private void ModelWindow_WindowUnregistered(object? sender, WindowEventArgs args)
 	{
 		Windows.Remove(args.Window);
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
@@ -67,7 +67,7 @@ internal class RegisteredWindowsViewModel : INotifyPropertyChanged, IDisposable
 	private void WorkspaceManager_Routed(object? sender, RouteEventArgs args)
 	{
 		// Find the Model.Window that corresponds to the routed window.
-		Model.Window model = WindowManager_WindowRegistered(args.Window);
+		Window model = WindowManager_WindowRegistered(args.Window);
 
 		// Update the workspace name.
 		model.WorkspaceName = args.CurrentWorkspace?.Name ?? "🔃";

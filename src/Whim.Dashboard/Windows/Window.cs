@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Whim.Dashboard.Controls.Model;
+namespace Whim.Dashboard.Windows;
 
 
 /// <summary>
-/// Window model used by <see cref="ViewModel.RegisteredWindowsViewModel"/> and <see cref="RegisteredWindows"/>.
+/// Window model used by <see cref="WindowsDashboardViewModel"/> and <see cref="WindowsDashboard"/>.
 /// </summary>
 internal class Window : INotifyPropertyChanged
 {

@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel;
 
-namespace Whim.Dashboard.Controls.Model;
+namespace Whim.Dashboard.Workspaces;
 
 /// <summary>
-/// Workspace model used by <see cref="ViewModel.WorkspaceDashboardViewModel"/> and <see cref="WorkspaceDashboard"/>.
+/// Workspace model used by <see cref="WorkspaceDashboardViewModel"/> and <see cref="WorkspaceDashboard"/>.
 /// </summary>
 internal class Workspace : INotifyPropertyChanged, IDisposable
 {

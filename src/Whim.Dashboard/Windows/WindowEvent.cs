@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Whim.Dashboard.Controls.Model;
+namespace Whim.Dashboard.Windows;
 
 internal class WindowEventArgs : EventArgs
 {

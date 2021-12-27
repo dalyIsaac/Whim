@@ -14,9 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Whim.Dashboard.Controls.ViewModel;
 
-namespace Whim.Dashboard.Controls;
+namespace Whim.Dashboard.Workspaces;
 
 /// <summary>
 /// Interaction logic for WorkspaceDashboard.xaml

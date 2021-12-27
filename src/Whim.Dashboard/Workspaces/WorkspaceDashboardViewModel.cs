@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Whim.Dashboard.Controls.ViewModel;
+namespace Whim.Dashboard.Workspaces;
 
 /// <summary>
 /// View model used for for <see cref="WorkspaceDashboard"/>'s <c>DataContext</c>. This wraps the
@@ -14,7 +14,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 {
 	private bool disposedValue;
 	private readonly IConfigContext _configContext;
-	public ObservableCollection<Model.Workspace> Workspaces { get; } = new();
+	public ObservableCollection<Workspace> Workspaces { get; } = new();
 	public int Count { get => Workspaces.Count; }
 
 	public WorkspaceDashboardViewModel(IConfigContext configContext)
@@ -28,7 +28,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 		foreach (IWorkspace workspace in configContext.WorkspaceManager)
 		{
 			IMonitor? monitor = configContext.WorkspaceManager.GetMonitorForWorkspace(workspace);
-			Model.Workspace modelWorkspace = new(workspace, monitor);
+			Workspace modelWorkspace = new(workspace, monitor);
 			Workspaces.Add(modelWorkspace);
 		}
 	}
@@ -42,7 +42,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WorkspaceManager_WorkspaceAdded(object? sender, WorkspaceEventArgs args)
 	{
-		Model.Workspace? model = Workspaces.FirstOrDefault(w => w.Name == args.Workspace.Name);
+		Workspace? model = Workspaces.FirstOrDefault(w => w.Name == args.Workspace.Name);
 		if (model != null)
 		{
 			return;
@@ -55,7 +55,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
 	{
-		Model.Workspace? model = Workspaces.FirstOrDefault(w => w.Name == args.Workspace.Name);
+		Workspace? model = Workspaces.FirstOrDefault(w => w.Name == args.Workspace.Name);
 
 		if (model == null) { return; }
 
@@ -69,7 +69,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 		// Update the old workspace
 		if (args.OldWorkspace != null)
 		{
-			Model.Workspace? model = Workspaces.FirstOrDefault(w => w.Name == args.OldWorkspace.Name);
+			Workspace? model = Workspaces.FirstOrDefault(w => w.Name == args.OldWorkspace.Name);
 			if (model != null)
 			{
 				model.Monitor = null;
@@ -77,7 +77,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 		}
 
 		// Update the new workspace
-		Model.Workspace? newWorkspace = Workspaces.FirstOrDefault(w => w.Name == args.NewWorkspace.Name);
+		Workspace? newWorkspace = Workspaces.FirstOrDefault(w => w.Name == args.NewWorkspace.Name);
 		if (newWorkspace != null)
 		{
 			newWorkspace.Monitor = args.Monitor;
@@ -94,7 +94,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 				_configContext.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
 				_configContext.WorkspaceManager.WorkspaceMonitorChanged -= WorkspaceManager_WorkspaceMonitorChanged;
 
-				foreach (Model.Workspace workspace in Workspaces)
+				foreach (Workspace workspace in Workspaces)
 				{
 					workspace.Dispose();
 				}

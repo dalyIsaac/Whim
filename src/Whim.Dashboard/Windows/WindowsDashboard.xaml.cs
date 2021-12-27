@@ -14,21 +14,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Whim.Dashboard.Controls.ViewModel;
 
-namespace Whim.Dashboard.Controls;
+namespace Whim.Dashboard.Windows;
 
 /// <summary>
 /// Interaction logic for RegisteredWindows.xaml
 /// </summary>
-public partial class RegisteredWindows : UserControl, IDisposable
+public partial class WindowsDashboard : UserControl, IDisposable
 {
-	private readonly RegisteredWindowsViewModel _viewModel;
+	private readonly WindowsDashboardViewModel _viewModel;
 	private bool disposedValue;
 
-	public RegisteredWindows(IConfigContext configContext)
+	public WindowsDashboard(IConfigContext configContext)
 	{
-		_viewModel = new RegisteredWindowsViewModel(configContext);
+		_viewModel = new WindowsDashboardViewModel(configContext);
 
 		InitializeComponent();
 		DataContext = _viewModel;
