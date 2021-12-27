@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -5,7 +6,7 @@ namespace Whim;
 /// <summary>
 /// The manager for <see cref="IMonitor"/>s.
 /// </summary>
-public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable
+public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable, IDisposable
 {
 	/// <summary>
 	/// The number of <see cref="IMonitor"/>s contained by <see cref="IMonitorManager"/>.
@@ -24,4 +25,6 @@ public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable
 	/// <param name="y"></param>
 	/// <returns></returns>
 	public IMonitor GetMonitorAtPoint(int x, int y);
+
+	public event EventHandler<MonitorEventArgs>? MonitorsChanged;
 }

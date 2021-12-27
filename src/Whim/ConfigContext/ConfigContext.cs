@@ -50,6 +50,7 @@ public class ConfigContext : IConfigContext
 	{
 		Logger.Debug("Disposing config context...");
 		WindowManager.Dispose();
+		MonitorManager.Dispose();
 		KeybindManager.Dispose();
 		PluginManager.Dispose();
 
