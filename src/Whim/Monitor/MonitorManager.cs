@@ -68,8 +68,35 @@ public class MonitorManager : IMonitorManager
 		IMonitor[] previousMonitors = _monitors;
 		_monitors = GetCurrentMonitors();
 
+		List<IMonitor> unchangedMonitors = new();
+		List<IMonitor> removedMonitors = new();
+		List<IMonitor> addedMonitors = new();
+
+		HashSet<IMonitor> previousMonitorsSet = new(previousMonitors);
+		HashSet<IMonitor> currentMonitorsSet = new(_monitors);
+
+		foreach (IMonitor monitor in previousMonitorsSet)
+		{
+			if (currentMonitorsSet.Contains(monitor))
+			{
+				unchangedMonitors.Add(monitor);
+			}
+			else
+			{
+				removedMonitors.Add(monitor);
+			}
+		}
+
+		foreach (IMonitor monitor in currentMonitorsSet)
+		{
+			if (!previousMonitorsSet.Contains(monitor))
+			{
+				addedMonitors.Add(monitor);
+			}
+		}
+
 		// Trigger MonitorsChanged event.
-		MonitorsChanged?.Invoke(this, new MonitorEventArgs(previousMonitors, _monitors));
+		MonitorsChanged?.Invoke(this, new MonitorEventArgs(unchangedMonitors, removedMonitors, addedMonitors));
 	}
 
 	/// <summary>
