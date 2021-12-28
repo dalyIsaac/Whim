@@ -19,8 +19,34 @@ namespace Whim.Bar;
 /// </summary>
 public partial class BarWindow : System.Windows.Window
 {
-	public BarWindow()
+	private readonly IConfigContext _configContext;
+	private readonly BarConfig _barConfig;
+	private readonly IMonitor _monitor;
+
+	public BarWindow(IConfigContext configContext, BarConfig barConfig, IMonitor monitor)
 	{
+		_configContext = configContext;
+		_barConfig = barConfig;
+		_monitor = monitor;
+
 		InitializeComponent();
+
+		// Set up the bar
+		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c(_configContext)));
+		CenterPanel.Children.AddRange(_barConfig.CenterComponents.Select(c => c(_configContext)));
+		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_configContext)));
+	}
+
+	/// <summary>
+	/// Renders the bar in the correct location.
+	/// </summary>
+	public void Render()
+	{
+		Left = _monitor.X;
+		Top = _monitor.Y;
+		Width = _monitor.Width;
+		Height = _barConfig.Height;
+
+		Show();
 	}
 }

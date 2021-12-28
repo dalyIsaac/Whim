@@ -7,6 +7,14 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 	<Grid>
-		<TextBlock Text="BarPlugin"/>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+
+		<StackPanel x:Name="LeftPanel" Orientation="Horizontal" Grid.Column="0"/>
+		<StackPanel x:Name="CenterPanel" Orientation="Horizontal" Grid.Column="1"/>
+		<StackPanel x:Name="RightPanel" Orientation="Horizontal" Grid.Column="2" FlowDirection="RightToLeft"/>
 	</Grid>
 </Window>
