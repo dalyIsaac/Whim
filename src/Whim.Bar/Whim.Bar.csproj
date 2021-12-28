@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Whim\Whim.csproj" />
+		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
 </Project>

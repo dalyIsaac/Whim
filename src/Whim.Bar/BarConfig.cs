@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace Whim.Bar;
 
-using BarComponent = Func<IConfigContext, UserControl>;
+public delegate UserControl BarComponent(IConfigContext configContext);
 
 public class BarConfig : INotifyPropertyChanged
 {
@@ -45,7 +45,7 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _height;
+	private int _height = 24;
 	public int Height
 	{
 		get => _height;
@@ -56,7 +56,7 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _padding;
+	private int _padding = 2;
 	public int Padding
 	{
 		get => _padding;
@@ -67,7 +67,7 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _spacing;
+	private int _spacing = 2;
 	public int Spacing
 	{
 		get => _spacing;
@@ -78,7 +78,7 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _borderRadius;
+	private int _borderRadius = 4;
 	public int BorderRadius
 	{
 		get => _borderRadius;

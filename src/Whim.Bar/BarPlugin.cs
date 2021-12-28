@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Whim.Bar;
+
 public class BarPlugin : IPlugin, IDisposable
 {
 	private readonly IConfigContext _configContext;
