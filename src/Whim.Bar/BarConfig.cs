@@ -45,7 +45,7 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _height = 24;
+	private int _height = 48;
 	public int Height
 	{
 		get => _height;

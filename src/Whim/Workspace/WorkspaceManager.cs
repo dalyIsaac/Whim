@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-using ProxyLayoutEngine = Func<ILayoutEngine, ILayoutEngine>;
-
 /// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
 /// </summary>
@@ -73,6 +71,12 @@ public class WorkspaceManager : IWorkspaceManager
 
 		// Subscribe to WindowRegistered event.
 		_configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
+
+		// Initialize each of the workspaces.
+		foreach (IWorkspace workspace in _workspaces)
+		{
+			workspace.Initialize();
+		}
 	}
 
 	#region Workspaces

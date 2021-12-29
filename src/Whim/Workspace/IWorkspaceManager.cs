@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-using ProxyLayoutEngine = Func<ILayoutEngine, ILayoutEngine>;
+public delegate ILayoutEngine ProxyLayoutEngine(ILayoutEngine engine);
 
 /// <summary>
 /// The manager for <see cref="IWorkspace"/>s. This is responsible for routing

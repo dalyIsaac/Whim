@@ -6,7 +6,9 @@
 		xmlns:local="clr-namespace:Whim.Bar"
 		mc:Ignorable="d"
 		WindowStyle="None"
-		Title="MainWindow" Height="450" Width="800">
+		ShowInTaskbar="False"
+		Visibility="Hidden"
+		Title="Whim Bar" Height="450" Width="800">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="1*"/>

@@ -59,7 +59,7 @@ public class Workspace : IWorkspace
 										width: loc.Location.Width,
 										height: loc.Location.Height);
 
-			Logger.Debug($"{loc.Window} at {loc.Location}");
+			Logger.Verbose($"{loc.Window} at {loc.Location}");
 			handle.DeferWindowPos(loc);
 		}
 	}
@@ -78,9 +78,12 @@ public class Workspace : IWorkspace
 		}
 
 		_layoutEngines = layoutEngines.ToList();
+	}
 
+	public void Initialize()
+	{
 		// Apply the proxy layout engines
-		foreach (Func<ILayoutEngine, ILayoutEngine> proxyLayout in _configContext.WorkspaceManager.ProxyLayoutEngines)
+		foreach (ProxyLayoutEngine proxyLayout in _configContext.WorkspaceManager.ProxyLayoutEngines)
 		{
 			for (int i = 0; i < _layoutEngines.Count; i++)
 			{

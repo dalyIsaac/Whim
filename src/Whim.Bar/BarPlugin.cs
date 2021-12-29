@@ -16,6 +16,8 @@ public class BarPlugin : IPlugin, IDisposable
 		_configContext = configContext;
 		_barConfig = barConfig;
 		_configContext.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+		_configContext.FilterManager.IgnoreTitleMatch("Whim Bar");
+		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
 	}
 
 	public void Initialize()

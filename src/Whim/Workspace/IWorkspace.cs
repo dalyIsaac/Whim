@@ -19,6 +19,12 @@ public interface IWorkspace : ICommandable
 	/// </summary>
 	public string Name { get; set; }
 
+	/// <summary>
+	/// Initializes the workspace. This includes wrapping its layout engines with
+	/// proxies from <see cref="IWorkspaceManager"/>.
+	/// </summary>
+	public void Initialize();
+
 	#region Layout engine
 	/// <summary>
 	/// The active layout engine.
