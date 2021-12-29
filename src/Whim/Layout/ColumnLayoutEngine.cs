@@ -6,7 +6,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 {
 	public override string Name => "Column";
 
-	public override IEnumerable<IWindowLocation> DoLayout(IArea area)
+	public override IEnumerable<IWindowLocation> DoLayout(ILocation location)
 	{
 		Logger.Debug("Performing a column layout");
 
@@ -15,10 +15,10 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 			yield break;
 		}
 
-		int x = 0;
-		int y = 0;
-		int width = area.Width / _stack.Count;
-		int height = area.Height;
+		int x = location.X;
+		int y = location.Y;
+		int width = location.Width / _stack.Count;
+		int height = location.Height;
 
 		foreach (IWindow window in _stack)
 		{

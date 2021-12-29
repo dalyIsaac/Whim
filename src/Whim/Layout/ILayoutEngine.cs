@@ -13,11 +13,11 @@ public interface ILayoutEngine : ICommandable
 	public string Name { get; }
 
 	/// <summary>
-	/// Performs a layout inside the available <see cref="IArea"/> region.
+	/// Performs a layout inside the available <see cref="ILocation"/> region.
 	/// </summary>
-	/// <param name="area">The available area to do a layout inside.</param>
+	/// <param name="location">The available area to do a layout inside.</param>
 	/// <returns></returns>
-	public IEnumerable<IWindowLocation> DoLayout(IArea area);
+	public IEnumerable<IWindowLocation> DoLayout(ILocation location);
 
 	/// <summary>
 	/// Adds the window to the layout engine.

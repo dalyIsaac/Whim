@@ -22,10 +22,10 @@ public class BarLayoutEngine : ILayoutEngine
 		_innerLayoutEngine.AddWindow(window);
 	}
 
-	public IEnumerable<IWindowLocation> DoLayout(IArea area)
+	public IEnumerable<IWindowLocation> DoLayout(ILocation location)
 	{
-		Area proxiedArea = new(area.Width, area.Height - _barConfig.Height);
-		return _innerLayoutEngine.DoLayout(proxiedArea);
+		Location proxiedLocation = new(location.X, location.Y + _barConfig.Height, location.Width, location.Height - _barConfig.Height);
+		return _innerLayoutEngine.DoLayout(proxiedLocation);
 	}
 
 	public bool RemoveWindow(IWindow window)

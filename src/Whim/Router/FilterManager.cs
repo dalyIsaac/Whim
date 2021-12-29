@@ -94,6 +94,7 @@ public class FilterManager : IFilterManager
 			  .IgnoreProcessName("ShellExperienceHost")
 			  .IgnoreProcessName("SearchHost") // Windows 11 search
 			  .IgnoreProcessName("ScreenClippingHost") // Windows 10 screen clipping
-			  .IgnoreWindowClass("Xaml_WindowedPopupClass");
+			  .IgnoreWindowClass("Xaml_WindowedPopupClass")
+			  .IgnoreTitle("Task Switching"); // Windows 11 task switcher (alt+tab)
 	}
 }

@@ -25,5 +25,5 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 		return _stack.RemoveAll(x => x.Handle == window.Handle) > 0;
 	}
 
-	public abstract IEnumerable<IWindowLocation> DoLayout(IArea area);
+	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation location);
 }

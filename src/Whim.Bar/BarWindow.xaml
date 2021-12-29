@@ -7,7 +7,6 @@
 		mc:Ignorable="d"
 		WindowStyle="None"
 		ShowInTaskbar="False"
-		Visibility="Hidden"
 		Title="Whim Bar" Height="450" Width="800">
 	<Grid>
 		<Grid.ColumnDefinitions>
