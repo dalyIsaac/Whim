@@ -15,36 +15,9 @@ public class Window : IWindow
 
 	public HWND Handle { get => _pointer.Handle; }
 
-	public string Title
-	{
-		get
-		{
-			unsafe
-			{
-				fixed (char* buffer = new char[_bufferCapacity])
-				{
-					int length = PInvoke.GetWindowText(_pointer.Handle, buffer, _bufferCapacity + 1);
-					return length > 0 ? new string(buffer) : "";
-				}
-			}
-		}
-	}
+	public string Title { get => Win32Helper.GetWindowText(_pointer.Handle); }
 
-	public string Class
-	{
-		get
-		{
-			unsafe
-			{
-				fixed (char* buffer = new char[_bufferCapacity])
-				{
-					int length = PInvoke.GetClassName(_pointer.Handle, buffer, _bufferCapacity + 1);
-					return length > 0 ? new string(buffer) : "";
-				}
-			}
-		}
-	}
-
+	public string Class { get => Win32Helper.GetClassName(_pointer.Handle); }
 	public ILocation Location
 	{
 		get
