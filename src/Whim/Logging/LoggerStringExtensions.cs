@@ -6,9 +6,9 @@ public static class LoggerStringExtensions
 {
 	public static string AddCaller(this string message, string memberName, string sourceFilePath, int sourceLineNumber){
 		string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
-		string fileLocation = $"{fileName}:{sourceLineNumber}".PadRight(30);
+		string fileLocation = $"{fileName}:{sourceLineNumber}";
 
-		string methodName = $"[{memberName}]".PadRight(30);
+		string methodName = $"[{memberName}]";
 
 		return $"{fileLocation} {methodName} {message}";
 	}
