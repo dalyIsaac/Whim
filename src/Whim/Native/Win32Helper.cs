@@ -7,6 +7,8 @@ namespace Whim;
 
 public static class Win32Helper
 {
+	private const int _bufferCapacity = 255;
+
 	/// <summary>
 	/// Quit the window.
 	/// </summary>
@@ -80,4 +82,38 @@ public static class Win32Helper
 	/// <returns></returns>
 	public static UnhookWinEventSafeHandle SetWindowsEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc)
 		=> PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
+
+	/// <summary>
+	/// Safe wrapper around <see cref="PInvoke.GetClassName"/>.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
+	public static string GetClassName(HWND hwnd)
+	{
+		unsafe
+		{
+			fixed (char* buffer = new char[_bufferCapacity])
+			{
+				int length = PInvoke.GetClassName(hwnd, buffer, _bufferCapacity + 1);
+				return length > 0 ? new string(buffer) : "";
+			}
+		}
+	}
+
+	/// <summary>
+	/// Safe wrapper around <see cref="PInvoke.GetWindowText"/>.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
+	public static string GetWindowText(HWND hwnd)
+	{
+		unsafe
+		{
+			fixed (char* buffer = new char[_bufferCapacity])
+			{
+				int length = PInvoke.GetWindowText(hwnd, buffer, _bufferCapacity + 1);
+				return length > 0 ? new string(buffer) : "";
+			}
+		}
+	}
 }
