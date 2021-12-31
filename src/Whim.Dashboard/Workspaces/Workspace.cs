@@ -48,7 +48,7 @@ internal class Workspace : INotifyPropertyChanged, IDisposable
 
 	private void Workspace_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs args)
 	{
-		OnPropertyChanged(nameof(Monitor));
+		OnPropertyChanged(nameof(LayoutEngine));
 	}
 
 	protected virtual void Dispose(bool disposing)

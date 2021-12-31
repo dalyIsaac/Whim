@@ -22,7 +22,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 		_configContext = configContext;
 		configContext.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
 		configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
-		configContext.WorkspaceManager.WorkspaceMonitorChanged += WorkspaceManager_WorkspaceMonitorChanged;
+		configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 
 		// Add the workspaces the WorkspaceManager knows about.
 		foreach (IWorkspace workspace in configContext.WorkspaceManager)
@@ -45,6 +45,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 		Workspace? model = Workspaces.FirstOrDefault(w => w.Name == args.Workspace.Name);
 		if (model != null)
 		{
+			// Ignore the model if it already exists.
 			return;
 		}
 
@@ -64,7 +65,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
 	}
 
-	private void WorkspaceManager_WorkspaceMonitorChanged(object? sender, WorkspaceMonitorChangedEventArgs args)
+	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
 	{
 		// Update the old workspace
 		if (args.OldWorkspace != null)
@@ -92,7 +93,7 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 			{
 				_configContext.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
 				_configContext.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
-				_configContext.WorkspaceManager.WorkspaceMonitorChanged -= WorkspaceManager_WorkspaceMonitorChanged;
+				_configContext.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
 
 				foreach (Workspace workspace in Workspaces)
 				{

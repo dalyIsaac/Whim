@@ -32,13 +32,14 @@ public partial class BarWindow : System.Windows.Window
 		InitializeComponent();
 
 		// Set up the bar
-		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c(_configContext)));
-		CenterPanel.Children.AddRange(_barConfig.CenterComponents.Select(c => c(_configContext)));
-		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_configContext)));
+		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c(_configContext, _monitor, this)));
+		CenterPanel.Children.AddRange(_barConfig.CenterComponents.Select(c => c(_configContext, _monitor, this)));
+		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_configContext, _monitor, this)));
 	}
 
 	/// <summary>
-	/// Renders the bar in the correct location.
+	/// Renders the bar in the correct location. Use this instead of Show() to ensure
+	/// the bar is rendered in the correct location.
 	/// </summary>
 	public void Render()
 	{

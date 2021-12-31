@@ -6,6 +6,7 @@
 		xmlns:local="clr-namespace:Whim.Bar"
 		mc:Ignorable="d"
 		WindowStyle="None"
+		ResizeMode="NoResize"
 		ShowInTaskbar="False"
 		Title="Whim Bar" Height="450" Width="800">
 	<Grid>

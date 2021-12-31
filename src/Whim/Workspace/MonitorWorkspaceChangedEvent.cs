@@ -2,13 +2,13 @@ using System;
 
 namespace Whim;
 
-public class WorkspaceMonitorChangedEventArgs : EventArgs
+public class MonitorWorkspaceChangedEventArgs : EventArgs
 {
 	public IMonitor Monitor { get; }
 	public IWorkspace? OldWorkspace { get; }
 	public IWorkspace NewWorkspace { get; }
 
-	public WorkspaceMonitorChangedEventArgs(IMonitor monitor, IWorkspace? oldWorkspace, IWorkspace newWorkspace)
+	public MonitorWorkspaceChangedEventArgs(IMonitor monitor, IWorkspace? oldWorkspace, IWorkspace newWorkspace)
 	{
 		Monitor = monitor;
 		OldWorkspace = oldWorkspace;

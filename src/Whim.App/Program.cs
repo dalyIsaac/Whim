@@ -32,7 +32,7 @@ public class Program
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_F12), (args) => dashboardPlugin.Toggle());
 
 		// Add bar
-		List<BarComponent> leftComponents = new() { TextWidget.CreateComponent("Hello World!") };
+		List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
 		List<BarComponent> centerComponents = new() { TextWidget.CreateComponent("Hello World!") };
 		List<BarComponent> rightComponents = new() { TextWidget.CreateComponent("Hello World!") };
 

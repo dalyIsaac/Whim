@@ -35,7 +35,7 @@ public class BarPlugin : IPlugin, IDisposable
 		// Remove the removed monitors
 		foreach (IMonitor monitor in e.RemovedMonitors)
 		{
-			_monitorBarMap[monitor].Close();
+			_monitorBarMap[monitor]?.Close();
 			_monitorBarMap.Remove(monitor);
 		}
 

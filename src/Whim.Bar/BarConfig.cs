@@ -6,7 +6,11 @@ using System.Windows.Controls;
 
 namespace Whim.Bar;
 
-public delegate UserControl BarComponent(IConfigContext configContext);
+/// <summary>
+/// Delegate for creating a component.
+/// A component will subscribe to <see cref="Window.Closed"/> if it has resources to dispose.
+/// </summary>
+public delegate UserControl BarComponent(IConfigContext configContext, IMonitor monitor, System.Windows.Window window);
 
 public class BarConfig : INotifyPropertyChanged
 {

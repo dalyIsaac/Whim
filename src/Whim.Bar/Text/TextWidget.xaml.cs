@@ -31,6 +31,6 @@ public partial class TextWidget : UserControl
 
 	public static BarComponent CreateComponent(string? value = null)
 	{
-		return new BarComponent((configContext) => new TextWidget(value));
+		return new BarComponent((configContext, monitor, window) => new TextWidget(value));
 	}
 }
