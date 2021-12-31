@@ -46,3 +46,12 @@ KBDLLHOOKSTRUCT
 BeginDeferWindowPos
 DeferWindowPos
 EndDeferWindowPos
+
+GetAncestor
+IsWindowVisible
+GetWindowLong
+WINDOW_STYLE
+WINDOW_EX_STYLE
+GetDesktopWindow
+GetShellWindow
+GetWindow

@@ -184,7 +184,7 @@ public class WorkspaceManager : IWorkspaceManager
 		IWindow window = args.Window;
 		window.WindowUnregistered += Window_WindowUnregistered;
 
-		if (ActiveWorkspace == null || !window.IsFocused)
+		if (ActiveWorkspace == null)
 		{
 			return;
 		}
