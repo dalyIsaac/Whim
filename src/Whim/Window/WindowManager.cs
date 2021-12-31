@@ -137,7 +137,13 @@ public class WindowManager : IWindowManager
 	/// <param name="dwmsEventTime"></param>
 	private void WindowsEventHook(HWINEVENTHOOK hWinEventHook, uint eventType, HWND hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime)
 	{
-		if (!IsEventWindowValid(idChild, idObject, hwnd)) { return; }
+		if (!IsEventWindowValid(idChild, idObject, hwnd)
+			|| Win32Helper.IsSplashScreen(hwnd)
+			|| !Win32Helper.IsStandardWindow(hwnd)
+			|| !Win32Helper.HasNoVisibleOwner(hwnd))
+		{
+			return;
+		}
 
 		// Handle registering and unregistering of windows.
 		if (eventType == PInvoke.EVENT_OBJECT_SHOW)

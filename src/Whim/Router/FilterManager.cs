@@ -85,16 +85,6 @@ public class FilterManager : IFilterManager
 	/// </summary>
 	public static void AddDefaultFilters(IFilterManager router)
 	{
-		router.IgnoreWindowClass("TaskManagerWindow")
-			  .IgnoreWindowClass("Shell_TrayWnd") // Windows 11 start
-			  .IgnoreWindowClass("MSCTFIME UI") // Windows 10 IME
-			  .IgnoreWindowClass("TaskListThumbnailWnd") // Taskbar thumbnail
-			  .IgnoreWindowClass("TaskListOverlayWnd") // Taskbar thumbnail
-			  .IgnoreWindowClass("tooltips_class32") // Tooltips
-			  .IgnoreProcessName("ShellExperienceHost")
-			  .IgnoreProcessName("SearchHost") // Windows 11 search
-			  .IgnoreProcessName("ScreenClippingHost") // Windows 10 screen clipping
-			  .IgnoreWindowClass("Xaml_WindowedPopupClass")
-			  .IgnoreTitle("Task Switching"); // Windows 11 task switcher (alt+tab)
+		router.IgnoreProcessName("SearchUI.exe");
 	}
 }
