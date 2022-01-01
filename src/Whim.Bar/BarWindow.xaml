@@ -5,10 +5,31 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Whim.Bar"
 		mc:Ignorable="d"
+		d:DataContext="{d:DesignInstance Type=local:BarConfig}"
 		WindowStyle="None"
 		ResizeMode="NoResize"
 		ShowInTaskbar="False"
-		Title="Whim Bar" Height="450" Width="800">
+		Title="Whim Bar" Height="{Binding Path=Height}" Width="800">
+	<Window.Resources>
+		<Style TargetType="Button">
+			<Setter Property="Height" Value="24"/>
+			<Setter Property="Padding" Value="4"/>
+			<Setter Property="Margin" Value="4"/>
+
+			<Style.Resources>
+				<Style TargetType="Border">
+					<Setter Property="CornerRadius" Value="4" />
+				</Style>
+			</Style.Resources>
+		</Style>
+
+		<Style TargetType="TextBlock">
+			<Setter Property="Height" Value="24"/>
+			<Setter Property="Padding" Value="4"/>
+			<Setter Property="Margin" Value="4"/>
+		</Style>
+	</Window.Resources>
+
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="1*"/>

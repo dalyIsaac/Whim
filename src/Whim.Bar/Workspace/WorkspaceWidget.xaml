@@ -17,7 +17,7 @@
 
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>
-					<Button Content="{Binding Name}" Command="{Binding SwitchWorkspaceCommand}" CommandParameter="{Binding}" />
+					<Button Content="{Binding Name}" Command="{Binding SwitchWorkspaceCommand}" CommandParameter="{Binding}"/>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
 		</ItemsControl>

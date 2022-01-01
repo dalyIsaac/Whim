@@ -60,39 +60,6 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _padding = 2;
-	public int Padding
-	{
-		get => _padding;
-		set
-		{
-			_padding = value;
-			OnPropertyChanged(nameof(Padding));
-		}
-	}
-
-	private int _spacing = 2;
-	public int Spacing
-	{
-		get => _spacing;
-		set
-		{
-			_spacing = value;
-			OnPropertyChanged(nameof(Spacing));
-		}
-	}
-
-	private int _borderRadius = 4;
-	public int BorderRadius
-	{
-		get => _borderRadius;
-		set
-		{
-			_borderRadius = value;
-			OnPropertyChanged(nameof(BorderRadius));
-		}
-	}
-
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

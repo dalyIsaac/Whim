@@ -7,6 +7,5 @@
 			 mc:Ignorable="d"
 			 d:DataContext="{d:DesignInstance Type=local:ActiveLayoutViewModel}"
 			 d:DesignHeight="450" d:DesignWidth="800">
-	<!-- <TextBlock Text="{Binding Path=ActiveLayoutEngine}"/> -->
 	<Button Content="{Binding Path=ActiveLayoutEngine}" Command="{Binding Path=NextLayoutEngineCommand}" CommandParameter="{Binding}" />
 </UserControl>
