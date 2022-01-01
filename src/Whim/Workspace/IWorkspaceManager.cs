@@ -90,6 +90,13 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
 
 	/// <summary>
+	/// Retrieves the active workspace for the given monitor.
+	/// </summary>
+	/// <param name="monitor"></param>
+	/// <returns><see langword="null"/> if the monitor is not active.</returns>
+	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
+
+	/// <summary>
 	/// Adds a proxy layout engine to the workspace manager.
 	/// A proxy layout engine is used by plugins to add layout functionality to
 	/// all workspaces.

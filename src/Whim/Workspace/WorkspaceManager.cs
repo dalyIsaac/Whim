@@ -23,7 +23,7 @@ public class WorkspaceManager : IWorkspaceManager
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 
 	/// <summary>
-	/// Maps monitors to their workspace.
+	/// Maps monitors to their active workspace.
 	/// </summary>
 	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
 
@@ -218,5 +218,10 @@ public class WorkspaceManager : IWorkspaceManager
 	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
 	{
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
+	}
+
+	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
+	{
+		return _monitorWorkspaceMap[monitor];
 	}
 }

@@ -21,7 +21,7 @@ public class Program
 		// Add workspaces
 		for (int i = 0; i < 4; i++)
 		{
-			Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine());
+			Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
 			configContext.WorkspaceManager.Add(workspace);
 		}
 
@@ -32,7 +32,7 @@ public class Program
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_F12), (args) => dashboardPlugin.Toggle());
 
 		// Add bar
-		List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
+		List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent(), ActiveLayoutWidget.CreateComponent() };
 		List<BarComponent> centerComponents = new() { TextWidget.CreateComponent("Hello World!") };
 		List<BarComponent> rightComponents = new() { DateTimeWidget.CreateComponent() };
 

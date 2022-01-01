@@ -16,22 +16,21 @@ using System.Windows.Shapes;
 namespace Whim.Bar;
 
 /// <summary>
-/// Interaction logic for DateTimeWidget.xaml
+/// Interaction logic for ActiveLayoutWidget.xaml
 /// </summary>
-public partial class DateTimeWidget : UserControl
+public partial class ActiveLayoutWidget : UserControl
 {
-	public DateTimeWidgetViewModel ViewModel { get; private set; }
+	public ActiveLayoutWidgetViewModel ViewModel { get; private set; }
 
-	public DateTimeWidget(int interval = 100, string format = "HH:mm:ss dd-MMM-yyyy")
+	public ActiveLayoutWidget(IConfigContext config, IMonitor monitor)
 	{
-		ViewModel = new DateTimeWidgetViewModel(interval, format);
+		ViewModel = new ActiveLayoutWidgetViewModel(config, monitor);
 		InitializeComponent();
 		DataContext = ViewModel;
 	}
 
-
 	public static BarComponent CreateComponent()
 	{
-		return new BarComponent((configContext, monitor, window) => new DateTimeWidget());
+		return new BarComponent((configContext, monitor, window) => new ActiveLayoutWidget(configContext, monitor));
 	}
 }
