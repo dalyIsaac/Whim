@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-using ProxyLayoutEngine = Func<ILayoutEngine, ILayoutEngine>;
+public delegate ILayoutEngine ProxyLayoutEngine(ILayoutEngine engine);
 
 /// <summary>
 /// The manager for <see cref="IWorkspace"/>s. This is responsible for routing
@@ -39,7 +39,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// <summary>
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
-	public event EventHandler<WorkspaceMonitorChangedEventArgs>? WorkspaceMonitorChanged;
+	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/> to add.
@@ -88,6 +88,13 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// <param name="workspace"></param>
 	/// <returns><see langword="null"/> if the workspace is not active.</returns>
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
+
+	/// <summary>
+	/// Retrieves the active workspace for the given monitor.
+	/// </summary>
+	/// <param name="monitor"></param>
+	/// <returns><see langword="null"/> if the monitor is not active.</returns>
+	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
 
 	/// <summary>
 	/// Adds a proxy layout engine to the workspace manager.

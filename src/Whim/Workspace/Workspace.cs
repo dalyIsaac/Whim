@@ -50,7 +50,7 @@ public class Workspace : IWorkspace
 
 		using IWindowDeferPosHandle handle = WindowDeferPosHandle.Initialize(Windows.Count());
 
-		IEnumerable<IWindowLocation> locations = ActiveLayoutEngine.DoLayout(new Area(monitor.Width, monitor.Height));
+		IEnumerable<IWindowLocation> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height));
 		foreach (IWindowLocation loc in locations)
 		{
 			// Adjust the window location to the monitor's coordinates
@@ -59,7 +59,7 @@ public class Workspace : IWorkspace
 										width: loc.Location.Width,
 										height: loc.Location.Height);
 
-			Logger.Debug($"{loc.Window} at {loc.Location}");
+			Logger.Verbose($"{loc.Window} at {loc.Location}");
 			handle.DeferWindowPos(loc);
 		}
 	}
@@ -78,9 +78,12 @@ public class Workspace : IWorkspace
 		}
 
 		_layoutEngines = layoutEngines.ToList();
+	}
 
+	public void Initialize()
+	{
 		// Apply the proxy layout engines
-		foreach (Func<ILayoutEngine, ILayoutEngine> proxyLayout in _configContext.WorkspaceManager.ProxyLayoutEngines)
+		foreach (ProxyLayoutEngine proxyLayout in _configContext.WorkspaceManager.ProxyLayoutEngines)
 		{
 			for (int i = 0; i < _layoutEngines.Count; i++)
 			{

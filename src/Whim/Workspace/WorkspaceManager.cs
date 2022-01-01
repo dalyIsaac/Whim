@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-using ProxyLayoutEngine = Func<ILayoutEngine, ILayoutEngine>;
-
 /// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
 /// </summary>
@@ -25,11 +23,11 @@ public class WorkspaceManager : IWorkspaceManager
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 
 	/// <summary>
-	/// Maps monitors to their workspace.
+	/// Maps monitors to their active workspace.
 	/// </summary>
 	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
 
-	public event EventHandler<WorkspaceMonitorChangedEventArgs>? WorkspaceMonitorChanged;
+	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
 	public event EventHandler<RouteEventArgs>? WorkspaceRouted;
 
@@ -73,6 +71,12 @@ public class WorkspaceManager : IWorkspaceManager
 
 		// Subscribe to WindowRegistered event.
 		_configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
+
+		// Initialize each of the workspaces.
+		foreach (IWorkspace workspace in _workspaces)
+		{
+			workspace.Initialize();
+		}
 	}
 
 	#region Workspaces
@@ -158,7 +162,7 @@ public class WorkspaceManager : IWorkspaceManager
 		workspace.DoLayout();
 
 		// Fire the event.
-		WorkspaceMonitorChanged?.Invoke(this, new WorkspaceMonitorChangedEventArgs(monitor, oldWorkspace, workspace));
+		MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(monitor, oldWorkspace, workspace));
 	}
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
@@ -214,5 +218,10 @@ public class WorkspaceManager : IWorkspaceManager
 	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
 	{
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
+	}
+
+	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
+	{
+		return _monitorWorkspaceMap[monitor];
 	}
 }
