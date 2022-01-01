@@ -34,7 +34,7 @@ public class Program
 		// Add bar
 		List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
 		List<BarComponent> centerComponents = new() { TextWidget.CreateComponent("Hello World!") };
-		List<BarComponent> rightComponents = new() { TextWidget.CreateComponent("Hello World!") };
+		List<BarComponent> rightComponents = new() { DateTimeWidget.CreateComponent() };
 
 		BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
 		BarPlugin barPlugin = new(configContext, barConfig);
