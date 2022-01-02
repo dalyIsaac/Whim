@@ -44,10 +44,6 @@ public class Window : IWindow
 
 	public bool IsMouseMoving { get; internal set; }
 
-	public event WindowUpdateEventHandler? WindowUpdated;
-	public event WindowFocusEventHandler? WindowFocused;
-	public event WindowUnregisterEventHandler? WindowUnregistered;
-
 	public void BringToTop()
 	{
 		Logger.Debug(ToString());
@@ -58,7 +54,7 @@ public class Window : IWindow
 	{
 		Logger.Debug(ToString());
 		Win32Helper.QuitApplication(_pointer.Handle);
-		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
+		_configContext.WindowManager.TriggerWindowUnregistered(	new WindowEventArgs(this));
 	}
 
 	public void Focus()
@@ -70,14 +66,14 @@ public class Window : IWindow
 		}
 
 		PInvoke.SetForegroundWindow(_pointer.Handle);
-		WindowFocused?.Invoke(this, new WindowEventArgs(this));
+		_configContext.WindowManager.TriggerWindowFocused(new WindowEventArgs(this));
 	}
 
 	public void Hide()
 	{
 		Logger.Debug(ToString());
 		Win32Helper.HideWindow(_pointer.Handle);
-		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
+		_configContext.WindowManager.TriggerWindowUpdated(new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
 	}
 
 	public void ShowInCurrentState()
@@ -169,12 +165,6 @@ public class Window : IWindow
 		}
 	}
 
-	internal void UnregisterWindow()
-	{
-		Logger.Debug(ToString());
-		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
-	}
-
 	// NOTE: when writing docs, make a note that register and unregister are handled
 	// separately here.
 	void IWindow.HandleEvent(uint eventType)
@@ -212,7 +202,7 @@ public class Window : IWindow
 	private void UpdateWindow(WindowUpdateType type)
 	{
 		Logger.Debug($"{this}, {type}");
-		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(this, type));
+		_configContext.WindowManager.TriggerWindowUpdated(new WindowUpdateEventArgs(this, type));
 	}
 
 

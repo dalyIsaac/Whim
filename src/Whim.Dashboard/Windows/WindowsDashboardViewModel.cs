@@ -22,6 +22,9 @@ internal class WindowsDashboardViewModel : INotifyPropertyChanged, IDisposable
 	{
 		_configContext = configContext;
 		configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
+		configContext.WindowManager.WindowUpdated += WindowManager_WindowUpdated;
+		configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
 		configContext.WorkspaceManager.WorkspaceRouted += WorkspaceManager_Routed;
 	}
 
@@ -31,6 +34,8 @@ internal class WindowsDashboardViewModel : INotifyPropertyChanged, IDisposable
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
+
+	private Window? FindWindow(IWindow window) => Windows.FirstOrDefault(w => w.Handle == window.Handle.Value);
 
 	/// <summary>
 	/// Overload of <see cref="WindowManager_WindowRegistered(object, WindowEventArgs)"/> which
@@ -47,20 +52,48 @@ internal class WindowsDashboardViewModel : INotifyPropertyChanged, IDisposable
 		}
 
 		model = new(window);
-		model.WindowUnregistered += ModelWindow_WindowUnregistered;
 		Windows.Add(model);
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
 		return model;
 	}
 
-	private void WindowManager_WindowRegistered(object sender, Whim.WindowEventArgs args)
+	private void WindowManager_WindowRegistered(object? sender, Whim.WindowEventArgs args)
 	{
 		WindowManager_WindowRegistered(args.Window);
 	}
 
-	private void ModelWindow_WindowUnregistered(object? sender, WindowEventArgs args)
+	private void WindowManager_WindowUpdated(object? sender, Whim.WindowUpdateEventArgs args)
 	{
-		Windows.Remove(args.Window);
+		Window? model = FindWindow(args.Window);
+		if (model == null)
+		{
+			return;
+		}
+
+		model.RegisterEvent(args.Window, args.UpdateType.ToString());
+	}
+
+	private void WindowManager_WindowFocused(object? sender, Whim.WindowEventArgs args)
+	{
+		Window? model = FindWindow(args.Window);
+		if (model == null)
+		{
+			return;
+		}
+
+		model.RegisterEvent(args.Window, "Focused");
+	}
+
+	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
+	{
+		Window? model = FindWindow(args.Window);
+
+		if (model == null)
+		{
+			return;
+		}
+
+		Windows.Remove(model);
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
 	}
 
@@ -80,6 +113,9 @@ internal class WindowsDashboardViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				_configContext.WindowManager.WindowRegistered -= WindowManager_WindowRegistered;
+				_configContext.WindowManager.WindowUpdated -= WindowManager_WindowUpdated;
+				_configContext.WindowManager.WindowFocused -= WindowManager_WindowFocused;
+				_configContext.WindowManager.WindowUnregistered -= WindowManager_WindowUnregistered;
 				_configContext.WorkspaceManager.WorkspaceRouted -= WorkspaceManager_Routed;
 			}
 

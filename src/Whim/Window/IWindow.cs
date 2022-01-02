@@ -58,21 +58,6 @@ public interface IWindow
 	public bool IsMouseMoving { get; }
 
 	/// <summary>
-	/// Event for when this window is updated.
-	/// </summary>
-	public event WindowUpdateEventHandler WindowUpdated;
-
-	/// <summary>
-	/// Event for when this window is focused.
-	/// </summary>
-	public event WindowFocusEventHandler WindowFocused;
-
-	/// <summary>
-	/// Event for when this window is unregistered.
-	/// </summary>
-	public event WindowUnregisterEventHandler WindowUnregistered;
-
-	/// <summary>
 	/// Moves the focus to this window.
 	/// </summary>
 	public void Focus();
