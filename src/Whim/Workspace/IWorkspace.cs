@@ -63,5 +63,10 @@ public interface IWorkspace : ICommandable
 	/// </summary>
 	/// <param name="window"></param>
 	public bool RemoveWindow(IWindow window);
+
+	/// <summary>
+	/// Deactivates the workspace.
+	/// </summary>
+	public void Deactivate();
 	#endregion
 }

@@ -157,6 +157,9 @@ public class WorkspaceManager : IWorkspaceManager
 		// Get the old workspace for the event.
 		_monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? oldWorkspace);
 
+		// Hide all the windows from the old workspace.
+		oldWorkspace?.Deactivate();
+
 		// Change the workspace.
 		_monitorWorkspaceMap[monitor] = workspace;
 
