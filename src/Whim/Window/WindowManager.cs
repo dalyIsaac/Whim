@@ -13,7 +13,10 @@ public class WindowManager : IWindowManager
 
 	public Commander Commander { get; } = new();
 
-	public event WindowRegisterEventHandler? WindowRegistered;
+	public event EventHandler<WindowEventArgs>? WindowRegistered;
+	public event EventHandler<WindowUpdateEventArgs>? WindowUpdated;
+	public event EventHandler<WindowEventArgs>? WindowFocused;
+	public event EventHandler<WindowEventArgs>? WindowUnregistered;
 
 	/// <summary>
 	/// Map of <see cref="HWND"/> to <see cref="IWindow"/> for easy <see cref="IWindow"/> lookup.
@@ -201,18 +204,33 @@ public class WindowManager : IWindowManager
 	/// <param name="hwnd"></param>
 	private void TryUnregisterWindow(HWND hwnd)
 	{
-		Logger.Verbose($"Unregistering {hwnd.Value}");
+		Logger.Debug($"Unregistering {hwnd.Value}");
 
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			Logger.Verbose($"Window {hwnd.Value} is not registered");
+			Logger.Debug($"Window {hwnd.Value} is not registered");
 			return;
 		}
 
 		_windows.Remove(hwnd);
 		if (window is Window win)
 		{
-			win.UnregisterWindow();
+			WindowUnregistered?.Invoke(this, new WindowEventArgs(win));
 		}
+	}
+
+	public void TriggerWindowUpdated(WindowUpdateEventArgs args)
+	{
+		WindowUpdated?.Invoke(this, args);
+	}
+
+	public void TriggerWindowFocused(WindowEventArgs args)
+	{
+		WindowFocused?.Invoke(this, args);
+	}
+
+	public void TriggerWindowUnregistered(WindowEventArgs args)
+	{
+		WindowUnregistered?.Invoke(this, args);
 	}
 }

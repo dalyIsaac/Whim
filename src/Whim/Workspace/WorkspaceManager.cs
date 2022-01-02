@@ -29,11 +29,15 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
-	public event EventHandler<RouteEventArgs>? WorkspaceRouted;
+	public event EventHandler<RouteEventArgs>? WindowRouted;
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+
+	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+
+	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
 	/// <summary>
 	/// The active workspace.
@@ -69,8 +73,9 @@ public class WorkspaceManager : IWorkspaceManager
 		// Set the active workspace.
 		ActiveWorkspace = _workspaces[0];
 
-		// Subscribe to WindowRegistered event.
+		// Subscribe to <see cref="IWindowManager"/> events.
 		_configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
+		_configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
 
 		// Initialize each of the workspaces.
 		foreach (IWorkspace workspace in _workspaces)
@@ -183,10 +188,9 @@ public class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Windows
-	internal void WindowManager_WindowRegistered(object sender, WindowEventArgs args)
+	internal void WindowManager_WindowRegistered(object? sender, WindowEventArgs args)
 	{
 		IWindow window = args.Window;
-		window.WindowUnregistered += Window_WindowUnregistered;
 
 		if (ActiveWorkspace == null)
 		{
@@ -195,13 +199,12 @@ public class WorkspaceManager : IWorkspaceManager
 
 		_windowWorkspaceMap[window] = ActiveWorkspace;
 		ActiveWorkspace?.AddWindow(window);
-		WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
+		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 	}
 
-	internal void Window_WindowUnregistered(object sender, WindowEventArgs args)
+	internal void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
 	{
 		IWindow window = args.Window;
-		window.WindowUnregistered -= Window_WindowUnregistered;
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
@@ -211,7 +214,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 		workspace.RemoveWindow(window);
 		_windowWorkspaceMap.Remove(window);
-		WorkspaceRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
+		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
 	}
 	#endregion
 
@@ -223,5 +226,15 @@ public class WorkspaceManager : IWorkspaceManager
 	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
 	{
 		return _monitorWorkspaceMap[monitor];
+	}
+
+	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args)
+	{
+		ActiveLayoutEngineChanged?.Invoke(this, args);
+	}
+
+	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args)
+	{
+		WorkspaceRenamed?.Invoke(this, args);
 	}
 }

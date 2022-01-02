@@ -24,7 +24,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// <summary>
 	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
 	/// </summary>
-	public event EventHandler<RouteEventArgs>? WorkspaceRouted;
+	public event EventHandler<RouteEventArgs>? WindowRouted;
 
 	/// <summary>
 	/// Event for when a workspace is added.
@@ -40,6 +40,26 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
+
+	/// <summary>
+	/// Event for when a workspace's active layout engine has changed.
+	/// </summary>
+	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+
+	/// <summary>
+	/// Triggered when workspace is renamed.
+	/// </summary>
+	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
+
+	/// <summary>
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="ActiveLayoutEngineChanged"/>.
+	/// </summary>
+	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args);
+
+	/// <summary>
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceRenamed"/>.
+	/// </summary>
+	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args);
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/> to add.

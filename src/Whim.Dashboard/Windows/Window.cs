@@ -33,7 +33,6 @@ internal class Window : INotifyPropertyChanged
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
-	public event EventHandler<WindowEventArgs>? WindowUnregistered;
 
 	internal Window(IWindow window)
 	{
@@ -46,11 +45,6 @@ internal class Window : INotifyPropertyChanged
 		TimeRegistered = Now();
 		LastEvent = "Registered";
 		LastEventTime = TimeRegistered;
-
-		// register WindowUpdated, WindowFocused, and WindowUnregistered
-		window.WindowUpdated += Window_Updated;
-		window.WindowFocused += Window_Focused;
-		window.WindowUnregistered += Window_Unregistered;
 	}
 
 	protected virtual void OnPropertyChanged(string? propertyName)
@@ -63,21 +57,6 @@ internal class Window : INotifyPropertyChanged
 	internal void Window_Updated(object sender, Whim.WindowUpdateEventArgs args) => RegisterEvent(args.Window, args.UpdateType.ToString());
 
 	/// <summary>
-	/// Handles the <see cref="Whim.Window.WindowUnregisterEventHandler"/> event. This calls
-	/// <see cref="RegisterEvent(IWindow, string)"/> to register the event, and triggers its own
-	/// <see cref="WindowUnregistered"/> event.
-	/// </summary>
-	/// <param name="window"></param>
-	internal void Window_Unregistered(object sender, Whim.WindowEventArgs args)
-	{
-		RegisterEvent(args.Window, "Unregistered");
-		args.Window.WindowUpdated -= Window_Updated;
-		args.Window.WindowFocused -= Window_Focused;
-		args.Window.WindowUnregistered -= Window_Unregistered;
-		WindowUnregistered?.Invoke(this, new WindowEventArgs(this));
-	}
-
-	/// <summary>
 	/// Updates the title and event properties with information from the latest event.
 	/// </summary>
 	/// <param name="window"></param>
@@ -85,7 +64,7 @@ internal class Window : INotifyPropertyChanged
 	/// A string describing the latest event/update. This encompasses <see cref="WindowUpdateType"/>
 	/// and events like focusing.
 	/// </param>
-	private void RegisterEvent(IWindow window, string updateType)
+	public void RegisterEvent(IWindow window, string updateType)
 	{
 		LastEventTime = Now();
 		LastEvent = updateType;

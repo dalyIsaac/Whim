@@ -20,9 +20,10 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 	public WorkspaceDashboardViewModel(IConfigContext configContext)
 	{
 		_configContext = configContext;
-		configContext.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
-		configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
-		configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
+		_configContext.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
+		_configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
+		_configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
+		_configContext.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
 
 		// Add the workspaces the WorkspaceManager knows about.
 		foreach (IWorkspace workspace in configContext.WorkspaceManager)
@@ -61,7 +62,6 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 		if (model == null) { return; }
 
 		Workspaces.Remove(model);
-		model.Dispose();
 		OnPropertyChanged(nameof(Count)); // Count is a derived property.
 	}
 
@@ -85,6 +85,17 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
+	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs args)
+	{
+		Workspace? workspace = Workspaces.FirstOrDefault(w => w.Name == args.Workspace.Name);
+		if (workspace == null)
+		{
+			return;
+		}
+
+		workspace.Workspace_ActiveLayoutEngineChanged();
+	}
+
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!disposedValue)
@@ -94,11 +105,6 @@ internal class WorkspaceDashboardViewModel : INotifyPropertyChanged, IDisposable
 				_configContext.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
 				_configContext.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
 				_configContext.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
-
-				foreach (Workspace workspace in Workspaces)
-				{
-					workspace.Dispose();
-				}
 			}
 
 			disposedValue = true;

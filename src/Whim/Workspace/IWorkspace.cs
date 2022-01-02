@@ -9,13 +9,8 @@ namespace Whim;
 public interface IWorkspace : ICommandable
 {
 	/// <summary>
-	/// Triggered when the workspace is renamed.
-	/// </summary>
-	public event EventHandler<WorkspaceRenameEventArgs>? WorkspaceRenamed;
-
-	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the
-	/// <see cref="WorkspaceRenamed"/> event is triggered.
+	/// <see cref="IWorkspaceManager.WorkspaceRenamed"/> event is triggered.
 	/// </summary>
 	public string Name { get; set; }
 
@@ -30,11 +25,6 @@ public interface IWorkspace : ICommandable
 	/// The active layout engine.
 	/// </summary>
 	public ILayoutEngine ActiveLayoutEngine { get; }
-
-	/// <summary>
-	/// Event for when the active layout engine has changed.
-	/// </summary>
-	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
 
 	/// <summary>
 	/// Rotate to the next layout engine.
