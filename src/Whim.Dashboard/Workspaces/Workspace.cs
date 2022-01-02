@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 
 namespace Whim.Dashboard.Workspaces;
@@ -6,7 +5,7 @@ namespace Whim.Dashboard.Workspaces;
 /// <summary>
 /// Workspace model used by <see cref="WorkspaceDashboardViewModel"/> and <see cref="WorkspaceDashboard"/>.
 /// </summary>
-internal class Workspace : INotifyPropertyChanged, IDisposable
+internal class Workspace : INotifyPropertyChanged
 {
 	private readonly IWorkspace _workspace;
 	private bool disposedValue;
@@ -36,7 +35,6 @@ internal class Workspace : INotifyPropertyChanged, IDisposable
 	{
 		_workspace = workspace;
 		_monitor = monitor;
-		workspace.ActiveLayoutEngineChanged += Workspace_ActiveLayoutEngineChanged;
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -46,30 +44,8 @@ internal class Workspace : INotifyPropertyChanged, IDisposable
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	private void Workspace_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs args)
+	internal void Workspace_ActiveLayoutEngineChanged()
 	{
 		OnPropertyChanged(nameof(LayoutEngine));
-	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!disposedValue)
-		{
-			if (disposing)
-			{
-				_workspace.ActiveLayoutEngineChanged -= Workspace_ActiveLayoutEngineChanged;
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			disposedValue = true;
-		}
-	}
-
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
 	}
 }

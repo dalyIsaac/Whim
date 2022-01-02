@@ -21,12 +21,12 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		Monitor = monitor;
 		NextLayoutEngineCommand = new NextLayoutEngineCommand(configContext, this);
 
-		_configContext.WorkspaceManager.WorkspaceAdded += WorkspaceAdded;
-		_configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceRemoved;
+		_configContext.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
+		_configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
+		_configContext.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
 
 		foreach (IWorkspace workspace in _configContext.WorkspaceManager)
 		{
-			workspace.ActiveLayoutEngineChanged += Workspace_ActiveLayoutEngineChanged;
 			_workspaces.Add(workspace);
 		}
 	}
@@ -50,13 +50,9 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_configContext.WorkspaceManager.WorkspaceAdded -= WorkspaceAdded;
-				_configContext.WorkspaceManager.WorkspaceRemoved -= WorkspaceRemoved;
-
-				foreach (IWorkspace workspace in _configContext.WorkspaceManager)
-				{
-					workspace.ActiveLayoutEngineChanged -= Workspace_ActiveLayoutEngineChanged;
-				}
+				_configContext.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
+				_configContext.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
+				_configContext.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
@@ -72,17 +68,17 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		GC.SuppressFinalize(this);
 	}
 
-	private void WorkspaceAdded(object? sender, WorkspaceEventArgs e)
+	private void WorkspaceManager_WorkspaceAdded(object? sender, WorkspaceEventArgs e)
 	{
 		_workspaces.Add(e.Workspace);
 	}
 
-	private void WorkspaceRemoved(object? sender, WorkspaceEventArgs e)
+	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs e)
 	{
 		_workspaces.Remove(e.Workspace);
 	}
 
-	private void Workspace_ActiveLayoutEngineChanged(object? sender, EventArgs e)
+	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, EventArgs e)
 	{
 		OnPropertyChanged(nameof(ActiveLayoutEngine));
 	}

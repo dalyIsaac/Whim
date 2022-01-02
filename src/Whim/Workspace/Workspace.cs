@@ -14,7 +14,9 @@ public class Workspace : IWorkspace
 		get => _name;
 		set
 		{
-			WorkspaceRenamed?.Invoke(this, new WorkspaceRenameEventArgs(this, _name, value));
+			_configContext.WorkspaceManager.TriggerWorkspaceRenamed(
+				new WorkspaceRenamedEventArgs(this, _name, value)
+			);
 			_name = value;
 		}
 	}
@@ -64,9 +66,6 @@ public class Workspace : IWorkspace
 		}
 	}
 
-	public event EventHandler<WorkspaceRenameEventArgs>? WorkspaceRenamed;
-	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
-
 	public Workspace(IConfigContext configContext, string name, params ILayoutEngine[] layoutEngines)
 	{
 		_configContext = configContext;
@@ -99,7 +98,13 @@ public class Workspace : IWorkspace
 		int prevIdx = _activeLayoutEngineIndex;
 		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + 1) % _layoutEngines.Count;
 
-		ActiveLayoutEngineChanged?.Invoke(this, new ActiveLayoutEngineChangedEventArgs(_layoutEngines[prevIdx], _layoutEngines[_activeLayoutEngineIndex]));
+		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
+			new ActiveLayoutEngineChangedEventArgs(
+				this,
+				_layoutEngines[prevIdx],
+				_layoutEngines[_activeLayoutEngineIndex]
+			)
+		);
 
 		DoLayout();
 	}
@@ -111,7 +116,13 @@ public class Workspace : IWorkspace
 		int prevIdx = _activeLayoutEngineIndex;
 		_activeLayoutEngineIndex = (_activeLayoutEngineIndex - 1) % _layoutEngines.Count;
 
-		ActiveLayoutEngineChanged?.Invoke(this, new ActiveLayoutEngineChangedEventArgs(_layoutEngines[prevIdx], _layoutEngines[_activeLayoutEngineIndex]));
+		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
+			new ActiveLayoutEngineChangedEventArgs(
+				this,
+				_layoutEngines[prevIdx],
+				_layoutEngines[_activeLayoutEngineIndex]
+			)
+		);
 
 		DoLayout();
 	}
@@ -140,7 +151,13 @@ public class Workspace : IWorkspace
 			return true;
 		}
 
-		ActiveLayoutEngineChanged?.Invoke(this, new ActiveLayoutEngineChangedEventArgs(_layoutEngines[prevIdx], _layoutEngines[_activeLayoutEngineIndex]));
+		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
+			new ActiveLayoutEngineChangedEventArgs(
+				this,
+				_layoutEngines[prevIdx],
+				_layoutEngines[_activeLayoutEngineIndex]
+			)
+		);
 
 		DoLayout();
 		return true;

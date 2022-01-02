@@ -2,13 +2,13 @@ using System;
 
 namespace Whim;
 
-public class WorkspaceRenameEventArgs : EventArgs
+public class WorkspaceRenamedEventArgs : EventArgs
 {
 	public string OldName { get; }
 	public string NewName { get; }
 	public IWorkspace Workspace { get; }
 
-	public WorkspaceRenameEventArgs(IWorkspace workspace, string oldName, string newName)
+	public WorkspaceRenamedEventArgs(IWorkspace workspace, string oldName, string newName)
 	{
 		Workspace = workspace;
 		OldName = oldName;

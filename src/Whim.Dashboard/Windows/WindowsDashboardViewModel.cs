@@ -25,7 +25,7 @@ internal class WindowsDashboardViewModel : INotifyPropertyChanged, IDisposable
 		configContext.WindowManager.WindowUpdated += WindowManager_WindowUpdated;
 		configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
 		configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
-		configContext.WorkspaceManager.WorkspaceRouted += WorkspaceManager_Routed;
+		configContext.WorkspaceManager.WindowRouted += WorkspaceManager_Routed;
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -116,7 +116,7 @@ internal class WindowsDashboardViewModel : INotifyPropertyChanged, IDisposable
 				_configContext.WindowManager.WindowUpdated -= WindowManager_WindowUpdated;
 				_configContext.WindowManager.WindowFocused -= WindowManager_WindowFocused;
 				_configContext.WindowManager.WindowUnregistered -= WindowManager_WindowUnregistered;
-				_configContext.WorkspaceManager.WorkspaceRouted -= WorkspaceManager_Routed;
+				_configContext.WorkspaceManager.WindowRouted -= WorkspaceManager_Routed;
 			}
 
 			disposedValue = true;
