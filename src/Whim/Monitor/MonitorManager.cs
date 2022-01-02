@@ -62,6 +62,21 @@ public class MonitorManager : IMonitorManager
 		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;
 	}
 
+	public void Initialize()
+	{
+		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
+	}
+
+	public void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
+	{
+		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWindow(e.Window);
+
+		if (monitor != null)
+		{
+			FocusedMonitor = monitor;
+		}
+	}
+
 	private void SystemEvents_DisplaySettingsChanging(object? sender, EventArgs e)
 	{
 		// Get the new monitors.
