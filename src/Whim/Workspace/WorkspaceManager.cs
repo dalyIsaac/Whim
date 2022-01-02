@@ -42,7 +42,7 @@ public class WorkspaceManager : IWorkspaceManager
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
-	public IWorkspace? ActiveWorkspace { get; private set; }
+	public IWorkspace? ActiveWorkspace { get => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor]; }
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get => _proxyLayoutEngines; }
@@ -69,9 +69,6 @@ public class WorkspaceManager : IWorkspaceManager
 			Activate(_workspaces[idx], monitor);
 			idx++;
 		}
-
-		// Set the active workspace.
-		ActiveWorkspace = _workspaces[0];
 
 		// Subscribe to <see cref="IWindowManager"/> events.
 		_configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
@@ -160,6 +157,9 @@ public class WorkspaceManager : IWorkspaceManager
 		// Get the old workspace for the event.
 		_monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? oldWorkspace);
 
+		// Hide all the windows from the old workspace.
+		oldWorkspace?.Deactivate();
+
 		// Change the workspace.
 		_monitorWorkspaceMap[monitor] = workspace;
 
@@ -226,6 +226,11 @@ public class WorkspaceManager : IWorkspaceManager
 	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
 	{
 		return _monitorWorkspaceMap[monitor];
+	}
+
+	public IMonitor? GetMonitorForWindow(IWindow window)
+	{
+		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? GetMonitorForWorkspace(workspace) : null;
 	}
 
 	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args)

@@ -39,6 +39,7 @@ public class ConfigContext : IConfigContext
 	public void Initialize()
 	{
 		Logger.Debug("Initializing config context...");
+		MonitorManager.Initialize();
 		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
 		KeybindManager.Initialize();

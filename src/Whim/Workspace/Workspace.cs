@@ -211,4 +211,12 @@ public class Workspace : IWorkspace
 	}
 
 	public override string ToString() => Name;
+
+	public void Deactivate()
+	{
+		foreach (IWindow window in Windows)
+		{
+			window.Hide();
+		}
+	}
 }

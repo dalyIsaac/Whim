@@ -10,10 +10,7 @@ public interface IWindowManager : ICommandable, IDisposable
 	/// <summary>
 	/// Initialize the windows event hooks.
 	/// </summary>
-	/// <returns>
-	/// <see langword="true"/> when the hooks have all been registered successfully, otherwise
-	/// <see langword="false"/>
-	/// </returns>
+	/// <returns></returns>
 	public void Initialize();
 
 	/// <summary>

@@ -19,6 +19,11 @@ public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable, IDisposa
 	public IMonitor FocusedMonitor { get; }
 
 	/// <summary>
+	/// Initialize the windows event hooks.
+	/// </summary>
+	public void Initialize();
+
+	/// <summary>
 	/// Returns the <see cref="IMonitor"/> at the given <i>x</i> and <i>y</i> coordinates.
 	/// </summary>
 	/// <param name="x"></param>
