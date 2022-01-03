@@ -239,33 +239,49 @@ public static class Win32Helper
 	/// Using the given <see paramref="loc"/>, sets the window's position.
 	/// </summary>
 	/// <param name="loc"></param>
-	public static void SetWindowPos(IWindowLocation loc)
+	public static void SetWindowPos(IWindowLocation windowLocation)
 	{
+
+		IWindow window = windowLocation.Window;
+		ILocation location = windowLocation.Location;
+		WindowState windowState = windowLocation.WindowState;
 		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
 							   | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
 							   | SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
 							   | SET_WINDOW_POS_FLAGS.SWP_NOZORDER
 							   | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
 
-		// A single call to SetWindowPos fails to set a UWP window's position.
-		// The prior approach was to use DeferWindowPos, but using that twice
-		// for a UWP window would cause the UWP window to render incorrectly.
-		// We can probably take the marginal hit to performance from
-		// SetWindowPos.
-		PInvoke.SetWindowPos(loc.Window.Handle,
-					   new Windows.Win32.Foundation.HWND(0),
-					   loc.Location.X,
-					   loc.Location.Y,
-					   loc.Location.Width,
-					   loc.Location.Height,
-					   flags);
+		if (windowState == WindowState.Maximized || windowState == WindowState.Minimized)
+		{
+			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+		}
 
-		PInvoke.SetWindowPos(loc.Window.Handle,
-					   new Windows.Win32.Foundation.HWND(0),
-					   loc.Location.X,
-					   loc.Location.Y,
-					   loc.Location.Width,
-					   loc.Location.Height,
-					   flags);
+		PInvoke.SetWindowPos(
+			window.Handle,
+			new Windows.Win32.Foundation.HWND(0),
+			location.X,
+			location.Y,
+			location.Width,
+			location.Height,
+			flags);
+
+		if (windowState == WindowState.Maximized)
+		{
+			if (!window.IsMinimized)
+			{
+				MinimizeWindow(window.Handle);
+			}
+		}
+		else if (windowState == WindowState.Minimized)
+		{
+			if (!window.IsMaximized)
+			{
+				ShowWindowMaximized(window.Handle);
+			}
+		}
+		else if (window.Class != "Windows.UI.Core.CoreWindow")
+		{
+			ShowWindowNoActivate(window.Handle);
+		}
 	}
 }
