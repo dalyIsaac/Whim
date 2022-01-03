@@ -50,8 +50,6 @@ public class Workspace : IWorkspace
 			throw new InvalidOperationException("No layout engines found for workspace " + Name);
 		}
 
-		using IWindowDeferPosHandle handle = WindowDeferPosHandle.Initialize(Windows.Count());
-
 		IEnumerable<IWindowLocation> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height));
 		foreach (IWindowLocation loc in locations)
 		{
@@ -62,7 +60,7 @@ public class Workspace : IWorkspace
 										height: loc.Location.Height);
 
 			Logger.Verbose($"{loc.Window} at {loc.Location}");
-			handle.DeferWindowPos(loc);
+			Win32Helper.SetWindowPos(loc);
 		}
 	}
 

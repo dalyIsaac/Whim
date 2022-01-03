@@ -8,7 +8,6 @@ namespace Whim.Dashboard.Workspaces;
 internal class Workspace : INotifyPropertyChanged
 {
 	private readonly IWorkspace _workspace;
-	private bool disposedValue;
 
 	public string Name => _workspace.Name;
 

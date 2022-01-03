@@ -232,4 +232,40 @@ public static class Win32Helper
 		// It is enough that the window is zero-sized in one dimension only.
 		return rect.top == rect.bottom || rect.left == rect.right;
 	}
+
+	private static readonly HWND HWND_TOP = new(0);
+
+	/// <summary>
+	/// Using the given <see paramref="loc"/>, sets the window's position.
+	/// </summary>
+	/// <param name="loc"></param>
+	public static void SetWindowPos(IWindowLocation loc)
+	{
+		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
+							   | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
+							   | SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
+							   | SET_WINDOW_POS_FLAGS.SWP_NOZORDER
+							   | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
+
+		// A single call to SetWindowPos fails to set a UWP window's position.
+		// The prior approach was to use DeferWindowPos, but using that twice
+		// for a UWP window would cause the UWP window to render incorrectly.
+		// We can probably take the marginal hit to performance from
+		// SetWindowPos.
+		PInvoke.SetWindowPos(loc.Window.Handle,
+					   new Windows.Win32.Foundation.HWND(0),
+					   loc.Location.X,
+					   loc.Location.Y,
+					   loc.Location.Width,
+					   loc.Location.Height,
+					   flags);
+
+		PInvoke.SetWindowPos(loc.Window.Handle,
+					   new Windows.Win32.Foundation.HWND(0),
+					   loc.Location.X,
+					   loc.Location.Y,
+					   loc.Location.Width,
+					   loc.Location.Height,
+					   flags);
+	}
 }
