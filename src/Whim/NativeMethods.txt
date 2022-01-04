@@ -43,9 +43,8 @@ WM_KEYDOWN
 WM_SYSKEYDOWN
 KBDLLHOOKSTRUCT
 
-BeginDeferWindowPos
-DeferWindowPos
-EndDeferWindowPos
+SetWindowPos
+DwmGetWindowAttribute
 
 GetAncestor
 IsWindowVisible

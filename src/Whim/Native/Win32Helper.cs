@@ -232,4 +232,77 @@ public static class Win32Helper
 		// It is enough that the window is zero-sized in one dimension only.
 		return rect.top == rect.bottom || rect.left == rect.right;
 	}
+
+	/// <summary>
+	/// Returns <see langword="true"/> when the window is a cloaked window.
+	/// For example, and empty <c>ApplicationFrameWindow</c>.
+	/// For more, see https://social.msdn.microsoft.com/Forums/vstudio/en-US/f8341376-6015-4796-8273-31e0be91da62/difference-between-actually-visible-and-not-visiblewhich-are-there-but-we-cant-see-windows-of?forum=vcgeneral
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
+	public static bool IsCloakedWindow(HWND hwnd)
+	{
+		unsafe
+		{
+			int cloaked;
+			HRESULT res = PInvoke.DwmGetWindowAttribute(hwnd,
+						Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
+						&cloaked,
+						sizeof(int));
+			return cloaked != 0 || res.Failed;
+		}
+	}
+
+	private static readonly HWND HWND_TOP = new(0);
+
+	/// <summary>
+	/// Using the given <see paramref="loc"/>, sets the window's position.
+	/// </summary>
+	/// <param name="loc"></param>
+	public static void SetWindowPos(IWindowLocation windowLocation)
+	{
+
+		IWindow window = windowLocation.Window;
+		ILocation location = windowLocation.Location;
+		WindowState windowState = windowLocation.WindowState;
+
+		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
+							   | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
+							   | SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
+							   | SET_WINDOW_POS_FLAGS.SWP_NOZORDER
+							   | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
+
+		if (windowState == WindowState.Maximized || windowState == WindowState.Minimized)
+		{
+			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+		}
+
+		PInvoke.SetWindowPos(
+			window.Handle,
+			new Windows.Win32.Foundation.HWND(0),
+			location.X,
+			location.Y,
+			location.Width,
+			location.Height,
+			flags);
+
+		if (windowState == WindowState.Maximized)
+		{
+			if (!window.IsMinimized)
+			{
+				MinimizeWindow(window.Handle);
+			}
+		}
+		else if (windowState == WindowState.Minimized)
+		{
+			if (!window.IsMaximized)
+			{
+				ShowWindowMaximized(window.Handle);
+			}
+		}
+		else if (window.Class != "Windows.UI.Core.CoreWindow")
+		{
+			ShowWindowNoActivate(window.Handle);
+		}
+	}
 }

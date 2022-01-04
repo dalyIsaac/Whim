@@ -142,28 +142,46 @@ public class WindowManager : IWindowManager
 	{
 		if (!IsEventWindowValid(idChild, idObject, hwnd)) { return; }
 
-		// Handle registering and unregistering of windows.
-		if (eventType == PInvoke.EVENT_OBJECT_SHOW)
+		// Try get the window
+		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			if (!Win32Helper.IsSplashScreen(hwnd)
-				&& Win32Helper.IsStandardWindow(hwnd)
-				&& Win32Helper.HasNoVisibleOwner(hwnd))
+			Logger.Verbose($"Window {hwnd.Value} is not registered");
+			window = RegisterWindow(hwnd);
+			if (window == null)
 			{
-				RegisterWindow(hwnd);
+				return;
 			}
-
-			return;
-		}
-		else if (eventType == PInvoke.EVENT_OBJECT_DESTROY)
-		{
-			TryUnregisterWindow(hwnd);
-			return;
 		}
 
-		// Handle other events within the window.
-		if (_windows.TryGetValue(hwnd, out IWindow? window) && window != null)
+		switch (eventType)
 		{
-			window.HandleEvent(eventType);
+			case PInvoke.EVENT_OBJECT_DESTROY:
+				TryUnregisterWindow(window);
+				break;
+			case PInvoke.EVENT_OBJECT_CLOAKED:
+				UpdateWindow(window, WindowUpdateType.Cloaked);
+				break;
+			case PInvoke.EVENT_OBJECT_UNCLOAKED:
+				UpdateWindow(window, WindowUpdateType.Uncloaked);
+				break;
+			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
+				UpdateWindow(window, WindowUpdateType.MinimizeStart);
+				break;
+			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
+				UpdateWindow(window, WindowUpdateType.MinimizeEnd);
+				break;
+			case PInvoke.EVENT_SYSTEM_FOREGROUND:
+				UpdateWindow(window, WindowUpdateType.Foreground);
+				break;
+			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
+				StartWindowMove();
+				break;
+			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
+				EndWindowMove();
+				break;
+			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
+				WindowMove();
+				break;
 		}
 	}
 
@@ -175,6 +193,14 @@ public class WindowManager : IWindowManager
 	/// <returns></returns>
 	private IWindow? RegisterWindow(HWND hwnd)
 	{
+		if (Win32Helper.IsSplashScreen(hwnd)
+			|| Win32Helper.IsCloakedWindow(hwnd)
+			|| !Win32Helper.IsStandardWindow(hwnd)
+			|| !Win32Helper.HasNoVisibleOwner(hwnd))
+		{
+			return null;
+		}
+
 		Pointer pointer = new(hwnd);
 		Logger.Debug($"Registering window {pointer}");
 
@@ -201,22 +227,34 @@ public class WindowManager : IWindowManager
 	/// Try unregister the given <see cref="HWND"/>'s associated <see cref="IWindow"/> from this
 	/// <see cref="IWindowManager"/>.
 	/// </summary>
-	/// <param name="hwnd"></param>
-	private void TryUnregisterWindow(HWND hwnd)
+	/// <param name="window"></param>
+	private void TryUnregisterWindow(IWindow window)
 	{
-		Logger.Debug($"Unregistering {hwnd.Value}");
+		Logger.Debug($"Unregistering {window.Handle.Value}");
 
-		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
-		{
-			Logger.Debug($"Window {hwnd.Value} is not registered");
-			return;
-		}
+		_windows.Remove(window.Handle);
+		WindowUnregistered?.Invoke(this, new WindowEventArgs(window));
+	}
 
-		_windows.Remove(hwnd);
-		if (window is Window win)
-		{
-			WindowUnregistered?.Invoke(this, new WindowEventArgs(win));
-		}
+	private void UpdateWindow(IWindow window, WindowUpdateType type)
+	{
+		Logger.Debug($"{window} {type}");
+		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, type));
+	}
+
+	private void WindowMove()
+	{
+		// TODO: mouse handlers
+	}
+
+	private void EndWindowMove()
+	{
+		// TODO: mouse handlers
+	}
+
+	private void StartWindowMove()
+	{
+		// TODO: mouse handlers
 	}
 
 	public void TriggerWindowUpdated(WindowUpdateEventArgs args)

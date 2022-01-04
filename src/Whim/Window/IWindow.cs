@@ -105,10 +105,4 @@ public interface IWindow
 	/// Quits the window.
 	/// </summary>
 	public void Close();
-
-	/// <summary>
-	/// Handles the events raised by the <see cref="WindowManager"/> from Windows.
-	/// </summary>
-	/// <param name="eventType">The window type.</param>
-	internal void HandleEvent(uint eventType);
 }
