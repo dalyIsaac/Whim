@@ -165,62 +165,6 @@ public class Window : IWindow
 		}
 	}
 
-	// NOTE: when writing docs, make a note that register and unregister are handled
-	// separately here.
-	void IWindow.HandleEvent(uint eventType)
-	{
-		Logger.Debug($"{this}, {eventType}");
-		switch (eventType)
-		{
-			case PInvoke.EVENT_OBJECT_CLOAKED:
-				UpdateWindow(WindowUpdateType.Cloaked);
-				break;
-			case PInvoke.EVENT_OBJECT_UNCLOAKED:
-				UpdateWindow(WindowUpdateType.Uncloaked);
-				break;
-			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
-				UpdateWindow(WindowUpdateType.MinimizeStart);
-				break;
-			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
-				UpdateWindow(WindowUpdateType.MinimizeEnd);
-				break;
-			case PInvoke.EVENT_SYSTEM_FOREGROUND:
-				UpdateWindow(WindowUpdateType.Foreground);
-				break;
-			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
-				StartWindowMove();
-				break;
-			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
-				EndWindowMove();
-				break;
-			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
-				WindowMove();
-				break;
-		}
-	}
-
-	private void UpdateWindow(WindowUpdateType type)
-	{
-		Logger.Debug($"{this}, {type}");
-		_configContext.WindowManager.TriggerWindowUpdated(new WindowUpdateEventArgs(this, type));
-	}
-
-
-	private void WindowMove()
-	{
-		// TODO: mouse handlers
-	}
-
-	private void EndWindowMove()
-	{
-		// TODO: mouse handlers
-	}
-
-	private void StartWindowMove()
-	{
-		// TODO: mouse handlers
-	}
-
 	public override bool Equals(object? obj)
 	{
 		if (obj == null || GetType() != obj.GetType())

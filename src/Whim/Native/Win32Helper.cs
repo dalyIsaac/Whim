@@ -233,6 +233,26 @@ public static class Win32Helper
 		return rect.top == rect.bottom || rect.left == rect.right;
 	}
 
+	/// <summary>
+	/// Returns <see langword="true"/> when the window is a cloaked window.
+	/// For example, and empty <c>ApplicationFrameWindow</c>.
+	/// For more, see https://social.msdn.microsoft.com/Forums/vstudio/en-US/f8341376-6015-4796-8273-31e0be91da62/difference-between-actually-visible-and-not-visiblewhich-are-there-but-we-cant-see-windows-of?forum=vcgeneral
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
+	public static bool IsCloakedWindow(HWND hwnd)
+	{
+		unsafe
+		{
+			int cloaked;
+			HRESULT res = PInvoke.DwmGetWindowAttribute(hwnd,
+						Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
+						&cloaked,
+						sizeof(int));
+			return cloaked != 0 || res.Failed;
+		}
+	}
+
 	private static readonly HWND HWND_TOP = new(0);
 
 	/// <summary>
@@ -245,6 +265,7 @@ public static class Win32Helper
 		IWindow window = windowLocation.Window;
 		ILocation location = windowLocation.Location;
 		WindowState windowState = windowLocation.WindowState;
+
 		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
 							   | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
 							   | SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
