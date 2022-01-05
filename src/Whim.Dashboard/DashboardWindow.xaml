@@ -9,7 +9,6 @@
 	<ScrollViewer VerticalScrollBarVisibility="Auto" >
 		<Grid Name="Grid">
 			<Grid.RowDefinitions>
-				<RowDefinition Height="300" />
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<!--NOTE: Add child elements in the code-behind.-->

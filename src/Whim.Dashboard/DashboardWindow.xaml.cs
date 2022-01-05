@@ -14,7 +14,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Whim.Dashboard;
 using Whim.Dashboard.Windows;
-using Whim.Dashboard.Workspaces;
 
 namespace Whim.Dashboard;
 
@@ -25,7 +24,6 @@ public partial class DashboardWindow : System.Windows.Window, IDisposable
 {
 	private readonly IConfigContext _configContext;
 
-	private readonly WorkspaceDashboard? _workspaceDashboard;
 	private readonly WindowsDashboard? _registeredWindows;
 
 	private bool disposedValue;
@@ -35,10 +33,6 @@ public partial class DashboardWindow : System.Windows.Window, IDisposable
 		_configContext = configContext;
 
 		InitializeComponent();
-
-		_workspaceDashboard = new(configContext);
-		Grid.Children.Add(_workspaceDashboard);
-		Grid.SetRow(_workspaceDashboard, 0);
 
 		_registeredWindows = new(configContext);
 		Grid.Children.Add(_registeredWindows);
@@ -51,7 +45,6 @@ public partial class DashboardWindow : System.Windows.Window, IDisposable
 		{
 			if (disposing)
 			{
-				_workspaceDashboard?.Dispose();
 				_registeredWindows?.Dispose();
 			}
 
