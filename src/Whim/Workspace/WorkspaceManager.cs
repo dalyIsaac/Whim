@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Whim;
 
@@ -145,29 +146,35 @@ public class WorkspaceManager : IWorkspaceManager
 		return _workspaces.Find(w => w.Name == workspaceName);
 	}
 
-	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
+	public void Activate(IWorkspace workspace, IMonitor? focusedMonitor = null)
 	{
 		Logger.Debug($"Activating workspace {workspace.Name}");
 
-		if (monitor == null)
+		if (focusedMonitor == null)
 		{
-			monitor = _configContext.MonitorManager.FocusedMonitor;
+			focusedMonitor = _configContext.MonitorManager.FocusedMonitor;
 		}
 
 		// Get the old workspace for the event.
-		_monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? oldWorkspace);
+		_monitorWorkspaceMap.TryGetValue(focusedMonitor, out IWorkspace? oldWorkspace);
 
 		// Hide all the windows from the old workspace.
 		oldWorkspace?.Deactivate();
 
-		// Change the workspace.
-		_monitorWorkspaceMap[monitor] = workspace;
+		// Update the monitor which just lost `workspace`.
+		IMonitor? loserMonitor = _monitorWorkspaceMap.Keys.FirstOrDefault(m => _monitorWorkspaceMap[m] == workspace);
 
-		// Update the layout.
+		if (loserMonitor != null && oldWorkspace != null)
+		{
+			_monitorWorkspaceMap[loserMonitor] = oldWorkspace;
+			oldWorkspace.DoLayout();
+			MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(loserMonitor, workspace, oldWorkspace));
+		}
+
+		// Update the focused monitor.
+		_monitorWorkspaceMap[focusedMonitor] = workspace;
 		workspace.DoLayout();
-
-		// Fire the event.
-		MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(monitor, oldWorkspace, workspace));
+		MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(focusedMonitor, oldWorkspace, workspace));
 	}
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
