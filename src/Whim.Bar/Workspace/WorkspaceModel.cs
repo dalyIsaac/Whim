@@ -7,7 +7,7 @@ public class WorkspaceModel : INotifyPropertyChanged
 	public IWorkspace Workspace { get; }
 	public string Name => Workspace.Name;
 
-	private bool _activeonMonitor = false;
+	private bool _activeonMonitor;
 	public bool ActiveOnMonitor
 	{
 		get => _activeonMonitor;
@@ -20,9 +20,10 @@ public class WorkspaceModel : INotifyPropertyChanged
 
 	public System.Windows.Input.ICommand SwitchWorkspaceCommand { get; }
 
-	public WorkspaceModel(IConfigContext configContext, WorkspaceWidgetViewModel viewModel, IWorkspace workspace)
+	public WorkspaceModel(IConfigContext configContext, WorkspaceWidgetViewModel viewModel, IWorkspace workspace, bool activeOnMonitor)
 	{
 		Workspace = workspace;
+		ActiveOnMonitor = activeOnMonitor;
 		SwitchWorkspaceCommand = new SwitchWorkspaceCommand(configContext, viewModel, this);
 	}
 

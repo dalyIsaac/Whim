@@ -26,7 +26,8 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 		// Populate the list of workspaces
 		foreach (IWorkspace workspace in _configContext.WorkspaceManager)
 		{
-			Workspaces.Add(new WorkspaceModel(configContext, this, workspace));
+			IMonitor? monitorForWorkspace = _configContext.WorkspaceManager.GetMonitorForWorkspace(workspace);
+			Workspaces.Add(new WorkspaceModel(configContext, this, workspace, Monitor == monitorForWorkspace));
 		}
 	}
 
@@ -44,7 +45,8 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 			return;
 		}
 
-		Workspaces.Add(new WorkspaceModel(_configContext, this, args.Workspace));
+		IMonitor? monitorForWorkspace = _configContext.WorkspaceManager.GetMonitorForWorkspace(args.Workspace);
+		Workspaces.Add(new WorkspaceModel(_configContext, this, args.Workspace, Monitor == monitorForWorkspace));
 	}
 
 	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
