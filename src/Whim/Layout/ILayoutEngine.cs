@@ -23,4 +23,13 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	/// Retrieves the first window in the layout engine.
 	/// </summary>
 	public IWindow? GetFirstWindow();
+
+	/// <summary>
+	/// Retrieves the previous window in the layout engine.
+	public IWindow? GetPreviousWindow(IWindow window);
+
+	/// <summary>
+	/// Retrieves the next window in the layout engine.
+	/// </summary>
+	public IWindow? GetNextWindow(IWindow window);
 }

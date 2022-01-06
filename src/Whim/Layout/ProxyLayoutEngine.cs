@@ -31,6 +31,10 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 
 	public IWindow? GetFirstWindow() => _innerLayoutEngine.GetFirstWindow();
 
+	public IWindow? GetPreviousWindow(IWindow window) => _innerLayoutEngine.GetPreviousWindow(window);
+
+	public IWindow? GetNextWindow(IWindow window) => _innerLayoutEngine.GetNextWindow(window);
+
 	public void Clear() => _innerLayoutEngine.Clear();
 
 	public bool Contains(IWindow window) => _innerLayoutEngine.Contains(window);
