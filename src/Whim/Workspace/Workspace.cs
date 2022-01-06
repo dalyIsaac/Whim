@@ -21,6 +21,8 @@ public class Workspace : IWorkspace
 		}
 	}
 
+	public IWindow? FocusedWindow { get; private set; }
+
 	private readonly List<ILayoutEngine> _layoutEngines = new();
 	private int _activeLayoutEngineIndex = 0;
 
@@ -87,6 +89,23 @@ public class Workspace : IWorkspace
 				_layoutEngines[i] = proxyLayout(_layoutEngines[i]);
 			}
 		}
+
+		// Subscribe to window focus events
+		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
+	}
+
+	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
+	{
+		if (_windows.Contains(e.Window))
+		{
+			FocusedWindow = e.Window;
+		}
+	}
+
+	public void FocusFirstWindow()
+	{
+		Logger.Debug($"Focusing first window in workspace {Name}");
+		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
 	public void NextLayoutEngine()
@@ -174,9 +193,10 @@ public class Workspace : IWorkspace
 		_windows.Add(window);
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
-			layoutEngine.AddWindow(window);
+			layoutEngine.Add(window);
 		}
 		DoLayout();
+		window.Focus();
 	}
 
 	public bool RemoveWindow(IWindow window)
@@ -189,10 +209,12 @@ public class Workspace : IWorkspace
 			return false;
 		}
 
+		IWindow? previousWindow = ActiveLayoutEngine.GetPreviousWindow(window);
+
 		bool success = true;
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
-			if (!layoutEngine.RemoveWindow(window))
+			if (!layoutEngine.Remove(window))
 			{
 				Logger.Debug($"Window {window} could not be removed from layout engine {layoutEngine}");
 				success = false;
@@ -203,6 +225,7 @@ public class Workspace : IWorkspace
 		{
 			_windows.Remove(window);
 			DoLayout();
+			previousWindow?.Focus();
 		}
 
 		return success;
