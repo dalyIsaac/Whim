@@ -32,4 +32,16 @@ public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable, IDisposa
 	public IMonitor GetMonitorAtPoint(int x, int y);
 
 	public event EventHandler<MonitorEventArgs>? MonitorsChanged;
+
+	/// <summary>
+	/// Gets the monitor before the given monitor.
+	/// </summary>
+	/// <returns></returns>
+	public IMonitor GetPreviousMonitor(IMonitor monitor);
+
+	/// <summary>
+	/// Gets the monitor after the given monitor.
+	/// </summary>
+	/// <returns></returns>
+	public IMonitor GetNextMonitor(IMonitor monitor);
 }

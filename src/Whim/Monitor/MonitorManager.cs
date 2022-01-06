@@ -48,7 +48,9 @@ public class MonitorManager : IMonitorManager
 		_configContext = configContext;
 
 		// Get the monitors.
-		_monitors = GetCurrentMonitors();
+		_monitors = GetCurrentMonitors().OrderBy(m => m.X)
+										.ThenBy(m => m.Y)
+										.ToArray();
 
 		// Get the initial focused monitor
 		IMonitor? primaryMonitor = _monitors?.FirstOrDefault(m => m.IsPrimary);
@@ -141,7 +143,39 @@ public class MonitorManager : IMonitorManager
 	{
 		Logger.Debug($"Getting monitor at point ({x}, {y})");
 		Screen screen = Screen.FromPoint(new System.Drawing.Point(x, y));
-		return _monitors.FirstOrDefault(m => m.Name == screen.DeviceName) ?? _monitors[0];
+
+		IMonitor? monitor = _monitors.FirstOrDefault(m => m.Name == screen.DeviceName);
+		if (monitor == null)
+		{
+			Logger.Error($"No monitor found at point ({x}, {y})");
+			return _monitors[0];
+		}
+
+		return monitor;
+	}
+
+	public IMonitor GetPreviousMonitor(IMonitor monitor)
+	{
+		int index = Array.IndexOf(_monitors, monitor) % _monitors.Length;
+		if (index == -1)
+		{
+			Logger.Error($"Monitor {monitor.Name} not found.");
+			return _monitors[0];
+		}
+
+		return _monitors[(index - 1) % _monitors.Length];
+	}
+
+	public IMonitor GetNextMonitor(IMonitor monitor)
+	{
+		int index = Array.IndexOf(_monitors, monitor) % _monitors.Length;
+		if (index == -1)
+		{
+			Logger.Error($"Monitor {monitor.Name} not found.");
+			return _monitors[0];
+		}
+
+		return _monitors[(index + 1) % _monitors.Length];
 	}
 
 	protected virtual void Dispose(bool disposing)
