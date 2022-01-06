@@ -174,7 +174,7 @@ public class Workspace : IWorkspace
 		_windows.Add(window);
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
-			layoutEngine.AddWindow(window);
+			layoutEngine.Add(window);
 		}
 		DoLayout();
 	}
@@ -192,7 +192,7 @@ public class Workspace : IWorkspace
 		bool success = true;
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
-			if (!layoutEngine.RemoveWindow(window))
+			if (!layoutEngine.Remove(window))
 			{
 				Logger.Debug($"Window {window} could not be removed from layout engine {layoutEngine}");
 				success = false;

@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Layout engines dictate how windows are laid out.
 /// </summary>
-public interface ILayoutEngine : ICommandable
+public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 {
 	/// <summary>
 	/// The name of the layout engine.
@@ -20,14 +20,7 @@ public interface ILayoutEngine : ICommandable
 	public IEnumerable<IWindowLocation> DoLayout(ILocation location);
 
 	/// <summary>
-	/// Adds the window to the layout engine.
+	/// Retrieves the first window in the layout engine.
 	/// </summary>
-	/// <param name="window"></param>
-	public void AddWindow(IWindow window);
-
-	/// <summary>
-	/// Removes the window from the layout engine.
-	/// </summary>
-	/// <param name="window"></param>
-	public bool RemoveWindow(IWindow window);
+	public IWindow? GetFirstWindow();
 }

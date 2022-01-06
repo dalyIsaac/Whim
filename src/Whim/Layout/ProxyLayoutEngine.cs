@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -20,9 +21,25 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	/// </summary>
 	public string Name => _innerLayoutEngine.Name;
 
-	public abstract void AddWindow(IWindow window);
+	public int Count => _innerLayoutEngine.Count;
 
-	public abstract bool RemoveWindow(IWindow window);
+	public bool IsReadOnly => _innerLayoutEngine.IsReadOnly;
+
+	public void Add(IWindow window) => _innerLayoutEngine.Add(window);
+
+	public bool Remove(IWindow window) => _innerLayoutEngine.Remove(window);
+
+	public IWindow? GetFirstWindow() => _innerLayoutEngine.GetFirstWindow();
+
+	public void Clear() => _innerLayoutEngine.Clear();
+
+	public bool Contains(IWindow window) => _innerLayoutEngine.Contains(window);
+
+	public void CopyTo(IWindow[] array, int arrayIndex) => _innerLayoutEngine.CopyTo(array, arrayIndex);
+
+	public IEnumerator<IWindow> GetEnumerator() => _innerLayoutEngine.GetEnumerator();
+
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation location);
 }
