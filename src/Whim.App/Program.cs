@@ -41,6 +41,10 @@ public class Program
 
 		configContext.PluginManager.RegisterPlugin(barPlugin);
 
+		// Keyboard shortcuts
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.MoveWindowToNextMonitor());
+
 		return configContext;
 	}
 }

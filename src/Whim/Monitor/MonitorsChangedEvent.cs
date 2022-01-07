@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Whim;
 
-public class MonitorEventArgs : EventArgs
+public class MonitorsChangedEventArgs : EventArgs
 {
 	/// <summary>
 	/// The monitors that were not removed or added.
@@ -31,7 +31,7 @@ public class MonitorEventArgs : EventArgs
 	/// </summary>
 	public IEnumerable<IMonitor> CurrentMonitors { get => Concat(UnchangedMonitors, AddedMonitors); }
 
-	public MonitorEventArgs(IEnumerable<IMonitor> unchangedMonitors, IEnumerable<IMonitor> removedMonitors, IEnumerable<IMonitor> addedMonitors)
+	public MonitorsChangedEventArgs(IEnumerable<IMonitor> unchangedMonitors, IEnumerable<IMonitor> removedMonitors, IEnumerable<IMonitor> addedMonitors)
 	{
 		UnchangedMonitors = unchangedMonitors;
 		RemovedMonitors = removedMonitors;

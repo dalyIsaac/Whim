@@ -196,7 +196,7 @@ public class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Windows
-	internal void WindowManager_WindowRegistered(object? sender, WindowEventArgs args)
+	private void WindowManager_WindowRegistered(object? sender, WindowEventArgs args)
 	{
 		Logger.Debug($"Window registered: {args.Window}");
 
@@ -212,7 +212,7 @@ public class WorkspaceManager : IWorkspaceManager
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 	}
 
-	internal void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
+	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
 	{
 		Logger.Debug($"Window unregistered: {args.Window}");
 
@@ -230,6 +230,7 @@ public class WorkspaceManager : IWorkspaceManager
 	}
 	#endregion
 
+	#region Monitors
 	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
 	{
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
@@ -244,6 +245,7 @@ public class WorkspaceManager : IWorkspaceManager
 	{
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? GetMonitorForWorkspace(workspace) : null;
 	}
+	#endregion
 
 	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args)
 	{
@@ -282,6 +284,12 @@ public class WorkspaceManager : IWorkspaceManager
 		}
 
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
+
+		if (ActiveWorkspace == workspace)
+		{
+			return;
+		}
+
 		ActiveWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
 	}
@@ -314,12 +322,13 @@ public class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		ActiveWorkspace.RemoveWindow(window);
-		workspace.AddWindow(window);
+		MoveWindowToWorkspace(workspace, window);
 	}
 
 	public void MoveWindowToPreviousMonitor(IWindow? window = null)
 	{
+		Logger.Debug($"Moving window {window} to previous monitor");
+
 		// Get the previous monitor.
 		IMonitor monitor = _configContext.MonitorManager.FocusedMonitor;
 		IMonitor previousMonitor = _configContext.MonitorManager.GetPreviousMonitor(monitor);
@@ -329,6 +338,8 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToNextMonitor(IWindow? window = null)
 	{
+		Logger.Debug($"Moving window {window} to next monitor");
+
 		// Get the next monitor.
 		IMonitor monitor = _configContext.MonitorManager.FocusedMonitor;
 		IMonitor nextMonitor = _configContext.MonitorManager.GetNextMonitor(monitor);

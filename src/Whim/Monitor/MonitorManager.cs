@@ -25,9 +25,31 @@ public class MonitorManager : IMonitorManager
 	private bool disposedValue;
 
 	/// <summary>
+	/// Backing field for <see cref="FocusedMonitor"/>.
+	/// <b>Please do not use this field directly.</b>
+	/// </summary>
+	private IMonitor _focusedMonitor;
+
+	/// <summary>
 	/// The <see cref="IMonitor"/> which currently has focus.
 	/// </summary>
-	public IMonitor FocusedMonitor { get; private set; }
+	public IMonitor FocusedMonitor
+	{
+		get => _focusedMonitor;
+		private set
+		{
+			if (value == _focusedMonitor)
+			{
+				return;
+			}
+
+			IMonitor previousMonitor = _focusedMonitor;
+			_focusedMonitor = value;
+			MonitorFocused?.Invoke(this, new MonitorFocusedEventArgs(previousMonitor, _focusedMonitor));
+		}
+	}
+
+	public event EventHandler<MonitorFocusedEventArgs>? MonitorFocused;
 
 	public int Length => _monitors.Length;
 
@@ -35,7 +57,7 @@ public class MonitorManager : IMonitorManager
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	public event EventHandler<MonitorEventArgs>? MonitorsChanged;
+	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
 	/// <summary>
 	///
@@ -58,7 +80,7 @@ public class MonitorManager : IMonitorManager
 		{
 			throw new Exception("No primary monitor found.");
 		}
-		FocusedMonitor = primaryMonitor;
+		_focusedMonitor = primaryMonitor;
 
 		// Listen for changes in the monitors.
 		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;
@@ -71,6 +93,7 @@ public class MonitorManager : IMonitorManager
 
 	public void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
 	{
+		Logger.Debug($"Focusing on {e.Window}");
 		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWindow(e.Window);
 
 		if (monitor != null)
@@ -113,7 +136,7 @@ public class MonitorManager : IMonitorManager
 		}
 
 		// Trigger MonitorsChanged event.
-		MonitorsChanged?.Invoke(this, new MonitorEventArgs(unchangedMonitors, removedMonitors, addedMonitors));
+		MonitorsChanged?.Invoke(this, new MonitorsChangedEventArgs(unchangedMonitors, removedMonitors, addedMonitors));
 	}
 
 	/// <summary>
@@ -156,6 +179,8 @@ public class MonitorManager : IMonitorManager
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor)
 	{
+		Logger.Debug($"Getting previous monitor for {monitor}");
+
 		int index = Array.IndexOf(_monitors, monitor) % _monitors.Length;
 		if (index == -1)
 		{
@@ -168,6 +193,8 @@ public class MonitorManager : IMonitorManager
 
 	public IMonitor GetNextMonitor(IMonitor monitor)
 	{
+		Logger.Debug($"Getting next monitor for {monitor}");
+
 		int index = Array.IndexOf(_monitors, monitor) % _monitors.Length;
 		if (index == -1)
 		{
