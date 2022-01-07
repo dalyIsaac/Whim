@@ -135,12 +135,6 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
-	/// Switches focus for the active workspace to <see paramref="window"/>.
-	/// </summary>
-	/// <param name="window">The window to switch focus to.</param>
-	public void SwitchToWindow(IWindow window);
-
-	/// <summary>
 	/// Moves the given <see paramref="window"/> to the given <see paramref="workspace"/>.
 	/// </summary>
 	/// <param name="workspace">The workspace to move the window to.</param>

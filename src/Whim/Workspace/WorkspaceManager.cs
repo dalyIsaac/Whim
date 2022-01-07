@@ -257,24 +257,6 @@ public class WorkspaceManager : IWorkspaceManager
 		WorkspaceRenamed?.Invoke(this, args);
 	}
 
-	public void SwitchToWindow(IWindow window)
-	{
-		Logger.Debug($"Switching to window {window}");
-
-		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
-		{
-			Logger.Error($"Window {window} was not found in any workspace");
-			return;
-		}
-
-		if (workspace != ActiveWorkspace)
-		{
-			Activate(workspace);
-		}
-
-		window.Focus();
-	}
-
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
 	{
 		if ((window = GetWindow(window)) == null)
