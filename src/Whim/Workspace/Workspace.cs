@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -99,6 +99,7 @@ public class Workspace : IWorkspace
 		if (_windows.Contains(e.Window))
 		{
 			FocusedWindow = e.Window;
+			Logger.Debug($"Focused window {e.Window} in workspace {Name}");
 		}
 	}
 
@@ -113,7 +114,7 @@ public class Workspace : IWorkspace
 		Logger.Debug(Name);
 
 		int prevIdx = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + 1) % _layoutEngines.Count;
+		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Count);
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(
@@ -131,7 +132,7 @@ public class Workspace : IWorkspace
 		Logger.Debug(Name);
 
 		int prevIdx = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = (_activeLayoutEngineIndex - 1) % _layoutEngines.Count;
+		_activeLayoutEngineIndex = (_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Count);
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(

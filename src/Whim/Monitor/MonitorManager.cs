@@ -181,28 +181,28 @@ public class MonitorManager : IMonitorManager
 	{
 		Logger.Debug($"Getting previous monitor for {monitor}");
 
-		int index = Array.IndexOf(_monitors, monitor) % _monitors.Length;
+		int index = Array.IndexOf(_monitors, monitor);
 		if (index == -1)
 		{
 			Logger.Error($"Monitor {monitor.Name} not found.");
 			return _monitors[0];
 		}
 
-		return _monitors[(index - 1) % _monitors.Length];
+		return _monitors[(index - 1).Mod(_monitors.Length)];
 	}
 
 	public IMonitor GetNextMonitor(IMonitor monitor)
 	{
 		Logger.Debug($"Getting next monitor for {monitor}");
 
-		int index = Array.IndexOf(_monitors, monitor) % _monitors.Length;
+		int index = Array.IndexOf(_monitors, monitor);
 		if (index == -1)
 		{
 			Logger.Error($"Monitor {monitor.Name} not found.");
 			return _monitors[0];
 		}
 
-		return _monitors[(index + 1) % _monitors.Length];
+		return _monitors[(index + 1).Mod(_monitors.Length)];
 	}
 
 	protected virtual void Dispose(bool disposing)

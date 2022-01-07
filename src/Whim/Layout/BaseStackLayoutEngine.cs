@@ -68,7 +68,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 			return null;
 		}
 
-		return _stack[(idx - 1 + _stack.Count) % _stack.Count];
+		return _stack[(idx - 1 + _stack.Count).Mod(_stack.Count)];
 	}
 
 	public IWindow? GetNextWindow(IWindow window)
@@ -79,6 +79,6 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 			return null;
 		}
 
-		return _stack[(idx + 1) % _stack.Count];
+		return _stack[(idx + 1).Mod(_stack.Count)];
 	}
 }
