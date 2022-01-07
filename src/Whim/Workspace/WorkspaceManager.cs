@@ -290,6 +290,7 @@ public class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
+		_windowWorkspaceMap[window] = workspace;
 		ActiveWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
 	}
@@ -312,6 +313,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 		if (oldMonitor == monitor)
 		{
+			Logger.Error($"Window {window} is already on monitor {monitor}");
 			return;
 		}
 

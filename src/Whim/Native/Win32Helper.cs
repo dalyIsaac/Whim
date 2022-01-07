@@ -277,9 +277,14 @@ public static class Win32Helper
 			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
 		}
 
+		// We use HWND_BOTTOM, as modifying the Z-order of a window
+		// may cause EVENT_SYSTEM_FOREGROUND to be set to Whim, which in turn
+		// causes the relevant window to be focused, when the user hasn't
+		// actually changed the focus.
+
 		PInvoke.SetWindowPos(
 			window.Handle,
-			new Windows.Win32.Foundation.HWND(0),
+			(HWND)(1), // HWND_BOTTOM
 			location.X,
 			location.Y,
 			location.Width,

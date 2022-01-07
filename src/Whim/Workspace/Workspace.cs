@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -226,7 +226,6 @@ public class Workspace : IWorkspace
 		{
 			_windows.Remove(window);
 			DoLayout();
-			previousWindow?.Focus();
 		}
 
 		return success;

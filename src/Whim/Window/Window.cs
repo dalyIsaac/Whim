@@ -54,18 +54,22 @@ public class Window : IWindow
 	{
 		Logger.Debug(ToString());
 		Win32Helper.QuitApplication(_pointer.Handle);
-		_configContext.WindowManager.TriggerWindowUnregistered(	new WindowEventArgs(this));
+		_configContext.WindowManager.TriggerWindowUnregistered(new WindowEventArgs(this));
 	}
 
 	public void Focus()
 	{
 		Logger.Debug(ToString());
-		if (IsFocused)
+		if (!IsFocused)
 		{
-			Logger.Debug($"Already focused {this}");
+			PInvoke.SetForegroundWindow(_pointer.Handle);
 		}
 
-		PInvoke.SetForegroundWindow(_pointer.Handle);
+		// Sometimes we want to let listeners that the window is focused, but
+		// other things might have changed, like the monitor the window's on.
+		// For example, <see cref="MonitorManager.FocusMonitor"/> relies on
+		// <see cref="IWindowManager.WindowFocused"/> to be called.
+		// Admittedly, this is a bit of a hack.
 		_configContext.WindowManager.TriggerWindowFocused(new WindowEventArgs(this));
 	}
 
