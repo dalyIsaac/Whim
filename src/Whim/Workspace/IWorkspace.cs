@@ -78,5 +78,23 @@ public interface IWorkspace : ICommandable
 	/// Focuses on the first window in the workspace.
 	/// </summary>
 	public void FocusFirstWindow();
+
+	/// <summary>
+	/// Focuses the <see paramref="window"/> in the <see paramref="direction"/>.
+	/// </summary>
+	/// <param name="direction">The direction to focus in.</param>
+	/// <param name="window">
+	/// The origin window
+	/// </param>
+	public void FocusWindowInDirection(WindowDirection direction, IWindow window);
+
+	/// <summary>
+	/// Swaps the <see paramref="window"/> in the <see paramref="direction"/>.
+	/// </summary>
+	/// <param name="direction">The direction to swap the window in.</param>
+	/// <param name="window">
+	/// The window to swap. If null, the currently focused window is swapped.
+	/// </param>
+	public void SwapWindowInDirection(WindowDirection direction, IWindow? window = null);
 	#endregion
 }
