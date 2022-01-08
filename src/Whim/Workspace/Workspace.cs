@@ -210,8 +210,6 @@ public class Workspace : IWorkspace
 			return false;
 		}
 
-		IWindow? previousWindow = ActiveLayoutEngine.GetPreviousWindow(window);
-
 		bool success = true;
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
