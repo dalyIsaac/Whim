@@ -150,10 +150,7 @@ public class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug($"Activating workspace {workspace.Name}");
 
-		if (focusedMonitor == null)
-		{
-			focusedMonitor = _configContext.MonitorManager.FocusedMonitor;
-		}
+		focusedMonitor ??= _configContext.MonitorManager.FocusedMonitor;
 
 		// Get the old workspace for the event.
 		_monitorWorkspaceMap.TryGetValue(focusedMonitor, out IWorkspace? oldWorkspace);
@@ -259,7 +256,8 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
 	{
-		if ((window = GetWindow(window)) == null)
+		window ??= ActiveWorkspace.FocusedWindow;
+		if (window == null)
 		{
 			Logger.Error("No window was found");
 			return;
@@ -279,7 +277,8 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
 	{
-		if ((window = GetWindow(window)) == null)
+		window ??= ActiveWorkspace.FocusedWindow;
+		if (window == null)
 		{
 			Logger.Error("No window was found");
 			return;
@@ -329,18 +328,5 @@ public class WorkspaceManager : IWorkspaceManager
 		IMonitor nextMonitor = _configContext.MonitorManager.GetNextMonitor(monitor);
 
 		MoveWindowToMonitor(nextMonitor, window);
-	}
-
-	/// <summary>
-	/// Wrapper for boilerplate to get the focused monitor if <see paramref="window"/> is null.
-	/// </summary>
-	private IWindow? GetWindow(IWindow? window)
-	{
-		if (window == null)
-		{
-			window = ActiveWorkspace?.FocusedWindow;
-		}
-
-		return window;
 	}
 }
