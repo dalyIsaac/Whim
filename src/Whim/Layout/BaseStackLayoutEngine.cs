@@ -59,4 +59,26 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	{
 		return _stack.FirstOrDefault();
 	}
+
+	public IWindow? GetPreviousWindow(IWindow window)
+	{
+		int idx = _stack.IndexOf(window);
+		if (idx == -1)
+		{
+			return null;
+		}
+
+		return _stack[(idx - 1 + _stack.Count).Mod(_stack.Count)];
+	}
+
+	public IWindow? GetNextWindow(IWindow window)
+	{
+		int idx = _stack.IndexOf(window);
+		if (idx == -1)
+		{
+			return null;
+		}
+
+		return _stack[(idx + 1).Mod(_stack.Count)];
+	}
 }

@@ -53,6 +53,11 @@ public interface IWorkspace : ICommandable
 	public IEnumerable<IWindow> Windows { get; }
 
 	/// <summary>
+	/// The currently focused window.
+	/// </summary>
+	public IWindow? FocusedWindow { get; }
+
+	/// <summary>
 	/// Adds the window to the workspace.
 	/// </summary>
 	/// <param name="window"></param>
@@ -68,5 +73,10 @@ public interface IWorkspace : ICommandable
 	/// Deactivates the workspace.
 	/// </summary>
 	public void Deactivate();
+
+	/// <summary>
+	/// Focuses on the first window in the workspace.
+	/// </summary>
+	public void FocusFirstWindow();
 	#endregion
 }

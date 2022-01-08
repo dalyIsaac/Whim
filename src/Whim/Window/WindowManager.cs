@@ -239,6 +239,12 @@ public class WindowManager : IWindowManager
 	private void UpdateWindow(IWindow window, WindowUpdateType type)
 	{
 		Logger.Debug($"{window} {type}");
+
+		if (type == WindowUpdateType.Foreground)
+		{
+			window.Focus();
+		}
+
 		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, type));
 	}
 

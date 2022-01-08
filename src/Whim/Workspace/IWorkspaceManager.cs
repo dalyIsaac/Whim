@@ -14,7 +14,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
-	public IWorkspace? ActiveWorkspace { get; }
+	public IWorkspace ActiveWorkspace { get; }
 
 	/// <summary>
 	/// Initialize the event listeners.
@@ -133,4 +133,42 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// The proxy layout engines.
 	/// </summary>
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get; }
+
+	/// <summary>
+	/// Moves the given <see paramref="window"/> to the given <see paramref="workspace"/>.
+	/// </summary>
+	/// <param name="workspace">The workspace to move the window to.</param>
+	/// <param name="window">
+	/// The window to move. If <see langword="null"/>, this will default to
+	/// the focused/active window.
+	/// </param>
+	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null);
+
+	/// <summary>
+	/// Moves the given <see paramref="window"/> to the given <see paramref="monitor"/>.
+	/// </summary>
+	/// <param name="monitor">The monitor to move the window to.</param>
+	/// <param name="window">
+	/// The window to move. If <see langword="null"/>, this will default to
+	/// the focused/active window.
+	/// </param>
+	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null);
+
+	/// <summary>
+	/// Moves the given <see paramref="window"/> to the previous monitor.
+	/// </summary>
+	/// <param name="window">
+	/// The window to move. If <see langword="null"/>, this will default to
+	/// the focused/active window.
+	/// </param>
+	public void MoveWindowToPreviousMonitor(IWindow? window = null);
+
+	/// <summary>
+	/// Moves the given <see paramref="window"/> to the next monitor.
+	/// </summary>
+	/// <param name="window">
+	/// The window to move. If <see langword="null"/>, this will default to
+	/// the focused/active window.
+	/// </param>
+	public void MoveWindowToNextMonitor(IWindow? window = null);
 }

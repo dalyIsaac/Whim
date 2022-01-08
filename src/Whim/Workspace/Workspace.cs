@@ -21,6 +21,8 @@ public class Workspace : IWorkspace
 		}
 	}
 
+	public IWindow? FocusedWindow { get; private set; }
+
 	private readonly List<ILayoutEngine> _layoutEngines = new();
 	private int _activeLayoutEngineIndex = 0;
 
@@ -87,6 +89,24 @@ public class Workspace : IWorkspace
 				_layoutEngines[i] = proxyLayout(_layoutEngines[i]);
 			}
 		}
+
+		// Subscribe to window focus events
+		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
+	}
+
+	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
+	{
+		if (_windows.Contains(e.Window))
+		{
+			FocusedWindow = e.Window;
+			Logger.Debug($"Focused window {e.Window} in workspace {Name}");
+		}
+	}
+
+	public void FocusFirstWindow()
+	{
+		Logger.Debug($"Focusing first window in workspace {Name}");
+		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
 	public void NextLayoutEngine()
@@ -94,7 +114,7 @@ public class Workspace : IWorkspace
 		Logger.Debug(Name);
 
 		int prevIdx = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + 1) % _layoutEngines.Count;
+		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Count);
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(
@@ -112,7 +132,7 @@ public class Workspace : IWorkspace
 		Logger.Debug(Name);
 
 		int prevIdx = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = (_activeLayoutEngineIndex - 1) % _layoutEngines.Count;
+		_activeLayoutEngineIndex = (_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Count);
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(
@@ -177,6 +197,7 @@ public class Workspace : IWorkspace
 			layoutEngine.Add(window);
 		}
 		DoLayout();
+		window.Focus();
 	}
 
 	public bool RemoveWindow(IWindow window)

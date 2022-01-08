@@ -43,7 +43,7 @@ public class WorkspaceManager : IWorkspaceManager
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
-	public IWorkspace? ActiveWorkspace { get => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor]; }
+	public IWorkspace ActiveWorkspace { get => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor]; }
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get => _proxyLayoutEngines; }
@@ -174,6 +174,7 @@ public class WorkspaceManager : IWorkspaceManager
 		// Update the focused monitor.
 		_monitorWorkspaceMap[focusedMonitor] = workspace;
 		workspace.DoLayout();
+		workspace.FocusFirstWindow();
 		MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(focusedMonitor, oldWorkspace, workspace));
 	}
 
@@ -195,8 +196,10 @@ public class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Windows
-	internal void WindowManager_WindowRegistered(object? sender, WindowEventArgs args)
+	private void WindowManager_WindowRegistered(object? sender, WindowEventArgs args)
 	{
+		Logger.Debug($"Window registered: {args.Window}");
+
 		IWindow window = args.Window;
 
 		if (ActiveWorkspace == null)
@@ -209,8 +212,10 @@ public class WorkspaceManager : IWorkspaceManager
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 	}
 
-	internal void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
+	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
 	{
+		Logger.Debug($"Window unregistered: {args.Window}");
+
 		IWindow window = args.Window;
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
@@ -225,6 +230,7 @@ public class WorkspaceManager : IWorkspaceManager
 	}
 	#endregion
 
+	#region Monitors
 	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
 	{
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
@@ -239,6 +245,7 @@ public class WorkspaceManager : IWorkspaceManager
 	{
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? GetMonitorForWorkspace(workspace) : null;
 	}
+	#endregion
 
 	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args)
 	{
@@ -248,5 +255,92 @@ public class WorkspaceManager : IWorkspaceManager
 	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args)
 	{
 		WorkspaceRenamed?.Invoke(this, args);
+	}
+
+	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
+	{
+		if ((window = GetWindow(window)) == null)
+		{
+			Logger.Error("No window was found");
+			return;
+		}
+
+		Logger.Debug($"Moving window {window} to workspace {workspace}");
+
+		if (ActiveWorkspace == workspace)
+		{
+			return;
+		}
+
+		_windowWorkspaceMap[window] = workspace;
+		ActiveWorkspace.RemoveWindow(window);
+		workspace.AddWindow(window);
+	}
+
+	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
+	{
+		if ((window = GetWindow(window)) == null)
+		{
+			Logger.Error("No window was found");
+			return;
+		}
+
+		Logger.Debug($"Moving window {window} to monitor {monitor}");
+		IMonitor? oldMonitor = GetMonitorForWindow(window);
+		if (oldMonitor == null)
+		{
+			Logger.Error($"Window {window} was not found in any monitor");
+			return;
+		}
+
+		if (oldMonitor == monitor)
+		{
+			Logger.Error($"Window {window} is already on monitor {monitor}");
+			return;
+		}
+
+		IWorkspace? workspace = GetWorkspaceForMonitor(monitor);
+		if (workspace == null)
+		{
+			Logger.Error($"Monitor {monitor} was not found in any workspace");
+			return;
+		}
+
+		MoveWindowToWorkspace(workspace, window);
+	}
+
+	public void MoveWindowToPreviousMonitor(IWindow? window = null)
+	{
+		Logger.Debug($"Moving window {window} to previous monitor");
+
+		// Get the previous monitor.
+		IMonitor monitor = _configContext.MonitorManager.FocusedMonitor;
+		IMonitor previousMonitor = _configContext.MonitorManager.GetPreviousMonitor(monitor);
+
+		MoveWindowToMonitor(previousMonitor, window);
+	}
+
+	public void MoveWindowToNextMonitor(IWindow? window = null)
+	{
+		Logger.Debug($"Moving window {window} to next monitor");
+
+		// Get the next monitor.
+		IMonitor monitor = _configContext.MonitorManager.FocusedMonitor;
+		IMonitor nextMonitor = _configContext.MonitorManager.GetNextMonitor(monitor);
+
+		MoveWindowToMonitor(nextMonitor, window);
+	}
+
+	/// <summary>
+	/// Wrapper for boilerplate to get the focused monitor if <see paramref="window"/> is null.
+	/// </summary>
+	private IWindow? GetWindow(IWindow? window)
+	{
+		if (window == null)
+		{
+			window = ActiveWorkspace?.FocusedWindow;
+		}
+
+		return window;
 	}
 }
