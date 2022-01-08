@@ -30,7 +30,7 @@ public class BarPlugin : IPlugin, IDisposable
 		}
 	}
 
-	private void MonitorManager_MonitorsChanged(object? sender, MonitorEventArgs e)
+	private void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
 	{
 		// Remove the removed monitors
 		foreach (IMonitor monitor in e.RemovedMonitors)

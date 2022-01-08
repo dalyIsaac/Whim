@@ -35,7 +35,7 @@ public class MonitorManager : IMonitorManager
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	public event EventHandler<MonitorEventArgs>? MonitorsChanged;
+	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
 	/// <summary>
 	///
@@ -111,7 +111,7 @@ public class MonitorManager : IMonitorManager
 		}
 
 		// Trigger MonitorsChanged event.
-		MonitorsChanged?.Invoke(this, new MonitorEventArgs(unchangedMonitors, removedMonitors, addedMonitors));
+		MonitorsChanged?.Invoke(this, new MonitorsChangedEventArgs(unchangedMonitors, removedMonitors, addedMonitors));
 	}
 
 	/// <summary>

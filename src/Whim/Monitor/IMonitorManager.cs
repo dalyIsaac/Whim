@@ -31,5 +31,5 @@ public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable, IDisposa
 	/// <returns></returns>
 	public IMonitor GetMonitorAtPoint(int x, int y);
 
-	public event EventHandler<MonitorEventArgs>? MonitorsChanged;
+	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 }
