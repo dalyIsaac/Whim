@@ -187,7 +187,7 @@ public class Workspace : IWorkspace
 
 		if (_windows.Contains(window))
 		{
-			Logger.Debug($"Window {window} already exists in workspace {Name}");
+			Logger.Error($"Window {window} already exists in workspace {Name}");
 			return;
 		}
 
@@ -206,7 +206,7 @@ public class Workspace : IWorkspace
 
 		if (!_windows.Contains(window))
 		{
-			Logger.Debug($"Window {window} already does not exist in workspace {Name}");
+			Logger.Error($"Window {window} already does not exist in workspace {Name}");
 			return false;
 		}
 
@@ -215,7 +215,7 @@ public class Workspace : IWorkspace
 		{
 			if (!layoutEngine.Remove(window))
 			{
-				Logger.Debug($"Window {window} could not be removed from layout engine {layoutEngine}");
+				Logger.Error($"Window {window} could not be removed from layout engine {layoutEngine}");
 				success = false;
 			}
 		}
@@ -227,6 +227,40 @@ public class Workspace : IWorkspace
 		}
 
 		return success;
+	}
+
+	public void FocusWindowInDirection(WindowDirection direction, IWindow window)
+	{
+		Logger.Debug($"Focusing window {window} in workspace {Name}");
+
+		if (!_windows.Contains(window))
+		{
+			Logger.Error($"Window {window} does not exist in workspace {Name}");
+			return;
+		}
+
+		ActiveLayoutEngine.FocusWindowInDirection(direction, window);
+	}
+
+	public void SwapWindowInDirection(WindowDirection direction, IWindow? window = null)
+	{
+		window ??= FocusedWindow;
+		if (window == null)
+		{
+			Logger.Error($"No window to swap in workspace {Name}");
+			return;
+		}
+
+		Logger.Debug($"Swapping window {window} in workspace {Name}");
+
+		if (!_windows.Contains(window))
+		{
+			Logger.Error($"Window {window} does not exist in workspace {Name}");
+			return;
+		}
+
+		ActiveLayoutEngine.SwapWindowInDirection(direction, window);
+		DoLayout();
 	}
 
 	public override string ToString() => Name;

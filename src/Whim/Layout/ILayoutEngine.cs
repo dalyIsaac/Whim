@@ -25,11 +25,20 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	public IWindow? GetFirstWindow();
 
 	/// <summary>
-	/// Retrieves the previous window in the layout engine.
-	public IWindow? GetPreviousWindow(IWindow window);
+	/// Focuses the <see paramref="window"/> in the <see paramref="direction"/>.
+	/// It's recommended that this method is not called directly, but rather
+	/// through the <see cref="IWorkspace.FocusWindowInDirection"/> method.
+	/// </summary>
+	/// <param name="direction">The direction to focus in.</param>
+	/// <param name="window">The origin window</param>
+	public void FocusWindowInDirection(WindowDirection direction, IWindow window);
 
 	/// <summary>
-	/// Retrieves the next window in the layout engine.
+	/// Swaps the <see paramref="window"/> in the <see paramref="direction"/>.
+	/// It's recommended that this method is not called directly, but rather
+	/// through <see cref="IWorkspace.SwapWindowInDirection"/>.
 	/// </summary>
-	public IWindow? GetNextWindow(IWindow window);
+	/// <param name="direction">The direction to swap the window in.</param>
+	/// <param name="window">The window to swap.</param>
+	public void SwapWindowInDirection(WindowDirection direction, IWindow window);
 }

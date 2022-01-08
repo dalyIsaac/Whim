@@ -45,6 +45,30 @@ public class Program
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.MoveWindowToNextMonitor());
 
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_LEFT), (args) =>
+		{
+			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			if (workspace.FocusedWindow == null)
+			{
+				return;
+			}
+
+			workspace.ActiveLayoutEngine.FocusWindowInDirection(WindowDirection.Left, workspace.FocusedWindow);
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_RIGHT), (args) =>
+		{
+			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			if (workspace.FocusedWindow == null)
+			{
+				return;
+			}
+
+			workspace.ActiveLayoutEngine.FocusWindowInDirection(WindowDirection.Right, workspace.FocusedWindow);
+		});
+
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(WindowDirection.Left));
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(WindowDirection.Right));
+
 		return configContext;
 	}
 }
