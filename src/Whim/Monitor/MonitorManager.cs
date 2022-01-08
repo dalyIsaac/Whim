@@ -25,31 +25,9 @@ public class MonitorManager : IMonitorManager
 	private bool disposedValue;
 
 	/// <summary>
-	/// Backing field for <see cref="FocusedMonitor"/>.
-	/// <b>Please do not use this field directly.</b>
-	/// </summary>
-	private IMonitor _focusedMonitor;
-
-	/// <summary>
 	/// The <see cref="IMonitor"/> which currently has focus.
 	/// </summary>
-	public IMonitor FocusedMonitor
-	{
-		get => _focusedMonitor;
-		private set
-		{
-			if (value == _focusedMonitor)
-			{
-				return;
-			}
-
-			IMonitor previousMonitor = _focusedMonitor;
-			_focusedMonitor = value;
-			MonitorFocused?.Invoke(this, new MonitorFocusedEventArgs(previousMonitor, _focusedMonitor));
-		}
-	}
-
-	public event EventHandler<MonitorFocusedEventArgs>? MonitorFocused;
+	public IMonitor FocusedMonitor { get; private set; }
 
 	public int Length => _monitors.Length;
 
@@ -80,7 +58,7 @@ public class MonitorManager : IMonitorManager
 		{
 			throw new Exception("No primary monitor found.");
 		}
-		_focusedMonitor = primaryMonitor;
+		FocusedMonitor = primaryMonitor;
 
 		// Listen for changes in the monitors.
 		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;

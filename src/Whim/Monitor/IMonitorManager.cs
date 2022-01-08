@@ -19,11 +19,6 @@ public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable, IDisposa
 	public IMonitor FocusedMonitor { get; }
 
 	/// <summary>
-	/// Event for when the <see cref="FocusedMonitor"/> has changed.
-	/// </summary>
-	public event EventHandler<MonitorFocusedEventArgs>? MonitorFocused;
-
-	/// <summary>
 	/// Initialize the windows event hooks.
 	/// </summary>
 	public void Initialize();
