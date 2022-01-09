@@ -190,6 +190,17 @@ public class WorkspaceManager : IWorkspaceManager
 
 		return null;
 	}
+
+	public void LayoutAllActiveWorkspaces()
+	{
+		Logger.Debug("Layout all active workspaces");
+
+		// For each workspace which is active in a monitor, do a layout.
+		foreach (IWorkspace workspace in _monitorWorkspaceMap.Values)
+		{
+			workspace.DoLayout();
+		}
+	}
 	#endregion
 
 	#region Windows

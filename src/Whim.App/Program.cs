@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Whim.Bar;
 using Whim.Dashboard;
+using Whim.Gaps;
 
 namespace Whim.App;
 
@@ -40,6 +41,12 @@ public class Program
 		BarPlugin barPlugin = new(configContext, barConfig);
 
 		configContext.PluginManager.RegisterPlugin(barPlugin);
+
+		// Add gap
+		GapsConfig gapsConfig = new(10, 5);
+		GapsPlugin gapsPlugin = new(configContext, gapsConfig);
+
+		configContext.PluginManager.RegisterPlugin(gapsPlugin);
 
 		// Keyboard shortcuts
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());

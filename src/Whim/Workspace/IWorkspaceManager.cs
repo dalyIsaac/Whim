@@ -62,6 +62,11 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args);
 
 	/// <summary>
+	/// Triggers all active workspaces to update their layout.
+	/// </summary>
+	public void LayoutAllActiveWorkspaces();
+
+	/// <summary>
 	/// The <see cref="IWorkspace"/> to add.
 	/// </summary>
 	/// <param name="workspaces"></param>

@@ -11,6 +11,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
 		<ProjectReference Include="..\Whim.Dashboard\Whim.Dashboard.csproj" />
+		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
