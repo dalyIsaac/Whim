@@ -20,10 +20,16 @@ public class Location : ILocation
 
 	public bool IsPointInside(int x, int y) => IsPointInside(this, x, y);
 
-	public static bool IsPointInside(ILocation location, int x, int y)
-	{
-		return location.X <= x && location.Y <= y && location.X + location.Width >= x && location.Y + location.Height >= y;
-	}
-
 	public override string ToString() => $"(X: {X}, Y: {Y}, Width: {Width}, Height: {Height})";
+
+	public static bool IsPointInside(ILocation location, int x, int y) => location.X <= x
+		&& location.Y <= y
+		&& location.X + location.Width >= x
+		&& location.Y + location.Height >= y;
+
+	public static ILocation Add(ILocation a, ILocation b) => new Location(
+		a.X + b.X,
+		a.Y + b.Y,
+		a.Width + b.Width,
+		a.Height + b.Height);
 }
