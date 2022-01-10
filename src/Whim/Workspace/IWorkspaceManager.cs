@@ -63,6 +63,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 
 	/// <summary>
 	/// Triggers all active workspaces to update their layout.
+	/// Active workspaces are those that are visible on a monitor.
 	/// </summary>
 	public void LayoutAllActiveWorkspaces();
 
