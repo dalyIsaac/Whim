@@ -43,7 +43,7 @@ public class Program
 		configContext.PluginManager.RegisterPlugin(barPlugin);
 
 		// Add gap
-		GapsConfig gapsConfig = new(10, 5);
+		GapsConfig gapsConfig = new(outerGap: 0, innerGap: 10);
 		GapsPlugin gapsPlugin = new(configContext, gapsConfig);
 
 		configContext.PluginManager.RegisterPlugin(gapsPlugin);
@@ -75,6 +75,9 @@ public class Program
 
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(WindowDirection.Left));
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(WindowDirection.Right));
+
+		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));
+		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateOuterGap(10));
 
 		return configContext;
 	}

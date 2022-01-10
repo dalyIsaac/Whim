@@ -13,12 +13,28 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 
 	public override IEnumerable<IWindowLocation> DoLayout(ILocation location)
 	{
+		int doubleOuterGap = _gapsConfig.OuterGap * 2;
+		int doubleInnerGap = _gapsConfig.InnerGap * 2;
+
 		Location proxiedLocation = new(
 			x: location.X + _gapsConfig.OuterGap,
 			y: location.Y + _gapsConfig.OuterGap,
-			width: location.Width - _gapsConfig.OuterGap * 2,
-			height: location.Height - _gapsConfig.OuterGap * 2
+			width: location.Width - doubleOuterGap,
+			height: location.Height - doubleOuterGap
 		);
-		return _innerLayoutEngine.DoLayout(proxiedLocation);
+
+		foreach (IWindowLocation loc in _innerLayoutEngine.DoLayout(proxiedLocation))
+		{
+			yield return new WindowLocation(
+				window: loc.Window,
+				location: new Location(
+					x: loc.Location.X + _gapsConfig.InnerGap,
+					y: loc.Location.Y + _gapsConfig.InnerGap,
+					width: loc.Location.Width - doubleInnerGap,
+					height: loc.Location.Height - doubleInnerGap
+				),
+				windowState: loc.WindowState
+			);
+		}
 	}
 }
