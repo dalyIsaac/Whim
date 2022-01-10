@@ -29,7 +29,6 @@ public partial class FocusedWindowWidget : UserControl
 		DataContext = ViewModel;
 	}
 
-
 	public static BarComponent CreateComponent()
 	{
 		return new BarComponent((configContext, monitor, window) => new FocusedWindowWidget(configContext));
