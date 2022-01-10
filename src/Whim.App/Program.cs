@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Whim.Bar;
 using Whim.Dashboard;
+using Whim.Gaps;
 
 namespace Whim.App;
 
@@ -41,6 +42,12 @@ public class Program
 
 		configContext.PluginManager.RegisterPlugin(barPlugin);
 
+		// Add gap
+		GapsConfig gapsConfig = new(outerGap: 0, innerGap: 10);
+		GapsPlugin gapsPlugin = new(configContext, gapsConfig);
+
+		configContext.PluginManager.RegisterPlugin(gapsPlugin);
+
 		// Keyboard shortcuts
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.MoveWindowToNextMonitor());
@@ -68,6 +75,9 @@ public class Program
 
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(WindowDirection.Left));
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(WindowDirection.Right));
+
+		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));
+		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateOuterGap(10));
 
 		return configContext;
 	}

@@ -3,6 +3,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.UI.Accessibility;
+using System.Runtime.InteropServices;
 
 namespace Whim;
 
@@ -263,7 +264,10 @@ public static class Win32Helper
 	{
 
 		IWindow window = windowLocation.Window;
-		ILocation location = windowLocation.Location;
+
+		ILocation offset = GetWindowOffset(window.Handle);
+		ILocation location = Location.Add(windowLocation.Location, offset);
+
 		WindowState windowState = windowLocation.WindowState;
 
 		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
@@ -278,7 +282,7 @@ public static class Win32Helper
 		}
 
 		// We use HWND_BOTTOM, as modifying the Z-order of a window
-		// may cause EVENT_SYSTEM_FOREGROUND to be set to Whim, which in turn
+		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
 		// causes the relevant window to be focused, when the user hasn't
 		// actually changed the focus.
 
@@ -308,6 +312,44 @@ public static class Win32Helper
 		else if (window.Class != "Windows.UI.Core.CoreWindow")
 		{
 			ShowWindowNoActivate(window.Handle);
+		}
+	}
+
+	/// <summary>
+	/// Returns the window's offset.<br/>
+	/// This is based on the issue raised at https://github.com/workspacer/workspacer/issues/139,
+	/// and the associated frix from https://github.com/workspacer/workspacer/pull/146
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
+	public static ILocation GetWindowOffset(HWND hwnd)
+	{
+		if (!PInvoke.GetWindowRect(hwnd, out RECT windowRect))
+		{
+			Logger.Error($"Could not get the window rect for {hwnd.Value}");
+			return new Location(0, 0, 0, 0);
+		}
+
+		unsafe
+		{
+			RECT extendedFrameRect = new();
+			uint size = (uint)Marshal.SizeOf<RECT>();
+			HRESULT res = PInvoke.DwmGetWindowAttribute(hwnd,
+							Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
+							&extendedFrameRect,
+							size);
+
+			if (res.Failed)
+			{
+				Logger.Error($"Could not get the extended frame rect for {hwnd.Value}");
+				return new Location(0, 0, 0, 0);
+			}
+
+			return new Location(
+				x: windowRect.left - extendedFrameRect.left,
+				y: windowRect.top - extendedFrameRect.top,
+				width: (windowRect.right - windowRect.left) - (extendedFrameRect.right - extendedFrameRect.left),
+				height: (windowRect.bottom - windowRect.top) - (extendedFrameRect.bottom - extendedFrameRect.top));
 		}
 	}
 }
