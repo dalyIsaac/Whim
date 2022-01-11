@@ -4,8 +4,12 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:local="clr-namespace:Whim.Bar"
+			 xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
 			 mc:Ignorable="d"
-			 d:DataContext="{d:DesignInstance Type=local:ActiveLayoutViewModel}"
+			 d:DataContext="{d:DesignInstance Type=local:ActiveLayoutWidgetViewModel}"
 			 d:DesignHeight="450" d:DesignWidth="800">
-	<Button Content="{Binding Path=ActiveLayoutEngine}" Command="{Binding Path=NextLayoutEngineCommand}" CommandParameter="{Binding}" />
+	<wpfui:Button Content="{Binding Path=ActiveLayoutEngine}"
+				  Command="{Binding Path=NextLayoutEngineCommand}"
+				  CommandParameter="{Binding}"
+				  Appearance="Secondary"/>
 </UserControl>

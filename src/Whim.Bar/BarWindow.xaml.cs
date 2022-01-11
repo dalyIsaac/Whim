@@ -8,9 +8,11 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Windows.Win32.Foundation;
 
 namespace Whim.Bar;
 
@@ -35,6 +37,10 @@ public partial class BarWindow : System.Windows.Window
 		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c(_configContext, _monitor, this)));
 		CenterPanel.Children.AddRange(_barConfig.CenterComponents.Select(c => c(_configContext, _monitor, this)));
 		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_configContext, _monitor, this)));
+
+		WPFUI.Theme.Manager.SetSystemTheme(true);
+		WPFUI.Theme.Watcher.Start();
+		WPFUI.Background.Manager.Apply(this, true);
 	}
 
 	/// <summary>
@@ -43,11 +49,16 @@ public partial class BarWindow : System.Windows.Window
 	/// </summary>
 	public void Render()
 	{
-		Left = _monitor.X;
-		Top = _monitor.Y;
-		Width = _monitor.Width;
+		Left = _monitor.X + _barConfig.Margin;
+		Top = _monitor.Y + _barConfig.Margin;
+		Width = _monitor.Width - (_barConfig.Margin * 2);
 		Height = _barConfig.Height;
 
 		Show();
+	}
+
+	private void Window_Loaded(object sender, RoutedEventArgs e)
+	{
+		Win32Helper.SetWindowCorners(new HWND(new WindowInteropHelper(this).Handle));
 	}
 }

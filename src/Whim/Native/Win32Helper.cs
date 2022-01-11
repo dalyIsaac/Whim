@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Dwm;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.UI.Accessibility;
 using System.Runtime.InteropServices;
+using System;
 
 namespace Whim;
 
@@ -350,6 +352,21 @@ public static class Win32Helper
 				y: windowRect.top - extendedFrameRect.top,
 				width: (windowRect.right - windowRect.left) - (extendedFrameRect.right - extendedFrameRect.left),
 				height: (windowRect.bottom - windowRect.top) - (extendedFrameRect.bottom - extendedFrameRect.top));
+		}
+	}
+
+	public static void SetWindowCorners(HWND hwnd, DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND)
+	{
+		unsafe
+		{
+			HRESULT res = PInvoke.DwmSetWindowAttribute(hwnd,
+								 DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
+								 &preference,
+								 sizeof(DWM_WINDOW_CORNER_PREFERENCE));
+			if (res.Failed)
+			{
+				Logger.Error($"Failed to set window corners for {hwnd.Value}");
+			}
 		}
 	}
 }
