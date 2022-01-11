@@ -7,6 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="WPF-UI" Version="1.2.1" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 

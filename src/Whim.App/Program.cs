@@ -33,14 +33,9 @@ public class Program
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_F12), (args) => dashboardPlugin.Toggle());
 
 		// Add bar
-		List<BarComponent> leftComponents = new()
-		{
-			WorkspaceWidget.CreateComponent(),
-			ActiveLayoutWidget.CreateComponent(),
-			FocusedWindowWidget.CreateComponent(),
-		};
-		List<BarComponent> centerComponents = new() { TextWidget.CreateComponent("Hello World!") };
-		List<BarComponent> rightComponents = new() { DateTimeWidget.CreateComponent() };
+		List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
+		List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
+		List<BarComponent> rightComponents = new() { ActiveLayoutWidget.CreateComponent(), DateTimeWidget.CreateComponent() };
 
 		BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
 		BarPlugin barPlugin = new(configContext, barConfig);

@@ -60,6 +60,17 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
+	private int _margin = 10;
+	public int Margin
+	{
+		get => _margin;
+		set
+		{
+			_margin = value;
+			OnPropertyChanged(nameof(Margin));
+		}
+	}
+
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

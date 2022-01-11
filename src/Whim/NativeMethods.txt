@@ -44,6 +44,8 @@ KBDLLHOOKSTRUCT
 
 SetWindowPos
 DwmGetWindowAttribute
+DwmSetWindowAttribute
+DWM_WINDOW_CORNER_PREFERENCE
 
 GetAncestor
 IsWindowVisible

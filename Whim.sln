@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.App", "src\Whim.App\Wh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Bar", "src\Whim.Bar\Whim.Bar.csproj", "{E95331E9-FE75-44FF-ABDD-519550814DB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.Gaps", "src\Whim.Gaps\Whim.Gaps.csproj", "{6B13ECFB-0754-4721-819A-9F4712B75E18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Gaps", "src\Whim.Gaps\Whim.Gaps.csproj", "{6B13ECFB-0754-4721-819A-9F4712B75E18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
