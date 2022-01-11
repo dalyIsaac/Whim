@@ -10,19 +10,17 @@ namespace Whim;
 public class Window : IWindow
 {
 	private readonly IConfigContext _configContext;
-	private const int _bufferCapacity = 255;
-	private readonly Pointer _pointer;
 
-	public HWND Handle { get => _pointer.Handle; }
+	public HWND Handle { get; }
 
-	public string Title { get => Win32Helper.GetWindowText(_pointer.Handle); }
+	public string Title { get => Win32Helper.GetWindowText(Handle); }
 
-	public string Class { get => Win32Helper.GetClassName(_pointer.Handle); }
+	public string Class { get => Win32Helper.GetClassName(Handle); }
 	public ILocation Location
 	{
 		get
 		{
-			PInvoke.GetWindowRect(_pointer.Handle, out RECT rect);
+			PInvoke.GetWindowRect(Handle, out RECT rect);
 			return new Location(rect.left,
 										 rect.top,
 										 rect.right - rect.left,
@@ -36,24 +34,24 @@ public class Window : IWindow
 
 	public string ProcessName { get; }
 
-	public bool IsFocused => PInvoke.GetForegroundWindow() == _pointer.Handle;
+	public bool IsFocused => PInvoke.GetForegroundWindow() == Handle;
 
-	public bool IsMinimized => PInvoke.IsIconic(_pointer.Handle);
+	public bool IsMinimized => PInvoke.IsIconic(Handle);
 
-	public bool IsMaximized => PInvoke.IsZoomed(_pointer.Handle);
+	public bool IsMaximized => PInvoke.IsZoomed(Handle);
 
 	public bool IsMouseMoving { get; internal set; }
 
 	public void BringToTop()
 	{
 		Logger.Debug(ToString());
-		PInvoke.BringWindowToTop(_pointer.Handle);
+		PInvoke.BringWindowToTop(Handle);
 	}
 
 	public void Close()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.QuitApplication(_pointer.Handle);
+		Win32Helper.QuitApplication(Handle);
 		_configContext.WindowManager.TriggerWindowUnregistered(new WindowEventArgs(this));
 	}
 
@@ -62,7 +60,7 @@ public class Window : IWindow
 		Logger.Debug(ToString());
 		if (!IsFocused)
 		{
-			PInvoke.SetForegroundWindow(_pointer.Handle);
+			PInvoke.SetForegroundWindow(Handle);
 		}
 
 		// Sometimes we want to let listeners that the window is focused, but
@@ -76,7 +74,7 @@ public class Window : IWindow
 	public void Hide()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.HideWindow(_pointer.Handle);
+		Win32Helper.HideWindow(Handle);
 		_configContext.WindowManager.TriggerWindowUpdated(new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
 	}
 
@@ -100,36 +98,36 @@ public class Window : IWindow
 	public void ShowMaximized()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.ShowWindowMaximized(_pointer.Handle);
+		Win32Helper.ShowWindowMaximized(Handle);
 	}
 
 	public void ShowMinimized()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.ShowWindowMinimized(_pointer.Handle);
+		Win32Helper.ShowWindowMinimized(Handle);
 	}
 
 	public void ShowNormal()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.ShowWindowNoActivate(_pointer.Handle);
+		Win32Helper.ShowWindowNoActivate(Handle);
 	}
 
 	/// <summary>
 	/// Constructor for the <see cref="IWindow"/> implementation.
 	/// </summary>
-	/// <param name="pointer"></param>
+	/// <param name="hwnd"></param>
 	/// <param name="configContext"></param>
 	/// <exception cref="Win32Exception"></exception>
-	private Window(Pointer pointer, IConfigContext configContext)
+	private Window(HWND hwnd, IConfigContext configContext)
 	{
 		_configContext = configContext;
-		_pointer = pointer;
+		Handle = hwnd;
 
 		unsafe
 		{
 			uint pid;
-			_ = PInvoke.GetWindowThreadProcessId(_pointer.Handle, &pid);
+			_ = PInvoke.GetWindowThreadProcessId(Handle, &pid);
 			ProcessId = (int)pid;
 		}
 
@@ -154,17 +152,17 @@ public class Window : IWindow
 		};
 	}
 
-	internal static Window? RegisterWindow(Pointer pointer, IConfigContext configContext)
+	internal static Window? RegisterWindow(HWND hwnd, IConfigContext configContext)
 	{
-		Logger.Debug($"Registering window {pointer}");
+		Logger.Debug($"Registering window {hwnd.Value}");
 
 		try
 		{
-			return new Window(pointer, configContext);
+			return new Window(hwnd, configContext);
 		}
 		catch (Exception e)
 		{
-			Logger.Error($"Could not create a Window instance for {pointer}, {e.Message}");
+			Logger.Error($"Could not create a Window instance for {hwnd.Value}, {e.Message}");
 			return null;
 		}
 	}
@@ -185,5 +183,5 @@ public class Window : IWindow
 		return Handle.GetHashCode();
 	}
 
-	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{Class}> {{{_pointer}}}";
+	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{Class}> {{{Handle.Value}}}";
 }

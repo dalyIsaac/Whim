@@ -201,10 +201,9 @@ public class WindowManager : IWindowManager
 			return null;
 		}
 
-		Pointer pointer = new(hwnd);
-		Logger.Debug($"Registering window {pointer}");
+		Logger.Debug($"Registering window {hwnd.Value}");
 
-		Window? window = Window.RegisterWindow(pointer, _configContext);
+		Window? window = Window.RegisterWindow(hwnd, _configContext);
 
 		if (window == null || _configContext.FilterManager.FilterWindow(window))
 		{
