@@ -99,9 +99,10 @@ public class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug($"Removing workspace {workspace}");
 
-		if (_workspaces.Count <= _configContext.MonitorManager.Length)
+		if (_workspaces.Count - 1 <= _configContext.MonitorManager.Length)
 		{
-			throw new InvalidOperationException($"There must be at least {_configContext.MonitorManager.Length} workspaces.");
+			Logger.Debug($"There must be at least {_configContext.MonitorManager.Length} workspaces.");
+			return false;
 		}
 
 		bool wasFound = _workspaces.Remove(workspace);
@@ -165,7 +166,9 @@ public class WorkspaceManager : IWorkspaceManager
 		{
 			_monitorWorkspaceMap[loserMonitor] = oldWorkspace;
 			oldWorkspace.DoLayout();
-			MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(loserMonitor, workspace, oldWorkspace));
+			MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(loserMonitor,
+																					  oldWorkspace: workspace,
+																					  newWorkspace: oldWorkspace));
 		}
 
 		// Update the focused monitor.
