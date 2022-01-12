@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Whim;
-
-using Filter = Func<IWindow, bool>;
-using Router = Func<IWindow, IWorkspace?>;
 
 public class RouterManager : IRouterManager
 {
@@ -35,7 +31,7 @@ public class RouterManager : IRouterManager
 		AddRouter(router);
 	}
 
-	public void ClearRoutes()
+	public void Clear()
 	{
 		Logger.Debug("Clearing routes");
 		_routers.Clear();

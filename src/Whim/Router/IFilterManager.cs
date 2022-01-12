@@ -1,8 +1,6 @@
-using System;
-
 namespace Whim;
 
-using Filter = Func<IWindow, bool>;
+public delegate bool Filter(IWindow window);
 
 public interface IFilterManager
 {
@@ -26,7 +24,7 @@ public interface IFilterManager
 	/// <see langword="true"/> when the window should be ignored, otherwise
 	/// <see langword="false"/>.
 	/// </returns>
-	public bool FilterWindow(IWindow window);
+	public bool ShouldBeIgnored(IWindow window);
 
 	/// <summary>
 	/// Ignores the window class. Case insensitive.

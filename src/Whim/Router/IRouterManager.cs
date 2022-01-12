@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace Whim;
 
-namespace Whim;
-
-using Filter = Func<IWindow, bool>;
-using Router = Func<IWindow, IWorkspace?>;
+public delegate IWorkspace? Router(IWindow window);
 
 public interface IRouterManager
 {
@@ -20,7 +17,7 @@ public interface IRouterManager
 	/// <summary>
 	/// Clear all the routes.
 	/// </summary>
-	public void ClearRoutes();
+	public void Clear();
 
 	/// <summary>
 	/// Add a router.

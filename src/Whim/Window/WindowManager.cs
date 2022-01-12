@@ -205,7 +205,7 @@ public class WindowManager : IWindowManager
 
 		Window? window = Window.RegisterWindow(hwnd, _configContext);
 
-		if (window == null || _configContext.FilterManager.FilterWindow(window))
+		if (window == null || _configContext.FilterManager.ShouldBeIgnored(window))
 		{
 			return null;
 		}

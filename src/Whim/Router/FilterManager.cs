@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Whim;
-
-using Filter = Func<IWindow, bool>;
 
 public class FilterManager : IFilterManager
 {
@@ -46,7 +43,7 @@ public class FilterManager : IFilterManager
 		}
 	}
 
-	public bool FilterWindow(IWindow window)
+	public bool ShouldBeIgnored(IWindow window)
 	{
 		return _ignoreWindowClasses.Contains(window.Class.ToLower())
 			|| _ignoreProcessNames.Contains(window.ProcessName.ToLower())
