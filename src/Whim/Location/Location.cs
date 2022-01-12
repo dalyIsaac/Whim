@@ -1,4 +1,6 @@
-﻿namespace Whim;
+﻿using System;
+
+namespace Whim;
 
 public class Location : ILocation
 {
@@ -32,4 +34,12 @@ public class Location : ILocation
 		a.Y + b.Y,
 		a.Width + b.Width,
 		a.Height + b.Height);
+
+	public override bool Equals(object? obj) => obj is Location location
+											 && location.X == X
+											 && location.Y == Y
+											 && location.Width == Width
+											 && location.Height == Height;
+
+	public override int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
 }
