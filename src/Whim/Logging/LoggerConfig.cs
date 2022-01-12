@@ -25,7 +25,7 @@ public class LoggerConfig
 	/// <summary>
 	/// The configuration for the file sink.
 	/// </summary>
-	public FileSinkConfig FileSink { get; }
+	public FileSinkConfig? FileSink { get; }
 
 	/// <summary>
 	/// The configuration for the debug sink (what Visual Studio connects to).
@@ -57,7 +57,7 @@ public class LoggerConfig
 	/// </summary>
 	/// <param name="fileSinkConfig"><see cref="FileSinkConfig"/></param>
 	/// <param name="debugSink"><see cref="DebugSink"/></param>
-	public LoggerConfig(FileSinkConfig fileSinkConfig, SinkConfig? debugSink = null)
+	public LoggerConfig(FileSinkConfig? fileSinkConfig = null, SinkConfig? debugSink = null)
 	{
 		FileSink = fileSinkConfig;
 		DebugSink = debugSink;
