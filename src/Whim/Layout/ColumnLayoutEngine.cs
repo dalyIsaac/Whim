@@ -4,13 +4,9 @@ namespace Whim;
 
 public class ColumnLayoutEngine : BaseStackLayoutEngine
 {
-	public override string Name { get; }
-	public bool LeftToRight { get; }
 
-	public ColumnLayoutEngine(string name = "Column", bool leftToRight = true)
+	public ColumnLayoutEngine(string name = "Column", bool leftToRight = true) : base(name, leftToRight)
 	{
-		Name = name;
-		LeftToRight = leftToRight;
 	}
 
 	public override IEnumerable<IWindowLocation> DoLayout(ILocation location)
@@ -54,73 +50,6 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 			{
 				x -= width;
 			}
-		}
-	}
-
-	public override void FocusWindowInDirection(WindowDirection direction, IWindow window)
-	{
-		Logger.Debug($"Focusing window {window} in layout engine {Name}");
-
-		if (direction != WindowDirection.Left && direction != WindowDirection.Right)
-		{
-			return;
-		}
-
-		// Find the index of the window in the stack
-		int windowIndex = _stack.FindIndex(x => x.Handle == window.Handle);
-		if (windowIndex == -1)
-		{
-			Logger.Error($"Window {window.Title} not found in layout engine {Name}");
-			return;
-		}
-
-		int delta = GetDelta(LeftToRight, direction);
-		int adjIndex = (windowIndex + delta).Mod(_stack.Count);
-
-		IWindow adjWindow = _stack[adjIndex];
-		adjWindow.Focus();
-	}
-
-	public override void SwapWindowInDirection(WindowDirection direction, IWindow window)
-	{
-		Logger.Debug($"Swapping window {window} in layout engine {Name}");
-
-		if (direction != WindowDirection.Left && direction != WindowDirection.Right)
-		{
-			return;
-		}
-
-		// Find the index of the window in the stack
-		int windowIndex = _stack.FindIndex(x => x.Handle == window?.Handle);
-		if (windowIndex == -1)
-		{
-			Logger.Error($"Window {window?.Title} not found in layout engine {Name}");
-			return;
-		}
-
-		int delta = GetDelta(LeftToRight, direction);
-		int adjIndex = (windowIndex + delta).Mod(_stack.Count);
-
-		// Swap window
-		IWindow adjWindow = _stack[adjIndex];
-		_stack[windowIndex] = adjWindow;
-		_stack[adjIndex] = window;
-	}
-
-	/// <summary>
-	/// Gets the delta to determine whether we want to move towards 0 or not.
-	/// </summary>
-	/// <param name="leftToRight">Whether we are moving left to right or right to left.</param>
-	/// <param name="direction">The window direction to move.</param>
-	private static int GetDelta(bool leftToRight, WindowDirection direction)
-	{
-		if (leftToRight)
-		{
-			return direction == WindowDirection.Left ? -1 : 1;
-		}
-		else
-		{
-			return direction == WindowDirection.Left ? 1 : -1;
 		}
 	}
 }

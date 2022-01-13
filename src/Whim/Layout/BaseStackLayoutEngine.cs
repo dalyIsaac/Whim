@@ -6,6 +6,8 @@ namespace Whim;
 
 /// <summary>
 /// Abstract layout engine with a stack data structure.
+/// Stack layout engines should only implement <see cref="WindowDirection.Left"/>
+/// and <see cref="WindowDirection.Right"/>.
 /// </summary>
 public abstract class BaseStackLayoutEngine : ILayoutEngine
 {
@@ -13,11 +15,19 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 
 	public Commander Commander { get; } = new();
 
-	public abstract string Name { get; }
+	public bool LeftToRight { get; }
+
+	public string Name { get; }
 
 	public int Count => _stack.Count;
 
 	public bool IsReadOnly => false;
+
+	public BaseStackLayoutEngine(string name, bool leftToRight)
+	{
+		Name = name;
+		LeftToRight = leftToRight;
+	}
 
 	public void Add(IWindow window)
 	{
@@ -60,7 +70,79 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 		return _stack.FirstOrDefault();
 	}
 
-	public abstract void FocusWindowInDirection(WindowDirection direction, IWindow window);
+	/// <summary>
+	/// Focus the window in the given direction.
+	/// Stack layout engines should only implement <see cref="WindowDirection.Left"/>
+	/// and <see cref="WindowDirection.Right"/>.
+	public virtual void FocusWindowInDirection(WindowDirection direction, IWindow window)
+	{
+		Logger.Debug($"Focusing window {window} in layout engine {Name}");
 
-	public abstract void SwapWindowInDirection(WindowDirection direction, IWindow window);
+		if (direction != WindowDirection.Left && direction != WindowDirection.Right)
+		{
+			return;
+		}
+
+		// Find the index of the window in the stack
+		int windowIndex = _stack.FindIndex(x => x.Handle == window.Handle);
+		if (windowIndex == -1)
+		{
+			Logger.Error($"Window {window.Title} not found in layout engine {Name}");
+			return;
+		}
+
+		int delta = GetDelta(LeftToRight, direction);
+		int adjIndex = (windowIndex + delta).Mod(_stack.Count);
+
+		IWindow adjWindow = _stack[adjIndex];
+		adjWindow.Focus();
+	}
+
+	/// <summary>
+	/// Swap the window with the window in the given direction.
+	/// Stack layout engines should only implement <see cref="WindowDirection.Left"/>
+	/// and <see cref="WindowDirection.Right"/>.
+	/// </summary>
+	public virtual void SwapWindowInDirection(WindowDirection direction, IWindow window)
+	{
+		Logger.Debug($"Swapping window {window} in layout engine {Name}");
+
+		if (direction != WindowDirection.Left && direction != WindowDirection.Right)
+		{
+			return;
+		}
+
+		// Find the index of the window in the stack
+		int windowIndex = _stack.FindIndex(x => x.Handle == window?.Handle);
+		if (windowIndex == -1)
+		{
+			Logger.Error($"Window {window?.Title} not found in layout engine {Name}");
+			return;
+		}
+
+		int delta = GetDelta(LeftToRight, direction);
+		int adjIndex = (windowIndex + delta).Mod(_stack.Count);
+
+		// Swap window
+		IWindow adjWindow = _stack[adjIndex];
+		_stack[windowIndex] = adjWindow;
+		_stack[adjIndex] = window;
+	}
+
+	/// <summary>
+	/// Gets the delta to determine whether we want to move towards 0 or not.
+	/// </summary>
+	/// <param name="leftToRight">Whether we are moving left to right or right to left.</param>
+	/// <param name="direction">The window direction to move.</param>
+	private static int GetDelta(bool leftToRight, WindowDirection direction)
+	{
+		if (leftToRight)
+		{
+			return direction == WindowDirection.Left ? -1 : 1;
+		}
+		else
+		{
+			return direction == WindowDirection.Left ? 1 : -1;
+		}
+	}
 }

@@ -22,7 +22,7 @@ public class Program
 		// Add workspaces
 		for (int i = 0; i < 4; i++)
 		{
-			Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
+			Workspace workspace = new(configContext, i.ToString(), new TallLayoutEngine(), new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
 			configContext.WorkspaceManager.Add(workspace);
 		}
 
