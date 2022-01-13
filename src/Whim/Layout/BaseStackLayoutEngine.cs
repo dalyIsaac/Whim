@@ -11,6 +11,18 @@ namespace Whim;
 /// </summary>
 public abstract class BaseStackLayoutEngine : ILayoutEngine
 {
+	#region Primary area fields
+	protected readonly int _primaryAreaBaseCount = 1;
+	protected int _primaryAreaCountOffset;
+	protected int _primaryAreaTotal => _primaryAreaBaseCount + _primaryAreaCountOffset;
+
+	protected readonly int _primaryAreaSizePercent;
+	protected int _primaryAreaSizePercentOffset = 0;
+	protected readonly int _primaryAreaSizePercentIncrement;
+	#endregion
+
+	protected IConfigContext _configContext;
+
 	protected readonly List<IWindow> _stack = new();
 
 	public Commander Commander { get; } = new();
@@ -23,10 +35,13 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 
 	public bool IsReadOnly => false;
 
-	public BaseStackLayoutEngine(string name, bool leftToRight)
+	public BaseStackLayoutEngine(IConfigContext configContext, string name, bool leftToRight, int primaryPercentBase, int primaryPercentIncrement = 5)
 	{
+		_configContext = configContext;
 		Name = name;
 		LeftToRight = leftToRight;
+		_primaryAreaSizePercent = primaryPercentBase;
+		_primaryAreaSizePercentIncrement = primaryPercentIncrement;
 	}
 
 	public void Add(IWindow window)
@@ -74,7 +89,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	/// Focus the window in the given direction.
 	/// Stack layout engines should only implement <see cref="WindowDirection.Left"/>
 	/// and <see cref="WindowDirection.Right"/>.
-	public virtual void FocusWindowInDirection(WindowDirection direction, IWindow window)
+	public void FocusWindowInDirection(WindowDirection direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window} in layout engine {Name}");
 
@@ -103,7 +118,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	/// Stack layout engines should only implement <see cref="WindowDirection.Left"/>
 	/// and <see cref="WindowDirection.Right"/>.
 	/// </summary>
-	public virtual void SwapWindowInDirection(WindowDirection direction, IWindow window)
+	public void SwapWindowInDirection(WindowDirection direction, IWindow window)
 	{
 		Logger.Debug($"Swapping window {window} in layout engine {Name}");
 
@@ -143,6 +158,60 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 		else
 		{
 			return direction == WindowDirection.Left ? 1 : -1;
+		}
+	}
+
+	/// <summary>
+	/// Shrink the primary area of the layout engine.
+	/// </summary>
+	public void ShrinkPrimaryArea()
+	{
+		Logger.Debug($"Shrinking primary area of layout engine {Name}");
+		_primaryAreaSizePercentOffset += _primaryAreaSizePercentIncrement;
+		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+	}
+
+	/// <summary>
+	/// Expand the primary area of the layout engine.
+	/// </summary>
+	public void ExpandPrimaryArea()
+	{
+		Logger.Debug($"Expanding primary area of layout engine {Name}");
+		_primaryAreaSizePercentOffset -= _primaryAreaSizePercentIncrement;
+		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+	}
+
+	/// <summary>
+	/// Reset the primary area of the layout engine.
+	/// </summary>
+	public void ResetPrimaryArea()
+	{
+		Logger.Debug($"Resetting primary area of layout engine {Name}");
+		_primaryAreaSizePercentOffset = 0;
+		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+	}
+
+	/// <summary>
+	/// Increment the number of windows in the primary area of the layout engine.
+	/// </summary>
+	public void IncrementNumInPrimaryArea()
+	{
+		Logger.Debug($"Incrementing number of windows in primary area of layout engine {Name}");
+		_primaryAreaCountOffset++;
+		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+	}
+
+	/// <summary>
+	/// Decrement the number of windows in the primary area of the layout engine.
+	/// </summary>
+	public void DecrementNumInPrimaryArea()
+	{
+		Logger.Debug($"Decrementing number of windows in primary area of layout engine {Name}");
+
+		if (_primaryAreaTotal > 1)
+		{
+			_primaryAreaCountOffset--;
+			_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 		}
 	}
 }

@@ -46,4 +46,13 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation location);
+
+	public ILayoutEngine InnerLayoutEngine()
+	{
+		if (_innerLayoutEngine is BaseProxyLayoutEngine proxyLayoutEngine)
+		{
+			return proxyLayoutEngine.InnerLayoutEngine();
+		}
+		return _innerLayoutEngine;
+	}
 }

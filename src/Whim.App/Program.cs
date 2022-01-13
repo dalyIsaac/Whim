@@ -22,7 +22,7 @@ public class Program
 		// Add workspaces
 		for (int i = 0; i < 4; i++)
 		{
-			Workspace workspace = new(configContext, i.ToString(), new TallLayoutEngine(), new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
+			Workspace workspace = new(configContext, i.ToString(), new TallLayoutEngine(configContext), new ColumnLayoutEngine(configContext), new ColumnLayoutEngine(configContext, "Right to left", false));
 			configContext.WorkspaceManager.Add(workspace);
 		}
 
@@ -79,6 +79,49 @@ public class Program
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateOuterGap(10));
 
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_H), (args) =>
+		{
+			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			if (GetBaseLayoutEngine(workspace) is BaseStackLayoutEngine layoutEngine)
+			{
+				layoutEngine.ExpandPrimaryArea();
+			}
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_L), (args) =>
+		{
+			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			if (GetBaseLayoutEngine(workspace) is BaseStackLayoutEngine layoutEngine)
+			{
+				layoutEngine.ShrinkPrimaryArea();
+			}
+		});
+
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift, VIRTUAL_KEY.VK_H), (args) =>
+		{
+			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			if (GetBaseLayoutEngine(workspace) is BaseStackLayoutEngine layoutEngine)
+			{
+				layoutEngine.IncrementNumInPrimaryArea();
+			}
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift, VIRTUAL_KEY.VK_L), (args) =>
+		{
+			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			if (GetBaseLayoutEngine(workspace) is BaseStackLayoutEngine layoutEngine)
+			{
+				layoutEngine.DecrementNumInPrimaryArea();
+			}
+		});
+
 		return configContext;
+	}
+
+	private static ILayoutEngine GetBaseLayoutEngine(IWorkspace workspace)
+	{
+		if (workspace.ActiveLayoutEngine is BaseProxyLayoutEngine proxyLayoutEngine)
+		{
+			return proxyLayoutEngine.InnerLayoutEngine();
+		}
+		return workspace.ActiveLayoutEngine;
 	}
 }

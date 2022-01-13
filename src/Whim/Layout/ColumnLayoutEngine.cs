@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -5,51 +6,66 @@ namespace Whim;
 public class ColumnLayoutEngine : BaseStackLayoutEngine
 {
 
-	public ColumnLayoutEngine(string name = "Column", bool leftToRight = true) : base(name, leftToRight)
+	public ColumnLayoutEngine(IConfigContext configContext, string name = "Column", bool leftToRight = true) : base(configContext, name, leftToRight, 40)
 	{
 	}
 
 	public override IEnumerable<IWindowLocation> DoLayout(ILocation location)
 	{
-		string direction = LeftToRight ? "left to right" : "right to left";
-		Logger.Debug($"Performing a column layout {direction}");
+		string directionStr = LeftToRight ? "left to right" : "right to left";
+		Logger.Debug($"Performing a column layout {directionStr}");
 
 		if (_stack.Count == 0)
 		{
 			yield break;
 		}
 
-		int x, y, width, height;
+		int numInPrimary = Math.Min(_primaryAreaTotal, _stack.Count);
+		int numInSecondary = _stack.Count - numInPrimary;
+
+		int primaryAreaWidth = location.Width * (_primaryAreaSizePercent + _primaryAreaSizePercentOffset) / 100;
+		int secondaryAreaWidth = (location.Width - primaryAreaWidth);
+
+		int primaryWindowWidth = primaryAreaWidth / numInPrimary;
+		int secondaryWindowWidth = secondaryAreaWidth / numInSecondary;
+
+		int x, y, direction;
+		int height = location.Height;
 
 		if (LeftToRight)
 		{
-			width = location.Width / _stack.Count;
-			height = location.Height;
 			x = location.X;
 			y = location.Y;
+			direction = 1;
 		}
 		else
 		{
-			width = location.Width / _stack.Count;
-			height = location.Height;
-			x = location.X + location.Width - width;
+			x = location.X + location.Width - primaryWindowWidth;
 			y = location.Y;
+			direction = -1;
 		}
 
-		foreach (IWindow window in _stack)
+		// Layout the primary windows
+		int stackIdx = 0;
+		for (; stackIdx < numInPrimary; stackIdx++)
 		{
+			IWindow window = _stack[stackIdx];
 			yield return new WindowLocation(window,
-											new Location(x, y, width, height),
+											new Location(x, y, primaryWindowWidth, height),
 											WindowState.Normal);
 
-			if (LeftToRight)
-			{
-				x += width;
-			}
-			else
-			{
-				x -= width;
-			}
+			x += direction * primaryWindowWidth;
+		}
+
+		// Layout the secondary windows
+		for (; stackIdx < _stack.Count; stackIdx++)
+		{
+			IWindow window = _stack[stackIdx];
+			yield return new WindowLocation(window,
+											new Location(x, y, secondaryWindowWidth, height),
+											WindowState.Normal);
+
+			x += direction * secondaryWindowWidth;
 		}
 	}
 }

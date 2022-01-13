@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-public class TallLayoutEngine : BasePrimaryStackLayoutEngine
+public class TallLayoutEngine : BaseStackLayoutEngine
 {
-	private IWindowLocation[] _lastLayout = Array.Empty<IWindowLocation>();
-
-	public TallLayoutEngine(string name = "Tall", bool leftToRight = true) : base(name, leftToRight, 50, 5)
+	public TallLayoutEngine(IConfigContext configContext, string name = "Tall", bool leftToRight = true) : base(configContext, name, leftToRight, 50)
 	{
 	}
 
@@ -21,10 +19,8 @@ public class TallLayoutEngine : BasePrimaryStackLayoutEngine
 			yield break;
 		}
 
-		_lastLayout = new IWindowLocation[_stack.Count];
-
 		int numInPrimary = Math.Min(_primaryAreaTotal, _stack.Count);
-		int primaryAreaWidth = location.Width * (_primaryPercentBase + _primaryPercentOffset) / 100;
+		int primaryAreaWidth = location.Width * (_primaryAreaSizePercent + _primaryAreaSizePercentOffset) / 100;
 		int primaryWindowHeight = location.Height / numInPrimary;
 
 		int secondaryAreaWidth = location.Width - primaryAreaWidth;
@@ -38,11 +34,11 @@ public class TallLayoutEngine : BasePrimaryStackLayoutEngine
 		}
 		else
 		{
-			secondaryWindowHeight= location.Height / (_stack.Count - numInPrimary);
+			secondaryWindowHeight = location.Height / (_stack.Count - numInPrimary);
 		}
 
 		int primaryX, secondaryX;
-		int y =  location.Y;
+		int y = location.Y;
 
 		if (LeftToRight)
 		{
@@ -60,7 +56,7 @@ public class TallLayoutEngine : BasePrimaryStackLayoutEngine
 		for (; stackIdx < numInPrimary; stackIdx++)
 		{
 			IWindow window = _stack[stackIdx];
-			_lastLayout[stackIdx] = new WindowLocation(window,
+			yield return new WindowLocation(window,
 											new Location(primaryX, y, primaryAreaWidth, primaryWindowHeight),
 											WindowState.Normal);
 			y += primaryWindowHeight;
@@ -71,16 +67,10 @@ public class TallLayoutEngine : BasePrimaryStackLayoutEngine
 		for (; stackIdx < _stack.Count; stackIdx++)
 		{
 			IWindow window = _stack[stackIdx];
-			_lastLayout[stackIdx] = new WindowLocation(window,
+			yield return new WindowLocation(window,
 											new Location(secondaryX, y, secondaryAreaWidth, secondaryWindowHeight),
 											WindowState.Normal);
 			y += secondaryWindowHeight;
-		}
-
-		// Yield the layout
-		foreach (IWindowLocation windowLocation in _lastLayout)
-		{
-			yield return windowLocation;
 		}
 	}
 }
