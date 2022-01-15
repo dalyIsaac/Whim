@@ -2,7 +2,7 @@
 
 namespace Whim;
 
-public class Location : ILocation
+public class Location : ILocation<int>
 {
 	public int X { get; }
 
@@ -20,20 +20,15 @@ public class Location : ILocation
 		Height = height;
 	}
 
-	public bool IsPointInside(int x, int y) => IsPointInside(this, x, y);
+	public bool IsPointInside(int x, int y) => ILocation<int>.IsPointInside(this, x, y);
 
 	public override string ToString() => $"(X: {X}, Y: {Y}, Width: {Width}, Height: {Height})";
 
-	public static bool IsPointInside(ILocation location, int x, int y) => location.X <= x
-		&& location.Y <= y
-		&& location.X + location.Width >= x
-		&& location.Y + location.Height >= y;
-
-	public static ILocation Add(ILocation a, ILocation b) => new Location(
-		a.X + b.X,
-		a.Y + b.Y,
-		a.Width + b.Width,
-		a.Height + b.Height);
+	public static ILocation<int> Add(ILocation<int> a, ILocation<int> b) => new Location(
+	a.X + b.X,
+	a.Y + b.Y,
+	a.Width + b.Width,
+	a.Height + b.Height);
 
 	public override bool Equals(object? obj) => obj is Location location
 											 && location.X == X

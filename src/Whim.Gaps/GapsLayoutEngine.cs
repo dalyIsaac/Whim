@@ -11,7 +11,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 		_gapsConfig = gapsConfig;
 	}
 
-	public override IEnumerable<IWindowLocation> DoLayout(ILocation location)
+	public override IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
 	{
 		int doubleOuterGap = _gapsConfig.OuterGap * 2;
 		int doubleInnerGap = _gapsConfig.InnerGap * 2;

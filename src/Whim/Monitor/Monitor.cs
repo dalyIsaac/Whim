@@ -31,7 +31,7 @@ public class Monitor : IMonitor
 	public int Y => Screen.WorkingArea.Y;
 	public bool IsPrimary => Screen.Primary;
 
-	public bool IsPointInside(int x, int y) => Location.IsPointInside(this, x, y);
+	public bool IsPointInside(int x, int y) => ILocation<int>.IsPointInside(this, x, y);
 
 	public override string ToString() => Screen.ToString();
 }

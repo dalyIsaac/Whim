@@ -267,8 +267,8 @@ public static class Win32Helper
 
 		IWindow window = windowLocation.Window;
 
-		ILocation offset = GetWindowOffset(window.Handle);
-		ILocation location = Location.Add(windowLocation.Location, offset);
+		ILocation<int> offset = GetWindowOffset(window.Handle);
+		ILocation<int> location = Location.Add(windowLocation.Location, offset);
 
 		WindowState windowState = windowLocation.WindowState;
 
@@ -324,7 +324,7 @@ public static class Win32Helper
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public static ILocation GetWindowOffset(HWND hwnd)
+	public static ILocation<int> GetWindowOffset(HWND hwnd)
 	{
 		if (!PInvoke.GetWindowRect(hwnd, out RECT windowRect))
 		{

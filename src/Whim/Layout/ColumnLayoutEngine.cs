@@ -13,7 +13,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		LeftToRight = leftToRight;
 	}
 
-	public override IEnumerable<IWindowLocation> DoLayout(ILocation location)
+	public override IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
 	{
 		string direction = LeftToRight ? "left to right" : "right to left";
 		Logger.Debug($"Performing a column layout {direction}");

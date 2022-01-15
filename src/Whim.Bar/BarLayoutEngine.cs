@@ -11,7 +11,7 @@ public class BarLayoutEngine : BaseProxyLayoutEngine
 		_barConfig = barConfig;
 	}
 
-	public override IEnumerable<IWindowLocation> DoLayout(ILocation location)
+	public override IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
 	{
 		int height = _barConfig.Height + _barConfig.Margin;
 		Location proxiedLocation = new(
