@@ -8,8 +8,8 @@ public class TreeLayoutEngine : ILayoutEngine
 {
 	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
-	public Node? Root { get; set; }
-	public NodeDirection Direction { get; set; } = NodeDirection.Right;
+	public Node? Root { get; private set; }
+	public NodeDirection Direction = NodeDirection.Right;
 
 	public string Name { get; set; }
 
@@ -19,7 +19,7 @@ public class TreeLayoutEngine : ILayoutEngine
 
 	public Commander Commander { get; } = new();
 
-	public TreeLayoutEngine(IConfigContext configContext, string name)
+	public TreeLayoutEngine(IConfigContext configContext, string name = "Tree")
 	{
 		_configContext = configContext;
 		Name = name;
@@ -27,10 +27,102 @@ public class TreeLayoutEngine : ILayoutEngine
 
 	public void Add(IWindow window)
 	{
+		Logger.Debug($"Adding window {window.Title} to layout engine {Name}");
+
+		LeafNode newLeaf = new(window);
+		_windows.Add(window, newLeaf);
+
+		if (Root == null)
+		{
+			Root = newLeaf;
+			return;
+		}
+
+		// Get the focused window node
+		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.FocusedWindow;
+
+		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out LeafNode? focusedLeaf))
+		{
+			// We can't find the focused window, so we'll just add it to the right-most node.
+			focusedLeaf = GetRightMostLeaf(Root);
+		}
+
+		if (focusedLeaf == null)
+		{
+			Logger.Error($"Could not find a leaf node to add window {window.Title} to layout engine {Name}");
+			return;
+		}
+
+		// If the parent node is null, then it's the root and we need to create a new split node
+		if (focusedLeaf.Parent == null)
+		{
+			// Create a new split node
+			SplitNode splitNode = new(Direction)
+			{
+				EqualWeight = true,
+				Children = new List<Node>() { focusedLeaf, newLeaf }
+			};
+
+			focusedLeaf.Parent = splitNode;
+			focusedLeaf.Weight = 0.5;
+
+			newLeaf.Parent = splitNode;
+			newLeaf.Weight = 0.5;
+
+			Root = splitNode;
+			return;
+		}
+
+		SplitNode parent = focusedLeaf.Parent;
+		// If the parent node is a split node and the direction matches, then we need to
+		// add the window to the split node.
+		if (parent.Direction == Direction)
+		{
+			parent.Children.Add(newLeaf);
+			newLeaf.Parent = parent;
+
+			if (parent.EqualWeight)
+			{
+				// We need to distribute the weight evenly.
+				foreach (Node child in parent.Children)
+				{
+					child.Weight = 1d / parent.Children.Count;
+				}
+			}
+			else
+			{
+				// Split the existingLeaf in half.
+				newLeaf.Weight = focusedLeaf.Weight / 2;
+				focusedLeaf.Weight /= 2;
+			}
+
+			return;
+		}
+
+		// If the parent node is a split node and the direction doesn't match, then we need to
+		// create a new split node and add the window to the split node.
+		SplitNode newSplitNode = new(Direction)
+		{
+			EqualWeight = true,
+			Children = new List<Node> { focusedLeaf, newLeaf },
+			Weight = focusedLeaf.Weight,
+			Parent = parent
+		};
+
+		// Update the weights
+		newLeaf.Weight = 0.5;
+		newLeaf.Parent = newSplitNode;
+		focusedLeaf.Weight = 0.5;
+
+		// Update the parent node
+		int idx = parent.Children.IndexOf(focusedLeaf);
+		parent.Children[idx] = newSplitNode;
+
+		// Update the existing leaf's parent
+		focusedLeaf.Parent = newSplitNode;
+		Count += 1;
 	}
 
-	public void Remove(IWindow window)
-	{
 
 	public IWindow? GetFirstWindow()
 	{
