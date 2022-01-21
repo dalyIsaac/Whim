@@ -123,6 +123,70 @@ public class TreeLayoutEngine : ILayoutEngine
 		Count += 1;
 	}
 
+	public bool Remove(IWindow window)
+	{
+		Logger.Debug($"Removing window {window.Title} from layout engine {Name}");
+
+		// Get the node for the window.
+		if (!_windows.TryGetValue(window, out LeafNode? removingNode))
+		{
+			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
+			return false;
+		}
+
+		_windows.Remove(window);
+		Count -= 1;
+
+		// Remove the node from the tree.
+		if (removingNode.Parent == null)
+		{
+			// The node is the root node.
+			Root = null;
+			return true;
+		}
+
+		SplitNode parent = removingNode.Parent;
+		bool success = parent.Children.Remove(removingNode);
+
+		// If the parent node has only one child, then we need to remove the split node.
+		if (parent.Children.Count == 1)
+		{
+			Node child = parent.Children[0];
+			child.Parent = parent.Parent;
+
+			if (child.Parent == null)
+			{
+				// The parent is the root node.
+				Root = child;
+			}
+			else
+			{
+				child.Parent.Children.Add(child);
+				child.Parent.Children.Remove(parent);
+			}
+		}
+
+		// If the parent node has more than one child, then we need to redistribute the weights.
+		else
+		{
+			if (parent.EqualWeight)
+			{
+				// We need to distribute the weight evenly.
+				foreach (Node child in parent.Children)
+				{
+					child.Weight = 100 / parent.Children.Count;
+				}
+			}
+			else
+			{
+				// Give the extra weight to the last child.
+				Node lastChild = parent.Children[^1];
+				lastChild.Weight += removingNode.Weight;
+			}
+		}
+
+		return success;
+	}
 
 	public IWindow? GetFirstWindow()
 	{
@@ -160,10 +224,6 @@ public class TreeLayoutEngine : ILayoutEngine
 		throw new System.NotImplementedException();
 	}
 
-	bool ICollection<IWindow>.Remove(IWindow item)
-	{
-		throw new System.NotImplementedException();
-	}
 
 	public IEnumerator<IWindow> GetEnumerator()
 	{
@@ -175,6 +235,11 @@ public class TreeLayoutEngine : ILayoutEngine
 		throw new System.NotImplementedException();
 	}
 
+	/// <summary>
+	/// Gets a node's location within the unit square.
+	/// </summary>
+	/// <param name="node">The node to get the location for.</param>
+	/// <returns>Location of the node. Used for recursion.</returns>
 	public static ILocation<double>? GetNodeLocation(Node node, NodeLocation? location = null)
 	{
 		if (location == null)
