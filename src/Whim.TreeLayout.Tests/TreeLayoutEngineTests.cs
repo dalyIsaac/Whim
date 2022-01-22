@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -176,13 +177,13 @@ public class Tests
 		{
 			Left,
 			RightTopLeftTop,
-			RightBottom,
 			RightTopLeftBottomLeft,
 			RightTopLeftBottomRightTop,
 			RightTopLeftBottomRightBottom,
 			RightTopRight1,
 			RightTopRight2,
-			RightTopRight3
+			RightTopRight3,
+			RightBottom
 		};
 	}
 
@@ -607,24 +608,19 @@ public class Tests
 	}
 	#endregion
 
+	[Fact]
+	public void DoLayout()
+	{
+		TestTree tree = new();
 
+		ILocation<int> screen = new Location(0, 0, 1920, 1080);
 
-	//[Fact]
-	//public void DoLayout_UnitSquare()
-	//{
-	//	TestTree tree = new();
+		IWindowLocation[] locations = TreeLayoutEngine.DoLayout(tree.Root, screen).ToArray();
+		ILocation<int>[] actual = locations.Select(x => x.Location).ToArray();
 
-	//	ILocation<int> screen = new Location(0, 0, 1920, 1080);
+		ILocation<int>[] expected = TestTreeWindowLocations.All.Select(x => x.ToLocation(screen)).ToArray();
 
-	//	IWindowLocation[] locations = TreeLayoutEngine.DoLayout(screen, tree.Root).ToArray();
-
-	//	for (int i = 0; i < locations.Length; i++)
-	//	{
-	//		Assert.Equal(TestTreeWindowLocations.All[i].ToLocation(screen), locations[i].Location);
-	//	}
-	//}
-
-	// TODO: Add
-	// TODO: Remove
+		actual.Should().Equal(expected);
+	}
 }
 

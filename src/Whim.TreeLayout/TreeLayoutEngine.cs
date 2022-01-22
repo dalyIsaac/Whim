@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -194,10 +195,7 @@ public class TreeLayoutEngine : ILayoutEngine
 		return GetLeftMostLeaf(Root)?.Window;
 	}
 
-	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
-	{
-		throw new System.NotImplementedException();
-	}
+	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location) => Root != null ? DoLayout(Root, location) : Enumerable.Empty<IWindowLocation>();
 
 	public void FocusWindowInDirection(WindowDirection direction, IWindow window)
 	{
@@ -223,7 +221,6 @@ public class TreeLayoutEngine : ILayoutEngine
 	{
 		throw new System.NotImplementedException();
 	}
-
 
 	public IEnumerator<IWindow> GetEnumerator()
 	{
@@ -273,6 +270,11 @@ public class TreeLayoutEngine : ILayoutEngine
 		return GetNodeLocation(parent, location);
 	}
 
+	/// <summary>
+	/// Gets the weight and index of a node within its parent.
+	/// </summary>
+	/// <param name="parent">The parent node.</param>
+	/// <param name="node">The node to get the weight and index for.</param>
 	public static (double weight, double precedingWeight) GetWeightAndIndex(SplitNode parent, Node node)
 	{
 		int idx = parent.Children.IndexOf(node);
@@ -290,6 +292,56 @@ public class TreeLayoutEngine : ILayoutEngine
 		}
 
 		return (weight, precedingWeight);
+	}
+
+	/// <summary>
+	/// Gets the <see cref="WindowLocation"/> for all windows, within the unit square.
+	/// </summary>
+	/// <returns></returns>
+	public static IEnumerable<IWindowLocation> DoLayout(Node node, ILocation<int> location)
+	{
+		// If the node is a leaf node, then we can return the location, and break.
+		if (node is LeafNode leafNode)
+		{
+			yield return new WindowLocation(leafNode.Window, location, WindowState.Normal);
+			yield break;
+		}
+
+		// If the node is not a leaf node, it's a split node.
+		SplitNode parent = (SplitNode)node;
+
+		// Perform an in-order traversal of the tree.
+		double precedingWeight = 0;
+		foreach (Node child in parent.Children)
+		{
+			double weight = parent.EqualWeight ? 1d / parent.Children.Count : child.Weight;
+
+			Location childLocation = new(
+				x: location.X,
+				y: location.Y,
+				width: location.Width,
+				height: location.Height
+			);
+
+			// NOTE: We assume that NodeDirection is always either Right or Bottom.
+			if (parent.Direction == NodeDirection.Right)
+			{
+				childLocation.X += Convert.ToInt32(precedingWeight * location.Width);
+				childLocation.Width = Convert.ToInt32(weight * location.Width);
+			}
+			else
+			{
+				childLocation.Y += Convert.ToInt32(precedingWeight * location.Height);
+				childLocation.Height = Convert.ToInt32(weight * location.Height);
+			}
+
+			foreach (IWindowLocation childLocationResult in DoLayout(child, childLocation))
+			{
+				yield return childLocationResult;
+			}
+
+			precedingWeight += weight;
+		}
 	}
 
 	public static LeafNode? GetLeftMostLeaf(Node? root)
