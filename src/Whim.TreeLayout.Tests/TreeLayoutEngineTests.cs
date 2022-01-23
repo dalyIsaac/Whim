@@ -104,7 +104,7 @@ public class Tests
 			Root.Children.Add(Left);
 
 			// Right
-			Right = new SplitNode(NodeDirection.Bottom, Root) { Weight = 0.5 };
+			Right = new SplitNode(NodeDirection.Down, Root) { Weight = 0.5 };
 			Root.Children.Add(Right);
 
 			// RightTop
@@ -112,7 +112,7 @@ public class Tests
 			Right.Children.Add(RightTop);
 
 			// RightTopLeft
-			RightTopLeft = new SplitNode(NodeDirection.Bottom, RightTop) { Weight = 0.5 };
+			RightTopLeft = new SplitNode(NodeDirection.Down, RightTop) { Weight = 0.5 };
 			RightTop.Children.Add(RightTopLeft);
 
 			// RightBottom
@@ -132,7 +132,7 @@ public class Tests
 			RightTopLeftBottom.Children.Add(RightTopLeftBottomLeft);
 
 			// RightTopLeftBottomRight
-			RightTopLeftBottomRight = new SplitNode(NodeDirection.Bottom, RightTopLeftBottom) { Weight = 0.5 };
+			RightTopLeftBottomRight = new SplitNode(NodeDirection.Down, RightTopLeftBottom) { Weight = 0.5 };
 			RightTopLeftBottom.Children.Add(RightTopLeftBottomRight);
 
 			// RightTopLeftBottomRightTop
@@ -144,7 +144,7 @@ public class Tests
 			RightTopLeftBottomRight.Children.Add(RightTopLeftBottomRightBottom);
 
 			// RightTopRight
-			RightTopRight = new SplitNode(NodeDirection.Bottom, RightTop) { Weight = 0.5 };
+			RightTopRight = new SplitNode(NodeDirection.Down, RightTop) { Weight = 0.5 };
 			RightTop.Children.Add(RightTopRight);
 
 			// RightTopRight1
@@ -428,7 +428,7 @@ public class Tests
 		engine.Add(rightTopLeftTopWindow.Object);
 		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftTopWindow.Object);
 
-		engine.Direction = NodeDirection.Bottom;
+		engine.Direction = NodeDirection.Down;
 		engine.Add(rightBottomWindow.Object);
 
 		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftTopWindow.Object);
@@ -436,7 +436,7 @@ public class Tests
 
 		engine.Add(rightTopRight1Window.Object);
 		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopRight1Window.Object);
-		engine.Direction = NodeDirection.Bottom;
+		engine.Direction = NodeDirection.Down;
 
 		engine.Add(rightTopRight2Window.Object);
 		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopRight2Window.Object);
@@ -444,7 +444,7 @@ public class Tests
 		engine.Add(rightTopRight3Window.Object);
 
 		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftTopWindow.Object);
-		engine.Direction = NodeDirection.Bottom;
+		engine.Direction = NodeDirection.Down;
 
 		engine.Add(rightTopLeftBottomLeftWindow.Object);
 		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftBottomLeftWindow.Object);
@@ -452,7 +452,7 @@ public class Tests
 
 		engine.Add(rightTopLeftBottomRightTopWindow.Object);
 		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftBottomRightTopWindow.Object);
-		engine.Direction = NodeDirection.Bottom;
+		engine.Direction = NodeDirection.Down;
 
 		engine.Add(rightTopLeftBottomRightBottomWindow.Object);
 
@@ -560,7 +560,7 @@ public class Tests
 		engine.Add(rightWindow1.Object);
 		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightWindow1.Object);
 
-		engine.Direction = NodeDirection.Bottom;
+		engine.Direction = NodeDirection.Down;
 		engine.Add(rightWindow2.Object);
 
 		// The root should be a split node, with two children.
@@ -608,6 +608,7 @@ public class Tests
 	}
 	#endregion
 
+	#region DoLayout
 	[Fact]
 	public void DoLayout()
 	{
@@ -622,5 +623,14 @@ public class Tests
 
 		actual.Should().Equal(expected);
 	}
+	#endregion
+
+	#region GetParentInDirection
+	// TODO
+	#endregion
+
+	#region GetNodeInDirection
+	// TODO
+	#endregion
 }
 

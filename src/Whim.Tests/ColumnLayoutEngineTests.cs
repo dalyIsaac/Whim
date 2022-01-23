@@ -137,7 +137,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Top, leftWindow.Object);
+		engine.FocusWindowInDirection(WindowDirection.Up, leftWindow.Object);
 
 		leftWindow.Verify(w => w.Focus(), Times.Never);
 		rightWindow.Verify(w => w.Focus(), Times.Never);
@@ -312,7 +312,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Top, leftWindow.Object);
+		engine.SwapWindowInDirection(WindowDirection.Up, leftWindow.Object);
 
 		IWindowLocation[] windows = engine.DoLayout(new Location(0, 0, 1920, 1080)).ToArray();
 

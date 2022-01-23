@@ -2,8 +2,8 @@ namespace Whim;
 
 public enum WindowDirection
 {
-	Top,
-	Bottom,
+	Up,
+	Down,
 	Left,
 	Right,
 }

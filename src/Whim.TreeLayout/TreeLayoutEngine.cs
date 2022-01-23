@@ -237,7 +237,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	/// </summary>
 	/// <param name="node">The node to get the location for.</param>
 	/// <returns>Location of the node. Used for recursion.</returns>
-	public static ILocation<double>? GetNodeLocation(Node node, NodeLocation? location = null)
+	public static ILocation<double> GetNodeLocation(Node node, NodeLocation? location = null)
 	{
 		if (location == null)
 		{
@@ -260,7 +260,7 @@ public class TreeLayoutEngine : ILayoutEngine
 			location.X += precedingWeight;
 			location.Width *= weight;
 		}
-		else if (parent.Direction == NodeDirection.Bottom)
+		else if (parent.Direction == NodeDirection.Down)
 		{
 			location.Y *= weight;
 			location.Y += precedingWeight;
