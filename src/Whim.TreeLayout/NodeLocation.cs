@@ -9,6 +9,20 @@ public class NodeLocation : ILocation<double>
 	public double Width { get; set; }
 	public double Height { get; set; }
 
+	public NodeLocation() {}
+
+	/// <summary>
+	/// Constructor which creates a copy of the given location.
+	/// </summary>
+	/// <param name="location">The location to copy.</param>
+	public NodeLocation(ILocation<double> location)
+	{
+		X = location.X;
+		Y = location.Y;
+		Width = location.Width;
+		Height = location.Height;
+	}
+
 	public bool IsPointInside(double x, double y) => ILocation<double>.IsPointInside(this, x, y);
 
 	// override object.Equals

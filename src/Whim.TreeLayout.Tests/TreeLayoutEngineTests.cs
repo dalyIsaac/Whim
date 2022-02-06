@@ -11,182 +11,6 @@ public class Tests
 		Logger.Initialize();
 	}
 
-	/// <summary>
-	/// Returns all the nodes of the following tree, for tests. The tree exists within the coordinates (0,0) to (1,1).
-	/// ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	/// |                                                                               |                                     |                                          |
-	/// |                                                                               |                                     |                                          |
-	/// |                                                                               |                                     |               RightTopRight1             |
-	/// |                                                                               |                                     |                                          |
-	/// |                                                                               |            RightTopLeftTop          |                                          |
-	/// |                                                                               |                                     |                                          |
-	/// |                                                                               |                                     r------------------------------------------|
-	/// |                                                                               |                                     i                                          |
-	/// |                                                                               |                                     g                                          |
-	/// |                                                                               |------------RightTopLeft-------------h                                          |
-	/// |                                                                               |                  |                  t               RightTopRight2             |
-	/// |                                                                               |                  |                  T                                          |
-	/// |                                                                               |                  b   RightTopLeft   o                                          |
-	/// |                                                                               |                  o      Bottom      p------------------------------------------|
-	/// |                                                                               |   RightTopLeft   t     RightTop     |                                          |
-	/// |                                                                               |       Bottom     t                  |                                          |
-	/// |                                                                               |        Left      o------Right-------|               RightTopRight3             |
-	/// |                                                                               R                  m                  |                                          |
-	/// |                                   Left                                        o                  |                  |                                          |
-	/// |                                                                               o-----------------------------------Right----------------------------------------|
-	/// |                                                                               t                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                 RightBottom                                    |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// |                                                                               |                                                                                |
-	/// ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	/// </summary>
-	private class TestTree
-	{
-		public SplitNode Root;
-		public LeafNode Left;
-		public SplitNode Right;
-		public SplitNode RightTop;
-		public SplitNode RightTopLeft;
-		public LeafNode RightTopLeftTop;
-		public SplitNode RightTopLeftBottom;
-		public LeafNode RightTopLeftBottomLeft;
-		public SplitNode RightTopLeftBottomRight;
-		public LeafNode RightTopLeftBottomRightTop;
-		public LeafNode RightTopLeftBottomRightBottom;
-		public SplitNode RightTopRight;
-		public LeafNode RightTopRight1;
-		public LeafNode RightTopRight2;
-		public LeafNode RightTopRight3;
-		public LeafNode RightBottom;
-
-		public TestTree(
-			Mock<IWindow>? leftWindow = null,
-			Mock<IWindow>? rightTopLeftTopWindow = null,
-			Mock<IWindow>? rightTopRight1Window = null,
-			Mock<IWindow>? rightTopRight2Window = null,
-			Mock<IWindow>? rightTopRight3Window = null,
-			Mock<IWindow>? rightTopLeftBottomLeftWindow = null,
-			Mock<IWindow>? rightTopLeftBottomRightTopWindow = null,
-			Mock<IWindow>? rightTopLeftBottomRightBottomWindow = null,
-			Mock<IWindow>? rightBottomWindow = null
-		)
-		{
-			leftWindow ??= new Mock<IWindow>();
-			rightTopLeftTopWindow ??= new Mock<IWindow>();
-			rightTopLeftBottomLeftWindow ??= new Mock<IWindow>();
-			rightTopLeftBottomRightTopWindow ??= new Mock<IWindow>();
-			rightTopLeftBottomRightBottomWindow ??= new Mock<IWindow>();
-			rightTopRight1Window ??= new Mock<IWindow>();
-			rightTopRight2Window ??= new Mock<IWindow>();
-			rightTopRight3Window ??= new Mock<IWindow>();
-			rightBottomWindow ??= new Mock<IWindow>();
-
-			Root = new SplitNode(NodeDirection.Right);
-
-			// left
-			Left = new LeafNode(leftWindow.Object, Root) { Weight = 0.5 };
-			Root.Children.Add(Left);
-
-			// Right
-			Right = new SplitNode(NodeDirection.Down, Root) { Weight = 0.5 };
-			Root.Children.Add(Right);
-
-			// RightTop
-			RightTop = new SplitNode(NodeDirection.Right, Right) { Weight = 0.5 };
-			Right.Children.Add(RightTop);
-
-			// RightTopLeft
-			RightTopLeft = new SplitNode(NodeDirection.Down, RightTop) { Weight = 0.5 };
-			RightTop.Children.Add(RightTopLeft);
-
-			// RightBottom
-			RightBottom = new LeafNode(rightBottomWindow.Object, Right) { Weight = 0.5 };
-			Right.Children.Add(RightBottom);
-
-			// RightTopLeftTop
-			RightTopLeftTop = new LeafNode(rightTopLeftTopWindow.Object, RightTopLeft) { Weight = 0.5 };
-			RightTopLeft.Children.Add(RightTopLeftTop);
-
-			// RightTopLeftBottom
-			RightTopLeftBottom = new SplitNode(NodeDirection.Right, RightTopLeft) { Weight = 0.5 };
-			RightTopLeft.Children.Add(RightTopLeftBottom);
-
-			// RightTopLeftBottomLeft
-			RightTopLeftBottomLeft = new LeafNode(rightTopLeftBottomLeftWindow.Object, RightTopLeftBottom) { Weight = 0.5 };
-			RightTopLeftBottom.Children.Add(RightTopLeftBottomLeft);
-
-			// RightTopLeftBottomRight
-			RightTopLeftBottomRight = new SplitNode(NodeDirection.Down, RightTopLeftBottom) { Weight = 0.5 };
-			RightTopLeftBottom.Children.Add(RightTopLeftBottomRight);
-
-			// RightTopLeftBottomRightTop
-			RightTopLeftBottomRightTop = new LeafNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight) { Weight = 0.5 };
-			RightTopLeftBottomRight.Children.Add(RightTopLeftBottomRightTop);
-
-			// RightTopLeftBottomRightBottom
-			RightTopLeftBottomRightBottom = new LeafNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight) { Weight = 0.5 };
-			RightTopLeftBottomRight.Children.Add(RightTopLeftBottomRightBottom);
-
-			// RightTopRight
-			RightTopRight = new SplitNode(NodeDirection.Down, RightTop) { Weight = 0.5 };
-			RightTop.Children.Add(RightTopRight);
-
-			// RightTopRight1
-			RightTopRight1 = new LeafNode(rightTopRight1Window.Object, RightTopRight) { Weight = 1d / 3 };
-			RightTopRight.Children.Add(RightTopRight1);
-
-			// RightTopRight2
-			RightTopRight2 = new LeafNode(rightTopRight2Window.Object, RightTopRight) { Weight = 1d / 3 };
-			RightTopRight.Children.Add(RightTopRight2);
-
-			// RightTopRight3
-			RightTopRight3 = new LeafNode(rightTopRight3Window.Object, RightTopRight) { Weight = 1d / 3 };
-			RightTopRight.Children.Add(RightTopRight3);
-		}
-	}
-
-	private static class TestTreeWindowLocations
-	{
-		public static ILocation<double> Left = new NodeLocation() { X = 0, Y = 0, Width = 0.5, Height = 1 };
-		public static ILocation<double> RightBottom = new NodeLocation() { X = 0.5, Y = 0.5, Width = 0.5, Height = 0.5 };
-		public static ILocation<double> RightTopLeftTop = new NodeLocation() { X = 0.5, Y = 0, Width = 0.25, Height = 0.25 };
-		public static ILocation<double> RightTopLeftBottomLeft = new NodeLocation() { X = 0.5, Y = 0.25, Width = 0.125, Height = 0.25 };
-		public static ILocation<double> RightTopLeftBottomRightTop = new NodeLocation() { X = 0.625, Y = 0.25, Width = 0.125, Height = 0.175 };
-		public static ILocation<double> RightTopLeftBottomRightBottom = new NodeLocation() { X = 0.625, Y = 0.425, Width = 0.125, Height = 0.075 };
-		public static ILocation<double> RightTopRight1 = new NodeLocation() { X = 0.75, Y = 0, Width = 0.25, Height = 0.5 * 1d / 3 };
-		public static ILocation<double> RightTopRight2 = new NodeLocation() { X = 0.75, Y = 0.5 * 1d / 3, Width = 0.25, Height = 0.5 * 1d / 3 };
-		public static ILocation<double> RightTopRight3 = new NodeLocation() { X = 0.75, Y = 1d / 3, Width = 0.25, Height = 0.5 * 1d / 3 };
-
-		public static ILocation<double>[] All = new ILocation<double>[]
-		{
-			Left,
-			RightTopLeftTop,
-			RightTopLeftBottomLeft,
-			RightTopLeftBottomRightTop,
-			RightTopLeftBottomRightBottom,
-			RightTopRight1,
-			RightTopRight2,
-			RightTopRight3,
-			RightBottom
-		};
-	}
-
 	#region GetWeightAndIndex
 	[Fact]
 	public void GetWeightAndIndex_Left()
@@ -395,80 +219,20 @@ public class Tests
 	[Fact]
 	public void Add_TestTree()
 	{
-		Mock<IWorkspace> activeWorkspace = new();
-		Mock<IWorkspaceManager> workspaceManager = new();
-		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(activeWorkspace.Object);
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
-
-		TreeLayoutEngine engine = new(configContext.Object);
-
-		Mock<IWindow> leftWindow = new();
-		leftWindow.Setup(m => m.ToString()).Returns("leftWindow");
-		Mock<IWindow> rightTopLeftTopWindow = new();
-		rightTopLeftTopWindow.Setup(m => m.ToString()).Returns("rightTopLeftTopWindow");
-		Mock<IWindow> rightBottomWindow = new();
-		rightBottomWindow.Setup(m => m.ToString()).Returns("rightBottomWindow");
-		Mock<IWindow> rightTopRight1Window = new();
-		rightTopRight1Window.Setup(m => m.ToString()).Returns("rightTopRight1Window");
-		Mock<IWindow> rightTopRight2Window = new();
-		rightTopRight2Window.Setup(m => m.ToString()).Returns("rightTopRight2Window");
-		Mock<IWindow> rightTopRight3Window = new();
-		rightTopRight3Window.Setup(m => m.ToString()).Returns("rightTopRight3Window");
-		Mock<IWindow> rightTopLeftBottomLeftWindow = new();
-		rightTopLeftBottomLeftWindow.Setup(m => m.ToString()).Returns("rightTopLeftBottomLeftWindow");
-		Mock<IWindow> rightTopLeftBottomRightTopWindow = new();
-		rightTopLeftBottomRightTopWindow.Setup(m => m.ToString()).Returns("rightTopLeftBottomRightTopWindow");
-		Mock<IWindow> rightTopLeftBottomRightBottomWindow = new();
-		rightTopLeftBottomRightBottomWindow.Setup(m => m.ToString()).Returns("rightTopLeftBottomRightBottomWindow");
-
-		engine.Add(leftWindow.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(leftWindow.Object);
-
-		engine.Add(rightTopLeftTopWindow.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftTopWindow.Object);
-
-		engine.Direction = NodeDirection.Down;
-		engine.Add(rightBottomWindow.Object);
-
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftTopWindow.Object);
-		engine.Direction = NodeDirection.Right;
-
-		engine.Add(rightTopRight1Window.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopRight1Window.Object);
-		engine.Direction = NodeDirection.Down;
-
-		engine.Add(rightTopRight2Window.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopRight2Window.Object);
-
-		engine.Add(rightTopRight3Window.Object);
-
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftTopWindow.Object);
-		engine.Direction = NodeDirection.Down;
-
-		engine.Add(rightTopLeftBottomLeftWindow.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftBottomLeftWindow.Object);
-		engine.Direction = NodeDirection.Right;
-
-		engine.Add(rightTopLeftBottomRightTopWindow.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightTopLeftBottomRightTopWindow.Object);
-		engine.Direction = NodeDirection.Down;
-
-		engine.Add(rightTopLeftBottomRightBottomWindow.Object);
-
+		TestTreeEngine testEngine = new();
 
 		TestTree tree = new(
-			leftWindow: leftWindow,
-			rightTopLeftTopWindow: rightTopLeftTopWindow,
-			rightBottomWindow: rightBottomWindow,
-			rightTopRight1Window: rightTopRight1Window,
-			rightTopRight2Window: rightTopRight2Window,
-			rightTopRight3Window: rightTopRight3Window,
-			rightTopLeftBottomLeftWindow: rightTopLeftBottomLeftWindow,
-			rightTopLeftBottomRightTopWindow: rightTopLeftBottomRightTopWindow,
-			rightTopLeftBottomRightBottomWindow: rightTopLeftBottomRightBottomWindow
+			leftWindow: testEngine.LeftWindow,
+			rightTopLeftTopWindow: testEngine.RightTopLeftTopWindow,
+			rightBottomWindow: testEngine.RightBottomWindow,
+			rightTopRight1Window: testEngine.RightTopRight1Window,
+			rightTopRight2Window: testEngine.RightTopRight2Window,
+			rightTopRight3Window: testEngine.RightTopRight3Window,
+			rightTopLeftBottomLeftWindow: testEngine.RightTopLeftBottomLeftWindow,
+			rightTopLeftBottomRightTopWindow: testEngine.RightTopLeftBottomRightTopWindow,
+			rightTopLeftBottomRightBottomWindow: testEngine.RightTopLeftBottomRightBottomWindow
 		);
-		Assert.Equal(engine.Root, tree.Root);
+		Assert.Equal(testEngine.Engine.Root, tree.Root);
 	}
 	#endregion
 
@@ -625,12 +389,161 @@ public class Tests
 	}
 	#endregion
 
-	#region GetParentInDirection
-	// TODO
-	#endregion
+	#region GetAdjacentNode
+	/// <summary>
+	/// There is no node to the left of Left.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_Left()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
 
-	#region GetNodeInDirection
-	// TODO
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		// The root should be a split node, with two children.
+		Assert.Null(testEngine.Engine.GetAdjacentNode(testEngine.LeftWindow.Object, WindowDirection.Left, monitor.Object));
+	}
+
+	/// <summary>
+	/// The node to the left of RightBottom is Left.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_RightBottom_Left()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
+
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		Assert.Equal(testEngine.LeftNode, testEngine.Engine.GetAdjacentNode(testEngine.RightBottomWindow.Object, WindowDirection.Left, monitor.Object));
+	}
+
+	/// <summary>
+	/// The node above RightBottom should be RightTopLeftBottomLeft.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_RightBottom_Up()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
+
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		Assert.Equal(testEngine.RightTopLeftBottomLeftNode, testEngine.Engine.GetAdjacentNode(testEngine.RightBottomWindow.Object, WindowDirection.Up, monitor.Object));
+	}
+
+	/// <summary>
+	/// There is no node to the right or below RightBottom.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_RightBottom_Null()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
+
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		Assert.Null(testEngine.Engine.GetAdjacentNode(testEngine.RightBottomWindow.Object, WindowDirection.Right, monitor.Object));
+		Assert.Null(testEngine.Engine.GetAdjacentNode(testEngine.RightBottomWindow.Object, WindowDirection.Down, monitor.Object));
+	}
+
+	/// <summary>
+	/// The node to the left of RightTopRight3 is RightTopLeftBottomRightTop.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_RightTopRight3_Left()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
+
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		Assert.Equal(testEngine.RightTopLeftBottomRightTopNode, testEngine.Engine.GetAdjacentNode(testEngine.RightTopRight3Window.Object, WindowDirection.Left, monitor.Object));
+	}
+
+	/// <summary>
+	/// The node to the right of RightTopLeftBottomRightTop is RightTopRight2.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_RightTopLeftBottomRightTop_Right()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
+
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		Assert.Equal(testEngine.RightTopRight2Node, testEngine.Engine.GetAdjacentNode(testEngine.RightTopLeftBottomRightTopWindow.Object, WindowDirection.Right, monitor.Object));
+	}
+
+	/// <summary>
+	/// The node to the right of RightTopLeftBottomRightTop is RightTopLeftBottomRightBottom.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_RightTopLeftBottomRightTop_Down()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
+
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		Assert.Equal(testEngine.RightTopLeftBottomRightBottomNode, testEngine.Engine.GetAdjacentNode(testEngine.RightTopLeftBottomRightTopWindow.Object, WindowDirection.Down, monitor.Object));
+	}
+
+	/// <summary>
+	/// The node to the left of RightTopLeftBottomRightTop is RightTopLeftBottomLeft.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_RightTopLeftBottomRightTop_Left()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
+
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		Assert.Equal(testEngine.RightTopLeftBottomLeftNode, testEngine.Engine.GetAdjacentNode(testEngine.RightTopLeftBottomRightTopWindow.Object, WindowDirection.Left, monitor.Object));
+	}
+
+	/// <summary>
+	/// The node above RightTopLeftBottomRightTop is RightTopLeftTop.
+	/// </summary>
+	[Fact]
+	public void GetAdjacentNode_RightTopLeftBottomRightTop_Up()
+	{
+		// Set up the populated tree layout engine
+		TestTreeEngine testEngine = new();
+
+		// Set up the monitor which we are using to calculate the adjacent position.
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Width).Returns(1920);
+		monitor.Setup(m => m.Height).Returns(1080);
+
+		Assert.Equal(testEngine.RightTopLeftTopNode, testEngine.Engine.GetAdjacentNode(testEngine.RightTopLeftBottomRightTopWindow.Object, WindowDirection.Up, monitor.Object));
+	}
 	#endregion
 }
 

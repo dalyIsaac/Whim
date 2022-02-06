@@ -37,6 +37,6 @@ public interface ILocation<T>
 
 	public static bool IsPointInside(ILocation<double> location, double x, double y) => location.X <= x
 	&& location.Y <= y
-	&& location.X + location.Width >= x
-	&& location.Y + location.Height >= y;
+	&& location.X + location.Width > x
+	&& location.Y + location.Height > y;
 }

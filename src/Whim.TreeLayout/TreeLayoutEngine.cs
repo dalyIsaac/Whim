@@ -28,6 +28,18 @@ public class TreeLayoutEngine : ILayoutEngine
 
 	public void Add(IWindow window)
 	{
+		AddWindow(window);
+	}
+
+	/// <summary>
+	/// Adds a window to the layout engine, and returns the node that represents it.
+	/// Please use the <see cref="IWindow.Add"/> method instead of this method, as
+	/// the return value is used for testing.
+	/// </summary>
+	/// <param name="window">The window to add.</param>
+	/// <returns>The node that represents the window.</returns>
+	public LeafNode? AddWindow(IWindow window)
+	{
 		Logger.Debug($"Adding window {window.Title} to layout engine {Name}");
 
 		LeafNode newLeaf = new(window);
@@ -36,7 +48,7 @@ public class TreeLayoutEngine : ILayoutEngine
 		if (Root == null)
 		{
 			Root = newLeaf;
-			return;
+			return newLeaf;
 		}
 
 		// Get the focused window node
@@ -51,7 +63,7 @@ public class TreeLayoutEngine : ILayoutEngine
 		if (focusedLeaf == null)
 		{
 			Logger.Error($"Could not find a leaf node to add window {window.Title} to layout engine {Name}");
-			return;
+			return null;
 		}
 
 		// If the parent node is null, then it's the root and we need to create a new split node
@@ -71,7 +83,7 @@ public class TreeLayoutEngine : ILayoutEngine
 			newLeaf.Weight = 0.5;
 
 			Root = splitNode;
-			return;
+			return newLeaf;
 		}
 
 		SplitNode parent = focusedLeaf.Parent;
@@ -97,7 +109,7 @@ public class TreeLayoutEngine : ILayoutEngine
 				focusedLeaf.Weight /= 2;
 			}
 
-			return;
+			return newLeaf;
 		}
 
 		// If the parent node is a split node and the direction doesn't match, then we need to
@@ -122,6 +134,8 @@ public class TreeLayoutEngine : ILayoutEngine
 		// Update the existing leaf's parent
 		focusedLeaf.Parent = newSplitNode;
 		Count += 1;
+
+		return newLeaf;
 	}
 
 	public bool Remove(IWindow window)
@@ -233,7 +247,131 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <summary>
-	/// Gets a node's location within the unit square.
+	/// Gets the adjacent node in the given <paramref name="direction"/>.
+	/// </summary>
+	/// <param name="window">The window to get the adjacent node for.</param>
+	/// <param name="direction">The direction to get the adjacent node in.</param>
+	/// <param name="monitor">
+	/// The monitor which the engine is currently focused for. This is used to
+	/// determine the delta we use for the internal calculations.
+	/// </param>
+	/// <returns>
+	/// The adjacent node in the given <paramref name="direction"/>.
+	/// <see langword="null"/> if there is no adjacent node in the given <paramref name="direction"/>,
+	/// or an error occurred.
+	/// </returns>
+	public LeafNode? GetAdjacentNode(IWindow window, WindowDirection direction, IMonitor monitor)
+	{
+		Logger.Debug($"Getting node in direction {Direction} for window {window.Title}");
+
+		if (Root == null)
+		{
+			Logger.Error($"No root node in layout engine {Name}");
+			return null;
+		}
+
+		if (!_windows.TryGetValue(window, out LeafNode? node))
+		{
+			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
+			return null;
+		}
+
+		// Get the coordinates of the node.
+		ILocation<double> nodeLocation = GetNodeLocation(node);
+
+		// Next, we figure out the adjacent point of the nodeLocation.
+		ILocation<double> adjacentLocation = new NodeLocation()
+		{
+			X = nodeLocation.X + (direction switch
+			{
+				WindowDirection.Left => -1d / monitor.Width,
+				WindowDirection.Right => nodeLocation.Width + (1d / monitor.Width),
+				_ => 0d
+			}),
+			Y = nodeLocation.Y + (direction switch
+			{
+				WindowDirection.Up => -1d / monitor.Height,
+				WindowDirection.Down => nodeLocation.Height + (1d / monitor.Height),
+				_ => 0d
+			}),
+		};
+
+		return GetNodeContainingPoint(Root, new NodeLocation() { Height = 1, Width = 1 }, adjacentLocation, node);
+	}
+
+	/// <summary>
+	/// Gets the node which contains the given <paramref name="searchPoint"/>.
+	/// This works by performing a breadth-first search.
+	/// </summary>
+	/// <param name="root">The root node to start the search from.</param>
+	/// <param name="rootLocation">
+	/// The location of the parent node. This is used to calculate the
+	/// relative location of the point.
+	/// </param>
+	/// <param name="searchPoint">The point of the leaf node to search for.</param>
+	/// <param name="originalNode">
+	/// The leaf node to search for. The returned node cannot be the same as this node.
+	/// </param>
+	public static LeafNode? GetNodeContainingPoint(Node root,
+												ILocation<double> rootLocation,
+												ILocation<double> searchPoint,
+												LeafNode originalNode)
+	{
+		if (root is LeafNode leaf)
+		{
+			return leaf == originalNode ? null : leaf;
+		}
+
+		if (root is not SplitNode splitNode)
+		{
+			return null;
+		}
+
+		SplitNode parent = splitNode;
+
+		NodeLocation childLocation = new(rootLocation);
+
+		foreach (Node child in parent.Children)
+		{
+			// Set up the width/height of the child.
+			if (parent.Direction == NodeDirection.Right)
+			{
+				childLocation.Width = child.Weight * rootLocation.Width;
+			}
+			else if (parent.Direction == NodeDirection.Down)
+			{
+				childLocation.Height = child.Weight * rootLocation.Height;
+			}
+
+			if (childLocation.IsPointInside(searchPoint.X, searchPoint.Y))
+			{
+				LeafNode? result = GetNodeContainingPoint(root: child,
+											  rootLocation: childLocation,
+											  searchPoint: searchPoint,
+											  originalNode: originalNode);
+				if (result != null)
+				{
+					return result;
+				}
+			}
+
+			// Since it wasn't a match, update the position of the child.
+			if (parent.Direction == NodeDirection.Right)
+			{
+				childLocation.X += childLocation.Width;
+			}
+			else if (parent.Direction == NodeDirection.Down)
+			{
+				childLocation.Y += childLocation.Height;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// Gets a node's location within the unit square. This works by moving up
+	/// the tree until the root is reached.
 	/// </summary>
 	/// <param name="node">The node to get the location for.</param>
 	/// <returns>Location of the node. Used for recursion.</returns>
