@@ -213,12 +213,38 @@ public class TreeLayoutEngine : ILayoutEngine
 
 	public void FocusWindowInDirection(WindowDirection direction, IWindow window)
 	{
-		throw new System.NotImplementedException();
+		Logger.Debug($"Focusing window {window.Title} in direction {direction} in layout engine {Name}");
+
+		if (!_windows.TryGetValue(window, out LeafNode? node))
+		{
+			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
+			return;
+		}
+
+		LeafNode? targetNode = GetAdjacentNode(node, direction, _configContext.MonitorManager.FocusedMonitor);
+		targetNode?.Window.Focus();
 	}
 
 	public void SwapWindowInDirection(WindowDirection direction, IWindow window)
 	{
-		throw new System.NotImplementedException();
+		Logger.Debug($"Swapping window {window.Title} in direction {direction} in layout engine {Name}");
+
+		if (!_windows.TryGetValue(window, out LeafNode? node))
+		{
+			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
+			return;
+		}
+
+		LeafNode? targetNode = GetAdjacentNode(node, direction, _configContext.MonitorManager.FocusedMonitor);
+		if (targetNode == null)
+		{
+			Logger.Error($"Could not find adjacent node for window {window.Title} in layout engine {Name}");
+			return;
+		}
+
+		// Swap the windows.
+		(targetNode.Window, node.Window) = (node.Window, targetNode.Window);
+		window.Focus();
 	}
 
 	public void Clear()
