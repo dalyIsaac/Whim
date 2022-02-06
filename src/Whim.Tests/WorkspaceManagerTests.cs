@@ -27,11 +27,6 @@ public class WorkspaceManagerTests
 		return (monitorManagerMock, monitorMock, secondMonitorMock);
 	}
 
-	public WorkspaceManagerTests()
-	{
-		Logger.Initialize();
-	}
-
 	[Fact]
 	public void AddWorkspace()
 	{
