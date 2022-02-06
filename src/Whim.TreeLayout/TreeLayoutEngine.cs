@@ -41,6 +41,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	public LeafNode? AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding window {window.Title} to layout engine {Name}");
+		Count++;
 
 		LeafNode newLeaf = new(window);
 		_windows.Add(window, newLeaf);
@@ -63,6 +64,7 @@ public class TreeLayoutEngine : ILayoutEngine
 		if (focusedLeaf == null)
 		{
 			Logger.Error($"Could not find a leaf node to add window {window.Title} to layout engine {Name}");
+			Count--;
 			return null;
 		}
 
@@ -133,7 +135,6 @@ public class TreeLayoutEngine : ILayoutEngine
 
 		// Update the existing leaf's parent
 		focusedLeaf.Parent = newSplitNode;
-		Count += 1;
 
 		return newLeaf;
 	}
@@ -150,7 +151,7 @@ public class TreeLayoutEngine : ILayoutEngine
 		}
 
 		_windows.Remove(window);
-		Count -= 1;
+		Count--;
 
 		// Remove the node from the tree.
 		if (removingNode.Parent == null)
@@ -249,28 +250,38 @@ public class TreeLayoutEngine : ILayoutEngine
 
 	public void Clear()
 	{
-		throw new System.NotImplementedException();
+		Logger.Debug($"Clearing layout engine {Name}");
+		Root = null;
 	}
 
 	public bool Contains(IWindow item)
 	{
-		throw new System.NotImplementedException();
+		Logger.Debug($"Checking if layout engine {Name} contains window {item.Title}");
+		return _windows.ContainsKey(item);
 	}
 
 	public void CopyTo(IWindow[] array, int arrayIndex)
 	{
-		throw new System.NotImplementedException();
+		foreach (IWindow window in this)
+		{
+			array[arrayIndex++] = window;
+		}
 	}
 
 	public IEnumerator<IWindow> GetEnumerator()
 	{
-		throw new System.NotImplementedException();
+		if (Root == null)
+		{
+			yield break;
+		}
+
+		foreach (IWindowLocation location in DoLayout(Root, new Location(0, 0, 0, 0)))
+		{
+			yield return location.Window;
+		}
 	}
 
-	IEnumerator IEnumerable.GetEnumerator()
-	{
-		throw new System.NotImplementedException();
-	}
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	/// <summary>
 	/// Gets the adjacent node in the given <paramref name="direction"/>.
