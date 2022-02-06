@@ -249,7 +249,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	/// <summary>
 	/// Gets the adjacent node in the given <paramref name="direction"/>.
 	/// </summary>
-	/// <param name="window">The window to get the adjacent node for.</param>
+	/// <param name="node">The node to get the adjacent node for.</param>
 	/// <param name="direction">The direction to get the adjacent node in.</param>
 	/// <param name="monitor">
 	/// The monitor which the engine is currently focused for. This is used to
@@ -260,19 +260,13 @@ public class TreeLayoutEngine : ILayoutEngine
 	/// <see langword="null"/> if there is no adjacent node in the given <paramref name="direction"/>,
 	/// or an error occurred.
 	/// </returns>
-	public LeafNode? GetAdjacentNode(IWindow window, WindowDirection direction, IMonitor monitor)
+	public LeafNode? GetAdjacentNode(LeafNode node, WindowDirection direction, IMonitor monitor)
 	{
-		Logger.Debug($"Getting node in direction {Direction} for window {window.Title}");
+		Logger.Debug($"Getting node in direction {Direction} for window {node.Window.Title}");
 
 		if (Root == null)
 		{
 			Logger.Error($"No root node in layout engine {Name}");
-			return null;
-		}
-
-		if (!_windows.TryGetValue(window, out LeafNode? node))
-		{
-			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
 			return null;
 		}
 
