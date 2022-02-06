@@ -73,61 +73,31 @@ public class Logger
 
 	public static void Verbose(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		if (instance == null)
-		{
-			throw new LoggerNotInitializedException();
-		}
-
-		instance._logger.Verbose(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger.Verbose(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Debug(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		if (instance == null)
-		{
-			throw new LoggerNotInitializedException();
-		}
-
-		instance._logger.Debug(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger.Debug(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Information(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		if (instance == null)
-		{
-			throw new LoggerNotInitializedException();
-		}
-
-		instance._logger.Information(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger.Information(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Warning(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		if (instance == null)
-		{
-			throw new LoggerNotInitializedException();
-		}
-
-		instance._logger.Warning(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger.Warning(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Error(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		if (instance == null)
-		{
-			throw new LoggerNotInitializedException();
-		}
-
-		instance._logger.Error(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger.Error(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Fatal(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		if (instance == null)
-		{
-			throw new LoggerNotInitializedException();
-		}
-
-		instance._logger.Fatal(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger.Fatal(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 }

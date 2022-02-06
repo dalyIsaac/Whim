@@ -128,7 +128,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_IgnoreIllegalDirection()
 	{
-		Logger.Initialize();
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -146,7 +145,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_WindowNotFound()
 	{
-		Logger.Initialize();
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -303,7 +301,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_IgnoreIllegalDirection()
 	{
-		Logger.Initialize();
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -328,7 +325,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_WindowNotFound()
 	{
-		Logger.Initialize();
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
