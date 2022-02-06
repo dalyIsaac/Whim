@@ -5,11 +5,6 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestDoLayout
 {
-	public TestDoLayout()
-	{
-		Logger.Initialize();
-	}
-
 	[Fact]
 	public void DoLayout()
 	{

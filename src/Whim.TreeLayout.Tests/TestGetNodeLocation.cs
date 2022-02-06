@@ -6,11 +6,6 @@ public class TestGetNodeLocation
 {
 	private readonly TestTree _tree = new();
 
-	public TestGetNodeLocation()
-	{
-		Logger.Initialize();
-	}
-
 	#region GetNodeLocation
 	[Fact]
 	public void GetNodeLocation_Left()

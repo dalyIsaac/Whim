@@ -6,11 +6,6 @@ public class TestGetWeightAndIndex
 {
 	private readonly TestTree _tree = new();
 
-	public TestGetWeightAndIndex()
-	{
-		Logger.Initialize();
-	}
-
 	[Fact]
 	public void GetWeightAndIndex_Left()
 	{

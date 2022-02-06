@@ -10,8 +10,6 @@ public class TestGetAdjacentNode
 
 	public TestGetAdjacentNode()
 	{
-		Logger.Initialize();
-
 		_monitor = new();
 		_monitor.Setup(m => m.Width).Returns(1920);
 		_monitor.Setup(m => m.Height).Returns(1080);

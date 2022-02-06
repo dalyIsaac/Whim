@@ -7,11 +7,6 @@ public class TestRemove
 {
 	private readonly Mock<IConfigContext> _configContext = new();
 
-	public TestRemove()
-	{
-		Logger.Initialize();
-	}
-
 	[Fact]
 	public void Remove_IllegalWindow()
 	{

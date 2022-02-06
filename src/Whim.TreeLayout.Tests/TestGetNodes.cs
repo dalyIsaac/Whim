@@ -6,11 +6,6 @@ public class TestGetNodes
 {
 	private readonly TestTree _tree = new();
 
-	public TestGetNodes()
-	{
-		Logger.Initialize();
-	}
-
 	[Fact]
 	public void GetLeftMostLeaf()
 	{

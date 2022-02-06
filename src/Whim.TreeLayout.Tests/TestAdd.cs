@@ -5,16 +5,9 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestAdd
 {
-	public TestAdd()
-	{
-		Logger.Initialize();
-	}
-
 	[Fact]
 	public void Add_Root()
 	{
-		Logger.Initialize();
-
 		Mock<IWorkspaceManager> workspaceManager = new();
 		Mock<IConfigContext> configContext = new();
 		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
