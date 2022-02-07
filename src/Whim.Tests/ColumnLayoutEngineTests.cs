@@ -136,7 +136,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Up, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Up, leftWindow.Object);
 
 		leftWindow.Verify(w => w.Focus(), Times.Never);
 		rightWindow.Verify(w => w.Focus(), Times.Never);
@@ -154,7 +154,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Left, otherWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, otherWindow.Object);
 
 		leftWindow.Verify(w => w.Focus(), Times.Never);
 		rightWindow.Verify(w => w.Focus(), Times.Never);
@@ -172,7 +172,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Right, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Right, leftWindow.Object);
 
 		rightWindow.Verify(w => w.Focus(), Times.Once);
 	}
@@ -189,7 +189,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Right, rightWindow.Object);
+		engine.FocusWindowInDirection(Direction.Right, rightWindow.Object);
 
 		leftWindow.Verify(w => w.Focus(), Times.Once);
 	}
@@ -206,7 +206,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Left, rightWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, rightWindow.Object);
 
 		leftWindow.Verify(w => w.Focus(), Times.Once);
 	}
@@ -223,7 +223,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Left, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, leftWindow.Object);
 
 		rightWindow.Verify(w => w.Focus(), Times.Once);
 	}
@@ -240,7 +240,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Left, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, leftWindow.Object);
 
 		rightWindow.Verify(w => w.Focus(), Times.Once);
 	}
@@ -257,7 +257,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Left, rightWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, rightWindow.Object);
 
 		leftWindow.Verify(w => w.Focus(), Times.Once);
 	}
@@ -274,7 +274,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Right, rightWindow.Object);
+		engine.FocusWindowInDirection(Direction.Right, rightWindow.Object);
 
 		leftWindow.Verify(w => w.Focus(), Times.Once);
 	}
@@ -291,7 +291,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.FocusWindowInDirection(WindowDirection.Right, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Right, leftWindow.Object);
 
 		rightWindow.Verify(w => w.Focus(), Times.Once);
 	}
@@ -309,7 +309,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Up, leftWindow.Object);
+		engine.SwapWindowInDirection(Direction.Up, leftWindow.Object);
 
 		IWindowLocation[] windows = engine.DoLayout(new Location(0, 0, 1920, 1080)).ToArray();
 
@@ -334,7 +334,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Left, notFoundWindow.Object);
+		engine.SwapWindowInDirection(Direction.Left, notFoundWindow.Object);
 
 		IWindowLocation[] windows = engine.DoLayout(new Location(0, 0, 1920, 1080)).ToArray();
 
@@ -359,7 +359,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Right, leftWindow.Object);
+		engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
@@ -385,7 +385,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Right, rightWindow.Object);
+		engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
@@ -411,7 +411,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Left, rightWindow.Object);
+		engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
@@ -437,7 +437,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Left, leftWindow.Object);
+		engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
@@ -463,7 +463,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(rightWindow.Object);
 		engine.Add(leftWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Left, leftWindow.Object);
+		engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
@@ -489,7 +489,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(rightWindow.Object);
 		engine.Add(leftWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Left, rightWindow.Object);
+		engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
@@ -515,7 +515,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(rightWindow.Object);
 		engine.Add(leftWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Right, rightWindow.Object);
+		engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
@@ -541,7 +541,7 @@ public class ColumnLayoutEngineTests
 		engine.Add(rightWindow.Object);
 		engine.Add(leftWindow.Object);
 
-		engine.SwapWindowInDirection(WindowDirection.Right, leftWindow.Object);
+		engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowLocation[] windows = engine.DoLayout(location).ToArray();

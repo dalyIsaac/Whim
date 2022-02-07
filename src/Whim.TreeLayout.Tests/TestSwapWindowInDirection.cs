@@ -9,7 +9,7 @@ public class TestSwapWindowInDirection
 	[Fact]
 	public void RightTopLeftBottomLeft_Left()
 	{
-		_testEngine.Engine.SwapWindowInDirection(WindowDirection.Left, _testEngine.RightTopLeftBottomLeftWindow.Object);
+		_testEngine.Engine.SwapWindowInDirection(Direction.Left, _testEngine.RightTopLeftBottomLeftWindow.Object);
 
 		Assert.Equal(_testEngine.RightTopLeftBottomLeftNode.Window, _testEngine.LeftWindow.Object);
 		Assert.Equal(_testEngine.LeftNode.Window, _testEngine.RightTopLeftBottomLeftWindow.Object);
@@ -18,7 +18,7 @@ public class TestSwapWindowInDirection
 	[Fact]
 	public void RightTopLeftBottomLeft_Right()
 	{
-		_testEngine.Engine.SwapWindowInDirection(WindowDirection.Right, _testEngine.RightTopLeftBottomLeftWindow.Object);
+		_testEngine.Engine.SwapWindowInDirection(Direction.Right, _testEngine.RightTopLeftBottomLeftWindow.Object);
 
 		Assert.Equal(_testEngine.RightTopLeftBottomLeftNode.Window, _testEngine.RightTopLeftBottomRightTopWindow.Object);
 		Assert.Equal(_testEngine.RightTopLeftBottomRightTopNode.Window, _testEngine.RightTopLeftBottomLeftWindow.Object);
@@ -27,7 +27,7 @@ public class TestSwapWindowInDirection
 	[Fact]
 	public void RightTopLeftBottomLeft_Up()
 	{
-		_testEngine.Engine.SwapWindowInDirection(WindowDirection.Up, _testEngine.RightTopLeftBottomLeftWindow.Object);
+		_testEngine.Engine.SwapWindowInDirection(Direction.Up, _testEngine.RightTopLeftBottomLeftWindow.Object);
 
 		Assert.Equal(_testEngine.RightTopLeftBottomLeftNode.Window, _testEngine.RightTopLeftTopWindow.Object);
 		Assert.Equal(_testEngine.RightTopLeftTopNode.Window, _testEngine.RightTopLeftBottomLeftWindow.Object);
@@ -36,7 +36,7 @@ public class TestSwapWindowInDirection
 	[Fact]
 	public void RightTopLeftBottomLeft_Down()
 	{
-		_testEngine.Engine.SwapWindowInDirection(WindowDirection.Down, _testEngine.RightTopLeftBottomLeftWindow.Object);
+		_testEngine.Engine.SwapWindowInDirection(Direction.Down, _testEngine.RightTopLeftBottomLeftWindow.Object);
 
 		Assert.Equal(_testEngine.RightTopLeftBottomLeftNode.Window, _testEngine.RightBottomWindow.Object);
 		Assert.Equal(_testEngine.RightBottomNode.Window, _testEngine.RightTopLeftBottomLeftWindow.Object);
@@ -48,7 +48,7 @@ public class TestSwapWindowInDirection
 	[Fact]
 	public void Left_Left()
 	{
-		_testEngine.Engine.SwapWindowInDirection(WindowDirection.Left, _testEngine.LeftWindow.Object);
+		_testEngine.Engine.SwapWindowInDirection(Direction.Left, _testEngine.LeftWindow.Object);
 
 		Assert.Equal(_testEngine.LeftNode.Window, _testEngine.LeftWindow.Object);
 	}

@@ -1,6 +1,6 @@
 namespace Whim;
 
-public enum WindowDirection
+public enum Direction
 {
 	Up,
 	Down,

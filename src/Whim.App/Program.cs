@@ -60,7 +60,7 @@ public class Program
 				return;
 			}
 
-			workspace.ActiveLayoutEngine.FocusWindowInDirection(WindowDirection.Left, workspace.FocusedWindow);
+			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Left, workspace.FocusedWindow);
 		});
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_RIGHT), (args) =>
 		{
@@ -70,11 +70,11 @@ public class Program
 				return;
 			}
 
-			workspace.ActiveLayoutEngine.FocusWindowInDirection(WindowDirection.Right, workspace.FocusedWindow);
+			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Right, workspace.FocusedWindow);
 		});
 
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(WindowDirection.Left));
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(WindowDirection.Right));
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Left));
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Right));
 
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateOuterGap(10));

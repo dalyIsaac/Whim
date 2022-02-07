@@ -229,7 +229,7 @@ public class Workspace : IWorkspace
 		return success;
 	}
 
-	public void FocusWindowInDirection(WindowDirection direction, IWindow window)
+	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
@@ -242,7 +242,7 @@ public class Workspace : IWorkspace
 		ActiveLayoutEngine.FocusWindowInDirection(direction, window);
 	}
 
-	public void SwapWindowInDirection(WindowDirection direction, IWindow? window = null)
+	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
 		window ??= FocusedWindow;
 		if (window == null)

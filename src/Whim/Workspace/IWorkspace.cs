@@ -86,7 +86,7 @@ public interface IWorkspace : ICommandable
 	/// <param name="window">
 	/// The origin window
 	/// </param>
-	public void FocusWindowInDirection(WindowDirection direction, IWindow window);
+	public void FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
 	/// Swaps the <see paramref="window"/> in the <see paramref="direction"/>.
@@ -95,6 +95,6 @@ public interface IWorkspace : ICommandable
 	/// <param name="window">
 	/// The window to swap. If null, the currently focused window is swapped.
 	/// </param>
-	public void SwapWindowInDirection(WindowDirection direction, IWindow? window = null);
+	public void SwapWindowInDirection(Direction direction, IWindow? window = null);
 	#endregion
 }

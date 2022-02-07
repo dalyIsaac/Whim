@@ -31,9 +31,9 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 
 	public IWindow? GetFirstWindow() => _innerLayoutEngine.GetFirstWindow();
 
-	public void FocusWindowInDirection(WindowDirection direction, IWindow window) => _innerLayoutEngine.FocusWindowInDirection(direction, window);
+	public void FocusWindowInDirection(Direction direction, IWindow window) => _innerLayoutEngine.FocusWindowInDirection(direction, window);
 
-	public void SwapWindowInDirection(WindowDirection direction, IWindow window) => _innerLayoutEngine.SwapWindowInDirection(direction, window);
+	public void SwapWindowInDirection(Direction direction, IWindow window) => _innerLayoutEngine.SwapWindowInDirection(direction, window);
 
 	public void Clear() => _innerLayoutEngine.Clear();
 
