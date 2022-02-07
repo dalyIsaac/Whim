@@ -232,4 +232,38 @@ public partial class TreeLayoutEngine
 
 		return (LeafNode)node;
 	}
+
+	public static SplitNode? GetCommonParent(Node a, Node b)
+	{
+		HashSet<SplitNode> aParents = new(GetParents(a));
+
+		SplitNode? bParent = b.Parent;
+		while (bParent != null && !aParents.Contains(bParent))
+		{
+			bParent = bParent.Parent;
+		}
+
+		return bParent as SplitNode;
+	}
+
+	public static SplitNode[] GetParents(Node? node)
+	{
+		List<SplitNode> parents = new();
+
+		node = node?.Parent;
+		while (node != null)
+		{
+			if (node is SplitNode splitNode)
+			{
+				parents.Add(splitNode);
+				node = splitNode.Parent;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return parents.ToArray();
+	}
 }
