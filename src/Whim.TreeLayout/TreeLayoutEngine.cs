@@ -6,10 +6,11 @@ namespace Whim.TreeLayout;
 
 public partial class TreeLayoutEngine : ILayoutEngine
 {
+	public static NodeDirection Direction = NodeDirection.Right;
+
 	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
 	public Node? Root { get; private set; }
-	public NodeDirection Direction = NodeDirection.Right;
 
 	public string Name { get; set; }
 

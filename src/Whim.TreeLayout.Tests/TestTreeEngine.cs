@@ -72,17 +72,17 @@ internal class TestTreeEngine
 		Assert.NotNull(RightTopLeftTopNode);
 		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftTopWindow.Object);
 
-		Engine.Direction = NodeDirection.Down;
+		TreeLayoutEngine.Direction = NodeDirection.Down;
 		RightBottomNode = Engine.AddWindow(RightBottomWindow.Object)!;
 		Assert.NotNull(RightBottomNode);
 
 		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftTopWindow.Object);
-		Engine.Direction = NodeDirection.Right;
+		TreeLayoutEngine.Direction = NodeDirection.Right;
 
 		RightTopRight1Node = Engine.AddWindow(RightTopRight1Window.Object)!;
 		Assert.NotNull(RightTopRight1Node);
 		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopRight1Window.Object);
-		Engine.Direction = NodeDirection.Down;
+		TreeLayoutEngine.Direction = NodeDirection.Down;
 
 		RightTopRight2Node = Engine.AddWindow(RightTopRight2Window.Object)!;
 		Assert.NotNull(RightTopRight2Node);
@@ -92,17 +92,17 @@ internal class TestTreeEngine
 		Assert.NotNull(RightTopRight3Node);
 
 		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftTopWindow.Object);
-		Engine.Direction = NodeDirection.Down;
+		TreeLayoutEngine.Direction = NodeDirection.Down;
 
 		RightTopLeftBottomLeftNode = Engine.AddWindow(RightTopLeftBottomLeftWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomLeftNode);
 		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftBottomLeftWindow.Object);
-		Engine.Direction = NodeDirection.Right;
+		TreeLayoutEngine.Direction = NodeDirection.Right;
 
 		RightTopLeftBottomRightTopNode = Engine.AddWindow(RightTopLeftBottomRightTopWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomRightTopNode);
 		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftBottomRightTopWindow.Object);
-		Engine.Direction = NodeDirection.Down;
+		TreeLayoutEngine.Direction = NodeDirection.Down;
 
 		RightTopLeftBottomRightBottomNode = Engine.AddWindow(RightTopLeftBottomRightBottomWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomRightBottomNode);
