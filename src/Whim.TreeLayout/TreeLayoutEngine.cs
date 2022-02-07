@@ -221,7 +221,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			return;
 		}
 
-		LeafNode? targetNode = GetAdjacentNode(node, direction, _configContext.MonitorManager.FocusedMonitor);
+		LeafNode? targetNode = GetAdjacentNode(node, direction);
 		targetNode?.Window.Focus();
 	}
 
@@ -235,7 +235,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			return;
 		}
 
-		LeafNode? targetNode = GetAdjacentNode(node, direction, _configContext.MonitorManager.FocusedMonitor);
+		LeafNode? targetNode = GetAdjacentNode(node, direction);
 		if (targetNode == null)
 		{
 			Logger.Error($"Could not find adjacent node for window {window.Title} in layout engine {Name}");
@@ -287,16 +287,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </summary>
 	/// <param name="node">The node to get the adjacent node for.</param>
 	/// <param name="direction">The direction to get the adjacent node in.</param>
-	/// <param name="monitor">
-	/// The monitor which the engine is currently focused for. This is used to
-	/// determine the delta we use for the internal calculations.
-	/// </param>
 	/// <returns>
 	/// The adjacent node in the given <paramref name="direction"/>.
 	/// <see langword="null"/> if there is no adjacent node in the given <paramref name="direction"/>,
 	/// or an error occurred.
 	/// </returns>
-	public LeafNode? GetAdjacentNode(LeafNode node, WindowDirection direction, IMonitor monitor)
+	public LeafNode? GetAdjacentNode(LeafNode node, WindowDirection direction)
 	{
 		Logger.Debug($"Getting node in direction {Direction} for window {node.Window.Title}");
 
@@ -305,6 +301,9 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			Logger.Error($"No root node in layout engine {Name}");
 			return null;
 		}
+
+		// We use this monitor to determine the delta we use for the internal calculations.
+		IMonitor monitor = _configContext.MonitorManager.FocusedMonitor;
 
 		// Get the coordinates of the node.
 		ILocation<double> nodeLocation = GetNodeLocation(node);
