@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +7,10 @@ namespace Whim.TreeLayout;
 
 public partial class TreeLayoutEngine : ILayoutEngine
 {
-	public static NodeDirection Direction = NodeDirection.Right;
-
 	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
 	public Node? Root { get; private set; }
+	public NodeDirection Direction = NodeDirection.Right;
 
 	public string Name { get; set; }
 
@@ -58,7 +58,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out LeafNode? focusedLeaf))
 		{
 			// We can't find the focused window, so we'll just add it to the right-most node.
-			focusedLeaf = GetRightMostLeaf(Root);
+			focusedLeaf = Root.GetRightMostLeaf();
 		}
 
 		if (focusedLeaf == null)
@@ -207,12 +207,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	public IWindow? GetFirstWindow()
 	{
 		Logger.Debug($"Getting first window from layout engine {Name}");
-		return GetLeftMostLeaf(Root)?.Window;
+		return Root?.GetLeftMostLeaf()?.Window;
 	}
 
 	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location) => Root != null ? DoLayout(Root, location) : Enumerable.Empty<IWindowLocation>();
 
-	public void FocusWindowInDirection(WindowDirection direction, IWindow window)
+	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window.Title} in direction {direction} in layout engine {Name}");
 
@@ -226,7 +226,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		targetNode?.Window.Focus();
 	}
 
-	public void SwapWindowInDirection(WindowDirection direction, IWindow window)
+	public void SwapWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Swapping window {window.Title} in direction {direction} in layout engine {Name}");
 
@@ -283,6 +283,100 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+	/// <summary>'
+	/// The maximum relative delta for moving a window's edge, within its parent.
+	/// </summary>
+	private const double MAX_RELATIVE_DELTA = 0.5;
+
+	/// <summary>
+	/// Change the focused window's edge by the specified <paramref name="fractionDelta"/>.
+	/// </summary>
+	/// <param name="edge">The edge to change.</param>
+	/// <param name="fractionDelta">The percentage to change the edge by.</param>
+	public void MoveFocusedWindowEdgeInDirection(Direction edge, double fractionDelta)
+	{
+		Logger.Debug($"Moving focused window edge in direction {edge} by {fractionDelta} in layout engine {Name}");
+
+		if (Root == null)
+		{
+			Logger.Error($"No root node in layout engine {Name}");
+			return;
+		}
+
+		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.FocusedWindow;
+		if (focusedWindow == null)
+		{
+			Logger.Error($"No focused window in layout engine {Name}");
+			return;
+		}
+
+		if (!_windows.TryGetValue(focusedWindow, out LeafNode? focusedNode))
+		{
+			Logger.Error($"Could not find node for focused window in layout engine {Name}");
+			return;
+		}
+
+		LeafNode? adjacentNode = GetAdjacentNode(focusedNode, edge);
+		if (adjacentNode == null)
+		{
+			Logger.Error($"Could not find adjacent node for focused window in layout engine {Name}");
+			return;
+		}
+
+		// Get the common parent node.
+		Node[] focusedNodeParents = focusedNode.GetLineage().ToArray();
+		Node[] adjacentNodeParents = adjacentNode.GetLineage().ToArray();
+		Node? parentNode = Node.GetCommonParent(focusedNodeParents, adjacentNodeParents);
+
+		if (parentNode == null)
+		{
+			Logger.Error($"Could not find common parent node for the focused and adjacent windows in layout engine {Name}");
+			return;
+		}
+
+		// Adjust the weight of the focused node.
+		// First, we need to find the location of the parent node.
+		ILocation<double> parentLocation = GetNodeLocation(parentNode);
+
+		bool isWidth;
+		if (edge == Whim.Direction.Left || edge == Whim.Direction.Right)
+		{
+			isWidth = true;
+		}
+		else if (edge == Whim.Direction.Up || edge == Whim.Direction.Down)
+		{
+			isWidth = false;
+		}
+		else
+		{
+			Logger.Error($"Invalid edge {edge} in layout engine {Name}");
+			return;
+		}
+
+		double relativeDelta = fractionDelta / (isWidth ? parentLocation.Width : parentLocation.Height);
+
+		// We cap the relative delta to MAX_RELATIVE_DELTA of the parent node's weight, to avoid nasty cases.
+		if (relativeDelta > MAX_RELATIVE_DELTA)
+		{
+			Logger.Debug($"Capping relative delta of {relativeDelta} to {MAX_RELATIVE_DELTA * 100}%");
+			relativeDelta = MAX_RELATIVE_DELTA;
+		}
+		else if (relativeDelta < -MAX_RELATIVE_DELTA)
+		{
+			Logger.Debug($"Capping relative delta of {relativeDelta} to {-MAX_RELATIVE_DELTA * 100}%");
+			relativeDelta = -MAX_RELATIVE_DELTA;
+		}
+
+		// Now we can adjust the weight.
+		int parentDepth = parentNode.GetDepth();
+
+		Node focusedAncestorNode = focusedNodeParents[focusedNodeParents.Length - parentDepth - 2];
+		Node adjacentAncestorNode = adjacentNodeParents[adjacentNodeParents.Length - parentDepth - 2];
+
+		focusedAncestorNode.Weight += relativeDelta;
+		adjacentAncestorNode.Weight -= relativeDelta;
+	}
+
 	/// <summary>
 	/// Gets the adjacent node in the given <paramref name="direction"/>.
 	/// </summary>
@@ -293,7 +387,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// <see langword="null"/> if there is no adjacent node in the given <paramref name="direction"/>,
 	/// or an error occurred.
 	/// </returns>
-	public LeafNode? GetAdjacentNode(LeafNode node, WindowDirection direction)
+	public LeafNode? GetAdjacentNode(LeafNode node, Direction direction)
 	{
 		Logger.Debug($"Getting node in direction {Direction} for window {node.Window.Title}");
 
@@ -314,14 +408,14 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		{
 			X = nodeLocation.X + (direction switch
 			{
-				WindowDirection.Left => -1d / monitor.Width,
-				WindowDirection.Right => nodeLocation.Width + (1d / monitor.Width),
+				Whim.Direction.Left => -1d / monitor.Width,
+				Whim.Direction.Right => nodeLocation.Width + (1d / monitor.Width),
 				_ => 0d
 			}),
 			Y = nodeLocation.Y + (direction switch
 			{
-				WindowDirection.Up => -1d / monitor.Height,
-				WindowDirection.Down => nodeLocation.Height + (1d / monitor.Height),
+				Whim.Direction.Up => -1d / monitor.Height,
+				Whim.Direction.Down => nodeLocation.Height + (1d / monitor.Height),
 				_ => 0d
 			}),
 		};

@@ -9,7 +9,7 @@ public class TestGetNodes
 	[Fact]
 	public void GetLeftMostLeaf()
 	{
-		LeafNode? node = TreeLayoutEngine.GetLeftMostLeaf(_tree.Left);
+		LeafNode? node = _tree.Left.GetLeftMostLeaf();
 
 		Assert.Equal(_tree.Left, node);
 	}
@@ -17,7 +17,7 @@ public class TestGetNodes
 	[Fact]
 	public void GetRightMostLeaf()
 	{
-		LeafNode? node = TreeLayoutEngine.GetRightMostLeaf(_tree.RightBottom);
+		LeafNode? node = _tree.RightBottom.GetRightMostLeaf();
 
 		Assert.Equal(_tree.RightBottom, node);
 	}

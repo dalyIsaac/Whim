@@ -6,17 +6,11 @@ namespace Whim.TreeLayout.Tests;
 public class TestParents
 {
 	[Fact]
-	public void GetParents_NullNode()
-	{
-		Assert.Empty(TreeLayoutEngine.GetParents(null));
-	}
-
-	[Fact]
 	public void GetParents_RootNode()
 	{
 		TestTree tree = new();
 
-		Assert.Empty(TreeLayoutEngine.GetParents(tree.Root));
+		Assert.Equal(new Node[] { tree.Root }, tree.Root.GetLineage());
 	}
 
 	[Fact]
@@ -24,8 +18,8 @@ public class TestParents
 	{
 		TestTree tree = new();
 
-		Node[] expected = new[] { tree.RightTopLeftBottomRight, tree.RightTopLeftBottom, tree.RightTopLeft, tree.RightTop, tree.Right, tree.Root };
-		Node[] actual = TreeLayoutEngine.GetParents(tree.RightTopLeftBottomRightTop).ToArray();
+		Node[] expected = new Node[] { tree.RightTopLeftBottomRightTop, tree.RightTopLeftBottomRight, tree.RightTopLeftBottom, tree.RightTopLeft, tree.RightTop, tree.Right, tree.Root };
+		Node[] actual = tree.RightTopLeftBottomRightTop.GetLineage().ToArray();
 		Assert.Equal(expected, actual);
 	}
 
@@ -34,7 +28,10 @@ public class TestParents
 	{
 		TestTree engine = new();
 
-		Assert.Equal(engine.Root, TreeLayoutEngine.GetCommonParent(engine.Left, engine.RightBottom));
+		Node[] leftAncestors = engine.Left.GetLineage().ToArray();
+		Node[] rightAncestors = engine.RightBottom.GetLineage().ToArray();
+
+		Assert.Equal(engine.Root, Node.GetCommonParent(leftAncestors, rightAncestors));
 	}
 
 	[Fact]
@@ -42,7 +39,10 @@ public class TestParents
 	{
 		TestTree engine = new();
 
-		Assert.Equal(engine.RightTop, TreeLayoutEngine.GetCommonParent(engine.RightTopLeftBottomRightTop, engine.RightTopRight3));
+		Node[] rightTopLeftBottomRightTopAncestors = engine.RightTopLeftBottomRightTop.GetLineage().ToArray();
+		Node[] rightTopRight3Ancestors = engine.RightTopRight3.GetLineage().ToArray();
+
+		Assert.Equal(engine.RightTop, Node.GetCommonParent(rightTopLeftBottomRightTopAncestors, rightTopRight3Ancestors));
 	}
 
 	[Fact]
@@ -50,6 +50,9 @@ public class TestParents
 	{
 		TestTree engine = new();
 
-		Assert.Null(TreeLayoutEngine.GetCommonParent(engine.Left, new LeafNode(new Mock<IWindow>().Object)));
+		Node[] leftAncestors = engine.Left.GetLineage().ToArray();
+		Node[] illegalAncestors = new[] { new SplitNode(NodeDirection.Right) };
+
+		Assert.Null(Node.GetCommonParent(leftAncestors, illegalAncestors));
 	}
 }
