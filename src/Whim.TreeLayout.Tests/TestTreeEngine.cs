@@ -107,5 +107,8 @@ internal class TestTreeEngine
 
 		RightTopLeftBottomRightBottomNode = Engine.AddWindow(RightTopLeftBottomRightBottomWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomRightBottomNode);
+
+		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftBottomRightBottomWindow.Object);
+		Engine.MoveFocusedWindowEdgeInDirection(Direction.Up, -0.075);
 	}
 }

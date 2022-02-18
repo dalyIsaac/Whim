@@ -40,12 +40,20 @@ public class SplitNode : Node
 			return false;
 		}
 
-		return obj is SplitNode node &&
+		var result = obj is SplitNode node &&
 			node.EqualWeight == EqualWeight &&
 			node.Direction == Direction &&
 			// Checking for parent equality is too dangerous, as there are cycles.
 			((node.Parent == null) == (Parent == null)) &&
 			node.Children.SequenceEqual(Children);
+
+		if (result == false)
+		{
+			//throw new Exception("LeafNode equality check failed");
+			Console.WriteLine("Hello world!");
+		}
+
+		return result;
 	}
 
 	// override object.GetHashCode

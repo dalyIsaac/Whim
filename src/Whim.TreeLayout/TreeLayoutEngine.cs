@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +23,14 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	{
 		_configContext = configContext;
 		Name = name;
+	}
+
+	// TODO: handle chords
+	// TODO: fix tests
+	public void Add(IWindow window, NodeDirection direction)
+	{
+		Direction = direction;
+		Add(window);
 	}
 
 	public void Add(IWindow window)
@@ -296,12 +303,6 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	public void MoveFocusedWindowEdgeInDirection(Direction edge, double fractionDelta)
 	{
 		Logger.Debug($"Moving focused window edge in direction {edge} by {fractionDelta} in layout engine {Name}");
-
-		if (Root == null)
-		{
-			Logger.Error($"No root node in layout engine {Name}");
-			return;
-		}
 
 		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.FocusedWindow;
 		if (focusedWindow == null)

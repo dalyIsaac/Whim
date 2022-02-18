@@ -123,15 +123,15 @@ internal class TestTree
 		RightTopLeftBottom.Children.Add(RightTopLeftBottomLeft);
 
 		// RightTopLeftBottomRight
-		RightTopLeftBottomRight = new SplitNode(NodeDirection.Down, RightTopLeftBottom) { Weight = 0.5 };
+		RightTopLeftBottomRight = new SplitNode(NodeDirection.Down, RightTopLeftBottom) { Weight = 0.5, EqualWeight = false };
 		RightTopLeftBottom.Children.Add(RightTopLeftBottomRight);
 
 		// RightTopLeftBottomRightTop
-		RightTopLeftBottomRightTop = new LeafNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight) { Weight = 0.5 };
+		RightTopLeftBottomRightTop = new LeafNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight) { Weight = 0.7 };
 		RightTopLeftBottomRight.Children.Add(RightTopLeftBottomRightTop);
 
 		// RightTopLeftBottomRightBottom
-		RightTopLeftBottomRightBottom = new LeafNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight) { Weight = 0.5 };
+		RightTopLeftBottomRightBottom = new LeafNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight) { Weight = 0.3 };
 		RightTopLeftBottomRight.Children.Add(RightTopLeftBottomRightBottom);
 
 		// RightTopRight

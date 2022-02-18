@@ -4,6 +4,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Whim.Bar;
 using Whim.Dashboard;
 using Whim.Gaps;
+using Whim.TreeLayout;
 
 namespace Whim.App;
 
@@ -22,7 +23,8 @@ public class Program
 		// Add workspaces
 		for (int i = 0; i < 4; i++)
 		{
-			Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
+			// Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
+			Workspace workspace = new(configContext, i.ToString(), new TreeLayoutEngine(configContext));
 			configContext.WorkspaceManager.Add(workspace);
 		}
 

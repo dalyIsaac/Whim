@@ -32,10 +32,17 @@ public class LeafNode : Node
 			return false;
 		}
 
-		return obj is LeafNode node &&
+		var result = obj is LeafNode node &&
 			node.Window.Equals(Window) &&
 			// Checking for parent equality is too dangerous, as there are cycles.
 			((node.Parent == null) == (Parent == null));
+
+		if (result == false) {
+			//throw new Exception("LeafNode equality check failed");
+			Console.WriteLine("Hello world!");
+		}
+
+		return result;
 	}
 
 	// override object.GetHashCode
