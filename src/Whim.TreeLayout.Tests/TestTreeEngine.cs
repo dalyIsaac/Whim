@@ -14,6 +14,14 @@ internal class TestTreeEngine
 	public Mock<IWorkspaceManager> WorkspaceManager = new();
 	public Mock<IConfigContext> ConfigContext = new();
 
+	public SplitNode RootNode;
+	public SplitNode RightNode;
+	public SplitNode RightTopNode;
+	public SplitNode RightTopLeftNode;
+	public SplitNode RightTopLeftBottomNode;
+	public SplitNode RightTopLeftBottomRightNode;
+	public SplitNode RightTopRightNode;
+
 	public Mock<IWindow> LeftWindow = new();
 	public LeafNode LeftNode;
 
@@ -108,7 +116,16 @@ internal class TestTreeEngine
 		RightTopLeftBottomRightBottomNode = Engine.AddWindow(RightTopLeftBottomRightBottomWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomRightBottomNode);
 
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftBottomRightBottomWindow.Object);
-		Engine.MoveFocusedWindowEdgeInDirection(Direction.Up, -0.075);
+		RootNode = (Engine.Root as SplitNode)!;
+
+		RightTopLeftBottomRightNode = (RightTopLeftBottomRightBottomNode.Parent as SplitNode)!;
+		RightTopLeftBottomNode = (RightTopLeftBottomRightNode.Parent as SplitNode)!;
+		RightTopLeftNode = (RightTopLeftBottomNode.Parent as SplitNode)!;
+		RightTopRightNode = (RightTopRight1Node.Parent as SplitNode)!;
+		RightTopNode = (RightTopRightNode.Parent as SplitNode)!;
+		RightNode = (RightBottomNode.Parent as SplitNode)!;
+
+		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftBottomRightTopWindow.Object);
+		Engine.MoveFocusedWindowEdgeInDirection(Direction.Down, 0.05);
 	}
 }

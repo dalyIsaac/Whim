@@ -55,4 +55,26 @@ public class TestParents
 
 		Assert.Null(Node.GetCommonParent(leftAncestors, illegalAncestors));
 	}
+
+	[Fact]
+	public void GetCommonParent_Left_Empty()
+	{
+		TestTree engine = new();
+
+		Node[] leftAncestors = engine.Left.GetLineage().ToArray();
+		Node[] emptyAncestors = new Node[0];
+
+		Assert.Null(Node.GetCommonParent(leftAncestors, emptyAncestors));
+	}
+
+	[Fact]
+	public void GetCommonParent_Empty_Right()
+	{
+		TestTree engine = new();
+
+		Node[] emptyAncestors = new Node[0];
+		Node[] rightAncestors = engine.Right.GetLineage().ToArray();
+
+		Assert.Null(Node.GetCommonParent(emptyAncestors, rightAncestors));
+	}
 }

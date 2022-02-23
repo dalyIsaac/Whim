@@ -38,16 +38,16 @@ public partial class TreeLayoutEngine
 
 		NodeLocation childLocation = new(rootLocation);
 
-		foreach (Node child in parent.Children)
+		foreach ((double weight, Node child) in parent)
 		{
 			// Set up the width/height of the child.
 			if (parent.Direction == NodeDirection.Right)
 			{
-				childLocation.Width = child.Weight * rootLocation.Width;
+				childLocation.Width = weight * rootLocation.Width;
 			}
 			else if (parent.Direction == NodeDirection.Down)
 			{
-				childLocation.Height = child.Weight * rootLocation.Height;
+				childLocation.Height = weight * rootLocation.Height;
 			}
 
 			if (childLocation.IsPointInside(searchPoint.X, searchPoint.Y))
@@ -95,7 +95,15 @@ public partial class TreeLayoutEngine
 		}
 
 		SplitNode parent = node.Parent;
-		(double weight, double precedingWeight) = GetWeightAndIndex(parent, node);
+		var result = parent.GetWeightAndPrecedingWeight(node);
+
+		if (result == null)
+		{
+			return location;
+		}
+
+		double weight = result.Value.weight;
+		double precedingWeight = result.Value.precedingWeight;
 
 		// We translate by the preceding weight.
 		// We then scale by the weight.
@@ -116,30 +124,6 @@ public partial class TreeLayoutEngine
 	}
 
 	/// <summary>
-	/// Gets the weight and index of a node within its parent.
-	/// </summary>
-	/// <param name="parent">The parent node.</param>
-	/// <param name="node">The node to get the weight and index for.</param>
-	public static (double weight, double precedingWeight) GetWeightAndIndex(SplitNode parent, Node node)
-	{
-		int idx = parent.Children.IndexOf(node);
-		double weight, precedingWeight;
-
-		if (parent.EqualWeight)
-		{
-			weight = 1d / parent.Children.Count;
-			precedingWeight = idx * weight;
-		}
-		else
-		{
-			weight = node.Weight;
-			precedingWeight = parent.Children.Take(idx).Sum(child => child.Weight);
-		}
-
-		return (weight, precedingWeight);
-	}
-
-	/// <summary>
 	/// Gets the <see cref="WindowLocation"/> for all windows, within the unit square.
 	/// </summary>
 	/// <returns></returns>
@@ -157,10 +141,8 @@ public partial class TreeLayoutEngine
 
 		// Perform an in-order traversal of the tree.
 		double precedingWeight = 0;
-		foreach (Node child in parent.Children)
+		foreach ((double weight, Node child) in parent)
 		{
-			double weight = parent.EqualWeight ? 1d / parent.Children.Count : child.Weight;
-
 			Location childLocation = new(
 				x: location.X,
 				y: location.Y,

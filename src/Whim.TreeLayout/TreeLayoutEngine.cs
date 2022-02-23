@@ -25,8 +25,6 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Name = name;
 	}
 
-	// TODO: handle chords
-	// TODO: fix tests
 	public void Add(IWindow window, NodeDirection direction)
 	{
 		Direction = direction;
@@ -65,7 +63,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out LeafNode? focusedLeaf))
 		{
 			// We can't find the focused window, so we'll just add it to the right-most node.
-			focusedLeaf = Root.GetRightMostLeaf();
+			focusedLeaf = Root switch
+			{
+				LeafNode leaf => leaf,
+				SplitNode split => split.GetRightMostLeaf(),
+				_ => null
+			};
 		}
 
 		if (focusedLeaf == null)
@@ -79,17 +82,9 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		if (focusedLeaf.Parent == null)
 		{
 			// Create a new split node
-			SplitNode splitNode = new(Direction)
-			{
-				EqualWeight = true,
-				Children = new List<Node>() { focusedLeaf, newLeaf }
-			};
-
-			focusedLeaf.Parent = splitNode;
-			focusedLeaf.Weight = 0.5;
-
-			newLeaf.Parent = splitNode;
-			newLeaf.Weight = 0.5;
+			SplitNode splitNode = new(Direction);
+			splitNode.Add(focusedLeaf);
+			splitNode.Add(newLeaf);
 
 			Root = splitNode;
 			return newLeaf;
@@ -100,48 +95,18 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// add the window to the split node.
 		if (parent.Direction == Direction)
 		{
-			parent.Children.Add(newLeaf);
-			newLeaf.Parent = parent;
-
-			if (parent.EqualWeight)
-			{
-				// We need to distribute the weight evenly.
-				foreach (Node child in parent.Children)
-				{
-					child.Weight = 1d / parent.Children.Count;
-				}
-			}
-			else
-			{
-				// Split the existingLeaf in half.
-				newLeaf.Weight = focusedLeaf.Weight / 2;
-				focusedLeaf.Weight /= 2;
-			}
-
+			parent.Add(newLeaf);
 			return newLeaf;
 		}
 
 		// If the parent node is a split node and the direction doesn't match, then we need to
 		// create a new split node and add the window to the split node.
-		SplitNode newSplitNode = new(Direction)
-		{
-			EqualWeight = true,
-			Children = new List<Node> { focusedLeaf, newLeaf },
-			Weight = focusedLeaf.Weight,
-			Parent = parent
-		};
-
-		// Update the weights
-		newLeaf.Weight = 0.5;
-		newLeaf.Parent = newSplitNode;
-		focusedLeaf.Weight = 0.5;
+		SplitNode newSplitNode = new(Direction, parent);
+		newSplitNode.Add(focusedLeaf);
+		newSplitNode.Add(newLeaf);
 
 		// Update the parent node
-		int idx = parent.Children.IndexOf(focusedLeaf);
-		parent.Children[idx] = newSplitNode;
-
-		// Update the existing leaf's parent
-		focusedLeaf.Parent = newSplitNode;
+		parent.Replace(focusedLeaf, newSplitNode);
 
 		return newLeaf;
 	}
@@ -169,46 +134,27 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		SplitNode parent = removingNode.Parent;
-		bool success = parent.Children.Remove(removingNode);
+		parent.Remove(removingNode);
 
 		// If the parent node has only one child, then we need to remove the split node.
-		if (parent.Children.Count == 1)
+		if (parent.Count == 1)
 		{
-			Node child = parent.Children[0];
-			child.Parent = parent.Parent;
+			(double _, Node child) = parent[0];
+			SplitNode? grandParent = parent.Parent;
 
-			if (child.Parent == null)
+			if (grandParent == null)
 			{
 				// The parent is the root node.
 				Root = child;
+				return true;
 			}
-			else
-			{
-				child.Parent.Children.Add(child);
-				child.Parent.Children.Remove(parent);
-			}
+
+			// Since parent has just a single child, then replace parent with child.
+			grandParent.Replace(parent, child);
+			return true;
 		}
 
-		// If the parent node has more than one child, then we need to redistribute the weights.
-		else
-		{
-			if (parent.EqualWeight)
-			{
-				// We need to distribute the weight evenly.
-				foreach (Node child in parent.Children)
-				{
-					child.Weight = 100 / parent.Children.Count;
-				}
-			}
-			else
-			{
-				// Give the extra weight to the last child.
-				Node lastChild = parent.Children[^1];
-				lastChild.Weight += removingNode.Weight;
-			}
-		}
-
-		return success;
+		return true;
 	}
 
 	public IWindow? GetFirstWindow()
@@ -327,7 +273,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// Get the common parent node.
 		Node[] focusedNodeParents = focusedNode.GetLineage().ToArray();
 		Node[] adjacentNodeParents = adjacentNode.GetLineage().ToArray();
-		Node? parentNode = Node.GetCommonParent(focusedNodeParents, adjacentNodeParents);
+		SplitNode? parentNode = Node.GetCommonParent(focusedNodeParents, adjacentNodeParents);
 
 		if (parentNode == null)
 		{
@@ -374,8 +320,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Node focusedAncestorNode = focusedNodeParents[focusedNodeParents.Length - parentDepth - 2];
 		Node adjacentAncestorNode = adjacentNodeParents[adjacentNodeParents.Length - parentDepth - 2];
 
-		focusedAncestorNode.Weight += relativeDelta;
-		adjacentAncestorNode.Weight -= relativeDelta;
+		parentNode.AdjustChildWeight(focusedAncestorNode, relativeDelta);
+		parentNode.AdjustChildWeight(adjacentAncestorNode, -relativeDelta);
 	}
 
 	/// <summary>

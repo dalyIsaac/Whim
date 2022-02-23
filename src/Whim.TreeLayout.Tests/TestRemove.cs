@@ -98,9 +98,11 @@ public class TestRemove
 		// The root should be a split node, with two children.
 		Assert.True(engine.Remove(rightWindow1.Object));
 		Assert.True(engine.Root is SplitNode);
-		Assert.Equal(2, (engine.Root as SplitNode)?.Children.Count);
-		Assert.Equal(leftWindow.Object, ((engine.Root as SplitNode)?.Children[0] as LeafNode)?.Window);
-		Assert.Equal(rightWindow2.Object, ((engine.Root as SplitNode)?.Children[1] as LeafNode)?.Window);
+
+		SplitNode root = (engine.Root as SplitNode)!;
+		Assert.Equal(2, root.Count);
+		Assert.Equal(leftWindow.Object, (root[0].node as LeafNode)?.Window);
+		Assert.Equal(rightWindow2.Object, (root[1].node as LeafNode)?.Window);
 	}
 
 	/// <summary>
@@ -134,8 +136,10 @@ public class TestRemove
 		// The root should be a split node, with three children.
 		Assert.True(engine.Remove(window2.Object));
 		Assert.True(engine.Root is SplitNode);
-		Assert.Equal(2, (engine.Root as SplitNode)?.Children.Count);
-		Assert.Equal(window1.Object, ((engine.Root as SplitNode)?.Children[0] as LeafNode)?.Window);
-		Assert.Equal(window3.Object, ((engine.Root as SplitNode)?.Children[1] as LeafNode)?.Window);
+
+		SplitNode root = (engine.Root as SplitNode)!;
+		Assert.Equal(2, root.Count);
+		Assert.Equal(window1.Object, (root[0].node as LeafNode)?.Window);
+		Assert.Equal(window3.Object, (root[1].node as LeafNode)?.Window);
 	}
 }

@@ -49,18 +49,18 @@ namespace Whim.TreeLayout.Tests;
 /// </summary>
 internal class TestTree
 {
-	public SplitNode Root;
+	public TestSplitNode Root;
 	public LeafNode Left;
-	public SplitNode Right;
-	public SplitNode RightTop;
-	public SplitNode RightTopLeft;
+	public TestSplitNode Right;
+	public TestSplitNode RightTop;
+	public TestSplitNode RightTopLeft;
 	public LeafNode RightTopLeftTop;
-	public SplitNode RightTopLeftBottom;
+	public TestSplitNode RightTopLeftBottom;
 	public LeafNode RightTopLeftBottomLeft;
-	public SplitNode RightTopLeftBottomRight;
+	public TestSplitNode RightTopLeftBottomRight;
 	public LeafNode RightTopLeftBottomRightTop;
 	public LeafNode RightTopLeftBottomRightBottom;
-	public SplitNode RightTopRight;
+	public TestSplitNode RightTopRight;
 	public LeafNode RightTopRight1;
 	public LeafNode RightTopRight2;
 	public LeafNode RightTopRight3;
@@ -88,66 +88,60 @@ internal class TestTree
 		rightTopRight3Window ??= new Mock<IWindow>();
 		rightBottomWindow ??= new Mock<IWindow>();
 
-		Root = new SplitNode(NodeDirection.Right);
+		Root = new TestSplitNode(NodeDirection.Right);
 
 		// left
-		Left = new LeafNode(leftWindow.Object, Root) { Weight = 0.5 };
-		Root.Children.Add(Left);
+		Left = new LeafNode(leftWindow.Object, Root);
 
 		// Right
-		Right = new SplitNode(NodeDirection.Down, Root) { Weight = 0.5 };
-		Root.Children.Add(Right);
+		Right = new TestSplitNode(NodeDirection.Down, Root);
 
 		// RightTop
-		RightTop = new SplitNode(NodeDirection.Right, Right) { Weight = 0.5 };
-		Right.Children.Add(RightTop);
+		RightTop = new TestSplitNode(NodeDirection.Right, Right);
 
 		// RightTopLeft
-		RightTopLeft = new SplitNode(NodeDirection.Down, RightTop) { Weight = 0.5 };
-		RightTop.Children.Add(RightTopLeft);
+		RightTopLeft = new TestSplitNode(NodeDirection.Down, RightTop);
 
 		// RightBottom
-		RightBottom = new LeafNode(rightBottomWindow.Object, Right) { Weight = 0.5 };
-		Right.Children.Add(RightBottom);
+		RightBottom = new LeafNode(rightBottomWindow.Object, Right);
 
 		// RightTopLeftTop
-		RightTopLeftTop = new LeafNode(rightTopLeftTopWindow.Object, RightTopLeft) { Weight = 0.5 };
-		RightTopLeft.Children.Add(RightTopLeftTop);
+		RightTopLeftTop = new LeafNode(rightTopLeftTopWindow.Object, RightTopLeft);
 
 		// RightTopLeftBottom
-		RightTopLeftBottom = new SplitNode(NodeDirection.Right, RightTopLeft) { Weight = 0.5 };
-		RightTopLeft.Children.Add(RightTopLeftBottom);
+		RightTopLeftBottom = new TestSplitNode(NodeDirection.Right, RightTopLeft);
 
 		// RightTopLeftBottomLeft
-		RightTopLeftBottomLeft = new LeafNode(rightTopLeftBottomLeftWindow.Object, RightTopLeftBottom) { Weight = 0.5 };
-		RightTopLeftBottom.Children.Add(RightTopLeftBottomLeft);
+		RightTopLeftBottomLeft = new LeafNode(rightTopLeftBottomLeftWindow.Object, RightTopLeftBottom);
 
 		// RightTopLeftBottomRight
-		RightTopLeftBottomRight = new SplitNode(NodeDirection.Down, RightTopLeftBottom) { Weight = 0.5, EqualWeight = false };
-		RightTopLeftBottom.Children.Add(RightTopLeftBottomRight);
+		RightTopLeftBottomRight = new TestSplitNode(NodeDirection.Down, RightTopLeftBottom);
 
 		// RightTopLeftBottomRightTop
-		RightTopLeftBottomRightTop = new LeafNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight) { Weight = 0.7 };
-		RightTopLeftBottomRight.Children.Add(RightTopLeftBottomRightTop);
+		RightTopLeftBottomRightTop = new LeafNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight);
 
 		// RightTopLeftBottomRightBottom
-		RightTopLeftBottomRightBottom = new LeafNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight) { Weight = 0.3 };
-		RightTopLeftBottomRight.Children.Add(RightTopLeftBottomRightBottom);
+		RightTopLeftBottomRightBottom = new LeafNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight);
 
 		// RightTopRight
-		RightTopRight = new SplitNode(NodeDirection.Down, RightTop) { Weight = 0.5 };
-		RightTop.Children.Add(RightTopRight);
+		RightTopRight = new TestSplitNode(NodeDirection.Down, RightTop);
 
 		// RightTopRight1
-		RightTopRight1 = new LeafNode(rightTopRight1Window.Object, RightTopRight) { Weight = 1d / 3 };
-		RightTopRight.Children.Add(RightTopRight1);
+		RightTopRight1 = new LeafNode(rightTopRight1Window.Object, RightTopRight);
 
 		// RightTopRight2
-		RightTopRight2 = new LeafNode(rightTopRight2Window.Object, RightTopRight) { Weight = 1d / 3 };
-		RightTopRight.Children.Add(RightTopRight2);
+		RightTopRight2 = new LeafNode(rightTopRight2Window.Object, RightTopRight);
 
 		// RightTopRight3
-		RightTopRight3 = new LeafNode(rightTopRight3Window.Object, RightTopRight) { Weight = 1d / 3 };
-		RightTopRight.Children.Add(RightTopRight3);
+		RightTopRight3 = new LeafNode(rightTopRight3Window.Object, RightTopRight);
+
+		// Initialize the split nodes.
+		Root.Initialize(new List<Node> { Left, Right }, new List<double> { 0.5, 0.5 });
+		Right.Initialize(new List<Node> { RightTop, RightBottom }, new List<double> { 0.5, 0.5 });
+		RightTop.Initialize(new List<Node> { RightTopLeft, RightTopRight }, new List<double> { 0.5, 0.5 });
+		RightTopLeft.Initialize(new List<Node> { RightTopLeftTop, RightTopLeftBottom }, new List<double> { 0.5, 0.5 });
+		RightTopLeftBottom.Initialize(new List<Node> { RightTopLeftBottomLeft, RightTopLeftBottomRight }, new List<double> { 0.5, 0.5 });
+		RightTopLeftBottomRight.Initialize(new List<Node> { RightTopLeftBottomRightTop, RightTopLeftBottomRightBottom }, new List<double> { 0.7, 0.3 });
+		RightTopRight.Initialize(new List<Node> { RightTopRight1, RightTopRight2, RightTopRight3 }, new List<double> { 1d / 3, 1d / 3, 1d / 3 });
 	}
 }

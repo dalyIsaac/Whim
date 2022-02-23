@@ -4,24 +4,11 @@ namespace Whim.TreeLayout;
 
 public abstract class Node
 {
-	public SplitNode? Parent { get; set; }
-
-	private double _weight = 1;
-	public double Weight
-	{
-		get => Parent?.EqualWeight == true ? 1d / Parent.Children.Count : _weight;
-		set
-		{
-			_weight = value;
-			if (Parent != null)
-			{
-				Parent.EqualWeight = false;
-			}
-		}
-	}
+	public SplitNode? Parent { get; internal set; }
 
 	/// <summary>
 	/// The lineage of this node (i.e., the path from this node to the root).
+	/// This node is returned first, and the root is returned last.
 	/// </summary>
 	public IEnumerable<Node> GetLineage()
 	{
@@ -33,35 +20,43 @@ public abstract class Node
 		}
 	}
 
+	/// <summary>
+	/// Gets the left-most node in the tree. Left-most refers to the node's
+	/// position in the tree, not the position in the screen.
+	/// </summary>
 	public LeafNode? GetLeftMostLeaf()
 	{
 		Node node = this;
 
 		while (node is SplitNode splitNode)
 		{
-			if (splitNode.Children.Count == 0)
+			if (splitNode.Count == 0)
 			{
 				return null;
 			}
 
-			node = splitNode.Children[0];
+			(double _, node) = splitNode[0];
 		}
 
 		return (LeafNode)node;
 	}
 
+	/// <summary>
+	/// Gets the right-most node in the tree. Right-most refers to the node's
+	/// position in the tree, not the position in the screen.
+	/// </summary>
 	public LeafNode? GetRightMostLeaf()
 	{
 		Node node = this;
 
 		while (node is SplitNode splitNode)
 		{
-			if (splitNode.Children.Count == 0)
+			if (splitNode.Count == 0)
 			{
 				return null;
 			}
 
-			node = splitNode.Children[^1];
+			(double _, node) = splitNode[^1];
 		}
 
 		return (LeafNode)node;
@@ -80,7 +75,7 @@ public abstract class Node
 		return depth;
 	}
 
-	public static Node? GetCommonParent(Node[] aParents, Node[] bParents)
+	public static SplitNode? GetCommonParent(Node[] aParents, Node[] bParents)
 	{
 		if (aParents.Length == 0 || bParents.Length == 0)
 		{
@@ -106,6 +101,10 @@ public abstract class Node
 			return null;
 		}
 
-		return aParents[aIdx + 1];
+		if (aParents[aIdx + 1] is SplitNode aSplitNode)
+		{
+			return aSplitNode;
+		}
+		return null;
 	}
 }
