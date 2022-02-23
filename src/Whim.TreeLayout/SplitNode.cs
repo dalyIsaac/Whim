@@ -5,6 +5,10 @@ using System.Linq;
 
 namespace Whim.TreeLayout;
 
+/// <summary>
+/// SplitNodes dictate the layout of the windows. They have a specific direction, and
+/// children.
+/// </summary>
 public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 {
 	/// <summary>
@@ -16,15 +20,23 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <summary>
 	/// The direction to split the <see cref="_children"/>.
 	/// </summary>
-	public NodeDirection Direction { get; set; }
+	public SplitNodeDirection Direction { get; set; }
 
+	/// <summary>
+	/// The weights of the children. If <see cref="EqualWeight"/> is <see langword="true"/>, then
+	/// the weights here are ignored in favour of <code>1d / _children.Count</code>.
+	/// </summary>
 	protected readonly List<double> _weights = new();
 
+	/// <summary>
+	/// The child nodes of this <see cref="SplitNode"/>. These can be either <see cref="SplitNode"/>s
+	/// or <see cref="LeafNode"/>s.
+	/// </summary>
 	protected readonly List<Node> _children = new();
 
 	public int Count => _children.Count;
 
-	public SplitNode(NodeDirection direction, SplitNode? parent = null)
+	public SplitNode(SplitNodeDirection direction, SplitNode? parent = null)
 	{
 		Parent = parent;
 		Direction = direction;
@@ -35,18 +47,25 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		_children[index]
 	);
 
+	/// <summary>
+	/// Add the given node as a child of this <see cref="SplitNode"/>. This assumes that
+	/// the window has already been added to the layout engine.
+	/// This method will also update <paramref name="node"/>'s <see cref="Node.Parent"/>
+	/// </summary>
+	/// <param name="node"></param>
 	internal void Add(Node node)
 	{
-		// See https://stackoverflow.com/questions/27242588/cannot-access-protected-member
 		node.Parent = this;
 		_children.Add(node);
 
 		if (EqualWeight || _weights.Count == 0)
 		{
+			// Add the weight 1d, since it doesn't matter.
 			_weights.Add(1d);
 		}
 		else
 		{
+			// Take half of the last window's space.
 			double half = _weights[^1] / 2;
 			_weights[^1] = half;
 			_weights.Add(half);
@@ -100,6 +119,13 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+	/// <summary>
+	/// Replace the old node with the new node, in this <see cref="SplitNode"/>'s list of children.
+	/// This does not update the <see cref="Node.Parent"/> or children of the old node.
+	/// </summary>
+	/// <param name="oldNode">The node to be replaced.</param>
+	/// <param name="newNode">The node to take the place of the old node.</param>
+	/// <returns><see langword="true"/> if the node was found and replaced, <see langword="false"/> otherwise.</returns>
 	internal bool Replace(Node oldNode, Node newNode)
 	{
 		int idx = _children.IndexOf(oldNode);
@@ -109,19 +135,11 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return false;
 		}
 
-		Replace(idx, newNode);
-		return true;
-	}
-
-	internal void Replace(int idx, Node newNode)
-	{
+		// Replace the child at idx with the new node.
 		_children[idx] = newNode;
+		newNode.Parent = this;
 
-		// Update the parent references.
-		foreach (Node child in _children)
-		{
-			child.Parent = this;
-		}
+		return true;
 	}
 
 	internal void AdjustChildWeight(Node node, double delta)

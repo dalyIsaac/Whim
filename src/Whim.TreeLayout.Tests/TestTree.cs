@@ -88,19 +88,19 @@ internal class TestTree
 		rightTopRight3Window ??= new Mock<IWindow>();
 		rightBottomWindow ??= new Mock<IWindow>();
 
-		Root = new TestSplitNode(NodeDirection.Right);
+		Root = new TestSplitNode(SplitNodeDirection.Right);
 
 		// left
 		Left = new LeafNode(leftWindow.Object, Root);
 
 		// Right
-		Right = new TestSplitNode(NodeDirection.Down, Root);
+		Right = new TestSplitNode(SplitNodeDirection.Down, Root);
 
 		// RightTop
-		RightTop = new TestSplitNode(NodeDirection.Right, Right);
+		RightTop = new TestSplitNode(SplitNodeDirection.Right, Right);
 
 		// RightTopLeft
-		RightTopLeft = new TestSplitNode(NodeDirection.Down, RightTop);
+		RightTopLeft = new TestSplitNode(SplitNodeDirection.Down, RightTop);
 
 		// RightBottom
 		RightBottom = new LeafNode(rightBottomWindow.Object, Right);
@@ -109,13 +109,13 @@ internal class TestTree
 		RightTopLeftTop = new LeafNode(rightTopLeftTopWindow.Object, RightTopLeft);
 
 		// RightTopLeftBottom
-		RightTopLeftBottom = new TestSplitNode(NodeDirection.Right, RightTopLeft);
+		RightTopLeftBottom = new TestSplitNode(SplitNodeDirection.Right, RightTopLeft);
 
 		// RightTopLeftBottomLeft
 		RightTopLeftBottomLeft = new LeafNode(rightTopLeftBottomLeftWindow.Object, RightTopLeftBottom);
 
 		// RightTopLeftBottomRight
-		RightTopLeftBottomRight = new TestSplitNode(NodeDirection.Down, RightTopLeftBottom);
+		RightTopLeftBottomRight = new TestSplitNode(SplitNodeDirection.Down, RightTopLeftBottom);
 
 		// RightTopLeftBottomRightTop
 		RightTopLeftBottomRightTop = new LeafNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight);
@@ -124,7 +124,7 @@ internal class TestTree
 		RightTopLeftBottomRightBottom = new LeafNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight);
 
 		// RightTopRight
-		RightTopRight = new TestSplitNode(NodeDirection.Down, RightTop);
+		RightTopRight = new TestSplitNode(SplitNodeDirection.Down, RightTop);
 
 		// RightTopRight1
 		RightTopRight1 = new LeafNode(rightTopRight1Window.Object, RightTopRight);

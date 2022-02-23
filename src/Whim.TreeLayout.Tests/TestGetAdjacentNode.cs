@@ -20,7 +20,7 @@ public class TestGetAdjacentNode
 		_configContext.Setup(c => c.MonitorManager).Returns(_monitorManager.Object);
 	}
 
-		#region GetAdjacentNode
+	#region GetAdjacentNode
 	/// <summary>
 	/// There is no node to the left of Left.
 	/// </summary>

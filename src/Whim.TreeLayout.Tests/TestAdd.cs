@@ -57,9 +57,9 @@ public class TestAdd
 		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 
 		TreeLayoutEngine engine = new(configContext.Object);
-		engine.Direction = NodeDirection.Right;
+		engine.FocusDirection = SplitNodeDirection.Right;
 
-		SplitNode splitNode = new(NodeDirection.Right);
+		SplitNode splitNode = new(SplitNodeDirection.Right);
 
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();

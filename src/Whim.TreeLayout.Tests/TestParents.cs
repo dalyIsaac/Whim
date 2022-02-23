@@ -51,7 +51,7 @@ public class TestParents
 		TestTree engine = new();
 
 		Node[] leftAncestors = engine.Left.GetLineage().ToArray();
-		Node[] illegalAncestors = new[] { new SplitNode(NodeDirection.Right) };
+		Node[] illegalAncestors = new[] { new SplitNode(SplitNodeDirection.Right) };
 
 		Assert.Null(Node.GetCommonParent(leftAncestors, illegalAncestors));
 	}

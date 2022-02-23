@@ -2,6 +2,9 @@ using System;
 
 namespace Whim.TreeLayout;
 
+/// <summary>
+/// LeafNodes represent the location of a window.
+/// </summary>
 public class LeafNode : Node
 {
 	public IWindow Window { get; set; }

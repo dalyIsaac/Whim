@@ -9,7 +9,11 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
 	public Node? Root { get; private set; }
-	public NodeDirection Direction = NodeDirection.Right;
+
+	/// <summary>
+	/// The direction which we will use for any following operations.
+	/// </summary>
+	public SplitNodeDirection FocusDirection = SplitNodeDirection.Right;
 
 	public string Name { get; set; }
 
@@ -25,12 +29,25 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Name = name;
 	}
 
-	public void Add(IWindow window, NodeDirection direction)
+	/// <summary>
+	/// Add the <paramref name="window"/> to the layout engine, in a
+	/// <paramref name="direction"/> to the currently focused window.
+	/// </summary>
+	/// <param name="window">The window to add.</param>
+	/// <param name="direction">
+	/// The direction to add the window, in relation to the currently focused window.
+	/// </param>
+	public void Add(IWindow window, SplitNodeDirection direction)
 	{
-		Direction = direction;
+		FocusDirection = direction;
 		Add(window);
 	}
 
+	/// <summary>
+	/// Add the <paramref name="window"/> to the layout engine.
+	/// The direction it is added in is determined by this instance's <see cref="FocusDirection"/> property.
+	/// </summary>
+	/// <param name="window">The window to add.</param>
 	public void Add(IWindow window)
 	{
 		AddWindow(window);
@@ -40,6 +57,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// Adds a window to the layout engine, and returns the node that represents it.
 	/// Please use the <see cref="IWindow.Add"/> method instead of this method, as
 	/// the return value is used for testing.
+	/// The <paramref name="window"/> is added in the direction specified by this instance's
+	/// <see cref="FocusDirection"/> property.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
 	/// <returns>The node that represents the window.</returns>
@@ -49,8 +68,11 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Count++;
 
 		LeafNode newLeaf = new(window);
+
+		// Add the window to the window-node map.
 		_windows.Add(window, newLeaf);
 
+		// If there is no root, then the window is the new root.
 		if (Root == null)
 		{
 			Root = newLeaf;
@@ -71,6 +93,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			};
 		}
 
+		// If we really can't find a focused window, then we'll exit early.
+		// Ideally, we should never get here.
 		if (focusedLeaf == null)
 		{
 			Logger.Error($"Could not find a leaf node to add window {window.Title} to layout engine {Name}");
@@ -78,11 +102,11 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			return null;
 		}
 
-		// If the parent node is null, then it's the root and we need to create a new split node
+		// If the parent node is null, then the focused leaf is the root and we need to create a new split node.
 		if (focusedLeaf.Parent == null)
 		{
-			// Create a new split node
-			SplitNode splitNode = new(Direction);
+			// Create a new split node, and update the root.
+			SplitNode splitNode = new(FocusDirection);
 			splitNode.Add(focusedLeaf);
 			splitNode.Add(newLeaf);
 
@@ -91,9 +115,9 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		SplitNode parent = focusedLeaf.Parent;
-		// If the parent node is a split node and the direction matches, then we need to
+		// If the parent node is a split node and the direction matches, then all we need to do is
 		// add the window to the split node.
-		if (parent.Direction == Direction)
+		if (parent.Direction == FocusDirection)
 		{
 			parent.Add(newLeaf);
 			return newLeaf;
@@ -101,16 +125,22 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 		// If the parent node is a split node and the direction doesn't match, then we need to
 		// create a new split node and add the window to the split node.
-		SplitNode newSplitNode = new(Direction, parent);
+		// The focused leaf will also be added to the new split node.
+		SplitNode newSplitNode = new(FocusDirection, parent);
 		newSplitNode.Add(focusedLeaf);
 		newSplitNode.Add(newLeaf);
 
-		// Update the parent node
+		// Replace the focused leaf with the new split node.
 		parent.Replace(focusedLeaf, newSplitNode);
 
 		return newLeaf;
 	}
 
+	/// <summary>
+	/// Removes the <paramref name="window"/> from the layout engine.
+	/// </summary>
+	/// <param name="window">The window to remove.</param>
+	/// <returns><see langword="true"/> if the window was removed, <see langword="false"/> otherwise.</returns>
 	public bool Remove(IWindow window)
 	{
 		Logger.Debug($"Removing window {window.Title} from layout engine {Name}");
@@ -149,9 +179,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 				return true;
 			}
 
-			// Since parent has just a single child, then replace parent with child.
+			// Since parent had just a single child, then replace parent with child.
 			grandParent.Replace(parent, child);
-			return true;
 		}
 
 		return true;
@@ -205,6 +234,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Clearing layout engine {Name}");
 		Root = null;
+		_windows.Clear();
 	}
 
 	public bool Contains(IWindow item)
@@ -221,6 +251,10 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 	}
 
+	/// <summary>
+	/// Iterates over the windows in the layout engine.
+	/// This utilises the <see cref="DoLayout"/> method to iterate over the windows.
+	/// </summary>
 	public IEnumerator<IWindow> GetEnumerator()
 	{
 		if (Root == null)
@@ -236,7 +270,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	/// <summary>'
+	/// <summary>
 	/// The maximum relative delta for moving a window's edge, within its parent.
 	/// </summary>
 	private const double MAX_RELATIVE_DELTA = 0.5;
@@ -271,9 +305,9 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Get the common parent node.
-		Node[] focusedNodeParents = focusedNode.GetLineage().ToArray();
-		Node[] adjacentNodeParents = adjacentNode.GetLineage().ToArray();
-		SplitNode? parentNode = Node.GetCommonParent(focusedNodeParents, adjacentNodeParents);
+		Node[] focusedNodeLineage = focusedNode.GetLineage().ToArray();
+		Node[] adjacentNodeLineage = adjacentNode.GetLineage().ToArray();
+		SplitNode? parentNode = Node.GetCommonParent(focusedNodeLineage, adjacentNodeLineage);
 
 		if (parentNode == null)
 		{
@@ -285,22 +319,22 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// First, we need to find the location of the parent node.
 		ILocation<double> parentLocation = GetNodeLocation(parentNode);
 
-		bool isWidth;
-		if (edge == Whim.Direction.Left || edge == Whim.Direction.Right)
+		bool? isWidth = edge switch
 		{
-			isWidth = true;
-		}
-		else if (edge == Whim.Direction.Up || edge == Whim.Direction.Down)
-		{
-			isWidth = false;
-		}
-		else
+			Whim.Direction.Left => true,
+			Whim.Direction.Right => true,
+			Whim.Direction.Up => false,
+			Whim.Direction.Down => false,
+			_ => null
+		};
+
+		if (isWidth == null)
 		{
 			Logger.Error($"Invalid edge {edge} in layout engine {Name}");
 			return;
 		}
 
-		double relativeDelta = fractionDelta / (isWidth ? parentLocation.Width : parentLocation.Height);
+		double relativeDelta = fractionDelta / ((bool)isWidth ? parentLocation.Width : parentLocation.Height);
 
 		// We cap the relative delta to MAX_RELATIVE_DELTA of the parent node's weight, to avoid nasty cases.
 		if (relativeDelta > MAX_RELATIVE_DELTA)
@@ -317,8 +351,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// Now we can adjust the weight.
 		int parentDepth = parentNode.GetDepth();
 
-		Node focusedAncestorNode = focusedNodeParents[focusedNodeParents.Length - parentDepth - 2];
-		Node adjacentAncestorNode = adjacentNodeParents[adjacentNodeParents.Length - parentDepth - 2];
+		Node focusedAncestorNode = focusedNodeLineage[focusedNodeLineage.Length - parentDepth - 2];
+		Node adjacentAncestorNode = adjacentNodeLineage[adjacentNodeLineage.Length - parentDepth - 2];
 
 		parentNode.AdjustChildWeight(focusedAncestorNode, relativeDelta);
 		parentNode.AdjustChildWeight(adjacentAncestorNode, -relativeDelta);
@@ -336,7 +370,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </returns>
 	public LeafNode? GetAdjacentNode(LeafNode node, Direction direction)
 	{
-		Logger.Debug($"Getting node in direction {Direction} for window {node.Window.Title}");
+		Logger.Debug($"Getting node in direction {FocusDirection} for window {node.Window.Title}");
 
 		if (Root == null)
 		{

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Whim.TreeLayout;
 
@@ -41,11 +40,11 @@ public partial class TreeLayoutEngine
 		foreach ((double weight, Node child) in parent)
 		{
 			// Set up the width/height of the child.
-			if (parent.Direction == NodeDirection.Right)
+			if (parent.Direction == SplitNodeDirection.Right)
 			{
 				childLocation.Width = weight * rootLocation.Width;
 			}
-			else if (parent.Direction == NodeDirection.Down)
+			else if (parent.Direction == SplitNodeDirection.Down)
 			{
 				childLocation.Height = weight * rootLocation.Height;
 			}
@@ -63,11 +62,11 @@ public partial class TreeLayoutEngine
 			}
 
 			// Since it wasn't a match, update the position of the child.
-			if (parent.Direction == NodeDirection.Right)
+			if (parent.Direction == SplitNodeDirection.Right)
 			{
 				childLocation.X += childLocation.Width;
 			}
-			else if (parent.Direction == NodeDirection.Down)
+			else if (parent.Direction == SplitNodeDirection.Down)
 			{
 				childLocation.Y += childLocation.Height;
 			}
@@ -107,13 +106,13 @@ public partial class TreeLayoutEngine
 
 		// We translate by the preceding weight.
 		// We then scale by the weight.
-		if (parent.Direction == NodeDirection.Right)
+		if (parent.Direction == SplitNodeDirection.Right)
 		{
 			location.X *= weight;
 			location.X += precedingWeight;
 			location.Width *= weight;
 		}
-		else if (parent.Direction == NodeDirection.Down)
+		else if (parent.Direction == SplitNodeDirection.Down)
 		{
 			location.Y *= weight;
 			location.Y += precedingWeight;
@@ -151,7 +150,7 @@ public partial class TreeLayoutEngine
 			);
 
 			// NOTE: We assume that NodeDirection is always either Right or Bottom.
-			if (parent.Direction == NodeDirection.Right)
+			if (parent.Direction == SplitNodeDirection.Right)
 			{
 				childLocation.X += Convert.ToInt32(precedingWeight * location.Width);
 				childLocation.Width = Convert.ToInt32(weight * location.Width);

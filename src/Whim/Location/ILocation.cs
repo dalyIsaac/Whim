@@ -30,11 +30,23 @@ public interface ILocation<T>
 	/// </summary>
 	public bool IsPointInside(T x, T y);
 
+	/// <param name="x">The x-coordinate of the point to check.</param>
+	/// <param name="y">The y-coordinate of the point to check.</param>
+	/// <returns>
+	/// <see langword="true"/> if the location given by <paramref name="x"/> and <paramref name="y"/>
+	/// is inside <paramref name="location"/>.
+	/// </returns>
 	public static bool IsPointInside(ILocation<int> location, int x, int y) => location.X <= x
 	&& location.Y <= y
 	&& location.X + location.Width >= x
 	&& location.Y + location.Height >= y;
 
+	/// <param name="x">The x-coordinate of the point to check.</param>
+	/// <param name="y">The y-coordinate of the point to check.</param>
+	/// <returns>
+	/// <see langword="true"/> if the location given by <paramref name="x"/> and <paramref name="y"/>
+	/// is inside <paramref name="location"/>.
+	/// </returns>
 	public static bool IsPointInside(ILocation<double> location, double x, double y) => location.X <= x
 	&& location.Y <= y
 	&& location.X + location.Width > x

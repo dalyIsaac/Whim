@@ -2,13 +2,39 @@ using System;
 
 namespace Whim.TreeLayout;
 
+/// <summary>
+/// The location of a <see cref="Node"/> inside a monitor. The <see cref="NodeLocation"/>
+/// is calculated by the <see cref="TreeLayoutEngine"/>, as the tree operates inside
+/// in the unit square.
+/// The relative location of each <see cref="NodeLocation"/> is dependent on its usage.
+/// </summary>
 public class NodeLocation : ILocation<double>
 {
+	/// <summary>
+	/// The x-coordinate (top-left corner) of the node.
+	/// </summary>
 	public double X { get; set; }
+
+	/// <summary>
+	/// The y-coordinate (top-left corner) of the node.
+	/// </summary>
 	public double Y { get; set; }
+
+	/// <summary>
+	/// The width of the node. The x-coordinate of the bottom-right corner is
+	/// given by <see cref="X"/> + <see cref="Width"/>.
+	/// </summary>
 	public double Width { get; set; }
+
+	/// <summary>
+	/// The height of the node. The y-coordinate of the bottom-right corner is
+	/// given by <see cref="Y"/> + <see cref="Height"/>.
+	/// </summary>
 	public double Height { get; set; }
 
+	/// <summary>
+	/// Constructor which sets the location of the node to all zeros.
+	/// </summary>
 	public NodeLocation() {}
 
 	/// <summary>
@@ -23,6 +49,12 @@ public class NodeLocation : ILocation<double>
 		Height = location.Height;
 	}
 
+	/// <param name="x">The x-coordinate of the point to check.</param>
+	/// <param name="y">The y-coordinate of the point to check.</param>
+	/// <returns>
+	/// <see langword="true"/> if the location given by <paramref name="x"/> and <paramref name="y"/>
+	/// is inside this location.
+	/// </returns>
 	public bool IsPointInside(double x, double y) => ILocation<double>.IsPointInside(this, x, y);
 
 	// override object.Equals
