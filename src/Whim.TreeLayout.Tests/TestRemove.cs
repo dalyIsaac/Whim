@@ -53,7 +53,7 @@ public class TestRemove
 		// Set up the engine
 		TreeLayoutEngine engine = new(_configContext.Object);
 		engine.Add(leftWindow.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(leftWindow.Object);
+		activeWorkspace.Setup(x => x.LastFocusedWindow).Returns(leftWindow.Object);
 		engine.Add(rightWindow.Object);
 
 		// The root should be a split node, with two children.
@@ -87,10 +87,10 @@ public class TestRemove
 		TreeLayoutEngine engine = new(_configContext.Object);
 
 		engine.Add(leftWindow.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(leftWindow.Object);
+		activeWorkspace.Setup(x => x.LastFocusedWindow).Returns(leftWindow.Object);
 
 		engine.Add(rightWindow1.Object);
-		activeWorkspace.Setup(x => x.FocusedWindow).Returns(rightWindow1.Object);
+		activeWorkspace.Setup(x => x.LastFocusedWindow).Returns(rightWindow1.Object);
 
 		engine.FocusDirection = SplitNodeDirection.Down;
 		engine.Add(rightWindow2.Object);

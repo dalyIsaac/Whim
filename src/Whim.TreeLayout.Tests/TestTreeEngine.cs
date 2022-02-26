@@ -75,42 +75,42 @@ internal class TestTreeEngine
 
 		LeftNode = Engine.AddWindow(LeftWindow.Object)!;
 		Assert.NotNull(LeftNode);
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(LeftWindow.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(LeftWindow.Object);
 
 		RightTopLeftTopNode = Engine.AddWindow(RightTopLeftTopWindow.Object)!;
 		Assert.NotNull(RightTopLeftTopNode);
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftTopWindow.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftTopWindow.Object);
 
 		Engine.FocusDirection = SplitNodeDirection.Down;
 		RightBottomNode = Engine.AddWindow(RightBottomWindow.Object)!;
 		Assert.NotNull(RightBottomNode);
 
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftTopWindow.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftTopWindow.Object);
 		Engine.FocusDirection = SplitNodeDirection.Right;
 
 		RightTopRight1Node = Engine.AddWindow(RightTopRight1Window.Object)!;
 		Assert.NotNull(RightTopRight1Node);
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopRight1Window.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopRight1Window.Object);
 		Engine.FocusDirection = SplitNodeDirection.Down;
 
 		RightTopRight2Node = Engine.AddWindow(RightTopRight2Window.Object)!;
 		Assert.NotNull(RightTopRight2Node);
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopRight2Window.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopRight2Window.Object);
 
 		RightTopRight3Node = Engine.AddWindow(RightTopRight3Window.Object)!;
 		Assert.NotNull(RightTopRight3Node);
 
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftTopWindow.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftTopWindow.Object);
 		Engine.FocusDirection = SplitNodeDirection.Down;
 
 		RightTopLeftBottomLeftNode = Engine.AddWindow(RightTopLeftBottomLeftWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomLeftNode);
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftBottomLeftWindow.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftBottomLeftWindow.Object);
 		Engine.FocusDirection = SplitNodeDirection.Right;
 
 		RightTopLeftBottomRightTopNode = Engine.AddWindow(RightTopLeftBottomRightTopWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomRightTopNode);
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftBottomRightTopWindow.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftBottomRightTopWindow.Object);
 		Engine.FocusDirection = SplitNodeDirection.Down;
 
 		RightTopLeftBottomRightBottomNode = Engine.AddWindow(RightTopLeftBottomRightBottomWindow.Object)!;
@@ -125,7 +125,7 @@ internal class TestTreeEngine
 		RightTopNode = (RightTopRightNode.Parent as SplitNode)!;
 		RightNode = (RightBottomNode.Parent as SplitNode)!;
 
-		ActiveWorkspace.Setup(x => x.FocusedWindow).Returns(RightTopLeftBottomRightTopWindow.Object);
+		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftBottomRightTopWindow.Object);
 		Engine.MoveFocusedWindowEdgeInDirection(Direction.Down, 0.05);
 	}
 }

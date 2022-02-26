@@ -55,7 +55,7 @@ public interface IWorkspace : ICommandable
 	/// <summary>
 	/// The currently focused window.
 	/// </summary>
-	public IWindow? FocusedWindow { get; }
+	public IWindow? LastFocusedWindow { get; }
 
 	/// <summary>
 	/// Adds the window to the workspace.

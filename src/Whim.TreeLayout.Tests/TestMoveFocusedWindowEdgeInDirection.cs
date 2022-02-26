@@ -12,7 +12,7 @@ public class TestMoveFocusedWindowEdgeInDirection
 	{
 		TestTree tree = new();
 		TestTreeEngine testEngine = new();
-		testEngine.ActiveWorkspace.Setup(w => w.FocusedWindow).Returns(testEngine.LeftWindow.Object);
+		testEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testEngine.LeftWindow.Object);
 
 		testEngine.Engine.MoveFocusedWindowEdgeInDirection(Direction.Left, 0.1);
 		Assert.Equal(tree.Left.GetWeight(), testEngine.LeftNode.GetWeight());
@@ -26,7 +26,7 @@ public class TestMoveFocusedWindowEdgeInDirection
 	public void MoveFocusedWindowEdgeInDirection_Left_Right()
 	{
 		TestTreeEngine testEngine = new();
-		testEngine.ActiveWorkspace.Setup(w => w.FocusedWindow).Returns(testEngine.LeftWindow.Object);
+		testEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testEngine.LeftWindow.Object);
 
 		testEngine.Engine.MoveFocusedWindowEdgeInDirection(Direction.Right, 0.1);
 		Assert.Equal(0.5 + 0.1, testEngine.LeftNode.GetWeight());
@@ -40,7 +40,7 @@ public class TestMoveFocusedWindowEdgeInDirection
 	public void MoveFocusedWindowEdgeInDirection_RightTopLeftBottomLeft_Left()
 	{
 		TestTreeEngine testEngine = new();
-		testEngine.ActiveWorkspace.Setup(w => w.FocusedWindow).Returns(testEngine.RightTopLeftBottomLeftWindow.Object);
+		testEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testEngine.RightTopLeftBottomLeftWindow.Object);
 
 		testEngine.Engine.MoveFocusedWindowEdgeInDirection(Direction.Left, 0.1);
 		Assert.Equal(0.5 + 0.1, testEngine.RightBottomNode.Parent?.GetWeight());
@@ -54,7 +54,7 @@ public class TestMoveFocusedWindowEdgeInDirection
 	public void MoveFocusedWindowEdgeInDirection_RightBottom_Up()
 	{
 		TestTreeEngine testEngine = new();
-		testEngine.ActiveWorkspace.Setup(w => w.FocusedWindow).Returns(testEngine.RightBottomWindow.Object);
+		testEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testEngine.RightBottomWindow.Object);
 
 		testEngine.Engine.MoveFocusedWindowEdgeInDirection(Direction.Up, 0.1);
 		Assert.Equal(0.5 + 0.1, testEngine.RightBottomNode.GetWeight());
@@ -68,7 +68,7 @@ public class TestMoveFocusedWindowEdgeInDirection
 	public void MoveFocusedWindowEdgeInDirection_RightTopRight3_Down()
 	{
 		TestTreeEngine testEngine = new();
-		testEngine.ActiveWorkspace.Setup(w => w.FocusedWindow).Returns(testEngine.RightTopRight3Window.Object);
+		testEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testEngine.RightTopRight3Window.Object);
 
 		testEngine.Engine.MoveFocusedWindowEdgeInDirection(Direction.Down, 0.1);
 		Assert.Equal(0.5 + 0.1, testEngine.RightTopRight3Node.Parent?.Parent?.GetWeight());

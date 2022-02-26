@@ -270,7 +270,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
 	{
-		window ??= ActiveWorkspace.FocusedWindow;
+		window ??= ActiveWorkspace.LastFocusedWindow;
 		if (window == null)
 		{
 			Logger.Error("No window was found");
@@ -291,7 +291,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
 	{
-		window ??= ActiveWorkspace.FocusedWindow;
+		window ??= ActiveWorkspace.LastFocusedWindow;
 		if (window == null)
 		{
 			Logger.Error("No window was found");

@@ -21,7 +21,10 @@ public class Workspace : IWorkspace
 		}
 	}
 
-	public IWindow? FocusedWindow { get; private set; }
+	/// <summary>
+	/// The last focused window in this workspace.
+	/// </summary>
+	public IWindow? LastFocusedWindow { get; private set; }
 
 	private readonly List<ILayoutEngine> _layoutEngines = new();
 	private int _activeLayoutEngineIndex = 0;
@@ -98,7 +101,7 @@ public class Workspace : IWorkspace
 	{
 		if (_windows.Contains(e.Window))
 		{
-			FocusedWindow = e.Window;
+			LastFocusedWindow = e.Window;
 			Logger.Debug($"Focused window {e.Window} in workspace {Name}");
 		}
 	}
@@ -204,6 +207,11 @@ public class Workspace : IWorkspace
 	{
 		Logger.Debug($"Removing window {window} from workspace {Name}");
 
+		if (LastFocusedWindow == window)
+		{
+			LastFocusedWindow = null;
+		}
+
 		if (!_windows.Contains(window))
 		{
 			Logger.Error($"Window {window} already does not exist in workspace {Name}");
@@ -244,7 +252,7 @@ public class Workspace : IWorkspace
 
 	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
-		window ??= FocusedWindow;
+		window ??= LastFocusedWindow;
 		if (window == null)
 		{
 			Logger.Error($"No window to swap in workspace {Name}");

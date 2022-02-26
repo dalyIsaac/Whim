@@ -80,7 +80,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Get the focused window node
-		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.FocusedWindow;
+		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
 		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out LeafNode? focusedLeaf))
 		{
@@ -304,7 +304,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Moving focused window edge in direction {edge} by {fractionDelta} in layout engine {Name}");
 
-		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.FocusedWindow;
+		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 		if (focusedWindow == null)
 		{
 			Logger.Error($"No focused window in layout engine {Name}");
