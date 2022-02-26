@@ -40,6 +40,12 @@ public class LoggerConfig
 	public LoggerConfig() : this("whim.log") { }
 
 	/// <summary>
+	/// Initializes the <see cref="LoggerConfig"/> with the given base minimum log level.
+	/// </summary>
+	/// <param name="baseMinLogLevel">The base minimum log level.</param>
+	public LoggerConfig(LogLevel baseMinLogLevel) : this("whim.log", baseMinLogLevel) { }
+
+	/// <summary>
 	/// Initializes the <see cref="LoggerConfig"/> with a custom log file name.
 	/// </summary>
 	/// <param name="logFileName"></param>
