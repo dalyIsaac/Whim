@@ -41,9 +41,14 @@ public class LoggerConfig
 
 	/// <summary>
 	/// Initializes the <see cref="LoggerConfig"/> with the given base minimum log level.
+	/// The file and debug sink will both have the same minimum log level.
 	/// </summary>
 	/// <param name="baseMinLogLevel">The base minimum log level.</param>
-	public LoggerConfig(LogLevel baseMinLogLevel) : this("whim.log", baseMinLogLevel) { }
+	public LoggerConfig(LogLevel baseMinLogLevel) {
+		FileSink = new FileSinkConfig("whim.log", baseMinLogLevel);
+		DebugSink = new SinkConfig(baseMinLogLevel);
+		BaseMinLogLevel = baseMinLogLevel;
+	 }
 
 	/// <summary>
 	/// Initializes the <see cref="LoggerConfig"/> with a custom log file name.
