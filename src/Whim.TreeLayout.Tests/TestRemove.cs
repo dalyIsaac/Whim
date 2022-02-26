@@ -142,4 +142,37 @@ public class TestRemove
 		Assert.Equal(window1.Object, (root[0].node as LeafNode)?.Window);
 		Assert.Equal(window3.Object, (root[1].node as LeafNode)?.Window);
 	}
+
+	/// <summary>
+	/// Removes a child window, so that a sibling window becomes the new root.
+	/// The new root should have no parent.
+	/// </summary>
+	[Fact]
+	public void Remove_Child_RootBecomesSibling()
+	{
+		// Set up the active workspace
+		Mock<IWorkspace> activeWorkspace = new();
+		Mock<IWorkspaceManager> workspaceManager = new();
+		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(activeWorkspace.Object);
+
+		// Set up the config context
+		Mock<IConfigContext> configContext = new();
+		_configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
+
+		// Set up the windows
+		Mock<IWindow> window1 = new();
+		Mock<IWindow> window2 = new();
+
+		// Set up the engine
+		TreeLayoutEngine engine = new(_configContext.Object);
+
+		engine.Add(window1.Object);
+		engine.Add(window2.Object);
+
+		// The root should be a split node, with three children.
+		Assert.True(engine.Remove(window2.Object));
+		Assert.True(engine.Root is LeafNode);
+		Assert.Equal(window1.Object, (engine.Root as LeafNode)?.Window);
+		Assert.Null((engine.Root as LeafNode)?.Parent);
+	}
 }

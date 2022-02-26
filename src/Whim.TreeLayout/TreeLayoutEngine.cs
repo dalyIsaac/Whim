@@ -84,7 +84,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out LeafNode? focusedLeaf))
 		{
-			Logger.Information($"No focused window found. Looking for the right-most leaf node.");
+			Logger.Verbose($"No focused window found. Looking for the right-most leaf node.");
 
 			// We can't find the focused window, so we'll just add it to the right-most node.
 			focusedLeaf = Root switch
@@ -94,6 +94,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 				_ => null
 			};
 		}
+		Logger.Verbose($"Focused leaf node is {focusedLeaf}");
 
 		// If we really can't find a focused window, then we'll exit early.
 		// Ideally, we should never get here.
@@ -107,7 +108,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// If the parent node is null, then the focused leaf is the root and we need to create a new split node.
 		if (focusedLeaf.Parent == null)
 		{
-			Logger.Information($"Focused leaf node {focusedLeaf.Window.Title} is the root node. Creating a new split node.");
+			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is the root node. Creating a new split node.");
 
 			// Create a new split node, and update the root.
 			SplitNode splitNode = new(FocusDirection);
@@ -123,7 +124,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// add the window to the split node.
 		if (parent.Direction == FocusDirection)
 		{
-			Logger.Information($"Focused leaf node {focusedLeaf.Window.Title} is in a split node with direction {FocusDirection}. Adding window {window.Title} to the split node.");
+			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is in a split node with direction {FocusDirection}. Adding window {window.Title} to the split node.");
 
 			parent.Add(newLeaf);
 			return newLeaf;
@@ -132,7 +133,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// If the parent node is a split node and the direction doesn't match, then we need to
 		// create a new split node and add the window to the split node.
 		// The focused leaf will also be added to the new split node.
-		Logger.Information($"Replacing the focused leaf node {focusedLeaf.Window.Title} with a split node with direction {FocusDirection}.");
+		Logger.Verbose($"Replacing the focused leaf node {focusedLeaf.Window.Title} with a split node with direction {FocusDirection}.");
 
 		SplitNode newSplitNode = new(FocusDirection, parent);
 		newSplitNode.Add(focusedLeaf);
@@ -167,7 +168,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		if (removingNode.Parent == null)
 		{
 			// The node is the root node.
-			Logger.Information($"The removed node was the root node");
+			Logger.Verbose($"The removed node was the root node");
 
 			Root = null;
 			return true;
@@ -179,7 +180,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// If the parent node has only one child, then we need to remove the split node.
 		if (parent.Count == 1)
 		{
-			Logger.Information($"The parent node had just one child. Removing the split node.");
+			Logger.Verbose($"The parent node had just one child. Removing the split node.");
 
 			(double _, Node child) = parent[0];
 			SplitNode? grandParent = parent.Parent;
@@ -187,14 +188,15 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			if (grandParent == null)
 			{
 				// The parent is the root node.
-				Logger.Information($"The parent node was the root node");
+				Logger.Verbose($"The parent node was the root node");
 
 				Root = child;
+				child.Parent = null;
 				return true;
 			}
 
 			// Since parent had just a single child, then replace parent with child.
-			Logger.Information("Replacing parent with child");
+			Logger.Verbose("Replacing parent with child");
 			grandParent.Replace(parent, child);
 		}
 

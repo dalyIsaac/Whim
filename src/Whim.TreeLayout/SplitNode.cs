@@ -55,6 +55,8 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <param name="node"></param>
 	internal void Add(Node node)
 	{
+		Logger.Verbose($"Adding {node} to {this}");
+
 		node.Parent = this;
 		_children.Add(node);
 
