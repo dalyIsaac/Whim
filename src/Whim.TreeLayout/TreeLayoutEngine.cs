@@ -227,6 +227,11 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 		// Swap the windows.
 		(targetNode.Window, node.Window) = (node.Window, targetNode.Window);
+
+		// Update the map.
+		_windows[targetNode.Window] = targetNode;
+		_windows[node.Window] = node;
+
 		window.Focus();
 	}
 

@@ -251,7 +251,7 @@ public class Workspace : IWorkspace
 			return;
 		}
 
-		Logger.Debug($"Swapping window {window} in workspace {Name}");
+		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
 
 		if (!_windows.Contains(window))
 		{

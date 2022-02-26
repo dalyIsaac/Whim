@@ -43,6 +43,20 @@ public class TestSwapWindowInDirection
 	}
 
 	/// <summary>
+	/// Test that moving a window more than once works. This should implicitly check that the
+	/// <c>IWindow</c>-<c>LeafNode</c> is updated.
+	/// </summary>
+	[Fact]
+	public void RightTopLeftTop_Twice()
+	{
+		_testEngine.Engine.SwapWindowInDirection(Direction.Left, _testEngine.RightTopLeftTopWindow.Object);
+		_testEngine.Engine.SwapWindowInDirection(Direction.Right, _testEngine.RightTopLeftTopWindow.Object);
+
+		Assert.Equal(_testEngine.LeftNode.Window, _testEngine.LeftWindow.Object);
+		Assert.Equal(_testEngine.RightTopLeftTopNode.Window, _testEngine.RightTopLeftTopWindow.Object);
+	}
+
+	/// <summary>
 	/// Swapping Left left should do nothing.
 	/// </summary>
 	[Fact]

@@ -83,7 +83,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 
 	public override void SwapWindowInDirection(Direction direction, IWindow window)
 	{
-		Logger.Debug($"Swapping window {window} in layout engine {Name}");
+		Logger.Debug($"Swapping window {window} in layout engine {Name} in direction {direction}");
 
 		if (direction != Direction.Left && direction != Direction.Right)
 		{
