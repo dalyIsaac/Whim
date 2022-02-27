@@ -18,9 +18,10 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	public bool EqualWeight { get; protected set; } = true;
 
 	/// <summary>
-	/// The direction to split the <see cref="_children"/>.
+	/// When <see langword="true"/>, the <see cref="_children"/> are arranged horizontally.
+	/// Otherwise, they are arranged vertically.
 	/// </summary>
-	public SplitNodeDirection Direction { get; set; }
+	public bool IsHorizontal { get; private set; }
 
 	/// <summary>
 	/// The weights of the children. If <see cref="EqualWeight"/> is <see langword="true"/>, then
@@ -36,10 +37,10 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 
 	public int Count => _children.Count;
 
-	public SplitNode(SplitNodeDirection direction, SplitNode? parent = null)
+	public SplitNode(bool isHorizontal = true, SplitNode? parent = null)
 	{
 		Parent = parent;
-		Direction = direction;
+		IsHorizontal = isHorizontal;
 	}
 
 	public (double weight, Node node) this[int index] => (
@@ -223,12 +224,12 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 
 		return obj is SplitNode node &&
 			node.EqualWeight == EqualWeight &&
-			node.Direction == Direction &&
+			node.IsHorizontal == IsHorizontal &&
 			// Checking for parent equality is too dangerous, as there are cycles.
 			((node.Parent == null) == (Parent == null)) &&
 			node.SequenceEqual(this);
 	}
 
 	// override object.GetHashCode
-	public override int GetHashCode() => HashCode.Combine(EqualWeight, Direction, this);
+	public override int GetHashCode() => HashCode.Combine(EqualWeight, IsHorizontal, this);
 }

@@ -92,7 +92,7 @@ public class TestRemove
 		engine.Add(rightWindow1.Object);
 		activeWorkspace.Setup(x => x.LastFocusedWindow).Returns(rightWindow1.Object);
 
-		engine.FocusDirection = SplitNodeDirection.Down;
+		engine.AddNodeDirection = Direction.Down;
 		engine.Add(rightWindow2.Object);
 
 		// The root should be a split node, with two children.

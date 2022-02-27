@@ -13,7 +13,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// <summary>
 	/// The direction which we will use for any following operations.
 	/// </summary>
-	public SplitNodeDirection FocusDirection = SplitNodeDirection.Right;
+	public Direction AddNodeDirection = Direction.Right;
 
 	public string Name { get; set; }
 
@@ -37,15 +37,15 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// <param name="direction">
 	/// The direction to add the window, in relation to the currently focused window.
 	/// </param>
-	public void Add(IWindow window, SplitNodeDirection direction)
+	public void Add(IWindow window, Direction direction)
 	{
-		FocusDirection = direction;
+		AddNodeDirection = direction;
 		Add(window);
 	}
 
 	/// <summary>
 	/// Add the <paramref name="window"/> to the layout engine.
-	/// The direction it is added in is determined by this instance's <see cref="FocusDirection"/> property.
+	/// The direction it is added in is determined by this instance's <see cref="AddNodeDirection"/> property.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
 	public void Add(IWindow window)
@@ -58,7 +58,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// Please use the <see cref="IWindow.Add"/> method instead of this method, as
 	/// the return value is used for testing.
 	/// The <paramref name="window"/> is added in the direction specified by this instance's
-	/// <see cref="FocusDirection"/> property.
+	/// <see cref="AddNodeDirection"/> property.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
 	/// <returns>The node that represents the window.</returns>
@@ -111,7 +111,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is the root node. Creating a new split node.");
 
 			// Create a new split node, and update the root.
-			SplitNode splitNode = new(FocusDirection);
+			SplitNode splitNode = new(isHorizontal: AddNodeDirection.IsHorizontal());
 			splitNode.Add(focusedLeaf);
 			splitNode.Add(newLeaf);
 
@@ -122,9 +122,9 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		SplitNode parent = focusedLeaf.Parent;
 		// If the parent node is a split node and the direction matches, then all we need to do is
 		// add the window to the split node.
-		if (parent.Direction == FocusDirection)
+		if (parent.IsHorizontal == AddNodeDirection.IsHorizontal())
 		{
-			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is in a split node with direction {FocusDirection}. Adding window {window.Title} to the split node.");
+			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is in a split node with direction {AddNodeDirection}. Adding window {window.Title} to the split node.");
 
 			parent.Add(newLeaf);
 			return newLeaf;
@@ -133,9 +133,9 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// If the parent node is a split node and the direction doesn't match, then we need to
 		// create a new split node and add the window to the split node.
 		// The focused leaf will also be added to the new split node.
-		Logger.Verbose($"Replacing the focused leaf node {focusedLeaf.Window.Title} with a split node with direction {FocusDirection}.");
+		Logger.Verbose($"Replacing the focused leaf node {focusedLeaf.Window.Title} with a split node with direction {AddNodeDirection}.");
 
-		SplitNode newSplitNode = new(FocusDirection, parent);
+		SplitNode newSplitNode = new(isHorizontal: AddNodeDirection.IsHorizontal(), parent);
 		newSplitNode.Add(focusedLeaf);
 		newSplitNode.Add(newLeaf);
 
@@ -392,7 +392,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </returns>
 	public LeafNode? GetAdjacentNode(LeafNode node, Direction direction)
 	{
-		Logger.Debug($"Getting node in direction {FocusDirection} for window {node.Window.Title}");
+		Logger.Debug($"Getting node in direction {direction} for window {node.Window.Title}");
 
 		if (Root == null)
 		{

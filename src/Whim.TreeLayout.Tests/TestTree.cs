@@ -88,19 +88,19 @@ internal class TestTree
 		rightTopRight3Window ??= new Mock<IWindow>();
 		rightBottomWindow ??= new Mock<IWindow>();
 
-		Root = new TestSplitNode(SplitNodeDirection.Right);
+		Root = new TestSplitNode(isHorizontal: true);
 
 		// left
 		Left = new LeafNode(leftWindow.Object, Root);
 
 		// Right
-		Right = new TestSplitNode(SplitNodeDirection.Down, Root);
+		Right = new TestSplitNode(isHorizontal: false, Root);
 
 		// RightTop
-		RightTop = new TestSplitNode(SplitNodeDirection.Right, Right);
+		RightTop = new TestSplitNode(isHorizontal: true, Right);
 
 		// RightTopLeft
-		RightTopLeft = new TestSplitNode(SplitNodeDirection.Down, RightTop);
+		RightTopLeft = new TestSplitNode(isHorizontal: false, RightTop);
 
 		// RightBottom
 		RightBottom = new LeafNode(rightBottomWindow.Object, Right);
@@ -109,13 +109,13 @@ internal class TestTree
 		RightTopLeftTop = new LeafNode(rightTopLeftTopWindow.Object, RightTopLeft);
 
 		// RightTopLeftBottom
-		RightTopLeftBottom = new TestSplitNode(SplitNodeDirection.Right, RightTopLeft);
+		RightTopLeftBottom = new TestSplitNode(isHorizontal: true, RightTopLeft);
 
 		// RightTopLeftBottomLeft
 		RightTopLeftBottomLeft = new LeafNode(rightTopLeftBottomLeftWindow.Object, RightTopLeftBottom);
 
 		// RightTopLeftBottomRight
-		RightTopLeftBottomRight = new TestSplitNode(SplitNodeDirection.Down, RightTopLeftBottom);
+		RightTopLeftBottomRight = new TestSplitNode(isHorizontal: false, RightTopLeftBottom);
 
 		// RightTopLeftBottomRightTop
 		RightTopLeftBottomRightTop = new LeafNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight);
@@ -124,7 +124,7 @@ internal class TestTree
 		RightTopLeftBottomRightBottom = new LeafNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight);
 
 		// RightTopRight
-		RightTopRight = new TestSplitNode(SplitNodeDirection.Down, RightTop);
+		RightTopRight = new TestSplitNode(isHorizontal: false, RightTop);
 
 		// RightTopRight1
 		RightTopRight1 = new LeafNode(rightTopRight1Window.Object, RightTopRight);

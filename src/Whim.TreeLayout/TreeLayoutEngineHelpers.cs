@@ -40,11 +40,11 @@ public partial class TreeLayoutEngine
 		foreach ((double weight, Node child) in parent)
 		{
 			// Set up the width/height of the child.
-			if (parent.Direction == SplitNodeDirection.Right)
+			if (parent.IsHorizontal)
 			{
 				childLocation.Width = weight * rootLocation.Width;
 			}
-			else if (parent.Direction == SplitNodeDirection.Down)
+			else
 			{
 				childLocation.Height = weight * rootLocation.Height;
 			}
@@ -62,11 +62,11 @@ public partial class TreeLayoutEngine
 			}
 
 			// Since it wasn't a match, update the position of the child.
-			if (parent.Direction == SplitNodeDirection.Right)
+			if (parent.IsHorizontal)
 			{
 				childLocation.X += childLocation.Width;
 			}
-			else if (parent.Direction == SplitNodeDirection.Down)
+			else
 			{
 				childLocation.Y += childLocation.Height;
 			}
@@ -106,13 +106,13 @@ public partial class TreeLayoutEngine
 
 		// We translate by the preceding weight.
 		// We then scale by the weight.
-		if (parent.Direction == SplitNodeDirection.Right)
+		if (parent.IsHorizontal)
 		{
 			location.X *= weight;
 			location.X += precedingWeight;
 			location.Width *= weight;
 		}
-		else if (parent.Direction == SplitNodeDirection.Down)
+		else
 		{
 			location.Y *= weight;
 			location.Y += precedingWeight;
@@ -149,8 +149,7 @@ public partial class TreeLayoutEngine
 				height: location.Height
 			);
 
-			// NOTE: We assume that NodeDirection is always either Right or Bottom.
-			if (parent.Direction == SplitNodeDirection.Right)
+			if (parent.IsHorizontal)
 			{
 				childLocation.X += Convert.ToInt32(precedingWeight * location.Width);
 				childLocation.Width = Convert.ToInt32(weight * location.Width);

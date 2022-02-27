@@ -61,7 +61,7 @@ internal class TestTreeEngine
 		ConfigContext.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 
 		Engine = new(ConfigContext.Object);
-		Engine.FocusDirection = SplitNodeDirection.Right;
+		Engine.AddNodeDirection = Direction.Right;
 
 		LeftWindow.Setup(m => m.ToString()).Returns("leftWindow");
 		RightTopLeftTopWindow.Setup(m => m.ToString()).Returns("rightTopLeftTopWindow");
@@ -81,17 +81,17 @@ internal class TestTreeEngine
 		Assert.NotNull(RightTopLeftTopNode);
 		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftTopWindow.Object);
 
-		Engine.FocusDirection = SplitNodeDirection.Down;
+		Engine.AddNodeDirection = Direction.Down;
 		RightBottomNode = Engine.AddWindow(RightBottomWindow.Object)!;
 		Assert.NotNull(RightBottomNode);
 
 		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftTopWindow.Object);
-		Engine.FocusDirection = SplitNodeDirection.Right;
+		Engine.AddNodeDirection = Direction.Right;
 
 		RightTopRight1Node = Engine.AddWindow(RightTopRight1Window.Object)!;
 		Assert.NotNull(RightTopRight1Node);
 		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopRight1Window.Object);
-		Engine.FocusDirection = SplitNodeDirection.Down;
+		Engine.AddNodeDirection = Direction.Down;
 
 		RightTopRight2Node = Engine.AddWindow(RightTopRight2Window.Object)!;
 		Assert.NotNull(RightTopRight2Node);
@@ -101,17 +101,17 @@ internal class TestTreeEngine
 		Assert.NotNull(RightTopRight3Node);
 
 		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftTopWindow.Object);
-		Engine.FocusDirection = SplitNodeDirection.Down;
+		Engine.AddNodeDirection = Direction.Down;
 
 		RightTopLeftBottomLeftNode = Engine.AddWindow(RightTopLeftBottomLeftWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomLeftNode);
 		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftBottomLeftWindow.Object);
-		Engine.FocusDirection = SplitNodeDirection.Right;
+		Engine.AddNodeDirection = Direction.Right;
 
 		RightTopLeftBottomRightTopNode = Engine.AddWindow(RightTopLeftBottomRightTopWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomRightTopNode);
 		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftBottomRightTopWindow.Object);
-		Engine.FocusDirection = SplitNodeDirection.Down;
+		Engine.AddNodeDirection = Direction.Down;
 
 		RightTopLeftBottomRightBottomNode = Engine.AddWindow(RightTopLeftBottomRightBottomWindow.Object)!;
 		Assert.NotNull(RightTopLeftBottomRightBottomNode);

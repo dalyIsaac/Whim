@@ -6,7 +6,7 @@ namespace Whim.TreeLayout.Tests;
 /// </summary>
 public class TestSplitNode : SplitNode
 {
-	public TestSplitNode(SplitNodeDirection direction, SplitNode? parent = null) : base(direction, parent)
+	public TestSplitNode(bool isHorizontal = true, SplitNode? parent = null) : base(isHorizontal, parent)
 	{
 	}
 
