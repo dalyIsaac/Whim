@@ -74,8 +74,8 @@ public class TestAdd
 		engine.Add(window3.Object);
 
 		SplitNode root = (engine.Root as SplitNode)!;
-		Assert.Equal(0.6d, root[0].weight);
-		Assert.Equal(0.2d, root[1].weight);
-		Assert.Equal(0.2d, root[2].weight);
+		Assert.Equal(0.3d, root[0].weight);
+		Assert.Equal(0.3d, root[1].weight);
+		Assert.Equal(0.4d, root[2].weight);
 	}
 }

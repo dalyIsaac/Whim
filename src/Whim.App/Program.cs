@@ -18,13 +18,17 @@ public class Program
 
 	private static ConfigContext CreateConfigContext()
 	{
-		ConfigContext configContext = new();
+		ConfigContext configContext = new(new LoggerConfig(LogLevel.Verbose));
+		List<TreeLayoutEngine> treeLayoutEngines = new();
 
 		// Add workspaces
 		for (int i = 0; i < 4; i++)
 		{
 			// Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
-			Workspace workspace = new(configContext, i.ToString(), new TreeLayoutEngine(configContext));
+			TreeLayoutEngine treeLayoutEngine = new(configContext);
+			treeLayoutEngines.Add(treeLayoutEngine);
+
+			Workspace workspace = new(configContext, i.ToString(), treeLayoutEngine);
 			configContext.WorkspaceManager.Add(workspace);
 		}
 
@@ -57,26 +61,65 @@ public class Program
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_LEFT), (args) =>
 		{
 			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
-			if (workspace.FocusedWindow == null)
-			{
+			if (workspace.LastFocusedWindow == null)
 				return;
-			}
 
-			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Left, workspace.FocusedWindow);
+			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Left, workspace.LastFocusedWindow);
 		});
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_RIGHT), (args) =>
 		{
 			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
-			if (workspace.FocusedWindow == null)
-			{
+			if (workspace.LastFocusedWindow == null)
 				return;
-			}
 
-			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Right, workspace.FocusedWindow);
+			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Right, workspace.LastFocusedWindow);
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_UP), (args) =>
+		{
+			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			if (workspace.LastFocusedWindow == null)
+				return;
+
+			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Up, workspace.LastFocusedWindow);
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_DOWN), (args) =>
+		{
+			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			if (workspace.LastFocusedWindow == null)
+				return;
+
+			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Down, workspace.LastFocusedWindow);
 		});
 
+		// Swap windows in direction.
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Left));
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Right));
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_UP), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Up));
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_DOWN), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Down));
+
+		// Set direction.
+		KeybindEventHandler setNodeDirection = (args) =>
+		{
+			// Get direction.
+			Direction? direction = args.Keybind.Key switch
+			{
+				VIRTUAL_KEY.VK_LEFT => Direction.Left,
+				VIRTUAL_KEY.VK_RIGHT => Direction.Right,
+				VIRTUAL_KEY.VK_UP => Direction.Up,
+				VIRTUAL_KEY.VK_DOWN => Direction.Down,
+				_ => null
+			};
+
+			if (direction == null)
+				return;
+
+			foreach (TreeLayoutEngine treeLayoutEngine in treeLayoutEngines)
+				treeLayoutEngine.AddNodeDirection = direction.Value;
+		};
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_RIGHT), setNodeDirection);
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_DOWN), setNodeDirection);
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_LEFT), setNodeDirection);
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_UP), setNodeDirection);
 
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateOuterGap(10));

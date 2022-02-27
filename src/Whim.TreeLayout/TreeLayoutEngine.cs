@@ -55,8 +55,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	/// <summary>
 	/// Adds a window to the layout engine, and returns the node that represents it.
-	/// Please use the <see cref="IWindow.Add"/> method instead of this method, as
-	/// the return value is used for testing.
+	/// Please use <see cref="IWindow.Add"/> instead of this method, as
+	/// the return value was added for testing, and does not match <see cref="ILayoutEngine"/>.
 	/// The <paramref name="window"/> is added in the direction specified by this instance's
 	/// <see cref="AddNodeDirection"/> property.
 	/// </summary>
@@ -111,9 +111,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is the root node. Creating a new split node.");
 
 			// Create a new split node, and update the root.
-			SplitNode splitNode = new(isHorizontal: AddNodeDirection.IsHorizontal());
-			splitNode.Add(focusedLeaf);
-			splitNode.Add(newLeaf);
+			SplitNode splitNode = new(focusedLeaf, newLeaf, AddNodeDirection);
 
 			Root = splitNode;
 			return newLeaf;
@@ -126,7 +124,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		{
 			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is in a split node with direction {AddNodeDirection}. Adding window {window.Title} to the split node.");
 
-			parent.Add(newLeaf);
+			parent.Add(existingFocusedNode: focusedLeaf, newNode: newLeaf, AddNodeDirection);
 			return newLeaf;
 		}
 
@@ -135,9 +133,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// The focused leaf will also be added to the new split node.
 		Logger.Verbose($"Replacing the focused leaf node {focusedLeaf.Window.Title} with a split node with direction {AddNodeDirection}.");
 
-		SplitNode newSplitNode = new(isHorizontal: AddNodeDirection.IsHorizontal(), parent);
-		newSplitNode.Add(focusedLeaf);
-		newSplitNode.Add(newLeaf);
+		SplitNode newSplitNode = new(focusedLeaf, newLeaf, AddNodeDirection, parent);
 
 		// Replace the focused leaf with the new split node.
 		parent.Replace(focusedLeaf, newSplitNode);

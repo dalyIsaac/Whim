@@ -43,6 +43,20 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		IsHorizontal = isHorizontal;
 	}
 
+	public SplitNode(Node focusedNode, Node newNode, Direction direction, SplitNode? parent = null) : this(direction.IsHorizontal(), parent)
+	{
+		if (direction.IsPositiveIndex())
+		{
+			Add(focusedNode);
+			Add(newNode);
+		}
+		else
+		{
+			Add(newNode);
+			Add(focusedNode);
+		}
+	}
+
 	public (double weight, Node node) this[int index] => (
 		EqualWeight ? 1d / _weights.Count : _weights[index],
 		_children[index]
@@ -72,6 +86,45 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			double half = _weights[^1] / 2;
 			_weights[^1] = half;
 			_weights.Add(half);
+		}
+	}
+
+	/// <summary>
+	/// Add the <paramref name="newNode"/> as a child of this <see cref="SplitNode"/>,
+	/// in relation to the <paramref name="existingFocusedNode"/>.
+	/// </summary>
+	/// <param name="existingFocusedNode"></param>
+	/// <param name="newNode"></param>
+	/// <param name="direction"></param>
+	internal void Add(Node existingFocusedNode, Node newNode, Direction direction)
+	{
+		Logger.Debug($"Adding {newNode} to {this}, in direction {direction}");
+
+		// Find the index of the focused node.
+		int index = _children.IndexOf(existingFocusedNode);
+		if (index == -1)
+		{
+			Logger.Error($"Failed to find focused node {existingFocusedNode} in {this}");
+			return;
+		}
+
+		// Insert the node.
+		int newNodeIndex = index + (direction.IsPositiveIndex() ? 1 : -1);
+		_children.Insert(newNodeIndex, newNode);
+		newNode.Parent = this;
+
+		// Insert the weight.
+		if (EqualWeight || _weights.Count == 0)
+		{
+			// Add the weight 1d, since it doesn't matter.
+			_weights.Insert(newNodeIndex, 1d);
+		}
+		else
+		{
+			// Take half of the focused node's space.
+			double half = _weights[index] / 2;
+			_weights[index] = half;
+			_weights.Insert(newNodeIndex, half);
 		}
 	}
 
