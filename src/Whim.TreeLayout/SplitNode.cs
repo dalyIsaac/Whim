@@ -198,15 +198,13 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		return true;
 	}
 
-	internal void AdjustChildWeight(Node node, double delta)
+	/// <summary>
+	/// Distribute the weights of the children of this <see cref="SplitNode"/>,
+	/// so the children have equal weight, but <see cref="SplitNode.EqualWeight"/>
+	/// is <see langword="false"/>.
+	/// </summary>
+	private void DistributeWeight()
 	{
-		int idx = _children.IndexOf(node);
-		if (idx < 0)
-		{
-			Logger.Error($"Node {node} not found in {this}");
-			return;
-		}
-
 		if (EqualWeight)
 		{
 			// Distribute weights, because previously we didn't
@@ -219,6 +217,18 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			}
 			EqualWeight = false;
 		}
+	}
+
+	internal void AdjustChildWeight(Node node, double delta)
+	{
+		int idx = _children.IndexOf(node);
+		if (idx < 0)
+		{
+			Logger.Error($"Node {node} not found in {this}");
+			return;
+		}
+
+		DistributeWeight();
 
 		_weights[idx] += delta;
 	}
@@ -258,6 +268,34 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		}
 
 		return (weight, precedingWeight);
+	}
+
+	/// <summary>
+	/// Flip the direction.
+	/// </summary>
+	internal void Flip() => IsHorizontal = !IsHorizontal;
+
+	/// <summary>
+	/// Merge the given child <see cref="SplitNode"/> into this one, at it's current
+	/// position.
+	/// </summary>
+	/// <param name="child">The child to merge.</param>
+	internal void MergeChild(SplitNode child)
+	{
+		int idx = _children.IndexOf(child);
+		if (idx < 0)
+		{
+			Logger.Error($"Node {child} not found in {this}");
+			return;
+		}
+
+		DistributeWeight();
+
+		// Insert the child's children into this node.
+		double childWeight = GetChildWeight(child) ?? 1d;
+		_children.RemoveAt(idx);
+		_children.InsertRange(idx, child._children);
+		_weights.InsertRange(idx, child.Select(c => c.Weight * childWeight));
 	}
 
 	// override object.Equals

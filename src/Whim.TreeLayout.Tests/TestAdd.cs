@@ -59,8 +59,6 @@ public class TestAdd
 		TreeLayoutEngine engine = new(configContext.Object);
 		engine.AddNodeDirection = Direction.Right;
 
-		SplitNode splitNode = new(isHorizontal: true);
-
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();

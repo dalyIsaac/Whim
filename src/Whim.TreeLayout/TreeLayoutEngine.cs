@@ -421,4 +421,45 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 		return GetNodeContainingPoint(Root, new NodeLocation() { Height = 1, Width = 1 }, adjacentLocation, node);
 	}
+
+	public void FlipAndMerge()
+	{
+		// TODO: Consider making part of `ILayoutEngine`.
+		Logger.Debug($"Flipping and merging split node for the focused window in layout engine {Name}");
+		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+
+		if (focusedWindow == null)
+		{
+			Logger.Error($"No focused window in layout engine {Name}");
+			return;
+		}
+
+		if (!_windows.TryGetValue(focusedWindow, out LeafNode? node))
+		{
+			Logger.Error($"Could not find node for window {focusedWindow.Title} in layout engine {Name}");
+			return;
+		}
+
+		if (node.Parent == null)
+		{
+			Logger.Debug($"Node for window {focusedWindow.Title} has no parent in layout engine {Name}");
+			return;
+		}
+
+		SplitNode parent = node.Parent;
+		if (parent.Parent == null)
+		{
+			// There is no grandparent, so just flip.
+			parent.Flip();
+			// TODO: DoLayout()?
+			return;
+		}
+
+		// We need to merge the parent and grandparent.
+		SplitNode grandparent = parent.Parent;
+		grandparent.MergeChild(parent);
+
+		// TODO: DoLayout()?
+	}
+
 }
