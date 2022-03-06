@@ -17,7 +17,7 @@ public class TestAdd
 		Mock<IWindow> window = new();
 		engine.Add(window.Object);
 
-		Assert.Equal(engine.Root, new LeafNode(window.Object));
+		Assert.Equal(engine.Root, new WindowNode(window.Object));
 	}
 
 	[Fact]

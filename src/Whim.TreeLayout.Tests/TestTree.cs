@@ -50,21 +50,21 @@ namespace Whim.TreeLayout.Tests;
 internal class TestTree
 {
 	public TestSplitNode Root;
-	public LeafNode Left;
+	public WindowNode Left;
 	public TestSplitNode Right;
 	public TestSplitNode RightTop;
 	public TestSplitNode RightTopLeft;
-	public LeafNode RightTopLeftTop;
+	public WindowNode RightTopLeftTop;
 	public TestSplitNode RightTopLeftBottom;
-	public LeafNode RightTopLeftBottomLeft;
+	public WindowNode RightTopLeftBottomLeft;
 	public TestSplitNode RightTopLeftBottomRight;
-	public LeafNode RightTopLeftBottomRightTop;
-	public LeafNode RightTopLeftBottomRightBottom;
+	public WindowNode RightTopLeftBottomRightTop;
+	public WindowNode RightTopLeftBottomRightBottom;
 	public TestSplitNode RightTopRight;
-	public LeafNode RightTopRight1;
-	public LeafNode RightTopRight2;
-	public LeafNode RightTopRight3;
-	public LeafNode RightBottom;
+	public WindowNode RightTopRight1;
+	public WindowNode RightTopRight2;
+	public WindowNode RightTopRight3;
+	public WindowNode RightBottom;
 
 	public TestTree(
 		Mock<IWindow>? leftWindow = null,
@@ -91,7 +91,7 @@ internal class TestTree
 		Root = new TestSplitNode(isHorizontal: true);
 
 		// left
-		Left = new LeafNode(leftWindow.Object, Root);
+		Left = new WindowNode(leftWindow.Object, Root);
 
 		// Right
 		Right = new TestSplitNode(isHorizontal: false, Root);
@@ -103,37 +103,37 @@ internal class TestTree
 		RightTopLeft = new TestSplitNode(isHorizontal: false, RightTop);
 
 		// RightBottom
-		RightBottom = new LeafNode(rightBottomWindow.Object, Right);
+		RightBottom = new WindowNode(rightBottomWindow.Object, Right);
 
 		// RightTopLeftTop
-		RightTopLeftTop = new LeafNode(rightTopLeftTopWindow.Object, RightTopLeft);
+		RightTopLeftTop = new WindowNode(rightTopLeftTopWindow.Object, RightTopLeft);
 
 		// RightTopLeftBottom
 		RightTopLeftBottom = new TestSplitNode(isHorizontal: true, RightTopLeft);
 
 		// RightTopLeftBottomLeft
-		RightTopLeftBottomLeft = new LeafNode(rightTopLeftBottomLeftWindow.Object, RightTopLeftBottom);
+		RightTopLeftBottomLeft = new WindowNode(rightTopLeftBottomLeftWindow.Object, RightTopLeftBottom);
 
 		// RightTopLeftBottomRight
 		RightTopLeftBottomRight = new TestSplitNode(isHorizontal: false, RightTopLeftBottom);
 
 		// RightTopLeftBottomRightTop
-		RightTopLeftBottomRightTop = new LeafNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight);
+		RightTopLeftBottomRightTop = new WindowNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight);
 
 		// RightTopLeftBottomRightBottom
-		RightTopLeftBottomRightBottom = new LeafNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight);
+		RightTopLeftBottomRightBottom = new WindowNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight);
 
 		// RightTopRight
 		RightTopRight = new TestSplitNode(isHorizontal: false, RightTop);
 
 		// RightTopRight1
-		RightTopRight1 = new LeafNode(rightTopRight1Window.Object, RightTopRight);
+		RightTopRight1 = new WindowNode(rightTopRight1Window.Object, RightTopRight);
 
 		// RightTopRight2
-		RightTopRight2 = new LeafNode(rightTopRight2Window.Object, RightTopRight);
+		RightTopRight2 = new WindowNode(rightTopRight2Window.Object, RightTopRight);
 
 		// RightTopRight3
-		RightTopRight3 = new LeafNode(rightTopRight3Window.Object, RightTopRight);
+		RightTopRight3 = new WindowNode(rightTopRight3Window.Object, RightTopRight);
 
 		// Initialize the split nodes.
 		Root.Initialize(new List<Node> { Left, Right }, new List<double> { 0.5, 0.5 });

@@ -1,19 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Whim.TreeLayout;
 
-public partial class TreeLayoutEngine : ILayoutEngine
+public partial class TreeLayoutEngine : ILayoutEngine, IDisposable
 {
 	private readonly IConfigContext _configContext;
-	private readonly Dictionary<IWindow, LeafNode> _windows = new();
+	private readonly Dictionary<IWindow, WindowNode> _windows = new();
+	private readonly HashSet<PhantomNode> _phantomNodes = new();
 	public Node? Root { get; private set; }
 
 	/// <summary>
 	/// The direction which we will use for any following operations.
 	/// </summary>
 	public Direction AddNodeDirection = Direction.Right;
+	private bool disposedValue;
 
 	public string Name { get; set; }
 
@@ -26,6 +29,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	public TreeLayoutEngine(IConfigContext configContext, string name = "Tree")
 	{
 		_configContext = configContext;
+		_configContext.WorkspaceManager.ActiveLayoutEngineChanged += ActiveLayoutEngineChanged;
 		Name = name;
 	}
 
@@ -62,12 +66,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </summary>
 	/// <param name="window">The window to add.</param>
 	/// <returns>The node that represents the window.</returns>
-	public LeafNode? AddWindow(IWindow window)
+	public WindowNode? AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding window {window.Title} to layout engine {Name}");
 		Count++;
 
-		LeafNode newLeaf = new(window);
+		WindowNode newLeaf = new(window);
 
 		// Add the window to the window-node map.
 		_windows.Add(window, newLeaf);
@@ -82,14 +86,14 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// Get the focused window node
 		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
-		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out LeafNode? focusedLeaf))
+		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out WindowNode? focusedLeaf))
 		{
 			Logger.Verbose($"No focused window found. Looking for the right-most leaf node.");
 
 			// We can't find the focused window, so we'll just add it to the right-most node.
 			focusedLeaf = Root switch
 			{
-				LeafNode leaf => leaf,
+				WindowNode leaf => leaf,
 				SplitNode split => split.GetRightMostLeaf(),
 				_ => null
 			};
@@ -106,6 +110,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// If the parent node is null, then the focused leaf is the root and we need to create a new split node.
+		// In this scenario, there's no possibility of a sibling phantom node.
 		if (focusedLeaf.Parent == null)
 		{
 			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is the root node. Creating a new split node.");
@@ -118,6 +123,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		SplitNode parent = focusedLeaf.Parent;
+		if (GetAdjacentNode(focusedLeaf, AddNodeDirection) is PhantomNode phantomNode)
+		{
+			parent.Replace(phantomNode, newLeaf);
+			return newLeaf;
+		}
+
 		// If the parent node is a split node and the direction matches, then all we need to do is
 		// add the window to the split node.
 		if (parent.IsHorizontal == AddNodeDirection.IsHorizontal())
@@ -151,7 +162,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Logger.Debug($"Removing window {window.Title} from layout engine {Name}");
 
 		// Get the node for the window.
-		if (!_windows.TryGetValue(window, out LeafNode? removingNode))
+		if (!_windows.TryGetValue(window, out WindowNode? removingNode))
 		{
 			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
 			return false;
@@ -205,27 +216,46 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		return Root?.GetLeftMostLeaf()?.Window;
 	}
 
-	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location) => Root != null ? DoLayout(Root, location) : Enumerable.Empty<IWindowLocation>();
+	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
+	{
+		if (Root == null)
+		{
+			yield break;
+		}
+
+
+		foreach (var item in GetWindowLocations(Root, location))
+		{
+			if (item.Node is PhantomNode phantomNode)
+			{
+				phantomNode.Show();
+			}
+			else if (item.Node is WindowNode leafNode)
+			{
+				yield return new WindowLocation(leafNode.Window, item.Location, item.WindowState);
+			}
+		}
+	}
 
 	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window.Title} in direction {direction} in layout engine {Name}");
 
-		if (!_windows.TryGetValue(window, out LeafNode? node))
+		if (!_windows.TryGetValue(window, out WindowNode? node))
 		{
 			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
 			return;
 		}
 
-		LeafNode? targetNode = GetAdjacentNode(node, direction);
-		targetNode?.Window.Focus();
+		LeafNode? adjacentNode = GetAdjacentNode(node, direction);
+		adjacentNode?.Focus();
 	}
 
 	public void SwapWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Swapping window {window.Title} in direction {direction} in layout engine {Name}");
 
-		if (!_windows.TryGetValue(window, out LeafNode? node))
+		if (!_windows.TryGetValue(window, out WindowNode? node))
 		{
 			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
 			return;
@@ -238,12 +268,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			return;
 		}
 
-		// Swap the windows.
-		(targetNode.Window, node.Window) = (node.Window, targetNode.Window);
+		// Get the parents.
+		SplitNode? targetNodeParent = targetNode.Parent;
+		SplitNode? nodeParent = node.Parent;
 
-		// Update the map.
-		_windows[targetNode.Window] = targetNode;
-		_windows[node.Window] = node;
+		targetNodeParent?.Replace(targetNode, node);
+		nodeParent?.Replace(node, targetNode);
 
 		window.Focus();
 	}
@@ -280,7 +310,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			yield break;
 		}
 
-		foreach (IWindowLocation location in DoLayout(Root, new Location(0, 0, 0, 0)))
+		foreach (IWindowLocation location in GetWindowLocations(Root, new Location(0, 0, 0, 0)))
 		{
 			yield return location.Window;
 		}
@@ -309,7 +339,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			return;
 		}
 
-		if (!_windows.TryGetValue(focusedWindow, out LeafNode? focusedNode))
+		if (!_windows.TryGetValue(focusedWindow, out WindowNode? focusedNode))
 		{
 			Logger.Error($"Could not find node for focused window in layout engine {Name}");
 			return;
@@ -388,7 +418,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </returns>
 	public LeafNode? GetAdjacentNode(LeafNode node, Direction direction)
 	{
-		Logger.Debug($"Getting node in direction {direction} for window {node.Window.Title}");
+		Logger.Debug($"Getting node in direction {direction} for window {node}");
 
 		if (Root == null)
 		{
@@ -434,7 +464,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			return;
 		}
 
-		if (!_windows.TryGetValue(focusedWindow, out LeafNode? node))
+		if (!_windows.TryGetValue(focusedWindow, out WindowNode? node))
 		{
 			Logger.Error($"Could not find node for window {focusedWindow.Title} in layout engine {Name}");
 			return;
@@ -462,4 +492,77 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// TODO: DoLayout()?
 	}
 
+	public void SplitFocusedWindow()
+	{
+		Logger.Debug($"Splitting focused window in layout engine {Name}");
+		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+
+		if (focusedWindow == null)
+		{
+			Logger.Error($"No focused window in layout engine {Name}");
+			return;
+		}
+
+		if (!_windows.TryGetValue(focusedWindow, out WindowNode? leafNode))
+		{
+			Logger.Error($"Could not find node for window {focusedWindow.Title} in layout engine {Name}");
+			return;
+		}
+
+		SplitNode splitNode = new(isHorizontal: AddNodeDirection.IsHorizontal(), parent: leafNode.Parent);
+		if (leafNode.Parent == null)
+		{
+			// It's the root node.
+			Root = splitNode;
+		}
+
+		splitNode.Add(leafNode);
+
+		// Create and add the phantom window.
+		PhantomNode phantomNode = new();
+		splitNode.Add(phantomNode);
+		_phantomNodes.Add(phantomNode);
+
+		// TODO: DoLayout()?
+	}
+
+	private void ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
+	{
+		if (e.CurrentLayoutEngine == this)
+		{
+			// We're the new active layout engine.
+			foreach (PhantomNode phantomNode in _phantomNodes)
+			{
+				phantomNode.Show();
+			}
+		}
+		else if (e.PreviousLayoutEngine == this)
+		{
+			// We're no longer the active layout engine.
+			foreach (PhantomNode phantomNode in _phantomNodes)
+			{
+				phantomNode.Hide();
+			}
+		}
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				_configContext.WorkspaceManager.ActiveLayoutEngineChanged -= ActiveLayoutEngineChanged;
+			}
+
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
 }

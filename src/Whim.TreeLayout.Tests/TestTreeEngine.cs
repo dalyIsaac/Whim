@@ -23,31 +23,31 @@ internal class TestTreeEngine
 	public SplitNode RightTopRightNode;
 
 	public Mock<IWindow> LeftWindow = new();
-	public LeafNode LeftNode;
+	public WindowNode LeftNode;
 
 	public Mock<IWindow> RightTopLeftTopWindow = new();
-	public LeafNode RightTopLeftTopNode;
+	public WindowNode RightTopLeftTopNode;
 
 	public Mock<IWindow> RightBottomWindow = new();
-	public LeafNode RightBottomNode;
+	public WindowNode RightBottomNode;
 
 	public Mock<IWindow> RightTopRight1Window = new();
-	public LeafNode RightTopRight1Node;
+	public WindowNode RightTopRight1Node;
 
 	public Mock<IWindow> RightTopRight2Window = new();
-	public LeafNode RightTopRight2Node;
+	public WindowNode RightTopRight2Node;
 
 	public Mock<IWindow> RightTopRight3Window = new();
-	public LeafNode RightTopRight3Node;
+	public WindowNode RightTopRight3Node;
 
 	public Mock<IWindow> RightTopLeftBottomLeftWindow = new();
-	public LeafNode RightTopLeftBottomLeftNode;
+	public WindowNode RightTopLeftBottomLeftNode;
 
 	public Mock<IWindow> RightTopLeftBottomRightTopWindow = new();
-	public LeafNode RightTopLeftBottomRightTopNode;
+	public WindowNode RightTopLeftBottomRightTopNode;
 
 	public Mock<IWindow> RightTopLeftBottomRightBottomWindow = new();
-	public LeafNode RightTopLeftBottomRightBottomNode;
+	public WindowNode RightTopLeftBottomRightBottomNode;
 	public TreeLayoutEngine Engine;
 
 	public TestTreeEngine()

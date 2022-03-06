@@ -31,7 +31,7 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 
 	/// <summary>
 	/// The child nodes of this <see cref="SplitNode"/>. These can be either <see cref="SplitNode"/>s
-	/// or <see cref="LeafNode"/>s.
+	/// or <see cref="WindowNode"/>s.
 	/// </summary>
 	protected readonly List<Node> _children = new();
 
