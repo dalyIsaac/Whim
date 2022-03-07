@@ -454,7 +454,6 @@ public partial class TreeLayoutEngine : ILayoutEngine, IDisposable
 
 	public void FlipAndMerge()
 	{
-		// TODO: Consider making part of `ILayoutEngine`.
 		Logger.Debug($"Flipping and merging split node for the focused window in layout engine {Name}");
 		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
@@ -481,7 +480,8 @@ public partial class TreeLayoutEngine : ILayoutEngine, IDisposable
 		{
 			// There is no grandparent, so just flip.
 			parent.Flip();
-			// TODO: DoLayout()?
+
+			_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 			return;
 		}
 
@@ -489,7 +489,7 @@ public partial class TreeLayoutEngine : ILayoutEngine, IDisposable
 		SplitNode grandparent = parent.Parent;
 		grandparent.MergeChild(parent);
 
-		// TODO: DoLayout()?
+		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
 	public void SplitFocusedWindow()
@@ -523,7 +523,7 @@ public partial class TreeLayoutEngine : ILayoutEngine, IDisposable
 		splitNode.Add(phantomNode);
 		_phantomNodes.Add(phantomNode);
 
-		// TODO: DoLayout()?
+		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
 	private void ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
