@@ -177,4 +177,18 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// the focused/active window.
 	/// </param>
 	public void MoveWindowToNextMonitor(IWindow? window = null);
+
+	#region Phantom Windows
+	/// <summary>
+	/// Register a phantom window for the given <paramref name="workspace"/>.
+	/// </summary>
+	/// <param name="window">The phantom window to register.</param>
+	/// <param name="workspace">The workspace to register the window for.</param>
+	public void RegisterPhantomWindow(IWorkspace workspace, IWindow window);
+
+	/// <summary>
+	/// Unregister the given phantom window.
+	/// </summary>
+	public void UnregisterPhantomWindow(IWindow window);
+	#endregion
 }

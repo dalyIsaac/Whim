@@ -33,7 +33,7 @@ public abstract class Node
 	/// position in the tree, not necessarily the position in the screen.
 	/// </summary>
 	/// <returns>The left-most node in the tree.</returns>
-	public WindowNode? GetLeftMostLeaf()
+	public LeafNode? GetLeftMostLeaf()
 	{
 		Node node = this;
 
@@ -47,7 +47,7 @@ public abstract class Node
 			(double _, node) = splitNode[0];
 		}
 
-		return (WindowNode)node;
+		return (LeafNode)node;
 	}
 
 	/// <summary>
@@ -55,7 +55,7 @@ public abstract class Node
 	/// position in the tree, not necessarily the position in the screen.
 	/// </summary>
 	/// <returns>The right-most node in the tree.</returns>
-	public WindowNode? GetRightMostLeaf()
+	public LeafNode? GetRightMostLeaf()
 	{
 		Node node = this;
 
@@ -69,7 +69,7 @@ public abstract class Node
 			(double _, node) = splitNode[^1];
 		}
 
-		return (WindowNode)node;
+		return (LeafNode)node;
 	}
 
 	/// <summary>

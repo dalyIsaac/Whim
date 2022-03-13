@@ -97,6 +97,7 @@ public class Program
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_UP), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Up));
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_DOWN), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Down));
 
+		#region TreeLayoutEngine
 		// Set direction.
 		KeybindEventHandler setNodeDirection = (args) =>
 		{
@@ -120,6 +121,16 @@ public class Program
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_DOWN), setNodeDirection);
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_LEFT), setNodeDirection);
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_UP), setNodeDirection);
+
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_S), (args) =>
+		{
+			TreeLayoutEngine? layoutEngine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
+			if (layoutEngine != null)
+			{
+				layoutEngine.SplitFocusedWindow();
+			}
+		});
+		#endregion
 
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateOuterGap(10));

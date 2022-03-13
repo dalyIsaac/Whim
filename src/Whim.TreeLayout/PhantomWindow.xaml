@@ -6,10 +6,8 @@
 		xmlns:local="clr-namespace:Whim.TreeLayout"
 		xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
 		mc:Ignorable="d"
-		WindowStyle="None"
 		ResizeMode="NoResize"
 		ShowInTaskbar="False"
-		AllowsTransparency="True"
 		Title="Whim TreeLayout Phantom Window" Height="{Binding Path=Height}" Width="800">
 	<Window.Resources>
 		<ResourceDictionary>

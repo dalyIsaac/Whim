@@ -7,19 +7,7 @@ namespace Whim.TreeLayout;
 /// </summary>
 public class WindowNode : LeafNode
 {
-	public IWindow Window { get; }
-
-	public WindowNode(IWindow window, SplitNode? parent = null)
-	{
-		Window = window;
-		Parent = parent;
-	}
-
-	public override void Focus()
-	{
-		Window.Focus();
-	}
-
+	public WindowNode(IWindow window, SplitNode? parent = null) : base(window, parent) { }
 	public override string? ToString()
 	{
 		return Window?.ToString();

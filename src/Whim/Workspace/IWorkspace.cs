@@ -97,4 +97,21 @@ public interface IWorkspace : ICommandable
 	/// </param>
 	public void SwapWindowInDirection(Direction direction, IWindow? window = null);
 	#endregion
+
+	#region Phantom Windows
+	/// <summary>
+	/// Register a phantom window. This can only be done by the active layout engine.
+	/// </summary>
+	/// <param name="engine">The layout engine to register the phantom window to.</param>
+	/// <param name="window">The phantom window to register.</param>
+	public void RegisterPhantomWindow(ILayoutEngine engine, IWindow window);
+
+	/// <summary>
+	/// Unregister a phantom window. This can only be done by the active layout engine,
+	/// and the phantom window must be registered to the same layout engine.
+	/// </summary>
+	/// <param name="engine">The layout engine to unregister the phantom window from.</param>
+	/// <param name="window">The phantom window to unregister.</param>
+	public void UnregisterPhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false);
+	#endregion
 }

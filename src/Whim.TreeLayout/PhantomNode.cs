@@ -1,34 +1,41 @@
+using System.Windows.Interop;
+using Windows.Win32.Foundation;
+
 namespace Whim.TreeLayout;
 
 public class PhantomNode : LeafNode
 {
-	private readonly PhantomWindow _window;
+	private readonly PhantomWindow _phantomWindow;
 
-	public PhantomNode(SplitNode? parent = null)
+	private PhantomNode(IWindow windowModel, PhantomWindow phantomWindow, SplitNode? parent = null) : base(windowModel, parent)
 	{
-		Parent = parent;
-		_window = new PhantomWindow();
-		Show();
+		_phantomWindow = phantomWindow;
 	}
 
-	public void Show()
+	public static PhantomNode? CreatePhantomNode(IConfigContext configContext, SplitNode? parent = null)
 	{
-		// TODO: get location from parent
-		_window.Show();
+		PhantomWindow phantomWindow = new();
+
+		// We need to show the window in order to get its handle.
+		phantomWindow.Show();
+
+		IWindow? windowModel = Whim.Window.CreateWindow((HWND)new WindowInteropHelper(phantomWindow).Handle, configContext);
+
+		if (windowModel == null)
+		{
+			return null;
+		}
+
+		return new PhantomNode(windowModel, phantomWindow, parent);
 	}
 
 	public void Hide()
 	{
-		_window.Hide();
+		_phantomWindow.Hide();
 	}
 
 	public void Close()
 	{
-		_window.Close();
-	}
-
-	public override void Focus()
-	{
-		_window.Focus();
+		_phantomWindow.Close();
 	}
 }

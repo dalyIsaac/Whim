@@ -46,4 +46,58 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
+
+	/// <summary>
+	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
+	/// or a child layout engine is type <typeparamref name="T"/>.
+	/// </summary>
+	/// <typeparam name="T">The type of layout engine to check for.</typeparam>
+	/// <param name="root">
+	/// The root layout engine to check. If this is a proxy layout engine, it'll check its child
+	/// proxy layout engines.
+	/// </param>
+	/// <returns>
+	// The layout engine with type <typeparamref name="T"/>, or null if none is found.
+	/// </returns>
+	public static T? GetLayoutEngine<T>(ILayoutEngine root) where T : ILayoutEngine
+	{
+		if (root is T)
+		{
+			return (T)root;
+		}
+
+		if (root is BaseProxyLayoutEngine proxy && proxy._innerLayoutEngine != null)
+		{
+			return BaseProxyLayoutEngine.GetLayoutEngine<T>(proxy._innerLayoutEngine);
+		}
+
+		return default;
+	}
+
+	/// <summary>
+	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
+	/// or a child layout engine is equal to <paramref name="layoutEngine"/>.
+	/// </summary>
+	/// <param name="root">
+	/// The root layout engine to check. If this is a proxy layout engine, it'll check its child
+	/// proxy layout engines.
+	/// </param>
+	/// <param name="layoutEngine">The layout engine to check for.</param>
+	/// <returns>
+	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
+	/// </returns>
+	public static bool ContainsEqual(ILayoutEngine root, ILayoutEngine layoutEngine)
+	{
+		if (root == layoutEngine)
+		{
+			return true;
+		}
+
+		if (root is BaseProxyLayoutEngine proxy && proxy._innerLayoutEngine != null)
+		{
+			return BaseProxyLayoutEngine.ContainsEqual(proxy._innerLayoutEngine, layoutEngine);
+		}
+
+		return false;
+	}
 }

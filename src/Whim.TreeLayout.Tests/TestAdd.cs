@@ -76,40 +76,4 @@ public class TestAdd
 		Assert.Equal(0.3d, root[1].weight);
 		Assert.Equal(0.4d, root[2].weight);
 	}
-
-	[Fact]
-	public void Add_Phantom()
-	{
-		Mock<IMonitor> monitor = new();
-		Mock<IMonitorManager> monitorManager = new();
-		Mock<IWorkspace> activeWorkspace = new();
-		Mock<IWorkspaceManager> workspaceManager = new();
-		Mock<IConfigContext> configContext = new();
-
-		monitor.Setup(m => m.Width).Returns(1920);
-		monitor.Setup(m => m.Height).Returns(1080);
-
-		monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
-		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(activeWorkspace.Object);
-
-		configContext.Setup(x => x.MonitorManager).Returns(monitorManager.Object);
-		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
-
-		TreeLayoutEngine engine = new(configContext.Object);
-		engine.AddNodeDirection = Direction.Right;
-
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-
-		engine.Add(window1.Object);
-		engine.SplitFocusedWindow();
-
-		engine.Add(window2.Object);
-
-		SplitNode root = (engine.Root as SplitNode)!;
-		Assert.Equal(0.5d, root[0].weight);
-		Assert.Equal(0.5d, root[1].weight);
-		Assert.Equal(window1.Object, ((WindowNode)(root[0].node)).Window);
-		Assert.Equal(window2.Object, ((WindowNode)(root[1].node)).Window);
-	}
 }
