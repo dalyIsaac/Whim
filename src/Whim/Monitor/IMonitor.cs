@@ -3,7 +3,7 @@ namespace Whim;
 /// <summary>
 /// Represents a single display device.
 /// </summary>
-public interface IMonitor : ILocation
+public interface IMonitor : ILocation<int>
 {
 	/// <summary>
 	/// The name of the monitor.

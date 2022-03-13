@@ -47,7 +47,7 @@ public class LocationTests
 	{
 		Location location1 = new(0, 0, 10, 10);
 		Location location2 = new(5, 5, 5, 5);
-		ILocation location3 = Location.Add(location1, location2);
+		ILocation<int> location3 = Location.Add(location1, location2);
 		Assert.StrictEqual(new Location(5, 5, 15, 15), location3);
 	}
 }

@@ -45,5 +45,5 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation location);
+	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
 }

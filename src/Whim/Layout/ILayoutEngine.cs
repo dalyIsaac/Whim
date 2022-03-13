@@ -17,7 +17,7 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	/// </summary>
 	/// <param name="location">The available area to do a layout inside.</param>
 	/// <returns></returns>
-	public IEnumerable<IWindowLocation> DoLayout(ILocation location);
+	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
 
 	/// <summary>
 	/// Retrieves the first window in the layout engine.
