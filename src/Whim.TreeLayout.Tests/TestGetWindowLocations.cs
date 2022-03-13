@@ -16,7 +16,7 @@ public class TestGetWindowLocations
 		TreeLayoutWindowLocation[] locations = TreeLayoutEngine.GetWindowLocations(tree.Root, screen).ToArray();
 		ILocation<int>[] actual = locations.Select(x => x.Location).ToArray();
 
-		ILocation<int>[] expected = TestTreeWindowLocations.All.Select(x => x.ToLocation(screen)).ToArray();
+		ILocation<int>[] expected = TestTreeWindowLocations.All.Select(x => x.Scale(screen)).ToArray();
 
 		actual.Should().Equal(expected);
 	}

@@ -30,8 +30,8 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	protected readonly List<double> _weights = new();
 
 	/// <summary>
-	/// The child nodes of this <see cref="SplitNode"/>. These can be either <see cref="SplitNode"/>s
-	/// or <see cref="WindowNode"/>s.
+	/// The child nodes of this <see cref="SplitNode"/>. These will likely be either <see cref="SplitNode"/>s,
+	/// or child classes of <see cref="LeafNode"/>.
 	/// </summary>
 	protected readonly List<Node> _children = new();
 
@@ -128,6 +128,11 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		}
 	}
 
+	/// <summary>
+	/// Remove the <paramref name="node"/> from this <see cref="SplitNode"/>.
+	/// </summary>
+	/// <param name="node"></param>
+	/// <returns>Whether the removal was successful.</returns>
 	internal bool Remove(Node node)
 	{
 		int idx = _children.IndexOf(node);
@@ -199,7 +204,8 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
-	/// Distribute the weights of the children of this <see cref="SplitNode"/>,
+	/// If <see cref="SplitNode.EqualWeight"/> is <see langword="true"/>, this will
+	/// distribute the weights of the children of this <see cref="SplitNode"/>,
 	/// so the children have equal weight, but <see cref="SplitNode.EqualWeight"/>
 	/// is <see langword="false"/>.
 	/// </summary>
@@ -219,6 +225,21 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		}
 	}
 
+	/// <summary>
+	/// This changes the weight of the <paramref name="node"/> to by
+	/// <paramref name="delta"/>.
+	///
+	/// The <paramref name="delta"/> must be a child of this <see cref="SplitNode"/>
+	/// instance.
+	///
+	/// This method does not guarantee that the weights of the children will
+	/// sum to 1.
+	/// </summary>
+	/// <param name="node">The node whose weight is to be changed.</param>
+	/// <param name="delta">
+	// The amount to change the weight by. The delta should continue the assumption
+	/// the coordinates for this node are in the range [0, 1].
+	/// </param>
 	internal void AdjustChildWeight(Node node, double delta)
 	{
 		int idx = _children.IndexOf(node);
@@ -233,6 +254,12 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		_weights[idx] += delta;
 	}
 
+	/// <summary>
+	/// Get the weight of the given <paramref name="node"/>.
+	/// The <paramref name="node"/> must be a child of this <see cref="SplitNode"/>.
+	/// </summary>
+	/// <param name="node"></param>
+	/// <returns></returns>
 	public double? GetChildWeight(Node node)
 	{
 		int idx = _children.IndexOf(node);
@@ -245,6 +272,13 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		return EqualWeight ? 1d / _children.Count : _weights[idx];
 	}
 
+	/// <summary>
+	/// Gets the weight of the given <paramref name="node"/>, and the sum of its
+	/// preceding siblings.
+	/// The <paramref name="node"/> must be a child of this <see cref="SplitNode"/>.
+	/// </summary>
+	/// <param name="node"></param>
+	/// <returns></returns>
 	public (double weight, double precedingWeight)? GetWeightAndPrecedingWeight(Node node)
 	{
 		int idx = _children.IndexOf(node);

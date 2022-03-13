@@ -77,6 +77,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		return null;
 	}
 
+	/// <summary>
+	/// Add the given <paramref name="newLeaf"/> node to the layout engine,
+	/// in the direction specified by this instance's <see cref="AddNodeDirection"/> property.
+	/// </summary>
+	/// <param name="newLeaf">The node to add.</param>
+	/// <returns>True if the node was added, false otherwise.</returns>
 	private bool AddLeafNode(LeafNode newLeaf)
 	{
 		IWindow window = newLeaf.Window;
@@ -174,6 +180,14 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		return true;
 	}
 
+	/// <summary>
+	/// Replace the given <paramref name="phantomNode"/> with the given <paramref name="windowNode"/>.
+	/// The <paramref name="phantomNode"/> will be removed from its parent node, which must be
+	/// <paramref name="parent"/>.
+	/// </summary>
+	/// <param name="parent">The parent node of the <paramref name="phantomNode"/>.</param>
+	/// <param name="phantomNode">The phantom node to replace.</param>
+	/// <param name="windowNode">The window node to replace the phantom node with.</param>
 	private void ReplacePhantomNode(SplitNode parent, PhantomNode phantomNode, WindowNode windowNode)
 	{
 		parent.Replace(phantomNode, windowNode);
@@ -480,6 +494,10 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		return GetNodeContainingPoint(Root, new NodeLocation() { Height = 1, Width = 1 }, adjacentLocation, node);
 	}
 
+	/// <summary>
+	/// Flip the direction of the <see cref="SplitNode"/> parent of the currently focused window, and merge it with
+	/// the grandparent <see cref="SplitNode"/>.
+	/// </summary>
 	public void FlipAndMerge()
 	{
 		Logger.Debug($"Flipping and merging split node for the focused window in layout engine {Name}");

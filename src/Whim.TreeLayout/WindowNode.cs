@@ -3,7 +3,9 @@ using System;
 namespace Whim.TreeLayout;
 
 /// <summary>
-/// LeafNodes represent the location of a window.
+/// WindowNodes represent the location of a window within the layout engine.
+/// Unlike <see cref="PhantomNode"/>s, <see cref="WindowNode"/>s are common
+/// to all layout engines within a <see cref="IWorkspace"/>.
 /// </summary>
 public class WindowNode : LeafNode
 {

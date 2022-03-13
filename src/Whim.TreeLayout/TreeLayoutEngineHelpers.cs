@@ -15,6 +15,7 @@ public partial class TreeLayoutEngine
 	/// <param name="originalNode">
 	/// The leaf node to search for. The returned node cannot be the same as this node.
 	/// </param>
+	/// <returns>The node which contains the given <paramref name="searchPoint"/>.</returns>
 	public static LeafNode? GetNodeContainingPoint(Node root,
 												ILocation<double> rootLocation,
 												ILocation<double> searchPoint,

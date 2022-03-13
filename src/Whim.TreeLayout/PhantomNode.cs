@@ -3,6 +3,13 @@ using Windows.Win32.Foundation;
 
 namespace Whim.TreeLayout;
 
+/// <summary>
+/// A phantom node represents a phantom window within the layout tree.
+/// Unlike a <see cref="WindowNode"/>, a phantom node is specific to the
+/// <see cref="TreeLayoutEngine"/> instance.
+/// As such phantom nodes have to manage the window itself, instead of relying
+/// on the <see cref="IWindowManager"/>.
+/// </summary>
 public class PhantomNode : LeafNode
 {
 	private readonly PhantomWindow _phantomWindow;
