@@ -35,7 +35,7 @@ public class NodeLocation : ILocation<double>
 	/// <summary>
 	/// Constructor which sets the location of the node to all zeros.
 	/// </summary>
-	public NodeLocation() {}
+	public NodeLocation() { }
 
 	/// <summary>
 	/// Constructor which creates a copy of the given location.
