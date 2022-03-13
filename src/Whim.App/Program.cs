@@ -130,6 +130,15 @@ public class Program
 				layoutEngine.SplitFocusedWindow();
 			}
 		});
+
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_F), (args) =>
+		{
+			TreeLayoutEngine? layoutEngine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
+			if (layoutEngine != null)
+			{
+				layoutEngine.FlipAndMerge();
+			}
+		});
 		#endregion
 
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));

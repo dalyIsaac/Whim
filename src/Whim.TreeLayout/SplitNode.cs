@@ -295,7 +295,14 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		double childWeight = GetChildWeight(child) ?? 1d;
 		_children.RemoveAt(idx);
 		_children.InsertRange(idx, child._children);
+		_weights.RemoveAt(idx);
 		_weights.InsertRange(idx, child.Select(c => c.Weight * childWeight));
+
+		// Update parents.
+		foreach (Node grandChild in child._children)
+		{
+			grandChild.Parent = this;
+		}
 	}
 
 	// override object.Equals

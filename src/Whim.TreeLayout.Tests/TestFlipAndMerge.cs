@@ -53,9 +53,11 @@ public class TestFlipAndMerge
 		Assert.Equal(0.5, root[0].weight);
 
 		double rightWeight = 0.5d / 3;
-		Assert.Equal(rightWeight, root[1].weight);
-		Assert.Equal(rightWeight, root[2].weight);
-		Assert.Equal(rightWeight, root[3].weight);
+		for (int i = 1; i <= 3; i++)
+		{
+			Assert.Equal(rightWeight, root[i].weight);
+			Assert.Equal(root, root[i].node.Parent);
+		}
 	}
 
 	[Fact]
