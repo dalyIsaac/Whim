@@ -21,15 +21,30 @@ public class Workspace : IWorkspace
 		}
 	}
 
-	public IWindow? FocusedWindow { get; private set; }
+	/// <summary>
+	/// The last focused window in this workspace.
+	/// </summary>
+	public IWindow? LastFocusedWindow { get; private set; }
 
 	private readonly List<ILayoutEngine> _layoutEngines = new();
 	private int _activeLayoutEngineIndex = 0;
 
 	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
 
+	/// <summary>
+	/// All the windows in this workspace which are common to every layout engine.
+	/// The intersection of <see cref="Windows"/> and <see cref="PhantomWindows"/>
+	/// is the empty set.
+	/// </summary>
 	private readonly HashSet<IWindow> _windows = new();
 	public IEnumerable<IWindow> Windows => _windows;
+
+	/// <summary>
+	/// Phantom windows are specific to a single layout engine.
+	/// The intersection of <see cref="Windows"/> and <see cref="PhantomWindows"/>
+	/// is the empty set.
+	/// </summary>
+	private readonly Dictionary<IWindow, ILayoutEngine> _phantomWindows = new();
 
 	public Commander Commander { get; } = new();
 
@@ -96,9 +111,14 @@ public class Workspace : IWorkspace
 
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
 	{
-		if (_windows.Contains(e.Window))
+		if (
+			_windows.Contains(e.Window) ||
+			(_phantomWindows.TryGetValue(e.Window, out ILayoutEngine? layoutEngine)
+			&& layoutEngine != null
+			&& ILayoutEngine.ContainsEqual(ActiveLayoutEngine, layoutEngine))
+		)
 		{
-			FocusedWindow = e.Window;
+			LastFocusedWindow = e.Window;
 			Logger.Debug($"Focused window {e.Window} in workspace {Name}");
 		}
 	}
@@ -109,12 +129,17 @@ public class Workspace : IWorkspace
 		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
-	public void NextLayoutEngine()
+	private void UpdateLayoutEngine(int delta)
 	{
-		Logger.Debug(Name);
-
 		int prevIdx = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Count);
+		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Count);
+
+		// If the LastFocusedWindow is a phantom window, remove it.
+		// This is because phantom windows belong to a specific layout engine.
+		if (LastFocusedWindow != null && _phantomWindows.TryGetValue(LastFocusedWindow, out ILayoutEngine? prevLayoutEngine))
+		{
+			LastFocusedWindow = null;
+		}
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(
@@ -127,22 +152,16 @@ public class Workspace : IWorkspace
 		DoLayout();
 	}
 
+	public void NextLayoutEngine()
+	{
+		Logger.Debug(Name);
+		UpdateLayoutEngine(1);
+	}
+
 	public void PreviousLayoutEngine()
 	{
 		Logger.Debug(Name);
-
-		int prevIdx = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = (_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Count);
-
-		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs(
-				this,
-				_layoutEngines[prevIdx],
-				_layoutEngines[_activeLayoutEngineIndex]
-			)
-		);
-
-		DoLayout();
+		UpdateLayoutEngine(-1);
 	}
 
 	public bool TrySetLayoutEngine(string name)
@@ -185,6 +204,12 @@ public class Workspace : IWorkspace
 	{
 		Logger.Debug($"Adding window {window} to workspace {Name}");
 
+		if (_phantomWindows.ContainsKey(window))
+		{
+			Logger.Verbose($"Phantom window {window} is already in workspace {Name}");
+			return;
+		}
+
 		if (_windows.Contains(window))
 		{
 			Logger.Error($"Window {window} already exists in workspace {Name}");
@@ -203,6 +228,18 @@ public class Workspace : IWorkspace
 	public bool RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing window {window} from workspace {Name}");
+
+		if (LastFocusedWindow == window)
+		{
+			LastFocusedWindow = null;
+		}
+
+		if (_phantomWindows.ContainsKey(window))
+		{
+			bool removePhantomSuccess = RemovePhantomWindow(window);
+			DoLayout();
+			return removePhantomSuccess;
+		}
 
 		if (!_windows.Contains(window))
 		{
@@ -229,7 +266,32 @@ public class Workspace : IWorkspace
 		return success;
 	}
 
-	public void FocusWindowInDirection(WindowDirection direction, IWindow window)
+	private bool RemovePhantomWindow(IWindow window)
+	{
+		Logger.Debug($"Removing phantom window {window} from workspace {Name}");
+
+		if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine))
+		{
+			Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
+			return false;
+		}
+
+		if (!ILayoutEngine.ContainsEqual(ActiveLayoutEngine, layoutEngine))
+		{
+			Logger.Error($"Phantom window {window} is not in the active layout engine {ActiveLayoutEngine}");
+			return false;
+		}
+
+		if (!layoutEngine.Remove(window))
+		{
+			Logger.Error($"Phantom window {window} could not be removed from layout engine {layoutEngine}");
+			return false;
+		}
+
+		return true;
+	}
+
+	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
@@ -242,16 +304,16 @@ public class Workspace : IWorkspace
 		ActiveLayoutEngine.FocusWindowInDirection(direction, window);
 	}
 
-	public void SwapWindowInDirection(WindowDirection direction, IWindow? window = null)
+	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
-		window ??= FocusedWindow;
+		window ??= LastFocusedWindow;
 		if (window == null)
 		{
 			Logger.Error($"No window to swap in workspace {Name}");
 			return;
 		}
 
-		Logger.Debug($"Swapping window {window} in workspace {Name}");
+		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
 
 		if (!_windows.Contains(window))
 		{
@@ -272,4 +334,58 @@ public class Workspace : IWorkspace
 			window.Hide();
 		}
 	}
+
+	#region Phantom Windows
+	public void RegisterPhantomWindow(ILayoutEngine engine, IWindow window)
+	{
+		Logger.Debug($"Registering phantom window {window} in workspace {Name}");
+
+		if (ILayoutEngine.ContainsEqual(engine, ActiveLayoutEngine))
+		{
+			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
+			return;
+		}
+
+		if (_phantomWindows.ContainsKey(window))
+		{
+			Logger.Error($"Phantom window {window} already exists in workspace {Name}");
+			return;
+		}
+
+		_phantomWindows.Add(window, engine);
+		_configContext.WorkspaceManager.RegisterPhantomWindow(this, window);
+		DoLayout();
+	}
+
+	public void UnregisterPhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false)
+	{
+		Logger.Debug($"Unregistering phantom window {window} in workspace {Name}");
+
+		if (ILayoutEngine.ContainsEqual(engine, ActiveLayoutEngine))
+		{
+			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
+			return;
+		}
+
+		if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine))
+		{
+			Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
+			return;
+		}
+
+		if (phantomEngine != engine)
+		{
+			Logger.Error($"Phantom window {window} does not belong to layout engine {engine} in workspace {Name}");
+			return;
+		}
+
+		_phantomWindows.Remove(window);
+		_configContext.WorkspaceManager.UnregisterPhantomWindow(window);
+
+		if (doLayout)
+		{
+			DoLayout();
+		}
+	}
+	#endregion
 }

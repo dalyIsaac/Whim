@@ -152,7 +152,7 @@ public class Window : IWindow
 		};
 	}
 
-	internal static Window? RegisterWindow(HWND hwnd, IConfigContext configContext)
+	public static Window? CreateWindow(HWND hwnd, IConfigContext configContext)
 	{
 		Logger.Debug($"Registering window {hwnd.Value}");
 

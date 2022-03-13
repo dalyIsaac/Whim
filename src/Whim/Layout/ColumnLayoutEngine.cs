@@ -57,11 +57,11 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		}
 	}
 
-	public override void FocusWindowInDirection(WindowDirection direction, IWindow window)
+	public override void FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window} in layout engine {Name}");
 
-		if (direction != WindowDirection.Left && direction != WindowDirection.Right)
+		if (direction != Direction.Left && direction != Direction.Right)
 		{
 			return;
 		}
@@ -81,11 +81,11 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		adjWindow.Focus();
 	}
 
-	public override void SwapWindowInDirection(WindowDirection direction, IWindow window)
+	public override void SwapWindowInDirection(Direction direction, IWindow window)
 	{
-		Logger.Debug($"Swapping window {window} in layout engine {Name}");
+		Logger.Debug($"Swapping window {window} in layout engine {Name} in direction {direction}");
 
-		if (direction != WindowDirection.Left && direction != WindowDirection.Right)
+		if (direction != Direction.Left && direction != Direction.Right)
 		{
 			return;
 		}
@@ -112,15 +112,15 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 	/// </summary>
 	/// <param name="leftToRight">Whether we are moving left to right or right to left.</param>
 	/// <param name="direction">The window direction to move.</param>
-	private static int GetDelta(bool leftToRight, WindowDirection direction)
+	private static int GetDelta(bool leftToRight, Direction direction)
 	{
 		if (leftToRight)
 		{
-			return direction == WindowDirection.Left ? -1 : 1;
+			return direction == Direction.Left ? -1 : 1;
 		}
 		else
 		{
-			return direction == WindowDirection.Left ? 1 : -1;
+			return direction == Direction.Left ? 1 : -1;
 		}
 	}
 }

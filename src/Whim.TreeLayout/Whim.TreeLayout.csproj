@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="WPF-UI" Version="1.2.2-prerelease116" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+
+</Project>

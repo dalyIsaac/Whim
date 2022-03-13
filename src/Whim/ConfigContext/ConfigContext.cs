@@ -24,9 +24,9 @@ public class ConfigContext : IConfigContext
 
 	public event EventHandler<ShutdownEventArgs>? Shutdown;
 
-	public ConfigContext()
+	public ConfigContext(LoggerConfig? loggerConfig)
 	{
-		Logger = Logger.Initialize();
+		Logger = Logger.Initialize(loggerConfig ?? new LoggerConfig());
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager(this);
 		WindowManager = new WindowManager(this);

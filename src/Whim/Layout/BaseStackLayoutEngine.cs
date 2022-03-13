@@ -60,7 +60,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 		return _stack.FirstOrDefault();
 	}
 
-	public abstract void FocusWindowInDirection(WindowDirection direction, IWindow window);
+	public abstract void FocusWindowInDirection(Direction direction, IWindow window);
 
-	public abstract void SwapWindowInDirection(WindowDirection direction, IWindow window);
+	public abstract void SwapWindowInDirection(Direction direction, IWindow window);
 }

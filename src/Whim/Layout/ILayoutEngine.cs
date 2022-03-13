@@ -31,7 +31,7 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	/// </summary>
 	/// <param name="direction">The direction to focus in.</param>
 	/// <param name="window">The origin window</param>
-	public void FocusWindowInDirection(WindowDirection direction, IWindow window);
+	public void FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
 	/// Swaps the <see paramref="window"/> in the <see paramref="direction"/>.
@@ -40,5 +40,59 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	/// </summary>
 	/// <param name="direction">The direction to swap the window in.</param>
 	/// <param name="window">The window to swap.</param>
-	public void SwapWindowInDirection(WindowDirection direction, IWindow window);
+	public void SwapWindowInDirection(Direction direction, IWindow window);
+
+	/// <summary>
+	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
+	/// or a child layout engine is type <typeparamref name="T"/>.
+	/// </summary>
+	/// <typeparam name="T">The type of layout engine to check for.</typeparam>
+	/// <param name="root">
+	/// The root layout engine to check. If this is a proxy layout engine, it'll check its child
+	/// proxy layout engines.
+	/// </param>
+	/// <returns>
+	// The layout engine with type <typeparamref name="T"/>, or null if none is found.
+	/// </returns>
+	public static T? GetLayoutEngine<T>(ILayoutEngine root) where T : ILayoutEngine
+	{
+		if (root is T)
+		{
+			return (T)root;
+		}
+
+		if (root is BaseProxyLayoutEngine proxy)
+		{
+			return BaseProxyLayoutEngine.GetLayoutEngine<T>(proxy);
+		}
+
+		return default;
+	}
+
+	/// <summary>
+	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
+	/// or a child layout engine is equal to <paramref name="layoutEngine"/>.
+	/// </summary>
+	/// <param name="root">
+	/// The root layout engine to check. If this is a proxy layout engine, it'll check its child
+	/// proxy layout engines.
+	/// </param>
+	/// <param name="layoutEngine">The layout engine to check for.</param>
+	/// <returns>
+	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
+	/// </returns>
+	public static bool ContainsEqual(ILayoutEngine root, ILayoutEngine layoutEngine)
+	{
+		if (root == layoutEngine)
+		{
+			return true;
+		}
+
+		if (root is BaseProxyLayoutEngine proxy)
+		{
+			return BaseProxyLayoutEngine.ContainsEqual(proxy, layoutEngine);
+		}
+
+		return false;
+	}
 }

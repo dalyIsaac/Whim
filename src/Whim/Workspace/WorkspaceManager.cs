@@ -187,10 +187,12 @@ public class WorkspaceManager : IWorkspaceManager
 		{
 			if (_monitorWorkspaceMap[monitor] == workspace)
 			{
+				Logger.Debug($"Found monitor {monitor} for workspace {workspace.Name}");
 				return monitor;
 			}
 		}
 
+		Logger.Debug($"Could not find monitor for workspace {workspace.Name}");
 		return null;
 	}
 
@@ -209,18 +211,20 @@ public class WorkspaceManager : IWorkspaceManager
 	#region Windows
 	private void WindowManager_WindowRegistered(object? sender, WindowEventArgs args)
 	{
-		Logger.Debug($"Window registered: {args.Window}");
+		Logger.Debug($"Registering window {args.Window}");
 
 		IWindow window = args.Window;
 
 		if (ActiveWorkspace == null)
 		{
+			Logger.Error($"No active workspace found.");
 			return;
 		}
 
 		_windowWorkspaceMap[window] = ActiveWorkspace;
 		ActiveWorkspace?.AddWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
+		Logger.Debug($"Window {window} registered to workspace {ActiveWorkspace!.Name}");
 	}
 
 	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
@@ -270,7 +274,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
 	{
-		window ??= ActiveWorkspace.FocusedWindow;
+		window ??= ActiveWorkspace.LastFocusedWindow;
 		if (window == null)
 		{
 			Logger.Error("No window was found");
@@ -291,7 +295,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
 	{
-		window ??= ActiveWorkspace.FocusedWindow;
+		window ??= ActiveWorkspace.LastFocusedWindow;
 		if (window == null)
 		{
 			Logger.Error("No window was found");
@@ -343,4 +347,18 @@ public class WorkspaceManager : IWorkspaceManager
 
 		MoveWindowToMonitor(nextMonitor, window);
 	}
+
+	#region Phantom Windows
+	public void RegisterPhantomWindow(IWorkspace workspace, IWindow window)
+	{
+		Logger.Debug($"Registering phantom window {window} to workspace {workspace}");
+		_windowWorkspaceMap[window] = workspace;
+	}
+
+	public void UnregisterPhantomWindow(IWindow window)
+	{
+		Logger.Debug($"Unregistering phantom window {window}");
+		_windowWorkspaceMap.Remove(window);
+	}
+	#endregion
 }
