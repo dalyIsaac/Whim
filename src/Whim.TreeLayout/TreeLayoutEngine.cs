@@ -335,9 +335,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			yield break;
 		}
 
-		foreach (IWindowLocation location in GetWindowLocations(Root, new Location(0, 0, 0, 0)))
+		foreach (TreeLayoutWindowLocation location in GetWindowLocations(Root, new Location(0, 0, 0, 0)))
 		{
-			yield return location.Window;
+			if (location.Node is LeafNode leafNode)
+			{
+				yield return leafNode.Window;
+			}
 		}
 	}
 

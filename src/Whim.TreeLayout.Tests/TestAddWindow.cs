@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
-public class TestAdd
+public class TestAddWindow
 {
 	[Fact]
 	public void Add_Root()

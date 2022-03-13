@@ -23,10 +23,24 @@ public class TestGetNodes
 	}
 
 	[Fact]
+	public void GetLeftMostLeaf_EmptySplitNode()
+	{
+		SplitNode node = new();
+		Assert.Null(node.GetLeftMostLeaf());
+	}
+
+	[Fact]
 	public void GetRightMostLeaf()
 	{
 		LeafNode? node = _tree.Right.GetRightMostLeaf();
 
 		Assert.Equal(_tree.RightBottom, node);
+	}
+
+	[Fact]
+	public void GetRightMostLeaf_EmptySplitNode()
+	{
+		SplitNode node = new();
+		Assert.Null(node.GetRightMostLeaf());
 	}
 }

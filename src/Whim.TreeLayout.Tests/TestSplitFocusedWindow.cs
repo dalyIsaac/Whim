@@ -9,6 +9,7 @@ public class TestSplitFocusedWindow
 	private readonly Mock<IMonitorManager> _monitorManager = new();
 	private readonly Mock<IWorkspace> _activeWorkspace = new();
 	private readonly Mock<IWorkspaceManager> _workspaceManager = new();
+	private readonly Mock<IWindowManager> _windowManager = new();
 	private readonly Mock<IConfigContext> _configContext = new();
 	private readonly TreeLayoutEngine _engine;
 
@@ -22,6 +23,7 @@ public class TestSplitFocusedWindow
 
 		_configContext.Setup(x => x.MonitorManager).Returns(_monitorManager.Object);
 		_configContext.Setup(x => x.WorkspaceManager).Returns(_workspaceManager.Object);
+		_configContext.Setup(x => x.WindowManager).Returns(_windowManager.Object);
 
 		_engine = new TreeLayoutEngine(_configContext.Object);
 	}

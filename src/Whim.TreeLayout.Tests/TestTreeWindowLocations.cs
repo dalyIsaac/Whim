@@ -17,14 +17,36 @@ internal static class TestTreeWindowLocations
 
 	public static ILocation<double>[] All = new ILocation<double>[]
 	{
-			Left,
-			RightTopLeftTop,
-			RightTopLeftBottomLeft,
-			RightTopLeftBottomRightTop,
-			RightTopLeftBottomRightBottom,
-			RightTopRight1,
-			RightTopRight2,
-			RightTopRight3,
-			RightBottom
+		Left,
+		RightTopLeftTop,
+		RightTopLeftBottomLeft,
+		RightTopLeftBottomRightTop,
+		RightTopLeftBottomRightBottom,
+		RightTopRight1,
+		RightTopRight2,
+		RightTopRight3,
+		RightBottom
+	};
+
+	public static IWindowLocation[] GetAllWindowLocations(ILocation<int> screen, IWindow leftWindow,
+		IWindow rightTopLeftTopWindow,
+		IWindow rightTopLeftBottomLeftWindow,
+		IWindow rightTopLeftBottomRightTopWindow,
+		IWindow rightTopLeftBottomRightBottomWindow,
+		IWindow rightTopRight1Window,
+		IWindow rightTopRight2Window,
+		IWindow rightTopRight3Window,
+		IWindow rightBottomWindow)
+	=> new IWindowLocation[]
+	{
+		new WindowLocation(leftWindow, Left.ToLocation(screen), WindowState.Normal),
+		new WindowLocation(rightTopLeftTopWindow, RightTopLeftTop.ToLocation(screen), WindowState.Normal),
+		new WindowLocation(rightTopLeftBottomLeftWindow, RightTopLeftBottomLeft.ToLocation(screen), WindowState.Normal),
+		new WindowLocation(rightTopLeftBottomRightTopWindow, RightTopLeftBottomRightTop.ToLocation(screen), WindowState.Normal),
+		new WindowLocation(rightTopLeftBottomRightBottomWindow, RightTopLeftBottomRightBottom.ToLocation(screen), WindowState.Normal),
+		new WindowLocation(rightTopRight1Window, RightTopRight1.ToLocation(screen), WindowState.Normal),
+		new WindowLocation(rightTopRight2Window, RightTopRight2.ToLocation(screen), WindowState.Normal),
+		new WindowLocation(rightTopRight3Window, RightTopRight3.ToLocation(screen), WindowState.Normal),
+		new WindowLocation(rightBottomWindow, RightBottom.ToLocation(screen), WindowState.Normal)
 	};
 }

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
-public class TestRemove
+public class TestRemoveWindow
 {
 	private readonly Mock<IWorkspace> _activeWorkspace = new();
 	private readonly Mock<IWorkspaceManager> _workspaceManager = new();
@@ -12,7 +12,7 @@ public class TestRemove
 	private readonly Mock<IConfigContext> _configContext = new();
 	private readonly TreeLayoutEngine _engine;
 
-	public TestRemove()
+	public TestRemoveWindow()
 	{
 		_monitorManager.Setup(m => m.FocusedMonitor).Returns(_focusedMonitor.Object);
 		_workspaceManager.Setup(x => x.ActiveWorkspace).Returns(_activeWorkspace.Object);
