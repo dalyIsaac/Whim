@@ -204,6 +204,46 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
+	/// Swap the two nodes in this <see cref="SplitNode"/>'s list of children.
+	/// Both nodes must be children of this <see cref="SplitNode"/>.
+	/// </summary>
+	/// <param name="a">The first node to swap.</param>
+	/// <param name="b">The second node to swap.</param>
+	/// <returns><see langword="true"/> if the nodes were found and swapped, <see langword="false"/> otherwise.</returns>
+	internal bool Swap(Node a, Node b)
+	{
+		int aIdx = -1;
+		int bIdx = -1;
+
+		for (int i = 0; i < _children.Count; i++)
+		{
+			if (_children[i] == a)
+			{
+				aIdx = i;
+			}
+			else if (_children[i] == b)
+			{
+				bIdx = i;
+			}
+
+			if (aIdx != -1 && bIdx != -1)
+			{
+				break;
+			}
+		}
+
+		if (aIdx == -1 || bIdx == -1)
+		{
+			Logger.Error($"Failed to swap {a} and {b} in {this}");
+			return false;
+		}
+
+		// Swap the nodes.
+		(_children[aIdx], _children[bIdx]) = (_children[bIdx], _children[aIdx]);
+		return true;
+	}
+
+	/// <summary>
 	/// If <see cref="SplitNode.EqualWeight"/> is <see langword="true"/>, this will
 	/// distribute the weights of the children of this <see cref="SplitNode"/>,
 	/// so the children have equal weight, but <see cref="SplitNode.EqualWeight"/>

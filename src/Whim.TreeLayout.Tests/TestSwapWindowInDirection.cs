@@ -75,4 +75,16 @@ public class TestSwapWindowInDirection
 		WindowNode leftNode = (WindowNode)_testEngine.RootNode[0].node;
 		Assert.Equal(leftNode.Window, _testEngine.LeftWindow.Object);
 	}
+
+	[Fact]
+	public void RightTopRight1_RightTopRight2()
+	{
+		_testEngine.Engine.SwapWindowInDirection(Direction.Down, _testEngine.RightTopRight1Window.Object);
+
+		WindowNode rightTopRight1Node = (WindowNode)_testEngine.RightTopRightNode[0].node;
+		Assert.Equal(rightTopRight1Node.Window, _testEngine.RightTopRight2Window.Object);
+
+		WindowNode rightTopRight2Node = (WindowNode)_testEngine.RightTopRightNode[1].node;
+		Assert.Equal(rightTopRight2Node.Window, _testEngine.RightTopRight1Window.Object);
+	}
 }
