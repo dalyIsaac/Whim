@@ -267,7 +267,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 
-		foreach (var item in GetWindowLocations(Root, location))
+		foreach (TreeLayoutWindowLocation? item in GetWindowLocations(Root, location))
 		{
 			if (item.Node is LeafNode leafNode)
 			{
