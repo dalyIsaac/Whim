@@ -310,12 +310,22 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			return;
 		}
 
+		Logger.Verbose($"Swapping window {window.Title} with window {targetNode.Window.Title}");
+
 		// Get the parents.
 		SplitNode? targetNodeParent = targetNode.Parent;
 		SplitNode? nodeParent = node.Parent;
 
-		targetNodeParent?.Replace(targetNode, node);
-		nodeParent?.Replace(node, targetNode);
+		// Swap the nodes.
+		if (targetNodeParent == nodeParent)
+		{
+			targetNodeParent?.Swap(node, targetNode);
+		}
+		else
+		{
+			targetNodeParent?.Replace(targetNode, node);
+			nodeParent?.Replace(node, targetNode);
+		}
 
 		window.Focus();
 	}
