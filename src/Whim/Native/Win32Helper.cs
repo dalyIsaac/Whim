@@ -259,7 +259,7 @@ public static class Win32Helper
 	private static readonly HWND HWND_TOP = new(0);
 
 	/// <summary>
-	/// Using the given <see paramref="loc"/>, sets the window's position.
+	/// Using the given <paramref name="loc"/>, sets the window's position.
 	/// </summary>
 	/// <param name="loc"></param>
 	public static void SetWindowPos(IWindowLocation windowLocation)

@@ -90,7 +90,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 			return;
 		}
 
-		// Find the index of the window in the stack
+		// Find the index of the window in the stack.
 		int windowIndex = _stack.FindIndex(x => x.Handle == window?.Handle);
 		if (windowIndex == -1)
 		{
@@ -105,6 +105,11 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		IWindow adjWindow = _stack[adjIndex];
 		_stack[windowIndex] = adjWindow;
 		_stack[adjIndex] = window;
+	}
+
+	public override void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window)
+	{
+		// Not implemented.
 	}
 
 	/// <summary>

@@ -10,6 +10,7 @@ namespace Whim;
 public abstract class BaseStackLayoutEngine : ILayoutEngine
 {
 	protected readonly List<IWindow> _stack = new();
+	protected readonly List<double> _weights = new();
 
 	public Commander Commander { get; } = new();
 
@@ -63,4 +64,6 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	public abstract void FocusWindowInDirection(Direction direction, IWindow window);
 
 	public abstract void SwapWindowInDirection(Direction direction, IWindow window);
+
+	public abstract void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window);
 }

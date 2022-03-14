@@ -141,7 +141,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
-	/// Moves the given <see paramref="window"/> to the given <see paramref="workspace"/>.
+	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.
 	/// </summary>
 	/// <param name="workspace">The workspace to move the window to.</param>
 	/// <param name="window">
@@ -151,7 +151,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null);
 
 	/// <summary>
-	/// Moves the given <see paramref="window"/> to the given <see paramref="monitor"/>.
+	/// Moves the given <paramref name="window"/> to the given <paramref name="monitor"/>.
 	/// </summary>
 	/// <param name="monitor">The monitor to move the window to.</param>
 	/// <param name="window">
@@ -161,7 +161,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null);
 
 	/// <summary>
-	/// Moves the given <see paramref="window"/> to the previous monitor.
+	/// Moves the given <paramref name="window"/> to the previous monitor.
 	/// </summary>
 	/// <param name="window">
 	/// The window to move. If <see langword="null"/>, this will default to
@@ -170,7 +170,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	public void MoveWindowToPreviousMonitor(IWindow? window = null);
 
 	/// <summary>
-	/// Moves the given <see paramref="window"/> to the next monitor.
+	/// Moves the given <paramref name="window"/> to the next monitor.
 	/// </summary>
 	/// <param name="window">
 	/// The window to move. If <see langword="null"/>, this will default to

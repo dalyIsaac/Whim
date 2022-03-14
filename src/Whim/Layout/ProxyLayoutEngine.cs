@@ -45,6 +45,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) => _innerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
+
 	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
 
 	/// <summary>
