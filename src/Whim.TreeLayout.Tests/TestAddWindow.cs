@@ -67,7 +67,7 @@ public class TestAddWindow
 		engine.Add(window2.Object);
 
 		workspaceManager.Setup(w => w.ActiveWorkspace.LastFocusedWindow).Returns(window1.Object);
-		engine.MoveFocusedWindowEdgeInDirection(Direction.Right, 0.1);
+		engine.MoveWindowEdgeInDirection(Direction.Right, 0.1, window1.Object);
 
 		engine.Add(window3.Object);
 

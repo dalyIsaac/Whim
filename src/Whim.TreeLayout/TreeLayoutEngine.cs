@@ -365,23 +365,11 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </summary>
 	private const double MAX_RELATIVE_DELTA = 0.5;
 
-	/// <summary>
-	/// Change the focused window's edge by the specified <paramref name="fractionDelta"/>.
-	/// </summary>
-	/// <param name="edge">The edge to change.</param>
-	/// <param name="fractionDelta">The percentage to change the edge by.</param>
-	public void MoveFocusedWindowEdgeInDirection(Direction edge, double fractionDelta)
+	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window)
 	{
-		Logger.Debug($"Moving focused window edge in direction {edge} by {fractionDelta} in layout engine {Name}");
+		Logger.Debug($"Moving window {window} edge in direction {edge} by {fractionDelta} in layout engine {Name}");
 
-		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
-		if (focusedWindow == null)
-		{
-			Logger.Error($"No focused window in layout engine {Name}");
-			return;
-		}
-
-		if (!_windows.TryGetValue(focusedWindow, out LeafNode? focusedNode))
+		if (!_windows.TryGetValue(window, out LeafNode? focusedNode))
 		{
 			Logger.Error($"Could not find node for focused window in layout engine {Name}");
 			return;

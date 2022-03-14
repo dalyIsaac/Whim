@@ -125,7 +125,6 @@ internal class TestTreeEngine
 		RightTopNode = (RightTopRightNode.Parent as SplitNode)!;
 		RightNode = (RightBottomNode.Parent as SplitNode)!;
 
-		ActiveWorkspace.Setup(x => x.LastFocusedWindow).Returns(RightTopLeftBottomRightTopWindow.Object);
-		Engine.MoveFocusedWindowEdgeInDirection(Direction.Down, 0.05);
+		Engine.MoveWindowEdgeInDirection(Direction.Down, 0.05, RightTopLeftBottomRightTopWindow.Object);
 	}
 }

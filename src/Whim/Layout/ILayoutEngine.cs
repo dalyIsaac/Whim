@@ -25,7 +25,7 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	public IWindow? GetFirstWindow();
 
 	/// <summary>
-	/// Focuses the <see paramref="window"/> in the <see paramref="direction"/>.
+	/// Focuses the <paramref name="window"/> in the <paramref name="direction"/>.
 	/// It's recommended that this method is not called directly, but rather
 	/// through the <see cref="IWorkspace.FocusWindowInDirection"/> method.
 	/// </summary>
@@ -34,13 +34,21 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	public void FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
-	/// Swaps the <see paramref="window"/> in the <see paramref="direction"/>.
+	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
 	/// It's recommended that this method is not called directly, but rather
 	/// through <see cref="IWorkspace.SwapWindowInDirection"/>.
 	/// </summary>
 	/// <param name="direction">The direction to swap the window in.</param>
 	/// <param name="window">The window to swap.</param>
 	public void SwapWindowInDirection(Direction direction, IWindow window);
+
+	/// <summary>
+	/// Change the focused window's edge by the specified <paramref name="fractionDelta"/>.
+	/// </summary>
+	/// <param name="edge">The edge to change.</param>
+	/// <param name="fractionDelta">The percentage to change the edge by.</param>
+	/// <param name="window">The window to change the edge of.</param>
+	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window);
 
 	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>

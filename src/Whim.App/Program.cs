@@ -24,11 +24,15 @@ public class Program
 		// Add workspaces
 		for (int i = 0; i < 4; i++)
 		{
-			// Workspace workspace = new(configContext, i.ToString(), new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
 			TreeLayoutEngine treeLayoutEngine = new(configContext);
 			treeLayoutEngines.Add(treeLayoutEngine);
 
-			Workspace workspace = new(configContext, i.ToString(), treeLayoutEngine);
+			Workspace workspace = new(configContext,
+							 i.ToString(),
+							 new ColumnLayoutEngine(),
+							 new ColumnLayoutEngine("Right to left", false),
+							 treeLayoutEngine);
+
 			configContext.WorkspaceManager.Add(workspace);
 		}
 
@@ -143,6 +147,33 @@ public class Program
 
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));
 		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateOuterGap(10));
+
+		Direction edge = Direction.Left;
+
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_J), (args) =>
+		{
+			edge = Direction.Left;
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_K), (args) =>
+		{
+			edge = Direction.Right;
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_I), (args) =>
+		{
+			edge = Direction.Up;
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_M), (args) =>
+		{
+			edge = Direction.Down;
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_H), (args) =>
+		{
+			configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(edge, edge == Direction.Left || edge == Direction.Up ? 0.1 : -0.1);
+		});
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_L), (args) =>
+		{
+			configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(edge, edge == Direction.Left || edge == Direction.Up ? -0.1 : 0.1);
+		});
 
 		return configContext;
 	}

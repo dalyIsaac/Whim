@@ -80,7 +80,7 @@ public interface IWorkspace : ICommandable
 	public void FocusFirstWindow();
 
 	/// <summary>
-	/// Focuses the <see paramref="window"/> in the <see paramref="direction"/>.
+	/// Focuses the <paramref name="window"/> in the <paramref name="direction"/>.
 	/// </summary>
 	/// <param name="direction">The direction to focus in.</param>
 	/// <param name="window">
@@ -89,13 +89,25 @@ public interface IWorkspace : ICommandable
 	public void FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
-	/// Swaps the <see paramref="window"/> in the <see paramref="direction"/>.
+	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
 	/// </summary>
 	/// <param name="direction">The direction to swap the window in.</param>
 	/// <param name="window">
 	/// The window to swap. If null, the currently focused window is swapped.
 	/// </param>
 	public void SwapWindowInDirection(Direction direction, IWindow? window = null);
+
+	/// <summary>
+	/// Change the <paramref name="window"/>'s edge <paramref name="direction"/> by
+	/// the specified <paramref name="fractionDelta"/>.
+	/// </summary>
+	/// <param name="edge">The edge to change.</param>
+	/// <param name="fractionDelta">The percentage to change the edge by.</param>
+	/// <param name="window">
+	/// The window to change the edge of. If null, the currently focused window is
+	/// used.
+	/// </param>
+	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null);
 	#endregion
 
 	#region Phantom Windows

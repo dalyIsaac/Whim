@@ -295,7 +295,7 @@ public class Workspace : IWorkspace
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
-		if (!_windows.Contains(window))
+		if (!ContainsWindow(window))
 		{
 			Logger.Error($"Window {window} does not exist in workspace {Name}");
 			return;
@@ -315,13 +315,34 @@ public class Workspace : IWorkspace
 
 		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
 
-		if (!_windows.Contains(window))
+		if (!ContainsWindow(window))
 		{
 			Logger.Error($"Window {window} does not exist in workspace {Name}");
 			return;
 		}
 
 		ActiveLayoutEngine.SwapWindowInDirection(direction, window);
+		DoLayout();
+	}
+
+	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null)
+	{
+		window ??= LastFocusedWindow;
+		if (window == null)
+		{
+			Logger.Error($"No window to move in workspace {Name}");
+			return;
+		}
+
+		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edge} by {delta}");
+
+		if (!ContainsWindow(window))
+		{
+			Logger.Error($"Window {window} does not exist in workspace {Name}");
+			return;
+		}
+
+		ActiveLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
 		DoLayout();
 	}
 
@@ -388,4 +409,14 @@ public class Workspace : IWorkspace
 		}
 	}
 	#endregion
+
+	/// <summary>
+	/// Returns true when the workspace contains the provided <paramref name="window"/>.
+	/// </summary>
+	/// <param name="window">The window to check for.</param>
+	/// <returns>True when the workspace contains the provided <paramref name="window"/>.</returns>
+	private bool ContainsWindow(IWindow window) => _windows.Contains(window) || (
+		_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
+		&& ILayoutEngine.ContainsEqual(ActiveLayoutEngine, phantomEngine)
+	);
 }
