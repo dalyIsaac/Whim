@@ -24,6 +24,11 @@ public class WorkspaceManager : IWorkspaceManager
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 
 	/// <summary>
+	/// All the phantom windows that are currently registered.
+	/// </summary>
+	private readonly HashSet<IWindow> _phantomWindows = new();
+
+	/// <summary>
 	/// Maps monitors to their active workspace.
 	/// </summary>
 	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
@@ -281,6 +286,12 @@ public class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
+		if (_phantomWindows.Contains(window))
+		{
+			Logger.Error($"Window {window} is a phantom window and cannot be moved");
+			return;
+		}
+
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
 		if (ActiveWorkspace == workspace)
@@ -352,12 +363,14 @@ public class WorkspaceManager : IWorkspaceManager
 	public void RegisterPhantomWindow(IWorkspace workspace, IWindow window)
 	{
 		Logger.Debug($"Registering phantom window {window} to workspace {workspace}");
+		_phantomWindows.Add(window);
 		_windowWorkspaceMap[window] = workspace;
 	}
 
 	public void UnregisterPhantomWindow(IWindow window)
 	{
 		Logger.Debug($"Unregistering phantom window {window}");
+		_phantomWindows.Remove(window);
 		_windowWorkspaceMap.Remove(window);
 	}
 	#endregion

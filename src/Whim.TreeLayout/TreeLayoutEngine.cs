@@ -8,6 +8,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 {
 	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
+	private readonly HashSet<IWindow> _phantomWindows = new();
+
 	public Node? Root { get; private set; }
 
 	/// <summary>
@@ -192,6 +194,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	{
 		parent.Replace(phantomNode, windowNode);
 		phantomNode.Close();
+		_phantomWindows.Remove(phantomNode.Window);
 		_configContext.WorkspaceManager.ActiveWorkspace.UnregisterPhantomWindow(this, phantomNode.Window);
 	}
 
@@ -267,7 +270,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 
-		foreach (var item in GetWindowLocations(Root, location))
+		foreach (TreeLayoutWindowLocation? item in GetWindowLocations(Root, location))
 		{
 			if (item.Node is LeafNode leafNode)
 			{
@@ -546,8 +549,19 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			return;
 		}
 
+		_phantomWindows.Add(phantomNode.Window);
 		_configContext.WorkspaceManager.ActiveWorkspace.RegisterPhantomWindow(this, phantomNode.Window);
 		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 		phantomNode.Focus();
+	}
+
+	public void HidePhantomWindows()
+	{
+		Logger.Debug($"Hiding phantom windows in layout engine {Name}");
+
+		foreach (IWindow window in _phantomWindows)
+		{
+			window.Hide();
+		}
 	}
 }

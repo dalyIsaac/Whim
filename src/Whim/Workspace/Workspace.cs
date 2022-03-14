@@ -136,7 +136,7 @@ public class Workspace : IWorkspace
 
 		// If the LastFocusedWindow is a phantom window, remove it.
 		// This is because phantom windows belong to a specific layout engine.
-		if (LastFocusedWindow != null && _phantomWindows.TryGetValue(LastFocusedWindow, out ILayoutEngine? prevLayoutEngine))
+		if (LastFocusedWindow != null && _phantomWindows.ContainsKey(LastFocusedWindow))
 		{
 			LastFocusedWindow = null;
 		}
@@ -149,6 +149,7 @@ public class Workspace : IWorkspace
 			)
 		);
 
+		_layoutEngines[prevIdx].HidePhantomWindows();
 		DoLayout();
 	}
 
