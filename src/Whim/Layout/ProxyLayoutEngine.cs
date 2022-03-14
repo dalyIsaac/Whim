@@ -49,6 +49,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 
 	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
 
+	public void HidePhantomWindows() => _innerLayoutEngine.HidePhantomWindows();
+
 	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.

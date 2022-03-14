@@ -66,4 +66,6 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	public abstract void SwapWindowInDirection(Direction direction, IWindow window);
 
 	public abstract void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window);
+
+	public void HidePhantomWindows() { }
 }

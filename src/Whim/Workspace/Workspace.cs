@@ -149,6 +149,7 @@ public class Workspace : IWorkspace
 			)
 		);
 
+		_layoutEngines[prevIdx].HidePhantomWindows();
 		DoLayout();
 	}
 

@@ -51,6 +51,11 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window);
 
 	/// <summary>
+	/// Hides all phantom windows belonging to the layout engine.
+	/// </summary>
+	public void HidePhantomWindows();
+
+	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.
 	/// </summary>
