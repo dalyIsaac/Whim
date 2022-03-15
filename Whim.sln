@@ -15,9 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Gaps", "src\Whim.Gaps\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Tests", "src\Whim.Tests\Whim.Tests.csproj", "{B2BA068D-D77A-4B7B-9B64-2C23701F48B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.TreeLayout", "src\Whim.TreeLayout\Whim.TreeLayout.csproj", "{72CEA67D-7305-4246-BBDD-6FE23DC9FF55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout", "src\Whim.TreeLayout\Whim.TreeLayout.csproj", "{72CEA67D-7305-4246-BBDD-6FE23DC9FF55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.TreeLayout.Tests", "src\Whim.TreeLayout.Tests\Whim.TreeLayout.Tests.csproj", "{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout.Tests", "src\Whim.TreeLayout.Tests\Whim.TreeLayout.Tests.csproj", "{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.FloatingLayout", "src\Whim.FloatingLayout\Whim.FloatingLayout.csproj", "{636EA561-2625-4D2A-9A8A-890E5AEF18B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{636EA561-2625-4D2A-9A8A-890E5AEF18B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{636EA561-2625-4D2A-9A8A-890E5AEF18B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{636EA561-2625-4D2A-9A8A-890E5AEF18B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{636EA561-2625-4D2A-9A8A-890E5AEF18B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
