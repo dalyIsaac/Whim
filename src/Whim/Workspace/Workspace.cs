@@ -70,6 +70,11 @@ public class Workspace : IWorkspace
 		IEnumerable<IWindowLocation> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height));
 		foreach (IWindowLocation loc in locations)
 		{
+			if (loc.Window.IsMouseMoving)
+			{
+				continue;
+			}
+
 			// Adjust the window location to the monitor's coordinates
 			loc.Location = new Location(x: loc.Location.X + monitor.X,
 										y: loc.Location.Y + monitor.Y,
