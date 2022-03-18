@@ -55,7 +55,7 @@ public interface IWindow
 	/// <summary>
 	/// Indicates whether the mouse is moving the window.
 	/// </summary>
-	public bool IsMouseMoving { get; internal set; }
+	public bool IsMouseMoving { get; set; }
 
 	/// <summary>
 	/// Moves the focus to this window.

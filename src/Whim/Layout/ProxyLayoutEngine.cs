@@ -51,6 +51,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 
 	public void HidePhantomWindows() => _innerLayoutEngine.HidePhantomWindows();
 
+	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom) => _innerLayoutEngine.MoveWindowToPoint(window, point, isPhantom);
+
 	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.
@@ -65,9 +67,9 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	/// </returns>
 	public static T? GetLayoutEngine<T>(ILayoutEngine root) where T : ILayoutEngine
 	{
-		if (root is T)
+		if (root is T t)
 		{
-			return (T)root;
+			return t;
 		}
 
 		if (root is BaseProxyLayoutEngine proxy && proxy._innerLayoutEngine != null)

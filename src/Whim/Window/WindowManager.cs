@@ -35,7 +35,7 @@ public class WindowManager : IWindowManager
 
 	private IWindow? _mouseMoveWindow;
 
-	private readonly object _mouseMoveLock = new object();
+	private readonly object _mouseMoveLock = new();
 
 
 	/// <summary>
@@ -279,10 +279,22 @@ public class WindowManager : IWindowManager
 			{
 				Logger.Verbose($"Window move for {_mouseMoveWindow} ended");
 				_mouseMoveWindow.IsMouseMoving = false;
+				MoveWindowToLocation(_mouseMoveWindow);
+
 				_mouseMoveWindow = null;
-				_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 			}
 		}
+	}
+
+	private void MoveWindowToLocation(IWindow window)
+	{
+		if (!PInvoke.GetCursorPos(out POINT point))
+		{
+			return;
+		}
+
+		_configContext.WorkspaceManager.MoveWindowToPoint(window, new Point<int>(point.x, point.y));
+		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
 	public void TriggerWindowUpdated(WindowUpdateEventArgs args)

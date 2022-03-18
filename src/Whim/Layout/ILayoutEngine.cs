@@ -56,6 +56,15 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	public void HidePhantomWindows();
 
 	/// <summary>
+	/// Move the <paramref name="window"/> to the <paramref name="point"/>.
+	/// The point has a coordinate space of [0, 1] for both x and y.
+	/// </summary>
+	/// <param name="window">The window to move.</param>
+	/// <param name="point">The point to move the window to.</param>
+	/// <param name="isPhantom">Whether the window is a phantom window.</param>
+	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom = false);
+
+	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.
 	/// </summary>

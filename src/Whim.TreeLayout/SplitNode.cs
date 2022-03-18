@@ -108,8 +108,19 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return;
 		}
 
+		int newNodeIndex = index + (direction.IsPositiveIndex() ? 1 : 0);
+
+		// Bound the index.
+		if (newNodeIndex < 0)
+		{
+			newNodeIndex = 0;
+		}
+		else if (newNodeIndex > _children.Count)
+		{
+			newNodeIndex = _children.Count;
+		}
+
 		// Insert the node.
-		int newNodeIndex = index + (direction.IsPositiveIndex() ? 1 : -1);
 		_children.Insert(newNodeIndex, newNode);
 		newNode.Parent = this;
 

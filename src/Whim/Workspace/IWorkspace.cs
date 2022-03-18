@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -108,6 +107,14 @@ public interface IWorkspace : ICommandable
 	/// used.
 	/// </param>
 	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null);
+
+	/// <summary>
+	/// Moves the given <paramref name="window"/> to the given <paramref name="point"/>.
+	/// </summary>
+	/// <param name="window">The window to move.</param>
+	/// <param name="point">The point to move the window to.</param>
+	/// <param name="isPhantom">Indicates whether the window being moved is a phantom window.</param>
+	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom = false);
 	#endregion
 
 	#region Phantom Windows

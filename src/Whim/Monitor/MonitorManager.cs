@@ -140,15 +140,15 @@ public class MonitorManager : IMonitorManager
 		return _monitors;
 	}
 
-	public IMonitor GetMonitorAtPoint(int x, int y)
+	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
-		Logger.Debug($"Getting monitor at point ({x}, {y})");
-		Screen screen = Screen.FromPoint(new System.Drawing.Point(x, y));
+		Logger.Debug($"Getting monitor at point {point}");
+		Screen screen = Screen.FromPoint(point.ToSystemPoint());
 
 		IMonitor? monitor = _monitors.FirstOrDefault(m => m.Name == screen.DeviceName);
 		if (monitor == null)
 		{
-			Logger.Error($"No monitor found at point ({x}, {y})");
+			Logger.Error($"No monitor found at point {point}");
 			return _monitors[0];
 		}
 

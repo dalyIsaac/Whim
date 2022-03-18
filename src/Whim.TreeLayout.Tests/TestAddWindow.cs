@@ -8,7 +8,10 @@ public class TestAddWindow
 	[Fact]
 	public void Add_Root()
 	{
+		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspaceManager> workspaceManager = new();
+		workspaceManager.Setup(w => w.ActiveWorkspace).Returns(workspace.Object);
+
 		Mock<IConfigContext> configContext = new();
 		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 

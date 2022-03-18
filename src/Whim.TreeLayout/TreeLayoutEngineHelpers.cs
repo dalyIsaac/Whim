@@ -12,18 +12,15 @@ public partial class TreeLayoutEngine
 	/// relative location of the point.
 	/// </param>
 	/// <param name="searchPoint">The point of the leaf node to search for.</param>
-	/// <param name="originalNode">
-	/// The leaf node to search for. The returned node cannot be the same as this node.
-	/// </param>
 	/// <returns>The node which contains the given <paramref name="searchPoint"/>.</returns>
 	public static LeafNode? GetNodeContainingPoint(Node root,
 												ILocation<double> rootLocation,
-												ILocation<double> searchPoint,
-												LeafNode originalNode)
+												IPoint<double> searchPoint
+												)
 	{
 		if (root is LeafNode leaf)
 		{
-			return leaf == originalNode ? null : leaf;
+			return leaf;
 		}
 
 		if (root is not SplitNode splitNode)
@@ -47,12 +44,11 @@ public partial class TreeLayoutEngine
 				childLocation.Height = weight * rootLocation.Height;
 			}
 
-			if (childLocation.IsPointInside(searchPoint.X, searchPoint.Y))
+			if (childLocation.IsPointInside(searchPoint))
 			{
 				LeafNode? result = GetNodeContainingPoint(root: child,
 											  rootLocation: childLocation,
-											  searchPoint: searchPoint,
-											  originalNode: originalNode);
+											  searchPoint: searchPoint);
 				if (result != null)
 				{
 					return result;

@@ -178,6 +178,13 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
 	/// </param>
 	public void MoveWindowToNextMonitor(IWindow? window = null);
 
+	/// <summary>
+	/// Moves the given <paramref name="window"/> to the given <paramref name="point"/>.
+	/// </summary>
+	/// <param name="window">The window to move.</param>
+	/// <param name="point">The point to move the window to.</param>
+	public void MoveWindowToPoint(IWindow window, IPoint<int> point);
+
 	#region Phantom Windows
 	/// <summary>
 	/// Register a phantom window for the given <paramref name="workspace"/>.

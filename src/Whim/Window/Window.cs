@@ -40,7 +40,7 @@ public class Window : IWindow
 
 	public bool IsMaximized => PInvoke.IsZoomed(Handle);
 
-	public bool IsMouseMoving { get; set; }
+	public bool IsMouseMoving { get; set; } = false;
 
 	public void BringToTop()
 	{
