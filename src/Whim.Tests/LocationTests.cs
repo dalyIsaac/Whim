@@ -36,10 +36,24 @@ public class LocationTests
 	public void IsPointInside_ReturnsTrue_WhenPointIsOnEdge()
 	{
 		Location location = new(0, 0, 10, 10);
+
+		// Extreme boundaries.
 		Assert.True(location.IsPointInside(new Point<int>(0, 0)));
-		Assert.True(location.IsPointInside(new Point<int>(10, 10)));
-		Assert.True(location.IsPointInside(new Point<int>(0, 10)));
-		Assert.True(location.IsPointInside(new Point<int>(10, 0)));
+		Assert.False(location.IsPointInside(new Point<int>(10, 10)));
+		Assert.False(location.IsPointInside(new Point<int>(0, 10)));
+		Assert.False(location.IsPointInside(new Point<int>(10, 0)));
+
+		// Other boundaries.
+		Assert.True(location.IsPointInside(new Point<int>(5, 0)));
+		Assert.True(location.IsPointInside(new Point<int>(0, 5)));
+
+		// Internal points.
+		Assert.True(location.IsPointInside(new Point<int>(5, 5)));
+
+		// External points.
+		Assert.False(location.IsPointInside(new Point<int>(5, -5)));
+		Assert.False(location.IsPointInside(new Point<int>(-5, 5)));
+		Assert.False(location.IsPointInside(new Point<int>(-5, -5)));
 	}
 
 	[Fact]

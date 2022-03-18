@@ -10,16 +10,15 @@ public class TestMonitor
 	[InlineData(1920, 1080, 192, 108, 0.1, 0.1)]
 	[InlineData(1920, 1080, 960, 270, 0.5, 0.25)]
 	[Theory]
-	public void ToUnitSquare(int width, int height, int pointX, int pointY, int expectedX, int expectedY)
+	public void ToUnitSquare(int width, int height, int pointX, int pointY, double expectedX, double expectedY)
 	{
 		// Given
-		Mock<Screen> screen = new();
-		screen.Setup(s => s.WorkingArea).Returns(new Rectangle(0, 0, width, height));
-
-		Monitor monitor = new(screen.Object);
+		Mock<IMonitor> monitor = new();
+		monitor.SetupGet(m => m.Width).Returns(width);
+		monitor.SetupGet(m => m.Height).Returns(height);
 
 		// When
-		IPoint<double> point = monitor.ToUnitSquare(new Point<int>(pointX, pointY));
+		IPoint<double> point = monitor.Object.ToUnitSquare(new Point<int>(pointX, pointY));
 
 		// Then
 		Assert.Equal(expectedX, point.X);
