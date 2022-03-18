@@ -113,7 +113,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		// Not implemented.
 	}
 
-	public override void MoveWindowToPoint(IWindow window, IPoint<double> point, bool _isPhantom)
+	public override void AddWindowAtPoint(IWindow window, IPoint<double> point, bool _isPhantom)
 	{
 		// Calculate the index of the window in the stack.
 		int idx = (int)Math.Round(point.X / (double)_stack.Count, MidpointRounding.AwayFromZero);

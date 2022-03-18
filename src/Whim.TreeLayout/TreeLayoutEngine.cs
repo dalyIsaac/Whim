@@ -598,11 +598,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 	}
 
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom)
+	public void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom)
 	{
-		// TODO: Still has some weird issues when there's 3 vert, and we drag the top
-		// to the third such that the top is just mm below the third's top.
-
 		if (Root == null)
 		{
 			// Add the window normally.

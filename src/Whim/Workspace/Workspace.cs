@@ -367,7 +367,7 @@ public class Workspace : IWorkspace
 
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
-			layoutEngine.MoveWindowToPoint(window, point, isPhantom);
+			layoutEngine.AddWindowAtPoint(window, point, isPhantom);
 		}
 	}
 

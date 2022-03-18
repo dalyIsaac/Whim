@@ -51,7 +51,7 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 
 	public void HidePhantomWindows() => _innerLayoutEngine.HidePhantomWindows();
 
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom) => _innerLayoutEngine.MoveWindowToPoint(window, point, isPhantom);
+	public void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom) => _innerLayoutEngine.AddWindowAtPoint(window, point, isPhantom);
 
 	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>

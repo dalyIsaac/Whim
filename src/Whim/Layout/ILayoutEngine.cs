@@ -62,7 +62,7 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
 	/// <param name="isPhantom">Whether the window is a phantom window.</param>
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom = false);
+	public void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom = false);
 
 	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
