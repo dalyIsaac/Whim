@@ -1,6 +1,4 @@
 using Moq;
-using System.Drawing;
-using System.Windows.Forms;
 using Xunit;
 
 namespace Whim.Tests;

@@ -15,8 +15,7 @@ public partial class TreeLayoutEngine
 	/// <returns>The node which contains the given <paramref name="searchPoint"/>.</returns>
 	public static LeafNode? GetNodeContainingPoint(Node root,
 												ILocation<double> rootLocation,
-												IPoint<double> searchPoint
-												)
+												IPoint<double> searchPoint)
 	{
 		if (root is LeafNode leaf)
 		{
@@ -34,7 +33,7 @@ public partial class TreeLayoutEngine
 
 		foreach ((double weight, Node child) in parent)
 		{
-			// Set up the width/height of the child.
+			// Scale the width/height of the child.
 			if (parent.IsHorizontal)
 			{
 				childLocation.Width = weight * rootLocation.Width;
