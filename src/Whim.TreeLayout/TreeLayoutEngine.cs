@@ -348,12 +348,17 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Logger.Debug($"Clearing layout engine {Name}");
 		Root = null;
 		_windows.Clear();
+
+		HidePhantomWindows();
+		_phantomWindows.Clear();
+
+		Count = 0;
 	}
 
 	public bool Contains(IWindow item)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {item.Title}");
-		return _windows.ContainsKey(item);
+		return _windows.ContainsKey(item) || _phantomWindows.Contains(item);
 	}
 
 	public void CopyTo(IWindow[] array, int arrayIndex)

@@ -12,6 +12,7 @@ internal class TestTreeEngine
 	public Mock<IMonitorManager> MonitorManager = new();
 	public Mock<IWorkspace> ActiveWorkspace = new();
 	public Mock<IWorkspaceManager> WorkspaceManager = new();
+	public Mock<IWindowManager> WindowManager = new();
 	public Mock<IConfigContext> ConfigContext = new();
 
 	public SplitNode RootNode;
@@ -58,6 +59,7 @@ internal class TestTreeEngine
 		ConfigContext.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
 
 		WorkspaceManager.Setup(x => x.ActiveWorkspace).Returns(ActiveWorkspace.Object);
+		ConfigContext.Setup(x => x.WindowManager).Returns(WindowManager.Object);
 		ConfigContext.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 
 		Engine = new(ConfigContext.Object);
@@ -126,5 +128,21 @@ internal class TestTreeEngine
 		RightNode = (RightBottomNode.Parent as SplitNode)!;
 
 		Engine.MoveWindowEdgeInDirection(Direction.Down, 0.05, RightTopLeftBottomRightTopWindow.Object);
+	}
+
+	public IWindow[] GetWindows()
+	{
+		return new[]
+		{
+			LeftWindow.Object,
+			RightTopLeftTopWindow.Object,
+			RightBottomWindow.Object,
+			RightTopRight1Window.Object,
+			RightTopRight2Window.Object,
+			RightTopRight3Window.Object,
+			RightTopLeftBottomLeftWindow.Object,
+			RightTopLeftBottomRightTopWindow.Object,
+			RightTopLeftBottomRightBottomWindow.Object
+		};
 	}
 }
