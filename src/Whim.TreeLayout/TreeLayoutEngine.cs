@@ -624,8 +624,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// Get the node's location.
 		ILocation<double> nodeLocation = GetNodeLocation(node);
 
-		// Save the old direction. This is because AddWindow relies on AddNodeDirection
-		// to determine the direction.
+		// Save the old direction. AddWindow relies on AddNodeDirection to determine the direction.
+		// However, we want to retain the user's current direction after the window is added.
 		Direction oldAddNodeDirection = AddNodeDirection;
 
 		// Update AddNodeDirection with the direction based on the point.

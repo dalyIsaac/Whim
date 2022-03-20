@@ -17,7 +17,7 @@ public partial class TreeLayoutEngine
 												ILocation<double> rootLocation,
 												IPoint<double> searchPoint)
 	{
-		if (root is LeafNode leaf)
+		if (root is LeafNode leaf && rootLocation.IsPointInside(searchPoint))
 		{
 			return leaf;
 		}
