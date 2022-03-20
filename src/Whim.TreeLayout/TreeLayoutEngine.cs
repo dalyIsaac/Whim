@@ -64,13 +64,16 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </summary>
 	/// <param name="window">The window to add.</param>
 	/// <returns>The node that represents the window.</returns>
-	public WindowNode? AddWindow(IWindow window)
+	public WindowNode? AddWindow(IWindow window, IWindow? focusedWindow = null)
 	{
 		Logger.Debug($"Adding window {window.Title} to layout engine {Name}");
 		Count++;
 
+		// Get the focused window node
+		focusedWindow ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+
 		WindowNode node = new(window);
-		if (AddLeafNode(node))
+		if (AddLeafNode(node, focusedWindow))
 		{
 			return node;
 		}
@@ -84,8 +87,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// in the direction specified by this instance's <see cref="AddNodeDirection"/> property.
 	/// </summary>
 	/// <param name="newLeaf">The node to add.</param>
+	/// <param name="window">
+	/// The focused window. If <paramref name="focusedWindow"/> is null, then
+	/// the focused window is set to the <see cref="IWorkspace.LastFocusedWindow"/>.
+	/// </param>
 	/// <returns>True if the node was added, false otherwise.</returns>
-	private bool AddLeafNode(LeafNode newLeaf)
+	private bool AddLeafNode(LeafNode newLeaf, IWindow? focusedWindow = null)
 	{
 		IWindow window = newLeaf.Window;
 
@@ -100,7 +107,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Get the focused window node
-		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		focusedWindow ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
 		Logger.Verbose($"Focused window is {focusedWindow}");
 		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out LeafNode? focusedLeaf))
@@ -216,6 +223,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 		_windows.Remove(window);
 		Count--;
+
+		if (removingNode is PhantomNode phantomNode)
+		{
+			_phantomWindows.Remove(phantomNode.Window);
+			_configContext.WorkspaceManager.ActiveWorkspace.UnregisterPhantomWindow(this, phantomNode.Window);
+		}
 
 		// Remove the node from the tree.
 		if (removingNode.Parent == null)
@@ -335,12 +348,17 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Logger.Debug($"Clearing layout engine {Name}");
 		Root = null;
 		_windows.Clear();
+
+		HidePhantomWindows();
+		_phantomWindows.Clear();
+
+		Count = 0;
 	}
 
 	public bool Contains(IWindow item)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {item.Title}");
-		return _windows.ContainsKey(item);
+		return _windows.ContainsKey(item) || _phantomWindows.Contains(item);
 	}
 
 	public void CopyTo(IWindow[] array, int arrayIndex)
@@ -492,7 +510,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			}),
 		};
 
-		return GetNodeContainingPoint(Root, new NodeLocation() { Height = 1, Width = 1 }, adjacentLocation, node);
+		return GetNodeContainingPoint(Root, new NodeLocation() { Height = 1, Width = 1 }, adjacentLocation);
 	}
 
 	/// <summary>
@@ -539,9 +557,19 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
+	/// <summary>
+	/// Split the focused window in two, and insert a phantom window in the direction
+	/// of <see cref="AddNodeDirection"/>.
+	/// </summary>
 	public void SplitFocusedWindow()
 	{
 		Logger.Debug($"Splitting focused window in layout engine {Name}");
+		SplitFocusedWindow(null);
+	}
+
+	private void SplitFocusedWindow(IWindow? focusedWindow = null)
+	{
+		Logger.Debug($"Splitting focused window in layout engine {Name} with focused window {focusedWindow}");
 
 		// Create the phantom window.
 		PhantomNode? phantomNode = PhantomNode.CreatePhantomNode(_configContext);
@@ -552,7 +580,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Try add the phantom node.
-		if (!AddLeafNode(phantomNode))
+		if (!AddLeafNode(phantomNode, focusedWindow))
 		{
 			phantomNode.Close();
 			Logger.Error($"Could not add phantom node for layout engine {Name}");
@@ -572,6 +600,70 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		foreach (IWindow window in _phantomWindows)
 		{
 			window.Hide();
+		}
+	}
+
+	public void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom)
+	{
+		if (Root == null)
+		{
+			// Add the window normally.
+			MoveWindowToPointAddWindow(window, isPhantom, null);
+			return;
+		}
+
+		// Find the node at the point.
+		LeafNode? node = GetNodeContainingPoint(Root, new NodeLocation() { Height = 1, Width = 1 }, point);
+		if (node == null)
+		{
+			Logger.Error($"Could not find node containing point {point} in layout engine {Name}");
+			return;
+		}
+
+		// Get the parent node.
+		SplitNode? parent = node.Parent;
+
+		// Get the direction.
+		bool isHorizontal = parent?.IsHorizontal ?? AddNodeDirection.IsHorizontal();
+
+		// Get the node's location.
+		ILocation<double> nodeLocation = GetNodeLocation(node);
+
+		// Save the old direction. AddWindow relies on AddNodeDirection to determine the direction.
+		// However, we want to retain the user's current direction after the window is added.
+		Direction oldAddNodeDirection = AddNodeDirection;
+
+		// Update AddNodeDirection with the direction based on the point.
+		if (isHorizontal)
+		{
+			AddNodeDirection = point.X < nodeLocation.X + (nodeLocation.Width / 2)
+				? Direction.Left
+				: Direction.Right;
+		}
+		else
+		{
+			AddNodeDirection = point.Y < nodeLocation.Y + (nodeLocation.Height / 2)
+				? Direction.Up
+				: Direction.Down;
+		}
+
+		MoveWindowToPointAddWindow(window, isPhantom, node.Window);
+
+		// Restore the old direction.
+		AddNodeDirection = oldAddNodeDirection;
+	}
+
+	private void MoveWindowToPointAddWindow(IWindow window, bool isPhantom, IWindow? focusedWindow)
+	{
+		if (isPhantom)
+		{
+			// We don't actually care about this phantom window, as we'll spawn a new one.
+			window.Close();
+			SplitFocusedWindow(focusedWindow);
+		}
+		else
+		{
+			AddWindow(window, focusedWindow);
 		}
 	}
 }

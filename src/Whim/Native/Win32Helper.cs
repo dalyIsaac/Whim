@@ -320,7 +320,7 @@ public static class Win32Helper
 	/// <summary>
 	/// Returns the window's offset.<br/>
 	/// This is based on the issue raised at https://github.com/workspacer/workspacer/issues/139,
-	/// and the associated frix from https://github.com/workspacer/workspacer/pull/146
+	/// and the associated fix from https://github.com/workspacer/workspacer/pull/146.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>

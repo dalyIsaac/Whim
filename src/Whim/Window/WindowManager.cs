@@ -33,6 +33,11 @@ public class WindowManager : IWindowManager
 	/// </summary>
 	private readonly WINEVENTPROC _hookDelegate;
 
+	private IWindow? _mouseMoveWindow;
+
+	private readonly object _mouseMoveLock = new();
+
+
 	/// <summary>
 	/// Indicates whether values have been disposed.
 	/// </summary>
@@ -174,13 +179,13 @@ public class WindowManager : IWindowManager
 				UpdateWindow(window, WindowUpdateType.Foreground);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
-				StartWindowMove();
+				StartWindowMove(window);
+				break;
+			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
+				WindowMove(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
 				EndWindowMove();
-				break;
-			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
-				WindowMove();
 				break;
 		}
 	}
@@ -247,19 +252,49 @@ public class WindowManager : IWindowManager
 		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, type));
 	}
 
-	private void WindowMove()
+	private void StartWindowMove(IWindow window)
 	{
-		// TODO: mouse handlers
+		Logger.Debug($"Starting window move for {window}");
+
+		_mouseMoveWindow = window;
+		_mouseMoveWindow.IsMouseMoving = true;
+	}
+
+	private void WindowMove(IWindow window)
+	{
+		Logger.Debug($"Window move for {window}");
+		if (_mouseMoveWindow == window)
+		{
+			WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, WindowUpdateType.Move));
+		}
 	}
 
 	private void EndWindowMove()
 	{
-		// TODO: mouse handlers
+		lock (_mouseMoveLock)
+		{
+			Logger.Debug($"Ending window move for {_mouseMoveWindow}");
+
+			if (_mouseMoveWindow != null)
+			{
+				Logger.Verbose($"Window move for {_mouseMoveWindow} ended");
+				_mouseMoveWindow.IsMouseMoving = false;
+				MoveWindowToLocation(_mouseMoveWindow);
+
+				_mouseMoveWindow = null;
+			}
+		}
 	}
 
-	private void StartWindowMove()
+	private void MoveWindowToLocation(IWindow window)
 	{
-		// TODO: mouse handlers
+		if (!PInvoke.GetCursorPos(out POINT point))
+		{
+			return;
+		}
+
+		_configContext.WorkspaceManager.MoveWindowToPoint(window, new Point<int>(point.x, point.y));
+		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
 	public void TriggerWindowUpdated(WindowUpdateEventArgs args)

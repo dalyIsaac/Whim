@@ -359,6 +359,39 @@ public class WorkspaceManager : IWorkspaceManager
 		MoveWindowToMonitor(nextMonitor, window);
 	}
 
+	public void MoveWindowToPoint(IWindow window, IPoint<int> location)
+	{
+		Logger.Debug($"Moving window {window} to location {location}");
+
+		// Get the monitor.
+		IMonitor targetMonitor = _configContext.MonitorManager.GetMonitorAtPoint(location);
+
+		// Get the target workspace.
+		IWorkspace? targetWorkspace = GetWorkspaceForMonitor(targetMonitor);
+		if (targetWorkspace == null)
+		{
+			Logger.Error($"Monitor {targetMonitor} was not found to correspond to any workspace");
+			return;
+		}
+
+		bool isPhantom = _phantomWindows.Contains(window);
+		if (targetWorkspace != ActiveWorkspace && isPhantom)
+		{
+			Logger.Error($"Window {window} is a phantom window and cannot be moved");
+			return;
+		}
+
+		if (!ActiveWorkspace.RemoveWindow(window))
+		{
+			Logger.Error($"Could not remove window {window} from workspace {ActiveWorkspace}");
+			return;
+		}
+
+		IPoint<double> normalized = targetMonitor.ToUnitSquare(location);
+		targetWorkspace.MoveWindowToPoint(window, normalized, isPhantom);
+		_windowWorkspaceMap[window] = targetWorkspace;
+	}
+
 	#region Phantom Windows
 	public void RegisterPhantomWindow(IWorkspace workspace, IWindow window)
 	{

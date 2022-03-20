@@ -20,7 +20,7 @@ public class Location : ILocation<int>
 		Height = height;
 	}
 
-	public bool IsPointInside(int x, int y) => ILocation<int>.IsPointInside(this, x, y);
+	public bool IsPointInside(IPoint<int> point) => ILocation<int>.IsPointInside(this, point);
 
 	public override string ToString() => $"(X: {X}, Y: {Y}, Width: {Width}, Height: {Height})";
 

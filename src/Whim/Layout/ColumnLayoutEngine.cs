@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -110,6 +111,29 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 	public override void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window)
 	{
 		// Not implemented.
+	}
+
+	public override void AddWindowAtPoint(IWindow window, IPoint<double> point, bool _isPhantom)
+	{
+		// Calculate the index of the window in the stack.
+		int idx = (int)Math.Round(point.X / (double)_stack.Count, MidpointRounding.AwayFromZero);
+
+		// Bound idx.
+		if (idx < 0)
+		{
+			idx = 0;
+		}
+		else if (idx > _stack.Count)
+		{
+			idx = _stack.Count;
+		}
+
+		if (!LeftToRight)
+		{
+			idx = _stack.Count - idx;
+		}
+
+		_stack.Insert(idx, window);
 	}
 
 	/// <summary>

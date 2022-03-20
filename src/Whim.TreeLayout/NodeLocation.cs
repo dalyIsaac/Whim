@@ -49,13 +49,11 @@ public class NodeLocation : ILocation<double>
 		Height = location.Height;
 	}
 
-	/// <param name="x">The x-coordinate of the point to check.</param>
-	/// <param name="y">The y-coordinate of the point to check.</param>
+	/// <param name="point">The point to check.</param>
 	/// <returns>
-	/// <see langword="true"/> if the location given by <paramref name="x"/> and <paramref name="y"/>
-	/// is inside this location.
+	/// <see langword="true"/> if the location given by <paramref name="point"/> is inside the location.
 	/// </returns>
-	public bool IsPointInside(double x, double y) => ILocation<double>.IsPointInside(this, x, y);
+	public bool IsPointInside(IPoint<double> point) => ILocation<double>.IsPointInside(this, point);
 
 	// override object.Equals
 	public override bool Equals(object? obj)

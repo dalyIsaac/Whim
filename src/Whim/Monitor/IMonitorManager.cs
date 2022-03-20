@@ -26,10 +26,9 @@ public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable, IDisposa
 	/// <summary>
 	/// Returns the <see cref="IMonitor"/> at the given <i>x</i> and <i>y</i> coordinates.
 	/// </summary>
-	/// <param name="x"></param>
-	/// <param name="y"></param>
+	/// <param name="point">Point defined in terms of the real monitor coordinates.</param>
 	/// <returns></returns>
-	public IMonitor GetMonitorAtPoint(int x, int y);
+	public IMonitor GetMonitorAtPoint(IPoint<int> point);
 
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
