@@ -24,28 +24,10 @@ public class TestGetWindowLocations
 	[Fact]
 	public void DoLayout_NullRoot()
 	{
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.Width).Returns(1920);
-		monitor.Setup(m => m.Height).Returns(1080);
-
-		Mock<IMonitorManager> monitorManager = new();
-		monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
-
-		Mock<IWorkspace> activeWorkspace = new();
-		Mock<IWorkspaceManager> workspaceManager = new();
-		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(activeWorkspace.Object);
-
-		Mock<IWindowManager> windowManager = new();
-
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(x => x.MonitorManager).Returns(monitorManager.Object);
-		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
-		configContext.Setup(x => x.WindowManager).Returns(windowManager.Object);
-
+		TestTreeEngineEmpty testTreeEngine = new();
 		ILocation<int> screen = new Location(0, 0, 1920, 1080);
 
-		TreeLayoutEngine _engine = new TreeLayoutEngine(configContext.Object);
-		IEnumerable<IWindowLocation> actual = _engine.DoLayout(screen);
+		IEnumerable<IWindowLocation> actual = testTreeEngine.Engine.DoLayout(screen);
 
 		Assert.Empty(actual);
 	}

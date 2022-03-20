@@ -12,6 +12,7 @@ internal class TestTreeEngineEmpty
 	public Mock<IMonitorManager> MonitorManager = new();
 	public Mock<IWorkspace> ActiveWorkspace = new();
 	public Mock<IWorkspaceManager> WorkspaceManager = new();
+	public Mock<IWindowManager> WindowManager = new();
 	public Mock<IConfigContext> ConfigContext = new();
 
 	public TreeLayoutEngine Engine;
@@ -25,6 +26,7 @@ internal class TestTreeEngineEmpty
 
 		WorkspaceManager.Setup(x => x.ActiveWorkspace).Returns(ActiveWorkspace.Object);
 		ConfigContext.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
+		ConfigContext.Setup(x => x.WindowManager).Returns(WindowManager.Object);
 
 		Engine = new(ConfigContext.Object);
 		Engine.AddNodeDirection = Direction.Right;

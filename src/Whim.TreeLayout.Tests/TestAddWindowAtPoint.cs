@@ -5,16 +5,6 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestAddWindowAtPoint
 {
-	// Cases to add:
-	// 1. Root is null.
-	// 2. Couldn't find node at point.
-	// 3. There is no parent node.
-	// 4. There is a parent node.
-	// 5. Direction is horizontal.
-	// 6. Direction is vertical.
-	// 7. Adding phantom node.
-	// 8. Adding window node.
-
 	[Fact]
 	public void NullRoot()
 	{
