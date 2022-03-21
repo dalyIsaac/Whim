@@ -494,23 +494,22 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		ILocation<double> nodeLocation = GetNodeLocation(node);
 
 		// Next, we figure out the adjacent point of the nodeLocation.
-		ILocation<double> adjacentLocation = new NodeLocation()
-		{
-			X = nodeLocation.X + (direction switch
+		IPoint<double> adjacentLocation = new Point<double>(
+			x: nodeLocation.X + (direction switch
 			{
 				Whim.Direction.Left => -1d / monitor.Width,
 				Whim.Direction.Right => nodeLocation.Width + (1d / monitor.Width),
 				_ => 0d
 			}),
-			Y = nodeLocation.Y + (direction switch
+			y: nodeLocation.Y + (direction switch
 			{
 				Whim.Direction.Up => -1d / monitor.Height,
 				Whim.Direction.Down => nodeLocation.Height + (1d / monitor.Height),
 				_ => 0d
-			}),
-		};
+			})
+		);
 
-		return GetNodeContainingPoint(Root, new NodeLocation() { Height = 1, Width = 1 }, adjacentLocation);
+		return GetNodeContainingPoint(Root, new DoubleLocation() { Height = 1, Width = 1 }, adjacentLocation);
 	}
 
 	/// <summary>
@@ -613,7 +612,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Find the node at the point.
-		LeafNode? node = GetNodeContainingPoint(Root, new NodeLocation() { Height = 1, Width = 1 }, point);
+		LeafNode? node = GetNodeContainingPoint(Root, new DoubleLocation() { Height = 1, Width = 1 }, point);
 		if (node == null)
 		{
 			Logger.Error($"Could not find node containing point {point} in layout engine {Name}");

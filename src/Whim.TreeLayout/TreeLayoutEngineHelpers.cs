@@ -29,7 +29,7 @@ public partial class TreeLayoutEngine
 
 		SplitNode parent = splitNode;
 
-		NodeLocation childLocation = new(rootLocation);
+		DoubleLocation childLocation = new(rootLocation);
 
 		foreach ((double weight, Node child) in parent)
 		{
@@ -74,11 +74,11 @@ public partial class TreeLayoutEngine
 	/// </summary>
 	/// <param name="node">The node to get the location for.</param>
 	/// <returns>Location of the node. Used for recursion.</returns>
-	public static ILocation<double> GetNodeLocation(Node node, NodeLocation? location = null)
+	public static ILocation<double> GetNodeLocation(Node node, DoubleLocation? location = null)
 	{
 		if (location == null)
 		{
-			location = new NodeLocation() { X = 0, Y = 0, Width = 1, Height = 1 };
+			location = new DoubleLocation() { X = 0, Y = 0, Width = 1, Height = 1 };
 		}
 
 		if (node.Parent == null)
