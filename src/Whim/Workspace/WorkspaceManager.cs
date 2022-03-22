@@ -375,13 +375,14 @@ public class WorkspaceManager : IWorkspaceManager
 		}
 
 		bool isPhantom = _phantomWindows.Contains(window);
-		if (targetWorkspace != ActiveWorkspace && isPhantom)
+		if (isPhantom && targetWorkspace != ActiveWorkspace)
 		{
 			Logger.Error($"Window {window} is a phantom window and cannot be moved");
 			return;
 		}
 
-		if (!ActiveWorkspace.RemoveWindow(window))
+		// If the active workspace contains the window, and can't remove it, error out.
+		if (targetWorkspace != ActiveWorkspace && !ActiveWorkspace.RemoveWindow(window))
 		{
 			Logger.Error($"Could not remove window {window} from workspace {ActiveWorkspace}");
 			return;

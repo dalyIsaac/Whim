@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Whim.Bar;
 using Whim.Dashboard;
+using Whim.FloatingLayout;
 using Whim.Gaps;
 using Whim.TreeLayout;
 
@@ -57,6 +58,10 @@ public class Program
 		GapsPlugin gapsPlugin = new(configContext, gapsConfig);
 
 		configContext.PluginManager.RegisterPlugin(gapsPlugin);
+
+		// Add floating layout.
+		FloatingLayoutPlugin floatingLayoutPlugin = new(configContext);
+		configContext.PluginManager.RegisterPlugin(floatingLayoutPlugin);
 
 		// Keyboard shortcuts
 		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());
@@ -174,6 +179,13 @@ public class Program
 		{
 			configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(edge, edge == Direction.Left || edge == Direction.Up ? -0.1 : 0.1);
 		});
+
+		// Floating layout
+		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_F), (args) =>
+		{
+			floatingLayoutPlugin.ToggleWindowFloating();
+		});
+
 
 		return configContext;
 	}
