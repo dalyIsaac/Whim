@@ -108,15 +108,11 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 	private ILocation<double>? GetUnitLocation(IWindow window)
 	{
-		if (!Windows.Win32.PInvoke.GetWindowRect(window.Handle, out Windows.Win32.Foundation.RECT rect))
+		ILocation<int>? location = Win32Helper.DwmGetWindowLocation(window.Handle);
+		if (location == null)
 		{
 			return null;
 		}
-
-		ILocation<int> location = new Location(rect.left,
-										 rect.top,
-										 rect.right - rect.left,
-										 rect.bottom - rect.top);
 
 		IMonitor monitor = _configContext.MonitorManager.GetMonitorAtPoint(location);
 		return monitor.ToUnitSquare(location);
