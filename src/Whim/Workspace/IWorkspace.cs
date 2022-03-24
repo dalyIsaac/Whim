@@ -69,6 +69,13 @@ public interface IWorkspace : ICommandable
 	public bool RemoveWindow(IWindow window);
 
 	/// <summary>
+	/// Indicates whether the workspace contains the window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	public bool ContainsWindow(IWindow window);
+
+	/// <summary>
 	/// Deactivates the workspace.
 	/// </summary>
 	public void Deactivate();

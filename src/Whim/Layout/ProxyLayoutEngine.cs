@@ -9,7 +9,7 @@ namespace Whim;
 public abstract class BaseProxyLayoutEngine : ILayoutEngine
 {
 	protected readonly ILayoutEngine _innerLayoutEngine;
-	public Commander Commander { get; } = new();
+	public virtual Commander Commander { get; } = new();
 
 	public BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 	{
@@ -19,39 +19,39 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	/// <summary>
 	/// The name is only really important for the user, so we can use the name of the proxied layout engine.
 	/// </summary>
-	public string Name => _innerLayoutEngine.Name;
+	public virtual string Name => _innerLayoutEngine.Name;
 
-	public int Count => _innerLayoutEngine.Count;
+	public virtual int Count => _innerLayoutEngine.Count;
 
-	public bool IsReadOnly => _innerLayoutEngine.IsReadOnly;
+	public virtual bool IsReadOnly => _innerLayoutEngine.IsReadOnly;
 
-	public void Add(IWindow window) => _innerLayoutEngine.Add(window);
+	public virtual void Add(IWindow window) => _innerLayoutEngine.Add(window);
 
-	public bool Remove(IWindow window) => _innerLayoutEngine.Remove(window);
+	public virtual bool Remove(IWindow window) => _innerLayoutEngine.Remove(window);
 
-	public IWindow? GetFirstWindow() => _innerLayoutEngine.GetFirstWindow();
+	public virtual IWindow? GetFirstWindow() => _innerLayoutEngine.GetFirstWindow();
 
-	public void FocusWindowInDirection(Direction direction, IWindow window) => _innerLayoutEngine.FocusWindowInDirection(direction, window);
+	public virtual void FocusWindowInDirection(Direction direction, IWindow window) => _innerLayoutEngine.FocusWindowInDirection(direction, window);
 
-	public void SwapWindowInDirection(Direction direction, IWindow window) => _innerLayoutEngine.SwapWindowInDirection(direction, window);
+	public virtual void SwapWindowInDirection(Direction direction, IWindow window) => _innerLayoutEngine.SwapWindowInDirection(direction, window);
 
-	public void Clear() => _innerLayoutEngine.Clear();
+	public virtual void Clear() => _innerLayoutEngine.Clear();
 
-	public bool Contains(IWindow window) => _innerLayoutEngine.Contains(window);
+	public virtual bool Contains(IWindow window) => _innerLayoutEngine.Contains(window);
 
-	public void CopyTo(IWindow[] array, int arrayIndex) => _innerLayoutEngine.CopyTo(array, arrayIndex);
+	public virtual void CopyTo(IWindow[] array, int arrayIndex) => _innerLayoutEngine.CopyTo(array, arrayIndex);
 
-	public IEnumerator<IWindow> GetEnumerator() => _innerLayoutEngine.GetEnumerator();
+	public virtual IEnumerator<IWindow> GetEnumerator() => _innerLayoutEngine.GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) => _innerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
+	public virtual void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) => _innerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
 
 	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
 
-	public void HidePhantomWindows() => _innerLayoutEngine.HidePhantomWindows();
+	public virtual void HidePhantomWindows() => _innerLayoutEngine.HidePhantomWindows();
 
-	public void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom) => _innerLayoutEngine.AddWindowAtPoint(window, point, isPhantom);
+	public virtual void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom) => _innerLayoutEngine.AddWindowAtPoint(window, point, isPhantom);
 
 	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>

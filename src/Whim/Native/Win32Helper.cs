@@ -334,6 +334,24 @@ public static class Win32Helper
 
 		unsafe
 		{
+			ILocation<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
+			if (extendedFrameLocation == null)
+			{
+				return new Location(0, 0, 0, 0);
+			}
+
+			return new Location(
+				x: windowRect.left - extendedFrameLocation.X,
+				y: windowRect.top - extendedFrameLocation.Y,
+				width: (windowRect.right - windowRect.left) - extendedFrameLocation.Width,
+				height: (windowRect.bottom - windowRect.top) - extendedFrameLocation.Height);
+		}
+	}
+
+	public static ILocation<int>? DwmGetWindowLocation(HWND hwnd)
+	{
+		unsafe
+		{
 			RECT extendedFrameRect = new();
 			uint size = (uint)Marshal.SizeOf<RECT>();
 			HRESULT res = PInvoke.DwmGetWindowAttribute(hwnd,
@@ -344,14 +362,14 @@ public static class Win32Helper
 			if (res.Failed)
 			{
 				Logger.Error($"Could not get the extended frame rect for {hwnd.Value}");
-				return new Location(0, 0, 0, 0);
+				return null;
 			}
 
 			return new Location(
-				x: windowRect.left - extendedFrameRect.left,
-				y: windowRect.top - extendedFrameRect.top,
-				width: (windowRect.right - windowRect.left) - (extendedFrameRect.right - extendedFrameRect.left),
-				height: (windowRect.bottom - windowRect.top) - (extendedFrameRect.bottom - extendedFrameRect.top));
+				x: extendedFrameRect.left,
+				y: extendedFrameRect.top,
+				width: extendedFrameRect.right - extendedFrameRect.left,
+				height: extendedFrameRect.bottom - extendedFrameRect.top);
 		}
 	}
 

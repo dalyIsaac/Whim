@@ -374,22 +374,33 @@ public class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
+		Logger.Debug($"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor}");
+		Logger.Debug($"Active workspace is {ActiveWorkspace}");
+
 		bool isPhantom = _phantomWindows.Contains(window);
-		if (targetWorkspace != ActiveWorkspace && isPhantom)
+		if (isPhantom && targetWorkspace != ActiveWorkspace)
 		{
 			Logger.Error($"Window {window} is a phantom window and cannot be moved");
 			return;
 		}
 
-		if (!ActiveWorkspace.RemoveWindow(window))
+		// If the active workspace contains the window, and can't remove it, error out.
+		if (targetWorkspace != ActiveWorkspace && !ActiveWorkspace.RemoveWindow(window))
 		{
 			Logger.Error($"Could not remove window {window} from workspace {ActiveWorkspace}");
 			return;
 		}
 
 		IPoint<double> normalized = targetMonitor.ToUnitSquare(location);
+		Logger.Verbose($"Normalized location: {normalized}");
+
 		targetWorkspace.MoveWindowToPoint(window, normalized, isPhantom);
 		_windowWorkspaceMap[window] = targetWorkspace;
+
+		// Trigger layouts.
+		ActiveWorkspace.DoLayout();
+		targetWorkspace.DoLayout();
+		window.Focus();
 	}
 
 	#region Phantom Windows

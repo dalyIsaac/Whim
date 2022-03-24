@@ -354,7 +354,7 @@ public class Workspace : IWorkspace
 
 	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom)
 	{
-		Logger.Debug($"Moving window {window} to point {point}");
+		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
 
 		// Double check isPhantom.
 		if (_phantomWindows.ContainsKey(window) && !isPhantom)
@@ -440,7 +440,7 @@ public class Workspace : IWorkspace
 	/// </summary>
 	/// <param name="window">The window to check for.</param>
 	/// <returns>True when the workspace contains the provided <paramref name="window"/>.</returns>
-	private bool ContainsWindow(IWindow window) => _windows.Contains(window) || (
+	public bool ContainsWindow(IWindow window) => _windows.Contains(window) || (
 		_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
 		&& ILayoutEngine.ContainsEqual(ActiveLayoutEngine, phantomEngine)
 	);
