@@ -28,8 +28,8 @@ public static class MonitorHelpers
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
 	public static IPoint<double> ToUnitSquare(this ILocation<int> monitor, IPoint<int> point)
 	{
-		double x = (double)point.X / monitor.Width;
-		double y = (double)point.Y / monitor.Height;
+		double x = Math.Abs((double)point.X / monitor.Width);
+		double y = Math.Abs((double)point.Y / monitor.Height);
 		return new Point<double>(x, y);
 	}
 
@@ -40,10 +40,10 @@ public static class MonitorHelpers
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
 	public static ILocation<double> ToUnitSquare(this ILocation<int> monitor, ILocation<int> location)
 	{
-		double x = (double)location.X / monitor.Width;
-		double y = (double)location.Y / monitor.Height;
-		double width = (double)location.Width / monitor.Width;
-		double height = (double)location.Height / monitor.Height;
+		double x = Math.Abs((double)location.X / monitor.Width);
+		double y = Math.Abs((double)location.Y / monitor.Height);
+		double width = Math.Abs((double)location.Width / monitor.Width);
+		double height = Math.Abs((double)location.Height / monitor.Height);
 		return new DoubleLocation(x, y, width, height);
 	}
 
@@ -55,10 +55,10 @@ public static class MonitorHelpers
 	public static ILocation<int> ToMonitor(this ILocation<int> monitor, ILocation<double> location)
 	{
 		return new Location(
-			x: Convert.ToInt32(monitor.X + location.X * monitor.Width),
-			y: Convert.ToInt32(monitor.Y + location.Y * monitor.Height),
-			width: Convert.ToInt32(location.Width * monitor.Width),
-			height: Convert.ToInt32(location.Height * monitor.Height)
+			x: Math.Abs(Convert.ToInt32(monitor.X + location.X * monitor.Width)),
+			y: Math.Abs(Convert.ToInt32(monitor.Y + location.Y * monitor.Height)),
+			width: Math.Abs(Convert.ToInt32(location.Width * monitor.Width)),
+			height: Math.Abs(Convert.ToInt32(location.Height * monitor.Height))
 		);
 	}
 }

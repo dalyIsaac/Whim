@@ -115,6 +115,8 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 
 	public override void AddWindowAtPoint(IWindow window, IPoint<double> point, bool _isPhantom)
 	{
+		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");
+
 		// Calculate the index of the window in the stack.
 		int idx = (int)Math.Round(point.X / (double)_stack.Count, MidpointRounding.AwayFromZero);
 

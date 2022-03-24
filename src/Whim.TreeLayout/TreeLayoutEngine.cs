@@ -652,6 +652,14 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		AddNodeDirection = oldAddNodeDirection;
 	}
 
+	/// <summary>
+	/// Helper method to add a window to the layout engine.
+	/// This calls <see cref="SplitFocusedWindow"/> if the window is a phantom window.
+	/// Otherwise, it calls <see cref-"AddWindow(IWindow, LeafNode)"/>.
+	/// </summary>
+	/// <param name="window">The window to add.</param>
+	/// <param name="isPhantom">Whether the window is a phantom window.</param>
+	/// <param name="focusedWindow">The focused window.</param>
 	private void MoveWindowToPointAddWindow(IWindow window, bool isPhantom, IWindow? focusedWindow)
 	{
 		if (isPhantom)

@@ -374,6 +374,9 @@ public class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
+		Logger.Debug($"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor}");
+		Logger.Debug($"Active workspace is {ActiveWorkspace}");
+
 		bool isPhantom = _phantomWindows.Contains(window);
 		if (isPhantom && targetWorkspace != ActiveWorkspace)
 		{
@@ -389,8 +392,15 @@ public class WorkspaceManager : IWorkspaceManager
 		}
 
 		IPoint<double> normalized = targetMonitor.ToUnitSquare(location);
+		Logger.Verbose($"Normalized location: {normalized}");
+
 		targetWorkspace.MoveWindowToPoint(window, normalized, isPhantom);
 		_windowWorkspaceMap[window] = targetWorkspace;
+
+		// Trigger layouts.
+		ActiveWorkspace.DoLayout();
+		targetWorkspace.DoLayout();
+		window.Focus();
 	}
 
 	#region Phantom Windows

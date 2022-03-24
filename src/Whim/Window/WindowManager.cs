@@ -294,7 +294,6 @@ public class WindowManager : IWindowManager
 		}
 
 		_configContext.WorkspaceManager.MoveWindowToPoint(window, new Point<int>(point.x, point.y));
-		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
 	public void TriggerWindowUpdated(WindowUpdateEventArgs args)
