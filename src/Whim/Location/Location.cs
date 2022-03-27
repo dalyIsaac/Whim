@@ -37,4 +37,6 @@ public class Location : ILocation<int>
 											 && location.Height == Height;
 
 	public override int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
+
+	public static ILocation<int> Empty() => new Location(0, 0, 0, 0);
 }

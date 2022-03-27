@@ -1,6 +1,4 @@
-﻿using System.Windows.Forms;
-
-namespace Whim;
+﻿namespace Whim;
 
 /// <summary>
 /// Implementation of <see cref="IMonitor"/>.
@@ -8,18 +6,16 @@ namespace Whim;
 public class Monitor : IMonitor
 {
 	/// <summary>
-	/// Internal WinForms <see cref="System.Windows.Forms.Screen"/>.
+	/// Internal representation of a screen, based on the WinForms Screen class.
+	/// This has been ported to <see cref="Screen"/>.
 	/// </summary>
 	internal Screen Screen { get; }
 
 	/// <summary>
 	///
 	/// </summary>
-	/// <param name="screen">
-	/// Internal WinForms <see cref="System.Windows.Forms.Screen"/> from which
-	/// <see cref="Monitor"/> exposes information.
-	/// </param>
-	public Monitor(Screen screen)
+	/// <param name="screen"></param>
+	internal Monitor(Screen screen)
 	{
 		Screen = screen;
 	}
