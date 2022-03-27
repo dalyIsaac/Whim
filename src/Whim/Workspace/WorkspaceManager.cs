@@ -384,8 +384,7 @@ public class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		// If the active workspace contains the window, and can't remove it, error out.
-		if (targetWorkspace != ActiveWorkspace && !ActiveWorkspace.RemoveWindow(window))
+		if (!ActiveWorkspace.RemoveWindow(window))
 		{
 			Logger.Error($"Could not remove window {window} from workspace {ActiveWorkspace}");
 			return;

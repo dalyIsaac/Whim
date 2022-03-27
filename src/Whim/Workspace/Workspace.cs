@@ -375,6 +375,8 @@ public class Workspace : IWorkspace
 
 	public void Deactivate()
 	{
+		Logger.Debug($"Deactivating workspace {Name}");
+
 		foreach (IWindow window in Windows)
 		{
 			window.Hide();
