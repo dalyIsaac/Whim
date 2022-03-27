@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<StartupObject>Whim.App.Program</StartupObject>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
+		<ProjectReference Include="..\Whim.Dashboard\Whim.Dashboard.csproj" />
+		<ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" />
+		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
+		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+
+</Project>
