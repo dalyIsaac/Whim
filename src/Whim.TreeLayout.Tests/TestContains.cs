@@ -11,7 +11,7 @@ public class TestContains
 
 		foreach (IWindow window in testTreeEngine.GetWindows())
 		{
-			Assert.True(testTreeEngine.Engine.Contains(window));
+			Assert.Contains(window, testTreeEngine.Engine);
 		}
 	}
 

@@ -57,3 +57,15 @@ GetShellWindow
 GetWindow
 
 GetCursorPos
+
+EnumDisplayMonitors
+GetSystemMetrics
+SystemParametersInfo
+MONITORENUMPROC
+MONITORINFOF_PRIMARY
+MONITORINFOEXW
+GetMonitorInfo
+GetDeviceCaps
+CreateDC
+DeleteDC
+MonitorFromPoint

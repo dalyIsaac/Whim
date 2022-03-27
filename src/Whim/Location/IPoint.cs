@@ -1,3 +1,5 @@
+using Windows.Win32.Foundation;
+
 namespace Whim;
 
 public interface IPoint<T>
@@ -15,8 +17,8 @@ public interface IPoint<T>
 
 public static class PointHelpers
 {
-	public static System.Drawing.Point ToSystemPoint(this IPoint<int> point)
+	public static POINT ToSystemPoint(this IPoint<int> point)
 	{
-		return new System.Drawing.Point(point.X, point.Y);
+		return new POINT() { x = point.X, y = point.Y };
 	}
 }

@@ -5,7 +5,6 @@ using Windows.Win32.Graphics.Dwm;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.UI.Accessibility;
 using System.Runtime.InteropServices;
-using System;
 
 namespace Whim;
 
@@ -355,7 +354,7 @@ public static class Win32Helper
 			RECT extendedFrameRect = new();
 			uint size = (uint)Marshal.SizeOf<RECT>();
 			HRESULT res = PInvoke.DwmGetWindowAttribute(hwnd,
-							Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
+							DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
 							&extendedFrameRect,
 							size);
 

@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace Whim;
 
@@ -143,7 +142,7 @@ public class MonitorManager : IMonitorManager
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
 		Logger.Debug($"Getting monitor at point {point}");
-		Screen screen = Screen.FromPoint(point.ToSystemPoint());
+		Screen screen = Screen.FromPoint(point);
 
 		IMonitor? monitor = _monitors.FirstOrDefault(m => m.Name == screen.DeviceName);
 		if (monitor == null)

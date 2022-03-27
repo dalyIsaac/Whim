@@ -40,3 +40,4 @@ public interface ILocation<T> : IPoint<T>
 	&& location.X + location.Width > point.X
 	&& location.Y + location.Height > point.Y;
 }
+
