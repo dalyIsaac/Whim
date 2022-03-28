@@ -59,6 +59,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" />
 		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
+		<ProjectReference Include="..\Whim.NewBar\Whim.NewBar.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 </Project>

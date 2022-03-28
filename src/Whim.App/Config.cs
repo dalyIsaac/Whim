@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Whim.NewBar;
 using Whim.FloatingLayout;
 using Whim.Gaps;
 //using Whim.TreeLayout;
@@ -33,6 +34,16 @@ internal static class Config
 
 			configContext.WorkspaceManager.Add(workspace);
 		}
+
+		// Add bar
+		List<BarComponent> leftComponents = new() { /* WorkspaceWidget.CreateComponent() */ };
+		List<BarComponent> centerComponents = new() { /* FocusedWindowWidget.CreateComponent() */ };
+		List<BarComponent> rightComponents = new() { /* ActiveLayoutWidget.CreateComponent(), DateTimeWidget.CreateComponent() */ };
+
+		BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
+		BarPlugin barPlugin = new(configContext, barConfig);
+
+		configContext.PluginManager.RegisterPlugin(barPlugin);
 
 		// Add gap
 		GapsConfig gapsConfig = new(outerGap: 0, innerGap: 10);

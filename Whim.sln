@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout.Tests", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.FloatingLayout", "src\Whim.FloatingLayout\Whim.FloatingLayout.csproj", "{636EA561-2625-4D2A-9A8A-890E5AEF18B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.App", "src\Whim.App\Whim.App.csproj", "{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.App", "src\Whim.App\Whim.App.csproj", "{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.NewBar", "src\Whim.NewBar\Whim.NewBar.csproj", "{15DF5867-1318-4D25-A05D-0011F7C3D30D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -203,6 +205,22 @@ Global
 		{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}.Release|x86.ActiveCfg = Release|x86
 		{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}.Release|x86.Build.0 = Release|x86
 		{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}.Release|x86.Deploy.0 = Release|x86
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Debug|arm64.Build.0 = Debug|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Debug|x64.Build.0 = Debug|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Debug|x86.Build.0 = Debug|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Release|arm64.ActiveCfg = Release|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Release|arm64.Build.0 = Release|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Release|x64.ActiveCfg = Release|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Release|x64.Build.0 = Release|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Release|x86.ActiveCfg = Release|Any CPU
+		{15DF5867-1318-4D25-A05D-0011F7C3D30D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
