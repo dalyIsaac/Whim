@@ -8,4 +8,9 @@ public static class WinUIHelpers
 	{
 		return (HWND)WinRT.Interop.WindowNative.GetWindowHandle(window);
 	}
+
+	public static bool Hide(this Microsoft.UI.Xaml.Window window)
+	{
+		return Win32Helper.HideWindow(window.GetHandle());
+	}
 }

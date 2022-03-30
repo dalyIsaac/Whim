@@ -37,41 +37,41 @@ public static class Win32Helper
 	/// Hides the window of the associated handle.
 	/// </summary>
 	/// <param name="hwnd"></param>
-	public static void HideWindow(HWND hwnd)
+	public static bool HideWindow(HWND hwnd)
 	{
-		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_HIDE);
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_HIDE);
 	}
 
 	/// <summary>
 	/// Activates the window and displays it as a maximized window.
 	/// </summary>
-	public static void ShowWindowMaximized(HWND hwnd)
+	public static bool ShowWindowMaximized(HWND hwnd)
 	{
-		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMAXIMIZED);
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMAXIMIZED);
 	}
 
 	/// <summary>
 	/// Activates the window and displays it as a minimized window.
 	/// </summary>
-	public static void ShowWindowMinimized(HWND hwnd)
+	public static bool ShowWindowMinimized(HWND hwnd)
 	{
-		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMINIMIZED);
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMINIMIZED);
 	}
 
 	/// <summary>
 	/// Minimizes the specified window and activates the next top-level window in the Z order.
 	/// </summary>
-	public static void MinimizeWindow(HWND hwnd)
+	public static bool MinimizeWindow(HWND hwnd)
 	{
-		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_MINIMIZE);
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_MINIMIZE);
 	}
 
 	/// <summary>
 	/// Displays a window in its most recent size and position. The window is not activated.
 	/// </summary>
-	public static void ShowWindowNoActivate(HWND hwnd)
+	public static bool ShowWindowNoActivate(HWND hwnd)
 	{
-		PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
 	}
 
 	/// <summary>
