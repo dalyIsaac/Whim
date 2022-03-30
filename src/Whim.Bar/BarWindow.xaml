@@ -1,71 +1,27 @@
-﻿<Window x:Class="Whim.Bar.BarWindow"
-		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:local="clr-namespace:Whim.Bar"
-		xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
-		mc:Ignorable="d"
-		d:DataContext="{d:DesignInstance Type=local:BarConfig}"
-		WindowStyle="None"
-		ResizeMode="NoResize"
-		ShowInTaskbar="False"
-		AllowsTransparency="True"
-		Title="Whim Bar" Height="{Binding Path=Height}" Width="800"
-		Loaded="Window_Loaded">
-	<Window.Resources>
-		<ResourceDictionary>
-			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary Source="pack://application:,,,/WPFUI;component/Styles/Theme/Light.xaml" />
-				<ResourceDictionary Source="pack://application:,,,/WPFUI;component/Styles/Theme/Dark.xaml" />
-				<ResourceDictionary Source="pack://application:,,,/WPFUI;component/Styles/WPFUI.xaml" />
-			</ResourceDictionary.MergedDictionaries>
+﻿<Window x:Class="Whim.Bar.BarWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Whim.Bar" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
 
-			<Style TargetType="TextBlock">
-				<Setter Property="FontFamily" Value="Segoe UI Variable"/>
-				<Setter Property="FlowDirection" Value="LeftToRight"/>
-				<Setter Property="FontSize" Value="12"/>
-				<Setter Property="Padding" Value="4"/>
-				<Setter Property="Margin" Value="4"/>
-			</Style>
+	<Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*" />
+			<ColumnDefinition Width="1*" />
+			<ColumnDefinition Width="1*" />
+		</Grid.ColumnDefinitions>
 
-			<Style TargetType="{x:Type local:BarWindow}" BasedOn="{StaticResource UiWindow}">
-				<Setter Property="MinHeight" Value="0"/>
-			</Style>
-		</ResourceDictionary>
-	</Window.Resources>
-
-	<Border>
-		<Border.Style>
-			<Style TargetType="Border">
-				<Setter Property="Padding" Value="8 0"/>
-			</Style>
-		</Border.Style>
-
-		<Grid VerticalAlignment="Stretch">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="1*"/>
-				<ColumnDefinition Width="1*"/>
-				<ColumnDefinition Width="1*"/>
-			</Grid.ColumnDefinitions>
-
-			<StackPanel x:Name="LeftPanel"
+		<StackPanel x:Name="LeftPanel"
 					Orientation="Horizontal"
 					Grid.Column="0"
-					VerticalAlignment="Center"/>
+					VerticalAlignment="Center" />
 
-			<StackPanel x:Name="CenterPanel"
+		<StackPanel x:Name="CenterPanel"
 					Orientation="Horizontal"
 					Grid.Column="1"
 					VerticalAlignment="Center"
-					HorizontalAlignment="Center"/>
+					HorizontalAlignment="Center" />
 
-			<StackPanel x:Name="RightPanel"
+		<StackPanel x:Name="RightPanel"
 					Orientation="Horizontal"
 					Grid.Column="2"
 					VerticalAlignment="Center"
-					FlowDirection="RightToLeft"/>
-		</Grid>
-	</Border>
-
+					FlowDirection="RightToLeft" />
+	</Grid>
 </Window>

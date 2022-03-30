@@ -1,6 +1,6 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace Whim.Bar;
 

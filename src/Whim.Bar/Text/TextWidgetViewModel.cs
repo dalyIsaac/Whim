@@ -16,7 +16,7 @@ public class TextWidgetViewModel : INotifyPropertyChanged
 			if (_value != value)
 			{
 				_value = value;
-				OnPropertyChanged("Value");
+				OnPropertyChanged(nameof(Value));
 			}
 		}
 	}
