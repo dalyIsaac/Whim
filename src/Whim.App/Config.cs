@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Whim.Bar;
 using Whim.FloatingLayout;
 using Whim.Gaps;

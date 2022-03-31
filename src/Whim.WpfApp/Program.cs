@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Whim.Bar;
-using Whim.Dashboard;
 using Whim.FloatingLayout;
 using Whim.Gaps;
 using Whim.TreeLayout;
@@ -36,12 +35,6 @@ public class Program
 
 			configContext.WorkspaceManager.Add(workspace);
 		}
-
-		// Add dashboard
-		DashboardPlugin dashboardPlugin = new(configContext);
-
-		configContext.PluginManager.RegisterPlugin(dashboardPlugin);
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_F12), (args) => dashboardPlugin.Toggle());
 
 		// Add bar
 		List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
