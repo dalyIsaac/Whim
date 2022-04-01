@@ -1,5 +1,5 @@
 using System;
-using System.Windows.Input;
+using System.ComponentModel;
 
 namespace Whim.Bar;
 
@@ -8,18 +8,21 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand
 	private readonly IConfigContext _configContext;
 	private readonly WorkspaceWidgetViewModel _viewModel;
 	private readonly WorkspaceModel _workspace;
+	public event EventHandler? CanExecuteChanged;
 
 	public SwitchWorkspaceCommand(IConfigContext configContext, WorkspaceWidgetViewModel viewModel, WorkspaceModel workspace)
 	{
 		_configContext = configContext;
 		_viewModel = viewModel;
 		_workspace = workspace;
+		_workspace.PropertyChanged += Workspace_PropertyChanged;
 	}
 
-	public event EventHandler? CanExecuteChanged
+	private void Workspace_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 	{
-		add => CommandManager.RequerySuggested += value;
-		remove => CommandManager.RequerySuggested -= value;
+		if (e.PropertyName == nameof(_workspace.ActiveOnMonitor)) {
+			CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+		}
 	}
 
 	public bool CanExecute(object? parameter) => !_workspace.ActiveOnMonitor;

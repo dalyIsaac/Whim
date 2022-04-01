@@ -5,28 +5,28 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestSplitFocusedWindow
 {
-	private readonly TestTreeEngineEmpty _testTreeEngine = new();
-
-	[StaFact]
+	[Fact]
 	public void No_Focused_Window()
 	{
-		_testTreeEngine.Engine.SplitFocusedWindow();
+		TestTreeEngineEmpty testTreeEngine = new(true);
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper();
 
-		Assert.True(_testTreeEngine.Engine.Root is PhantomNode);
+		Assert.True(testTreeEngine.Engine.Root is PhantomNode);
 	}
 
-	[StaFact]
+	[Fact]
 	public void Add_Single_Phantom()
 	{
-		_testTreeEngine.Engine.AddNodeDirection = Direction.Right;
+		TestTreeEngineEmpty testTreeEngine = new(true);
+		testTreeEngine.Engine.AddNodeDirection = Direction.Right;
 
 		Mock<IWindow> window1 = new();
 
-		_testTreeEngine.Engine.Add(window1.Object);
-		_testTreeEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(window1.Object);
-		_testTreeEngine.Engine.SplitFocusedWindow();
+		testTreeEngine.Engine.Add(window1.Object);
+		testTreeEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(window1.Object);
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper();
 
-		SplitNode root = (_testTreeEngine.Engine.Root as SplitNode)!;
+		SplitNode root = (testTreeEngine.Engine.Root as SplitNode)!;
 
 		var left = root[0];
 		var right = root[1];
@@ -38,20 +38,21 @@ public class TestSplitFocusedWindow
 		Assert.True(right.node is PhantomNode);
 	}
 
-	[StaFact]
+	[Fact]
 	public void Add_Multiple_Phantom()
 	{
-		_testTreeEngine.Engine.AddNodeDirection = Direction.Right;
+		TestTreeEngineEmpty testTreeEngine = new(true);
+		testTreeEngine.Engine.AddNodeDirection = Direction.Right;
 
 		Mock<IWindow> window1 = new();
 
-		_testTreeEngine.Engine.Add(window1.Object);
-		_testTreeEngine.Engine.SplitFocusedWindow();
+		testTreeEngine.Engine.Add(window1.Object);
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper();
 
-		_testTreeEngine.ActiveWorkspace.Setup(a => a.LastFocusedWindow).Returns(window1.Object);
-		_testTreeEngine.Engine.SplitFocusedWindow();
+		testTreeEngine.ActiveWorkspace.Setup(a => a.LastFocusedWindow).Returns(window1.Object);
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper();
 
-		SplitNode root = (_testTreeEngine.Engine.Root as SplitNode)!;
+		SplitNode root = (testTreeEngine.Engine.Root as SplitNode)!;
 		var left = root[0];
 		var middle = root[1];
 		var right = root[2];
@@ -66,22 +67,23 @@ public class TestSplitFocusedWindow
 		Assert.True(right.node is PhantomNode);
 	}
 
-	[StaFact]
+	[Fact]
 	public void Add_Nested_Phantom()
 	{
-		_testTreeEngine.Engine.AddNodeDirection = Direction.Right;
+		TestTreeEngineEmpty testTreeEngine = new(true);
+		testTreeEngine.Engine.AddNodeDirection = Direction.Right;
 
 		Mock<IWindow> window1 = new();
 
-		_testTreeEngine.Engine.Add(window1.Object);
-		_testTreeEngine.Engine.SplitFocusedWindow();
+		testTreeEngine.Engine.Add(window1.Object);
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper();
 
-		SplitNode root = (_testTreeEngine.Engine.Root as SplitNode)!;
+		SplitNode root = (testTreeEngine.Engine.Root as SplitNode)!;
 		PhantomNode phantomRight = (root[1].node as PhantomNode)!;
-		_testTreeEngine.ActiveWorkspace.Setup(a => a.LastFocusedWindow).Returns(phantomRight.Window);
-		_testTreeEngine.Engine.AddNodeDirection = Direction.Down;
+		testTreeEngine.ActiveWorkspace.Setup(a => a.LastFocusedWindow).Returns(phantomRight.Window);
+		testTreeEngine.Engine.AddNodeDirection = Direction.Down;
 
-		_testTreeEngine.Engine.SplitFocusedWindow();
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper();
 
 		var left = root[0];
 		var rightParent = root[1];
@@ -99,22 +101,23 @@ public class TestSplitFocusedWindow
 		Assert.True(rightBottom.node is PhantomNode);
 	}
 
-	[StaFact]
+	[Fact]
 	public void Replace_Phantom()
 	{
-		_testTreeEngine.Engine.AddNodeDirection = Direction.Right;
+		TestTreeEngineEmpty testTreeEngine = new(true);
+		testTreeEngine.Engine.AddNodeDirection = Direction.Right;
 
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 
-		_testTreeEngine.Engine.Add(window1.Object);
+		testTreeEngine.Engine.Add(window1.Object);
 
-		_testTreeEngine.Engine.SplitFocusedWindow();
-		_testTreeEngine.ActiveWorkspace.Setup(a => a.LastFocusedWindow).Returns(window1.Object);
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper();
+		testTreeEngine.ActiveWorkspace.Setup(a => a.LastFocusedWindow).Returns(window1.Object);
 
-		_testTreeEngine.Engine.Add(window2.Object);
+		testTreeEngine.Engine.Add(window2.Object);
 
-		SplitNode root = (_testTreeEngine.Engine.Root as SplitNode)!;
+		SplitNode root = (testTreeEngine.Engine.Root as SplitNode)!;
 		Assert.Equal(0.5d, root[0].weight);
 		Assert.Equal(0.5d, root[1].weight);
 		Assert.Equal(window1.Object, ((WindowNode)(root[0].node)).Window);

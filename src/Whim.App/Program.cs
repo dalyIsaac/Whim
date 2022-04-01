@@ -1,192 +1,57 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
-using Whim.Bar;
-using Whim.Dashboard;
-using Whim.FloatingLayout;
-using Whim.Gaps;
-using Whim.TreeLayout;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Whim.App;
 
-public class Program
+#if DISABLE_XAML_GENERATED_MAIN
+public static class Program
 {
-	[STAThread]
-	public static void Main()
-	{
-		_ = new App(CreateConfigContext());
-	}
+	[global::System.Runtime.InteropServices.DllImport("Microsoft.ui.xaml.dll")]
+	private static extern void XamlCheckProcessRequirements();
 
-	private static ConfigContext CreateConfigContext()
+	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler", " 1.0.0.0")]
+	[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+	[global::System.STAThreadAttribute]
+	// Replaces the standard App.g.i.cs.
+	// Note: We can't declare Main to be async because in a WinUI app
+	// that prevents Narrator from reading XAML elements.
+	static void Main(string[] args)
 	{
-		ConfigContext configContext = new(new LoggerConfig(LogLevel.Verbose));
-		List<TreeLayoutEngine> treeLayoutEngines = new();
+		XamlCheckProcessRequirements();
 
-		// Add workspaces
-		for (int i = 0; i < 4; i++)
+		global::WinRT.ComWrappersSupport.InitializeComWrappers();
+
+		bool this_is_the_first_instance = true;
+
+		// If this is the first instance launched, then register it as the "main" instance.
+		// If this isn't the first instance launched, then "main" will already be registered,
+		// so retrieve it.
+		var mainInstance = Microsoft.Windows.AppLifecycle.AppInstance.FindOrRegisterForKey("main");
+
+		// If the instance that's executing the OnLaunched handler right now
+		// isn't the "main" instance.
+		if (!mainInstance.IsCurrent)
 		{
-			TreeLayoutEngine treeLayoutEngine = new(configContext);
-			treeLayoutEngines.Add(treeLayoutEngine);
+			this_is_the_first_instance = false;
 
-			Workspace workspace = new(configContext,
-							 i.ToString(),
-							 new ColumnLayoutEngine(),
-							 new ColumnLayoutEngine("Right to left", false),
-							 treeLayoutEngine);
-
-			configContext.WorkspaceManager.Add(workspace);
+			// Redirect the activation (and args) to the "main" instance, and exit.
+			var activatedEventArgs =
+				Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
+			mainInstance.RedirectActivationToAsync(activatedEventArgs);
 		}
 
-		// Add dashboard
-		DashboardPlugin dashboardPlugin = new(configContext);
-
-		configContext.PluginManager.RegisterPlugin(dashboardPlugin);
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_F12), (args) => dashboardPlugin.Toggle());
-
-		// Add bar
-		List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
-		List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
-		List<BarComponent> rightComponents = new() { ActiveLayoutWidget.CreateComponent(), DateTimeWidget.CreateComponent() };
-
-		BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
-		BarPlugin barPlugin = new(configContext, barConfig);
-
-		configContext.PluginManager.RegisterPlugin(barPlugin);
-
-		// Add gap
-		GapsConfig gapsConfig = new(outerGap: 0, innerGap: 10);
-		GapsPlugin gapsPlugin = new(configContext, gapsConfig);
-
-		configContext.PluginManager.RegisterPlugin(gapsPlugin);
-
-		// Add floating layout.
-		FloatingLayoutPlugin floatingLayoutPlugin = new(configContext);
-		configContext.PluginManager.RegisterPlugin(floatingLayoutPlugin);
-
-		// Keyboard shortcuts
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.MoveWindowToNextMonitor());
-
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_LEFT), (args) =>
+		if (this_is_the_first_instance)
 		{
-			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
-			if (workspace.LastFocusedWindow == null)
-				return;
-
-			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Left, workspace.LastFocusedWindow);
-		});
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_RIGHT), (args) =>
-		{
-			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
-			if (workspace.LastFocusedWindow == null)
-				return;
-
-			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Right, workspace.LastFocusedWindow);
-		});
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_UP), (args) =>
-		{
-			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
-			if (workspace.LastFocusedWindow == null)
-				return;
-
-			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Up, workspace.LastFocusedWindow);
-		});
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_DOWN), (args) =>
-		{
-			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
-			if (workspace.LastFocusedWindow == null)
-				return;
-
-			workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Down, workspace.LastFocusedWindow);
-		});
-
-		// Swap windows in direction.
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Left));
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Right));
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_UP), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Up));
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_DOWN), (args) => configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Down));
-
-		#region TreeLayoutEngine
-		// Set direction.
-		KeybindEventHandler setNodeDirection = (args) =>
-		{
-			// Get direction.
-			Direction? direction = args.Keybind.Key switch
+			global::Microsoft.UI.Xaml.Application.Start((p) =>
 			{
-				VIRTUAL_KEY.VK_LEFT => Direction.Left,
-				VIRTUAL_KEY.VK_RIGHT => Direction.Right,
-				VIRTUAL_KEY.VK_UP => Direction.Up,
-				VIRTUAL_KEY.VK_DOWN => Direction.Down,
-				_ => null
-			};
-
-			if (direction == null)
-				return;
-
-			foreach (TreeLayoutEngine treeLayoutEngine in treeLayoutEngines)
-				treeLayoutEngine.AddNodeDirection = direction.Value;
-		};
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_RIGHT), setNodeDirection);
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_DOWN), setNodeDirection);
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_LEFT), setNodeDirection);
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_UP), setNodeDirection);
-
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_S), (args) =>
-		{
-			TreeLayoutEngine? layoutEngine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
-			if (layoutEngine != null)
-			{
-				layoutEngine.SplitFocusedWindow();
-			}
-		});
-
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift | KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_F), (args) =>
-		{
-			TreeLayoutEngine? layoutEngine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
-			if (layoutEngine != null)
-			{
-				layoutEngine.FlipAndMerge();
-			}
-		});
-		#endregion
-
-		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateInnerGap(10));
-		// configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LAlt, VIRTUAL_KEY.VK_G), (args) => gapsPlugin.UpdateOuterGap(10));
-
-		Direction edge = Direction.Left;
-
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_J), (args) =>
-		{
-			edge = Direction.Left;
-		});
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_K), (args) =>
-		{
-			edge = Direction.Right;
-		});
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_I), (args) =>
-		{
-			edge = Direction.Up;
-		});
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_M), (args) =>
-		{
-			edge = Direction.Down;
-		});
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_H), (args) =>
-		{
-			configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(edge, edge == Direction.Left || edge == Direction.Up ? 0.1 : -0.1);
-		});
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_L), (args) =>
-		{
-			configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(edge, edge == Direction.Left || edge == Direction.Up ? -0.1 : 0.1);
-		});
-
-		// Floating layout
-		configContext.KeybindManager.Add(new Keybind(KeyModifiers.LWin | KeyModifiers.LShift, VIRTUAL_KEY.VK_F), (args) =>
-		{
-			floatingLayoutPlugin.ToggleWindowFloating();
-		});
-
-
-		return configContext;
+				var context = new global::Microsoft.UI.Dispatching.DispatcherQueueSynchronizationContext(global::Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
+				global::System.Threading.SynchronizationContext.SetSynchronizationContext(context);
+				new App(Config.CreateConfigContext());
+			});
+		}
 	}
 }
+#endif

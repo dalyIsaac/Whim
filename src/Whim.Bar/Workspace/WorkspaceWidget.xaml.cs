@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using Microsoft.UI.Xaml.Controls;
+using System;
 
 namespace Whim.Bar;
 
@@ -22,15 +10,14 @@ public partial class WorkspaceWidget : UserControl
 {
 	public WorkspaceWidgetViewModel ViewModel { get; }
 
-	public WorkspaceWidget(IConfigContext configContext, IMonitor monitor, System.Windows.Window window)
+	public WorkspaceWidget(IConfigContext configContext, IMonitor monitor, Microsoft.UI.Xaml.Window window)
 	{
 		ViewModel = new WorkspaceWidgetViewModel(configContext, monitor);
 		window.Closed += Window_Closed;
 		InitializeComponent();
-		DataContext = ViewModel;
 	}
 
-	private void Window_Closed(object? sender, EventArgs e)
+	private void Window_Closed(object? sender, Microsoft.UI.Xaml.WindowEventArgs e)
 	{
 		ViewModel.Dispose();
 	}

@@ -51,7 +51,14 @@ internal class TestTreeEngine
 	public WindowNode RightTopLeftBottomRightBottomNode;
 	public TreeLayoutEngine Engine;
 
-	public TestTreeEngine()
+	/// <summary>
+	/// </summary>
+	/// <param name="testTreeLayoutEngine">
+	/// If true, then the engine will be created with a TestTreeLayoutEngine,
+	/// which allows us to test SplitFocusedWindow without having to move onto
+	/// the UI thread.
+	/// </param>
+	public TestTreeEngine(bool testTreeLayoutEngine = false)
 	{
 		Monitor.Setup(m => m.Width).Returns(1920);
 		Monitor.Setup(m => m.Height).Returns(1080);
@@ -62,7 +69,7 @@ internal class TestTreeEngine
 		ConfigContext.Setup(x => x.WindowManager).Returns(WindowManager.Object);
 		ConfigContext.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 
-		Engine = new(ConfigContext.Object);
+		Engine = testTreeLayoutEngine ? new WrapTreeLayoutEngine(ConfigContext.Object) : new TreeLayoutEngine(ConfigContext.Object);
 		Engine.AddNodeDirection = Direction.Right;
 
 		LeftWindow.Setup(m => m.ToString()).Returns("leftWindow");

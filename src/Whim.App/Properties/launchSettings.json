@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Whim.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Whim.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

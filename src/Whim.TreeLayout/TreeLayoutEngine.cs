@@ -566,12 +566,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		SplitFocusedWindow(null);
 	}
 
-	private void SplitFocusedWindow(IWindow? focusedWindow = null)
+	protected void SplitFocusedWindow(IWindow? focusedWindow = null, PhantomNode? phantomNode = null)
 	{
 		Logger.Debug($"Splitting focused window in layout engine {Name} with focused window {focusedWindow}");
 
 		// Create the phantom window.
-		PhantomNode? phantomNode = PhantomNode.CreatePhantomNode(_configContext);
+		phantomNode ??= PhantomNode.CreatePhantomNode(_configContext);
 		if (phantomNode == null)
 		{
 			Logger.Error($"Could not create phantom node for layout engine {Name}");

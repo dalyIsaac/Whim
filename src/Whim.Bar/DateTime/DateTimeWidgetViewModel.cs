@@ -1,13 +1,13 @@
+using Microsoft.UI.Xaml;
 using System;
 using System.ComponentModel;
-using System.Timers;
 
 namespace Whim.Bar;
 
 public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
-	private readonly Timer _timer;
-	private string _format;
+	private readonly DispatcherTimer _timer = new();
+	private readonly string _format;
 	private bool disposedValue;
 
 	public string Value { get => DateTime.Now.ToString(_format); }
@@ -15,8 +15,8 @@ public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 	public DateTimeWidgetViewModel(int interval, string format)
 	{
 		_format = format;
-		_timer = new Timer(interval);
-		_timer.Elapsed += Timer_Elapsed;
+		_timer.Interval = TimeSpan.FromMilliseconds(interval);
+		_timer.Tick += Timer_Tick;
 		_timer.Start();
 	}
 
@@ -27,7 +27,7 @@ public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+	private void Timer_Tick(object? sender, object e)
 	{
 		OnPropertyChanged(nameof(Value));
 	}
@@ -39,7 +39,7 @@ public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_timer.Dispose();
+				_timer.Stop();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

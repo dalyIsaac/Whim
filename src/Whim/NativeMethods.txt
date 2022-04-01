@@ -50,6 +50,7 @@ DWM_WINDOW_CORNER_PREFERENCE
 GetAncestor
 IsWindowVisible
 GetWindowLong
+SetWindowLong
 WINDOW_STYLE
 WINDOW_EX_STYLE
 GetDesktopWindow

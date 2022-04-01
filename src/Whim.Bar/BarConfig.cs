@@ -1,8 +1,8 @@
-using System;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Controls;
 
 namespace Whim.Bar;
 
@@ -10,7 +10,7 @@ namespace Whim.Bar;
 /// Delegate for creating a component.
 /// A component will subscribe to <see cref="Window.Closed"/> if it has resources to dispose.
 /// </summary>
-public delegate UserControl BarComponent(IConfigContext configContext, IMonitor monitor, System.Windows.Window window);
+public delegate UserControl BarComponent(IConfigContext configContext, IMonitor monitor, Microsoft.UI.Xaml.Window window);
 
 public class BarConfig : INotifyPropertyChanged
 {
@@ -60,8 +60,8 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _margin = 10;
-	public int Margin
+	private Thickness _margin = new(10.0);
+	public Thickness Margin
 	{
 		get => _margin;
 		set

@@ -1,6 +1,3 @@
-using System.Windows.Interop;
-using Windows.Win32.Foundation;
-
 namespace Whim.TreeLayout;
 
 /// <summary>
@@ -12,9 +9,9 @@ namespace Whim.TreeLayout;
 /// </summary>
 public class PhantomNode : LeafNode
 {
-	private readonly PhantomWindow _phantomWindow;
+	private readonly Microsoft.UI.Xaml.Window? _phantomWindow;
 
-	private PhantomNode(IWindow windowModel, PhantomWindow phantomWindow, SplitNode? parent = null) : base(windowModel, parent)
+	protected PhantomNode(IWindow windowModel, Microsoft.UI.Xaml.Window? phantomWindow, SplitNode? parent = null) : base(windowModel, parent)
 	{
 		_phantomWindow = phantomWindow;
 	}
@@ -23,10 +20,7 @@ public class PhantomNode : LeafNode
 	{
 		PhantomWindow phantomWindow = new();
 
-		// We need to show the window in order to get its handle.
-		phantomWindow.Show();
-
-		IWindow? windowModel = Whim.Window.CreateWindow((HWND)new WindowInteropHelper(phantomWindow).Handle, configContext);
+		IWindow? windowModel = Whim.Window.CreateWindow(phantomWindow.GetHandle(), configContext);
 
 		if (windowModel == null)
 		{
@@ -38,11 +32,11 @@ public class PhantomNode : LeafNode
 
 	public void Hide()
 	{
-		_phantomWindow.Hide();
+		_phantomWindow?.Hide();
 	}
 
 	public void Close()
 	{
-		_phantomWindow.Close();
+		_phantomWindow?.Close();
 	}
 }
