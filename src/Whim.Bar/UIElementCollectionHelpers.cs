@@ -8,7 +8,7 @@ public static class UIElementCollectionHelpers
 {
 	public static void AddRange(this UIElementCollection collection, IEnumerable<UIElement> elements)
 	{
-		foreach (var element in elements)
+		foreach (UIElement element in elements)
 		{
 			collection.Add(element);
 		}

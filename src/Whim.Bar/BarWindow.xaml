@@ -1,4 +1,10 @@
-﻿<Window x:Class="Whim.Bar.BarWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Whim.Bar" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
+﻿<Window
+	x:Class="Whim.Bar.BarWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d">
 
 	<Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
 		<Grid.ColumnDefinitions>
@@ -7,21 +13,44 @@
 			<ColumnDefinition Width="1*" />
 		</Grid.ColumnDefinitions>
 
-		<StackPanel x:Name="LeftPanel"
-					Orientation="Horizontal"
-					Grid.Column="0"
-					VerticalAlignment="Center" />
+		<Grid.Resources>
+			<Style TargetType="Grid">
+				<Setter Property="Padding" Value="4" />
+			</Style>
 
-		<StackPanel x:Name="CenterPanel"
-					Orientation="Horizontal"
-					Grid.Column="1"
-					VerticalAlignment="Center"
-					HorizontalAlignment="Center" />
+			<Style TargetType="Button">
+				<!--  Binding doesn't work because Microsoft loves feature parity:  -->
+				<!--  https://docs.microsoft.com/en-us/windows/winui/api/microsoft.ui.xaml.setter?view=winui-3.0  -->
+				<!--<Setter Property="Margin" Value="{x:Bind Path=_barConfig.Margin, Mode=OneWay}" />-->
 
-		<StackPanel x:Name="RightPanel"
-					Orientation="Horizontal"
-					Grid.Column="2"
-					VerticalAlignment="Center"
-					FlowDirection="RightToLeft" />
+				<Setter Property="Margin" Value="4" />
+				<Setter Property="CornerRadius" Value="4" />
+			</Style>
+
+			<Style TargetType="TextBlock">
+				<Setter Property="Margin" Value="4" />
+				<Setter Property="Padding" Value="6" />
+			</Style>
+		</Grid.Resources>
+
+		<StackPanel
+			x:Name="LeftPanel"
+			Grid.Column="0"
+			VerticalAlignment="Center"
+			Orientation="Horizontal" />
+
+		<StackPanel
+			x:Name="CenterPanel"
+			Grid.Column="1"
+			HorizontalAlignment="Center"
+			VerticalAlignment="Center"
+			Orientation="Horizontal" />
+
+		<StackPanel
+			x:Name="RightPanel"
+			Grid.Column="2"
+			VerticalAlignment="Center"
+			FlowDirection="RightToLeft"
+			Orientation="Horizontal" />
 	</Grid>
 </Window>

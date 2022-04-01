@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -59,8 +60,8 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _margin = 10;
-	public int Margin
+	private Thickness _margin = new(10.0);
+	public Thickness Margin
 	{
 		get => _margin;
 		set

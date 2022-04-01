@@ -41,10 +41,15 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 			throw new Exception("Window was unexpectedly null");
 		}
 
+		int leftMargin = (int)_barConfig.Margin.Left;
+		int rightMargin = (int)_barConfig.Margin.Right;
+		int topMargin = (int)_barConfig.Margin.Top;
+		int bottomMargin = (int)_barConfig.Margin.Bottom;
+
 		_windowLocation = new WindowLocation(window, new Location(
-			x: _monitor.X + _barConfig.Margin,
-			y: _monitor.Y + _barConfig.Margin,
-			width: _monitor.Width - (_barConfig.Margin * 2),
+			x: _monitor.X + leftMargin,
+			y: _monitor.Y + rightMargin,
+			width: _monitor.Width - (leftMargin + rightMargin),
 			height: _barConfig.Height), WindowState.Normal);
 
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
