@@ -1,5 +1,3 @@
-using Windows.Win32.Foundation;
-
 namespace Whim.TreeLayout;
 
 /// <summary>
@@ -11,9 +9,9 @@ namespace Whim.TreeLayout;
 /// </summary>
 public class PhantomNode : LeafNode
 {
-	private readonly PhantomWindow _phantomWindow;
+	private readonly Microsoft.UI.Xaml.Window? _phantomWindow;
 
-	private PhantomNode(IWindow windowModel, PhantomWindow phantomWindow, SplitNode? parent = null) : base(windowModel, parent)
+	protected PhantomNode(IWindow windowModel, Microsoft.UI.Xaml.Window? phantomWindow, SplitNode? parent = null) : base(windowModel, parent)
 	{
 		_phantomWindow = phantomWindow;
 	}
@@ -34,11 +32,11 @@ public class PhantomNode : LeafNode
 
 	public void Hide()
 	{
-		_phantomWindow.Hide();
+		_phantomWindow?.Hide();
 	}
 
 	public void Close()
 	{
-		_phantomWindow.Close();
+		_phantomWindow?.Close();
 	}
 }

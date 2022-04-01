@@ -1,5 +1,4 @@
 using Moq;
-using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
@@ -17,7 +16,7 @@ internal class TestTreeEngineEmpty
 
 	public TreeLayoutEngine Engine;
 
-	public TestTreeEngineEmpty()
+	public TestTreeEngineEmpty(bool testTreeLayoutEngine = false)
 	{
 		Monitor.Setup(m => m.Width).Returns(1920);
 		Monitor.Setup(m => m.Height).Returns(1080);
@@ -28,7 +27,7 @@ internal class TestTreeEngineEmpty
 		ConfigContext.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 		ConfigContext.Setup(x => x.WindowManager).Returns(WindowManager.Object);
 
-		Engine = new(ConfigContext.Object);
+		Engine = testTreeLayoutEngine ? new WrapTreeLayoutEngine(ConfigContext.Object) : new TreeLayoutEngine(ConfigContext.Object);
 		Engine.AddNodeDirection = Direction.Right;
 	}
 }

@@ -15,12 +15,12 @@ public class TestContains
 		}
 	}
 
-	[StaFact]
+	[Fact]
 	public void ContainsPhantomWindows()
 	{
-		TestTreeEngine testTreeEngine = new();
+		TestTreeEngine testTreeEngine = new(true);
 		testTreeEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testTreeEngine.LeftWindow.Object);
-		testTreeEngine.Engine.SplitFocusedWindow();
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper();
 
 		SplitNode root = (SplitNode)testTreeEngine.Engine.Root!;
 		SplitNode left = (SplitNode)root[0].node;
