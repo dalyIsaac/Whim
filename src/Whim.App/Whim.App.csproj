@@ -13,6 +13,7 @@
 		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
 		<Nullable>enable</Nullable>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -24,7 +25,13 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
@@ -33,6 +40,9 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
+	<ItemGroup>
+		<None Remove="StartupExceptionWindow.xaml" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="Assets\SplashScreen.scale-200.png" />
@@ -45,6 +55,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<EmbeddedResource Include="Template/whim.config.template.csx" />
+		<EmbeddedResource Include="Template/omnisharp.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.1.0" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" />
 		<Manifest Include="$(ApplicationManifest)" />
@@ -56,11 +72,25 @@
 	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
+
 	<ItemGroup>
-		<ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" />
-		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
-		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
-		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
+		<ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="StartupExceptionWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build">
+		<Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.Bar\" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.FloatingLayout\$(OutDir)Whim.FloatingLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.FloatingLayout\" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(OutDir)Whim.Gaps.dll" DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" />
+	</Target>
 </Project>

@@ -13,27 +13,35 @@ namespace Whim;
 /// </summary>
 public class ConfigContext : IConfigContext
 {
-	public Logger Logger { get; }
-	public IWorkspaceManager WorkspaceManager { get; }
-	public IWindowManager WindowManager { get; }
-	public IMonitorManager MonitorManager { get; }
-	public IRouterManager RouterManager { get; }
-	public IFilterManager FilterManager { get; }
-	public IKeybindManager KeybindManager { get; }
-	public IPluginManager PluginManager { get; }
+	public Logger Logger { get; set; }
+	public IWorkspaceManager WorkspaceManager { get; set; }
+	public IWindowManager WindowManager { get; set; }
+	public IMonitorManager MonitorManager { get; set; }
+	public IRouterManager RouterManager { get; set; }
+	public IFilterManager FilterManager { get; set; }
+	public IKeybindManager KeybindManager { get; set; }
+	public IPluginManager PluginManager { get; set; }
 
 	public event EventHandler<ShutdownEventArgs>? Shutdown;
 
-	public ConfigContext(LoggerConfig? loggerConfig)
+	public ConfigContext(
+		LoggerConfig? loggerConfig = null,
+		IRouterManager? routerManager = null,
+		IFilterManager? filterManager = null,
+		IWindowManager? windowManager = null,
+		IMonitorManager? monitorManager = null,
+		IWorkspaceManager? workspaceManager = null,
+		IKeybindManager? keybindManager = null,
+		IPluginManager? pluginManager = null)
 	{
 		Logger = Logger.Initialize(loggerConfig ?? new LoggerConfig());
-		RouterManager = new RouterManager(this);
-		FilterManager = new FilterManager(this);
-		WindowManager = new WindowManager(this);
-		MonitorManager = new MonitorManager(this);
-		WorkspaceManager = new WorkspaceManager(this);
-		KeybindManager = new KeybindManager(this);
-		PluginManager = new PluginManager(this);
+		RouterManager = routerManager ?? new RouterManager(this);
+		FilterManager = filterManager ?? new FilterManager(this);
+		WindowManager = windowManager ?? new WindowManager(this);
+		MonitorManager = monitorManager ?? new MonitorManager(this);
+		WorkspaceManager = workspaceManager ?? new WorkspaceManager(this);
+		KeybindManager = keybindManager ?? new KeybindManager(this);
+		PluginManager = pluginManager ?? new PluginManager(this);
 	}
 
 	public void Initialize()

@@ -1,20 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,8 +11,14 @@ namespace Whim.App;
 public partial class App : Application
 {
 	private readonly IConfigContext _configContext;
+	private Exception? _startupException;
 
-	public App(IConfigContext configContext)
+	/// <summary>
+	/// Initializes the Whim application.
+	/// </summary>
+	/// <param name="configContext">The Whim config context.</param>
+	/// <param name="startupException">An exception encountered during startup.</param>
+	public App(IConfigContext configContext, Exception? startupException = null)
 	{
 		Logger.Debug("Starting application...");
 
@@ -35,10 +26,28 @@ public partial class App : Application
 
 		InitializeComponent();
 
-		Logger.Debug("Initializing Whim");
-
 		_configContext = configContext;
-		_configContext.Initialize();
+		_startupException = startupException;
+	}
+
+	protected override void OnLaunched(LaunchActivatedEventArgs args)
+	{
+		if (_startupException == null)
+		{
+			try
+			{
+				_configContext.Initialize();
+				return;
+			}
+			catch (Exception ex)
+			{
+				_startupException = ex;
+			}
+		}
+
+		// If we get to here, there's been an error somewhere during startup.
+		_configContext.Quit();
+		new StartupExceptionWindow(_startupException!).Activate();
 	}
 
 	// Add when Windows App SDK supports the application exit event.

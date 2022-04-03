@@ -45,12 +45,7 @@ public static class Program
 
 		if (this_is_the_first_instance)
 		{
-			global::Microsoft.UI.Xaml.Application.Start((p) =>
-			{
-				var context = new global::Microsoft.UI.Dispatching.DispatcherQueueSynchronizationContext(global::Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
-				global::System.Threading.SynchronizationContext.SetSynchronizationContext(context);
-				new App(Config.CreateConfigContext());
-			});
+			Whim.Start();
 		}
 	}
 }
