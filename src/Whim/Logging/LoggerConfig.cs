@@ -54,8 +54,8 @@ public class LoggerConfig
 	/// Initializes the <see cref="LoggerConfig"/> with a custom log file name.
 	/// </summary>
 	/// <param name="logFileName"></param>
-	/// <param name="baseMinLogLevel">Sets <see cref="LoggerConfig.BaseMinLogLevel"/></param>
-	public LoggerConfig(string logFileName, LogLevel baseMinLogLevel = LogLevel.Verbose)
+	/// <param name="baseMinLogLevel">Sets <see cref="BaseMinLogLevel"/></param>
+	public LoggerConfig(string logFileName, LogLevel baseMinLogLevel = LogLevel.Error)
 	{
 		FileSink = new FileSinkConfig(logFileName, LogLevel.Debug);
 		DebugSink = new SinkConfig(LogLevel.Debug);
