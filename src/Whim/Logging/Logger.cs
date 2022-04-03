@@ -33,7 +33,7 @@ public class Logger
 
 		if (fileSink != null)
 		{
-			string loggerFilePath = Path.Combine(FileHelper.GetUserWhimPath(), fileSink.FileName);
+			string loggerFilePath = Path.Combine(FileHelper.GetWhimDir(), fileSink.FileName);
 			_loggerConfiguration.WriteTo.File(
 								loggerFilePath,
 								levelSwitch: fileSink.MinLogLevelSwitch
