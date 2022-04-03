@@ -9,6 +9,30 @@ internal class Whim
 {
 	internal static void Start()
 	{
+		// Create an empty Whim config context.
+		IConfigContext configContext = new ConfigContext();
+		Exception? startupException = null;
+
+		try
+		{
+			configContext = GetConfigContext(configContext);
+		}
+		catch (Exception ex)
+		{
+			startupException = ex;
+		}
+
+		// Start the application and the message loop.
+		global::Microsoft.UI.Xaml.Application.Start((p) =>
+			{
+				var context = new global::Microsoft.UI.Dispatching.DispatcherQueueSynchronizationContext(global::Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
+				global::System.Threading.SynchronizationContext.SetSynchronizationContext(context);
+				new App(configContext, startupException);
+			});
+	}
+
+	private static IConfigContext GetConfigContext(IConfigContext configContext)
+	{
 		// Ensure the Whim directory exists.
 		FileHelper.EnsureWhimDirExists();
 
@@ -26,21 +50,6 @@ internal class Whim
 		Task<Func<IConfigContext, IConfigContext>> task = CSharpScript.EvaluateAsync<Func<IConfigContext, IConfigContext>>(rawConfig, options);
 		Func<IConfigContext, IConfigContext> doConfig = task.Result;
 
-		// Create an empty Whim config context.
-		IConfigContext configContext = new ConfigContext();
-		configContext = doConfig(configContext);
-
-		// Initialize Whim.
-		configContext.Initialize();
-
-		// Start the application and the message loop.
-		Logger.Information("Starting application...");
-
-		global::Microsoft.UI.Xaml.Application.Start((p) =>
-			{
-				var context = new global::Microsoft.UI.Dispatching.DispatcherQueueSynchronizationContext(global::Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
-				global::System.Threading.SynchronizationContext.SetSynchronizationContext(context);
-				new App(configContext);
-			});
+		return doConfig(configContext);
 	}
 }
