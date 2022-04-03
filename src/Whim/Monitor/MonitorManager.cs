@@ -58,13 +58,12 @@ public class MonitorManager : IMonitorManager
 			throw new Exception("No primary monitor found.");
 		}
 		FocusedMonitor = primaryMonitor;
-
-		// Listen for changes in the monitors.
-		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;
 	}
 
 	public void Initialize()
 	{
+		// Listen for changes in the monitors.
+		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;
 		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
