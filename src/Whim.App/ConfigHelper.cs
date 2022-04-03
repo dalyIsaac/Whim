@@ -22,32 +22,38 @@ internal static class ConfigHelper
 	}
 
 	/// <summary>
-	/// Creates a config based on the Whim template and saves it to the config file.
-	/// This will throw if any null values are encountered.
+	/// Read the given <paramref name="filename"/> from the assembly's resources and return it as a string.
 	/// </summary>
-	internal static void CreateConfig()
+	/// <param name="assembly"></param>
+	/// <param name="filename"></param>
+	/// <returns></returns>
+	/// <exception cref="Exception"></exception>
+	private static string ReadFile(this Assembly assembly, string filename)
 	{
-		// Load the Whim template from the assembly's resources.
-		Assembly? assembly = Assembly.GetAssembly(typeof(Program));
-		if (assembly == null)
-		{
-			throw new Exception($"Could not find assembly for {nameof(Program)}");
-		}
-
-		string? templateName = assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith("whim.config.template.csx"));
+		string? templateName = assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith(filename));
 		if (templateName == null)
 		{
-			throw new Exception($"Could not find Whim template in assembly {assembly.FullName}");
+			throw new Exception($"Could not find file \"{ filename }\" in assembly { assembly.FullName}");
 		}
 
 		using Stream? stream = assembly.GetManifestResourceStream(templateName);
 		if (stream == null)
 		{
-			throw new Exception($"Could not find manifest resource stream for Whim template in assembly {assembly.FullName}");
+			throw new Exception($"Could not find manifest resource stream for \"{ filename }\" in assembly {assembly.FullName}");
 		}
 
 		using StreamReader reader = new(stream);
-		string template = reader.ReadToEnd();
+		return reader.ReadToEnd();
+	}
+
+	/// <summary>
+	/// Load the Whim template from the assembly's resources, and replace the WHIM_PATH.
+	/// </summary>
+	/// <returns>The Whim template.</returns>
+	private static string ReadConfigFile(this Assembly assembly)
+	{
+		// Load the Whim template from the assembly's resources.
+		string template = assembly.ReadFile("whim.config.template.csx");
 
 		// Replace WHIM_PATH with the assembly's path.
 		string? assemblyPath = Path.GetDirectoryName(assembly.Location);
@@ -56,9 +62,27 @@ internal static class ConfigHelper
 			throw new Exception($"Could not find assembly path for assembly {assembly.FullName}");
 		}
 
-		template = template.Replace("WHIM_PATH", assemblyPath);
+		return template.Replace("WHIM_PATH", assemblyPath);
+	}
 
-		// Save the Whim config to the Whim config file.
+	/// <summary>
+	/// Creates a config based on the Whim template and saves it to the config file.
+	/// This will throw if any null values are encountered.
+	/// </summary>
+	internal static void CreateConfig()
+	{
+		// Load the assembly.
+		Assembly? assembly = Assembly.GetAssembly(typeof(Program));
+		if (assembly == null)
+		{
+			throw new Exception($"Could not find assembly for {nameof(Program)}");
+		}
+
+		string template = assembly.ReadConfigFile();
+		string omnisharpJson = assembly.ReadFile("omnisharp.json");
+
+		// Save the files.
 		File.WriteAllText(configFilePath, template);
+		File.WriteAllText(FileHelper.GetWhimFileDir("omnisharp.json"), omnisharpJson);
 	}
 }

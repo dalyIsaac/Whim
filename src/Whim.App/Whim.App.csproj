@@ -26,13 +26,13 @@
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
@@ -41,7 +41,7 @@
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="StartupExceptionWindow.xaml" />
+		<None Remove="StartupExceptionWindow.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -55,7 +55,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="whim.config.template.csx" />
+		<EmbeddedResource Include="Template/whim.config.template.csx" />
+		<EmbeddedResource Include="Template/omnisharp.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -81,9 +82,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="StartupExceptionWindow.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<Page Update="StartupExceptionWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 
 	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build">

@@ -26,7 +26,7 @@ private static class KeybindHelpers
 			return;
 		}
 
-		workspace.ActiveLayoutEngine.FocusWindowInDirection(Direction.Left, workspace.LastFocusedWindow);
+		workspace.ActiveLayoutEngine.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
 	};
 
 	public static KeybindEventHandler SwapWindowInDirection(IConfigContext configContext, Direction direction) => (args) =>
@@ -41,7 +41,7 @@ private static class KeybindHelpers
 /// <param name="configContext"></param>
 /// <param name="name"></param>
 /// <returns></returns>
-IWorkspace createWorkspace(IConfigContext configContext, string name)
+IWorkspace CreateWorkspace(IConfigContext configContext, string name)
 {
 	return new Workspace(configContext, name, new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
 }
@@ -51,12 +51,12 @@ IWorkspace createWorkspace(IConfigContext configContext, string name)
 /// </summary>
 /// <param name="configContext"></param>
 /// <returns></returns>
-IConfigContext doConfig(IConfigContext configContext)
+IConfigContext DoConfig(IConfigContext configContext)
 {
 	// Add workspaces.
-	configContext.WorkspaceManager.Add(createWorkspace(configContext, "1"));
-	configContext.WorkspaceManager.Add(createWorkspace(configContext, "2"));
-	configContext.WorkspaceManager.Add(createWorkspace(configContext, "3"));
+	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "1"));
+	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "2"));
+	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "3"));
 
 	// Bar plugin.
 	List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
@@ -89,20 +89,22 @@ IConfigContext doConfig(IConfigContext configContext)
 	configContext.KeybindManager.Add(new Keybind(winAlt, VIRTUAL_KEY.VK_DOWN), KeybindHelpers.FocusWindowInDirection(configContext, Direction.Down));
 
 	// Swap windows in direction.
-	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_LEFT), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Left));
-	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_RIGHT), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Right));
-	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_UP), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Up));
-	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_DOWN), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Down));
+	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_LEFT), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Left));
+	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_RIGHT), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Right));
+	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_UP), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Up));
+	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_DOWN), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Down));
 
 	// Move window to monitor.
-	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());
-	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.MoveWindowToNextMonitor());
+	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());
+	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.MoveWindowToNextMonitor());
 
 	// Floating layout
-	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_F), (args) => floatingLayoutPlugin.ToggleWindowFloating());
+	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_F), (args) => floatingLayoutPlugin.ToggleWindowFloating());
 
 	return configContext;
 }
 
+#pragma warning disable CS8974 // Methods should not return 'this'.
 // We return doConfig here so that Whim can call it when it loads.
-return doConfig;
+return DoConfig;
+#pragma warning restore CS8974 // Methods should not return 'this'.
