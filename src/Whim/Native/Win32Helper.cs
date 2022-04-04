@@ -180,6 +180,20 @@ public static class Win32Helper
 		return true;
 	}
 
+	/// <summary>
+	/// Hides the caption buttons from the given window.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	public static void HideCaptionButtons(HWND hwnd)
+	{
+		int style = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+
+		// Hide the title bar and caption buttons
+		style &= ~(int)WINDOW_STYLE.WS_CAPTION & ~(int)WINDOW_STYLE.WS_THICKFRAME;
+
+		PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
+	}
+
 	private static readonly HashSet<string> _systemClasses = new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
 
 	/// <summary>
@@ -372,6 +386,12 @@ public static class Win32Helper
 		}
 	}
 
+	/// <summary>
+	/// Sets the preferred window corners for the given <paramref name="window"/>.
+	/// By default, the window corners are rounded.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <param name="preference"></param>
 	public static void SetWindowCorners(HWND hwnd, DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND)
 	{
 		unsafe

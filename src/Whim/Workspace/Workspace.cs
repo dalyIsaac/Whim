@@ -46,6 +46,11 @@ public class Workspace : IWorkspace
 	/// </summary>
 	private readonly Dictionary<IWindow, ILayoutEngine> _phantomWindows = new();
 
+	/// <summary>
+	/// Map of windows to their current location.
+	/// </summary>
+	private readonly Dictionary<IWindow, IWindowLocation> _windowLocations = new();
+
 	public Commander Commander { get; } = new();
 
 	public void DoLayout()
@@ -83,6 +88,9 @@ public class Workspace : IWorkspace
 
 			Logger.Verbose($"{loc.Window} at {loc.Location}");
 			Win32Helper.SetWindowPos(loc);
+
+			// Update the window location
+			_windowLocations[loc.Window] = loc;
 		}
 	}
 
@@ -381,6 +389,14 @@ public class Workspace : IWorkspace
 		{
 			window.Hide();
 		}
+
+		_windowLocations.Clear();
+	}
+
+	public IWindowLocation? TryGetWindowLocation(IWindow window)
+	{
+		_windowLocations.TryGetValue(window, out IWindowLocation? location);
+		return location;
 	}
 
 	#region Phantom Windows

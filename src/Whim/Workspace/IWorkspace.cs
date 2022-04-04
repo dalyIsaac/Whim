@@ -81,6 +81,16 @@ public interface IWorkspace : ICommandable
 	public void Deactivate();
 
 	/// <summary>
+	/// Gets the current location (as of the last <see cref="DoLayout"/>) of the window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns>
+	/// If the window is not in the workspace, or the workspace is not focused,
+	/// <c>null</c> is returned.
+	/// </returns>
+	public IWindowLocation? TryGetWindowLocation(IWindow window);
+
+	/// <summary>
 	/// Focuses on the first window in the workspace.
 	/// </summary>
 	public void FocusFirstWindow();
