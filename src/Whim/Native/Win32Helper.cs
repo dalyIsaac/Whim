@@ -180,6 +180,20 @@ public static class Win32Helper
 		return true;
 	}
 
+	/// <summary>
+	/// Hides the caption buttons from the given window.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	public static void HideCaptionButtons(HWND hwnd)
+	{
+		int style = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+
+		// Hide the title bar and caption buttons
+		style &= ~(int)WINDOW_STYLE.WS_CAPTION & ~(int)WINDOW_STYLE.WS_THICKFRAME;
+
+		PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
+	}
+
 	private static readonly HashSet<string> _systemClasses = new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
 
 	/// <summary>
@@ -261,8 +275,14 @@ public static class Win32Helper
 	/// Using the given <paramref name="loc"/>, sets the window's position.
 	/// </summary>
 	/// <param name="loc"></param>
-	public static void SetWindowPos(IWindowLocation windowLocation)
+	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
+	public static void SetWindowPos(IWindowLocation windowLocation, HWND? hwndInsertAfter = null)
 	{
+		// We use HWND_BOTTOM, as modifying the Z-order of a window
+		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
+		// causes the relevant window to be focused, when the user hasn't
+		// actually changed the focus.
+		hwndInsertAfter ??= (HWND)1; // HWND_BOTTOM
 
 		IWindow window = windowLocation.Window;
 
@@ -282,14 +302,9 @@ public static class Win32Helper
 			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
 		}
 
-		// We use HWND_BOTTOM, as modifying the Z-order of a window
-		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
-		// causes the relevant window to be focused, when the user hasn't
-		// actually changed the focus.
-
 		PInvoke.SetWindowPos(
 			window.Handle,
-			(HWND)(1), // HWND_BOTTOM
+			(HWND)hwndInsertAfter,
 			location.X,
 			location.Y,
 			location.Width,
@@ -372,6 +387,12 @@ public static class Win32Helper
 		}
 	}
 
+	/// <summary>
+	/// Sets the preferred window corners for the given <paramref name="window"/>.
+	/// By default, the window corners are rounded.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <param name="preference"></param>
 	public static void SetWindowCorners(HWND hwnd, DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND)
 	{
 		unsafe

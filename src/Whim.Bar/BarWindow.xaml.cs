@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Windows.Win32;
-using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim.Bar;
 
@@ -42,7 +40,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
 		Title = "Whim Bar";
-		SetWindowStyle();
+		Win32Helper.HideCaptionButtons(_windowLocation.Window.Handle);
 		Win32Helper.SetWindowCorners(_windowLocation.Window.Handle);
 
 		// Set up the bar.
@@ -58,19 +56,5 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 	public void Render()
 	{
 		Win32Helper.SetWindowPos(_windowLocation);
-	}
-
-	/// <summary>
-	///
-	/// </summary>
-	/// <returns></returns>
-	private void SetWindowStyle()
-	{
-		int style = PInvoke.GetWindowLong(_windowLocation.Window.Handle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
-
-		// Hide the title bar and caption buttons
-		style &= ~(int)WINDOW_STYLE.WS_CAPTION & ~(int)WINDOW_STYLE.WS_THICKFRAME;
-
-		PInvoke.SetWindowLong(_windowLocation.Window.Handle, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
 	}
 }

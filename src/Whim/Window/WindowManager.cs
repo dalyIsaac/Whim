@@ -258,6 +258,7 @@ public class WindowManager : IWindowManager
 
 		_mouseMoveWindow = window;
 		_mouseMoveWindow.IsMouseMoving = true;
+		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, WindowUpdateType.MoveStart));
 	}
 
 	private void WindowMove(IWindow window)
@@ -281,6 +282,7 @@ public class WindowManager : IWindowManager
 				_mouseMoveWindow.IsMouseMoving = false;
 				MoveWindowToLocation(_mouseMoveWindow);
 
+				WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(_mouseMoveWindow, WindowUpdateType.MoveEnd));
 				_mouseMoveWindow = null;
 			}
 		}
