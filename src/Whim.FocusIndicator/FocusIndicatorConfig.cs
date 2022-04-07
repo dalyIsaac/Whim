@@ -18,6 +18,10 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 	}
 
 	private Color _color = Colors.Red;
+
+	/// <summary>
+	/// The color of the focus indicator.
+	/// </summary>
 	public Brush Color
 	{
 		get => new SolidColorBrush(_color);
@@ -32,6 +36,10 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 	}
 
 	private int _borderSize = 10;
+
+	/// <summary>
+	/// The size of the focus indicator border, in pixels.
+	/// </summary>
 	public int BorderSize
 	{
 		get => _borderSize;
@@ -43,6 +51,10 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 	}
 
 	private bool _isVisible;
+
+	/// <summary>
+	/// When <see langword="true"/>, the focus indicator is visible.
+	/// </summary>
 	public bool IsVisible
 	{
 		get => _isVisible;
@@ -53,6 +65,15 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 		}
 	}
 
+	/// <summary>
+	/// When <see langword="true"/>, the focus indicator will be visible for
+	/// <see cref="FadeTimeout"/>.
+	/// </summary>
 	public bool FadeEnabled { get; set; } = false;
+
+	/// <summary>
+	/// The amount of time that the focus indicator will be visible, when
+	/// <see langword="FadeEnabled"/>.
+	/// </summary>
 	public TimeSpan FadeTimeout { get; set; } = TimeSpan.FromSeconds(10);
 }
