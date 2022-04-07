@@ -1,6 +1,7 @@
 ﻿#r "WHIM_PATH\whim.dll"
 #r "WHIM_PATH\plugins\Whim.Bar\Whim.Bar.dll"
 #r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
+#r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
 #r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout\Whim.TreeLayout.dll"
 
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using Whim;
 using Whim.Bar;
 using Whim.FloatingLayout;
+using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.TreeLayout;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -76,6 +78,11 @@ IConfigContext DoConfig(IConfigContext configContext)
 	GapsConfig gapsConfig = new(outerGap: 0, innerGap: 10);
 	GapsPlugin gapsPlugin = new(configContext, gapsConfig);
 	configContext.PluginManager.RegisterPlugin(gapsPlugin);
+
+	// Focus indicator.
+	FocusIndicatorConfig focusIndicatorConfig = new() { FadeEnabled = true };
+	FocusIndicatorPlugin focusIndicatorPlugin = new(configContext, focusIndicatorConfig);
+	configContext.PluginManager.RegisterPlugin(focusIndicatorPlugin);
 
 	// Keybindings.
 	KeyModifiers winAlt = KeyModifiers.LWin | KeyModifiers.LAlt;
