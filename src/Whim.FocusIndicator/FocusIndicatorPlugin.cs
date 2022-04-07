@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using System;
 using System.ComponentModel;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -24,6 +25,7 @@ public class FocusIndicatorPlugin : IPlugin
 		_configContext.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
 		_configContext.WindowManager.WindowStartedMoving += WindowManager_WindowStartedMoving;
+		_configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
 	}
 
@@ -40,6 +42,11 @@ public class FocusIndicatorPlugin : IPlugin
 	private void WindowManager_WindowStartedMoving(object? sender, WindowEventArgs e)
 	{
 		_focusIndicatorConfig.IsVisible = false;
+	}
+
+	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs e)
+	{
+		Show();
 	}
 
 	private void FocusIndicatorConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -63,7 +70,7 @@ public class FocusIndicatorPlugin : IPlugin
 		window ??= activeWorkspace.LastFocusedWindow;
 		if (window == null)
 		{
-			Logger.Error("No window to show focus indicator for");
+			Hide();
 			return;
 		}
 
