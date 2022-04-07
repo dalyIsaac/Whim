@@ -5,7 +5,7 @@
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<RootNamespace>Whim.App</RootNamespace>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<Platforms>x86;x64;arm64</Platforms>
+		<Platforms>x86;x64;arm64;AnyCPU</Platforms>
 		<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
 		<PublishProfile>win10-$(Platform).pubxml</PublishProfile>
 		<UseWinUI>true</UseWinUI>
@@ -13,7 +13,6 @@
 		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
 		<Nullable>enable</Nullable>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -26,10 +25,16 @@
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
@@ -74,9 +79,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
@@ -90,6 +96,7 @@
 	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build">
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.Bar\" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.FloatingLayout\$(OutDir)Whim.FloatingLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.FloatingLayout\" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(OutDir)Whim.FocusIndicator.dll" DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(OutDir)Whim.Gaps.dll" DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" />
 	</Target>

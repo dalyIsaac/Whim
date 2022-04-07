@@ -10,30 +10,20 @@ public class FocusIndicatorPlugin : IPlugin
 {
 	private readonly IConfigContext _configContext;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
-	private readonly FocusIndicatorWindow _focusIndicatorWindow;
-	private readonly DispatcherTimer _dispatcherTimer;
+	private FocusIndicatorWindow? _focusIndicatorWindow;
+	private DispatcherTimer? _dispatcherTimer;
 
 	public FocusIndicatorPlugin(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
 	{
 		_configContext = configContext;
 		_focusIndicatorConfig = focusIndicatorConfig;
-		_focusIndicatorWindow = new FocusIndicatorWindow(focusIndicatorConfig);
-		_dispatcherTimer = new DispatcherTimer();
 	}
 
 	public void Initialize()
 	{
-		// When the window has focused or the timer has ticked, as change the config's
-		// IsVisible property.
-		// The FocusIndicatorConfig_PropertyChanged listener listens to changes on IsVisible
-		// and handles them.
+		_configContext.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
-		_dispatcherTimer.Tick += DispatcherTimer_Tick;
-
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
-
-		// TODO: filter.
-		// It might be better in the constructor.
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
@@ -80,11 +70,17 @@ public class FocusIndicatorPlugin : IPlugin
 		}
 
 		// Activate the window.
+		if (_focusIndicatorWindow == null)
+		{
+			_focusIndicatorWindow = new FocusIndicatorWindow(_configContext, _focusIndicatorConfig);
+		}
 		_focusIndicatorWindow.Activate(windowLocation);
 
 		// If the fade is enabled, start the timer.
 		if (_focusIndicatorConfig.FadeEnabled)
 		{
+			_dispatcherTimer = new DispatcherTimer();
+			_dispatcherTimer.Tick += DispatcherTimer_Tick;
 			_dispatcherTimer.Interval = _focusIndicatorConfig.FadeTimeout;
 			_dispatcherTimer.Start();
 		}
@@ -92,7 +88,11 @@ public class FocusIndicatorPlugin : IPlugin
 
 	private void Hide()
 	{
-		_dispatcherTimer.Stop();
-		_focusIndicatorWindow.Hide();
+		if (_dispatcherTimer != null)
+		{
+			_dispatcherTimer.Stop();
+			_dispatcherTimer.Tick -= DispatcherTimer_Tick;
+			_focusIndicatorWindow?.Hide();
+		}
 	}
 }

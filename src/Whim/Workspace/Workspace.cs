@@ -72,6 +72,7 @@ public class Workspace : IWorkspace
 			throw new InvalidOperationException("No layout engines found for workspace " + Name);
 		}
 
+		_windowLocations.Clear();
 		IEnumerable<IWindowLocation> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height));
 		foreach (IWindowLocation loc in locations)
 		{

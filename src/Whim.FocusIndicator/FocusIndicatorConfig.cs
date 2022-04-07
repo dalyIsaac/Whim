@@ -1,11 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
-using Windows.UI;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media;
 
 namespace Whim.FocusIndicator;
 
 public class FocusIndicatorConfig : INotifyPropertyChanged
 {
+	internal const string Title = "Whim Focus Indicator";
+
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	protected virtual void OnPropertyChanged(string propertyName)
@@ -13,18 +16,21 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	private Color _borderColor;
-	public Color BorderColor
+	private Brush? _borderBrush;
+	public Brush BorderBrush
 	{
-		get => _borderColor;
+		get => _borderBrush ?? new SolidColorBrush(Colors.Red);
 		set
 		{
-			_borderColor = value;
-			OnPropertyChanged(nameof(BorderColor));
+			if (_borderBrush != value)
+			{
+				_borderBrush = value;
+				OnPropertyChanged(nameof(BorderBrush));
+			}
 		}
 	}
 
-	private int _borderSize;
+	private int _borderSize = 10;
 	public int BorderSize
 	{
 		get => _borderSize;
@@ -46,6 +52,6 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 		}
 	}
 
-	public bool FadeEnabled { get; set; }
-	public TimeSpan FadeTimeout { get; set; }
+	public bool FadeEnabled { get; set; } = false;
+	public TimeSpan FadeTimeout { get; set; } = TimeSpan.FromSeconds(10);
 }

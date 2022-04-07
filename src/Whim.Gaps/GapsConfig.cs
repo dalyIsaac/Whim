@@ -1,6 +1,5 @@
-using System;
-
 namespace Whim.Gaps;
+
 public class GapsConfig
 {
 	/// <summary>

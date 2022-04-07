@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Windows.Win32;
-using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim.Bar;
 

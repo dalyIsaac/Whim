@@ -7,5 +7,5 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Grid Background="{x:Bind Path=FocusIndicatorConfig.BorderColor}" />
+	<Grid Background="{x:Bind Path=FocusIndicatorConfig.BorderBrush}" />
 </Window>

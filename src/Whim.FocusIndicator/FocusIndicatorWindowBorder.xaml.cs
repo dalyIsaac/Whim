@@ -1,4 +1,5 @@
-﻿using Windows.Win32.Foundation;
+﻿using System;
+using Windows.Win32.Foundation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -10,13 +11,22 @@ namespace Whim.FocusIndicator;
 public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 {
 	public readonly FocusIndicatorConfig FocusIndicatorConfig;
+	private IWindow _window;
 
-	public FocusIndicatorWindow(FocusIndicatorConfig focusIndicatorConfig)
+	public FocusIndicatorWindow(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
 	{
 		FocusIndicatorConfig = focusIndicatorConfig;
 		InitializeComponent();
 
+		Title = FocusIndicatorConfig.Title;
+
 		HWND hwnd = new(WinRT.Interop.WindowNative.GetWindowHandle(this));
+		_window = Window.CreateWindow(this.GetHandle(), configContext);
+		if (_window == null)
+		{
+			throw new Exception("Window was unexpectedly null");
+		}
+
 		Win32Helper.HideCaptionButtons(hwnd);
 		Win32Helper.SetWindowCorners(hwnd);
 	}
@@ -27,7 +37,16 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 	/// <param name="windowLocation">The location of the window.</param>
 	public void Activate(IWindowLocation windowLocation)
 	{
-		Activate();
-		Win32Helper.SetWindowPos(windowLocation);
+		ILocation<int> focusedWindowLocation = windowLocation.Location;
+		int borderSize = FocusIndicatorConfig.BorderSize;
+
+		ILocation<int> borderLocation = new Location(
+			x: focusedWindowLocation.X - borderSize,
+			y: focusedWindowLocation.Y - borderSize,
+			height: focusedWindowLocation.Height + borderSize * 2,
+			width: focusedWindowLocation.Width + borderSize * 2
+		);
+
+		Win32Helper.SetWindowPos(new WindowLocation(_window, borderLocation, WindowState.Normal));
 	}
 }

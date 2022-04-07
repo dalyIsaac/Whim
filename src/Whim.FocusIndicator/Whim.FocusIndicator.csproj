@@ -7,6 +7,7 @@
 		<UseWinUI>true</UseWinUI>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
+
 	<ItemGroup>
 		<None Remove="FocusIndicatorWindowBorder.xaml" />
 	</ItemGroup>
@@ -15,7 +16,6 @@
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
