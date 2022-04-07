@@ -33,7 +33,7 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 	}
 
 	/// <summary>
-	/// Activates the window at the given coordinates.
+	/// Activates the window behind the given window.
 	/// </summary>
 	/// <param name="windowLocation">The location of the window.</param>
 	public void Activate(IWindowLocation windowLocation)

@@ -23,6 +23,7 @@ public class FocusIndicatorPlugin : IPlugin
 		_configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
 		_configContext.WindowManager.WindowUpdated += WindowManager_WindowUpdated;
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
+		_focusIndicatorWindow = new FocusIndicatorWindow(_configContext, _focusIndicatorConfig);
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
@@ -53,6 +54,7 @@ public class FocusIndicatorPlugin : IPlugin
 			case WindowUpdateType.Cloaked:
 			case WindowUpdateType.MoveStart:
 			case WindowUpdateType.MinimizeStart:
+			case WindowUpdateType.Move:
 				Hide();
 				break;
 			case WindowUpdateType.Foreground:
@@ -60,7 +62,6 @@ public class FocusIndicatorPlugin : IPlugin
 			case WindowUpdateType.MinimizeEnd:
 				Show();
 				break;
-			case WindowUpdateType.Move:
 			default:
 				break;
 		}
@@ -83,10 +84,12 @@ public class FocusIndicatorPlugin : IPlugin
 
 	private void Show(IWindow? window = null)
 	{
+		Logger.Debug("Showing focus indicator");
 		IWorkspace activeWorkspace = _configContext.WorkspaceManager.ActiveWorkspace;
 		window ??= activeWorkspace.LastFocusedWindow;
 		if (window == null)
 		{
+			Logger.Debug("No window to show focus indicator for");
 			Hide();
 			return;
 		}
@@ -99,11 +102,6 @@ public class FocusIndicatorPlugin : IPlugin
 			return;
 		}
 
-		// Activate the window.
-		if (_focusIndicatorWindow == null)
-		{
-			_focusIndicatorWindow = new FocusIndicatorWindow(_configContext, _focusIndicatorConfig);
-		}
 		_focusIndicatorWindow.Activate(windowLocation);
 
 		// If the fade is enabled, start the timer.
@@ -123,6 +121,7 @@ public class FocusIndicatorPlugin : IPlugin
 
 	private void Hide()
 	{
+		Logger.Debug("Hiding focus indicator");
 		_focusIndicatorWindow?.Hide();
 		if (_dispatcherTimer != null)
 		{
