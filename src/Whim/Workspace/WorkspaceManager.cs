@@ -92,7 +92,6 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void Add(IWorkspace workspace)
 	{
-		// TODO: cache until initialization
 		Logger.Debug($"Adding workspace {workspace}");
 		_workspaces.Add(workspace);
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs(workspace));
