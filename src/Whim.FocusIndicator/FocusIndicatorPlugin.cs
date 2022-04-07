@@ -109,6 +109,11 @@ public class FocusIndicatorPlugin : IPlugin
 		// If the fade is enabled, start the timer.
 		if (_focusIndicatorConfig.FadeEnabled)
 		{
+			if (_dispatcherTimer != null)
+			{
+				_dispatcherTimer.Stop();
+			}
+
 			_dispatcherTimer = new DispatcherTimer();
 			_dispatcherTimer.Tick += DispatcherTimer_Tick;
 			_dispatcherTimer.Interval = _focusIndicatorConfig.FadeTimeout;
