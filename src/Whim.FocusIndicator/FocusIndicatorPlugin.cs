@@ -51,7 +51,23 @@ public class FocusIndicatorPlugin : IPlugin
 
 	private void WindowManager_WindowUpdated(object? sender, WindowUpdateEventArgs e)
 	{
-		Show();
+		switch (e.UpdateType)
+		{
+			case WindowUpdateType.Uncloaked:
+			case WindowUpdateType.Cloaked:
+			case WindowUpdateType.MoveStart:
+			case WindowUpdateType.MinimizeStart:
+				Hide();
+				break;
+			case WindowUpdateType.Foreground:
+			case WindowUpdateType.MoveEnd:
+			case WindowUpdateType.MinimizeEnd:
+				Show();
+				break;
+			case WindowUpdateType.Move:
+			default:
+				break;
+		}
 	}
 
 	private void FocusIndicatorConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
