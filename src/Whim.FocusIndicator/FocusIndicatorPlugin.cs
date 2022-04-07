@@ -24,8 +24,8 @@ public class FocusIndicatorPlugin : IPlugin
 	{
 		_configContext.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
-		_configContext.WindowManager.WindowStartedMoving += WindowManager_WindowStartedMoving;
 		_configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
+		_configContext.WindowManager.WindowUpdated += WindowManager_WindowUpdated;
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
 	}
 
@@ -45,6 +45,11 @@ public class FocusIndicatorPlugin : IPlugin
 	}
 
 	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs e)
+	{
+		Show();
+	}
+
+	private void WindowManager_WindowUpdated(object? sender, WindowUpdateEventArgs e)
 	{
 		Show();
 	}

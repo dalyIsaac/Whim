@@ -17,7 +17,6 @@ public class WindowManager : IWindowManager
 	public event EventHandler<WindowUpdateEventArgs>? WindowUpdated;
 	public event EventHandler<WindowEventArgs>? WindowFocused;
 	public event EventHandler<WindowEventArgs>? WindowUnregistered;
-	public event EventHandler<WindowEventArgs>? WindowStartedMoving;
 
 	/// <summary>
 	/// Map of <see cref="HWND"/> to <see cref="IWindow"/> for easy <see cref="IWindow"/> lookup.
@@ -259,7 +258,7 @@ public class WindowManager : IWindowManager
 
 		_mouseMoveWindow = window;
 		_mouseMoveWindow.IsMouseMoving = true;
-		WindowStartedMoving?.Invoke(this, new WindowEventArgs(window));
+		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, WindowUpdateType.MoveStart));
 	}
 
 	private void WindowMove(IWindow window)
@@ -283,6 +282,7 @@ public class WindowManager : IWindowManager
 				_mouseMoveWindow.IsMouseMoving = false;
 				MoveWindowToLocation(_mouseMoveWindow);
 
+				WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(_mouseMoveWindow, WindowUpdateType.MoveEnd));
 				_mouseMoveWindow = null;
 			}
 		}

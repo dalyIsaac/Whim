@@ -29,11 +29,6 @@ public interface IWindowManager : ICommandable, IDisposable
 	public event EventHandler<WindowEventArgs>? WindowFocused;
 
 	/// <summary>
-	/// Event for when a window has started moving.
-	/// </summary>
-	public event EventHandler<WindowEventArgs>? WindowStartedMoving;
-
-	/// <summary>
 	/// Event for when a window is unregistered.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowUnregistered;
