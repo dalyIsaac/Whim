@@ -275,8 +275,14 @@ public static class Win32Helper
 	/// Using the given <paramref name="loc"/>, sets the window's position.
 	/// </summary>
 	/// <param name="loc"></param>
-	public static void SetWindowPos(IWindowLocation windowLocation)
+	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
+	public static void SetWindowPos(IWindowLocation windowLocation, HWND? hwndInsertAfter = null)
 	{
+		// We use HWND_BOTTOM, as modifying the Z-order of a window
+		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
+		// causes the relevant window to be focused, when the user hasn't
+		// actually changed the focus.
+		hwndInsertAfter ??= (HWND)1; // HWND_BOTTOM
 
 		IWindow window = windowLocation.Window;
 
@@ -296,14 +302,9 @@ public static class Win32Helper
 			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
 		}
 
-		// We use HWND_BOTTOM, as modifying the Z-order of a window
-		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
-		// causes the relevant window to be focused, when the user hasn't
-		// actually changed the focus.
-
 		PInvoke.SetWindowPos(
 			window.Handle,
-			(HWND)(1), // HWND_BOTTOM
+			(HWND)hwndInsertAfter,
 			location.X,
 			location.Y,
 			location.Width,
