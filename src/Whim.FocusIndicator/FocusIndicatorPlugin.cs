@@ -23,6 +23,7 @@ public class FocusIndicatorPlugin : IPlugin
 	{
 		_configContext.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_configContext.WindowManager.WindowStartedMoving += WindowManager_WindowStartedMoving;
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
 	}
 
@@ -32,6 +33,11 @@ public class FocusIndicatorPlugin : IPlugin
 	}
 
 	private void DispatcherTimer_Tick(object? sender, object e)
+	{
+		_focusIndicatorConfig.IsVisible = false;
+	}
+
+	private void WindowManager_WindowStartedMoving(object? sender, WindowEventArgs e)
 	{
 		_focusIndicatorConfig.IsVisible = false;
 	}
@@ -88,11 +94,11 @@ public class FocusIndicatorPlugin : IPlugin
 
 	private void Hide()
 	{
+		_focusIndicatorWindow?.Hide();
 		if (_dispatcherTimer != null)
 		{
 			_dispatcherTimer.Stop();
 			_dispatcherTimer.Tick -= DispatcherTimer_Tick;
-			_focusIndicatorWindow?.Hide();
 		}
 	}
 }
