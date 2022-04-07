@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
+using Windows.UI;
 
 namespace Whim.FocusIndicator;
 
@@ -16,16 +17,16 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	private Brush? _borderBrush;
-	public Brush BorderBrush
+	private Color _color = Colors.Red;
+	public Brush Color
 	{
-		get => _borderBrush ?? new SolidColorBrush(Colors.Red);
+		get => new SolidColorBrush(_color);
 		set
 		{
-			if (_borderBrush != value)
+			if (value is SolidColorBrush colorBrush)
 			{
-				_borderBrush = value;
-				OnPropertyChanged(nameof(BorderBrush));
+				_color = colorBrush.Color;
+				OnPropertyChanged(nameof(Color));
 			}
 		}
 	}
