@@ -24,6 +24,10 @@ public class FocusIndicatorPlugin : IPlugin
 		_configContext.WindowManager.WindowUpdated += WindowManager_WindowUpdated;
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
 		_focusIndicatorWindow = new FocusIndicatorWindow(_configContext, _focusIndicatorConfig);
+
+		// Activate the window so it renders.
+		_focusIndicatorWindow.Activate();
+		_focusIndicatorWindow.Hide();
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
@@ -102,7 +106,7 @@ public class FocusIndicatorPlugin : IPlugin
 			return;
 		}
 
-		_focusIndicatorWindow.Activate(windowLocation);
+		_focusIndicatorWindow?.Activate(windowLocation);
 
 		// If the fade is enabled, start the timer.
 		if (_focusIndicatorConfig.FadeEnabled)
