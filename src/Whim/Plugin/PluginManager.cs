@@ -16,13 +16,23 @@ public class PluginManager : IPluginManager
 		_configContext = configContext;
 	}
 
-	public void Initialize()
+	public void PreInitialize()
 	{
-		Logger.Debug("Initializing plugin manager...");
+		Logger.Debug("Pre-initializing plugin manager...");
 
 		foreach (IPlugin plugin in _plugins)
 		{
-			plugin.Initialize();
+			plugin.PreInitialize();
+		}
+	}
+
+	public void PostInitialize()
+	{
+		Logger.Debug("Post-initializing plugin manager...");
+
+		foreach (IPlugin plugin in _plugins)
+		{
+			plugin.PostInitialize();
 		}
 	}
 

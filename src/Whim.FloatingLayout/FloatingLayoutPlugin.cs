@@ -9,10 +9,14 @@ public class FloatingLayoutPlugin : IPlugin
 	{
 		_configContext = configContext;
 		_floatingLayoutConfig = floatingLayoutConfig ?? new FloatingLayoutConfig();
+	}
+
+	public void PreInitialize()
+	{
 		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_configContext, _floatingLayoutConfig, layout));
 	}
 
-	public void Initialize() { }
+	public void PostInitialize() { }
 
 	public void MarkWindowAsFloating(IWindow? window = null)
 	{

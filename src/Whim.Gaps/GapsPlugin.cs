@@ -9,13 +9,14 @@ public class GapsPlugin : IPlugin
 	{
 		_configContext = configContext;
 		_gapsConfig = gapsConfig;
+	}
+
+	public void PreInitialize()
+	{
 		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new GapsLayoutEngine(_gapsConfig, layout));
 	}
 
-	public void Initialize()
-	{
-
-	}
+	public void PostInitialize() { }
 
 	public void UpdateOuterGap(int delta)
 	{

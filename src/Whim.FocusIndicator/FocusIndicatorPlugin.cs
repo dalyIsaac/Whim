@@ -16,13 +16,18 @@ public class FocusIndicatorPlugin : IPlugin
 		_focusIndicatorConfig = focusIndicatorConfig;
 	}
 
-	public void Initialize()
+	public void PreInitialize()
 	{
 		_configContext.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
 		_configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
 		_configContext.WindowManager.WindowUpdated += WindowManager_WindowUpdated;
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
+	}
+
+	public void PostInitialize()
+	{
+		// The window must be created on the UI thread (so don't do it in the constructor).
 		_focusIndicatorWindow = new FocusIndicatorWindow(_configContext, _focusIndicatorConfig);
 
 		// Activate the window so it renders.

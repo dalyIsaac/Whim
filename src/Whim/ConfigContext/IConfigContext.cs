@@ -21,6 +21,11 @@ public interface IConfigContext
 	public IFilterManager FilterManager { get; }
 	public IKeybindManager KeybindManager { get; }
 	public IPluginManager PluginManager { get; }
+
+	/// <summary>
+	/// This will be called by Whim after your config has been read.
+	/// Do not call it yourself.
+	/// </summary>
 	public void Initialize();
 
 	/// <summary>

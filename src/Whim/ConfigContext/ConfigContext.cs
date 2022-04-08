@@ -47,12 +47,17 @@ public class ConfigContext : IConfigContext
 	public void Initialize()
 	{
 		Logger.Initialize();
+
 		Logger.Debug("Initializing config context...");
+
+		PluginManager.PreInitialize();
+
 		MonitorManager.Initialize();
 		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
 		KeybindManager.Initialize();
-		PluginManager.Initialize();
+
+		PluginManager.PostInitialize();
 	}
 
 
