@@ -25,7 +25,7 @@ public class ConfigContext : IConfigContext
 	public event EventHandler<ShutdownEventArgs>? Shutdown;
 
 	public ConfigContext(
-		LoggerConfig? loggerConfig = null,
+		Logger? logger = null,
 		IRouterManager? routerManager = null,
 		IFilterManager? filterManager = null,
 		IWindowManager? windowManager = null,
@@ -34,7 +34,7 @@ public class ConfigContext : IConfigContext
 		IKeybindManager? keybindManager = null,
 		IPluginManager? pluginManager = null)
 	{
-		Logger = Logger.Initialize(loggerConfig ?? new LoggerConfig());
+		Logger = logger ?? new Logger();
 		RouterManager = routerManager ?? new RouterManager(this);
 		FilterManager = filterManager ?? new FilterManager(this);
 		WindowManager = windowManager ?? new WindowManager(this);
@@ -46,12 +46,18 @@ public class ConfigContext : IConfigContext
 
 	public void Initialize()
 	{
+		Logger.Initialize();
+
 		Logger.Debug("Initializing config context...");
+
+		PluginManager.PreInitialize();
+
 		MonitorManager.Initialize();
 		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
 		KeybindManager.Initialize();
-		PluginManager.Initialize();
+
+		PluginManager.PostInitialize();
 	}
 
 

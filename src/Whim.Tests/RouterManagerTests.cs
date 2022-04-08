@@ -42,8 +42,6 @@ public class RouterManagerTests
 	[Fact]
 	public void AddWindowClassRouteString()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		RouterManager routerManager = new(CreateConfigContextMock("Test").Object);
 		routerManager.AddWindowClassRoute("Test", "Test");
 
@@ -55,8 +53,6 @@ public class RouterManagerTests
 	[Fact]
 	public void AddWindowClassRoute()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		Mock<IWorkspace> workspaceMock = new();
 		workspaceMock.Setup(w => w.Name).Returns("Test");
 
@@ -71,8 +67,6 @@ public class RouterManagerTests
 	[Fact]
 	public void AddProcessNameRouteString()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		RouterManager routerManager = new(CreateConfigContextMock("Test").Object);
 		routerManager.AddProcessNameRoute("Test", "Test");
 
@@ -84,8 +78,6 @@ public class RouterManagerTests
 	[Fact]
 	public void AddProcessNameRoute()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		Mock<IWorkspace> workspaceMock = new();
 		workspaceMock.Setup(w => w.Name).Returns("Test");
 
@@ -100,8 +92,6 @@ public class RouterManagerTests
 	[Fact]
 	public void AddTitleRouteString()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		RouterManager routerManager = new(CreateConfigContextMock("Test").Object);
 		routerManager.AddTitleRoute("Test", "Test");
 
@@ -113,8 +103,6 @@ public class RouterManagerTests
 	[Fact]
 	public void AddTitleRoute()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		Mock<IWorkspace> workspaceMock = new();
 		workspaceMock.Setup(w => w.Name).Returns("Test");
 
@@ -129,8 +117,6 @@ public class RouterManagerTests
 	[Fact]
 	public void AddTitleMatchRouteString()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		RouterManager routerManager = new(CreateConfigContextMock("Test").Object);
 		routerManager.AddTitleMatchRoute("Test", "Test");
 
@@ -142,8 +128,6 @@ public class RouterManagerTests
 	[Fact]
 	public void AddTitleMatchRoute()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		Mock<IWorkspace> workspaceMock = new();
 		workspaceMock.Setup(w => w.Name).Returns("Test");
 
@@ -158,8 +142,6 @@ public class RouterManagerTests
 	[Fact]
 	public void Clear()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		RouterManager routerManager = new(CreateConfigContextMock("Test").Object);
 		routerManager.AddWindowClassRoute("Test", "Test");
 
@@ -173,8 +155,6 @@ public class RouterManagerTests
 	[Fact]
 	public void CustomRouter()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		Mock<IWorkspace> workspaceMock = new();
 		workspaceMock.Setup(w => w.Name).Returns("Test");
 

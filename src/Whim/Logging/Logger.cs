@@ -17,19 +17,37 @@ public class Logger
 	/// <summary>
 	/// Serilog <see cref="ILogger"/> instance.
 	/// </summary>
-	private readonly ILogger _logger;
+	private ILogger? _logger;
 
 	/// <summary>
 	/// Serilog <see cref="LoggerConfiguration"/> instance.
 	/// </summary>
-	private readonly LoggerConfiguration _loggerConfiguration;
+	private LoggerConfiguration? _loggerConfiguration;
 
-	private Logger(LoggerConfig config)
+	/// <summary>
+	/// The config for the logger.
+	/// NOTE: Changes to this will only take effect if set prior to <see cref="Initialize"/>.
+	/// </summary>
+	public LoggerConfig Config { get; set; }
+
+	/// <summary>
+	/// Initialize the <see cref="Logger"/> with the <see cref="IConfigContext.WhimPath"/> and
+	/// <see cref="LoggerConfig"/>.
+	/// </summary>
+	/// <param name="whimPath"><see cref="IConfigContext.WhimPath"/></param>
+	/// <param name="config"><see cref="LoggerConfig"/></param>
+	public Logger(LoggerConfig? config = null)
 	{
-		FileSinkConfig? fileSink = config.FileSink;
-		SinkConfig? debugSink = config.DebugSink;
+		Config = config ?? new LoggerConfig();
+	}
 
-		_loggerConfiguration = new LoggerConfiguration().MinimumLevel.ControlledBy(config.BaseMinLogLevelSwitch);
+	public void Initialize()
+	{
+		Logger.instance = this;
+		FileSinkConfig? fileSink = Config.FileSink;
+		SinkConfig? debugSink = Config.DebugSink;
+
+		_loggerConfiguration = new LoggerConfiguration().MinimumLevel.ControlledBy(Config.BaseMinLogLevelSwitch);
 
 		if (fileSink != null)
 		{
@@ -49,55 +67,33 @@ public class Logger
 		_logger.Debug("Created logger!");
 	}
 
-	/// <summary>
-	/// Initialize the <see cref="Logger"/> with the <see cref="IConfigContext.WhimPath"/> and
-	/// <see cref="LoggerConfig"/>.
-	/// </summary>
-	/// <param name="whimPath"><see cref="IConfigContext.WhimPath"/></param>
-	/// <param name="config"><see cref="LoggerConfig"/></param>
-	/// <returns>The <see cref="Logger"/> singleton instance.</returns>
-	public static Logger Initialize(LoggerConfig config)
-	{
-		if (instance == null)
-		{
-			instance = new Logger(config);
-		}
-		return instance;
-	}
-
-	/// <summary>
-	/// Initialize the <see cref="Logger"/> with the defaults.
-	/// </summary>
-	/// <returns>The <see cref="Logger"/> singleton instance.</returns>
-	public static Logger Initialize() => Initialize(new LoggerConfig());
-
 	public static void Verbose(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger.Verbose(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Verbose(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Debug(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger.Debug(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Debug(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Information(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger.Information(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Information(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Warning(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger.Warning(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Warning(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Error(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger.Error(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Error(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 
 	public static void Fatal(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger.Fatal(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Fatal(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
 	}
 }
