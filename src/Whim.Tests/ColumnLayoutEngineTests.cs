@@ -22,7 +22,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void DoLayout_LeftToRight_SingleWindow()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 		engine.Add(CreateWindow());
 
@@ -41,7 +40,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void DoLayout_LeftToRight_MultipleWindows()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 		engine.Add(CreateWindow());
 		engine.Add(CreateWindow());
@@ -74,7 +72,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void DoLayout_RightToLeft_SingleWindow()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 		engine.Add(CreateWindow());
 
@@ -93,7 +90,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void DoLayout_RightToLeft_MultipleWindows()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 		engine.Add(CreateWindow());
 		engine.Add(CreateWindow());
@@ -163,7 +159,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_LeftToRight_FocusRight()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -180,7 +175,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_LeftToRight_FocusRightWrapAround()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -197,7 +191,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_LeftToRight_FocusLeft()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -214,7 +207,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_LeftToRight_FocusLeftWrapAround()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -231,7 +223,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_RightToLeft_FocusLeft()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -248,7 +239,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_RightToLeft_FocusLeftWrapAround()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -265,7 +255,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_RightToLeft_FocusRight()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -282,7 +271,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void FocusWindowInDirection_RightToLeft_FocusRightWrapAround()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -350,7 +338,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_LeftToRight_SwapRight()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -376,7 +363,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_LeftToRight_SwapRightWrapAround()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -402,7 +388,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_LeftToRight_SwapLeft()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -428,7 +413,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_LeftToRight_SwapLeftWrapAround()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new();
 
 		Mock<IWindow> leftWindow = CreateMockWindow();
@@ -454,7 +438,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_RightToLeft_SwapLeft()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 
 		Mock<IWindow> rightWindow = CreateMockWindow();
@@ -480,7 +463,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_RightToLeft_SwapLeftWrapAround()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 
 		Mock<IWindow> rightWindow = CreateMockWindow();
@@ -506,7 +488,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_RightToLeft_SwapRight()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 
 		Mock<IWindow> rightWindow = CreateMockWindow();
@@ -532,7 +513,6 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void SwapWindowInDirection_RightToLeft_SwapRightWrapAround()
 	{
-		Logger.Initialize(new LoggerConfig());
 		ColumnLayoutEngine engine = new(leftToRight: false);
 
 		Mock<IWindow> rightWindow = CreateMockWindow();

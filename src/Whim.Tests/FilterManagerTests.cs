@@ -63,8 +63,6 @@ public class FilterManagerTests
 	[Fact]
 	public void ClearKeepDefaults()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
 		filterManager.IgnoreWindowClass("Test");
 
@@ -83,8 +81,6 @@ public class FilterManagerTests
 	[Fact]
 	public void ClearAll()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
 		filterManager.IgnoreWindowClass("Test");
 
@@ -103,8 +99,6 @@ public class FilterManagerTests
 	[Fact]
 	public void CustomFilter()
 	{
-		Logger.Initialize(new LoggerConfig());
-
 		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
 		filterManager.Add(w => w.Class == "Test");
 
