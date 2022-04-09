@@ -160,7 +160,7 @@ public class MonitorManager : IMonitorManager
 		int index = Array.IndexOf(_monitors, monitor);
 		if (index == -1)
 		{
-			Logger.Error($"Monitor {monitor.Name} not found.");
+			Logger.Error($"Monitor {monitor} not found.");
 			return _monitors[0];
 		}
 
@@ -174,7 +174,7 @@ public class MonitorManager : IMonitorManager
 		int index = Array.IndexOf(_monitors, monitor);
 		if (index == -1)
 		{
-			Logger.Error($"Monitor {monitor.Name} not found.");
+			Logger.Error($"Monitor {monitor} not found.");
 			return _monitors[0];
 		}
 

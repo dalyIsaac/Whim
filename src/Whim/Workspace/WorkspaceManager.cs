@@ -154,7 +154,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public void Activate(IWorkspace workspace, IMonitor? focusedMonitor = null)
 	{
-		Logger.Debug($"Activating workspace {workspace.Name}");
+		Logger.Debug($"Activating workspace {workspace}");
 
 		focusedMonitor ??= _configContext.MonitorManager.FocusedMonitor;
 
@@ -185,19 +185,19 @@ public class WorkspaceManager : IWorkspaceManager
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
 	{
-		Logger.Debug($"Getting monitor for active workspace {workspace.Name}");
+		Logger.Debug($"Getting monitor for active workspace {workspace}");
 
 		// Linear search for the monitor that contains the workspace.
 		foreach (IMonitor monitor in _configContext.MonitorManager)
 		{
 			if (_monitorWorkspaceMap[monitor] == workspace)
 			{
-				Logger.Debug($"Found monitor {monitor} for workspace {workspace.Name}");
+				Logger.Debug($"Found monitor {monitor} for workspace {workspace}");
 				return monitor;
 			}
 		}
 
-		Logger.Debug($"Could not find monitor for workspace {workspace.Name}");
+		Logger.Debug($"Could not find monitor for workspace {workspace}");
 		return null;
 	}
 
@@ -216,7 +216,7 @@ public class WorkspaceManager : IWorkspaceManager
 	#region Windows
 	private void WindowManager_WindowRegistered(object? sender, WindowEventArgs args)
 	{
-		Logger.Debug($"Registering window {args.Window}");
+		Logger.Debug($"Registering window {args}");
 
 		IWindow window = args.Window;
 
@@ -234,7 +234,7 @@ public class WorkspaceManager : IWorkspaceManager
 
 	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
 	{
-		Logger.Debug($"Window unregistered: {args.Window}");
+		Logger.Debug($"Window unregistered: {args}");
 
 		IWindow window = args.Window;
 

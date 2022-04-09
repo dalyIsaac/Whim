@@ -66,7 +66,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// <returns>The node that represents the window.</returns>
 	public WindowNode? AddWindow(IWindow window, IWindow? focusedWindow = null)
 	{
-		Logger.Debug($"Adding window {window.Title} to layout engine {Name}");
+		Logger.Debug($"Adding window {window} to layout engine {Name}");
 		Count++;
 
 		// Get the focused window node
@@ -128,7 +128,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// Ideally, we should never enter this block here.
 		if (focusedLeaf == null)
 		{
-			Logger.Error($"Could not find a leaf node to add window {window.Title} to layout engine {Name}");
+			Logger.Error($"Could not find a leaf node to add window {window} to layout engine {Name}");
 			_windows.Remove(window);
 			return false;
 		}
@@ -137,7 +137,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// In this scenario, there's no possibility of a sibling phantom node.
 		if (focusedLeaf.Parent == null)
 		{
-			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is the root node. Creating a new split node.");
+			Logger.Verbose($"Focused leaf node {focusedLeaf} is the root node. Creating a new split node.");
 
 			// Create a new split node, and update the root.
 			SplitNode splitNode = new(focusedLeaf, newLeaf, AddNodeDirection);
@@ -170,7 +170,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// add the window to the split node.
 		if (parent.IsHorizontal == AddNodeDirection.IsHorizontal())
 		{
-			Logger.Verbose($"Focused leaf node {focusedLeaf.Window.Title} is in a split node with direction {AddNodeDirection}. Adding window {window.Title} to the split node.");
+			Logger.Verbose($"Focused leaf node {focusedLeaf} is in a split node with direction {AddNodeDirection}. Adding window {window} to the split node.");
 
 			parent.Add(existingFocusedNode: focusedLeaf, newNode: newLeaf, AddNodeDirection);
 			return true;
@@ -179,7 +179,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		// If the parent node is a split node and the direction doesn't match, then we need to
 		// create a new split node and add the window to the split node.
 		// The focused leaf will also be added to the new split node.
-		Logger.Verbose($"Replacing the focused leaf node {focusedLeaf.Window.Title} with a split node with direction {AddNodeDirection}.");
+		Logger.Verbose($"Replacing the focused leaf node {focusedLeaf} with a split node with direction {AddNodeDirection}.");
 
 		SplitNode newSplitNode = new(focusedLeaf, newLeaf, AddNodeDirection, parent);
 
@@ -212,12 +212,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// <returns><see langword="true"/> if the window was removed, <see langword="false"/> otherwise.</returns>
 	public bool Remove(IWindow window)
 	{
-		Logger.Debug($"Removing window {window.Title} from layout engine {Name}");
+		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
 		// Get the node for the window.
 		if (!_windows.TryGetValue(window, out LeafNode? removingNode))
 		{
-			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
+			Logger.Error($"Could not find node for window {window} in layout engine {Name}");
 			return false;
 		}
 
@@ -294,11 +294,11 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
-		Logger.Debug($"Focusing window {window.Title} in direction {direction} in layout engine {Name}");
+		Logger.Debug($"Focusing window {window} in direction {direction} in layout engine {Name}");
 
 		if (!_windows.TryGetValue(window, out LeafNode? node))
 		{
-			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
+			Logger.Error($"Could not find node for window {window} in layout engine {Name}");
 			return;
 		}
 
@@ -308,22 +308,22 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	public void SwapWindowInDirection(Direction direction, IWindow window)
 	{
-		Logger.Debug($"Swapping window {window.Title} in direction {direction} in layout engine {Name}");
+		Logger.Debug($"Swapping window {window} in direction {direction} in layout engine {Name}");
 
 		if (!_windows.TryGetValue(window, out LeafNode? node))
 		{
-			Logger.Error($"Could not find node for window {window.Title} in layout engine {Name}");
+			Logger.Error($"Could not find node for window {window} in layout engine {Name}");
 			return;
 		}
 
 		LeafNode? targetNode = GetAdjacentNode(node, direction);
 		if (targetNode == null)
 		{
-			Logger.Error($"Could not find adjacent node for window {window.Title} in layout engine {Name}");
+			Logger.Error($"Could not find adjacent node for window {window} in layout engine {Name}");
 			return;
 		}
 
-		Logger.Verbose($"Swapping window {window.Title} with window {targetNode.Window.Title}");
+		Logger.Verbose($"Swapping window {window} with window {targetNode}");
 
 		// Get the parents.
 		SplitNode? targetNodeParent = targetNode.Parent;
@@ -357,7 +357,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	public bool Contains(IWindow item)
 	{
-		Logger.Debug($"Checking if layout engine {Name} contains window {item.Title}");
+		Logger.Debug($"Checking if layout engine {Name} contains window {item}");
 		return _windows.ContainsKey(item) || _phantomWindows.Contains(item);
 	}
 
@@ -529,13 +529,13 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 		if (!_windows.TryGetValue(focusedWindow, out LeafNode? node))
 		{
-			Logger.Error($"Could not find node for window {focusedWindow.Title} in layout engine {Name}");
+			Logger.Error($"Could not find node for window {focusedWindow} in layout engine {Name}");
 			return;
 		}
 
 		if (node.Parent == null)
 		{
-			Logger.Debug($"Node for window {focusedWindow.Title} has no parent in layout engine {Name}");
+			Logger.Debug($"Node for window {focusedWindow} has no parent in layout engine {Name}");
 			return;
 		}
 
