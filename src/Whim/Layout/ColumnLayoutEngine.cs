@@ -71,7 +71,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		int windowIndex = _stack.FindIndex(x => x.Handle == window.Handle);
 		if (windowIndex == -1)
 		{
-			Logger.Error($"Window {window.Title} not found in layout engine {Name}");
+			Logger.Error($"Window {window} not found in layout engine {Name}");
 			return;
 		}
 
@@ -95,7 +95,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		int windowIndex = _stack.FindIndex(x => x.Handle == window?.Handle);
 		if (windowIndex == -1)
 		{
-			Logger.Error($"Window {window?.Title} not found in layout engine {Name}");
+			Logger.Error($"Window {window ?} not found in layout engine {Name}");
 			return;
 		}
 

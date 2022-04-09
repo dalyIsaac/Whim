@@ -55,7 +55,7 @@ public class RouterManager : IRouterManager
 	public IRouterManager AddProcessNameRoute(string processName, IWorkspace workspace)
 	{
 		processName = processName.ToLower();
-		Logger.Debug($"Routing process name: {processName} to workspace {workspace.Name}");
+		Logger.Debug($"Routing process name: {processName} to workspace {workspace}");
 		AddRouter(window =>
 		{
 			if (window.ProcessName.ToLower() == processName)
@@ -85,7 +85,7 @@ public class RouterManager : IRouterManager
 	public IRouterManager AddTitleRoute(string title, IWorkspace workspace)
 	{
 		title = title.ToLower();
-		Logger.Debug($"Routing title: {title} to workspace {workspace.Name}");
+		Logger.Debug($"Routing title: {title} to workspace {workspace}");
 		AddRouter(window =>
 		{
 			if (window.Title.ToLower() == title)
@@ -114,7 +114,7 @@ public class RouterManager : IRouterManager
 
 	public IRouterManager AddTitleMatchRoute(string match, IWorkspace workspace)
 	{
-		Logger.Debug($"Routing title match: {match} to workspace {workspace.Name}");
+		Logger.Debug($"Routing title match: {match} to workspace {workspace}");
 		Regex regex = new(match);
 		AddRouter(window =>
 		{
@@ -162,7 +162,7 @@ public class RouterManager : IRouterManager
 	public IRouterManager AddWindowClassRoute(string windowClass, IWorkspace workspace)
 	{
 		windowClass = windowClass.ToLower();
-		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace.Name}");
+		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace}");
 		AddRouter(window =>
 		{
 			if (window.Class.ToLower() == windowClass)

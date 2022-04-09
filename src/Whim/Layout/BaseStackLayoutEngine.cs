@@ -22,13 +22,13 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 
 	public void Add(IWindow window)
 	{
-		Logger.Debug($"Adding window {window.Title} to layout engine {Name}");
+		Logger.Debug($"Adding window {window} to layout engine {Name}");
 		_stack.Add(window);
 	}
 
 	public bool Remove(IWindow window)
 	{
-		Logger.Debug($"Removing window {window.Title} from layout engine {Name}");
+		Logger.Debug($"Removing window {window} from layout engine {Name}");
 		return _stack.RemoveAll(x => x.Handle == window.Handle) > 0;
 	}
 
@@ -40,7 +40,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 
 	public bool Contains(IWindow window)
 	{
-		Logger.Debug($"Checking if layout engine {Name} contains window {window.Title}");
+		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
 		return _stack.Any(x => x.Handle == window.Handle);
 	}
 
