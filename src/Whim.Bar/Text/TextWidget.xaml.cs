@@ -1,16 +1,18 @@
-﻿namespace Whim.Bar;
+﻿using Microsoft.UI.Xaml.Controls;
+
+namespace Whim.Bar;
 
 /// <summary>
 /// Interaction logic for TextWidget.xaml
 /// </summary>
-public partial class TextWidget : PluginControl
+public partial class TextWidget : UserControl
 {
 	public TextWidgetViewModel ViewModel { get; private set; }
 
 	public TextWidget(string? value = null)
 	{
 		ViewModel = new TextWidgetViewModel(value);
-		InitializeComponent("Whim.Bar", "Text/TextWidget");
+		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "Text/TextWidget");
 	}
 
 	public static BarComponent CreateComponent(string? value = null)

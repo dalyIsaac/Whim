@@ -6,7 +6,7 @@ namespace Whim.Bar;
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class BarWindow : PluginWindow
+public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 {
 	private readonly IConfigContext _configContext;
 	private readonly BarConfig _barConfig;
@@ -19,7 +19,7 @@ public sealed partial class BarWindow : PluginWindow
 		_barConfig = barConfig;
 		_monitor = monitor;
 
-		InitializeComponent("Whim.Bar", "BarWindow");
+		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "BarWindow");
 
 		IWindow? window = Window.CreateWindow(this.GetHandle(), _configContext);
 		if (window == null)
@@ -39,6 +39,7 @@ public sealed partial class BarWindow : PluginWindow
 			height: _barConfig.Height), WindowState.Normal);
 
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
+		Title = "Whim Bar";
 		Win32Helper.HideCaptionButtons(_windowLocation.Window.Handle);
 		Win32Helper.SetWindowCorners(_windowLocation.Window.Handle);
 

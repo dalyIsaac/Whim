@@ -1,9 +1,11 @@
-﻿namespace Whim.Bar;
+﻿using Microsoft.UI.Xaml.Controls;
+
+namespace Whim.Bar;
 
 /// <summary>
 /// Interaction logic for WorkspaceWidget.xaml
 /// </summary>
-public partial class WorkspaceWidget : PluginControl
+public partial class WorkspaceWidget : UserControl
 {
 	public WorkspaceWidgetViewModel ViewModel { get; }
 
@@ -11,7 +13,7 @@ public partial class WorkspaceWidget : PluginControl
 	{
 		ViewModel = new WorkspaceWidgetViewModel(configContext, monitor);
 		window.Closed += Window_Closed;
-		InitializeComponent("Whim.Bar", "Workspace/WorkspaceWidget");
+		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "Workspace/WorkspaceWidget");
 	}
 
 	private void Window_Closed(object? sender, Microsoft.UI.Xaml.WindowEventArgs e)

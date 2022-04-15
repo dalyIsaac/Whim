@@ -6,7 +6,7 @@ namespace Whim.FocusIndicator;
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class FocusIndicatorWindow : PluginWindow
+public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 {
 	public readonly FocusIndicatorConfig FocusIndicatorConfig;
 	private readonly IWindow _window;
@@ -14,7 +14,7 @@ public sealed partial class FocusIndicatorWindow : PluginWindow
 	public FocusIndicatorWindow(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
 	{
 		FocusIndicatorConfig = focusIndicatorConfig;
-		InitializeComponent("Whim.FocusIndicator", "FocusIndicatorWindow");
+		UIElementExtensions.InitializeComponent(this, "Whim.FocusIndicator", "FocusIndicatorWindow");
 
 		Title = FocusIndicatorConfig.Title;
 

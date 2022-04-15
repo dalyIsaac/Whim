@@ -1,16 +1,18 @@
-﻿namespace Whim.Bar;
+﻿using Microsoft.UI.Xaml.Controls;
+
+namespace Whim.Bar;
 
 /// <summary>
 /// Interaction logic for ActiveLayoutWidget.xaml
 /// </summary>
-public partial class ActiveLayoutWidget : PluginControl
+public partial class ActiveLayoutWidget : UserControl
 {
 	public ActiveLayoutWidgetViewModel ViewModel { get; private set; }
 
 	public ActiveLayoutWidget(IConfigContext config, IMonitor monitor)
 	{
 		ViewModel = new ActiveLayoutWidgetViewModel(config, monitor);
-		InitializeComponent("Whim.Bar", "ActiveLayout/ActiveLayoutWidget");
+		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "ActiveLayout/ActiveLayoutWidget");
 	}
 
 	public static BarComponent CreateComponent()
