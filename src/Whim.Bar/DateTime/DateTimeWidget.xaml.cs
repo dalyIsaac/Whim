@@ -1,11 +1,9 @@
-﻿using Microsoft.UI.Xaml.Controls;
-
-namespace Whim.Bar;
+﻿namespace Whim.Bar;
 
 /// <summary>
 /// Interaction logic for DateTimeWidget.xaml
 /// </summary>
-public partial class DateTimeWidget : UserControl
+public partial class DateTimeWidget : PluginControl
 {
 	public DateTimeWidgetViewModel ViewModel { get; private set; }
 
@@ -13,7 +11,7 @@ public partial class DateTimeWidget : UserControl
 	{
 		ViewModel = new DateTimeWidgetViewModel(interval, format);
 		DataContext = ViewModel;
-		InitializeComponent();
+		InitializeComponent("Whim.Bar", "DateTime/DateTimeWidget");
 	}
 
 

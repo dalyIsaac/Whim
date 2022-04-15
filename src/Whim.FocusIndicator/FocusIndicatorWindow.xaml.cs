@@ -1,14 +1,12 @@
 ﻿using System;
 using Windows.Win32.Foundation;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace Whim.FocusIndicator;
+
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
+public sealed partial class FocusIndicatorWindow : PluginWindow
 {
 	public readonly FocusIndicatorConfig FocusIndicatorConfig;
 	private readonly IWindow _window;
@@ -16,7 +14,7 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 	public FocusIndicatorWindow(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
 	{
 		FocusIndicatorConfig = focusIndicatorConfig;
-		InitializeComponent();
+		InitializeComponent("Whim.FocusIndicator", "FocusIndicatorWindow");
 
 		Title = FocusIndicatorConfig.Title;
 

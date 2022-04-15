@@ -1,15 +1,15 @@
-﻿<Window
+﻿<whim:PluginWindow
 	x:Class="Whim.TreeLayout.PhantomWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:local="using:Whim.TreeLayout"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:whim="using:Whim"
 	mc:Ignorable="d">
 
 	<Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
 		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-			<TextBlock>Whim TreeLayout Phantom Wnidow</TextBlock>
+			<TextBlock>Whim TreeLayout Phantom Window</TextBlock>
 		</StackPanel>
 	</Grid>
-</Window>
+</whim:PluginWindow>

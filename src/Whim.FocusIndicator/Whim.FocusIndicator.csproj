@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="FocusIndicatorWindowBorder.xaml" />
+		<None Remove="FocusIndicatorWindow.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Update="FocusIndicatorWindowBorder.xaml">
+		<Page Update="FocusIndicatorWindow.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>

@@ -1,11 +1,11 @@
 ﻿namespace Whim.TreeLayout;
 
-public sealed partial class PhantomWindow : Microsoft.UI.Xaml.Window
+public sealed partial class PhantomWindow : PluginWindow
 {
 	public PhantomWindow()
 	{
-		this.InitializeComponent();
 		Title = "Whim TreeLayout Phantom Window";
 		ExtendsContentIntoTitleBar = true;
+		InitializeComponent("Whim.TreeLayout", "PhantomWindow");
 	}
 }
