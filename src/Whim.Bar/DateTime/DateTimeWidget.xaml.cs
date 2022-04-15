@@ -13,7 +13,7 @@ public partial class DateTimeWidget : UserControl
 	{
 		ViewModel = new DateTimeWidgetViewModel(interval, format);
 		DataContext = ViewModel;
-		InitializeComponent();
+		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "DateTime/DateTimeWidget");
 	}
 
 

@@ -12,7 +12,7 @@ public partial class ActiveLayoutWidget : UserControl
 	public ActiveLayoutWidget(IConfigContext config, IMonitor monitor)
 	{
 		ViewModel = new ActiveLayoutWidgetViewModel(config, monitor);
-		InitializeComponent();
+		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "ActiveLayout/ActiveLayoutWidget");
 	}
 
 	public static BarComponent CreateComponent()

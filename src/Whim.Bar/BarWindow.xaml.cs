@@ -19,7 +19,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		_barConfig = barConfig;
 		_monitor = monitor;
 
-		InitializeComponent();
+		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "BarWindow");
 
 		IWindow? window = Window.CreateWindow(this.GetHandle(), _configContext);
 		if (window == null)

@@ -26,7 +26,7 @@
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
@@ -35,7 +35,7 @@
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
@@ -90,10 +90,34 @@
 	</ItemGroup>
 
 	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build">
+		<!--Whim.Bar-->
+		<ItemGroup>
+			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
+			<BarDestinationFile Include="@(BarSourceFile->'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(BarSourceFile)" DestinationFiles="@(BarDestinationFile)" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.Bar\" />
+
+		<!--Whim.FloatingLayout-->
 		<Copy SourceFiles="$(SolutionDir)src\Whim.FloatingLayout\$(OutDir)Whim.FloatingLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.FloatingLayout\" />
+
+		<!--Whim.FocusIndicator-->
+		<ItemGroup>
+			<FocusIndicatorSourceFile Include="$(SolutionDir)\src\Whim.FocusIndicator\$(OutDir)\Whim.FocusIndicator\**\*" />
+			<FocusIndicatorDestinationFile Include="@(FocusIndicatorSourceFile->'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(FocusIndicatorSourceFile)" DestinationFiles="@(FocusIndicatorDestinationFile)" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(OutDir)Whim.FocusIndicator.dll" DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" />
+
+		<!--Whim.Gaps-->
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(OutDir)Whim.Gaps.dll" DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" />
+
+		<!--Whim.TreeLayout-->
+		<ItemGroup>
+			<TreeLayoutSourceFile Include="$(SolutionDir)\src\Whim.TreeLayout\$(OutDir)\Whim.TreeLayout\**\*" />
+			<TreeLayoutDestinationFile Include="@(TreeLayoutSourceFile->'$(TargetDir)plugins\Whim.TreeLayout\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(TreeLayoutSourceFile)" DestinationFiles="@(TreeLayoutDestinationFile)" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" />
 	</Target>
 </Project>

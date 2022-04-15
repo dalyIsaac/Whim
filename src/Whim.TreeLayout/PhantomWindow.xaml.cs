@@ -4,8 +4,8 @@ public sealed partial class PhantomWindow : Microsoft.UI.Xaml.Window
 {
 	public PhantomWindow()
 	{
-		this.InitializeComponent();
 		Title = "Whim TreeLayout Phantom Window";
 		ExtendsContentIntoTitleBar = true;
+		UIElementExtensions.InitializeComponent(this, "Whim.TreeLayout", "PhantomWindow");
 	}
 }

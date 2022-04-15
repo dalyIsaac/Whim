@@ -12,8 +12,7 @@ public partial class TextWidget : UserControl
 	public TextWidget(string? value = null)
 	{
 		ViewModel = new TextWidgetViewModel(value);
-		InitializeComponent();
-		DataContext = ViewModel;
+		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "Text/TextWidget");
 	}
 
 	public static BarComponent CreateComponent(string? value = null)
