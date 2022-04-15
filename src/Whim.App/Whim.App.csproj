@@ -89,38 +89,30 @@
 		</Page>
 	</ItemGroup>
 
-	<Target Name="CopyBarPlugin" AfterTargets="Build">
+	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build">
+		<!--Whim.Bar-->
 		<ItemGroup>
 			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
 			<BarDestinationFile Include="@(BarSourceFile->'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
 		</ItemGroup>
-
-		<Message Text="BarSourceFile: @(BarSourceFile)" Importance="high" />
-		<Message Text="BarDestinationFile: @(BarDestinationFile)" Importance="high" />
-
 		<Copy SourceFiles="@(BarSourceFile)" DestinationFiles="@(BarDestinationFile)" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.Bar\" />
-	</Target>
 
-	<Target Name="CopyFloatingLayoutPlugin" AfterTargets="CopyBarPlugin">
+		<!--Whim.FloatingLayout-->
 		<Copy SourceFiles="$(SolutionDir)src\Whim.FloatingLayout\$(OutDir)Whim.FloatingLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.FloatingLayout\" />
-	</Target>
 
-	<Target Name="CopyFocusIndicatorPlugin" AfterTargets="CopyFloatingLayoutPlugin">
+		<!--Whim.FocusIndicator-->
 		<ItemGroup>
 			<FocusIndicatorSourceFile Include="$(SolutionDir)\src\Whim.FocusIndicator\$(OutDir)\Whim.FocusIndicator\**\*" />
 			<FocusIndicatorDestinationFile Include="@(FocusIndicatorSourceFile->'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
 		</ItemGroup>
-
 		<Copy SourceFiles="@(FocusIndicatorSourceFile)" DestinationFiles="@(FocusIndicatorDestinationFile)" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(OutDir)Whim.FocusIndicator.dll" DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" />
-	</Target>
 
-	<Target Name="CopyGapsPlugin" AfterTargets="CopyFocusIndicatorPlugin">
+		<!--Whim.Gaps-->
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(OutDir)Whim.Gaps.dll" DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" />
-	</Target>
 
-	<Target Name="CopyTreeLayoutPlugin" AfterTargets="CopyGapsPlugin">
+		<!--Whim.TreeLayout-->
 		<ItemGroup>
 			<TreeLayoutSourceFile Include="$(SolutionDir)\src\Whim.TreeLayout\$(OutDir)\Whim.TreeLayout\**\*" />
 			<TreeLayoutDestinationFile Include="@(TreeLayoutSourceFile->'$(TargetDir)plugins\Whim.TreeLayout\%(RecursiveDir)%(Filename)%(Extension)')" />
