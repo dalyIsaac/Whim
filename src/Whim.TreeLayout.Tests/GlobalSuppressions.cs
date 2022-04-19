@@ -5,5 +5,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+// The general justification for these suppression messages is that this project contains tests.
 [assembly: SuppressMessage("Style", "IDE0008:Use explicit type")]
 [assembly: SuppressMessage("Style", "IDE0042:Variable declaration can be deconstructed")]
+[assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
+[assembly: SuppressMessage("Design", "CA1014:Mark assemblies with CLSCompliantAttribute")]
