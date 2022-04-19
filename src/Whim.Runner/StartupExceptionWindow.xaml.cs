@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
 
-namespace Whim.App;
+namespace Whim.Runner;
 
 /// <summary>
 /// Exposes the exception encountered during startup to the user.

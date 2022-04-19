@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Whim.App;
+namespace Whim.Runner;
 
 internal static class ConfigHelper
 {
@@ -33,13 +33,13 @@ internal static class ConfigHelper
 		string? templateName = assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith(filename));
 		if (templateName == null)
 		{
-			throw new Exception($"Could not find file \"{ filename }\" in assembly { assembly.FullName}");
+			throw new Exception($"Could not find file \"{filename}\" in assembly {assembly.FullName}");
 		}
 
 		using Stream? stream = assembly.GetManifestResourceStream(templateName);
 		if (stream == null)
 		{
-			throw new Exception($"Could not find manifest resource stream for \"{ filename }\" in assembly {assembly.FullName}");
+			throw new Exception($"Could not find manifest resource stream for \"{filename}\" in assembly {assembly.FullName}");
 		}
 
 		using StreamReader reader = new(stream);

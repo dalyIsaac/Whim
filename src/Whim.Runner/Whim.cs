@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using System;
 using System.Threading.Tasks;
 
-namespace Whim.App;
+namespace Whim.Runner;
 
 internal class Whim
 {
