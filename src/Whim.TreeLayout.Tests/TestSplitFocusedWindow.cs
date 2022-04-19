@@ -120,7 +120,7 @@ public class TestSplitFocusedWindow
 		SplitNode root = (testTreeEngine.Engine.Root as SplitNode)!;
 		Assert.Equal(0.5d, root[0].weight);
 		Assert.Equal(0.5d, root[1].weight);
-		Assert.Equal(window1.Object, ((WindowNode)(root[0].node)).Window);
-		Assert.Equal(window2.Object, ((WindowNode)(root[1].node)).Window);
+		Assert.Equal(window1.Object, ((WindowNode)root[0].node).Window);
+		Assert.Equal(window2.Object, ((WindowNode)root[1].node).Window);
 	}
 }

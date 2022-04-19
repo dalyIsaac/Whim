@@ -1,4 +1,3 @@
-using Moq;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
@@ -62,7 +61,7 @@ public class TestParents
 		TestTree engine = new();
 
 		Node[] leftAncestors = engine.Left.GetLineage().ToArray();
-		Node[] emptyAncestors = new Node[0];
+		Node[] emptyAncestors = Array.Empty<Node>();
 
 		Assert.Null(Node.GetCommonParent(leftAncestors, emptyAncestors));
 	}
@@ -72,7 +71,7 @@ public class TestParents
 	{
 		TestTree engine = new();
 
-		Node[] emptyAncestors = new Node[0];
+		Node[] emptyAncestors = Array.Empty<Node>();
 		Node[] rightAncestors = engine.Right.GetLineage().ToArray();
 
 		Assert.Null(Node.GetCommonParent(emptyAncestors, rightAncestors));
