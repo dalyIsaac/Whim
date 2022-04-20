@@ -269,8 +269,6 @@ public static class Win32Helper
 		}
 	}
 
-	private static readonly HWND HWND_TOP = new(0);
-
 	/// <summary>
 	/// Using the given <paramref name="loc"/>, sets the window's position.
 	/// </summary>
@@ -357,8 +355,8 @@ public static class Win32Helper
 			return new Location(
 				x: windowRect.left - extendedFrameLocation.X,
 				y: windowRect.top - extendedFrameLocation.Y,
-				width: (windowRect.right - windowRect.left) - extendedFrameLocation.Width,
-				height: (windowRect.bottom - windowRect.top) - extendedFrameLocation.Height);
+				width: windowRect.right - windowRect.left - extendedFrameLocation.Width,
+				height: windowRect.bottom - windowRect.top - extendedFrameLocation.Height);
 		}
 	}
 

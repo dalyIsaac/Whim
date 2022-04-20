@@ -27,7 +27,7 @@ public class Workspace : IWorkspace
 	public IWindow? LastFocusedWindow { get; private set; }
 
 	private readonly List<ILayoutEngine> _layoutEngines = new();
-	private int _activeLayoutEngineIndex = 0;
+	private int _activeLayoutEngineIndex;
 
 	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
 

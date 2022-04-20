@@ -227,7 +227,7 @@ public class WorkspaceManager : IWorkspaceManager
 		}
 
 		_windowWorkspaceMap[window] = ActiveWorkspace;
-		ActiveWorkspace?.AddWindow(window);
+		ActiveWorkspace.AddWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 		Logger.Debug($"Window {window} registered to workspace {ActiveWorkspace!.Name}");
 	}

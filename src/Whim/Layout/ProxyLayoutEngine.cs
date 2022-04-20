@@ -8,10 +8,10 @@ namespace Whim;
 /// </summary>
 public abstract class BaseProxyLayoutEngine : ILayoutEngine
 {
-	protected readonly ILayoutEngine _innerLayoutEngine;
+	protected ILayoutEngine _innerLayoutEngine { get; }
 	public virtual Commander Commander { get; } = new();
 
-	public BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
+	protected BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 	{
 		_innerLayoutEngine = innerLayoutEngine;
 	}

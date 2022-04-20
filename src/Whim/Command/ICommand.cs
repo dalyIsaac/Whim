@@ -28,11 +28,11 @@ public interface ICommand
 /// <summary>
 /// Command specification with payload.
 /// </summary>
-/// <typeparam name="CommandPayloadType">Generic payload for the command.</typeparam>
-public interface ICommand<CommandPayloadType> : ICommand
+/// <typeparam name="TCommandPayloadType">Generic payload for the command.</typeparam>
+public interface ICommand<TCommandPayloadType> : ICommand
 {
 	/// <summary>
 	/// Payload for the specification.
 	/// </summary>
-	public CommandPayloadType? Payload { get; }
+	public TCommandPayloadType? Payload { get; }
 }

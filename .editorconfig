@@ -223,3 +223,6 @@ dotnet_diagnostic.CA1416.severity = silent
 
 # Default severity for analyzer diagnostics with category 'Globalization'
 dotnet_analyzer_diagnostic.category-Globalization.severity = none
+
+# CA1031: Do not catch general exception types
+dotnet_diagnostic.CA1031.severity = none

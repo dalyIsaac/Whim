@@ -4,8 +4,8 @@ namespace Whim;
 
 public class ShutdownEventArgs : EventArgs
 {
-	public readonly ShutdownReason Reason;
-	public readonly string? Message;
+	public ShutdownReason Reason { get; }
+	public string? Message { get; }
 
 	public ShutdownEventArgs(ShutdownReason reason, string? message = null)
 	{
