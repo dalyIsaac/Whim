@@ -24,7 +24,7 @@ public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 
 	private void Quit_Click(object sender, RoutedEventArgs e)
 	{
-		Application.Current.Exit();
+		Close();
 	}
 
 	private void Window_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
