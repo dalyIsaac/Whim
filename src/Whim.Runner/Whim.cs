@@ -1,6 +1,8 @@
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.UI.Dispatching;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Whim.Runner;
@@ -25,12 +27,17 @@ internal class Whim
 		// Start the application and the message loop.
 		global::Microsoft.UI.Xaml.Application.Start((p) =>
 			{
-				var context = new global::Microsoft.UI.Dispatching.DispatcherQueueSynchronizationContext(global::Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
-				global::System.Threading.SynchronizationContext.SetSynchronizationContext(context);
-				new App(configContext, startupException);
+				DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
+				SynchronizationContext.SetSynchronizationContext(context);
+				_ = new App(configContext, startupException);
 			});
 	}
 
+	/// <summary>
+	/// Acquires and evaluates the user's <see cref="IConfigContext"/>.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <returns></returns>
 	private static IConfigContext GetConfigContext(IConfigContext configContext)
 	{
 		// Ensure the Whim directory exists.

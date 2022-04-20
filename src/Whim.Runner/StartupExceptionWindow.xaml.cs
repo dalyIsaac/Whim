@@ -8,7 +8,7 @@ namespace Whim.Runner;
 /// </summary>
 public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 {
-	public readonly string Exception;
+	public string Exception { get; }
 
 	/// <summary>
 	/// Exposes the exception encountered during startup to the user.
@@ -23,6 +23,11 @@ public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 	}
 
 	private void Quit_Click(object sender, RoutedEventArgs e)
+	{
+		Application.Current.Exit();
+	}
+
+	private void Window_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
 	{
 		Application.Current.Exit();
 	}

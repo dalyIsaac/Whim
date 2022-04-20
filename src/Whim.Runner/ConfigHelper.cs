@@ -27,19 +27,19 @@ internal static class ConfigHelper
 	/// <param name="assembly"></param>
 	/// <param name="filename"></param>
 	/// <returns></returns>
-	/// <exception cref="Exception"></exception>
+	/// <exception cref="RunnerException"></exception>
 	private static string ReadFile(this Assembly assembly, string filename)
 	{
 		string? templateName = assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith(filename));
 		if (templateName == null)
 		{
-			throw new Exception($"Could not find file \"{filename}\" in assembly {assembly.FullName}");
+			throw new RunnerException($"Could not find file \"{filename}\" in assembly {assembly.FullName}");
 		}
 
 		using Stream? stream = assembly.GetManifestResourceStream(templateName);
 		if (stream == null)
 		{
-			throw new Exception($"Could not find manifest resource stream for \"{filename}\" in assembly {assembly.FullName}");
+			throw new RunnerException($"Could not find manifest resource stream for \"{filename}\" in assembly {assembly.FullName}");
 		}
 
 		using StreamReader reader = new(stream);
@@ -59,7 +59,7 @@ internal static class ConfigHelper
 		string? assemblyPath = Path.GetDirectoryName(assembly.Location);
 		if (assemblyPath == null)
 		{
-			throw new Exception($"Could not find assembly path for assembly {assembly.FullName}");
+			throw new RunnerException($"Could not find assembly path for assembly {assembly.FullName}");
 		}
 
 		return template.Replace("WHIM_PATH", assemblyPath);
@@ -75,7 +75,7 @@ internal static class ConfigHelper
 		Assembly? assembly = Assembly.GetAssembly(typeof(Program));
 		if (assembly == null)
 		{
-			throw new Exception($"Could not find assembly for {nameof(Program)}");
+			throw new RunnerException($"Could not find assembly for {nameof(Program)}");
 		}
 
 		string template = assembly.ReadConfigFile();
