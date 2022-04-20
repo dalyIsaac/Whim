@@ -10,3 +10,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Design", "CA1014:Mark assemblies with CLSCompliantAttribute")]
 [assembly: SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores")]
 [assembly: SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
+[assembly: SuppressMessage("Style", "IDE0008:Use explicit type")]
