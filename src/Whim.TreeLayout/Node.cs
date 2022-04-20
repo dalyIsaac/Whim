@@ -18,13 +18,16 @@ public abstract class Node
 	/// This node is returned first, and the root is returned last.
 	/// I.e., if as an array: <code>new[] { this, ..., Parent, ..., Root }</code>.
 	/// </summary>
-	public IEnumerable<Node> GetLineage()
+	public IEnumerable<Node> Lineage
 	{
-		Node? node = this;
-		while (node != null)
+		get
 		{
-			yield return node;
-			node = node.Parent;
+			Node? node = this;
+			while (node != null)
+			{
+				yield return node;
+				node = node.Parent;
+			}
 		}
 	}
 
@@ -33,21 +36,24 @@ public abstract class Node
 	/// position in the tree, not necessarily the position in the screen.
 	/// </summary>
 	/// <returns>The left-most node in the tree.</returns>
-	public LeafNode? GetLeftMostLeaf()
+	public LeafNode? LeftMostLeaf
 	{
-		Node node = this;
-
-		while (node is SplitNode splitNode)
+		get
 		{
-			if (splitNode.Count == 0)
+			Node node = this;
+
+			while (node is SplitNode splitNode)
 			{
-				return null;
+				if (splitNode.Count == 0)
+				{
+					return null;
+				}
+
+				(double _, node) = splitNode[0];
 			}
 
-			(double _, node) = splitNode[0];
+			return (LeafNode)node;
 		}
-
-		return (LeafNode)node;
 	}
 
 	/// <summary>
@@ -55,38 +61,44 @@ public abstract class Node
 	/// position in the tree, not necessarily the position in the screen.
 	/// </summary>
 	/// <returns>The right-most node in the tree.</returns>
-	public LeafNode? GetRightMostLeaf()
+	public LeafNode? RightMostLeaf
 	{
-		Node node = this;
-
-		while (node is SplitNode splitNode)
+		get
 		{
-			if (splitNode.Count == 0)
+			Node node = this;
+
+			while (node is SplitNode splitNode)
 			{
-				return null;
+				if (splitNode.Count == 0)
+				{
+					return null;
+				}
+
+				(double _, node) = splitNode[^1];
 			}
 
-			(double _, node) = splitNode[^1];
+			return (LeafNode)node;
 		}
-
-		return (LeafNode)node;
 	}
 
 	/// <summary>
 	/// Get the depth of this node in the tree, where the root has depth of 0.
 	/// </summary>
 	/// <returns>The depth of this node.</returns>
-	public int GetDepth()
+	public int Depth
 	{
-		int depth = 0;
-		Node? node = Parent;
-		while (node != null)
+		get
 		{
-			depth++;
-			node = node.Parent;
-		}
+			int depth = 0;
+			Node? node = Parent;
+			while (node != null)
+			{
+				depth++;
+				node = node.Parent;
+			}
 
-		return depth;
+			return depth;
+		}
 	}
 
 	/// <summary>

@@ -9,7 +9,7 @@ public class TestGetNodes
 	[Fact]
 	public void GetLeftMostLeaf_Left()
 	{
-		LeafNode? node = _tree.Root.GetLeftMostLeaf();
+		LeafNode? node = _tree.Root.LeftMostLeaf;
 
 		Assert.Equal(_tree.Left, node);
 	}
@@ -17,7 +17,7 @@ public class TestGetNodes
 	[Fact]
 	public void GetLeftMostLeaf_Right()
 	{
-		LeafNode? node = _tree.Right.GetLeftMostLeaf();
+		LeafNode? node = _tree.Right.LeftMostLeaf;
 
 		Assert.Equal(_tree.RightTopLeftTop, node);
 	}
@@ -26,7 +26,7 @@ public class TestGetNodes
 	public void GetLeftMostLeaf_EmptySplitNode()
 	{
 		SplitNode node = new();
-		Assert.Null(node.GetLeftMostLeaf());
+		Assert.Null(node.LeftMostLeaf);
 	}
 
 	[Fact]
@@ -46,7 +46,7 @@ public class TestGetNodes
 	[Fact]
 	public void GetRightMostLeaf()
 	{
-		LeafNode? node = _tree.Right.GetRightMostLeaf();
+		LeafNode? node = _tree.Right.RightMostLeaf;
 
 		Assert.Equal(_tree.RightBottom, node);
 	}
@@ -55,6 +55,6 @@ public class TestGetNodes
 	public void GetRightMostLeaf_EmptySplitNode()
 	{
 		SplitNode node = new();
-		Assert.Null(node.GetRightMostLeaf());
+		Assert.Null(node.RightMostLeaf);
 	}
 }

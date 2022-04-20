@@ -118,7 +118,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			focusedLeaf = Root switch
 			{
 				LeafNode leaf => leaf,
-				SplitNode split => split.GetRightMostLeaf(),
+				SplitNode split => split.RightMostLeaf,
 				_ => null
 			};
 		}
@@ -272,7 +272,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	public IWindow? GetFirstWindow()
 	{
 		Logger.Debug($"Getting first window from layout engine {Name}");
-		return Root?.GetLeftMostLeaf()?.Window;
+		return Root?.LeftMostLeaf?.Window;
 	}
 
 	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
@@ -414,8 +414,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Get the common parent node.
-		Node[] focusedNodeLineage = focusedNode.GetLineage().ToArray();
-		Node[] adjacentNodeLineage = adjacentNode.GetLineage().ToArray();
+		Node[] focusedNodeLineage = focusedNode.Lineage.ToArray();
+		Node[] adjacentNodeLineage = adjacentNode.Lineage.ToArray();
 		SplitNode? parentNode = Node.GetCommonParent(focusedNodeLineage, adjacentNodeLineage);
 
 		if (parentNode == null)
@@ -458,7 +458,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Now we can adjust the weight.
-		int parentDepth = parentNode.GetDepth();
+		int parentDepth = parentNode.Depth;
 
 		Node focusedAncestorNode = focusedNodeLineage[focusedNodeLineage.Length - parentDepth - 2];
 		Node adjacentAncestorNode = adjacentNodeLineage[adjacentNodeLineage.Length - parentDepth - 2];

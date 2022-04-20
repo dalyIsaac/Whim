@@ -9,7 +9,7 @@ public class TestParents
 	{
 		TestTree tree = new();
 
-		Assert.Equal(new Node[] { tree.Root }, tree.Root.GetLineage());
+		Assert.Equal(new Node[] { tree.Root }, tree.Root.Lineage);
 	}
 
 	[Fact]
@@ -18,7 +18,7 @@ public class TestParents
 		TestTree tree = new();
 
 		Node[] expected = new Node[] { tree.RightTopLeftBottomRightTop, tree.RightTopLeftBottomRight, tree.RightTopLeftBottom, tree.RightTopLeft, tree.RightTop, tree.Right, tree.Root };
-		Node[] actual = tree.RightTopLeftBottomRightTop.GetLineage().ToArray();
+		Node[] actual = tree.RightTopLeftBottomRightTop.Lineage.ToArray();
 		Assert.Equal(expected, actual);
 	}
 
@@ -27,8 +27,8 @@ public class TestParents
 	{
 		TestTree engine = new();
 
-		Node[] leftAncestors = engine.Left.GetLineage().ToArray();
-		Node[] rightAncestors = engine.RightBottom.GetLineage().ToArray();
+		Node[] leftAncestors = engine.Left.Lineage.ToArray();
+		Node[] rightAncestors = engine.RightBottom.Lineage.ToArray();
 
 		Assert.Equal(engine.Root, Node.GetCommonParent(leftAncestors, rightAncestors));
 	}
@@ -38,8 +38,8 @@ public class TestParents
 	{
 		TestTree engine = new();
 
-		Node[] rightTopLeftBottomRightTopAncestors = engine.RightTopLeftBottomRightTop.GetLineage().ToArray();
-		Node[] rightTopRight3Ancestors = engine.RightTopRight3.GetLineage().ToArray();
+		Node[] rightTopLeftBottomRightTopAncestors = engine.RightTopLeftBottomRightTop.Lineage.ToArray();
+		Node[] rightTopRight3Ancestors = engine.RightTopRight3.Lineage.ToArray();
 
 		Assert.Equal(engine.RightTop, Node.GetCommonParent(rightTopLeftBottomRightTopAncestors, rightTopRight3Ancestors));
 	}
@@ -49,7 +49,7 @@ public class TestParents
 	{
 		TestTree engine = new();
 
-		Node[] leftAncestors = engine.Left.GetLineage().ToArray();
+		Node[] leftAncestors = engine.Left.Lineage.ToArray();
 		Node[] illegalAncestors = new[] { new SplitNode(isHorizontal: true) };
 
 		Assert.Null(Node.GetCommonParent(leftAncestors, illegalAncestors));
@@ -60,7 +60,7 @@ public class TestParents
 	{
 		TestTree engine = new();
 
-		Node[] leftAncestors = engine.Left.GetLineage().ToArray();
+		Node[] leftAncestors = engine.Left.Lineage.ToArray();
 		Node[] emptyAncestors = Array.Empty<Node>();
 
 		Assert.Null(Node.GetCommonParent(leftAncestors, emptyAncestors));
@@ -72,7 +72,7 @@ public class TestParents
 		TestTree engine = new();
 
 		Node[] emptyAncestors = Array.Empty<Node>();
-		Node[] rightAncestors = engine.Right.GetLineage().ToArray();
+		Node[] rightAncestors = engine.Right.Lineage.ToArray();
 
 		Assert.Null(Node.GetCommonParent(emptyAncestors, rightAncestors));
 	}
