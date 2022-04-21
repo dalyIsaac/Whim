@@ -230,6 +230,9 @@ dotnet_diagnostic.CA2201.severity = silent
 # CA1062: Validate arguments of public methods
 dotnet_diagnostic.CA1062.severity = silent
 
+# CA1725: Parameter names should match base declaration
+dotnet_diagnostic.CA1725.severity = silent
+
 # Disable globalization until #73
 dotnet_analyzer_diagnostic.category-Globalization.severity = silent
 dotnet_diagnostic.CA1303.severity = silent
