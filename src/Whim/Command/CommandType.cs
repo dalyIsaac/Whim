@@ -5,4 +5,6 @@ namespace Whim;
 /// </summary>
 public enum CommandType
 {
+	// TODO: Replace in #7
+	Unknown,
 }
