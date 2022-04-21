@@ -6,7 +6,7 @@ namespace Whim;
 /// <summary>
 /// The manager for bindings.
 /// </summary>
-public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, KeybindEventHandler>>, IDisposable
+public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, EventHandler<KeybindEventArgs>>>, IDisposable
 {
 	/// <summary>
 	/// Number of keybinds stored by the manager.
@@ -25,7 +25,7 @@ public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, KeybindEve
 	/// <param name="keybind"></param>
 	/// <param name="handler"></param>
 	/// <param name="throwIfExists">When <see langword="true"/>, throws if the keybind already exists.</param>
-	public void Add(IKeybind keybind, KeybindEventHandler handler, bool throwIfExists = false);
+	public void Add(IKeybind keybind, EventHandler<KeybindEventArgs> handler, bool throwIfExists = false);
 
 	/// <summary>
 	/// Tries to remove the given keybind and associated handler.
@@ -46,7 +46,7 @@ public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, KeybindEve
 	/// </summary>
 	/// <param name="keybind"></param>
 	/// <returns></returns>
-	public KeybindEventHandler? TryGet(IKeybind keybind);
+	public EventHandler<KeybindEventArgs>? TryGet(IKeybind keybind);
 
-	public KeybindEventHandler? this[IKeybind keybind] { get; set; }
+	public EventHandler<KeybindEventArgs>? this[IKeybind keybind] { get; set; }
 }
