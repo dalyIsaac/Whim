@@ -23,6 +23,7 @@ public partial class App : Application
 		Logger.Debug("Starting application...");
 
 		//Exit += Application_Exit;
+		UnhandledException += Application_UnhandledException;
 
 		InitializeComponent();
 
@@ -48,6 +49,12 @@ public partial class App : Application
 		// If we get to here, there's been an error somewhere during startup.
 		_configContext.Quit();
 		new StartupExceptionWindow(_startupException!).Activate();
+	}
+
+	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+	{
+		Logger.Error(e.Exception.ToString());
+		_configContext.Quit();
 	}
 
 	// Add when Windows App SDK supports the application exit event.

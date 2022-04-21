@@ -221,11 +221,22 @@ dotnet_naming_style.begins_with_i.capitalization = pascal_case
 # CA1416: Validate platform compatibility
 dotnet_diagnostic.CA1416.severity = silent
 
-# Default severity for analyzer diagnostics with category 'Globalization'
-dotnet_analyzer_diagnostic.category-Globalization.severity = silent
-
 # CA1031: Do not catch general exception types
 dotnet_diagnostic.CA1031.severity = silent
 
 # CA2201: Do not raise reserved exception types
 dotnet_diagnostic.CA2201.severity = silent
+
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = silent
+
+# Disable globalization until #73
+dotnet_analyzer_diagnostic.category-Globalization.severity = silent
+dotnet_diagnostic.CA1303.severity = silent
+dotnet_diagnostic.CA1304.severity = silent
+dotnet_diagnostic.CA1305.severity = silent
+dotnet_diagnostic.CA1306.severity = silent
+dotnet_diagnostic.CA1307.severity = silent
+dotnet_diagnostic.CA1308.severity = silent
+dotnet_diagnostic.CA1309.severity = silent
+dotnet_diagnostic.CA1310.severity = silent
