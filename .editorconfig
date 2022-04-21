@@ -233,13 +233,5 @@ dotnet_diagnostic.CA1062.severity = silent
 # CA1725: Parameter names should match base declaration
 dotnet_diagnostic.CA1725.severity = silent
 
-# Disable globalization until #73
-dotnet_analyzer_diagnostic.category-Globalization.severity = silent
-dotnet_diagnostic.CA1303.severity = silent
-dotnet_diagnostic.CA1304.severity = silent
-dotnet_diagnostic.CA1305.severity = silent
-dotnet_diagnostic.CA1306.severity = silent
-dotnet_diagnostic.CA1307.severity = silent
-dotnet_diagnostic.CA1308.severity = silent
-dotnet_diagnostic.CA1309.severity = silent
-dotnet_diagnostic.CA1310.severity = silent
+# CA1014: Mark assemblies with CLSCompliant attribute
+dotnet_diagnostic.CA1014.severity = none
