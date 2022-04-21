@@ -6,13 +6,6 @@ namespace Whim;
 public class RouterManager : IRouterManager
 {
 	private readonly IConfigContext _configContext;
-
-	#region Routers for specific properties
-	private readonly HashSet<string> _filterWindowClasses = new();
-	private readonly HashSet<string> _filterProcessNames = new();
-	private readonly HashSet<string> _filterTitles = new();
-	#endregion
-
 	private readonly List<Router> _routers = new();
 
 	public RouterManager(IConfigContext configContext)
