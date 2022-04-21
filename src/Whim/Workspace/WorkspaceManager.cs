@@ -48,10 +48,10 @@ public class WorkspaceManager : IWorkspaceManager
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
-	public IWorkspace ActiveWorkspace { get => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor]; }
+	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor];
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
-	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get => _proxyLayoutEngines; }
+	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
 
 	public WorkspaceManager(IConfigContext configContext)
 	{

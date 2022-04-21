@@ -13,9 +13,9 @@ public class Window : IWindow
 
 	public HWND Handle { get; }
 
-	public string Title { get => Win32Helper.GetWindowText(Handle); }
+	public string Title => Win32Helper.GetWindowText(Handle);
 
-	public string Class { get => Win32Helper.GetClassName(Handle); }
+	public string Class => Win32Helper.GetClassName(Handle);
 	public ILocation<int> Location
 	{
 		get

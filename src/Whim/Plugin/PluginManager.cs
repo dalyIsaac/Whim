@@ -9,7 +9,7 @@ public class PluginManager : IPluginManager
 	private readonly List<IPlugin> _plugins = new();
 	private bool disposedValue;
 
-	public IEnumerable<IPlugin> AvailablePlugins { get => _plugins; }
+	public IEnumerable<IPlugin> AvailablePlugins => _plugins;
 
 	public PluginManager(IConfigContext configContext)
 	{

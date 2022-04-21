@@ -24,12 +24,12 @@ public class MonitorsChangedEventArgs : EventArgs
 	/// <summary>
 	/// The previous monitors. This is derived from <see cref="UnchangedMonitors"/> and <see cref="RemovedMonitors"/>.
 	/// </summary>
-	public IEnumerable<IMonitor> PreviousMonitors { get => Concat(UnchangedMonitors, RemovedMonitors); }
+	public IEnumerable<IMonitor> PreviousMonitors => Concat(UnchangedMonitors, RemovedMonitors);
 
 	/// <summary>
 	/// The new monitors. This is derived from <see cref="UnchangedMonitors"/> and <see cref="AddedMonitors"/>.
 	/// </summary>
-	public IEnumerable<IMonitor> CurrentMonitors { get => Concat(UnchangedMonitors, AddedMonitors); }
+	public IEnumerable<IMonitor> CurrentMonitors => Concat(UnchangedMonitors, AddedMonitors);
 
 	public MonitorsChangedEventArgs(IEnumerable<IMonitor> unchangedMonitors, IEnumerable<IMonitor> removedMonitors, IEnumerable<IMonitor> addedMonitors)
 	{
