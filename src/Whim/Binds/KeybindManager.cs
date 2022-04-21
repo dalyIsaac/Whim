@@ -135,29 +135,6 @@ public class KeybindManager : IKeybindManager
 		return true;
 	}
 
-	public EventHandler<KeybindEventArgs>? this[IKeybind keybind]
-	{
-		get
-		{
-			Logger.Debug($"Getting keybind handler for keybind {keybind}");
-			return TryGet(keybind);
-		}
-		set
-		{
-			Logger.Debug($"Setting keybind handler for keybind {keybind}");
-			if (value == null)
-			{
-				// This really isn't ideal, but just in case.
-				Logger.Warning($"Tried to set keybind handler to null. Removing keybind {keybind}");
-				_keybinds.Remove(keybind);
-			}
-			else
-			{
-				_keybinds[keybind] = value;
-			}
-		}
-	}
-
 	public int Count => _keybinds.Count;
 
 	public void Add(IKeybind keybind, EventHandler<KeybindEventArgs> handler, bool throwIfExists = false)

@@ -47,6 +47,4 @@ public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, EventHandl
 	/// <param name="keybind"></param>
 	/// <returns></returns>
 	public EventHandler<KeybindEventArgs>? TryGet(IKeybind keybind);
-
-	public EventHandler<KeybindEventArgs>? this[IKeybind keybind] { get; set; }
 }
