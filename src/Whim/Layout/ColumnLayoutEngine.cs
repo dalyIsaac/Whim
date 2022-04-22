@@ -118,7 +118,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");
 
 		// Calculate the index of the window in the stack.
-		int idx = (int)Math.Round(point.X / (double)_stack.Count, MidpointRounding.AwayFromZero);
+		int idx = (int)Math.Round(point.X / _stack.Count, MidpointRounding.AwayFromZero);
 
 		// Bound idx.
 		if (idx < 0)

@@ -37,16 +37,18 @@ internal static class TestTreeWindowLocations
 		IWindow rightTopRight2Window,
 		IWindow rightTopRight3Window,
 		IWindow rightBottomWindow)
-	=> new IWindowLocation[]
 	{
-		new WindowLocation(leftWindow, Left.Scale(screen), WindowState.Normal),
-		new WindowLocation(rightTopLeftTopWindow, RightTopLeftTop.Scale(screen), WindowState.Normal),
-		new WindowLocation(rightTopLeftBottomLeftWindow, RightTopLeftBottomLeft.Scale(screen), WindowState.Normal),
-		new WindowLocation(rightTopLeftBottomRightTopWindow, RightTopLeftBottomRightTop.Scale(screen), WindowState.Normal),
-		new WindowLocation(rightTopLeftBottomRightBottomWindow, RightTopLeftBottomRightBottom.Scale(screen), WindowState.Normal),
-		new WindowLocation(rightTopRight1Window, RightTopRight1.Scale(screen), WindowState.Normal),
-		new WindowLocation(rightTopRight2Window, RightTopRight2.Scale(screen), WindowState.Normal),
-		new WindowLocation(rightTopRight3Window, RightTopRight3.Scale(screen), WindowState.Normal),
-		new WindowLocation(rightBottomWindow, RightBottom.Scale(screen), WindowState.Normal)
-	};
+		return new IWindowLocation[]
+		{
+			new WindowLocation(leftWindow, Left.Scale(screen), WindowState.Normal),
+			new WindowLocation(rightTopLeftTopWindow, RightTopLeftTop.Scale(screen), WindowState.Normal),
+			new WindowLocation(rightTopLeftBottomLeftWindow, RightTopLeftBottomLeft.Scale(screen), WindowState.Normal),
+			new WindowLocation(rightTopLeftBottomRightTopWindow, RightTopLeftBottomRightTop.Scale(screen), WindowState.Normal),
+			new WindowLocation(rightTopLeftBottomRightBottomWindow, RightTopLeftBottomRightBottom.Scale(screen), WindowState.Normal),
+			new WindowLocation(rightTopRight1Window, RightTopRight1.Scale(screen), WindowState.Normal),
+			new WindowLocation(rightTopRight2Window, RightTopRight2.Scale(screen), WindowState.Normal),
+			new WindowLocation(rightTopRight3Window, RightTopRight3.Scale(screen), WindowState.Normal),
+			new WindowLocation(rightBottomWindow, RightBottom.Scale(screen), WindowState.Normal)
+		};
+	}
 }

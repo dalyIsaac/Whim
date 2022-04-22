@@ -127,12 +127,12 @@ internal class TestTreeEngine
 
 		RootNode = (Engine.Root as SplitNode)!;
 
-		RightTopLeftBottomRightNode = (RightTopLeftBottomRightBottomNode.Parent as SplitNode)!;
-		RightTopLeftBottomNode = (RightTopLeftBottomRightNode.Parent as SplitNode)!;
-		RightTopLeftNode = (RightTopLeftBottomNode.Parent as SplitNode)!;
-		RightTopRightNode = (RightTopRight1Node.Parent as SplitNode)!;
-		RightTopNode = (RightTopRightNode.Parent as SplitNode)!;
-		RightNode = (RightBottomNode.Parent as SplitNode)!;
+		RightTopLeftBottomRightNode = RightTopLeftBottomRightBottomNode.Parent!;
+		RightTopLeftBottomNode = RightTopLeftBottomRightNode.Parent!;
+		RightTopLeftNode = RightTopLeftBottomNode.Parent!;
+		RightTopRightNode = RightTopRight1Node.Parent!;
+		RightTopNode = RightTopRightNode.Parent!;
+		RightNode = RightBottomNode.Parent!;
 
 		Engine.MoveWindowEdgeInDirection(Direction.Down, 0.05, RightTopLeftBottomRightTopWindow.Object);
 	}

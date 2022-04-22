@@ -28,7 +28,7 @@ internal partial class Screen
 	{
 		public List<Screen> Screens { get; } = new();
 
-		public unsafe virtual BOOL Callback(HMONITOR monitor, HDC hdc, RECT* rect, LPARAM param)
+		public virtual unsafe BOOL Callback(HMONITOR monitor, HDC hdc, RECT* rect, LPARAM param)
 		{
 			Screens.Add(new Screen(monitor, hdc));
 			return (BOOL)true;
@@ -42,7 +42,7 @@ internal partial class Screen
 	/// </summary>
 	private static Screen[]? s_screens;
 
-	internal unsafe static Screen[] AllScreens
+	internal static unsafe Screen[] AllScreens
 	{
 		get
 		{

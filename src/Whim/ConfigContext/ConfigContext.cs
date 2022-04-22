@@ -36,12 +36,12 @@ public class ConfigContext : IConfigContext
 	{
 		Logger = logger ?? new Logger();
 		RouterManager = routerManager ?? new RouterManager(this);
-		FilterManager = filterManager ?? new FilterManager(this);
+		FilterManager = filterManager ?? new FilterManager();
 		WindowManager = windowManager ?? new WindowManager(this);
 		MonitorManager = monitorManager ?? new MonitorManager(this);
 		WorkspaceManager = workspaceManager ?? new WorkspaceManager(this);
-		KeybindManager = keybindManager ?? new KeybindManager(this);
-		PluginManager = pluginManager ?? new PluginManager(this);
+		KeybindManager = keybindManager ?? new KeybindManager();
+		PluginManager = pluginManager ?? new PluginManager();
 	}
 
 	public void Initialize()

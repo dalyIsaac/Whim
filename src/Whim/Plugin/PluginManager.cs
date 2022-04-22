@@ -5,16 +5,10 @@ namespace Whim;
 
 public class PluginManager : IPluginManager
 {
-	private readonly IConfigContext _configContext;
 	private readonly List<IPlugin> _plugins = new();
 	private bool disposedValue;
 
-	public IEnumerable<IPlugin> AvailablePlugins { get => _plugins; }
-
-	public PluginManager(IConfigContext configContext)
-	{
-		_configContext = configContext;
-	}
+	public IEnumerable<IPlugin> AvailablePlugins => _plugins;
 
 	public void PreInitialize()
 	{

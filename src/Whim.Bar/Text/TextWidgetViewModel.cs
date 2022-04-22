@@ -7,10 +7,7 @@ public class TextWidgetViewModel : INotifyPropertyChanged
 	private string _value;
 	public string Value
 	{
-		get
-		{
-			return _value;
-		}
+		get => _value;
 		set
 		{
 			if (_value != value)

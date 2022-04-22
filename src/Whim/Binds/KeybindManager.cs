@@ -11,16 +11,14 @@ namespace Whim;
 
 public class KeybindManager : IKeybindManager
 {
-	private readonly IConfigContext _configContext;
-	private readonly Dictionary<IKeybind, KeybindEventHandler> _keybinds = new();
+	private readonly Dictionary<IKeybind, KeybindHandler> _keybinds = new();
 
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool disposedValue;
 
-	public KeybindManager(IConfigContext configContext)
+	public KeybindManager()
 	{
-		_configContext = configContext;
 		_keyboardHook = KeyboardHook;
 	}
 
@@ -48,6 +46,8 @@ public class KeybindManager : IKeybindManager
 		KBDLLHOOKSTRUCT kbdll = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
 
+		// If one of the following keys are pressed, and they're the only key pressed,
+		// then we want to ignore the keypress.
 		switch (key)
 		{
 			case VIRTUAL_KEY.VK_LSHIFT:
@@ -124,7 +124,7 @@ public class KeybindManager : IKeybindManager
 			return false;
 		}
 
-		KeybindEventHandler? handler = TryGet(keybind);
+		KeybindHandler? handler = TryGet(keybind);
 		if (handler == null)
 		{
 			Logger.Verbose($"No handler for {keybind}");
@@ -135,32 +135,9 @@ public class KeybindManager : IKeybindManager
 		return true;
 	}
 
-	public KeybindEventHandler? this[IKeybind keybind]
-	{
-		get
-		{
-			Logger.Debug($"Getting keybind handler for keybind {keybind}");
-			return TryGet(keybind);
-		}
-		set
-		{
-			Logger.Debug($"Setting keybind handler for keybind {keybind}");
-			if (value == null)
-			{
-				// This really isn't ideal, but just in case.
-				Logger.Warning($"Tried to set keybind handler to null. Removing keybind {keybind}");
-				_keybinds.Remove(keybind);
-			}
-			else
-			{
-				_keybinds[keybind] = value;
-			}
-		}
-	}
-
 	public int Count => _keybinds.Count;
 
-	public void Add(IKeybind keybind, KeybindEventHandler handler, bool throwIfExists = false)
+	public void Add(IKeybind keybind, KeybindHandler handler, bool throwIfExists = false)
 	{
 		Logger.Debug($"Adding keybind {keybind}");
 		if (_keybinds.ContainsKey(keybind))
@@ -181,7 +158,7 @@ public class KeybindManager : IKeybindManager
 		_keybinds.Clear();
 	}
 
-	public IEnumerator<KeyValuePair<IKeybind, KeybindEventHandler>> GetEnumerator() => _keybinds.GetEnumerator();
+	public IEnumerator<KeyValuePair<IKeybind, KeybindHandler>> GetEnumerator() => _keybinds.GetEnumerator();
 
 	public bool Remove(IKeybind keybind)
 	{
@@ -189,10 +166,10 @@ public class KeybindManager : IKeybindManager
 		return _keybinds.Remove(keybind);
 	}
 
-	public KeybindEventHandler? TryGet(IKeybind keybind)
+	public KeybindHandler? TryGet(IKeybind keybind)
 	{
 		Logger.Debug($"Trying to get keybind handler for keybind {keybind}");
-		return _keybinds.TryGetValue(keybind, out KeybindEventHandler? handler) ? handler : null;
+		return _keybinds.TryGetValue(keybind, out KeybindHandler? handler) ? handler : null;
 	}
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

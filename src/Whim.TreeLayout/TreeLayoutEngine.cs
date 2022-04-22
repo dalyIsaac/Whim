@@ -15,7 +15,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// <summary>
 	/// The direction which we will use for any following operations.
 	/// </summary>
-	public Direction AddNodeDirection = Direction.Right;
+	public Direction AddNodeDirection { get; set; } = Direction.Right;
 
 	public string Name { get; set; }
 
@@ -50,10 +50,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// The direction it is added in is determined by this instance's <see cref="AddNodeDirection"/> property.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
-	public void Add(IWindow window)
-	{
-		AddWindow(window);
-	}
+	public void Add(IWindow window) => AddWindow(window);
 
 	/// <summary>
 	/// Adds a window to the layout engine, and returns the node that represents it.
@@ -118,7 +115,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			focusedLeaf = Root switch
 			{
 				LeafNode leaf => leaf,
-				SplitNode split => split.GetRightMostLeaf(),
+				SplitNode split => split.RightMostLeaf,
 				_ => null
 			};
 		}
@@ -272,7 +269,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	public IWindow? GetFirstWindow()
 	{
 		Logger.Debug($"Getting first window from layout engine {Name}");
-		return Root?.GetLeftMostLeaf()?.Window;
+		return Root?.LeftMostLeaf?.Window;
 	}
 
 	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
@@ -414,8 +411,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Get the common parent node.
-		Node[] focusedNodeLineage = focusedNode.GetLineage().ToArray();
-		Node[] adjacentNodeLineage = adjacentNode.GetLineage().ToArray();
+		Node[] focusedNodeLineage = focusedNode.Lineage.ToArray();
+		Node[] adjacentNodeLineage = adjacentNode.Lineage.ToArray();
 		SplitNode? parentNode = Node.GetCommonParent(focusedNodeLineage, adjacentNodeLineage);
 
 		if (parentNode == null)
@@ -458,7 +455,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Now we can adjust the weight.
-		int parentDepth = parentNode.GetDepth();
+		int parentDepth = parentNode.Depth;
 
 		Node focusedAncestorNode = focusedNodeLineage[focusedNodeLineage.Length - parentDepth - 2];
 		Node adjacentAncestorNode = adjacentNodeLineage[adjacentNodeLineage.Length - parentDepth - 2];

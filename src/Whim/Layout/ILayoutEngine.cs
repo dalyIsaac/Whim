@@ -78,9 +78,9 @@ public interface ILayoutEngine : ICollection<IWindow>, ICommandable
 	/// </returns>
 	public static T? GetLayoutEngine<T>(ILayoutEngine root) where T : ILayoutEngine
 	{
-		if (root is T)
+		if (root is T layoutEngine)
 		{
-			return (T)root;
+			return layoutEngine;
 		}
 
 		if (root is BaseProxyLayoutEngine proxy)

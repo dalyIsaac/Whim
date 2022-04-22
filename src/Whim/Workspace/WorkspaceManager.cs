@@ -48,10 +48,10 @@ public class WorkspaceManager : IWorkspaceManager
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
-	public IWorkspace ActiveWorkspace { get => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor]; }
+	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor];
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
-	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get => _proxyLayoutEngines; }
+	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
 
 	public WorkspaceManager(IConfigContext configContext)
 	{
@@ -227,7 +227,7 @@ public class WorkspaceManager : IWorkspaceManager
 		}
 
 		_windowWorkspaceMap[window] = ActiveWorkspace;
-		ActiveWorkspace?.AddWindow(window);
+		ActiveWorkspace.AddWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
 		Logger.Debug($"Window {window} registered to workspace {ActiveWorkspace!.Name}");
 	}

@@ -13,9 +13,9 @@ public class Window : IWindow
 
 	public HWND Handle { get; }
 
-	public string Title { get => Win32Helper.GetWindowText(Handle); }
+	public string Title => Win32Helper.GetWindowText(Handle);
 
-	public string Class { get => Win32Helper.GetClassName(Handle); }
+	public string WindowClass => Win32Helper.GetClassName(Handle);
 	public ILocation<int> Location
 	{
 		get
@@ -40,7 +40,7 @@ public class Window : IWindow
 
 	public bool IsMaximized => PInvoke.IsZoomed(Handle);
 
-	public bool IsMouseMoving { get; set; } = false;
+	public bool IsMouseMoving { get; set; }
 
 	public void BringToTop()
 	{
@@ -183,5 +183,5 @@ public class Window : IWindow
 		return Handle.GetHashCode();
 	}
 
-	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{Class}> {{{Handle.Value}}}";
+	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle.Value}}}";
 }

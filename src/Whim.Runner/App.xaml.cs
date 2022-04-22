@@ -4,7 +4,7 @@ using System;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Whim.App;
+namespace Whim.Runner;
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.
 /// </summary>
@@ -23,6 +23,7 @@ public partial class App : Application
 		Logger.Debug("Starting application...");
 
 		//Exit += Application_Exit;
+		UnhandledException += Application_UnhandledException;
 
 		InitializeComponent();
 
@@ -48,6 +49,12 @@ public partial class App : Application
 		// If we get to here, there's been an error somewhere during startup.
 		_configContext.Quit();
 		new StartupExceptionWindow(_startupException!).Activate();
+	}
+
+	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+	{
+		Logger.Error(e.Exception.ToString());
+		_configContext.Quit();
 	}
 
 	// Add when Windows App SDK supports the application exit event.

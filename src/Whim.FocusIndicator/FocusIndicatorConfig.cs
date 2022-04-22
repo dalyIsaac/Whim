@@ -69,7 +69,7 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 	/// When <see langword="true"/>, the focus indicator will be visible for
 	/// <see cref="FadeTimeout"/>.
 	/// </summary>
-	public bool FadeEnabled { get; set; } = false;
+	public bool FadeEnabled { get; set; }
 
 	/// <summary>
 	/// The amount of time that the focus indicator will be visible, when

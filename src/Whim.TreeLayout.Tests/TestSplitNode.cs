@@ -10,7 +10,7 @@ public class TestSplitNode : SplitNode
 	{
 	}
 
-	public void Initialize(List<Node> nodes, List<double> weights)
+	public void Initialize(IList<Node> nodes, IList<double> weights)
 	{
 		if (nodes.Count != weights.Count)
 		{

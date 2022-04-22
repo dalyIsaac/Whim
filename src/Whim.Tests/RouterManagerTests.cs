@@ -10,7 +10,7 @@ public class RouterManagerTests
 											   string? title = null)
 	{
 		Mock<IWindow>? windowMock = new();
-		windowMock.Setup(w => w.Class).Returns(className ?? "");
+		windowMock.Setup(w => w.WindowClass).Returns(className ?? "");
 		windowMock.Setup(w => w.ProcessName).Returns(processName ?? "");
 		windowMock.Setup(w => w.Title).Returns(title ?? "");
 		return windowMock;
@@ -160,8 +160,8 @@ public class RouterManagerTests
 
 		RouterManager routerManager = new(CreateConfigContextMock(workspace: workspaceMock.Object).Object);
 
-		routerManager.Add((w) => w.Class == "Not Test" ? new Mock<IWorkspace>().Object : null);
-		routerManager.Add((w) => w.Class == "Test" ? workspaceMock.Object : null);
+		routerManager.Add((w) => w.WindowClass == "Not Test" ? new Mock<IWorkspace>().Object : null);
+		routerManager.Add((w) => w.WindowClass == "Test" ? workspaceMock.Object : null);
 
 		Mock<IWindow> window = CreateWindowMock(className: "Test");
 

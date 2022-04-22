@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout.Tests", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.FloatingLayout", "src\Whim.FloatingLayout\Whim.FloatingLayout.csproj", "{636EA561-2625-4D2A-9A8A-890E5AEF18B9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.App", "src\Whim.App\Whim.App.csproj", "{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Runner", "src\Whim.Runner\Whim.Runner.csproj", "{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D1CD9632-7BF6-40D3-BEE5-E6FA9BCE79CB} = {D1CD9632-7BF6-40D3-BEE5-E6FA9BCE79CB}
 		{636EA561-2625-4D2A-9A8A-890E5AEF18B9} = {636EA561-2625-4D2A-9A8A-890E5AEF18B9}
@@ -27,6 +27,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Bar", "src\Whim.Bar\Whim.Bar.csproj", "{D1CD9632-7BF6-40D3-BEE5-E6FA9BCE79CB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.FocusIndicator", "src\Whim.FocusIndicator\Whim.FocusIndicator.csproj", "{C16D9C8A-A36E-430C-AB84-700919BC7259}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ECA4C58D-FAF9-4F32-9C35-0555959ABFE5}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

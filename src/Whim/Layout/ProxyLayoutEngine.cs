@@ -8,50 +8,50 @@ namespace Whim;
 /// </summary>
 public abstract class BaseProxyLayoutEngine : ILayoutEngine
 {
-	protected readonly ILayoutEngine _innerLayoutEngine;
+	protected ILayoutEngine InnerLayoutEngine { get; }
 	public virtual Commander Commander { get; } = new();
 
-	public BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
+	protected BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 	{
-		_innerLayoutEngine = innerLayoutEngine;
+		InnerLayoutEngine = innerLayoutEngine;
 	}
 
 	/// <summary>
 	/// The name is only really important for the user, so we can use the name of the proxied layout engine.
 	/// </summary>
-	public virtual string Name => _innerLayoutEngine.Name;
+	public virtual string Name => InnerLayoutEngine.Name;
 
-	public virtual int Count => _innerLayoutEngine.Count;
+	public virtual int Count => InnerLayoutEngine.Count;
 
-	public virtual bool IsReadOnly => _innerLayoutEngine.IsReadOnly;
+	public virtual bool IsReadOnly => InnerLayoutEngine.IsReadOnly;
 
-	public virtual void Add(IWindow window) => _innerLayoutEngine.Add(window);
+	public virtual void Add(IWindow window) => InnerLayoutEngine.Add(window);
 
-	public virtual bool Remove(IWindow window) => _innerLayoutEngine.Remove(window);
+	public virtual bool Remove(IWindow window) => InnerLayoutEngine.Remove(window);
 
-	public virtual IWindow? GetFirstWindow() => _innerLayoutEngine.GetFirstWindow();
+	public virtual IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
 
-	public virtual void FocusWindowInDirection(Direction direction, IWindow window) => _innerLayoutEngine.FocusWindowInDirection(direction, window);
+	public virtual void FocusWindowInDirection(Direction direction, IWindow window) => InnerLayoutEngine.FocusWindowInDirection(direction, window);
 
-	public virtual void SwapWindowInDirection(Direction direction, IWindow window) => _innerLayoutEngine.SwapWindowInDirection(direction, window);
+	public virtual void SwapWindowInDirection(Direction direction, IWindow window) => InnerLayoutEngine.SwapWindowInDirection(direction, window);
 
-	public virtual void Clear() => _innerLayoutEngine.Clear();
+	public virtual void Clear() => InnerLayoutEngine.Clear();
 
-	public virtual bool Contains(IWindow window) => _innerLayoutEngine.Contains(window);
+	public virtual bool Contains(IWindow window) => InnerLayoutEngine.Contains(window);
 
-	public virtual void CopyTo(IWindow[] array, int arrayIndex) => _innerLayoutEngine.CopyTo(array, arrayIndex);
+	public virtual void CopyTo(IWindow[] array, int arrayIndex) => InnerLayoutEngine.CopyTo(array, arrayIndex);
 
-	public virtual IEnumerator<IWindow> GetEnumerator() => _innerLayoutEngine.GetEnumerator();
+	public virtual IEnumerator<IWindow> GetEnumerator() => InnerLayoutEngine.GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	public virtual void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) => _innerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
+	public virtual void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) => InnerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
 
 	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
 
-	public virtual void HidePhantomWindows() => _innerLayoutEngine.HidePhantomWindows();
+	public virtual void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
 
-	public virtual void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom) => _innerLayoutEngine.AddWindowAtPoint(window, point, isPhantom);
+	public virtual void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom) => InnerLayoutEngine.AddWindowAtPoint(window, point, isPhantom);
 
 	/// <summary>
 	/// Checks to see if the <paramref name="root"/> <cref name="ILayoutEngine"/>
@@ -72,9 +72,9 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 			return t;
 		}
 
-		if (root is BaseProxyLayoutEngine proxy && proxy._innerLayoutEngine != null)
+		if (root is BaseProxyLayoutEngine proxy && proxy.InnerLayoutEngine != null)
 		{
-			return BaseProxyLayoutEngine.GetLayoutEngine<T>(proxy._innerLayoutEngine);
+			return BaseProxyLayoutEngine.GetLayoutEngine<T>(proxy.InnerLayoutEngine);
 		}
 
 		return default;
@@ -99,9 +99,9 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 			return true;
 		}
 
-		if (root is BaseProxyLayoutEngine proxy && proxy._innerLayoutEngine != null)
+		if (root is BaseProxyLayoutEngine proxy && proxy.InnerLayoutEngine != null)
 		{
-			return BaseProxyLayoutEngine.ContainsEqual(proxy._innerLayoutEngine, layoutEngine);
+			return BaseProxyLayoutEngine.ContainsEqual(proxy.InnerLayoutEngine, layoutEngine);
 		}
 
 		return false;

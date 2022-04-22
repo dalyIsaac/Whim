@@ -30,13 +30,7 @@ public class PhantomNode : LeafNode
 		return new PhantomNode(windowModel, phantomWindow, parent);
 	}
 
-	public void Hide()
-	{
-		_phantomWindow?.Hide();
-	}
+	public void Hide() => _phantomWindow?.Hide();
 
-	public void Close()
-	{
-		_phantomWindow?.Close();
-	}
+	public void Close() => _phantomWindow?.Close();
 }

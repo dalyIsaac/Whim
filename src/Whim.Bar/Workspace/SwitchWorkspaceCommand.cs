@@ -20,7 +20,8 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand
 
 	private void Workspace_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 	{
-		if (e.PropertyName == nameof(_workspace.ActiveOnMonitor)) {
+		if (e.PropertyName == nameof(_workspace.ActiveOnMonitor))
+		{
 			CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 		}
 	}

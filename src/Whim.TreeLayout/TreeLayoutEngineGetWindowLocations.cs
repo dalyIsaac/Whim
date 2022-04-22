@@ -30,7 +30,7 @@ public partial class TreeLayoutEngine
 	public static IEnumerable<TreeLayoutWindowLocation> GetWindowLocations(Node node, ILocation<int> location)
 	{
 		// If the node is a leaf node, then we can return the location, and break.
-		if (node is LeafNode _leafNode)
+		if (node is LeafNode)
 		{
 			yield return new TreeLayoutWindowLocation(
 				node, location, WindowState.Normal

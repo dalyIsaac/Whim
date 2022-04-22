@@ -6,6 +6,6 @@ internal static class SplitNodeHelpers
 	/// Returns <see langword="true"/> if the direction indicates that a
 	/// newly added node would be placed after the currently focused node.
 	/// </summary>
-	internal static bool IsPositiveIndex(this Direction direction) => direction == Direction.Right
-																   || direction == Direction.Down;
+	internal static bool IsPositiveIndex(this Direction direction) => direction is Direction.Right
+																   or Direction.Down;
 }

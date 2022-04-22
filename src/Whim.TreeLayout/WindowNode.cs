@@ -10,10 +10,7 @@ namespace Whim.TreeLayout;
 public class WindowNode : LeafNode
 {
 	public WindowNode(IWindow window, SplitNode? parent = null) : base(window, parent) { }
-	public override string? ToString()
-	{
-		return Window?.ToString();
-	}
+	public override string? ToString() => Window?.ToString();
 
 	// override object.Equals
 	public override bool Equals(object? obj)

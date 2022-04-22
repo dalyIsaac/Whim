@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Input;
 
 namespace Whim.Bar;
 
@@ -7,7 +6,10 @@ public class NextLayoutEngineCommand : System.Windows.Input.ICommand
 {
 	private readonly IConfigContext _configContext;
 	private readonly ActiveLayoutWidgetViewModel _viewModel;
+
+#pragma warning disable CS0067 // The event 'NextLayoutEngineCommand.CanExecuteChanged' is never used
 	public event EventHandler? CanExecuteChanged;
+#pragma warning restore CS0067 // The event 'NextLayoutEngineCommand.CanExecuteChanged' is never used
 
 	public NextLayoutEngineCommand(IConfigContext configContext, ActiveLayoutWidgetViewModel viewModel)
 	{

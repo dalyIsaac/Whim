@@ -1,24 +1,37 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Platforms>x86;x64;arm64</Platforms>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="coverlet.collector" Version="3.1.0">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="FluentAssertions" Version="6.3.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
 		<PackageReference Include="Moq" Version="4.16.1" />
 		<PackageReference Include="xunit" Version="2.4.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
 

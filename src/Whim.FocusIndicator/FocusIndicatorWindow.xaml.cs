@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.Win32.Foundation;
+﻿using Windows.Win32.Foundation;
 
 namespace Whim.FocusIndicator;
 
@@ -8,7 +7,7 @@ namespace Whim.FocusIndicator;
 /// </summary>
 public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 {
-	public readonly FocusIndicatorConfig FocusIndicatorConfig;
+	public FocusIndicatorConfig FocusIndicatorConfig { get; }
 	private readonly IWindow _window;
 
 	public FocusIndicatorWindow(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
@@ -22,7 +21,7 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		IWindow? window = Window.CreateWindow(this.GetHandle(), configContext);
 		if (window == null)
 		{
-			throw new Exception("Window was unexpectedly null");
+			throw new FocusIndicatorException("Window was unexpectedly null");
 		}
 		_window = window;
 

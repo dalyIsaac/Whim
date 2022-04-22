@@ -1,0 +1,10 @@
+{
+  "FileOptions": {
+    "ExcludeSearchPatterns": [
+      "src/Whim.Runner/Template/whim.config.template.csx"
+    ]
+  },
+  "RoslynExtensionsOptions": {
+    "EnableAnalyzersSupport": true
+  }
+}

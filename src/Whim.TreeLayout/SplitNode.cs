@@ -400,7 +400,7 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		//   http://go.microsoft.com/fwlink/?LinkId=85238
 		//
 
-		if (obj == null || obj is not SplitNode)
+		if (obj is null or not SplitNode)
 		{
 			return false;
 		}

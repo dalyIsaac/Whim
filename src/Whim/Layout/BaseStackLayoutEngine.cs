@@ -56,10 +56,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 
 	public abstract IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
 
-	public IWindow? GetFirstWindow()
-	{
-		return _stack.FirstOrDefault();
-	}
+	public IWindow? GetFirstWindow() => _stack.FirstOrDefault();
 
 	public abstract void FocusWindowInDirection(Direction direction, IWindow window);
 

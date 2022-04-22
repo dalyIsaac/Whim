@@ -11,7 +11,7 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	private bool disposedValue;
 
 	private readonly HashSet<IWorkspace> _workspaces = new();
-	public string ActiveLayoutEngine { get => _configContext.WorkspaceManager.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? ""; }
+	public string ActiveLayoutEngine => _configContext.WorkspaceManager.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
 
 	public System.Windows.Input.ICommand NextLayoutEngineCommand { get; }
 
@@ -31,17 +31,11 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	private void WorkspaceManager_ActiveWorkspaceChanged(object? sender, EventArgs e)
-	{
-		OnPropertyChanged(nameof(ActiveLayoutEngine));
-	}
+	private void WorkspaceManager_ActiveWorkspaceChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(ActiveLayoutEngine));
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	protected virtual void OnPropertyChanged(string? propertyName)
-	{
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-	}
+	protected virtual void OnPropertyChanged(string? propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 	protected virtual void Dispose(bool disposing)
 	{

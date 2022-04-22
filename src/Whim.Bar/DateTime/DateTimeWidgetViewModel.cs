@@ -10,7 +10,7 @@ public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 	private readonly string _format;
 	private bool disposedValue;
 
-	public string Value { get => DateTime.Now.ToString(_format); }
+	public string Value => DateTime.Now.ToString(_format);
 
 	public DateTimeWidgetViewModel(int interval, string format)
 	{

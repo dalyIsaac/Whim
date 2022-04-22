@@ -8,6 +8,19 @@
 		<Nullable>enable</Nullable>
 		<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
 		<Platforms>x86;x64;arm64</Platforms>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
 	</PropertyGroup>
 
 	<ItemGroup>

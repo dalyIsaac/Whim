@@ -8,7 +8,7 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 	private readonly IConfigContext _configContext;
 	private bool disposedValue;
 
-	public string? Value { get => _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Title; }
+	public string? Value => _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Title;
 
 	public FocusedWindowWidgetViewModel(IConfigContext configContext)
 	{

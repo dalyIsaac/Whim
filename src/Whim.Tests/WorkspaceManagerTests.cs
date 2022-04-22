@@ -258,8 +258,10 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.WindowManager).Returns(windowManagerMock.Object);
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
-		workspaceManager.Add(workspaceMock.Object);
+		WorkspaceManager workspaceManager = new(configContextMock.Object)
+		{
+			workspaceMock.Object
+		};
 		workspaceManager.Initialize();
 
 		// Setup the ActiveWorkspace
@@ -308,8 +310,10 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.WindowManager).Returns(windowManagerMock.Object);
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
-		workspaceManager.Add(workspaceMock.Object);
+		WorkspaceManager workspaceManager = new(configContextMock.Object)
+		{
+			workspaceMock.Object
+		};
 		workspaceManager.Initialize();
 
 		// Setup the ActiveWorkspace
@@ -341,8 +345,10 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.WindowManager).Returns(windowManagerMock.Object);
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
-		workspaceManager.Add(workspaceMock.Object);
+		WorkspaceManager workspaceManager = new(configContextMock.Object)
+		{
+			workspaceMock.Object
+		};
 		workspaceManager.Initialize();
 
 		// Move the window to the workspace
@@ -370,8 +376,10 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.WindowManager).Returns(windowManagerMock.Object);
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
-		workspaceManager.Add(workspaceMock.Object);
+		WorkspaceManager workspaceManager = new(configContextMock.Object)
+		{
+			workspaceMock.Object
+		};
 		workspaceManager.Initialize();
 
 		// Setup the ActiveWorkspace

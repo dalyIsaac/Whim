@@ -59,8 +59,10 @@ public class TestAddWindow
 		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(activeWorkspace.Object);
 		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 
-		TreeLayoutEngine engine = new(configContext.Object);
-		engine.AddNodeDirection = Direction.Right;
+		TreeLayoutEngine engine = new(configContext.Object)
+		{
+			AddNodeDirection = Direction.Right
+		};
 
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();

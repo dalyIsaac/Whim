@@ -10,8 +10,5 @@ public abstract class LeafNode : Node
 		Parent = parent;
 	}
 
-	public void Focus()
-	{
-		Window.Focus();
-	}
+	public void Focus() => Window.Focus();
 }
