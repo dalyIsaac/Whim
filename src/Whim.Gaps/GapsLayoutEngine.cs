@@ -23,7 +23,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 			height: location.Height - doubleOuterGap
 		);
 
-		foreach (IWindowLocation loc in _innerLayoutEngine.DoLayout(proxiedLocation))
+		foreach (IWindowLocation loc in InnerLayoutEngine.DoLayout(proxiedLocation))
 		{
 			yield return new WindowLocation(
 				window: loc.Window,

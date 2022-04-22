@@ -15,7 +15,7 @@ public class Window : IWindow
 
 	public string Title => Win32Helper.GetWindowText(Handle);
 
-	public string Class => Win32Helper.GetClassName(Handle);
+	public string WindowClass => Win32Helper.GetClassName(Handle);
 	public ILocation<int> Location
 	{
 		get
@@ -127,7 +127,7 @@ public class Window : IWindow
 		unsafe
 		{
 			uint pid;
-			PInvoke.GetWindowThreadProcessId(Handle, &pid);
+			_ = PInvoke.GetWindowThreadProcessId(Handle, &pid);
 			ProcessId = (int)pid;
 		}
 
@@ -183,5 +183,5 @@ public class Window : IWindow
 		return Handle.GetHashCode();
 	}
 
-	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{Class}> {{{Handle.Value}}}";
+	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle.Value}}}";
 }

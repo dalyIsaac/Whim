@@ -20,6 +20,6 @@ public class BarLayoutEngine : BaseProxyLayoutEngine
 			width: location.Width,
 			height: location.Height - height
 		);
-		return _innerLayoutEngine.DoLayout(proxiedLocation);
+		return InnerLayoutEngine.DoLayout(proxiedLocation);
 	}
 }

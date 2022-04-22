@@ -10,7 +10,7 @@ public class FilterManagerTests
 											   string? title = null)
 	{
 		Mock<IWindow>? windowMock = new();
-		windowMock.Setup(w => w.Class).Returns(className ?? "");
+		windowMock.Setup(w => w.WindowClass).Returns(className ?? "");
 		windowMock.Setup(w => w.ProcessName).Returns(processName ?? "");
 		windowMock.Setup(w => w.Title).Returns(title ?? "");
 		return windowMock;
@@ -19,7 +19,7 @@ public class FilterManagerTests
 	[Fact]
 	public void IgnoreWindowClass()
 	{
-		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
+		FilterManager filterManager = new();
 		filterManager.IgnoreWindowClass("Test");
 
 		Mock<IWindow> window = CreateWindowMock(className: "Test");
@@ -30,7 +30,7 @@ public class FilterManagerTests
 	[Fact]
 	public void IgnoreProcessName()
 	{
-		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
+		FilterManager filterManager = new();
 		filterManager.IgnoreProcessName("Test");
 
 		Mock<IWindow> window = CreateWindowMock(processName: "Test");
@@ -41,7 +41,7 @@ public class FilterManagerTests
 	[Fact]
 	public void IgnoreTitle()
 	{
-		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
+		FilterManager filterManager = new();
 		filterManager.IgnoreTitle("Test");
 
 		Mock<IWindow> window = CreateWindowMock(title: "Test");
@@ -52,7 +52,7 @@ public class FilterManagerTests
 	[Fact]
 	public void IgnoreTitleMatch()
 	{
-		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
+		FilterManager filterManager = new();
 		filterManager.IgnoreTitleMatch("Test");
 
 		Mock<IWindow> window = CreateWindowMock(title: "Test");
@@ -63,7 +63,7 @@ public class FilterManagerTests
 	[Fact]
 	public void ClearKeepDefaults()
 	{
-		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
+		FilterManager filterManager = new();
 		filterManager.IgnoreWindowClass("Test");
 
 		Mock<IWindow> window = CreateWindowMock(className: "Test");
@@ -81,7 +81,7 @@ public class FilterManagerTests
 	[Fact]
 	public void ClearAll()
 	{
-		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
+		FilterManager filterManager = new();
 		filterManager.IgnoreWindowClass("Test");
 
 		Mock<IWindow> window = CreateWindowMock(className: "Test");
@@ -99,8 +99,8 @@ public class FilterManagerTests
 	[Fact]
 	public void CustomFilter()
 	{
-		FilterManager filterManager = new(new Mock<IConfigContext>().Object);
-		filterManager.Add(w => w.Class == "Test");
+		FilterManager filterManager = new();
+		filterManager.Add(w => w.WindowClass == "Test");
 
 		Mock<IWindow> window = CreateWindowMock(className: "Test");
 

@@ -11,16 +11,14 @@ namespace Whim;
 
 public class KeybindManager : IKeybindManager
 {
-	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IKeybind, EventHandler<KeybindEventArgs>> _keybinds = new();
 
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool disposedValue;
 
-	public KeybindManager(IConfigContext configContext)
+	public KeybindManager()
 	{
-		_configContext = configContext;
 		_keyboardHook = KeyboardHook;
 	}
 
@@ -48,6 +46,8 @@ public class KeybindManager : IKeybindManager
 		KBDLLHOOKSTRUCT kbdll = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
 
+		// If one of the following keys are pressed, and they're the only key pressed,
+		// then we want to ignore the keypress.
 		switch (key)
 		{
 			case VIRTUAL_KEY.VK_LSHIFT:

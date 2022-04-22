@@ -187,6 +187,9 @@ public class WindowManager : IWindowManager
 			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
 				EndWindowMove();
 				break;
+			default:
+				Logger.Error($"Unhandled event {eventType}");
+				break;
 		}
 	}
 

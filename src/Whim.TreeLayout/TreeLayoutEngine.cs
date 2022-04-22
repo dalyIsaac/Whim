@@ -15,7 +15,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// <summary>
 	/// The direction which we will use for any following operations.
 	/// </summary>
-	public Direction AddNodeDirection = Direction.Right;
+	public Direction AddNodeDirection { get; set; } = Direction.Right;
 
 	public string Name { get; set; }
 

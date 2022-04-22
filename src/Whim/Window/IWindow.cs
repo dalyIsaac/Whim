@@ -20,7 +20,7 @@ public interface IWindow
 	/// <summary>
 	/// The name of the class to which the window belongs.
 	/// </summary>
-	public string Class { get; }
+	public string WindowClass { get; }
 
 	/// <summary>
 	/// The process ID of the window.

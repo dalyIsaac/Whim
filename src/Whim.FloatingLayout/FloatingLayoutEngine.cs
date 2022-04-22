@@ -24,7 +24,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 
 		// Iterate over all windows in the inner layout engine.
-		foreach (IWindowLocation windowLocation in _innerLayoutEngine.DoLayout(location))
+		foreach (IWindowLocation windowLocation in InnerLayoutEngine.DoLayout(location))
 		{
 			yield return windowLocation;
 		}
@@ -44,7 +44,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 
 		// Pass to the inner layout engine.
-		_innerLayoutEngine.AddWindowAtPoint(window, point);
+		InnerLayoutEngine.AddWindowAtPoint(window, point);
 	}
 
 	public void MarkWindowAsFloating(IWindow? window = null)
@@ -54,7 +54,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 		if (window != null)
 		{
-			_innerLayoutEngine.Remove(window);
+			InnerLayoutEngine.Remove(window);
 			UpdateFloatingWindow(window);
 			_floatingLayoutConfig.MarkWindowAsFloating(window);
 		}
@@ -67,7 +67,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 		if (window != null)
 		{
-			_innerLayoutEngine.Add(window);
+			InnerLayoutEngine.Add(window);
 			_windowToLocation.Remove(window);
 			_floatingLayoutConfig.MarkWindowAsDocked(window);
 		}

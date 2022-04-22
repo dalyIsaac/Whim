@@ -250,3 +250,9 @@ dotnet_diagnostic.IDE0046.severity = silent
 
 # IDE0022: Use expression body for methods
 dotnet_diagnostic.IDE0022.severity = silent
+
+# IDE0072: Add missing cases
+dotnet_diagnostic.IDE0072.severity = silent
+
+# IDE0010: Add missing cases
+dotnet_diagnostic.IDE0010.severity = silent

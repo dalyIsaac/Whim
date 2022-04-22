@@ -26,9 +26,4 @@ public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 	{
 		Close();
 	}
-
-	private void Window_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
-	{
-		Application.Current.Exit();
-	}
 }

@@ -6,7 +6,6 @@ namespace Whim;
 
 public class FilterManager : IFilterManager
 {
-	private readonly IConfigContext _configContext;
 
 	#region Filters for specific properties
 	private readonly HashSet<string> _ignoreWindowClasses = new();
@@ -19,9 +18,8 @@ public class FilterManager : IFilterManager
 	/// </summary>
 	private readonly List<Filter> _filters = new();
 
-	public FilterManager(IConfigContext configContext)
+	public FilterManager()
 	{
-		_configContext = configContext;
 		AddDefaultFilters(this);
 	}
 
@@ -45,7 +43,7 @@ public class FilterManager : IFilterManager
 
 	public bool ShouldBeIgnored(IWindow window)
 	{
-		return _ignoreWindowClasses.Contains(window.Class.ToLower())
+		return _ignoreWindowClasses.Contains(window.WindowClass.ToLower())
 			|| _ignoreProcessNames.Contains(window.ProcessName.ToLower())
 			|| _ignoreTitles.Contains(window.Title.ToLower())
 			|| _filters.Any(f => f(window));

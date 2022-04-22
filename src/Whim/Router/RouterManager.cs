@@ -138,7 +138,7 @@ public class RouterManager : IRouterManager
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspaceName}");
 		Add(window =>
 		{
-			if (window.Class.ToLower() == windowClass)
+			if (window.WindowClass.ToLower() == windowClass)
 			{
 				return _configContext.WorkspaceManager.TryGet(workspaceName);
 			}
@@ -153,7 +153,7 @@ public class RouterManager : IRouterManager
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace}");
 		Add(window =>
 		{
-			if (window.Class.ToLower() == windowClass)
+			if (window.WindowClass.ToLower() == windowClass)
 			{
 				return workspace;
 			}
