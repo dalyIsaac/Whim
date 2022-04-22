@@ -3,10 +3,12 @@ using System.Collections.Generic;
 
 namespace Whim;
 
+public delegate void KeybindHandler(KeybindEventArgs args);
+
 /// <summary>
 /// The manager for bindings.
 /// </summary>
-public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, EventHandler<KeybindEventArgs>>>, IDisposable
+public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, KeybindHandler>>, IDisposable
 {
 	/// <summary>
 	/// Number of keybinds stored by the manager.
@@ -25,7 +27,7 @@ public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, EventHandl
 	/// <param name="keybind"></param>
 	/// <param name="handler"></param>
 	/// <param name="throwIfExists">When <see langword="true"/>, throws if the keybind already exists.</param>
-	public void Add(IKeybind keybind, EventHandler<KeybindEventArgs> handler, bool throwIfExists = false);
+	public void Add(IKeybind keybind, KeybindHandler handler, bool throwIfExists = false);
 
 	/// <summary>
 	/// Tries to remove the given keybind and associated handler.
@@ -46,5 +48,5 @@ public interface IKeybindManager : IEnumerable<KeyValuePair<IKeybind, EventHandl
 	/// </summary>
 	/// <param name="keybind"></param>
 	/// <returns></returns>
-	public EventHandler<KeybindEventArgs>? TryGet(IKeybind keybind);
+	public KeybindHandler? TryGet(IKeybind keybind);
 }

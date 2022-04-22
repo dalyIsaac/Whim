@@ -20,7 +20,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 /// </summary>
 private static class KeybindHelpers
 {
-	public static KeybindEventHandler FocusWindowInDirection(IConfigContext configContext, Direction direction) => (args) =>
+	public static KeybindHandler FocusWindowInDirection(IConfigContext configContext, Direction direction) => (args) =>
 	{
 		IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
 		if (workspace.LastFocusedWindow == null)
@@ -31,7 +31,7 @@ private static class KeybindHelpers
 		workspace.ActiveLayoutEngine.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
 	};
 
-	public static KeybindEventHandler SwapWindowInDirection(IConfigContext configContext, Direction direction) => (args) =>
+	public static KeybindHandler SwapWindowInDirection(IConfigContext configContext, Direction direction) => (args) =>
 	{
 		configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
 	};
@@ -110,7 +110,6 @@ IConfigContext DoConfig(IConfigContext configContext)
 
 	return configContext;
 }
-
 #pragma warning disable CS8974 // Methods should not return 'this'.
 // We return doConfig here so that Whim can call it when it loads.
 return DoConfig;
