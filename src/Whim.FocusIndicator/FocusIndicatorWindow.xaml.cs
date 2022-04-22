@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.Win32.Foundation;
+﻿using Windows.Win32.Foundation;
 
 namespace Whim.FocusIndicator;
 
@@ -8,7 +7,7 @@ namespace Whim.FocusIndicator;
 /// </summary>
 public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 {
-	public  FocusIndicatorConfig FocusIndicatorConfig { get; }
+	public FocusIndicatorConfig FocusIndicatorConfig { get; }
 	private readonly IWindow _window;
 
 	public FocusIndicatorWindow(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)

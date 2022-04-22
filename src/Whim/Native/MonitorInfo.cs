@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using Windows.Win32;
 using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;

@@ -17,8 +17,5 @@ public interface IPoint<T>
 
 public static class PointHelpers
 {
-	public static POINT ToSystemPoint(this IPoint<int> point)
-	{
-		return new POINT() { x = point.X, y = point.Y };
-	}
+	public static POINT ToSystemPoint(this IPoint<int> point) => new() { x = point.X, y = point.Y };
 }

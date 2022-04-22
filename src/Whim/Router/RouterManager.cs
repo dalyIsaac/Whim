@@ -13,15 +13,10 @@ public class RouterManager : IRouterManager
 		_configContext = configContext;
 	}
 
-	private void AddRouter(Router router)
-	{
-		_routers.Add(router);
-	}
-
-
 	public void Add(Router router)
 	{
-		AddRouter(router);
+		Logger.Debug($"Adding router {router}");
+		_routers.Add(router);
 	}
 
 	public void Clear()
@@ -34,7 +29,7 @@ public class RouterManager : IRouterManager
 	{
 		processName = processName.ToLower();
 		Logger.Debug($"Routing process name: {processName} to workspace {workspaceName}");
-		AddRouter(window =>
+		Add(window =>
 		{
 			if (window.ProcessName.ToLower() == processName)
 			{
@@ -49,7 +44,7 @@ public class RouterManager : IRouterManager
 	{
 		processName = processName.ToLower();
 		Logger.Debug($"Routing process name: {processName} to workspace {workspace}");
-		AddRouter(window =>
+		Add(window =>
 		{
 			if (window.ProcessName.ToLower() == processName)
 			{
@@ -64,7 +59,7 @@ public class RouterManager : IRouterManager
 	{
 		title = title.ToLower();
 		Logger.Debug($"Routing title: {title} to workspace {workspaceName}");
-		AddRouter(window =>
+		Add(window =>
 		{
 			if (window.Title.ToLower() == title)
 			{
@@ -79,7 +74,7 @@ public class RouterManager : IRouterManager
 	{
 		title = title.ToLower();
 		Logger.Debug($"Routing title: {title} to workspace {workspace}");
-		AddRouter(window =>
+		Add(window =>
 		{
 			if (window.Title.ToLower() == title)
 			{
@@ -94,7 +89,7 @@ public class RouterManager : IRouterManager
 	{
 		Logger.Debug($"Routing title match: {match} to workspace {workspaceName}");
 		Regex regex = new(match);
-		AddRouter(window =>
+		Add(window =>
 		{
 			if (regex.IsMatch(window.Title))
 			{
@@ -109,7 +104,7 @@ public class RouterManager : IRouterManager
 	{
 		Logger.Debug($"Routing title match: {match} to workspace {workspace}");
 		Regex regex = new(match);
-		AddRouter(window =>
+		Add(window =>
 		{
 			if (regex.IsMatch(window.Title))
 			{
@@ -141,7 +136,7 @@ public class RouterManager : IRouterManager
 	{
 		windowClass = windowClass.ToLower();
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspaceName}");
-		AddRouter(window =>
+		Add(window =>
 		{
 			if (window.Class.ToLower() == windowClass)
 			{
@@ -156,7 +151,7 @@ public class RouterManager : IRouterManager
 	{
 		windowClass = windowClass.ToLower();
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace}");
-		AddRouter(window =>
+		Add(window =>
 		{
 			if (window.Class.ToLower() == windowClass)
 			{

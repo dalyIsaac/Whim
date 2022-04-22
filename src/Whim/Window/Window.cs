@@ -127,7 +127,7 @@ public class Window : IWindow
 		unsafe
 		{
 			uint pid;
-			_ = PInvoke.GetWindowThreadProcessId(Handle, &pid);
+			PInvoke.GetWindowThreadProcessId(Handle, &pid);
 			ProcessId = (int)pid;
 		}
 

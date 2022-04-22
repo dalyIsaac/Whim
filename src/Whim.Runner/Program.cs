@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Whim.Runner;
+﻿namespace Whim.Runner;
 
 #if DISABLE_XAML_GENERATED_MAIN
 public static class Program

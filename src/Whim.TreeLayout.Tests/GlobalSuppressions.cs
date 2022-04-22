@@ -13,3 +13,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0008:Use explicit type")]
 [assembly: SuppressMessage("Style", "IDE0042:Variable declaration can be deconstructed")]
 [assembly: SuppressMessage("Style", "IDE0058:Expression value is never used")]
+[assembly: SuppressMessage("Style", "IDE0022:Use expression body for methods")]

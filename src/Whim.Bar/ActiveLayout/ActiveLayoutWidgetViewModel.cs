@@ -31,17 +31,11 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	private void WorkspaceManager_ActiveWorkspaceChanged(object? sender, EventArgs e)
-	{
-		OnPropertyChanged(nameof(ActiveLayoutEngine));
-	}
+	private void WorkspaceManager_ActiveWorkspaceChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(ActiveLayoutEngine));
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	protected virtual void OnPropertyChanged(string? propertyName)
-	{
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-	}
+	protected virtual void OnPropertyChanged(string? propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 	protected virtual void Dispose(bool disposing)
 	{

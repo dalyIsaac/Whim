@@ -50,10 +50,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// The direction it is added in is determined by this instance's <see cref="AddNodeDirection"/> property.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
-	public void Add(IWindow window)
-	{
-		AddWindow(window);
-	}
+	public void Add(IWindow window) => AddWindow(window);
 
 	/// <summary>
 	/// Adds a window to the layout engine, and returns the node that represents it.

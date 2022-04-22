@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -7,7 +6,7 @@ namespace Whim.Runner;
 
 internal static class ConfigHelper
 {
-	private readonly static string configFilePath = FileHelper.GetWhimFileDir("whim.config.csx");
+	private static readonly string configFilePath = FileHelper.GetWhimFileDir("whim.config.csx");
 
 	internal static bool DoesConfigExist() => File.Exists(configFilePath);
 
@@ -16,10 +15,7 @@ internal static class ConfigHelper
 	/// Otherwise, it will create a new Whim config file.
 	/// </summary>
 	/// <returns>The Whim config.</returns>
-	internal static string LoadConfig()
-	{
-		return File.ReadAllText(configFilePath);
-	}
+	internal static string LoadConfig() => File.ReadAllText(configFilePath);
 
 	/// <summary>
 	/// Read the given <paramref name="filename"/> from the assembly's resources and return it as a string.

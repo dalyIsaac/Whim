@@ -87,7 +87,7 @@ public partial class TreeLayoutEngine
 		}
 
 		SplitNode parent = node.Parent;
-		var result = parent.GetWeightAndPrecedingWeight(node);
+		(double weight, double precedingWeight)? result = parent.GetWeightAndPrecedingWeight(node);
 
 		if (result == null)
 		{

@@ -18,6 +18,7 @@ public static class Win32Helper
 	/// <param name="hwnd"></param>
 	public static void QuitApplication(HWND hwnd)
 	{
+		Logger.Debug($"Quitting application with HWND {hwnd}");
 		PInvoke.SendNotifyMessage(hwnd, PInvoke.WM_SYSCOMMAND, new WPARAM(PInvoke.SC_CLOSE), 0);
 	}
 
@@ -27,6 +28,7 @@ public static class Win32Helper
 	/// <param name="hwnd"></param>
 	public static void ForceForegroundWindow(HWND hwnd)
 	{
+		Logger.Debug($"Forcing window HWND {hwnd} to foreground");
 		// Implementation courtesy of https://github.com/workspacer/workspacer/commit/1c02613cea485f1ae97f70d6399f7124aeb31297
 		// keybd_event synthesizes a keystroke - see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-keybd_event
 		PInvoke.keybd_event(0, 0, 0, 0);
@@ -39,6 +41,7 @@ public static class Win32Helper
 	/// <param name="hwnd"></param>
 	public static bool HideWindow(HWND hwnd)
 	{
+		Logger.Debug($"Hiding window HWND {hwnd}");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_HIDE);
 	}
 
@@ -47,6 +50,7 @@ public static class Win32Helper
 	/// </summary>
 	public static bool ShowWindowMaximized(HWND hwnd)
 	{
+		Logger.Debug($"Showing window HWND {hwnd} maximized");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMAXIMIZED);
 	}
 
@@ -55,6 +59,7 @@ public static class Win32Helper
 	/// </summary>
 	public static bool ShowWindowMinimized(HWND hwnd)
 	{
+		Logger.Debug($"Showing window HWND {hwnd} minimized");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMINIMIZED);
 	}
 
@@ -63,6 +68,7 @@ public static class Win32Helper
 	/// </summary>
 	public static bool MinimizeWindow(HWND hwnd)
 	{
+		Logger.Debug($"Minimizing window HWND {hwnd}");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_MINIMIZE);
 	}
 
@@ -71,6 +77,7 @@ public static class Win32Helper
 	/// </summary>
 	public static bool ShowWindowNoActivate(HWND hwnd)
 	{
+		Logger.Debug($"Showing window HWND {hwnd} no activate");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
 	}
 
@@ -191,7 +198,7 @@ public static class Win32Helper
 		// Hide the title bar and caption buttons
 		style &= ~(int)WINDOW_STYLE.WS_CAPTION & ~(int)WINDOW_STYLE.WS_THICKFRAME;
 
-		_ = PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
+		PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
 	}
 
 	private static readonly HashSet<string> _systemClasses = new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
