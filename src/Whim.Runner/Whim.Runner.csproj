@@ -102,7 +102,7 @@
 		</Page>
 	</ItemGroup>
 
-	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build">
+	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build;Publish">
 		<!--Whim.Bar-->
 		<ItemGroup>
 			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
@@ -132,37 +132,5 @@
 		</ItemGroup>
 		<Copy SourceFiles="@(TreeLayoutSourceFile)" DestinationFiles="@(TreeLayoutDestinationFile)" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" />
-	</Target>
-
-	<Target Name="CopyPluginsAfterPublish" AfterTargets="Publish">
-		<!--Whim.Bar-->
-		<ItemGroup>
-			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(PublishDir)\Whim.Bar\**\*" />
-			<BarDestinationFile Include="@(BarSourceFile->'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
-		</ItemGroup>
-		<Copy SourceFiles="@(BarSourceFile)" DestinationFiles="@(BarDestinationFile)" />
-		<Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(PublishDir)Whim.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.Bar\" />
-
-		<!--Whim.FloatingLayout-->
-		<Copy SourceFiles="$(SolutionDir)src\Whim.FloatingLayout\$(PublishDir)Whim.FloatingLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.FloatingLayout\" />
-
-		<!--Whim.FocusIndicator-->
-		<ItemGroup>
-			<FocusIndicatorSourceFile Include="$(SolutionDir)\src\Whim.FocusIndicator\$(PublishDir)\Whim.FocusIndicator\**\*" />
-			<FocusIndicatorDestinationFile Include="@(FocusIndicatorSourceFile->'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
-		</ItemGroup>
-		<Copy SourceFiles="@(FocusIndicatorSourceFile)" DestinationFiles="@(FocusIndicatorDestinationFile)" />
-		<Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(PublishDir)Whim.FocusIndicator.dll" DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" />
-
-		<!--Whim.Gaps-->
-		<Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(PublishDir)Whim.Gaps.dll" DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" />
-
-		<!--Whim.TreeLayout-->
-		<ItemGroup>
-			<TreeLayoutSourceFile Include="$(SolutionDir)\src\Whim.TreeLayout\$(PublishDir)\Whim.TreeLayout\**\*" />
-			<TreeLayoutDestinationFile Include="@(TreeLayoutSourceFile->'$(TargetDir)plugins\Whim.TreeLayout\%(RecursiveDir)%(Filename)%(Extension)')" />
-		</ItemGroup>
-		<Copy SourceFiles="@(TreeLayoutSourceFile)" DestinationFiles="@(TreeLayoutDestinationFile)" />
-		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(PublishDir)Whim.TreeLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" />
 	</Target>
 </Project>
