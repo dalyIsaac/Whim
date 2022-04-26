@@ -27,6 +27,8 @@
 		<AnalysisModeSecurity>All</AnalysisModeSecurity>
 		<AnalysisModeStyle>All</AnalysisModeStyle>
 		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<Description>An extensible window manager for Windows.</Description>
+		<Authors>Isaac Daly</Authors>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
