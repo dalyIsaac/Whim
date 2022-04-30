@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
@@ -29,6 +29,7 @@
 		<AnalysisModeUsage>All</AnalysisModeUsage>
 		<Description>An extensible window manager for Windows.</Description>
 		<Authors>Isaac Daly</Authors>
+		<ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
