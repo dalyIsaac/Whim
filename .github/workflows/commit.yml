@@ -1,32 +1,40 @@
 name: commit
 
 on:
-  - push
-  - pull_request
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   commit:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
     runs-on: windows-latest
 
     steps:
-      - name: Clone repo
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Restore dependencies
         run: |
-          dotnet restore Whim.sln
+          dotnet restore Whim.sln /p:Configuration=$env:Configuration
+        env:
+          Configuration: ${{ matrix.configuration }}
 
       - name: Check formatting
         run: |
-          dotnet format Whim.sln --verify-no-changes
+          dotnet format Whim.sln --verify-no-changes --no-restore
 
       - name: Build
         run: |
-          dotnet build Whim.sln
+          dotnet build Whim.sln --no-restore
 
       - name: Test
         run: |
-          dotnet test Whim.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
