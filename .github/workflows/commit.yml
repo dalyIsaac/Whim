@@ -1,0 +1,34 @@
+name: commit
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  commit:
+    runs-on: windows-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore Whim.sln
+
+      - name: Check formatting
+        run: |
+          dotnet format Whim.sln --verify-no-changes
+
+      - name: Build
+        run: |
+          dotnet build Whim.sln
+
+      - name: Test
+        run: |
+          dotnet test Whim.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          files: "*.opencover.xml"
