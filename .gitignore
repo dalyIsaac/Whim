@@ -350,4 +350,4 @@ MigrationBackup/
 .ionide/
 
 # Installer
-src/setup.exe
+src/whim-install.exe
