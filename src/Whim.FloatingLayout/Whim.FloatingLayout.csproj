@@ -20,6 +20,7 @@
 		<AnalysisModeUsage>All</AnalysisModeUsage>
 		<Description>An extensible window manager for Windows.</Description>
 		<Authors>Isaac Daly</Authors>
+		<Version>0.1.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
