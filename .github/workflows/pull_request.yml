@@ -1,0 +1,9 @@
+name: pull_request
+
+on: pull_request
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dangoslen/changelog-enforcer@v3
