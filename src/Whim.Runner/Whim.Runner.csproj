@@ -60,6 +60,9 @@
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
+		<Content Remove="Assets\Icon.ico" />
+	</ItemGroup>
+	<ItemGroup>
 		<None Remove="StartupExceptionWindow.xaml" />
 	</ItemGroup>
 

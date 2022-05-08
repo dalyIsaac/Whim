@@ -145,51 +145,58 @@ public class WindowManager : IWindowManager
 	/// <param name="dwmsEventTime"></param>
 	private void WindowsEventHook(HWINEVENTHOOK hWinEventHook, uint eventType, HWND hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime)
 	{
-		if (!IsEventWindowValid(idChild, idObject, hwnd)) { return; }
-
-		// Try get the window
-		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
+		try
 		{
-			Logger.Verbose($"Window {hwnd.Value} is not registered");
-			window = RegisterWindow(hwnd);
-			if (window == null)
+			if (!IsEventWindowValid(idChild, idObject, hwnd)) { return; }
+
+			// Try get the window
+			if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 			{
-				return;
+				Logger.Verbose($"Window {hwnd.Value} is not registered");
+				window = RegisterWindow(hwnd);
+				if (window == null)
+				{
+					return;
+				}
+			}
+
+			switch (eventType)
+			{
+				case PInvoke.EVENT_OBJECT_DESTROY:
+					TryUnregisterWindow(window);
+					break;
+				case PInvoke.EVENT_OBJECT_CLOAKED:
+					UpdateWindow(window, WindowUpdateType.Cloaked);
+					break;
+				case PInvoke.EVENT_OBJECT_UNCLOAKED:
+					UpdateWindow(window, WindowUpdateType.Uncloaked);
+					break;
+				case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
+					UpdateWindow(window, WindowUpdateType.MinimizeStart);
+					break;
+				case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
+					UpdateWindow(window, WindowUpdateType.MinimizeEnd);
+					break;
+				case PInvoke.EVENT_SYSTEM_FOREGROUND:
+					UpdateWindow(window, WindowUpdateType.Foreground);
+					break;
+				case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
+					StartWindowMove(window);
+					break;
+				case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
+					WindowMove(window);
+					break;
+				case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
+					EndWindowMove();
+					break;
+				default:
+					Logger.Error($"Unhandled event {eventType}");
+					break;
 			}
 		}
-
-		switch (eventType)
+		catch (Exception ex)
 		{
-			case PInvoke.EVENT_OBJECT_DESTROY:
-				TryUnregisterWindow(window);
-				break;
-			case PInvoke.EVENT_OBJECT_CLOAKED:
-				UpdateWindow(window, WindowUpdateType.Cloaked);
-				break;
-			case PInvoke.EVENT_OBJECT_UNCLOAKED:
-				UpdateWindow(window, WindowUpdateType.Uncloaked);
-				break;
-			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
-				UpdateWindow(window, WindowUpdateType.MinimizeStart);
-				break;
-			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
-				UpdateWindow(window, WindowUpdateType.MinimizeEnd);
-				break;
-			case PInvoke.EVENT_SYSTEM_FOREGROUND:
-				UpdateWindow(window, WindowUpdateType.Foreground);
-				break;
-			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
-				StartWindowMove(window);
-				break;
-			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
-				WindowMove(window);
-				break;
-			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
-				EndWindowMove();
-				break;
-			default:
-				Logger.Error($"Unhandled event {eventType}");
-				break;
+			Logger.Error(ex.ToString());
 		}
 	}
 
