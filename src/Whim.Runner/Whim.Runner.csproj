@@ -111,6 +111,14 @@
 		<Copy SourceFiles="@(BarSourceFile)" DestinationFiles="@(BarDestinationFile)" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.Bar\" />
 
+		<!--Whim.CommandPalette-->
+		<ItemGroup>
+			<CommandPaletteSourceFile Include="$(SolutionDir)\src\Whim.CommandPalette\$(OutDir)\Whim.CommandPalette\**\*" />
+			<CommandPaletteDestinationFile Include="@(CommandPaletteSourceFile->'$(TargetDir)plugins\Whim.CommandPalette\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(CommandPaletteSourceFile)" DestinationFiles="@(CommandPaletteDestinationFile)" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.CommandPalette\$(OutDir)Whim.CommandPalette.dll" DestinationFolder="$(TargetDir)plugins\Whim.CommandPalette\" />
+
 		<!--Whim.FloatingLayout-->
 		<Copy SourceFiles="$(SolutionDir)src\Whim.FloatingLayout\$(OutDir)Whim.FloatingLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.FloatingLayout\" />
 
