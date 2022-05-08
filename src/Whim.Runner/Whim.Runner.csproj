@@ -27,6 +27,7 @@
 		<AnalysisModeSecurity>All</AnalysisModeSecurity>
 		<AnalysisModeStyle>All</AnalysisModeStyle>
 		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -60,10 +61,8 @@
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
-		<Content Remove="Assets\Icon.ico" />
-	</ItemGroup>
-	<ItemGroup>
 		<None Remove="StartupExceptionWindow.xaml" />
+		<None Remove="TrayIconResources.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -81,6 +80,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="H.NotifyIcon.WinUI" Version="2.0.48" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.1.0" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.2" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" />
@@ -96,6 +96,12 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="TrayIconResources.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

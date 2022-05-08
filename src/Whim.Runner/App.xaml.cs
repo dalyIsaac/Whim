@@ -1,4 +1,6 @@
-﻿using Microsoft.UI.Xaml;
+using H.NotifyIcon;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
 using System;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -10,6 +12,7 @@ namespace Whim.Runner;
 /// </summary>
 public partial class App : Application
 {
+	private static TaskbarIcon? TrayIcon { get; private set; }
 	private readonly IConfigContext _configContext;
 	private Exception? _startupException;
 
@@ -49,6 +52,21 @@ public partial class App : Application
 		// If we get to here, there's been an error somewhere during startup.
 		_configContext.Quit();
 		new StartupExceptionWindow(_startupException!).Activate();
+	}
+
+	private void InitializeTrayIcon()
+	{
+		XamlUICommand? exitApplicationCommand = (XamlUICommand)Resources["ExitApplicationCommand"];
+		exitApplicationCommand.ExecuteRequested += ExitApplicationCommand_ExecuteRequested;
+
+		TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
+		TrayIcon.ForceCreate();
+	}
+
+	private void ExitApplicationCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+	{
+		_configContext.Quit();
+		Exit();
 	}
 
 	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
