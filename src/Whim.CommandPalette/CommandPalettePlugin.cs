@@ -23,7 +23,7 @@ public class CommandPalettePlugin : IPlugin
 		_commandPaletteWindow = new CommandPaletteWindow(_configContext, _commandPaletteConfig);
 	}
 
-	public void Show()
+	public void Activate()
 	{
 		_commandPaletteWindow?.Activate();
 	}
@@ -31,5 +31,10 @@ public class CommandPalettePlugin : IPlugin
 	public void Hide()
 	{
 		_commandPaletteWindow?.Hide();
+	}
+
+	public void Toggle()
+	{
+		_commandPaletteWindow.Toggle();
 	}
 }
