@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Layout engines dictate how windows are laid out.
 /// </summary>
-public interface ILayoutEngine : ICollection<IWindow>, ICommandable
+public interface ILayoutEngine : ICollection<IWindow>
 {
 	/// <summary>
 	/// The name of the layout engine.

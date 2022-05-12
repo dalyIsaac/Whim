@@ -12,8 +12,6 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	protected readonly List<IWindow> _stack = new();
 	protected readonly List<double> _weights = new();
 
-	public Commander Commander { get; } = new();
-
 	public abstract string Name { get; }
 
 	public int Count => _stack.Count;

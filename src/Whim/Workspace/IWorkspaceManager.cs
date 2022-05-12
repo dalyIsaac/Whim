@@ -9,7 +9,7 @@ public delegate ILayoutEngine ProxyLayoutEngine(ILayoutEngine engine);
 /// The manager for <see cref="IWorkspace"/>s. This is responsible for routing
 /// windows between workspaces.
 /// </summary>
-public interface IWorkspaceManager : IEnumerable<IWorkspace>, ICommandable
+public interface IWorkspaceManager : IEnumerable<IWorkspace>
 {
 	/// <summary>
 	/// The active workspace.

@@ -9,7 +9,6 @@ namespace Whim;
 public abstract class BaseProxyLayoutEngine : ILayoutEngine
 {
 	protected ILayoutEngine InnerLayoutEngine { get; }
-	public virtual Commander Commander { get; } = new();
 
 	protected BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 	{
