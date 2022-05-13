@@ -8,7 +8,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-public class KeybindManager : IKeybindManager
+internal class KeybindManager : IKeybindManager
 {
 	private readonly Dictionary<IKeybind, ICommand> _keybinds = new();
 

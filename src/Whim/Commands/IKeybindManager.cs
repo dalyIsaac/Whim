@@ -6,7 +6,7 @@ namespace Whim;
 /// The manager for bindings. This is used as part of <see cref="CommandManager"/>.
 /// It is responsible for hooking into windows and handling keybinds.
 /// </summary>
-public interface IKeybindManager : IDisposable
+internal interface IKeybindManager : IDisposable
 {
 	/// <summary>
 	/// Initialize the keyboard hook.
