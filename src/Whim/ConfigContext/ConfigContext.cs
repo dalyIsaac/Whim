@@ -19,7 +19,7 @@ public class ConfigContext : IConfigContext
 	public IMonitorManager MonitorManager { get; set; }
 	public IRouterManager RouterManager { get; set; }
 	public IFilterManager FilterManager { get; set; }
-	public IKeybindManager KeybindManager { get; set; }
+	public ICommandManager CommandManager { get; set; }
 	public IPluginManager PluginManager { get; set; }
 
 	public event EventHandler<ShutdownEventArgs>? Shutdown;
@@ -31,7 +31,7 @@ public class ConfigContext : IConfigContext
 		IWindowManager? windowManager = null,
 		IMonitorManager? monitorManager = null,
 		IWorkspaceManager? workspaceManager = null,
-		IKeybindManager? keybindManager = null,
+		ICommandManager? commandManager = null,
 		IPluginManager? pluginManager = null)
 	{
 		Logger = logger ?? new Logger();
@@ -40,7 +40,7 @@ public class ConfigContext : IConfigContext
 		WindowManager = windowManager ?? new WindowManager(this);
 		MonitorManager = monitorManager ?? new MonitorManager(this);
 		WorkspaceManager = workspaceManager ?? new WorkspaceManager(this);
-		KeybindManager = keybindManager ?? new KeybindManager();
+		CommandManager = commandManager ?? new CommandManager();
 		PluginManager = pluginManager ?? new PluginManager();
 	}
 
@@ -55,7 +55,7 @@ public class ConfigContext : IConfigContext
 		MonitorManager.Initialize();
 		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
-		KeybindManager.Initialize();
+		CommandManager.Initialize();
 
 		PluginManager.PostInitialize();
 	}
@@ -66,7 +66,7 @@ public class ConfigContext : IConfigContext
 		Logger.Debug("Disposing config context...");
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
-		KeybindManager.Dispose();
+		CommandManager.Dispose();
 		PluginManager.Dispose();
 
 		Shutdown?.Invoke(this, args ?? new ShutdownEventArgs(ShutdownReason.User));

@@ -19,7 +19,7 @@ public interface IConfigContext
 	public IMonitorManager MonitorManager { get; }
 	public IRouterManager RouterManager { get; }
 	public IFilterManager FilterManager { get; }
-	public IKeybindManager KeybindManager { get; }
+	public ICommandManager CommandManager { get; }
 	public IPluginManager PluginManager { get; }
 
 	/// <summary>
