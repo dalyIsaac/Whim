@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Windows.Win32;
@@ -11,7 +10,7 @@ namespace Whim;
 
 public class KeybindManager : IKeybindManager
 {
-	private readonly Dictionary<IKeybind, KeybindHandler> _keybinds = new();
+	private readonly Dictionary<IKeybind, ICommand> _keybinds = new();
 
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
@@ -78,7 +77,7 @@ public class KeybindManager : IKeybindManager
 	{
 		KeyModifiers modifiers = 0;
 
-		// there is no other way to distinguish between left and right modifier keys
+		// There is no other way to distinguish between left and right modifier keys.
 		if (IsModifierPressed(VIRTUAL_KEY.VK_LSHIFT))
 		{
 			modifiers |= KeyModifiers.LShift;
@@ -124,32 +123,35 @@ public class KeybindManager : IKeybindManager
 			return false;
 		}
 
-		KeybindHandler? handler = TryGet(keybind);
-		if (handler == null)
+		ICommand? command = TryGet(keybind);
+		if (command == null)
 		{
 			Logger.Verbose($"No handler for {keybind}");
 			return false;
 		}
 
-		handler.Invoke(new KeybindEventArgs(keybind));
+		command.Callback.Invoke();
 		return true;
 	}
 
-	public int Count => _keybinds.Count;
-
-	public void Add(IKeybind keybind, KeybindHandler handler, bool throwIfExists = false)
+	public void Add(ICommand command)
 	{
-		Logger.Debug($"Adding keybind {keybind}");
-		if (_keybinds.ContainsKey(keybind))
+		Logger.Debug($"Adding command {command}");
+		IKeybind? keybind = command.Keybind;
+
+		if (keybind == null)
 		{
-			Logger.Warning($"Keybind {keybind} already exists");
-			if (throwIfExists)
-			{
-				throw new ArgumentException("Keybind already exists");
-			}
+			Logger.Error("No keybind");
+			return;
 		}
 
-		_keybinds.Add(keybind, handler);
+		if (_keybinds.ContainsKey(keybind))
+		{
+			Logger.Error($"Keybind {keybind} already exists");
+			throw new ArgumentException("Keybind already exists");
+		}
+
+		_keybinds.Add(keybind, command);
 	}
 
 	public void Clear()
@@ -158,21 +160,17 @@ public class KeybindManager : IKeybindManager
 		_keybinds.Clear();
 	}
 
-	public IEnumerator<KeyValuePair<IKeybind, KeybindHandler>> GetEnumerator() => _keybinds.GetEnumerator();
-
 	public bool Remove(IKeybind keybind)
 	{
 		Logger.Debug($"Removing keybind {keybind}");
 		return _keybinds.Remove(keybind);
 	}
 
-	public KeybindHandler? TryGet(IKeybind keybind)
+	public ICommand? TryGet(IKeybind keybind)
 	{
 		Logger.Debug($"Trying to get keybind handler for keybind {keybind}");
-		return _keybinds.TryGetValue(keybind, out KeybindHandler? handler) ? handler : null;
+		return _keybinds.TryGetValue(keybind, out ICommand? command) ? command : null;
 	}
-
-	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	protected virtual void Dispose(bool disposing)
 	{
