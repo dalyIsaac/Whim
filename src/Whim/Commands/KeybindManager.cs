@@ -27,6 +27,71 @@ public class KeybindManager : IKeybindManager
 		_unhookKeyboardHook = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _keyboardHook, null, 0);
 	}
 
+	public void Add(ICommand command)
+	{
+		Logger.Debug($"Adding command {command}");
+		IKeybind? keybind = command.Keybind;
+
+		if (keybind == null)
+		{
+			Logger.Error("No keybind");
+			return;
+		}
+
+		if (_keybinds.ContainsKey(keybind))
+		{
+			Logger.Error($"Keybind {keybind} already exists");
+			throw new ArgumentException("Keybind already exists");
+		}
+
+		_keybinds.Add(keybind, command);
+	}
+
+	public void Clear()
+	{
+		Logger.Debug("Clearing keybinds");
+		_keybinds.Clear();
+	}
+
+	public bool Remove(IKeybind keybind)
+	{
+		Logger.Debug($"Removing keybind {keybind}");
+		return _keybinds.Remove(keybind);
+	}
+
+	public ICommand? TryGet(IKeybind keybind)
+	{
+		Logger.Debug($"Trying to get keybind handler for keybind {keybind}");
+		return _keybinds.TryGetValue(keybind, out ICommand? command) ? command : null;
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				if (_unhookKeyboardHook != null && !_unhookKeyboardHook.IsInvalid)
+				{
+					_unhookKeyboardHook.Dispose();
+				}
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+
+
 	/// <summary>
 	/// For relevant documentation, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-hookproc
 	/// </summary>
@@ -132,69 +197,5 @@ public class KeybindManager : IKeybindManager
 
 		command.Callback.Invoke();
 		return true;
-	}
-
-	public void Add(ICommand command)
-	{
-		Logger.Debug($"Adding command {command}");
-		IKeybind? keybind = command.Keybind;
-
-		if (keybind == null)
-		{
-			Logger.Error("No keybind");
-			return;
-		}
-
-		if (_keybinds.ContainsKey(keybind))
-		{
-			Logger.Error($"Keybind {keybind} already exists");
-			throw new ArgumentException("Keybind already exists");
-		}
-
-		_keybinds.Add(keybind, command);
-	}
-
-	public void Clear()
-	{
-		Logger.Debug("Clearing keybinds");
-		_keybinds.Clear();
-	}
-
-	public bool Remove(IKeybind keybind)
-	{
-		Logger.Debug($"Removing keybind {keybind}");
-		return _keybinds.Remove(keybind);
-	}
-
-	public ICommand? TryGet(IKeybind keybind)
-	{
-		Logger.Debug($"Trying to get keybind handler for keybind {keybind}");
-		return _keybinds.TryGetValue(keybind, out ICommand? command) ? command : null;
-	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				if (_unhookKeyboardHook != null && !_unhookKeyboardHook.IsInvalid)
-				{
-					_unhookKeyboardHook.Dispose();
-				}
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			disposedValue = true;
-		}
-	}
-
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
 	}
 }
