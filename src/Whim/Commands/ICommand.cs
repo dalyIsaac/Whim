@@ -30,10 +30,4 @@ public interface ICommand
 	/// to Whim. If this is null, the menu item will always be accessible.
 	/// </summary>
 	public Action? Condition { get; }
-
-	/// <summary>
-	/// The keybind for the command. If this is null, the command will not be
-	/// bound to a keybind.
-	/// </summary>
-	public IKeybind? Keybind { get; }
 }

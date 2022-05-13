@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -10,14 +9,14 @@ namespace Whim;
 
 internal class KeybindManager : IKeybindManager
 {
-	private readonly Dictionary<IKeybind, ICommand> _keybinds = new();
-
+	private readonly ICommandItems _commandItems;
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool disposedValue;
 
-	public KeybindManager()
+	public KeybindManager(ICommandItems commandItems)
 	{
+		_commandItems = commandItems;
 		_keyboardHook = KeyboardHook;
 	}
 
@@ -25,44 +24,6 @@ internal class KeybindManager : IKeybindManager
 	{
 		Logger.Debug("Initializing keybind manager...");
 		_unhookKeyboardHook = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _keyboardHook, null, 0);
-	}
-
-	public void Add(ICommand command)
-	{
-		Logger.Debug($"Adding command {command}");
-		IKeybind? keybind = command.Keybind;
-
-		if (keybind == null)
-		{
-			Logger.Error("No keybind");
-			return;
-		}
-
-		if (_keybinds.ContainsKey(keybind))
-		{
-			Logger.Error($"Keybind {keybind} already exists");
-			throw new ArgumentException("Keybind already exists");
-		}
-
-		_keybinds.Add(keybind, command);
-	}
-
-	public void Clear()
-	{
-		Logger.Debug("Clearing keybinds");
-		_keybinds.Clear();
-	}
-
-	public bool Remove(IKeybind keybind)
-	{
-		Logger.Debug($"Removing keybind {keybind}");
-		return _keybinds.Remove(keybind);
-	}
-
-	public ICommand? TryGet(IKeybind keybind)
-	{
-		Logger.Debug($"Trying to get keybind handler for keybind {keybind}");
-		return _keybinds.TryGetValue(keybind, out ICommand? command) ? command : null;
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -90,7 +51,6 @@ internal class KeybindManager : IKeybindManager
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
 	}
-
 
 	/// <summary>
 	/// For relevant documentation, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-hookproc
@@ -188,7 +148,7 @@ internal class KeybindManager : IKeybindManager
 			return false;
 		}
 
-		ICommand? command = TryGet(keybind);
+		ICommand? command = _commandItems.TryGetCommand(keybind);
 		if (command == null)
 		{
 			Logger.Verbose($"No handler for {keybind}");
