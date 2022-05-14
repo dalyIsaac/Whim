@@ -155,7 +155,8 @@ internal class KeybindManager : IKeybindManager
 			return false;
 		}
 
-		command.Callback.Invoke();
+		command.TryExecute();
+
 		return true;
 	}
 }

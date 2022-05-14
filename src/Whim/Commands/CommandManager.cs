@@ -2,7 +2,7 @@ using System;
 
 namespace Whim;
 
-public class CommandManager : ICommandManager, IDisposable
+public class CommandManager : ICommandManager
 {
 	private readonly ICommandItems _commandItems;
 	private readonly IKeybindManager _keybindManager;

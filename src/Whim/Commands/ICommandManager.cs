@@ -1,3 +1,5 @@
+using System;
+
 namespace Whim;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace Whim;
 /// This involves handling keybindings, dispatching commands, and providing
 /// access to the commands themselves.
 /// </summary>
-public interface ICommandManager : ICommandItems
+public interface ICommandManager : ICommandItems, IDisposable
 {
 	/// <summary>
 	/// Initialize the keyboard hook.

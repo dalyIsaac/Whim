@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim;
 
 /// <summary>
@@ -13,21 +11,19 @@ public interface ICommand
 	public string Identifier { get; }
 
 	/// <summary>
-	/// The title of the menu item. This is what is displayed in the menu for
-	/// the user to select.
+	/// The title of the command. For example, "Focus right window".
 	/// </summary>
 	public string Title { get; }
 
 	/// <summary>
-	/// The callback to execute when the menu item is selected. This can include
-	/// triggering another menu to be shown, free form input, or to perform some
-	/// action.
+	/// Indicates whether the command can currently be executed.
 	/// </summary>
-	public Action Callback { get; }
+	public bool CanExecute();
 
 	/// <summary>
-	/// A condition to determine if the menu item should be visible and active
-	/// to Whim. If this is null, the menu item will always be accessible.
+	/// Tries to execute the command. If the command is not executable (due to
+	/// the condition not being met), false is returned.
 	/// </summary>
-	public Action? Condition { get; }
+	/// <returns>True if the command was executed, false otherwise.</returns>
+	public bool TryExecute();
 }
