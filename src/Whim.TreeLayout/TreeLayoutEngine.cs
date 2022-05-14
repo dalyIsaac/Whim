@@ -23,8 +23,6 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	public bool IsReadOnly => false;
 
-	public Commander Commander { get; } = new();
-
 	public TreeLayoutEngine(IConfigContext configContext, string name = "Tree")
 	{
 		_configContext = configContext;

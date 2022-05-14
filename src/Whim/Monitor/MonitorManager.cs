@@ -13,8 +13,6 @@ public class MonitorManager : IMonitorManager
 {
 	private readonly IConfigContext _configContext;
 
-	public Commander Commander { get; } = new();
-
 	/// <summary>
 	/// The <see cref="IMonitor"/>s of the computer.
 	/// This is initialized to make the compiler happy - we should never have a case where there's

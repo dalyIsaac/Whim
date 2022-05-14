@@ -11,7 +11,6 @@ namespace Whim;
 public class WorkspaceManager : IWorkspaceManager
 {
 	private readonly IConfigContext _configContext;
-	public Commander Commander { get; } = new();
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/>s stored by this manager.

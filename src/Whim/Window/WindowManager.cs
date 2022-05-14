@@ -11,8 +11,6 @@ public class WindowManager : IWindowManager
 {
 	private readonly IConfigContext _configContext;
 
-	public Commander Commander { get; } = new();
-
 	public event EventHandler<WindowEventArgs>? WindowRegistered;
 	public event EventHandler<WindowUpdateEventArgs>? WindowUpdated;
 	public event EventHandler<WindowEventArgs>? WindowFocused;

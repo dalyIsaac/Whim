@@ -1,4 +1,4 @@
-﻿#r "WHIM_PATH\whim.dll"
+#r "WHIM_PATH\whim.dll"
 #r "WHIM_PATH\plugins\Whim.Bar\Whim.Bar.dll"
 #r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
 #r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
@@ -14,28 +14,6 @@ using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.TreeLayout;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-
-/// <summary>
-/// Methods to simplify some of the creation of the more tedious keybindings.
-/// </summary>
-private static class KeybindHelpers
-{
-	public static KeybindHandler FocusWindowInDirection(IConfigContext configContext, Direction direction) => (args) =>
-	{
-		IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
-		if (workspace.LastFocusedWindow == null)
-		{
-			return;
-		}
-
-		workspace.ActiveLayoutEngine.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
-	};
-
-	public static KeybindHandler SwapWindowInDirection(IConfigContext configContext, Direction direction) => (args) =>
-	{
-		configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
-	};
-}
 
 /// <summary>
 /// Returns a new workspace with <paramref name="name"/> and layout engines.
@@ -67,7 +45,6 @@ IConfigContext DoConfig(IConfigContext configContext)
 
 	BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
 	BarPlugin barPlugin = new(configContext, barConfig);
-
 	configContext.PluginManager.RegisterPlugin(barPlugin);
 
 	// Floating window plugin.
@@ -89,27 +66,13 @@ IConfigContext DoConfig(IConfigContext configContext)
 	KeyModifiers winShift = KeyModifiers.LWin | KeyModifiers.LShift;
 	KeyModifiers winCtrl = KeyModifiers.LWin | KeyModifiers.LControl;
 
-	// Focus window in direction.
-	configContext.KeybindManager.Add(new Keybind(winAlt, VIRTUAL_KEY.VK_LEFT), KeybindHelpers.FocusWindowInDirection(configContext, Direction.Left));
-	configContext.KeybindManager.Add(new Keybind(winAlt, VIRTUAL_KEY.VK_RIGHT), KeybindHelpers.FocusWindowInDirection(configContext, Direction.Right));
-	configContext.KeybindManager.Add(new Keybind(winAlt, VIRTUAL_KEY.VK_UP), KeybindHelpers.FocusWindowInDirection(configContext, Direction.Up));
-	configContext.KeybindManager.Add(new Keybind(winAlt, VIRTUAL_KEY.VK_DOWN), KeybindHelpers.FocusWindowInDirection(configContext, Direction.Down));
-
-	// Swap windows in direction.
-	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_LEFT), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Left));
-	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_RIGHT), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Right));
-	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_UP), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Up));
-	configContext.KeybindManager.Add(new Keybind(winCtrl, VIRTUAL_KEY.VK_DOWN), KeybindHelpers.SwapWindowInDirection(configContext, Direction.Down));
-
-	// Move window to monitor.
-	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_LEFT), (args) => configContext.WorkspaceManager.MoveWindowToPreviousMonitor());
-	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_RIGHT), (args) => configContext.WorkspaceManager.MoveWindowToNextMonitor());
-
-	// Floating layout
-	configContext.KeybindManager.Add(new Keybind(winShift, VIRTUAL_KEY.VK_F), (args) => floatingLayoutPlugin.ToggleWindowFloating());
+	// Load the commands and keybindings.
+	configContext.CommandManager.LoadCommands(DefaultCommands.GetCommands(configContext));
+	configContext.CommandManager.LoadCommands(FloatingLayoutCommands.GetCommands(floatingLayoutPlugin));
 
 	return configContext;
 }
+
 #pragma warning disable CS8974 // Methods should not return 'this'.
 // We return doConfig here so that Whim can call it when it loads.
 return DoConfig;

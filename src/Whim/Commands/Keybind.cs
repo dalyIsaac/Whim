@@ -5,15 +5,13 @@ namespace Whim;
 
 public class Keybind : IKeybind
 {
-	public string? Name { get; }
 	public KeyModifiers Modifiers { get; }
 	public VIRTUAL_KEY Key { get; }
 
-	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key, string? name = null)
+	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key)
 	{
 		Modifiers = modifiers;
 		Key = key;
-		Name = name;
 	}
 
 	public override bool Equals(object? obj)
