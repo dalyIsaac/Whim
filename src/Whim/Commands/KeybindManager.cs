@@ -159,5 +159,4 @@ internal class KeybindManager : IKeybindManager
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
 	}
-
 }
