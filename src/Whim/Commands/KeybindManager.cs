@@ -26,32 +26,6 @@ internal class KeybindManager : IKeybindManager
 		_unhookKeyboardHook = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _keyboardHook, null, 0);
 	}
 
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				if (_unhookKeyboardHook != null && !_unhookKeyboardHook.IsInvalid)
-				{
-					_unhookKeyboardHook.Dispose();
-				}
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			disposedValue = true;
-		}
-	}
-
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
-	}
-
 	/// <summary>
 	/// For relevant documentation, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-hookproc
 	/// </summary>
@@ -159,4 +133,31 @@ internal class KeybindManager : IKeybindManager
 
 		return true;
 	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				if (_unhookKeyboardHook != null && !_unhookKeyboardHook.IsInvalid)
+				{
+					_unhookKeyboardHook.Dispose();
+				}
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+
 }

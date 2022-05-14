@@ -2,6 +2,9 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
+/// <summary>
+/// A keybinding. This should be hashable.
+/// </summary>
 public interface IKeybind
 {
 	/// <summary>
