@@ -63,6 +63,27 @@ internal class KeybindsMap : IEnumerable<(IKeybind, string)>
 	}
 
 	/// <summary>
+	/// Remove the identifier from the map.
+	/// </summary>
+	/// <param name="identifier"></param>
+	/// <returns></returns>
+	public bool Remove(string identifier)
+	{
+		Logger.Debug($"Removing identifier {identifier}");
+
+		// Get the keybind from the identifier.
+		if (!_identifierKeybindMap.TryGetValue(identifier, out IKeybind? keybind))
+		{
+			return false;
+		}
+
+		// Remove the identifier from the map.
+		_keybindIdentifierMap.Remove(keybind);
+		_identifierKeybindMap.Remove(identifier);
+		return true;
+	}
+
+	/// <summary>
 	/// Clear the map.
 	/// </summary>
 	public void Clear()

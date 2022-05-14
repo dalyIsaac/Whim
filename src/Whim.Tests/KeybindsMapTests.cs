@@ -54,8 +54,8 @@ public class KeybindsMapTests
 		Keybind keybind2 = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_G);
 		keybindsMap.Add(keybind2, identifier);
 
-		// Verify that the first first keybind is not mapped.
-		Assert.Null(keybindsMap.TryGetKeybind(identifier));
+		// Verify that the first keybind is not mapped.
+		Assert.Null(keybindsMap.TryGetIdentifier(keybind));
 
 		// Verify that the second keybind is mapped to the identifier.
 		Assert.Equal(identifier, keybindsMap.TryGetIdentifier(keybind2));
@@ -63,7 +63,7 @@ public class KeybindsMapTests
 	}
 
 	[Fact]
-	public void Remove()
+	public void RemoveKeybind()
 	{
 		KeybindsMap keybindsMap = new();
 
@@ -73,6 +73,22 @@ public class KeybindsMapTests
 
 		Assert.True(keybindsMap.Remove(keybind));
 		Assert.False(keybindsMap.Remove(keybind));
+
+		Assert.Null(keybindsMap.TryGetIdentifier(keybind));
+		Assert.Null(keybindsMap.TryGetKeybind(identifier));
+	}
+
+	[Fact]
+	public void RemoveIdentifier()
+	{
+		KeybindsMap keybindsMap = new();
+
+		string identifier = "command";
+		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
+		keybindsMap.Add(keybind, identifier);
+
+		Assert.True(keybindsMap.Remove(identifier));
+		Assert.False(keybindsMap.Remove(identifier));
 
 		Assert.Null(keybindsMap.TryGetIdentifier(keybind));
 		Assert.Null(keybindsMap.TryGetKeybind(identifier));

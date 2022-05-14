@@ -13,10 +13,17 @@ public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 	/// <summary>
 	/// Adds the <paramref name="command"/> to the collection.
 	///
-	/// If <paramref name="keybind"/> is not null and is already bound, it will be overwritten.
+	/// <para/>
+	/// Setting <paramref name="keybind"/> will overwrite the existing keybind.
 	/// In other words, the last command bound to the keybind will be the one that is bound.
 	///
+	/// <para/>
 	/// A command can have only one keybind.
+	///
+	/// <para/>
+	/// This will throw an exception if there are two different commands with the same identifier.
+	/// This is done (in contrast to Whim's general lack of throwing exceptions) as <see cref="Add"/>
+	/// will usually be done during the application's startup.
 	/// </summary>
 	/// <param name="command">The command to add</param>
 	/// <param name="keybind">The keybind to bind the command to</param>
@@ -24,11 +31,34 @@ public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 	public void Add(ICommand command, IKeybind? keybind = null);
 
 	/// <summary>
+	/// Sets the existing command (via the <paramref name="identifier"/>) to
+	/// have the given <paramref name="keybind"/>.
+	///
+	/// <para/>
+	/// This will overwrite the existing keybind - command identifier mapping,
+	/// and will enforce a one-to-one mapping.
+	///
+	/// <para/>
+	/// This is largely a helper around <see cref="Add(ICommand, IKeybind?)"/>.
+	/// </summary>
+	/// <param name="identifier">The identifier of the command to set the keybind for</param>
+	/// <param name="keybind">The keybind to bind the command to</param>
+	/// <returns>True if the command was found and the keybind was set, false otherwise.</returns>
+	public bool SetKeybind(string identifier, IKeybind keybind);
+
+	/// <summary>
 	/// Tries to remove the given keybind. It does not remove the command bound to the keybind.
 	/// </summary>
 	/// <param name="keybind">The keybind to remove</param>
 	/// <returns>If the keybind was removed, returns true. Otherwise, returns false.</returns>
 	public bool RemoveKeybind(IKeybind keybind);
+
+	/// <summary>
+	/// Tries to remove the keybind bound to the given <paramref name="identifier"/>.
+	/// </summary>
+	/// <param name="identifier">The identifier of the command to remove the keybind for</param>
+	/// <returns>If the keybind was removed, returns true. Otherwise, returns false.</returns>
+	public bool RemoveKeybind(string identifier);
 
 	/// <summary>
 	/// Tries to remove the command with the given identifier.

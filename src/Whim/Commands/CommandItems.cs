@@ -33,10 +33,32 @@ internal class CommandItems : ICommandItems
 		_identifierCommandMap[command.Identifier] = command;
 	}
 
+	public bool SetKeybind(string identifier, IKeybind keybind)
+	{
+		Logger.Debug($"Setting keybind {keybind} for command {identifier}");
+
+		// Get the command.
+		ICommand? command = TryGetCommand(identifier);
+		if (command == null)
+		{
+			Logger.Error($"Command {identifier} does not exist");
+			return false;
+		}
+
+		Add(command, keybind);
+		return true;
+	}
+
 	public bool RemoveKeybind(IKeybind keybind)
 	{
 		Logger.Debug($"Removing keybind {keybind}");
 		return _keybindsMap.Remove(keybind);
+	}
+
+	public bool RemoveKeybind(string identifier)
+	{
+		Logger.Debug($"Removing keybind for command {identifier}");
+		return _keybindsMap.Remove(identifier);
 	}
 
 	public bool Remove(string identifier)

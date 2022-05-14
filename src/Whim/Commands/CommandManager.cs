@@ -22,9 +22,11 @@ public class CommandManager : ICommandManager
 	}
 
 	public void Add(ICommand command, IKeybind? keybind = null) => _commandItems.Add(command, keybind);
+	public bool SetKeybind(string identifier, IKeybind keybind) => _commandItems.SetKeybind(identifier, keybind);
 	public void Clear() => _commandItems.Clear();
 	public void ClearKeybinds() => _commandItems.ClearKeybinds();
 	public bool RemoveKeybind(IKeybind keybind) => _commandItems.RemoveKeybind(keybind);
+	public bool RemoveKeybind(string identifier) => _commandItems.RemoveKeybind(identifier);
 	public bool Remove(string identifier) => _commandItems.Remove(identifier);
 	public ICommand? TryGetCommand(string identifier) => _commandItems?.TryGetCommand(identifier);
 	public ICommand? TryGetCommand(IKeybind keybind) => _commandItems?.TryGetCommand(keybind);

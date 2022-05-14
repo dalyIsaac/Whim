@@ -90,6 +90,51 @@ public class CommandItemsTests
 	}
 
 	/// <summary>
+	/// Set a keybind to a command which doesn't exist.
+	/// </summary>
+	[Fact]
+	public void SetKeybindToNonExistentCommand()
+	{
+		CommandItems commandItems = new();
+		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
+
+		Assert.False(commandItems.SetKeybind("command", keybind));
+	}
+
+	/// <summary>
+	/// Set a keybind to an existing command.
+	/// </summary>
+	[Fact]
+	public void SetKeybindToExistingCommand()
+	{
+		CommandItems commandItems = new();
+		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
+
+		// Set up the first command.
+		Mock<ICommand> command = new();
+		command.Setup(c => c.Identifier).Returns("command");
+		commandItems.Add(command.Object, keybind);
+
+		// Set up the second command.
+		Mock<ICommand> command2 = new();
+		command2.Setup(c => c.Identifier).Returns("command2");
+		commandItems.Add(command2.Object);
+
+		// Set the keybind to the second command.
+		commandItems.SetKeybind(command2.Object.Identifier, keybind);
+
+		// Check that the first command is still there.
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+
+		// Check that the second command is now the one bound to the keybind.
+		Assert.Equal(command2.Object, commandItems.TryGetCommand(keybind));
+		Assert.Equal(keybind, commandItems.TryGetKeybind(command2.Object.Identifier));
+
+		// Check that the first command is not bound to the keybind.
+		Assert.Null(commandItems.TryGetKeybind(command.Object.Identifier));
+	}
+
+	/// <summary>
 	/// Remove a keybind, but verify the command is still there.
 	/// </summary>
 	[Fact]
@@ -106,6 +151,31 @@ public class CommandItemsTests
 
 		// Remove the keybind.
 		commandItems.RemoveKeybind(keybind);
+
+		// Check that the command is still there.
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+
+		// Check that the keybind is no longer there.
+		Assert.Null(commandItems.TryGetCommand(keybind));
+	}
+
+	/// <summary>
+	/// Remove a keybind, given the command.
+	/// </summary>
+	[Fact]
+	public void RemoveKeybindGivenCommand()
+	{
+		CommandItems commandItems = new();
+		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
+
+		// Set up the command.
+		Mock<ICommand> command = new();
+		command.Setup(c => c.Identifier).Returns("command");
+
+		commandItems.Add(command.Object, keybind);
+
+		// Remove the keybind.
+		commandItems.RemoveKeybind(command.Object.Identifier);
 
 		// Check that the command is still there.
 		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
