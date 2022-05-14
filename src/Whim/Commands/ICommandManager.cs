@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Whim;
 
@@ -13,4 +14,10 @@ public interface ICommandManager : ICommandItems, IDisposable
 	/// Initialize the keyboard hook.
 	/// </summary>
 	public void Initialize();
+
+	/// <summary>
+	/// Loads the given commmands and keybinds.
+	/// </summary>
+	/// <param name="commands"></param>
+	public void LoadCommands(IEnumerable<(ICommand, IKeybind?)> commands);
 }

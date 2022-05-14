@@ -35,7 +35,7 @@ internal class KeybindManager : IKeybindManager
 	/// <returns></returns>
 	private LRESULT KeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 	{
-		Logger.Verbose($"{nCode} {wParam} {lParam}");
+		Logger.Verbose($"{nCode} {wParam.Value} {lParam.Value}");
 		if (nCode != 0 || (wParam != (nuint)PInvoke.WM_KEYDOWN && wParam != (nuint)PInvoke.WM_SYSKEYDOWN))
 		{
 			return PInvoke.CallNextHookEx(null, nCode, wParam, lParam);

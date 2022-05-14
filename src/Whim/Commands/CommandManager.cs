@@ -57,4 +57,12 @@ public class CommandManager : ICommandManager
 
 	public IEnumerator<(ICommand, IKeybind?)> GetEnumerator() => _commandItems.GetEnumerator();
 	IEnumerator IEnumerable.GetEnumerator() => _commandItems.GetEnumerator();
+
+	public void LoadCommands(IEnumerable<(ICommand, IKeybind?)> commands)
+	{
+		foreach ((ICommand command, IKeybind? keybind) in commands)
+		{
+			Add(command, keybind);
+		}
+	}
 }
