@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Whim;
 
@@ -20,10 +22,9 @@ public class CommandManager : ICommandManager
 	}
 
 	public void Add(ICommand command, IKeybind? keybind = null) => _commandItems.Add(command, keybind);
-	public bool Bind(string identifier, IKeybind keybind) => _commandItems.Bind(identifier, keybind);
 	public void Clear() => _commandItems.Clear();
 	public void ClearKeybinds() => _commandItems.ClearKeybinds();
-	public bool Remove(IKeybind keybind) => _commandItems.Remove(keybind);
+	public bool RemoveKeybind(IKeybind keybind) => _commandItems.RemoveKeybind(keybind);
 	public bool Remove(string identifier) => _commandItems.Remove(identifier);
 	public ICommand? TryGetCommand(string identifier) => _commandItems?.TryGetCommand(identifier);
 	public ICommand? TryGetCommand(IKeybind keybind) => _commandItems?.TryGetCommand(keybind);
@@ -51,4 +52,7 @@ public class CommandManager : ICommandManager
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
 	}
+
+	public IEnumerator<(ICommand, IKeybind?)> GetEnumerator() => _commandItems.GetEnumerator();
+	IEnumerator IEnumerable.GetEnumerator() => _commandItems.GetEnumerator();
 }

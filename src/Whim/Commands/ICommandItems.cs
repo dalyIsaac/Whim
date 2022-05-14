@@ -1,18 +1,22 @@
 using System;
+using System.Collections.Generic;
 
 namespace Whim;
 
 /// <summary>
 /// ICommandItems is a collection of commands (though does not implement
-/// <see cref="System.Collections.Generic.ICollection{T}"/>).
+/// <see cref="ICollection{T}"/>).
 /// It stores the commands and their keybinds for easy access and operation.
 /// </summary>
-public interface ICommandItems
+public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 {
 	/// <summary>
 	/// Adds the <paramref name="command"/> to the collection.
+	///
 	/// If <paramref name="keybind"/> is not null and is already bound, it will be overwritten.
 	/// In other words, the last command bound to the keybind will be the one that is bound.
+	///
+	/// A command can have only one keybind.
 	/// </summary>
 	/// <param name="command">The command to add</param>
 	/// <param name="keybind">The keybind to bind the command to</param>
@@ -20,21 +24,11 @@ public interface ICommandItems
 	public void Add(ICommand command, IKeybind? keybind = null);
 
 	/// <summary>
-	/// Bind the command with the given identifier to the given keybind.
-	/// If the keybind is already bound, it will be overwritten.
-	/// In other words, the last command bound to the keybind will be the one that is bound.
-	/// </summary>
-	/// <param name="identifier">The identifier of the command to bind</param>
-	/// <param name="keybind">The keybind to bind the command to</param>
-	/// <returns>False if the identifier does not have a command bound to it. True otherwise.</returns>
-	public bool Bind(string identifier, IKeybind keybind);
-
-	/// <summary>
-	/// Tries to remove the given keybind and associated command.
+	/// Tries to remove the given keybind. It does not remove the command bound to the keybind.
 	/// </summary>
 	/// <param name="keybind">The keybind to remove</param>
 	/// <returns>If the keybind was removed, returns true. Otherwise, returns false.</returns>
-	public bool Remove(IKeybind keybind);
+	public bool RemoveKeybind(IKeybind keybind);
 
 	/// <summary>
 	/// Tries to remove the command with the given identifier.

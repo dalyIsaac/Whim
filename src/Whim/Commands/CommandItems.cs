@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -9,49 +10,33 @@ namespace Whim;
 /// </summary>
 internal class CommandItems : ICommandItems
 {
-	private readonly Dictionary<IKeybind, string> _keybindIdentifierMap = new();
+	private readonly KeybindsMap _keybindsMap = new();
 	private readonly Dictionary<string, ICommand> _identifierCommandMap = new();
 
 	public void Add(ICommand command, IKeybind? keybind = null)
 	{
 		Logger.Debug($"Adding command {command}");
 
-		if (keybind != null)
-		{
-			Logger.Debug($"Adding (or overriding) keybind {keybind}");
-			_keybindIdentifierMap[keybind] = command.Identifier;
-		}
-
 		ICommand? existingCommand = TryGetCommand(command.Identifier);
-
 		if (existingCommand != null && command != existingCommand)
 		{
 			Logger.Error($"Command {command.Identifier} already exists");
 			throw new ArgumentException($"Command {command.Identifier} already exists");
 		}
 
+		if (keybind != null)
+		{
+			Logger.Debug($"Adding (or overriding) keybind {keybind}");
+			_keybindsMap.Add(keybind, command.Identifier);
+		}
+
 		_identifierCommandMap[command.Identifier] = command;
 	}
 
-	public bool Bind(string identifier, IKeybind keybind)
-	{
-		Logger.Debug($"Binding command \"{identifier}\" to keybind {keybind}");
-		ICommand? command = TryGetCommand(identifier);
-
-		if (command == null)
-		{
-			Logger.Error($"Command with identifier \"{identifier}\" does not exist");
-			return false;
-		}
-
-		_keybindIdentifierMap[keybind] = identifier;
-		return true;
-	}
-
-	public bool Remove(IKeybind keybind)
+	public bool RemoveKeybind(IKeybind keybind)
 	{
 		Logger.Debug($"Removing keybind {keybind}");
-		return _keybindIdentifierMap.Remove(keybind);
+		return _keybindsMap.Remove(keybind);
 	}
 
 	public bool Remove(string identifier)
@@ -70,15 +55,7 @@ internal class CommandItems : ICommandItems
 
 		if (keybind != null)
 		{
-			if (_keybindIdentifierMap.Remove(keybind))
-			{
-				Logger.Debug($"Removed keybind {keybind}");
-			}
-			else
-			{
-				Logger.Error($"Failed to remove keybind {keybind}");
-				return false;
-			}
+			_keybindsMap.Remove(keybind);
 		}
 
 		return _identifierCommandMap.Remove(identifier);
@@ -87,14 +64,14 @@ internal class CommandItems : ICommandItems
 	public void Clear()
 	{
 		Logger.Debug("Clearing commands");
-		_keybindIdentifierMap.Clear();
 		_identifierCommandMap.Clear();
+		ClearKeybinds();
 	}
 
 	public void ClearKeybinds()
 	{
 		Logger.Debug("Clearing keybinds");
-		_keybindIdentifierMap.Clear();
+		_keybindsMap.Clear();
 	}
 
 	public ICommand? TryGetCommand(string identifier)
@@ -106,26 +83,36 @@ internal class CommandItems : ICommandItems
 	public ICommand? TryGetCommand(IKeybind keybind)
 	{
 		Logger.Debug($"Trying to get command bound to keybind {keybind}");
-		if (!_keybindIdentifierMap.TryGetValue(keybind, out string? identifierValue))
-		{
-			return null;
-		}
-
-		return TryGetCommand(identifierValue);
+		string? identifier = _keybindsMap.TryGetIdentifier(keybind);
+		return identifier != null ? TryGetCommand(identifier) : null;
 	}
 
 	public IKeybind? TryGetKeybind(string identifier)
 	{
 		Logger.Debug($"Trying to get keybind for command \"{identifier}\"");
+		return _keybindsMap.TryGetKeybind(identifier);
+	}
 
-		foreach (KeyValuePair<IKeybind, string> pair in _keybindIdentifierMap)
+	public IEnumerator<(ICommand, IKeybind?)> GetEnumerator()
+	{
+		HashSet<string> processedIdentifiers = new();
+
+		// Iterate over each of the keybinds and associated commands.
+		foreach ((IKeybind keybind, string identifier) in _keybindsMap)
 		{
-			if (pair.Value == identifier)
-			{
-				return pair.Key;
-			}
+			yield return (TryGetCommand(identifier)!, keybind);
+			processedIdentifiers.Add(identifier);
 		}
 
-		return null;
+		// Iterate over each of the commands without an associated keybind.
+		foreach (KeyValuePair<string, ICommand> pair in _identifierCommandMap)
+		{
+			if (!processedIdentifiers.Contains(pair.Key))
+			{
+				yield return (pair.Value, null);
+			}
+		}
 	}
+
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

@@ -8,11 +8,6 @@ namespace Whim;
 public interface IKeybind
 {
 	/// <summary>
-	/// Optional name of the keybind.
-	/// </summary>
-	public string? Name { get; }
-
-	/// <summary>
 	/// Modifiers like Alt, Ctrl, and Win.
 	/// </summary>
 	public KeyModifiers Modifiers { get; }
