@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
+﻿using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
@@ -20,7 +7,9 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private readonly IConfigContext _configContext;
 	private readonly CommandPaletteConfig _commandPaletteConfig;
 	private readonly IWindow _window;
-	public bool IsVisible { get; private set; }
+	private IMonitor? _monitor;
+	public bool IsVisible => _monitor != null;
+	public CommandPaletteViewModel ViewModel { get; }
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPaletteConfig commandPaletteConfig)
 	{
@@ -29,10 +18,21 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
 
 		Title = CommandPaletteConfig.Title;
+		ViewModel = new CommandPaletteViewModel(configContext, _commandPaletteConfig);
 	}
 
-	public void Activate(IMonitor monitor)
+	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
 	{
+		ViewModel.Activate(items);
+		monitor ??= _configContext.MonitorManager.FocusedMonitor;
+
+		if (monitor != _monitor)
+		{
+			return;
+		}
+
+		_monitor = monitor;
+
 		int width = 800;
 		int height = 800;
 
@@ -48,13 +48,12 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			new WindowLocation(_window, windowLocation, WindowState.Normal),
 			_window.Handle
 		);
-		IsVisible = true;
 	}
 
 	public void Hide()
 	{
 		_window.Hide();
-		IsVisible = false;
+		_monitor = null;
 	}
 
 	public void Toggle()
@@ -65,7 +64,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 		else
 		{
-			Activate(_configContext.MonitorManager.FocusedMonitor);
+			Activate();
 		}
 	}
 }

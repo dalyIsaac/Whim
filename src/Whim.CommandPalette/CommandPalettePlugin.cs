@@ -1,9 +1,12 @@
+using System.Collections.Generic;
+
 namespace Whim.CommandPalette;
 
 public class CommandPalettePlugin : IPlugin
 {
 	private readonly IConfigContext _configContext;
 	private readonly CommandPaletteConfig _commandPaletteConfig;
+	private readonly Dictionary<string, uint> _commandCounts = new();
 	private CommandPaletteWindow? _commandPaletteWindow;
 
 	public CommandPalettePlugin(IConfigContext configContext, CommandPaletteConfig commandPaletteConfig)
@@ -23,9 +26,12 @@ public class CommandPalettePlugin : IPlugin
 		_commandPaletteWindow = new CommandPaletteWindow(_configContext, _commandPaletteConfig);
 	}
 
-	public void Activate()
+	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null)
 	{
-		_commandPaletteWindow?.Activate();
+		_commandPaletteWindow?.Activate(
+			items,
+			_configContext.MonitorManager.FocusedMonitor
+		);
 	}
 
 	public void Hide()
@@ -35,6 +41,6 @@ public class CommandPalettePlugin : IPlugin
 
 	public void Toggle()
 	{
-		_commandPaletteWindow.Toggle();
+		_commandPaletteWindow?.Toggle();
 	}
 }
