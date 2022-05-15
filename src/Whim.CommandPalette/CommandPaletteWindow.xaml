@@ -16,11 +16,23 @@
 		<TextBox
 			x:Name="TextEntry"
 			FontSize="24"
-			PlaceholderText="Command" />
+			PlaceholderText="Start typing..."
+			Text="{x:Bind ViewModel.Query, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 
-		<StackPanel
-			x:Name="CommandPaletteItems"
-			Grid.Row="1"
-			Orientation="Horizontal" />
+		<ItemsControl Grid.Row="1" ItemsSource="{x:Bind ViewModel.Matches}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate x:DataType="local:CommandPaletteMatch">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="200" />
+						</Grid.ColumnDefinitions>
+
+						<TextBlock Text="{x:Bind Command.Title}" />
+						<TextBlock Grid.Column="1" Text="{x:Bind Keybind}" />
+					</Grid>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
 	</Grid>
 </Window>

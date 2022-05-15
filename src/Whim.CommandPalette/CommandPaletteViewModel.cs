@@ -19,9 +19,19 @@ public class CommandPaletteViewModel : INotifyPropertyChanged
 			{
 				_query = value;
 				OnPropertyChanged(nameof(Query));
+				UpdateMatches();
 			}
 		}
 	}
+
+	/// <summary>
+	/// The current commands from which <see cref="Matches"/> is derived.
+	/// </summary>
+	private readonly List<CommandPaletteMatch> _currentCommands = new();
+
+	/// <summary>
+	/// The matching commands which are shown to the user.
+	/// </summary>
 
 	public ObservableCollection<CommandPaletteMatch> Matches { get; } = new();
 
@@ -40,13 +50,39 @@ public class CommandPaletteViewModel : INotifyPropertyChanged
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items)
 	{
-		items ??= _configContext.CommandManager;
-		Query = "";
-		Matches.Clear();
+		_currentCommands.Clear();
 
-		foreach (CommandPaletteMatch match in _plugin.Config.Matcher.Match(Query, items, _configContext, _plugin))
+		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
 		{
-			Matches.Add(match);
+			if (command.CanExecute())
+			{
+				_currentCommands.Add(new CommandPaletteMatch(command, keybind));
+			}
+		}
+
+		Query = "";
+		UpdateMatches();
+	}
+
+	private void UpdateMatches()
+	{
+		int idx = 0;
+		IEnumerator<CommandPaletteMatch> enumerator = _plugin.Config.Matcher.Match(Query, _currentCommands, _configContext, _plugin).GetEnumerator();
+
+		while (enumerator.MoveNext() && idx < Matches.Count)
+		{
+			Matches[idx] = enumerator.Current;
+			idx++;
+		}
+
+		while (idx < Matches.Count)
+		{
+			Matches.RemoveAt(idx);
+		}
+
+		while (enumerator.MoveNext())
+		{
+			Matches.Add(enumerator.Current);
 		}
 	}
 }

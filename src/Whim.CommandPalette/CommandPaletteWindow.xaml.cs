@@ -24,7 +24,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		ViewModel.Activate(items);
 		monitor ??= _configContext.MonitorManager.FocusedMonitor;
 
-		if (monitor != _monitor)
+		if (monitor == _monitor)
 		{
 			return;
 		}

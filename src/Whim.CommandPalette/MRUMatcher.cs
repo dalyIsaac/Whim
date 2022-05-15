@@ -11,55 +11,31 @@ public class MRUMatcher : ICommandPaletteMatcher
 {
 	public IEnumerable<CommandPaletteMatch> Match(
 		string query,
-		IEnumerable<(ICommand, IKeybind?)> items,
+		IEnumerable<CommandPaletteMatch> items,
 		IConfigContext configContext,
 		CommandPalettePlugin plugin
 	)
 	{
 		// Filter out the items which cannot be executed, or are not a match.
-		List<(int, ICommand, IKeybind?)> filteredItems = new();
-		foreach ((ICommand command, IKeybind? keybind) in items)
+		List<(int, CommandPaletteMatch)> filteredItems = new();
+		foreach (CommandPaletteMatch match in items)
 		{
-			if (!command.CanExecute())
-			{
-				continue;
-			}
-
-			int startIdx = command.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase);
+			int startIdx = match.Command.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase);
 			if (startIdx == -1)
 			{
 				continue;
 			}
 
-			filteredItems.Add((startIdx, command, keybind));
+			filteredItems.Add((startIdx, match));
 		}
 
 		// Sort the filtered items by the start index of the match.
 		filteredItems.Sort((a, b) => a.Item1.CompareTo(b.Item1));
 
 		// Return the filtered items.
-		foreach ((int startIdx, ICommand command, IKeybind? keybind) in filteredItems)
+		foreach ((int _, CommandPaletteMatch match) in filteredItems)
 		{
-			yield return new CommandPaletteMatch(
-				CreateMatchText(startIdx, query.Length, command),
-				command,
-				keybind
-			);
+			yield return match;
 		}
-	}
-
-	/// <summary>
-	/// CreateMatchText will create a markdown-formatted string representing the
-	/// match, where the matched portion is bold.
-	/// </summary>
-	private static string CreateMatchText(int startIdx, int matchLength, ICommand command)
-	{
-		StringBuilder builder = new(command.Title.Length + 4);
-		builder.Append(command.Title, 0, startIdx);
-		builder.Append("**");
-		builder.Append(command.Title, startIdx, matchLength);
-		builder.Append("**");
-		builder.Append(command.Title, startIdx + matchLength, command.Title.Length - startIdx - matchLength);
-		return builder.ToString();
 	}
 }

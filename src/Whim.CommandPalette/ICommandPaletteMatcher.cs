@@ -9,7 +9,7 @@ public interface ICommandPaletteMatcher
 	/// </summary>
 	public IEnumerable<CommandPaletteMatch> Match(
 		string query,
-		IEnumerable<(ICommand, IKeybind?)> items,
+		IEnumerable<CommandPaletteMatch> items,
 		IConfigContext configContext,
 		CommandPalettePlugin plugin
 	);
