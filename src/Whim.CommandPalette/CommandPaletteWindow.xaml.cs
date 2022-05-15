@@ -5,20 +5,18 @@ namespace Whim.CommandPalette;
 public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 {
 	private readonly IConfigContext _configContext;
-	private readonly CommandPaletteConfig _commandPaletteConfig;
 	private readonly IWindow _window;
 	private IMonitor? _monitor;
 	public bool IsVisible => _monitor != null;
 	public CommandPaletteViewModel ViewModel { get; }
 
-	public CommandPaletteWindow(IConfigContext configContext, CommandPaletteConfig commandPaletteConfig)
+	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
 		_configContext = configContext;
-		_commandPaletteConfig = commandPaletteConfig;
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
 
 		Title = CommandPaletteConfig.Title;
-		ViewModel = new CommandPaletteViewModel(configContext, _commandPaletteConfig);
+		ViewModel = new CommandPaletteViewModel(configContext, plugin);
 	}
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)

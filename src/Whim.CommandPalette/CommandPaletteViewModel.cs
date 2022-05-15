@@ -7,7 +7,7 @@ namespace Whim.CommandPalette;
 public class CommandPaletteViewModel : INotifyPropertyChanged
 {
 	private readonly IConfigContext _configContext;
-	private readonly CommandPaletteConfig _config;
+	private readonly CommandPalettePlugin _plugin;
 
 	private string _query = "";
 	public string Query
@@ -32,10 +32,10 @@ public class CommandPaletteViewModel : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	public CommandPaletteViewModel(IConfigContext configContext, CommandPaletteConfig config)
+	public CommandPaletteViewModel(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
 		_configContext = configContext;
-		_config = config;
+		_plugin = plugin;
 	}
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items)
@@ -44,7 +44,7 @@ public class CommandPaletteViewModel : INotifyPropertyChanged
 		Query = "";
 		Matches.Clear();
 
-		foreach (CommandPaletteMatch match in _config.Matcher(Query, items, _configContext))
+		foreach (CommandPaletteMatch match in _plugin.Config.Matcher.Match(Query, items, _configContext, _plugin))
 		{
 			Matches.Add(match);
 		}

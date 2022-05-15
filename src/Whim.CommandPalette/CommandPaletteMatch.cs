@@ -5,13 +5,13 @@ public class CommandPaletteMatch
 	/// <summary>
 	/// A markdown-formatted string representing the match.
 	/// </summary>
-	public string Text { get; }
+	public string MatchText { get; }
 	public ICommand Command { get; }
 	public IKeybind? Keybind { get; }
 
-	public CommandPaletteMatch(string text, ICommand command, IKeybind? keybind)
+	public CommandPaletteMatch(string matchText, ICommand command, IKeybind? keybind)
 	{
-		Text = text;
+		MatchText = matchText;
 		Command = command;
 		Keybind = keybind;
 	}
