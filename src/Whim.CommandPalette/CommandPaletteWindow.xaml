@@ -16,11 +16,16 @@
 		<TextBox
 			x:Name="TextEntry"
 			FontSize="24"
+			KeyDown="TextEntry_KeyDown"
 			PlaceholderText="Start typing..."
-			Text="{x:Bind ViewModel.Query, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+			TextChanged="TextEntry_TextChanged" />
 
-		<ItemsControl Grid.Row="1" ItemsSource="{x:Bind ViewModel.Matches}">
-			<ItemsControl.ItemTemplate>
+		<ListView
+			x:Name="CommandListItems"
+			Grid.Row="1"
+			IsTabStop="False"
+			SelectionMode="Single">
+			<ListView.ItemTemplate>
 				<DataTemplate x:DataType="local:CommandPaletteMatch">
 					<Grid>
 						<Grid.ColumnDefinitions>
@@ -32,7 +37,7 @@
 						<TextBlock Grid.Column="1" Text="{x:Bind Keybind}" />
 					</Grid>
 				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ItemsControl>
+			</ListView.ItemTemplate>
+		</ListView>
 	</Grid>
 </Window>
