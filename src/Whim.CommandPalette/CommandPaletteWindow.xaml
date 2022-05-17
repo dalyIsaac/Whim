@@ -24,6 +24,7 @@
 			x:Name="CommandListItems"
 			Grid.Row="1"
 			IsTabStop="False"
+			ItemClick="CommandListItems_ItemClick"
 			SelectionMode="Single">
 			<ListView.ItemTemplate>
 				<DataTemplate x:DataType="local:CommandPaletteMatch">

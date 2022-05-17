@@ -100,7 +100,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 				CommandListItems.SelectedIndex = (selectedIndex + _matches.Count - 1) % _matches.Count;
 				break;
 			case Windows.System.VirtualKey.Enter:
-				// TODO: Execute
+				ExecuteCommand();
 				break;
 			case Windows.System.VirtualKey.Escape:
 				Hide();
@@ -154,5 +154,23 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		Logger.Debug($"Command palette match count: {_matches.Count}");
 
 		CommandListItems.SelectedIndex = _matches.Count > 0 ? 0 : -1;
+	}
+
+	private void CommandListItems_ItemClick(object sender, Microsoft.UI.Xaml.Controls.ItemClickEventArgs e)
+	{
+		CommandListItems.SelectedItem = e.ClickedItem;
+		ExecuteCommand();
+	}
+
+	private void ExecuteCommand()
+	{
+		if (CommandListItems.SelectedIndex < 0)
+		{
+			Hide();
+		}
+
+		CommandPaletteMatch match = _matches[CommandListItems.SelectedIndex];
+		match.Command.TryExecute();
+		Hide();
 	}
 }
