@@ -34,6 +34,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
 	{
+		_allCommands.Clear();
 		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
 		{
 			if (command.CanExecute())
@@ -41,6 +42,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 				_allCommands.Add(new CommandPaletteMatch(command, keybind));
 			}
 		}
+
 		UpdateMatches();
 
 		monitor ??= _configContext.MonitorManager.FocusedMonitor;
@@ -118,31 +120,38 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		IEnumerator<CommandPaletteMatch> enumerator = _plugin.Config.Matcher.Match(
+		IEnumerable<CommandPaletteMatch> items = _plugin.Config.Matcher.Match(
 			query,
 			_allCommands,
 			_configContext,
 			_plugin
-		).GetEnumerator();
+		);
 
-		while (enumerator.MoveNext() && idx < _matches.Count)
+		foreach (CommandPaletteMatch match in items)
 		{
-			if (_matches[idx] != enumerator.Current)
+			if (idx < _matches.Count)
 			{
-				_matches[idx] = enumerator.Current;
+				// We don't want to trigger a property changed notification unnecessarily.
+				if (_matches[idx] != match)
+				{
+					_matches[idx] = match;
+				}
+			}
+			else
+			{
+				_matches.Add(match);
 			}
 			idx++;
 		}
 
-		for (; idx < _matches.Count; idx++)
+		// If there are more matches than we have space for, remove the last ones.
+		int count = _matches.Count;
+		for (; idx < count; idx++)
 		{
-			_matches.RemoveAt(idx);
+			_matches.RemoveAt(_matches.Count - 1);
 		}
 
-		while (enumerator.MoveNext())
-		{
-			_matches.Add(enumerator.Current);
-		}
+		Logger.Debug($"Command palette match count: {_matches.Count}");
 
 		CommandListItems.SelectedIndex = _matches.Count > 0 ? 0 : -1;
 	}
