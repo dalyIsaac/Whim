@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Whim;
 
@@ -18,4 +19,54 @@ public enum KeyModifiers
 
 	LWin = 64,
 	RWin = 128,
+}
+
+public static class KeyModifiersExtensions
+{
+	public static IEnumerable<string> GetParts(this KeyModifiers modifiers)
+	{
+		List<string> parts = new();
+
+		if (modifiers.HasFlag(KeyModifiers.LWin))
+		{
+			parts.Add("LWin");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.RWin))
+		{
+			parts.Add("RWin");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.LControl))
+		{
+			parts.Add("LCtrl");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.RControl))
+		{
+			parts.Add("RCtrl");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.LAlt))
+		{
+			parts.Add("LAlt");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.RAlt))
+		{
+			parts.Add("RAlt");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.LShift))
+		{
+			parts.Add("LShift");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.RShift))
+		{
+			parts.Add("RShift");
+		}
+
+		return parts;
+	}
 }

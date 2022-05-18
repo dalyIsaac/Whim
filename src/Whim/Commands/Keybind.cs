@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -8,10 +10,24 @@ public class Keybind : IKeybind
 	public KeyModifiers Modifiers { get; }
 	public VIRTUAL_KEY Key { get; }
 
+	/// <summary>
+	/// The keys which make up this keybind.
+	/// </summary>
+	private ReadOnlyCollection<string> AllKeys { get; }
+
+	private readonly string _allKeysStr;
+
 	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key)
 	{
 		Modifiers = modifiers;
 		Key = key;
+
+		List<string> allKeys = new();
+		allKeys.AddRange(Modifiers.GetParts());
+		allKeys.Add(Key.GetKeyString());
+
+		AllKeys = allKeys.AsReadOnly();
+		_allKeysStr = string.Join(" + ", AllKeys);
 	}
 
 	public override bool Equals(object? obj)
@@ -28,5 +44,5 @@ public class Keybind : IKeybind
 
 	public override int GetHashCode() => HashCode.Combine(Modifiers, Key);
 
-	public override string ToString() => $"{Modifiers} + {Key}";
+	public override string ToString() => _allKeysStr;
 }
