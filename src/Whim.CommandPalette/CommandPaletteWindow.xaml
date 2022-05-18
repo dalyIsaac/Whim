@@ -9,13 +9,42 @@
 
 	<Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="48" />
+			<RowDefinition Height="36" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
+		<Grid.Resources>
+			<ResourceDictionary>
+				<ResourceDictionary.ThemeDictionaries>
+					<ResourceDictionary x:Key="Dark">
+						<Style x:Key="KeybindBorderStyle" TargetType="Border">
+							<Setter Property="BorderThickness" Value="1" />
+							<Setter Property="CornerRadius" Value="2" />
+							<Setter Property="Background" Value="Transparent" />
+							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+						</Style>
+						<Style x:Key="KeyChordTextBlockStyle" TargetType="TextBlock">
+							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+						</Style>
+					</ResourceDictionary>
+
+					<ResourceDictionary x:Key="Light">
+						<Style x:Key="KeybindBorderStyle" TargetType="Border">
+							<Setter Property="BorderThickness" Value="1" />
+							<Setter Property="CornerRadius" Value="2" />
+							<Setter Property="Background" Value="Transparent" />
+							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+						</Style>
+						<Style x:Key="KeyChordTextBlockStyle" TargetType="TextBlock">
+							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+						</Style>
+					</ResourceDictionary>
+				</ResourceDictionary.ThemeDictionaries>
+			</ResourceDictionary>
+		</Grid.Resources>
+
 		<TextBox
 			x:Name="TextEntry"
-			FontSize="24"
 			KeyDown="TextEntry_KeyDown"
 			PlaceholderText="Start typing..."
 			TextChanged="TextEntry_TextChanged" />
@@ -35,7 +64,29 @@
 						</Grid.ColumnDefinitions>
 
 						<TextBlock Text="{x:Bind Command.Title}" />
-						<TextBlock Grid.Column="1" Text="{x:Bind Keybind}" />
+						<ItemsControl Grid.Column="1" ItemsSource="{x:Bind Keybind}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal" />
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="x:String">
+									<Border
+										Padding="2,0,2,0"
+										HorizontalAlignment="Right"
+										VerticalAlignment="Center"
+										Style="{ThemeResource KeybindBorderStyle}">
+										<TextBlock
+											FontSize="12"
+											Style="{ThemeResource KeyChordTextBlockStyle}"
+											Text="{x:Bind}" />
+									</Border>
+
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
 					</Grid>
 				</DataTemplate>
 			</ListView.ItemTemplate>
