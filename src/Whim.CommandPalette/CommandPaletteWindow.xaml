@@ -64,29 +64,18 @@
 						</Grid.ColumnDefinitions>
 
 						<TextBlock Text="{x:Bind Command.Title}" />
-						<ItemsControl Grid.Column="1" ItemsSource="{x:Bind Keybind}">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<StackPanel Orientation="Horizontal" />
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
 
-							<ItemsControl.ItemTemplate>
-								<DataTemplate x:DataType="x:String">
-									<Border
-										Padding="2,0,2,0"
-										HorizontalAlignment="Right"
-										VerticalAlignment="Center"
-										Style="{ThemeResource KeybindBorderStyle}">
-										<TextBlock
-											FontSize="12"
-											Style="{ThemeResource KeyChordTextBlockStyle}"
-											Text="{x:Bind}" />
-									</Border>
-
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
+						<Border
+							Grid.Column="1"
+							Padding="2,0,2,0"
+							HorizontalAlignment="Right"
+							VerticalAlignment="Center"
+							Style="{ThemeResource KeybindBorderStyle}">
+							<TextBlock
+								FontSize="12"
+								Style="{ThemeResource KeyChordTextBlockStyle}"
+								Text="{x:Bind Keybind}" />
+						</Border>
 					</Grid>
 				</DataTemplate>
 			</ListView.ItemTemplate>
