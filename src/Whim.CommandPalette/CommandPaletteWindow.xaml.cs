@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Whim.CommandPalette;
@@ -37,7 +36,6 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		TextEntry.Text = "";
 		_allCommands.Clear();
-		TextEntry.Focus(FocusState.Programmatic);
 		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
 		{
 			if (command.CanExecute())

@@ -8,11 +8,9 @@ namespace Whim.CommandPalette;
 /// </summary>
 public class MostOftenUsedMatcher : ICommandPaletteMatcher
 {
-	private record struct MatchData(uint Count, CommandPaletteMatch Match);
+	private record struct MatchData(CommandPaletteMatch Match, uint Count);
 
 	private readonly Dictionary<string, uint> _commandExecutionCount = new();
-
-	private static int Compare(MatchData a, MatchData b) => -a.Count.CompareTo(b.Count);
 
 	public IEnumerable<CommandPaletteMatch> Match(
 		string query,
@@ -30,11 +28,11 @@ public class MostOftenUsedMatcher : ICommandPaletteMatcher
 
 			// Get the number of times the command has been executed.
 			_commandExecutionCount.TryGetValue(match.Command.Identifier, out uint count);
-			filteredItems.Add(new(count, match));
+			filteredItems.Add(new(match, count));
 		}
 
-		// Sort the filtered items by the start index of the match.
-		filteredItems.Sort((a, b) => Compare(a, b));
+		// Sort the filtered items by the number of times the command has been executed.
+		filteredItems.Sort((a, b) => -a.Count.CompareTo(b.Count));
 
 		// Return the filtered items.
 		foreach (MatchData data in filteredItems)

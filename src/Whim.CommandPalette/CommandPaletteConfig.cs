@@ -4,5 +4,5 @@ public class CommandPaletteConfig
 {
 	internal const string Title = "Whim Command Palette";
 
-	public ICommandPaletteMatcher Matcher { get; set; } = new MostOftenUsedMatcher();
+	public ICommandPaletteMatcher Matcher { get; set; } = new MostRecentlyUsedMatcher();
 }
