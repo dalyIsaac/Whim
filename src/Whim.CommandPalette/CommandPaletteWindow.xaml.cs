@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.UI.Xaml;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Whim.CommandPalette;
@@ -34,7 +35,9 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
 	{
+		TextEntry.Text = "";
 		_allCommands.Clear();
+		TextEntry.Focus(FocusState.Programmatic);
 		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
 		{
 			if (command.CanExecute())
@@ -74,6 +77,8 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		_window.Hide();
 		_monitor = null;
+		TextEntry.Text = "";
+		_allCommands.Clear();
 	}
 
 	public void Toggle()
@@ -120,12 +125,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		IEnumerable<CommandPaletteMatch> items = _plugin.Config.Matcher.Match(
-			query,
-			_allCommands,
-			_configContext,
-			_plugin
-		);
+		IEnumerable<CommandPaletteMatch> items = _plugin.Config.Matcher.Match(query, _allCommands);
 
 		foreach (CommandPaletteMatch match in items)
 		{
@@ -171,6 +171,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		CommandPaletteMatch match = _matches[CommandListItems.SelectedIndex];
 		match.Command.TryExecute();
+		_plugin.Config.Matcher.OnMatchExecuted(match);
 		Hide();
 	}
 }

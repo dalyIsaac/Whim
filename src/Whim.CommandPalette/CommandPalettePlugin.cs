@@ -7,7 +7,6 @@ public class CommandPalettePlugin : IPlugin
 	private readonly IConfigContext _configContext;
 	private CommandPaletteWindow? _commandPaletteWindow;
 	public CommandPaletteConfig Config { get; }
-	public Dictionary<string, uint> CommandExecutionCount { get; } = new();
 
 	public CommandPalettePlugin(IConfigContext configContext, CommandPaletteConfig commandPaletteConfig)
 	{
