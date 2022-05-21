@@ -65,10 +65,12 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		);
 
 		Activate();
+		TextEntry.Focus(Microsoft.UI.Xaml.FocusState.Programmatic);
 		Win32Helper.SetWindowPos(
 			new WindowLocation(_window, windowLocation, WindowState.Normal),
 			_window.Handle
 		);
+		_window.FocusForceForeground();
 	}
 
 	public void Hide()
