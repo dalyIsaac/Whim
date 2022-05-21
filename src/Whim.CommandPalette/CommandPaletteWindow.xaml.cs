@@ -34,6 +34,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
 	{
+		Logger.Debug("Activating command palette");
 		TextEntry.Text = "";
 		_allCommands.Clear();
 		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
@@ -75,6 +76,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	public void Hide()
 	{
+		Logger.Debug("Hiding command palette");
 		_window.Hide();
 		_monitor = null;
 		TextEntry.Text = "";
@@ -83,6 +85,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	public void Toggle()
 	{
+		Logger.Debug("Toggling command palette");
 		if (IsVisible)
 		{
 			Hide();
@@ -95,6 +98,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	private void TextEntry_KeyDown(object _sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 	{
+		Logger.Debug("Command palette key down: {0}", e.Key.ToString());
 		int selectedIndex = CommandListItems.SelectedIndex;
 		switch (e.Key)
 		{
@@ -122,6 +126,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	private void UpdateMatches()
 	{
+		Logger.Debug("Updating command palette matches");
 		string query = TextEntry.Text;
 		int idx = 0;
 
@@ -158,12 +163,14 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	private void CommandListItems_ItemClick(object sender, Microsoft.UI.Xaml.Controls.ItemClickEventArgs e)
 	{
+		Logger.Debug("Command palette item clicked");
 		CommandListItems.SelectedItem = e.ClickedItem;
 		ExecuteCommand();
 	}
 
 	private void ExecuteCommand()
 	{
+		Logger.Debug("Executing command");
 		if (CommandListItems.SelectedIndex < 0)
 		{
 			Hide();
