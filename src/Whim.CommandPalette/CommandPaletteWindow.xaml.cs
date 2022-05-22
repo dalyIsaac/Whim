@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
@@ -12,15 +13,12 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private IMonitor? _monitor;
 	public bool IsVisible => _monitor != null;
 
+	private ItemCollection _matches => ListViewItems.Items;
+
 	/// <summary>
 	/// The current commands from which <see cref="Matches"/> is derived.
 	/// </summary>
 	private readonly List<CommandPaletteMatch> _allCommands = new();
-
-	/// <summary>
-	/// The matching commands which are shown to the user.
-	/// </summary>
-	private readonly ObservableCollection<CommandPaletteMatch> _matches = new();
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
@@ -29,7 +27,6 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
 
 		Title = CommandPaletteConfig.Title;
-		CommandListItems.ItemsSource = _matches;
 	}
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
@@ -66,7 +63,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		);
 
 		Activate();
-		TextEntry.Focus(Microsoft.UI.Xaml.FocusState.Programmatic);
+		TextEntry.Focus(FocusState.Programmatic);
 		Win32Helper.SetWindowPos(
 			new WindowLocation(_window, windowLocation, WindowState.Normal),
 			_window.Handle
@@ -99,14 +96,14 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private void TextEntry_KeyDown(object _sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 	{
 		Logger.Debug("Command palette key down: {0}", e.Key.ToString());
-		int selectedIndex = CommandListItems.SelectedIndex;
+		int selectedIndex = ListViewItems.SelectedIndex;
 		switch (e.Key)
 		{
 			case Windows.System.VirtualKey.Down:
-				CommandListItems.SelectedIndex = (selectedIndex + 1) % _matches.Count;
+				ListViewItems.SelectedIndex = (selectedIndex + 1) % _matches.Count;
 				break;
 			case Windows.System.VirtualKey.Up:
-				CommandListItems.SelectedIndex = (selectedIndex + _matches.Count - 1) % _matches.Count;
+				ListViewItems.SelectedIndex = (selectedIndex + _matches.Count - 1) % _matches.Count;
 				break;
 			case Windows.System.VirtualKey.Enter:
 				ExecuteCommand();
@@ -119,7 +116,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 	}
 
-	private void TextEntry_TextChanged(object sender, Microsoft.UI.Xaml.Controls.TextChangedEventArgs e)
+	private void TextEntry_TextChanged(object sender, TextChangedEventArgs e)
 	{
 		UpdateMatches();
 	}
@@ -130,21 +127,15 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		IEnumerable<CommandPaletteMatch> items = _plugin.Config.Matcher.Match(query, _allCommands);
-
-		foreach (CommandPaletteMatch match in items)
+		foreach (CommandPaletteMatch match in _plugin.Config.Matcher.Match(query, _allCommands))
 		{
 			if (idx < _matches.Count)
 			{
-				// We don't want to trigger a property changed notification unnecessarily.
-				if (_matches[idx] != match)
-				{
-					_matches[idx] = match;
-				}
+				_matches[idx] = new PaletteItem(match);
 			}
 			else
 			{
-				_matches.Add(match);
+				_matches.Add(new PaletteItem(match));
 			}
 			idx++;
 		}
@@ -158,27 +149,31 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		Logger.Debug($"Command palette match count: {_matches.Count}");
 
-		CommandListItems.SelectedIndex = _matches.Count > 0 ? 0 : -1;
+		ListViewItems.SelectedIndex = _matches.Count > 0 ? 0 : -1;
 	}
 
-	private void CommandListItems_ItemClick(object sender, Microsoft.UI.Xaml.Controls.ItemClickEventArgs e)
+	private void CommandListItems_ItemClick(object sender, ItemClickEventArgs e)
 	{
 		Logger.Debug("Command palette item clicked");
-		CommandListItems.SelectedItem = e.ClickedItem;
+		ListViewItems.SelectedItem = e.ClickedItem;
 		ExecuteCommand();
 	}
 
 	private void ExecuteCommand()
 	{
 		Logger.Debug("Executing command");
-		if (CommandListItems.SelectedIndex < 0)
+		if (ListViewItems.SelectedIndex < 0)
 		{
 			Hide();
 		}
 
-		CommandPaletteMatch match = _matches[CommandListItems.SelectedIndex];
-		match.Command.TryExecute();
-		_plugin.Config.Matcher.OnMatchExecuted(match);
-		Hide();
+		if (_matches[ListViewItems.SelectedIndex] is PaletteItem item)
+		{
+			CommandPaletteMatch match = item.Match;
+
+			match.Command.TryExecute();
+			_plugin.Config.Matcher.OnMatchExecuted(match);
+			Hide();
+		}
 	}
 }

@@ -13,7 +13,7 @@ public class Keybind : IKeybind
 	/// <summary>
 	/// The keys which make up this keybind.
 	/// </summary>
-	private ReadOnlyCollection<string> AllKeys { get; }
+	public ReadOnlyCollection<string> AllKeys { get; }
 
 	private readonly string _allKeysStr;
 

@@ -13,36 +13,6 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<Grid.Resources>
-			<ResourceDictionary>
-				<ResourceDictionary.ThemeDictionaries>
-					<ResourceDictionary x:Key="Dark">
-						<Style x:Key="KeybindBorderStyle" TargetType="Border">
-							<Setter Property="BorderThickness" Value="1" />
-							<Setter Property="CornerRadius" Value="2" />
-							<Setter Property="Background" Value="Transparent" />
-							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
-						</Style>
-						<Style x:Key="KeyChordTextBlockStyle" TargetType="TextBlock">
-							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
-						</Style>
-					</ResourceDictionary>
-
-					<ResourceDictionary x:Key="Light">
-						<Style x:Key="KeybindBorderStyle" TargetType="Border">
-							<Setter Property="BorderThickness" Value="1" />
-							<Setter Property="CornerRadius" Value="2" />
-							<Setter Property="Background" Value="Transparent" />
-							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
-						</Style>
-						<Style x:Key="KeyChordTextBlockStyle" TargetType="TextBlock">
-							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
-						</Style>
-					</ResourceDictionary>
-				</ResourceDictionary.ThemeDictionaries>
-			</ResourceDictionary>
-		</Grid.Resources>
-
 		<TextBox
 			x:Name="TextEntry"
 			KeyDown="TextEntry_KeyDown"
@@ -50,35 +20,10 @@
 			TextChanged="TextEntry_TextChanged" />
 
 		<ListView
-			x:Name="CommandListItems"
+			x:Name="ListViewItems"
 			Grid.Row="1"
 			IsTabStop="False"
 			ItemClick="CommandListItems_ItemClick"
-			SelectionMode="Single">
-			<ListView.ItemTemplate>
-				<DataTemplate x:DataType="local:CommandPaletteMatch">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="200" />
-						</Grid.ColumnDefinitions>
-
-						<TextBlock Text="{x:Bind Command.Title}" />
-
-						<Border
-							Grid.Column="1"
-							Padding="2,0,2,0"
-							HorizontalAlignment="Right"
-							VerticalAlignment="Center"
-							Style="{ThemeResource KeybindBorderStyle}">
-							<TextBlock
-								FontSize="12"
-								Style="{ThemeResource KeyChordTextBlockStyle}"
-								Text="{x:Bind Keybind}" />
-						</Border>
-					</Grid>
-				</DataTemplate>
-			</ListView.ItemTemplate>
-		</ListView>
+			SelectionMode="Single" />
 	</Grid>
 </Window>

@@ -20,7 +20,9 @@
 		<UseWinUI>true</UseWinUI>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="CommandListItem.xaml" />
 	  <None Remove="CommandPaletteWindow.xaml" />
+	  <None Remove="PaletteItems\PaletteKeybindItem.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -30,6 +32,18 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="PaletteItems\PaletteKeybindItem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Controls\CommandListItem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>
