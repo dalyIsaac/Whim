@@ -5,48 +5,49 @@ namespace Whim.CommandPalette;
 
 public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 {
-	private record struct MatchData(CommandPaletteMatch Match, long LastUsed);
+	private record struct MatchData(PaletteItem MatchItem, long LastUsed);
 
 	private readonly Dictionary<string, long> _commandExecutionTime = new();
 
-	public IEnumerable<CommandPaletteMatch> Match(string query, IEnumerable<CommandPaletteMatch> items)
+	public IEnumerable<PaletteItem> Match(string query, IEnumerable<Match> items)
 	{
 		query = query.Trim();
 		List<MatchData> filteredItems = new();
-		foreach (CommandPaletteMatch match in items)
+		foreach (Match match in items)
 		{
-			match.Title.Segments.Clear();
-
 			int startIdx = match.Command.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase);
 			if (startIdx == -1)
 			{
 				continue;
 			}
 
+			HighlightedText highlightedTitle = new();
+			string title = match.Command.Title;
+
 			if (query.Length != 0)
 			{
 				if (startIdx != 0)
 				{
-					match.Title.Segments.Add(
+					highlightedTitle.Segments.Add(
 						new HighlightedTextSegment(
-							match.Command.Title[..startIdx],
+							title[..startIdx],
 							false
 						)
 					);
 				}
 
-				match.Title.Segments.Add(
+				highlightedTitle.Segments.Add(
 					new HighlightedTextSegment(
-						match.Command.Title.Substring(startIdx, query.Length),
+						title.Substring(startIdx, query.Length),
 						true
 					)
 				);
 
-				if (startIdx + query.Length != match.Command.Title.Length)
+				if (startIdx + query.Length != title.Length)
 				{
-					match.Title.Segments.Add(
+					highlightedTitle.Segments.Add(
 						new HighlightedTextSegment(
-							match.Command.Title[(startIdx + query.Length)..],
+							title[(startIdx + query.Length)..],
 							false
 						)
 					);
@@ -54,12 +55,12 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 			}
 			else
 			{
-				match.Title.Segments.Add(new HighlightedTextSegment(match.Command.Title, false));
+				highlightedTitle.Segments.Add(new HighlightedTextSegment(title, false));
 			}
 
 			// Get the time the command was last executed.
 			_commandExecutionTime.TryGetValue(match.Command.Identifier, out long time);
-			filteredItems.Add(new(match, time));
+			filteredItems.Add(new MatchData(new PaletteItem(match, highlightedTitle), time));
 		}
 
 		// Sort the filtered items by the last time the command was executed.
@@ -68,11 +69,11 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 		// Return the filtered items.
 		foreach (MatchData data in filteredItems)
 		{
-			yield return data.Match;
+			yield return data.MatchItem;
 		}
 	}
 
-	public void OnMatchExecuted(CommandPaletteMatch match)
+	public void OnMatchExecuted(Match match)
 	{
 		string id = match.Command.Identifier;
 		_commandExecutionTime[id] = DateTime.Now.Ticks;

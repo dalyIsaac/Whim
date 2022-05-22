@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Whim.CommandPalette;
 
@@ -13,12 +14,12 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private IMonitor? _monitor;
 	public bool IsVisible => _monitor != null;
 
-	private ItemCollection _matches => ListViewItems.Items;
+	private readonly ObservableCollection<PaletteRow> _paletteRows = new();
 
 	/// <summary>
 	/// The current commands from which <see cref="Matches"/> is derived.
 	/// </summary>
-	private readonly List<CommandPaletteMatch> _allCommands = new();
+	private readonly List<Match> _allCommands = new();
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
@@ -27,6 +28,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
 
 		Title = CommandPaletteConfig.Title;
+		ListViewItems.ItemsSource = _paletteRows;
 	}
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
@@ -38,7 +40,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		{
 			if (command.CanExecute())
 			{
-				_allCommands.Add(new CommandPaletteMatch(command, keybind));
+				_allCommands.Add(new Match(command, keybind));
 			}
 		}
 
@@ -93,17 +95,17 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 	}
 
-	private void TextEntry_KeyDown(object _sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+	private void TextEntry_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 	{
 		Logger.Debug("Command palette key down: {0}", e.Key.ToString());
 		int selectedIndex = ListViewItems.SelectedIndex;
 		switch (e.Key)
 		{
 			case Windows.System.VirtualKey.Down:
-				ListViewItems.SelectedIndex = (selectedIndex + 1) % _matches.Count;
+				ListViewItems.SelectedIndex = (selectedIndex + 1) % _paletteRows.Count;
 				break;
 			case Windows.System.VirtualKey.Up:
-				ListViewItems.SelectedIndex = (selectedIndex + _matches.Count - 1) % _matches.Count;
+				ListViewItems.SelectedIndex = (selectedIndex + _paletteRows.Count - 1) % _paletteRows.Count;
 				break;
 			case Windows.System.VirtualKey.Enter:
 				ExecuteCommand();
@@ -127,29 +129,29 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		foreach (CommandPaletteMatch match in _plugin.Config.Matcher.Match(query, _allCommands))
+		foreach (PaletteItem item in _plugin.Config.Matcher.Match(query, _allCommands))
 		{
-			if (idx < _matches.Count)
+			if (idx < _paletteRows.Count)
 			{
-				_matches[idx] = new PaletteItem(match);
+				_paletteRows[idx].Update(item);
 			}
 			else
 			{
-				_matches.Add(new PaletteItem(match));
+				_paletteRows.Add(new PaletteRow(item));
 			}
 			idx++;
 		}
 
-		// If there are more matches than we have space for, remove the last ones.
-		int count = _matches.Count;
+		// If there are more items than we have space for, remove the last ones.
+		int count = _paletteRows.Count;
 		for (; idx < count; idx++)
 		{
-			_matches.RemoveAt(_matches.Count - 1);
+			_paletteRows.RemoveAt(_paletteRows.Count - 1);
 		}
 
-		Logger.Debug($"Command palette match count: {_matches.Count}");
+		Logger.Debug($"Command palette match count: {_paletteRows.Count}");
 
-		ListViewItems.SelectedIndex = _matches.Count > 0 ? 0 : -1;
+		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
 	}
 
 	private void CommandListItems_ItemClick(object sender, ItemClickEventArgs e)
@@ -167,13 +169,10 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			Hide();
 		}
 
-		if (_matches[ListViewItems.SelectedIndex] is PaletteItem item)
-		{
-			CommandPaletteMatch match = item.Match;
+		Match match = _paletteRows[ListViewItems.SelectedIndex].Model.Match;
 
-			match.Command.TryExecute();
-			_plugin.Config.Matcher.OnMatchExecuted(match);
-			Hide();
-		}
+		match.Command.TryExecute();
+		_plugin.Config.Matcher.OnMatchExecuted(match);
+		Hide();
 	}
 }

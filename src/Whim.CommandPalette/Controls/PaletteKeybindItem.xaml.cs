@@ -8,7 +8,7 @@ public sealed partial class PaletteKeybindItem : UserControl
 
 	public PaletteKeybindItem(string key)
 	{
-		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteItems/PaletteKeybindItem");
+		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Controls/PaletteKeybindItem");
 		KeybindItem = key;
 	}
 }
