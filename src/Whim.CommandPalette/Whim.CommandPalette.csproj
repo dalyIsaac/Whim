@@ -41,12 +41,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="Controls\CommandListItem.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Page Update="CommandPaletteWindow.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>

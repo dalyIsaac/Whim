@@ -55,7 +55,8 @@ public sealed partial class PaletteRow : UserControl
 			}
 		}
 
-		for (; idx < inlines.Count; idx++)
+		int inlinesCount = inlines.Count;
+		for (; idx < inlinesCount; idx++)
 		{
 			inlines.RemoveAt(inlines.Count - 1);
 		}
@@ -63,17 +64,6 @@ public sealed partial class PaletteRow : UserControl
 
 	private void SetKeybinds()
 	{
-		//for (int i = 0; i < Model.Match.AllKeys.Count; i++)
-		//{
-		//	string key = Model.Match.AllKeys[i];
-		//	CommandKeybind.Items.Add(new PaletteKeybindItem(key));
-
-		//	if (i != Model.Match.AllKeys.Count - 1)
-		//	{
-		//		CommandKeybind.Items.Add(new TextBlock() { Text = "+" });
-		//	}
-		//}
-
 		InlineCollection inlines = CommandKeybind.Inlines;
 
 		for (int i = 0; i < Model.Match.AllKeys.Count; i++)
