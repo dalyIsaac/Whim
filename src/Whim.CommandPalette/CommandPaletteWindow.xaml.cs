@@ -166,28 +166,25 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			Logger.Verbose($"Matched {item.Match.Command.Title}");
 			if (idx < _paletteRows.Count)
 			{
+				// Update the existing row.
 				_paletteRows[idx].Update(item);
 			}
 			else if (_unusedRows.Count > 0)
 			{
-				Logger.Verbose("Restoring unused row");
+				// Restoring the unused row.
 				PaletteRow row = _unusedRows[^1];
 				row.Update(item);
 
 				_paletteRows.Add(row);
 
 				_unusedRows.RemoveAt(_unusedRows.Count - 1);
-				Logger.Verbose("Unused row restored");
 			}
 			else
 			{
-				Logger.Verbose("1");
+				// Add a new row.
 				PaletteRow row = new(item);
-				Logger.Verbose("2");
 				_paletteRows.Add(row);
-				Logger.Verbose("3");
 				row.Initialize();
-				Logger.Verbose("4");
 			}
 			idx++;
 
@@ -202,7 +199,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			_paletteRows.RemoveAt(_paletteRows.Count - 1);
 		}
 
-		Logger.Debug($"Command palette match count: {_paletteRows.Count}");
+		Logger.Verbose($"Command palette match count: {_paletteRows.Count}");
 
 		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
 	}

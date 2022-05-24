@@ -17,15 +17,13 @@ public sealed partial class PaletteRow : UserControl
 
 	public void Initialize()
 	{
-		Logger.Verbose("a");
 		SetTitle();
-		Logger.Verbose("b");
 		SetKeybinds();
-		Logger.Verbose("c");
 	}
 
 	public void Update(PaletteItem item)
 	{
+		Logger.Debug("Updating with a new item");
 		Model = item;
 		SetTitle();
 	}
