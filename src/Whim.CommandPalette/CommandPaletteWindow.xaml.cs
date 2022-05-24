@@ -15,6 +15,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	public bool IsVisible => _monitor != null;
 
 	private readonly ObservableCollection<PaletteRow> _paletteRows = new();
+	private readonly List<PaletteRow> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which <see cref="Matches"/> is derived.
@@ -104,7 +105,6 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_window.FocusForceForeground();
 	}
 
-
 	public void Hide()
 	{
 		Logger.Debug("Hiding command palette");
@@ -168,6 +168,17 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			{
 				_paletteRows[idx].Update(item);
 			}
+			else if (_unusedRows.Count > 0)
+			{
+				Logger.Verbose("Restoring unused row");
+				PaletteRow row = _unusedRows[^1];
+				row.Update(item);
+
+				_paletteRows.Add(row);
+
+				_unusedRows.RemoveAt(_unusedRows.Count - 1);
+				Logger.Verbose("Unused row restored");
+			}
 			else
 			{
 				Logger.Verbose("1");
@@ -187,6 +198,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		int count = _paletteRows.Count;
 		for (; idx < count; idx++)
 		{
+			_unusedRows.Add(_paletteRows[^1]);
 			_paletteRows.RemoveAt(_paletteRows.Count - 1);
 		}
 

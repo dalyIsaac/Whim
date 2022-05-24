@@ -55,7 +55,7 @@ public sealed partial class PaletteRow : UserControl
 			}
 		}
 
-		for (; idx < segments.Count; idx++)
+		for (; idx < inlines.Count; idx++)
 		{
 			inlines.RemoveAt(inlines.Count - 1);
 		}
