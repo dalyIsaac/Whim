@@ -29,30 +29,61 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		Title = CommandPaletteConfig.Title;
 		ListViewItems.ItemsSource = _paletteRows;
+
+		// Populate the commands to reduce the first render time.
+		Populate();
+		UpdateMatches();
+	}
+
+	/// <summary>
+	/// Populate <see cref="_allCommands"/> with all the current commands.
+	/// </summary>
+	private void Populate(IEnumerable<(ICommand, IKeybind?)>? items = null)
+	{
+		Logger.Debug($"Populating the current list of all commands.");
+		int idx = 0;
+		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
+		{
+			if (!command.CanExecute())
+			{
+				continue;
+			}
+
+			if (idx < _allCommands.Count)
+			{
+				if (_allCommands[idx].Command != command)
+				{
+					_allCommands[idx] = new Match(command, keybind);
+				}
+			}
+			else
+			{
+				_allCommands.Add(new Match(command, keybind));
+			}
+
+			idx++;
+		}
+
+		for (; idx < _allCommands.Count; idx++)
+		{
+			_allCommands.RemoveAt(_allCommands.Count - 1);
+		}
 	}
 
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating command palette");
-		TextEntry.Text = "";
-		_allCommands.Clear();
-		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
-		{
-			if (command.CanExecute())
-			{
-				_allCommands.Add(new Match(command, keybind));
-			}
-		}
-
-		UpdateMatches();
 
 		monitor ??= _configContext.MonitorManager.FocusedMonitor;
 		if (monitor == _monitor)
 		{
 			return;
 		}
-
 		_monitor = monitor;
+		TextEntry.Text = "";
+
+		Populate(items);
+		UpdateMatches();
 
 		int width = 800;
 		int height = 800;
@@ -64,7 +95,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			height: height
 		);
 
-		Activate();
+		base.Activate();
 		TextEntry.Focus(FocusState.Programmatic);
 		Win32Helper.SetWindowPos(
 			new WindowLocation(_window, windowLocation, WindowState.Normal),
@@ -72,6 +103,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		);
 		_window.FocusForceForeground();
 	}
+
 
 	public void Hide()
 	{
@@ -131,15 +163,24 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		foreach (PaletteItem item in _plugin.Config.Matcher.Match(query, _allCommands))
 		{
+			Logger.Verbose($"Matched {item.Match.Command.Title}");
 			if (idx < _paletteRows.Count)
 			{
 				_paletteRows[idx].Update(item);
 			}
 			else
 			{
-				_paletteRows.Add(new PaletteRow(item));
+				Logger.Verbose("1");
+				PaletteRow row = new(item);
+				Logger.Verbose("2");
+				_paletteRows.Add(row);
+				Logger.Verbose("3");
+				row.Initialize();
+				Logger.Verbose("4");
 			}
 			idx++;
+
+			Logger.Verbose($"Finished updating {item.Match.Command.Title}");
 		}
 
 		// If there are more items than we have space for, remove the last ones.

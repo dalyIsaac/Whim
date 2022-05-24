@@ -13,14 +13,44 @@
 			<ColumnDefinition Width="200" />
 		</Grid.ColumnDefinitions>
 
+		<Grid.Resources>
+			<ResourceDictionary>
+				<ResourceDictionary.ThemeDictionaries>
+					<ResourceDictionary x:Key="Dark">
+						<Style x:Key="KeybindBorderStyle" TargetType="Border">
+							<Setter Property="BorderThickness" Value="1" />
+							<Setter Property="CornerRadius" Value="2" />
+							<Setter Property="Background" Value="Transparent" />
+							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+						</Style>
+						<Style x:Key="KeyChordTextBlockStyle" TargetType="TextBlock">
+							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+						</Style>
+					</ResourceDictionary>
+
+					<ResourceDictionary x:Key="Light">
+						<Style x:Key="KeybindBorderStyle" TargetType="Border">
+							<Setter Property="BorderThickness" Value="1" />
+							<Setter Property="CornerRadius" Value="2" />
+							<Setter Property="Background" Value="Transparent" />
+							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+						</Style>
+						<Style x:Key="KeyChordTextBlockStyle" TargetType="TextBlock">
+							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+						</Style>
+					</ResourceDictionary>
+				</ResourceDictionary.ThemeDictionaries>
+			</ResourceDictionary>
+		</Grid.Resources>
+
 		<TextBlock x:Name="CommandTitle" />
 
-		<ItemsControl x:Name="CommandKeybind" Grid.Column="1">
-			<ItemsControl.ItemsPanel>
-				<ItemsPanelTemplate>
-					<StackPanel Orientation="Horizontal" />
-				</ItemsPanelTemplate>
-			</ItemsControl.ItemsPanel>
-		</ItemsControl>
+		<Border
+			Padding="2,0,2,0"
+			HorizontalAlignment="Right"
+			VerticalAlignment="Center"
+			Style="{ThemeResource KeybindBorderStyle}">
+			<TextBlock x:Name="CommandKeybind" Grid.Column="1" />
+		</Border>
 	</Grid>
 </UserControl>

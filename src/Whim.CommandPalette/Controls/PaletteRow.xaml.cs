@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Text;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using System.Collections.Generic;
 
@@ -12,9 +13,15 @@ public sealed partial class PaletteRow : UserControl
 	{
 		Model = item;
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Controls/PaletteRow");
+	}
 
+	public void Initialize()
+	{
+		Logger.Verbose("a");
 		SetTitle();
+		Logger.Verbose("b");
 		SetKeybinds();
+		Logger.Verbose("c");
 	}
 
 	public void Update(PaletteItem item)
@@ -39,7 +46,7 @@ public sealed partial class PaletteRow : UserControl
 				// Only update the run if it's different.
 				if (run != inlines[idx])
 				{
-					inlines[idx] = seg.ToRun();
+					inlines[idx] = run;
 				}
 			}
 			else
@@ -56,14 +63,27 @@ public sealed partial class PaletteRow : UserControl
 
 	private void SetKeybinds()
 	{
+		//for (int i = 0; i < Model.Match.AllKeys.Count; i++)
+		//{
+		//	string key = Model.Match.AllKeys[i];
+		//	CommandKeybind.Items.Add(new PaletteKeybindItem(key));
+
+		//	if (i != Model.Match.AllKeys.Count - 1)
+		//	{
+		//		CommandKeybind.Items.Add(new TextBlock() { Text = "+" });
+		//	}
+		//}
+
+		InlineCollection inlines = CommandKeybind.Inlines;
+
 		for (int i = 0; i < Model.Match.AllKeys.Count; i++)
 		{
 			string key = Model.Match.AllKeys[i];
-			CommandKeybind.Items.Add(new PaletteKeybindItem(key));
+			inlines.Add(new Run() { Text = key, FontWeight = FontWeights.Bold });
 
 			if (i != Model.Match.AllKeys.Count - 1)
 			{
-				CommandKeybind.Items.Add(new TextBlock() { Text = "+" });
+				inlines.Add(new Run() { Text = " + " });
 			}
 		}
 	}
