@@ -47,16 +47,6 @@ public static class KeyModifiersExtensions
 			parts.Add("RCtrl");
 		}
 
-		if (modifiers.HasFlag(KeyModifiers.LAlt))
-		{
-			parts.Add("LAlt");
-		}
-
-		if (modifiers.HasFlag(KeyModifiers.RAlt))
-		{
-			parts.Add("RAlt");
-		}
-
 		if (modifiers.HasFlag(KeyModifiers.LShift))
 		{
 			parts.Add("LShift");
@@ -65,6 +55,16 @@ public static class KeyModifiersExtensions
 		if (modifiers.HasFlag(KeyModifiers.RShift))
 		{
 			parts.Add("RShift");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.LAlt))
+		{
+			parts.Add("LAlt");
+		}
+
+		if (modifiers.HasFlag(KeyModifiers.RAlt))
+		{
+			parts.Add("RAlt");
 		}
 
 		return parts;
