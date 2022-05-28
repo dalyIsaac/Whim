@@ -11,7 +11,7 @@ public sealed partial class PaletteRow : UserControl
 	public PaletteRow(PaletteItem item)
 	{
 		Model = item;
-		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Controls/PaletteRow");
+		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");
 	}
 
 	public void Initialize()
