@@ -91,7 +91,7 @@ public static class Win32Helper
 	/// <param name="lpfnWinEventProc"></param>
 	/// <returns></returns>
 	public static UnhookWinEventSafeHandle SetWindowsEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc)
-		=> PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
+	=> PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
 
 	/// <summary>
 	/// Safe wrapper around <see cref="PInvoke.GetClassName"/>.

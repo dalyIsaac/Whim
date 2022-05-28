@@ -41,6 +41,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		Title = "Whim Bar";
 		Win32Helper.HideCaptionButtons(_windowLocation.Window.Handle);
 		Win32Helper.SetWindowCorners(_windowLocation.Window.Handle);
+		this.SetIsShownInSwitchers(false);
 
 		// Set up the bar.
 		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c(_configContext, _monitor, this)));
