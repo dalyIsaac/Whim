@@ -26,7 +26,7 @@ public class Match
 	public ICommand Command { get; }
 	public ReadOnlyCollection<string> AllKeys { get; }
 
-	public Match(ICommand command, IKeybind? keybind)
+	public Match(ICommand command, IKeybind? keybind = null)
 	{
 		Command = command;
 

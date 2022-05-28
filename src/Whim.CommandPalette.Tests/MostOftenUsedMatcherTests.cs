@@ -51,6 +51,7 @@ public class MostOftenUsedMatcherTests
 		CreateMatch("grault", 7);
 		CreateMatch("garply", 8);
 		CreateMatch("waldo", 9);
+		CreateMatch("uxui", 10);
 	}
 
 	[Fact]
@@ -69,6 +70,7 @@ public class MostOftenUsedMatcherTests
 			new("baz", CreateHighlightedText(new HighlightedTextSegment("baz", false))),
 			new("bar", CreateHighlightedText(new HighlightedTextSegment("bar", false))),
 			new("foo", CreateHighlightedText(new HighlightedTextSegment("foo", false))),
+			new("uxui", CreateHighlightedText(new HighlightedTextSegment("uxui", false))),
 		};
 
 		matches.Select(m => (m.Match.Command.Identifier, m.Title.Segments)).Should().BeEquivalentTo(expectedItems);
@@ -81,6 +83,7 @@ public class MostOftenUsedMatcherTests
 
 		List<(string MatchCommand, IList<HighlightedTextSegment> Title)> expectedItems = new()
 		{
+			("uxui", CreateHighlightedText(new HighlightedTextSegment("ux", true), new HighlightedTextSegment("ui", false))),
 			("quux", CreateHighlightedText(new HighlightedTextSegment("qu", false), new HighlightedTextSegment("ux", true))),
 			("qux", CreateHighlightedText(new HighlightedTextSegment("q", false), new HighlightedTextSegment("ux", true))),
 		};

@@ -48,6 +48,7 @@ public class MostRecentlyUsedMatcherTests
 		CreateMatch("grault");
 		CreateMatch("garply");
 		CreateMatch("waldo");
+		CreateMatch("uxui");
 	}
 
 	[Fact]
@@ -57,6 +58,7 @@ public class MostRecentlyUsedMatcherTests
 
 		List<(string MatchCommand, IList<HighlightedTextSegment> Title)> expectedItems = new()
 		{
+			new("uxui", CreateHighlightedText(new HighlightedTextSegment("uxui", false))),
 			new("waldo", CreateHighlightedText(new HighlightedTextSegment("waldo", false))),
 			new("garply", CreateHighlightedText(new HighlightedTextSegment("garply", false))),
 			new("grault", CreateHighlightedText(new HighlightedTextSegment("grault", false))),
@@ -78,6 +80,7 @@ public class MostRecentlyUsedMatcherTests
 
 		List<(string MatchCommand, IList<HighlightedTextSegment> Title)> expectedItems = new()
 		{
+			("uxui", CreateHighlightedText(new HighlightedTextSegment("ux", true), new HighlightedTextSegment("ui", false))),
 			("quux", CreateHighlightedText(new HighlightedTextSegment("qu", false), new HighlightedTextSegment("ux", true))),
 			("qux", CreateHighlightedText(new HighlightedTextSegment("q", false), new HighlightedTextSegment("ux", true))),
 		};
