@@ -13,6 +13,7 @@
 			<ColumnDefinition Width="200" />
 		</Grid.ColumnDefinitions>
 
+		<!--  Dark and light mode theming  -->
 		<Grid.Resources>
 			<ResourceDictionary>
 				<ResourceDictionary.ThemeDictionaries>
@@ -43,6 +44,7 @@
 			</ResourceDictionary>
 		</Grid.Resources>
 
+		<!--  The row's controls  -->
 		<TextBlock x:Name="CommandTitle" />
 
 		<Border

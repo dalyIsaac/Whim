@@ -56,7 +56,10 @@ public static class WindowExtensions
 	/// <param name="componentPath"></param>
 	/// <param name="configContext"></param>
 	/// <returns></returns>
-	/// <exception cref="InitializeWindowException"></exception>
+	/// <exception cref="InitializeWindowException">
+	/// When an <see cref="IWindow"/> cannot be created from the handle of the given
+	/// <paramref name="uiWindow"/>.
+	/// </exception>
 	public static IWindow InitializeBorderlessWindow(
 		this Microsoft.UI.Xaml.Window uiWindow,
 		string componentNamespace,

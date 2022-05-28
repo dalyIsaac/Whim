@@ -1,5 +1,4 @@
 ﻿using Microsoft.UI.Xaml;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 

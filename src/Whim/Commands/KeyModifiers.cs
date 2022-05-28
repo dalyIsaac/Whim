@@ -23,6 +23,12 @@ public enum KeyModifiers
 
 public static class KeyModifiersExtensions
 {
+	/// <summary>
+	/// Get an <see cref="IEnumerable{string}"/> of <see cref="KeyModifiers"/> names, ordered
+	/// by how keybindings are normally shown.
+	/// </summary>
+	/// <param name="modifiers"></param>
+	/// <returns></returns>
 	public static IEnumerable<string> GetParts(this KeyModifiers modifiers)
 	{
 		List<string> parts = new();

@@ -71,6 +71,15 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 	}
 
+	/// <summary>
+	/// Activate the command palette.
+	/// </summary>
+	/// <param name="items">
+	/// The items to activate the command palette with.
+	/// These items will be passed to the <see cref="ICommandPaletteMatcher"/> to determine the matches.
+	/// For example, when the query is empty, typically all items will be matched and be displayed.
+	/// </param>
+	/// <param name="monitor">The monitor to display the command palette on.</param>
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating command palette");
@@ -105,6 +114,9 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_window.FocusForceForeground();
 	}
 
+	/// <summary>
+	/// Hide the command palette. Wipe the query text and clear the matches.
+	/// </summary>
 	public void Hide()
 	{
 		Logger.Debug("Hiding command palette");
@@ -114,6 +126,9 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_allCommands.Clear();
 	}
 
+	/// <summary>
+	/// Toggle the visibility of the command palette.
+	/// </summary>
 	public void Toggle()
 	{
 		Logger.Debug("Toggling command palette");
@@ -127,6 +142,11 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 	}
 
+	/// <summary>
+	/// Handler for when the user presses down a key.
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
 	private void TextEntry_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 	{
 		Logger.Debug("Command palette key down: {0}", e.Key.ToString());
@@ -134,16 +154,21 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		switch (e.Key)
 		{
 			case Windows.System.VirtualKey.Down:
+				// Go down the command palette's list.
 				ListViewItems.SelectedIndex = (selectedIndex + 1) % _paletteRows.Count;
 				ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
 				break;
+
 			case Windows.System.VirtualKey.Up:
+				// Go up the command palette's list.
 				ListViewItems.SelectedIndex = (selectedIndex + _paletteRows.Count - 1) % _paletteRows.Count;
 				ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
 				break;
+
 			case Windows.System.VirtualKey.Enter:
 				ExecuteCommand();
 				break;
+
 			case Windows.System.VirtualKey.Escape:
 				Hide();
 				break;
@@ -157,6 +182,11 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		UpdateMatches();
 	}
 
+	/// <summary>
+	/// Update the matches shown to the user.
+	/// Effort has been made to reduce the amount of time spent executing this method.
+	/// It can likely be improved (help is welcomed).
+	/// </summary>
 	private void UpdateMatches()
 	{
 		Logger.Debug("Updating command palette matches");

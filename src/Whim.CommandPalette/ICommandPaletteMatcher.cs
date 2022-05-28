@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
+/// <summary>
+/// A matcher is used by the command palette to find commands that match a given input.
+/// </summary>
 public interface ICommandPaletteMatcher
 {
 	/// <summary>

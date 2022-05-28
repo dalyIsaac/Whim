@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
+/// <summary>
+/// A palette row is a single command title, and an optional associated keybind.
+/// </summary>
 public sealed partial class PaletteRow : UserControl
 {
 	public PaletteItem Model { get; private set; }
@@ -27,6 +30,10 @@ public sealed partial class PaletteRow : UserControl
 		SetTitle();
 	}
 
+	/// <summary>
+	/// Update the title based on the model's title segments.
+	/// Efforts have been made to reduce the amount of time spent in this method.
+	/// </summary>
 	private void SetTitle()
 	{
 		Logger.Debug("Setting title");
@@ -49,10 +56,12 @@ public sealed partial class PaletteRow : UserControl
 			}
 			else
 			{
+				// Add the run, because there's no space.
 				inlines.Add(run);
 			}
 		}
 
+		// Remove excess runs.
 		int inlinesCount = inlines.Count;
 		for (; idx < inlinesCount; idx++)
 		{

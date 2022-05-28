@@ -27,11 +27,18 @@ public class MostOftenUsedMatcher : ICommandPaletteMatcher
 				continue;
 			}
 
+			// Add the match to the list of matches, and highlight the matching text.
 			HighlightedText highlightedTitle = new();
 			string title = match.Command.Title;
 
-			if (query.Length != 0)
+			// If the query is empty, add the entire title as a single segment.
+			if (query.Length == 0)
 			{
+				highlightedTitle.Segments.Add(new HighlightedTextSegment(title, false));
+			}
+			else
+			{
+				// Add the text from the start of the title to the start of the query.
 				if (startIdx != 0)
 				{
 					highlightedTitle.Segments.Add(
@@ -42,6 +49,7 @@ public class MostOftenUsedMatcher : ICommandPaletteMatcher
 					);
 				}
 
+				// Add the highlighted query text.
 				highlightedTitle.Segments.Add(
 					new HighlightedTextSegment(
 						title.Substring(startIdx, query.Length),
@@ -49,6 +57,7 @@ public class MostOftenUsedMatcher : ICommandPaletteMatcher
 					)
 				);
 
+				// Add the text from the end of the query to the end of the title.
 				if (startIdx + query.Length != title.Length)
 				{
 					highlightedTitle.Segments.Add(
@@ -58,10 +67,6 @@ public class MostOftenUsedMatcher : ICommandPaletteMatcher
 						)
 					);
 				}
-			}
-			else
-			{
-				highlightedTitle.Segments.Add(new HighlightedTextSegment(title, false));
 			}
 
 			// Get the number of times the command has been executed.

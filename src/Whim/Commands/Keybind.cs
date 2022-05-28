@@ -15,6 +15,9 @@ public class Keybind : IKeybind
 	/// </summary>
 	public ReadOnlyCollection<string> AllKeys { get; }
 
+	/// <summary>
+	/// Saved representation of the keybind as a string.
+	/// </summary>
 	private readonly string _allKeysStr;
 
 	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key)

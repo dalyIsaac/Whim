@@ -25,6 +25,10 @@ public class CommandPalettePlugin : IPlugin
 		_commandPaletteWindow = new CommandPaletteWindow(_configContext, this);
 	}
 
+	/// <summary>
+	/// Activate the command palette window.
+	/// </summary>
+	/// <param name="items"></param>
 	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null)
 	{
 		_commandPaletteWindow?.Activate(
@@ -33,11 +37,17 @@ public class CommandPalettePlugin : IPlugin
 		);
 	}
 
+	/// <summary>
+	/// Hide the command palette.
+	/// </summary>
 	public void Hide()
 	{
 		_commandPaletteWindow?.Hide();
 	}
 
+	/// <summary>
+	/// Toggle the visibility of the command palette.
+	/// </summary>
 	public void Toggle()
 	{
 		_commandPaletteWindow?.Toggle();
