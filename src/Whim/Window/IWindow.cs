@@ -63,6 +63,11 @@ public interface IWindow
 	public void Focus();
 
 	/// <summary>
+	/// Forces the window to the foreground and to be focused.
+	/// </summary>
+	public void FocusForceForeground();
+
+	/// <summary>
 	/// Hides this window.
 	/// </summary>
 	public void Hide();
