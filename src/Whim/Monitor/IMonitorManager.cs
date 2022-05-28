@@ -6,7 +6,7 @@ namespace Whim;
 /// <summary>
 /// The manager for <see cref="IMonitor"/>s.
 /// </summary>
-public interface IMonitorManager : IEnumerable<IMonitor>, ICommandable, IDisposable
+public interface IMonitorManager : IEnumerable<IMonitor>, IDisposable
 {
 	/// <summary>
 	/// The number of <see cref="IMonitor"/>s contained by <see cref="IMonitorManager"/>.

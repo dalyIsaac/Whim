@@ -71,6 +71,13 @@ public class Window : IWindow
 		_configContext.WindowManager.TriggerWindowFocused(new WindowEventArgs(this));
 	}
 
+	public void FocusForceForeground()
+	{
+		Logger.Debug(ToString());
+		PInvoke.SetForegroundWindow(Handle);
+		_configContext.WindowManager.TriggerWindowFocused(new WindowEventArgs(this));
+	}
+
 	public void Hide()
 	{
 		Logger.Debug(ToString());

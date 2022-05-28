@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// The manager for <see cref="IWindow"/>s.
 /// </summary>
-public interface IWindowManager : ICommandable, IDisposable
+public interface IWindowManager : IDisposable
 {
 	/// <summary>
 	/// Initialize the windows event hooks.

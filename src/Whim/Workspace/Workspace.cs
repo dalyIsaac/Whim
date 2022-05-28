@@ -51,8 +51,6 @@ public class Workspace : IWorkspace
 	/// </summary>
 	private readonly Dictionary<IWindow, IWindowLocation> _windowLocations = new();
 
-	public Commander Commander { get; } = new();
-
 	public void DoLayout()
 	{
 		Logger.Debug($"Workspace {Name}");

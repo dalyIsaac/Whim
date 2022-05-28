@@ -1,6 +1,4 @@
-﻿using Windows.Win32.Foundation;
-
-namespace Whim.FocusIndicator;
+﻿namespace Whim.FocusIndicator;
 
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
@@ -13,21 +11,9 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 	public FocusIndicatorWindow(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
 	{
 		FocusIndicatorConfig = focusIndicatorConfig;
-		UIElementExtensions.InitializeComponent(this, "Whim.FocusIndicator", "FocusIndicatorWindow");
+		_window = this.InitializeBorderlessWindow("Whim.FocusIndicator", "FocusIndicatorWindow", configContext);
 
 		Title = FocusIndicatorConfig.Title;
-
-		HWND hwnd = new(WinRT.Interop.WindowNative.GetWindowHandle(this));
-		IWindow? window = Window.CreateWindow(this.GetHandle(), configContext);
-		if (window == null)
-		{
-			throw new FocusIndicatorException("Window was unexpectedly null");
-		}
-		_window = window;
-
-		Win32Helper.HideCaptionButtons(hwnd);
-		Win32Helper.SetWindowCorners(hwnd);
-		this.SetIsShownInSwitchers(false);
 	}
 
 	/// <summary>

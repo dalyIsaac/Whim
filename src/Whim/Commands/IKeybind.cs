@@ -2,13 +2,11 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
+/// <summary>
+/// A keybinding. This should be hashable.
+/// </summary>
 public interface IKeybind
 {
-	/// <summary>
-	/// Optional name of the keybind.
-	/// </summary>
-	public string? Name { get; }
-
 	/// <summary>
 	/// Modifiers like Alt, Ctrl, and Win.
 	/// </summary>

@@ -47,4 +47,38 @@ public static class WindowExtensions
 	{
 		window.GetAppWindow().IsShownInSwitchers = show;
 	}
+
+	/// <summary>
+	/// Initializes the given <paramref name="uiWindow"/> as a borderless window.
+	/// </summary>
+	/// <param name="uiWindow"></param>
+	/// <param name="componentNamespace"></param>
+	/// <param name="componentPath"></param>
+	/// <param name="configContext"></param>
+	/// <returns></returns>
+	/// <exception cref="InitializeWindowException">
+	/// When an <see cref="IWindow"/> cannot be created from the handle of the given
+	/// <paramref name="uiWindow"/>.
+	/// </exception>
+	public static IWindow InitializeBorderlessWindow(
+		this Microsoft.UI.Xaml.Window uiWindow,
+		string componentNamespace,
+		string componentPath,
+		IConfigContext configContext
+	)
+	{
+		UIElementExtensions.InitializeComponent(uiWindow, componentNamespace, componentPath);
+
+		HWND hwnd = new(WinRT.Interop.WindowNative.GetWindowHandle(uiWindow));
+		IWindow? window = Window.CreateWindow(GetHandle(uiWindow), configContext);
+		if (window == null)
+		{
+			throw new InitializeWindowException("Window was unexpectedly null");
+		}
+
+		Win32Helper.HideCaptionButtons(hwnd);
+		Win32Helper.SetWindowCorners(hwnd);
+
+		return window;
+	}
 }

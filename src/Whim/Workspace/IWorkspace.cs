@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Workspaces contain windows to be organized by layout engines.
 /// </summary>
-public interface IWorkspace : ICommandable
+public interface IWorkspace
 {
 	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the

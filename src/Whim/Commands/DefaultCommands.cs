@@ -1,0 +1,116 @@
+using System;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
+
+namespace Whim;
+
+public static class DefaultCommands
+{
+	public const KeyModifiers WinAlt = KeyModifiers.LWin | KeyModifiers.LAlt;
+	public const KeyModifiers WinShift = KeyModifiers.LWin | KeyModifiers.LShift;
+	public const KeyModifiers WinCtrl = KeyModifiers.LWin | KeyModifiers.LControl;
+
+	public static (ICommand, IKeybind?)[] GetCommands(IConfigContext configContext) => new (ICommand, IKeybind?)[]
+	{
+		// Focus window in direction.
+		(
+			new Command(
+				identifier: "default_commands.focus_window_in_direction.left",
+				title: "Focus the window in the left direction",
+				callback: FocusWindowInDirection(configContext, Direction.Left)
+			),
+			new Keybind(WinAlt, VIRTUAL_KEY.VK_LEFT)
+		),
+		(
+			new Command(
+				identifier: "default_commands.focus_window_in_direction.right",
+				title: "Focus the window in the right direction",
+				callback: FocusWindowInDirection(configContext, Direction.Right)
+			),
+			new Keybind(WinAlt, VIRTUAL_KEY.VK_RIGHT)
+		),
+		(
+			new Command(
+				identifier: "default_commands.focus_window_in_direction.up",
+				title: "Focus the window in the up direction",
+				callback: FocusWindowInDirection(configContext, Direction.Up)
+			),
+			new Keybind(WinAlt, VIRTUAL_KEY.VK_UP)
+		),
+		(
+			new Command(
+				identifier: "default_commands.focus_window_in_direction.down",
+				title: "Focus the window in the down direction",
+				callback: FocusWindowInDirection(configContext, Direction.Down)
+			),
+			new Keybind(WinAlt, VIRTUAL_KEY.VK_DOWN)
+		),
+
+		// Swap windows in direction.
+		(
+			new Command(
+				identifier: "default_commands.swap_window_in_direction.left",
+				title: "Swap the window with the window to the left",
+				callback: SwapWindowInDirection(configContext, Direction.Left)
+			),
+			new Keybind(WinCtrl, VIRTUAL_KEY.VK_LEFT)
+		),
+		(
+			new Command(
+				identifier: "default_commands.swap_window_in_direction.right",
+				title: "Swap the window with the window to the right",
+				callback: SwapWindowInDirection(configContext, Direction.Right)
+			),
+			new Keybind(WinCtrl, VIRTUAL_KEY.VK_RIGHT)
+		),
+		(
+			new Command(
+				identifier: "default_commands.swap_window_in_direction.up",
+				title: "Swap the window with the window to the up",
+				callback: SwapWindowInDirection(configContext, Direction.Up)
+			),
+			new Keybind(WinCtrl, VIRTUAL_KEY.VK_UP)
+		),
+		(
+			new Command(
+				identifier: "default_commands.swap_window_in_direction.down",
+				title: "Swap the window with the window to the down",
+				callback: SwapWindowInDirection(configContext, Direction.Down)
+			),
+			new Keybind(WinCtrl, VIRTUAL_KEY.VK_DOWN)
+		),
+
+		// Move window to monitor.
+		(
+			new Command(
+				identifier: "default_commands.move_window_to_monitor.previous",
+				title: "Move the window to the previous monitor",
+				callback: () => configContext.WorkspaceManager.MoveWindowToPreviousMonitor()
+			),
+			new Keybind(WinShift, VIRTUAL_KEY.VK_LEFT)
+		),
+		(
+			new Command(
+				identifier: "default_commands.move_window_to_monitor.next",
+				title: "Move the window to the next monitor",
+				callback: () => configContext.WorkspaceManager.MoveWindowToNextMonitor()
+			),
+			new Keybind(WinShift, VIRTUAL_KEY.VK_RIGHT)
+		),
+	};
+
+	public static Action FocusWindowInDirection(IConfigContext configContext, Direction direction) => () =>
+	{
+		IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+		if (workspace.LastFocusedWindow == null)
+		{
+			return;
+		}
+
+		workspace.ActiveLayoutEngine.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
+	};
+
+	public static Action SwapWindowInDirection(IConfigContext configContext, Direction direction) => () =>
+	{
+		configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
+	};
+}
