@@ -86,8 +86,8 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		Populate(items);
 		UpdateMatches();
 
-		int width = 800;
-		int height = 800;
+		int width = 680;
+		int height = 680;
 
 		ILocation<int> windowLocation = new Location(
 			x: monitor.X + (monitor.Width / 2) - (width / 2),
@@ -135,9 +135,11 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		{
 			case Windows.System.VirtualKey.Down:
 				ListViewItems.SelectedIndex = (selectedIndex + 1) % _paletteRows.Count;
+				ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
 				break;
 			case Windows.System.VirtualKey.Up:
 				ListViewItems.SelectedIndex = (selectedIndex + _paletteRows.Count - 1) % _paletteRows.Count;
+				ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
 				break;
 			case Windows.System.VirtualKey.Enter:
 				ExecuteCommand();

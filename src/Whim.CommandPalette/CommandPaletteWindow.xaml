@@ -7,7 +7,12 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<StackPanel Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+	<Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
 		<TextBox
 			x:Name="TextEntry"
 			KeyDown="TextEntry_KeyDown"
@@ -17,9 +22,8 @@
 		<ListView
 			x:Name="ListViewItems"
 			Grid.Row="1"
-			MaxHeight="400"
 			IsTabStop="False"
 			ItemClick="CommandListItems_ItemClick"
 			SelectionMode="Single" />
-	</StackPanel>
+	</Grid>
 </Window>
