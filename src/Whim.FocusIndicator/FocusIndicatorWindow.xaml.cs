@@ -27,6 +27,7 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 
 		Win32Helper.HideCaptionButtons(hwnd);
 		Win32Helper.SetWindowCorners(hwnd);
+		this.SetIsShownInSwitchers(false);
 	}
 
 	/// <summary>
