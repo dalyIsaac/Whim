@@ -19,24 +19,24 @@
 				<ResourceDictionary.ThemeDictionaries>
 					<ResourceDictionary x:Key="Dark">
 						<Style x:Key="KeybindBorderStyle" TargetType="Border">
-							<Setter Property="BorderThickness" Value="1" />
-							<Setter Property="CornerRadius" Value="2" />
 							<Setter Property="Background" Value="Transparent" />
 							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="BorderThickness" Value="1" />
+							<Setter Property="CornerRadius" Value="2" />
 						</Style>
-						<Style x:Key="KeyChordTextBlockStyle" TargetType="TextBlock">
+						<Style x:Key="KeyBindTextBlockStyle" TargetType="TextBlock">
 							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
 
 					<ResourceDictionary x:Key="Light">
 						<Style x:Key="KeybindBorderStyle" TargetType="Border">
-							<Setter Property="BorderThickness" Value="1" />
-							<Setter Property="CornerRadius" Value="2" />
 							<Setter Property="Background" Value="Transparent" />
 							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="BorderThickness" Value="1" />
+							<Setter Property="CornerRadius" Value="2" />
 						</Style>
-						<Style x:Key="KeyChordTextBlockStyle" TargetType="TextBlock">
+						<Style x:Key="KeyBindTextBlockStyle" TargetType="TextBlock">
 							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
@@ -53,7 +53,7 @@
 			HorizontalAlignment="Right"
 			VerticalAlignment="Center"
 			Style="{ThemeResource KeybindBorderStyle}">
-			<TextBlock x:Name="CommandKeybind" />
+			<TextBlock x:Name="CommandKeybind" Style="{ThemeResource KeyBindTextBlockStyle}" />
 		</Border>
 	</Grid>
 </UserControl>
