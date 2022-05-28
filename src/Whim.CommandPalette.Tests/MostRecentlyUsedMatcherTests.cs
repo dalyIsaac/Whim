@@ -9,7 +9,6 @@ namespace Whim.CommandPalette.Tests;
 public class MostRecentlyUsedMatcherTests
 {
 	private readonly List<Match> _items = new();
-	private readonly Dictionary<string, uint> _commandExecutionCounts = new();
 
 	private readonly MostRecentlyUsedMatcher _matcher = new();
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Text;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using System.Collections.Generic;
 
@@ -30,6 +29,7 @@ public sealed partial class PaletteRow : UserControl
 
 	private void SetTitle()
 	{
+		Logger.Debug("Setting title");
 		InlineCollection inlines = CommandTitle.Inlines;
 		IList<HighlightedTextSegment> segments = Model.Title.Segments;
 
@@ -62,17 +62,10 @@ public sealed partial class PaletteRow : UserControl
 
 	private void SetKeybinds()
 	{
-		InlineCollection inlines = CommandKeybind.Inlines;
-
-		for (int i = 0; i < Model.Match.AllKeys.Count; i++)
+		Logger.Debug("Setting keybinds");
+		if (Model.Match.Keys != null)
 		{
-			string key = Model.Match.AllKeys[i];
-			inlines.Add(new Run() { Text = key, FontWeight = FontWeights.Bold });
-
-			if (i != Model.Match.AllKeys.Count - 1)
-			{
-				inlines.Add(new Run() { Text = " + " });
-			}
+			CommandKeybind.Text = Model.Match.Keys;
 		}
 	}
 }

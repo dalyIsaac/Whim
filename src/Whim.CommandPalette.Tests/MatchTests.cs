@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Moq;
+﻿using Moq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;
 
@@ -12,14 +11,13 @@ public class MatchTests
 	{
 		Match match = new(new Mock<ICommand>().Object);
 
-		Assert.Empty(match.AllKeys);
+		Assert.Null(match.Keys);
 	}
 
 	[Fact]
 	public void Match_Keybind()
 	{
 		Match match = new(new Mock<ICommand>().Object, new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_A));
-
-		match.AllKeys.Should().BeEquivalentTo(new[] { "LWin", "A" });
+		Assert.Equal("LWin + A", match.Keys);
 	}
 }

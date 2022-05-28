@@ -24,24 +24,12 @@ public record HighlightedText
 public class Match
 {
 	public ICommand Command { get; }
-	public ReadOnlyCollection<string> AllKeys { get; }
+	public string? Keys { get; }
 
 	public Match(ICommand command, IKeybind? keybind = null)
 	{
 		Command = command;
-
-		switch (keybind)
-		{
-			case not null:
-			{
-				AllKeys = keybind is Keybind k ? k.AllKeys : new Keybind(keybind.Modifiers, keybind.Key).AllKeys;
-				break;
-			}
-
-			default:
-				AllKeys = new ReadOnlyCollection<string>(new List<string>());
-				break;
-		}
+		Keys = keybind?.ToString();
 	}
 
 	public override int GetHashCode() => Command.GetHashCode();
