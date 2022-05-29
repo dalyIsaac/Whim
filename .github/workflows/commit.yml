@@ -38,6 +38,9 @@ jobs:
           dotnet format style Whim.sln
       # END TODO
 
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
       - name: Build
         run: |
           msbuild Whim.sln /p:Configuration=$env:Configuration
