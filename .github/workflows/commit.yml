@@ -46,8 +46,6 @@ jobs:
 
       - name: Build
         run: |
-          echo $env:Configuration
-          echo $env:Platform
           msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform
         env:
           Configuration: ${{ matrix.configuration }}
