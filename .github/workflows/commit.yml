@@ -53,7 +53,7 @@ jobs:
 
       - name: Test
         run: |
-          dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
