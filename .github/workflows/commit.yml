@@ -24,13 +24,23 @@ jobs:
         env:
           Configuration: ${{ matrix.configuration }}
 
-      - name: Check formatting
+      # TODO: Replace commented code with the uncommented code once the 6.0.4 SDK has been released.
+      # - name: Check formatting
+      #   run: |
+      #     dotnet format Whim.sln --verify-no-changes --no-restore
+
+      - name: Check whitespace formatting
         run: |
-          dotnet format Whim.sln --verify-no-changes --no-restore
+          dotnet format whitespace Whim.sln
+
+      - name: Check style
+        run: |
+          dotnet format style Whim.sln
+      # END TODO
 
       - name: Build
         run: |
-          dotnet build Whim.sln --no-restore
+          msbuild Whim.sln /p:Configuration=$env:Configuration
 
       - name: Test
         run: |
