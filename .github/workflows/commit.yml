@@ -10,7 +10,10 @@ jobs:
   commit:
     strategy:
       matrix:
+        # configuration: [Debug, Release]
+        # platform: [x64, arm64]
         configuration: [Debug, Release]
+        platform: [x64]
 
     runs-on: windows-latest
 
@@ -43,7 +46,12 @@ jobs:
 
       - name: Build
         run: |
-          msbuild Whim.sln /p:Configuration=$env:Configuration
+          echo $env:Configuration
+          echo $env:Platform
+          msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
 
       - name: Test
         run: |
