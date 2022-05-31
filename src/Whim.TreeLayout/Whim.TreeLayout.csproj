@@ -1,14 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
-		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-		<RootNamespace>Whim.TreeLayout</RootNamespace>
-		<UseWinUI>true</UseWinUI>
-		<Nullable>enable</Nullable>
-		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
-		<Platforms>x64;arm64</Platforms>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
 		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
@@ -16,13 +8,23 @@
 		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
 		<AnalysisModeNaming>All</AnalysisModeNaming>
 		<AnalysisModePerformance>All</AnalysisModePerformance>
-		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
 		<AnalysisModeReliability>All</AnalysisModeReliability>
 		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
 		<AnalysisModeStyle>All</AnalysisModeStyle>
 		<AnalysisModeUsage>All</AnalysisModeUsage>
-		<Description>An extensible window manager for Windows.</Description>
 		<Authors>Isaac Daly</Authors>
+		<Description>An extensible window manager for Windows.</Description>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;arm64</Platforms>
+		<RootNamespace>Whim.TreeLayout</RootNamespace>
+		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
+		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<UseWinUI>true</UseWinUI>
 		<Version>0.1.0</Version>
 	</PropertyGroup>
 
