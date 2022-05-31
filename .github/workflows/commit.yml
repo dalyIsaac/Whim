@@ -53,9 +53,9 @@ jobs:
 
       - name: Test
         run: |
-          dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test Whim.sln /p:CollectCoverage=true /p:CoverletOutput=../../ /p:MergeWith=../TestResults/coverage.json /p:CoverletOutputFormat=json
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
         with:
-          files: "*.opencover.xml"
+          files: coverage.json
