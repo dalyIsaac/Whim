@@ -59,3 +59,4 @@ jobs:
         uses: codecov/codecov-action@v3.1.0
         with:
           files: coverage.json
+          if: ${{ matrix.platform }} == 'x64' && ${{ matrix.configuration }} == 'Release'
