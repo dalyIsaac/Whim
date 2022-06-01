@@ -10,10 +10,8 @@ jobs:
   commit:
     strategy:
       matrix:
-        # configuration: [Debug, Release]
-        # platform: [x64, arm64]
         configuration: [Debug, Release]
-        platform: [x64]
+        platform: [x64, arm64]
 
     runs-on: windows-latest
 
