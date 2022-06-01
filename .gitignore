@@ -141,8 +141,8 @@ _TeamCity*
 *.coverage
 *.coveragexml
 
-# Code coverage results
-coverage.json
+# OpenCover is a Code Coverage Tool
+*.opencover.xml
 
 # NCrunch
 _NCrunch_*

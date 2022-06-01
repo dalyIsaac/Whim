@@ -53,10 +53,9 @@ jobs:
 
       - name: Test
         run: |
-          dotnet test Whim.sln /p:CollectCoverage=true /p:CoverletOutput=../../ /p:MergeWith=../TestResults/coverage.json /p:CoverletOutputFormat=json
+          dotnet test Whim.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
         with:
-          files: coverage.json
-          if: ${{ matrix.platform }} == 'x64' && ${{ matrix.configuration }} == 'Release'
+          files: src/**/*.opencover.xml
