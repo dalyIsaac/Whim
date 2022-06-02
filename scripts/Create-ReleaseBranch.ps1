@@ -18,29 +18,22 @@
 
 	.EXAMPLE
 	PS> ./Create-ReleaseBranch.ps1 major
-
 #>
 param (
 	[Parameter(Mandatory = $true, Position = 0)]
 	[string]$BumpType
 )
 
-Assert-GitMainBranch
-Assert-GitClean
-$nextVersion = Get-NextVersion($BumpType)
-Assert-GitVersion($nextVersion)
-Set-Version($nextVersion)
-Add-BumpCommit
-Add-ReleaseBranch($nextVersion)
-
 <#
 	.SYNOPSIS
 	Assert that the current branch is the main branch.
 #>
 function Assert-GitMainBranch() {
+	Write-Host "Checking the current branch..."
+
 	$branch = (git rev-parse --abbrev-ref HEAD)
 
-	if ($branch -ne "main") {
+	if ($branch -cne "main") {
 		throw "Not on the main branch: $branch"
 	}
 }
@@ -50,10 +43,12 @@ function Assert-GitMainBranch() {
 	Verify that the codebase is clean.
 #>
 function Assert-GitClean() {
+	Write-Host "Checking the status of the repository..."
+
 	$status = (git status --porcelain)
 
 	if ($null -ne $status) {
-		Write-Output $status
+		Write-Host $status
 		throw "Git status is not clean:"
 	}
 }
@@ -68,6 +63,8 @@ function Get-NextVersion() {
 		[string]$BumpType
 	)
 
+	Write-Host "Calculating the next version..."
+
 	if (($BumpType -ne "patch") -and ($BumpType -ne "minor") -and ($BumpType -ne "major")) {
 		Write-Error "BumpType must be one of: patch, minor, major"
 		exit 1
@@ -75,7 +72,9 @@ function Get-NextVersion() {
 
 	# Get the current version.
 	$xml = [Xml] (Get-Content .\src\Whim.Runner\Whim.Runner.csproj)
-	$version = $xml.Project.PropertyGroup.Version
+
+	#Print out the xml
+	$version = $xml.Project.PropertyGroup[0].Version
 
 	$versionParts = $version.Split(".")
 
@@ -108,13 +107,14 @@ function Get-NextVersion() {
 	# Check with the user that the next version is correct.
 	Write-Host "The current version is $version"
 	Write-Host "The next version will be $nextVersion"
-	$proceed = Read-Host "Is this correct? (y/n): "
+	$proceed = Read-Host "Is this correct? (y/N)"
 
-	if ($proceed -ne "y") {
+	if ($proceed -cne "y") {
 		Write-Error "Aborting"
 		exit 1
 	}
 
+	Write-Host "`n"
 	return $nextVersion
 }
 
@@ -128,6 +128,8 @@ function Assert-GitVersion() {
 		[String]
 		$nextVersion
 	)
+
+	Write-Host "Checking for existing tags and branches..."
 
 	git fetch
 
@@ -147,10 +149,12 @@ function Assert-GitVersion() {
 
 	# Verify that there is no tag named $nextVersion.
 	$tags = git tag
-	if ($tags.Contains($nextVersion)) {
+	if (($tags -ne $null) -and ($tags.Contains($nextVersion))) {
 		Write-Error "A tag containing the string $nextVersion already exists"
 		exit 1
 	}
+
+	Write-Host "`n"
 }
 
 <#
@@ -163,23 +167,25 @@ function Set-Version() {
 		[string]$version
 	)
 
+	Write-Host "Updating the version number..."
+
 	# Check for set-version.
 	if (!(Get-Command setversion -ErrorAction SilentlyContinue)) {
-		$proceed = Read-Host "dotnet-setversion not found. Install now? (Y/n): "
+		$proceed = Read-Host "dotnet-setversion not found. Install now? (Y/n)"
 		if ([string]::IsNullOrEmpty($proceed)) {
 			$proceed = "Y"
 		}
 
-		if ($proceed -eq "Y") {
-			dotnet tool install -g dotnet-setversion
-		}
-		else {
+		if ($proceed -cne "Y") {
 			Write-Error -Message "dotnet-setversion not found. Aborting."
 			exit 1
 		}
 
-		setversion -r $Version
+		dotnet tool install -g dotnet-setversion
 	}
+
+	setversion -r $Version
+	Write-Host "`n"
 }
 
 <#
@@ -193,17 +199,26 @@ function Add-BumpCommit() {
 		$nextVersion
 	)
 
+	Write-Host "Creating a commit for the next version..."
+
 	git add .
-	git commit -m "Bumped version to $nextVersion" -S
+	$proceed = git commit -m "Bumped version to $nextVersion" -S
+
+	if ($proceed -ne $true) {
+		Write-Error "Failed to create commit"
+		exit 1
+	}
 
 	# Ask the user if they want to push.
-	$proceed = Read-Host "Push to remote? (y/n): "
+	$proceed = Read-Host "Push commit to remote? (y/N)"
 	if ($proceed -ne "y") {
 		Write-Error "Aborting"
 		exit 1
 	}
 
 	git push
+
+	Write-Host "`n"
 }
 
 <#
@@ -217,14 +232,27 @@ function Add-ReleaseBranch() {
 		$nextVersion
 	)
 
+	Write-Host "Creating a release branch..."
+
 	git checkout -b $nextVersion
 
 	# Ask the user if they want to push.
-	$proceed = Read-Host "Push to remote? (y/n): "
+	$proceed = Read-Host "Push tag to remote? (y/N)"
 	if ($proceed -ne "y") {
 		Write-Error "Aborting"
 		exit 1
 	}
 
 	git push --set-upstream origin $nextVersion
+
+	Write-Host "`n"
 }
+
+
+# Assert-GitMainBranch
+# Assert-GitClean
+$nextVersion = Get-NextVersion($BumpType)
+Assert-GitVersion($nextVersion)
+Set-Version($nextVersion)
+Add-BumpCommit($nextVersion)
+Add-ReleaseBranch($nextVersion)
