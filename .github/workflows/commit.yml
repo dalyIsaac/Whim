@@ -1,0 +1,59 @@
+name: commit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  commit:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+        platform: [x64, arm64]
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore Whim.sln /p:Configuration=$env:Configuration
+        env:
+          Configuration: ${{ matrix.configuration }}
+
+      # TODO: Replace commented code with the uncommented code once the 6.0.4 SDK has been released.
+      # - name: Check formatting
+      #   run: |
+      #     dotnet format Whim.sln --verify-no-changes --no-restore
+
+      - name: Check whitespace formatting
+        run: |
+          dotnet format whitespace Whim.sln
+
+      - name: Check style
+        run: |
+          dotnet format style Whim.sln
+      # END TODO
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build
+        run: |
+          msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
+
+      - name: Test
+        run: |
+          dotnet test Whim.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          files: src/**/*.opencover.xml

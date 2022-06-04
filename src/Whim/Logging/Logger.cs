@@ -1,6 +1,6 @@
+using Serilog;
 using System.IO;
 using System.Runtime.CompilerServices;
-using Serilog;
 
 namespace Whim;
 
