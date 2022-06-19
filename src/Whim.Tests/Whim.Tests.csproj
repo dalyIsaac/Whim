@@ -22,7 +22,7 @@
 		<Nullable>enable</Nullable>
 		<Platforms>x64;arm64</Platforms>
 		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
-		<Version>0.1.0</Version>
+		<Version>1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

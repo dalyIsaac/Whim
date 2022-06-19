@@ -1,0 +1,79 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+      - release/v*
+    tags:
+      - v*
+
+jobs:
+  release:
+    runs-on: windows-latest
+    concurrency: ci-${{ github.ref }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Determine channel
+        shell: pwsh
+        run: |
+          $channel = $null
+          $isPrerelease = $true
+
+          if ($env:GITHUB_REF -eq "refs/heads/main") {
+            $channel = "canary"
+          } elseif ($env:GITHUB_REF.StartsWith("refs/heads/release/")) {
+            $channel = "beta"
+          } elseif ($env:GITHUB_REF.StartsWith("refs/tags/")) {
+            $channel = "stable"
+            $isPrerelease = $false
+          } else {
+            throw "Unsupported ref: $env:GITHUB_REF"
+          }
+
+          $isPrerelease = $isPrerelease.ToString().ToLower()
+          "channel=${channel}" >> $env:GITHUB_ENV
+          "isPrerelease=${isPrerelease}" >> $env:GITHUB_ENV
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore Whim.sln /p:Configuration=$env:Configuration
+        env:
+          Configuration: ${{ matrix.configuration }}
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build
+        run: |
+          msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
+
+      - name: Build release
+        run: |
+          %programfiles(x86)%\Inno Setup 6\iscc.exe whim-installer.iss
+
+      - name: Create release
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $currentRelease, $nextRelease = .\scripts\Get-WhimRelease.ps1 -Channel $env:channel
+
+          $resp = gh api repos/$env:GITHUB_REPOSITORY/releases/generate-notes `
+            -H "Accept: application/vnd.github.v3+json" `
+            -f tag_name=$nextRelease `
+            -f previous_tag_name=$currentRelease `
+            | ConvertFrom-Json
+
+          $notes = $resp.body ?? "Initial release"
+
+          gh release create "$nextRelease" bin/whim-install.exe `
+            --title "$nextRelease" `
+            --prerelease="$env:isPrerelease" `
+            --notes $notes
