@@ -6,7 +6,7 @@ The main development branch is `main`.
 
 Whim has the following release channels:
 
-- `canary`: The latest changes in `main`.
+- `alpha`: The latest changes in `main`.
 - `beta`: The latest changes in a release branch `release/v*`.
 - `stable`: A release of the latest stable version, in a release branch.
 
@@ -17,9 +17,11 @@ Releases follow the format `v<version>-<channel>.<build>.<commit>`. For example,
 - `build` is the number of commits since the bump commit.
 - `commit` is the commit hash.
 
-### Canary Releases
+Scripts will generally return the release string with no leading `v`. Builds will similarly have no leading `v`. However, **GitHub releases** (and thus tags) **will have a leading `v`**.
 
-`canary` releases are created by making a commit to `main`, typically via a squashed pull request. This will run [`release.yml`](#releaseyml).
+### Alpha Releases
+
+`alpha` releases are created by making a commit to `main`, typically via a squashed pull request. This will run [`release.yml`](#releaseyml).
 
 ### Beta Releases
 
@@ -35,7 +37,7 @@ Releases follow the format `v<version>-<channel>.<build>.<commit>`. For example,
 
 ### `release.yml`
 
-[`release.yml`](../.github/workflows/release.yml) will:
+`release.yml` will:
 
 1. Get the release version.
 2. Build the release artifacts.
@@ -44,7 +46,7 @@ Releases follow the format `v<version>-<channel>.<build>.<commit>`. For example,
 
 ### `Create-ReleaseBranch.ps1`
 
-[`Create-ReleaseBranch.ps1`](../scripts/Create-ReleaseBranch.ps1) will:
+`Create-ReleaseBranch.ps1` will:
 
 1. Create a branch to bump the version.
 2. Bump the version and push the commit.
@@ -56,11 +58,18 @@ Releases follow the format `v<version>-<channel>.<build>.<commit>`. For example,
 
 ### `Create-StableRelease.ps1`
 
-[`Create-StableRelease.ps1`](../scripts/Create-StableRelease.ps1) will:
+`Create-StableRelease.ps1` will:
 
 1. Get the release version.
 2. Push a lightweight tag, which will trigger [`release.yml`](#releaseyml)
 
-## Pull Requests
+### `Get-NextWhimRelease.ps1`
 
-All pull requests must have an appropriate label prior to merging. This is checked by [`pull_request_labels.yml`](../.github/workflows/pull_request_labels.yml).
+`Get-NextWhimRelease.ps1` will return the next release version given the parameters:
+
+- `channel`
+- `versionBump` (`major`, `minor`, `patch`, `none`)
+
+## `Get-CurrentWhimRelease.ps1`
+
+`Get-CurrentWhimRelease.ps1` will return the current release version given the specified channel.

@@ -30,7 +30,7 @@
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<UseWinUI>true</UseWinUI>
 		<WinUISDKReferences>false</WinUISDKReferences>
-		<Version>1</Version>
+		<Version>0.1.0</Version>
 		<WindowsPackageType>None</WindowsPackageType>
 	</PropertyGroup>
 

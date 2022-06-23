@@ -10,6 +10,11 @@ on:
 
 jobs:
   release:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+        platform: [x64, arm64]
+
     runs-on: windows-latest
     concurrency: ci-${{ github.ref }}
 
@@ -24,7 +29,7 @@ jobs:
           $isPrerelease = $true
 
           if ($env:GITHUB_REF -eq "refs/heads/main") {
-            $channel = "canary"
+            $channel = "alpha"
           } elseif ($env:GITHUB_REF.StartsWith("refs/heads/release/")) {
             $channel = "beta"
           } elseif ($env:GITHUB_REF.StartsWith("refs/tags/")) {
@@ -63,7 +68,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $currentRelease, $nextRelease = .\scripts\Get-WhimRelease.ps1 -Channel $env:channel
+          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $env:channel
+          $currentRelease = "v${currentRelease}"
+
+          $nextRelease = .\scripts\Get-NextWhimRelease.ps1 -Channel $env:channel
+          $nextRelease = "v${nextRelease}"
 
           $resp = gh api repos/$env:GITHUB_REPOSITORY/releases/generate-notes `
             -H "Accept: application/vnd.github.v3+json" `

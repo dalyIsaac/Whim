@@ -13,16 +13,17 @@ if (!$releaseBranch.StartsWith("release/v")) {
     throw "You must be on a release branch to create a stable release."
 }
 
-$currentRelease, $nextRelease = .\scripts\Get-WhimRelease.ps1 -Channel stable
+$nextRelease = .\scripts\Get-NextWhimRelease.ps1 -Channel stable -VersionBump none
+$nextRelease = "v${nextRelease}"
 
 # Verify there are no tags matching $nextRelease.
 git fetch --tags
 $existingTags = git tag -l $nextRelease
 if ($null -ne $existingTags) {
-    throw "There are already tags matching the release version $nextRelease."
+    throw "There are already tags matching the release version ${nextRelease}."
 }
 
-$proceed = Read-Host "Are you sure you want to create a stable release for $nextRelease? (y/N)"
+$proceed = Read-Host "Are you sure you want to create a stable release for ${nextRelease}? (y/N)"
 if ($proceed -cne "y") {
     throw "Stable release creation cancelled."
 }

@@ -2,9 +2,18 @@
     .SYNOPSIS
     Bumps the version and creates a release branch.
 
+    .PARAMETER VersionBump
+    The version bump to use in the release tag string.
+
     .EXAMPLE
     PS> .\scripts\Create-ReleaseBranch.ps1
 #>
+
+param (
+    [Parameter(Mandatory = $false, Position = 0)]
+    [ValidateSet('minor', 'major')]
+    [string]$VersionBump = "minor"
+)
 
 $repository = $env:GITHUB_REPOSITORY
 
@@ -18,8 +27,10 @@ if ($null -ne $status) {
     throw "Git working directory is dirty. Please commit or stash changes before proceeding."
 }
 
-$version = (.\scripts\Get-WhimVersion.ps1) + 1
-$bumpVersionBranch = "bump/v${version}"
+$nextVersion = .\scripts\Get-NextWhimRelease.ps1 -VersionBump $versionBump
+$nextVersion = $nextVersion.Split("-")[0]
+
+$bumpVersionBranch = "bump/v${nextVersion}"
 
 # Create the branch.
 git checkout -b $bumpVersionBranch
@@ -41,7 +52,7 @@ if (!(Get-Command setversion -ErrorAction SilentlyContinue)) {
 }
 
 # Bump the version.
-setversion -r $version
+setversion -r $nextVersion
 
 $proceed = Read-Host "Commit and push on branch ${bumpVersionBranch}? (y/N)"
 if ($proceed -cne "y") {
@@ -51,7 +62,7 @@ if ($proceed -cne "y") {
 
 # Commit the changes.
 git add .
-git commit -m "Bump version to $version" -S
+git commit -m "Bump version to ${nextVersion}" -S
 
 # Push the branch.
 git push -u origin $bumpVersionBranch
@@ -65,8 +76,8 @@ if ($proceed -cne "y") {
 # Create a new pull request.
 $prUrl = gh pr create `
     --reviewer "dalyIsaac" `
-    --title "Bump Whim version to $version" `
-    --body "Bump Whim version to $version" `
+    --title "Bump Whim version to ${nextVersion}" `
+    --body "Bump Whim version to ${nextVersion}" `
     --label "whim version"
 
 # Checkout main.
@@ -99,6 +110,6 @@ git fetch
 git pull
 
 # Create a release branch.
-$releaseBranch = "release/v$version"
+$releaseBranch = "release/v${nextVersion}"
 git checkout -b $releaseBranch
 git push -u origin $releaseBranch

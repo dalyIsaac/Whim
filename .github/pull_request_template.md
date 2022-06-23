@@ -6,7 +6,6 @@
 -->
 
 - [ ] This code is up-to-date with the `main` branch.
-- [ ] I've updated the `CHANGELOG.md` file.
 
 This PR fixes #
 
