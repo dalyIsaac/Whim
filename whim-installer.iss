@@ -4,7 +4,7 @@
 #define MyAppName "Whim"
 #define MyAppBuildDir SourcePath + "src\Whim.Runner\bin\x64\Release\net6.0-windows10.0.19041.0"
 #define MyAppExeName "Whim.Runner.exe"
-#define MyAppVersion GetVersionNumbersString(MyAppBuildDir + "\" + MyAppExeName)
+#define MyAppVersion GetStringFileInfo(MyAppBuildDir + "\" + MyAppExeName, "ProductVersion")
 #define MyAppPublisher "Isaac Daly"
 #define MyAppURL "https://github.com/dalyIsaac/Whim"
 

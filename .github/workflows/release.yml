@@ -61,7 +61,7 @@ jobs:
 
       - name: Build release
         run: |
-          %programfiles(x86)%\Inno Setup 6\iscc.exe whim-installer.iss
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' .\whim-installer.iss
 
       - name: Create release
         shell: pwsh
