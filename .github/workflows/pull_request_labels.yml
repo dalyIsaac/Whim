@@ -10,7 +10,7 @@ jobs:
     # we add the `triage` label.
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.pull_request.action == 'opened'
-    concurrency: pr-labels-{{ github.pull_request.number }}
+    concurrency: pr-labels-${{ github.pull_request.number }}
     steps:
       - name: Label opened pull requests with triage
         env:
@@ -23,7 +23,7 @@ jobs:
     # If triage is attached, fail.
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.pull_request.action != 'opened'
-    concurrency: pr-labels-{{ github.pull_request.number }}
+    concurrency: pr-labels-${{ github.pull_request.number }}
     steps:
       - name: Require labels
         shell: pwsh
