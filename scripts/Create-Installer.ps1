@@ -13,9 +13,18 @@ $buildDir = "src\Whim.Runner\bin\${Architecture}\Release\net6.0-windows10.0.1904
 $version = (Get-Item "${buildDir}\Whim.Runner.exe").VersionInfo.ProductVersion
 $installerName = "WhimInstaller-${Architecture}-${version}"
 
-& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" .\whim-installer.iss `
+$output = & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" .\whim-installer.iss `
 	/DMyBuildDir="$buildDir" `
 	/DMyOutputBaseFilename="$installerName" `
 	/DMyVersion="$version"
 
-return "bin\${installerName}.exe"
+$path = $output.Split("\n")[-1]
+
+# Test if the installer exists.
+if (Test-Path $path) {
+	return $path
+} else {
+	Write-Host "Failed to create installer"
+	Write-Host $output
+	exit 1
+}
