@@ -96,8 +96,11 @@ jobs:
 
       - name: Build release
         shell: pwsh
+        env:
+          Platform: ${{ matrix.platform }}
         run: |
-          .\scripts\Create-Installer.ps1 -Architecture $env:Platform
+          $installerPath = .\scripts\Create-Installer.ps1 -Architecture $env:Platform
+          "installerPath=${installerPath}" >> $env:GITHUB_ENV
 
       - name: Upload release assets
         shell: pwsh
@@ -108,4 +111,4 @@ jobs:
           $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $channel
           $currentRelease = "v${currentRelease}"
 
-          gh release upload "$currentRelease" bin/whim-install.exe
+          gh release upload "$currentRelease" $env:installerPath

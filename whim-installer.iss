@@ -1,4 +1,9 @@
-; NOTE: #Version and #BuildDir are passed via the CLI. See scripts\Create-Installer.ps1
+; This requires the following CLI arguments:
+; - \DMyBuildDir
+; - \DMyOutputBaseFilename
+; - \DMyVersion
+;
+; See scripts\Create-Installer.ps1
 
 #define MyAppName "Whim"
 #define MyAppExeName "Whim.Runner.exe"
@@ -8,7 +13,7 @@
 [Setup]
 AppId={{63D20D07-83ED-453F-8906-BB3216B8EF51}
 AppName={#MyAppName}
-AppVersion={#Version}
+AppVersion={#MyVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -22,7 +27,7 @@ PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 MinVersion=10.0.19041
 OutputDir=bin\
-OutputBaseFilename=whim-install
+OutputBaseFilename={#MyOutputBaseFilename}
 Compression=lzma2
 SolidCompression=yes
 UninstallDisplayName={#MyAppName}
@@ -32,8 +37,8 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "{#BuildDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyBuildDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyBuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
