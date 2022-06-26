@@ -57,26 +57,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Determine channel
+      - name: Get variables
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $channel = $null
-          $isPrerelease = $true
+          $channel, $isPrerelease = .\scripts\Get-Channel.ps1
+          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $channel
+          $version = "v${currentRelease}"
 
-          if ($env:GITHUB_REF -eq "refs/heads/main") {
-            $channel = "alpha"
-          } elseif ($env:GITHUB_REF.StartsWith("refs/heads/release/")) {
-            $channel = "beta"
-          } elseif ($env:GITHUB_REF.StartsWith("refs/tags/")) {
-            $channel = "stable"
-            $isPrerelease = $false
-          } else {
-            throw "Unsupported ref: $env:GITHUB_REF"
-          }
-
-          $isPrerelease = $isPrerelease.ToString().ToLower()
-          "channel=${channel}" >> $env:GITHUB_ENV
-          "isPrerelease=${isPrerelease}" >> $env:GITHUB_ENV
+          "Version=${version}" >> $env:GITHUB_ENV
 
       - name: Restore dependencies
         run: |
@@ -89,7 +79,10 @@ jobs:
 
       - name: Build
         run: |
-          msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform
+          msbuild Whim.sln `
+            /p:Configuration=$env:Configuration `
+            /p:Platform=$env:Platform `
+            /p:Version=$env:Version
         env:
           Configuration: ${{ matrix.configuration }}
           Platform: ${{ matrix.platform }}
@@ -100,15 +93,11 @@ jobs:
           Platform: ${{ matrix.platform }}
         run: |
           $installerPath = .\scripts\Create-Installer.ps1 -Architecture $env:Platform
-          "installerPath=${installerPath}" >> $env:GITHUB_ENV
+          "InstallerPath=${installerPath}" >> $env:GITHUB_ENV
 
       - name: Upload release assets
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $channel, $isPrerelease = .\scripts\Get-Channel.ps1
-          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $channel
-          $currentRelease = "v${currentRelease}"
-
-          gh release upload "$currentRelease" $env:installerPath
+          gh release upload "${env:Version}" "${env:InstallerPath}"
