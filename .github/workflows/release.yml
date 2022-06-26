@@ -9,14 +9,49 @@ on:
       - v*
 
 jobs:
-  release:
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
-        platform: [x64, arm64]
+  create-release:
+    runs-on: ubuntu-latest
+    concurrency: ci-create-release-${{ github.ref }}
 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create the release
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $channel, $isPrerelease = .\scripts\Get-Channel.ps1
+          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $channel
+          $currentRelease = "v${currentRelease}"
+
+          $nextRelease = .\scripts\Get-NextWhimRelease.ps1 -Channel $channel
+          $nextRelease = "v${nextRelease}"
+
+          $resp = gh api repos/$env:GITHUB_REPOSITORY/releases/generate-notes `
+            -H "Accept: application/vnd.github.v3+json" `
+            -f tag_name=$nextRelease `
+            -f previous_tag_name=$currentRelease `
+            | ConvertFrom-Json
+
+          $notes = $resp.body ?? "Initial release"
+
+          gh release create "$nextRelease" `
+            --title "$nextRelease" `
+            --prerelease="$isPrerelease" `
+            --notes $notes
+
+  release:
     runs-on: windows-latest
     concurrency: ci-${{ github.ref }}
+    needs:
+      - create-release
+
+    strategy:
+      matrix:
+        configuration: [Release]
+        platform: [x64, arm64]
 
     steps:
       - name: Checkout
@@ -60,29 +95,17 @@ jobs:
           Platform: ${{ matrix.platform }}
 
       - name: Build release
+        shell: pwsh
         run: |
-          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' .\whim-installer.iss
+          .\scripts\Create-Installer.ps1 -Architecture $env:Platform
 
-      - name: Create release
+      - name: Upload release assets
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $env:channel
+          $channel, $isPrerelease = .\scripts\Get-Channel.ps1
+          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $channel
           $currentRelease = "v${currentRelease}"
 
-          $nextRelease = .\scripts\Get-NextWhimRelease.ps1 -Channel $env:channel
-          $nextRelease = "v${nextRelease}"
-
-          $resp = gh api repos/$env:GITHUB_REPOSITORY/releases/generate-notes `
-            -H "Accept: application/vnd.github.v3+json" `
-            -f tag_name=$nextRelease `
-            -f previous_tag_name=$currentRelease `
-            | ConvertFrom-Json
-
-          $notes = $resp.body ?? "Initial release"
-
-          gh release create "$nextRelease" bin/whim-install.exe `
-            --title "$nextRelease" `
-            --prerelease="$env:isPrerelease" `
-            --notes $notes
+          gh release upload "$currentRelease" bin/whim-install.exe
