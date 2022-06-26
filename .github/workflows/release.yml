@@ -1,0 +1,114 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+      - release/v*
+    tags:
+      - v*
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    concurrency: ci-create-release-${{ github.ref }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create the release
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $channel, $isPrerelease = .\scripts\Get-Channel.ps1
+          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $channel
+          $currentRelease = "v${currentRelease}"
+
+          $nextRelease = .\scripts\Get-NextWhimRelease.ps1 -Channel $channel
+          $nextRelease = "v${nextRelease}"
+
+          $resp = gh api repos/$env:GITHUB_REPOSITORY/releases/generate-notes `
+            -H "Accept: application/vnd.github.v3+json" `
+            -f tag_name=$nextRelease `
+            -f previous_tag_name=$currentRelease `
+            | ConvertFrom-Json
+
+          $notes = $resp.body ?? "Initial release"
+
+          gh release create "$nextRelease" `
+            --title "$nextRelease" `
+            --prerelease="$isPrerelease" `
+            --notes $notes
+
+  release:
+    runs-on: windows-latest
+    concurrency: ci-${{ github.ref }}
+    needs:
+      - create-release
+
+    strategy:
+      matrix:
+        configuration: [Release]
+        platform: [x64, arm64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Determine channel
+        shell: pwsh
+        run: |
+          $channel = $null
+          $isPrerelease = $true
+
+          if ($env:GITHUB_REF -eq "refs/heads/main") {
+            $channel = "alpha"
+          } elseif ($env:GITHUB_REF.StartsWith("refs/heads/release/")) {
+            $channel = "beta"
+          } elseif ($env:GITHUB_REF.StartsWith("refs/tags/")) {
+            $channel = "stable"
+            $isPrerelease = $false
+          } else {
+            throw "Unsupported ref: $env:GITHUB_REF"
+          }
+
+          $isPrerelease = $isPrerelease.ToString().ToLower()
+          "channel=${channel}" >> $env:GITHUB_ENV
+          "isPrerelease=${isPrerelease}" >> $env:GITHUB_ENV
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore Whim.sln /p:Configuration=$env:Configuration
+        env:
+          Configuration: ${{ matrix.configuration }}
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build
+        run: |
+          msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
+
+      - name: Build release
+        shell: pwsh
+        env:
+          Platform: ${{ matrix.platform }}
+        run: |
+          $installerPath = .\scripts\Create-Installer.ps1 -Architecture $env:Platform
+          "installerPath=${installerPath}" >> $env:GITHUB_ENV
+
+      - name: Upload release assets
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $channel, $isPrerelease = .\scripts\Get-Channel.ps1
+          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $channel
+          $currentRelease = "v${currentRelease}"
+
+          gh release upload "$currentRelease" $env:installerPath

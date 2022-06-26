@@ -1,20 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
-		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-		<RootNamespace>Whim.Runner</RootNamespace>
-		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<Platforms>x86;x64;arm64</Platforms>
-		<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
-		<PublishProfile>win10-$(Platform).pubxml</PublishProfile>
-		<UseWinUI>true</UseWinUI>
-		<WindowsPackageType>None</WindowsPackageType>
-		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
-		<Nullable>enable</Nullable>
-		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
 		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
@@ -22,19 +7,33 @@
 		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
 		<AnalysisModeNaming>All</AnalysisModeNaming>
 		<AnalysisModePerformance>All</AnalysisModePerformance>
-		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
 		<AnalysisModeReliability>All</AnalysisModeReliability>
 		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
 		<AnalysisModeStyle>All</AnalysisModeStyle>
 		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Authors>Isaac Daly</Authors>
+		<Description>An extensible window manager for Windows.</Description>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<Nullable>enable</Nullable>
+		<OutputType>WinExe</OutputType>
+		<Platforms>x64;arm64</Platforms>
+		<PublishProfile>win10-$(Platform).pubxml</PublishProfile>
+		<RootNamespace>Whim.Runner</RootNamespace>
+		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
+		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<UseWinUI>true</UseWinUI>
+		<WinUISDKReferences>false</WinUISDKReferences>
+		<Version>0.1.0</Version>
+		<WindowsPackageType>None</WindowsPackageType>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
@@ -65,7 +64,6 @@
 
 	<ItemGroup>
 		<Content Include="Assets\SplashScreen.scale-200.png" />
-		<Content Include="Assets\LockScreenLogo.scale-200.png" />
 		<Content Include="Assets\Square150x150Logo.scale-200.png" />
 		<Content Include="Assets\Square44x44Logo.scale-200.png" />
 		<Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
@@ -97,12 +95,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Assets\StoreLogo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
 		<Page Update="StartupExceptionWindow.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
 
-	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build">
+	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build;Publish">
 		<!--Whim.Bar-->
 		<ItemGroup>
 			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />

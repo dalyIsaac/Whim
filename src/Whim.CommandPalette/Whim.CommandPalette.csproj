@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
-		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
-		<Platforms>x64;arm64</Platforms>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
 		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
@@ -12,17 +8,26 @@
 		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
 		<AnalysisModeNaming>All</AnalysisModeNaming>
 		<AnalysisModePerformance>All</AnalysisModePerformance>
-		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
 		<AnalysisModeReliability>All</AnalysisModeReliability>
 		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
 		<AnalysisModeStyle>All</AnalysisModeStyle>
 		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;arm64</Platforms>
+		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
+		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+		<Version>0.1.0</Version>
 		<UseWinUI>true</UseWinUI>
 	</PropertyGroup>
+
 	<ItemGroup>
-	  <None Remove="CommandListItem.xaml" />
-	  <None Remove="CommandPaletteWindow.xaml" />
-	  <None Remove="PaletteItems\PaletteKeybindItem.xaml" />
+		<None Remove="CommandListItem.xaml" />
+		<None Remove="CommandPaletteWindow.xaml" />
+		<None Remove="PaletteItems\PaletteKeybindItem.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -35,14 +40,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="PaletteItems\PaletteKeybindItem.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<Page Update="PaletteItems\PaletteKeybindItem.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="CommandPaletteWindow.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<Page Update="CommandPaletteWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
+
 </Project>

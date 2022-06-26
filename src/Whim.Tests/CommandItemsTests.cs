@@ -1,5 +1,5 @@
-﻿using System;
-using Moq;
+﻿using Moq;
+using System;
 using System.Collections.Generic;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;
