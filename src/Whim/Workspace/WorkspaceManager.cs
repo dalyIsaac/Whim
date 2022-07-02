@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ namespace Whim;
 /// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
 /// </summary>
-public class WorkspaceManager : IWorkspaceManager
+internal class WorkspaceManager : IWorkspaceManager
 {
 	private readonly IConfigContext _configContext;
 

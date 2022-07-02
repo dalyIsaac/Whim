@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-public class CommandManager : ICommandManager
+internal class CommandManager : ICommandManager
 {
 	private readonly ICommandItems _commandItems;
 	private readonly IKeybindManager _keybindManager;

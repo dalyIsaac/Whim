@@ -1,9 +1,9 @@
-﻿namespace Whim;
+namespace Whim;
 
 /// <summary>
 /// Implementation of <see cref="IMonitor"/>.
 /// </summary>
-public class Monitor : IMonitor
+internal class Monitor : IMonitor
 {
 	/// <summary>
 	/// Internal representation of a screen, based on the WinForms Screen class.

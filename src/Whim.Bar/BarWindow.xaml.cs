@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 namespace Whim.Bar;
 
@@ -20,7 +20,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "BarWindow");
 
-		IWindow? window = Window.CreateWindow(this.GetHandle(), _configContext);
+		IWindow? window = IWindow.CreateWindow(this.GetHandle(), _configContext);
 		if (window == null)
 		{
 			throw new BarException("Window was unexpectedly null");
