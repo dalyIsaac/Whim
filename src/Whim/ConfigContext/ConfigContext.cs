@@ -11,7 +11,7 @@ namespace Whim;
 /// <c>ConfigContext</c> also contains other associated state and functionality, like the
 /// <see cref="Logger"/>.
 /// </summary>
-public class ConfigContext : IConfigContext
+internal class ConfigContext : IConfigContext
 {
 	public Logger Logger { get; set; }
 	public IWorkspaceManager WorkspaceManager { get; set; }

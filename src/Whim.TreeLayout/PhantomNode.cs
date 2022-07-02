@@ -20,7 +20,7 @@ public class PhantomNode : LeafNode
 	{
 		PhantomWindow phantomWindow = new();
 
-		IWindow? windowModel = Whim.Window.CreateWindow(phantomWindow.GetHandle(), configContext);
+		IWindow? windowModel = Whim.IWindow.CreateWindow(phantomWindow.GetHandle(), configContext);
 
 		if (windowModel == null)
 		{

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Whim;
 
-public class RouterManager : IRouterManager
+internal class RouterManager : IRouterManager
 {
 	private readonly IConfigContext _configContext;
 	private readonly List<Router> _routers = new();

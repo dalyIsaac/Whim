@@ -9,7 +9,7 @@ namespace Whim;
 /// <summary>
 /// Implementation of <see cref="IMonitorManager"/>.
 /// </summary>
-public class MonitorManager : IMonitorManager
+internal class MonitorManager : IMonitorManager
 {
 	private readonly IConfigContext _configContext;
 
