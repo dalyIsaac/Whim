@@ -2,8 +2,14 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.FloatingLayout;
 
+/// <summary>
+/// Default commands for the floating layout plugin.
+/// </summary>
 public static class FloatingLayoutCommands
 {
+	/// <summary>
+	/// Gets the default floating layout plugin commands.
+	/// </summary>
 	public static (ICommand, IKeybind?)[] GetCommands(FloatingLayoutPlugin floatingLayoutPlugin) => new (ICommand, IKeybind?)[]
 	{
 		(
