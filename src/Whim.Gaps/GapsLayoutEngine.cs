@@ -11,7 +11,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 		_gapsConfig = gapsConfig;
 	}
 
-	public override IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
+	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
 	{
 		int doubleOuterGap = _gapsConfig.OuterGap * 2;
 		int doubleInnerGap = _gapsConfig.InnerGap * 2;
@@ -23,9 +23,9 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 			height: location.Height - doubleOuterGap
 		);
 
-		foreach (IWindowLocation loc in InnerLayoutEngine.DoLayout(proxiedLocation))
+		foreach (IWindowState loc in InnerLayoutEngine.DoLayout(proxiedLocation))
 		{
-			yield return new WindowLocation(
+			yield return new WindowState(
 				window: loc.Window,
 				location: new Location(
 					x: loc.Location.X + _gapsConfig.InnerGap,
@@ -33,7 +33,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 					width: loc.Location.Width - doubleInnerGap,
 					height: loc.Location.Height - doubleInnerGap
 				),
-				windowState: loc.WindowState
+				windowSize: loc.WindowSize
 			);
 		}
 	}

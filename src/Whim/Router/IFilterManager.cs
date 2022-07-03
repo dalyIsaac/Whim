@@ -1,7 +1,13 @@
 namespace Whim;
 
+/// <summary>
+/// Delegate which is called to filter a <see cref="IWindow"/>.
+/// </summary>
 public delegate bool Filter(IWindow window);
 
+/// <summary>
+/// Manages filters for <see cref="IWindow"/>s.
+/// </summary>
 public interface IFilterManager
 {
 	/// <summary>

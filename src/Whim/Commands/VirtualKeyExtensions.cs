@@ -2,6 +2,9 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
+/// <summary>
+/// Extension methods for <see cref="VIRTUAL_KEY"/>.
+/// </summary>
 public static class VirtualKeyExtensions
 {
 	/// <summary>

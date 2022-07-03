@@ -17,6 +17,7 @@ public class BarPlugin : IPlugin, IDisposable
 		_barConfig = barConfig;
 	}
 
+	/// <inheritdoc />
 	public void PreInitialize()
 	{
 		_configContext.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
@@ -24,6 +25,7 @@ public class BarPlugin : IPlugin, IDisposable
 		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
 	}
 
+	/// <inheritdoc />
 	public void PostInitialize()
 	{
 		foreach (IMonitor monitor in _configContext.MonitorManager)
@@ -57,6 +59,7 @@ public class BarPlugin : IPlugin, IDisposable
 		}
 	}
 
+	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!disposedValue)
@@ -76,6 +79,8 @@ public class BarPlugin : IPlugin, IDisposable
 			disposedValue = true;
 		}
 	}
+
+	/// <inheritdoc />
 	public void Dispose()
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

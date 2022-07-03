@@ -20,20 +20,30 @@ public interface ILocation<T> : IPoint<T>
 	/// </summary>
 	public bool IsPointInside(IPoint<T> point);
 
+	/// <summary>
+	/// Checks if the given <paramref name="point"/> is inside the bounding box of the given
+	/// <paramref name="location"/>.
+	/// </summary>
+	/// <param name="location"></param>
 	/// <param name="point">The point to check.</param>
 	/// <returns>
-	/// <see langword="true"/> if the location given by <paramref name="x"/> and <paramref name="y"/>
-	/// is inside <paramref name="location"/>.
+	/// <see langword="true"/> if the location given by <paramref name="point"/> is inside the
+	/// <paramref name="location"/>'s bounding box; otherwise, <see langword="false"/>.
 	/// </returns>
 	public static bool IsPointInside(ILocation<int> location, IPoint<int> point) => location.X <= point.X
 	&& location.Y <= point.Y
 	&& location.X + location.Width > point.X
 	&& location.Y + location.Height > point.Y;
 
+	/// <summary>
+	/// Checks if the given <paramref name="point"/> is inside the bounding box of the given
+	/// <paramref name="location"/>.
+	/// </summary>
+	/// <param name="location"></param>
 	/// <param name="point">The point to check.</param>
 	/// <returns>
-	/// <see langword="true"/> if the location given by <paramref name="x"/> and <paramref name="y"/>
-	/// is inside <paramref name="location"/>.
+	/// <see langword="true"/> if the location given by <paramref name="point"/> is inside the
+	/// <paramref name="location"/>'s bounding box; otherwise, <see langword="false"/>.
 	/// </returns>
 	public static bool IsPointInside(ILocation<double> location, IPoint<double> point) => location.X <= point.X
 	&& location.Y <= point.Y

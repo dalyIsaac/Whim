@@ -33,7 +33,7 @@ internal class Workspace : IWorkspace
 
 	/// <summary>
 	/// All the windows in this workspace which are common to every layout engine.
-	/// The intersection of <see cref="Windows"/> and <see cref="PhantomWindows"/>
+	/// The intersection of <see cref="_windows"/> and <see cref="_phantomWindows"/>
 	/// is the empty set.
 	/// </summary>
 	private readonly HashSet<IWindow> _windows = new();
@@ -41,7 +41,7 @@ internal class Workspace : IWorkspace
 
 	/// <summary>
 	/// Phantom windows are specific to a single layout engine.
-	/// The intersection of <see cref="Windows"/> and <see cref="PhantomWindows"/>
+	/// The intersection of <see cref="_windows"/> and <see cref="_phantomWindows"/>
 	/// is the empty set.
 	/// </summary>
 	private readonly Dictionary<IWindow, ILayoutEngine> _phantomWindows = new();
@@ -49,7 +49,7 @@ internal class Workspace : IWorkspace
 	/// <summary>
 	/// Map of windows to their current location.
 	/// </summary>
-	private readonly Dictionary<IWindow, IWindowLocation> _windowLocations = new();
+	private readonly Dictionary<IWindow, IWindowState> _windowLocations = new();
 
 	public void DoLayout()
 	{
@@ -71,8 +71,8 @@ internal class Workspace : IWorkspace
 		}
 
 		_windowLocations.Clear();
-		IEnumerable<IWindowLocation> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height));
-		foreach (IWindowLocation loc in locations)
+		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height));
+		foreach (IWindowState loc in locations)
 		{
 			if (loc.Window.IsMouseMoving)
 			{
@@ -393,9 +393,9 @@ internal class Workspace : IWorkspace
 		_windowLocations.Clear();
 	}
 
-	public IWindowLocation? TryGetWindowLocation(IWindow window)
+	public IWindowState? TryGetWindowLocation(IWindow window)
 	{
-		_windowLocations.TryGetValue(window, out IWindowLocation? location);
+		_windowLocations.TryGetValue(window, out IWindowState? location);
 		return location;
 	}
 

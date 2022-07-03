@@ -8,6 +8,9 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
+/// <summary>
+/// Helper methods to interact with the Win32 API via a wrapper around the raw P/Invoke calls.
+/// </summary>
 public static class Win32Helper
 {
 	private const int _bufferCapacity = 255;
@@ -82,7 +85,7 @@ public static class Win32Helper
 	}
 
 	/// <summary>
-	/// Set the <see cref="PInvoke.SetWinEventHook"/> <br/>.
+	/// Set the <see cref="PInvoke.SetWinEventHook(uint, uint, SafeHandle, WINEVENTPROC, uint, uint, uint)"/> <br/>.
 	///
 	/// For more, see https://docs.microsoft.com/en-au/windows/win32/api/winuser/nf-winuser-setwineventhook
 	/// </summary>
@@ -277,11 +280,11 @@ public static class Win32Helper
 	}
 
 	/// <summary>
-	/// Using the given <paramref name="loc"/>, sets the window's position.
+	/// Using the given <paramref name="windowState"/>, sets the window's position.
 	/// </summary>
-	/// <param name="loc"></param>
+	/// <param name="windowState"></param>
 	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
-	public static void SetWindowPos(IWindowLocation windowLocation, HWND? hwndInsertAfter = null)
+	public static void SetWindowPos(IWindowState windowState, HWND? hwndInsertAfter = null)
 	{
 		// We use HWND_BOTTOM, as modifying the Z-order of a window
 		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
@@ -289,12 +292,12 @@ public static class Win32Helper
 		// actually changed the focus.
 		hwndInsertAfter ??= (HWND)1; // HWND_BOTTOM
 
-		IWindow window = windowLocation.Window;
+		IWindow window = windowState.Window;
 
 		ILocation<int> offset = GetWindowOffset(window.Handle);
-		ILocation<int> location = Location.Add(windowLocation.Location, offset);
+		ILocation<int> location = Location.Add(windowState.Location, offset);
 
-		WindowSize windowState = windowLocation.WindowState;
+		WindowSize windowSize = windowState.WindowSize;
 
 		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
 							   | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
@@ -302,7 +305,7 @@ public static class Win32Helper
 							   | SET_WINDOW_POS_FLAGS.SWP_NOZORDER
 							   | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
 
-		if (windowState == WindowSize.Maximized || windowState == WindowSize.Minimized)
+		if (windowSize == WindowSize.Maximized || windowSize == WindowSize.Minimized)
 		{
 			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
 		}
@@ -316,14 +319,14 @@ public static class Win32Helper
 			location.Height,
 			flags);
 
-		if (windowState == WindowSize.Maximized)
+		if (windowSize == WindowSize.Maximized)
 		{
 			if (!window.IsMinimized)
 			{
 				MinimizeWindow(window.Handle);
 			}
 		}
-		else if (windowState == WindowSize.Minimized)
+		else if (windowSize == WindowSize.Minimized)
 		{
 			if (!window.IsMaximized)
 			{
@@ -367,6 +370,11 @@ public static class Win32Helper
 		}
 	}
 
+	/// <summary>
+	/// Returns the window's location from DWM.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
 	public static ILocation<int>? DwmGetWindowLocation(HWND hwnd)
 	{
 		unsafe
@@ -393,7 +401,7 @@ public static class Win32Helper
 	}
 
 	/// <summary>
-	/// Sets the preferred window corners for the given <paramref name="window"/>.
+	/// Sets the preferred window corners for the given <paramref name="hwnd"/>.
 	/// By default, the window corners are rounded.
 	/// </summary>
 	/// <param name="hwnd"></param>

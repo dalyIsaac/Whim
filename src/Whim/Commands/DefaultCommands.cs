@@ -3,12 +3,29 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
+/// <summary>
+/// Whim's default commands.
+/// </summary>
 public static class DefaultCommands
 {
+	/// <summary>
+	/// The value for the key modifier <c>Win</c> + <c>Alt</c>.
+	/// </summary>
 	public const KeyModifiers WinAlt = KeyModifiers.LWin | KeyModifiers.LAlt;
+
+	/// <summary>
+	/// The value for the key modifier <c>Win</c> + <c>Shift</c>.
+	/// </summary>
 	public const KeyModifiers WinShift = KeyModifiers.LWin | KeyModifiers.LShift;
+
+	/// <summary>
+	/// The value for the key modifier <c>Win</c> + <c>Ctrl</c>.
+	/// </summary>
 	public const KeyModifiers WinCtrl = KeyModifiers.LWin | KeyModifiers.LControl;
 
+	/// <summary>
+	/// Gets the default commands.
+	/// </summary>
 	public static (ICommand, IKeybind?)[] GetCommands(IConfigContext configContext) => new (ICommand, IKeybind?)[]
 	{
 		// Focus window in direction.
@@ -98,6 +115,9 @@ public static class DefaultCommands
 		),
 	};
 
+	/// <summary>
+	/// Action to focus the last focused window in the specified direction.
+	/// </summary>
 	public static Action FocusWindowInDirection(IConfigContext configContext, Direction direction) => () =>
 	{
 		IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
@@ -109,6 +129,9 @@ public static class DefaultCommands
 		workspace.ActiveLayoutEngine.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
 	};
 
+	/// <summary>
+	/// Action to swap the last focused window with the window in the specified direction.
+	/// </summary>
 	public static Action SwapWindowInDirection(IConfigContext configContext, Direction direction) => () =>
 	{
 		configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);

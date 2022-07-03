@@ -4,6 +4,9 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
+/// <summary>
+/// Extensions for <see cref="Microsoft.UI.Xaml.Window"/>.
+/// </summary>
 public static class WindowExtensions
 {
 	/// <summary>

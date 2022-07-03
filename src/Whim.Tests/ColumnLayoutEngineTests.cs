@@ -28,11 +28,11 @@ public class ColumnLayoutEngineTests
 		};
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] result = engine.DoLayout(location).ToArray();
+		IWindowState[] result = engine.DoLayout(location).ToArray();
 
 		Assert.Single(result);
 
-		IWindowLocation windowLocation = result[0];
+		IWindowState windowLocation = result[0];
 		Assert.Equal(0, windowLocation.Location.X);
 		Assert.Equal(0, windowLocation.Location.Y);
 		Assert.Equal(1920, windowLocation.Location.Width);
@@ -50,11 +50,11 @@ public class ColumnLayoutEngineTests
 		};
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] result = engine.DoLayout(location).ToArray();
+		IWindowState[] result = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(3, result.Length);
 
-		IWindowLocation windowLocation = result[0];
+		IWindowState windowLocation = result[0];
 		Assert.Equal(0, windowLocation.Location.X);
 		Assert.Equal(0, windowLocation.Location.Y);
 		Assert.Equal(640, windowLocation.Location.Width);
@@ -82,11 +82,11 @@ public class ColumnLayoutEngineTests
 		};
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] result = engine.DoLayout(location).ToArray();
+		IWindowState[] result = engine.DoLayout(location).ToArray();
 
 		Assert.Single(result);
 
-		IWindowLocation windowLocation = result[0];
+		IWindowState windowLocation = result[0];
 		Assert.Equal(0, windowLocation.Location.X);
 		Assert.Equal(0, windowLocation.Location.Y);
 		Assert.Equal(1920, windowLocation.Location.Width);
@@ -104,11 +104,11 @@ public class ColumnLayoutEngineTests
 		};
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] result = engine.DoLayout(location).ToArray();
+		IWindowState[] result = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(3, result.Length);
 
-		IWindowLocation windowLocation = result[0];
+		IWindowState windowLocation = result[0];
 		Assert.Equal(1280, windowLocation.Location.X);
 		Assert.Equal(0, windowLocation.Location.Y);
 		Assert.Equal(640, windowLocation.Location.Width);
@@ -307,7 +307,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Up, leftWindow.Object);
 
-		IWindowLocation[] windows = engine.DoLayout(new Location(0, 0, 1920, 1080)).ToArray();
+		IWindowState[] windows = engine.DoLayout(new Location(0, 0, 1920, 1080)).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -332,7 +332,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Left, notFoundWindow.Object);
 
-		IWindowLocation[] windows = engine.DoLayout(new Location(0, 0, 1920, 1080)).ToArray();
+		IWindowState[] windows = engine.DoLayout(new Location(0, 0, 1920, 1080)).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -357,7 +357,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
+		IWindowState[] windows = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -382,7 +382,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
+		IWindowState[] windows = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -407,7 +407,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
+		IWindowState[] windows = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -432,7 +432,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
+		IWindowState[] windows = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -457,7 +457,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
+		IWindowState[] windows = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -482,7 +482,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
+		IWindowState[] windows = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -507,7 +507,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
+		IWindowState[] windows = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(2, windows.Length);
 
@@ -532,7 +532,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
 
 		Location location = new(0, 0, 1920, 1080);
-		IWindowLocation[] windows = engine.DoLayout(location).ToArray();
+		IWindowState[] windows = engine.DoLayout(location).ToArray();
 
 		Assert.Equal(2, windows.Length);
 

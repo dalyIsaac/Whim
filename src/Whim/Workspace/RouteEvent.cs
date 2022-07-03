@@ -9,6 +9,9 @@ namespace Whim;
 /// </summary>
 public class RouteEventArgs : EventArgs
 {
+	/// <summary>
+	/// The window that was routed.
+	/// </summary>
 	public IWindow Window { get; }
 
 	/// <summary>
@@ -30,9 +33,18 @@ public class RouteEventArgs : EventArgs
 		CurrentWorkspace = currentWorkspace;
 	}
 
+	/// <summary>
+	/// Helper method for creating a new <see cref="RouteEventArgs"/> for when a window is added to a workspace.
+	/// </summary>
 	public static RouteEventArgs WindowAdded(IWindow window, IWorkspace workspace) => new(window, null, workspace);
 
+	/// <summary>
+	/// Helper method for creating a new <see cref="RouteEventArgs"/> for when a window is removed from a workspace.
+	/// </summary>
 	public static RouteEventArgs WindowRemoved(IWindow window, IWorkspace workspace) => new(window, workspace, null);
 
+	/// <summary>
+	/// Helper method for creating a new <see cref="RouteEventArgs"/> for when a window is routed between workspaces.
+	/// </summary>
 	public static RouteEventArgs WindowMoved(IWindow window, IWorkspace fromWorkspace, IWorkspace toWorkspace) => new(window, fromWorkspace, toWorkspace);
 }

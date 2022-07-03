@@ -104,7 +104,7 @@ public class FocusIndicatorPlugin : IPlugin
 		}
 
 		// Get the window location.
-		IWindowLocation? windowLocation = activeWorkspace.TryGetWindowLocation(window);
+		IWindowState? windowLocation = activeWorkspace.TryGetWindowLocation(window);
 		if (windowLocation == null)
 		{
 			Logger.Error($"Could not find window location for window {window}");

@@ -12,7 +12,7 @@ public class WindowNode : LeafNode
 	public WindowNode(IWindow window, SplitNode? parent = null) : base(window, parent) { }
 	public override string? ToString() => Window?.ToString();
 
-	// override object.Equals
+	/// <inheritdoc />
 	public override bool Equals(object? obj)
 	{
 		//
@@ -33,6 +33,6 @@ public class WindowNode : LeafNode
 			((node.Parent == null) == (Parent == null));
 	}
 
-	// override object.GetHashCode
+	/// <inheritdoc />
 	public override int GetHashCode() => HashCode.Combine(Window, Parent);
 }

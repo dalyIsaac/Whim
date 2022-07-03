@@ -49,6 +49,9 @@ public interface IWorkspace
 	#endregion
 
 	#region Windows
+	/// <summary>
+	/// The windows in the workspace.
+	/// </summary>
 	public IEnumerable<IWindow> Windows { get; }
 
 	/// <summary>
@@ -88,7 +91,7 @@ public interface IWorkspace
 	/// If the window is not in the workspace, or the workspace is not focused,
 	/// <c>null</c> is returned.
 	/// </returns>
-	public IWindowLocation? TryGetWindowLocation(IWindow window);
+	public IWindowState? TryGetWindowLocation(IWindow window);
 
 	/// <summary>
 	/// Focuses on the first window in the workspace.
@@ -114,11 +117,11 @@ public interface IWorkspace
 	public void SwapWindowInDirection(Direction direction, IWindow? window = null);
 
 	/// <summary>
-	/// Change the <paramref name="window"/>'s edge <paramref name="direction"/> by
-	/// the specified <paramref name="fractionDelta"/>.
+	/// Change the <paramref name="window"/>'s <paramref name="edge"/> direction by
+	/// the specified <paramref name="delta"/>.
 	/// </summary>
 	/// <param name="edge">The edge to change.</param>
-	/// <param name="fractionDelta">The percentage to change the edge by.</param>
+	/// <param name="delta">The percentage to change the edge by.</param>
 	/// <param name="window">
 	/// The window to change the edge of. If null, the currently focused window is
 	/// used.
@@ -148,6 +151,7 @@ public interface IWorkspace
 	/// </summary>
 	/// <param name="engine">The layout engine to unregister the phantom window from.</param>
 	/// <param name="window">The phantom window to unregister.</param>
+	/// <param name="doLayout">Indicates whether to do a layout after unregistering the phantom window.</param>
 	public void UnregisterPhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false);
 	#endregion
 }

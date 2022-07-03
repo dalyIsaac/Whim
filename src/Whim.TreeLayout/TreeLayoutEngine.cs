@@ -270,7 +270,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		return Root?.LeftMostLeaf?.Window;
 	}
 
-	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
+	public IEnumerable<IWindowState> DoLayout(ILocation<int> location)
 	{
 		if (Root == null)
 		{
@@ -282,7 +282,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		{
 			if (item.Node is LeafNode leafNode)
 			{
-				yield return new WindowLocation(leafNode.Window, item.Location, item.WindowState);
+				yield return new WindowState(leafNode.Window, item.Location, item.WindowState);
 			}
 		}
 	}
@@ -650,7 +650,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// <summary>
 	/// Helper method to add a window to the layout engine.
 	/// This calls <see cref="SplitFocusedWindow"/> if the window is a phantom window.
-	/// Otherwise, it calls <see cref-"AddWindow(IWindow, LeafNode)"/>.
+	/// Otherwise, it calls <see cref="AddWindow(IWindow, LeafNode)"/>.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
 	/// <param name="isPhantom">Whether the window is a phantom window.</param>

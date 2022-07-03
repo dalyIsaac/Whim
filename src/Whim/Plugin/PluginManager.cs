@@ -8,7 +8,7 @@ internal class PluginManager : IPluginManager
 	private readonly List<IPlugin> _plugins = new();
 	private bool disposedValue;
 
-	public IEnumerable<IPlugin> AvailablePlugins => _plugins;
+	public IEnumerable<IPlugin> LoadedPlugins => _plugins;
 
 	public void PreInitialize()
 	{

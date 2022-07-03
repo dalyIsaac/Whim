@@ -22,7 +22,7 @@ public class TreeLayoutWindowLocation
 public partial class TreeLayoutEngine
 {
 	/// <summary>
-	/// Gets the <see cref="WindowLocation"/> for all windows, within the unit square.
+	/// Gets the <see cref="WindowState"/> for all windows, within the unit square.
 	/// </summary>
 	/// <param name="node">The root node of the tree.</param>
 	/// <param name="location">The location of the root node.</param>

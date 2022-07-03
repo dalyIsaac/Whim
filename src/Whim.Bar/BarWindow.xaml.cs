@@ -10,7 +10,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 	private readonly IConfigContext _configContext;
 	private readonly BarConfig _barConfig;
 	private readonly IMonitor _monitor;
-	private readonly IWindowLocation _windowLocation;
+	private readonly IWindowState _windowLocation;
 
 	public BarWindow(IConfigContext configContext, BarConfig barConfig, IMonitor monitor)
 	{
@@ -31,7 +31,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		int topMargin = (int)_barConfig.Margin.Top;
 		int bottomMargin = (int)_barConfig.Margin.Bottom;
 
-		_windowLocation = new WindowLocation(window, new Location(
+		_windowLocation = new WindowState(window, new Location(
 			x: _monitor.X + leftMargin,
 			y: _monitor.Y + rightMargin,
 			width: _monitor.Width - (leftMargin + rightMargin),

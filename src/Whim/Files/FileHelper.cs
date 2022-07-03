@@ -17,6 +17,9 @@ public static class FileHelper
 			".whim"
 		);
 
+	/// <summary>
+	/// Ensures that the Whim directory exists. If it does not, it is created.
+	/// </summary>
 	public static void EnsureWhimDirExists()
 	{
 		if (!Directory.Exists(GetWhimDir()))

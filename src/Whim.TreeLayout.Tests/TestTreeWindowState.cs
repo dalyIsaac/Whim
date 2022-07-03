@@ -1,9 +1,9 @@
 namespace Whim.TreeLayout.Tests;
 
 /// <summary>
-/// This contains the window locations for <see cref="TestTree"/>.
+/// This contains the window states for <see cref="TestTree"/>.
 /// </summary>
-internal static class TestTreeWindowLocations
+internal static class TestTreeWindowState
 {
 	public static ILocation<double> Left = new DoubleLocation() { X = 0, Y = 0, Width = 0.5, Height = 1 };
 	public static ILocation<double> RightBottom = new DoubleLocation() { X = 0.5, Y = 0.5, Width = 0.5, Height = 0.5 };
@@ -28,7 +28,7 @@ internal static class TestTreeWindowLocations
 		RightBottom
 	};
 
-	public static IWindowLocation[] GetAllWindowLocations(ILocation<int> screen, IWindow leftWindow,
+	public static IWindowState[] GetAllWindowStates(ILocation<int> screen, IWindow leftWindow,
 		IWindow rightTopLeftTopWindow,
 		IWindow rightTopLeftBottomLeftWindow,
 		IWindow rightTopLeftBottomRightTopWindow,
@@ -38,17 +38,17 @@ internal static class TestTreeWindowLocations
 		IWindow rightTopRight3Window,
 		IWindow rightBottomWindow)
 	{
-		return new IWindowLocation[]
+		return new IWindowState[]
 		{
-			new WindowLocation(leftWindow, Left.Scale(screen), WindowSize.Normal),
-			new WindowLocation(rightTopLeftTopWindow, RightTopLeftTop.Scale(screen), WindowSize.Normal),
-			new WindowLocation(rightTopLeftBottomLeftWindow, RightTopLeftBottomLeft.Scale(screen), WindowSize.Normal),
-			new WindowLocation(rightTopLeftBottomRightTopWindow, RightTopLeftBottomRightTop.Scale(screen), WindowSize.Normal),
-			new WindowLocation(rightTopLeftBottomRightBottomWindow, RightTopLeftBottomRightBottom.Scale(screen), WindowSize.Normal),
-			new WindowLocation(rightTopRight1Window, RightTopRight1.Scale(screen), WindowSize.Normal),
-			new WindowLocation(rightTopRight2Window, RightTopRight2.Scale(screen), WindowSize.Normal),
-			new WindowLocation(rightTopRight3Window, RightTopRight3.Scale(screen), WindowSize.Normal),
-			new WindowLocation(rightBottomWindow, RightBottom.Scale(screen), WindowSize.Normal)
+			new WindowState(leftWindow, Left.Scale(screen), WindowSize.Normal),
+			new WindowState(rightTopLeftTopWindow, RightTopLeftTop.Scale(screen), WindowSize.Normal),
+			new WindowState(rightTopLeftBottomLeftWindow, RightTopLeftBottomLeft.Scale(screen), WindowSize.Normal),
+			new WindowState(rightTopLeftBottomRightTopWindow, RightTopLeftBottomRightTop.Scale(screen), WindowSize.Normal),
+			new WindowState(rightTopLeftBottomRightBottomWindow, RightTopLeftBottomRightBottom.Scale(screen), WindowSize.Normal),
+			new WindowState(rightTopRight1Window, RightTopRight1.Scale(screen), WindowSize.Normal),
+			new WindowState(rightTopRight2Window, RightTopRight2.Scale(screen), WindowSize.Normal),
+			new WindowState(rightTopRight3Window, RightTopRight3.Scale(screen), WindowSize.Normal),
+			new WindowState(rightBottomWindow, RightBottom.Scale(screen), WindowSize.Normal)
 		};
 	}
 }

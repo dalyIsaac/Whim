@@ -18,12 +18,17 @@ public interface IMonitor : ILocation<int>
 	public bool IsPrimary { get; }
 }
 
+/// <summary>
+/// Helper methods for converting between the unit square coordinate system and a monitor's
+/// coordinate system.
+/// </summary>
 public static class MonitorHelpers
 {
 	/// <summary>
-	/// Translate the <paramref name="point"/> from the <see cref="IMonitor"/>'s coordinate system to the
-	/// unit square.
+	/// Translate the <paramref name="point"/> from the <paramref name="monitor"/>'s coordinate
+	/// system to the unit square.
 	/// </summary>
+	/// <param name="monitor"></param>
 	/// <param name="point">The point to translate.</param>
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
 	public static IPoint<double> ToUnitSquare(this ILocation<int> monitor, IPoint<int> point)
@@ -34,9 +39,11 @@ public static class MonitorHelpers
 	}
 
 	/// <summary>
-	/// Translate the <paramref name="point"/> from the unit square to the <see cref="IMonitor"/>'s coordinate system.
+	/// Translate the <paramref name="location"/> from the unit square to the
+	/// <paramref name="monitor"/>'s coordinate system.
 	/// </summary>
-	/// <param name="point">The point to translate.</param>
+	/// <param name="monitor"></param>
+	/// <param name="location">The point to translate.</param>
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
 	public static ILocation<double> ToUnitSquare(this ILocation<int> monitor, ILocation<int> location)
 	{
@@ -48,8 +55,10 @@ public static class MonitorHelpers
 	}
 
 	/// <summary>
-	/// Translate the <paramref name="location"/> from the unit square to the <see cref="IMonitor"/>'s coordinate system.
+	/// Translate the <paramref name="location"/> from the unit square to the
+	/// <paramref name="monitor"/>'s coordinate system.
 	/// </summary>
+	/// <param name="monitor"></param>
 	/// <param name="location">The location to translate.</param>
 	/// <returns>The converted location.</returns>
 	public static ILocation<int> ToMonitor(this ILocation<int> monitor, ILocation<double> location)

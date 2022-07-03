@@ -288,7 +288,7 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// </summary>
 	/// <param name="node">The node whose weight is to be changed.</param>
 	/// <param name="delta">
-	// The amount to change the weight by. The delta should continue the assumption
+	/// The amount to change the weight by. The delta should continue the assumption
 	/// the coordinates for this node are in the range [0, 1].
 	/// </param>
 	internal void AdjustChildWeight(Node node, double delta)

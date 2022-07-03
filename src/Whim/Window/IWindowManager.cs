@@ -19,7 +19,7 @@ public interface IWindowManager : IDisposable
 	public event EventHandler<WindowEventArgs>? WindowRegistered;
 
 	/// <summary>
-	/// Event for when a window is updated.
+	/// Event for when a window is updated by Windows.
 	/// </summary>
 	public event EventHandler<WindowUpdateEventArgs>? WindowUpdated;
 
@@ -29,7 +29,7 @@ public interface IWindowManager : IDisposable
 	public event EventHandler<WindowEventArgs>? WindowFocused;
 
 	/// <summary>
-	/// Event for when a window is unregistered.
+	/// Event for when a window is unregistered from Whim.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowUnregistered;
 }

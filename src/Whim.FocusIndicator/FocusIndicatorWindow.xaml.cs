@@ -20,7 +20,7 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 	/// Activates the window behind the given window.
 	/// </summary>
 	/// <param name="windowLocation">The location of the window.</param>
-	public void Activate(IWindowLocation windowLocation)
+	public void Activate(IWindowState windowLocation)
 	{
 		ILocation<int> focusedWindowLocation = windowLocation.Location;
 		int borderSize = FocusIndicatorConfig.BorderSize;
@@ -33,7 +33,7 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		);
 
 		Win32Helper.SetWindowPos(
-			new WindowLocation(_window, borderLocation, WindowSize.Normal),
+			new WindowState(_window, borderLocation, WindowSize.Normal),
 			windowLocation.Window.Handle
 		);
 	}
