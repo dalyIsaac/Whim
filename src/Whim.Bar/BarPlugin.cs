@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace Whim.Bar;
 
+/// <summary>
+/// BarPlugin displays an interactive bar at the top of the screen for Whim. It can be configured
+/// with various <see cref="BarComponent"/>s to display on the left, center, and right sides of the bar.
+/// </summary>
 public class BarPlugin : IPlugin, IDisposable
 {
 	private readonly IConfigContext _configContext;
@@ -11,6 +15,11 @@ public class BarPlugin : IPlugin, IDisposable
 	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = new();
 	private bool disposedValue;
 
+	/// <summary>
+	/// Create the bar plugin.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="barConfig"></param>
 	public BarPlugin(IConfigContext configContext, BarConfig barConfig)
 	{
 		_configContext = configContext;

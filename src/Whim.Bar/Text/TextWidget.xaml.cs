@@ -5,7 +5,7 @@ namespace Whim.Bar;
 /// <summary>
 /// Interaction logic for TextWidget.xaml
 /// </summary>
-public partial class TextWidget : UserControl
+internal partial class TextWidget : UserControl
 {
 	public TextWidgetViewModel ViewModel { get; private set; }
 

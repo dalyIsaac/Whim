@@ -5,7 +5,7 @@ namespace Whim.Bar;
 /// <summary>
 /// Interaction logic for DateTimeWidget.xaml
 /// </summary>
-public partial class DateTimeWidget : UserControl
+internal partial class DateTimeWidget : UserControl
 {
 	public DateTimeWidgetViewModel ViewModel { get; private set; }
 

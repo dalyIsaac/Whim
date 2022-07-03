@@ -3,13 +3,24 @@ using System.ComponentModel;
 
 namespace Whim.Bar;
 
+/// <summary>
+/// Command for switching workspace.
+/// </summary>
 public class SwitchWorkspaceCommand : System.Windows.Input.ICommand
 {
 	private readonly IConfigContext _configContext;
 	private readonly WorkspaceWidgetViewModel _viewModel;
 	private readonly WorkspaceModel _workspace;
+
+	/// <inheritdoc/>
 	public event EventHandler? CanExecuteChanged;
 
+	/// <summary>
+	/// Creates a new instance of <see cref="SwitchWorkspaceCommand"/>.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="viewModel"></param>
+	/// <param name="workspace"></param>
 	public SwitchWorkspaceCommand(IConfigContext configContext, WorkspaceWidgetViewModel viewModel, WorkspaceModel workspace)
 	{
 		_configContext = configContext;
@@ -26,8 +37,10 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand
 		}
 	}
 
+	/// <inheritdoc/>
 	public bool CanExecute(object? parameter) => !_workspace.ActiveOnMonitor;
 
+	/// <inheritdoc/>
 	public void Execute(object? parameter)
 	{
 		Logger.Debug("Executing...");

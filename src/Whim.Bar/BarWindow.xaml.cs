@@ -12,6 +12,13 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 	private readonly IMonitor _monitor;
 	private readonly IWindowState _windowLocation;
 
+	/// <summary>
+	/// Creates a new bar window.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="barConfig"></param>
+	/// <param name="monitor"></param>
+	/// <exception cref="BarException"></exception>
 	public BarWindow(IConfigContext configContext, BarConfig barConfig, IMonitor monitor)
 	{
 		_configContext = configContext;

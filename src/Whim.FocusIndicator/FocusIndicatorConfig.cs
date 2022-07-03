@@ -10,8 +10,10 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 {
 	internal const string Title = "Whim Focus Indicator";
 
+	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
 
+	/// <inheritdoc/>
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
