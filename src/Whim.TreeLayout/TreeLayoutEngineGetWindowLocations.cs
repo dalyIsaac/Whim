@@ -9,13 +9,13 @@ public class TreeLayoutWindowLocation
 
 	public ILocation<int> Location { get; }
 
-	public WindowSize WindowState { get; }
+	public WindowSize WindowSize { get; }
 
-	public TreeLayoutWindowLocation(Node node, ILocation<int> location, WindowSize windowState)
+	public TreeLayoutWindowLocation(Node node, ILocation<int> location, WindowSize windowSize)
 	{
 		this.Node = node;
 		Location = location;
-		WindowState = windowState;
+		WindowSize = windowSize;
 	}
 }
 

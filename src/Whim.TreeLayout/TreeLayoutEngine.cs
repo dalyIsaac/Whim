@@ -282,7 +282,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		{
 			if (item.Node is LeafNode leafNode)
 			{
-				yield return new WindowState(leafNode.Window, item.Location, item.WindowState);
+				yield return new WindowState(leafNode.Window, item.Location, item.WindowSize);
 			}
 		}
 	}
