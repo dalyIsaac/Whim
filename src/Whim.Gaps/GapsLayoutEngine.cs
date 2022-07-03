@@ -2,15 +2,24 @@ using System.Collections.Generic;
 
 namespace Whim.Gaps;
 
+/// <summary>
+/// A proxy layout engine to add gaps to the layout.
+/// </summary>
 public class GapsLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly GapsConfig _gapsConfig;
 
+	/// <summary>
+	/// Create a new instance of the proxy layout engine <see cref="GapsLayoutEngine"/>.
+	/// </summary>
+	/// <param name="gapsConfig"></param>
+	/// <param name="innerLayoutEngine"></param>
 	public GapsLayoutEngine(GapsConfig gapsConfig, ILayoutEngine innerLayoutEngine) : base(innerLayoutEngine)
 	{
 		_gapsConfig = gapsConfig;
 	}
 
+	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
 	{
 		int doubleOuterGap = _gapsConfig.OuterGap * 2;
