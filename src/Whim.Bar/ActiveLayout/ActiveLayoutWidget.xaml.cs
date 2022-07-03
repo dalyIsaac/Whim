@@ -5,7 +5,7 @@ namespace Whim.Bar;
 /// <summary>
 /// Interaction logic for ActiveLayoutWidget.xaml
 /// </summary>
-internal partial class ActiveLayoutWidget : UserControl
+public partial class ActiveLayoutWidget : UserControl
 {
 	/// <summary>
 	/// The view model for the active layout widget.
