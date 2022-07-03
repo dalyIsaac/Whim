@@ -3,7 +3,7 @@
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
+internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 {
 	public FocusIndicatorConfig FocusIndicatorConfig { get; }
 	private readonly IWindow _window;

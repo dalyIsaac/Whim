@@ -6,6 +6,9 @@ using Windows.UI;
 
 namespace Whim.FocusIndicator;
 
+/// <summary>
+/// Configuration for the focus indicator plugin.
+/// </summary>
 public class FocusIndicatorConfig : INotifyPropertyChanged
 {
 	internal const string Title = "Whim Focus Indicator";
