@@ -9,9 +9,9 @@ public class TreeLayoutWindowLocation
 
 	public ILocation<int> Location { get; }
 
-	public WindowState WindowState { get; }
+	public WindowSize WindowState { get; }
 
-	public TreeLayoutWindowLocation(Node node, ILocation<int> location, WindowState windowState)
+	public TreeLayoutWindowLocation(Node node, ILocation<int> location, WindowSize windowState)
 	{
 		this.Node = node;
 		Location = location;
@@ -33,7 +33,7 @@ public partial class TreeLayoutEngine
 		if (node is LeafNode)
 		{
 			yield return new TreeLayoutWindowLocation(
-				node, location, WindowState.Normal
+				node, location, WindowSize.Normal
 			);
 
 			yield break;

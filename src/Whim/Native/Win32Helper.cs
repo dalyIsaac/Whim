@@ -294,7 +294,7 @@ public static class Win32Helper
 		ILocation<int> offset = GetWindowOffset(window.Handle);
 		ILocation<int> location = Location.Add(windowLocation.Location, offset);
 
-		WindowState windowState = windowLocation.WindowState;
+		WindowSize windowState = windowLocation.WindowState;
 
 		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
 							   | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
@@ -302,7 +302,7 @@ public static class Win32Helper
 							   | SET_WINDOW_POS_FLAGS.SWP_NOZORDER
 							   | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
 
-		if (windowState == WindowState.Maximized || windowState == WindowState.Minimized)
+		if (windowState == WindowSize.Maximized || windowState == WindowSize.Minimized)
 		{
 			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
 		}
@@ -316,14 +316,14 @@ public static class Win32Helper
 			location.Height,
 			flags);
 
-		if (windowState == WindowState.Maximized)
+		if (windowState == WindowSize.Maximized)
 		{
 			if (!window.IsMinimized)
 			{
 				MinimizeWindow(window.Handle);
 			}
 		}
-		else if (windowState == WindowState.Minimized)
+		else if (windowState == WindowSize.Minimized)
 		{
 			if (!window.IsMaximized)
 			{

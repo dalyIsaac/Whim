@@ -10,7 +10,7 @@ public interface IWindowLocation
 	/// <summary>
 	/// The state of the window.
 	/// </summary>
-	public WindowState WindowState { get; set; }
+	public WindowSize WindowState { get; set; }
 
 	/// <summary>
 	/// The window in question.

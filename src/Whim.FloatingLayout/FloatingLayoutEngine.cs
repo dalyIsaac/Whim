@@ -20,7 +20,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		// Iterate over all windows in _windowToLocation.
 		foreach ((IWindow window, ILocation<double> loc) in _windowToLocation)
 		{
-			yield return new WindowLocation(window, location.ToMonitor(loc), WindowState.Normal);
+			yield return new WindowLocation(window, location.ToMonitor(loc), WindowSize.Normal);
 		}
 
 		// Iterate over all windows in the inner layout engine.
