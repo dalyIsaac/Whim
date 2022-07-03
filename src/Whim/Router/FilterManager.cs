@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Whim;
 
-public class FilterManager : IFilterManager
+internal class FilterManager : IFilterManager
 {
 
 	#region Filters for specific properties

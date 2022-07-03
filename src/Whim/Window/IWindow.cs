@@ -1,3 +1,4 @@
+using System;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -110,4 +111,24 @@ public interface IWindow
 	/// Quits the window.
 	/// </summary>
 	public void Close();
+
+	/// <summary>
+	/// Create a new window. If the window cannot be created, <c>null</c> is returned.
+	/// </summary>
+	/// <param name="hwnd">The handle of the window.</param>
+	/// <param name="configContext">The configuration context.</param>
+	public static IWindow? CreateWindow(HWND hwnd, IConfigContext configContext)
+	{
+		Logger.Debug($"Registering window {hwnd.Value}");
+
+		try
+		{
+			return new Window(hwnd, configContext);
+		}
+		catch (Exception e)
+		{
+			Logger.Error($"Could not create a Window instance for {hwnd.Value}, {e.Message}");
+			return null;
+		}
+	}
 }

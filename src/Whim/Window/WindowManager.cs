@@ -7,7 +7,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-public class WindowManager : IWindowManager
+internal class WindowManager : IWindowManager
 {
 	private readonly IConfigContext _configContext;
 
@@ -209,7 +209,7 @@ public class WindowManager : IWindowManager
 
 		Logger.Debug($"Registering window {hwnd.Value}");
 
-		Window? window = Window.CreateWindow(hwnd, _configContext);
+		IWindow? window = IWindow.CreateWindow(hwnd, _configContext);
 
 		if (window == null || _configContext.FilterManager.ShouldBeIgnored(window))
 		{

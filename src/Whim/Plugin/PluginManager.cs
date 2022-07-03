@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-public class PluginManager : IPluginManager
+internal class PluginManager : IPluginManager
 {
 	private readonly List<IPlugin> _plugins = new();
 	private bool disposedValue;

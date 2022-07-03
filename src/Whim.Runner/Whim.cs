@@ -12,7 +12,7 @@ internal class Whim
 	internal static void Start()
 	{
 		// Create an empty Whim config context.
-		IConfigContext configContext = new ConfigContext();
+		IConfigContext configContext = Engine.CreateConfigContext();
 		Exception? startupException = null;
 
 		try

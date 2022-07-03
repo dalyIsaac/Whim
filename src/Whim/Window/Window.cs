@@ -7,7 +7,7 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-public class Window : IWindow
+internal class Window : IWindow
 {
 	private readonly IConfigContext _configContext;
 
@@ -126,7 +126,7 @@ public class Window : IWindow
 	/// <param name="hwnd"></param>
 	/// <param name="configContext"></param>
 	/// <exception cref="Win32Exception"></exception>
-	private Window(HWND hwnd, IConfigContext configContext)
+	internal Window(HWND hwnd, IConfigContext configContext)
 	{
 		_configContext = configContext;
 		Handle = hwnd;
@@ -157,21 +157,6 @@ public class Window : IWindow
 			// We throw the exception here to implicitly ignore this process.
 			throw ex;
 		};
-	}
-
-	public static Window? CreateWindow(HWND hwnd, IConfigContext configContext)
-	{
-		Logger.Debug($"Registering window {hwnd.Value}");
-
-		try
-		{
-			return new Window(hwnd, configContext);
-		}
-		catch (Exception e)
-		{
-			Logger.Error($"Could not create a Window instance for {hwnd.Value}, {e.Message}");
-			return null;
-		}
 	}
 
 	public override bool Equals(object? obj)

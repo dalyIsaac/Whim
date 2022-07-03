@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Whim;
 
-public class Workspace : IWorkspace
+internal class Workspace : IWorkspace
 {
 	private readonly IConfigContext _configContext;
 
