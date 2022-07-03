@@ -35,7 +35,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 			x: _monitor.X + leftMargin,
 			y: _monitor.Y + rightMargin,
 			width: _monitor.Width - (leftMargin + rightMargin),
-			height: _barConfig.Height), WindowState.Normal);
+			height: _barConfig.Height), WindowSize.Normal);
 
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
 		Title = "Whim Bar";

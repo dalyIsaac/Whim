@@ -33,7 +33,7 @@ public sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		);
 
 		Win32Helper.SetWindowPos(
-			new WindowLocation(_window, borderLocation, WindowState.Normal),
+			new WindowLocation(_window, borderLocation, WindowSize.Normal),
 			windowLocation.Window.Handle
 		);
 	}

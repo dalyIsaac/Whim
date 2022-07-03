@@ -45,7 +45,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		{
 			yield return new WindowLocation(window,
 											new Location(x, y, width, height),
-											WindowState.Normal);
+											WindowSize.Normal);
 
 			if (LeftToRight)
 			{

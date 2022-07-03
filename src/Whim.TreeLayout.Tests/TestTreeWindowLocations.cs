@@ -40,15 +40,15 @@ internal static class TestTreeWindowLocations
 	{
 		return new IWindowLocation[]
 		{
-			new WindowLocation(leftWindow, Left.Scale(screen), WindowState.Normal),
-			new WindowLocation(rightTopLeftTopWindow, RightTopLeftTop.Scale(screen), WindowState.Normal),
-			new WindowLocation(rightTopLeftBottomLeftWindow, RightTopLeftBottomLeft.Scale(screen), WindowState.Normal),
-			new WindowLocation(rightTopLeftBottomRightTopWindow, RightTopLeftBottomRightTop.Scale(screen), WindowState.Normal),
-			new WindowLocation(rightTopLeftBottomRightBottomWindow, RightTopLeftBottomRightBottom.Scale(screen), WindowState.Normal),
-			new WindowLocation(rightTopRight1Window, RightTopRight1.Scale(screen), WindowState.Normal),
-			new WindowLocation(rightTopRight2Window, RightTopRight2.Scale(screen), WindowState.Normal),
-			new WindowLocation(rightTopRight3Window, RightTopRight3.Scale(screen), WindowState.Normal),
-			new WindowLocation(rightBottomWindow, RightBottom.Scale(screen), WindowState.Normal)
+			new WindowLocation(leftWindow, Left.Scale(screen), WindowSize.Normal),
+			new WindowLocation(rightTopLeftTopWindow, RightTopLeftTop.Scale(screen), WindowSize.Normal),
+			new WindowLocation(rightTopLeftBottomLeftWindow, RightTopLeftBottomLeft.Scale(screen), WindowSize.Normal),
+			new WindowLocation(rightTopLeftBottomRightTopWindow, RightTopLeftBottomRightTop.Scale(screen), WindowSize.Normal),
+			new WindowLocation(rightTopLeftBottomRightBottomWindow, RightTopLeftBottomRightBottom.Scale(screen), WindowSize.Normal),
+			new WindowLocation(rightTopRight1Window, RightTopRight1.Scale(screen), WindowSize.Normal),
+			new WindowLocation(rightTopRight2Window, RightTopRight2.Scale(screen), WindowSize.Normal),
+			new WindowLocation(rightTopRight3Window, RightTopRight3.Scale(screen), WindowSize.Normal),
+			new WindowLocation(rightBottomWindow, RightBottom.Scale(screen), WindowSize.Normal)
 		};
 	}
 }

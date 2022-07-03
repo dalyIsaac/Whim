@@ -6,11 +6,11 @@ public class WindowLocation : IWindowLocation
 {
 	public ILocation<int> Location { get; set; }
 
-	public WindowState WindowState { get; set; }
+	public WindowSize WindowState { get; set; }
 
 	public IWindow Window { get; }
 
-	public WindowLocation(IWindow window, ILocation<int> location, WindowState windowState)
+	public WindowLocation(IWindow window, ILocation<int> location, WindowSize windowState)
 	{
 		Window = window;
 		Location = location;
