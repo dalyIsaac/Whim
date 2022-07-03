@@ -116,22 +116,23 @@ internal class Workspace : IWorkspace
 				_layoutEngines[i] = proxyLayout(_layoutEngines[i]);
 			}
 		}
-
-		// Subscribe to window focus events
-		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
+	/// <summary>
+	/// Called when a window is focused, regardless of whether it's in this workspace.
+	/// </summary>
+	/// <param name="window"></param>
+	internal void WindowFocused(IWindow window)
 	{
 		if (
-			_windows.Contains(e.Window) ||
-			(_phantomWindows.TryGetValue(e.Window, out ILayoutEngine? layoutEngine)
+			_windows.Contains(window) ||
+			(_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
 			&& layoutEngine != null
 			&& ILayoutEngine.ContainsEqual(ActiveLayoutEngine, layoutEngine))
 		)
 		{
-			LastFocusedWindow = e.Window;
-			Logger.Debug($"Focused window {e.Window} in workspace {Name}");
+			LastFocusedWindow = window;
+			Logger.Debug($"Focused window {window} in workspace {Name}");
 		}
 	}
 

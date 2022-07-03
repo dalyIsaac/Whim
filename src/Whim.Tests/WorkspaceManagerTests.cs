@@ -241,57 +241,6 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void WindowManager_WindowRegistered_WindowUnregistered()
-	{
-		Mock<IWindowManager> windowManagerMock = new();
-		Mock<IWindow> windowMock = new();
-		Mock<IMonitor> monitorMock = new();
-
-		Mock<IMonitorManager> monitorManagerMock = new();
-		monitorManagerMock.Setup(m => m.GetEnumerator()).Returns(new List<IMonitor> { monitorMock.Object }.GetEnumerator());
-		monitorManagerMock.Setup(m => m.FocusedMonitor).Returns(monitorMock.Object);
-
-		Mock<IWorkspace> workspaceMock = new();
-
-		// Setup config context
-		Mock<IConfigContext> configContextMock = new();
-		configContextMock.Setup(x => x.WindowManager).Returns(windowManagerMock.Object);
-		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
-
-		WorkspaceManager workspaceManager = new(configContextMock.Object)
-		{
-			workspaceMock.Object
-		};
-		workspaceManager.Initialize();
-
-		// Setup the ActiveWorkspace
-		workspaceManager.Activate(workspaceMock.Object, monitorMock.Object);
-
-		var registerResult = Assert.Raises<RouteEventArgs>(
-			h => workspaceManager.WindowRouted += h,
-			h => workspaceManager.WindowRouted -= h,
-			() =>
-			{
-				windowManagerMock.Raise(w => w.WindowRegistered += null, new WindowEventArgs(windowMock.Object));
-			}
-		);
-
-		Assert.Equal(workspaceMock.Object, registerResult.Arguments.CurrentWorkspace);
-
-		// Unregister the window
-		var unregisterResult = Assert.Raises<RouteEventArgs>(
-			h => workspaceManager.WindowRouted += h,
-			h => workspaceManager.WindowRouted -= h,
-			() =>
-			{
-				windowManagerMock.Raise(w => w.WindowUnregistered += null, new WindowEventArgs(windowMock.Object));
-			}
-		);
-
-		Assert.Equal(workspaceMock.Object, unregisterResult.Arguments.PreviousWorkspace);
-	}
-
-	[Fact]
 	public void MoveWindowToWorkspace()
 	{
 		Mock<IWindowManager> windowManagerMock = new();

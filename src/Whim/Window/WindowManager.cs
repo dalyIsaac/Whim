@@ -224,6 +224,7 @@ internal class WindowManager : IWindowManager
 		}
 
 		Logger.Debug($"Registered {window}");
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window);
 		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
 		return window;
 	}
@@ -238,7 +239,7 @@ internal class WindowManager : IWindowManager
 		Logger.Debug($"Unregistering {window.Handle.Value}");
 
 		_windows.Remove(window.Handle);
-		WindowUnregistered?.Invoke(this, new WindowEventArgs(window));
+		TriggerWindowUnregistered(new WindowEventArgs(window));
 	}
 
 	private void UpdateWindow(IWindow window, WindowUpdateType type)
@@ -306,11 +307,13 @@ internal class WindowManager : IWindowManager
 
 	public void TriggerWindowFocused(WindowEventArgs args)
 	{
+		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(args.Window);
 		WindowFocused?.Invoke(this, args);
 	}
 
 	public void TriggerWindowUnregistered(WindowEventArgs args)
 	{
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowUnregistered(args.Window);
 		WindowUnregistered?.Invoke(this, args);
 	}
 }
