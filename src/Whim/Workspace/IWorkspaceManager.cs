@@ -52,16 +52,6 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
 	/// <summary>
-	/// Used by <see cref="IWorkspace"/> to trigger <see cref="ActiveLayoutEngineChanged"/>.
-	/// </summary>
-	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args);
-
-	/// <summary>
-	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceRenamed"/>.
-	/// </summary>
-	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args);
-
-	/// <summary>
 	/// Triggers all active workspaces to update their layout.
 	/// Active workspaces are those that are visible on a monitor.
 	/// </summary>

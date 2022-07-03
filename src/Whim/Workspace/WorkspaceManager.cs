@@ -280,11 +280,17 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 	#endregion
 
+	/// <summary>
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="ActiveLayoutEngineChanged"/>.
+	/// </summary>
 	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args)
 	{
 		ActiveLayoutEngineChanged?.Invoke(this, args);
 	}
 
+	/// <summary>
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceRenamed"/>.
+	/// </summary>
 	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args)
 	{
 		WorkspaceRenamed?.Invoke(this, args);

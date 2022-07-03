@@ -300,17 +300,26 @@ internal class WindowManager : IWindowManager
 		_configContext.WorkspaceManager.MoveWindowToPoint(window, new Point<int>(point.x, point.y));
 	}
 
+	/// <summary>
+	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowUpdated"/>.
+	/// </summary>
 	public void TriggerWindowUpdated(WindowUpdateEventArgs args)
 	{
 		WindowUpdated?.Invoke(this, args);
 	}
 
+	/// <summary>
+	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowFocused"/>.
+	/// </summary>
 	public void TriggerWindowFocused(WindowEventArgs args)
 	{
 		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(args.Window);
 		WindowFocused?.Invoke(this, args);
 	}
 
+	/// <summary>
+	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowUnregistered"/>.
+	/// </summary>
 	public void TriggerWindowUnregistered(WindowEventArgs args)
 	{
 		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowUnregistered(args.Window);
