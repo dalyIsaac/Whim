@@ -75,10 +75,6 @@ public class WorkspaceManager : IWorkspaceManager
 			idx++;
 		}
 
-		// Subscribe to <see cref="IWindowManager"/> events.
-		_configContext.WindowManager.WindowRegistered += WindowManager_WindowRegistered;
-		_configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
-
 		// Initialize each of the workspaces.
 		foreach (IWorkspace workspace in _workspaces)
 		{
@@ -213,11 +209,13 @@ public class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Windows
-	private void WindowManager_WindowRegistered(object? sender, WindowEventArgs args)
+	/// <summary>
+	/// Called when a window has been registered by the <see cref="IWindowManager"/>.
+	/// </summary>
+	/// <param name="window">The window that was registered.</param>
+	internal void WindowRegistered(IWindow window)
 	{
-		Logger.Debug($"Registering window {args}");
-
-		IWindow window = args.Window;
+		Logger.Debug($"Registering window {window}");
 
 		if (ActiveWorkspace == null)
 		{
@@ -231,11 +229,13 @@ public class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Window {window} registered to workspace {ActiveWorkspace!.Name}");
 	}
 
-	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs args)
+	/// <summary>
+	/// Called when a window has been registered by the <see cref="IWindowManager"/>.
+	/// </summary>
+	/// <param name="window">The window that was registered.</param>
+	internal void WindowUnregistered(IWindow window)
 	{
-		Logger.Debug($"Window unregistered: {args}");
-
-		IWindow window = args.Window;
+		Logger.Debug($"Window unregistered: {window}");
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
@@ -246,6 +246,20 @@ public class WorkspaceManager : IWorkspaceManager
 		workspace.RemoveWindow(window);
 		_windowWorkspaceMap.Remove(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
+	}
+
+	/// <summary>
+	/// Called when a window has been focused by the <see cref="IWindowManager"/>.
+	/// </summary>
+	/// <param name="window">The window that was focused.</param>
+	internal void WindowFocused(IWindow window)
+	{
+		Logger.Debug($"Window focused: {window}");
+
+		foreach (IWorkspace workspace in _workspaces)
+		{
+			(workspace as Workspace)?.WindowFocused(window);
+		}
 	}
 	#endregion
 

@@ -62,13 +62,16 @@ public class MonitorManager : IMonitorManager
 	{
 		// Listen for changes in the monitors.
 		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;
-		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
+	/// <summary>
+	/// Called when the window has been focused.
+	/// </summary>
+	/// <param name="window"></param>
+	internal void WindowFocused(IWindow window)
 	{
-		Logger.Debug($"Focusing on {e.Window}");
-		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWindow(e.Window);
+		Logger.Debug($"Focusing on {window}");
+		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWindow(window);
 
 		if (monitor != null)
 		{
