@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -52,7 +51,7 @@ internal class Window : IWindow
 	{
 		Logger.Debug(ToString());
 		Win32Helper.QuitApplication(Handle);
-		_configContext.WindowManager.TriggerWindowUnregistered(new WindowEventArgs(this));
+		(_configContext.WindowManager as WindowManager)?.TriggerWindowUnregistered(new WindowEventArgs(this));
 	}
 
 	public void Focus()
@@ -68,21 +67,21 @@ internal class Window : IWindow
 		// For example, <see cref="MonitorManager.FocusMonitor"/> relies on
 		// <see cref="IWindowManager.WindowFocused"/> to be called.
 		// Admittedly, this is a bit of a hack.
-		_configContext.WindowManager.TriggerWindowFocused(new WindowEventArgs(this));
+		(_configContext.WindowManager as WindowManager)?.TriggerWindowFocused(new WindowEventArgs(this));
 	}
 
 	public void FocusForceForeground()
 	{
 		Logger.Debug(ToString());
 		PInvoke.SetForegroundWindow(Handle);
-		_configContext.WindowManager.TriggerWindowFocused(new WindowEventArgs(this));
+		(_configContext.WindowManager as WindowManager)?.TriggerWindowFocused(new WindowEventArgs(this));
 	}
 
 	public void Hide()
 	{
 		Logger.Debug(ToString());
 		Win32Helper.HideWindow(Handle);
-		_configContext.WindowManager.TriggerWindowUpdated(new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
+		(_configContext.WindowManager as WindowManager)?.TriggerWindowUpdated(new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
 	}
 
 	public void ShowInCurrentState()

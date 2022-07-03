@@ -14,7 +14,7 @@ internal class Workspace : IWorkspace
 		get => _name;
 		set
 		{
-			_configContext.WorkspaceManager.TriggerWorkspaceRenamed(
+			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
 				new WorkspaceRenamedEventArgs(this, _name, value)
 			);
 			_name = value;
@@ -154,7 +154,7 @@ internal class Workspace : IWorkspace
 			LastFocusedWindow = null;
 		}
 
-		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
+		(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(
 				this,
 				_layoutEngines[prevIdx],
@@ -202,7 +202,7 @@ internal class Workspace : IWorkspace
 			return true;
 		}
 
-		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
+		(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(
 				this,
 				_layoutEngines[prevIdx],

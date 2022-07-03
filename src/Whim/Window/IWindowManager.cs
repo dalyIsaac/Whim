@@ -32,19 +32,4 @@ public interface IWindowManager : IDisposable
 	/// Event for when a window is unregistered.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowUnregistered;
-
-	/// <summary>
-	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowUpdated"/>.
-	/// </summary>
-	public void TriggerWindowUpdated(WindowUpdateEventArgs args);
-
-	/// <summary>
-	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowFocused"/>.
-	/// </summary>
-	public void TriggerWindowFocused(WindowEventArgs args);
-
-	/// <summary>
-	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowUnregistered"/>.
-	/// </summary>
-	public void TriggerWindowUnregistered(WindowEventArgs args);
 }
