@@ -12,6 +12,9 @@ namespace Whim.CommandPalette;
 /// <param name="IsHighlighted"></param>
 public record struct HighlightedTextSegment(string Text, bool IsHighlighted)
 {
+	/// <summary>
+	/// Converts the <see cref="HighlightedTextSegment"/> to a <see cref="Run"/>.
+	/// </summary>
 	public Run ToRun()
 	{
 		string matchText = Text;
@@ -25,6 +28,9 @@ public record struct HighlightedTextSegment(string Text, bool IsHighlighted)
 /// </summary>
 public record HighlightedText
 {
+	/// <summary>
+	/// The segments of text.
+	/// </summary>
 	public IList<HighlightedTextSegment> Segments { get; } = new List<HighlightedTextSegment>();
 }
 
@@ -33,15 +39,28 @@ public record HighlightedText
 /// </summary>
 public class Match
 {
+	/// <summary>
+	/// The command to execute.
+	/// </summary>
 	public ICommand Command { get; }
+
+	/// <summary>
+	/// The keybind to execute the command.
+	/// </summary>
 	public string? Keys { get; }
 
+	/// <summary>
+	/// Creates a new match from the given command and keybind.
+	/// </summary>
+	/// <param name="command"></param>
+	/// <param name="keybind"></param>
 	public Match(ICommand command, IKeybind? keybind = null)
 	{
 		Command = command;
 		Keys = keybind?.ToString();
 	}
 
+	/// <inheritdoc />
 	public override int GetHashCode() => Command.GetHashCode();
 }
 

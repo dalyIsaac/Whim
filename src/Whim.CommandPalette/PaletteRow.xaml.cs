@@ -7,7 +7,7 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-public sealed partial class PaletteRow : UserControl
+internal sealed partial class PaletteRow : UserControl
 {
 	public PaletteItem Model { get; private set; }
 

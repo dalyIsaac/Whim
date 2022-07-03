@@ -1,5 +1,8 @@
 ﻿namespace Whim.CommandPalette;
 
+/// <summary>
+/// The configuration for the command palette plugin.
+/// </summary>
 public class CommandPaletteConfig
 {
 	/// <summary>
