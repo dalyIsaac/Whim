@@ -5,9 +5,13 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
+/// <inheritdoc />
 public class Keybind : IKeybind
 {
+	/// <inheritdoc />
 	public KeyModifiers Modifiers { get; }
+
+	/// <inheritdoc />
 	public VIRTUAL_KEY Key { get; }
 
 	/// <summary>
@@ -20,6 +24,11 @@ public class Keybind : IKeybind
 	/// </summary>
 	private readonly string _allKeysStr;
 
+	/// <summary>
+	/// Creates a new keybind.
+	/// </summary>
+	/// <param name="modifiers">The modifiers for the keybind.</param>
+	/// <param name="key">The key for the keybind.</param>
 	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key)
 	{
 		Modifiers = modifiers;
@@ -33,6 +42,7 @@ public class Keybind : IKeybind
 		_allKeysStr = string.Join(" + ", AllKeys);
 	}
 
+	/// <inheritdoc />
 	public override bool Equals(object? obj)
 	{
 		if (obj == null || GetType() != obj.GetType())
@@ -45,7 +55,9 @@ public class Keybind : IKeybind
 			   Key == keybind.Key;
 	}
 
+	/// <inheritdoc />
 	public override int GetHashCode() => HashCode.Combine(Modifiers, Key);
 
+	/// <inheritdoc />
 	public override string ToString() => _allKeysStr;
 }

@@ -5,7 +5,7 @@ namespace Whim.Bar;
 /// <summary>
 /// Interaction logic for FocusedWindowWidget.xaml
 /// </summary>
-public partial class FocusedWindowWidget : UserControl
+internal partial class FocusedWindowWidget : UserControl
 {
 	public FocusedWindowWidgetViewModel ViewModel { get; private set; }
 

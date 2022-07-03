@@ -1,6 +1,9 @@
 namespace Whim;
 
-public interface IWindowLocation
+/// <summary>
+/// The state of a window.
+/// </summary>
+public interface IWindowState
 {
 	/// <summary>
 	/// The dimensions of the bounding rectangle of the specified window.
@@ -10,7 +13,7 @@ public interface IWindowLocation
 	/// <summary>
 	/// The state of the window.
 	/// </summary>
-	public WindowSize WindowState { get; set; }
+	public WindowSize WindowSize { get; set; }
 
 	/// <summary>
 	/// The window in question.

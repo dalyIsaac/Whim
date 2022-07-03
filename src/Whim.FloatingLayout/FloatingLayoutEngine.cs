@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Whim.FloatingLayout;
 
+/// <summary>
+/// A proxy layout engine to allow windows to be free-floating.
+/// </summary>
 public class FloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IConfigContext _configContext;
@@ -9,22 +12,29 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 	private readonly Dictionary<IWindow, ILocation<double>> _windowToLocation = new();
 
+	/// <summary>
+	/// Creates a new instance of the proxy layout engine <see cref="FloatingLayoutEngine"/>.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="floatingLayoutConfig"></param>
+	/// <param name="innerLayoutEngine"></param>
 	public FloatingLayoutEngine(IConfigContext configContext, FloatingLayoutConfig floatingLayoutConfig, ILayoutEngine innerLayoutEngine) : base(innerLayoutEngine)
 	{
 		_configContext = configContext;
 		_floatingLayoutConfig = floatingLayoutConfig;
 	}
 
-	public override IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
+	/// <inheritdoc />
+	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
 	{
 		// Iterate over all windows in _windowToLocation.
 		foreach ((IWindow window, ILocation<double> loc) in _windowToLocation)
 		{
-			yield return new WindowLocation(window, location.ToMonitor(loc), WindowSize.Normal);
+			yield return new WindowState(window, location.ToMonitor(loc), WindowSize.Normal);
 		}
 
 		// Iterate over all windows in the inner layout engine.
-		foreach (IWindowLocation windowLocation in InnerLayoutEngine.DoLayout(location))
+		foreach (IWindowState windowLocation in InnerLayoutEngine.DoLayout(location))
 		{
 			yield return windowLocation;
 		}
@@ -47,6 +57,10 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		InnerLayoutEngine.AddWindowAtPoint(window, point);
 	}
 
+	/// <summary>
+	/// Mark the given <paramref name="window"/> as a floating window.
+	/// </summary>
+	/// <param name="window"></param>
 	public void MarkWindowAsFloating(IWindow? window = null)
 	{
 		window ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
@@ -60,6 +74,10 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 	}
 
+	/// <summary>
+	/// Mark the given <paramref name="window"/> as a docked window.
+	/// </summary>
+	/// <param name="window"></param>
 	public void MarkWindowAsDocked(IWindow? window = null)
 	{
 		window ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
@@ -73,6 +91,10 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 	}
 
+	/// <summary>
+	/// Toggle the floating state of the given <paramref name="window"/>.
+	/// </summary>
+	/// <param name="window"></param>
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
 		window ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;

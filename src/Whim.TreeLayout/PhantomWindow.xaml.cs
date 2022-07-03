@@ -1,6 +1,6 @@
 ﻿namespace Whim.TreeLayout;
 
-public sealed partial class PhantomWindow : Microsoft.UI.Xaml.Window
+internal sealed partial class PhantomWindow : Microsoft.UI.Xaml.Window
 {
 	public PhantomWindow()
 	{

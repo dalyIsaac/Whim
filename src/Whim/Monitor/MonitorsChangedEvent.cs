@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Whim;
 
+/// <summary>
+/// Represents the change in monitors of Windows and Whim.
+/// </summary>
 public class MonitorsChangedEventArgs : EventArgs
 {
 	/// <summary>
@@ -31,6 +34,12 @@ public class MonitorsChangedEventArgs : EventArgs
 	/// </summary>
 	public IEnumerable<IMonitor> CurrentMonitors => Concat(UnchangedMonitors, AddedMonitors);
 
+	/// <summary>
+	/// Creates a new <see cref="MonitorsChangedEventArgs"/>.
+	/// </summary>
+	/// <param name="unchangedMonitors">The monitors that were not removed or added.</param>
+	/// <param name="removedMonitors">The monitors that were removed.</param>
+	/// <param name="addedMonitors">The monitors that were added.</param>
 	public MonitorsChangedEventArgs(IEnumerable<IMonitor> unchangedMonitors, IEnumerable<IMonitor> removedMonitors, IEnumerable<IMonitor> addedMonitors)
 	{
 		UnchangedMonitors = unchangedMonitors;

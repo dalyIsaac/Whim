@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace Whim.Bar;
 
+/// <summary>
+/// BarPlugin displays an interactive bar at the top of the screen for Whim. It can be configured
+/// with various <see cref="BarComponent"/>s to display on the left, center, and right sides of the bar.
+/// </summary>
 public class BarPlugin : IPlugin, IDisposable
 {
 	private readonly IConfigContext _configContext;
@@ -11,12 +15,18 @@ public class BarPlugin : IPlugin, IDisposable
 	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = new();
 	private bool disposedValue;
 
+	/// <summary>
+	/// Create the bar plugin.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="barConfig"></param>
 	public BarPlugin(IConfigContext configContext, BarConfig barConfig)
 	{
 		_configContext = configContext;
 		_barConfig = barConfig;
 	}
 
+	/// <inheritdoc />
 	public void PreInitialize()
 	{
 		_configContext.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
@@ -24,6 +34,7 @@ public class BarPlugin : IPlugin, IDisposable
 		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
 	}
 
+	/// <inheritdoc />
 	public void PostInitialize()
 	{
 		foreach (IMonitor monitor in _configContext.MonitorManager)
@@ -57,6 +68,7 @@ public class BarPlugin : IPlugin, IDisposable
 		}
 	}
 
+	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!disposedValue)
@@ -76,6 +88,8 @@ public class BarPlugin : IPlugin, IDisposable
 			disposedValue = true;
 		}
 	}
+
+	/// <inheritdoc />
 	public void Dispose()
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

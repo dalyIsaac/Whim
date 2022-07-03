@@ -3,36 +3,54 @@ using System.Collections.Generic;
 
 namespace Whim.TreeLayout;
 
-public class TreeLayoutWindowLocation
+/// <summary>
+/// The state of a node.
+/// </summary>
+public class NodeState
 {
+	/// <summary>
+	/// The node.
+	/// </summary>
 	public Node Node { get; }
 
+	/// <summary>
+	/// The location of the node.
+	/// </summary>
 	public ILocation<int> Location { get; }
 
-	public WindowSize WindowState { get; }
+	/// <summary>
+	/// The <see cref="WindowSize"/>.
+	/// </summary>
+	public WindowSize WindowSize { get; }
 
-	public TreeLayoutWindowLocation(Node node, ILocation<int> location, WindowSize windowState)
+	/// <summary>
+	/// Creates a new <see cref="NodeState"/>.
+	/// </summary>
+	/// <param name="node"></param>
+	/// <param name="location"></param>
+	/// <param name="windowSize"></param>
+	public NodeState(Node node, ILocation<int> location, WindowSize windowSize)
 	{
-		this.Node = node;
+		Node = node;
 		Location = location;
-		WindowState = windowState;
+		WindowSize = windowSize;
 	}
 }
 
 public partial class TreeLayoutEngine
 {
 	/// <summary>
-	/// Gets the <see cref="WindowLocation"/> for all windows, within the unit square.
+	/// Gets the <see cref="WindowState"/> for all windows, within the unit square.
 	/// </summary>
 	/// <param name="node">The root node of the tree.</param>
 	/// <param name="location">The location of the root node.</param>
 	/// <returns></returns>
-	public static IEnumerable<TreeLayoutWindowLocation> GetWindowLocations(Node node, ILocation<int> location)
+	public static IEnumerable<NodeState> GetWindowLocations(Node node, ILocation<int> location)
 	{
 		// If the node is a leaf node, then we can return the location, and break.
 		if (node is LeafNode)
 		{
-			yield return new TreeLayoutWindowLocation(
+			yield return new NodeState(
 				node, location, WindowSize.Normal
 			);
 
@@ -64,7 +82,7 @@ public partial class TreeLayoutEngine
 				childLocation.Height = Convert.ToInt32(weight * location.Height);
 			}
 
-			foreach (TreeLayoutWindowLocation childLocationResult in GetWindowLocations(child, childLocation))
+			foreach (NodeState childLocationResult in GetWindowLocations(child, childLocation))
 			{
 				yield return childLocationResult;
 			}

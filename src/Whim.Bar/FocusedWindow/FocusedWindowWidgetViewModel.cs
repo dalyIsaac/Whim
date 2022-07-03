@@ -3,26 +3,39 @@ using System.ComponentModel;
 
 namespace Whim.Bar;
 
+/// <summary>
+/// View model containing the focused window.
+/// </summary>
 public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IConfigContext _configContext;
 	private bool disposedValue;
 
+	/// <summary>
+	/// The title of the last focused window.
+	/// </summary>
 	public string? Value => _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Title;
 
+	/// <summary>
+	/// Creates a new instance of the view model <see cref="FocusedWindowWidgetViewModel"/>.
+	/// </summary>
+	/// <param name="configContext"></param>
 	public FocusedWindowWidgetViewModel(IConfigContext configContext)
 	{
 		_configContext = configContext;
 		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
+	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
 
+	/// <inheritdoc/>
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
+	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!disposedValue)
@@ -39,6 +52,7 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
+	/// <inheritdoc/>
 	public void Dispose()
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

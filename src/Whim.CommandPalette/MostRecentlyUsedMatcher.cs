@@ -3,12 +3,16 @@ using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
+/// <summary>
+/// MostRecentlyUsedMatcher will return matches in the order of most recently used.
+/// </summary>
 public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 {
 	private record struct MatchData(PaletteItem MatchItem, long LastUsed);
 
 	private readonly Dictionary<string, long> _commandExecutionTime = new();
 
+	/// <inheritdoc/>
 	public IEnumerable<PaletteItem> Match(string query, IEnumerable<Match> items)
 	{
 		query = query.Trim();
@@ -78,6 +82,7 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 		}
 	}
 
+	/// <inheritdoc/>
 	public void OnMatchExecuted(Match match)
 	{
 		string id = match.Command.Identifier;

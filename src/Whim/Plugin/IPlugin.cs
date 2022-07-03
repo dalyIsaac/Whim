@@ -1,5 +1,8 @@
 namespace Whim;
 
+/// <summary>
+/// A plugin for Whim.
+/// </summary>
 public interface IPlugin
 {
 	/// <summary>

@@ -16,7 +16,7 @@ internal class KeybindsMap : IEnumerable<(IKeybind, string)>
 
 	/// <summary>
 	/// Overwrite the keybind with the new command identifier.
-	// Prevent the identifier from having multiple keybinds.
+	/// Prevent the identifier from having multiple keybinds.
 	/// </summary>
 	/// <param name="keybind"></param>
 	/// <param name="identifier"></param>

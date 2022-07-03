@@ -5,14 +5,29 @@ using System.Linq;
 
 namespace Whim.Bar;
 
+/// <summary>
+/// View model containing the workspaces for a given monitor.
+/// </summary>
 public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IConfigContext _configContext;
 	private bool disposedValue;
 
+	/// <summary>
+	/// The monitor which contains the workspaces.
+	/// </summary>
 	public IMonitor Monitor { get; }
+
+	/// <summary>
+	/// The workspaces for the monitor.
+	/// </summary>
 	public ObservableCollection<WorkspaceModel> Workspaces { get; } = new();
 
+	/// <summary>
+	/// Creates a new instance of <see cref="WorkspaceWidgetViewModel"/>.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="monitor"></param>
 	public WorkspaceWidgetViewModel(IConfigContext configContext, IMonitor monitor)
 	{
 		_configContext = configContext;
@@ -30,8 +45,10 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
+	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
 
+	/// <inheritdoc/>
 	protected virtual void OnPropertyChanged(string? propertyName)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -82,6 +99,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
+	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!disposedValue)
@@ -100,6 +118,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
+	/// <inheritdoc/>
 	public void Dispose()
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

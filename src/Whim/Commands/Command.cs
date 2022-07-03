@@ -2,13 +2,16 @@ using System;
 
 namespace Whim;
 
+/// <inheritdoc />
 public class Command : ICommand
 {
 	private readonly Action _callback;
 	private readonly Func<bool>? _condition;
 
+	/// <inheritdoc />
 	public string Identifier { get; }
 
+	/// <inheritdoc />
 	public string Title { get; }
 
 	/// <summary>
@@ -34,11 +37,13 @@ public class Command : ICommand
 		_condition = condition;
 	}
 
+	/// <inheritdoc />
 	public bool CanExecute()
 	{
 		return _condition?.Invoke() ?? true;
 	}
 
+	/// <inheritdoc />
 	public bool TryExecute()
 	{
 		Logger.Debug($"Trying to execute command {Identifier}");
@@ -53,8 +58,6 @@ public class Command : ICommand
 		return false;
 	}
 
-	public override string ToString()
-	{
-		return $"{Identifier} ({Title})";
-	}
+	/// <inheritdoc />
+	public override string ToString() => $"{Identifier} ({Title})";
 }

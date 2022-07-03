@@ -2,6 +2,9 @@ using System;
 
 namespace Whim.Runner;
 
+/// <summary>
+/// Exception thrown by Whim.Runner.
+/// </summary>
 [Serializable]
 public class RunnerException : Exception
 {

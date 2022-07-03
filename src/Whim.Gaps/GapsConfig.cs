@@ -1,5 +1,8 @@
 namespace Whim.Gaps;
 
+/// <summary>
+/// Configuration for the gaps plugin.
+/// </summary>
 public class GapsConfig
 {
 	/// <summary>
@@ -12,6 +15,11 @@ public class GapsConfig
 	/// </summary>
 	public int InnerGap { get; set; }
 
+	/// <summary>
+	/// Create a new instance of <see cref="GapsConfig"/>.
+	/// </summary>
+	/// <param name="outerGap"></param>
+	/// <param name="innerGap"></param>
 	public GapsConfig(int outerGap = 0, int innerGap = 0)
 	{
 		OuterGap = outerGap;

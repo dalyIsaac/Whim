@@ -5,7 +5,7 @@ namespace Whim.Bar;
 /// <summary>
 /// Interaction logic for WorkspaceWidget.xaml
 /// </summary>
-public partial class WorkspaceWidget : UserControl
+internal partial class WorkspaceWidget : UserControl
 {
 	public WorkspaceWidgetViewModel ViewModel { get; }
 

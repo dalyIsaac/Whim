@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-public delegate ILayoutEngine ProxyLayoutEngine(ILayoutEngine engine);
-
 /// <summary>
 /// The manager for <see cref="IWorkspace"/>s. This is responsible for routing
 /// windows between workspaces.
@@ -60,7 +58,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	/// <summary>
 	/// The <see cref="IWorkspace"/> to add.
 	/// </summary>
-	/// <param name="workspaces"></param>
+	/// <param name="workspace"></param>
 	public void Add(IWorkspace workspace);
 
 	/// <summary>

@@ -13,11 +13,11 @@ public interface ILayoutEngine : ICollection<IWindow>
 	public string Name { get; }
 
 	/// <summary>
-	/// Performs a layout inside the available <see cref="ILocation"/> region.
+	/// Performs a layout inside the available <paramref name="location"/>.
 	/// </summary>
 	/// <param name="location">The available area to do a layout inside.</param>
 	/// <returns></returns>
-	public IEnumerable<IWindowLocation> DoLayout(ILocation<int> location);
+	public IEnumerable<IWindowState> DoLayout(ILocation<int> location);
 
 	/// <summary>
 	/// Retrieves the first window in the layout engine.
@@ -74,7 +74,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// proxy layout engines.
 	/// </param>
 	/// <returns>
-	// The layout engine with type <typeparamref name="T"/>, or null if none is found.
+	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
 	public static T? GetLayoutEngine<T>(ILayoutEngine root) where T : ILayoutEngine
 	{

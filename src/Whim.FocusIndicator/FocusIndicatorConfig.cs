@@ -6,12 +6,17 @@ using Windows.UI;
 
 namespace Whim.FocusIndicator;
 
+/// <summary>
+/// Configuration for the focus indicator plugin.
+/// </summary>
 public class FocusIndicatorConfig : INotifyPropertyChanged
 {
 	internal const string Title = "Whim Focus Indicator";
 
+	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
 
+	/// <inheritdoc/>
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

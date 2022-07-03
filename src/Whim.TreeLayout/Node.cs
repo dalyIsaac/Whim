@@ -105,7 +105,7 @@ public abstract class Node
 	/// Gets the deepest common parent of the lineage of <paramref name="aParents"/> and <paramref name="bParents"/>.
 	/// Deepest, where you get deeper the further away from the root.
 	///
-	/// The lineages should match <see cref="GetLineage"/>, where the root is the last node in the array.
+	/// The lineages should match <see cref="Lineage"/>, where the root is the last node in the array.
 	/// I.e., <code>new[] { aNode, ..., Parent, ..., Root }</code>.
 	/// </summary>
 	/// <param name="aParents">The lineage of the first node.</param>
@@ -118,7 +118,7 @@ public abstract class Node
 			return null;
 		}
 
-		/// Start at the root, and work our way down.
+		// Start at the root, and work our way down.
 		int aIdx = aParents.Length - 1;
 		int bIdx = bParents.Length - 1;
 

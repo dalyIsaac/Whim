@@ -3,28 +3,61 @@ using System.Collections.Generic;
 
 namespace Whim;
 
+/// <summary>
+/// The available key modifiers.
+/// </summary>
 [Flags]
 public enum KeyModifiers
 {
+	/// <summary>
+	/// No modifiers.
+	/// </summary>
 	None = 0,
 
+	/// <summary>
+	/// The <c>LControl</c> modifier key.
+	/// </summary>
 	LControl = 1,
+	/// <summary>
+	/// The <c>RControl</c> modifier key.
+	/// </summary>
 	RControl = 2,
 
+	/// <summary>
+	/// The <c>LShift</c> modifier key.
+	/// </summary>
 	LShift = 4,
+	/// <summary>
+	/// The <c>RShift</c> modifier key.
+	/// </summary>
 	RShift = 8,
 
+	/// <summary>
+	/// The <c>LAlt</c> modifier key.
+	/// </summary>
 	LAlt = 16,
+	/// <summary>
+	/// The <c>RAlt</c> modifier key.
+	/// </summary>
 	RAlt = 32,
 
+	/// <summary>
+	/// The <c>LWin</c> modifier key.
+	/// </summary>
 	LWin = 64,
+	/// <summary>
+	/// The <c>RWin</c> modifier key.
+	/// </summary>
 	RWin = 128,
 }
 
+/// <summary>
+/// Extension methods for <see cref="KeyModifiers"/>.
+/// </summary>
 public static class KeyModifiersExtensions
 {
 	/// <summary>
-	/// Get an <see cref="IEnumerable{string}"/> of <see cref="KeyModifiers"/> names, ordered
+	/// Get an <see cref="IEnumerable{T}"/> of <see cref="KeyModifiers"/> names, ordered
 	/// by how keybindings are normally shown.
 	/// </summary>
 	/// <param name="modifiers"></param>

@@ -13,10 +13,10 @@ public class TestGetWindowLocations
 
 		ILocation<int> screen = new Location(0, 0, 1920, 1080);
 
-		TreeLayoutWindowLocation[] locations = TreeLayoutEngine.GetWindowLocations(tree.Root, screen).ToArray();
+		NodeState[] locations = TreeLayoutEngine.GetWindowLocations(tree.Root, screen).ToArray();
 		ILocation<int>[] actual = locations.Select(x => x.Location).ToArray();
 
-		ILocation<int>[] expected = TestTreeWindowLocations.All.Select(x => x.Scale(screen)).ToArray();
+		ILocation<int>[] expected = TestTreeWindowState.All.Select(x => x.Scale(screen)).ToArray();
 
 		actual.Should().Equal(expected);
 	}
@@ -27,7 +27,7 @@ public class TestGetWindowLocations
 		TestTreeEngineEmpty testTreeEngine = new();
 		ILocation<int> screen = new Location(0, 0, 1920, 1080);
 
-		IEnumerable<IWindowLocation> actual = testTreeEngine.Engine.DoLayout(screen);
+		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen);
 
 		Assert.Empty(actual);
 	}
@@ -38,8 +38,8 @@ public class TestGetWindowLocations
 		ILocation<int> screen = new Location(0, 0, 1920, 1080);
 		TestTreeEngine testTreeEngine = new();
 
-		IEnumerable<IWindowLocation> actual = testTreeEngine.Engine.DoLayout(screen);
-		IWindowLocation[] expected = TestTreeWindowLocations.GetAllWindowLocations(screen,
+		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen);
+		IWindowState[] expected = TestTreeWindowState.GetAllWindowStates(screen,
 			testTreeEngine.LeftWindow.Object,
 			testTreeEngine.RightTopLeftTopWindow.Object,
 			testTreeEngine.RightTopLeftBottomLeftWindow.Object,

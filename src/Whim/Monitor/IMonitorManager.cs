@@ -30,6 +30,9 @@ public interface IMonitorManager : IEnumerable<IMonitor>, IDisposable
 	/// <returns></returns>
 	public IMonitor GetMonitorAtPoint(IPoint<int> point);
 
+	/// <summary>
+	/// Event raised when the monitors handled by Whim are changed.
+	/// </summary>
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
 	/// <summary>

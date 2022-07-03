@@ -3,18 +3,32 @@ using System.Collections.Generic;
 
 namespace Whim;
 
+/// <summary>
+/// Arranges windows in columns.
+/// </summary>
 public class ColumnLayoutEngine : BaseStackLayoutEngine
 {
+	/// <inheritdoc />
 	public override string Name { get; }
+
+	/// <summary>
+	/// Indicates the direction of the layout.
+	/// </summary>
 	public bool LeftToRight { get; }
 
+	/// <summary>
+	/// Creates a new instance of the <see cref="ColumnLayoutEngine"/> class.
+	/// </summary>
+	/// <param name="name">The name of the layout engine.</param>
+	/// <param name="leftToRight">Indicates the direction of the layout.</param>
 	public ColumnLayoutEngine(string name = "Column", bool leftToRight = true)
 	{
 		Name = name;
 		LeftToRight = leftToRight;
 	}
 
-	public override IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
+	/// <inheritdoc />
+	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
 	{
 		string direction = LeftToRight ? "left to right" : "right to left";
 		Logger.Debug($"Performing a column layout {direction}");
@@ -43,7 +57,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 
 		foreach (IWindow window in _stack)
 		{
-			yield return new WindowLocation(window,
+			yield return new WindowState(window,
 											new Location(x, y, width, height),
 											WindowSize.Normal);
 
@@ -58,6 +72,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		}
 	}
 
+	/// <inheritdoc />
 	public override void FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window} in layout engine {Name}");
@@ -82,6 +97,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		adjWindow.Focus();
 	}
 
+	/// <inheritdoc />
 	public override void SwapWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Swapping window {window} in layout engine {Name} in direction {direction}");
@@ -108,11 +124,13 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 		_stack[adjIndex] = window;
 	}
 
+	/// <inheritdoc />
 	public override void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window)
 	{
 		// Not implemented.
 	}
 
+	/// <inheritdoc />
 	public override void AddWindowAtPoint(IWindow window, IPoint<double> point, bool _isPhantom)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");

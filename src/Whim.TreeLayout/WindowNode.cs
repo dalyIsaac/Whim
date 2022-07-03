@@ -9,10 +9,19 @@ namespace Whim.TreeLayout;
 /// </summary>
 public class WindowNode : LeafNode
 {
+	/// <summary>
+	/// Creates a new window node for the given <paramref name="window"/>/
+	/// </summary>
+	/// <param name="window"></param>
+	/// <param name="parent"></param>
 	public WindowNode(IWindow window, SplitNode? parent = null) : base(window, parent) { }
+
+	/// <summary>
+	/// Gets the string representation of the window.
+	/// </summary>
 	public override string? ToString() => Window?.ToString();
 
-	// override object.Equals
+	/// <inheritdoc />
 	public override bool Equals(object? obj)
 	{
 		//
@@ -33,6 +42,6 @@ public class WindowNode : LeafNode
 			((node.Parent == null) == (Parent == null));
 	}
 
-	// override object.GetHashCode
+	/// <inheritdoc />
 	public override int GetHashCode() => HashCode.Combine(Window, Parent);
 }

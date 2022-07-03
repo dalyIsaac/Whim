@@ -13,7 +13,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.Left);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.Left, location);
+		Assert.Equal(TestTreeWindowState.Left, location);
 	}
 
 	[Fact]
@@ -22,7 +22,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.RightBottom);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.RightBottom, location);
+		Assert.Equal(TestTreeWindowState.RightBottom, location);
 	}
 
 	[Fact]
@@ -31,7 +31,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.RightTopLeftTop);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.RightTopLeftTop, location);
+		Assert.Equal(TestTreeWindowState.RightTopLeftTop, location);
 	}
 
 	[Fact]
@@ -40,7 +40,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.RightTopLeftBottomLeft);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.RightTopLeftBottomLeft, location);
+		Assert.Equal(TestTreeWindowState.RightTopLeftBottomLeft, location);
 	}
 
 	[Fact]
@@ -49,7 +49,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.RightTopLeftBottomRightTop);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.RightTopLeftBottomRightTop, location);
+		Assert.Equal(TestTreeWindowState.RightTopLeftBottomRightTop, location);
 	}
 
 	[Fact]
@@ -58,7 +58,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.RightTopLeftBottomRightBottom);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.RightTopLeftBottomRightBottom, location);
+		Assert.Equal(TestTreeWindowState.RightTopLeftBottomRightBottom, location);
 	}
 
 	[Fact]
@@ -67,7 +67,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.RightTopRight1);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.RightTopRight1, location);
+		Assert.Equal(TestTreeWindowState.RightTopRight1, location);
 	}
 
 	[Fact]
@@ -76,7 +76,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.RightTopRight2);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.RightTopRight2, location);
+		Assert.Equal(TestTreeWindowState.RightTopRight2, location);
 	}
 
 	[Fact]
@@ -85,7 +85,7 @@ public class TestGetNodeLocation
 		ILocation<double>? location = TreeLayoutEngine.GetNodeLocation(_tree.RightTopRight3);
 
 		Assert.NotNull(location);
-		Assert.Equal(TestTreeWindowLocations.RightTopRight3, location);
+		Assert.Equal(TestTreeWindowState.RightTopRight3, location);
 	}
 	#endregion
 

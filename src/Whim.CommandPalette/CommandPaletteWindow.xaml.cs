@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace Whim.CommandPalette;
 
-public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
+internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 {
 	private readonly IConfigContext _configContext;
 	private readonly CommandPalettePlugin _plugin;
@@ -18,7 +18,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private readonly List<PaletteRow> _unusedRows = new();
 
 	/// <summary>
-	/// The current commands from which <see cref="Matches"/> is derived.
+	/// The current commands from which the matches shown in <see cref="ListViewItems"/> are drawn.
 	/// </summary>
 	private readonly List<Match> _allCommands = new();
 
@@ -108,7 +108,7 @@ public sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		base.Activate();
 		TextEntry.Focus(FocusState.Programmatic);
 		Win32Helper.SetWindowPos(
-			new WindowLocation(_window, windowLocation, WindowSize.Normal),
+			new WindowState(_window, windowLocation, WindowSize.Normal),
 			_window.Handle
 		);
 		_window.FocusForceForeground();

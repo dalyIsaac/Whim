@@ -2,16 +2,25 @@ using System.Collections.Generic;
 
 namespace Whim.Gaps;
 
+/// <summary>
+/// A proxy layout engine to add gaps to the layout.
+/// </summary>
 public class GapsLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly GapsConfig _gapsConfig;
 
+	/// <summary>
+	/// Create a new instance of the proxy layout engine <see cref="GapsLayoutEngine"/>.
+	/// </summary>
+	/// <param name="gapsConfig"></param>
+	/// <param name="innerLayoutEngine"></param>
 	public GapsLayoutEngine(GapsConfig gapsConfig, ILayoutEngine innerLayoutEngine) : base(innerLayoutEngine)
 	{
 		_gapsConfig = gapsConfig;
 	}
 
-	public override IEnumerable<IWindowLocation> DoLayout(ILocation<int> location)
+	/// <inheritdoc />
+	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
 	{
 		int doubleOuterGap = _gapsConfig.OuterGap * 2;
 		int doubleInnerGap = _gapsConfig.InnerGap * 2;
@@ -23,9 +32,9 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 			height: location.Height - doubleOuterGap
 		);
 
-		foreach (IWindowLocation loc in InnerLayoutEngine.DoLayout(proxiedLocation))
+		foreach (IWindowState loc in InnerLayoutEngine.DoLayout(proxiedLocation))
 		{
-			yield return new WindowLocation(
+			yield return new WindowState(
 				window: loc.Window,
 				location: new Location(
 					x: loc.Location.X + _gapsConfig.InnerGap,
@@ -33,7 +42,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 					width: loc.Location.Width - doubleInnerGap,
 					height: loc.Location.Height - doubleInnerGap
 				),
-				windowState: loc.WindowState
+				windowSize: loc.WindowSize
 			);
 		}
 	}

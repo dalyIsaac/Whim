@@ -10,11 +10,16 @@ internal class Window : IWindow
 {
 	private readonly IConfigContext _configContext;
 
+	/// <inheritdoc/>
 	public HWND Handle { get; }
 
+	/// <inheritdoc/>
 	public string Title => Win32Helper.GetWindowText(Handle);
 
+	/// <inheritdoc/>
 	public string WindowClass => Win32Helper.GetClassName(Handle);
+
+	/// <inheritdoc/>
 	public ILocation<int> Location
 	{
 		get
@@ -27,26 +32,35 @@ internal class Window : IWindow
 		}
 	}
 
+	/// <inheritdoc/>
 	public int ProcessId { get; }
 
+	/// <inheritdoc/>
 	public string ProcessFileName { get; }
 
+	/// <inheritdoc/>
 	public string ProcessName { get; }
 
+	/// <inheritdoc/>
 	public bool IsFocused => PInvoke.GetForegroundWindow() == Handle;
 
+	/// <inheritdoc/>
 	public bool IsMinimized => PInvoke.IsIconic(Handle);
 
+	/// <inheritdoc/>
 	public bool IsMaximized => PInvoke.IsZoomed(Handle);
 
+	/// <inheritdoc/>
 	public bool IsMouseMoving { get; set; }
 
+	/// <inheritdoc/>
 	public void BringToTop()
 	{
 		Logger.Debug(ToString());
 		PInvoke.BringWindowToTop(Handle);
 	}
 
+	/// <inheritdoc/>
 	public void Close()
 	{
 		Logger.Debug(ToString());
@@ -54,6 +68,7 @@ internal class Window : IWindow
 		(_configContext.WindowManager as WindowManager)?.TriggerWindowUnregistered(new WindowEventArgs(this));
 	}
 
+	/// <inheritdoc/>
 	public void Focus()
 	{
 		Logger.Debug(ToString());
@@ -70,6 +85,7 @@ internal class Window : IWindow
 		(_configContext.WindowManager as WindowManager)?.TriggerWindowFocused(new WindowEventArgs(this));
 	}
 
+	/// <inheritdoc/>
 	public void FocusForceForeground()
 	{
 		Logger.Debug(ToString());
@@ -77,6 +93,7 @@ internal class Window : IWindow
 		(_configContext.WindowManager as WindowManager)?.TriggerWindowFocused(new WindowEventArgs(this));
 	}
 
+	/// <inheritdoc/>
 	public void Hide()
 	{
 		Logger.Debug(ToString());
@@ -84,6 +101,7 @@ internal class Window : IWindow
 		(_configContext.WindowManager as WindowManager)?.TriggerWindowUpdated(new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
 	}
 
+	/// <inheritdoc/>
 	public void ShowInCurrentState()
 	{
 		Logger.Debug(ToString());
@@ -101,18 +119,21 @@ internal class Window : IWindow
 		}
 	}
 
+	/// <inheritdoc/>
 	public void ShowMaximized()
 	{
 		Logger.Debug(ToString());
 		Win32Helper.ShowWindowMaximized(Handle);
 	}
 
+	/// <inheritdoc/>
 	public void ShowMinimized()
 	{
 		Logger.Debug(ToString());
 		Win32Helper.ShowWindowMinimized(Handle);
 	}
 
+	/// <inheritdoc/>
 	public void ShowNormal()
 	{
 		Logger.Debug(ToString());
@@ -158,6 +179,7 @@ internal class Window : IWindow
 		};
 	}
 
+	/// <inheritdoc/>
 	public override bool Equals(object? obj)
 	{
 		if (obj == null || GetType() != obj.GetType())
@@ -169,10 +191,12 @@ internal class Window : IWindow
 			window.Handle == Handle;
 	}
 
+	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
 		return Handle.GetHashCode();
 	}
 
+	/// <inheritdoc/>
 	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle.Value}}}";
 }

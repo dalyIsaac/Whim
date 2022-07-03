@@ -5,6 +5,7 @@ using System;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Whim.Runner;
+
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.
 /// </summary>
@@ -31,6 +32,7 @@ public partial class App : Application
 		_startupException = startupException;
 	}
 
+	/// <inheritdoc/>
 	protected override void OnLaunched(LaunchActivatedEventArgs args)
 	{
 		if (_startupException == null)

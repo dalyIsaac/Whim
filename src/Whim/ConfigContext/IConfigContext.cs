@@ -13,13 +13,44 @@ namespace Whim;
 /// </summary>
 public interface IConfigContext
 {
+	/// <summary>
+	/// Whim's <see cref="Logger"/> instances.
+	/// </summary>
 	public Logger Logger { get; }
+
+	/// <summary>
+	/// Whim's <see cref="IWorkspaceManager"/> instances.
+	/// </summary>
 	public IWorkspaceManager WorkspaceManager { get; }
+
+	/// <summary>
+	/// Whim's <see cref="IWindowManager"/> instances.
+	/// </summary>
 	public IWindowManager WindowManager { get; }
+
+	/// <summary>
+	/// Whim's <see cref="IMonitorManager"/> instances.
+	/// </summary>
 	public IMonitorManager MonitorManager { get; }
+
+	/// <summary>
+	/// Whim's <see cref="IRouterManager"/> instances.
+	/// </summary>
 	public IRouterManager RouterManager { get; }
+
+	/// <summary>
+	/// Whim's <see cref="IFilterManager"/> instances.
+	/// </summary>
 	public IFilterManager FilterManager { get; }
+
+	/// <summary>
+	/// Whim's <see cref="ICommandManager"/> instances.
+	/// </summary>
 	public ICommandManager CommandManager { get; }
+
+	/// <summary>
+	/// Whim's <see cref="IPluginManager"/> instances.
+	/// </summary>
 	public IPluginManager PluginManager { get; }
 
 	/// <summary>

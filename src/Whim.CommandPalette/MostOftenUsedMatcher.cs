@@ -12,6 +12,7 @@ public class MostOftenUsedMatcher : ICommandPaletteMatcher
 
 	private readonly Dictionary<string, uint> _commandExecutionCount = new();
 
+	/// <inheritdoc/>
 	public IEnumerable<PaletteItem> Match(
 		string query,
 		IEnumerable<Match> items
@@ -84,6 +85,7 @@ public class MostOftenUsedMatcher : ICommandPaletteMatcher
 		}
 	}
 
+	/// <inheritdoc/>
 	public void OnMatchExecuted(Match match)
 	{
 		string id = match.Command.Identifier;

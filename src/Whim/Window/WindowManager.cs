@@ -22,12 +22,12 @@ internal class WindowManager : IWindowManager
 	private readonly Dictionary<HWND, IWindow> _windows = new();
 
 	/// <summary>
-	/// All the hooks registered with <see cref="PInvoke.SetWinEventHook"/>.
+	/// All the hooks registered with <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>.
 	/// </summary>
 	private readonly UnhookWinEventSafeHandle[] _registeredHooks = new UnhookWinEventSafeHandle[6];
 
 	/// <summary>
-	/// The delegate for handling all events triggered by <see cref="PInvoke.SetWinEventHook"/>.
+	/// The delegate for handling all events triggered by <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>.
 	/// </summary>
 	private readonly WINEVENTPROC _hookDelegate;
 
@@ -130,7 +130,7 @@ internal class WindowManager : IWindowManager
 			   && hwnd != null;
 
 	/// <summary>
-	/// Event hook for <see cref="PInvoke.SetWinEventHook"/>. <br />
+	/// Event hook for <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>. <br />
 	///
 	/// For more, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
 	/// </summary>

@@ -31,16 +31,17 @@ public class Logger
 	public LoggerConfig Config { get; set; }
 
 	/// <summary>
-	/// Initialize the <see cref="Logger"/> with the <see cref="IConfigContext.WhimPath"/> and
-	/// <see cref="LoggerConfig"/>.
+	/// Initialize the <see cref="Logger"/> with the <see cref="LoggerConfig"/>.
 	/// </summary>
-	/// <param name="whimPath"><see cref="IConfigContext.WhimPath"/></param>
-	/// <param name="config"><see cref="LoggerConfig"/></param>
+	/// <param name="config"></param>
 	public Logger(LoggerConfig? config = null)
 	{
 		Config = config ?? new LoggerConfig();
 	}
 
+	/// <summary>
+	/// Initializes the <see cref="Logger"/> with the file and debug sink.
+	/// </summary>
 	public void Initialize()
 	{
 		Logger.instance = this;
@@ -67,33 +68,100 @@ public class Logger
 		_logger.Debug("Created logger!");
 	}
 
+	/// <summary>
+	/// Adds caller information to the message.
+	/// </summary>
+	/// <param name="message">The message to add caller information to.</param>
+	/// <param name="memberName">The name of the calling member.</param>
+	/// <param name="sourceFilePath">The path to the source file.</param>
+	/// <param name="sourceLineNumber">The line number in the source file.</param>
+	/// <returns>The message with caller information added.</returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static string AddCaller(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	{
+		string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
+		string fileLocation = $"{fileName}:{sourceLineNumber}";
+
+		string methodName = $"[{memberName}]";
+
+		return $"{fileLocation} {methodName} {message}";
+	}
+
+	/// <summary>
+	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
+	/// Write a log event with the <see cref="LogLevel.Verbose"/> level.
+	/// </summary>
+	/// <param name="message">The message to log.</param>
+	/// <param name="memberName">The caller's member name.</param>
+	/// <param name="sourceFilePath">The caller's source file path.</param>
+	/// <param name="sourceLineNumber">The caller's source line number.</param>
 	public static void Verbose(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger?.Verbose(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Verbose(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
 
+	/// <summary>
+	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
+	/// Write a log event with the <see cref="LogLevel.Debug"/> level.
+	/// </summary>
+	/// <param name="message">The message to log.</param>
+	/// <param name="memberName">The caller's member name.</param>
+	/// <param name="sourceFilePath">The caller's source file path.</param>
+	/// <param name="sourceLineNumber">The caller's source line number.</param>
 	public static void Debug(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger?.Debug(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Debug(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
 
+	/// <summary>
+	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
+	/// Write a log event with the <see cref="LogLevel.Information"/> level.
+	/// </summary>
+	/// <param name="message">The message to log.</param>
+	/// <param name="memberName">The caller's member name.</param>
+	/// <param name="sourceFilePath">The caller's source file path.</param>
+	/// <param name="sourceLineNumber">The caller's source line number.</param>
 	public static void Information(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger?.Information(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Information(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
 
+	/// <summary>
+	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
+	/// Write a log event with the <see cref="LogLevel.Warning"/> level.
+	/// </summary>
+	/// <param name="message">The message to log.</param>
+	/// <param name="memberName">The caller's member name.</param>
+	/// <param name="sourceFilePath">The caller's source file path.</param>
+	/// <param name="sourceLineNumber">The caller's source line number.</param>
 	public static void Warning(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger?.Warning(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Warning(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
 
+	/// <summary>
+	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
+	/// Write a log event with the <see cref="LogLevel.Error"/> level.
+	/// </summary>
+	/// <param name="message">The message to log.</param>
+	/// <param name="memberName">The caller's member name.</param>
+	/// <param name="sourceFilePath">The caller's source file path.</param>
+	/// <param name="sourceLineNumber">The caller's source line number.</param>
 	public static void Error(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger?.Error(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Error(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
 
+	/// <summary>
+	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
+	/// Write a log event with the <see cref="LogLevel.Fatal"/> level.
+	/// </summary>
+	/// <param name="message">The message to log.</param>
+	/// <param name="memberName">The caller's member name.</param>
+	/// <param name="sourceFilePath">The caller's source file path.</param>
+	/// <param name="sourceLineNumber">The caller's source line number.</param>
 	public static void Fatal(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
-		instance?._logger?.Fatal(message.AddCaller(memberName, sourceFilePath, sourceLineNumber));
+		instance?._logger?.Fatal(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
 }

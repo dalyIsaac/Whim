@@ -3,6 +3,9 @@ using System.ComponentModel;
 
 namespace Whim.FocusIndicator;
 
+/// <summary>
+/// FocusIndicatorPlugin is the plugin that displays a focus indicator on the focused window.
+/// </summary>
 public class FocusIndicatorPlugin : IPlugin
 {
 	private readonly IConfigContext _configContext;
@@ -10,12 +13,18 @@ public class FocusIndicatorPlugin : IPlugin
 	private FocusIndicatorWindow? _focusIndicatorWindow;
 	private DispatcherTimer? _dispatcherTimer;
 
+	/// <summary>
+	/// Creates a new instance of the focus indicator plugin.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="focusIndicatorConfig"></param>
 	public FocusIndicatorPlugin(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
 	{
 		_configContext = configContext;
 		_focusIndicatorConfig = focusIndicatorConfig;
 	}
 
+	/// <inheritdoc/>
 	public void PreInitialize()
 	{
 		_configContext.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
@@ -25,6 +34,7 @@ public class FocusIndicatorPlugin : IPlugin
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
 	}
 
+	/// <inheritdoc/>
 	public void PostInitialize()
 	{
 		// The window must be created on the UI thread (so don't do it in the constructor).
@@ -104,7 +114,7 @@ public class FocusIndicatorPlugin : IPlugin
 		}
 
 		// Get the window location.
-		IWindowLocation? windowLocation = activeWorkspace.TryGetWindowLocation(window);
+		IWindowState? windowLocation = activeWorkspace.TryGetWindowLocation(window);
 		if (windowLocation == null)
 		{
 			Logger.Error($"Could not find window location for window {window}");
