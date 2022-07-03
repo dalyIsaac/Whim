@@ -4,12 +4,16 @@ using System.Linq;
 
 namespace Whim.TreeLayout;
 
+/// <summary>
+/// A tree layout engine allows users to create arbitrary window grid layouts.
+/// </summary>
 public partial class TreeLayoutEngine : ILayoutEngine
 {
 	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
 	private readonly HashSet<IWindow> _phantomWindows = new();
 
+	/// <inheritdoc/>
 	public Node? Root { get; private set; }
 
 	/// <summary>
@@ -17,12 +21,20 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </summary>
 	public Direction AddNodeDirection { get; set; } = Direction.Right;
 
+	/// <inheritdoc/>
 	public string Name { get; set; }
 
+	/// <inheritdoc/>
 	public int Count { get; private set; }
 
+	/// <inheritdoc/>
 	public bool IsReadOnly => false;
 
+	/// <summary>
+	/// Creates a new tree layout engine.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="name"></param>
 	public TreeLayoutEngine(IConfigContext configContext, string name = "Tree")
 	{
 		_configContext = configContext;
@@ -52,12 +64,11 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	/// <summary>
 	/// Adds a window to the layout engine, and returns the node that represents it.
-	/// Please use <see cref="IWindow.Add"/> instead of this method, as
-	/// the return value was added for testing, and does not match <see cref="ILayoutEngine"/>.
 	/// The <paramref name="window"/> is added in the direction specified by this instance's
 	/// <see cref="AddNodeDirection"/> property.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
+	/// <param name="focusedWindow">The currently focused window from whom to get the node.</param>
 	/// <returns>The node that represents the window.</returns>
 	public WindowNode? AddWindow(IWindow window, IWindow? focusedWindow = null)
 	{
@@ -82,7 +93,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// in the direction specified by this instance's <see cref="AddNodeDirection"/> property.
 	/// </summary>
 	/// <param name="newLeaf">The node to add.</param>
-	/// <param name="window">
+	/// <param name="focusedWindow">
 	/// The focused window. If <paramref name="focusedWindow"/> is null, then
 	/// the focused window is set to the <see cref="IWorkspace.LastFocusedWindow"/>.
 	/// </param>
@@ -264,12 +275,14 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		return true;
 	}
 
+	/// <inheritdoc/>
 	public IWindow? GetFirstWindow()
 	{
 		Logger.Debug($"Getting first window from layout engine {Name}");
 		return Root?.LeftMostLeaf?.Window;
 	}
 
+	/// <inheritdoc/>
 	public IEnumerable<IWindowState> DoLayout(ILocation<int> location)
 	{
 		if (Root == null)
@@ -278,7 +291,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 
-		foreach (TreeLayoutWindowLocation? item in GetWindowLocations(Root, location))
+		foreach (NodeState? item in GetWindowLocations(Root, location))
 		{
 			if (item.Node is LeafNode leafNode)
 			{
@@ -287,6 +300,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 	}
 
+	/// <inheritdoc/>
 	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window} in direction {direction} in layout engine {Name}");
@@ -301,6 +315,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		adjacentNode?.Focus();
 	}
 
+	/// <inheritdoc/>
 	public void SwapWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Swapping window {window} in direction {direction} in layout engine {Name}");
@@ -338,6 +353,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		window.Focus();
 	}
 
+	/// <inheritdoc/>
 	public void Clear()
 	{
 		Logger.Debug($"Clearing layout engine {Name}");
@@ -350,12 +366,14 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Count = 0;
 	}
 
+	/// <inheritdoc/>
 	public bool Contains(IWindow item)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {item}");
 		return _windows.ContainsKey(item) || _phantomWindows.Contains(item);
 	}
 
+	/// <inheritdoc/>
 	public void CopyTo(IWindow[] array, int arrayIndex)
 	{
 		foreach (IWindow window in this)
@@ -375,7 +393,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			yield break;
 		}
 
-		foreach (TreeLayoutWindowLocation location in GetWindowLocations(Root, new Location(0, 0, 0, 0)))
+		foreach (NodeState location in GetWindowLocations(Root, new Location(0, 0, 0, 0)))
 		{
 			if (location.Node is LeafNode leafNode)
 			{
@@ -391,6 +409,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	/// </summary>
 	private const double MAX_RELATIVE_DELTA = 0.5;
 
+	/// <inheritdoc/>
 	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window)
 	{
 		Logger.Debug($"Moving window {window} edge in direction {edge} by {fractionDelta} in layout engine {Name}");
@@ -561,6 +580,12 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		SplitFocusedWindow(null);
 	}
 
+	/// <summary>
+	/// Splits the focused window in two, and inserts the given <paramref name="phantomNode"/>
+	/// in the direction of <see cref="AddNodeDirection"/>.
+	/// </summary>
+	/// <param name="focusedWindow"></param>
+	/// <param name="phantomNode"></param>
 	protected void SplitFocusedWindow(IWindow? focusedWindow = null, PhantomNode? phantomNode = null)
 	{
 		Logger.Debug($"Splitting focused window in layout engine {Name} with focused window {focusedWindow}");
@@ -587,6 +612,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		phantomNode.Focus();
 	}
 
+	/// <inheritdoc/>
 	public void HidePhantomWindows()
 	{
 		Logger.Debug($"Hiding phantom windows in layout engine {Name}");
@@ -597,6 +623,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 	}
 
+	/// <inheritdoc/>
 	public void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom)
 	{
 		if (Root == null)
@@ -649,8 +676,8 @@ public partial class TreeLayoutEngine : ILayoutEngine
 
 	/// <summary>
 	/// Helper method to add a window to the layout engine.
-	/// This calls <see cref="SplitFocusedWindow"/> if the window is a phantom window.
-	/// Otherwise, it calls <see cref="AddWindow(IWindow, LeafNode)"/>.
+	/// This calls <see cref="SplitFocusedWindow(IWindow?, PhantomNode?)"/> if the window is a phantom window.
+	/// Otherwise, it calls <see cref="AddWindow(IWindow, IWindow?)"/>.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
 	/// <param name="isPhantom">Whether the window is a phantom window.</param>

@@ -11,11 +11,23 @@ public class PhantomNode : LeafNode
 {
 	private readonly Microsoft.UI.Xaml.Window? _phantomWindow;
 
+	/// <summary>
+	/// Creates a new phantom node.
+	/// </summary>
+	/// <param name="windowModel"></param>
+	/// <param name="phantomWindow"></param>
+	/// <param name="parent"></param>
 	protected PhantomNode(IWindow windowModel, Microsoft.UI.Xaml.Window? phantomWindow, SplitNode? parent = null) : base(windowModel, parent)
 	{
 		_phantomWindow = phantomWindow;
 	}
 
+	/// <summary>
+	/// Creates a new phantom window. If the window model could not be retrieved, <see langword="null"/> is returned.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="parent"></param>
+	/// <returns></returns>
 	public static PhantomNode? CreatePhantomNode(IConfigContext configContext, SplitNode? parent = null)
 	{
 		PhantomWindow phantomWindow = new();

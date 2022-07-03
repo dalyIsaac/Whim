@@ -13,7 +13,7 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 {
 	/// <summary>
 	/// When <see langword="true"/>, the <see cref="_children"/> are split
-	/// within the parent node equally. This overrides the <see cref="Node.Weight"/>.
+	/// within the parent node equally. This overrides the weights in <see cref="_weights"/>.
 	/// </summary>
 	public bool EqualWeight { get; protected set; } = true;
 
@@ -35,14 +35,29 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// </summary>
 	protected readonly List<Node> _children = new();
 
+	/// <summary>
+	/// The number of nodes in this <see cref="SplitNode"/>.
+	/// </summary>
 	public int Count => _children.Count;
 
+	/// <summary>
+	/// Creates a new <see cref="SplitNode"/>.
+	/// </summary>
+	/// <param name="isHorizontal">The direction of this node.</param>
+	/// <param name="parent">The parent of this node.</param>
 	public SplitNode(bool isHorizontal = true, SplitNode? parent = null)
 	{
 		Parent = parent;
 		IsHorizontal = isHorizontal;
 	}
 
+	/// <summary>
+	/// Creates a new <see cref="SplitNode"/> to replace and absorb <paramref name="focusedNode"/>.
+	/// </summary>
+	/// <param name="focusedNode">The currently focused node.</param>
+	/// <param name="newNode">The new node to add.</param>
+	/// <param name="direction">The direction to add the split node in.</param>
+	/// <param name="parent">The parent of this node.</param>
 	public SplitNode(Node focusedNode, Node newNode, Direction direction, SplitNode? parent = null) : this(direction.IsHorizontal(), parent)
 	{
 		if (direction.IsPositiveIndex())
@@ -57,6 +72,11 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		}
 	}
 
+	/// <summary>
+	/// Gets the weight and node of the child at the given index.
+	/// </summary>
+	/// <param name="index"></param>
+	/// <returns></returns>
 	public (double weight, Node node) this[int index] => (
 		EqualWeight ? 1d / _weights.Count : _weights[index],
 		_children[index]
@@ -170,6 +190,10 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		return true;
 	}
 
+	/// <summary>
+	/// Gets the child nodes and their weights.
+	/// </summary>
+	/// <returns></returns>
 	public IEnumerator<(double Weight, Node Node)> GetEnumerator()
 	{
 		if (EqualWeight)
@@ -390,7 +414,7 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		}
 	}
 
-	// override object.Equals
+	/// <inheritdoc/>
 	public override bool Equals(object? obj)
 	{
 		//
@@ -413,6 +437,6 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			node.SequenceEqual(this);
 	}
 
-	// override object.GetHashCode
+	/// <inheritdoc/>
 	public override int GetHashCode() => HashCode.Combine(EqualWeight, IsHorizontal, this);
 }

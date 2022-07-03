@@ -9,7 +9,16 @@ namespace Whim.TreeLayout;
 /// </summary>
 public class WindowNode : LeafNode
 {
+	/// <summary>
+	/// Creates a new window node for the given <paramref name="window"/>/
+	/// </summary>
+	/// <param name="window"></param>
+	/// <param name="parent"></param>
 	public WindowNode(IWindow window, SplitNode? parent = null) : base(window, parent) { }
+
+	/// <summary>
+	/// Gets the string representation of the window.
+	/// </summary>
 	public override string? ToString() => Window?.ToString();
 
 	/// <inheritdoc />

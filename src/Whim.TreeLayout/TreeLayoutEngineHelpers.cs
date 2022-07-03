@@ -73,6 +73,7 @@ public partial class TreeLayoutEngine
 	/// the tree until the root is reached.
 	/// </summary>
 	/// <param name="node">The node to get the location for.</param>
+	/// <param name="location">A location to scale the node's location to.</param>
 	/// <returns>Location of the node. Used for recursion.</returns>
 	public static ILocation<double> GetNodeLocation(Node node, DoubleLocation? location = null)
 	{
