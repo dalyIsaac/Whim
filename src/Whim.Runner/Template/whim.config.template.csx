@@ -23,7 +23,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 /// <returns></returns>
 IWorkspace CreateWorkspace(IConfigContext configContext, string name)
 {
-	return new Workspace(configContext, name, new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
+    return IWorkspace.CreateWorkspace(configContext, name, new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
 }
 
 /// <summary>
@@ -60,11 +60,6 @@ IConfigContext DoConfig(IConfigContext configContext)
 	FocusIndicatorConfig focusIndicatorConfig = new() { FadeEnabled = true };
 	FocusIndicatorPlugin focusIndicatorPlugin = new(configContext, focusIndicatorConfig);
 	configContext.PluginManager.RegisterPlugin(focusIndicatorPlugin);
-
-	// Keybindings.
-	KeyModifiers winAlt = KeyModifiers.LWin | KeyModifiers.LAlt;
-	KeyModifiers winShift = KeyModifiers.LWin | KeyModifiers.LShift;
-	KeyModifiers winCtrl = KeyModifiers.LWin | KeyModifiers.LControl;
 
 	// Load the commands and keybindings.
 	configContext.CommandManager.LoadCommands(DefaultCommands.GetCommands(configContext));
