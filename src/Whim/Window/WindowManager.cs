@@ -314,6 +314,7 @@ internal class WindowManager : IWindowManager
 	public void TriggerWindowFocused(WindowEventArgs args)
 	{
 		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(args.Window);
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowFocused(args.Window);
 		WindowFocused?.Invoke(this, args);
 	}
 
