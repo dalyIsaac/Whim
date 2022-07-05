@@ -47,6 +47,10 @@ DwmGetWindowAttribute
 DwmSetWindowAttribute
 DWM_WINDOW_CORNER_PREFERENCE
 
+BeginDeferWindowPos
+DeferWindowPos
+EndDeferWindowPos
+
 GetAncestor
 IsWindowVisible
 GetWindowLong
