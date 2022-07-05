@@ -18,7 +18,10 @@
 
 		<ItemsControl.ItemTemplate>
 			<DataTemplate x:DataType="local:WorkspaceModel">
-				<Button Command="{x:Bind SwitchWorkspaceCommand}" Content="{x:Bind Name}" />
+				<Button
+					Command="{x:Bind SwitchWorkspaceCommand}"
+					CommandParameter="{x:Bind}"
+					Content="{x:Bind Name}" />
 			</DataTemplate>
 		</ItemsControl.ItemTemplate>
 	</ItemsControl>
