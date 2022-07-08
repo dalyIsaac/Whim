@@ -59,6 +59,7 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 
 	/// <summary>
 	/// When <see langword="true"/>, the focus indicator is visible.
+	/// Updating this will cause the plugin to redraw the indicator.
 	/// </summary>
 	public bool IsVisible
 	{

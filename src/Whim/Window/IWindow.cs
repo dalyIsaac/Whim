@@ -116,14 +116,13 @@ public interface IWindow
 	/// Create a new window. If the window cannot be created, <c>null</c> is returned.
 	/// </summary>
 	/// <param name="hwnd">The handle of the window.</param>
-	/// <param name="configContext">The configuration context.</param>
-	public static IWindow? CreateWindow(HWND hwnd, IConfigContext configContext)
+	public static IWindow? CreateWindow(HWND hwnd)
 	{
 		Logger.Debug($"Registering window {hwnd.Value}");
 
 		try
 		{
-			return new Window(hwnd, configContext);
+			return new Window(hwnd);
 		}
 		catch (Exception e)
 		{

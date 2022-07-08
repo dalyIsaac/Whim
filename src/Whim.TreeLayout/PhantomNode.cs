@@ -25,14 +25,13 @@ public class PhantomNode : LeafNode
 	/// <summary>
 	/// Creates a new phantom window. If the window model could not be retrieved, <see langword="null"/> is returned.
 	/// </summary>
-	/// <param name="configContext"></param>
 	/// <param name="parent"></param>
 	/// <returns></returns>
-	public static PhantomNode? CreatePhantomNode(IConfigContext configContext, SplitNode? parent = null)
+	public static PhantomNode? CreatePhantomNode(SplitNode? parent = null)
 	{
 		PhantomWindow phantomWindow = new();
 
-		IWindow? windowModel = Whim.IWindow.CreateWindow(phantomWindow.GetHandle(), configContext);
+		IWindow? windowModel = Whim.IWindow.CreateWindow(phantomWindow.GetHandle());
 
 		if (windowModel == null)
 		{

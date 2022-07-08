@@ -26,7 +26,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		_configContext = configContext;
 		_plugin = plugin;
-		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
+		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow");
 
 		Title = CommandPaletteConfig.Title;
 		ListViewItems.ItemsSource = _paletteRows;

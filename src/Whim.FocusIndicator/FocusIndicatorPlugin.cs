@@ -28,17 +28,24 @@ public class FocusIndicatorPlugin : IPlugin
 	public void PreInitialize()
 	{
 		_configContext.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
-		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
-		_configContext.WindowManager.WindowUnregistered += WindowManager_WindowUnregistered;
-		_configContext.WindowManager.WindowUpdated += WindowManager_WindowUpdated;
+
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
+
+		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
+
+		_configContext.WindowManager.WindowRegistered += WindowManager_EventSink;
+		_configContext.WindowManager.WindowUnregistered += WindowManager_EventSink;
+		_configContext.WindowManager.WindowMoveStart += WindowManager_EventSink;
+		_configContext.WindowManager.WindowMoved += WindowManager_EventSink;
+		_configContext.WindowManager.WindowMinimizeStart += WindowManager_EventSink;
+		_configContext.WindowManager.WindowMinimizeEnd += WindowManager_EventSink;
 	}
 
 	/// <inheritdoc/>
 	public void PostInitialize()
 	{
 		// The window must be created on the UI thread (so don't do it in the constructor).
-		_focusIndicatorWindow = new FocusIndicatorWindow(_configContext, _focusIndicatorConfig);
+		_focusIndicatorWindow = new FocusIndicatorWindow(_focusIndicatorConfig);
 
 		// Activate the window so it renders.
 		_focusIndicatorWindow.Activate();
@@ -55,36 +62,9 @@ public class FocusIndicatorPlugin : IPlugin
 		_focusIndicatorConfig.IsVisible = false;
 	}
 
-	private void WindowManager_WindowStartedMoving(object? sender, WindowEventArgs e)
-	{
-		_focusIndicatorConfig.IsVisible = false;
-	}
-
-	private void WindowManager_WindowUnregistered(object? sender, WindowEventArgs e)
+	private void WindowManager_EventSink(object? sender, WindowEventArgs e)
 	{
 		Show();
-	}
-
-	private void WindowManager_WindowUpdated(object? sender, WindowUpdateEventArgs e)
-	{
-		Logger.Verbose($"Window {e.Window} updated with update type {e.UpdateType}");
-		switch (e.UpdateType)
-		{
-			case WindowUpdateType.Cloaked:
-			case WindowUpdateType.MoveStart:
-			case WindowUpdateType.MinimizeStart:
-			case WindowUpdateType.Move:
-				Hide();
-				break;
-			case WindowUpdateType.Uncloaked:
-			case WindowUpdateType.Foreground:
-			case WindowUpdateType.MoveEnd:
-			case WindowUpdateType.MinimizeEnd:
-				Show();
-				break;
-			default:
-				break;
-		}
 	}
 
 	private void FocusIndicatorConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)

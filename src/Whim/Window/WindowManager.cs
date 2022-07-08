@@ -12,9 +12,12 @@ internal class WindowManager : IWindowManager
 	private readonly IConfigContext _configContext;
 
 	public event EventHandler<WindowEventArgs>? WindowRegistered;
-	public event EventHandler<WindowUpdateEventArgs>? WindowUpdated;
 	public event EventHandler<WindowEventArgs>? WindowFocused;
 	public event EventHandler<WindowEventArgs>? WindowUnregistered;
+	public event EventHandler<WindowEventArgs>? WindowMoveStart;
+	public event EventHandler<WindowEventArgs>? WindowMoved;
+	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
+	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
 
 	/// <summary>
 	/// Map of <see cref="HWND"/> to <see cref="IWindow"/> for easy <see cref="IWindow"/> lookup.
@@ -54,10 +57,10 @@ internal class WindowManager : IWindowManager
 		// Each of the following hooks register just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
 		_registeredHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_SHOW, _hookDelegate);
 		_registeredHooks[1] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);
-		_registeredHooks[2] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, _hookDelegate);
-		_registeredHooks[3] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
-		_registeredHooks[4] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
-		_registeredHooks[5] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, _hookDelegate);
+		_registeredHooks[2] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
+		_registeredHooks[3] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
+		_registeredHooks[4] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, _hookDelegate);
+		_registeredHooks[5] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, _hookDelegate);
 
 		// If any of the above hooks are invalid, we dispose the WindowManager instance and return false.
 		for (int i = 0; i < _registeredHooks.Length; i++)
@@ -154,36 +157,33 @@ internal class WindowManager : IWindowManager
 			{
 				return;
 			}
+			WindowsEventHook_WindowRegistered(window);
 		}
 
 		switch (eventType)
 		{
-			case PInvoke.EVENT_OBJECT_DESTROY:
-				TryUnregisterWindow(window);
-				break;
-			case PInvoke.EVENT_OBJECT_CLOAKED:
-				UpdateWindow(window, WindowUpdateType.Cloaked);
-				break;
-			case PInvoke.EVENT_OBJECT_UNCLOAKED:
-				UpdateWindow(window, WindowUpdateType.Uncloaked);
-				break;
-			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
-				UpdateWindow(window, WindowUpdateType.MinimizeStart);
-				break;
-			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
-				UpdateWindow(window, WindowUpdateType.MinimizeEnd);
-				break;
 			case PInvoke.EVENT_SYSTEM_FOREGROUND:
-				UpdateWindow(window, WindowUpdateType.Foreground);
+			case PInvoke.EVENT_OBJECT_UNCLOAKED:
+				WindowsEventHook_WindowFocused(window);
+				break;
+			case PInvoke.EVENT_OBJECT_DESTROY:
+			case PInvoke.EVENT_OBJECT_CLOAKED:
+				WindowsEventHook_WindowUnregistered(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
-				StartWindowMove(window);
-				break;
-			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
-				WindowMove(window);
+				WindowsEventHook_WindowMoveStart(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
-				EndWindowMove();
+				WindowsEventHook_WindowMoveEnd(window);
+				break;
+			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
+				WindowsEventHook_WindowMoved(window);
+				break;
+			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
+				WindowsEventHook_WindowMinimizeStart(window);
+				break;
+			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
+				WindowsEventHook_WindowMinimizeEnd(window);
 				break;
 			default:
 				Logger.Error($"Unhandled event {eventType}");
@@ -209,7 +209,7 @@ internal class WindowManager : IWindowManager
 
 		Logger.Debug($"Registering window {hwnd.Value}");
 
-		IWindow? window = IWindow.CreateWindow(hwnd, _configContext);
+		IWindow? window = IWindow.CreateWindow(hwnd);
 
 		if (window == null || _configContext.FilterManager.ShouldBeIgnored(window))
 		{
@@ -224,106 +224,83 @@ internal class WindowManager : IWindowManager
 		}
 
 		Logger.Debug($"Registered {window}");
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window);
-		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
 		return window;
 	}
 
-	/// <summary>
-	/// Try unregister the given <see cref="HWND"/>'s associated <see cref="IWindow"/> from this
-	/// <see cref="IWindowManager"/>.
-	/// </summary>
-	/// <param name="window"></param>
-	private void TryUnregisterWindow(IWindow window)
+	private void WindowsEventHook_WindowRegistered(IWindow window)
 	{
-		Logger.Debug($"Unregistering {window.Handle.Value}");
+		Logger.Debug($"Window registered: {window}");
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window);
+		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
+	}
 
+	private void WindowsEventHook_WindowFocused(IWindow window)
+	{
+		Logger.Debug($"Window focused: {window}");
+		window.Focus();
+		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(window);
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowFocused(window);
+		WindowFocused?.Invoke(this, new WindowEventArgs(window));
+	}
+
+	private void WindowsEventHook_WindowUnregistered(IWindow window)
+	{
+		Logger.Debug($"Window unregistered: {window}");
 		_windows.Remove(window.Handle);
-		TriggerWindowUnregistered(new WindowEventArgs(window));
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowUnregistered(window);
+		WindowUnregistered?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void UpdateWindow(IWindow window, WindowUpdateType type)
+	private void WindowsEventHook_WindowMoveStart(IWindow window)
 	{
-		Logger.Debug($"{window} {type}");
-
-		if (type == WindowUpdateType.Foreground)
-		{
-			window.Focus();
-		}
-
-		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, type));
-	}
-
-	private void StartWindowMove(IWindow window)
-	{
-		Logger.Debug($"Starting window move for {window}");
+		Logger.Debug($"Window move started: {window}");
 
 		_mouseMoveWindow = window;
 		_mouseMoveWindow.IsMouseMoving = true;
-		WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, WindowUpdateType.MoveStart));
+
+		WindowMoveStart?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void WindowMove(IWindow window)
+	private void WindowsEventHook_WindowMoveEnd(IWindow window)
 	{
-		Logger.Debug($"Window move for {window}");
-		if (_mouseMoveWindow == window)
-		{
-			WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(window, WindowUpdateType.Move));
-		}
-	}
+		Logger.Debug($"Window move ended: {window}");
 
-	private void EndWindowMove()
-	{
 		lock (_mouseMoveLock)
 		{
-			Logger.Debug($"Ending window move for {_mouseMoveWindow}");
-
-			if (_mouseMoveWindow != null)
+			if (_mouseMoveWindow == null)
 			{
-				Logger.Verbose($"Window move for {_mouseMoveWindow} ended");
-				_mouseMoveWindow.IsMouseMoving = false;
-				MoveWindowToLocation(_mouseMoveWindow);
-
-				WindowUpdated?.Invoke(this, new WindowUpdateEventArgs(_mouseMoveWindow, WindowUpdateType.MoveEnd));
-				_mouseMoveWindow = null;
+				return;
 			}
+
+			_mouseMoveWindow.IsMouseMoving = false;
+
+			// Move the window.
+			if (PInvoke.GetCursorPos(out POINT point))
+			{
+				_configContext.WorkspaceManager.MoveWindowToPoint(window, new Point<int>(point.x, point.y));
+			}
+
+			_mouseMoveWindow = null;
+
+			WindowMoved?.Invoke(this, new WindowEventArgs(window));
 		}
 	}
 
-	private void MoveWindowToLocation(IWindow window)
+	private void WindowsEventHook_WindowMoved(IWindow window)
 	{
-		if (!PInvoke.GetCursorPos(out POINT point))
-		{
-			return;
-		}
-
-		_configContext.WorkspaceManager.MoveWindowToPoint(window, new Point<int>(point.x, point.y));
+		Logger.Debug($"Window moved: {window}");
+		WindowMoved?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	/// <summary>
-	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowUpdated"/>.
-	/// </summary>
-	public void TriggerWindowUpdated(WindowUpdateEventArgs args)
+	private void WindowsEventHook_WindowMinimizeStart(IWindow window)
 	{
-		WindowUpdated?.Invoke(this, args);
+		Logger.Debug($"Window minimize started: {window}");
+		WindowMinimizeStart?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	/// <summary>
-	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowFocused"/>.
-	/// </summary>
-	public void TriggerWindowFocused(WindowEventArgs args)
+	private void WindowsEventHook_WindowMinimizeEnd(IWindow window)
 	{
-		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(args.Window);
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowFocused(args.Window);
-		WindowFocused?.Invoke(this, args);
-	}
-
-	/// <summary>
-	/// Used by <see cref="IWindow"/> to trigger <see cref="WindowUnregistered"/>.
-	/// </summary>
-	public void TriggerWindowUnregistered(WindowEventArgs args)
-	{
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowUnregistered(args.Window);
-		WindowUnregistered?.Invoke(this, args);
+		Logger.Debug($"Window minimize ended: {window}");
+		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs(window));
 	}
 }

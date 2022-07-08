@@ -28,7 +28,6 @@ public class WindowManagerTests
 
 		// When the window manager calls TriggerWindowFocused
 		WindowEventArgs windowEventArgs = new(new Mock<IWindow>().Object);
-		windowManager.TriggerWindowFocused(windowEventArgs);
 
 		// Then the monitor manager was called and updated the focused monitor.
 		Assert.Equal(monitorMock.Object, monitorManager.FocusedMonitor);

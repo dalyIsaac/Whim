@@ -19,11 +19,6 @@ public interface IWindowManager : IDisposable
 	public event EventHandler<WindowEventArgs>? WindowRegistered;
 
 	/// <summary>
-	/// Event for when a window is updated by Windows.
-	/// </summary>
-	public event EventHandler<WindowUpdateEventArgs>? WindowUpdated;
-
-	/// <summary>
 	/// Event for when a window is focused.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowFocused;
@@ -32,4 +27,28 @@ public interface IWindowManager : IDisposable
 	/// Event for when a window is unregistered from Whim.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowUnregistered;
+
+	/// <summary>
+	/// Event for when a window is being moved or resized.
+	/// </summary>
+	public event EventHandler<WindowEventArgs>? WindowMoveStart;
+
+	/// <summary>
+	/// Event for when a window has changed location, shape, or size.
+	///
+	/// This event is fired when Windows sends a <see cref="Windows.Win32.PInvoke.EVENT_OBJECT_LOCATIONCHANGE"/>
+	/// or <see cref="Windows.Win32.PInvoke.EVENT_SYSTEM_MOVESIZEEND"/> event.
+	/// See https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants for more information.
+	/// </summary>
+	public event EventHandler<WindowEventArgs>? WindowMoved;
+
+	/// <summary>
+	/// Event for when a window has started being minimized.
+	/// </summary>
+	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
+
+	/// <summary>
+	/// Event for when a window has ended being minimized.
+	/// </summary>
+	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
 }

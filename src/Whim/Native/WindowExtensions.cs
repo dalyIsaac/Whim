@@ -57,7 +57,6 @@ public static class WindowExtensions
 	/// <param name="uiWindow"></param>
 	/// <param name="componentNamespace"></param>
 	/// <param name="componentPath"></param>
-	/// <param name="configContext"></param>
 	/// <returns></returns>
 	/// <exception cref="InitializeWindowException">
 	/// When an <see cref="IWindow"/> cannot be created from the handle of the given
@@ -66,14 +65,13 @@ public static class WindowExtensions
 	public static IWindow InitializeBorderlessWindow(
 		this Microsoft.UI.Xaml.Window uiWindow,
 		string componentNamespace,
-		string componentPath,
-		IConfigContext configContext
+		string componentPath
 	)
 	{
 		UIElementExtensions.InitializeComponent(uiWindow, componentNamespace, componentPath);
 
 		HWND hwnd = new(WinRT.Interop.WindowNative.GetWindowHandle(uiWindow));
-		IWindow? window = IWindow.CreateWindow(GetHandle(uiWindow), configContext);
+		IWindow? window = IWindow.CreateWindow(GetHandle(uiWindow));
 		if (window == null)
 		{
 			throw new InitializeWindowException("Window was unexpectedly null");
