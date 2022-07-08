@@ -148,7 +148,7 @@ internal class WindowManager : IWindowManager
 		// Try get the window
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			Logger.Verbose($"Window {hwnd.Value} is not registered");
+			Logger.Verbose($"Window {hwnd.Value} is not registered, event type {eventType}");
 			window = RegisterWindow(hwnd);
 			if (window == null)
 			{

@@ -71,9 +71,14 @@ internal class Workspace : IWorkspace
 		}
 
 		_windowLocations.Clear();
+
+		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
 		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height));
+
+		using WindowDeferPosHandle handle = new(Windows.Count());
 		foreach (IWindowState loc in locations)
 		{
+			Logger.Verbose($"Setting location of window {loc.Window}");
 			if (loc.Window.IsMouseMoving)
 			{
 				continue;
@@ -86,11 +91,12 @@ internal class Workspace : IWorkspace
 										height: loc.Location.Height);
 
 			Logger.Verbose($"{loc.Window} at {loc.Location}");
-			Win32Helper.SetWindowPos(loc);
+			handle.DeferWindowPos(loc);
 
 			// Update the window location
 			_windowLocations[loc.Window] = loc;
 		}
+		Logger.Verbose($"Layout for workspace {Name} complete");
 	}
 
 	public Workspace(IConfigContext configContext, string name, params ILayoutEngine[] layoutEngines)

@@ -21,7 +21,7 @@ public static class Win32Helper
 	/// <param name="hwnd"></param>
 	public static void QuitApplication(HWND hwnd)
 	{
-		Logger.Debug($"Quitting application with HWND {hwnd}");
+		Logger.Debug($"Quitting application with HWND {hwnd.Value}");
 		PInvoke.SendNotifyMessage(hwnd, PInvoke.WM_SYSCOMMAND, new WPARAM(PInvoke.SC_CLOSE), 0);
 	}
 
@@ -31,7 +31,7 @@ public static class Win32Helper
 	/// <param name="hwnd"></param>
 	public static void ForceForegroundWindow(HWND hwnd)
 	{
-		Logger.Debug($"Forcing window HWND {hwnd} to foreground");
+		Logger.Debug($"Forcing window HWND {hwnd.Value} to foreground");
 		// Implementation courtesy of https://github.com/workspacer/workspacer/commit/1c02613cea485f1ae97f70d6399f7124aeb31297
 		// keybd_event synthesizes a keystroke - see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-keybd_event
 		PInvoke.keybd_event(0, 0, 0, 0);
@@ -44,7 +44,7 @@ public static class Win32Helper
 	/// <param name="hwnd"></param>
 	public static bool HideWindow(HWND hwnd)
 	{
-		Logger.Debug($"Hiding window HWND {hwnd}");
+		Logger.Debug($"Hiding window HWND {hwnd.Value}");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_HIDE);
 	}
 
@@ -53,7 +53,7 @@ public static class Win32Helper
 	/// </summary>
 	public static bool ShowWindowMaximized(HWND hwnd)
 	{
-		Logger.Debug($"Showing window HWND {hwnd} maximized");
+		Logger.Debug($"Showing window HWND {hwnd.Value} maximized");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMAXIMIZED);
 	}
 
@@ -62,7 +62,7 @@ public static class Win32Helper
 	/// </summary>
 	public static bool ShowWindowMinimized(HWND hwnd)
 	{
-		Logger.Debug($"Showing window HWND {hwnd} minimized");
+		Logger.Debug($"Showing window HWND {hwnd.Value} minimized");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMINIMIZED);
 	}
 
@@ -71,7 +71,7 @@ public static class Win32Helper
 	/// </summary>
 	public static bool MinimizeWindow(HWND hwnd)
 	{
-		Logger.Debug($"Minimizing window HWND {hwnd}");
+		Logger.Debug($"Minimizing window HWND {hwnd.Value}");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_MINIMIZE);
 	}
 
@@ -80,7 +80,7 @@ public static class Win32Helper
 	/// </summary>
 	public static bool ShowWindowNoActivate(HWND hwnd)
 	{
-		Logger.Debug($"Showing window HWND {hwnd} no activate");
+		Logger.Debug($"Showing window HWND {hwnd.Value} no activate");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
 	}
 
@@ -276,66 +276,6 @@ public static class Win32Helper
 						&cloaked,
 						sizeof(int));
 			return cloaked != 0 || res.Failed;
-		}
-	}
-
-	/// <summary>
-	/// Using the given <paramref name="windowState"/>, sets the window's position.
-	/// </summary>
-	/// <param name="windowState"></param>
-	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
-	public static void SetWindowPos(IWindowState windowState, HWND? hwndInsertAfter = null)
-	{
-		// We use HWND_BOTTOM, as modifying the Z-order of a window
-		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
-		// causes the relevant window to be focused, when the user hasn't
-		// actually changed the focus.
-		hwndInsertAfter ??= (HWND)1; // HWND_BOTTOM
-
-		IWindow window = windowState.Window;
-
-		ILocation<int> offset = GetWindowOffset(window.Handle);
-		ILocation<int> location = Location.Add(windowState.Location, offset);
-
-		WindowSize windowSize = windowState.WindowSize;
-
-		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
-							   | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
-							   | SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
-							   | SET_WINDOW_POS_FLAGS.SWP_NOZORDER
-							   | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
-
-		if (windowSize == WindowSize.Maximized || windowSize == WindowSize.Minimized)
-		{
-			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
-		}
-
-		PInvoke.SetWindowPos(
-			window.Handle,
-			(HWND)hwndInsertAfter,
-			location.X,
-			location.Y,
-			location.Width,
-			location.Height,
-			flags);
-
-		if (windowSize == WindowSize.Maximized)
-		{
-			if (!window.IsMinimized)
-			{
-				MinimizeWindow(window.Handle);
-			}
-		}
-		else if (windowSize == WindowSize.Minimized)
-		{
-			if (!window.IsMaximized)
-			{
-				ShowWindowMaximized(window.Handle);
-			}
-		}
-		else if (window.WindowClass != "Windows.UI.Core.CoreWindow")
-		{
-			ShowWindowNoActivate(window.Handle);
 		}
 	}
 

@@ -32,7 +32,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 			width: focusedWindowLocation.Width + (borderSize * 2)
 		);
 
-		Win32Helper.SetWindowPos(
+		WindowDeferPosHandle.SetWindowPos(
 			new WindowState(_window, borderLocation, WindowSize.Normal),
 			windowLocation.Window.Handle
 		);
