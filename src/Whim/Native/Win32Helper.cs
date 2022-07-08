@@ -280,67 +280,6 @@ public static class Win32Helper
 	}
 
 	/// <summary>
-	/// Using the given <paramref name="windowState"/>, sets the window's position.
-	/// When setting multiple windows, it is recommended to use <see cref="WindowDeferPosHandle"/>.
-	/// </summary>
-	/// <param name="windowState"></param>
-	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
-	public static void SetWindowPos(IWindowState windowState, HWND? hwndInsertAfter = null)
-	{
-		// We use HWND_BOTTOM, as modifying the Z-order of a window
-		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
-		// causes the relevant window to be focused, when the user hasn't
-		// actually changed the focus.
-		hwndInsertAfter ??= (HWND)1; // HWND_BOTTOM
-
-		IWindow window = windowState.Window;
-
-		ILocation<int> offset = GetWindowOffset(window.Handle);
-		ILocation<int> location = Location.Add(windowState.Location, offset);
-
-		WindowSize windowSize = windowState.WindowSize;
-
-		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
-							   | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
-							   | SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
-							   | SET_WINDOW_POS_FLAGS.SWP_NOZORDER
-							   | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
-
-		if (windowSize == WindowSize.Maximized || windowSize == WindowSize.Minimized)
-		{
-			flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
-		}
-
-		PInvoke.SetWindowPos(
-			window.Handle,
-			(HWND)hwndInsertAfter,
-			location.X,
-			location.Y,
-			location.Width,
-			location.Height,
-			flags);
-
-		if (windowSize == WindowSize.Maximized)
-		{
-			if (!window.IsMinimized)
-			{
-				MinimizeWindow(window.Handle);
-			}
-		}
-		else if (windowSize == WindowSize.Minimized)
-		{
-			if (!window.IsMaximized)
-			{
-				ShowWindowMaximized(window.Handle);
-			}
-		}
-		else if (window.WindowClass != "Windows.UI.Core.CoreWindow")
-		{
-			ShowWindowNoActivate(window.Handle);
-		}
-	}
-
-	/// <summary>
 	/// Returns the window's offset.<br/>
 	/// This is based on the issue raised at https://github.com/workspacer/workspacer/issues/139,
 	/// and the associated fix from https://github.com/workspacer/workspacer/pull/146.

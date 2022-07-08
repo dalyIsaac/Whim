@@ -107,7 +107,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		base.Activate();
 		TextEntry.Focus(FocusState.Programmatic);
-		Win32Helper.SetWindowPos(
+		WindowDeferPosHandle.SetWindowPos(
 			new WindowState(_window, windowLocation, WindowSize.Normal),
 			_window.Handle
 		);

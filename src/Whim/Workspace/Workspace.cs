@@ -75,7 +75,7 @@ internal class Workspace : IWorkspace
 		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
 		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height));
 
-		using WindowDeferPosHandle handle = WindowDeferPosHandle.Initialize(Windows.Count());
+		using WindowDeferPosHandle handle = new(Windows.Count());
 		foreach (IWindowState loc in locations)
 		{
 			Logger.Verbose($"Setting location of window {loc.Window}");

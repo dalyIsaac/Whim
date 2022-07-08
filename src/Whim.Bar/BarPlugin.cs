@@ -40,9 +40,10 @@ public class BarPlugin : IPlugin, IDisposable
 		foreach (IMonitor monitor in _configContext.MonitorManager)
 		{
 			BarWindow barWindow = new(_configContext, _barConfig, monitor);
-			barWindow.Render();
 			_monitorBarMap.Add(monitor, barWindow);
 		}
+
+		ShowAll();
 	}
 
 	private void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
@@ -61,10 +62,19 @@ public class BarPlugin : IPlugin, IDisposable
 			_monitorBarMap.Add(monitor, barWindow);
 		}
 
-		// Show all windows
+		ShowAll();
+	}
+
+	/// <summary>
+	/// Show all the bar windows.
+	/// </summary>
+	private void ShowAll()
+	{
+		using WindowDeferPosHandle deferPosHandle = new(_monitorBarMap.Count);
+
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
-			barWindow.Render();
+			deferPosHandle.DeferWindowPos(barWindow.WindowState);
 		}
 	}
 

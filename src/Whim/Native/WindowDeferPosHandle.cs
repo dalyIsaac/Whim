@@ -18,9 +18,17 @@ public sealed class WindowDeferPosHandle : IDisposable
 	private readonly List<IWindow> _toMaximize;
 	private readonly List<IWindow> _toNormal;
 
-	private WindowDeferPosHandle(nint info)
+	/// <summary>
+	/// Create a new <see cref="WindowDeferPosHandle"/> for <paramref name="count"/> windows.
+	/// This is to be used when setting the position of multiple windows at once.
+	///
+	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block
+	/// or statement, otherwise <see cref="PInvoke.EndDeferWindowPos"/> won't be called.
+	/// </summary>
+	/// <param name="count">The number of windows to layout.</param>
+	public WindowDeferPosHandle(int count)
 	{
-		_hWinPosInfo = info;
+		_hWinPosInfo = PInvoke.BeginDeferWindowPos(count);
 
 		_toMinimize = new List<IWindow>();
 		_toMaximize = new List<IWindow>();
@@ -107,17 +115,13 @@ public sealed class WindowDeferPosHandle : IDisposable
 	}
 
 	/// <summary>
-	/// Create a new <see cref="WindowDeferPosHandle"/> for <paramref name="count"/> windows.
-	/// This is to be used when setting the position of multiple windows at once.
-	///
-	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block
-	/// or statement, otherwise <see cref="PInvoke.EndDeferWindowPos"/> won't be called.
+	/// Set the position of a single window.
 	/// </summary>
-	/// <param name="count">The number of windows to layout.</param>
-	/// <returns></returns>
-	public static WindowDeferPosHandle Initialize(int count)
+	/// <param name="windowState"></param>
+	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
+	public static void SetWindowPos(IWindowState windowState, HWND? hwndInsertAfter = null)
 	{
-		nint info = PInvoke.BeginDeferWindowPos(count);
-		return new WindowDeferPosHandle(info);
+		using WindowDeferPosHandle handle = new(1);
+		handle.DeferWindowPos(windowState, hwndInsertAfter);
 	}
 }

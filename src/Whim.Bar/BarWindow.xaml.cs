@@ -10,7 +10,11 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 	private readonly IConfigContext _configContext;
 	private readonly BarConfig _barConfig;
 	private readonly IMonitor _monitor;
-	private readonly IWindowState _windowLocation;
+
+	/// <summary>
+	/// The current window state.
+	/// </summary>
+	public IWindowState WindowState { get; }
 
 	/// <summary>
 	/// Creates a new bar window.
@@ -38,7 +42,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		int topMargin = (int)_barConfig.Margin.Top;
 		int bottomMargin = (int)_barConfig.Margin.Bottom;
 
-		_windowLocation = new WindowState(window, new Location(
+		WindowState = new WindowState(window, new Location(
 			x: _monitor.X + leftMargin,
 			y: _monitor.Y + rightMargin,
 			width: _monitor.Width - (leftMargin + rightMargin),
@@ -46,8 +50,8 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
 		Title = "Whim Bar";
-		Win32Helper.HideCaptionButtons(_windowLocation.Window.Handle);
-		Win32Helper.SetWindowCorners(_windowLocation.Window.Handle);
+		Win32Helper.HideCaptionButtons(WindowState.Window.Handle);
+		Win32Helper.SetWindowCorners(WindowState.Window.Handle);
 		this.SetIsShownInSwitchers(false);
 
 		// Set up the bar.
@@ -56,12 +60,5 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_configContext, _monitor, this)));
 	}
 
-	/// <summary>
-	/// Renders the bar in the correct location. Use this instead of Show() to ensure
-	/// the bar is rendered in the correct location.
-	/// </summary>
-	public void Render()
-	{
-		Win32Helper.SetWindowPos(_windowLocation);
-	}
+
 }
