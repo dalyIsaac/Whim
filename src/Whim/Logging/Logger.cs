@@ -77,7 +77,7 @@ public class Logger
 	/// <param name="sourceLineNumber">The line number in the source file.</param>
 	/// <returns>The message with caller information added.</returns>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static string AddCaller(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	private static string AddCaller(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
 		string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
 		string fileLocation = $"{fileName}:{sourceLineNumber}";
