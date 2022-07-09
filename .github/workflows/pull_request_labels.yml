@@ -17,6 +17,7 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
         shell: pwsh
         run: |
+          gh pr view $env:PR_NUMBER --json labels
           $count = [int] (gh pr view $env:PR_NUMBER --json labels --jq '.labels | length')
 
           if ($count -eq 0) {
