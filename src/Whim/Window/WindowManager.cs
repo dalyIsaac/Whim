@@ -157,33 +157,34 @@ internal class WindowManager : IWindowManager
 			{
 				return;
 			}
-			WindowsEventHook_WindowRegistered(window);
+			OnWindowRegistered(window);
 		}
 
+		Logger.Verbose($"Windows event 0x{eventType:X4} for {window}");
 		switch (eventType)
 		{
 			case PInvoke.EVENT_SYSTEM_FOREGROUND:
 			case PInvoke.EVENT_OBJECT_UNCLOAKED:
-				WindowsEventHook_WindowFocused(window);
+				OnWindowFocused(window);
 				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
-				WindowsEventHook_WindowUnregistered(window);
+				OnWindowUnregistered(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
-				WindowsEventHook_WindowMoveStart(window);
+				OnWindowMoveStart(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
-				WindowsEventHook_WindowMoveEnd(window);
+				OnWindowMoveEnd(window);
 				break;
 			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
-				WindowsEventHook_WindowMoved(window);
+				OnWindowMoved(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
-				WindowsEventHook_WindowMinimizeStart(window);
+				OnWindowMinimizeStart(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
-				WindowsEventHook_WindowMinimizeEnd(window);
+				OnWindowMinimizeEnd(window);
 				break;
 			default:
 				Logger.Error($"Unhandled event {eventType}");
@@ -227,14 +228,19 @@ internal class WindowManager : IWindowManager
 		return window;
 	}
 
-	private void WindowsEventHook_WindowRegistered(IWindow window)
+	private void OnWindowRegistered(IWindow window)
 	{
 		Logger.Debug($"Window registered: {window}");
 		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window);
 		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void WindowsEventHook_WindowFocused(IWindow window)
+	/// <summary>
+	/// Handles when the given window is focused.
+	/// This can be called by <see cref="Workspace.AddWindow"/>, as an already focused window may
+	/// have switched to a different workspace.
+	/// </summary>
+	internal void OnWindowFocused(IWindow window)
 	{
 		Logger.Debug($"Window focused: {window}");
 		window.Focus();
@@ -243,7 +249,7 @@ internal class WindowManager : IWindowManager
 		WindowFocused?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void WindowsEventHook_WindowUnregistered(IWindow window)
+	private void OnWindowUnregistered(IWindow window)
 	{
 		Logger.Debug($"Window unregistered: {window}");
 		_windows.Remove(window.Handle);
@@ -251,7 +257,7 @@ internal class WindowManager : IWindowManager
 		WindowUnregistered?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void WindowsEventHook_WindowMoveStart(IWindow window)
+	private void OnWindowMoveStart(IWindow window)
 	{
 		Logger.Debug($"Window move started: {window}");
 
@@ -261,7 +267,7 @@ internal class WindowManager : IWindowManager
 		WindowMoveStart?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void WindowsEventHook_WindowMoveEnd(IWindow window)
+	private void OnWindowMoveEnd(IWindow window)
 	{
 		Logger.Debug($"Window move ended: {window}");
 
@@ -286,19 +292,19 @@ internal class WindowManager : IWindowManager
 		}
 	}
 
-	private void WindowsEventHook_WindowMoved(IWindow window)
+	private void OnWindowMoved(IWindow window)
 	{
 		Logger.Debug($"Window moved: {window}");
 		WindowMoved?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void WindowsEventHook_WindowMinimizeStart(IWindow window)
+	private void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
 		WindowMinimizeStart?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void WindowsEventHook_WindowMinimizeEnd(IWindow window)
+	private void OnWindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize ended: {window}");
 		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs(window));
