@@ -35,7 +35,7 @@ if ($null -ne $releases) {
         $priorRelease = $priorRelease.ToString()
         $currentReleaseTag = $priorRelease.Split("`t")[2]
 
-        $patch = [int] $currentReleaseTag.Split("-").Split(".")[2]
+        $patch = [int] $currentReleaseTag.Split("-").Split("+")[2]
     }
 }
 
@@ -54,4 +54,4 @@ elseif ($versionBump -eq "patch") {
 
 $commit = (git rev-parse HEAD).Substring(0, 8)
 
-return "${major}.${minor}.${patch}-${channel}.${commit}"
+return "${major}.${minor}.${patch}-${channel}+${commit}"
