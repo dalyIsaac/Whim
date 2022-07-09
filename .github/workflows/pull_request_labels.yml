@@ -2,7 +2,7 @@ name: pull_request_labels
 
 on:
   pull_request:
-    types: [opened, labeled, unlabeled]
+    types: [opened, reopened, edited, labeled, unlabeled]
 
 jobs:
   opened:
