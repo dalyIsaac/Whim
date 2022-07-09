@@ -35,7 +35,7 @@ if ($null -ne $releases) {
         $priorRelease = $priorRelease.ToString()
         $currentReleaseTag = $priorRelease.Split("`t")[2]
 
-        $patch = [int] $currentReleaseTag.Split("-").Split("+")[2]
+        $patch = [int] $currentReleaseTag.Split(".")[2].Split("-")[0]
     }
 }
 
