@@ -10,12 +10,10 @@ Whim has the following release channels:
 - `beta`: The latest changes in a release branch `release/v*`.
 - `stable`: A release of the latest stable version, in a release branch.
 
-Releases follow the format `v<version>-<channel>.<build>.<commit>`. For example, `v5-beta.4.3b8c8aa`.
+The release format is compatible with [Semantic Versioning 2.0](https://semver.org/spec/v2.0.0.html). The format is `MAJOR.MINOR.PATCH-CHANNEL+COMMIT`. For example, `0.5.1-beta.4+3b8c8aa`.
 
-- `version` is the version number.
-- `channel` is the release channel.
-- `build` is the number of commits since the bump commit.
-- `commit` is the commit hash.
+- `PATCH` is the number of commits since the last bump commit.
+- `COMMIT` is the first 8 characters of the commit hash.
 
 Scripts will generally return the release string with no leading `v`. Builds will similarly have no leading `v`. However, **GitHub releases** (and thus tags) **will have a leading `v`**.
 

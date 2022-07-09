@@ -17,7 +17,7 @@ $releases = gh release list
 if ($null -eq $releases) {
     $major, $minor, $patch = .\scripts\Get-WhimVersion.ps1
     $commit = (git rev-parse HEAD).Substring(0, 8)
-    return "${major}.${minor}.${patch}-${channel}.${commit}"
+    return "${major}.${minor}.${patch}-${channel}+${commit}"
 }
 
 $latestRelease = $releases | Select-String -Pattern $Channel -SimpleMatch | Select-Object -First 1
