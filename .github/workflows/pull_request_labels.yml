@@ -6,41 +6,19 @@ on:
 
 jobs:
   opened:
-    # When the pull request, there won't be any labels attached. To force the `label` job to run,
-    # we add the `triage` label.
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.pull_request.action == 'opened'
-    concurrency: pr-labels-${{ github.pull_request.number }}
     steps:
-      - name: Label opened pull requests with triage
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check there's at least one label
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr edit --add-labels "triage"
-
-  label:
-    # If the triage label is attached and there are other labels, remove triage.
-    # If triage is attached, fail.
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.pull_request.action != 'opened'
-    concurrency: pr-labels-${{ github.pull_request.number }}
-    steps:
-      - name: Require labels
+          PR_NUMBER: ${{ github.event.number }}
         shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
-          if ($null -eq $env:GITHUB_PR_LABELS) {
-            throw "Missing required labels"
-          }
+          $count = [int] (gh pr view $env:PR_NUMBER --json labels --jq '.labels | length')
 
-          $labels = $env:GITHUB_PR_LABELS.Split(',')
-          if ($labels.Contains("triage")) {
-            gh pr edit --remove-labels "triage"
-            $labels = $labels | Where-Object { $_ -ne "triage" }
-          }
-
-          if ($labels.Length -eq 0) {
-            throw "Pull request must have at least one label (excluding triage)"
+          if ($count -eq 0) {
+            throw "No labels found"
           }
