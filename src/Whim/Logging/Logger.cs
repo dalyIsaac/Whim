@@ -77,18 +77,17 @@ public class Logger
 	/// <param name="sourceLineNumber">The line number in the source file.</param>
 	/// <returns>The message with caller information added.</returns>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static string AddCaller(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	private static string AddCaller(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
 		string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
 		string fileLocation = $"{fileName}:{sourceLineNumber}";
 
 		string methodName = $"[{memberName}]";
 
-		return $"{fileLocation} {methodName} {message}";
+		return $"{fileLocation,-30} {methodName,-30} {message}";
 	}
 
 	/// <summary>
-	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
 	/// Write a log event with the <see cref="LogLevel.Verbose"/> level.
 	/// </summary>
 	/// <param name="message">The message to log.</param>
@@ -101,7 +100,6 @@ public class Logger
 	}
 
 	/// <summary>
-	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
 	/// Write a log event with the <see cref="LogLevel.Debug"/> level.
 	/// </summary>
 	/// <param name="message">The message to log.</param>
@@ -114,7 +112,6 @@ public class Logger
 	}
 
 	/// <summary>
-	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
 	/// Write a log event with the <see cref="LogLevel.Information"/> level.
 	/// </summary>
 	/// <param name="message">The message to log.</param>
@@ -127,7 +124,6 @@ public class Logger
 	}
 
 	/// <summary>
-	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
 	/// Write a log event with the <see cref="LogLevel.Warning"/> level.
 	/// </summary>
 	/// <param name="message">The message to log.</param>
@@ -140,7 +136,6 @@ public class Logger
 	}
 
 	/// <summary>
-	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
 	/// Write a log event with the <see cref="LogLevel.Error"/> level.
 	/// </summary>
 	/// <param name="message">The message to log.</param>
@@ -153,7 +148,6 @@ public class Logger
 	}
 
 	/// <summary>
-	/// void ILogger.Verbose(string messageTemplate) (+ 9 overloads)
 	/// Write a log event with the <see cref="LogLevel.Fatal"/> level.
 	/// </summary>
 	/// <param name="message">The message to log.</param>
