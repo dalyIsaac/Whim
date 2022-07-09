@@ -45,7 +45,7 @@ public class FocusIndicatorPlugin : IPlugin
 	public void PostInitialize()
 	{
 		// The window must be created on the UI thread (so don't do it in the constructor).
-		_focusIndicatorWindow = new FocusIndicatorWindow(_focusIndicatorConfig);
+		_focusIndicatorWindow = new FocusIndicatorWindow(_configContext, _focusIndicatorConfig);
 
 		// Activate the window so it renders.
 		_focusIndicatorWindow.Activate();

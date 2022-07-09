@@ -8,6 +8,8 @@ namespace Whim;
 
 internal class Window : IWindow
 {
+	private readonly IConfigContext _configContext;
+
 	/// <inheritdoc/>
 	public HWND Handle { get; }
 
@@ -73,6 +75,10 @@ internal class Window : IWindow
 		{
 			PInvoke.SetForegroundWindow(Handle);
 		}
+
+		// We manually call OnWindowFocused as n already focused window may have switched to a
+		// different workspace.
+		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(this);
 	}
 
 	/// <inheritdoc/>
@@ -80,6 +86,10 @@ internal class Window : IWindow
 	{
 		Logger.Debug(ToString());
 		PInvoke.SetForegroundWindow(Handle);
+
+		// We manually call OnWindowFocused as n already focused window may have switched to a
+		// different workspace.
+		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(this);
 	}
 
 	/// <inheritdoc/>
@@ -132,9 +142,11 @@ internal class Window : IWindow
 	/// Constructor for the <see cref="IWindow"/> implementation.
 	/// </summary>
 	/// <param name="hwnd"></param>
+	/// <param name="configContext"></param>
 	/// <exception cref="Win32Exception"></exception>
-	internal Window(HWND hwnd)
+	internal Window(HWND hwnd, IConfigContext configContext)
 	{
+		_configContext = configContext;
 		Handle = hwnd;
 
 		unsafe

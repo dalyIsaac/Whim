@@ -210,7 +210,7 @@ internal class WindowManager : IWindowManager
 
 		Logger.Debug($"Registering window {hwnd.Value}");
 
-		IWindow? window = IWindow.CreateWindow(hwnd);
+		IWindow? window = IWindow.CreateWindow(hwnd, _configContext);
 
 		if (window == null || _configContext.FilterManager.ShouldBeIgnored(window))
 		{

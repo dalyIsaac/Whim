@@ -243,7 +243,6 @@ internal class Workspace : IWorkspace
 		}
 		DoLayout();
 		window.Focus();
-		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(window);
 	}
 
 	public bool RemoveWindow(IWindow window)
