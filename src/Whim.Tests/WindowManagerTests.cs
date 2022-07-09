@@ -6,7 +6,7 @@ namespace Whim.Tests;
 public class WindowManagerTests
 {
 	[Fact]
-	public void TriggerWindowFocused_MonitorManager_WindowFocused()
+	public void OnWindowFocused_MonitorManager_WindowFocused()
 	{
 		// Given
 		Mock<IWorkspaceManager> workspaceManagerMock = new();
@@ -27,11 +27,9 @@ public class WindowManagerTests
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
 		// When the window manager calls TriggerWindowFocused
-		WindowEventArgs windowEventArgs = new(new Mock<IWindow>().Object);
-		windowManager.TriggerWindowFocused(windowEventArgs);
+		windowManager.OnWindowFocused(new Mock<IWindow>().Object);
 
 		// Then the monitor manager was called and updated the focused monitor.
 		Assert.Equal(monitorMock.Object, monitorManager.FocusedMonitor);
 	}
 }
-

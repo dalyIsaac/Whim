@@ -65,7 +65,6 @@ internal class Window : IWindow
 	{
 		Logger.Debug(ToString());
 		Win32Helper.QuitApplication(Handle);
-		(_configContext.WindowManager as WindowManager)?.TriggerWindowUnregistered(new WindowEventArgs(this));
 	}
 
 	/// <inheritdoc/>
@@ -77,12 +76,9 @@ internal class Window : IWindow
 			PInvoke.SetForegroundWindow(Handle);
 		}
 
-		// Sometimes we want to let listeners that the window is focused, but
-		// other things might have changed, like the monitor the window's on.
-		// For example, <see cref="MonitorManager.FocusMonitor"/> relies on
-		// <see cref="IWindowManager.WindowFocused"/> to be called.
-		// Admittedly, this is a bit of a hack.
-		(_configContext.WindowManager as WindowManager)?.TriggerWindowFocused(new WindowEventArgs(this));
+		// We manually call OnWindowFocused as n already focused window may have switched to a
+		// different workspace.
+		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(this);
 	}
 
 	/// <inheritdoc/>
@@ -90,7 +86,10 @@ internal class Window : IWindow
 	{
 		Logger.Debug(ToString());
 		PInvoke.SetForegroundWindow(Handle);
-		(_configContext.WindowManager as WindowManager)?.TriggerWindowFocused(new WindowEventArgs(this));
+
+		// We manually call OnWindowFocused as n already focused window may have switched to a
+		// different workspace.
+		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(this);
 	}
 
 	/// <inheritdoc/>
@@ -98,7 +97,6 @@ internal class Window : IWindow
 	{
 		Logger.Debug(ToString());
 		Win32Helper.HideWindow(Handle);
-		(_configContext.WindowManager as WindowManager)?.TriggerWindowUpdated(new WindowUpdateEventArgs(this, WindowUpdateType.Cloaked));
 	}
 
 	/// <inheritdoc/>
