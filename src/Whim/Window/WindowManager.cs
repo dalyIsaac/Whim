@@ -243,7 +243,6 @@ internal class WindowManager : IWindowManager
 	internal void OnWindowFocused(IWindow window)
 	{
 		Logger.Debug($"Window focused: {window}");
-		window.Focus();
 		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(window);
 		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowFocused(window);
 		WindowFocused?.Invoke(this, new WindowEventArgs(window));
