@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
@@ -20,16 +19,14 @@
 		<GenerateLibraryLayout>true</GenerateLibraryLayout>
 		<Nullable>enable</Nullable>
 		<Platforms>x64;arm64</Platforms>
-		<RootNamespace>Whim.TreeLayout</RootNamespace>
+		<RootNamespace>Whim.TreeLayout.Bar</RootNamespace>
 		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
 		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<UseWinUI>true</UseWinUI>
 		<Version>0.1.0</Version>
 	</PropertyGroup>
-
 	<ItemGroup>
-		<None Remove="PhantomWindow.xaml" />
 		<None Remove="TreeLayoutEngineWidget.xaml" />
 	</ItemGroup>
 
@@ -37,18 +34,16 @@
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.2" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.1" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
+		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<Page Update="TreeLayoutEngineWidget.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
-	<ItemGroup>
-		<Page Update="PhantomWindow.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
-
 </Project>

@@ -1,0 +1,14 @@
+﻿<UserControl
+	x:Class="Whim.TreeLayout.Bar.TreeLayoutEngineWidget"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="using:Whim.TreeLayout.Bar"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d">
+
+	<Button
+		Command="{x:Bind ViewModel.ToggleDirectionCommand}"
+		Content="{x:Bind Path=ViewModel.AddNodeDirection, Mode=OneWay}"
+		Visibility="{x:Bind Path=ViewModel.IsVisible, Mode=OneWay}" />
+</UserControl>
