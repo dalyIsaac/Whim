@@ -7,5 +7,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Grid />
+	<Button
+		Command="{x:Bind ViewModel.ToggleDirectionCommand}"
+		Content="{x:Bind Path=ViewModel.AddNodeDirection, Mode=OneWay}"
+		Visibility="{x:Bind Path=ViewModel.IsVisible, Mode=OneWay}" />
 </UserControl>

@@ -146,5 +146,13 @@
 		</ItemGroup>
 		<Copy SourceFiles="@(TreeLayoutSourceFile)" DestinationFiles="@(TreeLayoutDestinationFile)" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" />
+
+		<!--Whim.TreeLayout.Bar-->
+		<ItemGroup>
+			<TreeLayoutBarSourceFile Include="$(SolutionDir)\src\Whim.TreeLayout.Bar\$(OutDir)\Whim.TreeLayout.Bar\**\*" />
+			<TreeLayoutBarDestinationFile Include="@(TreeLayoutBarSourceFile->'$(TargetDir)plugins\Whim.TreeLayout.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(TreeLayoutBarSourceFile)" DestinationFiles="@(TreeLayoutBarDestinationFile)" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout.Bar\$(OutDir)Whim.TreeLayout.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.Bar\" />
 	</Target>
 </Project>

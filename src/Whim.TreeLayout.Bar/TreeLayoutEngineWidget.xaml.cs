@@ -21,15 +21,28 @@ namespace Whim.TreeLayout.Bar;
 /// </summary>
 public sealed partial class TreeLayoutEngineWidget : UserControl
 {
-	internal TreeLayoutEngineWidget(IConfigContext config, IMonitor monitor, Microsoft.UI.Xaml.Window window)
+	/// <summary>
+	/// The tree layout engine widget.
+	/// </summary>
+	public TreeLayoutEngineWidgetViewModel ViewModel { get; }
+
+	internal TreeLayoutEngineWidget(IConfigContext configContext, IMonitor monitor, Microsoft.UI.Xaml.Window window)
 	{
+		ViewModel = new TreeLayoutEngineWidgetViewModel(configContext, monitor);
+		window.Closed += Window_Closed;
 		UIElementExtensions.InitializeComponent(this, "Whim.TreeLayout.Bar", "TreeLayoutEngineWidget");
+	}
+
+	private void Window_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
+	{
+		ViewModel.Dispose();
 	}
 
 	/// <summary>
 	/// Create the tree layout engine bar component.
 	/// </summary>
-	public static BarComponent CreateComponent() {
+	public static BarComponent CreateComponent()
+	{
 		return new BarComponent((configContext, monitor, window) => new TreeLayoutEngineWidget(configContext, monitor, window));
 	}
 }

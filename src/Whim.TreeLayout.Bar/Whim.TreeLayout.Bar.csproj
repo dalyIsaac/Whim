@@ -31,13 +31,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.3" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.2" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
-	  <ProjectReference Include="..\Whim\Whim.csproj" />
+		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
+		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

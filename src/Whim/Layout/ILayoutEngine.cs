@@ -92,8 +92,8 @@ public interface ILayoutEngine : ICollection<IWindow>
 	}
 
 	/// <summary>
-	/// Checks to see if the <paramref name="root"/> layout engine or a child layout engine is equal
-	/// to <paramref name="layoutEngine"/>.
+	/// Checks to see if the <paramref name="root"/> layout engine or a child layout engine is
+	/// <paramref name="layoutEngine"/>.
 	/// </summary>
 	/// <param name="root">
 	/// The root layout engine to check. If this is a proxy layout engine, it'll check its child
