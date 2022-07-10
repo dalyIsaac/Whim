@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml;
+using System;
 using System.ComponentModel;
 
 namespace Whim.TreeLayout.Bar;
@@ -12,26 +13,32 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 	private readonly IMonitor _monitor;
 	private bool disposedValue;
 
-	private Direction? _addNodeDirection;
+	private Direction? _directionValue;
 
 	/// <summary>
 	/// Shortcut to indicate if <see cref="AddNodeDirection"/> is <see langword="null"/>.
 	/// </summary>
-	public bool IsVisible => _addNodeDirection == null;
+	public Visibility IsVisible => _directionValue != null ? Visibility.Visible : Visibility.Collapsed;
+
+	/// <summary>
+	/// The string representation of <see cref="DirectionValue"/>.
+	/// </summary>
+	public string? AddNodeDirection => _directionValue.ToString();
 
 	/// <summary>
 	/// The direction in which windows will be added. If this is <see langword="null"/>, then the
 	/// monitor for this widget is not focused, or does not have a <see cref="TreeLayoutEngine"/>
 	/// as the active layout engine.
 	/// </summary>
-	public Direction? AddNodeDirection
+	private Direction? DirectionValue
 	{
-		get => _addNodeDirection;
+		get => _directionValue;
 		set
 		{
-			if (_addNodeDirection != value)
+			if (value != _directionValue)
 			{
-				_addNodeDirection = value;
+				_directionValue = value;
+
 				OnPropertyChanged(nameof(AddNodeDirection));
 				OnPropertyChanged(nameof(IsVisible));
 			}
@@ -56,6 +63,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		_configContext = configContext;
 		_monitor = monitor;
 		ToggleDirectionCommand = new ToggleDirectionCommand(this);
+		UpdateNodeDirection();
 
 		_configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 		_configContext.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
@@ -63,38 +71,32 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
 	{
-		if (e.Monitor != _monitor || _configContext.MonitorManager.FocusedMonitor != _monitor)
-		{
-			AddNodeDirection = null;
-			return;
-		}
-
 		UpdateNodeDirection();
 	}
 
 	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
 	{
-		if (_monitor != _configContext.MonitorManager.FocusedMonitor)
-		{
-			AddNodeDirection = null;
-			return;
-		}
-
 		UpdateNodeDirection();
 	}
 
 	private void UpdateNodeDirection()
 	{
+		if (_monitor != _configContext.MonitorManager.FocusedMonitor)
+		{
+			DirectionValue = null;
+			return;
+		}
+
 		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
 		TreeLayoutEngine? engine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(rootEngine);
 
 		if (engine is null)
 		{
-			AddNodeDirection = null;
+			DirectionValue = null;
 			return;
 		}
 
-		AddNodeDirection = engine.AddNodeDirection;
+		DirectionValue = engine.AddNodeDirection;
 	}
 
 	/// <summary>
@@ -102,7 +104,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 	/// </summary>
 	public void ToggleDirection()
 	{
-		if (AddNodeDirection == null)
+		if (DirectionValue == null)
 		{
 			return;
 		}
@@ -112,11 +114,11 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 		if (engine is null)
 		{
-			AddNodeDirection = null;
+			DirectionValue = null;
 			return;
 		}
 
-		switch (AddNodeDirection)
+		switch (DirectionValue)
 		{
 			case Direction.Left:
 				engine.AddNodeDirection = Direction.Up;
@@ -135,7 +137,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 				break;
 		}
 
-		AddNodeDirection = engine.AddNodeDirection;
+		DirectionValue = engine.AddNodeDirection;
 	}
 
 	/// <inheritdoc/>
