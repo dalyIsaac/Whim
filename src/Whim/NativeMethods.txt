@@ -33,6 +33,7 @@ GetWindowThreadProcessId
 GetWindowText
 GetClassName
 GetWindowRect
+EnumWindows
 
 SetWindowsHookEx
 CallNextHookEx

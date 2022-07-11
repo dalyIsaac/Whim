@@ -14,6 +14,11 @@ public interface IWindowManager : IDisposable
 	public void Initialize();
 
 	/// <summary>
+	/// Register the top-level windows.
+	/// </summary>
+	public void PostInitialize();
+
+	/// <summary>
 	/// Event for when a window is registered by the <see cref="IWindowManager"/>.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowRegistered;

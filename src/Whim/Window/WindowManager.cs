@@ -73,6 +73,14 @@ internal class WindowManager : IWindowManager
 		}
 	}
 
+	public void PostInitialize()
+	{
+		foreach (HWND hwnd in Win32Helper.GetAllWindows())
+		{
+			RegisterWindow(hwnd);
+		}
+	}
+
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!disposedValue)
@@ -157,7 +165,6 @@ internal class WindowManager : IWindowManager
 			{
 				return;
 			}
-			OnWindowRegistered(window);
 		}
 
 		Logger.Verbose($"Windows event 0x{eventType:X4} for {window}");
@@ -225,6 +232,8 @@ internal class WindowManager : IWindowManager
 		}
 
 		Logger.Debug($"Registered {window}");
+
+		OnWindowRegistered(window);
 		return window;
 	}
 
