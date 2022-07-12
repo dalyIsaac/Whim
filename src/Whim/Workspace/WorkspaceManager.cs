@@ -213,23 +213,15 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// Called when a window has been registered by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was registered.</param>
-	/// <param name="keepOnMonitor">
-	/// Whether the window should be kept on the monitor it was registered on.
-	/// This parameter is ignored if the <see cref="IRouterManager"/> specifies the target workspace.
-	/// </param>
-	internal void WindowRegistered(IWindow window, bool keepOnMonitor)
+	internal void WindowRegistered(IWindow window)
 	{
 		Logger.Debug($"Registering window {window}");
 
 		IWorkspace? workspace = _configContext.RouterManager.RouteWindow(window);
 
-		if (workspace is null)
+		if (workspace == null)
 		{
-			if (keepOnMonitor)
-			{
-				workspace = GetWorkspaceForWindowLocation(window);
-			}
-
+			workspace = GetWorkspaceForWindowLocation(window);
 			workspace ??= ActiveWorkspace;
 		}
 

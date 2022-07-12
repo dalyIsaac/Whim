@@ -77,7 +77,7 @@ internal class WindowManager : IWindowManager
 	{
 		foreach (HWND hwnd in Win32Helper.GetAllWindows())
 		{
-			RegisterWindow(hwnd, keepOnMonitor: true);
+			RegisterWindow(hwnd);
 		}
 	}
 
@@ -204,14 +204,8 @@ internal class WindowManager : IWindowManager
 	/// <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="hwnd"></param>
-	/// <param name="keepOnMonitor">
-	/// Whether the window should be kept on the monitor it was registered on.
-	/// This parameter is ignored if the <see cref="IConfigContext.RouterManager"/>
-	/// specifies the target workspace, or if the <see cref="IConfigContext.FilterManager"/>
-	/// filters the window.
-	/// </param>
 	/// <returns></returns>
-	private IWindow? RegisterWindow(HWND hwnd, bool keepOnMonitor = false)
+	private IWindow? RegisterWindow(HWND hwnd)
 	{
 		if (Win32Helper.IsSplashScreen(hwnd)
 			|| Win32Helper.IsCloakedWindow(hwnd)
@@ -225,8 +219,19 @@ internal class WindowManager : IWindowManager
 
 		IWindow? window = IWindow.CreateWindow(hwnd, _configContext);
 
-		if (window == null || _configContext.FilterManager.ShouldBeIgnored(window))
+		if (window == null)
 		{
+			Logger.Debug($"Window {hwnd.Value} could not be created");
+			return null;
+		}
+		else if (_configContext.FilterManager.ShouldBeIgnored(window))
+		{
+			Logger.Debug($"Window {window} is filtered");
+			return null;
+		}
+		else if (window.IsMinimized)
+		{
+			Logger.Debug($"Window {window} is minimized");
 			return null;
 		}
 
@@ -239,14 +244,14 @@ internal class WindowManager : IWindowManager
 
 		Logger.Debug($"Registered {window}");
 
-		OnWindowRegistered(window, keepOnMonitor);
+		OnWindowRegistered(window);
 		return window;
 	}
 
-	private void OnWindowRegistered(IWindow window, bool keepOnMonitor)
+	private void OnWindowRegistered(IWindow window)
 	{
 		Logger.Debug($"Window registered: {window}");
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window, keepOnMonitor);
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window);
 		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
 	}
 
