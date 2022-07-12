@@ -12,7 +12,11 @@ namespace Whim.Runner;
 public partial class App : Application
 {
 	private readonly IConfigContext _configContext;
-	private Exception? _startupException;
+
+	/// <summary>
+	/// An exception which occurred during startup.
+	/// </summary>
+	private readonly Exception? _startupException;
 
 	/// <summary>
 	/// Initializes the Whim application.
@@ -35,29 +39,28 @@ public partial class App : Application
 	/// <inheritdoc/>
 	protected override void OnLaunched(LaunchActivatedEventArgs args)
 	{
-		if (_startupException == null)
+		try
 		{
-			try
+			if (_startupException != null)
 			{
-				_configContext.Exited += ConfigContext_Exited;
-				_configContext.Initialize();
-				return;
+				throw _startupException;
 			}
-			catch (Exception ex)
-			{
-				_startupException = ex;
-			}
-		}
 
-		// If we get to here, there's been an error somewhere during startup.
-		_configContext.Exit();
+			_configContext.Exited += ConfigContext_Exited;
+			_configContext.Initialize();
+			return;
+		}
+		catch (Exception ex)
+		{
+			_configContext.Exit(new ExitEventArgs(ExitReason.Error, ex.ToString()));
+		}
 	}
 
 	private void ConfigContext_Exited(object? sender, ExitEventArgs e)
 	{
-		if (_startupException != null)
+		if (e.Reason == ExitReason.User)
 		{
-			new StartupExceptionWindow(_startupException!).Activate();
+			new StartupExceptionWindow(e).Activate();
 		}
 		else
 		{
