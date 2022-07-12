@@ -3,14 +3,14 @@ using System;
 namespace Whim;
 
 /// <summary>
-/// Event arguments for the <see cref="IConfigContext.Quitting"/> event.
+/// Event arguments for the <see cref="IConfigContext.Exiting"/> event.
 /// </summary>
-public class QuitEventArgs : EventArgs
+public class ExitEventArgs : EventArgs
 {
 	/// <summary>
 	/// The reason why Whim has been shut down.
 	/// </summary>
-	public QuitReason Reason { get; }
+	public ExitReason Reason { get; }
 
 	/// <summary>
 	/// A string describing the reason why Whim has been shut down.
@@ -22,7 +22,7 @@ public class QuitEventArgs : EventArgs
 	/// </summary>
 	/// <param name="reason">The reason why Whim has been shut down.</param>
 	/// <param name="message">A string describing the reason why Whim has been shut down.</param>
-	public QuitEventArgs(QuitReason reason, string? message = null)
+	public ExitEventArgs(ExitReason reason, string? message = null)
 	{
 		Reason = reason;
 		Message = message;

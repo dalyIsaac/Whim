@@ -22,7 +22,8 @@ internal class ConfigContext : IConfigContext
 	public ICommandManager CommandManager { get; set; }
 	public IPluginManager PluginManager { get; set; }
 
-	public event EventHandler<QuitEventArgs>? Quitting;
+	public event EventHandler<ExitEventArgs>? Exiting;
+	public event EventHandler<ExitEventArgs>? Exited;
 
 	public ConfigContext(
 		Logger? logger = null,
@@ -62,10 +63,10 @@ internal class ConfigContext : IConfigContext
 	}
 
 
-	public void Quit(QuitEventArgs? args = null)
+	public void Exit(ExitEventArgs? args = null)
 	{
 		Logger.Debug("Disposing config context...");
-		Quitting?.Invoke(this, args ?? new QuitEventArgs(QuitReason.User));
+		Exiting?.Invoke(this, args ?? new ExitEventArgs(ExitReason.User));
 
 		WindowManager.Dispose();
 		MonitorManager.Dispose();

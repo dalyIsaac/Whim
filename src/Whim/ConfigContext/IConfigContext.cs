@@ -62,14 +62,19 @@ public interface IConfigContext
 	/// <summary>
 	/// This event is fired when the config context is shutting down.
 	/// </summary>
-	public event EventHandler<QuitEventArgs>? Quitting;
+	public event EventHandler<ExitEventArgs>? Exiting;
+
+	/// <summary>
+	/// This event is fired after the config context has been shut down.
+	/// </summary>
+	public event EventHandler<ExitEventArgs>? Exited;
 
 	/// <summary>
 	/// This is called to shutdown the config context.
 	/// </summary>
 	/// <param name="args">
 	/// The shutdown event arguments. If this is not provided, we assume
-	/// <see cref="QuitReason.User"/>.
+	/// <see cref="ExitReason.User"/>.
 	/// </param>
-	public void Quit(QuitEventArgs? args = null);
+	public void Exit(ExitEventArgs? args = null);
 }

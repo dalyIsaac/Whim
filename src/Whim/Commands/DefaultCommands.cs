@@ -114,12 +114,12 @@ public static class DefaultCommands
 			new Keybind(WinShift, VIRTUAL_KEY.VK_RIGHT)
 		),
 
-		// Quit.
+		// Exit.
 		(
 			new Command(
 				identifier: "default_commands.quit",
-				title: "Quit",
-				callback: () => configContext.Quit()
+				title: "Exit Whim",
+				callback: () => configContext.Exit()
 			),
 			null
 		),
