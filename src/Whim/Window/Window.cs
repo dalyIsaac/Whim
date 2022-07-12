@@ -33,6 +33,19 @@ internal class Window : IWindow
 	}
 
 	/// <inheritdoc/>
+	public IPoint<int> Center
+	{
+		get
+		{
+			ILocation<int> location = Location;
+			return new Point<int>(
+				location.X + (location.Width / 2),
+				location.Y + (location.Height / 2)
+			);
+		}
+	}
+
+	/// <inheritdoc/>
 	public int ProcessId { get; }
 
 	/// <inheritdoc/>

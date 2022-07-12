@@ -213,20 +213,47 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// Called when a window has been registered by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was registered.</param>
-	internal void WindowRegistered(IWindow window)
+	/// <param name="keepOnMonitor">
+	/// Whether the window should be kept on the monitor it was registered on.
+	/// This parameter is ignored if the <see cref="IRouterManager"/> specifies the target workspace.
+	/// </param>
+	internal void WindowRegistered(IWindow window, bool keepOnMonitor)
 	{
 		Logger.Debug($"Registering window {window}");
 
-		if (ActiveWorkspace == null)
+		IWorkspace? workspace = _configContext.RouterManager.RouteWindow(window);
+
+		if (workspace is null)
+		{
+			if (keepOnMonitor)
+			{
+				workspace = GetWorkspaceForWindowLocation(window);
+			}
+
+			workspace ??= ActiveWorkspace;
+		}
+
+		if (workspace == null)
 		{
 			Logger.Error($"No active workspace found.");
 			return;
 		}
 
-		_windowWorkspaceMap[window] = ActiveWorkspace;
-		ActiveWorkspace.AddWindow(window);
-		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, ActiveWorkspace!));
-		Logger.Debug($"Window {window} registered to workspace {ActiveWorkspace!.Name}");
+		_windowWorkspaceMap[window] = workspace;
+		workspace.AddWindow(window);
+		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
+		Logger.Debug($"Window {window} registered to workspace {workspace.Name}");
+	}
+
+	private IWorkspace? GetWorkspaceForWindowLocation(IWindow window)
+	{
+		IMonitor? monitor = _configContext.MonitorManager.GetMonitorAtPoint(window.Center);
+		if (monitor is null)
+		{
+			return null;
+		}
+
+		return GetWorkspaceForMonitor(monitor);
 	}
 
 	/// <summary>

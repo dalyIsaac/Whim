@@ -77,7 +77,7 @@ internal class WindowManager : IWindowManager
 	{
 		foreach (HWND hwnd in Win32Helper.GetAllWindows())
 		{
-			RegisterWindow(hwnd);
+			RegisterWindow(hwnd, keepOnMonitor: true);
 		}
 	}
 
@@ -204,8 +204,14 @@ internal class WindowManager : IWindowManager
 	/// <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="hwnd"></param>
+	/// <param name="keepOnMonitor">
+	/// Whether the window should be kept on the monitor it was registered on.
+	/// This parameter is ignored if the <see cref="IConfigContext.RouterManager"/>
+	/// specifies the target workspace, or if the <see cref="IConfigContext.FilterManager"/>
+	/// filters the window.
+	/// </param>
 	/// <returns></returns>
-	private IWindow? RegisterWindow(HWND hwnd)
+	private IWindow? RegisterWindow(HWND hwnd, bool keepOnMonitor = false)
 	{
 		if (Win32Helper.IsSplashScreen(hwnd)
 			|| Win32Helper.IsCloakedWindow(hwnd)
@@ -233,14 +239,14 @@ internal class WindowManager : IWindowManager
 
 		Logger.Debug($"Registered {window}");
 
-		OnWindowRegistered(window);
+		OnWindowRegistered(window, keepOnMonitor);
 		return window;
 	}
 
-	private void OnWindowRegistered(IWindow window)
+	private void OnWindowRegistered(IWindow window, bool keepOnMonitor)
 	{
 		Logger.Debug($"Window registered: {window}");
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window);
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window, keepOnMonitor);
 		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
 	}
 
