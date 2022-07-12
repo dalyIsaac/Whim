@@ -66,11 +66,15 @@ internal class ConfigContext : IConfigContext
 	public void Exit(ExitEventArgs? args = null)
 	{
 		Logger.Debug("Disposing config context...");
-		Exiting?.Invoke(this, args ?? new ExitEventArgs(ExitReason.User));
+		args ??= new ExitEventArgs(ExitReason.User);
+
+		Exiting?.Invoke(this, args);
 
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
 		CommandManager.Dispose();
 		PluginManager.Dispose();
+
+		Exited?.Invoke(this, args);
 	}
 }

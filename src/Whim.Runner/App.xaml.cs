@@ -39,7 +39,7 @@ public partial class App : Application
 		{
 			try
 			{
-				_configContext.Quitting += ConfigContext_Quitting;
+				_configContext.Exited += ConfigContext_Exited;
 				_configContext.Initialize();
 				return;
 			}
@@ -50,19 +50,25 @@ public partial class App : Application
 		}
 
 		// If we get to here, there's been an error somewhere during startup.
-		_configContext.Quit();
-		new StartupExceptionWindow(_startupException!).Activate();
+		_configContext.Exit();
 	}
 
-	private void ConfigContext_Quitting(object? sender, QuitEventArgs e)
+	private void ConfigContext_Exited(object? sender, ExitEventArgs e)
 	{
-		Exit();
+		if (_startupException != null)
+		{
+			new StartupExceptionWindow(_startupException!).Activate();
+		}
+		else
+		{
+			Exit();
+		}
 	}
 
 	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
 	{
 		Logger.Error(e.Exception.ToString());
-		_configContext.Quit();
+		_configContext.Exit();
 	}
 
 	// Add when Windows App SDK supports the application exit event.
