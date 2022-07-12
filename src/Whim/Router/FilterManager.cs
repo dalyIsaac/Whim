@@ -20,7 +20,7 @@ internal class FilterManager : IFilterManager
 
 	public FilterManager()
 	{
-		AddDefaultFilters(this);
+		IFilterManager.AddDefaultFilters(this);
 	}
 
 	public void Add(Filter filter)
@@ -37,7 +37,7 @@ internal class FilterManager : IFilterManager
 		_filters.Clear();
 		if (!clearDefaults)
 		{
-			AddDefaultFilters(this);
+			IFilterManager.AddDefaultFilters(this);
 		}
 	}
 
@@ -72,14 +72,5 @@ internal class FilterManager : IFilterManager
 		Regex regex = new(title);
 		_filters.Add(window => regex.IsMatch(window.Title));
 		return this;
-	}
-
-	/// <summary>
-	/// Populates the provided <see cref="IFilterManager"/> with the default
-	/// filters.
-	/// </summary>
-	public static void AddDefaultFilters(IFilterManager router)
-	{
-		router.IgnoreProcessName("SearchUI.exe");
 	}
 }

@@ -216,14 +216,13 @@ internal class WorkspaceManager : IWorkspaceManager
 	internal void WindowRegistered(IWindow window)
 	{
 		Logger.Debug($"Registering window {window}");
-
 		IWorkspace? workspace = _configContext.RouterManager.RouteWindow(window);
 
-		if (workspace == null)
+		if (!_configContext.RouterManager.RouteToActiveWorkspace && workspace == null)
 		{
 			workspace = GetWorkspaceForWindowLocation(window);
-			workspace ??= ActiveWorkspace;
 		}
+		workspace ??= ActiveWorkspace;
 
 		if (workspace == null)
 		{

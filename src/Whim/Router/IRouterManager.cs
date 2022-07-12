@@ -11,6 +11,14 @@ public delegate IWorkspace? Router(IWindow window);
 public interface IRouterManager
 {
 	/// <summary>
+	/// When <see langword="true"/>, windows are routed to the active workspace.
+	/// When <see langword="false"/>, windows are routed to the active workspace on the monitor they are on.
+	/// Defaults to <see langword="false"/>.
+	/// This is overridden by any other routers in this <see cref="IRouterManager"/>.
+	/// </summary>
+	public bool RouteToActiveWorkspace { get; set; }
+
+	/// <summary>
 	/// Routes a window to a workspace.
 	/// </summary>
 	/// <param name="window"></param>
