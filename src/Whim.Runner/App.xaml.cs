@@ -39,6 +39,7 @@ public partial class App : Application
 		{
 			try
 			{
+				_configContext.Quitting += ConfigContext_Quitting;
 				_configContext.Initialize();
 				return;
 			}
@@ -51,6 +52,11 @@ public partial class App : Application
 		// If we get to here, there's been an error somewhere during startup.
 		_configContext.Quit();
 		new StartupExceptionWindow(_startupException!).Activate();
+	}
+
+	private void ConfigContext_Quitting(object? sender, QuitEventArgs e)
+	{
+		Exit();
 	}
 
 	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
