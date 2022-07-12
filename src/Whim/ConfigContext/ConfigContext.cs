@@ -22,7 +22,7 @@ internal class ConfigContext : IConfigContext
 	public ICommandManager CommandManager { get; set; }
 	public IPluginManager PluginManager { get; set; }
 
-	public event EventHandler<ShutdownEventArgs>? Shutdown;
+	public event EventHandler<QuitEventArgs>? Quitting;
 
 	public ConfigContext(
 		Logger? logger = null,
@@ -62,14 +62,14 @@ internal class ConfigContext : IConfigContext
 	}
 
 
-	public void Quit(ShutdownEventArgs? args = null)
+	public void Quit(QuitEventArgs? args = null)
 	{
 		Logger.Debug("Disposing config context...");
+		Quitting?.Invoke(this, args ?? new QuitEventArgs(QuitReason.User));
+
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
 		CommandManager.Dispose();
 		PluginManager.Dispose();
-
-		Shutdown?.Invoke(this, args ?? new ShutdownEventArgs(ShutdownReason.User));
 	}
 }
