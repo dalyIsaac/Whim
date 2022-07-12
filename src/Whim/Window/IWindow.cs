@@ -24,6 +24,16 @@ public interface IWindow
 	public string WindowClass { get; }
 
 	/// <summary>
+	/// The location of the window.
+	/// </summary>
+	public ILocation<int> Location { get; }
+
+	/// <summary>
+	/// The center of the window.
+	/// </summary>
+	public IPoint<int> Center { get; }
+
+	/// <summary>
 	/// The process ID of the window.
 	/// </summary>
 	public int ProcessId { get; }

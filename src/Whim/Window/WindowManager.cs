@@ -73,6 +73,14 @@ internal class WindowManager : IWindowManager
 		}
 	}
 
+	public void PostInitialize()
+	{
+		foreach (HWND hwnd in Win32Helper.GetAllWindows())
+		{
+			RegisterWindow(hwnd);
+		}
+	}
+
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!disposedValue)
@@ -157,7 +165,6 @@ internal class WindowManager : IWindowManager
 			{
 				return;
 			}
-			OnWindowRegistered(window);
 		}
 
 		Logger.Verbose($"Windows event 0x{eventType:X4} for {window}");
@@ -212,8 +219,19 @@ internal class WindowManager : IWindowManager
 
 		IWindow? window = IWindow.CreateWindow(hwnd, _configContext);
 
-		if (window == null || _configContext.FilterManager.ShouldBeIgnored(window))
+		if (window == null)
 		{
+			Logger.Debug($"Window {hwnd.Value} could not be created");
+			return null;
+		}
+		else if (_configContext.FilterManager.ShouldBeIgnored(window))
+		{
+			Logger.Debug($"Window {window} is filtered");
+			return null;
+		}
+		else if (window.IsMinimized)
+		{
+			Logger.Debug($"Window {window} is minimized");
 			return null;
 		}
 
@@ -225,6 +243,8 @@ internal class WindowManager : IWindowManager
 		}
 
 		Logger.Debug($"Registered {window}");
+
+		OnWindowRegistered(window);
 		return window;
 	}
 

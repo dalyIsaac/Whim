@@ -55,4 +55,13 @@ public interface IFilterManager
 	/// </summary>
 	/// <param name="match"></param>
 	public IFilterManager IgnoreTitleMatch(string match);
+
+	/// <summary>
+	/// Populates the provided <see cref="IFilterManager"/> with the default
+	/// filters.
+	/// </summary>
+	public static void AddDefaultFilters(IFilterManager router)
+	{
+		router.IgnoreProcessName("SearchUI.exe");
+	}
 }

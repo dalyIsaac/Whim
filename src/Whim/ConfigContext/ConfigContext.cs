@@ -57,6 +57,7 @@ internal class ConfigContext : IConfigContext
 		WorkspaceManager.Initialize();
 		CommandManager.Initialize();
 
+		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
 	}
 

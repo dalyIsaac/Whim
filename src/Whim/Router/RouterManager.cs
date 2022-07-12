@@ -8,6 +8,8 @@ internal class RouterManager : IRouterManager
 	private readonly IConfigContext _configContext;
 	private readonly List<Router> _routers = new();
 
+	public bool RouteToActiveWorkspace { get; set; }
+
 	public RouterManager(IConfigContext configContext)
 	{
 		_configContext = configContext;

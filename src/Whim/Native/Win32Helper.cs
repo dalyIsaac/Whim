@@ -360,4 +360,21 @@ public static class Win32Helper
 			}
 		}
 	}
+
+	/// <summary>
+	/// Enumerates over all the <see cref="HWND"/> of all the top-level windows.
+	/// </summary>
+	/// <returns></returns>
+	public static IEnumerable<HWND> GetAllWindows()
+	{
+		List<HWND> windows = new();
+
+		PInvoke.EnumWindows((handle, param) =>
+		{
+			windows.Add(handle);
+			return (BOOL)true;
+		}, 0);
+
+		return windows;
+	}
 }
