@@ -70,10 +70,11 @@ internal class ConfigContext : IConfigContext
 
 		Exiting?.Invoke(this, args);
 
+		PluginManager.Dispose();
+		CommandManager.Dispose();
+		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
-		CommandManager.Dispose();
-		PluginManager.Dispose();
 
 		Exited?.Invoke(this, args);
 	}

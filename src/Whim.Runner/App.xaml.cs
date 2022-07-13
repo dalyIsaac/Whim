@@ -58,7 +58,7 @@ public partial class App : Application
 
 	private void ConfigContext_Exited(object? sender, ExitEventArgs e)
 	{
-		if (e.Reason == ExitReason.User)
+		if (e.Reason == ExitReason.Error)
 		{
 			new StartupExceptionWindow(e).Activate();
 		}

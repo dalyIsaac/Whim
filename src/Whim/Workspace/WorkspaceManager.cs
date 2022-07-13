@@ -50,6 +50,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor];
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
+	private bool disposedValue;
+
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
 
 	public WorkspaceManager(IConfigContext configContext)
@@ -452,6 +454,32 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Unregistering phantom window {window}");
 		_phantomWindows.Remove(window);
 		_windowWorkspaceMap.Remove(window);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				foreach (IWorkspace workspace in _workspaces)
+				{
+					workspace.Dispose();
+				}
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 	#endregion
 }

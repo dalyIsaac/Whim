@@ -7,7 +7,7 @@ namespace Whim;
 /// The manager for <see cref="IWorkspace"/>s. This is responsible for routing
 /// windows between workspaces.
 /// </summary>
-public interface IWorkspaceManager : IEnumerable<IWorkspace>
+public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 {
 	/// <summary>
 	/// The active workspace.
