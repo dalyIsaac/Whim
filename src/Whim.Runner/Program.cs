@@ -1,4 +1,7 @@
-﻿namespace Whim.Runner;
+﻿using Microsoft.UI.Dispatching;
+using System.Threading;
+
+namespace Whim.Runner;
 
 #if DISABLE_XAML_GENERATED_MAIN
 public static class Program
@@ -45,7 +48,13 @@ public static class Program
 
 		if (this_is_the_first_instance)
 		{
-			Whim.Start();
+			// Start the application and the message loop.
+			global::Microsoft.UI.Xaml.Application.Start((p) =>
+			{
+				DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
+				SynchronizationContext.SetSynchronizationContext(context);
+				_ = new App();
+			});
 		}
 	}
 }

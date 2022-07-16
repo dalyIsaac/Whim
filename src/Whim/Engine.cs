@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Whim;
 
 /// <summary>
@@ -10,12 +12,21 @@ public static class Engine
 	/// <summary>
 	/// Get the <see cref="IConfigContext"/>.
 	/// </summary>
-	public static IConfigContext CreateConfigContext()
+	/// <param name="assembly">The calling assembly.</param>
+	/// <returns>The <see cref="IConfigContext"/>.</returns>
+	/// <exception cref="ConfigLoaderException"></exception>
+	public static IConfigContext CreateConfigContext(Assembly? assembly)
 	{
 		if (_configContext == null)
 		{
-			_configContext = new ConfigContext();
+			if (assembly == null)
+			{
+				throw new ConfigLoaderException("Provided assembly was null.");
+			}
+
+			_configContext = ConfigLoader.LoadConfigContext(assembly);
 		}
+
 		return _configContext;
 	}
 }

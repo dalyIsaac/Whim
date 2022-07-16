@@ -10,3 +10,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Will be resolved by #51", Scope = "module")]
 [assembly: SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "They are used by subclasses", Scope = "module")]
 [assembly: SuppressMessage("Design", "CA1002:Do not expose generic lists", Justification = "They are used by subclasses", Scope = "module")]
+[assembly: SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Not concerned about Visual Basic", Scope = "member", Target = "~M:Whim.IConfigContext.Exit(Whim.ExitEventArgs)")]
