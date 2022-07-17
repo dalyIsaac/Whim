@@ -77,4 +77,19 @@ public interface IConfigContext
 	/// <see cref="ExitReason.User"/>.
 	/// </param>
 	public void Exit(ExitEventArgs? args = null);
+
+	/// <summary>
+	/// This event is fired when the config context is restarting.
+	/// </summary>
+	public event EventHandler? Restarting;
+
+	/// <summary>
+	/// This event is fired after the config context has been restarted.
+	/// </summary>
+	public event EventHandler? Restarted;
+
+	/// <summary>
+	/// This is called to restart the config context.
+	/// </summary>
+	public void Restart();
 }

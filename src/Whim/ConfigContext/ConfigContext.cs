@@ -13,40 +13,36 @@ namespace Whim;
 /// </summary>
 internal class ConfigContext : IConfigContext
 {
-	public Logger Logger { get; set; }
-	public IWorkspaceManager WorkspaceManager { get; set; }
-	public IWindowManager WindowManager { get; set; }
-	public IMonitorManager MonitorManager { get; set; }
-	public IRouterManager RouterManager { get; set; }
-	public IFilterManager FilterManager { get; set; }
-	public ICommandManager CommandManager { get; set; }
-	public IPluginManager PluginManager { get; set; }
+	public Logger Logger { get; private set; }
+	public IWorkspaceManager WorkspaceManager { get; private set; }
+	public IWindowManager WindowManager { get; private set; }
+	public IMonitorManager MonitorManager { get; private set; }
+	public IRouterManager RouterManager { get; private set; }
+	public IFilterManager FilterManager { get; private set; }
+	public ICommandManager CommandManager { get; private set; }
+	public IPluginManager PluginManager { get; private set; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
 
-	public ConfigContext(
-		Logger? logger = null,
-		IRouterManager? routerManager = null,
-		IFilterManager? filterManager = null,
-		IWindowManager? windowManager = null,
-		IMonitorManager? monitorManager = null,
-		IWorkspaceManager? workspaceManager = null,
-		ICommandManager? commandManager = null,
-		IPluginManager? pluginManager = null)
+	public event EventHandler? Restarting;
+	public event EventHandler? Restarted;
+
+	public ConfigContext()
 	{
-		Logger = logger ?? new Logger();
-		RouterManager = routerManager ?? new RouterManager(this);
-		FilterManager = filterManager ?? new FilterManager();
-		WindowManager = windowManager ?? new WindowManager(this);
-		MonitorManager = monitorManager ?? new MonitorManager(this);
-		WorkspaceManager = workspaceManager ?? new WorkspaceManager(this);
-		CommandManager = commandManager ?? new CommandManager();
-		PluginManager = pluginManager ?? new PluginManager();
+		Logger = new Logger();
+		RouterManager = new RouterManager(this);
+		FilterManager = new FilterManager();
+		WindowManager = new WindowManager(this);
+		MonitorManager = new MonitorManager(this);
+		WorkspaceManager = new WorkspaceManager(this);
+		CommandManager = new CommandManager();
+		PluginManager = new PluginManager();
 	}
 
 	public void Initialize()
 	{
+		// TODO: Load doConfig
 		Logger.Initialize();
 
 		Logger.Debug("Initializing config context...");
@@ -77,5 +73,27 @@ internal class ConfigContext : IConfigContext
 		MonitorManager.Dispose();
 
 		Exited?.Invoke(this, args);
+	}
+
+	public void Restart()
+	{
+		Logger.Debug("Restarting config context...");
+		Restarting?.Invoke(this, EventArgs.Empty);
+		Exit(new ExitEventArgs(ExitReason.Restart));
+
+		// Re-populate.
+		Logger = new Logger();
+		RouterManager = new RouterManager(this);
+		FilterManager = new FilterManager();
+		WindowManager = new WindowManager(this);
+		MonitorManager = new MonitorManager(this);
+		WorkspaceManager = new WorkspaceManager(this);
+		CommandManager = new CommandManager();
+		PluginManager = new PluginManager();
+
+		// Re-initialize.
+		Initialize();
+
+		Restarted?.Invoke(this, EventArgs.Empty);
 	}
 }
