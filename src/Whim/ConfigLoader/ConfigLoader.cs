@@ -1,12 +1,17 @@
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
-using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Whim;
+
+/// <summary>
+/// Applies the user's config to the <see cref="IConfigContext"/>.
+/// </summary>
+/// <param name="configContext">The <see cref="IConfigContext"/> to operate on.</param>
+public delegate void DoConfig(IConfigContext configContext);
 
 internal static class ConfigLoader
 {
@@ -88,7 +93,7 @@ internal static class ConfigLoader
 	/// <param name="assembly"></param>
 	/// <returns>The <see cref="IConfigContext"/>.</returns>
 	/// <exception cref="ConfigLoaderException"></exception>
-	internal static IConfigContext LoadConfigContext(Assembly assembly)
+	internal static DoConfig LoadConfigContext(Assembly assembly)
 	{
 		// Ensure the Whim directory exists.
 		FileHelper.EnsureWhimDirExists();
@@ -104,29 +109,7 @@ internal static class ConfigLoader
 
 		// Evaluate the Whim config.
 		ScriptOptions options = ScriptOptions.Default;
-		Task<Func<IConfigContext, IConfigContext>> task = CSharpScript.EvaluateAsync<Func<IConfigContext, IConfigContext>>(rawConfig, options);
-		Func<IConfigContext, IConfigContext> doConfig = task.Result;
-
-		// Create a Whim configContext instance.
-		IConfigContext? configContext = new ConfigContext();
-
-		try
-		{
-			configContext = doConfig(configContext);
-
-			if (configContext == null)
-			{
-				throw new ConfigLoaderException($"The result of evaluating the loaded Whim config from {ConfigLoader.ConfigFilePath} is null.");
-			}
-		}
-		catch (ConfigLoaderException e)
-		{
-#pragma warning disable CA1508 // Avoid dead conditional code - it could be null (sorry Roslyn).
-			configContext?.Exit(new ExitEventArgs(ExitReason.Error, e.ToString()));
-#pragma warning restore CA1508 // Avoid dead conditional code
-			throw;
-		}
-
-		return configContext;
+		Task<DoConfig> task = CSharpScript.EvaluateAsync<DoConfig>(rawConfig, options);
+		return task.Result;
 	}
 }

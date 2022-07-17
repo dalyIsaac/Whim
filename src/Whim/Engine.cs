@@ -24,7 +24,7 @@ public static class Engine
 				throw new ConfigLoaderException("Provided assembly was null.");
 			}
 
-			_configContext = ConfigLoader.LoadConfigContext(assembly);
+			_configContext = new ConfigContext(assembly);
 		}
 
 		return _configContext;

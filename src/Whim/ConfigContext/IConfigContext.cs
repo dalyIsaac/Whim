@@ -54,9 +54,12 @@ public interface IConfigContext
 	public IPluginManager PluginManager { get; }
 
 	/// <summary>
-	/// This will be called by Whim after your config has been read.
-	/// Do not call it yourself.
+	/// This will be called by the Whim Runner.
+	/// You likely won't need to call it yourself.
 	/// </summary>
+	/// <exception cref="ConfigLoaderException">
+	/// Thrown if the user's config could not be loaded.
+	/// </exception>
 	public void Initialize();
 
 	/// <summary>

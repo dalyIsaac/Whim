@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace Whim;
 
@@ -13,6 +14,11 @@ namespace Whim;
 /// </summary>
 internal class ConfigContext : IConfigContext
 {
+	/// <summary>
+	/// The assembly which is running this context.
+	/// </summary>
+	private readonly Assembly _assembly;
+
 	public Logger Logger { get; private set; }
 	public IWorkspaceManager WorkspaceManager { get; private set; }
 	public IWindowManager WindowManager { get; private set; }
@@ -28,8 +34,14 @@ internal class ConfigContext : IConfigContext
 	public event EventHandler? Restarting;
 	public event EventHandler? Restarted;
 
-	public ConfigContext()
+	/// <summary>
+	/// Create a new <see cref="IConfigContext"/>.
+	/// </summary>
+	/// <param name="assembly">The assembly which is running this context.</param>
+	public ConfigContext(Assembly assembly)
 	{
+		_assembly = assembly;
+
 		Logger = new Logger();
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
@@ -42,11 +54,15 @@ internal class ConfigContext : IConfigContext
 
 	public void Initialize()
 	{
-		// TODO: Load doConfig
 		Logger.Initialize();
 
 		Logger.Debug("Initializing config context...");
 
+		// Load the config context.
+		DoConfig doConfig = ConfigLoader.LoadConfigContext(_assembly);
+		doConfig(this);
+
+		// Initialize the managers.
 		PluginManager.PreInitialize();
 
 		MonitorManager.Initialize();
@@ -57,7 +73,6 @@ internal class ConfigContext : IConfigContext
 		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
 	}
-
 
 	public void Exit(ExitEventArgs? args = null)
 	{
