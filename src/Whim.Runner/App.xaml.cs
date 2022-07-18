@@ -55,13 +55,17 @@ public partial class App : Application
 
 	private void ConfigContext_Exited(object? sender, ExitEventArgs e)
 	{
-		if (e.Reason == ExitReason.Error)
+		switch (e.Reason)
 		{
-			new StartupExceptionWindow(e).Activate();
-		}
-		else
-		{
-			Exit();
+			case ExitReason.User:
+				Exit();
+				break;
+			case ExitReason.Error:
+				new StartupExceptionWindow(e).Activate();
+				break;
+			case ExitReason.Restart:
+			default:
+				break;
 		}
 	}
 

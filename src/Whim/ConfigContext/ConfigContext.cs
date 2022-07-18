@@ -31,9 +31,6 @@ internal class ConfigContext : IConfigContext
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
 
-	public event EventHandler? Restarting;
-	public event EventHandler? Restarted;
-
 	/// <summary>
 	/// Create a new <see cref="IConfigContext"/>.
 	/// </summary>
@@ -54,15 +51,12 @@ internal class ConfigContext : IConfigContext
 
 	public void Initialize()
 	{
-		Logger.Initialize();
-
-		Logger.Debug("Initializing config context...");
-
 		// Load the config context.
 		DoConfig doConfig = ConfigLoader.LoadConfigContext(_assembly);
 		doConfig(this);
 
 		// Initialize the managers.
+		Logger.Initialize();
 		PluginManager.PreInitialize();
 
 		MonitorManager.Initialize();
@@ -81,6 +75,7 @@ internal class ConfigContext : IConfigContext
 
 		Exiting?.Invoke(this, args);
 
+		Logger.Dispose();
 		PluginManager.Dispose();
 		CommandManager.Dispose();
 		WorkspaceManager.Dispose();
@@ -93,11 +88,9 @@ internal class ConfigContext : IConfigContext
 	public void Restart()
 	{
 		Logger.Debug("Restarting config context...");
-		Restarting?.Invoke(this, EventArgs.Empty);
 		Exit(new ExitEventArgs(ExitReason.Restart));
 
 		// Re-populate.
-		Logger = new Logger();
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this);
@@ -108,7 +101,5 @@ internal class ConfigContext : IConfigContext
 
 		// Re-initialize.
 		Initialize();
-
-		Restarted?.Invoke(this, EventArgs.Empty);
 	}
 }

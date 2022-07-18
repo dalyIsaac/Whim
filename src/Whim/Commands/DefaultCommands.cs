@@ -117,7 +117,7 @@ public static class DefaultCommands
 		// Exit.
 		(
 			new Command(
-				identifier: "default_commands.quit",
+				identifier: "default_commands.exit",
 				title: "Exit Whim",
 				callback: () => configContext.Exit()
 			),
