@@ -1,12 +1,16 @@
 ﻿using Microsoft.UI.Xaml.Controls;
+using System;
 
 namespace Whim.Bar;
 
 /// <summary>
 /// Interaction logic for WorkspaceWidget.xaml
 /// </summary>
-public partial class WorkspaceWidget : UserControl
+public partial class WorkspaceWidget : UserControl, IDisposable
 {
+	private readonly Microsoft.UI.Xaml.Window _window;
+	private bool disposedValue;
+
 	/// <summary>
 	/// The workspace view model.
 	/// </summary>
@@ -14,6 +18,7 @@ public partial class WorkspaceWidget : UserControl
 
 	internal WorkspaceWidget(IConfigContext configContext, IMonitor monitor, Microsoft.UI.Xaml.Window window)
 	{
+		_window = window;
 		ViewModel = new WorkspaceWidgetViewModel(configContext, monitor);
 		window.Closed += Window_Closed;
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "Workspace/WorkspaceWidget");
@@ -30,5 +35,30 @@ public partial class WorkspaceWidget : UserControl
 	public static BarComponent CreateComponent()
 	{
 		return new BarComponent((configContext, monitor, window) => new WorkspaceWidget(configContext, monitor, window));
+	}
+
+	/// <inheritdoc/>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_window.Closed -= Window_Closed;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc/>
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

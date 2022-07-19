@@ -188,6 +188,8 @@ internal class MonitorManager : IMonitorManager
 		{
 			if (disposing)
 			{
+				Logger.Debug("Disposing monitor manager");
+
 				// dispose managed state (managed objects)
 				SystemEvents.DisplaySettingsChanging -= SystemEvents_DisplaySettingsChanging;
 			}

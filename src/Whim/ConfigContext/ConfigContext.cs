@@ -57,6 +57,8 @@ internal class ConfigContext : IConfigContext
 
 		// Initialize the managers.
 		Logger.Initialize();
+
+		Logger.Debug("Initializing...");
 		PluginManager.PreInitialize();
 
 		MonitorManager.Initialize();
@@ -66,22 +68,26 @@ internal class ConfigContext : IConfigContext
 
 		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
+
+		Logger.Debug("Completed initialization");
 	}
 
 	public void Exit(ExitEventArgs? args = null)
 	{
-		Logger.Debug("Disposing config context...");
+		Logger.Debug("Exiting config context...");
 		args ??= new ExitEventArgs(ExitReason.User);
 
 		Exiting?.Invoke(this, args);
 
-		Logger.Dispose();
 		PluginManager.Dispose();
 		CommandManager.Dispose();
 		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
 
+		Logger.Debug("Mostly exited...");
+
+		Logger.Dispose();
 		Exited?.Invoke(this, args);
 	}
 

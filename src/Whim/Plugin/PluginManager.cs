@@ -42,6 +42,7 @@ internal class PluginManager : IPluginManager
 		{
 			if (disposing)
 			{
+				Logger.Debug("Disposing plugin manager");
 				foreach (IPlugin plugin in _plugins)
 				{
 					if (plugin is IDisposable disposable)

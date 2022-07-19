@@ -476,8 +476,9 @@ internal class Workspace : IWorkspace
 		{
 			if (disposing)
 			{
-				// dispose managed state (managed objects)
+				Logger.Debug($"Disposing workspace {Name}");
 
+				// dispose managed state (managed objects)
 				bool isWorkspaceActive = _configContext.WorkspaceManager.GetMonitorForWorkspace(this) != null;
 
 				// If the workspace isn't active on the monitor, show all the windows in as minimized.

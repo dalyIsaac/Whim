@@ -55,6 +55,11 @@ public partial class App : Application
 
 	private void ConfigContext_Exited(object? sender, ExitEventArgs e)
 	{
+		if (_configContext is not null)
+		{
+			_configContext.Exited -= ConfigContext_Exited;
+		}
+
 		switch (e.Reason)
 		{
 			case ExitReason.User:

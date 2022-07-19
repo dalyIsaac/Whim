@@ -462,6 +462,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			if (disposing)
 			{
+				Logger.Debug("Disposing workspace manager");
+
 				// dispose managed state (managed objects)
 				foreach (IWorkspace workspace in _workspaces)
 				{

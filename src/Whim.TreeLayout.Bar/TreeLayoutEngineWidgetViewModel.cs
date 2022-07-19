@@ -153,11 +153,13 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		{
 			if (disposing)
 			{
-				// TODO: dispose managed state (managed objects)
+				// dispose managed state (managed objects)
+				_configContext.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
+				_configContext.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
 			}
 
-			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-			// TODO: set large fields to null
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
 			disposedValue = true;
 		}
 	}

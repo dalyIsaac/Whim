@@ -170,7 +170,10 @@ public class Logger : IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				Log.CloseAndFlush();
+				if (_logger is IDisposable disposable)
+				{
+					disposable.Dispose();
+				}
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

@@ -6,11 +6,12 @@ namespace Whim.Bar;
 /// <summary>
 /// Command for switching workspace.
 /// </summary>
-public class SwitchWorkspaceCommand : System.Windows.Input.ICommand
+public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 {
 	private readonly IConfigContext _configContext;
 	private readonly WorkspaceWidgetViewModel _viewModel;
 	private readonly WorkspaceModel _workspace;
+	private bool disposedValue;
 
 	/// <inheritdoc/>
 	public event EventHandler? CanExecuteChanged;
@@ -49,5 +50,37 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand
 			Logger.Debug($"Activating workspace {_workspace.Workspace} on monitor {_viewModel.Monitor}");
 			_configContext.WorkspaceManager.Activate(_workspace.Workspace, _viewModel.Monitor);
 		}
+	}
+
+	/// <inheritdoc/>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_workspace.PropertyChanged -= Workspace_PropertyChanged;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	// // override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+	// ~SwitchWorkspaceCommand()
+	// {
+	//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+	//     Dispose(disposing: false);
+	// }
+
+	/// <inheritdoc/>
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

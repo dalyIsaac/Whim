@@ -91,6 +91,7 @@ public class BarPlugin : IPlugin, IDisposable
 				}
 
 				_monitorBarMap.Clear();
+				_configContext.MonitorManager.MonitorsChanged -= MonitorManager_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

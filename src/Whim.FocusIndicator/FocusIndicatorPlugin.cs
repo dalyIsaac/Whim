@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using System;
 using System.ComponentModel;
 
 namespace Whim.FocusIndicator;
@@ -6,12 +7,13 @@ namespace Whim.FocusIndicator;
 /// <summary>
 /// FocusIndicatorPlugin is the plugin that displays a focus indicator on the focused window.
 /// </summary>
-public class FocusIndicatorPlugin : IPlugin
+public class FocusIndicatorPlugin : IPlugin, IDisposable
 {
 	private readonly IConfigContext _configContext;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
 	private FocusIndicatorWindow? _focusIndicatorWindow;
 	private DispatcherTimer? _dispatcherTimer;
+	private bool disposedValue;
 
 	/// <summary>
 	/// Creates a new instance of the focus indicator plugin.
@@ -128,5 +130,37 @@ public class FocusIndicatorPlugin : IPlugin
 			_dispatcherTimer.Stop();
 			_dispatcherTimer.Tick -= DispatcherTimer_Tick;
 		}
+	}
+
+	/// <inheritdoc/>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_configContext.WindowManager.WindowFocused -= WindowManager_WindowFocused;
+				_configContext.WindowManager.WindowRegistered -= WindowManager_EventSink;
+				_configContext.WindowManager.WindowUnregistered -= WindowManager_EventSink;
+				_configContext.WindowManager.WindowMoveStart -= WindowManager_EventSink;
+				_configContext.WindowManager.WindowMoved -= WindowManager_EventSink;
+				_configContext.WindowManager.WindowMinimizeStart -= WindowManager_EventSink;
+				_configContext.WindowManager.WindowMinimizeEnd -= WindowManager_EventSink;
+				_focusIndicatorWindow?.Close();
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc/>
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

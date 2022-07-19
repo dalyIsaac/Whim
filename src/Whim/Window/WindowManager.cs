@@ -87,6 +87,8 @@ internal class WindowManager : IWindowManager
 		{
 			if (disposing)
 			{
+				Logger.Debug("Disposing window manager");
+
 				foreach (UnhookWinEventSafeHandle? hook in _registeredHooks)
 				{
 					if (hook == null || hook.IsClosed || hook.IsInvalid)

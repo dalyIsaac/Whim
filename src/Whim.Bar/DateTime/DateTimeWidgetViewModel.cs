@@ -54,6 +54,7 @@ public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 			{
 				// dispose managed state (managed objects)
 				_timer.Stop();
+				_timer.Tick -= Timer_Tick;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

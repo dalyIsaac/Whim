@@ -38,6 +38,8 @@ internal class CommandManager : ICommandManager
 		{
 			if (disposing)
 			{
+				Logger.Debug("Disposing command manager");
+
 				// dispose managed state (managed objects)
 				_keybindManager.Dispose();
 			}
