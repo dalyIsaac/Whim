@@ -48,6 +48,7 @@ public static class Program
 
 		if (this_is_the_first_instance)
 		{
+			System.Diagnostics.Debug.WriteLine("Starting!!!");
 			// Start the application and the message loop.
 			global::Microsoft.UI.Xaml.Application.Start((p) =>
 			{

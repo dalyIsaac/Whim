@@ -9,7 +9,7 @@ namespace Whim;
 /// functionality. <br/>
 ///
 /// <c>IConfigContext</c> also contains other associated state and functionality, like the
-/// <see cref="Logger"/>
+/// <see cref="Logger"/>.
 /// </summary>
 public interface IConfigContext
 {
@@ -80,9 +80,4 @@ public interface IConfigContext
 	/// <see cref="ExitReason.User"/>.
 	/// </param>
 	public void Exit(ExitEventArgs? args = null);
-
-	/// <summary>
-	/// This is called to restart the config context.
-	/// </summary>
-	public void Restart();
 }

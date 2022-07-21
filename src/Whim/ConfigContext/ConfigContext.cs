@@ -90,22 +90,4 @@ internal class ConfigContext : IConfigContext
 		Logger.Dispose();
 		Exited?.Invoke(this, args);
 	}
-
-	public void Restart()
-	{
-		Logger.Debug("Restarting config context...");
-		Exit(new ExitEventArgs(ExitReason.Restart));
-
-		// Re-populate.
-		RouterManager = new RouterManager(this);
-		FilterManager = new FilterManager();
-		WindowManager = new WindowManager(this);
-		MonitorManager = new MonitorManager(this);
-		WorkspaceManager = new WorkspaceManager(this);
-		CommandManager = new CommandManager();
-		PluginManager = new PluginManager();
-
-		// Re-initialize.
-		Initialize();
-	}
 }

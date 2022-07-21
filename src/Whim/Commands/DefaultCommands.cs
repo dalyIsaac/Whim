@@ -123,16 +123,6 @@ public static class DefaultCommands
 			),
 			null
 		),
-
-		// Restart.
-		(
-			new Command(
-				identifier: "default_commands.restart",
-				title: "Restart Whim",
-				callback: () => configContext.Restart()
-			),
-			null
-		),
 	};
 
 	/// <summary>
