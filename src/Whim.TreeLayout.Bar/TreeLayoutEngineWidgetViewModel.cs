@@ -11,7 +11,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 {
 	private readonly IConfigContext _configContext;
 	private readonly IMonitor _monitor;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	private Direction? _directionValue;
 
@@ -149,7 +149,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -160,7 +160,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

@@ -13,7 +13,7 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
 	private FocusIndicatorWindow? _focusIndicatorWindow;
 	private DispatcherTimer? _dispatcherTimer;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// Creates a new instance of the focus indicator plugin.
@@ -135,7 +135,7 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -152,7 +152,7 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

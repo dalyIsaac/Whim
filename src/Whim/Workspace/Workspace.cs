@@ -28,7 +28,7 @@ internal class Workspace : IWorkspace
 
 	private readonly List<ILayoutEngine> _layoutEngines = new();
 	private int _activeLayoutEngineIndex;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
 
@@ -472,7 +472,7 @@ internal class Workspace : IWorkspace
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -493,7 +493,7 @@ internal class Workspace : IWorkspace
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

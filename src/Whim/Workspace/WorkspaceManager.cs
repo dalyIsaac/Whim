@@ -50,7 +50,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor];
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
 
@@ -458,7 +458,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -473,7 +473,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

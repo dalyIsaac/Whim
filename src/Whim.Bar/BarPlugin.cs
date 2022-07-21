@@ -13,7 +13,7 @@ public class BarPlugin : IPlugin, IDisposable
 	private readonly BarConfig _barConfig;
 
 	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = new();
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// Create the bar plugin.
@@ -81,7 +81,7 @@ public class BarPlugin : IPlugin, IDisposable
 	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -96,7 +96,7 @@ public class BarPlugin : IPlugin, IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

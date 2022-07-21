@@ -42,7 +42,7 @@ internal class WindowManager : IWindowManager
 	/// <summary>
 	/// Indicates whether values have been disposed.
 	/// </summary>
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	public WindowManager(IConfigContext configContext)
 	{
@@ -83,7 +83,7 @@ internal class WindowManager : IWindowManager
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -102,7 +102,7 @@ internal class WindowManager : IWindowManager
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

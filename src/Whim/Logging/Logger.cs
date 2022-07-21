@@ -25,7 +25,7 @@ public class Logger : IDisposable
 	/// </summary>
 	private LoggerConfiguration? _loggerConfiguration;
 
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// The config for the logger.
@@ -165,7 +165,7 @@ public class Logger : IDisposable
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -178,7 +178,7 @@ public class Logger : IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

@@ -9,7 +9,7 @@ namespace Whim.Bar;
 public partial class WorkspaceWidget : UserControl, IDisposable
 {
 	private readonly Microsoft.UI.Xaml.Window _window;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// The workspace view model.
@@ -40,7 +40,7 @@ public partial class WorkspaceWidget : UserControl, IDisposable
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -50,7 +50,7 @@ public partial class WorkspaceWidget : UserControl, IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

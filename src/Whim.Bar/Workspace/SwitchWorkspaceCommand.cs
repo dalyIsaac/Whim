@@ -11,7 +11,7 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 	private readonly IConfigContext _configContext;
 	private readonly WorkspaceWidgetViewModel _viewModel;
 	private readonly WorkspaceModel _workspace;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <inheritdoc/>
 	public event EventHandler? CanExecuteChanged;
@@ -55,7 +55,7 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -65,7 +65,7 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

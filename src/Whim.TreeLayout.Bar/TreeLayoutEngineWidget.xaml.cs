@@ -9,7 +9,7 @@ namespace Whim.TreeLayout.Bar;
 /// </summary>
 public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 {
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	private readonly Microsoft.UI.Xaml.Window _window;
 
@@ -42,7 +42,7 @@ public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 	/// <inheritdoc/>
 	private void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -52,7 +52,7 @@ public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 
