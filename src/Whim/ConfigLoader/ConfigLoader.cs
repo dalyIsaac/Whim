@@ -59,7 +59,7 @@ internal static class ConfigLoader
 	private static string ReadTemplateConfigFile(this Assembly assembly)
 	{
 		// Load the Whim template from the assembly's resources.
-		string template = assembly.ReadFile("whim.config.template.csx");
+		string template = assembly.ReadFile("whim.config.csx");
 
 		// Replace WHIM_PATH with the assembly's path.
 		string? assemblyPath = Path.GetDirectoryName(assembly.Location);

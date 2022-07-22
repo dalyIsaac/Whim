@@ -73,11 +73,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Template/whim.config.template.csx" />
-		<EmbeddedResource Include="Template/omnisharp.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.2.0" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.2" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.1" />
@@ -109,6 +104,12 @@
 	</ItemGroup>
 
 	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build;Publish">
+		<!--Copy the Template folder from Whim-->
+		<ItemGroup>
+			<TemplateSourceFile Include="$(SolutionDir)\src\Whim\Template\**\*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(TemplateSourceFile)" DestinationFolder="$(TargetDir)Template" />
+
 		<!--Whim.Bar-->
 		<ItemGroup>
 			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />

@@ -1,7 +1,7 @@
 {
   "FileOptions": {
     "ExcludeSearchPatterns": [
-      "src/Whim.Runner/Template/whim.config.template.csx"
+      "src/Whim.Runner/Template/whim.config.csx"
     ]
   },
   "RoslynExtensionsOptions": {
