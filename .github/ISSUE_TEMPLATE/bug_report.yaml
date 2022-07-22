@@ -27,10 +27,18 @@ body:
 - type: textarea
   attributes:
     label: Config
-    description: A config (`whim.config.csx`) that can be used to reproduce the issue.
+    description: A `whim.config.csx` that can be used to reproduce the issue.
+    placeholder: |
+      #r "WHIM_PATH\whim.dll"
+
+      void DoConfig(IConfigContext configContext)
+      {
+          configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "1"));
+          // ...
+      }
+    render: csharp
   validations:
     required: true
-    render: csharp
 
 - type: textarea
   attributes:
