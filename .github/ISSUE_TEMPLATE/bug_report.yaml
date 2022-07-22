@@ -1,6 +1,5 @@
 name: 🐞 Bug
 description: File a bug/issue
-title: "Title"
 labels: ["bug", "triage"]
 body:
 - type: checkboxes
@@ -10,29 +9,29 @@ body:
     options:
     - label: I have searched the existing issues
       required: true
+
 - type: textarea
   attributes:
     label: Current Behavior
     description: A concise description of what you're experiencing.
   validations:
     required: true
+
 - type: textarea
   attributes:
     label: Expected Behavior
     description: A concise description of what you expected to happen.
   validations:
     required: true
+
 - type: textarea
   attributes:
-    label: Steps To Reproduce
-    description: Steps to reproduce the behavior.
-    placeholder: |
-      1. In this environment...
-      2. With this config...
-      3. Run '...'
-      4. See error...
+    label: Config
+    description: A config (`whim.config.csx`) that can be used to reproduce the issue.
   validations:
     required: true
+    render: csharp
+
 - type: textarea
   attributes:
     label: Environment
@@ -45,9 +44,21 @@ body:
         - Windows:
         - Architecture:
         - Whim:
-    render: markdown
   validations:
     required: true
+
+- type: textarea
+  attributes:
+    label: Steps To Reproduce
+    description: Steps to reproduce the behavior.
+    placeholder: |
+      1. In this environment...
+      2. With this config...
+      3. Run '...'
+      4. See error...
+  validations:
+    required: true
+
 - type: textarea
   attributes:
     label: Anything else?
