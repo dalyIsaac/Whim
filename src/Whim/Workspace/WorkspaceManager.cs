@@ -50,6 +50,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor];
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
+
 	private bool _disposedValue;
 
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
