@@ -7,6 +7,10 @@ on:
       - release/v*
     tags:
       - v*
+    paths-ignore:
+      - ".github/ISSUE_TEMPLATE/*"
+      - ".github/workflows/pull_request_labels.yml"
+      - ".github/pull_request_template.md"
 
 jobs:
   create-release:
