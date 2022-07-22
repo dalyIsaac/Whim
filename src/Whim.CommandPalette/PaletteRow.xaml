@@ -48,6 +48,7 @@
 		<TextBlock x:Name="CommandTitle" />
 
 		<Border
+			x:Name="CommandKeybindBorder"
 			Grid.Column="1"
 			Padding="2,0,2,0"
 			HorizontalAlignment="Right"

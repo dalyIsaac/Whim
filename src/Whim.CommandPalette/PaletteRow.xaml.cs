@@ -72,9 +72,15 @@ internal sealed partial class PaletteRow : UserControl
 	private void SetKeybinds()
 	{
 		Logger.Debug("Setting keybinds");
+
 		if (Model.Match.Keys != null)
 		{
 			CommandKeybind.Text = Model.Match.Keys;
+			CommandKeybindBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+		}
+		else
+		{
+			CommandKeybindBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
 		}
 	}
 }
