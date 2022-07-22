@@ -11,7 +11,7 @@ namespace Whim.Bar;
 public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IConfigContext _configContext;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// The monitor which contains the workspaces.
@@ -102,7 +102,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -114,7 +114,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

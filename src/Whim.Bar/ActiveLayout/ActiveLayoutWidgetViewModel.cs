@@ -16,7 +16,7 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// </summary>
 	public IMonitor Monitor { get; }
 
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	private readonly HashSet<IWorkspace> _workspaces = new();
 
@@ -62,7 +62,7 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -74,7 +74,7 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

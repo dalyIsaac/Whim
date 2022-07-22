@@ -24,7 +24,7 @@
 					FontFamily="Cascadia Code"
 					IsTextSelectionEnabled="True"
 					LineHeight="20"
-					Text="{x:Bind Exception}"
+					Text="{x:Bind Message}"
 					TextWrapping="WrapWholeWords" />
 			</StackPanel>
 

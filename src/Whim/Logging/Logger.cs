@@ -1,4 +1,5 @@
 using Serilog;
+using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -7,7 +8,7 @@ namespace Whim;
 /// <summary>
 /// Logger used throughout Whim. It is accessed according to the singleton pattern.
 /// </summary>
-public class Logger
+public class Logger : IDisposable
 {
 	/// <summary>
 	/// Logger instance.
@@ -23,6 +24,8 @@ public class Logger
 	/// Serilog <see cref="LoggerConfiguration"/> instance.
 	/// </summary>
 	private LoggerConfiguration? _loggerConfiguration;
+
+	private bool _disposedValue;
 
 	/// <summary>
 	/// The config for the logger.
@@ -157,5 +160,33 @@ public class Logger
 	public static void Fatal(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 	{
 		instance?._logger?.Fatal(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
+	}
+
+	/// <inheritdoc/>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				if (_logger is IDisposable disposable)
+				{
+					disposable.Dispose();
+				}
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc/>
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

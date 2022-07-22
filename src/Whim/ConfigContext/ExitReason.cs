@@ -3,7 +3,7 @@ namespace Whim;
 /// <summary>
 /// The possible reasons why Whim has been shut down.
 /// </summary>
-public enum ShutdownReason
+public enum ExitReason
 {
 	/// <summary>
 	/// Whim has been shut down normally.

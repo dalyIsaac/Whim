@@ -59,6 +59,4 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		CenterPanel.Children.AddRange(_barConfig.CenterComponents.Select(c => c(_configContext, _monitor, this)));
 		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_configContext, _monitor, this)));
 	}
-
-
 }

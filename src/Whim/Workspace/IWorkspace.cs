@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -5,7 +6,7 @@ namespace Whim;
 /// <summary>
 /// Workspaces contain windows to be organized by layout engines.
 /// </summary>
-public interface IWorkspace
+public interface IWorkspace : IDisposable
 {
 	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the

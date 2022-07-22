@@ -12,7 +12,7 @@ internal class KeybindManager : IKeybindManager
 	private readonly ICommandItems _commandItems;
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	public KeybindManager(ICommandItems commandItems)
 	{
@@ -136,7 +136,7 @@ internal class KeybindManager : IKeybindManager
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -149,7 +149,7 @@ internal class KeybindManager : IKeybindManager
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

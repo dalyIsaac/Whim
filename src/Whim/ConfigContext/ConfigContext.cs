@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace Whim;
 
@@ -13,43 +14,51 @@ namespace Whim;
 /// </summary>
 internal class ConfigContext : IConfigContext
 {
-	public Logger Logger { get; set; }
-	public IWorkspaceManager WorkspaceManager { get; set; }
-	public IWindowManager WindowManager { get; set; }
-	public IMonitorManager MonitorManager { get; set; }
-	public IRouterManager RouterManager { get; set; }
-	public IFilterManager FilterManager { get; set; }
-	public ICommandManager CommandManager { get; set; }
-	public IPluginManager PluginManager { get; set; }
+	/// <summary>
+	/// The assembly which is running this context.
+	/// </summary>
+	private readonly Assembly _assembly;
 
-	public event EventHandler<ShutdownEventArgs>? Shutdown;
+	public Logger Logger { get; private set; }
+	public IWorkspaceManager WorkspaceManager { get; private set; }
+	public IWindowManager WindowManager { get; private set; }
+	public IMonitorManager MonitorManager { get; private set; }
+	public IRouterManager RouterManager { get; private set; }
+	public IFilterManager FilterManager { get; private set; }
+	public ICommandManager CommandManager { get; private set; }
+	public IPluginManager PluginManager { get; private set; }
 
-	public ConfigContext(
-		Logger? logger = null,
-		IRouterManager? routerManager = null,
-		IFilterManager? filterManager = null,
-		IWindowManager? windowManager = null,
-		IMonitorManager? monitorManager = null,
-		IWorkspaceManager? workspaceManager = null,
-		ICommandManager? commandManager = null,
-		IPluginManager? pluginManager = null)
+	public event EventHandler<ExitEventArgs>? Exiting;
+	public event EventHandler<ExitEventArgs>? Exited;
+
+	/// <summary>
+	/// Create a new <see cref="IConfigContext"/>.
+	/// </summary>
+	/// <param name="assembly">The assembly which is running this context.</param>
+	public ConfigContext(Assembly assembly)
 	{
-		Logger = logger ?? new Logger();
-		RouterManager = routerManager ?? new RouterManager(this);
-		FilterManager = filterManager ?? new FilterManager();
-		WindowManager = windowManager ?? new WindowManager(this);
-		MonitorManager = monitorManager ?? new MonitorManager(this);
-		WorkspaceManager = workspaceManager ?? new WorkspaceManager(this);
-		CommandManager = commandManager ?? new CommandManager();
-		PluginManager = pluginManager ?? new PluginManager();
+		_assembly = assembly;
+
+		Logger = new Logger();
+		RouterManager = new RouterManager(this);
+		FilterManager = new FilterManager();
+		WindowManager = new WindowManager(this);
+		MonitorManager = new MonitorManager(this);
+		WorkspaceManager = new WorkspaceManager(this);
+		CommandManager = new CommandManager();
+		PluginManager = new PluginManager();
 	}
 
 	public void Initialize()
 	{
+		// Load the config context.
+		DoConfig doConfig = ConfigLoader.LoadConfigContext(_assembly);
+		doConfig(this);
+
+		// Initialize the managers.
 		Logger.Initialize();
 
-		Logger.Debug("Initializing config context...");
-
+		Logger.Debug("Initializing...");
 		PluginManager.PreInitialize();
 
 		MonitorManager.Initialize();
@@ -59,17 +68,26 @@ internal class ConfigContext : IConfigContext
 
 		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
+
+		Logger.Debug("Completed initialization");
 	}
 
-
-	public void Quit(ShutdownEventArgs? args = null)
+	public void Exit(ExitEventArgs? args = null)
 	{
-		Logger.Debug("Disposing config context...");
+		Logger.Debug("Exiting config context...");
+		args ??= new ExitEventArgs(ExitReason.User);
+
+		Exiting?.Invoke(this, args);
+
+		PluginManager.Dispose();
+		CommandManager.Dispose();
+		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
-		CommandManager.Dispose();
-		PluginManager.Dispose();
 
-		Shutdown?.Invoke(this, args ?? new ShutdownEventArgs(ShutdownReason.User));
+		Logger.Debug("Mostly exited...");
+
+		Logger.Dispose();
+		Exited?.Invoke(this, args);
 	}
 }

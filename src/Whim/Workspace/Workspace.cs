@@ -28,6 +28,7 @@ internal class Workspace : IWorkspace
 
 	private readonly List<ILayoutEngine> _layoutEngines = new();
 	private int _activeLayoutEngineIndex;
+	private bool _disposedValue;
 
 	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
 
@@ -468,4 +469,38 @@ internal class Workspace : IWorkspace
 		_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
 		&& ILayoutEngine.ContainsEqual(ActiveLayoutEngine, phantomEngine)
 	);
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				Logger.Debug($"Disposing workspace {Name}");
+
+				// dispose managed state (managed objects)
+				bool isWorkspaceActive = _configContext.WorkspaceManager.GetMonitorForWorkspace(this) != null;
+
+				// If the workspace isn't active on the monitor, show all the windows in as minimized.
+				if (!isWorkspaceActive)
+				{
+					foreach (IWindow window in Windows)
+					{
+						window.ShowMinimized();
+					}
+				}
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
 }

@@ -9,7 +9,7 @@ namespace Whim;
 /// functionality. <br/>
 ///
 /// <c>IConfigContext</c> also contains other associated state and functionality, like the
-/// <see cref="Logger"/>
+/// <see cref="Logger"/>.
 /// </summary>
 public interface IConfigContext
 {
@@ -54,22 +54,30 @@ public interface IConfigContext
 	public IPluginManager PluginManager { get; }
 
 	/// <summary>
-	/// This will be called by Whim after your config has been read.
-	/// Do not call it yourself.
+	/// This will be called by the Whim Runner.
+	/// You likely won't need to call it yourself.
 	/// </summary>
+	/// <exception cref="ConfigLoaderException">
+	/// Thrown if the user's config could not be loaded.
+	/// </exception>
 	public void Initialize();
 
 	/// <summary>
 	/// This event is fired when the config context is shutting down.
 	/// </summary>
-	public event EventHandler<ShutdownEventArgs>? Shutdown;
+	public event EventHandler<ExitEventArgs>? Exiting;
+
+	/// <summary>
+	/// This event is fired after the config context has been shut down.
+	/// </summary>
+	public event EventHandler<ExitEventArgs>? Exited;
 
 	/// <summary>
 	/// This is called to shutdown the config context.
 	/// </summary>
 	/// <param name="args">
 	/// The shutdown event arguments. If this is not provided, we assume
-	/// <see cref="ShutdownReason.User"/>.
+	/// <see cref="ExitReason.User"/>.
 	/// </param>
-	public void Quit(ShutdownEventArgs? args = null);
+	public void Exit(ExitEventArgs? args = null);
 }

@@ -11,7 +11,7 @@ public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly DispatcherTimer _timer = new();
 	private readonly string _format;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// The current date and time.
@@ -48,17 +48,18 @@ public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
 				_timer.Stop();
+				_timer.Tick -= Timer_Tick;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

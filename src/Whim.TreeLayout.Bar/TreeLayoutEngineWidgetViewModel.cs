@@ -11,7 +11,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 {
 	private readonly IConfigContext _configContext;
 	private readonly IMonitor _monitor;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	private Direction? _directionValue;
 
@@ -149,16 +149,18 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
-				// TODO: dispose managed state (managed objects)
+				// dispose managed state (managed objects)
+				_configContext.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
+				_configContext.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
 			}
 
-			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-			// TODO: set large fields to null
-			disposedValue = true;
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
 		}
 	}
 

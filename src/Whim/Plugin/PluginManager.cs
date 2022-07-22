@@ -6,7 +6,7 @@ namespace Whim;
 internal class PluginManager : IPluginManager
 {
 	private readonly List<IPlugin> _plugins = new();
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	public IEnumerable<IPlugin> LoadedPlugins => _plugins;
 
@@ -38,10 +38,11 @@ internal class PluginManager : IPluginManager
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
+				Logger.Debug("Disposing plugin manager");
 				foreach (IPlugin plugin in _plugins)
 				{
 					if (plugin is IDisposable disposable)
@@ -51,7 +52,7 @@ internal class PluginManager : IPluginManager
 				}
 			}
 
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

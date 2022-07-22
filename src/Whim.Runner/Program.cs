@@ -1,6 +1,12 @@
-﻿namespace Whim.Runner;
+﻿using Microsoft.UI.Dispatching;
+using System.Threading;
+
+namespace Whim.Runner;
 
 #if DISABLE_XAML_GENERATED_MAIN
+/// <summary>
+/// This is the entry point for Whim.
+/// </summary>
 public static class Program
 {
 	[global::System.Runtime.InteropServices.DllImport("Microsoft.ui.xaml.dll")]
@@ -45,7 +51,14 @@ public static class Program
 
 		if (this_is_the_first_instance)
 		{
-			Whim.Start();
+			System.Diagnostics.Debug.WriteLine("Starting!!!");
+			// Start the application and the message loop.
+			global::Microsoft.UI.Xaml.Application.Start((p) =>
+			{
+				DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
+				SynchronizationContext.SetSynchronizationContext(context);
+				_ = new App();
+			});
 		}
 	}
 }

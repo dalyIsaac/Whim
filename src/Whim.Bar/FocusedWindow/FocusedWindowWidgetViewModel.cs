@@ -9,7 +9,7 @@ namespace Whim.Bar;
 public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IConfigContext _configContext;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// The title of the last focused window.
@@ -38,7 +38,7 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
@@ -48,7 +48,7 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

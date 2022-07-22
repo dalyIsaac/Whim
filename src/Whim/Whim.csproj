@@ -29,6 +29,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.2.0" />
 		<PackageReference Include="Microsoft.Win32.SystemEvents" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.1.619-beta">
 			<PrivateAssets>all</PrivateAssets>
@@ -49,5 +50,10 @@
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
 			<_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
 		</AssemblyAttribute>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Template\omnisharp.json" />
+		<EmbeddedResource Include="Template\whim.config.csx" />
 	</ItemGroup>
 </Project>

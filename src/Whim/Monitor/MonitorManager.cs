@@ -19,7 +19,7 @@ internal class MonitorManager : IMonitorManager
 	/// zero <see cref="IMonitor"/>s, as the constructor should throw.
 	/// </summary>
 	private IMonitor[] _monitors = Array.Empty<IMonitor>();
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// The <see cref="IMonitor"/> which currently has focus.
@@ -184,17 +184,19 @@ internal class MonitorManager : IMonitorManager
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
+				Logger.Debug("Disposing monitor manager");
+
 				// dispose managed state (managed objects)
 				SystemEvents.DisplaySettingsChanging -= SystemEvents_DisplaySettingsChanging;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 	public void Dispose()

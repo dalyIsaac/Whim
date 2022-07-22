@@ -1,26 +1,18 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
+﻿using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Whim.Bar;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 namespace Whim.TreeLayout.Bar;
 
 /// <summary>
 /// Interaction logic for TreeLayoutEngineWidget.
 /// </summary>
-public sealed partial class TreeLayoutEngineWidget : UserControl
+public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 {
+	private bool _disposedValue;
+
+	private readonly Microsoft.UI.Xaml.Window _window;
+
 	/// <summary>
 	/// The tree layout engine widget.
 	/// </summary>
@@ -28,6 +20,7 @@ public sealed partial class TreeLayoutEngineWidget : UserControl
 
 	internal TreeLayoutEngineWidget(IConfigContext configContext, IMonitor monitor, Microsoft.UI.Xaml.Window window)
 	{
+		_window = window;
 		ViewModel = new TreeLayoutEngineWidgetViewModel(configContext, monitor);
 		window.Closed += Window_Closed;
 		UIElementExtensions.InitializeComponent(this, "Whim.TreeLayout.Bar", "TreeLayoutEngineWidget");
@@ -44,5 +37,30 @@ public sealed partial class TreeLayoutEngineWidget : UserControl
 	public static BarComponent CreateComponent()
 	{
 		return new BarComponent((configContext, monitor, window) => new TreeLayoutEngineWidget(configContext, monitor, window));
+	}
+
+	/// <inheritdoc/>
+	private void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_window.Closed -= Window_Closed;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc/>
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

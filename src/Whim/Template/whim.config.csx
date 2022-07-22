@@ -30,8 +30,7 @@ IWorkspace CreateWorkspace(IConfigContext configContext, string name)
 /// This is what's called when Whim is loaded.
 /// </summary>
 /// <param name="configContext"></param>
-/// <returns></returns>
-IConfigContext DoConfig(IConfigContext configContext)
+void DoConfig(IConfigContext configContext)
 {
 	// Add workspaces.
 	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "1"));
@@ -64,8 +63,6 @@ IConfigContext DoConfig(IConfigContext configContext)
 	// Load the commands and keybindings.
 	configContext.CommandManager.LoadCommands(DefaultCommands.GetCommands(configContext));
 	configContext.CommandManager.LoadCommands(FloatingLayoutCommands.GetCommands(floatingLayoutPlugin));
-
-	return configContext;
 }
 
 #pragma warning disable CS8974 // Methods should not return 'this'.

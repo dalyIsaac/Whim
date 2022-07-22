@@ -1,5 +1,4 @@
 ﻿using Microsoft.UI.Xaml;
-using System;
 
 namespace Whim.Runner;
 
@@ -8,18 +7,21 @@ namespace Whim.Runner;
 /// </summary>
 public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 {
-	public string Exception { get; }
+	/// <summary>
+	/// The exception message.
+	/// </summary>
+	public string Message { get; }
 
 	/// <summary>
 	/// Exposes the exception encountered during startup to the user.
 	/// </summary>
-	/// <param name="exception"></param>
-	public StartupExceptionWindow(Exception exception)
+	/// <param name="exitEventArgs"></param>
+	public StartupExceptionWindow(ExitEventArgs exitEventArgs)
 	{
 		InitializeComponent();
 		Title = "Whim Startup Error";
 
-		Exception = exception.ToString();
+		Message = exitEventArgs.Message ?? "Unknown error occurred";
 	}
 
 	private void Quit_Click(object sender, RoutedEventArgs e)

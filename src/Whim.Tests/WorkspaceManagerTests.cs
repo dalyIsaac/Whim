@@ -31,7 +31,7 @@ public class WorkspaceManagerTests
 	public void AddWorkspace()
 	{
 		Mock<IConfigContext> configContextMock = CreateConfigContextMock();
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		Assert.Raises<WorkspaceEventArgs>(h => workspaceManager.WorkspaceAdded += h,
 			h => workspaceManager.WorkspaceAdded -= h,
@@ -47,7 +47,7 @@ public class WorkspaceManagerTests
 	public void RemoveUnknownWorkspace()
 	{
 		Mock<IConfigContext> configContextMock = CreateConfigContextMock();
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		Assert.False(workspaceManager.Remove(new Mock<IWorkspace>().Object));
 	}
@@ -56,7 +56,7 @@ public class WorkspaceManagerTests
 	public void RemoveTooManyWorkspaces()
 	{
 		Mock<IConfigContext> configContextMock = CreateConfigContextMock();
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		Assert.False(workspaceManager.Remove(new Mock<IWorkspace>().Object));
 	}
@@ -65,7 +65,7 @@ public class WorkspaceManagerTests
 	public void RemoveWorkspaceNotInList()
 	{
 		Mock<IConfigContext> configContextMock = CreateConfigContextMock();
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		Assert.False(workspaceManager.Remove(new Mock<IWorkspace>().Object));
 	}
@@ -74,7 +74,7 @@ public class WorkspaceManagerTests
 	public void RemoveWorkspace()
 	{
 		Mock<IConfigContext> configContextMock = CreateConfigContextMock();
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		Mock<IWindow> windowMock = new();
 
@@ -106,7 +106,7 @@ public class WorkspaceManagerTests
 	public void RemoveWorkspaceStringFail()
 	{
 		Mock<IConfigContext> configContextMock = CreateConfigContextMock();
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		Assert.False(workspaceManager.Remove("Test"));
 	}
@@ -115,7 +115,7 @@ public class WorkspaceManagerTests
 	public void RemoveWorkspaceString()
 	{
 		Mock<IConfigContext> configContextMock = CreateConfigContextMock();
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		Mock<IWindow> windowMock = new();
 
@@ -146,7 +146,7 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
 		// Setup workspace manager
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		// Setup workspace manager workspaces
 		Mock<IWorkspace> workspace = new();
@@ -196,7 +196,7 @@ public class WorkspaceManagerTests
 		Mock<IConfigContext> configContextMock = CreateConfigContextMock();
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		// Register the monitor in _monitorWorkspaceMap
 		workspaceManager.Activate(new Mock<IWorkspace>().Object, monitorMock.Object);
@@ -216,7 +216,7 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
 		// Setup workspace manager
-		WorkspaceManager workspaceManager = new(configContextMock.Object);
+		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
 		// Setup workspace manager workspaces
 		Mock<IWorkspace> workspace = new();
@@ -259,7 +259,7 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.WindowManager).Returns(windowManagerMock.Object);
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
-		WorkspaceManager workspaceManager = new(configContextMock.Object)
+		using WorkspaceManager workspaceManager = new(configContextMock.Object)
 		{
 			workspaceMock.Object
 		};
@@ -294,7 +294,7 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.WindowManager).Returns(windowManagerMock.Object);
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
-		WorkspaceManager workspaceManager = new(configContextMock.Object)
+		using WorkspaceManager workspaceManager = new(configContextMock.Object)
 		{
 			workspaceMock.Object
 		};
@@ -325,7 +325,7 @@ public class WorkspaceManagerTests
 		configContextMock.Setup(x => x.WindowManager).Returns(windowManagerMock.Object);
 		configContextMock.Setup(x => x.MonitorManager).Returns(monitorManagerMock.Object);
 
-		WorkspaceManager workspaceManager = new(configContextMock.Object)
+		using WorkspaceManager workspaceManager = new(configContextMock.Object)
 		{
 			workspaceMock.Object
 		};

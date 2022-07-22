@@ -8,7 +8,7 @@ internal class CommandManager : ICommandManager
 {
 	private readonly ICommandItems _commandItems;
 	private readonly IKeybindManager _keybindManager;
-	private bool disposedValue;
+	private bool _disposedValue;
 
 	public CommandManager()
 	{
@@ -34,17 +34,19 @@ internal class CommandManager : ICommandManager
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposedValue)
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
+				Logger.Debug("Disposing command manager");
+
 				// dispose managed state (managed objects)
 				_keybindManager.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			disposedValue = true;
+			_disposedValue = true;
 		}
 	}
 

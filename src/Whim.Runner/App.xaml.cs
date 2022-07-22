@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
+using System.Reflection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -11,15 +12,15 @@ namespace Whim.Runner;
 /// </summary>
 public partial class App : Application
 {
-	private readonly IConfigContext _configContext;
-	private Exception? _startupException;
+	/// <summary>
+	/// This will be initialized in <see cref="OnLaunched"/>.
+	/// </summary>
+	private IConfigContext? _configContext;
 
 	/// <summary>
 	/// Initializes the Whim application.
 	/// </summary>
-	/// <param name="configContext">The Whim config context.</param>
-	/// <param name="startupException">An exception encountered during startup.</param>
-	public App(IConfigContext configContext, Exception? startupException = null)
+	public App()
 	{
 		Logger.Debug("Starting application...");
 
@@ -27,36 +28,53 @@ public partial class App : Application
 		UnhandledException += Application_UnhandledException;
 
 		InitializeComponent();
-
-		_configContext = configContext;
-		_startupException = startupException;
 	}
 
 	/// <inheritdoc/>
 	protected override void OnLaunched(LaunchActivatedEventArgs args)
 	{
-		if (_startupException == null)
+		StartWhim();
+	}
+
+	private void StartWhim()
+	{
+		try
 		{
-			try
-			{
-				_configContext.Initialize();
-				return;
-			}
-			catch (Exception ex)
-			{
-				_startupException = ex;
-			}
+			_configContext = Engine.CreateConfigContext(Assembly.GetAssembly(typeof(Program)));
+
+			_configContext.Exited += ConfigContext_Exited;
+			_configContext.Initialize();
+
+			return;
+		}
+		catch (Exception ex)
+		{
+			_configContext?.Exit(new ExitEventArgs(ExitReason.Error, ex.ToString()));
+		}
+	}
+
+	private void ConfigContext_Exited(object? sender, ExitEventArgs e)
+	{
+		if (_configContext is not null)
+		{
+			_configContext.Exited -= ConfigContext_Exited;
+			_configContext = null;
 		}
 
-		// If we get to here, there's been an error somewhere during startup.
-		_configContext.Quit();
-		new StartupExceptionWindow(_startupException!).Activate();
+		if (e.Reason == ExitReason.User)
+		{
+			Exit();
+		}
+		else
+		{
+			new StartupExceptionWindow(e).Activate();
+		}
 	}
 
 	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
 	{
 		Logger.Error(e.Exception.ToString());
-		_configContext.Quit();
+		_configContext?.Exit();
 	}
 
 	// Add when Windows App SDK supports the application exit event.
