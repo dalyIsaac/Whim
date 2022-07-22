@@ -51,6 +51,7 @@
 			<_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
 		</AssemblyAttribute>
 	</ItemGroup>
+
 	<ItemGroup>
 		<EmbeddedResource Include="Template\omnisharp.json" />
 		<EmbeddedResource Include="Template\whim.config.csx" />

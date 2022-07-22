@@ -21,7 +21,7 @@ public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 		InitializeComponent();
 		Title = "Whim Startup Error";
 
-		Message = exitEventArgs.Message ?? "Unknown error occured";
+		Message = exitEventArgs.Message ?? "Unknown error occurred";
 	}
 
 	private void Quit_Click(object sender, RoutedEventArgs e)

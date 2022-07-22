@@ -55,17 +55,19 @@ public partial class App : Application
 
 	private void ConfigContext_Exited(object? sender, ExitEventArgs e)
 	{
-		switch (e.Reason)
+		if (_configContext is not null)
 		{
-			case ExitReason.User:
-				Exit();
-				break;
-			case ExitReason.Error:
-				new StartupExceptionWindow(e).Activate();
-				break;
-			default:
-				Logger.Error($"Unhandled exit reason: {e.Reason}");
-				break;
+			_configContext.Exited -= ConfigContext_Exited;
+			_configContext = null;
+		}
+
+		if (e.Reason == ExitReason.User)
+		{
+			Exit();
+		}
+		else
+		{
+			new StartupExceptionWindow(e).Activate();
 		}
 	}
 

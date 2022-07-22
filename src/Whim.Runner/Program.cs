@@ -4,6 +4,9 @@ using System.Threading;
 namespace Whim.Runner;
 
 #if DISABLE_XAML_GENERATED_MAIN
+/// <summary>
+/// This is the entry point for Whim.
+/// </summary>
 public static class Program
 {
 	[global::System.Runtime.InteropServices.DllImport("Microsoft.ui.xaml.dll")]
