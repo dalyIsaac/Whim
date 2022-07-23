@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using System.Collections.Generic;
 
@@ -28,6 +29,7 @@ internal sealed partial class PaletteRow : UserControl
 		Logger.Debug("Updating with a new item");
 		Model = item;
 		SetTitle();
+		SetKeybinds();
 	}
 
 	/// <summary>
@@ -72,9 +74,19 @@ internal sealed partial class PaletteRow : UserControl
 	private void SetKeybinds()
 	{
 		Logger.Debug("Setting keybinds");
+
 		if (Model.Match.Keys != null)
 		{
-			CommandKeybind.Text = Model.Match.Keys;
+			string keys = Model.Match.Keys;
+			if (CommandKeybind.Text != keys)
+			{
+				CommandKeybind.Text = keys;
+				CommandKeybindBorder.Visibility = Visibility.Visible;
+			}
+		}
+		else if (CommandKeybindBorder.Visibility != Visibility.Collapsed)
+		{
+			CommandKeybindBorder.Visibility = Visibility.Collapsed;
 		}
 	}
 }
