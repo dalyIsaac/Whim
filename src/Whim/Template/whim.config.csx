@@ -34,9 +34,9 @@ IWorkspace CreateWorkspace(IConfigContext configContext, string name)
 void DoConfig(IConfigContext configContext)
 {
 	// Add workspaces.
-	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "1"));
-	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "2"));
-	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "3"));
+	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "Work"));
+	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "Procrastination"));
+	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "Entertainment"));
 
 	// Bar plugin.
 	List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
@@ -61,12 +61,18 @@ void DoConfig(IConfigContext configContext)
 	FocusIndicatorPlugin focusIndicatorPlugin = new(configContext, focusIndicatorConfig);
 	configContext.PluginManager.RegisterPlugin(focusIndicatorPlugin);
 
+	// Command palette.
+	CommandPaletteConfig commandPaletteConfig = new();
+	CommandPalettePlugin commandPalettePlugin = new(configContext, commandPaletteConfig);
+	configContext.PluginManager.RegisterPlugin(commandPalettePlugin);
+
 	// Load the commands and keybindings.
 	configContext.CommandManager.LoadCommands(DefaultCommands.GetCommands(configContext));
 	configContext.CommandManager.LoadCommands(barPlugin.GetCommands());
 	configContext.CommandManager.LoadCommands(floatingLayoutPlugin.GetCommands());
 	configContext.CommandManager.LoadCommands(gapsPlugin.GetCommands());
 	configContext.CommandManager.LoadCommands(focusIndicatorPlugin.GetCommands());
+	configContext.CommandManager.LoadCommands(commandPalettePlugin.GetCommands());
 }
 
 #pragma warning disable CS8974 // Methods should not return 'this'.
