@@ -24,7 +24,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 /// <returns></returns>
 IWorkspace CreateWorkspace(IConfigContext configContext, string name)
 {
-    return IWorkspace.CreateWorkspace(configContext, name, new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
+	return IWorkspace.CreateWorkspace(configContext, name, new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
 }
 
 /// <summary>
