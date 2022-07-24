@@ -13,16 +13,17 @@ public class GapsConfig
 	/// <summary>
 	/// The gap between windows.
 	/// </summary>
-	public int InnerGap { get; set; }
+	public int InnerGap { get; set; } = 10;
 
 	/// <summary>
-	/// Create a new instance of <see cref="GapsConfig"/>.
+	/// The default delta used by the commands <c>gaps.outer.increase</c> and
+	/// <c>gaps.outer.decrease</c>.
 	/// </summary>
-	/// <param name="outerGap"></param>
-	/// <param name="innerGap"></param>
-	public GapsConfig(int outerGap = 0, int innerGap = 0)
-	{
-		OuterGap = outerGap;
-		InnerGap = innerGap;
-	}
+	public int DefaultOuterDelta { get; set; } = 2;
+
+	/// <summary>
+	/// The default delta used by the commands <c>gaps.inner.increase</c> and
+	/// <c>gaps.inner.decrease</c>.
+	/// </summary>
+	public int DefaultInnerDelta { get; set; } = 2;
 }

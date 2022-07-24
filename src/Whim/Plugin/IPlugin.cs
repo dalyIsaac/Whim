@@ -19,4 +19,11 @@ public interface IPlugin
 	/// Put things which rely on the rest of the config context here.
 	/// </summary>
 	public void PostInitialize();
+
+	/// <summary>
+	/// Get the default commands for this plugin, and their associated keybinds.
+	/// It's up to the user to register the commands themselves using
+	/// <see cref="ICommandManager.LoadCommands"/>.
+	/// </summary>
+	public (ICommand, IKeybind?)[] GetCommands();
 }
