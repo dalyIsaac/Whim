@@ -5,6 +5,7 @@
 #r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
 #r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout\Whim.TreeLayout.dll"
+#r "WHIM_PATH\plugins\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.dll"
 
 using System;
 using System.Collections.Generic;
@@ -22,9 +23,14 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 /// <param name="configContext"></param>
 /// <param name="name"></param>
 /// <returns></returns>
-IWorkspace CreateWorkspace(IConfigContext configContext, string name)
+IWorkspace CreateWorkspace(IConfigContext configContext, string name) =>
 {
-	return IWorkspace.CreateWorkspace(configContext, name, new ColumnLayoutEngine(), new ColumnLayoutEngine("Right to left", false));
+	return IWorkspace.CreateWorkspace(
+		configContext,
+		name,
+		new TreeLayoutEngine(configContext),
+		new ColumnLayoutEngine(),
+		new ColumnLayoutEngine("Right to left", false));
 }
 
 /// <summary>
@@ -41,7 +47,12 @@ void DoConfig(IConfigContext configContext)
 	// Bar plugin.
 	List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
 	List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
-	List<BarComponent> rightComponents = new() { ActiveLayoutWidget.CreateComponent(), DateTimeWidget.CreateComponent() };
+	List<BarComponent> rightComponents = new()
+	{
+		ActiveLayoutWidget.CreateComponent(),
+		DateTimeWidget.CreateComponent(),
+		TreeLayoutEngineWidget.CreateComponent()
+	};
 
 	BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
 	BarPlugin barPlugin = new(configContext, barConfig);
