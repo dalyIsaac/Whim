@@ -63,7 +63,10 @@ void DoConfig(IConfigContext configContext)
 
 	// Load the commands and keybindings.
 	configContext.CommandManager.LoadCommands(DefaultCommands.GetCommands(configContext));
-	configContext.CommandManager.LoadCommands(FloatingLayoutCommands.GetCommands(floatingLayoutPlugin));
+	configContext.CommandManager.LoadCommands(barPlugin.GetCommands());
+	configContext.CommandManager.LoadCommands(floatingLayoutPlugin.GetCommands());
+	configContext.CommandManager.LoadCommands(gapsPlugin.GetCommands());
+	configContext.CommandManager.LoadCommands(focusIndicatorPlugin.GetCommands());
 }
 
 #pragma warning disable CS8974 // Methods should not return 'this'.
