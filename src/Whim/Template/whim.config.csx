@@ -1,3 +1,4 @@
+#nullable enable
 #r "WHIM_PATH\whim.dll"
 #r "WHIM_PATH\plugins\Whim.Bar\Whim.Bar.dll"
 #r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
