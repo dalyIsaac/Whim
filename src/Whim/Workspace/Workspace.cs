@@ -407,9 +407,9 @@ internal class Workspace : IWorkspace
 	}
 
 	#region Phantom Windows
-	public void RegisterPhantomWindow(ILayoutEngine engine, IWindow window)
+	public void AddPhantomWindow(ILayoutEngine engine, IWindow window)
 	{
-		Logger.Debug($"Registering phantom window {window} in workspace {Name}");
+		Logger.Debug($"Adding phantom window {window} in workspace {Name}");
 
 		if (ILayoutEngine.ContainsEqual(engine, ActiveLayoutEngine))
 		{
@@ -424,13 +424,13 @@ internal class Workspace : IWorkspace
 		}
 
 		_phantomWindows.Add(window, engine);
-		_configContext.WorkspaceManager.RegisterPhantomWindow(this, window);
+		_configContext.WorkspaceManager.AddPhantomWindow(this, window);
 		DoLayout();
 	}
 
-	public void UnregisterPhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false)
+	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false)
 	{
-		Logger.Debug($"Unregistering phantom window {window} in workspace {Name}");
+		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
 
 		if (ILayoutEngine.ContainsEqual(engine, ActiveLayoutEngine))
 		{
@@ -451,7 +451,7 @@ internal class Workspace : IWorkspace
 		}
 
 		_phantomWindows.Remove(window);
-		_configContext.WorkspaceManager.UnregisterPhantomWindow(window);
+		_configContext.WorkspaceManager.RemovePhantomWindow(window);
 
 		if (doLayout)
 		{

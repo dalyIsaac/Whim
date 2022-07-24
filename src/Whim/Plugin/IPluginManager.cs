@@ -26,12 +26,12 @@ public interface IPluginManager : IDisposable
 	public void PostInitialize();
 
 	/// <summary>
-	/// Registers a plugin.
+	/// Adds a plugin.
 	/// There's no guarantee that <see cref="PreInitialize"/> will be called before Whim is
 	/// initialized. However, <see cref="PostInitialize"/> will still be called after
 	/// <see cref="PreInitialize"/>.
 	/// </summary>
-	/// <param name="plugin">The plugin to register.</param>
-	/// <returns>The plugin that was registered.</returns>
-	public T RegisterPlugin<T>(T plugin) where T : IPlugin;
+	/// <param name="plugin">The plugin to add.</param>
+	/// <returns>The plugin that was added.</returns>
+	public T AddPlugin<T>(T plugin) where T : IPlugin;
 }

@@ -129,7 +129,7 @@ public interface IWindow
 	/// <param name="configContext">The configuration context.</param>
 	public static IWindow? CreateWindow(HWND hwnd, IConfigContext configContext)
 	{
-		Logger.Debug($"Registering window {hwnd.Value}");
+		Logger.Debug($"Adding window {hwnd.Value}");
 
 		try
 		{
