@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
-using System.Reflection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -40,7 +39,7 @@ public partial class App : Application
 	{
 		try
 		{
-			_configContext = Engine.CreateConfigContext(Assembly.GetAssembly(typeof(Program)));
+			_configContext = Engine.CreateConfigContext();
 
 			_configContext.Exited += ConfigContext_Exited;
 			_configContext.Initialize();

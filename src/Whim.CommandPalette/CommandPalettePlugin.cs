@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.CommandPalette;
 
@@ -94,4 +95,18 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
 	}
+
+	/// <inheritdoc />
+	public (ICommand, IKeybind?)[] GetCommands() => new (ICommand, IKeybind?)[]
+	{
+		// Toggle command palette
+		(
+			new Command(
+				identifier: "command_palette.toggle",
+				title: "Toggle command palette",
+				callback: () => Activate()
+			),
+			new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_K)
+		)
+	};
 }

@@ -24,7 +24,12 @@ public static class DefaultCommands
 	public const KeyModifiers WinCtrl = KeyModifiers.LWin | KeyModifiers.LControl;
 
 	/// <summary>
-	/// Gets the default commands.
+	/// The value for the key modifier <c>Win</c> + <c>Ctrl</c> + <c>Shift</c>.
+	/// </summary>
+	public const KeyModifiers WinCtrlShift = KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift;
+
+	/// <summary>
+	/// Gets the default commands and their associated keybinds.
 	/// </summary>
 	public static (ICommand, IKeybind?)[] GetCommands(IConfigContext configContext) => new (ICommand, IKeybind?)[]
 	{

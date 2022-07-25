@@ -107,4 +107,7 @@ public class BarPlugin : IPlugin, IDisposable
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
 	}
+
+	/// <inheritdoc />
+	public (ICommand, IKeybind?)[] GetCommands() => Array.Empty<(ICommand, IKeybind?)>();
 }

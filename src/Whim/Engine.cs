@@ -12,19 +12,12 @@ public static class Engine
 	/// <summary>
 	/// Get the <see cref="IConfigContext"/>.
 	/// </summary>
-	/// <param name="assembly">The calling assembly.</param>
 	/// <returns>The <see cref="IConfigContext"/>.</returns>
-	/// <exception cref="ConfigLoaderException"></exception>
-	public static IConfigContext CreateConfigContext(Assembly? assembly)
+	public static IConfigContext CreateConfigContext()
 	{
 		if (_configContext == null)
 		{
-			if (assembly == null)
-			{
-				throw new ConfigLoaderException("Provided assembly was null.");
-			}
-
-			_configContext = new ConfigContext(assembly);
+			_configContext = new ConfigContext();
 		}
 
 		return _configContext;

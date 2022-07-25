@@ -14,11 +14,6 @@ namespace Whim;
 /// </summary>
 internal class ConfigContext : IConfigContext
 {
-	/// <summary>
-	/// The assembly which is running this context.
-	/// </summary>
-	private readonly Assembly _assembly;
-
 	public Logger Logger { get; private set; }
 	public IWorkspaceManager WorkspaceManager { get; private set; }
 	public IWindowManager WindowManager { get; private set; }
@@ -34,11 +29,8 @@ internal class ConfigContext : IConfigContext
 	/// <summary>
 	/// Create a new <see cref="IConfigContext"/>.
 	/// </summary>
-	/// <param name="assembly">The assembly which is running this context.</param>
-	public ConfigContext(Assembly assembly)
+	public ConfigContext()
 	{
-		_assembly = assembly;
-
 		Logger = new Logger();
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
@@ -52,7 +44,7 @@ internal class ConfigContext : IConfigContext
 	public void Initialize()
 	{
 		// Load the config context.
-		DoConfig doConfig = ConfigLoader.LoadConfigContext(_assembly);
+		DoConfig doConfig = ConfigLoader.LoadConfigContext();
 		doConfig(this);
 
 		// Initialize the managers.

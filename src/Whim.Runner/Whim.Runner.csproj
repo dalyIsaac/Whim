@@ -104,12 +104,6 @@
 	</ItemGroup>
 
 	<Target Name="CopyPluginsAfterBuild" AfterTargets="Build;Publish">
-		<!--Copy the Template folder from Whim-->
-		<ItemGroup>
-			<TemplateSourceFile Include="$(SolutionDir)\src\Whim\Template\**\*" />
-		</ItemGroup>
-		<Copy SourceFiles="@(TemplateSourceFile)" DestinationFolder="$(TargetDir)Template" />
-
 		<!--Whim.Bar-->
 		<ItemGroup>
 			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
