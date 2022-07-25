@@ -175,15 +175,15 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 
 	#region Phantom Windows
 	/// <summary>
-	/// Register a phantom window for the given <paramref name="workspace"/>.
+	/// Add a phantom window for the given <paramref name="workspace"/>.
 	/// </summary>
-	/// <param name="window">The phantom window to register.</param>
-	/// <param name="workspace">The workspace to register the window for.</param>
-	public void RegisterPhantomWindow(IWorkspace workspace, IWindow window);
+	/// <param name="window">The phantom window to add.</param>
+	/// <param name="workspace">The workspace to add the window for.</param>
+	public void AddPhantomWindow(IWorkspace workspace, IWindow window);
 
 	/// <summary>
-	/// Unregister the given phantom window.
+	/// Remove the given phantom window.
 	/// </summary>
-	public void UnregisterPhantomWindow(IWindow window);
+	public void RemovePhantomWindow(IWindow window);
 	#endregion
 }

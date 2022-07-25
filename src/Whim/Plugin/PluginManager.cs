@@ -30,7 +30,7 @@ internal class PluginManager : IPluginManager
 		}
 	}
 
-	public T RegisterPlugin<T>(T plugin) where T : IPlugin
+	public T AddPlugin<T>(T plugin) where T : IPlugin
 	{
 		_plugins.Add(plugin);
 		return plugin;

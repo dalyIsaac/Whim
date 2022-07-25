@@ -35,8 +35,8 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 
 		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
 
-		_configContext.WindowManager.WindowRegistered += WindowManager_EventSink;
-		_configContext.WindowManager.WindowUnregistered += WindowManager_EventSink;
+		_configContext.WindowManager.WindowAdded += WindowManager_EventSink;
+		_configContext.WindowManager.WindowRemoved += WindowManager_EventSink;
 		_configContext.WindowManager.WindowMoveStart += WindowManager_EventSink;
 		_configContext.WindowManager.WindowMoved += WindowManager_EventSink;
 		_configContext.WindowManager.WindowMinimizeStart += WindowManager_EventSink;
@@ -141,8 +141,8 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 			{
 				// dispose managed state (managed objects)
 				_configContext.WindowManager.WindowFocused -= WindowManager_WindowFocused;
-				_configContext.WindowManager.WindowRegistered -= WindowManager_EventSink;
-				_configContext.WindowManager.WindowUnregistered -= WindowManager_EventSink;
+				_configContext.WindowManager.WindowAdded -= WindowManager_EventSink;
+				_configContext.WindowManager.WindowRemoved -= WindowManager_EventSink;
 				_configContext.WindowManager.WindowMoveStart -= WindowManager_EventSink;
 				_configContext.WindowManager.WindowMoved -= WindowManager_EventSink;
 				_configContext.WindowManager.WindowMinimizeStart -= WindowManager_EventSink;

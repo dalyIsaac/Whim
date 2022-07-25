@@ -23,7 +23,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 
 	/// <summary>
-	/// All the phantom windows that are currently registered.
+	/// All the phantom windows that are currently added.
 	/// </summary>
 	private readonly HashSet<IWindow> _phantomWindows = new();
 
@@ -213,12 +213,12 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	#region Windows
 	/// <summary>
-	/// Called when a window has been registered by the <see cref="IWindowManager"/>.
+	/// Called when a window has been added by the <see cref="IWindowManager"/>.
 	/// </summary>
-	/// <param name="window">The window that was registered.</param>
-	internal void WindowRegistered(IWindow window)
+	/// <param name="window">The window that was added.</param>
+	internal void WindowAdded(IWindow window)
 	{
-		Logger.Debug($"Registering window {window}");
+		Logger.Debug($"Adding window {window}");
 		IWorkspace? workspace = _configContext.RouterManager.RouteWindow(window);
 
 		if (!_configContext.RouterManager.RouteToActiveWorkspace && workspace == null)
@@ -236,7 +236,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		_windowWorkspaceMap[window] = workspace;
 		workspace.AddWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
-		Logger.Debug($"Window {window} registered to workspace {workspace.Name}");
+		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
 	private IWorkspace? GetWorkspaceForWindowLocation(IWindow window)
@@ -251,12 +251,12 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 
 	/// <summary>
-	/// Called when a window has been registered by the <see cref="IWindowManager"/>.
+	/// Called when a window has been removed by the <see cref="IWindowManager"/>.
 	/// </summary>
-	/// <param name="window">The window that was registered.</param>
-	internal void WindowUnregistered(IWindow window)
+	/// <param name="window">The window that was removed.</param>
+	internal void WindowRemoved(IWindow window)
 	{
-		Logger.Debug($"Window unregistered: {window}");
+		Logger.Debug($"Window removed: {window}");
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
@@ -443,16 +443,16 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 
 	#region Phantom Windows
-	public void RegisterPhantomWindow(IWorkspace workspace, IWindow window)
+	public void AddPhantomWindow(IWorkspace workspace, IWindow window)
 	{
-		Logger.Debug($"Registering phantom window {window} to workspace {workspace}");
+		Logger.Debug($"Adding phantom window {window} to workspace {workspace}");
 		_phantomWindows.Add(window);
 		_windowWorkspaceMap[window] = workspace;
 	}
 
-	public void UnregisterPhantomWindow(IWindow window)
+	public void RemovePhantomWindow(IWindow window)
 	{
-		Logger.Debug($"Unregistering phantom window {window}");
+		Logger.Debug($"Removing phantom window {window}");
 		_phantomWindows.Remove(window);
 		_windowWorkspaceMap.Remove(window);
 	}

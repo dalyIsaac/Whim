@@ -140,20 +140,20 @@ public interface IWorkspace : IDisposable
 
 	#region Phantom Windows
 	/// <summary>
-	/// Register a phantom window. This can only be done by the active layout engine.
+	/// Add a phantom window. This can only be done by the active layout engine.
 	/// </summary>
-	/// <param name="engine">The layout engine to register the phantom window to.</param>
-	/// <param name="window">The phantom window to register.</param>
-	public void RegisterPhantomWindow(ILayoutEngine engine, IWindow window);
+	/// <param name="engine">The layout engine to add the phantom window to.</param>
+	/// <param name="window">The phantom window to add.</param>
+	public void AddPhantomWindow(ILayoutEngine engine, IWindow window);
 
 	/// <summary>
-	/// Unregister a phantom window. This can only be done by the active layout engine,
-	/// and the phantom window must be registered to the same layout engine.
+	/// Remove a phantom window. This can only be done by the active layout engine,
+	/// and the phantom window must have been added to the same layout engine.
 	/// </summary>
-	/// <param name="engine">The layout engine to unregister the phantom window from.</param>
-	/// <param name="window">The phantom window to unregister.</param>
-	/// <param name="doLayout">Indicates whether to do a layout after unregistering the phantom window.</param>
-	public void UnregisterPhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false);
+	/// <param name="engine">The layout engine to remove the phantom window from.</param>
+	/// <param name="window">The phantom window to remove.</param>
+	/// <param name="doLayout">Indicates whether to do a layout after removing the phantom window.</param>
+	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false);
 	#endregion
 
 	/// <summary>

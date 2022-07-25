@@ -16,13 +16,13 @@ public class RouteEventArgs : EventArgs
 
 	/// <summary>
 	/// The workspace that the window was routed from. If the window has just
-	/// been registered, this will be null.
+	/// been added, this will be null.
 	/// </summary>
 	public IWorkspace? PreviousWorkspace { get; }
 
 	/// <summary>
 	/// The workspace that the window was routed to. If the window has just
-	/// been unregistered, this will be null.
+	/// been removed, this will be null.
 	/// </summary>
 	public IWorkspace? CurrentWorkspace { get; }
 

@@ -208,7 +208,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		parent.Replace(phantomNode, windowNode);
 		phantomNode.Close();
 		_phantomWindows.Remove(phantomNode.Window);
-		_configContext.WorkspaceManager.ActiveWorkspace.UnregisterPhantomWindow(this, phantomNode.Window);
+		_configContext.WorkspaceManager.ActiveWorkspace.RemovePhantomWindow(this, phantomNode.Window);
 	}
 
 	/// <summary>
@@ -233,7 +233,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		if (removingNode is PhantomNode phantomNode)
 		{
 			_phantomWindows.Remove(phantomNode.Window);
-			_configContext.WorkspaceManager.ActiveWorkspace.UnregisterPhantomWindow(this, phantomNode.Window);
+			_configContext.WorkspaceManager.ActiveWorkspace.RemovePhantomWindow(this, phantomNode.Window);
 		}
 
 		// Remove the node from the tree.
@@ -607,7 +607,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		}
 
 		_phantomWindows.Add(phantomNode.Window);
-		_configContext.WorkspaceManager.ActiveWorkspace.RegisterPhantomWindow(this, phantomNode.Window);
+		_configContext.WorkspaceManager.ActiveWorkspace.AddPhantomWindow(this, phantomNode.Window);
 		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 		phantomNode.Focus();
 	}

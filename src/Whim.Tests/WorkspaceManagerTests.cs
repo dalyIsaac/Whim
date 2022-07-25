@@ -198,7 +198,7 @@ public class WorkspaceManagerTests
 
 		using WorkspaceManager workspaceManager = new(configContextMock.Object);
 
-		// Register the monitor in _monitorWorkspaceMap
+		// Add the monitor in _monitorWorkspaceMap
 		workspaceManager.Activate(new Mock<IWorkspace>().Object, monitorMock.Object);
 		workspaceManager.Activate(new Mock<IWorkspace>().Object, secondMonitorMock.Object);
 
