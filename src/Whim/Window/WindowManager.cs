@@ -11,9 +11,9 @@ internal class WindowManager : IWindowManager
 {
 	private readonly IConfigContext _configContext;
 
-	public event EventHandler<WindowEventArgs>? WindowRegistered;
+	public event EventHandler<WindowEventArgs>? WindowAdded;
 	public event EventHandler<WindowEventArgs>? WindowFocused;
-	public event EventHandler<WindowEventArgs>? WindowUnregistered;
+	public event EventHandler<WindowEventArgs>? WindowRemoved;
 	public event EventHandler<WindowEventArgs>? WindowMoveStart;
 	public event EventHandler<WindowEventArgs>? WindowMoved;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
@@ -25,9 +25,9 @@ internal class WindowManager : IWindowManager
 	private readonly Dictionary<HWND, IWindow> _windows = new();
 
 	/// <summary>
-	/// All the hooks registered with <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>.
+	/// All the hooks added with <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>.
 	/// </summary>
-	private readonly UnhookWinEventSafeHandle[] _registeredHooks = new UnhookWinEventSafeHandle[6];
+	private readonly UnhookWinEventSafeHandle[] _addedHooks = new UnhookWinEventSafeHandle[6];
 
 	/// <summary>
 	/// The delegate for handling all events triggered by <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>.
@@ -54,21 +54,21 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug("Initializing window manager...");
 
-		// Each of the following hooks register just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
-		_registeredHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_SHOW, _hookDelegate);
-		_registeredHooks[1] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);
-		_registeredHooks[2] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
-		_registeredHooks[3] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
-		_registeredHooks[4] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, _hookDelegate);
-		_registeredHooks[5] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, _hookDelegate);
+		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
+		_addedHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_SHOW, _hookDelegate);
+		_addedHooks[1] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);
+		_addedHooks[2] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
+		_addedHooks[3] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
+		_addedHooks[4] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, _hookDelegate);
+		_addedHooks[5] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, _hookDelegate);
 
 		// If any of the above hooks are invalid, we dispose the WindowManager instance and return false.
-		for (int i = 0; i < _registeredHooks.Length; i++)
+		for (int i = 0; i < _addedHooks.Length; i++)
 		{
-			if (_registeredHooks[i].IsInvalid)
+			if (_addedHooks[i].IsInvalid)
 			{
 				// Disposing is handled by the caller.
-				throw new InvalidOperationException($"Failed to register hook {i}");
+				throw new InvalidOperationException($"Failed to add hook {i}");
 			}
 		}
 	}
@@ -77,7 +77,7 @@ internal class WindowManager : IWindowManager
 	{
 		foreach (HWND hwnd in Win32Helper.GetAllWindows())
 		{
-			RegisterWindow(hwnd);
+			AddWindow(hwnd);
 		}
 	}
 
@@ -89,7 +89,7 @@ internal class WindowManager : IWindowManager
 			{
 				Logger.Debug("Disposing window manager");
 
-				foreach (UnhookWinEventSafeHandle? hook in _registeredHooks)
+				foreach (UnhookWinEventSafeHandle? hook in _addedHooks)
 				{
 					if (hook == null || hook.IsClosed || hook.IsInvalid)
 					{
@@ -161,8 +161,8 @@ internal class WindowManager : IWindowManager
 		// Try get the window
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			Logger.Verbose($"Window {hwnd.Value} is not registered, event type {eventType}");
-			window = RegisterWindow(hwnd);
+			Logger.Verbose($"Window {hwnd.Value} is not added, event type {eventType}");
+			window = AddWindow(hwnd);
 			if (window == null)
 			{
 				return;
@@ -178,7 +178,7 @@ internal class WindowManager : IWindowManager
 				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
-				OnWindowUnregistered(window);
+				OnWindowRemoved(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
 				OnWindowMoveStart(window);
@@ -202,12 +202,12 @@ internal class WindowManager : IWindowManager
 	}
 
 	/// <summary>
-	/// Register the given <see cref="HWND"/> as an <see cref="IWindow"/> inside this
+	/// Add the given <see cref="HWND"/> as an <see cref="IWindow"/> inside this
 	/// <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	private IWindow? RegisterWindow(HWND hwnd)
+	private IWindow? AddWindow(HWND hwnd)
 	{
 		if (Win32Helper.IsSplashScreen(hwnd)
 			|| Win32Helper.IsCloakedWindow(hwnd)
@@ -217,7 +217,7 @@ internal class WindowManager : IWindowManager
 			return null;
 		}
 
-		Logger.Debug($"Registering window {hwnd.Value}");
+		Logger.Debug($"Adding window {hwnd.Value}");
 
 		IWindow? window = IWindow.CreateWindow(hwnd, _configContext);
 
@@ -240,21 +240,21 @@ internal class WindowManager : IWindowManager
 		// Try add the window to the dictionary.
 		if (!_windows.TryAdd(hwnd, window))
 		{
-			Logger.Debug($"Failed to register {window}");
+			Logger.Debug($"Failed to add {window}");
 			return null;
 		}
 
-		Logger.Debug($"Registered {window}");
+		Logger.Debug($"Added {window}");
 
-		OnWindowRegistered(window);
+		OnWindowAdded(window);
 		return window;
 	}
 
-	private void OnWindowRegistered(IWindow window)
+	private void OnWindowAdded(IWindow window)
 	{
-		Logger.Debug($"Window registered: {window}");
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRegistered(window);
-		WindowRegistered?.Invoke(this, new WindowEventArgs(window));
+		Logger.Debug($"Window added: {window}");
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowAdded(window);
+		WindowAdded?.Invoke(this, new WindowEventArgs(window));
 	}
 
 	/// <summary>
@@ -270,12 +270,12 @@ internal class WindowManager : IWindowManager
 		WindowFocused?.Invoke(this, new WindowEventArgs(window));
 	}
 
-	private void OnWindowUnregistered(IWindow window)
+	private void OnWindowRemoved(IWindow window)
 	{
-		Logger.Debug($"Window unregistered: {window}");
+		Logger.Debug($"Window removed: {window}");
 		_windows.Remove(window.Handle);
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowUnregistered(window);
-		WindowUnregistered?.Invoke(this, new WindowEventArgs(window));
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRemoved(window);
+		WindowRemoved?.Invoke(this, new WindowEventArgs(window));
 	}
 
 	private void OnWindowMoveStart(IWindow window)

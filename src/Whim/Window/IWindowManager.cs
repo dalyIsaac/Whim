@@ -14,14 +14,14 @@ public interface IWindowManager : IDisposable
 	public void Initialize();
 
 	/// <summary>
-	/// Register the top-level windows.
+	/// Add the top-level windows.
 	/// </summary>
 	public void PostInitialize();
 
 	/// <summary>
-	/// Event for when a window is registered by the <see cref="IWindowManager"/>.
+	/// Event for when a window is added by the <see cref="IWindowManager"/>.
 	/// </summary>
-	public event EventHandler<WindowEventArgs>? WindowRegistered;
+	public event EventHandler<WindowEventArgs>? WindowAdded;
 
 	/// <summary>
 	/// Event for when a window is focused.
@@ -29,9 +29,9 @@ public interface IWindowManager : IDisposable
 	public event EventHandler<WindowEventArgs>? WindowFocused;
 
 	/// <summary>
-	/// Event for when a window is unregistered from Whim.
+	/// Event for when a window is removed from Whim.
 	/// </summary>
-	public event EventHandler<WindowEventArgs>? WindowUnregistered;
+	public event EventHandler<WindowEventArgs>? WindowRemoved;
 
 	/// <summary>
 	/// Event for when a window is being moved or resized.

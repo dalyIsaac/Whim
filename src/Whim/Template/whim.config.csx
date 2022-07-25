@@ -45,21 +45,21 @@ void DoConfig(IConfigContext configContext)
 
 	BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
 	BarPlugin barPlugin = new(configContext, barConfig);
-	configContext.PluginManager.RegisterPlugin(barPlugin);
+	configContext.PluginManager.AddPlugin(barPlugin);
 
 	// Floating window plugin.
 	FloatingLayoutPlugin floatingLayoutPlugin = new(configContext);
-	configContext.PluginManager.RegisterPlugin(floatingLayoutPlugin);
+	configContext.PluginManager.AddPlugin(floatingLayoutPlugin);
 
 	// Gap plugin.
 	GapsConfig gapsConfig = new(outerGap: 0, innerGap: 10);
 	GapsPlugin gapsPlugin = new(configContext, gapsConfig);
-	configContext.PluginManager.RegisterPlugin(gapsPlugin);
+	configContext.PluginManager.AddPlugin(gapsPlugin);
 
 	// Focus indicator.
 	FocusIndicatorConfig focusIndicatorConfig = new() { FadeEnabled = true };
 	FocusIndicatorPlugin focusIndicatorPlugin = new(configContext, focusIndicatorConfig);
-	configContext.PluginManager.RegisterPlugin(focusIndicatorPlugin);
+	configContext.PluginManager.AddPlugin(focusIndicatorPlugin);
 
 	// Load the commands and keybindings.
 	configContext.CommandManager.LoadCommands(DefaultCommands.GetCommands(configContext));
