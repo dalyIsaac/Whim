@@ -75,10 +75,15 @@ internal static class ConfigLoader
 	/// Creates a config based on the Whim template and saves it to the config file.
 	/// This will throw if any null values are encountered.
 	/// </summary>
-	/// <param name="assembly">The assembly from which to load.</param>
 	/// <exception cref="ConfigLoaderException"></exception>
-	private static void CreateConfig(Assembly assembly)
+	private static void CreateConfig()
 	{
+		Assembly? assembly = Assembly.GetAssembly(typeof(ConfigLoader));
+		if (assembly is null)
+		{
+			throw new ConfigLoaderException("Could not find assembly for ConfigLoader");
+		}
+
 		string template = assembly.ReadTemplateConfigFile();
 		string omnisharpJson = assembly.ReadFile("omnisharp.json");
 
@@ -90,10 +95,9 @@ internal static class ConfigLoader
 	/// <summary>
 	/// Acquires and evaluates the user's <see cref="IConfigContext"/>.
 	/// </summary>
-	/// <param name="assembly"></param>
 	/// <returns>The <see cref="IConfigContext"/>.</returns>
 	/// <exception cref="ConfigLoaderException"></exception>
-	internal static DoConfig LoadConfigContext(Assembly assembly)
+	internal static DoConfig LoadConfigContext()
 	{
 		// Ensure the Whim directory exists.
 		FileHelper.EnsureWhimDirExists();
@@ -102,7 +106,7 @@ internal static class ConfigLoader
 		bool configExists = DoesConfigExist();
 		if (!configExists)
 		{
-			CreateConfig(assembly);
+			CreateConfig();
 		}
 
 		string rawConfig = LoadRawConfig();

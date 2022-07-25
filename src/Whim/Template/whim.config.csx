@@ -1,6 +1,7 @@
 #nullable enable
 #r "WHIM_PATH\whim.dll"
 #r "WHIM_PATH\plugins\Whim.Bar\Whim.Bar.dll"
+#r "WHIM_PATH\plugins\Whim.CommandPalette\Whim.CommandPalette.dll"
 #r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
 #r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
 #r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
@@ -11,10 +12,12 @@ using System;
 using System.Collections.Generic;
 using Whim;
 using Whim.Bar;
+using Whim.CommandPalette;
 using Whim.FloatingLayout;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.TreeLayout;
+using Whim.TreeLayout.Bar;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 /// <summary>
@@ -23,7 +26,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 /// <param name="configContext"></param>
 /// <param name="name"></param>
 /// <returns></returns>
-IWorkspace CreateWorkspace(IConfigContext configContext, string name) =>
+IWorkspace CreateWorkspace(IConfigContext configContext, string name)
 {
 	return IWorkspace.CreateWorkspace(
 		configContext,
@@ -63,7 +66,7 @@ void DoConfig(IConfigContext configContext)
 	configContext.PluginManager.AddPlugin(floatingLayoutPlugin);
 
 	// Gap plugin.
-	GapsConfig gapsConfig = new(outerGap: 0, innerGap: 10);
+	GapsConfig gapsConfig = new() { OuterGap = 0, InnerGap = 10 };
 	GapsPlugin gapsPlugin = new(configContext, gapsConfig);
 	configContext.PluginManager.AddPlugin(gapsPlugin);
 
@@ -75,7 +78,7 @@ void DoConfig(IConfigContext configContext)
 	// Command palette.
 	CommandPaletteConfig commandPaletteConfig = new();
 	CommandPalettePlugin commandPalettePlugin = new(configContext, commandPaletteConfig);
-	configContext.PluginManager.RegisterPlugin(commandPalettePlugin);
+	configContext.PluginManager.AddPlugin(commandPalettePlugin);
 
 	// Load the commands and keybindings.
 	configContext.CommandManager.LoadCommands(DefaultCommands.GetCommands(configContext));
