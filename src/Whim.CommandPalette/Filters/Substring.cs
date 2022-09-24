@@ -48,8 +48,9 @@ public static partial class Filters
 			PaletteFilterMatch[]? result = MatchesSubStringRecurse(word, wordToMatchAgainst, wordStart + 1, wordMatchStart + 1);
 			if (result is not null)
 			{
-				return Filters.Join(new PaletteFilterMatch(wordMatchStart, wordMatchStart + 1), result);
+				return Join(new PaletteFilterMatch(wordMatchStart, wordMatchStart + 1), result);
 			}
+			return null;
 		}
 
 		return MatchesSubStringRecurse(word, wordToMatchAgainst, wordStart, wordMatchStart + 1);
