@@ -10,7 +10,7 @@ namespace Whim;
 /// </summary>
 internal class CommandItems : ICommandItems
 {
-	private readonly KeybindsMap _keybindsMap = new();
+	private readonly KeybindCommandMap _keybindsMap = new();
 	private readonly Dictionary<string, ICommand> _identifierCommandMap = new();
 
 	public void Add(ICommand command, IKeybind? keybind = null)
@@ -33,15 +33,15 @@ internal class CommandItems : ICommandItems
 		_identifierCommandMap[command.Identifier] = command;
 	}
 
-	public bool SetKeybind(string identifier, IKeybind keybind)
+	public bool Add(string commandIdentifier, IKeybind keybind)
 	{
-		Logger.Debug($"Setting keybind {keybind} for command {identifier}");
+		Logger.Debug($"Setting keybind {keybind} for command {commandIdentifier}");
 
 		// Get the command.
-		ICommand? command = TryGetCommand(identifier);
+		ICommand? command = TryGetCommand(commandIdentifier);
 		if (command == null)
 		{
-			Logger.Error($"Command {identifier} does not exist");
+			Logger.Error($"Command {commandIdentifier} does not exist");
 			return false;
 		}
 
@@ -55,32 +55,38 @@ internal class CommandItems : ICommandItems
 		return _keybindsMap.Remove(keybind);
 	}
 
-	public bool RemoveKeybind(string identifier)
+	public bool RemoveKeybind(string commandIdentifier)
 	{
-		Logger.Debug($"Removing keybind for command {identifier}");
-		return _keybindsMap.Remove(identifier);
+		Logger.Debug($"Removing keybind for command {commandIdentifier}");
+		return _keybindsMap.Remove(commandIdentifier);
 	}
 
-	public bool Remove(string identifier)
+	public bool RemoveCommand(string commandIdentifier)
 	{
-		Logger.Debug($"Removing command \"{identifier}\"");
+		Logger.Debug($"Removing command \"{commandIdentifier}\"");
 
-		ICommand? command = TryGetCommand(identifier);
+		ICommand? command = TryGetCommand(commandIdentifier);
 		if (command == null)
 		{
-			Logger.Error($"Command \"{identifier}\" does not exist");
+			Logger.Error($"Command \"{commandIdentifier}\" does not exist");
 			return false;
 		}
 
 		// Get the keybind that is bound to the command.
-		IKeybind? keybind = TryGetKeybind(identifier);
+		IKeybind? keybind = TryGetKeybind(commandIdentifier);
 
 		if (keybind != null)
 		{
 			_keybindsMap.Remove(keybind);
 		}
 
-		return _identifierCommandMap.Remove(identifier);
+		return _identifierCommandMap.Remove(commandIdentifier);
+	}
+
+	public bool RemoveCommand(ICommand command)
+	{
+		Logger.Debug($"Removing command {command}");
+		return RemoveCommand(command.Identifier);
 	}
 
 	public void Clear()
@@ -96,23 +102,29 @@ internal class CommandItems : ICommandItems
 		_keybindsMap.Clear();
 	}
 
-	public ICommand? TryGetCommand(string identifier)
+	public ICommand? TryGetCommand(string commandIdentifier)
 	{
-		Logger.Debug($"Trying to get command \"{identifier}\"");
-		return _identifierCommandMap.TryGetValue(identifier, out ICommand? command) ? command : null;
+		Logger.Debug($"Trying to get command \"{commandIdentifier}\"");
+		return _identifierCommandMap.TryGetValue(commandIdentifier, out ICommand? command) ? command : null;
 	}
 
 	public ICommand? TryGetCommand(IKeybind keybind)
 	{
 		Logger.Debug($"Trying to get command bound to keybind {keybind}");
-		string? identifier = _keybindsMap.TryGetIdentifier(keybind);
-		return identifier != null ? TryGetCommand(identifier) : null;
+		string? commandIdentifier = _keybindsMap.TryGetIdentifier(keybind);
+		return commandIdentifier != null ? TryGetCommand(commandIdentifier) : null;
 	}
 
-	public IKeybind? TryGetKeybind(string identifier)
+	public IKeybind? TryGetKeybind(string commandIdentifier)
 	{
-		Logger.Debug($"Trying to get keybind for command \"{identifier}\"");
-		return _keybindsMap.TryGetKeybind(identifier);
+		Logger.Debug($"Trying to get keybind for command \"{commandIdentifier}\"");
+		return _keybindsMap.TryGetKeybind(commandIdentifier);
+	}
+
+	public IKeybind? TryGetKeybind(ICommand command)
+	{
+		Logger.Debug($"Trying to get keybind for command {command}");
+		return TryGetKeybind(command.Identifier);
 	}
 
 	public IEnumerator<(ICommand, IKeybind?)> GetEnumerator()
@@ -120,10 +132,10 @@ internal class CommandItems : ICommandItems
 		HashSet<string> processedIdentifiers = new();
 
 		// Iterate over each of the keybinds and associated commands.
-		foreach ((IKeybind keybind, string identifier) in _keybindsMap)
+		foreach ((IKeybind keybind, string commandIdentifier) in _keybindsMap)
 		{
-			yield return (TryGetCommand(identifier)!, keybind);
-			processedIdentifiers.Add(identifier);
+			yield return (TryGetCommand(commandIdentifier)!, keybind);
+			processedIdentifiers.Add(commandIdentifier);
 		}
 
 		// Iterate over each of the commands without an associated keybind.

@@ -51,7 +51,7 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	{
 		_commandPaletteWindow?.Activate(
 			items,
-			_configContext.MonitorManager.FocusedMonitor
+			monitor: _configContext.MonitorManager.FocusedMonitor
 		);
 	}
 

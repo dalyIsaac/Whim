@@ -4,12 +4,12 @@ using Xunit;
 
 namespace Whim.Tests;
 
-public class KeybindsMapTests
+public class KeybindCommandMapTests
 {
 	[Fact]
 	public void AddSingleCommand()
 	{
-		KeybindsMap keybindsMap = new();
+		KeybindCommandMap keybindsMap = new();
 
 		string identifier = "command";
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
@@ -23,7 +23,7 @@ public class KeybindsMapTests
 	[Fact]
 	public void AddOverwriteCommand()
 	{
-		KeybindsMap keybindsMap = new();
+		KeybindCommandMap keybindsMap = new();
 
 		string identifier = "command";
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
@@ -45,7 +45,7 @@ public class KeybindsMapTests
 	[Fact]
 	public void AddTwoCommandsWithSameIdentifier()
 	{
-		KeybindsMap keybindsMap = new();
+		KeybindCommandMap keybindsMap = new();
 
 		string identifier = "command";
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
@@ -65,7 +65,7 @@ public class KeybindsMapTests
 	[Fact]
 	public void RemoveKeybind()
 	{
-		KeybindsMap keybindsMap = new();
+		KeybindCommandMap keybindsMap = new();
 
 		string identifier = "command";
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
@@ -81,7 +81,7 @@ public class KeybindsMapTests
 	[Fact]
 	public void RemoveIdentifier()
 	{
-		KeybindsMap keybindsMap = new();
+		KeybindCommandMap keybindsMap = new();
 
 		string identifier = "command";
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
@@ -97,7 +97,7 @@ public class KeybindsMapTests
 	[Fact]
 	public void Clear()
 	{
-		KeybindsMap keybindsMap = new();
+		KeybindCommandMap keybindsMap = new();
 
 		string identifier = "command";
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
@@ -112,7 +112,7 @@ public class KeybindsMapTests
 	[Fact]
 	public void Enumerator()
 	{
-		KeybindsMap keybindsMap = new();
+		KeybindCommandMap keybindsMap = new();
 
 		string identifier = "command";
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);

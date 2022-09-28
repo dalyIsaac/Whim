@@ -7,14 +7,18 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-internal class KeybindManager : IKeybindManager
+/// <summary>
+/// Responsible is responsible for hooking into windows and handling keybinds.
+/// This is used as part of <see cref="CommandManager"/>.
+/// </summary>
+internal class KeybindHook
 {
 	private readonly ICommandItems _commandItems;
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
-	public KeybindManager(ICommandItems commandItems)
+	public KeybindHook(ICommandItems commandItems)
 	{
 		_commandItems = commandItems;
 		_keyboardHook = KeyboardHook;
