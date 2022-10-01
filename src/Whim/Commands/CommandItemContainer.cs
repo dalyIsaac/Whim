@@ -8,7 +8,7 @@ namespace Whim;
 /// CommandItems is responsible for storing and managing all the commands for the
 /// <see cref="CommandManager"/>.
 /// </summary>
-internal class CommandItems : ICommandItems
+internal class CommandItemContainer : ICommandItemContainer
 {
 	private readonly KeybindCommandMap _keybindsMap = new();
 	private readonly Dictionary<string, ICommand> _identifierCommandMap = new();
@@ -127,14 +127,14 @@ internal class CommandItems : ICommandItems
 		return TryGetKeybind(command.Identifier);
 	}
 
-	public IEnumerator<(ICommand, IKeybind?)> GetEnumerator()
+	public IEnumerator<CommandItem> GetEnumerator()
 	{
 		HashSet<string> processedIdentifiers = new();
 
 		// Iterate over each of the keybinds and associated commands.
 		foreach ((IKeybind keybind, string commandIdentifier) in _keybindsMap)
 		{
-			yield return (TryGetCommand(commandIdentifier)!, keybind);
+			yield return new CommandItem(TryGetCommand(commandIdentifier)!, keybind);
 			processedIdentifiers.Add(commandIdentifier);
 		}
 
@@ -143,7 +143,7 @@ internal class CommandItems : ICommandItems
 		{
 			if (!processedIdentifiers.Contains(pair.Key))
 			{
-				yield return (pair.Value, null);
+				yield return new CommandItem(pair.Value, null);
 			}
 		}
 	}

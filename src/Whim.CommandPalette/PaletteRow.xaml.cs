@@ -73,20 +73,8 @@ internal sealed partial class PaletteRow : UserControl
 
 	private void SetKeybinds()
 	{
-		Logger.Debug("Setting keybinds");
+		Logger.Debug("Setting keybinds visibility");
 
-		if (Model.PaletteItem.Keys != null)
-		{
-			string keys = Model.PaletteItem.Keys;
-			if (CommandKeybind.Text != keys)
-			{
-				CommandKeybind.Text = keys;
-				CommandKeybindBorder.Visibility = Visibility.Visible;
-			}
-		}
-		else if (CommandKeybindBorder.Visibility != Visibility.Collapsed)
-		{
-			CommandKeybindBorder.Visibility = Visibility.Collapsed;
-		}
+		//CommandKeybind.Visibility = Model.CommandItem.Keybind is null ? Visibility.Collapsed : Visibility.Visible;
 	}
 }

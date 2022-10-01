@@ -13,12 +13,12 @@ namespace Whim;
 /// </summary>
 internal class KeybindHook
 {
-	private readonly ICommandItems _commandItems;
+	private readonly ICommandItemContainer _commandItems;
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
-	public KeybindHook(ICommandItems commandItems)
+	public KeybindHook(ICommandItemContainer commandItems)
 	{
 		_commandItems = commandItems;
 		_keyboardHook = KeyboardHook;

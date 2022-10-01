@@ -1,6 +1,7 @@
 ﻿using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;
 
@@ -14,7 +15,7 @@ public class CommandItemsTests
 	[Fact]
 	public void AddCommand()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 
 		Mock<ICommand> command = new();
 		command.Setup(c => c.Identifier).Returns("command");
@@ -30,7 +31,7 @@ public class CommandItemsTests
 	[Fact]
 	public void AddCommandWithKeybind()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 
 		Mock<ICommand> command = new();
 		command.Setup(c => c.Identifier).Returns("command");
@@ -48,7 +49,7 @@ public class CommandItemsTests
 	[Fact]
 	public void AddTwoCommandsWithSameIdentifier()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 
 		Mock<ICommand> command = new();
 		command.Setup(c => c.Identifier).Returns("command");
@@ -66,7 +67,7 @@ public class CommandItemsTests
 	[Fact]
 	public void OverrideKeybind()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
 		// Set up the first command.
@@ -95,7 +96,7 @@ public class CommandItemsTests
 	[Fact]
 	public void AddToNonExistentCommand()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
 		Assert.False(commandItems.Add("command", keybind));
@@ -107,7 +108,7 @@ public class CommandItemsTests
 	[Fact]
 	public void AddToExistingCommand()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
 		// Set up the first command.
@@ -140,7 +141,7 @@ public class CommandItemsTests
 	[Fact]
 	public void RemoveKeybind()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
 		// Set up the command.
@@ -165,7 +166,7 @@ public class CommandItemsTests
 	[Fact]
 	public void RemoveKeybindGivenCommand()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
 		// Set up the command.
@@ -190,7 +191,7 @@ public class CommandItemsTests
 	[Fact]
 	public void RemoveBoundCommand()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
 		// Set up the command.
@@ -215,7 +216,7 @@ public class CommandItemsTests
 	[Fact]
 	public void RemoveUnboundCommand()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 
 		// Set up the command.
 		Mock<ICommand> command = new();
@@ -234,7 +235,7 @@ public class CommandItemsTests
 	[Fact]
 	public void Clear()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
 		// Set up the command.
@@ -259,7 +260,7 @@ public class CommandItemsTests
 	[Fact]
 	public void ClearKeybinds()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
 		// Set up the command.
@@ -284,7 +285,7 @@ public class CommandItemsTests
 	[Fact]
 	public void Enumerator()
 	{
-		CommandItems commandItems = new();
+		CommandItemContainer commandItems = new();
 
 		// Set up the first command.
 		Mock<ICommand> command = new();
@@ -311,23 +312,16 @@ public class CommandItemsTests
 		commandItems.Add(command4.Object, keybind4);
 
 		// Iterate over the commands.
-		IEnumerator<(ICommand, IKeybind?)> commands = commandItems.GetEnumerator();
-
-		// Convert the IEnumerator to a List.
-		List<(ICommand, IKeybind?)> commandsList = new();
-		while (commands.MoveNext())
-		{
-			commandsList.Add(commands.Current);
-		}
+		List<CommandItem> commands = commandItems.ToList();
 
 		// Check there's the right number of commands.
-		Assert.Equal(4, commandsList.Count);
+		Assert.Equal(4, commands.Count);
 
 		// Check that each of the command-keybind pairs are in the list.
-		Assert.Contains((command.Object, keybind), commandsList);
-		Assert.Contains((command2.Object, null), commandsList);
-		Assert.Contains((command3.Object, null), commandsList);
-		Assert.Contains((command4.Object, keybind4), commandsList);
+		Assert.Contains(new CommandItem(command.Object, keybind), commands);
+		Assert.Contains(new CommandItem(command2.Object, null), commands);
+		Assert.Contains(new CommandItem(command3.Object, null), commands);
+		Assert.Contains(new CommandItem(command4.Object, keybind4), commands);
 
 	}
 }

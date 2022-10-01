@@ -6,13 +6,13 @@ namespace Whim;
 
 internal class CommandManager : ICommandManager
 {
-	private readonly ICommandItems _commandItems;
+	private readonly ICommandItemContainer _commandItems;
 	private readonly KeybindHook _keybindHook;
 	private bool _disposedValue;
 
 	public CommandManager()
 	{
-		_commandItems = new CommandItems();
+		_commandItems = new CommandItemContainer();
 		_keybindHook = new KeybindHook(_commandItems);
 	}
 
@@ -59,10 +59,10 @@ internal class CommandManager : ICommandManager
 		GC.SuppressFinalize(this);
 	}
 
-	public IEnumerator<(ICommand, IKeybind?)> GetEnumerator() => _commandItems.GetEnumerator();
+	public IEnumerator<CommandItem> GetEnumerator() => _commandItems.GetEnumerator();
 	IEnumerator IEnumerable.GetEnumerator() => _commandItems.GetEnumerator();
 
-	public void LoadCommands(IEnumerable<(ICommand, IKeybind?)> commands)
+	public void LoadCommands(IEnumerable<CommandItem> commands)
 	{
 		foreach ((ICommand command, IKeybind? keybind) in commands)
 		{

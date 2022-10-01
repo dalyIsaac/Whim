@@ -5,18 +5,23 @@ using System.Runtime.CompilerServices;
 namespace Whim.CommandPalette;
 
 /// <summary>
-/// A matcher is used by the command palette to find commands that match a given input.
+/// MostRecentlyUsedMatcher will return matches in the order of most recently used.
 /// </summary>
-public class Matcher
+public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 {
 	private static readonly PalettePayloadComparer _sorter = new();
 
 	private readonly Dictionary<string, uint> _commandLastExecutionTime = new();
 
 	/// <summary>
+	/// The filter to use when matching commands.
+	/// </summary>
+	public PaletteFilter Filter { get; set; } = PaletteFilters.MatchesFuzzyContiguous;
+
+	/// <summary>
 	/// Matcher returns an ordered list of filtered matches for the <paramref name="query"/>.
 	/// </summary>
-	public ICollection<PaletteRowItem> Match(string query, ICollection<PaletteItem> items)
+	public ICollection<PaletteRowItem> Match(string query, ICollection<CommandItem> items)
 	{
 		PalettePayload[] matches = new PalettePayload[items.Count];
 		int matchCount = GetFilteredItems(query, items, matches);
@@ -43,16 +48,16 @@ public class Matcher
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private int GetFilteredItems(
 		string query,
-		ICollection<PaletteItem> items,
+		ICollection<CommandItem> items,
 		PalettePayload[] matches
 	)
 	{
 		int matchCount = 0;
 
 		// Get the matches for the query.
-		foreach (PaletteItem item in items)
+		foreach (CommandItem item in items)
 		{
-			PaletteFilterMatch[]? filterMatches = Filters.MatchesFuzzyContiguous(query, item.Command.Title);
+			PaletteFilterMatch[]? filterMatches = Filter(query, item.Command.Title);
 			if (filterMatches == null)
 			{
 				continue;
@@ -67,13 +72,13 @@ public class Matcher
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private int GetMostRecentlyUsedItems(
-		ICollection<PaletteItem> items,
+		ICollection<CommandItem> items,
 		PalettePayload[] matches
 	)
 	{
 		int matchCount = 0;
 
-		foreach (PaletteItem item in items)
+		foreach (CommandItem item in items)
 		{
 			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
 			matches[matchCount++] = new PalettePayload(item, Array.Empty<PaletteFilterMatch>(), count);
@@ -86,7 +91,7 @@ public class Matcher
 	/// Called when a match has been executed. This is used by the <see cref="ICommandPaletteMatcher"/>
 	/// implementation to update relevant internal state.
 	/// </summary>
-	public void OnMatchExecuted(PaletteItem match)
+	public void OnMatchExecuted(CommandItem match)
 	{
 		string id = match.Command.Identifier;
 		_commandLastExecutionTime[id] = (uint)DateTime.Now.Ticks;

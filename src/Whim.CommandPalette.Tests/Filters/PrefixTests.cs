@@ -12,7 +12,7 @@ public class PrefixTests
 	public void MatchesStrictPrefix_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
 		PaletteFilterMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
-		FilterTestUtils.FilterOk(Filters.MatchesStrictPrefix, word, wordToMatchAgainst, expectedMatches);
+		FilterTestUtils.FilterOk(PaletteFilters.MatchesStrictPrefix, word, wordToMatchAgainst, expectedMatches);
 	}
 
 	[InlineData("", "")]
@@ -23,7 +23,7 @@ public class PrefixTests
 	[Theory]
 	public void MatchesStrictPrefix_NotOk(string word, string wordToMatchAgainst)
 	{
-		FilterTestUtils.FilterNotOk(Filters.MatchesStrictPrefix, word, wordToMatchAgainst);
+		FilterTestUtils.FilterNotOk(PaletteFilters.MatchesStrictPrefix, word, wordToMatchAgainst);
 	}
 
 	[InlineData("alpha", "alpha", new int[] { 0, 5 })]
@@ -36,7 +36,7 @@ public class PrefixTests
 	public void MatchesPrefix_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
 		PaletteFilterMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
-		FilterTestUtils.FilterOk(Filters.MatchesPrefix, word, wordToMatchAgainst, expectedMatches);
+		FilterTestUtils.FilterOk(PaletteFilters.MatchesPrefix, word, wordToMatchAgainst, expectedMatches);
 	}
 
 	[InlineData("alpha", "alp")]
@@ -45,6 +45,6 @@ public class PrefixTests
 	[Theory]
 	public void MatchesPrefix_NotOk(string word, string wordToMatchAgainst)
 	{
-		FilterTestUtils.FilterNotOk(Filters.MatchesPrefix, word, wordToMatchAgainst);
+		FilterTestUtils.FilterNotOk(PaletteFilters.MatchesPrefix, word, wordToMatchAgainst);
 	}
 }

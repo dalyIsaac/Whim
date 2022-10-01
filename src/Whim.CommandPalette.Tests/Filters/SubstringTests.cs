@@ -9,7 +9,7 @@ public class SubstringTests
 	public void MatchesContiguousSubString_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
 		PaletteFilterMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
-		FilterTestUtils.FilterOk(Filters.MatchesContiguousSubString, word, wordToMatchAgainst, expectedMatches);
+		FilterTestUtils.FilterOk(PaletteFilters.MatchesContiguousSubString, word, wordToMatchAgainst, expectedMatches);
 	}
 
 	[InlineData("cmm", "cancelAnimationFrame()", new int[] { 0, 1 }, new int[] { 9, 10 }, new int[] { 18, 19 })]
@@ -19,13 +19,13 @@ public class SubstringTests
 	public void MatchesSubString_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
 		PaletteFilterMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
-		FilterTestUtils.FilterOk(Filters.MatchesSubString, word, wordToMatchAgainst, expectedMatches);
+		FilterTestUtils.FilterOk(PaletteFilters.MatchesSubString, word, wordToMatchAgainst, expectedMatches);
 	}
 
 	[InlineData("aaaaaaaaaaaaaaaaaaaax", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
 	[Theory]
 	public void MatchesSubString_NotOk(string word, string wordToMatchAgainst)
 	{
-		FilterTestUtils.FilterNotOk(Filters.MatchesSubString, word, wordToMatchAgainst);
+		FilterTestUtils.FilterNotOk(PaletteFilters.MatchesSubString, word, wordToMatchAgainst);
 	}
 }

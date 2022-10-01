@@ -5,7 +5,7 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// Utilities for palette filters.
 /// </summary>
-public static partial class Filters
+public static partial class PaletteFilters
 {
 	/// <summary>
 	/// Returns a filter which returns the matches for the first filter which returns a

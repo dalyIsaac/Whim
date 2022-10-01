@@ -2,7 +2,7 @@ using System;
 
 namespace Whim.CommandPalette;
 
-public static partial class Filters
+public static partial class PaletteFilters
 {
 	/// <summary>
 	/// Returns the match of the word, where the word is a contiguous substring of the wordToMatchAgainst.

@@ -46,11 +46,17 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	/// <summary>
 	/// Activate the command palette window.
 	/// </summary>
-	/// <param name="items"></param>
-	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null)
+	/// <param name="activatePayload">The configuration for activation.</param>
+	/// <param name="items">
+	/// The items to activate the command palette with. These items will be passed to the
+	/// <see cref="ICommandPaletteMatcher"/> to filter the results.
+	/// When the text is empty, typically all items are shown.
+	/// </param>
+	public void Activate(CommandPaletteActivationConfig? activatePayload = null, IEnumerable<CommandItem>? items = null)
 	{
 		_commandPaletteWindow?.Activate(
-			items,
+			activatePayload: activatePayload ?? Config.ActivationConfig,
+			items: items ?? _configContext.CommandManager,
 			monitor: _configContext.MonitorManager.FocusedMonitor
 		);
 	}
@@ -97,10 +103,10 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	}
 
 	/// <inheritdoc />
-	public (ICommand, IKeybind?)[] GetCommands() => new (ICommand, IKeybind?)[]
+	public CommandItem[] GetCommands() => new CommandItem[]
 	{
 		// Toggle command palette
-		(
+		new CommandItem(
 			new Command(
 				identifier: "command_palette.toggle",
 				title: "Toggle command palette",

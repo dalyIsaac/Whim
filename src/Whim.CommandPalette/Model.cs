@@ -35,43 +35,13 @@ public record HighlightedText
 	public IList<HighlightedTextSegment> Segments { get; } = new List<HighlightedTextSegment>();
 }
 
-/// <summary>
-/// A command and associated keybind.
-/// </summary>
-public class PaletteItem
-{
-	/// <summary>
-	/// The command to execute.
-	/// </summary>
-	public ICommand Command { get; }
-
-	/// <summary>
-	/// The keybind to execute the command.
-	/// </summary>
-	public string? Keys { get; }
-
-	/// <summary>
-	/// Creates a new match from the given command and keybind.
-	/// </summary>
-	/// <param name="command"></param>
-	/// <param name="keybind"></param>
-	public PaletteItem(ICommand command, IKeybind? keybind = null)
-	{
-		Command = command;
-		Keys = keybind?.ToString();
-	}
-
-	/// <inheritdoc />
-	public override int GetHashCode() => Command.GetHashCode();
-}
-
 internal record PalettePayload
 {
-	public PaletteItem Item { get; }
+	public CommandItem Item { get; }
 	public PaletteFilterMatch[] Matches { get; }
 	public uint LastUsedTime { get; }
 
-	public PalettePayload(PaletteItem item, PaletteFilterMatch[] matches, uint lastUsedTime)
+	public PalettePayload(CommandItem item, PaletteFilterMatch[] matches, uint lastUsedTime)
 	{
 		Item = item;
 		Matches = matches;
@@ -139,6 +109,40 @@ internal class PalettePayloadComparer : IComparer<PalettePayload>
 /// An item stored in the command palette, consisting of a match and associated highlighted title
 /// text.
 /// </summary>
-/// <param name="PaletteItem"></param>
+/// <param name="CommandItem"></param>
 /// <param name="Title"></param>
-public record PaletteRowItem(PaletteItem PaletteItem, HighlightedText Title);
+public record PaletteRowItem(CommandItem CommandItem, HighlightedText Title);
+
+/// <summary>
+/// Config for activating the command palette.
+/// </summary>
+public class CommandPaletteActivationConfig
+{
+	/// <summary>
+	/// The matcher to use to filter the results.
+	/// </summary>
+	public ICommandPaletteMatcher Matcher { get; set; }
+
+	/// <summary>
+	/// Text hint to show in the command palette.
+	/// </summary>
+	public string? Hint { get; set; }
+
+	/// <summary>
+	/// The text to pre-fill the command palette with.
+	/// </summary>
+	public string? InitialText { get; set; }
+
+	/// <summary>
+	/// Creates a new <see cref="CommandPaletteActivationConfig"/>.
+	/// </summary>
+	/// <param name="matcher"></param>
+	/// <param name="hint"></param>
+	/// <param name="initialText"></param>
+	public CommandPaletteActivationConfig(ICommandPaletteMatcher? matcher = null, string? hint = null, string? initialText = null)
+	{
+		Matcher = matcher ?? new MostRecentlyUsedMatcher();
+		Hint = hint;
+		InitialText = initialText;
+	}
+}

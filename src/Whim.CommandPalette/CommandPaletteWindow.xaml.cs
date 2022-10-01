@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Whim.CommandPalette;
 
@@ -20,7 +21,9 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="ListViewItems"/> are drawn.
 	/// </summary>
-	private readonly List<PaletteItem> _allCommands = new();
+	private readonly List<CommandItem> _allCommands = new();
+
+	private CommandPaletteActivationConfig _activationConfig;
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
@@ -32,18 +35,22 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		ListViewItems.ItemsSource = _paletteRows;
 
 		// Populate the commands to reduce the first render time.
-		Populate();
+		Populate(_plugin.Config.ActivationConfig, _configContext.CommandManager);
 		UpdateMatches();
 	}
 
 	/// <summary>
 	/// Populate <see cref="_allCommands"/> with all the current commands.
 	/// </summary>
-	private void Populate(IEnumerable<(ICommand, IKeybind?)>? items = null)
+	[MemberNotNull(nameof(_activationConfig))]
+	private void Populate(CommandPaletteActivationConfig activatePayload, IEnumerable<CommandItem> items)
 	{
 		Logger.Debug($"Populating the current list of all commands.");
+
+		_activationConfig = activatePayload;
+
 		int idx = 0;
-		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
+		foreach ((ICommand command, IKeybind? keybind) in items)
 		{
 			if (!command.CanExecute())
 			{
@@ -54,12 +61,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			{
 				if (_allCommands[idx].Command != command)
 				{
-					_allCommands[idx] = new PaletteItem(command, keybind);
+					_allCommands[idx] = new CommandItem(command, keybind);
 				}
 			}
 			else
 			{
-				_allCommands.Add(new PaletteItem(command, keybind));
+				_allCommands.Add(new CommandItem(command, keybind));
 			}
 
 			idx++;
@@ -74,13 +81,14 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// <summary>
 	/// Activate the command palette.
 	/// </summary>
+	/// <param name="activatePayload">The configuration for activation.</param>
 	/// <param name="items">
-	/// The items to activate the command palette with.
-	/// These items will be passed to the <see cref="ICommandPaletteMatcher"/> to determine the matches.
-	/// For example, when the query is empty, typically all items will be matched and be displayed.
+	/// The items to activate the command palette with. These items will be passed to the
+	/// <see cref="ICommandPaletteMatcher"/> to filter the results.
+	/// When the text is empty, typically all items are shown.
 	/// </param>
 	/// <param name="monitor">The monitor to display the command palette on.</param>
-	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
+	public void Activate(CommandPaletteActivationConfig activatePayload, IEnumerable<CommandItem> items, IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating command palette");
 
@@ -92,7 +100,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_monitor = monitor;
 		TextEntry.Text = "";
 
-		Populate(items);
+		Populate(activatePayload, items);
 		UpdateMatches();
 
 		int width = 680;
@@ -105,7 +113,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			height: height
 		);
 
-		base.Activate();
+		Activate();
 		TextEntry.Focus(FocusState.Programmatic);
 		WindowDeferPosHandle.SetWindowPos(
 			new WindowState(_window, windowLocation, WindowSize.Normal),
@@ -193,9 +201,9 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		foreach (PaletteRowItem item in _plugin.Config.Matcher.Match(query, _allCommands))
+		foreach (PaletteRowItem item in _activationConfig.Matcher.Match(query, _allCommands))
 		{
-			Logger.Verbose($"Matched {item.PaletteItem.Command.Title}");
+			Logger.Verbose($"Matched {item.CommandItem.Command.Title}");
 			if (idx < _paletteRows.Count)
 			{
 				// Update the existing row.
@@ -220,7 +228,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			}
 			idx++;
 
-			Logger.Verbose($"Finished updating {item.PaletteItem.Command.Title}");
+			Logger.Verbose($"Finished updating {item.CommandItem.Command.Title}");
 		}
 
 		// If there are more items than we have space for, remove the last ones.
@@ -251,10 +259,10 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			Hide();
 		}
 
-		PaletteItem match = _paletteRows[ListViewItems.SelectedIndex].Model.PaletteItem;
+		CommandItem match = _paletteRows[ListViewItems.SelectedIndex].Model.CommandItem;
 
 		match.Command.TryExecute();
-		_plugin.Config.Matcher.OnMatchExecuted(match);
+		_activationConfig.Matcher.OnMatchExecuted(match);
 		Hide();
 	}
 }

@@ -2,7 +2,7 @@ using System;
 
 namespace Whim.CommandPalette;
 
-public static partial class Filters
+public static partial class PaletteFilters
 {
 	/// <summary>
 	/// Returns prefix matches of the word, compared to the wordToMatchAgainst.

@@ -20,7 +20,7 @@ public class UtilsTests
 	public void Or(int i1, bool r1, int i2, bool r2, int[] expected)
 	{
 		int[] counters = new int[2];
-		PaletteFilter filter = Filters.Or(NewFilter(counters, i1, r1), NewFilter(counters, i2, r2));
+		PaletteFilter filter = PaletteFilters.Or(NewFilter(counters, i1, r1), NewFilter(counters, i2, r2));
 		FilterTestUtils.FilterOk(filter, "anything", "anything", new PaletteFilterMatch[] { new PaletteFilterMatch(0, 8) });
 		Assert.Equal(expected, counters);
 	}
@@ -30,7 +30,7 @@ public class UtilsTests
 	public void Or_NotOk(int i1, bool r1, int i2, bool r2, int[] expected)
 	{
 		int[] counters = new int[2];
-		PaletteFilter filter = Filters.Or(NewFilter(counters, i1, r1), NewFilter(counters, i2, r2));
+		PaletteFilter filter = PaletteFilters.Or(NewFilter(counters, i1, r1), NewFilter(counters, i2, r2));
 		FilterTestUtils.FilterNotOk(filter, "anything", "anything");
 		Assert.Equal(expected, counters);
 	}

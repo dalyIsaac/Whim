@@ -1,6 +1,6 @@
 namespace Whim.CommandPalette;
 
-public static partial class Filters
+public static partial class PaletteFilters
 {
 	/// <summary>
 	/// Filter which returns contiguous matches of a word, compared to a given word to match against.

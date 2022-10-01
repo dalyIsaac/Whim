@@ -29,7 +29,7 @@ public class CamelCaseTests
 	public void MatchesCamelCase_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
 		PaletteFilterMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
-		FilterTestUtils.FilterOk(Filters.MatchesCamelCase, word, wordToMatchAgainst, expectedMatches);
+		FilterTestUtils.FilterOk(PaletteFilters.MatchesCamelCase, word, wordToMatchAgainst, expectedMatches);
 	}
 
 	[InlineData("", "")]
@@ -37,6 +37,6 @@ public class CamelCaseTests
 	[Theory]
 	public void MatchesCamelCase_NotOk(string word, string wordToMatchAgainst)
 	{
-		FilterTestUtils.FilterNotOk(Filters.MatchesCamelCase, word, wordToMatchAgainst);
+		FilterTestUtils.FilterNotOk(PaletteFilters.MatchesCamelCase, word, wordToMatchAgainst);
 	}
 }

@@ -4,7 +4,7 @@ namespace Whim.CommandPalette;
 
 internal record struct CamelCaseAnalysis(float Upper, float Lower, float Alpha, float Numeric);
 
-public static partial class Filters
+public static partial class PaletteFilters
 {
 	/// <summary>
 	/// Returns the matches for the word, where the word is a camel case substring of the wordToMatchAgainst.

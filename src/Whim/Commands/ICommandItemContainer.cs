@@ -8,7 +8,7 @@ namespace Whim;
 /// <see cref="ICollection{T}"/>).
 /// It stores the commands and their keybinds for easy access and operation.
 /// </summary>
-public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
+public interface ICommandItemContainer : IEnumerable<CommandItem>
 {
 	/// <summary>
 	/// Adds the <paramref name="command"/> to the collection.

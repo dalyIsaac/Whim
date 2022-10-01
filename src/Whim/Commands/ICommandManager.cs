@@ -8,7 +8,7 @@ namespace Whim;
 /// This involves handling keybindings, dispatching commands, and providing
 /// access to the commands themselves.
 /// </summary>
-public interface ICommandManager : ICommandItems, IDisposable
+public interface ICommandManager : ICommandItemContainer, IDisposable
 {
 	/// <summary>
 	/// Initialize the keyboard hook.
@@ -19,5 +19,5 @@ public interface ICommandManager : ICommandItems, IDisposable
 	/// Loads the given commmands and keybinds.
 	/// </summary>
 	/// <param name="commands"></param>
-	public void LoadCommands(IEnumerable<(ICommand, IKeybind?)> commands);
+	public void LoadCommands(IEnumerable<CommandItem> commands);
 }

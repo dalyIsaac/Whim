@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
-public static partial class Filters
+public static partial class PaletteFilters
 {
 	/// <summary>
 	/// Matches beginning of words supporting non-ASCII languages.
@@ -88,7 +88,7 @@ public static partial class Filters
 			return result;
 		}
 
-		return Filters.Join(new PaletteFilterMatch(j, j + 1), result);
+		return PaletteFilters.Join(new PaletteFilterMatch(j, j + 1), result);
 	}
 
 	private static int NextWord(string word, int start)

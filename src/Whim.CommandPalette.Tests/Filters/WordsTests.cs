@@ -34,7 +34,7 @@ public class WordsTests
 	public void MatchesWordsSeparate_Ok(string query, string target, params int[][] expected)
 	{
 		PaletteFilterMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
-		FilterTestUtils.FilterOk(Filters.MatchesWordsSeparate, query, target, expectedMatches);
+		FilterTestUtils.FilterOk(PaletteFilters.MatchesWordsSeparate, query, target, expectedMatches);
 	}
 
 	[InlineData("alpha", "alp")]
@@ -47,7 +47,7 @@ public class WordsTests
 	[Theory]
 	public void MatchesWordsSeparate_NotOk(string query, string target)
 	{
-		FilterTestUtils.FilterNotOk(Filters.MatchesWordsSeparate, query, target);
+		FilterTestUtils.FilterNotOk(PaletteFilters.MatchesWordsSeparate, query, target);
 	}
 
 	[InlineData("pu", "Category: Git: Pull", new int[] { 15, 17 })]
@@ -55,13 +55,13 @@ public class WordsTests
 	public void MatchesWordsContiguous_Ok(string query, string target, params int[][] expected)
 	{
 		PaletteFilterMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
-		FilterTestUtils.FilterOk(Filters.MatchesWordsContiguous, query, target, expectedMatches);
+		FilterTestUtils.FilterOk(PaletteFilters.MatchesWordsContiguous, query, target, expectedMatches);
 	}
 
 	[InlineData("gipu", "Category: Git: Pull")]
 	[Theory]
 	public void MatchesWordsContiguous_NotOk(string query, string target)
 	{
-		FilterTestUtils.FilterNotOk(Filters.MatchesWordsContiguous, query, target);
+		FilterTestUtils.FilterNotOk(PaletteFilters.MatchesWordsContiguous, query, target);
 	}
 }

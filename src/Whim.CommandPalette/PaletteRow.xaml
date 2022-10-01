@@ -47,14 +47,31 @@
 		<!--  The row's controls  -->
 		<TextBlock x:Name="CommandTitle" />
 
-		<Border
-			x:Name="CommandKeybindBorder"
+		<!--<ItemsControl
+			x:Name="CommandKeybind"
 			Grid.Column="1"
-			Padding="2,0,2,0"
-			HorizontalAlignment="Right"
-			VerticalAlignment="Center"
-			Style="{ThemeResource KeybindBorderStyle}">
-			<TextBlock x:Name="CommandKeybind" Style="{ThemeResource KeyBindTextBlockStyle}" />
-		</Border>
+			ItemsSource="{x:Bind Model.CommandItem.Keybind.AllKeys}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel Orientation="Horizontal" />
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+
+			<ItemsControl.ItemTemplate>
+				<DataTemplate x:DataType="x:String">
+					<Border
+						Padding="2,0,2,0"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Center"
+						Style="{ThemeResource KeybindBorderStyle}">
+						<TextBlock
+							FontSize="12"
+							Style="{ThemeResource KeyChordTextBlockStyle}"
+							Text="{x:Bind}" />
+					</Border>
+
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>-->
 	</Grid>
 </UserControl>

@@ -10,5 +10,8 @@ public class CommandPaletteConfig
 	/// </summary>
 	internal const string Title = "Whim Command Palette";
 
-	internal readonly Matcher Matcher = new();
+	/// <summary>
+	/// The configuration for command palette activation.
+	/// </summary>
+	public CommandPaletteActivationConfig ActivationConfig { get; set; } = new();
 }

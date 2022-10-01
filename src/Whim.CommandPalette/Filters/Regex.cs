@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Whim.CommandPalette;
 
-public static partial class Filters
+public static partial class PaletteFilters
 {
 	/// <summary>
 	/// Returns matches of the word compared to the wordToMatchAgainst, where the word is a regular expression.
