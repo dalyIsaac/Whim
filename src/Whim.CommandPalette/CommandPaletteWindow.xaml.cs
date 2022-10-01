@@ -20,7 +20,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="ListViewItems"/> are drawn.
 	/// </summary>
-	private readonly List<Match> _allCommands = new();
+	private readonly List<PaletteItem> _allCommands = new();
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
@@ -54,12 +54,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			{
 				if (_allCommands[idx].Command != command)
 				{
-					_allCommands[idx] = new Match(command, keybind);
+					_allCommands[idx] = new PaletteItem(command, keybind);
 				}
 			}
 			else
 			{
-				_allCommands.Add(new Match(command, keybind));
+				_allCommands.Add(new PaletteItem(command, keybind));
 			}
 
 			idx++;
@@ -193,9 +193,9 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		foreach (PaletteItem item in _plugin.Config.Matcher.Match(query, _allCommands))
+		foreach (PaletteRowItem item in _plugin.Config.Matcher.Match(query, _allCommands))
 		{
-			Logger.Verbose($"Matched {item.Match.Command.Title}");
+			Logger.Verbose($"Matched {item.PaletteItem.Command.Title}");
 			if (idx < _paletteRows.Count)
 			{
 				// Update the existing row.
@@ -220,7 +220,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			}
 			idx++;
 
-			Logger.Verbose($"Finished updating {item.Match.Command.Title}");
+			Logger.Verbose($"Finished updating {item.PaletteItem.Command.Title}");
 		}
 
 		// If there are more items than we have space for, remove the last ones.
@@ -251,7 +251,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			Hide();
 		}
 
-		Match match = _paletteRows[ListViewItems.SelectedIndex].Model.Match;
+		PaletteItem match = _paletteRows[ListViewItems.SelectedIndex].Model.PaletteItem;
 
 		match.Command.TryExecute();
 		_plugin.Config.Matcher.OnMatchExecuted(match);

@@ -10,8 +10,5 @@ public class CommandPaletteConfig
 	/// </summary>
 	internal const string Title = "Whim Command Palette";
 
-	/// <summary>
-	/// The matcher to use when filtering for commands.
-	/// </summary>
-	public ICommandPaletteMatcher Matcher { get; set; } = new MostRecentlyUsedMatcher();
+	internal readonly Matcher Matcher = new();
 }

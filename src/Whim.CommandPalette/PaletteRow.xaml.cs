@@ -10,9 +10,9 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal sealed partial class PaletteRow : UserControl
 {
-	public PaletteItem Model { get; private set; }
+	public PaletteRowItem Model { get; private set; }
 
-	public PaletteRow(PaletteItem item)
+	public PaletteRow(PaletteRowItem item)
 	{
 		Model = item;
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");
@@ -24,7 +24,7 @@ internal sealed partial class PaletteRow : UserControl
 		SetKeybinds();
 	}
 
-	public void Update(PaletteItem item)
+	public void Update(PaletteRowItem item)
 	{
 		Logger.Debug("Updating with a new item");
 		Model = item;
@@ -75,9 +75,9 @@ internal sealed partial class PaletteRow : UserControl
 	{
 		Logger.Debug("Setting keybinds");
 
-		if (Model.Match.Keys != null)
+		if (Model.PaletteItem.Keys != null)
 		{
-			string keys = Model.Match.Keys;
+			string keys = Model.PaletteItem.Keys;
 			if (CommandKeybind.Text != keys)
 			{
 				CommandKeybind.Text = keys;

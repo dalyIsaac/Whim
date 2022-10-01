@@ -1,5 +1,6 @@
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Documents;
+using System;
 using System.Collections.Generic;
 using Windows.UI.Text;
 
@@ -37,7 +38,7 @@ public record HighlightedText
 /// <summary>
 /// A command and associated keybind.
 /// </summary>
-public class Match
+public class PaletteItem
 {
 	/// <summary>
 	/// The command to execute.
@@ -54,7 +55,7 @@ public class Match
 	/// </summary>
 	/// <param name="command"></param>
 	/// <param name="keybind"></param>
-	public Match(ICommand command, IKeybind? keybind = null)
+	public PaletteItem(ICommand command, IKeybind? keybind = null)
 	{
 		Command = command;
 		Keys = keybind?.ToString();
@@ -64,10 +65,67 @@ public class Match
 	public override int GetHashCode() => Command.GetHashCode();
 }
 
+public record PaletteItemSortPayload
+{
+	public PaletteItem Item { get; }
+	public PaletteFilterMatch[] Matches { get; }
+	public uint LastUsedTime { get; }
+
+	public PaletteItemSortPayload(PaletteItem item, PaletteFilterMatch[] matches, uint lastUsedTime)
+	{
+		Item = item;
+		Matches = matches;
+		LastUsedTime = lastUsedTime;
+	}
+
+	public PaletteRowItem ToRowItem()
+	{
+		HighlightedText title = new();
+		ReadOnlySpan<char> rawTitle = Item.Command.Title.AsSpan();
+
+		int start = 0;
+		foreach (PaletteFilterMatch match in Matches)
+		{
+			if (start < match.Start)
+			{
+				title.Segments.Add(new HighlightedTextSegment(rawTitle[start..match.Start].ToString(), false));
+				start = match.Start;
+			}
+
+			title.Segments.Add(new HighlightedTextSegment(rawTitle[match.Start..match.End].ToString(), true));
+			start = match.End;
+		}
+
+		if (start < rawTitle.Length)
+		{
+			title.Segments.Add(new HighlightedTextSegment(rawTitle[start..].ToString(), false));
+		}
+
+		return new PaletteRowItem(Item, title);
+	}
+}
+
+
+public class PaletteItemSortPayloadSorter : IComparer<PaletteItemSortPayload>
+{
+	public int Compare(PaletteItemSortPayload x, PaletteItemSortPayload y)
+	{
+		// Sort by the last used time.
+		int lastUsedTimeComparison = y.LastUsedTime.CompareTo(x.LastUsedTime);
+		if (lastUsedTimeComparison != 0)
+		{
+			return lastUsedTimeComparison;
+		}
+
+		// Sort by alphabetical order.
+		return string.Compare(x.Item.Command.Title, y.Item.Command.Title, System.StringComparison.Ordinal);
+	}
+}
+
 /// <summary>
 /// An item stored in the command palette, consisting of a match and associated highlighted title
 /// text.
 /// </summary>
-/// <param name="Match"></param>
+/// <param name="PaletteItem"></param>
 /// <param name="Title"></param>
-public record PaletteItem(Match Match, HighlightedText Title);
+public record PaletteRowItem(PaletteItem PaletteItem, HighlightedText Title);
