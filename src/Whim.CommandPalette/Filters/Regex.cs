@@ -14,7 +14,7 @@ public static partial class Filters
 	{
 		Regex regexp = new(word, RegexOptions.IgnoreCase);
 
-		System.Text.RegularExpressions.Match match = regexp.Match(wordToMatchAgainst);
+		Match match = regexp.Match(wordToMatchAgainst);
 		if (match.Success)
 		{
 			return new[] { new PaletteFilterMatch(match.Index, match.Index + match.Length) };

@@ -65,13 +65,13 @@ public class PaletteItem
 	public override int GetHashCode() => Command.GetHashCode();
 }
 
-public record PaletteItemSortPayload
+internal record PalettePayload
 {
 	public PaletteItem Item { get; }
 	public PaletteFilterMatch[] Matches { get; }
 	public uint LastUsedTime { get; }
 
-	public PaletteItemSortPayload(PaletteItem item, PaletteFilterMatch[] matches, uint lastUsedTime)
+	public PalettePayload(PaletteItem item, PaletteFilterMatch[] matches, uint lastUsedTime)
 	{
 		Item = item;
 		Matches = matches;
@@ -105,11 +105,24 @@ public record PaletteItemSortPayload
 	}
 }
 
-
-public class PaletteItemSortPayloadSorter : IComparer<PaletteItemSortPayload>
+/// <summary>
+/// Defines a method to compare <see cref="PalettePayload"/>.
+/// </summary>
+internal class PalettePayloadComparer : IComparer<PalettePayload>
 {
-	public int Compare(PaletteItemSortPayload x, PaletteItemSortPayload y)
+	/// <inheritdoc />
+	public int Compare(PalettePayload? x, PalettePayload? y)
 	{
+		// We throw here because it should never happen.
+		if (x is null)
+		{
+			throw new ArgumentNullException(nameof(x));
+		}
+		else if (y is null)
+		{
+			throw new ArgumentNullException(nameof(y));
+		}
+
 		// Sort by the last used time.
 		int lastUsedTimeComparison = y.LastUsedTime.CompareTo(x.LastUsedTime);
 		if (lastUsedTimeComparison != 0)

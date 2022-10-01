@@ -9,7 +9,7 @@ namespace Whim.CommandPalette;
 /// </summary>
 public class Matcher
 {
-	private static readonly PaletteItemSortPayloadSorter _sorter = new();
+	private static readonly PalettePayloadComparer _sorter = new();
 
 	private readonly Dictionary<string, uint> _commandLastExecutionTime = new();
 
@@ -18,7 +18,7 @@ public class Matcher
 	/// </summary>
 	public ICollection<PaletteRowItem> Match(string query, ICollection<PaletteItem> items)
 	{
-		PaletteItemSortPayload[] matches = new PaletteItemSortPayload[items.Count];
+		PalettePayload[] matches = new PalettePayload[items.Count];
 		int matchCount = GetFilteredItems(query, items, matches);
 
 		// If there are no matches, return the most recently used items.
@@ -44,7 +44,7 @@ public class Matcher
 	private int GetFilteredItems(
 		string query,
 		ICollection<PaletteItem> items,
-		PaletteItemSortPayload[] matches
+		PalettePayload[] matches
 	)
 	{
 		int matchCount = 0;
@@ -59,7 +59,7 @@ public class Matcher
 			}
 
 			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
-			matches[matchCount++] = new PaletteItemSortPayload(item, filterMatches, count);
+			matches[matchCount++] = new PalettePayload(item, filterMatches, count);
 		}
 
 		return matchCount;
@@ -68,7 +68,7 @@ public class Matcher
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private int GetMostRecentlyUsedItems(
 		ICollection<PaletteItem> items,
-		PaletteItemSortPayload[] matches
+		PalettePayload[] matches
 	)
 	{
 		int matchCount = 0;
@@ -76,7 +76,7 @@ public class Matcher
 		foreach (PaletteItem item in items)
 		{
 			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
-			matches[matchCount++] = new PaletteItemSortPayload(item, Array.Empty<PaletteFilterMatch>(), count);
+			matches[matchCount++] = new PalettePayload(item, Array.Empty<PaletteFilterMatch>(), count);
 		}
 
 		return matchCount;
