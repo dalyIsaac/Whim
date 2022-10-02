@@ -24,7 +24,7 @@
 							<Setter Property="BorderThickness" Value="1" />
 							<Setter Property="CornerRadius" Value="2" />
 						</Style>
-						<Style x:Key="KeyBindTextBlockStyle" TargetType="TextBlock">
+						<Style x:Key="KeybindTextBlockStyle" TargetType="TextBlock">
 							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
@@ -36,7 +36,7 @@
 							<Setter Property="BorderThickness" Value="1" />
 							<Setter Property="CornerRadius" Value="2" />
 						</Style>
-						<Style x:Key="KeyBindTextBlockStyle" TargetType="TextBlock">
+						<Style x:Key="KeybindTextBlockStyle" TargetType="TextBlock">
 							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
@@ -47,7 +47,7 @@
 		<!--  The row's controls  -->
 		<TextBlock x:Name="CommandTitle" />
 
-		<!--<ItemsControl
+		<ItemsControl
 			x:Name="CommandKeybind"
 			Grid.Column="1"
 			ItemsSource="{x:Bind Model.CommandItem.Keybind.AllKeys}">
@@ -66,12 +66,11 @@
 						Style="{ThemeResource KeybindBorderStyle}">
 						<TextBlock
 							FontSize="12"
-							Style="{ThemeResource KeyChordTextBlockStyle}"
+							Style="{ThemeResource KeybindTextBlockStyle}"
 							Text="{x:Bind}" />
 					</Border>
-
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
-		</ItemsControl>-->
+		</ItemsControl>
 	</Grid>
 </UserControl>
