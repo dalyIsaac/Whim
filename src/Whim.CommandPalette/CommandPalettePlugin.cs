@@ -62,6 +62,15 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	}
 
 	/// <summary>
+	/// Activate the command palette window, in free form mode.
+	/// </summary>
+	/// <param name="callback">The callback to execute after the user has entered text.</param>
+	public void ActivateFreeForm(CommandPaletteFreeTextCallback callback)
+	{
+		_commandPaletteWindow?.ActivateFreeForm(callback, _configContext.MonitorManager.FocusedMonitor);
+	}
+
+	/// <summary>
 	/// Hide the command palette.
 	/// </summary>
 	public void Hide()

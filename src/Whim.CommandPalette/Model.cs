@@ -114,6 +114,12 @@ internal class PalettePayloadComparer : IComparer<PalettePayload>
 public record PaletteRowItem(CommandItem CommandItem, HighlightedText Title);
 
 /// <summary>
+/// Callback for when the user has pressed enter key in the command palette, and is in free text mode.
+/// </summary>
+/// <param name="text"></param>
+public delegate void CommandPaletteFreeTextCallback(string text);
+
+/// <summary>
 /// Config for activating the command palette.
 /// </summary>
 public class CommandPaletteActivationConfig

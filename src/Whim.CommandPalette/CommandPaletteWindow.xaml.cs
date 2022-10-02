@@ -2,7 +2,6 @@
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Whim.CommandPalette;
 
@@ -23,7 +22,8 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// </summary>
 	private readonly List<CommandItem> _allCommands = new();
 
-	private CommandPaletteActivationConfig _activationConfig;
+	private CommandPaletteActivationConfig? _activationConfig;
+	private CommandPaletteFreeTextCallback? _freeTextCallback;
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
@@ -35,19 +35,17 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		ListViewItems.ItemsSource = _paletteRows;
 
 		// Populate the commands to reduce the first render time.
-		Populate(_plugin.Config.ActivationConfig, _configContext.CommandManager);
+		_activationConfig = _plugin.Config.ActivationConfig;
+		PopulateItems(_configContext.CommandManager);
 		UpdateMatches();
 	}
 
 	/// <summary>
 	/// Populate <see cref="_allCommands"/> with all the current commands.
 	/// </summary>
-	[MemberNotNull(nameof(_activationConfig))]
-	private void Populate(CommandPaletteActivationConfig activatePayload, IEnumerable<CommandItem> items)
+	private void PopulateItems(IEnumerable<CommandItem> items)
 	{
 		Logger.Debug($"Populating the current list of all commands.");
-
-		_activationConfig = activatePayload;
 
 		int idx = 0;
 		foreach ((ICommand command, IKeybind? keybind) in items)
@@ -78,6 +76,39 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 	}
 
+	private void PreActivate(IMonitor? monitor)
+	{
+		_monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
+		TextEntry.Text = "";
+	}
+
+	private void PostActivate()
+	{
+		if (_monitor == null)
+		{
+			Logger.Error("Attempted to activate the command palette without a monitor.");
+			return;
+		}
+
+		int width = 680;
+		int height = 680;
+
+		ILocation<int> windowLocation = new Location(
+			x: _monitor.X + (_monitor.Width / 2) - (width / 2),
+			y: _monitor.Y + (height / 4),
+			width: width,
+			height: height
+		);
+
+		Activate();
+		TextEntry.Focus(FocusState.Programmatic);
+		WindowDeferPosHandle.SetWindowPos(
+			new WindowState(_window, windowLocation, WindowSize.Normal),
+			_window.Handle
+		);
+		_window.FocusForceForeground();
+	}
+
 	/// <summary>
 	/// Activate the command palette.
 	/// </summary>
@@ -92,34 +123,27 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		Logger.Debug("Activating command palette");
 
-		monitor ??= _configContext.MonitorManager.FocusedMonitor;
-		if (monitor == _monitor)
-		{
-			return;
-		}
-		_monitor = monitor;
-		TextEntry.Text = "";
+		PreActivate(monitor);
 
-		Populate(activatePayload, items);
+		_activationConfig = activatePayload;
+		_freeTextCallback = null;
+		PopulateItems(items);
 		UpdateMatches();
 
-		int width = 680;
-		int height = 680;
+		PostActivate();
+	}
 
-		ILocation<int> windowLocation = new Location(
-			x: monitor.X + (monitor.Width / 2) - (width / 2),
-			y: monitor.Y + (height / 4),
-			width: width,
-			height: height
-		);
+	public void ActivateFreeForm(CommandPaletteFreeTextCallback callback, IMonitor? monitor = null)
+	{
+		Logger.Debug("Activating command palette in free form mode");
 
-		Activate();
-		TextEntry.Focus(FocusState.Programmatic);
-		WindowDeferPosHandle.SetWindowPos(
-			new WindowState(_window, windowLocation, WindowSize.Normal),
-			_window.Handle
-		);
-		_window.FocusForceForeground();
+		PreActivate(monitor);
+
+		_freeTextCallback = callback;
+		_activationConfig = null;
+		UpdateMatches();
+
+		PostActivate();
 	}
 
 	/// <summary>
@@ -201,34 +225,37 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		foreach (PaletteRowItem item in _activationConfig.Matcher.Match(query, _allCommands))
+		if (_activationConfig != null)
 		{
-			Logger.Verbose($"Matched {item.CommandItem.Command.Title}");
-			if (idx < _paletteRows.Count)
+			foreach (PaletteRowItem item in _activationConfig.Matcher.Match(query, _allCommands))
 			{
-				// Update the existing row.
-				_paletteRows[idx].Update(item);
-			}
-			else if (_unusedRows.Count > 0)
-			{
-				// Restoring the unused row.
-				PaletteRow row = _unusedRows[^1];
-				row.Update(item);
+				Logger.Verbose($"Matched {item.CommandItem.Command.Title}");
+				if (idx < _paletteRows.Count)
+				{
+					// Update the existing row.
+					_paletteRows[idx].Update(item);
+				}
+				else if (_unusedRows.Count > 0)
+				{
+					// Restoring the unused row.
+					PaletteRow row = _unusedRows[^1];
+					row.Update(item);
 
-				_paletteRows.Add(row);
+					_paletteRows.Add(row);
 
-				_unusedRows.RemoveAt(_unusedRows.Count - 1);
-			}
-			else
-			{
-				// Add a new row.
-				PaletteRow row = new(item);
-				_paletteRows.Add(row);
-				row.Initialize();
-			}
-			idx++;
+					_unusedRows.RemoveAt(_unusedRows.Count - 1);
+				}
+				else
+				{
+					// Add a new row.
+					PaletteRow row = new(item);
+					_paletteRows.Add(row);
+					row.Initialize();
+				}
+				idx++;
 
-			Logger.Verbose($"Finished updating {item.CommandItem.Command.Title}");
+				Logger.Verbose($"Finished updating {item.CommandItem.Command.Title}");
+			}
 		}
 
 		// If there are more items than we have space for, remove the last ones.
@@ -240,7 +267,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 
 		Logger.Verbose($"Command palette match count: {_paletteRows.Count}");
-
 		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
 	}
 
@@ -254,6 +280,17 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private void ExecuteCommand()
 	{
 		Logger.Debug("Executing command");
+
+		if (_freeTextCallback != null)
+		{
+			_freeTextCallback(TextEntry.Text);
+			return;
+		}
+		else if (_activationConfig == null)
+		{
+			return;
+		}
+
 		if (ListViewItems.SelectedIndex < 0)
 		{
 			Hide();
