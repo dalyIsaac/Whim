@@ -102,7 +102,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WorkspaceManager_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs e)
 	{
-		WorkspaceModel? workspace = Workspaces.FirstOrDefault(w => w.Name == e.NewName);
+		WorkspaceModel? workspace = Workspaces.FirstOrDefault(w => w == e.Workspace);
 		if (workspace == null)
 		{
 			return;
