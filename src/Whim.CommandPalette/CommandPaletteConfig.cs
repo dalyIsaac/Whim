@@ -13,5 +13,5 @@ public class CommandPaletteConfig
 	/// <summary>
 	/// The configuration for command palette activation.
 	/// </summary>
-	public CommandPaletteActivationConfig ActivationConfig { get; set; } = new();
+	public BaseCommandPaletteActivationConfig ActivationConfig { get; set; } = new CommandPaletteMenuActivationConfig();
 }

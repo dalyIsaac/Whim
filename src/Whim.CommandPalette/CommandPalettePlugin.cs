@@ -44,30 +44,33 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	}
 
 	/// <summary>
-	/// Activate the command palette window.
+	/// Activate the command palette window, in menu mode.
 	/// </summary>
-	/// <param name="activatePayload">The configuration for activation.</param>
+	/// <param name="config">The configuration for activation.</param>
 	/// <param name="items">
 	/// The items to activate the command palette with. These items will be passed to the
 	/// <see cref="ICommandPaletteMatcher"/> to filter the results.
 	/// When the text is empty, typically all items are shown.
 	/// </param>
-	public void Activate(CommandPaletteActivationConfig? activatePayload = null, IEnumerable<CommandItem>? items = null)
+	public void Activate(CommandPaletteMenuActivationConfig? config = null, IEnumerable<CommandItem>? items = null)
 	{
 		_commandPaletteWindow?.Activate(
-			activatePayload: activatePayload ?? Config.ActivationConfig,
+			config: config ?? Config.ActivationConfig,
 			items: items ?? _configContext.CommandManager,
 			monitor: _configContext.MonitorManager.FocusedMonitor
 		);
 	}
 
 	/// <summary>
-	/// Activate the command palette window, in free form mode.
+	/// Activate the command palette window, in free text mode.
 	/// </summary>
-	/// <param name="callback">The callback to execute after the user has entered text.</param>
-	public void ActivateFreeForm(CommandPaletteFreeTextCallback callback)
+	/// <param name="config">The configuration for activation.</param>
+	public void Activate(BaseCommandPaletteActivationConfig config)
 	{
-		_commandPaletteWindow?.ActivateFreeForm(callback, _configContext.MonitorManager.FocusedMonitor);
+		_commandPaletteWindow?.Activate(
+			config: config ?? Config.ActivationConfig,
+			monitor: _configContext.MonitorManager.FocusedMonitor
+		);
 	}
 
 	/// <summary>
@@ -129,7 +132,9 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 			new Command(
 				identifier: "command_palette.rename_workspace",
 				title: "Rename workspace",
-				callback: () => ActivateFreeForm((text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text)
+				callback: () => Activate(new CommandPaletteFreeTextActivationConfig(
+					callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text
+				))
 			)
 		),
 	};

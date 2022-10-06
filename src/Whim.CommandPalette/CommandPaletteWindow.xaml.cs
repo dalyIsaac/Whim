@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -22,8 +23,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// </summary>
 	private readonly List<CommandItem> _allCommands = new();
 
-	private CommandPaletteActivationConfig? _activationConfig;
-	private CommandPaletteFreeTextCallback? _freeTextCallback;
+	private BaseCommandPaletteActivationConfig? _activationConfig;
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
@@ -112,35 +112,21 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// <summary>
 	/// Activate the command palette.
 	/// </summary>
-	/// <param name="activatePayload">The configuration for activation.</param>
+	/// <param name="config">The configuration for activation.</param>
 	/// <param name="items">
 	/// The items to activate the command palette with. These items will be passed to the
 	/// <see cref="ICommandPaletteMatcher"/> to filter the results.
 	/// When the text is empty, typically all items are shown.
 	/// </param>
 	/// <param name="monitor">The monitor to display the command palette on.</param>
-	public void Activate(CommandPaletteActivationConfig activatePayload, IEnumerable<CommandItem> items, IMonitor? monitor = null)
+	public void Activate(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items = null, IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating command palette");
 
 		PreActivate(monitor);
 
-		_activationConfig = activatePayload;
-		_freeTextCallback = null;
-		PopulateItems(items);
-		UpdateMatches();
-
-		PostActivate();
-	}
-
-	public void ActivateFreeForm(CommandPaletteFreeTextCallback callback, IMonitor? monitor = null)
-	{
-		Logger.Debug("Activating command palette in free form mode");
-
-		PreActivate(monitor);
-
-		_freeTextCallback = callback;
-		_activationConfig = null;
+		_activationConfig = config;
+		PopulateItems(items ?? Array.Empty<CommandItem>());
 		UpdateMatches();
 
 		PostActivate();
@@ -225,9 +211,9 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		if (_activationConfig != null)
+		if (_activationConfig is CommandPaletteMenuActivationConfig menuActivationConfig)
 		{
-			foreach (PaletteRowItem item in _activationConfig.Matcher.Match(query, _allCommands))
+			foreach (PaletteRowItem item in menuActivationConfig.Matcher.Match(query, _allCommands))
 			{
 				Logger.Verbose($"Matched {item.CommandItem.Command.Title}");
 				if (idx < _paletteRows.Count)
@@ -281,34 +267,26 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		Logger.Debug("Executing command");
 
-		if (_freeTextCallback != null)
+		if (_activationConfig is CommandPaletteFreeTextActivationConfig freeTextActivationConfig)
 		{
-			_freeTextCallback(TextEntry.Text);
+			freeTextActivationConfig.Callback(TextEntry.Text);
 			Hide();
 			return;
 		}
-		else if (_activationConfig == null)
+		else if (_activationConfig is CommandPaletteMenuActivationConfig menuActivationConfig)
 		{
-			Hide();
-			return;
-		}
+			CommandItem match = _paletteRows[ListViewItems.SelectedIndex].Model.CommandItem;
 
-		if (ListViewItems.SelectedIndex < 0)
-		{
-			Hide();
-		}
+			// Since the palette window is reused, there's a chance that the _activationConfig
+			// will have been wiped by a free form child command.
+			BaseCommandPaletteActivationConfig currentConfig = _activationConfig;
+			match.Command.TryExecute();
+			menuActivationConfig.Matcher.OnMatchExecuted(match);
 
-		CommandItem match = _paletteRows[ListViewItems.SelectedIndex].Model.CommandItem;
-
-		// Since the palette window is reused, there's a chance that the _activationConfig
-		// will have been wiped by a free form child command.
-		CommandPaletteActivationConfig currentConfig = _activationConfig;
-		match.Command.TryExecute();
-		currentConfig.Matcher.OnMatchExecuted(match);
-
-		if (_activationConfig == currentConfig)
-		{
-			Hide();
+			if (_activationConfig == currentConfig)
+			{
+				Hide();
+			}
 		}
 	}
 }
