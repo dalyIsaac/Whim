@@ -14,10 +14,10 @@ internal class Workspace : IWorkspace
 		get => _name;
 		set
 		{
-			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
-				new WorkspaceRenamedEventArgs(this, _name, value)
-			);
+			string oldName = _name;
 			_name = value;
+			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
+				new WorkspaceRenamedEventArgs(this, oldName, _name));
 		}
 	}
 

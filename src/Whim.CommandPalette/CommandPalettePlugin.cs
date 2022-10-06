@@ -122,6 +122,15 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 				callback: () => Activate()
 			),
 			new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_K)
-		)
+		),
+
+		// Rename workspace
+		new CommandItem(
+			new Command(
+				identifier: "command_palette.rename_workspace",
+				title: "Rename workspace",
+				callback: () => ActivateFreeForm((text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text)
+			)
+		),
 	};
 }

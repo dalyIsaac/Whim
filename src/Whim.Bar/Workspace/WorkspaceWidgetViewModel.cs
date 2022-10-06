@@ -21,7 +21,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <summary>
 	/// The workspaces for the monitor.
 	/// </summary>
-	public ObservableCollection<WorkspaceModel> Workspaces { get; } = new();
+	public VeryObservableCollection<WorkspaceModel> Workspaces { get; } = new();
 
 	/// <summary>
 	/// Creates a new instance of <see cref="WorkspaceWidgetViewModel"/>.
@@ -36,6 +36,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 		_configContext.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
 		_configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
 		_configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
+		_configContext.WorkspaceManager.WorkspaceRenamed += WorkspaceManager_WorkspaceRenamed;
 
 		// Populate the list of workspaces
 		foreach (IWorkspace workspace in _configContext.WorkspaceManager)
@@ -97,6 +98,17 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 		{
 			newWorkspace.ActiveOnMonitor = true;
 		}
+	}
+
+	private void WorkspaceManager_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs e)
+	{
+		WorkspaceModel? workspace = Workspaces.FirstOrDefault(w => w.Name == e.NewName);
+		if (workspace == null)
+		{
+			return;
+		}
+
+		workspace.Workspace_Renamed(sender, e);
 	}
 
 	/// <inheritdoc/>

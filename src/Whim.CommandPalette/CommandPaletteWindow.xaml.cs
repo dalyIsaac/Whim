@@ -284,10 +284,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		if (_freeTextCallback != null)
 		{
 			_freeTextCallback(TextEntry.Text);
+			Hide();
 			return;
 		}
 		else if (_activationConfig == null)
 		{
+			Hide();
 			return;
 		}
 
@@ -298,8 +300,15 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		CommandItem match = _paletteRows[ListViewItems.SelectedIndex].Model.CommandItem;
 
+		// Since the palette window is reused, there's a chance that the _activationConfig
+		// will have been wiped by a free form child command.
+		CommandPaletteActivationConfig currentConfig = _activationConfig;
 		match.Command.TryExecute();
-		_activationConfig.Matcher.OnMatchExecuted(match);
-		Hide();
+		currentConfig.Matcher.OnMatchExecuted(match);
+
+		if (_activationConfig == currentConfig)
+		{
+			Hide();
+		}
 	}
 }
