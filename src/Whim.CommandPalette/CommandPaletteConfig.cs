@@ -11,6 +11,21 @@ public class CommandPaletteConfig
 	internal const string Title = "Whim Command Palette";
 
 	/// <summary>
+	/// The maximum height of the command palette window, as a percentage of the monitor height.
+	/// </summary>
+	public int MaxHeightPercent { get; set; } = 40;
+
+	/// <summary>
+	/// The maximum width of the command palette window, in pixels.
+	/// </summary>
+	public int MaxWidthPixels { get; set; } = 800;
+
+	/// <summary>
+	/// The top of the command palette window, as a percentage of the monitor height.
+	/// </summary>
+	public int YPositionPercent { get; set; } = 25;
+
+	/// <summary>
 	/// The configuration for command palette activation.
 	/// </summary>
 	public BaseCommandPaletteActivationConfig ActivationConfig { get; set; } = new CommandPaletteMenuActivationConfig();

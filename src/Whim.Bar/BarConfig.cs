@@ -95,7 +95,10 @@ public class BarConfig : INotifyPropertyChanged
 		}
 	}
 
-	/// <inheritdoc/>
+	/// <summary>
+	/// Handler to call when a property changes.
+	/// </summary>
+	/// <param name="propertyName">The name of the property that changed.</param>
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

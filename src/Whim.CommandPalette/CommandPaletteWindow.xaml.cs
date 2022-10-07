@@ -90,16 +90,20 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			return;
 		}
 
-		int width = 680;
-		int height = 680;
+		int width = _plugin.Config.MaxWidthPixels;
+		int height = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
+
+		int x = (_monitor.Width / 2) - (width / 2);
+		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
 
 		ILocation<int> windowLocation = new Location(
-			x: _monitor.X + (_monitor.Width / 2) - (width / 2),
-			y: _monitor.Y + (height / 4),
+			x: _monitor.X + x,
+			y: _monitor.Y + y,
 			width: width,
 			height: height
 		);
 
+		WindowGrid.MaxHeight = height;
 		Activate();
 		TextEntry.Focus(FocusState.Programmatic);
 		WindowDeferPosHandle.SetWindowPos(
