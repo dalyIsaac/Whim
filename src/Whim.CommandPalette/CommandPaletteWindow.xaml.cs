@@ -15,6 +15,8 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private IMonitor? _monitor;
 	public bool IsVisible => _monitor != null;
 
+	private int _maxHeight;
+
 	private readonly ObservableCollection<PaletteRow> _paletteRows = new();
 	private readonly List<PaletteRow> _unusedRows = new();
 
@@ -29,7 +31,10 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		_configContext = configContext;
 		_plugin = plugin;
+
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
+
+		ListViewItems.SizeChanged += ListViewItems_SizeChanged;
 
 		Title = CommandPaletteConfig.Title;
 		ListViewItems.ItemsSource = _paletteRows;
@@ -38,6 +43,66 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_activationConfig = _plugin.Config.ActivationConfig;
 		PopulateItems(_configContext.CommandManager);
 		UpdateMatches();
+	}
+
+	private void ListViewItems_SizeChanged(object sender, SizeChangedEventArgs e)
+	{
+		SetWindowPos(false);
+	}
+
+	/// <summary>
+	/// Sets the position of the command palette window.
+	/// </summary>
+	/// <param name="displayAtMaxHeight">Whether to render the window at the maximum possible height.</param>
+	/// <returns><see langword="false"/> when the monitor could not be found.</returns>
+	private bool SetWindowPos(bool displayAtMaxHeight)
+	{
+		if (_monitor == null)
+		{
+			Logger.Error("Attempted to activate the command palette without a monitor.");
+			return false;
+		}
+
+		int width = _plugin.Config.MaxWidthPixels;
+		int height;
+
+		if (ListViewItemsWrapper.Visibility == Visibility.Collapsed)
+		{
+			height = (int)TextEntry.ActualHeight;
+		}
+		else if (displayAtMaxHeight)
+		{
+			height = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
+			_maxHeight = height;
+		}
+		else
+		{
+			height = Math.Min(_maxHeight, (int)(TextEntry.ActualHeight + ListViewItems.ActualHeight));
+		}
+
+		if (WindowContainer.ActualHeight == height)
+		{
+			return true;
+		}
+
+		int x = (_monitor.Width / 2) - (width / 2);
+		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
+
+		ILocation<int> windowLocation = new Location(
+			x: _monitor.X + x,
+			y: _monitor.Y + y,
+			width: width,
+			height: height
+		);
+
+		WindowContainer.MaxHeight = height;
+
+		WindowDeferPosHandle.SetWindowPos(
+			new WindowState(_window, windowLocation, WindowSize.Normal),
+			_window.Handle
+		);
+
+		return true;
 	}
 
 	/// <summary>
@@ -84,32 +149,9 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	private void PostActivate()
 	{
-		if (_monitor == null)
-		{
-			Logger.Error("Attempted to activate the command palette without a monitor.");
-			return;
-		}
-
-		int width = _plugin.Config.MaxWidthPixels;
-		int height = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
-
-		int x = (_monitor.Width / 2) - (width / 2);
-		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
-
-		ILocation<int> windowLocation = new Location(
-			x: _monitor.X + x,
-			y: _monitor.Y + y,
-			width: width,
-			height: height
-		);
-
-		WindowGrid.MaxHeight = height;
 		Activate();
 		TextEntry.Focus(FocusState.Programmatic);
-		WindowDeferPosHandle.SetWindowPos(
-			new WindowState(_window, windowLocation, WindowSize.Normal),
-			_window.Handle
-		);
+		SetWindowPos(true);
 		_window.FocusForceForeground();
 	}
 
@@ -207,7 +249,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// <summary>
 	/// Update the matches shown to the user.
 	/// Effort has been made to reduce the amount of time spent executing this method.
-	/// It can likely be improved (help is welcomed).
 	/// </summary>
 	private void UpdateMatches()
 	{
@@ -246,7 +287,14 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 				Logger.Verbose($"Finished updating {item.CommandItem.Command.Title}");
 			}
+
+			ListViewItemsWrapper.Visibility = Visibility.Visible;
 		}
+		else
+		{
+			ListViewItemsWrapper.Visibility = Visibility.Collapsed;
+		}
+
 
 		// If there are more items than we have space for, remove the last ones.
 		int count = _paletteRows.Count;

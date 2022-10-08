@@ -23,7 +23,7 @@ public class CommandPaletteConfig
 	/// <summary>
 	/// The top of the command palette window, as a percentage of the monitor height.
 	/// </summary>
-	public int YPositionPercent { get; set; } = 25;
+	public int YPositionPercent { get; set; } = 20;
 
 	/// <summary>
 	/// The configuration for command palette activation.

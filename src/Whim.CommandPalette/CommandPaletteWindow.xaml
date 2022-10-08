@@ -7,7 +7,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Grid x:Name="WindowGrid" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+	<Grid x:Name="WindowContainer" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
@@ -19,11 +19,15 @@
 			PlaceholderText="Start typing..."
 			TextChanged="TextEntry_TextChanged" />
 
-		<ListView
-			x:Name="ListViewItems"
-			Grid.Row="1"
-			IsTabStop="False"
-			ItemClick="CommandListItems_ItemClick"
-			SelectionMode="Single" />
+		<RelativePanel x:Name="ListViewItemsWrapper" Grid.Row="1">
+			<ListView
+				x:Name="ListViewItems"
+				IsTabStop="False"
+				ItemClick="CommandListItems_ItemClick"
+				RelativePanel.AlignLeftWithPanel="True"
+				RelativePanel.AlignRightWithPanel="True"
+				RelativePanel.AlignTopWithPanel="True"
+				SelectionMode="Single" />
+		</RelativePanel>
 	</Grid>
 </Window>
