@@ -1,5 +1,4 @@
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
@@ -102,7 +101,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WorkspaceManager_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs e)
 	{
-		WorkspaceModel? workspace = Workspaces.FirstOrDefault(w => w == e.Workspace);
+		WorkspaceModel? workspace = Workspaces.FirstOrDefault(m => m.Workspace == e.Workspace);
 		if (workspace == null)
 		{
 			return;
