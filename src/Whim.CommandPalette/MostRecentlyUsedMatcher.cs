@@ -26,9 +26,15 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 		PalettePayload[] matches = new PalettePayload[items.Count];
 		int matchCount = GetFilteredItems(query, items, matches);
 
-		// If there are no matches, return the most recently used items.
 		if (matchCount == 0)
 		{
+			// If there are no matches and the query is not empty, return an empty list.
+			if (!string.IsNullOrEmpty(query))
+			{
+				return Array.Empty<PaletteRowItem>();
+			}
+
+			// If there are no matches, return the most recently used items.
 			matchCount = GetMostRecentlyUsedItems(items, matches);
 		}
 

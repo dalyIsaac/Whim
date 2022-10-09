@@ -15,6 +15,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private IMonitor? _monitor;
 	public bool IsVisible => _monitor != null;
 
+	private int _rowHeight;
 	private int _maxHeight;
 
 	private readonly ObservableCollection<PaletteRow> _paletteRows = new();
@@ -47,15 +48,19 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 	private void ListViewItems_SizeChanged(object sender, SizeChangedEventArgs e)
 	{
-		SetWindowPos(false);
+		_rowHeight = 0;
+		if (ListViewItems.Items.Count > 0 && ListViewItems.Items[0] is PaletteRow row)
+		{
+			// Not ensurely why this gives the right value, but it does.
+			_rowHeight = (int)row.ActualHeight * 2;
+		}
 	}
 
 	/// <summary>
 	/// Sets the position of the command palette window.
 	/// </summary>
-	/// <param name="displayAtMaxHeight">Whether to render the window at the maximum possible height.</param>
 	/// <returns><see langword="false"/> when the monitor could not be found.</returns>
-	private bool SetWindowPos(bool displayAtMaxHeight)
+	private bool SetWindowPos()
 	{
 		if (_monitor == null)
 		{
@@ -70,19 +75,13 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		{
 			height = (int)TextEntry.ActualHeight;
 		}
-		else if (displayAtMaxHeight)
+		else if (_rowHeight == 0)
 		{
-			height = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
-			_maxHeight = height;
+			height = _maxHeight;
 		}
 		else
 		{
-			height = Math.Min(_maxHeight, (int)(TextEntry.ActualHeight + ListViewItems.ActualHeight));
-		}
-
-		if (WindowContainer.ActualHeight == height)
-		{
-			return true;
+			height = Math.Min(_maxHeight, (int)TextEntry.ActualHeight + ListViewItems.Items.Count * _rowHeight);
 		}
 
 		int x = (_monitor.Width / 2) - (width / 2);
@@ -145,13 +144,13 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		_monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 		TextEntry.Text = "";
+		_maxHeight = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
 	}
 
 	private void PostActivate()
 	{
 		Activate();
 		TextEntry.Focus(FocusState.Programmatic);
-		SetWindowPos(true);
 		_window.FocusForceForeground();
 	}
 
@@ -306,6 +305,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		Logger.Verbose($"Command palette match count: {_paletteRows.Count}");
 		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
+		SetWindowPos();
 	}
 
 	private void CommandListItems_ItemClick(object sender, ItemClickEventArgs e)
