@@ -32,6 +32,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		_configContext = configContext;
 		_plugin = plugin;
+		_activationConfig = _plugin.Config.ActivationConfig;
 
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
 
@@ -42,7 +43,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		ListViewItems.ItemsSource = _paletteRows;
 
 		// Populate the commands to reduce the first render time.
-		_activationConfig = _plugin.Config.ActivationConfig;
 		PopulateItems(_configContext.CommandManager);
 		UpdateMatches();
 	}
@@ -63,90 +63,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		{
 			// Hide the window when it loses focus.
 			Hide();
-		}
-	}
-
-	/// <summary>
-	/// Sets the position of the command palette window.
-	/// </summary>
-	/// <returns><see langword="false"/> when the monitor could not be found.</returns>
-	private bool SetWindowPos()
-	{
-		if (_monitor == null)
-		{
-			Logger.Error("Attempted to activate the command palette without a monitor.");
-			return false;
-		}
-
-		int width = _plugin.Config.MaxWidthPixels;
-		int height;
-
-		if (ListViewItemsWrapper.Visibility == Visibility.Collapsed)
-		{
-			height = (int)TextEntry.ActualHeight;
-		}
-		else if (_rowHeight == 0)
-		{
-			height = _maxHeight;
-		}
-		else
-		{
-			height = Math.Min(_maxHeight, (int)TextEntry.ActualHeight + (ListViewItems.Items.Count * _rowHeight));
-		}
-
-		int x = (_monitor.Width / 2) - (width / 2);
-		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
-
-		ILocation<int> windowLocation = new Location(
-			x: _monitor.X + x,
-			y: _monitor.Y + y,
-			width: width,
-			height: height
-		);
-
-		WindowContainer.MaxHeight = height;
-
-		WindowDeferPosHandle.SetWindowPos(
-			new WindowState(_window, windowLocation, WindowSize.Normal),
-			_window.Handle
-		);
-
-		return true;
-	}
-
-	/// <summary>
-	/// Populate <see cref="_allCommands"/> with all the current commands.
-	/// </summary>
-	private void PopulateItems(IEnumerable<CommandItem> items)
-	{
-		Logger.Debug($"Populating the current list of all commands.");
-
-		int idx = 0;
-		foreach ((ICommand command, IKeybind? keybind) in items)
-		{
-			if (!command.CanExecute())
-			{
-				continue;
-			}
-
-			if (idx < _allCommands.Count)
-			{
-				if (_allCommands[idx].Command != command)
-				{
-					_allCommands[idx] = new CommandItem(command, keybind);
-				}
-			}
-			else
-			{
-				_allCommands.Add(new CommandItem(command, keybind));
-			}
-
-			idx++;
-		}
-
-		for (; idx < _allCommands.Count; idx++)
-		{
-			_allCommands.RemoveAt(_allCommands.Count - 1);
 		}
 	}
 
@@ -204,6 +120,42 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		else
 		{
 			Activate();
+		}
+	}
+
+	/// <summary>
+	/// Populate <see cref="_allCommands"/> with all the current commands.
+	/// </summary>
+	private void PopulateItems(IEnumerable<CommandItem> items)
+	{
+		Logger.Debug($"Populating the current list of all commands.");
+
+		int idx = 0;
+		foreach ((ICommand command, IKeybind? keybind) in items)
+		{
+			if (!command.CanExecute())
+			{
+				continue;
+			}
+
+			if (idx < _allCommands.Count)
+			{
+				if (_allCommands[idx].Command != command)
+				{
+					_allCommands[idx] = new CommandItem(command, keybind);
+				}
+			}
+			else
+			{
+				_allCommands.Add(new CommandItem(command, keybind));
+			}
+
+			idx++;
+		}
+
+		for (; idx < _allCommands.Count; idx++)
+		{
+			_allCommands.RemoveAt(_allCommands.Count - 1);
 		}
 	}
 
@@ -308,6 +260,51 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		Logger.Verbose($"Command palette match count: {_paletteRows.Count}");
 		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
 		SetWindowPos();
+	}
+
+	/// <summary>
+	/// Sets the position of the command palette window.
+	/// </summary>
+	private void SetWindowPos()
+	{
+		if (_monitor == null)
+		{
+			Logger.Error("Attempted to activate the command palette without a monitor.");
+			return;
+		}
+
+		int width = _plugin.Config.MaxWidthPixels;
+		int height;
+
+		if (ListViewItemsWrapper.Visibility == Visibility.Collapsed)
+		{
+			height = (int)TextEntry.ActualHeight;
+		}
+		else if (_rowHeight == 0)
+		{
+			height = _maxHeight;
+		}
+		else
+		{
+			height = Math.Min(_maxHeight, (int)TextEntry.ActualHeight + (ListViewItems.Items.Count * _rowHeight));
+		}
+
+		int x = (_monitor.Width / 2) - (width / 2);
+		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
+
+		ILocation<int> windowLocation = new Location(
+			x: _monitor.X + x,
+			y: _monitor.Y + y,
+			width: width,
+			height: height
+		);
+
+		WindowContainer.MaxHeight = height;
+
+		WindowDeferPosHandle.SetWindowPos(
+			new WindowState(_window, windowLocation, WindowSize.Normal),
+			_window.Handle
+		);
 	}
 
 	private void CommandListItems_ItemClick(object sender, ItemClickEventArgs e)

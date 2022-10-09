@@ -40,12 +40,12 @@ internal sealed partial class PaletteRow : UserControl
 	{
 		Logger.Debug("Setting title");
 		InlineCollection inlines = CommandTitle.Inlines;
-		IList<HighlightedTextSegment> segments = Model.Title.Segments;
+		IList<TextSegment> segments = Model.Title.Segments;
 
 		int idx;
 		for (idx = 0; idx < segments.Count; idx++)
 		{
-			HighlightedTextSegment seg = segments[idx];
+			TextSegment seg = segments[idx];
 			Run run = seg.ToRun();
 
 			if (idx < inlines.Count)

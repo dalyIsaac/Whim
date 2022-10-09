@@ -9,7 +9,7 @@ namespace Whim.CommandPalette;
 /// </summary>
 public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 {
-	private static readonly PalettePayloadComparer _sorter = new();
+	private static readonly MatcherCommandItemComparer _sorter = new();
 
 	private readonly Dictionary<string, uint> _commandLastExecutionTime = new();
 
@@ -23,7 +23,7 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 	/// </summary>
 	public ICollection<PaletteRowItem> Match(string query, ICollection<CommandItem> items)
 	{
-		PalettePayload[] matches = new PalettePayload[items.Count];
+		MatcherCommandItem[] matches = new MatcherCommandItem[items.Count];
 		int matchCount = GetFilteredItems(query, items, matches);
 
 		if (matchCount == 0)
@@ -52,42 +52,35 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private int GetFilteredItems(
-		string query,
-		ICollection<CommandItem> items,
-		PalettePayload[] matches
-	)
+	private int GetFilteredItems(string query, ICollection<CommandItem> items, MatcherCommandItem[] matches)
 	{
 		int matchCount = 0;
 
 		// Get the matches for the query.
 		foreach (CommandItem item in items)
 		{
-			PaletteFilterMatch[]? filterMatches = Filter(query, item.Command.Title);
+			PaletteFilterTextMatch[]? filterMatches = Filter(query, item.Command.Title);
 			if (filterMatches == null)
 			{
 				continue;
 			}
 
 			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
-			matches[matchCount++] = new PalettePayload(item, filterMatches, count);
+			matches[matchCount++] = new MatcherCommandItem(item, filterMatches, count);
 		}
 
 		return matchCount;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private int GetMostRecentlyUsedItems(
-		ICollection<CommandItem> items,
-		PalettePayload[] matches
-	)
+	private int GetMostRecentlyUsedItems(ICollection<CommandItem> items, MatcherCommandItem[] matches)
 	{
 		int matchCount = 0;
 
 		foreach (CommandItem item in items)
 		{
 			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
-			matches[matchCount++] = new PalettePayload(item, Array.Empty<PaletteFilterMatch>(), count);
+			matches[matchCount++] = new MatcherCommandItem(item, Array.Empty<PaletteFilterTextMatch>(), count);
 		}
 
 		return matchCount;

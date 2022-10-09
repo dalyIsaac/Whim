@@ -4,9 +4,9 @@ namespace Whim.CommandPalette.Tests;
 
 public static class FilterTestUtils
 {
-	public static void FilterOk(PaletteFilter filter, string word, string wordToMatchAgainst, PaletteFilterMatch[]? expectedMatches = null)
+	public static void FilterOk(PaletteFilter filter, string word, string wordToMatchAgainst, PaletteFilterTextMatch[]? expectedMatches = null)
 	{
-		PaletteFilterMatch[]? actualMatches = filter(word, wordToMatchAgainst);
+		PaletteFilterTextMatch[]? actualMatches = filter(word, wordToMatchAgainst);
 
 		if (expectedMatches == null)
 		{
@@ -18,8 +18,8 @@ public static class FilterTestUtils
 		Assert.Equal(expectedMatches.Length, actualMatches!.Length);
 		for (int i = 0; i < expectedMatches.Length; i++)
 		{
-			PaletteFilterMatch expected = expectedMatches[i];
-			PaletteFilterMatch actual = actualMatches[i];
+			PaletteFilterTextMatch expected = expectedMatches[i];
+			PaletteFilterTextMatch actual = actualMatches[i];
 
 			Assert.Equal(expected.Start, actual.Start);
 			Assert.Equal(expected.End, actual.End);
@@ -31,13 +31,13 @@ public static class FilterTestUtils
 		FilterOk(filter, word, wordToMatchAgainst, null);
 	}
 
-	public static PaletteFilterMatch[] CreateExpectedMatches(params int[][] expected)
+	public static PaletteFilterTextMatch[] CreateExpectedMatches(params int[][] expected)
 	{
-		PaletteFilterMatch[] result = new PaletteFilterMatch[expected.Length];
+		PaletteFilterTextMatch[] result = new PaletteFilterTextMatch[expected.Length];
 		for (int i = 0; i < expected.Length; i++)
 		{
 			int[] pair = expected[i];
-			result[i] = new PaletteFilterMatch(pair[0], pair[1]);
+			result[i] = new PaletteFilterTextMatch(pair[0], pair[1]);
 		}
 		return result;
 	}

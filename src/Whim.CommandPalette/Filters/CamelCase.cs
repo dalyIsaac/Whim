@@ -9,10 +9,7 @@ public static partial class PaletteFilters
 	/// <summary>
 	/// Returns the matches for the word, where the word is a camel case substring of the wordToMatchAgainst.
 	/// </summary>
-	/// <param name="word"></param>
-	/// <param name="wordToMatchAgainst"></param>
-	/// <returns></returns>
-	public static PaletteFilterMatch[]? MatchesCamelCase(string word, string wordToMatchAgainst)
+	public static PaletteFilterTextMatch[]? MatchesCamelCase(string word, string wordToMatchAgainst)
 	{
 		if (string.IsNullOrEmpty(wordToMatchAgainst))
 		{
@@ -23,15 +20,10 @@ public static partial class PaletteFilters
 
 		if (word.Length == 0)
 		{
-			return Array.Empty<PaletteFilterMatch>();
+			return Array.Empty<PaletteFilterTextMatch>();
 		}
 
-		if (!IsCamelCasePattern(word))
-		{
-			return null;
-		}
-
-		if (wordToMatchAgainst.Length > 60)
+		if (!IsCamelCasePattern(word) || wordToMatchAgainst.Length > 60)
 		{
 			return null;
 		}
@@ -47,7 +39,7 @@ public static partial class PaletteFilters
 			wordToMatchAgainst = wordToMatchAgainst.ToLower();
 		}
 
-		PaletteFilterMatch[]? result = null;
+		PaletteFilterTextMatch[]? result = null;
 		int i = 0;
 
 		word = word.ToLower();
@@ -59,11 +51,11 @@ public static partial class PaletteFilters
 		return result;
 	}
 
-	private static PaletteFilterMatch[]? MatchesCamelCaseRecurse(string word, string wordToMatchAgainst, int wordStart, int wordMatchStart)
+	private static PaletteFilterTextMatch[]? MatchesCamelCaseRecurse(string word, string wordToMatchAgainst, int wordStart, int wordMatchStart)
 	{
 		if (wordStart == word.Length)
 		{
-			return Array.Empty<PaletteFilterMatch>();
+			return Array.Empty<PaletteFilterTextMatch>();
 		}
 		else if (wordMatchStart == wordToMatchAgainst.Length)
 		{
@@ -75,14 +67,14 @@ public static partial class PaletteFilters
 		}
 		else
 		{
-			PaletteFilterMatch[]? result = MatchesCamelCaseRecurse(word, wordToMatchAgainst, wordStart + 1, wordMatchStart + 1);
+			PaletteFilterTextMatch[]? result = MatchesCamelCaseRecurse(word, wordToMatchAgainst, wordStart + 1, wordMatchStart + 1);
 			int nextUpperIndex = wordMatchStart + 1;
 			while (result == null && (nextUpperIndex = FindNextCamelCaseAnchor(wordToMatchAgainst, nextUpperIndex)) < wordToMatchAgainst.Length)
 			{
 				result = MatchesCamelCaseRecurse(word, wordToMatchAgainst, wordStart + 1, nextUpperIndex);
 				nextUpperIndex++;
 			}
-			return result == null ? null : Join(new PaletteFilterMatch(wordMatchStart, wordMatchStart + 1), result);
+			return result == null ? null : Join(new PaletteFilterTextMatch(wordMatchStart, wordMatchStart + 1), result);
 		}
 	}
 

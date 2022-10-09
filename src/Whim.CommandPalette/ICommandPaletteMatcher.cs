@@ -10,10 +10,7 @@ public interface ICommandPaletteMatcher
 	/// <summary>
 	/// Matcher returns an ordered list of filtered matches for the <paramref name="query"/>.
 	/// </summary>
-	public ICollection<PaletteRowItem> Match(
-		string query,
-		ICollection<CommandItem> items
-	);
+	public ICollection<PaletteRowItem> Match(string query, ICollection<CommandItem> items);
 
 	/// <summary>
 	/// Called when a match has been executed. This is used by the <see cref="ICommandPaletteMatcher"/>

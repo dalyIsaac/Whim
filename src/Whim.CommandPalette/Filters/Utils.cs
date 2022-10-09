@@ -17,7 +17,7 @@ public static partial class PaletteFilters
 	{
 		foreach (PaletteFilter filter in filters)
 		{
-			PaletteFilterMatch[]? match = filter(word, wordToMatchAgainst);
+			PaletteFilterTextMatch[]? match = filter(word, wordToMatchAgainst);
 			if (match != null)
 			{
 				return match;
@@ -35,7 +35,7 @@ public static partial class PaletteFilters
 	/// <param name="head">The match to place at the start of the array of returned matches.</param>
 	/// <param name="tail">The matches to place after the head.</param>
 	/// <returns></returns>
-	public static PaletteFilterMatch[] Join(PaletteFilterMatch head, PaletteFilterMatch[] tail)
+	public static PaletteFilterTextMatch[] Join(PaletteFilterTextMatch head, PaletteFilterTextMatch[] tail)
 	{
 		if (tail.Length == 0)
 		{
@@ -43,7 +43,7 @@ public static partial class PaletteFilters
 		}
 		else if (head.End == tail[0].Start)
 		{
-			tail[0] = new PaletteFilterMatch(head.Start, tail[0].End);
+			tail[0] = new PaletteFilterTextMatch(head.Start, tail[0].End);
 		}
 		else
 		{

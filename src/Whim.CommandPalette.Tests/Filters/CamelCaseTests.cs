@@ -28,7 +28,7 @@ public class CamelCaseTests
 	[Theory]
 	public void MatchesCamelCase_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
-		PaletteFilterMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
+		PaletteFilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesCamelCase, word, wordToMatchAgainst, expectedMatches);
 	}
 

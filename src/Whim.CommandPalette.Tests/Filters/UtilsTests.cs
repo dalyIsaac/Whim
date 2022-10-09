@@ -9,7 +9,7 @@ public class UtilsTests
 		return (string word, string wordToMatchAgainst) =>
 		{
 			counters[i]++;
-			return r ? new[] { new PaletteFilterMatch(0, word.Length) } : null;
+			return r ? new[] { new PaletteFilterTextMatch(0, word.Length) } : null;
 		};
 	}
 
@@ -21,7 +21,7 @@ public class UtilsTests
 	{
 		int[] counters = new int[2];
 		PaletteFilter filter = PaletteFilters.Or(NewFilter(counters, i1, r1), NewFilter(counters, i2, r2));
-		FilterTestUtils.FilterOk(filter, "anything", "anything", new PaletteFilterMatch[] { new PaletteFilterMatch(0, 8) });
+		FilterTestUtils.FilterOk(filter, "anything", "anything", new PaletteFilterTextMatch[] { new PaletteFilterTextMatch(0, 8) });
 		Assert.Equal(expected, counters);
 	}
 

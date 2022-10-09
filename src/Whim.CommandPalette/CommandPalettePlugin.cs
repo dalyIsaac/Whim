@@ -44,31 +44,27 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	}
 
 	/// <summary>
-	/// Activate the command palette window, in menu mode.
+	/// Activate the command palette.
 	/// </summary>
-	/// <param name="config">The configuration for activation.</param>
-	/// <param name="items">
-	/// The items to activate the command palette with. These items will be passed to the
-	/// <see cref="ICommandPaletteMatcher"/> to filter the results.
-	/// When the text is empty, typically all items are shown.
-	/// </param>
-	public void Activate(CommandPaletteMenuActivationConfig? config = null, IEnumerable<CommandItem>? items = null)
+	public void Activate()
 	{
 		_commandPaletteWindow?.Activate(
-			config: config ?? Config.ActivationConfig,
-			items: items ?? _configContext.CommandManager,
+			config: Config.ActivationConfig,
+			items: _configContext.CommandManager,
 			monitor: _configContext.MonitorManager.FocusedMonitor
 		);
 	}
 
 	/// <summary>
-	/// Activate the command palette window, in free text mode.
+	/// Activate the command palette with the given config.
 	/// </summary>
-	/// <param name="config">The configuration for activation.</param>
-	public void Activate(BaseCommandPaletteActivationConfig config)
+	/// <param name="config"></param>
+	/// <param name="items"></param>
+	public void ActivateWithConfig(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items = null)
 	{
 		_commandPaletteWindow?.Activate(
-			config: config ?? Config.ActivationConfig,
+			config: config,
+			items: items,
 			monitor: _configContext.MonitorManager.FocusedMonitor
 		);
 	}
@@ -132,11 +128,13 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 			new Command(
 				identifier: "command_palette.rename_workspace",
 				title: "Rename workspace",
-				callback: () => Activate(new CommandPaletteFreeTextActivationConfig(
-					callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
-					hint: "Enter new workspace name",
-					initialText: _configContext.WorkspaceManager.ActiveWorkspace.Name
-				))
+				callback: () => ActivateWithConfig(
+					new CommandPaletteFreeTextActivationConfig(
+						callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
+						hint: "Enter new workspace name",
+						initialText: _configContext.WorkspaceManager.ActiveWorkspace.Name
+					)
+				)
 			)
 		),
 	};

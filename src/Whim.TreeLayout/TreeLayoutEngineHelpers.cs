@@ -77,10 +77,7 @@ public partial class TreeLayoutEngine
 	/// <returns>Location of the node. Used for recursion.</returns>
 	public static ILocation<double> GetNodeLocation(Node node, DoubleLocation? location = null)
 	{
-		if (location == null)
-		{
-			location = new DoubleLocation() { X = 0, Y = 0, Width = 1, Height = 1 };
-		}
+		location ??= new DoubleLocation() { X = 0, Y = 0, Width = 1, Height = 1 };
 
 		if (node.Parent == null)
 		{

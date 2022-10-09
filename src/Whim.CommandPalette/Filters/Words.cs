@@ -10,10 +10,7 @@ public static partial class PaletteFilters
 	/// Matches substrings of the word with beginnings of the words in the target. E.g., "gp" or "g p" will match "Git: Pull".
 	/// Useful in cases where the target is words (e.g., command labels).
 	/// </summary>
-	/// <param name="word"></param>
-	/// <param name="target"></param>
-	/// <returns></returns>
-	public static PaletteFilterMatch[]? MatchesWordsContiguous(string word, string target)
+	public static PaletteFilterTextMatch[]? MatchesWordsContiguous(string word, string target)
 	{
 		return MatchesWordsBase(word, target, true);
 	}
@@ -22,22 +19,19 @@ public static partial class PaletteFilters
 	/// Matches beginning of words supporting non-ASCII languages.
 	/// Matches words with the beginnings of the words in the target. E.g., "pul" will match "Git: Pull".
 	/// </summary>
-	/// <param name="word"></param>
-	/// <param name="target"></param>
-	/// <returns></returns>
-	public static PaletteFilterMatch[]? MatchesWordsSeparate(string word, string target)
+	public static PaletteFilterTextMatch[]? MatchesWordsSeparate(string word, string target)
 	{
 		return MatchesWordsBase(word, target, false);
 	}
 
-	private static PaletteFilterMatch[]? MatchesWordsBase(string word, string target, bool contiguous = false)
+	private static PaletteFilterTextMatch[]? MatchesWordsBase(string word, string target, bool contiguous = false)
 	{
 		if (string.IsNullOrEmpty(target))
 		{
 			return null;
 		}
 
-		PaletteFilterMatch[]? result = null;
+		PaletteFilterTextMatch[]? result = null;
 		int i = 0;
 
 		word = word.ToLower();
@@ -50,11 +44,11 @@ public static partial class PaletteFilters
 		return result;
 	}
 
-	private static PaletteFilterMatch[]? MatchesWordsRecurse(string word, string wordToMatchAgainst, int i, int j, bool contiguous)
+	private static PaletteFilterTextMatch[]? MatchesWordsRecurse(string word, string wordToMatchAgainst, int i, int j, bool contiguous)
 	{
 		if (i == word.Length)
 		{
-			return Array.Empty<PaletteFilterMatch>();
+			return Array.Empty<PaletteFilterTextMatch>();
 		}
 		else if (j == wordToMatchAgainst.Length)
 		{
@@ -66,7 +60,7 @@ public static partial class PaletteFilters
 		}
 
 		int nextWordIndex = j + 1;
-		PaletteFilterMatch[]? result = MatchesWordsRecurse(word, wordToMatchAgainst, i + 1, j + 1, contiguous);
+		PaletteFilterTextMatch[]? result = MatchesWordsRecurse(word, wordToMatchAgainst, i + 1, j + 1, contiguous);
 		if (!contiguous)
 		{
 			while (result == null && (nextWordIndex = NextWord(wordToMatchAgainst, nextWordIndex)) < wordToMatchAgainst.Length)
@@ -88,7 +82,7 @@ public static partial class PaletteFilters
 			return result;
 		}
 
-		return PaletteFilters.Join(new PaletteFilterMatch(j, j + 1), result);
+		return PaletteFilters.Join(new PaletteFilterTextMatch(j, j + 1), result);
 	}
 
 	private static int NextWord(string word, int start)

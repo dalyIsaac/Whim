@@ -7,10 +7,7 @@ public static partial class PaletteFilters
 	/// <summary>
 	/// Returns the match of the word, where the word is a contiguous substring of the wordToMatchAgainst.
 	/// </summary>
-	/// <param name="word"></param>
-	/// <param name="wordToMatchAgainst"></param>
-	/// <returns></returns>
-	public static PaletteFilterMatch[]? MatchesContiguousSubString(string word, string wordToMatchAgainst)
+	public static PaletteFilterTextMatch[]? MatchesContiguousSubString(string word, string wordToMatchAgainst)
 	{
 		int index = wordToMatchAgainst.IndexOf(word, StringComparison.OrdinalIgnoreCase);
 		if (index == -1)
@@ -18,25 +15,22 @@ public static partial class PaletteFilters
 			return null;
 		}
 
-		return new[] { new PaletteFilterMatch(index, index + word.Length) };
+		return new[] { new PaletteFilterTextMatch(index, index + word.Length) };
 	}
 
 	/// <summary>
 	/// Returns the non-contiguous substring matches of the word, compared to the wordToMatchAgainst.
 	/// </summary>
-	/// <param name="word"></param>
-	/// <param name="wordToMatchAgainst"></param>
-	/// <returns></returns>
-	public static PaletteFilterMatch[]? MatchesSubString(string word, string wordToMatchAgainst)
+	public static PaletteFilterTextMatch[]? MatchesSubString(string word, string wordToMatchAgainst)
 	{
 		return MatchesSubStringRecurse(word.ToLower(), wordToMatchAgainst.ToLower(), 0, 0);
 	}
 
-	private static PaletteFilterMatch[]? MatchesSubStringRecurse(string word, string wordToMatchAgainst, int wordStart, int wordMatchStart)
+	private static PaletteFilterTextMatch[]? MatchesSubStringRecurse(string word, string wordToMatchAgainst, int wordStart, int wordMatchStart)
 	{
 		if (wordStart == word.Length)
 		{
-			return Array.Empty<PaletteFilterMatch>();
+			return Array.Empty<PaletteFilterTextMatch>();
 		}
 		if (wordMatchStart == wordToMatchAgainst.Length)
 		{
@@ -45,10 +39,10 @@ public static partial class PaletteFilters
 
 		if (word[wordStart] == wordToMatchAgainst[wordMatchStart])
 		{
-			PaletteFilterMatch[]? result = MatchesSubStringRecurse(word, wordToMatchAgainst, wordStart + 1, wordMatchStart + 1);
+			PaletteFilterTextMatch[]? result = MatchesSubStringRecurse(word, wordToMatchAgainst, wordStart + 1, wordMatchStart + 1);
 			if (result is not null)
 			{
-				return Join(new PaletteFilterMatch(wordMatchStart, wordMatchStart + 1), result);
+				return Join(new PaletteFilterTextMatch(wordMatchStart, wordMatchStart + 1), result);
 			}
 			return null;
 		}
