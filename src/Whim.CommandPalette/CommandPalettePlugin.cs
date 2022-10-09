@@ -133,7 +133,9 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 				identifier: "command_palette.rename_workspace",
 				title: "Rename workspace",
 				callback: () => Activate(new CommandPaletteFreeTextActivationConfig(
-					callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text
+					callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
+					hint: "Enter new workspace name",
+					initialText: _configContext.WorkspaceManager.ActiveWorkspace.Name
 				))
 			)
 		),

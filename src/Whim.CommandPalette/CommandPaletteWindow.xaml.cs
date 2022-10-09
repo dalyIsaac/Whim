@@ -140,20 +140,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 	}
 
-	private void PreActivate(IMonitor? monitor)
-	{
-		_monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
-		TextEntry.Text = "";
-		_maxHeight = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
-	}
-
-	private void PostActivate()
-	{
-		Activate();
-		TextEntry.Focus(FocusState.Programmatic);
-		_window.FocusForceForeground();
-	}
-
 	/// <summary>
 	/// Activate the command palette.
 	/// </summary>
@@ -168,13 +154,19 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		Logger.Debug("Activating command palette");
 
-		PreActivate(monitor);
-
 		_activationConfig = config;
+		_monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
+
+		TextEntry.Text = _activationConfig.InitialText;
+		TextEntry.PlaceholderText = _activationConfig.Hint ?? "Start typing...";
+		_maxHeight = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
+
 		PopulateItems(items ?? Array.Empty<CommandItem>());
 		UpdateMatches();
 
-		PostActivate();
+		Activate();
+		TextEntry.Focus(FocusState.Programmatic);
+		_window.FocusForceForeground();
 	}
 
 	/// <summary>

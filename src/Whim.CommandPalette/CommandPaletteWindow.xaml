@@ -16,7 +16,6 @@
 		<TextBox
 			x:Name="TextEntry"
 			KeyDown="TextEntry_KeyDown"
-			PlaceholderText="Start typing..."
 			TextChanged="TextEntry_TextChanged" />
 
 		<RelativePanel x:Name="ListViewItemsWrapper" Grid.Row="1">
