@@ -129,6 +129,16 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="ActiveLayoutEngineChanged"/>.
+	/// </summary>
+	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args);
+
+	/// <summary>
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceRenamed"/>.
+	/// </summary>
+	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args);
+
+	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.
 	/// </summary>
 	/// <param name="workspace">The workspace to move the window to.</param>
