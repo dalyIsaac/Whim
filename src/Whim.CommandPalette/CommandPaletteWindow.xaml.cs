@@ -36,6 +36,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
 
 		ListViewItems.SizeChanged += ListViewItems_SizeChanged;
+		Activated += CommandPaletteWindow_Activated;
 
 		Title = CommandPaletteConfig.Title;
 		ListViewItems.ItemsSource = _paletteRows;
@@ -53,6 +54,15 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		{
 			// Not ensurely why this gives the right value, but it does.
 			_rowHeight = (int)row.ActualHeight * 2;
+		}
+	}
+
+	private void CommandPaletteWindow_Activated(object sender, WindowActivatedEventArgs e)
+	{
+		if (e.WindowActivationState == WindowActivationState.Deactivated)
+		{
+			// Hide the window when it loses focus.
+			Hide();
 		}
 	}
 
@@ -81,7 +91,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 		else
 		{
-			height = Math.Min(_maxHeight, (int)TextEntry.ActualHeight + ListViewItems.Items.Count * _rowHeight);
+			height = Math.Min(_maxHeight, (int)TextEntry.ActualHeight + (ListViewItems.Items.Count * _rowHeight));
 		}
 
 		int x = (_monitor.Width / 2) - (width / 2);
