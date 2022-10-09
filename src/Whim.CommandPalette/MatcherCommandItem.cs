@@ -49,6 +49,7 @@ internal record MatcherCommandItem
 
 /// <summary>
 /// Defines a method to compare <see cref="MatcherCommandItem"/>.
+/// A higher score will be sorted first. For equal scores, the title will be sorted normally.
 /// </summary>
 internal class MatcherCommandItemComparer : IComparer<MatcherCommandItem>
 {
@@ -66,13 +67,16 @@ internal class MatcherCommandItemComparer : IComparer<MatcherCommandItem>
 		}
 
 		// Sort by the last used time.
-		int lastUsedTimeComparison = y.Score.CompareTo(x.Score);
-		if (lastUsedTimeComparison != 0)
+		if (x.Score > y.Score)
 		{
-			return lastUsedTimeComparison;
+			return -1;
+		}
+		else if (x.Score < y.Score)
+		{
+			return 1;
 		}
 
 		// Sort by alphabetical order.
-		return string.Compare(x.Item.Command.Title, y.Item.Command.Title, System.StringComparison.Ordinal);
+		return string.Compare(x.Item.Command.Title, y.Item.Command.Title, StringComparison.Ordinal);
 	}
 }
