@@ -3,7 +3,7 @@ namespace Whim;
 /// <summary>
 /// A command and associated keybind.
 /// </summary>
-public class CommandItem
+public record CommandItem
 {
 	/// <summary>
 	/// The command to execute.

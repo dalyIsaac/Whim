@@ -322,6 +322,5 @@ public class CommandItemsTests
 		Assert.Contains(new CommandItem(command2.Object, null), commands);
 		Assert.Contains(new CommandItem(command3.Object, null), commands);
 		Assert.Contains(new CommandItem(command4.Object, keybind4), commands);
-
 	}
 }
