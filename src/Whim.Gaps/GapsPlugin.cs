@@ -52,10 +52,10 @@ public class GapsPlugin : IPlugin
 	}
 
 	/// <inheritdoc />
-	public (ICommand, IKeybind?)[] GetCommands() => new (ICommand, IKeybind?)[]
+	public CommandItem[] GetCommands() => new CommandItem[]
 	{
 		// Increase outer gap
-		(
+		new CommandItem(
 			new Command(
 				identifier: "gaps.outer.increase",
 				title: "Increase outer gap",
@@ -65,7 +65,7 @@ public class GapsPlugin : IPlugin
 		),
 
 		// Decrease outer gap
-		(
+		new CommandItem(
 			new Command(
 				identifier: "gaps.outer.decrease",
 				title: "Decrease outer gap",
@@ -75,7 +75,7 @@ public class GapsPlugin : IPlugin
 		),
 
 		// Increase inner gap
-		(
+		new CommandItem(
 			new Command(
 				identifier: "gaps.inner.increase",
 				title: "Increase inner gap",
@@ -85,7 +85,7 @@ public class GapsPlugin : IPlugin
 		),
 
 		// Decrease inner gap
-		(
+		new CommandItem(
 			new Command(
 				identifier: "gaps.inner.decrease",
 				title: "Decrease inner gap",

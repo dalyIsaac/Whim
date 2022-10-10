@@ -25,5 +25,5 @@ public interface IPlugin
 	/// It's up to the user to register the commands themselves using
 	/// <see cref="ICommandManager.LoadCommands"/>.
 	/// </summary>
-	public (ICommand, IKeybind?)[] GetCommands();
+	public CommandItem[] GetCommands();
 }

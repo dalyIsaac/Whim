@@ -31,10 +31,10 @@ public static class DefaultCommands
 	/// <summary>
 	/// Gets the default commands and their associated keybinds.
 	/// </summary>
-	public static (ICommand, IKeybind?)[] GetCommands(IConfigContext configContext) => new (ICommand, IKeybind?)[]
+	public static CommandItem[] GetCommands(IConfigContext configContext) => new CommandItem[]
 	{
 		// Focus window in direction.
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.focus_window_in_direction.left",
 				title: "Focus the window in the left direction",
@@ -42,7 +42,7 @@ public static class DefaultCommands
 			),
 			new Keybind(WinAlt, VIRTUAL_KEY.VK_LEFT)
 		),
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.focus_window_in_direction.right",
 				title: "Focus the window in the right direction",
@@ -50,7 +50,7 @@ public static class DefaultCommands
 			),
 			new Keybind(WinAlt, VIRTUAL_KEY.VK_RIGHT)
 		),
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.focus_window_in_direction.up",
 				title: "Focus the window in the up direction",
@@ -58,7 +58,7 @@ public static class DefaultCommands
 			),
 			new Keybind(WinAlt, VIRTUAL_KEY.VK_UP)
 		),
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.focus_window_in_direction.down",
 				title: "Focus the window in the down direction",
@@ -68,7 +68,7 @@ public static class DefaultCommands
 		),
 
 		// Swap windows in direction.
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.swap_window_in_direction.left",
 				title: "Swap the window with the window to the left",
@@ -76,7 +76,7 @@ public static class DefaultCommands
 			),
 			new Keybind(WinCtrl, VIRTUAL_KEY.VK_LEFT)
 		),
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.swap_window_in_direction.right",
 				title: "Swap the window with the window to the right",
@@ -84,7 +84,7 @@ public static class DefaultCommands
 			),
 			new Keybind(WinCtrl, VIRTUAL_KEY.VK_RIGHT)
 		),
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.swap_window_in_direction.up",
 				title: "Swap the window with the window to the up",
@@ -92,7 +92,7 @@ public static class DefaultCommands
 			),
 			new Keybind(WinCtrl, VIRTUAL_KEY.VK_UP)
 		),
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.swap_window_in_direction.down",
 				title: "Swap the window with the window to the down",
@@ -102,7 +102,7 @@ public static class DefaultCommands
 		),
 
 		// Move window to monitor.
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.move_window_to_monitor.previous",
 				title: "Move the window to the previous monitor",
@@ -110,7 +110,7 @@ public static class DefaultCommands
 			),
 			new Keybind(WinShift, VIRTUAL_KEY.VK_LEFT)
 		),
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.move_window_to_monitor.next",
 				title: "Move the window to the next monitor",
@@ -120,7 +120,7 @@ public static class DefaultCommands
 		),
 
 		// Exit.
-		(
+		new CommandItem(
 			new Command(
 				identifier: "default_commands.exit",
 				title: "Exit Whim",

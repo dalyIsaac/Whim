@@ -109,5 +109,5 @@ public class BarPlugin : IPlugin, IDisposable
 	}
 
 	/// <inheritdoc />
-	public (ICommand, IKeybind?)[] GetCommands() => Array.Empty<(ICommand, IKeybind?)>();
+	public CommandItem[] GetCommands() => Array.Empty<CommandItem>();
 }

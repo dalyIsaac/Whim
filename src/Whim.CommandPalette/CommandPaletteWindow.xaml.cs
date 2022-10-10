@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -14,103 +15,83 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private IMonitor? _monitor;
 	public bool IsVisible => _monitor != null;
 
+	private int _rowHeight;
+	private int _maxHeight;
+
 	private readonly ObservableCollection<PaletteRow> _paletteRows = new();
 	private readonly List<PaletteRow> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="ListViewItems"/> are drawn.
 	/// </summary>
-	private readonly List<Match> _allCommands = new();
+	private readonly List<CommandItem> _allCommands = new();
+
+	private BaseCommandPaletteActivationConfig? _activationConfig;
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
 		_configContext = configContext;
 		_plugin = plugin;
+		_activationConfig = _plugin.Config.ActivationConfig;
+
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
+
+		ListViewItems.SizeChanged += ListViewItems_SizeChanged;
+		Activated += CommandPaletteWindow_Activated;
 
 		Title = CommandPaletteConfig.Title;
 		ListViewItems.ItemsSource = _paletteRows;
 
 		// Populate the commands to reduce the first render time.
-		Populate();
+		PopulateItems(_configContext.CommandManager);
 		UpdateMatches();
 	}
 
-	/// <summary>
-	/// Populate <see cref="_allCommands"/> with all the current commands.
-	/// </summary>
-	private void Populate(IEnumerable<(ICommand, IKeybind?)>? items = null)
+	private void ListViewItems_SizeChanged(object sender, SizeChangedEventArgs e)
 	{
-		Logger.Debug($"Populating the current list of all commands.");
-		int idx = 0;
-		foreach ((ICommand command, IKeybind? keybind) in items ?? _configContext.CommandManager)
+		_rowHeight = 0;
+		if (ListViewItems.Items.Count > 0 && ListViewItems.Items[0] is PaletteRow row)
 		{
-			if (!command.CanExecute())
-			{
-				continue;
-			}
-
-			if (idx < _allCommands.Count)
-			{
-				if (_allCommands[idx].Command != command)
-				{
-					_allCommands[idx] = new Match(command, keybind);
-				}
-			}
-			else
-			{
-				_allCommands.Add(new Match(command, keybind));
-			}
-
-			idx++;
+			// Not ensurely why this gives the right value, but it does.
+			_rowHeight = (int)row.ActualHeight * 2;
 		}
+	}
 
-		for (; idx < _allCommands.Count; idx++)
+	private void CommandPaletteWindow_Activated(object sender, WindowActivatedEventArgs e)
+	{
+		if (e.WindowActivationState == WindowActivationState.Deactivated)
 		{
-			_allCommands.RemoveAt(_allCommands.Count - 1);
+			// Hide the window when it loses focus.
+			Hide();
 		}
 	}
 
 	/// <summary>
 	/// Activate the command palette.
 	/// </summary>
+	/// <param name="config">The configuration for activation.</param>
 	/// <param name="items">
-	/// The items to activate the command palette with.
-	/// These items will be passed to the <see cref="ICommandPaletteMatcher"/> to determine the matches.
-	/// For example, when the query is empty, typically all items will be matched and be displayed.
+	/// The items to activate the command palette with. These items will be passed to the
+	/// <see cref="ICommandPaletteMatcher"/> to filter the results.
+	/// When the text is empty, typically all items are shown.
 	/// </param>
 	/// <param name="monitor">The monitor to display the command palette on.</param>
-	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null, IMonitor? monitor = null)
+	public void Activate(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items = null, IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating command palette");
 
-		monitor ??= _configContext.MonitorManager.FocusedMonitor;
-		if (monitor == _monitor)
-		{
-			return;
-		}
-		_monitor = monitor;
-		TextEntry.Text = "";
+		_activationConfig = config;
+		_monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 
-		Populate(items);
+		TextEntry.Text = _activationConfig.InitialText;
+		TextEntry.PlaceholderText = _activationConfig.Hint ?? "Start typing...";
+		_maxHeight = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
+
+		PopulateItems(items ?? Array.Empty<CommandItem>());
 		UpdateMatches();
 
-		int width = 680;
-		int height = 680;
-
-		ILocation<int> windowLocation = new Location(
-			x: monitor.X + (monitor.Width / 2) - (width / 2),
-			y: monitor.Y + (height / 4),
-			width: width,
-			height: height
-		);
-
-		base.Activate();
+		Activate();
 		TextEntry.Focus(FocusState.Programmatic);
-		WindowDeferPosHandle.SetWindowPos(
-			new WindowState(_window, windowLocation, WindowSize.Normal),
-			_window.Handle
-		);
 		_window.FocusForceForeground();
 	}
 
@@ -139,6 +120,42 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		else
 		{
 			Activate();
+		}
+	}
+
+	/// <summary>
+	/// Populate <see cref="_allCommands"/> with all the current commands.
+	/// </summary>
+	private void PopulateItems(IEnumerable<CommandItem> items)
+	{
+		Logger.Debug($"Populating the current list of all commands.");
+
+		int idx = 0;
+		foreach ((ICommand command, IKeybind? keybind) in items)
+		{
+			if (!command.CanExecute())
+			{
+				continue;
+			}
+
+			if (idx < _allCommands.Count)
+			{
+				if (_allCommands[idx].Command != command)
+				{
+					_allCommands[idx] = new CommandItem(command, keybind);
+				}
+			}
+			else
+			{
+				_allCommands.Add(new CommandItem(command, keybind));
+			}
+
+			idx++;
+		}
+
+		for (; idx < _allCommands.Count; idx++)
+		{
+			_allCommands.RemoveAt(_allCommands.Count - 1);
 		}
 	}
 
@@ -185,7 +202,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// <summary>
 	/// Update the matches shown to the user.
 	/// Effort has been made to reduce the amount of time spent executing this method.
-	/// It can likely be improved (help is welcomed).
 	/// </summary>
 	private void UpdateMatches()
 	{
@@ -193,35 +209,45 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		string query = TextEntry.Text;
 		int idx = 0;
 
-		foreach (PaletteItem item in _plugin.Config.Matcher.Match(query, _allCommands))
+		if (_activationConfig is CommandPaletteMenuActivationConfig menuActivationConfig)
 		{
-			Logger.Verbose($"Matched {item.Match.Command.Title}");
-			if (idx < _paletteRows.Count)
+			foreach (PaletteRowItem item in menuActivationConfig.Matcher.Match(query, _allCommands))
 			{
-				// Update the existing row.
-				_paletteRows[idx].Update(item);
-			}
-			else if (_unusedRows.Count > 0)
-			{
-				// Restoring the unused row.
-				PaletteRow row = _unusedRows[^1];
-				row.Update(item);
+				Logger.Verbose($"Matched {item.CommandItem.Command.Title}");
+				if (idx < _paletteRows.Count)
+				{
+					// Update the existing row.
+					_paletteRows[idx].Update(item);
+				}
+				else if (_unusedRows.Count > 0)
+				{
+					// Restoring the unused row.
+					PaletteRow row = _unusedRows[^1];
+					row.Update(item);
 
-				_paletteRows.Add(row);
+					_paletteRows.Add(row);
 
-				_unusedRows.RemoveAt(_unusedRows.Count - 1);
-			}
-			else
-			{
-				// Add a new row.
-				PaletteRow row = new(item);
-				_paletteRows.Add(row);
-				row.Initialize();
-			}
-			idx++;
+					_unusedRows.RemoveAt(_unusedRows.Count - 1);
+				}
+				else
+				{
+					// Add a new row.
+					PaletteRow row = new(item);
+					_paletteRows.Add(row);
+					row.Initialize();
+				}
+				idx++;
 
-			Logger.Verbose($"Finished updating {item.Match.Command.Title}");
+				Logger.Verbose($"Finished updating {item.CommandItem.Command.Title}");
+			}
+
+			ListViewItemsWrapper.Visibility = Visibility.Visible;
 		}
+		else
+		{
+			ListViewItemsWrapper.Visibility = Visibility.Collapsed;
+		}
+
 
 		// If there are more items than we have space for, remove the last ones.
 		int count = _paletteRows.Count;
@@ -232,8 +258,53 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 
 		Logger.Verbose($"Command palette match count: {_paletteRows.Count}");
-
 		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
+		SetWindowPos();
+	}
+
+	/// <summary>
+	/// Sets the position of the command palette window.
+	/// </summary>
+	private void SetWindowPos()
+	{
+		if (_monitor == null)
+		{
+			Logger.Error("Attempted to activate the command palette without a monitor.");
+			return;
+		}
+
+		int width = _plugin.Config.MaxWidthPixels;
+		int height;
+
+		if (ListViewItemsWrapper.Visibility == Visibility.Collapsed)
+		{
+			height = (int)TextEntry.ActualHeight;
+		}
+		else if (_rowHeight == 0)
+		{
+			height = _maxHeight;
+		}
+		else
+		{
+			height = Math.Min(_maxHeight, (int)TextEntry.ActualHeight + (ListViewItems.Items.Count * _rowHeight));
+		}
+
+		int x = (_monitor.Width / 2) - (width / 2);
+		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
+
+		ILocation<int> windowLocation = new Location(
+			x: _monitor.X + x,
+			y: _monitor.Y + y,
+			width: width,
+			height: height
+		);
+
+		WindowContainer.MaxHeight = height;
+
+		WindowDeferPosHandle.SetWindowPos(
+			new WindowState(_window, windowLocation, WindowSize.Normal),
+			_window.Handle
+		);
 	}
 
 	private void CommandListItems_ItemClick(object sender, ItemClickEventArgs e)
@@ -246,15 +317,27 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private void ExecuteCommand()
 	{
 		Logger.Debug("Executing command");
-		if (ListViewItems.SelectedIndex < 0)
+
+		if (_activationConfig is CommandPaletteFreeTextActivationConfig freeTextActivationConfig)
 		{
+			freeTextActivationConfig.Callback(TextEntry.Text);
 			Hide();
+			return;
 		}
+		else if (_activationConfig is CommandPaletteMenuActivationConfig menuActivationConfig)
+		{
+			CommandItem match = _paletteRows[ListViewItems.SelectedIndex].Model.CommandItem;
 
-		Match match = _paletteRows[ListViewItems.SelectedIndex].Model.Match;
+			// Since the palette window is reused, there's a chance that the _activationConfig
+			// will have been wiped by a free form child command.
+			BaseCommandPaletteActivationConfig currentConfig = _activationConfig;
+			match.Command.TryExecute();
+			menuActivationConfig.Matcher.OnMatchExecuted(match);
 
-		match.Command.TryExecute();
-		_plugin.Config.Matcher.OnMatchExecuted(match);
-		Hide();
+			if (_activationConfig == currentConfig)
+			{
+				Hide();
+			}
+		}
 	}
 }

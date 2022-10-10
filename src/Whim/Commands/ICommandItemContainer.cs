@@ -8,7 +8,7 @@ namespace Whim;
 /// <see cref="ICollection{T}"/>).
 /// It stores the commands and their keybinds for easy access and operation.
 /// </summary>
-public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
+public interface ICommandItemContainer : IEnumerable<CommandItem>
 {
 	/// <summary>
 	/// Adds the <paramref name="command"/> to the collection.
@@ -22,7 +22,7 @@ public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 	///
 	/// <para/>
 	/// This will throw an exception if there are two different commands with the same identifier.
-	/// This is done (in contrast to Whim's general lack of throwing exceptions) as <see cref="Add"/>
+	/// This is done (in contrast to Whim's general lack of throwing exceptions) as <c>Add</c>
 	/// will usually be done during the application's startup.
 	/// </summary>
 	/// <param name="command">The command to add</param>
@@ -31,7 +31,7 @@ public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 	public void Add(ICommand command, IKeybind? keybind = null);
 
 	/// <summary>
-	/// Sets the existing command (via the <paramref name="identifier"/>) to
+	/// Sets the existing command (via the <paramref name="commandIdentifier"/>) to
 	/// have the given <paramref name="keybind"/>.
 	///
 	/// <para/>
@@ -41,10 +41,10 @@ public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 	/// <para/>
 	/// This is largely a helper around <see cref="Add(ICommand, IKeybind?)"/>.
 	/// </summary>
-	/// <param name="identifier">The identifier of the command to set the keybind for</param>
+	/// <param name="commandIdentifier">The identifier of the command to set the keybind for</param>
 	/// <param name="keybind">The keybind to bind the command to</param>
 	/// <returns>True if the command was found and the keybind was set, false otherwise.</returns>
-	public bool SetKeybind(string identifier, IKeybind keybind);
+	public bool Add(string commandIdentifier, IKeybind keybind);
 
 	/// <summary>
 	/// Tries to remove the given keybind. It does not remove the command bound to the keybind.
@@ -54,19 +54,27 @@ public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 	public bool RemoveKeybind(IKeybind keybind);
 
 	/// <summary>
-	/// Tries to remove the keybind bound to the given <paramref name="identifier"/>.
+	/// Tries to remove the keybind bound to the given <paramref name="commandIdentifier"/>.
 	/// </summary>
-	/// <param name="identifier">The identifier of the command to remove the keybind for</param>
+	/// <param name="commandIdentifier">The identifier of the command to remove the keybind for</param>
 	/// <returns>If the keybind was removed, returns true. Otherwise, returns false.</returns>
-	public bool RemoveKeybind(string identifier);
+	public bool RemoveKeybind(string commandIdentifier);
+
+	/// <summary>
+	/// Tries to remove the given command.
+	/// Removing the command will also remove the keybind that is bound to it.
+	/// </summary>
+	/// <param name="command">The command to remove</param>
+	/// <returns>If the command was removed, returns true. Otherwise, returns false.</returns>
+	public bool RemoveCommand(ICommand command);
 
 	/// <summary>
 	/// Tries to remove the command with the given identifier.
 	/// Removing the command will also remove the keybind that is bound to it.
 	/// </summary>
-	/// <param name="identifier">The identifier of the command to remove</param>
+	/// <param name="commandIdentifier">The identifier of the command to remove</param>
 	/// <returns>If the command was removed, returns true. Otherwise, returns false.</returns>
-	public bool Remove(string identifier);
+	public bool RemoveCommand(string commandIdentifier);
 
 	/// <summary>
 	/// Clears all commands and keybinds.
@@ -81,9 +89,9 @@ public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 	/// <summary>
 	/// Tries to get the command with the given identifier.
 	/// </summary>
-	/// <param name="identifier">The identifier of the command to get</param>
+	/// <param name="commandIdentifier">The identifier of the command to get</param>
 	/// <returns>The command with the given identifier, or null if not found.</returns>
-	public ICommand? TryGetCommand(string identifier);
+	public ICommand? TryGetCommand(string commandIdentifier);
 
 	/// <summary>
 	/// Tries to get the given command associated with the given keybind.
@@ -95,7 +103,14 @@ public interface ICommandItems : IEnumerable<(ICommand, IKeybind?)>
 	/// <summary>
 	/// Tries to get the keybind that is bound to the command with the given identifier.
 	/// </summary>
-	/// <param name="identifier">The identifier of the command to get the keybind of</param>
+	/// <param name="commandIdentifier">The identifier of the command to get the keybind of</param>
 	/// <returns>The keybind that is bound to the command with the given identifier, or null if not found.</returns>
-	public IKeybind? TryGetKeybind(string identifier);
+	public IKeybind? TryGetKeybind(string commandIdentifier);
+
+	/// <summary>
+	/// Tries to get the keybind that is bound to the given command.
+	/// </summary>
+	/// <param name="command">The command to get the keybind of</param>
+	/// <returns>The keybind that is bound to the given command, or null if not found.</returns>
+	public IKeybind? TryGetKeybind(ICommand command);
 }

@@ -6,31 +6,33 @@ namespace Whim;
 
 internal class CommandManager : ICommandManager
 {
-	private readonly ICommandItems _commandItems;
-	private readonly IKeybindManager _keybindManager;
+	private readonly ICommandItemContainer _commandItems;
+	private readonly KeybindHook _keybindHook;
 	private bool _disposedValue;
 
 	public CommandManager()
 	{
-		_commandItems = new CommandItems();
-		_keybindManager = new KeybindManager(_commandItems);
+		_commandItems = new CommandItemContainer();
+		_keybindHook = new KeybindHook(_commandItems);
 	}
 
 	public void Initialize()
 	{
-		_keybindManager.Initialize();
+		_keybindHook.Initialize();
 	}
 
 	public void Add(ICommand command, IKeybind? keybind = null) => _commandItems.Add(command, keybind);
-	public bool SetKeybind(string identifier, IKeybind keybind) => _commandItems.SetKeybind(identifier, keybind);
+	public bool Add(string commandIdentifier, IKeybind keybind) => _commandItems.Add(commandIdentifier, keybind);
 	public void Clear() => _commandItems.Clear();
 	public void ClearKeybinds() => _commandItems.ClearKeybinds();
 	public bool RemoveKeybind(IKeybind keybind) => _commandItems.RemoveKeybind(keybind);
-	public bool RemoveKeybind(string identifier) => _commandItems.RemoveKeybind(identifier);
-	public bool Remove(string identifier) => _commandItems.Remove(identifier);
-	public ICommand? TryGetCommand(string identifier) => _commandItems?.TryGetCommand(identifier);
+	public bool RemoveKeybind(string commandIdentifier) => _commandItems.RemoveKeybind(commandIdentifier);
+	public bool RemoveCommand(string commandIdentifier) => _commandItems.RemoveCommand(commandIdentifier);
+	public bool RemoveCommand(ICommand command) => _commandItems.RemoveCommand(command);
+	public ICommand? TryGetCommand(string commandIdentifier) => _commandItems?.TryGetCommand(commandIdentifier);
 	public ICommand? TryGetCommand(IKeybind keybind) => _commandItems?.TryGetCommand(keybind);
-	public IKeybind? TryGetKeybind(string identifier) => _commandItems?.TryGetKeybind(identifier);
+	public IKeybind? TryGetKeybind(string commandIdentifier) => _commandItems?.TryGetKeybind(commandIdentifier);
+	public IKeybind? TryGetKeybind(ICommand command) => _commandItems?.TryGetKeybind(command);
 
 	protected virtual void Dispose(bool disposing)
 	{
@@ -41,7 +43,7 @@ internal class CommandManager : ICommandManager
 				Logger.Debug("Disposing command manager");
 
 				// dispose managed state (managed objects)
-				_keybindManager.Dispose();
+				_keybindHook.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
@@ -57,10 +59,10 @@ internal class CommandManager : ICommandManager
 		GC.SuppressFinalize(this);
 	}
 
-	public IEnumerator<(ICommand, IKeybind?)> GetEnumerator() => _commandItems.GetEnumerator();
+	public IEnumerator<CommandItem> GetEnumerator() => _commandItems.GetEnumerator();
 	IEnumerator IEnumerable.GetEnumerator() => _commandItems.GetEnumerator();
 
-	public void LoadCommands(IEnumerable<(ICommand, IKeybind?)> commands)
+	public void LoadCommands(IEnumerable<CommandItem> commands)
 	{
 		foreach ((ICommand command, IKeybind? keybind) in commands)
 		{

@@ -88,10 +88,10 @@ public class FloatingLayoutPlugin : IPlugin
 	}
 
 	/// <inheritdoc />
-	public (ICommand, IKeybind?)[] GetCommands() => new (ICommand, IKeybind?)[]
+	public CommandItem[] GetCommands() => new CommandItem[]
 	{
 		// Toggle window floating.
-		(
+		new CommandItem(
 			new Command(
 				identifier: "floating_layout.toggle_window_floating",
 				title: "Toggle window floating",

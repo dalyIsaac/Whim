@@ -59,4 +59,14 @@ public class WorkspaceModel : INotifyPropertyChanged
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
+
+	/// <summary>
+	/// Triggered when the workspace is renamed.
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
+	internal void Workspace_Renamed(object? sender, WorkspaceRenamedEventArgs e)
+	{
+		OnPropertyChanged(nameof(Name));
+	}
 }

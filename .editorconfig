@@ -256,3 +256,6 @@ dotnet_diagnostic.IDE0072.severity = silent
 
 # IDE0010: Add missing cases
 dotnet_diagnostic.IDE0010.severity = silent
+
+# IDE0045: Convert to conditional expression
+dotnet_diagnostic.IDE0045.severity = silent

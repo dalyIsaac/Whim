@@ -6,8 +6,10 @@ namespace Whim;
 /// <summary>
 /// This stores the keybinds and command identifiers.
 /// It ensures that it's a one-to-one mapping.
+/// This is not a `Dictionary`, because it allows lookup by both
+/// <see cref="IKeybind"/> and <c>command</c>.
 /// </summary>
-internal class KeybindsMap : IEnumerable<(IKeybind, string)>
+internal class KeybindCommandMap : IEnumerable<(IKeybind, string)>
 {
 	// We have two dictionaries here because we want a fast way to make sure that
 	// each keybind has only one corresponding command.

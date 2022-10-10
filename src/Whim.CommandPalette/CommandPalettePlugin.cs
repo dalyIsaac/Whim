@@ -44,14 +44,28 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	}
 
 	/// <summary>
-	/// Activate the command palette window.
+	/// Activate the command palette.
 	/// </summary>
-	/// <param name="items"></param>
-	public void Activate(IEnumerable<(ICommand, IKeybind?)>? items = null)
+	public void Activate()
 	{
 		_commandPaletteWindow?.Activate(
-			items,
-			_configContext.MonitorManager.FocusedMonitor
+			config: Config.ActivationConfig,
+			items: _configContext.CommandManager,
+			monitor: _configContext.MonitorManager.FocusedMonitor
+		);
+	}
+
+	/// <summary>
+	/// Activate the command palette with the given config.
+	/// </summary>
+	/// <param name="config"></param>
+	/// <param name="items"></param>
+	public void ActivateWithConfig(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items = null)
+	{
+		_commandPaletteWindow?.Activate(
+			config: config,
+			items: items,
+			monitor: _configContext.MonitorManager.FocusedMonitor
 		);
 	}
 
@@ -97,16 +111,31 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	}
 
 	/// <inheritdoc />
-	public (ICommand, IKeybind?)[] GetCommands() => new (ICommand, IKeybind?)[]
+	public CommandItem[] GetCommands() => new CommandItem[]
 	{
 		// Toggle command palette
-		(
+		new CommandItem(
 			new Command(
 				identifier: "command_palette.toggle",
 				title: "Toggle command palette",
 				callback: () => Activate()
 			),
 			new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_K)
-		)
+		),
+
+		// Rename workspace
+		new CommandItem(
+			new Command(
+				identifier: "command_palette.rename_workspace",
+				title: "Rename workspace",
+				callback: () => ActivateWithConfig(
+					new CommandPaletteFreeTextActivationConfig(
+						callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
+						hint: "Enter new workspace name",
+						initialText: _configContext.WorkspaceManager.ActiveWorkspace.Name
+					)
+				)
+			)
+		),
 	};
 }

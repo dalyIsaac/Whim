@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Whim.CommandPalette;
 
@@ -8,84 +9,90 @@ namespace Whim.CommandPalette;
 /// </summary>
 public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 {
-	private record struct MatchData(PaletteItem MatchItem, long LastUsed);
+	private static readonly MatcherCommandItemComparer _sorter = new();
 
-	private readonly Dictionary<string, long> _commandExecutionTime = new();
+	private readonly Dictionary<string, uint> _commandLastExecutionTime = new();
 
-	/// <inheritdoc/>
-	public IEnumerable<PaletteItem> Match(string query, IEnumerable<Match> items)
+	/// <summary>
+	/// The filter to use when matching commands.
+	/// </summary>
+	public PaletteFilter Filter { get; set; } = PaletteFilters.MatchesFuzzyContiguous;
+
+	/// <summary>
+	/// Matcher returns an ordered list of filtered matches for the <paramref name="query"/>.
+	/// </summary>
+	public ICollection<PaletteRowItem> Match(string query, ICollection<CommandItem> items)
 	{
-		query = query.Trim();
-		List<MatchData> filteredItems = new();
-		foreach (Match match in items)
+		MatcherCommandItem[] matches = new MatcherCommandItem[items.Count];
+		int matchCount = GetFilteredItems(query, items, matches);
+
+		if (matchCount == 0)
 		{
-			int startIdx = match.Command.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase);
-			if (startIdx == -1)
+			// If there are no matches and the query is not empty, return an empty list.
+			if (!string.IsNullOrEmpty(query))
+			{
+				return Array.Empty<PaletteRowItem>();
+			}
+
+			// If there are no matches, return the most recently used items.
+			matchCount = GetMostRecentlyUsedItems(items, matches);
+		}
+
+		// Sort the matches.
+		Array.Sort(matches, 0, matchCount, _sorter);
+
+		// Convert the matches to PaletteRowItems.
+		PaletteRowItem[] rowItems = new PaletteRowItem[matchCount];
+		for (int i = 0; i < matchCount; i++)
+		{
+			rowItems[i] = matches[i].ToRowItem();
+		}
+
+		return rowItems;
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private int GetFilteredItems(string query, ICollection<CommandItem> items, MatcherCommandItem[] matches)
+	{
+		int matchCount = 0;
+
+		// Get the matches for the query.
+		foreach (CommandItem item in items)
+		{
+			PaletteFilterTextMatch[]? filterMatches = Filter(query, item.Command.Title);
+			if (filterMatches == null)
 			{
 				continue;
 			}
 
-			// Add the match to the list of matches, and highlight the matching text.
-			HighlightedText highlightedTitle = new();
-			string title = match.Command.Title;
-
-			// If the query is empty, add the entire title as a single segment.
-			if (query.Length == 0)
-			{
-				highlightedTitle.Segments.Add(new HighlightedTextSegment(title, false));
-			}
-			else
-			{
-				// Add the text from the start of the title to the start of the query.
-				if (startIdx != 0)
-				{
-					highlightedTitle.Segments.Add(
-						new HighlightedTextSegment(
-							title[..startIdx],
-							false
-						)
-					);
-				}
-
-				// Add the highlighted query text.
-				highlightedTitle.Segments.Add(
-					new HighlightedTextSegment(
-						title.Substring(startIdx, query.Length),
-						true
-					)
-				);
-
-				// Add the text from the end of the query to the end of the title.
-				if (startIdx + query.Length != title.Length)
-				{
-					highlightedTitle.Segments.Add(
-						new HighlightedTextSegment(
-							title[(startIdx + query.Length)..],
-							false
-						)
-					);
-				}
-			}
-
-			// Get the time the command was last executed.
-			_commandExecutionTime.TryGetValue(match.Command.Identifier, out long time);
-			filteredItems.Add(new MatchData(new PaletteItem(match, highlightedTitle), time));
+			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
+			matches[matchCount++] = new MatcherCommandItem(item, filterMatches, count);
 		}
 
-		// Sort the filtered items by the last time the command was executed.
-		filteredItems.Sort((a, b) => -a.LastUsed.CompareTo(b.LastUsed));
-
-		// Return the filtered items.
-		foreach (MatchData data in filteredItems)
-		{
-			yield return data.MatchItem;
-		}
+		return matchCount;
 	}
 
-	/// <inheritdoc/>
-	public void OnMatchExecuted(Match match)
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private int GetMostRecentlyUsedItems(ICollection<CommandItem> items, MatcherCommandItem[] matches)
+	{
+		int matchCount = 0;
+
+		foreach (CommandItem item in items)
+		{
+			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
+			matches[matchCount++] = new MatcherCommandItem(item, Array.Empty<PaletteFilterTextMatch>(), count);
+		}
+
+		return matchCount;
+	}
+
+	/// <summary>
+	/// Called when a match has been executed. This is used by the <see cref="ICommandPaletteMatcher"/>
+	/// implementation to update relevant internal state.
+	/// </summary>
+	public void OnMatchExecuted(CommandItem match)
 	{
 		string id = match.Command.Identifier;
-		_commandExecutionTime[id] = DateTime.Now.Ticks;
+		_commandLastExecutionTime[id] = (uint)DateTime.Now.Ticks;
 	}
 }

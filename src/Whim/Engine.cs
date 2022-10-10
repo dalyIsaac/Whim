@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace Whim;
 
 /// <summary>
@@ -15,10 +13,7 @@ public static class Engine
 	/// <returns>The <see cref="IConfigContext"/>.</returns>
 	public static IConfigContext CreateConfigContext()
 	{
-		if (_configContext == null)
-		{
-			_configContext = new ConfigContext();
-		}
+		_configContext ??= new ConfigContext();
 
 		return _configContext;
 	}

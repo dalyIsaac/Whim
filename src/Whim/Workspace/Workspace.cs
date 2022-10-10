@@ -14,10 +14,10 @@ internal class Workspace : IWorkspace
 		get => _name;
 		set
 		{
-			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
-				new WorkspaceRenamedEventArgs(this, _name, value)
-			);
+			string oldName = _name;
 			_name = value;
+			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
+				new WorkspaceRenamedEventArgs(this, oldName, _name));
 		}
 	}
 
@@ -161,7 +161,7 @@ internal class Workspace : IWorkspace
 			LastFocusedWindow = null;
 		}
 
-		(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerActiveLayoutEngineChanged(
+		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(
 				this,
 				_layoutEngines[prevIdx],
@@ -189,16 +189,19 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
-		ILayoutEngine? layoutEngine = _layoutEngines.FirstOrDefault(x => x.Name == name);
-		if (layoutEngine == null)
+		int prevIdx = -1;
+		for (int idx = 0; idx < _layoutEngines.Count; idx++)
 		{
-			return false;
+			ILayoutEngine engine = _layoutEngines[idx];
+			if (engine.Name == name)
+			{
+				prevIdx = _activeLayoutEngineIndex;
+				_activeLayoutEngineIndex = idx;
+				break;
+			}
 		}
 
-		int prevIdx = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = _layoutEngines.IndexOf(layoutEngine);
-
-		if (_activeLayoutEngineIndex == -1)
+		if (prevIdx == -1)
 		{
 			Logger.Error($"Layout engine {name} not found for workspace {Name}");
 			return false;
@@ -209,7 +212,7 @@ internal class Workspace : IWorkspace
 			return true;
 		}
 
-		(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerActiveLayoutEngineChanged(
+		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs(
 				this,
 				_layoutEngines[prevIdx],

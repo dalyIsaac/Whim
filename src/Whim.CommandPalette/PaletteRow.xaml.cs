@@ -10,9 +10,9 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal sealed partial class PaletteRow : UserControl
 {
-	public PaletteItem Model { get; private set; }
+	public PaletteRowItem Model { get; private set; }
 
-	public PaletteRow(PaletteItem item)
+	public PaletteRow(PaletteRowItem item)
 	{
 		Model = item;
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");
@@ -24,7 +24,7 @@ internal sealed partial class PaletteRow : UserControl
 		SetKeybinds();
 	}
 
-	public void Update(PaletteItem item)
+	public void Update(PaletteRowItem item)
 	{
 		Logger.Debug("Updating with a new item");
 		Model = item;
@@ -40,12 +40,12 @@ internal sealed partial class PaletteRow : UserControl
 	{
 		Logger.Debug("Setting title");
 		InlineCollection inlines = CommandTitle.Inlines;
-		IList<HighlightedTextSegment> segments = Model.Title.Segments;
+		IList<TextSegment> segments = Model.Title.Segments;
 
 		int idx;
 		for (idx = 0; idx < segments.Count; idx++)
 		{
-			HighlightedTextSegment seg = segments[idx];
+			TextSegment seg = segments[idx];
 			Run run = seg.ToRun();
 
 			if (idx < inlines.Count)
@@ -75,16 +75,12 @@ internal sealed partial class PaletteRow : UserControl
 	{
 		Logger.Debug("Setting keybinds");
 
-		if (Model.Match.Keys != null)
+		if (Model.CommandItem.Keybind is not null)
 		{
-			string keys = Model.Match.Keys;
-			if (CommandKeybind.Text != keys)
-			{
-				CommandKeybind.Text = keys;
-				CommandKeybindBorder.Visibility = Visibility.Visible;
-			}
+			CommandKeybind.Text = Model.CommandItem.Keybind.ToString();
+			CommandKeybindBorder.Visibility = Visibility.Visible;
 		}
-		else if (CommandKeybindBorder.Visibility != Visibility.Collapsed)
+		else
 		{
 			CommandKeybindBorder.Visibility = Visibility.Collapsed;
 		}

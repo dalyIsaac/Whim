@@ -24,7 +24,7 @@
 							<Setter Property="BorderThickness" Value="1" />
 							<Setter Property="CornerRadius" Value="2" />
 						</Style>
-						<Style x:Key="KeyBindTextBlockStyle" TargetType="TextBlock">
+						<Style x:Key="KeybindTextBlockStyle" TargetType="TextBlock">
 							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
@@ -36,7 +36,7 @@
 							<Setter Property="BorderThickness" Value="1" />
 							<Setter Property="CornerRadius" Value="2" />
 						</Style>
-						<Style x:Key="KeyBindTextBlockStyle" TargetType="TextBlock">
+						<Style x:Key="KeybindTextBlockStyle" TargetType="TextBlock">
 							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
@@ -54,7 +54,7 @@
 			HorizontalAlignment="Right"
 			VerticalAlignment="Center"
 			Style="{ThemeResource KeybindBorderStyle}">
-			<TextBlock x:Name="CommandKeybind" Style="{ThemeResource KeyBindTextBlockStyle}" />
+			<TextBlock x:Name="CommandKeybind" Style="{ThemeResource KeybindTextBlockStyle}" />
 		</Border>
 	</Grid>
 </UserControl>
