@@ -39,6 +39,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: "{#MyBuildDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyBuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ".\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
