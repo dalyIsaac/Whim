@@ -52,6 +52,10 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 		// Activate the window so it renders.
 		_focusIndicatorWindow.Activate();
 		_focusIndicatorWindow.Hide();
+
+		// Only subscribe to workspace changes once the indicator window has been created - we shouldn't
+		// show a window which doesn't yet exist (it'll just crash Whim).
+		_configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
@@ -65,6 +69,11 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 	}
 
 	private void WindowManager_EventSink(object? sender, WindowEventArgs e)
+	{
+		Show();
+	}
+
+	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
 	{
 		Show();
 	}
