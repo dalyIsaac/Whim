@@ -81,4 +81,31 @@ public class TestAddWindow
 		Assert.Equal(0.3d, root[1].weight);
 		Assert.Equal(0.4d, root[2].weight);
 	}
+
+	/// <summary>
+	/// This is for when the currently window being added to the tree is also the last focused window.
+	/// This can occur when the window is being docked from a floating state.
+	/// </summary>
+	[Fact]
+	public void Add_CurrentlyFocusedWindow()
+	{
+		Mock<IWindow> window = new();
+
+		Mock<IWorkspace> workspace = new();
+		workspace.Setup(w => w.LastFocusedWindow).Returns(window.Object);
+
+		Mock<IWorkspaceManager> workspaceManager = new();
+		workspaceManager.Setup(w => w.ActiveWorkspace).Returns(workspace.Object);
+
+		Mock<IConfigContext> configContext = new();
+		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
+
+		TreeLayoutEngine engine = new(configContext.Object)
+		{
+			window.Object
+		};
+
+		Assert.Equal(engine.Root, new WindowNode(window.Object));
+		Assert.Single(engine);
+	}
 }

@@ -73,7 +73,6 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	public WindowNode? AddWindow(IWindow window, IWindow? focusedWindow = null)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
-		Count++;
 
 		// Get the focused window node
 		focusedWindow ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
@@ -81,10 +80,10 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		WindowNode node = new(window);
 		if (AddLeafNode(node, focusedWindow))
 		{
+			Count++;
 			return node;
 		}
 
-		Count--;
 		return null;
 	}
 
@@ -102,6 +101,16 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	{
 		IWindow window = newLeaf.Window;
 
+		// Get the focused window node
+		focusedWindow ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+
+		// If the engine doesn't have the focused window, set the focused window to null.
+		// This can occur when the focused window was a floating window.
+		if (focusedWindow != null && !_windows.ContainsKey(focusedWindow))
+		{
+			focusedWindow = null;
+		}
+
 		// Add the window to the window-node map.
 		_windows.Add(window, newLeaf);
 
@@ -111,9 +120,6 @@ public partial class TreeLayoutEngine : ILayoutEngine
 			Root = newLeaf;
 			return true;
 		}
-
-		// Get the focused window node
-		focusedWindow ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
 		Logger.Verbose($"Focused window is {focusedWindow}");
 		if (focusedWindow == null || !_windows.TryGetValue(focusedWindow, out LeafNode? focusedLeaf))
