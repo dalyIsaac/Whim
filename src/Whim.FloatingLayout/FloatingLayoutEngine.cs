@@ -85,7 +85,8 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 		if (window != null)
 		{
-			InnerLayoutEngine.Add(window);
+			ILocation<double> location = _windowToLocation[window];
+			InnerLayoutEngine.AddWindowAtPoint(window, location);
 			_windowToLocation.Remove(window);
 			_floatingLayoutConfig.MarkWindowAsDocked(window);
 		}
