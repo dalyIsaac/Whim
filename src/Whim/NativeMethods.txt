@@ -48,6 +48,7 @@ MONITORINFOEXW
 MONITORINFOF_PRIMARY
 OBJECT_IDENTIFIER
 SC_CLOSE
+SendInput
 SendNotifyMessage
 SetForegroundWindow
 SetWindowLong
