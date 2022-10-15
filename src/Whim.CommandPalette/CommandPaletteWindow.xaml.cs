@@ -35,6 +35,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_activationConfig = _plugin.Config.ActivationConfig;
 
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
+		this.SetIsShownInSwitchers(false);
 
 		ListViewItems.SizeChanged += ListViewItems_SizeChanged;
 		Activated += CommandPaletteWindow_Activated;
