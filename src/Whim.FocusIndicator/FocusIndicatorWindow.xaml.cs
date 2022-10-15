@@ -1,4 +1,8 @@
-﻿namespace Whim.FocusIndicator;
+﻿using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
+
+namespace Whim.FocusIndicator;
 
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
@@ -33,9 +37,13 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		);
 
 		this.SetIsShownInSwitchers(false);
+
+		// Prevent the window from being activated.
+		_ = PInvoke.SetWindowLong(this.GetHandle(), WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, (int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE);
+
 		WindowDeferPosHandle.SetWindowPos(
 			new WindowState(_window, borderLocation, WindowSize.Normal),
-			windowLocation.Window.Handle
+			new HWND(1)
 		);
 	}
 }
