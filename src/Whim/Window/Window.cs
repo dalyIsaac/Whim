@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
@@ -89,7 +90,7 @@ internal class Window : IWindow
 			PInvoke.SetForegroundWindow(Handle);
 		}
 
-		// We manually call OnWindowFocused as n already focused window may have switched to a
+		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
 		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(this);
 	}
@@ -98,9 +99,19 @@ internal class Window : IWindow
 	public void FocusForceForeground()
 	{
 		Logger.Debug(ToString());
+
+		// Use SendInput hack to allow Activate to work - required to resolve focus issue https://github.com/microsoft/PowerToys/issues/4270
+		unsafe
+		{
+			INPUT input = new() { type = INPUT_TYPE.INPUT_MOUSE };
+			INPUT[] inputs = new[] { input };
+			// Send empty mouse event. This makes this thread the last to send input, and hence allows it to pass foreground permission checks
+			_ = PInvoke.SendInput(inputs, sizeof(INPUT));
+		}
+
 		PInvoke.SetForegroundWindow(Handle);
 
-		// We manually call OnWindowFocused as n already focused window may have switched to a
+		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
 		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(this);
 	}
