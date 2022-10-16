@@ -27,7 +27,7 @@ public class TestGetWindowLocations
 		TestTreeEngineEmpty testTreeEngine = new();
 		ILocation<int> screen = new Location(0, 0, 1920, 1080);
 
-		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen);
+		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen, new Mock<IMonitor>().Object);
 
 		Assert.Empty(actual);
 	}
@@ -38,7 +38,7 @@ public class TestGetWindowLocations
 		ILocation<int> screen = new Location(0, 0, 1920, 1080);
 		TestTreeEngine testTreeEngine = new();
 
-		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen);
+		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen, new Mock<IMonitor>().Object);
 		IWindowState[] expected = TestTreeWindowState.GetAllWindowStates(screen,
 			testTreeEngine.LeftWindow.Object,
 			testTreeEngine.RightTopLeftTopWindow.Object,

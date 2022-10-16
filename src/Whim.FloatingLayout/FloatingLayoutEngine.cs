@@ -25,7 +25,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
+	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
 		// Iterate over all windows in _windowToLocation.
 		foreach ((IWindow window, ILocation<double> loc) in _windowToLocation)
@@ -34,7 +34,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 
 		// Iterate over all windows in the inner layout engine.
-		foreach (IWindowState windowLocation in InnerLayoutEngine.DoLayout(location))
+		foreach (IWindowState windowLocation in InnerLayoutEngine.DoLayout(location, monitor))
 		{
 			yield return windowLocation;
 		}

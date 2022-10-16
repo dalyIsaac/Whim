@@ -289,7 +289,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public IEnumerable<IWindowState> DoLayout(ILocation<int> location)
+	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
 		if (Root == null)
 		{

@@ -20,7 +20,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
+	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
 		int doubleOuterGap = _gapsConfig.OuterGap * 2;
 		int doubleInnerGap = _gapsConfig.InnerGap * 2;
@@ -32,7 +32,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 			height: location.Height - doubleOuterGap
 		);
 
-		foreach (IWindowState loc in InnerLayoutEngine.DoLayout(proxiedLocation))
+		foreach (IWindowState loc in InnerLayoutEngine.DoLayout(proxiedLocation, monitor))
 		{
 			yield return new WindowState(
 				window: loc.Window,
