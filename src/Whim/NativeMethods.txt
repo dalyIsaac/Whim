@@ -27,6 +27,7 @@ GetClassName
 GetCursorPos
 GetDesktopWindow
 GetDeviceCaps
+GetDpiForWindow
 GetForegroundWindow
 GetKeyState
 GetMonitorInfo
