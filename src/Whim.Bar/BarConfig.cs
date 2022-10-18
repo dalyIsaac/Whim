@@ -68,7 +68,7 @@ public class BarConfig : INotifyPropertyChanged
 	private int _height = 48;
 
 	/// <summary>
-	/// The height of the bar.
+	/// The height of the bar, in <see href="https://learn.microsoft.com/en-us/windows/win32/learnwin32/dpi-and-device-independent-pixels">device-independent pixels</see>.
 	/// </summary>
 	public int Height
 	{
@@ -83,7 +83,7 @@ public class BarConfig : INotifyPropertyChanged
 	private Thickness _margin = new(10.0);
 
 	/// <summary>
-	/// The margin of the bar.
+	/// The margin of the bar, in <see href="https://learn.microsoft.com/en-us/windows/win32/learnwin32/dpi-and-device-independent-pixels">device-independent pixels</see>.
 	/// </summary>
 	public Thickness Margin
 	{
