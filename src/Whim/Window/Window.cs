@@ -162,20 +162,6 @@ internal class Window : IWindow
 		Win32Helper.ShowWindowNoActivate(Handle);
 	}
 
-	/// <inheritdoc/>
-	public double GetDpiForWindow()
-	{
-		Logger.Debug(ToString());
-		return PInvoke.GetDpiForWindow(Handle);
-	}
-
-	/// <inheritdoc/>
-	public double GetDpiScalingFactor()
-	{
-		Logger.Debug(ToString());
-		return GetDpiForWindow() / 96.0;
-	}
-
 	/// <summary>
 	/// Constructor for the <see cref="IWindow"/> implementation.
 	/// </summary>

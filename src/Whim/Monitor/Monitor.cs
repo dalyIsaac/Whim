@@ -26,6 +26,7 @@ internal class Monitor : IMonitor
 	public int X => Screen.WorkingArea.X;
 	public int Y => Screen.WorkingArea.Y;
 	public bool IsPrimary => Screen.Primary;
+	public int ScaleFactor => Screen.ScaleFactor;
 
 	public bool IsPointInside(IPoint<int> point) => ILocation<int>.IsPointInside(this, point);
 

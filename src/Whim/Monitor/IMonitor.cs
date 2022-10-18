@@ -16,6 +16,11 @@ public interface IMonitor : ILocation<int>
 	/// <see langword="true"/> if the monitor is the primary monitor.
 	/// </summary>
 	public bool IsPrimary { get; }
+
+	/// <summary>
+	/// The scale factor of this monitor.
+	/// </summary>
+	public int ScaleFactor { get; }
 }
 
 /// <summary>

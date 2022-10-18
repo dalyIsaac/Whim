@@ -123,18 +123,6 @@ public interface IWindow
 	public void Close();
 
 	/// <summary>
-	/// Get the DPI scaling for the window.
-	/// </summary>
-	/// <returns></returns>
-	public double GetDpiForWindow();
-
-	/// <summary>
-	/// Get the device-independent pixels.
-	/// </summary>
-	/// <returns></returns>
-	public double GetDpiScalingFactor();
-
-	/// <summary>
 	/// Create a new window. If the window cannot be created, <c>null</c> is returned.
 	/// </summary>
 	/// <param name="hwnd">The handle of the window.</param>
