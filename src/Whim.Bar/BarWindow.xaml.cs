@@ -40,17 +40,12 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		double scaleFactor = _monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
 
-		double leftMargin = _barConfig.Margin.Left * scale;
-		double rightMargin = _barConfig.Margin.Right * scale;
-		double topMargin = _barConfig.Margin.Top * scale;
-		double bottomMargin = _barConfig.Margin.Bottom * scale;
-
 		WindowState = new WindowState(
 			window,
 			new Location(
-				x: (int)(_monitor.X + leftMargin),
-				y: (int)(_monitor.Y + topMargin),
-				width: (int)((_monitor.Width / scale) - (leftMargin + rightMargin)),
+				x: _monitor.X,
+				y: _monitor.Y,
+				width: (int)(_monitor.Width / scale),
 				height: _barConfig.Height
 			),
 			WindowSize.Normal
@@ -59,7 +54,6 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
 		Title = "Whim Bar";
 		Win32Helper.HideCaptionButtons(WindowState.Window.Handle);
-		Win32Helper.SetWindowCorners(WindowState.Window.Handle);
 		this.SetIsShownInSwitchers(false);
 
 		// Set up the bar.

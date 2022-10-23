@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -77,21 +76,6 @@ public class BarConfig : INotifyPropertyChanged
 		{
 			_height = value;
 			OnPropertyChanged(nameof(Height));
-		}
-	}
-
-	private Thickness _margin = new(10.0);
-
-	/// <summary>
-	/// The margin of the bar, in <see href="https://learn.microsoft.com/en-us/windows/win32/learnwin32/dpi-and-device-independent-pixels">device-independent pixels</see>.
-	/// </summary>
-	public Thickness Margin
-	{
-		get => _margin;
-		set
-		{
-			_margin = value;
-			OnPropertyChanged(nameof(Margin));
 		}
 	}
 
