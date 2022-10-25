@@ -15,7 +15,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private IMonitor? _monitor;
 	public bool IsVisible => _monitor != null;
 
-	private int _rowHeight;
 	private int _maxHeight;
 
 	private readonly ObservableCollection<PaletteRow> _paletteRows = new();
@@ -37,7 +36,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
 		this.SetIsShownInSwitchers(false);
 
-		ListViewItems.SizeChanged += ListViewItems_SizeChanged;
 		Activated += CommandPaletteWindow_Activated;
 
 		Title = CommandPaletteConfig.Title;
@@ -46,16 +44,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		// Populate the commands to reduce the first render time.
 		PopulateItems(_configContext.CommandManager);
 		UpdateMatches();
-	}
-
-	private void ListViewItems_SizeChanged(object sender, SizeChangedEventArgs e)
-	{
-		_rowHeight = 0;
-		if (ListViewItems.Items.Count > 0 && ListViewItems.Items[0] is PaletteRow row)
-		{
-			// Not ensurely why this gives the right value, but it does.
-			_rowHeight = (int)row.ActualHeight * 2;
-		}
 	}
 
 	private void CommandPaletteWindow_Activated(object sender, WindowActivatedEventArgs e)
@@ -275,20 +263,25 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 
 		int width = _plugin.Config.MaxWidthPixels;
-		int height;
+		int height = _maxHeight;
 
 		if (ListViewItemsWrapper.Visibility == Visibility.Collapsed)
 		{
 			height = (int)TextEntry.ActualHeight;
 		}
-		else if (_rowHeight == 0)
+		else if (ListViewItems.Items.Count > 0)
 		{
-			height = _maxHeight;
+			DependencyObject? container = ListViewItems.ContainerFromIndex(0);
+			if (container is ListViewItem item)
+			{
+				int fullHeight = (int)(TextEntry.ActualHeight + (item.ActualHeight * ListViewItems.Items.Count));
+				height = Math.Min(_maxHeight, fullHeight);
+			}
 		}
-		else
-		{
-			height = Math.Min(_maxHeight, (int)TextEntry.ActualHeight + (ListViewItems.Items.Count * _rowHeight));
-		}
+
+		int scaleFactor = _monitor.ScaleFactor;
+		double scale = scaleFactor / 100.0;
+		height = (int)(height * scale);
 
 		int x = (_monitor.Width / 2) - (width / 2);
 		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
