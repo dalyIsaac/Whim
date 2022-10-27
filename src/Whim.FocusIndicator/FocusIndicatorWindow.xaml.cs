@@ -9,11 +9,13 @@ namespace Whim.FocusIndicator;
 /// </summary>
 internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 {
+	private readonly IConfigContext _configContext;
 	public FocusIndicatorConfig FocusIndicatorConfig { get; }
 	private readonly IWindow _window;
 
 	public FocusIndicatorWindow(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
 	{
+		_configContext = configContext;
 		FocusIndicatorConfig = focusIndicatorConfig;
 		_window = this.InitializeBorderlessWindow("Whim.FocusIndicator", "FocusIndicatorWindow", configContext);
 
@@ -41,9 +43,11 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		// Prevent the window from being activated.
 		_ = PInvoke.SetWindowLong(this.GetHandle(), WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, (int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE);
 
-		WindowDeferPosHandle.SetWindowPos(
-			new WindowState(_window, borderLocation, WindowSize.Normal),
-			new HWND(1)
+		WindowDeferPosHandle.SetWindowPosFixScaling(
+			windowState: new WindowState(_window, borderLocation, WindowSize.Normal),
+			monitorManager: _configContext.MonitorManager,
+			monitor: _configContext.MonitorManager.FocusedMonitor,
+			hwndInsertAfter: new HWND(1)
 		);
 	}
 }

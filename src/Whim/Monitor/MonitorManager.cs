@@ -26,6 +26,8 @@ internal class MonitorManager : IMonitorManager
 	/// </summary>
 	public IMonitor FocusedMonitor { get; private set; }
 
+	public IMonitor PrimaryMonitor { get; private set; }
+
 	public int Length => _monitors.Length;
 
 	public IEnumerator<IMonitor> GetEnumerator() => _monitors.AsEnumerable().GetEnumerator();
@@ -56,6 +58,7 @@ internal class MonitorManager : IMonitorManager
 			throw new Exception("No primary monitor found.");
 		}
 		FocusedMonitor = primaryMonitor;
+		PrimaryMonitor = primaryMonitor;
 	}
 
 	public void Initialize()
@@ -109,6 +112,11 @@ internal class MonitorManager : IMonitorManager
 			if (!previousMonitorsSet.Contains(monitor))
 			{
 				addedMonitors.Add(monitor);
+			}
+
+			if (monitor.IsPrimary)
+			{
+				PrimaryMonitor = monitor;
 			}
 		}
 
