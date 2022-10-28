@@ -32,19 +32,6 @@ public class Location : ILocation<int>
 	/// <inheritdoc />
 	public override string ToString() => $"(X: {X}, Y: {Y}, Width: {Width}, Height: {Height})";
 
-	/// <summary>
-	/// Scale the given <paramref name="location"/> by the given <paramref name="scale"/>.
-	/// </summary>
-	/// <param name="location"></param>
-	/// <param name="scale"></param>
-	/// <returns></returns>
-	public static ILocation<int> Scale(ILocation<int> location, int scale) => new Location(
-		x: location.X * scale,
-		y: location.Y * scale,
-		width: location.Width * scale,
-		height: location.Height * scale
-	);
-
 	/// <inheritdoc />
 	public static ILocation<int> Add(ILocation<int> a, ILocation<int> b) => new Location(
 	a.X + b.X,
