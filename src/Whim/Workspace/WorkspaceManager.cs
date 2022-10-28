@@ -393,12 +393,12 @@ internal class WorkspaceManager : IWorkspaceManager
 		MoveWindowToMonitor(nextMonitor, window);
 	}
 
-	public void MoveWindowToPoint(IWindow window, IPoint<int> location)
+	public void MoveWindowToPoint(IWindow window, IPoint<int> point)
 	{
-		Logger.Debug($"Moving window {window} to location {location}");
+		Logger.Debug($"Moving window {window} to location {point}");
 
 		// Get the monitor.
-		IMonitor targetMonitor = _configContext.MonitorManager.GetMonitorAtPoint(location);
+		IMonitor targetMonitor = _configContext.MonitorManager.GetMonitorAtPoint(point);
 
 		// Get the target workspace.
 		IWorkspace? targetWorkspace = GetWorkspaceForMonitor(targetMonitor);
@@ -424,8 +424,9 @@ internal class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		IPoint<double> normalized = targetMonitor.ToUnitSquare(location);
-		Logger.Verbose($"Normalized location: {normalized}");
+		IPoint<int> pointInMonitor = targetMonitor.ToMonitorCoordinates(point);
+		IPoint<double> normalized = targetMonitor.ToUnitSquare(pointInMonitor);
+		Logger.Debug($"Normalized location: {normalized}");
 
 		targetWorkspace.MoveWindowToPoint(window, normalized, isPhantom);
 		_windowWorkspaceMap[window] = targetWorkspace;
