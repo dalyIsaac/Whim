@@ -7,14 +7,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Grid x:Name="PaletteItemGrid">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*" />
-			<ColumnDefinition Width="200" />
-		</Grid.ColumnDefinitions>
-
-		<!--  Dark and light mode theming  -->
-		<Grid.Resources>
+	<RelativePanel x:Name="PaletteItemPanel">
+		<RelativePanel.Resources>
 			<ResourceDictionary>
 				<ResourceDictionary.ThemeDictionaries>
 					<ResourceDictionary x:Key="Dark">
@@ -42,9 +36,8 @@
 					</ResourceDictionary>
 				</ResourceDictionary.ThemeDictionaries>
 			</ResourceDictionary>
-		</Grid.Resources>
+		</RelativePanel.Resources>
 
-		<!--  The row's controls  -->
 		<TextBlock x:Name="CommandTitle" />
 
 		<Border
@@ -53,8 +46,9 @@
 			Padding="2,0,2,0"
 			HorizontalAlignment="Right"
 			VerticalAlignment="Center"
+			RelativePanel.AlignRightWithPanel="True"
 			Style="{ThemeResource KeybindBorderStyle}">
 			<TextBlock x:Name="CommandKeybind" Style="{ThemeResource KeybindTextBlockStyle}" />
 		</Border>
-	</Grid>
+	</RelativePanel>
 </UserControl>
