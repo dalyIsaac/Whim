@@ -16,14 +16,38 @@ public interface IMonitor : ILocation<int>
 	/// <see langword="true"/> if the monitor is the primary monitor.
 	/// </summary>
 	public bool IsPrimary { get; }
+
+	/// <summary>
+	/// The scale factor of this monitor.
+	/// </summary>
+	public int ScaleFactor { get; }
 }
 
 /// <summary>
-/// Helper methods for converting between the unit square coordinate system and a monitor's
-/// coordinate system.
+/// Helper methods for converting between the coordinate systems.
 /// </summary>
 public static class MonitorHelpers
 {
+	/// <summary>
+	/// Translated the <paramref name="point"/> from the system's coordinate system to the
+	/// <paramref name="monitor"/>'s coordinate system.
+	/// The <paramref name="monitor"/>'s coordinate system is defined in terms of the monitor's
+	/// width and height, <b>not</b> the unit square.
+	/// This does not take into account the monitor's scale factor.
+	/// </summary>
+	/// <param name="monitor"></param>
+	/// <param name="point"></param>
+	/// <returns>
+	/// The converted point, where x and y are in the range [0, width) and [0, height).
+	/// </returns>
+	public static IPoint<int> ToMonitorCoordinates(this ILocation<int> monitor, IPoint<int> point)
+	{
+		return new Point<int>(
+			point.X - monitor.X,
+			point.Y - monitor.Y
+		);
+	}
+
 	/// <summary>
 	/// Translate the <paramref name="point"/> from the <paramref name="monitor"/>'s coordinate
 	/// system to the unit square.

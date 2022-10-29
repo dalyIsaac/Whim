@@ -1,63 +1,84 @@
+using System.Collections.Generic;
 using Xunit;
 
 namespace Whim.Tests;
 
 public class TestMonitor
 {
-	[Theory]
-	[InlineData(0, 0, 1920, 1080, 192, 108, 0.1, 0.1)]
-	[InlineData(0, 0, 1920, 1080, 960, 270, 0.5, 0.25)]
-	[InlineData(100, 100, 1920, 1080, 192, 108, 0.1, 0.1)]
-	[InlineData(100, 100, 1920, 1080, 960, 270, 0.5, 0.25)]
-	[InlineData(-100, 100, 1920, 1080, 192, 108, 0.1, 0.1)]
-	[InlineData(-100, 100, 1920, 1080, 960, 270, 0.5, 0.25)]
-	public void IntToUnitSquare(int monX, int monY, int monWidth, int monHeight, int pointX, int pointY, double expectedX, double expectedY)
+	public static IEnumerable<object[]> IntToUnitSquareData()
 	{
-		// Given
-		ILocation<int> monitor = new Location(monX, monY, monWidth, monHeight);
-
-		// When
-		IPoint<double> point = monitor.ToUnitSquare(new Point<int>(pointX, pointY));
-
-		// Then
-		Assert.Equal(expectedX, point.X);
-		Assert.Equal(expectedY, point.Y);
+		yield return new object[] { new Location(0, 0, 1920, 1080), new Point<int>(192, 108), new Point<double>(0.1, 0.1) };
+		yield return new object[] { new Location(0, 0, 1920, 1080), new Point<int>(960, 270), new Point<double>(0.5, 0.25) };
+		yield return new object[] { new Location(100, 100, 1920, 1080), new Point<int>(192, 108), new Point<double>(0.1, 0.1) };
+		yield return new object[] { new Location(100, 100, 1920, 1080), new Point<int>(960, 270), new Point<double>(0.5, 0.25) };
+		yield return new object[] { new Location(-100, 100, 1920, 1080), new Point<int>(192, 108), new Point<double>(0.1, 0.1) };
+		yield return new object[] { new Location(-100, 100, 1920, 1080), new Point<int>(960, 270), new Point<double>(0.5, 0.25) };
 	}
 
 	[Theory]
-	[InlineData(0, 0, 1920, 1080, 192, 108, 192, 108, 0.1, 0.1, 0.1, 0.1)]
-	[InlineData(100, 100, 1920, 1080, 192, 108, 192, 108, 0.1, 0.1, 0.1, 0.1)]
-	[InlineData(-100, -100, 1920, 1080, 192, 108, 192, 108, 0.1, 0.1, 0.1, 0.1)]
-	public void DoubleToUnitSquare(int monX, int monY, int monWidth, int height, int locX, int locY, int locWidth, int locHeight, double expectedX, double expectedY, double expectedWidth, double expectedHeight)
+	[MemberData(nameof(IntToUnitSquareData))]
+	public void IntToUnitSquareTheory(ILocation<int> monitor, IPoint<int> point, IPoint<double> expected)
 	{
-		// Given
-		ILocation<int> monitor = new Location(monX, monY, monWidth, height);
-
 		// When
-		ILocation<double> location = monitor.ToUnitSquare(new Location(locX, locY, locWidth, locHeight));
+		IPoint<double> actual = monitor.ToUnitSquare(point);
 
 		// Then
-		Assert.Equal(expectedX, location.X);
-		Assert.Equal(expectedY, location.Y);
-		Assert.Equal(expectedWidth, location.Width);
-		Assert.Equal(expectedHeight, location.Height);
+		Assert.Equal(expected.X, actual.X);
+		Assert.Equal(expected.Y, actual.Y);
+	}
+
+	public static IEnumerable<object[]> DoubleToUnitSquareData()
+	{
+		yield return new object[] { new Location(0, 0, 1920, 1080), new Location(192, 108, 192, 108), new DoubleLocation(0.1, 0.1, 0.1, 0.1) };
+		yield return new object[] { new Location(100, 100, 1920, 1080), new Location(192, 108, 192, 108), new DoubleLocation(0.1, 0.1, 0.1, 0.1) };
+		yield return new object[] { new Location(-100, -100, 1920, 1080), new Location(192, 108, 192, 108), new DoubleLocation(0.1, 0.1, 0.1, 0.1) };
 	}
 
 	[Theory]
-	[InlineData(0, 0, 1920, 1080, 0.1, 0.1, 0.1, 0.1, 192, 108, 192, 108)]
-	[InlineData(100, 100, 1920, 1080, 0.1, 0.1, 0.1, 0.1, 192 + 100, 108 + 100, 192, 108)]
-	public void ToMonitor(int monX, int monY, int monWidth, int monHeight, double locX, double locY, double locWidth, double locHeight, double expectedX, double expectedY, double expectedWidth, double expectedHeight)
+	[MemberData(nameof(DoubleToUnitSquareData))]
+	public void DoubleToUnitSquareTheory(ILocation<int> monitor, ILocation<int> location, ILocation<double> expected)
 	{
-		// Given
-		ILocation<int> monitor = new Location(monX, monY, monWidth, monHeight);
-
 		// When
-		ILocation<int> location = monitor.ToMonitor(new DoubleLocation(locX, locY, locWidth, locHeight));
+		ILocation<double> actual = monitor.ToUnitSquare(location);
 
 		// Then
-		Assert.Equal(expectedX, location.X);
-		Assert.Equal(expectedY, location.Y);
-		Assert.Equal(expectedWidth, location.Width);
-		Assert.Equal(expectedHeight, location.Height);
+		Assert.Equal(expected.X, actual.X);
+		Assert.Equal(expected.Y, actual.Y);
+	}
+
+	public static IEnumerable<object[]> ToMonitorData()
+	{
+		yield return new object[] { new Location(0, 0, 1920, 1080), new DoubleLocation(0.1, 0.1, 0.1, 0.1), new Location(192, 108, 192, 108) };
+		yield return new object[] { new Location(100, 100, 1920, 1080), new DoubleLocation(0.1, 0.1, 0.1, 0.1), new Location(192 + 100, 108 + 100, 192, 108) };
+	}
+
+	[Theory]
+	[MemberData(nameof(ToMonitorData))]
+	public void ToMonitorTheory(ILocation<int> monitor, ILocation<double> location, ILocation<int> expected)
+	{
+		// When
+		ILocation<int> actual = monitor.ToMonitor(location);
+
+		// Then
+		Assert.Equal(expected.X, actual.X);
+		Assert.Equal(expected.Y, actual.Y);
+	}
+
+	public static IEnumerable<object[]> ToMonitorCoordinatesData()
+	{
+		yield return new object[] { new Location(0, 0, 1920, 1080), new Point<int>(192, 108), new Point<int>(192, 108) };
+		yield return new object[] { new Location(100, 100, 1920, 1080), new Point<int>(192, 108), new Point<int>(92, 8) };
+	}
+
+	[Theory]
+	[MemberData(nameof(ToMonitorCoordinatesData))]
+	public void ToMonitorCoordinatesTheory(ILocation<int> monitor, IPoint<int> point, IPoint<int> expected)
+	{
+		// When
+		IPoint<int> actual = monitor.ToMonitorCoordinates(point);
+
+		// Then
+		Assert.Equal(expected.X, actual.X);
+		Assert.Equal(expected.Y, actual.Y);
 	}
 }

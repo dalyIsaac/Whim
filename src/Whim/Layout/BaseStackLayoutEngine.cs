@@ -69,7 +69,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	/// <inheritdoc/>
-	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location);
+	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
 	/// <inheritdoc/>
 	public IWindow? GetFirstWindow() => _stack.FirstOrDefault();

@@ -74,7 +74,7 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	public virtual void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) => InnerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
 
 	/// <inheritdoc/>
-	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location);
+	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
 	/// <inheritdoc/>
 	public virtual void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();

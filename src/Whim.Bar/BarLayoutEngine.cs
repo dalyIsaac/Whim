@@ -20,15 +20,17 @@ public class BarLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
+	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
-		int height = _barConfig.Height + (int)(_barConfig.Margin.Bottom + _barConfig.Margin.Top);
+		double scale = monitor.ScaleFactor / 100.0;
+		int height = (int)(_barConfig.Height * scale);
+
 		Location proxiedLocation = new(
 			x: location.X,
 			y: location.Y + height,
 			width: location.Width,
 			height: location.Height - height
 		);
-		return InnerLayoutEngine.DoLayout(proxiedLocation);
+		return InnerLayoutEngine.DoLayout(proxiedLocation, monitor);
 	}
 }

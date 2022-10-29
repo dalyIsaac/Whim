@@ -16,8 +16,9 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// Performs a layout inside the available <paramref name="location"/>.
 	/// </summary>
 	/// <param name="location">The available area to do a layout inside.</param>
+	/// <param name="monitor">The monitor which the layout is being done for.</param>
 	/// <returns></returns>
-	public IEnumerable<IWindowState> DoLayout(ILocation<int> location);
+	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
 	/// <summary>
 	/// Retrieves the first window in the layout engine.

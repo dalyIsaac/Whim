@@ -19,6 +19,11 @@ public interface IMonitorManager : IEnumerable<IMonitor>, IDisposable
 	public IMonitor FocusedMonitor { get; }
 
 	/// <summary>
+	/// The primary <see cref="IMonitor"/>.
+	/// </summary>
+	public IMonitor PrimaryMonitor { get; }
+
+	/// <summary>
 	/// Initialize the windows event hooks.
 	/// </summary>
 	public void Initialize();

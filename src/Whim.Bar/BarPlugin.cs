@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Windows.Win32.Graphics.Dwm;
 
 namespace Whim.Bar;
 
@@ -75,6 +76,7 @@ public class BarPlugin : IPlugin, IDisposable
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
 			deferPosHandle.DeferWindowPos(barWindow.WindowState);
+			Win32Helper.SetWindowCorners(barWindow.WindowState.Window.Handle, DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND);
 		}
 	}
 

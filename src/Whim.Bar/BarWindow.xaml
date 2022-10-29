@@ -19,10 +19,6 @@
 			</Style>
 
 			<Style TargetType="Button">
-				<!--  Binding doesn't work because Microsoft loves feature parity:  -->
-				<!--  https://docs.microsoft.com/en-us/windows/winui/api/microsoft.ui.xaml.setter?view=winui-3.0  -->
-				<!--<Setter Property="Margin" Value="{x:Bind Path=_barConfig.Margin, Mode=OneWay}" />-->
-
 				<Setter Property="Margin" Value="4" />
 				<Setter Property="CornerRadius" Value="4" />
 			</Style>

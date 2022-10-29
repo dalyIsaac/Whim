@@ -28,7 +28,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location)
+	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
 		string direction = LeftToRight ? "left to right" : "right to left";
 		Logger.Debug($"Performing a column layout {direction}");

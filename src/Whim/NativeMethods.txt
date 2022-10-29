@@ -30,6 +30,7 @@ GetDeviceCaps
 GetForegroundWindow
 GetKeyState
 GetMonitorInfo
+GetScaleFactorForMonitor
 GetShellWindow
 GetSystemMetrics
 GetWindow

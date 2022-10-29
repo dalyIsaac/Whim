@@ -4,6 +4,7 @@ using System.Threading;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.Shell.Common;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
@@ -76,6 +77,15 @@ internal partial class Screen
 		if (hdc != screenDC)
 		{
 			PInvoke.DeleteDC((CreatedHDC)screenDC.Value);
+		}
+	}
+
+	public int ScaleFactor
+	{
+		get
+		{
+			HRESULT result = PInvoke.GetScaleFactorForMonitor(_hmonitor, out DEVICE_SCALE_FACTOR scaleFactor);
+			return result.Succeeded ? (int)scaleFactor : 100;
 		}
 	}
 
