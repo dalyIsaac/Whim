@@ -102,7 +102,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug($"Removing workspace {workspace}");
 
-		if (_workspaces.Count - 1 <= _configContext.MonitorManager.Length)
+		if (_workspaces.Count - 1 < _configContext.MonitorManager.Length)
 		{
 			Logger.Debug($"There must be at least {_configContext.MonitorManager.Length} workspaces.");
 			return false;
@@ -279,7 +279,10 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		foreach (IWorkspace workspace in _workspaces)
 		{
-			(workspace as Workspace)?.WindowFocused(window);
+			if (workspace is Workspace ws)
+			{
+				ws.WindowFocused(window);
+			}
 		}
 	}
 	#endregion
@@ -292,7 +295,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
 	{
-		return _monitorWorkspaceMap[monitor];
+		return _monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? workspace) ? workspace : null;
 	}
 
 	public IMonitor? GetMonitorForWindow(IWindow window)
