@@ -6,14 +6,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="1*" />
-			<ColumnDefinition Width="1*" />
-			<ColumnDefinition Width="1*" />
-		</Grid.ColumnDefinitions>
-
-		<Grid.Resources>
+	<RelativePanel Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+		<RelativePanel.Resources>
 			<Style TargetType="Grid">
 				<Setter Property="Padding" Value="4" />
 			</Style>
@@ -27,26 +21,33 @@
 				<Setter Property="Margin" Value="4" />
 				<Setter Property="Padding" Value="6" />
 			</Style>
-		</Grid.Resources>
+		</RelativePanel.Resources>
 
 		<StackPanel
 			x:Name="LeftPanel"
 			Grid.Column="0"
 			VerticalAlignment="Center"
-			Orientation="Horizontal" />
+			Orientation="Horizontal"
+			RelativePanel.AlignVerticalCenterWithPanel="True" />
 
 		<StackPanel
 			x:Name="CenterPanel"
 			Grid.Column="1"
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
-			Orientation="Horizontal" />
+			Orientation="Horizontal"
+			RelativePanel.AlignHorizontalCenterWithPanel="True"
+			RelativePanel.AlignVerticalCenterWithPanel="True"
+			RelativePanel.LeftOf="RightPanel"
+			RelativePanel.RightOf="LeftPanel" />
 
 		<StackPanel
 			x:Name="RightPanel"
 			Grid.Column="2"
 			VerticalAlignment="Center"
 			FlowDirection="RightToLeft"
-			Orientation="Horizontal" />
-	</Grid>
+			Orientation="Horizontal"
+			RelativePanel.AlignRightWithPanel="True"
+			RelativePanel.AlignVerticalCenterWithPanel="True" />
+	</RelativePanel>
 </Window>

@@ -7,5 +7,15 @@
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
-	<TextBlock Text="{x:Bind Path=ViewModel.Value, Mode=OneWay}" />
+	<RelativePanel>
+		<TextBlock
+			RelativePanel.AlignHorizontalCenterWithPanel="True"
+			RelativePanel.AlignLeftWithPanel="True"
+			RelativePanel.AlignRightWithPanel="True"
+			RelativePanel.AlignVerticalCenterWithPanel="True"
+			Text="{x:Bind Path=ViewModel.Value, Mode=OneWay}"
+			TextTrimming="CharacterEllipsis"
+			TextWrapping="NoWrap" />
+	</RelativePanel>
+
 </UserControl>
