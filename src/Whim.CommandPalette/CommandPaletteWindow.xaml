@@ -21,6 +21,7 @@
 		<RelativePanel x:Name="ListViewItemsWrapper" Grid.Row="1">
 			<ListView
 				x:Name="ListViewItems"
+				IsItemClickEnabled="True"
 				IsTabStop="False"
 				ItemClick="CommandListItems_ItemClick"
 				RelativePanel.AlignLeftWithPanel="True"
