@@ -137,5 +137,22 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 				)
 			)
 		),
+
+		// Create workspace
+		new CommandItem(
+			new Command(
+				identifier: "command_palette.create_workspace",
+				title: "Create workspace",
+				callback: () => ActivateWithConfig(
+					new CommandPaletteFreeTextActivationConfig(
+						callback: (text) => {
+							IWorkspace workspace = _configContext.WorkspaceManager.WorkspaceFactory(_configContext, text);
+							_configContext.WorkspaceManager.Add(workspace);
+						},
+						hint: "Enter new workspace name"
+					)
+				)
+			)
+		),
 	};
 }
