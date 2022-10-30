@@ -44,6 +44,11 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
+	public Func<IConfigContext, string, IWorkspace> WorkspaceFactory { get; set; } = (configContext, name) =>
+	{
+		return new Workspace(configContext, name, new ColumnLayoutEngine());
+	};
+
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
@@ -339,6 +344,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		_windowWorkspaceMap[window] = workspace;
 		ActiveWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
+
+		LayoutAllActiveWorkspaces();
 	}
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)

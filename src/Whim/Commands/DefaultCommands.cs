@@ -119,6 +119,16 @@ public static class DefaultCommands
 			new Keybind(WinShift, VIRTUAL_KEY.VK_RIGHT)
 		),
 
+		// Close workspace.
+		new CommandItem(
+			new Command(
+				identifier: "default_commands.close_workspace",
+				title: "Close the current workspace",
+				callback: () => configContext.WorkspaceManager.Remove(configContext.WorkspaceManager.ActiveWorkspace)
+			),
+			new Keybind(WinCtrlShift, VIRTUAL_KEY.VK_W)
+		),
+
 		// Exit.
 		new CommandItem(
 			new Command(

@@ -42,6 +42,8 @@ IWorkspace CreateWorkspace(IConfigContext configContext, string name)
 /// <param name="configContext"></param>
 void DoConfig(IConfigContext configContext)
 {
+	configContext.WorkspaceManager.WorkspaceFactory = CreateWorkspace;
+
 	// Add workspaces.
 	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "Work"));
 	configContext.WorkspaceManager.Add(CreateWorkspace(configContext, "Procrastination"));
