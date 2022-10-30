@@ -15,6 +15,16 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public IWorkspace ActiveWorkspace { get; }
 
 	/// <summary>
+	/// Creates a workspace, named with the provided string.
+	///
+	/// <br/>
+	///
+	/// <b>NOTE</b>: This will not add the workspace to the manager, nor will it activate it.
+	/// Call <see cref="Add"/>.
+	/// </summary>
+	public Func<IConfigContext, string, IWorkspace> WorkspaceFactory { get; set; }
+
+	/// <summary>
 	/// Initialize the event listeners.
 	/// </summary>
 	public void Initialize();
