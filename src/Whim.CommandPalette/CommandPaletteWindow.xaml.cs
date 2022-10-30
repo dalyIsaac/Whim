@@ -68,6 +68,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	public void Activate(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items = null, IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating command palette");
+		ResetState();
 
 		_activationConfig = config;
 		_monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
@@ -92,6 +93,14 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		Logger.Debug("Hiding command palette");
 		_window.Hide();
+		ResetState();
+	}
+
+	/// <summary>
+	/// Reset the window's state.
+	/// </summary>
+	public void ResetState()
+	{
 		_monitor = null;
 		TextEntry.Text = "";
 		_allCommands.Clear();

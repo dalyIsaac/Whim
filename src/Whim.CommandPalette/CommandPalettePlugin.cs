@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.CommandPalette;
@@ -152,6 +153,32 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 						hint: "Enter new workspace name"
 					)
 				)
+			)
+		),
+
+		// Move window to workspace
+		new CommandItem(
+			new Command(
+				identifier: "command_palette.move_window_to_workspace",
+				title: "Move window to workspace",
+				callback: () =>
+				{
+					IEnumerable<CommandItem> items = _configContext.WorkspaceManager
+						.Select(w => new CommandItem(
+							new Command(
+								identifier: $"command_palette.move_window_to_workspace.{w.Name}",
+								title: w.Name,
+								callback: () => _configContext.WorkspaceManager.MoveWindowToWorkspace(w)
+							)
+						));
+
+					ActivateWithConfig(
+						config: new CommandPaletteMenuActivationConfig(
+							hint: "Select workspace"
+						),
+						items
+					);
+				}
 			)
 		),
 	};

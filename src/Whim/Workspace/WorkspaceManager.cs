@@ -344,6 +344,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		_windowWorkspaceMap[window] = workspace;
 		ActiveWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
+
+		LayoutAllActiveWorkspaces();
 	}
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)

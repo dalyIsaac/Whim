@@ -523,7 +523,7 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void MoveWindowToWorkspace()
+	public void MoveWindowToWorkspace_Success()
 	{
 		(var configContext, _, var monitors, _) = CreateMocks();
 
@@ -546,6 +546,10 @@ public class WorkspaceManagerTests
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
+
+		// Verify that DoLayout was called.
+		workspace.Verify(w => w.DoLayout(), Times.Once());
+		workspace2.Verify(w => w.DoLayout(), Times.Once());
 	}
 
 	[Fact]
