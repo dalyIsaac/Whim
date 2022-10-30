@@ -73,6 +73,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 
 		TextEntry.Text = _activationConfig.InitialText;
+		TextEntry.SelectAll();
 		TextEntry.PlaceholderText = _activationConfig.Hint ?? "Start typing...";
 		_maxHeight = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
 
