@@ -33,7 +33,7 @@ internal class CommandItemContainer : ICommandItemContainer
 		_identifierCommandMap[command.Identifier] = command;
 	}
 
-	public bool Add(string commandIdentifier, IKeybind keybind)
+	public bool SetKeybind(string commandIdentifier, IKeybind keybind)
 	{
 		Logger.Debug($"Setting keybind {keybind} for command {commandIdentifier}");
 

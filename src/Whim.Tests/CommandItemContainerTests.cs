@@ -94,19 +94,19 @@ public class CommandItemsTests
 	/// Set a keybind to a command which doesn't exist.
 	/// </summary>
 	[Fact]
-	public void AddToNonExistentCommand()
+	public void SetToNonExistentCommand()
 	{
 		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 
-		Assert.False(commandItems.Add("command", keybind));
+		Assert.False(commandItems.SetKeybind("command", keybind));
 	}
 
 	/// <summary>
 	/// Set a keybind to an existing command.
 	/// </summary>
 	[Fact]
-	public void AddToExistingCommand()
+	public void SetToExistingCommand()
 	{
 		CommandItemContainer commandItems = new();
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
@@ -122,7 +122,7 @@ public class CommandItemsTests
 		commandItems.Add(command2.Object);
 
 		// Set the keybind to the second command.
-		commandItems.Add(command2.Object.Identifier, keybind);
+		commandItems.SetKeybind(command2.Object.Identifier, keybind);
 
 		// Check that the first command is still there.
 		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));

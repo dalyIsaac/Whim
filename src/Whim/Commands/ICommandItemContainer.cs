@@ -44,7 +44,7 @@ public interface ICommandItemContainer : IEnumerable<CommandItem>
 	/// <param name="commandIdentifier">The identifier of the command to set the keybind for</param>
 	/// <param name="keybind">The keybind to bind the command to</param>
 	/// <returns>True if the command was found and the keybind was set, false otherwise.</returns>
-	public bool Add(string commandIdentifier, IKeybind keybind);
+	public bool SetKeybind(string commandIdentifier, IKeybind keybind);
 
 	/// <summary>
 	/// Tries to remove the given keybind. It does not remove the command bound to the keybind.
