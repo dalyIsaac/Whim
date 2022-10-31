@@ -26,7 +26,7 @@ public interface IPluginManager : IDisposable
 	/// <br />
 	///
 	/// This will also register all the commands for the plugins, specified in
-	/// <see cref="IPlugin.GetCommands"/>.
+	/// <see cref="IPlugin.Commands"/>.
 	/// </summary>
 	public void PostInitialize();
 
@@ -38,7 +38,7 @@ public interface IPluginManager : IDisposable
 	///
 	/// <br />
 	///
-	/// The commands for a plugin specified in <see cref="IPlugin.GetCommands"/> will be
+	/// The commands for a plugin specified in <see cref="IPlugin.Commands"/> will be
 	/// registered in <see cref="PostInitialize"/>.
 	/// </summary>
 	/// <param name="plugin">The plugin to add.</param>

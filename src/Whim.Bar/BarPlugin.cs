@@ -114,5 +114,5 @@ public class BarPlugin : IPlugin, IDisposable
 	}
 
 	/// <inheritdoc />
-	public CommandItem[] GetCommands() => Array.Empty<CommandItem>();
+	public IEnumerable<CommandItem> Commands { get; } = Array.Empty<CommandItem>();
 }

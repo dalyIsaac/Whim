@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Whim;
 
 /// <summary>
@@ -9,7 +11,7 @@ public interface IPlugin
 	/// Unique name of the plugin, in the snake case format of "author_name.plugin_name".
 	///
 	/// The name must be unique among all plugins. The name will be used in the names of the
-	/// commands from <see cref="GetCommands"/>.
+	/// commands from <see cref="Commands"/>.
 	/// </summary>
 	public string Name { get; }
 
@@ -34,9 +36,8 @@ public interface IPlugin
 	/// during startup.
 	/// </summary>
 	/// <remarks>
-	/// The commands should also be individually accessible via the implementation of
-	/// this interface.
-	/// The signature should be something like <c>public CommandItem CommandName => new CommandItem(...)</c>.
+	/// The commands should also be individually accessible via a class <c>PluginCommands</c>,
+	/// where <c>Plugin</c> is the name of the plugin.
 	/// </remarks>
-	public CommandItem[] GetCommands();
+	public IEnumerable<CommandItem> Commands { get; }
 }

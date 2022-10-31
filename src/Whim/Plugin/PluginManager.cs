@@ -33,7 +33,7 @@ internal class PluginManager : IPluginManager
 		foreach (IPlugin plugin in _plugins.Values)
 		{
 			plugin.PostInitialize();
-			_configContext.CommandManager.LoadCommands(plugin.GetCommands());
+			_configContext.CommandManager.LoadCommands(plugin.Commands);
 		}
 	}
 

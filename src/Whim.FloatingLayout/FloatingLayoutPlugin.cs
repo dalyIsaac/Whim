@@ -1,4 +1,4 @@
-using Windows.Win32.UI.Input.KeyboardAndMouse;
+using System.Collections.Generic;
 
 namespace Whim.FloatingLayout;
 
@@ -32,6 +32,9 @@ public class FloatingLayoutPlugin : IPlugin
 
 	/// <inheritdoc />
 	public void PostInitialize() { }
+
+	/// <inheritdoc />
+	public IEnumerable<CommandItem> Commands => new FloatingLayoutCommands(this);
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window
@@ -89,19 +92,4 @@ public class FloatingLayoutPlugin : IPlugin
 		floatingLayoutEngine.ToggleWindowFloating(window);
 		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
-
-	/// <inheritdoc />
-	public CommandItem[] GetCommands() => new CommandItem[] { ToggleWindowFloatingCommand };
-
-	/// <summary>
-	/// Toggle window floating command.
-	/// </summary>
-	public CommandItem ToggleWindowFloatingCommand => new(
-		new Command(
-			identifier: "floating_layout.toggle_window_floating",
-			title: "Toggle window floating",
-			callback: () => ToggleWindowFloating()
-		),
-		new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_F)
-	);
 }

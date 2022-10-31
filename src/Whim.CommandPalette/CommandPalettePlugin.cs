@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.CommandPalette;
 
@@ -115,88 +113,5 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	}
 
 	/// <inheritdoc />
-	public CommandItem[] GetCommands() => new CommandItem[]
-	{
-			ToggleCommand,
-			RenameWorkspaceCommand,
-			CreateWorkspaceCommand,
-			MoveWindowToWorkspaceCommand
-	};
-
-	/// <summary>
-	/// Toggle command palette command.
-	/// </summary>
-	public CommandItem ToggleCommand => new(
-		new Command(
-			identifier: $"{Name}.toggle",
-			title: "Toggle command palette",
-			callback: () => Activate()
-		),
-		new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_K)
-	);
-
-	/// <summary>
-	/// Rename workspace command.
-	/// </summary>
-	public CommandItem RenameWorkspaceCommand => new(
-		new Command(
-			identifier: $"{Name}.rename_workspace",
-			title: "Rename workspace",
-			callback: () => ActivateWithConfig(
-				new CommandPaletteFreeTextActivationConfig(
-					callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
-					hint: "Enter new workspace name",
-					initialText: _configContext.WorkspaceManager.ActiveWorkspace.Name
-				)
-			)
-		)
-	);
-
-	/// <summary>
-	/// Create workspace command.
-	/// </summary>
-	public CommandItem CreateWorkspaceCommand => new(
-		new Command(
-			identifier: $"{Name}.create_workspace",
-			title: "Create workspace",
-			callback: () => ActivateWithConfig(
-				new CommandPaletteFreeTextActivationConfig(
-					callback: (text) =>
-					{
-						IWorkspace workspace = _configContext.WorkspaceManager.WorkspaceFactory(_configContext, text);
-						_configContext.WorkspaceManager.Add(workspace);
-					},
-					hint: "Enter new workspace name"
-				)
-			)
-		)
-	);
-
-	/// <summary>
-	/// Move window to workspace command.
-	/// </summary>
-	public CommandItem MoveWindowToWorkspaceCommand => new(
-		new Command(
-			identifier: $"{Name}.move_window_to_workspace",
-			title: "Move window to workspace",
-			callback: () =>
-			{
-				IEnumerable<CommandItem> items = _configContext.WorkspaceManager
-					.Select(w => new CommandItem(
-						new Command(
-							identifier: $"{Name}.move_window_to_workspace.{w.Name}",
-							title: w.Name,
-							callback: () => _configContext.WorkspaceManager.MoveWindowToWorkspace(w)
-						)
-					));
-
-				ActivateWithConfig(
-					config: new CommandPaletteMenuActivationConfig(
-						hint: "Select workspace"
-					),
-					items
-				);
-			}
-		)
-	);
+	public IEnumerable<CommandItem> Commands => new CommandPaletteCommands(_configContext, this);
 }
