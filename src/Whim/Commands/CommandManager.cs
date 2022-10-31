@@ -7,6 +7,7 @@ namespace Whim;
 /// <inheritdoc />
 public class CommandManager : ICommandManager
 {
+	private readonly IConfigContext _configContext;
 	private readonly ICommandItemContainer _commandItems;
 	private readonly KeybindHook _keybindHook;
 	private bool _disposedValue;
@@ -14,8 +15,9 @@ public class CommandManager : ICommandManager
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CommandManager"/> class.
 	/// </summary>
-	public CommandManager()
+	public CommandManager(IConfigContext configContext)
 	{
+		_configContext = configContext;
 		_commandItems = new CommandItemContainer();
 		_keybindHook = new KeybindHook(_commandItems);
 	}
@@ -24,6 +26,7 @@ public class CommandManager : ICommandManager
 	public void Initialize()
 	{
 		_keybindHook.Initialize();
+		LoadCommands(new CoreCommands(_configContext));
 	}
 
 	/// <inheritdoc />
