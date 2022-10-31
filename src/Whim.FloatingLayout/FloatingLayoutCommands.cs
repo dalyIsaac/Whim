@@ -29,7 +29,7 @@ public class FloatingLayoutCommands : IEnumerable<CommandItem>
 			title: "Toggle window floating",
 			callback: () => _floatingLayoutPlugin.ToggleWindowFloating()
 		),
-		new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_F)
+		new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_F)
 	);
 
 	/// <summary>
@@ -41,7 +41,7 @@ public class FloatingLayoutCommands : IEnumerable<CommandItem>
 			title: "Mark window as floating",
 			callback: () => _floatingLayoutPlugin.MarkWindowAsFloating()
 		),
-		new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_M)
+		new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_M)
 	);
 
 	/// <summary>
@@ -53,7 +53,7 @@ public class FloatingLayoutCommands : IEnumerable<CommandItem>
 			title: "Mark window as docked",
 			callback: () => _floatingLayoutPlugin.MarkWindowAsDocked()
 		),
-		new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_D)
+		new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_D)
 	);
 
 	/// <inheritdoc/>

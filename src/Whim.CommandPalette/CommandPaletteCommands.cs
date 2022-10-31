@@ -32,7 +32,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 			title: "Toggle command palette",
 			callback: () => _commandPalettePlugin.Activate()
 		),
-		new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_K)
+		new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_K)
 	);
 
 	/// <summary>

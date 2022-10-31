@@ -29,7 +29,7 @@ public class GapsCommands : IEnumerable<CommandItem>
 			title: "Increase outer gap",
 			callback: () => _gapsPlugin.UpdateOuterGap(_gapsPlugin.GapsConfig.DefaultOuterDelta)
 		),
-		new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_L)
+		new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_L)
 	);
 
 	/// <summary>
@@ -41,7 +41,7 @@ public class GapsCommands : IEnumerable<CommandItem>
 			title: "Decrease outer gap",
 			callback: () => _gapsPlugin.UpdateOuterGap(-_gapsPlugin.GapsConfig.DefaultOuterDelta)
 		),
-		new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_H)
+		new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_H)
 	);
 
 	/// <summary>
@@ -53,7 +53,7 @@ public class GapsCommands : IEnumerable<CommandItem>
 			title: "Increase inner gap",
 			callback: () => _gapsPlugin.UpdateInnerGap(_gapsPlugin.GapsConfig.DefaultInnerDelta)
 		),
-		new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_K)
+		new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_K)
 	);
 
 	/// <summary>
@@ -65,7 +65,7 @@ public class GapsCommands : IEnumerable<CommandItem>
 			title: "Decrease inner gap",
 			callback: () => _gapsPlugin.UpdateInnerGap(-_gapsPlugin.GapsConfig.DefaultInnerDelta)
 		),
-		new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_J)
+		new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_J)
 	);
 
 	/// <inheritdoc/>
