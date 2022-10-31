@@ -15,6 +15,9 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	private CommandPaletteWindow? _commandPaletteWindow;
 	private bool _disposedValue;
 
+	/// <inheritdoc />
+	public string Name => "whim.commmand_palette";
+
 	/// <summary>
 	/// The configuration for the command palette plugin.
 	/// </summary>
@@ -117,7 +120,7 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 		// Toggle command palette
 		new CommandItem(
 			new Command(
-				identifier: "command_palette.toggle",
+				identifier: $"{Name}.toggle",
 				title: "Toggle command palette",
 				callback: () => Activate()
 			),
@@ -127,7 +130,7 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 		// Rename workspace
 		new CommandItem(
 			new Command(
-				identifier: "command_palette.rename_workspace",
+				identifier: $"{Name}.rename_workspace",
 				title: "Rename workspace",
 				callback: () => ActivateWithConfig(
 					new CommandPaletteFreeTextActivationConfig(
@@ -142,7 +145,7 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 		// Create workspace
 		new CommandItem(
 			new Command(
-				identifier: "command_palette.create_workspace",
+				identifier: $"{Name}.create_workspace",
 				title: "Create workspace",
 				callback: () => ActivateWithConfig(
 					new CommandPaletteFreeTextActivationConfig(
@@ -159,14 +162,14 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 		// Move window to workspace
 		new CommandItem(
 			new Command(
-				identifier: "command_palette.move_window_to_workspace",
+				identifier: $"{Name}.move_window_to_workspace",
 				title: "Move window to workspace",
 				callback: () =>
 				{
 					IEnumerable<CommandItem> items = _configContext.WorkspaceManager
 						.Select(w => new CommandItem(
 							new Command(
-								identifier: $"command_palette.move_window_to_workspace.{w.Name}",
+								identifier: $"{Name}.move_window_to_workspace.{w.Name}",
 								title: w.Name,
 								callback: () => _configContext.WorkspaceManager.MoveWindowToWorkspace(w)
 							)

@@ -34,4 +34,11 @@ public interface IPluginManager : IDisposable
 	/// <param name="plugin">The plugin to add.</param>
 	/// <returns>The plugin that was added.</returns>
 	public T AddPlugin<T>(T plugin) where T : IPlugin;
+
+	/// <summary>
+	/// Whether the plugin manager includes a plugin with the given name.
+	/// </summary>
+	/// <param name="pluginName">The name of the plugin.</param>
+	/// <returns>Whether the plugin manager includes a plugin with the given name.</returns>
+	public bool Contains(string pluginName);
 }

@@ -10,6 +10,9 @@ public class FloatingLayoutPlugin : IPlugin
 	private readonly IConfigContext _configContext;
 	private readonly FloatingLayoutConfig _floatingLayoutConfig;
 
+	/// <inheritdoc />
+	public string Name => "whim.floating_layout";
+
 	/// <summary>
 	/// Creates a new instance of the floating layout plugin.
 	/// </summary>

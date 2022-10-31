@@ -5,16 +5,16 @@ namespace Whim;
 
 internal class PluginManager : IPluginManager
 {
-	private readonly List<IPlugin> _plugins = new();
+	private readonly Dictionary<string, IPlugin> _plugins = new();
 	private bool _disposedValue;
 
-	public IEnumerable<IPlugin> LoadedPlugins => _plugins;
+	public IEnumerable<IPlugin> LoadedPlugins => _plugins.Values;
 
 	public void PreInitialize()
 	{
 		Logger.Debug("Pre-initializing plugin manager...");
 
-		foreach (IPlugin plugin in _plugins)
+		foreach (IPlugin plugin in _plugins.Values)
 		{
 			plugin.PreInitialize();
 		}
@@ -24,7 +24,7 @@ internal class PluginManager : IPluginManager
 	{
 		Logger.Debug("Post-initializing plugin manager...");
 
-		foreach (IPlugin plugin in _plugins)
+		foreach (IPlugin plugin in _plugins.Values)
 		{
 			plugin.PostInitialize();
 		}
@@ -32,8 +32,18 @@ internal class PluginManager : IPluginManager
 
 	public T AddPlugin<T>(T plugin) where T : IPlugin
 	{
-		_plugins.Add(plugin);
+		if (Contains(plugin.Name))
+		{
+			throw new InvalidOperationException($"Plugin with name '{plugin.Name}' already exists.");
+		}
+
+		_plugins.Add(plugin.Name, plugin);
 		return plugin;
+	}
+
+	public bool Contains(string pluginName)
+	{
+		return _plugins.ContainsKey(pluginName);
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -43,7 +53,7 @@ internal class PluginManager : IPluginManager
 			if (disposing)
 			{
 				Logger.Debug("Disposing plugin manager");
-				foreach (IPlugin plugin in _plugins)
+				foreach (IPlugin plugin in _plugins.Values)
 				{
 					if (plugin is IDisposable disposable)
 					{

@@ -15,6 +15,9 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 	private DispatcherTimer? _dispatcherTimer;
 	private bool _disposedValue;
 
+	/// <inheritdoc />
+	public string Name => "whim.focus_indicator";
+
 	/// <summary>
 	/// Creates a new instance of the focus indicator plugin.
 	/// </summary>

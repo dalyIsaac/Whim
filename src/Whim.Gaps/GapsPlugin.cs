@@ -10,6 +10,9 @@ public class GapsPlugin : IPlugin
 	private readonly IConfigContext _configContext;
 	private readonly GapsConfig _gapsConfig;
 
+	/// <inheritdoc />
+	public string Name => "whim.gaps";
+
 	/// <summary>
 	/// Creates a new instance of the gaps plugin.
 	/// </summary>
@@ -57,7 +60,7 @@ public class GapsPlugin : IPlugin
 		// Increase outer gap
 		new CommandItem(
 			new Command(
-				identifier: "gaps.outer.increase",
+				identifier: $"{Name}.outer.increase",
 				title: "Increase outer gap",
 				callback: () => UpdateOuterGap(_gapsConfig.DefaultOuterDelta)
 			),
@@ -67,7 +70,7 @@ public class GapsPlugin : IPlugin
 		// Decrease outer gap
 		new CommandItem(
 			new Command(
-				identifier: "gaps.outer.decrease",
+				identifier: $"{Name}.outer.decrease",
 				title: "Decrease outer gap",
 				callback: () => UpdateOuterGap(-_gapsConfig.DefaultOuterDelta)
 			),
@@ -77,7 +80,7 @@ public class GapsPlugin : IPlugin
 		// Increase inner gap
 		new CommandItem(
 			new Command(
-				identifier: "gaps.inner.increase",
+				identifier: $"{Name}.inner.increase",
 				title: "Increase inner gap",
 				callback: () => UpdateInnerGap(_gapsConfig.DefaultInnerDelta)
 			),
@@ -87,7 +90,7 @@ public class GapsPlugin : IPlugin
 		// Decrease inner gap
 		new CommandItem(
 			new Command(
-				identifier: "gaps.inner.decrease",
+				identifier: $"{Name}.inner.decrease",
 				title: "Decrease inner gap",
 				callback: () => UpdateInnerGap(-_gapsConfig.DefaultInnerDelta)
 			),

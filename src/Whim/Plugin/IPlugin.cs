@@ -6,6 +6,14 @@ namespace Whim;
 public interface IPlugin
 {
 	/// <summary>
+	/// Unique name of the plugin, in the snake case format of "author_name.plugin_name".
+	///
+	/// The name must be unique among all plugins. The name will be used in the names of the
+	/// commands from <see cref="GetCommands"/>.
+	/// </summary>
+	public string Name { get; }
+
+	/// <summary>
 	/// <b>This method is to be called by the plugin manager.</b>
 	/// Initializes the plugin before the <see cref="IConfigContext"/> has been initialized.
 	/// Put things like event listeners here or adding proxy layout engines
