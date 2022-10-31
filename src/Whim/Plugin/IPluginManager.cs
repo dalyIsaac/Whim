@@ -22,6 +22,11 @@ public interface IPluginManager : IDisposable
 	/// <summary>
 	/// Calls all plugins' <see cref="IPlugin.PostInitialize"/> method.
 	/// This runs after the rest of the config context has been initialized.
+	///
+	/// <br />
+	///
+	/// This will also register all the commands for the plugins, specified in
+	/// <see cref="IPlugin.GetCommands"/>.
 	/// </summary>
 	public void PostInitialize();
 
@@ -30,6 +35,11 @@ public interface IPluginManager : IDisposable
 	/// There's no guarantee that <see cref="PreInitialize"/> will be called before Whim is
 	/// initialized. However, <see cref="PostInitialize"/> will still be called after
 	/// <see cref="PreInitialize"/>.
+	///
+	/// <br />
+	///
+	/// The commands for a plugin specified in <see cref="IPlugin.GetCommands"/> will be
+	/// registered in <see cref="PostInitialize"/>.
 	/// </summary>
 	/// <param name="plugin">The plugin to add.</param>
 	/// <returns>The plugin that was added.</returns>

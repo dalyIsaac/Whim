@@ -81,14 +81,6 @@ void DoConfig(IConfigContext configContext)
 	CommandPaletteConfig commandPaletteConfig = new();
 	CommandPalettePlugin commandPalettePlugin = new(configContext, commandPaletteConfig);
 	configContext.PluginManager.AddPlugin(commandPalettePlugin);
-
-	// Load the commands and keybindings.
-	configContext.CommandManager.LoadCommands(DefaultCommands.GetCommands(configContext));
-	configContext.CommandManager.LoadCommands(barPlugin.GetCommands());
-	configContext.CommandManager.LoadCommands(floatingLayoutPlugin.GetCommands());
-	configContext.CommandManager.LoadCommands(gapsPlugin.GetCommands());
-	configContext.CommandManager.LoadCommands(focusIndicatorPlugin.GetCommands());
-	configContext.CommandManager.LoadCommands(commandPalettePlugin.GetCommands());
 }
 
 #pragma warning disable CS8974 // Methods should not return 'this'.
