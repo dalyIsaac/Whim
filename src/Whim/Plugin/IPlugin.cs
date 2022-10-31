@@ -30,8 +30,13 @@ public interface IPlugin
 
 	/// <summary>
 	/// Get the default commands for this plugin, and their associated keybinds.
-	/// It's up to the user to register the commands themselves using
-	/// <see cref="ICommandManager.LoadCommands"/>.
+	/// These commands are registered by the <see cref="IPluginManager.PostInitialize"/> method,
+	/// during startup.
 	/// </summary>
+	/// <remarks>
+	/// The commands should also be individually accessible via the implementation of
+	/// this interface.
+	/// The signature should be something like <c>public CommandItem CommandName => new CommandItem(...)</c>.
+	/// </remarks>
 	public CommandItem[] GetCommands();
 }

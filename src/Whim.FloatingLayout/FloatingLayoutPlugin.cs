@@ -91,16 +91,17 @@ public class FloatingLayoutPlugin : IPlugin
 	}
 
 	/// <inheritdoc />
-	public CommandItem[] GetCommands() => new CommandItem[]
-	{
-		// Toggle window floating.
-		new CommandItem(
-			new Command(
-				identifier: "floating_layout.toggle_window_floating",
-				title: "Toggle window floating",
-				callback: () => ToggleWindowFloating()
-			),
-			new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_F)
-		)
-	};
+	public CommandItem[] GetCommands() => new CommandItem[] { ToggleWindowFloatingCommand };
+
+	/// <summary>
+	/// Toggle window floating command.
+	/// </summary>
+	public CommandItem ToggleWindowFloatingCommand => new(
+		new Command(
+			identifier: "floating_layout.toggle_window_floating",
+			title: "Toggle window floating",
+			callback: () => ToggleWindowFloating()
+		),
+		new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_F)
+	);
 }

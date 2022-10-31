@@ -57,44 +57,57 @@ public class GapsPlugin : IPlugin
 	/// <inheritdoc />
 	public CommandItem[] GetCommands() => new CommandItem[]
 	{
-		// Increase outer gap
-		new CommandItem(
-			new Command(
-				identifier: $"{Name}.outer.increase",
-				title: "Increase outer gap",
-				callback: () => UpdateOuterGap(_gapsConfig.DefaultOuterDelta)
-			),
-			new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_L)
-		),
-
-		// Decrease outer gap
-		new CommandItem(
-			new Command(
-				identifier: $"{Name}.outer.decrease",
-				title: "Decrease outer gap",
-				callback: () => UpdateOuterGap(-_gapsConfig.DefaultOuterDelta)
-			),
-			new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_H)
-		),
-
-		// Increase inner gap
-		new CommandItem(
-			new Command(
-				identifier: $"{Name}.inner.increase",
-				title: "Increase inner gap",
-				callback: () => UpdateInnerGap(_gapsConfig.DefaultInnerDelta)
-			),
-			new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_K)
-		),
-
-		// Decrease inner gap
-		new CommandItem(
-			new Command(
-				identifier: $"{Name}.inner.decrease",
-				title: "Decrease inner gap",
-				callback: () => UpdateInnerGap(-_gapsConfig.DefaultInnerDelta)
-			),
-			new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_J)
-		)
+		IncreaseInnerGapCommand,
+		DecreaseInnerGapCommand,
+		IncreaseOuterGapCommand,
+		DecreaseOuterGapCommand
 	};
+
+	/// <summary>
+	/// Increase outer gap command.
+	/// </summary>
+	public CommandItem IncreaseOuterGapCommand => new(
+		new Command(
+			identifier: $"{Name}.outer.increase",
+			title: "Increase outer gap",
+			callback: () => UpdateOuterGap(_gapsConfig.DefaultOuterDelta)
+		),
+		new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_L)
+	);
+
+	/// <summary>
+	/// Decrease outer gap command.
+	/// </summary>
+	public CommandItem DecreaseOuterGapCommand => new(
+		new Command(
+			identifier: $"{Name}.outer.decrease",
+			title: "Decrease outer gap",
+			callback: () => UpdateOuterGap(-_gapsConfig.DefaultOuterDelta)
+		),
+		new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_H)
+	);
+
+	/// <summary>
+	/// Increase inner gap command.
+	/// </summary>
+	public CommandItem IncreaseInnerGapCommand => new(
+		new Command(
+			identifier: $"{Name}.inner.increase",
+			title: "Increase inner gap",
+			callback: () => UpdateInnerGap(_gapsConfig.DefaultInnerDelta)
+		),
+		new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_K)
+	);
+
+	/// <summary>
+	/// Decrease inner gap command.
+	/// </summary>
+	public CommandItem DecreaseInnerGapCommand => new(
+		new Command(
+			identifier: $"{Name}.inner.decrease",
+			title: "Decrease inner gap",
+			callback: () => UpdateInnerGap(-_gapsConfig.DefaultInnerDelta)
+		),
+		new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_J)
+	);
 }
