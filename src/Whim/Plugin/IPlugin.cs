@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Whim;
 
 /// <summary>
@@ -5,6 +7,14 @@ namespace Whim;
 /// </summary>
 public interface IPlugin
 {
+	/// <summary>
+	/// Unique name of the plugin, in the snake case format of "author_name.plugin_name".
+	///
+	/// The name must be unique among all plugins. The name will be used in the names of the
+	/// commands from <see cref="Commands"/>.
+	/// </summary>
+	public string Name { get; }
+
 	/// <summary>
 	/// <b>This method is to be called by the plugin manager.</b>
 	/// Initializes the plugin before the <see cref="IConfigContext"/> has been initialized.
@@ -22,8 +32,12 @@ public interface IPlugin
 
 	/// <summary>
 	/// Get the default commands for this plugin, and their associated keybinds.
-	/// It's up to the user to register the commands themselves using
-	/// <see cref="ICommandManager.LoadCommands"/>.
+	/// These commands are registered by the <see cref="IPluginManager.PostInitialize"/> method,
+	/// during startup.
 	/// </summary>
-	public CommandItem[] GetCommands();
+	/// <remarks>
+	/// The commands should also be individually accessible via a class <c>PluginCommands</c>,
+	/// where <c>Plugin</c> is the name of the plugin.
+	/// </remarks>
+	public IEnumerable<CommandItem> Commands { get; }
 }

@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.CommandPalette;
 
-/// <summary>
-/// CommandPalettePlugin displays a rudimentary command palette window. It allows the user to
-/// interact with the loaded commands of Whim.
-/// </summary>
-public class CommandPalettePlugin : IPlugin, IDisposable
+/// <inheritdoc />
+public class CommandPalettePlugin : ICommandPalettePlugin
 {
 	private readonly IConfigContext _configContext;
 	private CommandPaletteWindow? _commandPaletteWindow;
 	private bool _disposedValue;
+
+	/// <inheritdoc />
+	public string Name => "whim.commmand_palette";
 
 	/// <summary>
 	/// The configuration for the command palette plugin.
@@ -112,74 +110,5 @@ public class CommandPalettePlugin : IPlugin, IDisposable
 	}
 
 	/// <inheritdoc />
-	public CommandItem[] GetCommands() => new CommandItem[]
-	{
-		// Toggle command palette
-		new CommandItem(
-			new Command(
-				identifier: "command_palette.toggle",
-				title: "Toggle command palette",
-				callback: () => Activate()
-			),
-			new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_K)
-		),
-
-		// Rename workspace
-		new CommandItem(
-			new Command(
-				identifier: "command_palette.rename_workspace",
-				title: "Rename workspace",
-				callback: () => ActivateWithConfig(
-					new CommandPaletteFreeTextActivationConfig(
-						callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
-						hint: "Enter new workspace name",
-						initialText: _configContext.WorkspaceManager.ActiveWorkspace.Name
-					)
-				)
-			)
-		),
-
-		// Create workspace
-		new CommandItem(
-			new Command(
-				identifier: "command_palette.create_workspace",
-				title: "Create workspace",
-				callback: () => ActivateWithConfig(
-					new CommandPaletteFreeTextActivationConfig(
-						callback: (text) => {
-							IWorkspace workspace = _configContext.WorkspaceManager.WorkspaceFactory(_configContext, text);
-							_configContext.WorkspaceManager.Add(workspace);
-						},
-						hint: "Enter new workspace name"
-					)
-				)
-			)
-		),
-
-		// Move window to workspace
-		new CommandItem(
-			new Command(
-				identifier: "command_palette.move_window_to_workspace",
-				title: "Move window to workspace",
-				callback: () =>
-				{
-					IEnumerable<CommandItem> items = _configContext.WorkspaceManager
-						.Select(w => new CommandItem(
-							new Command(
-								identifier: $"command_palette.move_window_to_workspace.{w.Name}",
-								title: w.Name,
-								callback: () => _configContext.WorkspaceManager.MoveWindowToWorkspace(w)
-							)
-						));
-
-					ActivateWithConfig(
-						config: new CommandPaletteMenuActivationConfig(
-							hint: "Select workspace"
-						),
-						items
-					);
-				}
-			)
-		),
-	};
+	public IEnumerable<CommandItem> Commands => new CommandPaletteCommands(_configContext, this);
 }

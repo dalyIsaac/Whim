@@ -4,17 +4,17 @@ using Windows.Win32.Graphics.Dwm;
 
 namespace Whim.Bar;
 
-/// <summary>
-/// BarPlugin displays an interactive bar at the top of the screen for Whim. It can be configured
-/// with various <see cref="BarComponent"/>s to display on the left, center, and right sides of the bar.
-/// </summary>
-public class BarPlugin : IPlugin, IDisposable
+/// <inheritdoc/>
+public class BarPlugin : IBarPlugin
 {
 	private readonly IConfigContext _configContext;
 	private readonly BarConfig _barConfig;
 
 	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = new();
 	private bool _disposedValue;
+
+	/// <inheritdoc />
+	public string Name => "whim.bar";
 
 	/// <summary>
 	/// Create the bar plugin.
@@ -111,5 +111,5 @@ public class BarPlugin : IPlugin, IDisposable
 	}
 
 	/// <inheritdoc />
-	public CommandItem[] GetCommands() => Array.Empty<CommandItem>();
+	public IEnumerable<CommandItem> Commands { get; } = Array.Empty<CommandItem>();
 }

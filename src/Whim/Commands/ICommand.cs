@@ -6,7 +6,7 @@ namespace Whim;
 public interface ICommand
 {
 	/// <summary>
-	/// The unique identifier. For example, "core.focus_right_window".
+	/// The unique identifier. For example, "whim.core.focus_right_window".
 	/// </summary>
 	public string Identifier { get; }
 

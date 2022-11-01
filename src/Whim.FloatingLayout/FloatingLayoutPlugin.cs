@@ -1,14 +1,15 @@
-using Windows.Win32.UI.Input.KeyboardAndMouse;
+using System.Collections.Generic;
 
 namespace Whim.FloatingLayout;
 
-/// <summary>
-/// FloatingLayoutPlugin lets windows escape the layout engine and be free-floating.
-/// </summary>
-public class FloatingLayoutPlugin : IPlugin
+/// <inheritdoc />
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 {
 	private readonly IConfigContext _configContext;
 	private readonly FloatingLayoutConfig _floatingLayoutConfig;
+
+	/// <inheritdoc />
+	public string Name => "whim.floating_layout";
 
 	/// <summary>
 	/// Creates a new instance of the floating layout plugin.
@@ -29,6 +30,9 @@ public class FloatingLayoutPlugin : IPlugin
 
 	/// <inheritdoc />
 	public void PostInitialize() { }
+
+	/// <inheritdoc />
+	public IEnumerable<CommandItem> Commands => new FloatingLayoutCommands(this);
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window
@@ -86,18 +90,4 @@ public class FloatingLayoutPlugin : IPlugin
 		floatingLayoutEngine.ToggleWindowFloating(window);
 		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
-
-	/// <inheritdoc />
-	public CommandItem[] GetCommands() => new CommandItem[]
-	{
-		// Toggle window floating.
-		new CommandItem(
-			new Command(
-				identifier: "floating_layout.toggle_window_floating",
-				title: "Toggle window floating",
-				callback: () => ToggleWindowFloating()
-			),
-			new Keybind(DefaultCommands.WinShift, VIRTUAL_KEY.VK_F)
-		)
-	};
 }

@@ -36,8 +36,8 @@ internal class ConfigContext : IConfigContext
 		WindowManager = new WindowManager(this);
 		MonitorManager = new MonitorManager(this);
 		WorkspaceManager = new WorkspaceManager(this);
-		CommandManager = new CommandManager();
-		PluginManager = new PluginManager();
+		CommandManager = new CommandManager(this);
+		PluginManager = new PluginManager(this);
 	}
 
 	public void Initialize()

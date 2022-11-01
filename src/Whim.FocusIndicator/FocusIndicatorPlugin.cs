@@ -1,19 +1,21 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Whim.FocusIndicator;
 
-/// <summary>
-/// FocusIndicatorPlugin is the plugin that displays a focus indicator on the focused window.
-/// </summary>
-public class FocusIndicatorPlugin : IPlugin, IDisposable
+/// <inheritdoc/>
+public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 {
 	private readonly IConfigContext _configContext;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
 	private FocusIndicatorWindow? _focusIndicatorWindow;
 	private DispatcherTimer? _dispatcherTimer;
 	private bool _disposedValue;
+
+	/// <inheritdoc />
+	public string Name => "whim.focus_indicator";
 
 	/// <summary>
 	/// Creates a new instance of the focus indicator plugin.
@@ -174,5 +176,5 @@ public class FocusIndicatorPlugin : IPlugin, IDisposable
 	}
 
 	/// <inheritdoc />
-	public CommandItem[] GetCommands() => Array.Empty<CommandItem>();
+	public IEnumerable<CommandItem> Commands { get; } = Array.Empty<CommandItem>();
 }

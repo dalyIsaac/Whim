@@ -1,14 +1,19 @@
-using Windows.Win32.UI.Input.KeyboardAndMouse;
+using System.Collections.Generic;
 
 namespace Whim.Gaps;
 
-/// <summary>
-/// GapsPlugin is a plugin to add gaps between windows in the layout.
-/// </summary>
-public class GapsPlugin : IPlugin
+/// <inheritdoc />
+public class GapsPlugin : IGapsPlugin
 {
 	private readonly IConfigContext _configContext;
-	private readonly GapsConfig _gapsConfig;
+
+	/// <summary>
+	/// The configuration for the gaps plugin.
+	/// </summary>
+	public GapsConfig GapsConfig { get; }
+
+	/// <inheritdoc />
+	public string Name => "whim.gaps";
 
 	/// <summary>
 	/// Creates a new instance of the gaps plugin.
@@ -18,13 +23,13 @@ public class GapsPlugin : IPlugin
 	public GapsPlugin(IConfigContext configContext, GapsConfig gapsConfig)
 	{
 		_configContext = configContext;
-		_gapsConfig = gapsConfig;
+		GapsConfig = gapsConfig;
 	}
 
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new GapsLayoutEngine(_gapsConfig, layout));
+		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new GapsLayoutEngine(GapsConfig, layout));
 	}
 
 	/// <inheritdoc />
@@ -37,7 +42,7 @@ public class GapsPlugin : IPlugin
 	/// <param name="delta"></param>
 	public void UpdateOuterGap(int delta)
 	{
-		_gapsConfig.OuterGap += delta;
+		GapsConfig.OuterGap += delta;
 		_configContext.WorkspaceManager.LayoutAllActiveWorkspaces();
 	}
 
@@ -47,51 +52,10 @@ public class GapsPlugin : IPlugin
 	/// <param name="delta"></param>
 	public void UpdateInnerGap(int delta)
 	{
-		_gapsConfig.InnerGap += delta;
+		GapsConfig.InnerGap += delta;
 		_configContext.WorkspaceManager.LayoutAllActiveWorkspaces();
 	}
 
 	/// <inheritdoc />
-	public CommandItem[] GetCommands() => new CommandItem[]
-	{
-		// Increase outer gap
-		new CommandItem(
-			new Command(
-				identifier: "gaps.outer.increase",
-				title: "Increase outer gap",
-				callback: () => UpdateOuterGap(_gapsConfig.DefaultOuterDelta)
-			),
-			new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_L)
-		),
-
-		// Decrease outer gap
-		new CommandItem(
-			new Command(
-				identifier: "gaps.outer.decrease",
-				title: "Decrease outer gap",
-				callback: () => UpdateOuterGap(-_gapsConfig.DefaultOuterDelta)
-			),
-			new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_H)
-		),
-
-		// Increase inner gap
-		new CommandItem(
-			new Command(
-				identifier: "gaps.inner.increase",
-				title: "Increase inner gap",
-				callback: () => UpdateInnerGap(_gapsConfig.DefaultInnerDelta)
-			),
-			new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_K)
-		),
-
-		// Decrease inner gap
-		new CommandItem(
-			new Command(
-				identifier: "gaps.inner.decrease",
-				title: "Decrease inner gap",
-				callback: () => UpdateInnerGap(-_gapsConfig.DefaultInnerDelta)
-			),
-			new Keybind(DefaultCommands.WinCtrlShift, VIRTUAL_KEY.VK_J)
-		)
-	};
+	public IEnumerable<CommandItem> Commands => new GapsCommands(this);
 }
