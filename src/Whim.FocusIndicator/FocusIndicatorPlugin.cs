@@ -5,10 +5,8 @@ using System.ComponentModel;
 
 namespace Whim.FocusIndicator;
 
-/// <summary>
-/// FocusIndicatorPlugin is the plugin that displays a focus indicator on the focused window.
-/// </summary>
-public class FocusIndicatorPlugin : IPlugin, IDisposable
+/// <inheritdoc/>
+public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 {
 	private readonly IConfigContext _configContext;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
