@@ -77,7 +77,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			return;
 		}
 
-		workspace.ActiveLayoutEngine.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
+		workspace.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
 	};
 
 	/// <summary>
