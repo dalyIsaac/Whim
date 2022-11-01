@@ -9,13 +9,13 @@ namespace Whim.FloatingLayout;
 /// </summary>
 public class FloatingLayoutCommands : IEnumerable<CommandItem>
 {
-	private readonly FloatingLayoutPlugin _floatingLayoutPlugin;
+	private readonly IFloatingLayoutPlugin _floatingLayoutPlugin;
 	private string Name => _floatingLayoutPlugin.Name;
 
 	/// <summary>
 	/// Creates a new instance of the floating layout commands.
 	/// </summary>
-	public FloatingLayoutCommands(FloatingLayoutPlugin floatingLayoutPlugin)
+	public FloatingLayoutCommands(IFloatingLayoutPlugin floatingLayoutPlugin)
 	{
 		_floatingLayoutPlugin = floatingLayoutPlugin;
 	}
