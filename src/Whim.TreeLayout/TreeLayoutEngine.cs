@@ -4,10 +4,8 @@ using System.Linq;
 
 namespace Whim.TreeLayout;
 
-/// <summary>
-/// A tree layout engine allows users to create arbitrary window grid layouts.
-/// </summary>
-public partial class TreeLayoutEngine : ILayoutEngine
+/// <inheritdoc />
+public partial class TreeLayoutEngine : ITreeLayoutEngine
 {
 	private readonly IConfigContext _configContext;
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
@@ -41,35 +39,17 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		Name = name;
 	}
 
-	/// <summary>
-	/// Add the <paramref name="window"/> to the layout engine, in a
-	/// <paramref name="direction"/> to the currently focused window.
-	/// </summary>
-	/// <param name="window">The window to add.</param>
-	/// <param name="direction">
-	/// The direction to add the window, in relation to the currently focused window.
-	/// </param>
+	/// <inheritdoc/>
 	public void Add(IWindow window, Direction direction)
 	{
 		AddNodeDirection = direction;
 		Add(window);
 	}
 
-	/// <summary>
-	/// Add the <paramref name="window"/> to the layout engine.
-	/// The direction it is added in is determined by this instance's <see cref="AddNodeDirection"/> property.
-	/// </summary>
-	/// <param name="window">The window to add.</param>
+	/// <inheritdoc/>
 	public void Add(IWindow window) => AddWindow(window);
 
-	/// <summary>
-	/// Adds a window to the layout engine, and returns the node that represents it.
-	/// The <paramref name="window"/> is added in the direction specified by this instance's
-	/// <see cref="AddNodeDirection"/> property.
-	/// </summary>
-	/// <param name="window">The window to add.</param>
-	/// <param name="focusedWindow">The currently focused window from whom to get the node.</param>
-	/// <returns>The node that represents the window.</returns>
+	/// <inheritdoc/>
 	public WindowNode? AddWindow(IWindow window, IWindow? focusedWindow = null)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
@@ -217,11 +197,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		_configContext.WorkspaceManager.ActiveWorkspace.RemovePhantomWindow(this, phantomNode.Window);
 	}
 
-	/// <summary>
-	/// Removes the <paramref name="window"/> from the layout engine.
-	/// </summary>
-	/// <param name="window">The window to remove.</param>
-	/// <returns><see langword="true"/> if the window was removed, <see langword="false"/> otherwise.</returns>
+	/// <inheritdoc/>
 	public bool Remove(IWindow window)
 	{
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
@@ -487,16 +463,7 @@ public partial class TreeLayoutEngine : ILayoutEngine
 		parentNode.AdjustChildWeight(adjacentAncestorNode, -relativeDelta);
 	}
 
-	/// <summary>
-	/// Gets the adjacent node in the given <paramref name="direction"/>.
-	/// </summary>
-	/// <param name="node">The node to get the adjacent node for.</param>
-	/// <param name="direction">The direction to get the adjacent node in.</param>
-	/// <returns>
-	/// The adjacent node in the given <paramref name="direction"/>.
-	/// <see langword="null"/> if there is no adjacent node in the given <paramref name="direction"/>,
-	/// or an error occurred.
-	/// </returns>
+	/// <inheritdoc/>
 	public LeafNode? GetAdjacentNode(LeafNode node, Direction direction)
 	{
 		Logger.Debug($"Getting node in direction {direction} for window {node}");
