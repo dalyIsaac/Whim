@@ -52,14 +52,16 @@ public class CoreCommands : IEnumerable<CommandItem>
 		yield return FocusWindowInDirectionRight;
 		yield return FocusWindowInDirectionUp;
 		yield return FocusWindowInDirectionDown;
+
 		yield return SwapWindowInDirectionLeft;
 		yield return SwapWindowInDirectionRight;
 		yield return SwapWindowInDirectionUp;
 		yield return SwapWindowInDirectionDown;
+
 		yield return MoveWindowToPreviousMonitor;
 		yield return MoveWindowToNextMonitor;
+
 		yield return CloseCurrentWorkspace;
-		yield return ExitWhim;
 		yield return ExitWhim;
 	}
 
@@ -93,7 +95,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem FocusWindowInDirectionLeft => new(
 		new Command(
-			identifier: "${Name}.focus_window_in_direction.left",
+			identifier: $"{Name}.focus_window_in_direction.left",
 			title: "Focus the window in the left direction",
 			callback: FocusWindowInDirection(_configContext, Direction.Left)
 		),
@@ -105,7 +107,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem FocusWindowInDirectionRight => new(
 		new Command(
-			identifier: "${Name}.focus_window_in_direction.right",
+			identifier: $"{Name}.focus_window_in_direction.right",
 			title: "Focus the window in the right direction",
 			callback: FocusWindowInDirection(_configContext, Direction.Right)
 		),
@@ -117,7 +119,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem FocusWindowInDirectionUp => new(
 		new Command(
-			identifier: "${Name}.focus_window_in_direction.up",
+			identifier: $"{Name}.focus_window_in_direction.up",
 			title: "Focus the window in the up direction",
 			callback: FocusWindowInDirection(_configContext, Direction.Up)
 		),
@@ -129,7 +131,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem FocusWindowInDirectionDown => new(
 		new Command(
-			identifier: "${Name}.focus_window_in_direction.down",
+			identifier: $"{Name}.focus_window_in_direction.down",
 			title: "Focus the window in the down direction",
 			callback: FocusWindowInDirection(_configContext, Direction.Down)
 		),
@@ -141,7 +143,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem SwapWindowInDirectionLeft => new(
 		new Command(
-			identifier: "${Name}.swap_window_in_direction.left",
+			identifier: $"{Name}.swap_window_in_direction.left",
 			title: "Swap the window with the window to the left",
 			callback: SwapWindowInDirection(_configContext, Direction.Left)
 		),
@@ -153,7 +155,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem SwapWindowInDirectionRight => new(
 		new Command(
-			identifier: "${Name}.swap_window_in_direction.right",
+			identifier: $"{Name}.swap_window_in_direction.right",
 			title: "Swap the window with the window to the right",
 			callback: SwapWindowInDirection(_configContext, Direction.Right)
 		),
@@ -165,7 +167,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem SwapWindowInDirectionUp => new(
 		new Command(
-			identifier: "${Name}.swap_window_in_direction.up",
+			identifier: $"{Name}.swap_window_in_direction.up",
 			title: "Swap the window with the window to the up",
 			callback: SwapWindowInDirection(_configContext, Direction.Up)
 		),
@@ -177,7 +179,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem SwapWindowInDirectionDown => new(
 		new Command(
-			identifier: "${Name}.swap_window_in_direction.down",
+			identifier: $"{Name}.swap_window_in_direction.down",
 			title: "Swap the window with the window to the down",
 			callback: SwapWindowInDirection(_configContext, Direction.Down)
 		),
@@ -189,7 +191,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem MoveWindowToPreviousMonitor => new(
 		new Command(
-			identifier: "${Name}.move_window_to_previous_monitor",
+			identifier: $"{Name}.move_window_to_previous_monitor",
 			title: "Move the window to the previous monitor",
 			callback: () => _configContext.WorkspaceManager.MoveWindowToPreviousMonitor()
 		),
@@ -201,7 +203,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem MoveWindowToNextMonitor => new(
 		new Command(
-			identifier: "${Name}.move_window_to_next_monitor",
+			identifier: $"{Name}.move_window_to_next_monitor",
 			title: "Move the window to the next monitor",
 			callback: () => _configContext.WorkspaceManager.MoveWindowToNextMonitor()
 		),
@@ -213,7 +215,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem CloseCurrentWorkspace => new(
 		new Command(
-			identifier: "${Name}.close_current_workspace",
+			identifier: $"{Name}.close_current_workspace",
 			title: "Close the current workspace",
 			callback: () => _configContext.WorkspaceManager.Remove(_configContext.WorkspaceManager.ActiveWorkspace)
 		),
@@ -225,7 +227,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public CommandItem ExitWhim => new(
 		new Command(
-			identifier: "${Name}.exit_whim",
+			identifier: $"{Name}.exit_whim",
 			title: "Exit Whim",
 			callback: () => _configContext.Exit()
 		),
