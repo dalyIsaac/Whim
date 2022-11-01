@@ -88,7 +88,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		}
 
 		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		TreeLayoutEngine? engine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(rootEngine);
+		TreeLayoutEngine? engine = rootEngine.GetLayoutEngine<TreeLayoutEngine>();
 
 		if (engine is null)
 		{
@@ -110,7 +110,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		}
 
 		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		TreeLayoutEngine? engine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(rootEngine);
+		TreeLayoutEngine? engine = rootEngine.GetLayoutEngine<TreeLayoutEngine>();
 
 		if (engine is null)
 		{

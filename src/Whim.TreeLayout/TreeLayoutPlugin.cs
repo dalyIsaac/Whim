@@ -28,16 +28,16 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	public IEnumerable<CommandItem> Commands => new TreeLayoutCommands(this);
 
 	/// <inheritdoc/>
-	public TreeLayoutEngine? GetTreeLayoutEngine()
+	public ITreeLayoutEngine? GetTreeLayoutEngine()
 	{
 		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		return ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(rootEngine);
+		return rootEngine.GetLayoutEngine<ITreeLayoutEngine>();
 	}
 
 	/// <inheritdoc />
 	public void SetAddWindowDirection(Direction direction)
 	{
-		TreeLayoutEngine? engine = GetTreeLayoutEngine();
+		ITreeLayoutEngine? engine = GetTreeLayoutEngine();
 		if (engine != null)
 		{
 			engine.AddNodeDirection = direction;
