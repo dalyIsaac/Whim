@@ -2,10 +2,8 @@ using System.Collections.Generic;
 
 namespace Whim.FloatingLayout;
 
-/// <summary>
-/// FloatingLayoutPlugin lets windows escape the layout engine and be free-floating.
-/// </summary>
-public class FloatingLayoutPlugin : IPlugin
+/// <inheritdoc />
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 {
 	private readonly IConfigContext _configContext;
 	private readonly FloatingLayoutConfig _floatingLayoutConfig;
