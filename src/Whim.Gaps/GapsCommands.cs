@@ -9,13 +9,13 @@ namespace Whim.Gaps;
 /// </summary>
 public class GapsCommands : IEnumerable<CommandItem>
 {
-	private readonly GapsPlugin _gapsPlugin;
+	private readonly IGapsPlugin _gapsPlugin;
 	private string Name => _gapsPlugin.Name;
 
 	/// <summary>
 	/// Creates a new instance of the floating layout commands.
 	/// </summary>
-	public GapsCommands(GapsPlugin gapsPlugin)
+	public GapsCommands(IGapsPlugin gapsPlugin)
 	{
 		_gapsPlugin = gapsPlugin;
 	}

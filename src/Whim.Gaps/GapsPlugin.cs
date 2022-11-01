@@ -2,10 +2,8 @@ using System.Collections.Generic;
 
 namespace Whim.Gaps;
 
-/// <summary>
-/// GapsPlugin is a plugin to add gaps between windows in the layout.
-/// </summary>
-public class GapsPlugin : IPlugin
+/// <inheritdoc />
+public class GapsPlugin : IGapsPlugin
 {
 	private readonly IConfigContext _configContext;
 
