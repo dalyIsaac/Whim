@@ -3,11 +3,8 @@ using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
-/// <summary>
-/// CommandPalettePlugin displays a rudimentary command palette window. It allows the user to
-/// interact with the loaded commands of Whim.
-/// </summary>
-public class CommandPalettePlugin : IPlugin, IDisposable
+/// <inheritdoc />
+public class CommandPalettePlugin : ICommandPalettePlugin
 {
 	private readonly IConfigContext _configContext;
 	private CommandPaletteWindow? _commandPaletteWindow;

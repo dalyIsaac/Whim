@@ -11,13 +11,13 @@ namespace Whim.CommandPalette;
 public class CommandPaletteCommands : IEnumerable<CommandItem>
 {
 	private readonly IConfigContext _configContext;
-	private readonly CommandPalettePlugin _commandPalettePlugin;
+	private readonly ICommandPalettePlugin _commandPalettePlugin;
 	private string Name => _commandPalettePlugin.Name;
 
 	/// <summary>
 	/// Creates a new instance of the command palette commands.
 	/// </summary>
-	public CommandPaletteCommands(IConfigContext configContext, CommandPalettePlugin commandPalettePlugin)
+	public CommandPaletteCommands(IConfigContext configContext, ICommandPalettePlugin commandPalettePlugin)
 	{
 		_configContext = configContext;
 		_commandPalettePlugin = commandPalettePlugin;
@@ -26,7 +26,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	/// <summary>
 	/// Toggle command palette command.
 	/// </summary>
-	public CommandItem ToggleCommand => new(
+	public CommandItem ToggleCommandPaletteCommand => new(
 		new Command(
 			identifier: $"{Name}.toggle",
 			title: "Toggle command palette",
@@ -73,6 +73,19 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	);
 
 	/// <summary>
+	/// Move window to workspace command creator.
+	/// </summary>
+	/// <param name="workspace">The workspace to move the window to.</param>
+	/// <returns>The move window to workspace command.</returns>
+	public CommandItem MoveWindowToWorkspaceCommandCreator(IWorkspace workspace) => new(
+		new Command(
+			identifier: $"{Name}.move_window_to_workspace",
+			title: $"Move window to workspace \"{workspace.Name}\"",
+			callback: () => _configContext.WorkspaceManager.MoveWindowToWorkspace(workspace)
+		)
+	);
+
+	/// <summary>
 	/// Move window to workspace command.
 	/// </summary>
 	public CommandItem MoveWindowToWorkspaceCommand => new(
@@ -82,18 +95,10 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 			callback: () =>
 			{
 				IEnumerable<CommandItem> items = _configContext.WorkspaceManager
-					.Select(w => new CommandItem(
-						new Command(
-							identifier: $"{Name}.move_window_to_workspace.{w.Name}",
-							title: w.Name,
-							callback: () => _configContext.WorkspaceManager.MoveWindowToWorkspace(w)
-						)
-					));
+					.Select(w => MoveWindowToWorkspaceCommandCreator(w));
 
 				_commandPalettePlugin.ActivateWithConfig(
-					config: new CommandPaletteMenuActivationConfig(
-						hint: "Select workspace"
-					),
+					config: new CommandPaletteMenuActivationConfig(hint: "Select workspace"),
 					items
 				);
 			}
@@ -103,7 +108,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	/// <inheritdoc />
 	public IEnumerator<CommandItem> GetEnumerator()
 	{
-		yield return ToggleCommand;
+		yield return ToggleCommandPaletteCommand;
 		yield return RenameWorkspaceCommand;
 		yield return CreateWorkspaceCommand;
 		yield return MoveWindowToWorkspaceCommand;

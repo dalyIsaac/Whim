@@ -23,7 +23,7 @@ public class CoreCommandsTests
 
 
 	[Fact]
-	public void FocusWindowInDirectionLeft()
+	public void FocusWindowInDirectionLeftCommand()
 	{
 		(Mock<IConfigContext> configContext, _, Mock<IWindow> window) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -33,7 +33,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void FocusWindowInDirectionRight()
+	public void FocusWindowInDirectionRightCommand()
 	{
 		(Mock<IConfigContext> configContext, _, Mock<IWindow> window) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -43,7 +43,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void FocusWindowInDirectionUp()
+	public void FocusWindowInDirectionUpCommand()
 	{
 		(Mock<IConfigContext> configContext, _, Mock<IWindow> window) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -53,7 +53,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void FocusWindowInDirectionDown()
+	public void FocusWindowInDirectionDownCommand()
 	{
 		(Mock<IConfigContext> configContext, _, Mock<IWindow> window) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -63,7 +63,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void SwapWindowInDirectionLeft()
+	public void SwapWindowInDirectionLeftCommand()
 	{
 		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -73,7 +73,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void SwapWindowInDirectionRight()
+	public void SwapWindowInDirectionRightCommand()
 	{
 		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -83,7 +83,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void SwapWindowInDirectionUp()
+	public void SwapWindowInDirectionUpCommand()
 	{
 		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -93,7 +93,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void SwapWindowInDirectionDown()
+	public void SwapWindowInDirectionDownCommand()
 	{
 		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -103,7 +103,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void MoveWindowToPreviousMonitor()
+	public void MoveWindowToPreviousMonitorCommand()
 	{
 		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -113,7 +113,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void MoveWindowToNextMonitor()
+	public void MoveWindowToNextMonitorCommand()
 	{
 		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -123,7 +123,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void CloseCurrentWorkspace()
+	public void CloseCurrentWorkspaceCommand()
 	{
 		(Mock<IConfigContext> configContext, Mock<IWorkspace> workspace, _) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
@@ -133,7 +133,7 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
-	public void ExitWhim()
+	public void ExitWhimCommand()
 	{
 		(Mock<IConfigContext> configContext, _, Mock<IWindow> window) = CreateMocks();
 		CoreCommands commands = new(configContext.Object);
