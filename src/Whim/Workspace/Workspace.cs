@@ -135,7 +135,7 @@ internal class Workspace : IWorkspace
 			_windows.Contains(window) ||
 			(_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
 			&& layoutEngine != null
-			&& ILayoutEngine.ContainsEqual(ActiveLayoutEngine, layoutEngine))
+			&& ActiveLayoutEngine.ContainsEqual(layoutEngine))
 		)
 		{
 			LastFocusedWindow = window;
@@ -300,7 +300,7 @@ internal class Workspace : IWorkspace
 			return false;
 		}
 
-		if (!ILayoutEngine.ContainsEqual(ActiveLayoutEngine, layoutEngine))
+		if (!ActiveLayoutEngine.ContainsEqual(layoutEngine))
 		{
 			Logger.Error($"Phantom window {window} is not in the active layout engine {ActiveLayoutEngine}");
 			return false;
@@ -414,7 +414,7 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Adding phantom window {window} in workspace {Name}");
 
-		if (ILayoutEngine.ContainsEqual(engine, ActiveLayoutEngine))
+		if (engine.ContainsEqual(ActiveLayoutEngine))
 		{
 			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
 			return;
@@ -435,7 +435,7 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
 
-		if (ILayoutEngine.ContainsEqual(engine, ActiveLayoutEngine))
+		if (engine.ContainsEqual(ActiveLayoutEngine))
 		{
 			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
 			return;
@@ -470,7 +470,7 @@ internal class Workspace : IWorkspace
 	/// <returns>True when the workspace contains the provided <paramref name="window"/>.</returns>
 	public bool ContainsWindow(IWindow window) => _windows.Contains(window) || (
 		_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
-		&& ILayoutEngine.ContainsEqual(ActiveLayoutEngine, phantomEngine)
+		&& ActiveLayoutEngine.ContainsEqual(phantomEngine)
 	);
 
 	protected virtual void Dispose(bool disposing)

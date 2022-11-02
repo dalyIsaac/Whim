@@ -27,7 +27,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 	/// <summary>
 	/// The direction in which windows will be added. If this is <see langword="null"/>, then the
-	/// monitor for this widget is not focused, or does not have a <see cref="TreeLayoutEngine"/>
+	/// monitor for this widget is not focused, or does not have a <see cref="ITreeLayoutEngine"/>
 	/// as the active layout engine.
 	/// </summary>
 	private Direction? DirectionValue
@@ -88,7 +88,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		}
 
 		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		TreeLayoutEngine? engine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(rootEngine);
+		ITreeLayoutEngine? engine = rootEngine.GetLayoutEngine<TreeLayoutEngine>();
 
 		if (engine is null)
 		{
@@ -110,7 +110,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		}
 
 		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		TreeLayoutEngine? engine = ILayoutEngine.GetLayoutEngine<TreeLayoutEngine>(rootEngine);
+		ITreeLayoutEngine? engine = rootEngine.GetLayoutEngine<TreeLayoutEngine>();
 
 		if (engine is null)
 		{

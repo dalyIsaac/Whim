@@ -1,7 +1,7 @@
 namespace Whim.TreeLayout;
 
 /// <summary>
-/// A leaf node in the <see cref="TreeLayoutEngine"/>
+/// A leaf node in the <see cref="ITreeLayoutEngine"/>
 /// </summary>
 public abstract class LeafNode : Node
 {
