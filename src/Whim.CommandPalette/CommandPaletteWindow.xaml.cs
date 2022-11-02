@@ -169,13 +169,13 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		int selectedIndex = ListViewItems.SelectedIndex;
 		switch (e.Key)
 		{
-			case Windows.System.VirtualKey.Down:
+			case Windows.System.VirtualKey.Down when ListViewItems.Items.Count > 0:
 				// Go down the command palette's list.
 				ListViewItems.SelectedIndex = (selectedIndex + 1) % _paletteRows.Count;
 				ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
 				break;
 
-			case Windows.System.VirtualKey.Up:
+			case Windows.System.VirtualKey.Up when ListViewItems.Items.Count > 0:
 				// Go up the command palette's list.
 				ListViewItems.SelectedIndex = (selectedIndex + _paletteRows.Count - 1) % _paletteRows.Count;
 				ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
@@ -188,6 +188,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			case Windows.System.VirtualKey.Escape:
 				Hide();
 				break;
+
 			default:
 				break;
 		}
