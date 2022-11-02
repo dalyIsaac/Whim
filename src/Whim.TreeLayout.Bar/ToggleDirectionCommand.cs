@@ -3,7 +3,7 @@
 namespace Whim.TreeLayout.Bar;
 
 /// <summary>
-/// Command for toggling <see cref="TreeLayoutEngine.AddNodeDirection"/>.
+/// Command for toggling <see cref="ITreeLayoutEngine.AddNodeDirection"/>.
 /// </summary>
 public class ToggleDirectionCommand : System.Windows.Input.ICommand
 {
