@@ -207,20 +207,31 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		Logger.Debug("Updating command palette matches");
 		string query = TextEntry.Text;
-		int idx = 0;
+		int matchesCount = 0;
 
 		if (_activationConfig is CommandPaletteMenuActivationConfig menuActivationConfig)
 		{
-			idx = LoadMatches(query, menuActivationConfig);
+			matchesCount = LoadMatches(query, menuActivationConfig);
 
 			ListViewItemsWrapper.Visibility = Visibility.Visible;
+			if (matchesCount == 0)
+			{
+				NoMatchingCommandsTextBlock.Visibility = Visibility.Visible;
+				ListViewItems.Visibility = Visibility.Collapsed;
+			}
+			else
+			{
+				NoMatchingCommandsTextBlock.Visibility = Visibility.Collapsed;
+				ListViewItems.Visibility = Visibility.Visible;
+			}
 		}
 		else
 		{
+			NoMatchingCommandsTextBlock.Visibility = Visibility.Collapsed;
 			ListViewItemsWrapper.Visibility = Visibility.Collapsed;
 		}
 
-		RemoveUnusedRows(idx);
+		RemoveUnusedRows(matchesCount);
 
 		Logger.Verbose($"Command palette match count: {_paletteRows.Count}");
 		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
@@ -232,18 +243,18 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// </summary>
 	/// <param name="query">The query text string.</param>
 	/// <param name="menuActivationConfig"></param>
-	/// <returns>The index of the last processed row item.</returns>
+	/// <returns>The number of processed matches.</returns>
 	private int LoadMatches(string query, CommandPaletteMenuActivationConfig menuActivationConfig)
 	{
-		int idx = 0;
+		int matchesCount = 0;
 
 		foreach (PaletteRowItem item in menuActivationConfig.Matcher.Match(query, _allCommands))
 		{
 			Logger.Verbose($"Matched {item.CommandItem.Command.Title}");
-			if (idx < _paletteRows.Count)
+			if (matchesCount < _paletteRows.Count)
 			{
 				// Update the existing row.
-				_paletteRows[idx].Update(item);
+				_paletteRows[matchesCount].Update(item);
 			}
 			else if (_unusedRows.Count > 0)
 			{
@@ -261,12 +272,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 				_paletteRows.Add(row);
 				row.Initialize();
 			}
-			idx++;
+			matchesCount++;
 
 			Logger.Verbose($"Finished updating {item.CommandItem.Command.Title}");
 		}
 
-		return idx;
+		return matchesCount;
 	}
 
 	/// <summary>
