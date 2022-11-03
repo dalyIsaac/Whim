@@ -345,7 +345,10 @@ internal class WorkspaceManager : IWorkspaceManager
 		ActiveWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
 
-		LayoutAllActiveWorkspaces();
+		// Hide the window from the current layout. If the new workspace is active, then the
+		// window will be shown as part of DoLayout().
+		window.Hide();
+		workspace.DoLayout();
 	}
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
