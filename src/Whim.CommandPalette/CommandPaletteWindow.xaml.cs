@@ -211,35 +211,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		if (_activationConfig is CommandPaletteMenuActivationConfig menuActivationConfig)
 		{
-			foreach (PaletteRowItem item in menuActivationConfig.Matcher.Match(query, _allCommands))
-			{
-				Logger.Verbose($"Matched {item.CommandItem.Command.Title}");
-				if (idx < _paletteRows.Count)
-				{
-					// Update the existing row.
-					_paletteRows[idx].Update(item);
-				}
-				else if (_unusedRows.Count > 0)
-				{
-					// Restoring the unused row.
-					PaletteRow row = _unusedRows[^1];
-					row.Update(item);
-
-					_paletteRows.Add(row);
-
-					_unusedRows.RemoveAt(_unusedRows.Count - 1);
-				}
-				else
-				{
-					// Add a new row.
-					PaletteRow row = new(item);
-					_paletteRows.Add(row);
-					row.Initialize();
-				}
-				idx++;
-
-				Logger.Verbose($"Finished updating {item.CommandItem.Command.Title}");
-			}
+			idx = LoadMatches(query, menuActivationConfig);
 
 			ListViewItemsWrapper.Visibility = Visibility.Visible;
 		}
@@ -248,18 +220,67 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			ListViewItemsWrapper.Visibility = Visibility.Collapsed;
 		}
 
+		RemoveUnusedRows(idx);
 
-		// If there are more items than we have space for, remove the last ones.
+		Logger.Verbose($"Command palette match count: {_paletteRows.Count}");
+		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
+		SetWindowPos();
+	}
+
+	/// <summary>
+	/// Load the matches into the command palette rows.
+	/// </summary>
+	/// <param name="query">The query text string.</param>
+	/// <param name="menuActivationConfig"></param>
+	/// <returns>The index of the last processed row item.</returns>
+	private int LoadMatches(string query, CommandPaletteMenuActivationConfig menuActivationConfig)
+	{
+		int idx = 0;
+
+		foreach (PaletteRowItem item in menuActivationConfig.Matcher.Match(query, _allCommands))
+		{
+			Logger.Verbose($"Matched {item.CommandItem.Command.Title}");
+			if (idx < _paletteRows.Count)
+			{
+				// Update the existing row.
+				_paletteRows[idx].Update(item);
+			}
+			else if (_unusedRows.Count > 0)
+			{
+				// Restoring the unused row.
+				PaletteRow row = _unusedRows[^1];
+				row.Update(item);
+
+				_paletteRows.Add(row);
+				_unusedRows.RemoveAt(_unusedRows.Count - 1);
+			}
+			else
+			{
+				// Add a new row.
+				PaletteRow row = new(item);
+				_paletteRows.Add(row);
+				row.Initialize();
+			}
+			idx++;
+
+			Logger.Verbose($"Finished updating {item.CommandItem.Command.Title}");
+		}
+
+		return idx;
+	}
+
+	/// <summary>
+	/// If there are more items than we have space for, remove the last ones.
+	/// </summary>
+	/// <param name="idx"></param>
+	private void RemoveUnusedRows(int idx)
+	{
 		int count = _paletteRows.Count;
 		for (; idx < count; idx++)
 		{
 			_unusedRows.Add(_paletteRows[^1]);
 			_paletteRows.RemoveAt(_paletteRows.Count - 1);
 		}
-
-		Logger.Verbose($"Command palette match count: {_paletteRows.Count}");
-		ListViewItems.SelectedIndex = _paletteRows.Count > 0 ? 0 : -1;
-		SetWindowPos();
 	}
 
 	/// <summary>
