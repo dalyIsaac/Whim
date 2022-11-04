@@ -308,9 +308,9 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		int width = _plugin.Config.MaxWidthPixels;
 		int height = _maxHeight;
 
-		if (ListViewItemsWrapper.Visibility == Visibility.Collapsed)
+		if (NoMatchingCommandsTextBlock.Visibility == Visibility.Visible)
 		{
-			height = (int)TextEntry.ActualHeight;
+			height = (int)(TextEntry.ActualHeight * 2) + 12;
 		}
 		else if (ListViewItems.Items.Count > 0)
 		{

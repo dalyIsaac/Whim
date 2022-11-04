@@ -19,7 +19,14 @@
 			TextChanged="TextEntry_TextChanged" />
 
 		<RelativePanel x:Name="ListViewItemsWrapper" Grid.Row="1">
-			<TextBlock x:Name="NoMatchingCommandsTextBlock" Visibility="Collapsed">No matching commands</TextBlock>
+			<TextBlock
+				x:Name="NoMatchingCommandsTextBlock"
+				Padding="12,0,0,0"
+				RelativePanel.AlignLeftWithPanel="True"
+				RelativePanel.AlignVerticalCenterWithPanel="True"
+				Visibility="Collapsed">
+				No matching commands
+			</TextBlock>
 
 			<ListView
 				x:Name="ListViewItems"
