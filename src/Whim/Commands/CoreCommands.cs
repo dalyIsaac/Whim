@@ -35,6 +35,11 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public const KeyModifiers WinCtrlShift = KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift;
 
+	/// <summary>
+	/// The delta for moving a window's edges.
+	/// </summary>
+	public static double MoveWindowEdgeDelta { get; set; } = 0.05;
+
 	private readonly IConfigContext _configContext;
 
 	/// <summary>
@@ -57,6 +62,15 @@ public class CoreCommands : IEnumerable<CommandItem>
 		yield return SwapWindowInDirectionRight;
 		yield return SwapWindowInDirectionUp;
 		yield return SwapWindowInDirectionDown;
+
+		yield return MoveWindowLeftEdgeLeft;
+		yield return MoveWindowLeftEdgeRight;
+		yield return MoveWindowRightEdgeLeft;
+		yield return MoveWindowRightEdgeRight;
+		yield return MoveWindowTopEdgeUp;
+		yield return MoveWindowTopEdgeDown;
+		yield return MoveWindowBottomEdgeUp;
+		yield return MoveWindowBottomEdgeDown;
 
 		yield return MoveWindowToPreviousMonitor;
 		yield return MoveWindowToNextMonitor;
@@ -184,6 +198,102 @@ public class CoreCommands : IEnumerable<CommandItem>
 			callback: SwapWindowInDirection(_configContext, Direction.Down)
 		),
 		new Keybind(WinCtrl, VIRTUAL_KEY.VK_DOWN)
+	);
+
+	/// <summary>
+	/// Move the current window's left edge to the left.
+	/// </summary>
+	public CommandItem MoveWindowLeftEdgeLeft => new(
+		new Command(
+			identifier: $"{Name}.move_window_left_edge_left",
+			title: "Move the current window's left edge to the left",
+			callback: () => _configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Left, MoveWindowEdgeDelta)
+		),
+		new Keybind(WinCtrl, VIRTUAL_KEY.VK_H)
+	);
+
+	/// <summary>
+	/// Move the current window's left edge to the right.
+	/// </summary>
+	public CommandItem MoveWindowLeftEdgeRight => new(
+		new Command(
+			identifier: $"{Name}.move_window_left_edge_right",
+			title: "Move the current window's left edge to the right",
+			callback: () => _configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Left, -MoveWindowEdgeDelta)
+		),
+		new Keybind(WinCtrl, VIRTUAL_KEY.VK_J)
+	);
+
+	/// <summary>
+	/// Move the current window's right edge to the left.
+	/// </summary>
+	public CommandItem MoveWindowRightEdgeLeft => new(
+		new Command(
+			identifier: $"{Name}.move_window_right_edge_left",
+			title: "Move the current window's right edge to the left",
+			callback: () => _configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Right, -MoveWindowEdgeDelta)
+		),
+		new Keybind(WinCtrl, VIRTUAL_KEY.VK_K)
+	);
+
+	/// <summary>
+	/// Move the current window's right edge to the right.
+	/// </summary>
+	public CommandItem MoveWindowRightEdgeRight => new(
+		new Command(
+			identifier: $"{Name}.move_window_right_edge_right",
+			title: "Move the current window's right edge to the right",
+			callback: () => _configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Right, MoveWindowEdgeDelta)
+		),
+		new Keybind(WinCtrl, VIRTUAL_KEY.VK_L)
+	);
+
+	/// <summary>
+	/// Move the current window's top edge up.
+	/// </summary>
+	public CommandItem MoveWindowTopEdgeUp => new(
+		new Command(
+			identifier: $"{Name}.move_window_top_edge_up",
+			title: "Move the current window's top edge up",
+			callback: () => _configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Up, MoveWindowEdgeDelta)
+		),
+		new Keybind(WinCtrl, VIRTUAL_KEY.VK_U)
+	);
+
+	/// <summary>
+	/// Move the current window's top edge down.
+	/// </summary>
+	public CommandItem MoveWindowTopEdgeDown => new(
+		new Command(
+			identifier: $"{Name}.move_window_top_edge_down",
+			title: "Move the current window's top edge down",
+			callback: () => _configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Up, -MoveWindowEdgeDelta)
+		),
+		new Keybind(WinCtrl, VIRTUAL_KEY.VK_I)
+	);
+
+	/// <summary>
+	/// Move the current window's bottom edge up.
+	/// </summary>
+	public CommandItem MoveWindowBottomEdgeUp => new(
+		new Command(
+			identifier: $"{Name}.move_window_bottom_edge_up",
+			title: "Move the current window's bottom edge up",
+			callback: () => _configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Down, -MoveWindowEdgeDelta)
+		),
+		new Keybind(WinCtrl, VIRTUAL_KEY.VK_O)
+	);
+
+	/// <summary>
+	/// Move the current window's bottom edge down.
+	/// </summary>
+	public CommandItem MoveWindowBottomEdgeDown => new(
+		new Command(
+			identifier: $"{Name}.move_window_bottom_edge_down",
+			title: "Move the current window's bottom edge down",
+			callback: () => _configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Down, MoveWindowEdgeDelta)
+		),
+		new Keybind(WinCtrl, VIRTUAL_KEY.VK_P)
 	);
 
 	/// <summary>

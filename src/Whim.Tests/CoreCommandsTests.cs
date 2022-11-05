@@ -103,6 +103,87 @@ public class CoreCommandsTests
 	}
 
 	[Fact]
+	public void MoveWindowLeftEdgeLeft()
+	{
+		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
+		CoreCommands commands = new(configContext.Object);
+
+		commands.MoveWindowLeftEdgeLeft.Command.TryExecute();
+		configContext.Verify(x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Left, CoreCommands.MoveWindowEdgeDelta, null), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowLeftEdgeRight()
+	{
+		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
+		CoreCommands commands = new(configContext.Object);
+
+		commands.MoveWindowLeftEdgeRight.Command.TryExecute();
+		configContext.Verify(x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Left, -CoreCommands.MoveWindowEdgeDelta, null), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowRightEdgeLeft()
+	{
+		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
+		CoreCommands commands = new(configContext.Object);
+
+		commands.MoveWindowRightEdgeLeft.Command.TryExecute();
+		configContext.Verify(x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Right, -CoreCommands.MoveWindowEdgeDelta, null), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowRightEdgeRight()
+	{
+		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
+		CoreCommands commands = new(configContext.Object);
+
+		commands.MoveWindowRightEdgeRight.Command.TryExecute();
+		configContext.Verify(x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Right, CoreCommands.MoveWindowEdgeDelta, null), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowTopEdgeUp()
+	{
+		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
+		CoreCommands commands = new(configContext.Object);
+
+		commands.MoveWindowTopEdgeUp.Command.TryExecute();
+		configContext.Verify(x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Up, CoreCommands.MoveWindowEdgeDelta, null), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowTopEdgeDown()
+	{
+		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
+		CoreCommands commands = new(configContext.Object);
+
+		commands.MoveWindowTopEdgeDown.Command.TryExecute();
+		configContext.Verify(x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Up, -CoreCommands.MoveWindowEdgeDelta, null), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowBottomEdgeUp()
+	{
+		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
+		CoreCommands commands = new(configContext.Object);
+
+		commands.MoveWindowBottomEdgeUp.Command.TryExecute();
+		configContext.Verify(x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Down, -CoreCommands.MoveWindowEdgeDelta, null), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowBottomEdgeDown()
+	{
+		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
+		CoreCommands commands = new(configContext.Object);
+
+		commands.MoveWindowBottomEdgeDown.Command.TryExecute();
+		configContext.Verify(x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(Direction.Down, CoreCommands.MoveWindowEdgeDelta, null), Times.Once);
+	}
+
+
+	[Fact]
 	public void MoveWindowToPreviousMonitorCommand()
 	{
 		(Mock<IConfigContext> configContext, _, _) = CreateMocks();
