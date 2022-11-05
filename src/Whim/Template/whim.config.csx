@@ -81,6 +81,10 @@ void DoConfig(IConfigContext configContext)
 	CommandPaletteConfig commandPaletteConfig = new();
 	CommandPalettePlugin commandPalettePlugin = new(configContext, commandPaletteConfig);
 	configContext.PluginManager.AddPlugin(commandPalettePlugin);
+
+	// Tree layout.
+	TreeLayoutPlugin treeLayoutPlugin = new(configContext);
+	configContext.PluginManager.AddPlugin(treeLayoutPlugin);
 }
 
 #pragma warning disable CS8974 // Methods should not return 'this'.
