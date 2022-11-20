@@ -55,7 +55,7 @@ internal class WindowManager : IWindowManager
 		Logger.Debug("Initializing window manager...");
 
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
-		_addedHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_SHOW, _hookDelegate);
+		_addedHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_HIDE, _hookDelegate);
 		_addedHooks[1] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);
 		_addedHooks[2] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
 		_addedHooks[3] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
@@ -161,7 +161,7 @@ internal class WindowManager : IWindowManager
 		// Try get the window
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			Logger.Verbose($"Window {hwnd.Value} is not added, event type {eventType}");
+			Logger.Verbose($"Window {hwnd.Value} is not added, event type 0x{eventType:X4}");
 			window = AddWindow(hwnd);
 			if (window == null)
 			{
@@ -178,6 +178,7 @@ internal class WindowManager : IWindowManager
 				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
+			case PInvoke.EVENT_OBJECT_HIDE:
 				OnWindowRemoved(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
@@ -196,7 +197,7 @@ internal class WindowManager : IWindowManager
 				OnWindowMinimizeEnd(window);
 				break;
 			default:
-				Logger.Error($"Unhandled event {eventType}");
+				Logger.Error($"Unhandled event 0x{eventType:X4}");
 				break;
 		}
 	}
@@ -209,6 +210,7 @@ internal class WindowManager : IWindowManager
 	/// <returns></returns>
 	private IWindow? AddWindow(HWND hwnd)
 	{
+		Logger.Debug($"Adding window {hwnd.Value}");
 		if (Win32Helper.IsSplashScreen(hwnd)
 			|| Win32Helper.IsCloakedWindow(hwnd)
 			|| !Win32Helper.IsStandardWindow(hwnd)
@@ -216,8 +218,6 @@ internal class WindowManager : IWindowManager
 		{
 			return null;
 		}
-
-		Logger.Debug($"Adding window {hwnd.Value}");
 
 		IWindow? window = IWindow.CreateWindow(hwnd, _configContext);
 
