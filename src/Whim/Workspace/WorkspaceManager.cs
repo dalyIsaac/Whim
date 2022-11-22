@@ -164,12 +164,18 @@ internal class WorkspaceManager : IWorkspaceManager
 		// Get the old workspace for the event.
 		_monitorWorkspaceMap.TryGetValue(focusedMonitor, out IWorkspace? oldWorkspace);
 
-		// Hide all the windows from the old workspace.
-		oldWorkspace?.Deactivate();
-
 		// Update the monitor which just lost `workspace`.
 		IMonitor? loserMonitor = _monitorWorkspaceMap.Keys.FirstOrDefault(m => _monitorWorkspaceMap[m] == workspace);
 
+		// Update the focused monitor. Having this line before the old workspace is deactivated
+		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
+		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
+		_monitorWorkspaceMap[focusedMonitor] = workspace;
+
+		// Hide all the windows from the old workspace.
+		oldWorkspace?.Deactivate();
+
+		// Layout the losing monitor.
 		if (loserMonitor != null && oldWorkspace != null)
 		{
 			_monitorWorkspaceMap[loserMonitor] = oldWorkspace;
@@ -179,8 +185,7 @@ internal class WorkspaceManager : IWorkspaceManager
 																					  newWorkspace: oldWorkspace));
 		}
 
-		// Update the focused monitor.
-		_monitorWorkspaceMap[focusedMonitor] = workspace;
+		// Layout the new workspace.
 		workspace.DoLayout();
 		workspace.FocusFirstWindow();
 		MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(focusedMonitor, oldWorkspace, workspace));
