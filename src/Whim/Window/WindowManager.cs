@@ -176,9 +176,11 @@ internal class WindowManager : IWindowManager
 			case PInvoke.EVENT_OBJECT_UNCLOAKED:
 				OnWindowFocused(window);
 				break;
+			case PInvoke.EVENT_OBJECT_HIDE:
+				OnWindowHidden(window);
+				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
-			case PInvoke.EVENT_OBJECT_HIDE:
 				OnWindowRemoved(window);
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
@@ -262,12 +264,33 @@ internal class WindowManager : IWindowManager
 	/// This can be called by <see cref="Workspace.AddWindow"/>, as an already focused window may
 	/// have switched to a different workspace.
 	/// </summary>
+	/// <param name="window"></param>
 	internal void OnWindowFocused(IWindow window)
 	{
 		Logger.Debug($"Window focused: {window}");
 		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(window);
 		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowFocused(window);
 		WindowFocused?.Invoke(this, new WindowEventArgs(window));
+	}
+
+	/// <summary>
+	/// Handles when a window is hidden.
+	/// This will be called when a workspace is deactivated, or when a process hides a window.
+	/// For example, Discord will hide its window when it is minimized.
+	/// We only care about the hide event if the workspace is active.
+	/// </summary>
+	/// <param name="window"></param>
+	private void OnWindowHidden(IWindow window)
+	{
+		Logger.Debug($"Window hidden: {window}");
+
+		if (_configContext.WorkspaceManager.GetMonitorForWindow(window) == null)
+		{
+			Logger.Debug($"Window {window} is not on a monitor, ignoring event");
+			return;
+		}
+
+		OnWindowRemoved(window);
 	}
 
 	private void OnWindowRemoved(IWindow window)
