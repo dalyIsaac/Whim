@@ -1,4 +1,4 @@
-using Windows.Win32.Foundation;
+using System.Drawing;
 
 namespace Whim;
 
@@ -24,8 +24,8 @@ public interface IPoint<T>
 public static class PointHelpers
 {
 	/// <summary>
-	/// Converts the given <see cref="IPoint{T}"/> to a <see cref="POINT"/>.
+	/// Converts the given <see cref="IPoint{T}"/> to a <see cref="Point"/>.
 	/// </summary>
 	/// <param name="point">The point to convert.</param>
-	public static POINT ToSystemPoint(this IPoint<int> point) => new() { x = point.X, y = point.Y };
+	public static Point ToSystemPoint(this IPoint<int> point) => new(point.X, point.Y);
 }

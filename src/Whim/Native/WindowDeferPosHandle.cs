@@ -13,7 +13,7 @@ namespace Whim;
 /// </summary>
 public sealed class WindowDeferPosHandle : IDisposable
 {
-	private nint _hWinPosInfo;
+	private HDWP _hWinPosInfo;
 	private readonly List<IWindow> _toMinimize;
 	private readonly List<IWindow> _toMaximize;
 	private readonly List<IWindow> _toNormal;

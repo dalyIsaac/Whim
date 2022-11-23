@@ -18,7 +18,7 @@ internal static class MonitorInfo
 
 	internal static ILocation<int> GetLocation(this MONITORINFOEXW monitor)
 	{
-		return monitor.__AnonymousBase_winuser_L13571_C43.rcMonitor.ToLocation();
+		return monitor.monitorInfo.rcMonitor.ToLocation();
 	}
 
 	internal static string GetDeviceName(this MONITORINFOEXW monitor)
@@ -28,6 +28,6 @@ internal static class MonitorInfo
 
 	internal static bool IsPrimary(this MONITORINFOEXW monitor)
 	{
-		return (monitor.__AnonymousBase_winuser_L13571_C43.dwFlags & (uint)MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY) != 0;
+		return (monitor.monitorInfo.dwFlags & (uint)MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY) != 0;
 	}
 }

@@ -325,9 +325,9 @@ internal class WindowManager : IWindowManager
 			_mouseMoveWindow.IsMouseMoving = false;
 
 			// Move the window.
-			if (PInvoke.GetCursorPos(out POINT point))
+			if (PInvoke.GetCursorPos(out System.Drawing.Point point))
 			{
-				_configContext.WorkspaceManager.MoveWindowToPoint(window, new Point<int>(point.x, point.y));
+				_configContext.WorkspaceManager.MoveWindowToPoint(window, new Point<int>(point.X, point.Y));
 			}
 
 			_mouseMoveWindow = null;

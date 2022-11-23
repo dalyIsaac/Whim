@@ -11,7 +11,7 @@ namespace Whim;
 /// Responsible is responsible for hooking into windows and handling keybinds.
 /// This is used as part of <see cref="CommandManager"/>.
 /// </summary>
-internal class KeybindHook
+internal class KeybindHook : IDisposable
 {
 	private readonly ICommandItemContainer _commandItems;
 	private readonly HOOKPROC _keyboardHook;

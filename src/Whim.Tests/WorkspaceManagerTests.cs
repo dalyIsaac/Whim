@@ -39,7 +39,7 @@ public class WorkspaceManagerTests
 		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
 
 		using WorkspaceManager workspaceManager = new(configContext.Object);
-		Assert.Throws<InvalidOperationException>(() => workspaceManager.Initialize());
+		Assert.Throws<InvalidOperationException>(workspaceManager.Initialize);
 	}
 
 	[Fact]
