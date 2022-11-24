@@ -27,11 +27,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install .NET 7 SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 7.x.x
-
       - name: Restore dependencies
         run: |
           dotnet restore Whim.sln /p:Configuration=$env:Configuration
