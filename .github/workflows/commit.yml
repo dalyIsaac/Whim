@@ -33,19 +33,10 @@ jobs:
         env:
           Configuration: ${{ matrix.configuration }}
 
-      # TODO: Replace commented code with the uncommented code once the 6.0.4 SDK has been released.
-      # - name: Check formatting
-      #   run: |
-      #     dotnet format Whim.sln --verify-no-changes --no-restore
-
-      - name: Check whitespace formatting
+      - name: Check formatting
         run: |
-          dotnet format whitespace Whim.sln
+          dotnet format Whim.sln --verify-no-changes --no-restore
 
-      - name: Check style
-        run: |
-          dotnet format style Whim.sln
-      # END TODO
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
