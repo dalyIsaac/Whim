@@ -9,7 +9,7 @@ param (
 	[string]$Architecture
 )
 
-$buildDir = "src\Whim.Runner\bin\${Architecture}\Release\net6.0-windows10.0.19041.0"
+$buildDir = "src\Whim.Runner\bin\${Architecture}\Release\net7.0-windows10.0.19041.0"
 $version = (Get-Item "${buildDir}\Whim.Runner.exe").VersionInfo.ProductVersion
 $installerName = "WhimInstaller-${Architecture}-${version}"
 
