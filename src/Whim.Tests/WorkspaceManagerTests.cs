@@ -61,7 +61,7 @@ public class WorkspaceManagerTests
 		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
 			h => workspaceManager.MonitorWorkspaceChanged += h,
 			h => workspaceManager.MonitorWorkspaceChanged -= h,
-			() => workspaceManager.Initialize()
+			workspaceManager.Initialize
 		);
 
 		// The workspaces are initialized
