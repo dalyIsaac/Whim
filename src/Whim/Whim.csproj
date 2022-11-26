@@ -20,7 +20,7 @@
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<GenerateLibraryLayout>true</GenerateLibraryLayout>
 		<Nullable>enable</Nullable>
-		<Platforms>x64;arm64</Platforms>
+		<Platforms>x64;arm64;AnyCPU</Platforms>
 		<RootNamespace>Whim</RootNamespace>
 		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
 		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
