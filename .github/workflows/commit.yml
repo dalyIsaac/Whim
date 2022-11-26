@@ -42,7 +42,7 @@ jobs:
 
       - name: Build
         run: |
-          msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform
+          msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:BuildInParallel=true
         env:
           Configuration: ${{ matrix.configuration }}
           Platform: ${{ matrix.platform }}
