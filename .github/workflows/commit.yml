@@ -42,7 +42,11 @@ jobs:
 
       - name: Build
         run: |
-          msbuild Whim.sln -p:Configuration=$env:Configuration -p:Platform=$env:Platform -p:BuildInParallel=true -maxCpuCount
+          msbuild Whim.sln `
+            -p:Configuration=$env:Configuration `
+            -p:Platform=$env:Platform `
+            -p:BuildInParallel=true `
+            -maxCpuCount
         env:
           Configuration: ${{ matrix.configuration }}
           Platform: ${{ matrix.platform }}
