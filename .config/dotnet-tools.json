@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "xamlstyler.console": {
+      "version": "3.2206.4",
+      "commands": [
+        "xstyler"
+      ]
+    },
+    "csharpier": {
+      "version": "0.21.0",
+      "commands": [
+        "dotnet-csharpier"
+      ]
+    }
+  }
+}
