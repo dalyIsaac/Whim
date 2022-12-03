@@ -69,7 +69,9 @@ internal class TestTreeEngine
 		ConfigContext.Setup(x => x.WindowManager).Returns(WindowManager.Object);
 		ConfigContext.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 
-		Engine = testTreeLayoutEngine ? new WrapTreeLayoutEngine(ConfigContext.Object) : new TreeLayoutEngine(ConfigContext.Object);
+		Engine = testTreeLayoutEngine
+			? new WrapTreeLayoutEngine(ConfigContext.Object)
+			: new TreeLayoutEngine(ConfigContext.Object);
 		Engine.AddNodeDirection = Direction.Right;
 
 		LeftWindow.Setup(m => m.ToString()).Returns("leftWindow");

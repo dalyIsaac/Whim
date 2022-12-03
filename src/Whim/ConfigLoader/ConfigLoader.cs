@@ -44,7 +44,9 @@ internal static class ConfigLoader
 		using Stream? stream = assembly.GetManifestResourceStream(templateName);
 		if (stream == null)
 		{
-			throw new ConfigLoaderException($"Could not find manifest resource stream for \"{filename}\" in assembly {assembly.FullName}");
+			throw new ConfigLoaderException(
+				$"Could not find manifest resource stream for \"{filename}\" in assembly {assembly.FullName}"
+			);
 		}
 
 		using StreamReader reader = new(stream);

@@ -163,7 +163,11 @@ public interface IWorkspace : IDisposable
 	/// <param name="name">The name of the workspace.</param>
 	/// <param name="layoutEngines">The layout engines to load into the workspace.</param>
 	/// <returns></returns>
-	public static IWorkspace CreateWorkspace(IConfigContext configContext, string name, params ILayoutEngine[] layoutEngines)
+	public static IWorkspace CreateWorkspace(
+		IConfigContext configContext,
+		string name,
+		params ILayoutEngine[] layoutEngines
+	)
 	{
 		return new Workspace(configContext, name, layoutEngines);
 	}

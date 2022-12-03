@@ -22,7 +22,11 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 	/// <param name="configContext"></param>
 	/// <param name="viewModel"></param>
 	/// <param name="workspace"></param>
-	public SwitchWorkspaceCommand(IConfigContext configContext, WorkspaceWidgetViewModel viewModel, WorkspaceModel workspace)
+	public SwitchWorkspaceCommand(
+		IConfigContext configContext,
+		WorkspaceWidgetViewModel viewModel,
+		WorkspaceModel workspace
+	)
 	{
 		_configContext = configContext;
 		_viewModel = viewModel;

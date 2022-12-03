@@ -13,9 +13,11 @@ public partial class TreeLayoutEngine
 	/// </param>
 	/// <param name="searchPoint">The point of the leaf node to search for.</param>
 	/// <returns>The node which contains the given <paramref name="searchPoint"/>.</returns>
-	public static LeafNode? GetNodeContainingPoint(Node root,
-												ILocation<double> rootLocation,
-												IPoint<double> searchPoint)
+	public static LeafNode? GetNodeContainingPoint(
+		Node root,
+		ILocation<double> rootLocation,
+		IPoint<double> searchPoint
+	)
 	{
 		if (root is LeafNode leaf && rootLocation.IsPointInside(searchPoint))
 		{
@@ -45,9 +47,11 @@ public partial class TreeLayoutEngine
 
 			if (childLocation.IsPointInside(searchPoint))
 			{
-				LeafNode? result = GetNodeContainingPoint(root: child,
-											  rootLocation: childLocation,
-											  searchPoint: searchPoint);
+				LeafNode? result = GetNodeContainingPoint(
+					root: child,
+					rootLocation: childLocation,
+					searchPoint: searchPoint
+				);
 				if (result != null)
 				{
 					return result;
@@ -77,7 +81,13 @@ public partial class TreeLayoutEngine
 	/// <returns>Location of the node. Used for recursion.</returns>
 	public static ILocation<double> GetNodeLocation(Node node, DoubleLocation? location = null)
 	{
-		location ??= new DoubleLocation() { X = 0, Y = 0, Width = 1, Height = 1 };
+		location ??= new DoubleLocation()
+		{
+			X = 0,
+			Y = 0,
+			Width = 1,
+			Height = 1
+		};
 
 		if (node.Parent == null)
 		{

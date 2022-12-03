@@ -46,28 +46,30 @@ internal static class LogLevelExtensions
 	/// </summary>
 	/// <param name="level"></param>
 	/// <returns></returns>
-	internal static LogEventLevel ToSerilog(this LogLevel level) => level switch
-	{
-		LogLevel.Verbose => LogEventLevel.Verbose,
-		LogLevel.Debug => LogEventLevel.Debug,
-		LogLevel.Information => LogEventLevel.Information,
-		LogLevel.Warning => LogEventLevel.Warning,
-		LogLevel.Error => LogEventLevel.Error,
-		_ => LogEventLevel.Fatal,
-	};
+	internal static LogEventLevel ToSerilog(this LogLevel level) =>
+		level switch
+		{
+			LogLevel.Verbose => LogEventLevel.Verbose,
+			LogLevel.Debug => LogEventLevel.Debug,
+			LogLevel.Information => LogEventLevel.Information,
+			LogLevel.Warning => LogEventLevel.Warning,
+			LogLevel.Error => LogEventLevel.Error,
+			_ => LogEventLevel.Fatal,
+		};
 
 	/// <summary>
 	/// Gets the associated <see cref="LogLevel"/> for the Serilog <see cref="LogEventLevel"/>.
 	/// </summary>
 	/// <param name="level"></param>
 	/// <returns></returns>
-	internal static LogLevel ToSink(this LogEventLevel level) => level switch
-	{
-		LogEventLevel.Verbose => LogLevel.Verbose,
-		LogEventLevel.Debug => LogLevel.Debug,
-		LogEventLevel.Information => LogLevel.Information,
-		LogEventLevel.Warning => LogLevel.Warning,
-		LogEventLevel.Error => LogLevel.Error,
-		_ => LogLevel.Fatal,
-	};
+	internal static LogLevel ToSink(this LogEventLevel level) =>
+		level switch
+		{
+			LogEventLevel.Verbose => LogLevel.Verbose,
+			LogEventLevel.Debug => LogLevel.Debug,
+			LogEventLevel.Information => LogLevel.Information,
+			LogEventLevel.Warning => LogLevel.Warning,
+			LogEventLevel.Error => LogLevel.Error,
+			_ => LogLevel.Fatal,
+		};
 }

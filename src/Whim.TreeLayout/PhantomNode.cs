@@ -17,7 +17,8 @@ public class PhantomNode : LeafNode
 	/// <param name="windowModel"></param>
 	/// <param name="phantomWindow"></param>
 	/// <param name="parent"></param>
-	protected PhantomNode(IWindow windowModel, Microsoft.UI.Xaml.Window? phantomWindow, SplitNode? parent = null) : base(windowModel, parent)
+	protected PhantomNode(IWindow windowModel, Microsoft.UI.Xaml.Window? phantomWindow, SplitNode? parent = null)
+		: base(windowModel, parent)
 	{
 		_phantomWindow = phantomWindow;
 	}

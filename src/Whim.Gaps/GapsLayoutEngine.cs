@@ -31,12 +31,13 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 		int doubleOuterGap = outerGap * 2;
 		int doubleInnerGap = innerGap * 2;
 
-		Location proxiedLocation = new(
-			x: location.X + outerGap,
-			y: location.Y + outerGap,
-			width: location.Width - doubleOuterGap,
-			height: location.Height - doubleOuterGap
-		);
+		Location proxiedLocation =
+			new(
+				x: location.X + outerGap,
+				y: location.Y + outerGap,
+				width: location.Width - doubleOuterGap,
+				height: location.Height - doubleOuterGap
+			);
 
 		foreach (IWindowState loc in InnerLayoutEngine.DoLayout(proxiedLocation, monitor))
 		{

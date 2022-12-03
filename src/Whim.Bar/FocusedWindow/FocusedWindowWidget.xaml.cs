@@ -17,6 +17,7 @@ public partial class FocusedWindowWidget : UserControl
 		ViewModel = new FocusedWindowWidgetViewModel(configContext);
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "FocusedWindow/FocusedWindowWidget");
 	}
+
 	/// <summary>
 	/// Create the focused window widget bar component.
 	/// </summary>

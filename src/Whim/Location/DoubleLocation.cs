@@ -56,18 +56,16 @@ public class DoubleLocation : ILocation<double>
 	public override string ToString() => $"(X: {X}, Y: {Y}, Width: {Width}, Height: {Height})";
 
 	/// <inheritdoc />
-	public static ILocation<double> Add(ILocation<double> a, ILocation<double> b) => new DoubleLocation(
-	a.X + b.X,
-	a.Y + b.Y,
-	a.Width + b.Width,
-	a.Height + b.Height);
+	public static ILocation<double> Add(ILocation<double> a, ILocation<double> b) =>
+		new DoubleLocation(a.X + b.X, a.Y + b.Y, a.Width + b.Width, a.Height + b.Height);
 
 	/// <inheritdoc />
-	public override bool Equals(object? obj) => obj is DoubleLocation DoubleLocation
-											 && DoubleLocation.X == X
-											 && DoubleLocation.Y == Y
-											 && DoubleLocation.Width == Width
-											 && DoubleLocation.Height == Height;
+	public override bool Equals(object? obj) =>
+		obj is DoubleLocation DoubleLocation
+		&& DoubleLocation.X == X
+		&& DoubleLocation.Y == Y
+		&& DoubleLocation.Width == Width
+		&& DoubleLocation.Height == Height;
 
 	/// <inheritdoc />
 	public override int GetHashCode() => HashCode.Combine(X, Y, Width, Height);

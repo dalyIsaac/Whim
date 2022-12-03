@@ -31,5 +31,6 @@ public class InitializeWindowException : System.Exception
 	/// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
 	protected InitializeWindowException(
 		System.Runtime.Serialization.SerializationInfo info,
-		System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+		System.Runtime.Serialization.StreamingContext context
+	) : base(info, context) { }
 }

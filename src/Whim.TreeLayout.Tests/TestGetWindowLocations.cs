@@ -39,7 +39,8 @@ public class TestGetWindowLocations
 		TestTreeEngine testTreeEngine = new();
 
 		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen, new Mock<IMonitor>().Object);
-		IWindowState[] expected = TestTreeWindowState.GetAllWindowStates(screen,
+		IWindowState[] expected = TestTreeWindowState.GetAllWindowStates(
+			screen,
 			testTreeEngine.LeftWindow.Object,
 			testTreeEngine.RightTopLeftTopWindow.Object,
 			testTreeEngine.RightTopLeftBottomLeftWindow.Object,

@@ -26,7 +26,12 @@ public static partial class PaletteFilters
 		return MatchesSubStringRecurse(word.ToLower(), wordToMatchAgainst.ToLower(), 0, 0);
 	}
 
-	private static PaletteFilterTextMatch[]? MatchesSubStringRecurse(string word, string wordToMatchAgainst, int wordStart, int wordMatchStart)
+	private static PaletteFilterTextMatch[]? MatchesSubStringRecurse(
+		string word,
+		string wordToMatchAgainst,
+		int wordStart,
+		int wordMatchStart
+	)
 	{
 		if (wordStart == word.Length)
 		{
@@ -39,7 +44,12 @@ public static partial class PaletteFilters
 
 		if (word[wordStart] == wordToMatchAgainst[wordMatchStart])
 		{
-			PaletteFilterTextMatch[]? result = MatchesSubStringRecurse(word, wordToMatchAgainst, wordStart + 1, wordMatchStart + 1);
+			PaletteFilterTextMatch[]? result = MatchesSubStringRecurse(
+				word,
+				wordToMatchAgainst,
+				wordStart + 1,
+				wordMatchStart + 1
+			);
 			if (result is not null)
 			{
 				return Join(new PaletteFilterTextMatch(wordMatchStart, wordMatchStart + 1), result);

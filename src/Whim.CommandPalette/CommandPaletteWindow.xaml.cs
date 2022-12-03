@@ -65,7 +65,11 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// When the text is empty, typically all items are shown.
 	/// </param>
 	/// <param name="monitor">The monitor to display the command palette on.</param>
-	public void Activate(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items = null, IMonitor? monitor = null)
+	public void Activate(
+		BaseCommandPaletteActivationConfig config,
+		IEnumerable<CommandItem>? items = null,
+		IMonitor? monitor = null
+	)
 	{
 		Logger.Debug("Activating command palette");
 		ResetState();

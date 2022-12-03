@@ -48,6 +48,10 @@ public class VeryObservableCollection<T> : ObservableCollection<T>
 
 	private void NotifyPropertyChanged_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 	{
-		OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
+		OnCollectionChanged(
+			new System.Collections.Specialized.NotifyCollectionChangedEventArgs(
+				System.Collections.Specialized.NotifyCollectionChangedAction.Reset
+			)
+		);
 	}
 }

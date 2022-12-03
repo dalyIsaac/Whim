@@ -50,9 +50,7 @@ public partial class TreeLayoutEngine
 		// If the node is a leaf node, then we can return the location, and break.
 		if (node is LeafNode)
 		{
-			yield return new NodeState(
-				node, location, WindowSize.Normal
-			);
+			yield return new NodeState(node, location, WindowSize.Normal);
 
 			yield break;
 		}
@@ -64,12 +62,7 @@ public partial class TreeLayoutEngine
 		double precedingWeight = 0;
 		foreach ((double weight, Node child) in parent)
 		{
-			Location childLocation = new(
-				x: location.X,
-				y: location.Y,
-				width: location.Width,
-				height: location.Height
-			);
+			Location childLocation = new(x: location.X, y: location.Y, width: location.Width, height: location.Height);
 
 			if (parent.IsHorizontal)
 			{

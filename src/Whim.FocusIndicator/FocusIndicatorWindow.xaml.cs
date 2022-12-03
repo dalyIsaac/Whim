@@ -41,7 +41,11 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		this.SetIsShownInSwitchers(false);
 
 		// Prevent the window from being activated.
-		_ = PInvoke.SetWindowLong(this.GetHandle(), WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, (int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE);
+		_ = PInvoke.SetWindowLong(
+			this.GetHandle(),
+			WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE,
+			(int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE
+		);
 
 		WindowDeferPosHandle.SetWindowPosFixScaling(
 			windowState: new WindowState(_window, borderLocation, WindowSize.Normal),

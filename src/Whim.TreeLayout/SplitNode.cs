@@ -58,7 +58,8 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <param name="newNode">The new node to add.</param>
 	/// <param name="direction">The direction to add the split node in.</param>
 	/// <param name="parent">The parent of this node.</param>
-	public SplitNode(Node focusedNode, Node newNode, Direction direction, SplitNode? parent = null) : this(direction.IsHorizontal(), parent)
+	public SplitNode(Node focusedNode, Node newNode, Direction direction, SplitNode? parent = null)
+		: this(direction.IsHorizontal(), parent)
 	{
 		if (direction.IsPositiveIndex())
 		{
@@ -77,10 +78,8 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// </summary>
 	/// <param name="index"></param>
 	/// <returns></returns>
-	public (double weight, Node node) this[int index] => (
-		EqualWeight ? 1d / _weights.Count : _weights[index],
-		_children[index]
-	);
+	public (double weight, Node node) this[int index] =>
+		(EqualWeight ? 1d / _weights.Count : _weights[index], _children[index]);
 
 	/// <summary>
 	/// Add the given node as a child of this <see cref="SplitNode"/>. This assumes that
@@ -363,7 +362,8 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return null;
 		}
 
-		double weight, precedingWeight;
+		double weight,
+			precedingWeight;
 
 		if (EqualWeight)
 		{
@@ -429,12 +429,13 @@ public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return false;
 		}
 
-		return obj is SplitNode node &&
-			node.EqualWeight == EqualWeight &&
-			node.IsHorizontal == IsHorizontal &&
+		return obj is SplitNode node
+			&& node.EqualWeight == EqualWeight
+			&& node.IsHorizontal == IsHorizontal
+			&&
 			// Checking for parent equality is too dangerous, as there are cycles.
-			((node.Parent == null) == (Parent == null)) &&
-			node.SequenceEqual(this);
+			((node.Parent == null) == (Parent == null))
+			&& node.SequenceEqual(this);
 	}
 
 	/// <inheritdoc/>

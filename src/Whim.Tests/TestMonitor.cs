@@ -7,12 +7,42 @@ public class TestMonitor
 {
 	public static IEnumerable<object[]> IntToUnitSquareData()
 	{
-		yield return new object[] { new Location(0, 0, 1920, 1080), new Point<int>(192, 108), new Point<double>(0.1, 0.1) };
-		yield return new object[] { new Location(0, 0, 1920, 1080), new Point<int>(960, 270), new Point<double>(0.5, 0.25) };
-		yield return new object[] { new Location(100, 100, 1920, 1080), new Point<int>(192, 108), new Point<double>(0.1, 0.1) };
-		yield return new object[] { new Location(100, 100, 1920, 1080), new Point<int>(960, 270), new Point<double>(0.5, 0.25) };
-		yield return new object[] { new Location(-100, 100, 1920, 1080), new Point<int>(192, 108), new Point<double>(0.1, 0.1) };
-		yield return new object[] { new Location(-100, 100, 1920, 1080), new Point<int>(960, 270), new Point<double>(0.5, 0.25) };
+		yield return new object[]
+		{
+			new Location(0, 0, 1920, 1080),
+			new Point<int>(192, 108),
+			new Point<double>(0.1, 0.1)
+		};
+		yield return new object[]
+		{
+			new Location(0, 0, 1920, 1080),
+			new Point<int>(960, 270),
+			new Point<double>(0.5, 0.25)
+		};
+		yield return new object[]
+		{
+			new Location(100, 100, 1920, 1080),
+			new Point<int>(192, 108),
+			new Point<double>(0.1, 0.1)
+		};
+		yield return new object[]
+		{
+			new Location(100, 100, 1920, 1080),
+			new Point<int>(960, 270),
+			new Point<double>(0.5, 0.25)
+		};
+		yield return new object[]
+		{
+			new Location(-100, 100, 1920, 1080),
+			new Point<int>(192, 108),
+			new Point<double>(0.1, 0.1)
+		};
+		yield return new object[]
+		{
+			new Location(-100, 100, 1920, 1080),
+			new Point<int>(960, 270),
+			new Point<double>(0.5, 0.25)
+		};
 	}
 
 	[Theory]
@@ -29,9 +59,24 @@ public class TestMonitor
 
 	public static IEnumerable<object[]> DoubleToUnitSquareData()
 	{
-		yield return new object[] { new Location(0, 0, 1920, 1080), new Location(192, 108, 192, 108), new DoubleLocation(0.1, 0.1, 0.1, 0.1) };
-		yield return new object[] { new Location(100, 100, 1920, 1080), new Location(192, 108, 192, 108), new DoubleLocation(0.1, 0.1, 0.1, 0.1) };
-		yield return new object[] { new Location(-100, -100, 1920, 1080), new Location(192, 108, 192, 108), new DoubleLocation(0.1, 0.1, 0.1, 0.1) };
+		yield return new object[]
+		{
+			new Location(0, 0, 1920, 1080),
+			new Location(192, 108, 192, 108),
+			new DoubleLocation(0.1, 0.1, 0.1, 0.1)
+		};
+		yield return new object[]
+		{
+			new Location(100, 100, 1920, 1080),
+			new Location(192, 108, 192, 108),
+			new DoubleLocation(0.1, 0.1, 0.1, 0.1)
+		};
+		yield return new object[]
+		{
+			new Location(-100, -100, 1920, 1080),
+			new Location(192, 108, 192, 108),
+			new DoubleLocation(0.1, 0.1, 0.1, 0.1)
+		};
 	}
 
 	[Theory]
@@ -48,8 +93,18 @@ public class TestMonitor
 
 	public static IEnumerable<object[]> ToMonitorData()
 	{
-		yield return new object[] { new Location(0, 0, 1920, 1080), new DoubleLocation(0.1, 0.1, 0.1, 0.1), new Location(192, 108, 192, 108) };
-		yield return new object[] { new Location(100, 100, 1920, 1080), new DoubleLocation(0.1, 0.1, 0.1, 0.1), new Location(192 + 100, 108 + 100, 192, 108) };
+		yield return new object[]
+		{
+			new Location(0, 0, 1920, 1080),
+			new DoubleLocation(0.1, 0.1, 0.1, 0.1),
+			new Location(192, 108, 192, 108)
+		};
+		yield return new object[]
+		{
+			new Location(100, 100, 1920, 1080),
+			new DoubleLocation(0.1, 0.1, 0.1, 0.1),
+			new Location(192 + 100, 108 + 100, 192, 108)
+		};
 	}
 
 	[Theory]
@@ -66,8 +121,18 @@ public class TestMonitor
 
 	public static IEnumerable<object[]> ToMonitorCoordinatesData()
 	{
-		yield return new object[] { new Location(0, 0, 1920, 1080), new Point<int>(192, 108), new Point<int>(192, 108) };
-		yield return new object[] { new Location(100, 100, 1920, 1080), new Point<int>(192, 108), new Point<int>(92, 8) };
+		yield return new object[]
+		{
+			new Location(0, 0, 1920, 1080),
+			new Point<int>(192, 108),
+			new Point<int>(192, 108)
+		};
+		yield return new object[]
+		{
+			new Location(100, 100, 1920, 1080),
+			new Point<int>(192, 108),
+			new Point<int>(92, 8)
+		};
 	}
 
 	[Theory]

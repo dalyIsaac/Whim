@@ -93,8 +93,11 @@ public static class Win32Helper
 	/// <param name="eventMax"></param>
 	/// <param name="lpfnWinEventProc"></param>
 	/// <returns></returns>
-	public static UnhookWinEventSafeHandle SetWindowsEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc)
-	=> PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
+	public static UnhookWinEventSafeHandle SetWindowsEventHook(
+		uint eventMin,
+		uint eventMax,
+		WINEVENTPROC lpfnWinEventProc
+	) => PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
 
 	/// <summary>
 	/// Safe wrapper around <see cref="PInvoke.GetClassName"/>.
@@ -166,17 +169,21 @@ public static class Win32Helper
 
 		// WS_POPUP need to have a border or minimize/maximize buttons,
 		// otherwise the window is "not interesting"
-		if ((style & (uint)WINDOW_STYLE.WS_POPUP) == (uint)WINDOW_STYLE.WS_POPUP &&
-		   (style & (uint)WINDOW_STYLE.WS_THICKFRAME) == 0 &&
-		   (style & (uint)WINDOW_STYLE.WS_MINIMIZEBOX) == 0 &&
-		   (style & (uint)WINDOW_STYLE.WS_MAXIMIZEBOX) == 0)
+		if (
+			(style & (uint)WINDOW_STYLE.WS_POPUP) == (uint)WINDOW_STYLE.WS_POPUP
+			&& (style & (uint)WINDOW_STYLE.WS_THICKFRAME) == 0
+			&& (style & (uint)WINDOW_STYLE.WS_MINIMIZEBOX) == 0
+			&& (style & (uint)WINDOW_STYLE.WS_MAXIMIZEBOX) == 0
+		)
 		{
 			return false;
 		}
-		if ((style & (uint)WINDOW_STYLE.WS_CHILD) == (uint)WINDOW_STYLE.WS_CHILD ||
-			(style & (uint)WINDOW_STYLE.WS_DISABLED) == (uint)WINDOW_STYLE.WS_DISABLED ||
-			(exStyle & (uint)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW) == (uint)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW ||
-			(exStyle & (uint)WINDOW_EX_STYLE.WS_EX_NOACTIVATE) == (uint)WINDOW_EX_STYLE.WS_EX_NOACTIVATE)
+		if (
+			(style & (uint)WINDOW_STYLE.WS_CHILD) == (uint)WINDOW_STYLE.WS_CHILD
+			|| (style & (uint)WINDOW_STYLE.WS_DISABLED) == (uint)WINDOW_STYLE.WS_DISABLED
+			|| (exStyle & (uint)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW) == (uint)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW
+			|| (exStyle & (uint)WINDOW_EX_STYLE.WS_EX_NOACTIVATE) == (uint)WINDOW_EX_STYLE.WS_EX_NOACTIVATE
+		)
 		{
 			return false;
 		}
@@ -204,7 +211,8 @@ public static class Win32Helper
 		_ = PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
 	}
 
-	private static readonly HashSet<string> _systemClasses = new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
+	private static readonly HashSet<string> _systemClasses =
+		new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
 
 	/// <summary>
 	/// Returns <see langword="true"/> if the window is a system window.
@@ -271,10 +279,12 @@ public static class Win32Helper
 		unsafe
 		{
 			int cloaked;
-			HRESULT res = PInvoke.DwmGetWindowAttribute(hwnd,
-						Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
-						&cloaked,
-						sizeof(int));
+			HRESULT res = PInvoke.DwmGetWindowAttribute(
+				hwnd,
+				Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
+				&cloaked,
+				sizeof(int)
+			);
 			return cloaked != 0 || res.Failed;
 		}
 	}
@@ -293,7 +303,6 @@ public static class Win32Helper
 			Logger.Error($"Could not get the window rect for {hwnd.Value}");
 			return new Location(0, 0, 0, 0);
 		}
-
 		unsafe
 		{
 			ILocation<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
@@ -306,7 +315,8 @@ public static class Win32Helper
 				x: windowRect.left - extendedFrameLocation.X,
 				y: windowRect.top - extendedFrameLocation.Y,
 				width: windowRect.right - windowRect.left - extendedFrameLocation.Width,
-				height: windowRect.bottom - windowRect.top - extendedFrameLocation.Height);
+				height: windowRect.bottom - windowRect.top - extendedFrameLocation.Height
+			);
 		}
 	}
 
@@ -321,10 +331,12 @@ public static class Win32Helper
 		{
 			RECT extendedFrameRect = new();
 			uint size = (uint)Marshal.SizeOf<RECT>();
-			HRESULT res = PInvoke.DwmGetWindowAttribute(hwnd,
-							DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
-							&extendedFrameRect,
-							size);
+			HRESULT res = PInvoke.DwmGetWindowAttribute(
+				hwnd,
+				DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
+				&extendedFrameRect,
+				size
+			);
 
 			if (res.Failed)
 			{
@@ -336,7 +348,8 @@ public static class Win32Helper
 				x: extendedFrameRect.left,
 				y: extendedFrameRect.top,
 				width: extendedFrameRect.right - extendedFrameRect.left,
-				height: extendedFrameRect.bottom - extendedFrameRect.top);
+				height: extendedFrameRect.bottom - extendedFrameRect.top
+			);
 		}
 	}
 
@@ -346,14 +359,19 @@ public static class Win32Helper
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <param name="preference"></param>
-	public static void SetWindowCorners(HWND hwnd, DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND)
+	public static void SetWindowCorners(
+		HWND hwnd,
+		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND
+	)
 	{
 		unsafe
 		{
-			HRESULT res = PInvoke.DwmSetWindowAttribute(hwnd,
-								 DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
-								 &preference,
-								 sizeof(DWM_WINDOW_CORNER_PREFERENCE));
+			HRESULT res = PInvoke.DwmSetWindowAttribute(
+				hwnd,
+				DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
+				&preference,
+				sizeof(DWM_WINDOW_CORNER_PREFERENCE)
+			);
 			if (res.Failed)
 			{
 				Logger.Error($"Failed to set window corners for {hwnd.Value}");
@@ -369,11 +387,14 @@ public static class Win32Helper
 	{
 		List<HWND> windows = new();
 
-		PInvoke.EnumWindows((handle, param) =>
-		{
-			windows.Add(handle);
-			return (BOOL)true;
-		}, 0);
+		PInvoke.EnumWindows(
+			(handle, param) =>
+			{
+				windows.Add(handle);
+				return (BOOL)true;
+			},
+			0
+		);
 
 		return windows;
 	}

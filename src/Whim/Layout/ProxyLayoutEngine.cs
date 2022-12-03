@@ -51,10 +51,12 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	public virtual IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
 
 	/// <inheritdoc/>
-	public virtual void FocusWindowInDirection(Direction direction, IWindow window) => InnerLayoutEngine.FocusWindowInDirection(direction, window);
+	public virtual void FocusWindowInDirection(Direction direction, IWindow window) =>
+		InnerLayoutEngine.FocusWindowInDirection(direction, window);
 
 	/// <inheritdoc/>
-	public virtual void SwapWindowInDirection(Direction direction, IWindow window) => InnerLayoutEngine.SwapWindowInDirection(direction, window);
+	public virtual void SwapWindowInDirection(Direction direction, IWindow window) =>
+		InnerLayoutEngine.SwapWindowInDirection(direction, window);
 
 	/// <inheritdoc/>
 	public virtual void Clear() => InnerLayoutEngine.Clear();
@@ -71,7 +73,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	/// <inheritdoc/>
-	public virtual void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) => InnerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
+	public virtual void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) =>
+		InnerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
 
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
@@ -80,7 +83,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	public virtual void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
 
 	/// <inheritdoc/>
-	public virtual void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom) => InnerLayoutEngine.AddWindowAtPoint(window, point, isPhantom);
+	public virtual void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom) =>
+		InnerLayoutEngine.AddWindowAtPoint(window, point, isPhantom);
 
 	/// <summary>
 	/// Checks to see if this <cref name="ILayoutEngine"/>

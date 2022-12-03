@@ -56,10 +56,7 @@ public class Logger : IDisposable
 		if (fileSink != null)
 		{
 			string loggerFilePath = Path.Combine(FileHelper.GetWhimDir(), fileSink.FileName);
-			_loggerConfiguration.WriteTo.File(
-								loggerFilePath,
-								levelSwitch: fileSink.MinLogLevelSwitch
-							);
+			_loggerConfiguration.WriteTo.File(loggerFilePath, levelSwitch: fileSink.MinLogLevelSwitch);
 		}
 
 		if (debugSink != null)
@@ -80,14 +77,19 @@ public class Logger : IDisposable
 	/// <param name="sourceLineNumber">The line number in the source file.</param>
 	/// <returns>The message with caller information added.</returns>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private static string AddCaller(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	private static string AddCaller(
+		string message,
+		[CallerMemberName] string memberName = "",
+		[CallerFilePath] string sourceFilePath = "",
+		[CallerLineNumber] int sourceLineNumber = 0
+	)
 	{
 		string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
 		string fileLocation = $"{fileName}:{sourceLineNumber}";
 
 		string methodName = $"[{memberName}]";
 
-		return $"{fileLocation,-30} {methodName,-30} {message}";
+		return $"{fileLocation, -30} {methodName, -30} {message}";
 	}
 
 	/// <summary>
@@ -97,7 +99,12 @@ public class Logger : IDisposable
 	/// <param name="memberName">The caller's member name.</param>
 	/// <param name="sourceFilePath">The caller's source file path.</param>
 	/// <param name="sourceLineNumber">The caller's source line number.</param>
-	public static void Verbose(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	public static void Verbose(
+		string message,
+		[CallerMemberName] string memberName = "",
+		[CallerFilePath] string sourceFilePath = "",
+		[CallerLineNumber] int sourceLineNumber = 0
+	)
 	{
 		instance?._logger?.Verbose(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
@@ -109,7 +116,12 @@ public class Logger : IDisposable
 	/// <param name="memberName">The caller's member name.</param>
 	/// <param name="sourceFilePath">The caller's source file path.</param>
 	/// <param name="sourceLineNumber">The caller's source line number.</param>
-	public static void Debug(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	public static void Debug(
+		string message,
+		[CallerMemberName] string memberName = "",
+		[CallerFilePath] string sourceFilePath = "",
+		[CallerLineNumber] int sourceLineNumber = 0
+	)
 	{
 		instance?._logger?.Debug(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
@@ -121,7 +133,12 @@ public class Logger : IDisposable
 	/// <param name="memberName">The caller's member name.</param>
 	/// <param name="sourceFilePath">The caller's source file path.</param>
 	/// <param name="sourceLineNumber">The caller's source line number.</param>
-	public static void Information(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	public static void Information(
+		string message,
+		[CallerMemberName] string memberName = "",
+		[CallerFilePath] string sourceFilePath = "",
+		[CallerLineNumber] int sourceLineNumber = 0
+	)
 	{
 		instance?._logger?.Information(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
@@ -133,7 +150,12 @@ public class Logger : IDisposable
 	/// <param name="memberName">The caller's member name.</param>
 	/// <param name="sourceFilePath">The caller's source file path.</param>
 	/// <param name="sourceLineNumber">The caller's source line number.</param>
-	public static void Warning(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	public static void Warning(
+		string message,
+		[CallerMemberName] string memberName = "",
+		[CallerFilePath] string sourceFilePath = "",
+		[CallerLineNumber] int sourceLineNumber = 0
+	)
 	{
 		instance?._logger?.Warning(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
@@ -145,7 +167,12 @@ public class Logger : IDisposable
 	/// <param name="memberName">The caller's member name.</param>
 	/// <param name="sourceFilePath">The caller's source file path.</param>
 	/// <param name="sourceLineNumber">The caller's source line number.</param>
-	public static void Error(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	public static void Error(
+		string message,
+		[CallerMemberName] string memberName = "",
+		[CallerFilePath] string sourceFilePath = "",
+		[CallerLineNumber] int sourceLineNumber = 0
+	)
 	{
 		instance?._logger?.Error(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}
@@ -157,7 +184,12 @@ public class Logger : IDisposable
 	/// <param name="memberName">The caller's member name.</param>
 	/// <param name="sourceFilePath">The caller's source file path.</param>
 	/// <param name="sourceLineNumber">The caller's source line number.</param>
-	public static void Fatal(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+	public static void Fatal(
+		string message,
+		[CallerMemberName] string memberName = "",
+		[CallerFilePath] string sourceFilePath = "",
+		[CallerLineNumber] int sourceLineNumber = 0
+	)
 	{
 		instance?._logger?.Fatal(AddCaller(message, memberName, sourceFilePath, sourceLineNumber));
 	}

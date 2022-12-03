@@ -33,9 +33,21 @@ jobs:
         env:
           Configuration: ${{ matrix.configuration }}
 
-      - name: Check formatting
+      - name: Install dotnet tools
         run: |
-          dotnet format Whim.sln --verify-no-changes --no-restore
+          dotnet tool restore
+
+      - name: Check C# formatting
+        run: |
+          dotnet tool run dotnet-csharpier . --check
+
+      - name: Check XAML formatting
+        run: |
+          dotnet tool run xstyler --recursive --d . --passive --config ./.xamlstylerrc
+
+      - name: Check analyzers
+        run: |
+          dotnet format analyzers Whim.sln --verify-no-changes --no-restore
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1

@@ -1,3 +1,16 @@
 {
-    "editor.insertSpaces": false
+  "editor.insertSpaces": false,
+  "editor.formatOnSave": true,
+  "[csharp]": {
+    "editor.defaultFormatter": "csharpier.csharpier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

@@ -33,7 +33,8 @@ public class CommandManager : ICommandManager
 	public void Add(ICommand command, IKeybind? keybind = null) => _commandItems.Add(command, keybind);
 
 	/// <inheritdoc />
-	public bool SetKeybind(string commandIdentifier, IKeybind keybind) => _commandItems.SetKeybind(commandIdentifier, keybind);
+	public bool SetKeybind(string commandIdentifier, IKeybind keybind) =>
+		_commandItems.SetKeybind(commandIdentifier, keybind);
 
 	/// <inheritdoc />
 	public void Clear() => _commandItems.Clear();
@@ -94,6 +95,7 @@ public class CommandManager : ICommandManager
 
 	/// <inheritdoc />
 	public IEnumerator<CommandItem> GetEnumerator() => _commandItems.GetEnumerator();
+
 	IEnumerator IEnumerable.GetEnumerator() => _commandItems.GetEnumerator();
 
 	/// <inheritdoc />

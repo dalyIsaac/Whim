@@ -36,7 +36,9 @@ public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 	/// </summary>
 	public static BarComponent CreateComponent()
 	{
-		return new BarComponent((configContext, monitor, window) => new TreeLayoutEngineWidget(configContext, monitor, window));
+		return new BarComponent(
+			(configContext, monitor, window) => new TreeLayoutEngineWidget(configContext, monitor, window)
+		);
 	}
 
 	/// <inheritdoc/>

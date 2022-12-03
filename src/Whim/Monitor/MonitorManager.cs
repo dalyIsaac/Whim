@@ -47,9 +47,7 @@ internal class MonitorManager : IMonitorManager
 		_configContext = configContext;
 
 		// Get the monitors.
-		_monitors = GetCurrentMonitors().OrderBy(m => m.X)
-										.ThenBy(m => m.Y)
-										.ToArray();
+		_monitors = GetCurrentMonitors().OrderBy(m => m.X).ThenBy(m => m.Y).ToArray();
 
 		// Get the initial focused monitor
 		IMonitor? primaryMonitor = _monitors?.FirstOrDefault(m => m.IsPrimary);
@@ -207,6 +205,7 @@ internal class MonitorManager : IMonitorManager
 			_disposedValue = true;
 		}
 	}
+
 	public void Dispose()
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

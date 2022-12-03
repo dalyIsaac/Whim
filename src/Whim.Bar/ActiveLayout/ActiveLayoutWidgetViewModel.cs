@@ -23,7 +23,8 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <summary>
 	/// The name of the active layout engine.
 	/// </summary>
-	public string ActiveLayoutEngine => _configContext.WorkspaceManager.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
+	public string ActiveLayoutEngine =>
+		_configContext.WorkspaceManager.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
 
 	/// <summary>
 	/// Command to switch to the next layout engine.
@@ -51,13 +52,15 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
-	private void WorkspaceManager_ActiveWorkspaceChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(ActiveLayoutEngine));
+	private void WorkspaceManager_ActiveWorkspaceChanged(object? sender, EventArgs e) =>
+		OnPropertyChanged(nameof(ActiveLayoutEngine));
 
 	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	/// <inheritdoc/>
-	protected virtual void OnPropertyChanged(string? propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+	protected virtual void OnPropertyChanged(string? propertyName) =>
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)

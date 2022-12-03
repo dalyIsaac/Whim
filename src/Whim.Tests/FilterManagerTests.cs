@@ -5,9 +5,11 @@ namespace Whim.Tests;
 
 public class FilterManagerTests
 {
-	private static Mock<IWindow> CreateWindowMock(string? className = null,
-											   string? processName = null,
-											   string? title = null)
+	private static Mock<IWindow> CreateWindowMock(
+		string? className = null,
+		string? processName = null,
+		string? title = null
+	)
 	{
 		Mock<IWindow>? windowMock = new();
 		windowMock.Setup(w => w.WindowClass).Returns(className ?? "");
