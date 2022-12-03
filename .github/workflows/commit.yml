@@ -29,7 +29,7 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          dotnet restore Whim.sln /p:Configuration=$env:Configuration
+          dotnet restore Whim.sln -p:Configuration=$env:Configuration
         env:
           Configuration: ${{ matrix.configuration }}
 
@@ -42,14 +42,14 @@ jobs:
 
       - name: Build
         run: |
-          msbuild Whim.sln /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:BuildInParallel=true
+          msbuild Whim.sln -p:Configuration=$env:Configuration -p:Platform=$env:Platform -p:BuildInParallel=true -maxCpuCount
         env:
           Configuration: ${{ matrix.configuration }}
           Platform: ${{ matrix.platform }}
 
       - name: Test
         run: |
-          dotnet test Whim.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test Whim.sln -p:CollectCoverage=true -p:CoverletOutputFormat=opencover
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
