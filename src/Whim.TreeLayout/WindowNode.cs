@@ -36,8 +36,9 @@ public class WindowNode : LeafNode
 			return false;
 		}
 
-		return obj is WindowNode node &&
-			node.Window.Equals(Window) &&
+		return obj is WindowNode node
+			&& node.Window.Equals(Window)
+			&&
 			// Checking for parent equality is too dangerous, as there are cycles.
 			((node.Parent == null) == (Parent == null));
 	}

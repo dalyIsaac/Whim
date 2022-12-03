@@ -76,7 +76,10 @@ public class BarPlugin : IBarPlugin
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
 			deferPosHandle.DeferWindowPos(barWindow.WindowState);
-			Win32Helper.SetWindowCorners(barWindow.WindowState.Window.Handle, DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND);
+			Win32Helper.SetWindowCorners(
+				barWindow.WindowState.Window.Handle,
+				DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND
+			);
 		}
 	}
 

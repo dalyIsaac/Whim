@@ -88,5 +88,4 @@ public class TestGetNodeLocation
 		Assert.Equal(TestTreeWindowState.RightTopRight3, location);
 	}
 	#endregion
-
 }

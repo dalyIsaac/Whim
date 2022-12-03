@@ -42,10 +42,10 @@ public class WindowState : IWindowState
 			return false;
 		}
 
-		return obj is WindowState location &&
-			   Location.Equals(location.Location) &&
-			   WindowSize == location.WindowSize &&
-			   Window.Equals(location.Window);
+		return obj is WindowState location
+			&& Location.Equals(location.Location)
+			&& WindowSize == location.WindowSize
+			&& Window.Equals(location.Window);
 	}
 
 	/// <inheritdoc />

@@ -143,10 +143,7 @@ internal partial class Screen
 				else
 				{
 					// Multiple monitor System
-					MONITORINFO info = new()
-					{
-						cbSize = (uint)sizeof(MONITORINFO)
-					};
+					MONITORINFO info = new() { cbSize = (uint)sizeof(MONITORINFO) };
 					PInvoke.GetMonitorInfo(_hmonitor, ref info);
 					_workingArea = info.rcWork.ToLocation();
 				}
@@ -174,7 +171,9 @@ internal partial class Screen
 						//sync the UserPreference.Desktop change event.  We'll keep count
 						//of desktop changes so that the WorkingArea property on Screen
 						//instances know when to invalidate their cache.
-						SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler(OnUserPreferenceChanged);
+						SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler(
+							OnUserPreferenceChanged
+						);
 
 						s_desktopChangedCount = 0;
 					}
@@ -240,7 +239,15 @@ internal partial class Screen
 	/// </summary>
 	public override string ToString()
 	{
-		return GetType().Name + "[Bounds=" + _bounds.ToString() + " WorkingArea=" + WorkingArea.ToString() + " Primary=" + Primary.ToString() + " DeviceName=" + DeviceName;
+		return GetType().Name
+			+ "[Bounds="
+			+ _bounds.ToString()
+			+ " WorkingArea="
+			+ WorkingArea.ToString()
+			+ " Primary="
+			+ Primary.ToString()
+			+ " DeviceName="
+			+ DeviceName;
 	}
 
 	/// <summary>
@@ -251,7 +258,9 @@ internal partial class Screen
 	{
 		if (s_multiMonitorSupport)
 		{
-			return new Screen(PInvoke.MonitorFromPoint(point.ToSystemPoint(), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST));
+			return new Screen(
+				PInvoke.MonitorFromPoint(point.ToSystemPoint(), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
+			);
 		}
 		else
 		{

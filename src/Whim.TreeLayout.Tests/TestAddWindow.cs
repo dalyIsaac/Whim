@@ -28,17 +28,18 @@ public class TestAddWindow
 	{
 		TestTreeEngine testEngine = new();
 
-		TestTree tree = new(
-			leftWindow: testEngine.LeftWindow,
-			rightTopLeftTopWindow: testEngine.RightTopLeftTopWindow,
-			rightBottomWindow: testEngine.RightBottomWindow,
-			rightTopRight1Window: testEngine.RightTopRight1Window,
-			rightTopRight2Window: testEngine.RightTopRight2Window,
-			rightTopRight3Window: testEngine.RightTopRight3Window,
-			rightTopLeftBottomLeftWindow: testEngine.RightTopLeftBottomLeftWindow,
-			rightTopLeftBottomRightTopWindow: testEngine.RightTopLeftBottomRightTopWindow,
-			rightTopLeftBottomRightBottomWindow: testEngine.RightTopLeftBottomRightBottomWindow
-		);
+		TestTree tree =
+			new(
+				leftWindow: testEngine.LeftWindow,
+				rightTopLeftTopWindow: testEngine.RightTopLeftTopWindow,
+				rightBottomWindow: testEngine.RightBottomWindow,
+				rightTopRight1Window: testEngine.RightTopRight1Window,
+				rightTopRight2Window: testEngine.RightTopRight2Window,
+				rightTopRight3Window: testEngine.RightTopRight3Window,
+				rightTopLeftBottomLeftWindow: testEngine.RightTopLeftBottomLeftWindow,
+				rightTopLeftBottomRightTopWindow: testEngine.RightTopLeftBottomRightTopWindow,
+				rightTopLeftBottomRightBottomWindow: testEngine.RightTopLeftBottomRightBottomWindow
+			);
 		Assert.Equal(tree.Root, testEngine.Engine.Root);
 	}
 
@@ -59,10 +60,7 @@ public class TestAddWindow
 		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(activeWorkspace.Object);
 		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 
-		TreeLayoutEngine engine = new(configContext.Object)
-		{
-			AddNodeDirection = Direction.Right
-		};
+		TreeLayoutEngine engine = new(configContext.Object) { AddNodeDirection = Direction.Right };
 
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
@@ -100,10 +98,7 @@ public class TestAddWindow
 		Mock<IConfigContext> configContext = new();
 		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 
-		TreeLayoutEngine engine = new(configContext.Object)
-		{
-			window.Object
-		};
+		TreeLayoutEngine engine = new(configContext.Object) { window.Object };
 
 		Assert.Equal(engine.Root, new WindowNode(window.Object));
 		Assert.Single(engine);

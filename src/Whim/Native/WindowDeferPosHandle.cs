@@ -82,11 +82,12 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 		WindowSize windowSize = windowState.WindowSize;
 
-		SET_WINDOW_POS_FLAGS flags = SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
-		  | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
-		  | SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
-		  | SET_WINDOW_POS_FLAGS.SWP_NOZORDER
-		  | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
+		SET_WINDOW_POS_FLAGS flags =
+			SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
+			| SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
+			| SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
+			| SET_WINDOW_POS_FLAGS.SWP_NOZORDER
+			| SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
 
 		if (windowSize == WindowSize.Maximized)
 		{
@@ -111,7 +112,8 @@ public sealed class WindowDeferPosHandle : IDisposable
 			location.Y,
 			location.Width,
 			location.Height,
-			flags);
+			flags
+		);
 	}
 
 	/// <summary>
@@ -133,7 +135,12 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// <param name="monitorManager"></param>
 	/// <param name="monitor"></param>
 	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
-	public static void SetWindowPosFixScaling(IWindowState windowState, IMonitorManager monitorManager, IMonitor monitor, HWND? hwndInsertAfter = null)
+	public static void SetWindowPosFixScaling(
+		IWindowState windowState,
+		IMonitorManager monitorManager,
+		IMonitor monitor,
+		HWND? hwndInsertAfter = null
+	)
 	{
 		SetWindowPos(windowState, hwndInsertAfter);
 

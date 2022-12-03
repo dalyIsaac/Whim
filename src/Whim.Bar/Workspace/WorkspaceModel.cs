@@ -44,7 +44,12 @@ public class WorkspaceModel : INotifyPropertyChanged
 	/// <param name="viewModel"></param>
 	/// <param name="workspace"></param>
 	/// <param name="activeOnMonitor"></param>
-	public WorkspaceModel(IConfigContext configContext, WorkspaceWidgetViewModel viewModel, IWorkspace workspace, bool activeOnMonitor)
+	public WorkspaceModel(
+		IConfigContext configContext,
+		WorkspaceWidgetViewModel viewModel,
+		IWorkspace workspace,
+		bool activeOnMonitor
+	)
 	{
 		Workspace = workspace;
 		ActiveOnMonitor = activeOnMonitor;

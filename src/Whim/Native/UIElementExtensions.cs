@@ -22,6 +22,10 @@ public static class UIElementExtensions
 	public static void InitializeComponent(object component, string componentNamespace, string componentPath)
 	{
 		System.Uri resourceLocator = new($"ms-appx:///plugins/{componentNamespace}/{componentPath}.xaml");
-		Application.LoadComponent(component, resourceLocator, Microsoft.UI.Xaml.Controls.Primitives.ComponentResourceLocation.Nested);
+		Application.LoadComponent(
+			component,
+			resourceLocator,
+			Microsoft.UI.Xaml.Controls.Primitives.ComponentResourceLocation.Nested
+		);
 	}
 }

@@ -43,8 +43,11 @@ public class CommandPaletteMenuActivationConfig : BaseCommandPaletteActivationCo
 	/// <param name="matcher"></param>
 	/// <param name="hint"></param>
 	/// <param name="initialText"></param>
-	public CommandPaletteMenuActivationConfig(ICommandPaletteMatcher? matcher = null, string? hint = null, string? initialText = null)
-		: base(hint, initialText)
+	public CommandPaletteMenuActivationConfig(
+		ICommandPaletteMatcher? matcher = null,
+		string? hint = null,
+		string? initialText = null
+	) : base(hint, initialText)
 	{
 		Matcher = matcher ?? new MostRecentlyUsedMatcher();
 	}
@@ -72,8 +75,11 @@ public class CommandPaletteFreeTextActivationConfig : BaseCommandPaletteActivati
 	/// <param name="callback"></param>
 	/// <param name="hint"></param>
 	/// <param name="initialText"></param>
-	public CommandPaletteFreeTextActivationConfig(CommandPaletteFreeTextCallback callback, string? hint = null, string? initialText = null)
-		: base(hint, initialText)
+	public CommandPaletteFreeTextActivationConfig(
+		CommandPaletteFreeTextCallback callback,
+		string? hint = null,
+		string? initialText = null
+	) : base(hint, initialText)
 	{
 		Callback = callback;
 	}

@@ -35,7 +35,8 @@ internal partial class Screen
 		}
 	}
 
-	private static readonly bool s_multiMonitorSupport = PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CMONITORS) != 0;
+	private static readonly bool s_multiMonitorSupport =
+		PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CMONITORS) != 0;
 
 	/// <summary>
 	/// Used to store the screens until <see cref="OnDisplaySettingsChanging" /> invalidates it.

@@ -6,9 +6,7 @@ namespace Whim.TreeLayout.Tests;
 /// </summary>
 public class TestSplitNode : SplitNode
 {
-	public TestSplitNode(bool isHorizontal = true, SplitNode? parent = null) : base(isHorizontal, parent)
-	{
-	}
+	public TestSplitNode(bool isHorizontal = true, SplitNode? parent = null) : base(isHorizontal, parent) { }
 
 	public void Initialize(IList<Node> nodes, IList<double> weights)
 	{

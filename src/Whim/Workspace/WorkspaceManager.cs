@@ -44,10 +44,11 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
-	public Func<IConfigContext, string, IWorkspace> WorkspaceFactory { get; set; } = (configContext, name) =>
-	{
-		return new Workspace(configContext, name, new ColumnLayoutEngine());
-	};
+	public Func<IConfigContext, string, IWorkspace> WorkspaceFactory { get; set; } =
+		(configContext, name) =>
+		{
+			return new Workspace(configContext, name, new ColumnLayoutEngine());
+		};
 
 	/// <summary>
 	/// The active workspace.
@@ -101,6 +102,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
+
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	public bool Remove(IWorkspace workspace)
@@ -180,15 +182,19 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			_monitorWorkspaceMap[loserMonitor] = oldWorkspace;
 			oldWorkspace.DoLayout();
-			MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(loserMonitor,
-																					  oldWorkspace: workspace,
-																					  newWorkspace: oldWorkspace));
+			MonitorWorkspaceChanged?.Invoke(
+				this,
+				new MonitorWorkspaceChangedEventArgs(loserMonitor, oldWorkspace: workspace, newWorkspace: oldWorkspace)
+			);
 		}
 
 		// Layout the new workspace.
 		workspace.DoLayout();
 		workspace.FocusFirstWindow();
-		MonitorWorkspaceChanged?.Invoke(this, new MonitorWorkspaceChangedEventArgs(focusedMonitor, oldWorkspace, workspace));
+		MonitorWorkspaceChanged?.Invoke(
+			this,
+			new MonitorWorkspaceChangedEventArgs(focusedMonitor, oldWorkspace, workspace)
+		);
 	}
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
@@ -310,7 +316,9 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IMonitor? GetMonitorForWindow(IWindow window)
 	{
-		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? GetMonitorForWorkspace(workspace) : null;
+		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace)
+			? GetMonitorForWorkspace(workspace)
+			: null;
 	}
 	#endregion
 

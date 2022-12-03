@@ -12,10 +12,8 @@ public static class FileHelper
 	/// Gets the Whim path: <c>~/.whim</c>
 	/// </summary>
 	/// <returns></returns>
-	public static string GetWhimDir() => Path.Combine(
-			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-			".whim"
-		);
+	public static string GetWhimDir() =>
+		Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim");
 
 	/// <summary>
 	/// Ensures that the Whim directory exists. If it does not, it is created.
@@ -33,8 +31,5 @@ public static class FileHelper
 	/// </summary>
 	/// <param name="fileName">The file name.</param>
 	/// <returns>The file path.</returns>
-	public static string GetWhimFileDir(string fileName) => Path.Combine(
-			GetWhimDir(),
-			fileName
-		);
+	public static string GetWhimFileDir(string fileName) => Path.Combine(GetWhimDir(), fileName);
 }

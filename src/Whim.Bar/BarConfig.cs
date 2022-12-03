@@ -9,7 +9,11 @@ namespace Whim.Bar;
 /// Delegate for creating a component.
 /// A component will subscribe to <see cref="Microsoft.UI.Xaml.Window.Closed"/> if it has resources to dispose.
 /// </summary>
-public delegate UserControl BarComponent(IConfigContext configContext, IMonitor monitor, Microsoft.UI.Xaml.Window window);
+public delegate UserControl BarComponent(
+	IConfigContext configContext,
+	IMonitor monitor,
+	Microsoft.UI.Xaml.Window window
+);
 
 /// <summary>
 /// Configuration for the bar plugin.
@@ -94,7 +98,11 @@ public class BarConfig : INotifyPropertyChanged
 	/// <param name="leftComponents">The components to display on the left side of the bar.</param>
 	/// <param name="centerComponents">The components to display in the center of the bar.</param>
 	/// <param name="rightComponents">The components to display on the right side of the bar.</param>
-	public BarConfig(IEnumerable<BarComponent>? leftComponents = null, IEnumerable<BarComponent>? centerComponents = null, IEnumerable<BarComponent>? rightComponents = null)
+	public BarConfig(
+		IEnumerable<BarComponent>? leftComponents = null,
+		IEnumerable<BarComponent>? centerComponents = null,
+		IEnumerable<BarComponent>? rightComponents = null
+	)
 	{
 		_leftComponents = (leftComponents ?? Enumerable.Empty<BarComponent>()).ToList();
 		_centerComponents = (centerComponents ?? Enumerable.Empty<BarComponent>()).ToList();

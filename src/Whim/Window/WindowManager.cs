@@ -38,7 +38,6 @@ internal class WindowManager : IWindowManager
 
 	private readonly object _mouseMoveLock = new();
 
-
 	/// <summary>
 	/// Indicates whether values have been disposed.
 	/// </summary>
@@ -55,12 +54,36 @@ internal class WindowManager : IWindowManager
 		Logger.Debug("Initializing window manager...");
 
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
-		_addedHooks[0] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_HIDE, _hookDelegate);
-		_addedHooks[1] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);
-		_addedHooks[2] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
-		_addedHooks[3] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
-		_addedHooks[4] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, _hookDelegate);
-		_addedHooks[5] = Win32Helper.SetWindowsEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, _hookDelegate);
+		_addedHooks[0] = Win32Helper.SetWindowsEventHook(
+			PInvoke.EVENT_OBJECT_DESTROY,
+			PInvoke.EVENT_OBJECT_HIDE,
+			_hookDelegate
+		);
+		_addedHooks[1] = Win32Helper.SetWindowsEventHook(
+			PInvoke.EVENT_OBJECT_CLOAKED,
+			PInvoke.EVENT_OBJECT_UNCLOAKED,
+			_hookDelegate
+		);
+		_addedHooks[2] = Win32Helper.SetWindowsEventHook(
+			PInvoke.EVENT_SYSTEM_MOVESIZESTART,
+			PInvoke.EVENT_SYSTEM_MOVESIZEEND,
+			_hookDelegate
+		);
+		_addedHooks[3] = Win32Helper.SetWindowsEventHook(
+			PInvoke.EVENT_SYSTEM_FOREGROUND,
+			PInvoke.EVENT_SYSTEM_FOREGROUND,
+			_hookDelegate
+		);
+		_addedHooks[4] = Win32Helper.SetWindowsEventHook(
+			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
+			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
+			_hookDelegate
+		);
+		_addedHooks[5] = Win32Helper.SetWindowsEventHook(
+			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
+			PInvoke.EVENT_SYSTEM_MINIMIZEEND,
+			_hookDelegate
+		);
 
 		// If any of the above hooks are invalid, we dispose the WindowManager instance and return false.
 		for (int i = 0; i < _addedHooks.Length; i++)
@@ -136,11 +159,11 @@ internal class WindowManager : IWindowManager
 		// When idChild is CHILDID_SELF (0), the event was triggered
 		// by the object.
 		idChild == PInvoke.CHILDID_SELF
-			   // When idObject == OBJID_WINDOW (0), the event is
-			   // associated with the window (not a child object).
-			   && idObject == (int)OBJECT_IDENTIFIER.OBJID_WINDOW
-			   // The handle is not null.
-			   && hwnd != null;
+		// When idObject == OBJID_WINDOW (0), the event is
+		// associated with the window (not a child object).
+		&& idObject == (int)OBJECT_IDENTIFIER.OBJID_WINDOW
+		// The handle is not null.
+		&& hwnd != null;
 
 	/// <summary>
 	/// Event hook for <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>. <br />
@@ -154,9 +177,20 @@ internal class WindowManager : IWindowManager
 	/// <param name="idChild"></param>
 	/// <param name="idEventThread"></param>
 	/// <param name="dwmsEventTime"></param>
-	private void WindowsEventHook(HWINEVENTHOOK hWinEventHook, uint eventType, HWND hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime)
+	private void WindowsEventHook(
+		HWINEVENTHOOK hWinEventHook,
+		uint eventType,
+		HWND hwnd,
+		int idObject,
+		int idChild,
+		uint idEventThread,
+		uint dwmsEventTime
+	)
 	{
-		if (!IsEventWindowValid(idChild, idObject, hwnd)) { return; }
+		if (!IsEventWindowValid(idChild, idObject, hwnd))
+		{
+			return;
+		}
 
 		// Try get the window
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
@@ -213,10 +247,12 @@ internal class WindowManager : IWindowManager
 	private IWindow? AddWindow(HWND hwnd)
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
-		if (Win32Helper.IsSplashScreen(hwnd)
+		if (
+			Win32Helper.IsSplashScreen(hwnd)
 			|| Win32Helper.IsCloakedWindow(hwnd)
 			|| !Win32Helper.IsStandardWindow(hwnd)
-			|| !Win32Helper.HasNoVisibleOwner(hwnd))
+			|| !Win32Helper.HasNoVisibleOwner(hwnd)
+		)
 		{
 			return null;
 		}

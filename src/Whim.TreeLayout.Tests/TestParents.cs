@@ -17,7 +17,16 @@ public class TestParents
 	{
 		TestTree tree = new();
 
-		Node[] expected = new Node[] { tree.RightTopLeftBottomRightTop, tree.RightTopLeftBottomRight, tree.RightTopLeftBottom, tree.RightTopLeft, tree.RightTop, tree.Right, tree.Root };
+		Node[] expected = new Node[]
+		{
+			tree.RightTopLeftBottomRightTop,
+			tree.RightTopLeftBottomRight,
+			tree.RightTopLeftBottom,
+			tree.RightTopLeft,
+			tree.RightTop,
+			tree.Right,
+			tree.Root
+		};
 		Node[] actual = tree.RightTopLeftBottomRightTop.Lineage.ToArray();
 		Assert.Equal(expected, actual);
 	}
@@ -41,7 +50,10 @@ public class TestParents
 		Node[] rightTopLeftBottomRightTopAncestors = engine.RightTopLeftBottomRightTop.Lineage.ToArray();
 		Node[] rightTopRight3Ancestors = engine.RightTopRight3.Lineage.ToArray();
 
-		Assert.Equal(engine.RightTop, Node.GetCommonParent(rightTopLeftBottomRightTopAncestors, rightTopRight3Ancestors));
+		Assert.Equal(
+			engine.RightTop,
+			Node.GetCommonParent(rightTopLeftBottomRightTopAncestors, rightTopRight3Ancestors)
+		);
 	}
 
 	[Fact]

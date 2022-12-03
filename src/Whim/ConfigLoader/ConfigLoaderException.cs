@@ -20,5 +20,6 @@ public class ConfigLoaderException : Exception
 	/// <inheritdoc/>
 	protected ConfigLoaderException(
 		System.Runtime.Serialization.SerializationInfo info,
-		System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+		System.Runtime.Serialization.StreamingContext context
+	) : base(info, context) { }
 }

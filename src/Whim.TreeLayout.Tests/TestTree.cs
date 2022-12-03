@@ -121,7 +121,10 @@ internal class TestTree
 		RightTopLeftBottomRightTop = new WindowNode(rightTopLeftBottomRightTopWindow.Object, RightTopLeftBottomRight);
 
 		// RightTopLeftBottomRightBottom
-		RightTopLeftBottomRightBottom = new WindowNode(rightTopLeftBottomRightBottomWindow.Object, RightTopLeftBottomRight);
+		RightTopLeftBottomRightBottom = new WindowNode(
+			rightTopLeftBottomRightBottomWindow.Object,
+			RightTopLeftBottomRight
+		);
 
 		// RightTopRight
 		RightTopRight = new TestSplitNode(isHorizontal: false, RightTop);
@@ -140,8 +143,17 @@ internal class TestTree
 		Right.Initialize(new List<Node> { RightTop, RightBottom }, new List<double> { 0.5, 0.5 });
 		RightTop.Initialize(new List<Node> { RightTopLeft, RightTopRight }, new List<double> { 0.5, 0.5 });
 		RightTopLeft.Initialize(new List<Node> { RightTopLeftTop, RightTopLeftBottom }, new List<double> { 0.5, 0.5 });
-		RightTopLeftBottom.Initialize(new List<Node> { RightTopLeftBottomLeft, RightTopLeftBottomRight }, new List<double> { 0.5, 0.5 });
-		RightTopLeftBottomRight.Initialize(new List<Node> { RightTopLeftBottomRightTop, RightTopLeftBottomRightBottom }, new List<double> { 0.7, 0.3 });
-		RightTopRight.Initialize(new List<Node> { RightTopRight1, RightTopRight2, RightTopRight3 }, new List<double> { 1d / 3, 1d / 3, 1d / 3 });
+		RightTopLeftBottom.Initialize(
+			new List<Node> { RightTopLeftBottomLeft, RightTopLeftBottomRight },
+			new List<double> { 0.5, 0.5 }
+		);
+		RightTopLeftBottomRight.Initialize(
+			new List<Node> { RightTopLeftBottomRightTop, RightTopLeftBottomRightBottom },
+			new List<double> { 0.7, 0.3 }
+		);
+		RightTopRight.Initialize(
+			new List<Node> { RightTopRight1, RightTopRight2, RightTopRight3 },
+			new List<double> { 1d / 3, 1d / 3, 1d / 3 }
+		);
 	}
 }

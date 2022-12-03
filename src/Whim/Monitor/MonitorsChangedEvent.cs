@@ -40,7 +40,11 @@ public class MonitorsChangedEventArgs : EventArgs
 	/// <param name="unchangedMonitors">The monitors that were not removed or added.</param>
 	/// <param name="removedMonitors">The monitors that were removed.</param>
 	/// <param name="addedMonitors">The monitors that were added.</param>
-	public MonitorsChangedEventArgs(IEnumerable<IMonitor> unchangedMonitors, IEnumerable<IMonitor> removedMonitors, IEnumerable<IMonitor> addedMonitors)
+	public MonitorsChangedEventArgs(
+		IEnumerable<IMonitor> unchangedMonitors,
+		IEnumerable<IMonitor> removedMonitors,
+		IEnumerable<IMonitor> addedMonitors
+	)
 	{
 		UnchangedMonitors = unchangedMonitors;
 		RemovedMonitors = removedMonitors;

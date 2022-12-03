@@ -41,8 +41,7 @@ public static class Program
 			this_is_the_first_instance = false;
 
 			// Redirect the activation (and args) to the "main" instance, and exit.
-			var activatedEventArgs =
-				Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
+			var activatedEventArgs = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			mainInstance.RedirectActivationToAsync(activatedEventArgs);
@@ -53,12 +52,14 @@ public static class Program
 		{
 			System.Diagnostics.Debug.WriteLine("Starting!!!");
 			// Start the application and the message loop.
-			global::Microsoft.UI.Xaml.Application.Start((p) =>
-			{
-				DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
-				SynchronizationContext.SetSynchronizationContext(context);
-				_ = new App();
-			});
+			global::Microsoft.UI.Xaml.Application.Start(
+				(p) =>
+				{
+					DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
+					SynchronizationContext.SetSynchronizationContext(context);
+					_ = new App();
+				}
+			);
 		}
 	}
 }

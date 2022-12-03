@@ -17,7 +17,8 @@ internal class Workspace : IWorkspace
 			string oldName = _name;
 			_name = value;
 			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
-				new WorkspaceRenamedEventArgs(this, oldName, _name));
+				new WorkspaceRenamedEventArgs(this, oldName, _name)
+			);
 		}
 	}
 
@@ -74,7 +75,10 @@ internal class Workspace : IWorkspace
 		_windowLocations.Clear();
 
 		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
-		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(new Location(0, 0, monitor.Width, monitor.Height), monitor);
+		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
+			new Location(0, 0, monitor.Width, monitor.Height),
+			monitor
+		);
 
 		using WindowDeferPosHandle handle = new(Windows.Count());
 		foreach (IWindowState loc in locations)
@@ -86,10 +90,12 @@ internal class Workspace : IWorkspace
 			}
 
 			// Adjust the window location to the monitor's coordinates
-			loc.Location = new Location(x: loc.Location.X + monitor.X,
-										y: loc.Location.Y + monitor.Y,
-										width: loc.Location.Width,
-										height: loc.Location.Height);
+			loc.Location = new Location(
+				x: loc.Location.X + monitor.X,
+				y: loc.Location.Y + monitor.Y,
+				width: loc.Location.Width,
+				height: loc.Location.Height
+			);
 
 			Logger.Verbose($"{loc.Window} at {loc.Location}");
 			handle.DeferWindowPos(loc);
@@ -132,10 +138,12 @@ internal class Workspace : IWorkspace
 	internal void WindowFocused(IWindow window)
 	{
 		if (
-			_windows.Contains(window) ||
-			(_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
-			&& layoutEngine != null
-			&& ActiveLayoutEngine.ContainsEqual(layoutEngine))
+			_windows.Contains(window)
+			|| (
+				_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
+				&& layoutEngine != null
+				&& ActiveLayoutEngine.ContainsEqual(layoutEngine)
+			)
 		)
 		{
 			LastFocusedWindow = window;
@@ -468,10 +476,12 @@ internal class Workspace : IWorkspace
 	/// </summary>
 	/// <param name="window">The window to check for.</param>
 	/// <returns>True when the workspace contains the provided <paramref name="window"/>.</returns>
-	public bool ContainsWindow(IWindow window) => _windows.Contains(window) || (
-		_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
-		&& ActiveLayoutEngine.ContainsEqual(phantomEngine)
-	);
+	public bool ContainsWindow(IWindow window) =>
+		_windows.Contains(window)
+		|| (
+			_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
+			&& ActiveLayoutEngine.ContainsEqual(phantomEngine)
+		);
 
 	protected virtual void Dispose(bool disposing)
 	{

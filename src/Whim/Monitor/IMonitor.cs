@@ -42,10 +42,7 @@ public static class MonitorHelpers
 	/// </returns>
 	public static IPoint<int> ToMonitorCoordinates(this ILocation<int> monitor, IPoint<int> point)
 	{
-		return new Point<int>(
-			point.X - monitor.X,
-			point.Y - monitor.Y
-		);
+		return new Point<int>(point.X - monitor.X, point.Y - monitor.Y);
 	}
 
 	/// <summary>
@@ -95,4 +92,3 @@ public static class MonitorHelpers
 		);
 	}
 }
-

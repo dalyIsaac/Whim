@@ -26,10 +26,7 @@ internal class Window : IWindow
 		get
 		{
 			PInvoke.GetWindowRect(Handle, out RECT rect);
-			return new Location(rect.left,
-										 rect.top,
-										 rect.right - rect.left,
-										 rect.bottom - rect.top);
+			return new Location(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 		}
 	}
 
@@ -39,10 +36,7 @@ internal class Window : IWindow
 		get
 		{
 			ILocation<int> location = Location;
-			return new Point<int>(
-				location.X + (location.Width / 2),
-				location.Y + (location.Height / 2)
-			);
+			return new Point<int>(location.X + (location.Width / 2), location.Y + (location.Height / 2));
 		}
 	}
 
@@ -99,7 +93,6 @@ internal class Window : IWindow
 	public void FocusForceForeground()
 	{
 		Logger.Debug(ToString());
-
 		// Use SendInput hack to allow Activate to work - required to resolve focus issue https://github.com/microsoft/PowerToys/issues/4270
 		unsafe
 		{
@@ -172,7 +165,6 @@ internal class Window : IWindow
 	{
 		_configContext = configContext;
 		Handle = hwnd;
-
 		unsafe
 		{
 			uint pid;
@@ -198,7 +190,8 @@ internal class Window : IWindow
 
 			// We throw the exception here to implicitly ignore this process.
 			throw ex;
-		};
+		}
+		;
 	}
 
 	/// <inheritdoc/>
@@ -209,8 +202,7 @@ internal class Window : IWindow
 			return false;
 		}
 
-		return obj is Window window &&
-			window.Handle == Handle;
+		return obj is Window window && window.Handle == Handle;
 	}
 
 	/// <inheritdoc/>

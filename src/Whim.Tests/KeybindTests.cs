@@ -13,8 +13,16 @@ public class KeybindTests
 	[InlineData(KeyModifiers.LShift | KeyModifiers.LControl, VIRTUAL_KEY.VK_A, "LCtrl + LShift + A")]
 	[InlineData(KeyModifiers.LControl | KeyModifiers.LAlt, VIRTUAL_KEY.VK_A, "LCtrl + LAlt + A")]
 	[InlineData(KeyModifiers.LShift | KeyModifiers.LAlt, VIRTUAL_KEY.VK_A, "LShift + LAlt + A")]
-	[InlineData(KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt, VIRTUAL_KEY.VK_A, "LCtrl + LShift + LAlt + A")]
-	[InlineData(KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt, VIRTUAL_KEY.VK_A, "LWin + LCtrl + LShift + LAlt + A")]
+	[InlineData(
+		KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt,
+		VIRTUAL_KEY.VK_A,
+		"LCtrl + LShift + LAlt + A"
+	)]
+	[InlineData(
+		KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt,
+		VIRTUAL_KEY.VK_A,
+		"LWin + LCtrl + LShift + LAlt + A"
+	)]
 	public void Keybind_ToString_ReturnsCorrectString(KeyModifiers modifiers, VIRTUAL_KEY key, string expected)
 	{
 		Keybind keybind = new(modifiers, key);
@@ -29,8 +37,16 @@ public class KeybindTests
 	[InlineData(KeyModifiers.LShift | KeyModifiers.LControl, VIRTUAL_KEY.VK_A, new string[] { "LCtrl", "LShift", "A" })]
 	[InlineData(KeyModifiers.LControl | KeyModifiers.LAlt, VIRTUAL_KEY.VK_A, new string[] { "LCtrl", "LAlt", "A" })]
 	[InlineData(KeyModifiers.LShift | KeyModifiers.LAlt, VIRTUAL_KEY.VK_A, new string[] { "LShift", "LAlt", "A" })]
-	[InlineData(KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt, VIRTUAL_KEY.VK_A, new string[] { "LCtrl", "LShift", "LAlt", "A" })]
-	[InlineData(KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt, VIRTUAL_KEY.VK_A, new string[] { "LWin", "LCtrl", "LShift", "LAlt", "A" })]
+	[InlineData(
+		KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt,
+		VIRTUAL_KEY.VK_A,
+		new string[] { "LCtrl", "LShift", "LAlt", "A" }
+	)]
+	[InlineData(
+		KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt,
+		VIRTUAL_KEY.VK_A,
+		new string[] { "LWin", "LCtrl", "LShift", "LAlt", "A" }
+	)]
 	public void Keybind_AllKeys_ReturnsCorrect(KeyModifiers modifiers, VIRTUAL_KEY key, string[] expected)
 	{
 		Keybind keybind = new(modifiers, key);

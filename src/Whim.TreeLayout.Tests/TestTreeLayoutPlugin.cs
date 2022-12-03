@@ -5,7 +5,12 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestTreeLayoutPlugin
 {
-	public static (Mock<IConfigContext>, Mock<IWorkspaceManager>, Mock<IWorkspace>, Mock<ITreeLayoutEngine>) CreateMocks()
+	public static (
+		Mock<IConfigContext>,
+		Mock<IWorkspaceManager>,
+		Mock<IWorkspace>,
+		Mock<ITreeLayoutEngine>
+	) CreateMocks()
 	{
 		Mock<IConfigContext> configContext = new();
 		Mock<IWorkspaceManager> workspaceManager = new();

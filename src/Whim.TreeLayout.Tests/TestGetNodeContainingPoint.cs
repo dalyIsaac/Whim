@@ -5,7 +5,13 @@ namespace Whim.TreeLayout.Tests;
 public class TestGetNodeContainingPoint
 {
 	private readonly TestTree _testTree = new();
-	private readonly ILocation<double> rootLocation = new DoubleLocation() { X = 0, Y = 0, Width = 100, Height = 100 };
+	private readonly ILocation<double> rootLocation = new DoubleLocation()
+	{
+		X = 0,
+		Y = 0,
+		Width = 100,
+		Height = 100
+	};
 
 	[InlineData(-5, 0)]
 	[InlineData(0, -5)]
@@ -29,7 +35,10 @@ public class TestGetNodeContainingPoint
 	{
 		IPoint<double> searchPoint = new Point<double>(x, y);
 
-		Assert.Same(_testTree.Left, TreeLayoutEngine.GetNodeContainingPoint(root: _testTree.Root, rootLocation, searchPoint));
+		Assert.Same(
+			_testTree.Left,
+			TreeLayoutEngine.GetNodeContainingPoint(root: _testTree.Root, rootLocation, searchPoint)
+		);
 	}
 
 	[InlineData(50 + (25d / 2), 25)]
@@ -42,7 +51,10 @@ public class TestGetNodeContainingPoint
 	{
 		IPoint<double> searchPoint = new Point<double>(x, y);
 
-		Assert.Same(_testTree.RightTopLeftBottomRightTop, TreeLayoutEngine.GetNodeContainingPoint(root: _testTree.Root, rootLocation, searchPoint));
+		Assert.Same(
+			_testTree.RightTopLeftBottomRightTop,
+			TreeLayoutEngine.GetNodeContainingPoint(root: _testTree.Root, rootLocation, searchPoint)
+		);
 	}
 
 	[InlineData(50 + (25d / 2), 25 + (25 * 0.7))]
@@ -55,6 +67,9 @@ public class TestGetNodeContainingPoint
 	{
 		IPoint<double> searchPoint = new Point<double>(x, y);
 
-		Assert.Same(_testTree.RightTopLeftBottomRightBottom, TreeLayoutEngine.GetNodeContainingPoint(root: _testTree.Root, rootLocation, searchPoint));
+		Assert.Same(
+			_testTree.RightTopLeftBottomRightBottom,
+			TreeLayoutEngine.GetNodeContainingPoint(root: _testTree.Root, rootLocation, searchPoint)
+		);
 	}
 }

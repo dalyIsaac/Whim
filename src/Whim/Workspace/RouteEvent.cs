@@ -46,5 +46,6 @@ public class RouteEventArgs : EventArgs
 	/// <summary>
 	/// Helper method for creating a new <see cref="RouteEventArgs"/> for when a window is routed between workspaces.
 	/// </summary>
-	public static RouteEventArgs WindowMoved(IWindow window, IWorkspace fromWorkspace, IWorkspace toWorkspace) => new(window, fromWorkspace, toWorkspace);
+	public static RouteEventArgs WindowMoved(IWindow window, IWorkspace fromWorkspace, IWorkspace toWorkspace) =>
+		new(window, fromWorkspace, toWorkspace);
 }

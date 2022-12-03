@@ -50,9 +50,7 @@ public class Keybind : IKeybind
 			return false;
 		}
 
-		return obj is Keybind keybind &&
-			   Modifiers == keybind.Modifiers &&
-			   Key == keybind.Key;
+		return obj is Keybind keybind && Modifiers == keybind.Modifiers && Key == keybind.Key;
 	}
 
 	/// <inheritdoc />

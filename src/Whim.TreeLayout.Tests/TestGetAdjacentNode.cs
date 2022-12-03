@@ -37,7 +37,10 @@ public class TestGetAdjacentNode
 	[Fact]
 	public void GetAdjacentNode_RightBottom_Left()
 	{
-		Assert.Equal(_testEngine.LeftNode, _testEngine.Engine.GetAdjacentNode(_testEngine.RightBottomNode, Direction.Left));
+		Assert.Equal(
+			_testEngine.LeftNode,
+			_testEngine.Engine.GetAdjacentNode(_testEngine.RightBottomNode, Direction.Left)
+		);
 	}
 
 	/// <summary>
@@ -46,7 +49,10 @@ public class TestGetAdjacentNode
 	[Fact]
 	public void GetAdjacentNode_RightBottom_Up()
 	{
-		Assert.Equal(_testEngine.RightTopLeftBottomLeftNode, _testEngine.Engine.GetAdjacentNode(_testEngine.RightBottomNode, Direction.Up));
+		Assert.Equal(
+			_testEngine.RightTopLeftBottomLeftNode,
+			_testEngine.Engine.GetAdjacentNode(_testEngine.RightBottomNode, Direction.Up)
+		);
 	}
 
 	/// <summary>
@@ -65,7 +71,10 @@ public class TestGetAdjacentNode
 	[Fact]
 	public void GetAdjacentNode_RightTopRight3_Left()
 	{
-		Assert.Equal(_testEngine.RightTopLeftBottomRightTopNode, _testEngine.Engine.GetAdjacentNode(_testEngine.RightTopRight3Node, Direction.Left));
+		Assert.Equal(
+			_testEngine.RightTopLeftBottomRightTopNode,
+			_testEngine.Engine.GetAdjacentNode(_testEngine.RightTopRight3Node, Direction.Left)
+		);
 	}
 
 	/// <summary>
@@ -74,7 +83,10 @@ public class TestGetAdjacentNode
 	[Fact]
 	public void GetAdjacentNode_RightTopLeftBottomRightTop_Right()
 	{
-		Assert.Equal(_testEngine.RightTopRight2Node, _testEngine.Engine.GetAdjacentNode(_testEngine.RightTopLeftBottomRightTopNode, Direction.Right));
+		Assert.Equal(
+			_testEngine.RightTopRight2Node,
+			_testEngine.Engine.GetAdjacentNode(_testEngine.RightTopLeftBottomRightTopNode, Direction.Right)
+		);
 	}
 
 	/// <summary>
@@ -83,7 +95,10 @@ public class TestGetAdjacentNode
 	[Fact]
 	public void GetAdjacentNode_RightTopLeftBottomRightTop_Down()
 	{
-		Assert.Equal(_testEngine.RightTopLeftBottomRightBottomNode, _testEngine.Engine.GetAdjacentNode(_testEngine.RightTopLeftBottomRightTopNode, Direction.Down));
+		Assert.Equal(
+			_testEngine.RightTopLeftBottomRightBottomNode,
+			_testEngine.Engine.GetAdjacentNode(_testEngine.RightTopLeftBottomRightTopNode, Direction.Down)
+		);
 	}
 
 	/// <summary>
@@ -92,7 +107,10 @@ public class TestGetAdjacentNode
 	[Fact]
 	public void GetAdjacentNode_RightTopLeftBottomRightTop_Left()
 	{
-		Assert.Equal(_testEngine.RightTopLeftBottomLeftNode, _testEngine.Engine.GetAdjacentNode(_testEngine.RightTopLeftBottomRightTopNode, Direction.Left));
+		Assert.Equal(
+			_testEngine.RightTopLeftBottomLeftNode,
+			_testEngine.Engine.GetAdjacentNode(_testEngine.RightTopLeftBottomRightTopNode, Direction.Left)
+		);
 	}
 
 	/// <summary>
@@ -101,8 +119,10 @@ public class TestGetAdjacentNode
 	[Fact]
 	public void GetAdjacentNode_RightTopLeftBottomRightTop_Up()
 	{
-		Assert.Equal(_testEngine.RightTopLeftTopNode, _testEngine.Engine.GetAdjacentNode(_testEngine.RightTopLeftBottomRightTopNode, Direction.Up));
+		Assert.Equal(
+			_testEngine.RightTopLeftTopNode,
+			_testEngine.Engine.GetAdjacentNode(_testEngine.RightTopLeftBottomRightTopNode, Direction.Up)
+		);
 	}
 	#endregion
-
 }

@@ -43,7 +43,9 @@ public static partial class PaletteFilters
 		int i = 0;
 
 		word = word.ToLower();
-		while (i < wordToMatchAgainst.Length && (result = MatchesCamelCaseRecurse(word, wordToMatchAgainst, 0, i)) == null)
+		while (
+			i < wordToMatchAgainst.Length && (result = MatchesCamelCaseRecurse(word, wordToMatchAgainst, 0, i)) == null
+		)
 		{
 			i = FindNextCamelCaseAnchor(wordToMatchAgainst, i + 1);
 		}
@@ -51,7 +53,12 @@ public static partial class PaletteFilters
 		return result;
 	}
 
-	private static PaletteFilterTextMatch[]? MatchesCamelCaseRecurse(string word, string wordToMatchAgainst, int wordStart, int wordMatchStart)
+	private static PaletteFilterTextMatch[]? MatchesCamelCaseRecurse(
+		string word,
+		string wordToMatchAgainst,
+		int wordStart,
+		int wordMatchStart
+	)
 	{
 		if (wordStart == word.Length)
 		{
@@ -67,9 +74,18 @@ public static partial class PaletteFilters
 		}
 		else
 		{
-			PaletteFilterTextMatch[]? result = MatchesCamelCaseRecurse(word, wordToMatchAgainst, wordStart + 1, wordMatchStart + 1);
+			PaletteFilterTextMatch[]? result = MatchesCamelCaseRecurse(
+				word,
+				wordToMatchAgainst,
+				wordStart + 1,
+				wordMatchStart + 1
+			);
 			int nextUpperIndex = wordMatchStart + 1;
-			while (result == null && (nextUpperIndex = FindNextCamelCaseAnchor(wordToMatchAgainst, nextUpperIndex)) < wordToMatchAgainst.Length)
+			while (
+				result == null
+				&& (nextUpperIndex = FindNextCamelCaseAnchor(wordToMatchAgainst, nextUpperIndex))
+					< wordToMatchAgainst.Length
+			)
 			{
 				result = MatchesCamelCaseRecurse(word, wordToMatchAgainst, wordStart + 1, nextUpperIndex);
 				nextUpperIndex++;
@@ -80,16 +96,31 @@ public static partial class PaletteFilters
 
 	private static CamelCaseAnalysis AnalyzeCamelCaseWord(string word)
 	{
-		int upper = 0, lower = 0, alpha = 0, numeric = 0;
+		int upper = 0,
+			lower = 0,
+			alpha = 0,
+			numeric = 0;
 
 		for (int i = 0; i < word.Length; i++)
 		{
 			char code = word[i];
 
-			if (char.IsUpper(code)) { upper++; }
-			if (char.IsLower(code)) { lower++; }
-			if (char.IsLetterOrDigit(code)) { alpha++; }
-			if (char.IsDigit(code)) { numeric++; }
+			if (char.IsUpper(code))
+			{
+				upper++;
+			}
+			if (char.IsLower(code))
+			{
+				lower++;
+			}
+			if (char.IsLetterOrDigit(code))
+			{
+				alpha++;
+			}
+			if (char.IsDigit(code))
+			{
+				numeric++;
+			}
 		}
 
 		float upperPercent = (float)upper / word.Length;
@@ -131,7 +162,6 @@ public static partial class PaletteFilters
 			{
 				lower++;
 			}
-
 			else if (char.IsWhiteSpace(ch))
 			{
 				whitespace++;

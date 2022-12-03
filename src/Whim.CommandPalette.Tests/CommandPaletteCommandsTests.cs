@@ -5,7 +5,12 @@ namespace Whim.CommandPalette.Tests;
 
 public class CommandPaletteCommandsTests
 {
-	private static (Mock<IConfigContext>, Mock<IWorkspaceManager>, Mock<IWorkspace>, Mock<ICommandPalettePlugin>) CreateMocks()
+	private static (
+		Mock<IConfigContext>,
+		Mock<IWorkspaceManager>,
+		Mock<IWorkspace>,
+		Mock<ICommandPalettePlugin>
+	) CreateMocks()
 	{
 		Mock<IConfigContext> configContext = new();
 		Mock<IWorkspaceManager> workspaceManager = new();
@@ -19,7 +24,9 @@ public class CommandPaletteCommandsTests
 		return (configContext, workspaceManager, workspace, plugin);
 	}
 
-	private static List<CommandPaletteFreeTextActivationConfig> VerifyFreeTextActivated(Mock<ICommandPalettePlugin> plugin)
+	private static List<CommandPaletteFreeTextActivationConfig> VerifyFreeTextActivated(
+		Mock<ICommandPalettePlugin> plugin
+	)
 	{
 		List<CommandPaletteFreeTextActivationConfig> configs = new();
 		plugin.Setup(p => p.ActivateWithConfig(Capture.In(configs), It.IsAny<IEnumerable<CommandItem>?>()));
@@ -53,7 +60,14 @@ public class CommandPaletteCommandsTests
 		commands.RenameWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was activated.
-		plugin.Verify(x => x.ActivateWithConfig(It.IsAny<CommandPaletteFreeTextActivationConfig>(), It.IsAny<IEnumerable<CommandItem>?>()), Times.Once);
+		plugin.Verify(
+			x =>
+				x.ActivateWithConfig(
+					It.IsAny<CommandPaletteFreeTextActivationConfig>(),
+					It.IsAny<IEnumerable<CommandItem>?>()
+				),
+			Times.Once
+		);
 
 		// Call the callback.
 		configs[0].Callback("New workspace name");
@@ -65,22 +79,38 @@ public class CommandPaletteCommandsTests
 	[Fact]
 	public void CreateWorkspaceCommand()
 	{
-		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, _, Mock<ICommandPalettePlugin> plugin) = CreateMocks();
+		(
+			Mock<IConfigContext> configContext,
+			Mock<IWorkspaceManager> workspaceManager,
+			_,
+			Mock<ICommandPalettePlugin> plugin
+		) = CreateMocks();
 		CommandPaletteCommands commands = new(configContext.Object, plugin.Object);
 
 		// Set up the workspace factory.
 		Mock<IWorkspace> newWorkspace = new();
-		workspaceManager.SetupGet(x => x.WorkspaceFactory).Returns((_, name) =>
-		{
-			newWorkspace.SetupGet(w => w.Name).Returns(name);
-			return newWorkspace.Object;
-		});
+		workspaceManager
+			.SetupGet(x => x.WorkspaceFactory)
+			.Returns(
+				(_, name) =>
+				{
+					newWorkspace.SetupGet(w => w.Name).Returns(name);
+					return newWorkspace.Object;
+				}
+			);
 
 		List<CommandPaletteFreeTextActivationConfig> configs = VerifyFreeTextActivated(plugin);
 		commands.CreateWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was activated.
-		plugin.Verify(x => x.ActivateWithConfig(It.IsAny<CommandPaletteFreeTextActivationConfig>(), It.IsAny<IEnumerable<CommandItem>?>()), Times.Once);
+		plugin.Verify(
+			x =>
+				x.ActivateWithConfig(
+					It.IsAny<CommandPaletteFreeTextActivationConfig>(),
+					It.IsAny<IEnumerable<CommandItem>?>()
+				),
+			Times.Once
+		);
 
 		// Call the callback.
 		configs[0].Callback("New workspace name");
@@ -95,7 +125,12 @@ public class CommandPaletteCommandsTests
 	[Fact]
 	public void MoveWindowToWorkspaceCommand()
 	{
-		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, _, Mock<ICommandPalettePlugin> plugin) = CreateMocks();
+		(
+			Mock<IConfigContext> configContext,
+			Mock<IWorkspaceManager> workspaceManager,
+			_,
+			Mock<ICommandPalettePlugin> plugin
+		) = CreateMocks();
 		CommandPaletteCommands commands = new(configContext.Object, plugin.Object);
 
 		List<CommandPaletteFreeTextActivationConfig> freeTextConfigs = VerifyFreeTextActivated(plugin);
@@ -104,13 +139,25 @@ public class CommandPaletteCommandsTests
 		commands.MoveWindowToWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was menu activated.
-		plugin.Verify(x => x.ActivateWithConfig(It.IsAny<CommandPaletteMenuActivationConfig>(), It.IsAny<IEnumerable<CommandItem>?>()), Times.Once);
+		plugin.Verify(
+			x =>
+				x.ActivateWithConfig(
+					It.IsAny<CommandPaletteMenuActivationConfig>(),
+					It.IsAny<IEnumerable<CommandItem>?>()
+				),
+			Times.Once
+		);
 	}
 
 	[Fact]
 	public void MoveWindowToWorkspaceCommandCreator()
 	{
-		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, Mock<IWorkspace> workspace, Mock<ICommandPalettePlugin> plugin) = CreateMocks();
+		(
+			Mock<IConfigContext> configContext,
+			Mock<IWorkspaceManager> workspaceManager,
+			Mock<IWorkspace> workspace,
+			Mock<ICommandPalettePlugin> plugin
+		) = CreateMocks();
 		CommandPaletteCommands commands = new(configContext.Object, plugin.Object);
 
 		CommandItem item = commands.MoveWindowToWorkspaceCommandCreator(workspace.Object);

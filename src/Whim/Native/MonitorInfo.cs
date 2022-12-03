@@ -6,7 +6,8 @@ namespace Whim;
 internal static class MonitorInfo
 {
 	[DllImport("User32", ExactSpelling = true, EntryPoint = "GetMonitorInfoW")]
-	[DefaultDllImportSearchPaths(DllImportSearchPath.System32)] private static extern unsafe bool GetMonitorInfo(HMONITOR hMonitor, MONITORINFOEXW* lpmi);
+	[DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+	private static extern unsafe bool GetMonitorInfo(HMONITOR hMonitor, MONITORINFOEXW* lpmi);
 
 	internal static unsafe bool GetMonitorInfo(HMONITOR monitor, ref MONITORINFOEXW lpmi)
 	{

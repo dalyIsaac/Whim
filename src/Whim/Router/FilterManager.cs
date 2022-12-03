@@ -6,7 +6,6 @@ namespace Whim;
 
 internal class FilterManager : IFilterManager
 {
-
 	#region Filters for specific properties
 	private readonly HashSet<string> _ignoreWindowClasses = new();
 	private readonly HashSet<string> _ignoreProcessNames = new();

@@ -5,7 +5,6 @@ namespace Whim.Gaps;
 /// </summary>
 public interface IGapsPlugin : IPlugin
 {
-
 	/// <summary>
 	/// The configuration for the gaps plugin.
 	/// </summary>

@@ -18,7 +18,11 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="configContext"></param>
 	/// <param name="floatingLayoutConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public FloatingLayoutEngine(IConfigContext configContext, FloatingLayoutConfig floatingLayoutConfig, ILayoutEngine innerLayoutEngine) : base(innerLayoutEngine)
+	public FloatingLayoutEngine(
+		IConfigContext configContext,
+		FloatingLayoutConfig floatingLayoutConfig,
+		ILayoutEngine innerLayoutEngine
+	) : base(innerLayoutEngine)
 	{
 		_configContext = configContext;
 		_floatingLayoutConfig = floatingLayoutConfig;

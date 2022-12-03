@@ -34,7 +34,9 @@ public partial class WorkspaceWidget : UserControl, IDisposable
 	/// </summary>
 	public static BarComponent CreateComponent()
 	{
-		return new BarComponent((configContext, monitor, window) => new WorkspaceWidget(configContext, monitor, window));
+		return new BarComponent(
+			(configContext, monitor, window) => new WorkspaceWidget(configContext, monitor, window)
+		);
 	}
 
 	/// <inheritdoc/>

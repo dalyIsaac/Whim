@@ -162,7 +162,9 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		// add the window to the split node.
 		if (parent.IsHorizontal == AddNodeDirection.IsHorizontal())
 		{
-			Logger.Verbose($"Focused leaf node {focusedLeaf} is in a split node with direction {AddNodeDirection}. Adding window {window} to the split node.");
+			Logger.Verbose(
+				$"Focused leaf node {focusedLeaf} is in a split node with direction {AddNodeDirection}. Adding window {window} to the split node."
+			);
 
 			parent.Add(existingFocusedNode: focusedLeaf, newNode: newLeaf, AddNodeDirection);
 			return true;
@@ -171,7 +173,9 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		// If the parent node is a split node and the direction doesn't match, then we need to
 		// create a new split node and add the window to the split node.
 		// The focused leaf will also be added to the new split node.
-		Logger.Verbose($"Replacing the focused leaf node {focusedLeaf} with a split node with direction {AddNodeDirection}.");
+		Logger.Verbose(
+			$"Replacing the focused leaf node {focusedLeaf} with a split node with direction {AddNodeDirection}."
+		);
 
 		SplitNode newSplitNode = new(focusedLeaf, newLeaf, AddNodeDirection, parent);
 
@@ -271,7 +275,6 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		{
 			yield break;
 		}
-
 
 		foreach (NodeState? item in GetWindowLocations(Root, location))
 		{
@@ -416,7 +419,9 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 
 		if (parentNode == null)
 		{
-			Logger.Error($"Could not find common parent node for the focused and adjacent windows in layout engine {Name}");
+			Logger.Error(
+				$"Could not find common parent node for the focused and adjacent windows in layout engine {Name}"
+			);
 			return;
 		}
 
@@ -482,18 +487,24 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 
 		// Next, we figure out the adjacent point of the nodeLocation.
 		IPoint<double> adjacentLocation = new Point<double>(
-			x: nodeLocation.X + (direction switch
-			{
-				Whim.Direction.Left => -1d / monitor.Width,
-				Whim.Direction.Right => nodeLocation.Width + (1d / monitor.Width),
-				_ => 0d
-			}),
-			y: nodeLocation.Y + (direction switch
-			{
-				Whim.Direction.Up => -1d / monitor.Height,
-				Whim.Direction.Down => nodeLocation.Height + (1d / monitor.Height),
-				_ => 0d
-			})
+			x: nodeLocation.X
+				+ (
+					direction switch
+					{
+						Whim.Direction.Left => -1d / monitor.Width,
+						Whim.Direction.Right => nodeLocation.Width + (1d / monitor.Width),
+						_ => 0d
+					}
+				),
+			y: nodeLocation.Y
+				+ (
+					direction switch
+					{
+						Whim.Direction.Up => -1d / monitor.Height,
+						Whim.Direction.Down => nodeLocation.Height + (1d / monitor.Height),
+						_ => 0d
+					}
+				)
 		);
 
 		return GetNodeContainingPoint(Root, new DoubleLocation() { Height = 1, Width = 1 }, adjacentLocation);
@@ -630,15 +641,11 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		// Update AddNodeDirection with the direction based on the point.
 		if (isHorizontal)
 		{
-			AddNodeDirection = point.X < nodeLocation.X + (nodeLocation.Width / 2)
-				? Direction.Left
-				: Direction.Right;
+			AddNodeDirection = point.X < nodeLocation.X + (nodeLocation.Width / 2) ? Direction.Left : Direction.Right;
 		}
 		else
 		{
-			AddNodeDirection = point.Y < nodeLocation.Y + (nodeLocation.Height / 2)
-				? Direction.Up
-				: Direction.Down;
+			AddNodeDirection = point.Y < nodeLocation.Y + (nodeLocation.Height / 2) ? Direction.Up : Direction.Down;
 		}
 
 		MoveWindowToPointAddWindow(window, isPhantom, node.Window);

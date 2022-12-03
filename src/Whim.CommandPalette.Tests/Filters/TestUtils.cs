@@ -4,7 +4,12 @@ namespace Whim.CommandPalette.Tests;
 
 public static class FilterTestUtils
 {
-	public static void FilterOk(PaletteFilter filter, string word, string wordToMatchAgainst, PaletteFilterTextMatch[]? expectedMatches = null)
+	public static void FilterOk(
+		PaletteFilter filter,
+		string word,
+		string wordToMatchAgainst,
+		PaletteFilterTextMatch[]? expectedMatches = null
+	)
 	{
 		PaletteFilterTextMatch[]? actualMatches = filter(word, wordToMatchAgainst);
 

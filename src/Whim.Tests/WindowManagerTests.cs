@@ -11,8 +11,7 @@ public class WindowManagerTests
 		// Given
 		Mock<IWorkspaceManager> workspaceManagerMock = new();
 		Mock<IMonitor> monitorMock = new();
-		workspaceManagerMock.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>()))
-			.Returns(monitorMock.Object);
+		workspaceManagerMock.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns(monitorMock.Object);
 
 		Mock<IConfigContext> configContextMock = new();
 		configContextMock.Setup(c => c.WorkspaceManager).Returns(workspaceManagerMock.Object);

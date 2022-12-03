@@ -5,9 +5,11 @@ namespace Whim.Tests;
 
 public class RouterManagerTests
 {
-	private static Mock<IWindow> CreateWindowMock(string? className = null,
-											   string? processName = null,
-											   string? title = null)
+	private static Mock<IWindow> CreateWindowMock(
+		string? className = null,
+		string? processName = null,
+		string? title = null
+	)
 	{
 		Mock<IWindow>? windowMock = new();
 		windowMock.Setup(w => w.WindowClass).Returns(className ?? "");
@@ -16,8 +18,10 @@ public class RouterManagerTests
 		return windowMock;
 	}
 
-	private static Mock<IConfigContext> CreateConfigContextMock(string? workspaceName = null,
-															 IWorkspace? workspace = null)
+	private static Mock<IConfigContext> CreateConfigContextMock(
+		string? workspaceName = null,
+		IWorkspace? workspace = null
+	)
 	{
 		Mock<IConfigContext>? configContextMock = new();
 
@@ -26,14 +30,12 @@ public class RouterManagerTests
 			Mock<IWorkspace> workspaceMock = new();
 			workspaceMock.Setup(w => w.Name).Returns(workspaceName);
 
-			configContextMock.Setup(c => c.WorkspaceManager.TryGet(workspaceName))
-				.Returns(workspaceMock.Object);
+			configContextMock.Setup(c => c.WorkspaceManager.TryGet(workspaceName)).Returns(workspaceMock.Object);
 		}
 
 		if (workspace != null)
 		{
-			configContextMock.Setup(c => c.WorkspaceManager.TryGet(workspace.Name))
-				.Returns(workspace);
+			configContextMock.Setup(c => c.WorkspaceManager.TryGet(workspace.Name)).Returns(workspace);
 		}
 
 		return configContextMock;

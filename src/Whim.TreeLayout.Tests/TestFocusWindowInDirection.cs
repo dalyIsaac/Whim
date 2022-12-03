@@ -24,7 +24,9 @@ public class TestFocusWindowInDirection
 		TestTreeEngine testTreeEngine = new();
 
 		// Set the currently focused window.
-		testTreeEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testTreeEngine.RightBottomWindow.Object);
+		testTreeEngine.ActiveWorkspace
+			.Setup(w => w.LastFocusedWindow)
+			.Returns(testTreeEngine.RightBottomWindow.Object);
 
 		// Try to focus to the left of the left window.
 		testTreeEngine.Engine.FocusWindowInDirection(Direction.Left, testTreeEngine.LeftWindow.Object);
@@ -39,7 +41,9 @@ public class TestFocusWindowInDirection
 		TestTreeEngine testTreeEngine = new();
 
 		// Set the currently focused window.
-		testTreeEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testTreeEngine.RightBottomWindow.Object);
+		testTreeEngine.ActiveWorkspace
+			.Setup(w => w.LastFocusedWindow)
+			.Returns(testTreeEngine.RightBottomWindow.Object);
 
 		// Try to focus to the left of the right window.
 		testTreeEngine.Engine.FocusWindowInDirection(Direction.Left, testTreeEngine.RightBottomWindow.Object);

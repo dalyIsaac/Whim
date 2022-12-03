@@ -18,6 +18,7 @@ public enum KeyModifiers
 	/// The <c>LControl</c> modifier key.
 	/// </summary>
 	LControl = 1,
+
 	/// <summary>
 	/// The <c>RControl</c> modifier key.
 	/// </summary>
@@ -27,6 +28,7 @@ public enum KeyModifiers
 	/// The <c>LShift</c> modifier key.
 	/// </summary>
 	LShift = 4,
+
 	/// <summary>
 	/// The <c>RShift</c> modifier key.
 	/// </summary>
@@ -36,6 +38,7 @@ public enum KeyModifiers
 	/// The <c>LAlt</c> modifier key.
 	/// </summary>
 	LAlt = 16,
+
 	/// <summary>
 	/// The <c>RAlt</c> modifier key.
 	/// </summary>
@@ -45,6 +48,7 @@ public enum KeyModifiers
 	/// The <c>LWin</c> modifier key.
 	/// </summary>
 	LWin = 64,
+
 	/// <summary>
 	/// The <c>RWin</c> modifier key.
 	/// </summary>

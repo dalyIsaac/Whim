@@ -44,7 +44,13 @@ public static partial class PaletteFilters
 		return result;
 	}
 
-	private static PaletteFilterTextMatch[]? MatchesWordsRecurse(string word, string wordToMatchAgainst, int i, int j, bool contiguous)
+	private static PaletteFilterTextMatch[]? MatchesWordsRecurse(
+		string word,
+		string wordToMatchAgainst,
+		int i,
+		int j,
+		bool contiguous
+	)
 	{
 		if (i == word.Length)
 		{
@@ -63,7 +69,10 @@ public static partial class PaletteFilters
 		PaletteFilterTextMatch[]? result = MatchesWordsRecurse(word, wordToMatchAgainst, i + 1, j + 1, contiguous);
 		if (!contiguous)
 		{
-			while (result == null && (nextWordIndex = NextWord(wordToMatchAgainst, nextWordIndex)) < wordToMatchAgainst.Length)
+			while (
+				result == null
+				&& (nextWordIndex = NextWord(wordToMatchAgainst, nextWordIndex)) < wordToMatchAgainst.Length
+			)
 			{
 				result = MatchesWordsRecurse(word, wordToMatchAgainst, i + 1, nextWordIndex, contiguous);
 				nextWordIndex++;
@@ -89,8 +98,7 @@ public static partial class PaletteFilters
 	{
 		for (int i = start; i < word.Length; i++)
 		{
-			if (IsWordSeparator(word[i]) ||
-				(i > 0 && IsWordSeparator(word[i - 1])))
+			if (IsWordSeparator(word[i]) || (i > 0 && IsWordSeparator(word[i - 1])))
 			{
 				return i;
 			}

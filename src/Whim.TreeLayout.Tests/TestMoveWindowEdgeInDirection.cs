@@ -39,7 +39,11 @@ public class TestMoveWindowEdgeInDirection
 	{
 		TestTreeEngine testEngine = new();
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Left, 0.1, testEngine.RightTopLeftBottomLeftWindow.Object);
+		testEngine.Engine.MoveWindowEdgeInDirection(
+			Direction.Left,
+			0.1,
+			testEngine.RightTopLeftBottomLeftWindow.Object
+		);
 		Assert.Equal(0.5 + 0.1, testEngine.RightBottomNode.Parent?.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.LeftNode.GetWeight());
 	}

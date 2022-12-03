@@ -22,10 +22,7 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void DoLayout_LeftToRight_SingleWindow()
 	{
-		ColumnLayoutEngine engine = new()
-		{
-			CreateWindow()
-		};
+		ColumnLayoutEngine engine = new() { CreateWindow() };
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
@@ -42,12 +39,7 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void DoLayout_LeftToRight_MultipleWindows()
 	{
-		ColumnLayoutEngine engine = new()
-		{
-			CreateWindow(),
-			CreateWindow(),
-			CreateWindow()
-		};
+		ColumnLayoutEngine engine = new() { CreateWindow(), CreateWindow(), CreateWindow() };
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
@@ -76,10 +68,7 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void DoLayout_RightToLeft_SingleWindow()
 	{
-		ColumnLayoutEngine engine = new(leftToRight: false)
-		{
-			CreateWindow()
-		};
+		ColumnLayoutEngine engine = new(leftToRight: false) { CreateWindow() };
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
@@ -96,12 +85,7 @@ public class ColumnLayoutEngineTests
 	[Fact]
 	public void DoLayout_RightToLeft_MultipleWindows()
 	{
-		ColumnLayoutEngine engine = new(leftToRight: false)
-		{
-			CreateWindow(),
-			CreateWindow(),
-			CreateWindow()
-		};
+		ColumnLayoutEngine engine = new(leftToRight: false) { CreateWindow(), CreateWindow(), CreateWindow() };
 
 		Location location = new(0, 0, 1920, 1080);
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();

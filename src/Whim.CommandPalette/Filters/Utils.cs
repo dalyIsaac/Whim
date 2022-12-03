@@ -13,19 +13,20 @@ public static partial class PaletteFilters
 	/// </summary>
 	/// <param name="filters">The filters to iterate over.</param>
 	/// <returns></returns>
-	public static PaletteFilter Or(params PaletteFilter[] filters) => (word, wordToMatchAgainst) =>
-	{
-		foreach (PaletteFilter filter in filters)
+	public static PaletteFilter Or(params PaletteFilter[] filters) =>
+		(word, wordToMatchAgainst) =>
 		{
-			PaletteFilterTextMatch[]? match = filter(word, wordToMatchAgainst);
-			if (match != null)
+			foreach (PaletteFilter filter in filters)
 			{
-				return match;
+				PaletteFilterTextMatch[]? match = filter(word, wordToMatchAgainst);
+				if (match != null)
+				{
+					return match;
+				}
 			}
-		}
 
-		return null;
-	};
+			return null;
+		};
 
 	/// <summary>
 	/// Returns an array with the tail concatenated to the end of the head.

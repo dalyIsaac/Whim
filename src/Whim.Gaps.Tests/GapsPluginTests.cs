@@ -20,7 +20,8 @@ public class GapsPluginTests
 	public void UpdateOuterGap_IncreasesOuterGapByDelta()
 	{
 		// Arrange
-		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) = CreateMocks();
+		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) =
+			CreateMocks();
 		GapsPlugin plugin = new(configContext.Object, gapsConfig);
 
 		// Act
@@ -35,7 +36,8 @@ public class GapsPluginTests
 	public void UpdateInnerGap_IncreasesInnerGapByDelta()
 	{
 		// Arrange
-		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) = CreateMocks();
+		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) =
+			CreateMocks();
 		GapsPlugin plugin = new(configContext.Object, gapsConfig);
 
 		// Act
@@ -50,7 +52,8 @@ public class GapsPluginTests
 	public void UpdateOuterGap_WithNegativeDelta_DecreasesOuterGapByDelta()
 	{
 		// Arrange
-		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) = CreateMocks();
+		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) =
+			CreateMocks();
 		GapsPlugin plugin = new(configContext.Object, gapsConfig);
 
 		// Act
@@ -65,7 +68,8 @@ public class GapsPluginTests
 	public void UpdateInnerGap_WithNegativeDelta_DecreasesInnerGapByDelta()
 	{
 		// Arrange
-		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) = CreateMocks();
+		(Mock<IConfigContext> configContext, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) =
+			CreateMocks();
 		GapsPlugin plugin = new(configContext.Object, gapsConfig);
 
 		// Act
