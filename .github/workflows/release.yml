@@ -88,6 +88,7 @@ jobs:
             -p:Configuration=$env:Configuration `
             -p:Platform=$env:Platform `
             -p:Version=$env:CurrentRelease
+            -p:BuildInParallel=true
             -maxCpuCount
         env:
           Configuration: ${{ matrix.configuration }}
