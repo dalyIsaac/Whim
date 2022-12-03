@@ -14,6 +14,7 @@
 		<AnalysisModeStyle>All</AnalysisModeStyle>
 		<AnalysisModeUsage>All</AnalysisModeUsage>
 		<Authors>Isaac Daly</Authors>
+		<BuildInParallel>true</BuildInParallel>
 		<Description>An extensible window manager for Windows.</Description>
 		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
