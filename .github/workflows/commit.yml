@@ -35,7 +35,12 @@ jobs:
 
       - name: Check formatting
         run: |
-          dotnet format Whim.sln --verify-no-changes --no-restore
+          dotnet tool install csharpier --global
+          dotnet-csharpier . --check
+
+      - name: Check analyzers
+        run: |
+          dotnet format analyzers Whim.sln --verify-no-changes --no-restore
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
