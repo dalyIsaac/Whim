@@ -259,3 +259,6 @@ dotnet_diagnostic.IDE0010.severity = silent
 
 # IDE0045: Convert to conditional expression
 dotnet_diagnostic.IDE0045.severity = silent
+
+# IDE0055: Fix formatting
+dotnet_diagnostic.IDE0055.severity = none
