@@ -75,7 +75,7 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          dotnet restore Whim.sln /p:Configuration=$env:Configuration
+          dotnet restore Whim.sln -p:Configuration=$env:Configuration
         env:
           Configuration: ${{ matrix.configuration }}
 
@@ -85,9 +85,10 @@ jobs:
       - name: Build
         run: |
           msbuild Whim.sln `
-            /p:Configuration=$env:Configuration `
-            /p:Platform=$env:Platform `
-            /p:Version=$env:CurrentRelease
+            -p:Configuration=$env:Configuration `
+            -p:Platform=$env:Platform `
+            -p:Version=$env:CurrentRelease
+            -maxCpuCount
         env:
           Configuration: ${{ matrix.configuration }}
           Platform: ${{ matrix.platform }}

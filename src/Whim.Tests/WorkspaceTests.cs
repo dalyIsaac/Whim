@@ -21,7 +21,9 @@ public class WorkspacerTests
 #pragma warning restore IDE0017 // Simplify object initialization
 
 		// When
+#pragma warning disable IDE0017 // Simplify object initialization
 		workspace.Name = "Workspace2";
+#pragma warning restore IDE0017 // Simplify object initialization
 
 		// Then
 		Assert.Equal("Workspace2", workspace.Name);

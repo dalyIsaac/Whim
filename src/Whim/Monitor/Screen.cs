@@ -53,7 +53,7 @@ internal partial class Screen
 		else
 		{
 			// Multiple monitor system.
-			MONITORINFOEXW info = new() { __AnonymousBase_winuser_L13571_C43 = new MONITORINFO() { cbSize = (uint)sizeof(MONITORINFOEXW) } };
+			MONITORINFOEXW info = new() { monitorInfo = new MONITORINFO() { cbSize = (uint)sizeof(MONITORINFOEXW) } };
 			MonitorInfo.GetMonitorInfo(monitor, ref info);
 			_bounds = info.GetLocation();
 			Primary = info.IsPrimary();
