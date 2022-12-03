@@ -44,10 +44,6 @@ public class Location<T> : ILocation<T> where T : INumber<T>
 	public override string ToString() => $"(X: {X}, Y: {Y}, Width: {Width}, Height: {Height})";
 
 	/// <inheritdoc />
-	public static ILocation<T> Add(ILocation<T> a, ILocation<T> b) =>
-		new Location<T>(a.X + b.X, a.Y + b.Y, a.Width + b.Width, a.Height + b.Height);
-
-	/// <inheritdoc />
 	public override bool Equals(object? obj) =>
 		obj is Location<T> location
 		&& location.X == X
