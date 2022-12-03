@@ -43,7 +43,7 @@ jobs:
 
       - name: Check XAML formatting
         run: |
-          dotnet tool run xstyler --recursive --d . --passive
+          dotnet tool run xstyler --recursive --d . --passive --config ./xamlstylerrc
 
       - name: Check analyzers
         run: |
