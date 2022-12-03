@@ -378,7 +378,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 			yield break;
 		}
 
-		foreach (NodeState location in GetWindowLocations(Root, new Location(0, 0, 0, 0)))
+		foreach (NodeState location in GetWindowLocations(Root, new Location<int>()))
 		{
 			if (location.Node is LeafNode leafNode)
 			{
@@ -507,7 +507,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 				)
 		);
 
-		return GetNodeContainingPoint(Root, new DoubleLocation() { Height = 1, Width = 1 }, adjacentLocation);
+		return GetNodeContainingPoint(Root, new Location<double>() { Height = 1, Width = 1 }, adjacentLocation);
 	}
 
 	/// <summary>
@@ -618,7 +618,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		}
 
 		// Find the node at the point.
-		LeafNode? node = GetNodeContainingPoint(Root, new DoubleLocation() { Height = 1, Width = 1 }, point);
+		LeafNode? node = GetNodeContainingPoint(Root, new Location<double>() { Height = 1, Width = 1 }, point);
 		if (node == null)
 		{
 			Logger.Error($"Could not find node containing point {point} in layout engine {Name}");

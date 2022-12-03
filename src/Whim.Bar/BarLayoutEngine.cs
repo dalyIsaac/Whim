@@ -25,7 +25,7 @@ public class BarLayoutEngine : BaseProxyLayoutEngine
 		double scale = monitor.ScaleFactor / 100.0;
 		int height = (int)(_barConfig.Height * scale);
 
-		Location proxiedLocation =
+		Location<int> proxiedLocation =
 			new(x: location.X, y: location.Y + height, width: location.Width, height: location.Height - height);
 		return InnerLayoutEngine.DoLayout(proxiedLocation, monitor);
 	}

@@ -78,7 +78,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 		IWindow window = windowState.Window;
 
 		ILocation<int> offset = Win32Helper.GetWindowOffset(window.Handle);
-		ILocation<int> location = Location.Add(windowState.Location, offset);
+		ILocation<int> location = Location<int>.Add(windowState.Location, offset);
 
 		WindowSize windowSize = windowState.WindowSize;
 

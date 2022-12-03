@@ -13,5 +13,5 @@ public static class RectHelpers
 	/// <param name="rect">The <see cref="RECT"/> to convert.</param>
 	/// <returns>The converted <see cref="ILocation{T}"/>.</returns>
 	public static ILocation<int> ToLocation(this RECT rect) =>
-		new Location(x: rect.left, y: rect.top, width: rect.right - rect.left, height: rect.bottom - rect.top);
+		new Location<int>(x: rect.left, y: rect.top, width: rect.right - rect.left, height: rect.bottom - rect.top);
 }

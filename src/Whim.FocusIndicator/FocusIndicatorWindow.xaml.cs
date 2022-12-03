@@ -31,7 +31,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		ILocation<int> focusedWindowLocation = windowLocation.Location;
 		int borderSize = FocusIndicatorConfig.BorderSize;
 
-		ILocation<int> borderLocation = new Location(
+		ILocation<int> borderLocation = new Location<int>(
 			x: focusedWindowLocation.X - borderSize,
 			y: focusedWindowLocation.Y - borderSize,
 			height: focusedWindowLocation.Height + (borderSize * 2),

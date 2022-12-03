@@ -15,7 +15,7 @@ internal partial class Screen
 
 	private readonly ILocation<int> _bounds;
 
-	private ILocation<int> _workingArea = Location.Empty();
+	private ILocation<int> _workingArea = new Location<int>();
 
 	public readonly bool Primary;
 
@@ -40,7 +40,7 @@ internal partial class Screen
 		if (!s_multiMonitorSupport || monitor == PRIMARY_MONITOR)
 		{
 			// Single monitor system.
-			_bounds = new Location(
+			_bounds = new Location<int>(
 				x: PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN),
 				y: PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_YVIRTUALSCREEN),
 				width: PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CXVIRTUALSCREEN),

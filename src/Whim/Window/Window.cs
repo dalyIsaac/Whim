@@ -26,7 +26,7 @@ internal class Window : IWindow
 		get
 		{
 			PInvoke.GetWindowRect(Handle, out RECT rect);
-			return new Location(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			return new Location<int>(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 		}
 	}
 

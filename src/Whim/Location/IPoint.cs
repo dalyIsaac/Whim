@@ -1,11 +1,12 @@
 using System.Drawing;
+using System.Numerics;
 
 namespace Whim;
 
 /// <summary>
 /// A point in the coordinate space.
 /// </summary>
-public interface IPoint<T>
+public interface IPoint<T> where T : INumber<T>
 {
 	/// <summary>
 	/// The x-coordinate of the left of the item.

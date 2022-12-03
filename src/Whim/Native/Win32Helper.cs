@@ -301,17 +301,17 @@ public static class Win32Helper
 		if (!PInvoke.GetWindowRect(hwnd, out RECT windowRect))
 		{
 			Logger.Error($"Could not get the window rect for {hwnd.Value}");
-			return new Location(0, 0, 0, 0);
+			return new Location<int>();
 		}
 		unsafe
 		{
 			ILocation<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
 			if (extendedFrameLocation == null)
 			{
-				return new Location(0, 0, 0, 0);
+				return new Location<int>();
 			}
 
-			return new Location(
+			return new Location<int>(
 				x: windowRect.left - extendedFrameLocation.X,
 				y: windowRect.top - extendedFrameLocation.Y,
 				width: windowRect.right - windowRect.left - extendedFrameLocation.Width,
@@ -344,7 +344,7 @@ public static class Win32Helper
 				return null;
 			}
 
-			return new Location(
+			return new Location<int>(
 				x: extendedFrameRect.left,
 				y: extendedFrameRect.top,
 				width: extendedFrameRect.right - extendedFrameRect.left,
