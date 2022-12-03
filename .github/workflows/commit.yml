@@ -33,10 +33,17 @@ jobs:
         env:
           Configuration: ${{ matrix.configuration }}
 
-      - name: Check formatting
+      - name: Install dotnet tools
         run: |
-          dotnet tool install csharpier --global
-          dotnet-csharpier . --check
+          dotnet tool restore
+
+      - name: Check C# formatting
+        run: |
+          dotnet tool run dotnet-csharpier . --check
+
+      - name: Check XAML formatting
+        run: |
+          dotnet tool run xstyler --recursive --d . --passive
 
       - name: Check analyzers
         run: |
