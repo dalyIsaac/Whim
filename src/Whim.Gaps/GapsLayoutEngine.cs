@@ -41,16 +41,17 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 
 		foreach (IWindowState loc in InnerLayoutEngine.DoLayout(proxiedLocation, monitor))
 		{
-			yield return new WindowState(
-				window: loc.Window,
-				location: new Location<int>(
+			yield return new WindowState()
+			{
+				Window = loc.Window,
+				Location = new Location<int>(
 					x: loc.Location.X + innerGap,
 					y: loc.Location.Y + innerGap,
 					width: loc.Location.Width - doubleInnerGap,
 					height: loc.Location.Height - doubleInnerGap
 				),
-				windowSize: loc.WindowSize
-			);
+				WindowSize = loc.WindowSize
+			};
 		}
 	}
 }

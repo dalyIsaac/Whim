@@ -280,7 +280,12 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		{
 			if (item.Node is LeafNode leafNode)
 			{
-				yield return new WindowState(leafNode.Window, item.Location, item.WindowSize);
+				yield return new WindowState()
+				{
+					Window = leafNode.Window,
+					Location = item.Location,
+					WindowSize = item.WindowSize
+				};
 			}
 		}
 	}

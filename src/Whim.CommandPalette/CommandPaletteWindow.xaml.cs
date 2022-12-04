@@ -343,7 +343,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		WindowContainer.MaxHeight = height;
 
 		WindowDeferPosHandle.SetWindowPosFixScaling(
-			windowState: new WindowState(_window, windowLocation, WindowSize.Normal),
+			windowState: new WindowState()
+			{
+				Window = _window,
+				Location = windowLocation,
+				WindowSize = WindowSize.Normal
+			},
 			monitorManager: _configContext.MonitorManager,
 			monitor: _monitor,
 			hwndInsertAfter: _window.Handle

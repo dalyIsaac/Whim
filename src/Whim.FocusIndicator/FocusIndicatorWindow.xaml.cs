@@ -48,7 +48,12 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		);
 
 		WindowDeferPosHandle.SetWindowPosFixScaling(
-			windowState: new WindowState(_window, borderLocation, WindowSize.Normal),
+			windowState: new WindowState()
+			{
+				Window = _window,
+				Location = borderLocation,
+				WindowSize = WindowSize.Normal
+			},
 			monitorManager: _configContext.MonitorManager,
 			monitor: _configContext.MonitorManager.FocusedMonitor,
 			hwndInsertAfter: new HWND(1)
