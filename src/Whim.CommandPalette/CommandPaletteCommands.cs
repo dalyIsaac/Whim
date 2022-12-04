@@ -42,11 +42,12 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 				title: "Rename workspace",
 				callback: () =>
 					_commandPalettePlugin.ActivateWithConfig(
-						new CommandPaletteFreeTextActivationConfig(
-							callback: (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
-							hint: "Enter new workspace name",
-							initialText: _configContext.WorkspaceManager.ActiveWorkspace.Name
-						)
+						new CommandPaletteFreeTextActivationConfig()
+						{
+							Callback = (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
+							Hint = "Enter new workspace name",
+							InitialText = _configContext.WorkspaceManager.ActiveWorkspace.Name
+						}
 					)
 			)
 		);
@@ -61,8 +62,9 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 				title: "Create workspace",
 				callback: () =>
 					_commandPalettePlugin.ActivateWithConfig(
-						new CommandPaletteFreeTextActivationConfig(
-							callback: (text) =>
+						new CommandPaletteFreeTextActivationConfig()
+						{
+							Callback = (text) =>
 							{
 								IWorkspace workspace = _configContext.WorkspaceManager.WorkspaceFactory(
 									_configContext,
@@ -70,8 +72,8 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 								);
 								_configContext.WorkspaceManager.Add(workspace);
 							},
-							hint: "Enter new workspace name"
-						)
+							Hint = "Enter new workspace name"
+						}
 					)
 			)
 		);
@@ -105,7 +107,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 					);
 
 					_commandPalettePlugin.ActivateWithConfig(
-						config: new CommandPaletteMenuActivationConfig(hint: "Select workspace"),
+						config: new CommandPaletteMenuActivationConfig() { Hint = "Select workspace" },
 						items
 					);
 				}

@@ -3,17 +3,17 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// Base config for activating the command palette.
 /// </summary>
-public class BaseCommandPaletteActivationConfig
+public record BaseCommandPaletteActivationConfig
 {
 	/// <summary>
 	/// Text hint to show in the command palette.
 	/// </summary>
-	public string? Hint { get; }
+	public string? Hint { get; init; }
 
 	/// <summary>
 	/// The text to pre-fill the command palette with.
 	/// </summary>
-	public string? InitialText { get; }
+	public string? InitialText { get; init; }
 
 	/// <summary>
 	/// Creates a new <see cref="BaseCommandPaletteActivationConfig"/>.
@@ -30,27 +30,12 @@ public class BaseCommandPaletteActivationConfig
 /// <summary>
 /// Config for activating the command palette with a menu.
 /// </summary>
-public class CommandPaletteMenuActivationConfig : BaseCommandPaletteActivationConfig
+public record CommandPaletteMenuActivationConfig : BaseCommandPaletteActivationConfig
 {
 	/// <summary>
 	/// The matcher to use to filter the results.
 	/// </summary>
-	public ICommandPaletteMatcher Matcher { get; }
-
-	/// <summary>
-	/// Creates a new <see cref="CommandPaletteMenuActivationConfig"/>.
-	/// </summary>
-	/// <param name="matcher"></param>
-	/// <param name="hint"></param>
-	/// <param name="initialText"></param>
-	public CommandPaletteMenuActivationConfig(
-		ICommandPaletteMatcher? matcher = null,
-		string? hint = null,
-		string? initialText = null
-	) : base(hint, initialText)
-	{
-		Matcher = matcher ?? new MostRecentlyUsedMatcher();
-	}
+	public ICommandPaletteMatcher Matcher { get; init; } = new MostRecentlyUsedMatcher();
 }
 
 /// <summary>
@@ -62,25 +47,10 @@ public delegate void CommandPaletteFreeTextCallback(string text);
 /// <summary>
 /// Config for activating the command palette with free text.
 /// </summary>
-public class CommandPaletteFreeTextActivationConfig : BaseCommandPaletteActivationConfig
+public record CommandPaletteFreeTextActivationConfig : BaseCommandPaletteActivationConfig
 {
 	/// <summary>
 	/// The callback to invoke when the user has pressed enter.
 	/// </summary>
-	public CommandPaletteFreeTextCallback Callback { get; }
-
-	/// <summary>
-	/// Creates a new <see cref="CommandPaletteFreeTextActivationConfig"/>.
-	/// </summary>
-	/// <param name="callback"></param>
-	/// <param name="hint"></param>
-	/// <param name="initialText"></param>
-	public CommandPaletteFreeTextActivationConfig(
-		CommandPaletteFreeTextCallback callback,
-		string? hint = null,
-		string? initialText = null
-	) : base(hint, initialText)
-	{
-		Callback = callback;
-	}
+	public required CommandPaletteFreeTextCallback Callback { get; init; }
 }
