@@ -46,8 +46,13 @@ public class LoggerConfig
 	/// <param name="baseMinLogLevel">The base minimum log level.</param>
 	public LoggerConfig(LogLevel baseMinLogLevel)
 	{
-		FileSink = new FileSinkConfig("whim.log", baseMinLogLevel);
-		DebugSink = new SinkConfig(baseMinLogLevel);
+		FileSink = new FileSinkConfig()
+		{
+			FileName = "whim.log",
+			MinLogLevel = baseMinLogLevel,
+			RollingInterval = FileSinkConfigRollingInterval.Day
+		};
+		DebugSink = new SinkConfig() { MinLogLevel = LogLevel.Debug };
 		BaseMinLogLevel = baseMinLogLevel;
 	}
 
@@ -58,8 +63,13 @@ public class LoggerConfig
 	/// <param name="baseMinLogLevel">Sets <see cref="BaseMinLogLevel"/></param>
 	public LoggerConfig(string logFileName, LogLevel baseMinLogLevel = LogLevel.Error)
 	{
-		FileSink = new FileSinkConfig(logFileName, LogLevel.Debug);
-		DebugSink = new SinkConfig(LogLevel.Debug);
+		FileSink = new FileSinkConfig()
+		{
+			FileName = logFileName,
+			MinLogLevel = baseMinLogLevel,
+			RollingInterval = FileSinkConfigRollingInterval.Day
+		};
+		DebugSink = new SinkConfig() { MinLogLevel = LogLevel.Debug };
 		BaseMinLogLevel = baseMinLogLevel;
 	}
 

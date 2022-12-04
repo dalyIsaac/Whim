@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Default configuration options for a logging sink.
 /// </summary>
-public class SinkConfig
+public record SinkConfig
 {
 	/// <summary>
 	/// What the <see cref="Logger"/> looks at.
@@ -15,18 +15,9 @@ public class SinkConfig
 	/// <summary>
 	/// The sink's minimum log level.
 	/// </summary>
-	public LogLevel MinLogLevel
+	public required LogLevel MinLogLevel
 	{
 		get => LogLevelExtensions.ToSink(MinLogLevelSwitch.MinimumLevel);
 		set => MinLogLevelSwitch.MinimumLevel = value.ToSerilog();
-	}
-
-	/// <summary>
-	/// Initializes the sink config with the provided minimum log level.
-	/// </summary>
-	/// <param name="minLogLevel"></param>
-	public SinkConfig(LogLevel minLogLevel)
-	{
-		MinLogLevel = minLogLevel;
 	}
 }
