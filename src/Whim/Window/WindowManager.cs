@@ -292,7 +292,7 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Window added: {window}");
 		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowAdded(window);
-		WindowAdded?.Invoke(this, new WindowEventArgs(window));
+		WindowAdded?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	/// <summary>
@@ -306,7 +306,7 @@ internal class WindowManager : IWindowManager
 		Logger.Debug($"Window focused: {window}");
 		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(window);
 		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowFocused(window);
-		WindowFocused?.Invoke(this, new WindowEventArgs(window));
+		WindowFocused?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	/// <summary>
@@ -334,7 +334,7 @@ internal class WindowManager : IWindowManager
 		Logger.Debug($"Window removed: {window}");
 		_windows.Remove(window.Handle);
 		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRemoved(window);
-		WindowRemoved?.Invoke(this, new WindowEventArgs(window));
+		WindowRemoved?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	private void OnWindowMoveStart(IWindow window)
@@ -344,7 +344,7 @@ internal class WindowManager : IWindowManager
 		_mouseMoveWindow = window;
 		_mouseMoveWindow.IsMouseMoving = true;
 
-		WindowMoveStart?.Invoke(this, new WindowEventArgs(window));
+		WindowMoveStart?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	private void OnWindowMoveEnd(IWindow window)
@@ -368,25 +368,25 @@ internal class WindowManager : IWindowManager
 
 			_mouseMoveWindow = null;
 
-			WindowMoved?.Invoke(this, new WindowEventArgs(window));
+			WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window });
 		}
 	}
 
 	private void OnWindowMoved(IWindow window)
 	{
 		Logger.Debug($"Window moved: {window}");
-		WindowMoved?.Invoke(this, new WindowEventArgs(window));
+		WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	private void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
-		WindowMinimizeStart?.Invoke(this, new WindowEventArgs(window));
+		WindowMinimizeStart?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	private void OnWindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize ended: {window}");
-		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs(window));
+		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 }
