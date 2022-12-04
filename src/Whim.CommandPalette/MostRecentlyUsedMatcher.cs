@@ -66,7 +66,12 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 			}
 
 			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
-			matches[matchCount++] = new MatcherCommandItem(item, filterMatches, count);
+			matches[matchCount++] = new MatcherCommandItem()
+			{
+				Item = item,
+				TextSegments = filterMatches,
+				Score = count
+			};
 		}
 
 		return matchCount;
@@ -80,7 +85,12 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 		foreach (CommandItem item in items)
 		{
 			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
-			matches[matchCount++] = new MatcherCommandItem(item, Array.Empty<PaletteFilterTextMatch>(), count);
+			matches[matchCount++] = new MatcherCommandItem()
+			{
+				Item = item,
+				TextSegments = Array.Empty<PaletteFilterTextMatch>(),
+				Score = count
+			};
 		}
 
 		return matchCount;
