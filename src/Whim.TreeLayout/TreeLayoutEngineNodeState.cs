@@ -63,7 +63,13 @@ public partial class TreeLayoutEngine
 		foreach ((double weight, Node child) in parent)
 		{
 			Location<int> childLocation =
-				new(x: location.X, y: location.Y, width: location.Width, height: location.Height);
+				new()
+				{
+					X = location.X,
+					Y = location.Y,
+					Width = location.Width,
+					Height = location.Height
+				};
 
 			if (parent.IsHorizontal)
 			{

@@ -643,7 +643,7 @@ public class WorkspaceManagerTests
 
 		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(new Mock<IMonitor>().Object);
 
-		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>(0, 0));
+		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
@@ -668,7 +668,7 @@ public class WorkspaceManagerTests
 
 		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(monitors[1].Object);
 
-		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>(0, 0));
+		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
@@ -694,7 +694,7 @@ public class WorkspaceManagerTests
 		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(monitors[1].Object);
 		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(false);
 
-		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>(0, 0));
+		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
@@ -722,7 +722,7 @@ public class WorkspaceManagerTests
 		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(monitors[1].Object);
 		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
 
-		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>(0, 0));
+		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());

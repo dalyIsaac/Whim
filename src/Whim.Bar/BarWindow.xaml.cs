@@ -44,12 +44,13 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		WindowState = new WindowState()
 		{
 			Window = window,
-			Location = new Location<int>(
-				x: _monitor.X,
-				y: _monitor.Y,
-				width: (int)(_monitor.Width / scale),
-				height: _barConfig.Height
-			),
+			Location = new Location<int>()
+			{
+				X = _monitor.X,
+				Y = _monitor.Y,
+				Width = (int)(_monitor.Width / scale),
+				Height = _barConfig.Height
+			},
 			WindowSize = WindowSize.Normal
 		};
 

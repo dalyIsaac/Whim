@@ -42,7 +42,7 @@ public static class MonitorHelpers
 	/// </returns>
 	public static IPoint<int> ToMonitorCoordinates(this ILocation<int> monitor, IPoint<int> point)
 	{
-		return new Point<int>(point.X - monitor.X, point.Y - monitor.Y);
+		return new Point<int>() { X = point.X - monitor.X, Y = point.Y - monitor.Y };
 	}
 
 	/// <summary>
@@ -56,7 +56,7 @@ public static class MonitorHelpers
 	{
 		double x = Math.Abs((double)point.X / monitor.Width);
 		double y = Math.Abs((double)point.Y / monitor.Height);
-		return new Point<double>(x, y);
+		return new Point<double>() { X = x, Y = y };
 	}
 
 	/// <summary>
@@ -72,7 +72,13 @@ public static class MonitorHelpers
 		double y = Math.Abs((double)location.Y / monitor.Height);
 		double width = Math.Abs((double)location.Width / monitor.Width);
 		double height = Math.Abs((double)location.Height / monitor.Height);
-		return new Location<double>(x, y, width, height);
+		return new Location<double>()
+		{
+			X = x,
+			Y = y,
+			Width = width,
+			Height = height
+		};
 	}
 
 	/// <summary>
@@ -84,11 +90,12 @@ public static class MonitorHelpers
 	/// <returns>The converted location.</returns>
 	public static ILocation<int> ToMonitor(this ILocation<int> monitor, ILocation<double> location)
 	{
-		return new Location<int>(
-			x: Math.Abs(Convert.ToInt32(monitor.X + (location.X * monitor.Width))),
-			y: Math.Abs(Convert.ToInt32(monitor.Y + (location.Y * monitor.Height))),
-			width: Math.Abs(Convert.ToInt32(location.Width * monitor.Width)),
-			height: Math.Abs(Convert.ToInt32(location.Height * monitor.Height))
-		);
+		return new Location<int>()
+		{
+			X = Math.Abs(Convert.ToInt32(monitor.X + (location.X * monitor.Width))),
+			Y = Math.Abs(Convert.ToInt32(monitor.Y + (location.Y * monitor.Height))),
+			Width = Math.Abs(Convert.ToInt32(location.Width * monitor.Width)),
+			Height = Math.Abs(Convert.ToInt32(location.Height * monitor.Height))
+		};
 	}
 }

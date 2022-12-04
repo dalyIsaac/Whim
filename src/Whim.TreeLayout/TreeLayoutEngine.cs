@@ -491,8 +491,10 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		ILocation<double> nodeLocation = GetNodeLocation(node);
 
 		// Next, we figure out the adjacent point of the nodeLocation.
-		IPoint<double> adjacentLocation = new Point<double>(
-			x: nodeLocation.X
+		IPoint<double> adjacentLocation = new Point<double>()
+		{
+			X =
+				nodeLocation.X
 				+ (
 					direction switch
 					{
@@ -501,7 +503,8 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 						_ => 0d
 					}
 				),
-			y: nodeLocation.Y
+			Y =
+				nodeLocation.Y
 				+ (
 					direction switch
 					{
@@ -510,7 +513,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 						_ => 0d
 					}
 				)
-		);
+		};
 
 		return GetNodeContainingPoint(Root, new Location<double>() { Height = 1, Width = 1 }, adjacentLocation);
 	}

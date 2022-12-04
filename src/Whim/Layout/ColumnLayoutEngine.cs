@@ -63,7 +63,13 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 			yield return new WindowState()
 			{
 				Window = window,
-				Location = new Location<int>(x, y, width, height),
+				Location = new Location<int>()
+				{
+					X = x,
+					Y = y,
+					Width = width,
+					Height = height
+				},
 				WindowSize = WindowSize.Normal
 			};
 

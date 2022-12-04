@@ -11,7 +11,7 @@ public class TestAddWindowAtPoint
 		TestTreeEngineEmpty emptyEngine = new();
 		Mock<IWindow> window = new();
 
-		emptyEngine.Engine.AddWindowAtPoint(window.Object, new Point<double>(0, 0), false);
+		emptyEngine.Engine.AddWindowAtPoint(window.Object, new Point<double>() { X = 0, Y = 0 }, false);
 
 		Assert.True(emptyEngine.Engine.Root is WindowNode);
 	}
@@ -24,7 +24,7 @@ public class TestAddWindowAtPoint
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
 		Mock<IWindow> pointWindow = new();
-		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>(-10, -10), false);
+		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>() { X = -10, Y = -10 }, false);
 
 		Assert.Single(emptyEngine.Engine);
 	}
@@ -37,7 +37,7 @@ public class TestAddWindowAtPoint
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
 		Mock<IWindow> pointWindow = new();
-		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>(0.5, 0.5), false);
+		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>() { X = 0.5, Y = 0.5 }, false);
 
 		Assert.True(emptyEngine.Engine.Root is SplitNode);
 		Assert.Equal(2, emptyEngine.Engine.Count);
@@ -51,11 +51,11 @@ public class TestAddWindowAtPoint
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
 		Mock<IWindow> windowWithParent = new();
-		emptyEngine.Engine.AddWindowAtPoint(windowWithParent.Object, new Point<double>(0.5, 0.5), false);
+		emptyEngine.Engine.AddWindowAtPoint(windowWithParent.Object, new Point<double>() { X = 0.5, Y = 0.5 }, false);
 
 		emptyEngine.Engine.AddNodeDirection = Direction.Left;
 		Mock<IWindow> pointWindow = new();
-		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>(0.75, 0.75), false);
+		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>() { X = 0.75, Y = 0.75 }, false);
 
 		Assert.True(emptyEngine.Engine.Root is SplitNode);
 		Assert.Equal(3, emptyEngine.Engine.Count);
@@ -75,11 +75,11 @@ public class TestAddWindowAtPoint
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
 		Mock<IWindow> windowWithParent = new();
-		emptyEngine.Engine.AddWindowAtPoint(windowWithParent.Object, new Point<double>(0.5, 0.5), false);
+		emptyEngine.Engine.AddWindowAtPoint(windowWithParent.Object, new Point<double>() { X = 0.5, Y = 0.5 }, false);
 
 		emptyEngine.Engine.AddNodeDirection = Direction.Right;
 		Mock<IWindow> pointWindow = new();
-		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>(0.6, 0.6), false);
+		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>() { X = 0.6, Y = 0.6 }, false);
 
 		Assert.True(emptyEngine.Engine.Root is SplitNode);
 		Assert.Equal(3, emptyEngine.Engine.Count);
@@ -100,10 +100,10 @@ public class TestAddWindowAtPoint
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
 		Mock<IWindow> windowWithParent = new();
-		emptyEngine.Engine.AddWindowAtPoint(windowWithParent.Object, new Point<double>(0.5, 0.5), false);
+		emptyEngine.Engine.AddWindowAtPoint(windowWithParent.Object, new Point<double>() { X = 0.5, Y = 0.5 }, false);
 
 		Mock<IWindow> pointWindow = new();
-		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>(0.6, 0.6), false);
+		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>() { X = 0.6, Y = 0.6 }, false);
 
 		Assert.True(emptyEngine.Engine.Root is SplitNode);
 		Assert.Equal(3, emptyEngine.Engine.Count);
@@ -124,10 +124,10 @@ public class TestAddWindowAtPoint
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
 		Mock<IWindow> windowWithParent = new();
-		emptyEngine.Engine.AddWindowAtPoint(windowWithParent.Object, new Point<double>(0.5, 0.5), false);
+		emptyEngine.Engine.AddWindowAtPoint(windowWithParent.Object, new Point<double>() { X = 0.5, Y = 0.5 }, false);
 
 		Mock<IWindow> pointWindow = new();
-		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>(0.75, 0.75), false);
+		emptyEngine.Engine.AddWindowAtPoint(pointWindow.Object, new Point<double>() { X = 0.75, Y = 0.75 }, false);
 
 		Assert.True(emptyEngine.Engine.Root is SplitNode);
 		Assert.Equal(3, emptyEngine.Engine.Count);

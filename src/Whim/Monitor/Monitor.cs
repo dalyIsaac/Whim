@@ -28,7 +28,14 @@ internal class Monitor : IMonitor
 	public bool IsPrimary => Screen.Primary;
 	public int ScaleFactor => Screen.ScaleFactor;
 
-	public bool IsPointInside(IPoint<int> point) => new Location<int>(X, Y, Width, Height).IsPointInside(point);
+	public bool IsPointInside(IPoint<int> point) =>
+		new Location<int>()
+		{
+			X = X,
+			Y = Y,
+			Width = Width,
+			Height = Height
+		}.IsPointInside(point);
 
 	public override string ToString() => Screen.ToString();
 }
