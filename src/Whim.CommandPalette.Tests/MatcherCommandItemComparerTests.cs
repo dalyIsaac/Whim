@@ -12,7 +12,7 @@ public class MatcherCommandItemComparerTests
 
 		return new MatcherCommandItem()
 		{
-			Item = new CommandItem(command.Object),
+			Item = new CommandItem() { Command = command.Object },
 			TextSegments = Array.Empty<PaletteFilterTextMatch>(),
 			Score = score
 		};

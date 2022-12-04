@@ -36,47 +36,51 @@ public class TreeLayoutCommands : IEnumerable<CommandItem>
 	/// Add tree direction left command.
 	/// </summary>
 	public CommandItem AddTreeDirectionLeftCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.add_tree_direction_left",
 				title: "Add windows to the left of the current window",
 				callback: () => _plugin.SetAddWindowDirection(Direction.Left)
 			)
-		);
+		};
 
 	/// <summary>
 	/// Add tree direction right command.
 	/// </summary>
 	public CommandItem AddTreeDirectionRightCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.add_tree_direction_right",
 				title: "Add windows to the right of the current window",
 				callback: () => _plugin.SetAddWindowDirection(Direction.Right)
 			)
-		);
+		};
 
 	/// <summary>
 	/// Add tree direction up command.
 	/// </summary>
 	public CommandItem AddTreeDirectionUpCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.add_tree_direction_up",
 				title: "Add windows above the current window",
 				callback: () => _plugin.SetAddWindowDirection(Direction.Up)
 			)
-		);
+		};
 
 	/// <summary>
 	/// Add tree direction down command.
 	/// </summary>
 	public CommandItem AddTreeDirectionDownCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.add_tree_direction_down",
 				title: "Add windows below the current window",
 				callback: () => _plugin.SetAddWindowDirection(Direction.Down)
 			)
-		);
+		};
 }

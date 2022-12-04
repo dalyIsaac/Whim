@@ -27,17 +27,23 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	/// Toggle command palette command.
 	/// </summary>
 	public CommandItem ToggleCommandPaletteCommand =>
-		new(
-			new Command(identifier: $"{Name}.toggle", title: "Toggle command palette", _commandPalettePlugin.Activate),
-			new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_K)
-		);
+		new()
+		{
+			Command = new Command(
+				identifier: $"{Name}.toggle",
+				title: "Toggle command palette",
+				_commandPalettePlugin.Activate
+			),
+			Keybind = new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_K)
+		};
 
 	/// <summary>
 	/// Rename workspace command.
 	/// </summary>
 	public CommandItem RenameWorkspaceCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.rename_workspace",
 				title: "Rename workspace",
 				callback: () =>
@@ -50,14 +56,15 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 						}
 					)
 			)
-		);
+		};
 
 	/// <summary>
 	/// Create workspace command.
 	/// </summary>
 	public CommandItem CreateWorkspaceCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.create_workspace",
 				title: "Create workspace",
 				callback: () =>
@@ -76,7 +83,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 						}
 					)
 			)
-		);
+		};
 
 	/// <summary>
 	/// Move window to workspace command creator.
@@ -84,20 +91,22 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	/// <param name="workspace">The workspace to move the window to.</param>
 	/// <returns>The move window to workspace command.</returns>
 	public CommandItem MoveWindowToWorkspaceCommandCreator(IWorkspace workspace) =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.move_window_to_workspace",
 				title: $"Move window to workspace \"{workspace.Name}\"",
 				callback: () => _configContext.WorkspaceManager.MoveWindowToWorkspace(workspace)
 			)
-		);
+		};
 
 	/// <summary>
 	/// Move window to workspace command.
 	/// </summary>
 	public CommandItem MoveWindowToWorkspaceCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.move_window_to_workspace",
 				title: "Move window to workspace",
 				callback: () =>
@@ -112,7 +121,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 					);
 				}
 			)
-		);
+		};
 
 	/// <inheritdoc />
 	public IEnumerator<CommandItem> GetEnumerator()

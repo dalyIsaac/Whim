@@ -145,12 +145,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			{
 				if (_allCommands[idx].Command != command)
 				{
-					_allCommands[idx] = new CommandItem(command, keybind);
+					_allCommands[idx] = new CommandItem() { Command = command, Keybind = keybind };
 				}
 			}
 			else
 			{
-				_allCommands.Add(new CommandItem(command, keybind));
+				_allCommands.Add(new CommandItem() { Command = command, Keybind = keybind });
 			}
 
 			idx++;

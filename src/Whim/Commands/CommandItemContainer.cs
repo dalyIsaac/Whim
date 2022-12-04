@@ -134,7 +134,7 @@ internal class CommandItemContainer : ICommandItemContainer
 		// Iterate over each of the keybinds and associated commands.
 		foreach ((IKeybind keybind, string commandIdentifier) in _keybindsMap)
 		{
-			yield return new CommandItem(TryGetCommand(commandIdentifier)!, keybind);
+			yield return new CommandItem() { Command = TryGetCommand(commandIdentifier)!, Keybind = keybind };
 			processedIdentifiers.Add(commandIdentifier);
 		}
 
@@ -143,7 +143,7 @@ internal class CommandItemContainer : ICommandItemContainer
 		{
 			if (!processedIdentifiers.Contains(pair.Key))
 			{
-				yield return new CommandItem(pair.Value, null);
+				yield return new CommandItem() { Command = pair.Value };
 			}
 		}
 	}
