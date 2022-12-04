@@ -3,7 +3,7 @@ using System.Numerics;
 namespace Whim;
 
 /// <inheritdoc />
-public class Point<T> : IPoint<T> where T : INumber<T>
+public record Point<T> : IPoint<T> where T : INumber<T>
 {
 	/// <inheritdoc />
 	public T X { get; }

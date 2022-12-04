@@ -4,7 +4,7 @@ using System.Numerics;
 namespace Whim;
 
 /// <inheritdoc />
-public class Location<T> : ILocation<T> where T : INumber<T>
+public record Location<T> : ILocation<T>, IEquatable<Location<T>> where T : INumber<T>
 {
 	/// <inheritdoc />
 	public T X { get; set; }
@@ -42,14 +42,6 @@ public class Location<T> : ILocation<T> where T : INumber<T>
 
 	/// <inheritdoc />
 	public override string ToString() => $"(X: {X}, Y: {Y}, Width: {Width}, Height: {Height})";
-
-	/// <inheritdoc />
-	public override bool Equals(object? obj) =>
-		obj is Location<T> location
-		&& location.X == X
-		&& location.Y == Y
-		&& location.Width == Width
-		&& location.Height == Height;
 
 	/// <inheritdoc />
 	public override int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
