@@ -29,8 +29,8 @@ public class ColumnLayoutEngineTests
 			{
 				X = 0,
 				Y = 0,
-				Height = 1920,
-				Width = 1080
+				Width = 1920,
+				Height = 1080
 			};
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
@@ -53,8 +53,8 @@ public class ColumnLayoutEngineTests
 			{
 				X = 0,
 				Y = 0,
-				Height = 1920,
-				Width = 1080
+				Width = 1920,
+				Height = 1080
 			};
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
