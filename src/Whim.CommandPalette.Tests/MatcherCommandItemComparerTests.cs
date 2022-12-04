@@ -10,7 +10,12 @@ public class MatcherCommandItemComparerTests
 		Mock<ICommand> command = new();
 		command.SetupGet(c => c.Title).Returns(title);
 
-		return new MatcherCommandItem(new CommandItem(command.Object), Array.Empty<PaletteFilterTextMatch>(), score);
+		return new MatcherCommandItem()
+		{
+			Item = new CommandItem(command.Object),
+			TextSegments = Array.Empty<PaletteFilterTextMatch>(),
+			Score = score
+		};
 	}
 
 	[Fact]

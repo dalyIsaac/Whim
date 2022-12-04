@@ -119,7 +119,15 @@ internal class MonitorManager : IMonitorManager
 		}
 
 		// Trigger MonitorsChanged event.
-		MonitorsChanged?.Invoke(this, new MonitorsChangedEventArgs(unchangedMonitors, removedMonitors, addedMonitors));
+		MonitorsChanged?.Invoke(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				UnchangedMonitors = unchangedMonitors,
+				RemovedMonitors = removedMonitors,
+				AddedMonitors = addedMonitors
+			}
+		);
 	}
 
 	/// <summary>

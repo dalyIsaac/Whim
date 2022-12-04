@@ -17,7 +17,12 @@ internal class Workspace : IWorkspace
 			string oldName = _name;
 			_name = value;
 			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
-				new WorkspaceRenamedEventArgs(this, oldName, _name)
+				new WorkspaceRenamedEventArgs()
+				{
+					Workspace = this,
+					OldName = oldName,
+					NewName = _name
+				}
 			);
 		}
 	}
@@ -170,11 +175,12 @@ internal class Workspace : IWorkspace
 		}
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs(
-				this,
-				_layoutEngines[prevIdx],
-				_layoutEngines[_activeLayoutEngineIndex]
-			)
+			new ActiveLayoutEngineChangedEventArgs()
+			{
+				Workspace = this,
+				PreviousLayoutEngine = _layoutEngines[prevIdx],
+				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
+			}
 		);
 
 		_layoutEngines[prevIdx].HidePhantomWindows();
@@ -221,11 +227,12 @@ internal class Workspace : IWorkspace
 		}
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs(
-				this,
-				_layoutEngines[prevIdx],
-				_layoutEngines[_activeLayoutEngineIndex]
-			)
+			new ActiveLayoutEngineChangedEventArgs()
+			{
+				Workspace = this,
+				PreviousLayoutEngine = _layoutEngines[prevIdx],
+				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
+			}
 		);
 
 		DoLayout();

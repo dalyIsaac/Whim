@@ -98,7 +98,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug($"Adding workspace {workspace}");
 		_workspaces.Add(workspace);
-		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs(workspace));
+		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 	}
 
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
@@ -123,7 +123,7 @@ internal class WorkspaceManager : IWorkspaceManager
 			return false;
 		}
 
-		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs(workspace));
+		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 
 		// Remap windows to the last workspace
 		IWorkspace lastWorkspace = _workspaces[^1];
@@ -184,7 +184,12 @@ internal class WorkspaceManager : IWorkspaceManager
 			oldWorkspace.DoLayout();
 			MonitorWorkspaceChanged?.Invoke(
 				this,
-				new MonitorWorkspaceChangedEventArgs(loserMonitor, oldWorkspace: workspace, newWorkspace: oldWorkspace)
+				new MonitorWorkspaceChangedEventArgs()
+				{
+					Monitor = loserMonitor,
+					OldWorkspace = workspace,
+					NewWorkspace = oldWorkspace
+				}
 			);
 		}
 
@@ -193,7 +198,12 @@ internal class WorkspaceManager : IWorkspaceManager
 		workspace.FocusFirstWindow();
 		MonitorWorkspaceChanged?.Invoke(
 			this,
-			new MonitorWorkspaceChangedEventArgs(focusedMonitor, oldWorkspace, workspace)
+			new MonitorWorkspaceChangedEventArgs()
+			{
+				Monitor = focusedMonitor,
+				OldWorkspace = oldWorkspace,
+				NewWorkspace = workspace
+			}
 		);
 	}
 
