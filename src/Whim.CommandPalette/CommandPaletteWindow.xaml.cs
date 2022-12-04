@@ -145,12 +145,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			{
 				if (_allCommands[idx].Command != command)
 				{
-					_allCommands[idx] = new CommandItem(command, keybind);
+					_allCommands[idx] = new CommandItem() { Command = command, Keybind = keybind };
 				}
 			}
 			else
 			{
-				_allCommands.Add(new CommandItem(command, keybind));
+				_allCommands.Add(new CommandItem() { Command = command, Keybind = keybind });
 			}
 
 			idx++;
@@ -333,17 +333,23 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		int x = (_monitor.Width / 2) - (width / 2);
 		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
 
-		ILocation<int> windowLocation = new Location<int>(
-			x: _monitor.X + x,
-			y: _monitor.Y + y,
-			width: width,
-			height: height
-		);
+		ILocation<int> windowLocation = new Location<int>()
+		{
+			X = _monitor.X + x,
+			Y = _monitor.Y + y,
+			Width = width,
+			Height = height
+		};
 
 		WindowContainer.MaxHeight = height;
 
 		WindowDeferPosHandle.SetWindowPosFixScaling(
-			windowState: new WindowState(_window, windowLocation, WindowSize.Normal),
+			windowState: new WindowState()
+			{
+				Window = _window,
+				Location = windowLocation,
+				WindowSize = WindowSize.Normal
+			},
 			monitorManager: _configContext.MonitorManager,
 			monitor: _monitor,
 			hwndInsertAfter: _window.Handle

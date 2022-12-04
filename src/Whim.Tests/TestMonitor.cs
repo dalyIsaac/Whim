@@ -9,39 +9,75 @@ public class TestMonitor
 	{
 		yield return new object[]
 		{
-			new Location<int>(0, 0, 1920, 1080),
-			new Point<int>(192, 108),
-			new Point<double>(0.1, 0.1)
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 192, Y = 108 },
+			new Point<double>() { X = 0.1, Y = 0.1 }
 		};
 		yield return new object[]
 		{
-			new Location<int>(0, 0, 1920, 1080),
-			new Point<int>(960, 270),
-			new Point<double>(0.5, 0.25)
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 960, Y = 270 },
+			new Point<double>() { X = 0.5, Y = 0.25 }
 		};
 		yield return new object[]
 		{
-			new Location<int>(100, 100, 1920, 1080),
-			new Point<int>(192, 108),
-			new Point<double>(0.1, 0.1)
+			new Location<int>()
+			{
+				X = 100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 192, Y = 108 },
+			new Point<double>() { X = 0.1, Y = 0.1 }
 		};
 		yield return new object[]
 		{
-			new Location<int>(100, 100, 1920, 1080),
-			new Point<int>(960, 270),
-			new Point<double>(0.5, 0.25)
+			new Location<int>()
+			{
+				X = 100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 960, Y = 270 },
+			new Point<double>() { X = 0.5, Y = 0.25 }
 		};
 		yield return new object[]
 		{
-			new Location<int>(-100, 100, 1920, 1080),
-			new Point<int>(192, 108),
-			new Point<double>(0.1, 0.1)
+			new Location<int>()
+			{
+				X = -100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 192, Y = 108 },
+			new Point<double>() { X = 0.1, Y = 0.1 }
 		};
 		yield return new object[]
 		{
-			new Location<int>(-100, 100, 1920, 1080),
-			new Point<int>(960, 270),
-			new Point<double>(0.5, 0.25)
+			new Location<int>()
+			{
+				X = -100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 960, Y = 270 },
+			new Point<double>() { X = 0.5, Y = 0.25 }
 		};
 	}
 
@@ -61,21 +97,75 @@ public class TestMonitor
 	{
 		yield return new object[]
 		{
-			new Location<int>(0, 0, 1920, 1080),
-			new Location<int>(192, 108, 192, 108),
-			new Location<double>(0.1, 0.1, 0.1, 0.1)
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 1920,
+				Height = 1080
+			},
+			new Location<int>()
+			{
+				X = 192,
+				Y = 108,
+				Width = 192,
+				Height = 108
+			},
+			new Location<double>()
+			{
+				X = 0.1,
+				Y = 0.1,
+				Width = 0.1,
+				Height = 0.1
+			}
 		};
 		yield return new object[]
 		{
-			new Location<int>(100, 100, 1920, 1080),
-			new Location<int>(192, 108, 192, 108),
-			new Location<double>(0.1, 0.1, 0.1, 0.1)
+			new Location<int>()
+			{
+				X = 100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Location<int>()
+			{
+				X = 192,
+				Y = 108,
+				Width = 192,
+				Height = 108
+			},
+			new Location<double>()
+			{
+				X = 0.1,
+				Y = 0.1,
+				Width = 0.1,
+				Height = 0.1
+			}
 		};
 		yield return new object[]
 		{
-			new Location<int>(-100, -100, 1920, 1080),
-			new Location<int>(192, 108, 192, 108),
-			new Location<double>(0.1, 0.1, 0.1, 0.1)
+			new Location<int>()
+			{
+				X = -100,
+				Y = -100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Location<int>()
+			{
+				X = 192,
+				Y = 108,
+				Width = 192,
+				Height = 108
+			},
+			new Location<double>()
+			{
+				X = 0.1,
+				Y = 0.1,
+				Width = 0.1,
+				Height = 0.1
+			}
 		};
 	}
 
@@ -95,15 +185,51 @@ public class TestMonitor
 	{
 		yield return new object[]
 		{
-			new Location<int>(0, 0, 1920, 1080),
-			new Location<double>(0.1, 0.1, 0.1, 0.1),
-			new Location<int>(192, 108, 192, 108)
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 1920,
+				Height = 1080
+			},
+			new Location<double>()
+			{
+				X = 0.1,
+				Y = 0.1,
+				Width = 0.1,
+				Height = 0.1
+			},
+			new Location<int>()
+			{
+				X = 192,
+				Y = 108,
+				Width = 192,
+				Height = 108
+			}
 		};
 		yield return new object[]
 		{
-			new Location<int>(100, 100, 1920, 1080),
-			new Location<double>(0.1, 0.1, 0.1, 0.1),
-			new Location<int>(192 + 100, 108 + 100, 192, 108)
+			new Location<int>()
+			{
+				X = 100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Location<double>()
+			{
+				X = 0.1,
+				Y = 0.1,
+				Width = 0.1,
+				Height = 0.1
+			},
+			new Location<int>()
+			{
+				X = 192 + 100,
+				Y = 108 + 100,
+				Width = 192,
+				Height = 108
+			}
 		};
 	}
 
@@ -123,15 +249,27 @@ public class TestMonitor
 	{
 		yield return new object[]
 		{
-			new Location<int>(0, 0, 1920, 1080),
-			new Point<int>(192, 108),
-			new Point<int>(192, 108)
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 192, Y = 108 },
+			new Point<int>() { X = 192, Y = 108 }
 		};
 		yield return new object[]
 		{
-			new Location<int>(100, 100, 1920, 1080),
-			new Point<int>(192, 108),
-			new Point<int>(92, 8)
+			new Location<int>()
+			{
+				X = 100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 192, Y = 108 },
+			new Point<int>() { X = 92, Y = 8 }
 		};
 	}
 

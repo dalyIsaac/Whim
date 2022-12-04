@@ -48,7 +48,7 @@ public partial class App : Application
 		}
 		catch (Exception ex)
 		{
-			_configContext?.Exit(new ExitEventArgs(ExitReason.Error, ex.ToString()));
+			_configContext?.Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = ex.ToString() });
 		}
 	}
 

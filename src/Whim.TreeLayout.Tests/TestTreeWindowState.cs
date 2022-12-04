@@ -97,23 +97,60 @@ internal static class TestTreeWindowState
 	{
 		return new IWindowState[]
 		{
-			new WindowState(leftWindow, Left.Scale(screen), WindowSize.Normal),
-			new WindowState(rightTopLeftTopWindow, RightTopLeftTop.Scale(screen), WindowSize.Normal),
-			new WindowState(rightTopLeftBottomLeftWindow, RightTopLeftBottomLeft.Scale(screen), WindowSize.Normal),
-			new WindowState(
-				rightTopLeftBottomRightTopWindow,
-				RightTopLeftBottomRightTop.Scale(screen),
-				WindowSize.Normal
-			),
-			new WindowState(
-				rightTopLeftBottomRightBottomWindow,
-				RightTopLeftBottomRightBottom.Scale(screen),
-				WindowSize.Normal
-			),
-			new WindowState(rightTopRight1Window, RightTopRight1.Scale(screen), WindowSize.Normal),
-			new WindowState(rightTopRight2Window, RightTopRight2.Scale(screen), WindowSize.Normal),
-			new WindowState(rightTopRight3Window, RightTopRight3.Scale(screen), WindowSize.Normal),
-			new WindowState(rightBottomWindow, RightBottom.Scale(screen), WindowSize.Normal)
+			new WindowState()
+			{
+				Window = leftWindow,
+				Location = Left.Scale(screen),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = rightTopLeftTopWindow,
+				Location = RightTopLeftTop.Scale(screen),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = rightTopLeftBottomLeftWindow,
+				Location = RightTopLeftBottomLeft.Scale(screen),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = rightTopLeftBottomRightTopWindow,
+				Location = RightTopLeftBottomRightTop.Scale(screen),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = rightTopLeftBottomRightBottomWindow,
+				Location = RightTopLeftBottomRightBottom.Scale(screen),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = rightTopRight1Window,
+				Location = RightTopRight1.Scale(screen),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = rightTopRight2Window,
+				Location = RightTopRight2.Scale(screen),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = rightTopRight3Window,
+				Location = RightTopRight3.Scale(screen),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = rightBottomWindow,
+				Location = RightBottom.Scale(screen),
+				WindowSize = WindowSize.Normal
+			}
 		};
 	}
 }

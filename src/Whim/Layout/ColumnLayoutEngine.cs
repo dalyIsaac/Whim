@@ -60,7 +60,18 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 
 		foreach (IWindow window in _stack)
 		{
-			yield return new WindowState(window, new Location<int>(x, y, width, height), WindowSize.Normal);
+			yield return new WindowState()
+			{
+				Window = window,
+				Location = new Location<int>()
+				{
+					X = x,
+					Y = y,
+					Width = width,
+					Height = height
+				},
+				WindowSize = WindowSize.Normal
+			};
 
 			if (LeftToRight)
 			{

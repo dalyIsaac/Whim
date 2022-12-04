@@ -9,16 +9,9 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal record MatcherCommandItem
 {
-	public CommandItem Item { get; }
-	public PaletteFilterTextMatch[] TextSegments { get; }
-	public uint Score { get; }
-
-	public MatcherCommandItem(CommandItem item, PaletteFilterTextMatch[] textSegments, uint score)
-	{
-		Item = item;
-		TextSegments = textSegments;
-		Score = score;
-	}
+	public required CommandItem Item { get; init; }
+	public required PaletteFilterTextMatch[] TextSegments { get; init; }
+	public required uint Score { get; init; }
 
 	public PaletteRowItem ToRowItem()
 	{

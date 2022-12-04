@@ -11,13 +11,5 @@ public class WorkspaceEventArgs : EventArgs
 	/// <summary>
 	/// The workspace that was added or removed.
 	/// </summary>
-	public IWorkspace Workspace { get; }
-
-	/// <summary>
-	/// Creates a new workspace event args.
-	/// </summary>
-	public WorkspaceEventArgs(IWorkspace workspace)
-	{
-		Workspace = workspace;
-	}
+	public required IWorkspace Workspace { get; init; }
 }

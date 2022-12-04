@@ -24,40 +24,43 @@ public class FloatingLayoutCommands : IEnumerable<CommandItem>
 	/// Toggle window floating command.
 	/// </summary>
 	public CommandItem ToggleWindowFloatingCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.toggle_window_floating",
 				title: "Toggle window floating",
 				callback: () => _floatingLayoutPlugin.ToggleWindowFloating()
 			),
-			new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_F)
-		);
+			Keybind = new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_F)
+		};
 
 	/// <summary>
 	/// Mark window as floating command.
 	/// </summary>
 	public CommandItem MarkWindowAsFloatingCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.mark_window_as_floating",
 				title: "Mark window as floating",
 				callback: () => _floatingLayoutPlugin.MarkWindowAsFloating()
 			),
-			new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_M)
-		);
+			Keybind = new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_M)
+		};
 
 	/// <summary>
 	/// Mark window as docked command.
 	/// </summary>
 	public CommandItem MarkWindowAsDockedCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.mark_window_as_docked",
 				title: "Mark window as docked",
 				callback: () => _floatingLayoutPlugin.MarkWindowAsDocked()
 			),
-			new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_D)
-		);
+			Keybind = new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_D)
+		};
 
 	/// <inheritdoc/>
 	public IEnumerator<CommandItem> GetEnumerator()

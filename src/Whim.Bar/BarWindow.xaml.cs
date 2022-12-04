@@ -41,16 +41,18 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		double scaleFactor = _monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
 
-		WindowState = new WindowState(
-			window,
-			new Location<int>(
-				x: _monitor.X,
-				y: _monitor.Y,
-				width: (int)(_monitor.Width / scale),
-				height: _barConfig.Height
-			),
-			WindowSize.Normal
-		);
+		WindowState = new WindowState()
+		{
+			Window = window,
+			Location = new Location<int>()
+			{
+				X = _monitor.X,
+				Y = _monitor.Y,
+				Width = (int)(_monitor.Width / scale),
+				Height = _barConfig.Height
+			},
+			WindowSize = WindowSize.Normal
+		};
 
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
 		Title = "Whim Bar";

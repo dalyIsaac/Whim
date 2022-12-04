@@ -24,53 +24,57 @@ public class GapsCommands : IEnumerable<CommandItem>
 	/// Increase outer gap command.
 	/// </summary>
 	public CommandItem IncreaseOuterGapCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.outer.increase",
 				title: "Increase outer gap",
 				callback: () => _gapsPlugin.UpdateOuterGap(_gapsPlugin.GapsConfig.DefaultOuterDelta)
 			),
-			new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_L)
-		);
+			Keybind = new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_L)
+		};
 
 	/// <summary>
 	/// Decrease outer gap command.
 	/// </summary>
 	public CommandItem DecreaseOuterGapCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.outer.decrease",
 				title: "Decrease outer gap",
 				callback: () => _gapsPlugin.UpdateOuterGap(-_gapsPlugin.GapsConfig.DefaultOuterDelta)
 			),
-			new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_H)
-		);
+			Keybind = new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_H)
+		};
 
 	/// <summary>
 	/// Increase inner gap command.
 	/// </summary>
 	public CommandItem IncreaseInnerGapCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.inner.increase",
 				title: "Increase inner gap",
 				callback: () => _gapsPlugin.UpdateInnerGap(_gapsPlugin.GapsConfig.DefaultInnerDelta)
 			),
-			new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_K)
-		);
+			Keybind = new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_K)
+		};
 
 	/// <summary>
 	/// Decrease inner gap command.
 	/// </summary>
 	public CommandItem DecreaseInnerGapCommand =>
-		new(
-			new Command(
+		new()
+		{
+			Command = new Command(
 				identifier: $"{Name}.inner.decrease",
 				title: "Decrease inner gap",
 				callback: () => _gapsPlugin.UpdateInnerGap(-_gapsPlugin.GapsConfig.DefaultInnerDelta)
 			),
-			new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_J)
-		);
+			Keybind = new Keybind(CoreCommands.WinCtrlShift, VIRTUAL_KEY.VK_J)
+		};
 
 	/// <inheritdoc/>
 	public IEnumerator<CommandItem> GetEnumerator()

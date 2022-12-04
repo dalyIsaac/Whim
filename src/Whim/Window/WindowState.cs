@@ -6,26 +6,13 @@ namespace Whim;
 public class WindowState : IWindowState
 {
 	/// <inheritdoc />
-	public ILocation<int> Location { get; set; }
+	public required ILocation<int> Location { get; set; }
 
 	/// <inheritdoc />
-	public WindowSize WindowSize { get; set; }
+	public required WindowSize WindowSize { get; set; }
 
 	/// <inheritdoc />
-	public IWindow Window { get; }
-
-	/// <summary>
-	/// Creates a new <see cref="WindowState"/>.
-	/// </summary>
-	/// <param name="window">The window in question.</param>
-	/// <param name="location">The location of the window.</param>
-	/// <param name="windowSize">The size of the window.</param>
-	public WindowState(IWindow window, ILocation<int> location, WindowSize windowSize)
-	{
-		Window = window;
-		Location = location;
-		WindowSize = windowSize;
-	}
+	public required IWindow Window { get; init; }
 
 	/// <inheritdoc />
 	public override bool Equals(object? obj)

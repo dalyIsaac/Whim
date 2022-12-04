@@ -31,12 +31,13 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		ILocation<int> focusedWindowLocation = windowLocation.Location;
 		int borderSize = FocusIndicatorConfig.BorderSize;
 
-		ILocation<int> borderLocation = new Location<int>(
-			x: focusedWindowLocation.X - borderSize,
-			y: focusedWindowLocation.Y - borderSize,
-			height: focusedWindowLocation.Height + (borderSize * 2),
-			width: focusedWindowLocation.Width + (borderSize * 2)
-		);
+		ILocation<int> borderLocation = new Location<int>()
+		{
+			X = focusedWindowLocation.X - borderSize,
+			Y = focusedWindowLocation.Y - borderSize,
+			Height = focusedWindowLocation.Height + (borderSize * 2),
+			Width = focusedWindowLocation.Width + (borderSize * 2)
+		};
 
 		this.SetIsShownInSwitchers(false);
 
@@ -48,7 +49,12 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		);
 
 		WindowDeferPosHandle.SetWindowPosFixScaling(
-			windowState: new WindowState(_window, borderLocation, WindowSize.Normal),
+			windowState: new WindowState()
+			{
+				Window = _window,
+				Location = borderLocation,
+				WindowSize = WindowSize.Normal
+			},
 			monitorManager: _configContext.MonitorManager,
 			monitor: _configContext.MonitorManager.FocusedMonitor,
 			hwndInsertAfter: new HWND(1)

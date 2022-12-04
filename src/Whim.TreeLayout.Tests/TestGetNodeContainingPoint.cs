@@ -20,7 +20,7 @@ public class TestGetNodeContainingPoint
 	[Theory]
 	public void Outside(double x, double y)
 	{
-		IPoint<double> searchPoint = new Point<double>(x, y);
+		IPoint<double> searchPoint = new Point<double>() { X = x, Y = y };
 
 		Assert.Null(TreeLayoutEngine.GetNodeContainingPoint(root: _testTree.Root, rootLocation, searchPoint));
 	}
@@ -33,7 +33,7 @@ public class TestGetNodeContainingPoint
 	[Theory]
 	public void Left(double x, double y)
 	{
-		IPoint<double> searchPoint = new Point<double>(x, y);
+		IPoint<double> searchPoint = new Point<double>() { X = x, Y = y };
 
 		Assert.Same(
 			_testTree.Left,
@@ -49,7 +49,7 @@ public class TestGetNodeContainingPoint
 	[Theory]
 	public void RightTopLeftBottomRightTop(double x, double y)
 	{
-		IPoint<double> searchPoint = new Point<double>(x, y);
+		IPoint<double> searchPoint = new Point<double>() { X = x, Y = y };
 
 		Assert.Same(
 			_testTree.RightTopLeftBottomRightTop,
@@ -65,7 +65,7 @@ public class TestGetNodeContainingPoint
 	[Theory]
 	public void RightTopLeftBottomRightBottom(double x, double y)
 	{
-		IPoint<double> searchPoint = new Point<double>(x, y);
+		IPoint<double> searchPoint = new Point<double>() { X = x, Y = y };
 
 		Assert.Same(
 			_testTree.RightTopLeftBottomRightBottom,

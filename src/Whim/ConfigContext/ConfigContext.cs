@@ -66,7 +66,7 @@ internal class ConfigContext : IConfigContext
 	public void Exit(ExitEventArgs? args = null)
 	{
 		Logger.Debug("Exiting config context...");
-		args ??= new ExitEventArgs(ExitReason.User);
+		args ??= new ExitEventArgs() { Reason = ExitReason.User };
 
 		Exiting?.Invoke(this, args);
 

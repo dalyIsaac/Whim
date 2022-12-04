@@ -311,12 +311,13 @@ public static class Win32Helper
 				return new Location<int>();
 			}
 
-			return new Location<int>(
-				x: windowRect.left - extendedFrameLocation.X,
-				y: windowRect.top - extendedFrameLocation.Y,
-				width: windowRect.right - windowRect.left - extendedFrameLocation.Width,
-				height: windowRect.bottom - windowRect.top - extendedFrameLocation.Height
-			);
+			return new Location<int>()
+			{
+				X = windowRect.left - extendedFrameLocation.X,
+				Y = windowRect.top - extendedFrameLocation.Y,
+				Width = windowRect.right - windowRect.left - extendedFrameLocation.Width,
+				Height = windowRect.bottom - windowRect.top - extendedFrameLocation.Height
+			};
 		}
 	}
 
@@ -344,12 +345,13 @@ public static class Win32Helper
 				return null;
 			}
 
-			return new Location<int>(
-				x: extendedFrameRect.left,
-				y: extendedFrameRect.top,
-				width: extendedFrameRect.right - extendedFrameRect.left,
-				height: extendedFrameRect.bottom - extendedFrameRect.top
-			);
+			return new Location<int>()
+			{
+				X = extendedFrameRect.left,
+				Y = extendedFrameRect.top,
+				Width = extendedFrameRect.right - extendedFrameRect.left,
+				Height = extendedFrameRect.bottom - extendedFrameRect.top
+			};
 		}
 	}
 

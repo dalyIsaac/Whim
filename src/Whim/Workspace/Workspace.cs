@@ -17,7 +17,12 @@ internal class Workspace : IWorkspace
 			string oldName = _name;
 			_name = value;
 			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
-				new WorkspaceRenamedEventArgs(this, oldName, _name)
+				new WorkspaceRenamedEventArgs()
+				{
+					Workspace = this,
+					OldName = oldName,
+					NewName = _name
+				}
 			);
 		}
 	}
@@ -76,7 +81,13 @@ internal class Workspace : IWorkspace
 
 		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
 		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
-			new Location<int>(0, 0, monitor.Width, monitor.Height),
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = monitor.Width,
+				Height = monitor.Height
+			},
 			monitor
 		);
 
@@ -90,12 +101,13 @@ internal class Workspace : IWorkspace
 			}
 
 			// Adjust the window location to the monitor's coordinates
-			loc.Location = new Location<int>(
-				x: loc.Location.X + monitor.X,
-				y: loc.Location.Y + monitor.Y,
-				width: loc.Location.Width,
-				height: loc.Location.Height
-			);
+			loc.Location = new Location<int>()
+			{
+				X = loc.Location.X + monitor.X,
+				Y = loc.Location.Y + monitor.Y,
+				Width = loc.Location.Width,
+				Height = loc.Location.Height
+			};
 
 			Logger.Verbose($"{loc.Window} at {loc.Location}");
 			handle.DeferWindowPos(loc);
@@ -170,11 +182,12 @@ internal class Workspace : IWorkspace
 		}
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs(
-				this,
-				_layoutEngines[prevIdx],
-				_layoutEngines[_activeLayoutEngineIndex]
-			)
+			new ActiveLayoutEngineChangedEventArgs()
+			{
+				Workspace = this,
+				PreviousLayoutEngine = _layoutEngines[prevIdx],
+				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
+			}
 		);
 
 		_layoutEngines[prevIdx].HidePhantomWindows();
@@ -221,11 +234,12 @@ internal class Workspace : IWorkspace
 		}
 
 		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs(
-				this,
-				_layoutEngines[prevIdx],
-				_layoutEngines[_activeLayoutEngineIndex]
-			)
+			new ActiveLayoutEngineChangedEventArgs()
+			{
+				Workspace = this,
+				PreviousLayoutEngine = _layoutEngines[prevIdx],
+				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
+			}
 		);
 
 		DoLayout();

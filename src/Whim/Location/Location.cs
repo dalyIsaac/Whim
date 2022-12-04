@@ -7,34 +7,16 @@ namespace Whim;
 public record Location<T> : ILocation<T>, IEquatable<Location<T>> where T : INumber<T>
 {
 	/// <inheritdoc />
-	public T X { get; set; }
+	public T X { get; set; } = T.Zero;
 
 	/// <inheritdoc />
-	public T Y { get; set; }
+	public T Y { get; set; } = T.Zero;
 
 	/// <inheritdoc />
-	public T Width { get; set; }
+	public T Width { get; set; } = T.Zero;
 
 	/// <inheritdoc />
-	public T Height { get; set; }
-
-	/// <inheritdoc />
-	public Location()
-	{
-		X = T.Zero;
-		Y = T.Zero;
-		Width = T.Zero;
-		Height = T.Zero;
-	}
-
-	/// <inheritdoc />
-	public Location(T x, T y, T width, T height)
-	{
-		X = x;
-		Y = y;
-		Width = width;
-		Height = height;
-	}
+	public T Height { get; set; } = T.Zero;
 
 	/// <inheritdoc />
 	public bool IsPointInside(IPoint<T> point) =>

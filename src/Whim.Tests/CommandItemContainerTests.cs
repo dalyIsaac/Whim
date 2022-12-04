@@ -318,9 +318,9 @@ public class CommandItemsTests
 		Assert.Equal(4, commands.Count);
 
 		// Check that each of the command-keybind pairs are in the list.
-		Assert.Contains(new CommandItem(command.Object, keybind), commands);
-		Assert.Contains(new CommandItem(command2.Object, null), commands);
-		Assert.Contains(new CommandItem(command3.Object, null), commands);
-		Assert.Contains(new CommandItem(command4.Object, keybind4), commands);
+		Assert.Contains(new CommandItem() { Command = command.Object, Keybind = keybind }, commands);
+		Assert.Contains(new CommandItem() { Command = command2.Object }, commands);
+		Assert.Contains(new CommandItem() { Command = command3.Object }, commands);
+		Assert.Contains(new CommandItem() { Command = command4.Object, Keybind = keybind4 }, commands);
 	}
 }
