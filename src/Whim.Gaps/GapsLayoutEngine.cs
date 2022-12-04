@@ -31,7 +31,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 		int doubleOuterGap = outerGap * 2;
 		int doubleInnerGap = innerGap * 2;
 
-		Location proxiedLocation =
+		Location<int> proxiedLocation =
 			new(
 				x: location.X + outerGap,
 				y: location.Y + outerGap,
@@ -43,7 +43,7 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 		{
 			yield return new WindowState(
 				window: loc.Window,
-				location: new Location(
+				location: new Location<int>(
 					x: loc.Location.X + innerGap,
 					y: loc.Location.Y + innerGap,
 					width: loc.Location.Width - doubleInnerGap,

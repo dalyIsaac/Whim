@@ -31,7 +31,14 @@ public partial class TreeLayoutEngine
 
 		SplitNode parent = splitNode;
 
-		DoubleLocation childLocation = new(rootLocation);
+		Location<double> childLocation =
+			new()
+			{
+				X = rootLocation.X,
+				Y = rootLocation.Y,
+				Width = rootLocation.Width,
+				Height = rootLocation.Height
+			};
 
 		foreach ((double weight, Node child) in parent)
 		{
@@ -79,9 +86,9 @@ public partial class TreeLayoutEngine
 	/// <param name="node">The node to get the location for.</param>
 	/// <param name="location">A location to scale the node's location to.</param>
 	/// <returns>Location of the node. Used for recursion.</returns>
-	public static ILocation<double> GetNodeLocation(Node node, DoubleLocation? location = null)
+	public static ILocation<double> GetNodeLocation(Node node, Location<double>? location = null)
 	{
-		location ??= new DoubleLocation()
+		location ??= new Location<double>()
 		{
 			X = 0,
 			Y = 0,

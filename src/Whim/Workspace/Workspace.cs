@@ -76,7 +76,7 @@ internal class Workspace : IWorkspace
 
 		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
 		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
-			new Location(0, 0, monitor.Width, monitor.Height),
+			new Location<int>(0, 0, monitor.Width, monitor.Height),
 			monitor
 		);
 
@@ -90,7 +90,7 @@ internal class Workspace : IWorkspace
 			}
 
 			// Adjust the window location to the monitor's coordinates
-			loc.Location = new Location(
+			loc.Location = new Location<int>(
 				x: loc.Location.X + monitor.X,
 				y: loc.Location.Y + monitor.Y,
 				width: loc.Location.Width,

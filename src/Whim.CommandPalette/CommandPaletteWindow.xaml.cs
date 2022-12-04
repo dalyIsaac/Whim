@@ -333,7 +333,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		int x = (_monitor.Width / 2) - (width / 2);
 		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
 
-		ILocation<int> windowLocation = new Location(
+		ILocation<int> windowLocation = new Location<int>(
 			x: _monitor.X + x,
 			y: _monitor.Y + y,
 			width: width,

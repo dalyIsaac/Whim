@@ -6,7 +6,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 namespace Whim;
 
 /// <inheritdoc />
-public class Keybind : IKeybind
+public readonly struct Keybind : IKeybind, IEquatable<Keybind>
 {
 	/// <inheritdoc />
 	public KeyModifiers Modifiers { get; }
@@ -43,14 +43,21 @@ public class Keybind : IKeybind
 	}
 
 	/// <inheritdoc />
-	public override bool Equals(object? obj)
-	{
-		if (obj == null || GetType() != obj.GetType())
-		{
-			return false;
-		}
+	public override bool Equals(object? obj) => obj is Keybind keybind && Equals(keybind);
 
-		return obj is Keybind keybind && Modifiers == keybind.Modifiers && Key == keybind.Key;
+	/// <inheritdoc />
+	public bool Equals(Keybind other) => Modifiers == other.Modifiers && Key == other.Key;
+
+	/// <inheritdoc />
+	public static bool operator ==(Keybind left, Keybind right)
+	{
+		return left.Equals(right);
+	}
+
+	/// <inheritdoc />
+	public static bool operator !=(Keybind left, Keybind right)
+	{
+		return !(left == right);
 	}
 
 	/// <inheritdoc />

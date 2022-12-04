@@ -72,7 +72,7 @@ public static class MonitorHelpers
 		double y = Math.Abs((double)location.Y / monitor.Height);
 		double width = Math.Abs((double)location.Width / monitor.Width);
 		double height = Math.Abs((double)location.Height / monitor.Height);
-		return new DoubleLocation(x, y, width, height);
+		return new Location<double>(x, y, width, height);
 	}
 
 	/// <summary>
@@ -84,7 +84,7 @@ public static class MonitorHelpers
 	/// <returns>The converted location.</returns>
 	public static ILocation<int> ToMonitor(this ILocation<int> monitor, ILocation<double> location)
 	{
-		return new Location(
+		return new Location<int>(
 			x: Math.Abs(Convert.ToInt32(monitor.X + (location.X * monitor.Width))),
 			y: Math.Abs(Convert.ToInt32(monitor.Y + (location.Y * monitor.Height))),
 			width: Math.Abs(Convert.ToInt32(location.Width * monitor.Width)),
