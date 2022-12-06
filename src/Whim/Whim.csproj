@@ -32,7 +32,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.4.0" />
 		<PackageReference Include="Microsoft.Win32.SystemEvents" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta">
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.162-beta">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221116.1" />
