@@ -73,7 +73,7 @@ public static class WindowExtensions
 		UIElementExtensions.InitializeComponent(uiWindow, componentNamespace, componentPath);
 
 		HWND hwnd = new(WinRT.Interop.WindowNative.GetWindowHandle(uiWindow));
-		IWindow? window = IWindow.CreateWindow(GetHandle(uiWindow), configContext);
+		IWindow? window = IWindow.CreateWindow(configContext, GetHandle(uiWindow));
 		if (window == null)
 		{
 			throw new InitializeWindowException("Window was unexpectedly null");

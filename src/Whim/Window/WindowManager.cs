@@ -257,7 +257,7 @@ internal class WindowManager : IWindowManager
 			return null;
 		}
 
-		IWindow? window = IWindow.CreateWindow(hwnd, _configContext);
+		IWindow? window = IWindow.CreateWindow(_configContext, hwnd);
 
 		if (window == null)
 		{

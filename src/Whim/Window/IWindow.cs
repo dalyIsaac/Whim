@@ -1,4 +1,3 @@
-using System;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -127,18 +126,9 @@ public interface IWindow
 	/// </summary>
 	/// <param name="hwnd">The handle of the window.</param>
 	/// <param name="configContext">The configuration context.</param>
-	public static IWindow? CreateWindow(HWND hwnd, IConfigContext configContext)
+	public static IWindow? CreateWindow(IConfigContext configContext, HWND hwnd)
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
-
-		try
-		{
-			return new Window(hwnd, configContext);
-		}
-		catch (Exception e)
-		{
-			Logger.Error($"Could not create a Window instance for {hwnd.Value}, {e.Message}");
-			return null;
-		}
+		return Window.CreateWindow(configContext, hwnd);
 	}
 }
