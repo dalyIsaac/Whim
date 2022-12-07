@@ -80,7 +80,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	}
 
 	/// <inheritdoc/>
-	IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	/// <summary>
 	/// Action to focus the last focused window in the specified direction command.
