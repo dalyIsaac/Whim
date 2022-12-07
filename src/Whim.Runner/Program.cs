@@ -7,12 +7,12 @@ namespace Whim.Runner;
 /// <summary>
 /// This is the entry point for Whim.
 /// </summary>
-public static class Program
+public static partial class Program
 {
-	[global::System.Runtime.InteropServices.DllImport("Microsoft.ui.xaml.dll")]
+	[System.Runtime.InteropServices.LibraryImport("Microsoft.ui.xaml.dll")]
 	// The following can be fixed at some later time.
 #pragma warning disable CA5392 // Use DefaultDllImportSearchPaths attribute for P/Invokes
-	private static extern void XamlCheckProcessRequirements();
+	private static partial void XamlCheckProcessRequirements();
 #pragma warning restore CA5392 // Use DefaultDllImportSearchPaths attribute for P/Invokes
 
 	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler", " 1.0.0.0")]
