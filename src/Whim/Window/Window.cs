@@ -12,7 +12,7 @@ internal class Window : IWindow
 	private readonly IConfigContext _configContext;
 
 	/// <inheritdoc/>
-	public HWND Handle { get; }
+	public required HWND Handle { get; init; }
 
 	/// <inheritdoc/>
 	public string Title => Win32Helper.GetWindowText(Handle);
@@ -47,13 +47,13 @@ internal class Window : IWindow
 	}
 
 	/// <inheritdoc/>
-	public int ProcessId { get; }
+	public required int ProcessId { get; init; }
 
 	/// <inheritdoc/>
-	public string ProcessFileName { get; }
+	public required string ProcessFileName { get; init; }
 
 	/// <inheritdoc/>
-	public string ProcessName { get; }
+	public required string ProcessName { get; init; }
 
 	/// <inheritdoc/>
 	public bool IsFocused => PInvoke.GetForegroundWindow() == Handle;
@@ -164,26 +164,38 @@ internal class Window : IWindow
 	/// <summary>
 	/// Constructor for the <see cref="IWindow"/> implementation.
 	/// </summary>
-	/// <param name="hwnd"></param>
 	/// <param name="configContext"></param>
 	/// <exception cref="Win32Exception"></exception>
-	internal Window(HWND hwnd, IConfigContext configContext)
+	private Window(IConfigContext configContext)
 	{
 		_configContext = configContext;
-		Handle = hwnd;
+	}
+
+	/// <summary>
+	/// Tries to create a new <see cref="IWindow"/> with the given <paramref name="hwnd"/>.
+	/// Otherwise, returns <see langword="null"/>.
+	/// </summary>
+	/// <param name="configContext"></param>
+	/// <param name="hwnd">The handle of the window.</param>
+	/// <returns></returns>
+	public static IWindow? CreateWindow(IConfigContext configContext, HWND hwnd)
+	{
+		int processId;
+		string processName;
+		string processFileName;
 		unsafe
 		{
 			uint pid;
-			_ = PInvoke.GetWindowThreadProcessId(Handle, &pid);
-			ProcessId = (int)pid;
+			_ = PInvoke.GetWindowThreadProcessId(hwnd, &pid);
+			processId = (int)pid;
 		}
 
-		Process process = Process.GetProcessById(ProcessId);
-		ProcessName = process.ProcessName;
+		Process process = Process.GetProcessById(processId);
+		processName = process.ProcessName;
 
 		try
 		{
-			ProcessFileName = Path.GetFileName(process.MainModule?.FileName) ?? "--NA--";
+			processFileName = Path.GetFileName(process.MainModule?.FileName) ?? "--NA--";
 		}
 		catch (Win32Exception ex)
 		{
@@ -191,13 +203,17 @@ internal class Window : IWindow
 			// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process?view=net-6.0#remarks
 			// The exception will usually have a message of:
 			// "Unable to enumerate the process modules."
-			ProcessFileName = "--NA--";
-			Logger.Debug($"Failed to get process filename for process {ProcessId}");
-
-			// We throw the exception here to implicitly ignore this process.
-			throw ex;
+			Logger.Error($"Could not create a Window instance for {hwnd.Value}, {ex.Message}");
+			return null;
 		}
-		;
+
+		return new Window(configContext)
+		{
+			Handle = hwnd,
+			ProcessId = processId,
+			ProcessName = processName,
+			ProcessFileName = processFileName,
+		};
 	}
 
 	/// <inheritdoc/>

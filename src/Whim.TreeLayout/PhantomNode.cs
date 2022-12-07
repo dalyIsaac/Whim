@@ -33,7 +33,7 @@ public class PhantomNode : LeafNode
 	{
 		PhantomWindow phantomWindow = new();
 
-		IWindow? windowModel = IWindow.CreateWindow(phantomWindow.GetHandle(), configContext);
+		IWindow? windowModel = IWindow.CreateWindow(configContext, phantomWindow.GetHandle());
 
 		if (windowModel == null)
 		{
