@@ -21,6 +21,7 @@ internal class ConfigContext : IConfigContext
 	public IFilterManager FilterManager { get; private set; }
 	public ICommandManager CommandManager { get; private set; }
 	public IPluginManager PluginManager { get; private set; }
+	public INativeManager NativeManager { get; private set; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
@@ -38,6 +39,7 @@ internal class ConfigContext : IConfigContext
 		WorkspaceManager = new WorkspaceManager(this);
 		CommandManager = new CommandManager(this);
 		PluginManager = new PluginManager(this);
+		NativeManager = new NativeManager(this);
 	}
 
 	public void Initialize()
