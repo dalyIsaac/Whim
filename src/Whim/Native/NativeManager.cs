@@ -26,86 +26,83 @@ public class NativeManager : INativeManager
 
 	private const int _bufferCapacity = 255;
 
-	/// <inheritdoc />
-	public static void QuitWindow(IWindow window)
+	/// <inheritdoc/>
+	public void QuitWindow(HWND hwnd)
 	{
-		Logger.Debug($"Quitting window {window} with handle {window.Handle.Value}");
-		PInvoke.SendNotifyMessage(window.Handle, PInvoke.WM_SYSCOMMAND, new WPARAM(PInvoke.SC_CLOSE), 0);
-	}
-
-	/// <inheritdoc />
-	public static void ForceForegroundWindow(IWindow window)
-	{
-		Logger.Debug($"Forcing window {window} with handle {window.Handle.Value} to foreground");
-		// Implementation courtesy of https://github.com/workspacer/workspacer/commit/1c02613cea485f1ae97f70d6399f7124aeb31297
-		// keybd_event synthesizes a keystroke - see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-keybd_event
-		PInvoke.keybd_event(0, 0, 0, 0);
-		PInvoke.SetForegroundWindow(window.Handle);
+		Logger.Debug($"Quitting application with HWND {hwnd.Value}");
+		PInvoke.SendNotifyMessage(hwnd, PInvoke.WM_SYSCOMMAND, new WPARAM(PInvoke.SC_CLOSE), 0);
 	}
 
 	/// <inheritdoc/>
-	public static bool HideWindow(IWindow window)
+	public void ForceForegroundWindow(HWND hwnd)
 	{
-		Logger.Debug($"Hiding window {window} with handle {window.Handle.Value}");
-		return (bool)PInvoke.ShowWindow(window.Handle, SHOW_WINDOW_CMD.SW_HIDE);
+		Logger.Debug($"Forcing window HWND {hwnd.Value} to foreground");
+		// Implementation courtesy of https://github.com/workspacer/workspacer/commit/1c02613cea485f1ae97f70d6399f7124aeb31297
+		// keybd_event synthesizes a keystroke - see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-keybd_event
+		PInvoke.keybd_event(0, 0, 0, 0);
+		PInvoke.SetForegroundWindow(hwnd);
 	}
 
-	/// <inheritdoc />
-	public static bool ShowWindowMaximized(IWindow window)
+	/// <inheritdoc/>
+	public bool HideWindow(HWND hwnd)
 	{
-		Logger.Debug($"Showing window {window} with handle {window.Handle.Value} maximized");
-		return (bool)PInvoke.ShowWindow(window.Handle, SHOW_WINDOW_CMD.SW_SHOWMAXIMIZED);
+		Logger.Debug($"Hiding window HWND {hwnd.Value}");
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_HIDE);
 	}
 
-	/// <inheritdoc />
-	public static bool ShowWindowMinimized(IWindow window)
+	/// <inheritdoc/>
+	public bool ShowWindowMaximized(HWND hwnd)
 	{
-		Logger.Debug($"Showing window {window} with handle {window.Handle.Value} minimized");
-		return (bool)PInvoke.ShowWindow(window.Handle, SHOW_WINDOW_CMD.SW_SHOWMINIMIZED);
+		Logger.Debug($"Showing window HWND {hwnd.Value} maximized");
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMAXIMIZED);
 	}
 
-	/// <inheritdoc />
-	public static bool MinimizeWindow(IWindow window)
+	/// <inheritdoc/>
+	public bool ShowWindowMinimized(HWND hwnd)
 	{
-		Logger.Debug($"Minimizing window {window} with handle {window.Handle.Value}");
-		return (bool)PInvoke.ShowWindow(window.Handle, SHOW_WINDOW_CMD.SW_MINIMIZE);
+		Logger.Debug($"Showing window HWND {hwnd.Value} minimized");
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMINIMIZED);
 	}
 
-	/// <inheritdoc />
-	public static bool ShowWindowNoActivate(IWindow window)
+	/// <inheritdoc/>
+	public bool MinimizeWindow(HWND hwnd)
 	{
-		Logger.Debug($"Showing window {window} with handle {window.Handle.Value} no activate");
-		return (bool)PInvoke.ShowWindow(window.Handle, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
+		Logger.Debug($"Minimizing window HWND {hwnd.Value}");
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_MINIMIZE);
 	}
 
-	/// <inheritdoc />
-	public static UnhookWinEventSafeHandle SetWindowsEventHook(
-		uint eventMin,
-		uint eventMax,
-		WINEVENTPROC lpfnWinEventProc
-	) => PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
+	/// <inheritdoc/>
+	public bool ShowWindowNoActivate(HWND hwnd)
+	{
+		Logger.Debug($"Showing window HWND {hwnd.Value} no activate");
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
+	}
 
-	/// <inheritdoc />
-	public static string GetClassName(IWindow window)
+	/// <inheritdoc/>
+	public UnhookWinEventSafeHandle SetWindowsEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc) =>
+		PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
+
+	/// <inheritdoc/>
+	public string GetClassName(HWND hwnd)
 	{
 		unsafe
 		{
 			fixed (char* buffer = new char[_bufferCapacity])
 			{
-				int length = PInvoke.GetClassName(window.Handle, buffer, _bufferCapacity + 1);
+				int length = PInvoke.GetClassName(hwnd, buffer, _bufferCapacity + 1);
 				return length > 0 ? new string(buffer) : "";
 			}
 		}
 	}
 
-	/// <inheritdoc />
-	public static string GetWindowText(IWindow window)
+	/// <inheritdoc/>
+	public string GetWindowText(HWND hwnd)
 	{
 		unsafe
 		{
 			fixed (char* buffer = new char[_bufferCapacity])
 			{
-				int length = PInvoke.GetWindowText(window.Handle, buffer, _bufferCapacity + 1);
+				int length = PInvoke.GetWindowText(hwnd, buffer, _bufferCapacity + 1);
 				return length > 0 ? new string(buffer) : "";
 			}
 		}
@@ -113,10 +110,10 @@ public class NativeManager : INativeManager
 
 	private const string _splashClassName = "MsoSplash";
 
-	/// <inheritdoc />
-	public static bool IsSplashScreen(IWindow window)
+	/// <inheritdoc/>
+	public bool IsSplashScreen(HWND hwnd)
 	{
-		string classname = GetClassName(window);
+		string classname = GetClassName(hwnd);
 		if (classname.Length == 0)
 		{
 			return false;
@@ -125,19 +122,16 @@ public class NativeManager : INativeManager
 		return classname == _splashClassName;
 	}
 
-	/// <inheritdoc />
-	public static bool IsStandardWindow(IWindow window)
+	/// <inheritdoc/>
+	public bool IsStandardWindow(HWND hwnd)
 	{
-		if (
-			PInvoke.GetAncestor(window.Handle, GET_ANCESTOR_FLAGS.GA_ROOT) != window.Handle.Value
-			|| !PInvoke.IsWindowVisible(window.Handle)
-		)
+		if (PInvoke.GetAncestor(hwnd, GET_ANCESTOR_FLAGS.GA_ROOT) != hwnd || !PInvoke.IsWindowVisible(hwnd))
 		{
 			return false;
 		}
 
-		uint style = (uint)PInvoke.GetWindowLong(window.Handle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
-		uint exStyle = (uint)PInvoke.GetWindowLong(window.Handle, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+		uint style = (uint)PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+		uint exStyle = (uint)PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
 
 		// WS_POPUP need to have a border or minimize/maximize buttons,
 		// otherwise the window is "not interesting"
@@ -160,8 +154,8 @@ public class NativeManager : INativeManager
 			return false;
 		}
 
-		string className = GetClassName(window);
-		if (IsSystemWindow(window, className))
+		string className = GetClassName(hwnd);
+		if (IsSystemWindow(hwnd, className))
 		{
 			return false;
 		}
@@ -169,24 +163,24 @@ public class NativeManager : INativeManager
 		return true;
 	}
 
-	/// <inheritdoc />
-	public static void HideCaptionButtons(IWindow window)
+	/// <inheritdoc/>
+	public void HideCaptionButtons(HWND hwnd)
 	{
-		int style = PInvoke.GetWindowLong(window.Handle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+		int style = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
 
 		// Hide the title bar and caption buttons
 		style &= ~(int)WINDOW_STYLE.WS_CAPTION & ~(int)WINDOW_STYLE.WS_THICKFRAME;
 
-		_ = PInvoke.SetWindowLong(window.Handle, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
+		_ = PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
 	}
 
-	private static readonly HashSet<string> _systemClasses =
+	private readonly HashSet<string> _systemClasses =
 		new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
 
-	/// <inheritdoc />
-	public static bool IsSystemWindow(IWindow window, string className)
+	/// <inheritdoc/>
+	public bool IsSystemWindow(HWND hwnd, string className)
 	{
-		if (window.Handle.Value == PInvoke.GetDesktopWindow() || window.Handle.Value == PInvoke.GetShellWindow())
+		if (hwnd == PInvoke.GetDesktopWindow() || hwnd == PInvoke.GetShellWindow())
 		{
 			return true;
 		}
@@ -199,10 +193,10 @@ public class NativeManager : INativeManager
 		return false;
 	}
 
-	/// <inheritdoc />
-	public static bool HasNoVisibleOwner(IWindow window)
+	/// <inheritdoc/>
+	public bool HasNoVisibleOwner(HWND hwnd)
 	{
-		HWND owner = PInvoke.GetWindow(window.Handle, GET_WINDOW_CMD.GW_OWNER);
+		HWND owner = PInvoke.GetWindow(hwnd, GET_WINDOW_CMD.GW_OWNER);
 
 		// The following warning was disabled, since GetWindow can return null, per
 		// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindow
@@ -227,15 +221,15 @@ public class NativeManager : INativeManager
 		return rect.top == rect.bottom || rect.left == rect.right;
 	}
 
-	/// <inheritdoc />
-	public static bool IsCloakedWindow(IWindow window)
+	/// <inheritdoc/>
+	public bool IsCloakedWindow(HWND hwnd)
 	{
 		unsafe
 		{
 			int cloaked;
 			HRESULT res = PInvoke.DwmGetWindowAttribute(
-				window.Handle,
-				DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
+				hwnd,
+				Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
 				&cloaked,
 				sizeof(int)
 			);
@@ -243,17 +237,17 @@ public class NativeManager : INativeManager
 		}
 	}
 
-	/// <inheritdoc />
-	public static ILocation<int> GetWindowOffset(IWindow window)
+	/// <inheritdoc/>
+	public ILocation<int> GetWindowOffset(HWND hwnd)
 	{
-		if (!PInvoke.GetWindowRect(window.Handle, out RECT windowRect))
+		if (!PInvoke.GetWindowRect(hwnd, out RECT windowRect))
 		{
-			Logger.Error($"Could not get the window rect for {window.Handle.Value}");
+			Logger.Error($"Could not get the window rect for {hwnd.Value}");
 			return new Location<int>();
 		}
 		unsafe
 		{
-			ILocation<int>? extendedFrameLocation = DwmGetWindowLocation(window);
+			ILocation<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
 			if (extendedFrameLocation == null)
 			{
 				return new Location<int>();
@@ -269,15 +263,15 @@ public class NativeManager : INativeManager
 		}
 	}
 
-	/// <inheritdoc />
-	public static ILocation<int>? DwmGetWindowLocation(IWindow window)
+	/// <inheritdoc/>
+	public ILocation<int>? DwmGetWindowLocation(HWND hwnd)
 	{
 		unsafe
 		{
 			RECT extendedFrameRect = new();
 			uint size = (uint)Marshal.SizeOf<RECT>();
 			HRESULT res = PInvoke.DwmGetWindowAttribute(
-				window.Handle,
+				hwnd,
 				DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
 				&extendedFrameRect,
 				size
@@ -285,7 +279,7 @@ public class NativeManager : INativeManager
 
 			if (res.Failed)
 			{
-				Logger.Error($"Could not get the extended frame rect for {window.Handle.Value}");
+				Logger.Error($"Could not get the extended frame rect for {hwnd.Value}");
 				return null;
 			}
 
@@ -299,29 +293,29 @@ public class NativeManager : INativeManager
 		}
 	}
 
-	/// <inheritdoc />
-	public static void SetWindowCorners(
-		IWindow window,
+	/// <inheritdoc/>
+	public void SetWindowCorners(
+		HWND hwnd,
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND
 	)
 	{
 		unsafe
 		{
 			HRESULT res = PInvoke.DwmSetWindowAttribute(
-				window.Handle,
+				hwnd,
 				DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
 				&preference,
 				sizeof(DWM_WINDOW_CORNER_PREFERENCE)
 			);
 			if (res.Failed)
 			{
-				Logger.Error($"Failed to set window corners for {window.Handle.Value}");
+				Logger.Error($"Failed to set window corners for {hwnd.Value}");
 			}
 		}
 	}
 
-	/// <inheritdoc />
-	public static IEnumerable<HWND> GetAllWindows()
+	/// <inheritdoc/>
+	public IEnumerable<HWND> GetAllWindows()
 	{
 		List<HWND> windows = new();
 

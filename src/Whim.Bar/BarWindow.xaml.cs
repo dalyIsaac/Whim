@@ -56,7 +56,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
 		Title = "Whim Bar";
-		Win32Helper.HideCaptionButtons(WindowState.Window.Handle);
+		_configContext.NativeManager.HideCaptionButtons(WindowState.Window.Handle);
 		this.SetIsShownInSwitchers(false);
 
 		// Set up the bar.

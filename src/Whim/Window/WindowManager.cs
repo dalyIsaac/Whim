@@ -54,32 +54,32 @@ internal class WindowManager : IWindowManager
 		Logger.Debug("Initializing window manager...");
 
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
-		_addedHooks[0] = Win32Helper.SetWindowsEventHook(
+		_addedHooks[0] = _configContext.NativeManager.SetWindowsEventHook(
 			PInvoke.EVENT_OBJECT_DESTROY,
 			PInvoke.EVENT_OBJECT_HIDE,
 			_hookDelegate
 		);
-		_addedHooks[1] = Win32Helper.SetWindowsEventHook(
+		_addedHooks[1] = _configContext.NativeManager.SetWindowsEventHook(
 			PInvoke.EVENT_OBJECT_CLOAKED,
 			PInvoke.EVENT_OBJECT_UNCLOAKED,
 			_hookDelegate
 		);
-		_addedHooks[2] = Win32Helper.SetWindowsEventHook(
+		_addedHooks[2] = _configContext.NativeManager.SetWindowsEventHook(
 			PInvoke.EVENT_SYSTEM_MOVESIZESTART,
 			PInvoke.EVENT_SYSTEM_MOVESIZEEND,
 			_hookDelegate
 		);
-		_addedHooks[3] = Win32Helper.SetWindowsEventHook(
+		_addedHooks[3] = _configContext.NativeManager.SetWindowsEventHook(
 			PInvoke.EVENT_SYSTEM_FOREGROUND,
 			PInvoke.EVENT_SYSTEM_FOREGROUND,
 			_hookDelegate
 		);
-		_addedHooks[4] = Win32Helper.SetWindowsEventHook(
+		_addedHooks[4] = _configContext.NativeManager.SetWindowsEventHook(
 			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
 			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
 			_hookDelegate
 		);
-		_addedHooks[5] = Win32Helper.SetWindowsEventHook(
+		_addedHooks[5] = _configContext.NativeManager.SetWindowsEventHook(
 			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
 			PInvoke.EVENT_SYSTEM_MINIMIZEEND,
 			_hookDelegate
@@ -98,7 +98,7 @@ internal class WindowManager : IWindowManager
 
 	public void PostInitialize()
 	{
-		foreach (HWND hwnd in Win32Helper.GetAllWindows())
+		foreach (HWND hwnd in _configContext.NativeManager.GetAllWindows())
 		{
 			AddWindow(hwnd);
 		}
@@ -248,10 +248,10 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
 		if (
-			Win32Helper.IsSplashScreen(hwnd)
-			|| Win32Helper.IsCloakedWindow(hwnd)
-			|| !Win32Helper.IsStandardWindow(hwnd)
-			|| !Win32Helper.HasNoVisibleOwner(hwnd)
+			_configContext.NativeManager.IsSplashScreen(hwnd)
+			|| _configContext.NativeManager.IsCloakedWindow(hwnd)
+			|| !_configContext.NativeManager.IsStandardWindow(hwnd)
+			|| !_configContext.NativeManager.HasNoVisibleOwner(hwnd)
 		)
 		{
 			return null;

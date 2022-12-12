@@ -15,10 +15,10 @@ internal class Window : IWindow
 	public required HWND Handle { get; init; }
 
 	/// <inheritdoc/>
-	public string Title => Win32Helper.GetWindowText(Handle);
+	public string Title => _configContext.NativeManager.GetWindowText(Handle);
 
 	/// <inheritdoc/>
-	public string WindowClass => Win32Helper.GetClassName(Handle);
+	public string WindowClass => _configContext.NativeManager.GetClassName(Handle);
 
 	/// <inheritdoc/>
 	public ILocation<int> Location
@@ -78,7 +78,7 @@ internal class Window : IWindow
 	public void Close()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.QuitApplication(Handle);
+		_configContext.NativeManager.QuitWindow(Handle);
 	}
 
 	/// <inheritdoc/>
@@ -119,7 +119,7 @@ internal class Window : IWindow
 	public void Hide()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.HideWindow(Handle);
+		_configContext.NativeManager.HideWindow(Handle);
 	}
 
 	/// <inheritdoc/>
@@ -144,21 +144,21 @@ internal class Window : IWindow
 	public void ShowMaximized()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.ShowWindowMaximized(Handle);
+		_configContext.NativeManager.ShowWindowMaximized(Handle);
 	}
 
 	/// <inheritdoc/>
 	public void ShowMinimized()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.ShowWindowMinimized(Handle);
+		_configContext.NativeManager.ShowWindowMinimized(Handle);
 	}
 
 	/// <inheritdoc/>
 	public void ShowNormal()
 	{
 		Logger.Debug(ToString());
-		Win32Helper.ShowWindowNoActivate(Handle);
+		_configContext.NativeManager.ShowWindowNoActivate(Handle);
 	}
 
 	/// <summary>

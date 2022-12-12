@@ -140,7 +140,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 	private ILocation<double>? GetUnitLocation(IWindow window)
 	{
-		ILocation<int>? location = Win32Helper.DwmGetWindowLocation(window.Handle);
+		ILocation<int>? location = _configContext.NativeManager.DwmGetWindowLocation(window.Handle);
 		if (location == null)
 		{
 			return null;

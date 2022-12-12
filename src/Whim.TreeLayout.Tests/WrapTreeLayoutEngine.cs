@@ -10,11 +10,11 @@ internal class WrapTreeLayoutEngine : TreeLayoutEngine
 {
 	public WrapTreeLayoutEngine(IConfigContext configContext) : base(configContext) { }
 
-	internal void SplitFocusedWindowWrapper(IWindow? focusedWindow = null)
+	internal void SplitFocusedWindowWrapper(IConfigContext configContext, IWindow? focusedWindow = null)
 	{
 		Mock<IWindow> windowModel = new();
 
-		PhantomNode phantomNode = new WrapPhantomNode(windowModel.Object);
+		PhantomNode phantomNode = new WrapPhantomNode(configContext, windowModel.Object);
 
 		SplitFocusedWindow(focusedWindow, phantomNode);
 	}

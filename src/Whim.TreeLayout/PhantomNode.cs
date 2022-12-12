@@ -9,17 +9,24 @@ namespace Whim.TreeLayout;
 /// </summary>
 public class PhantomNode : LeafNode
 {
+	private readonly IConfigContext _configContext;
 	private readonly Microsoft.UI.Xaml.Window? _phantomWindow;
 
 	/// <summary>
 	/// Creates a new phantom node.
 	/// </summary>
+	/// <param name="configContext"></param>
 	/// <param name="windowModel"></param>
 	/// <param name="phantomWindow"></param>
 	/// <param name="parent"></param>
-	protected PhantomNode(IWindow windowModel, Microsoft.UI.Xaml.Window? phantomWindow, SplitNode? parent = null)
-		: base(windowModel, parent)
+	protected PhantomNode(
+		IConfigContext configContext,
+		IWindow windowModel,
+		Microsoft.UI.Xaml.Window? phantomWindow,
+		SplitNode? parent = null
+	) : base(windowModel, parent)
 	{
+		_configContext = configContext;
 		_phantomWindow = phantomWindow;
 	}
 
@@ -40,11 +47,11 @@ public class PhantomNode : LeafNode
 			return null;
 		}
 
-		return new PhantomNode(windowModel, phantomWindow, parent);
+		return new PhantomNode(configContext, windowModel, phantomWindow, parent);
 	}
 
 	/// <inheritdoc/>
-	public void Hide() => _phantomWindow?.Hide();
+	public void Hide() => _phantomWindow?.Hide(_configContext);
 
 	/// <inheritdoc/>
 	public void Close() => _phantomWindow?.Close();

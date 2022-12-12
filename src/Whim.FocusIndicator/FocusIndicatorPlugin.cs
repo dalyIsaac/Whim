@@ -53,7 +53,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 
 		// Activate the window so it renders.
 		_focusIndicatorWindow.Activate();
-		_focusIndicatorWindow.Hide();
+		_focusIndicatorWindow.Hide(_configContext);
 
 		// Only subscribe to workspace changes once the indicator window has been created - we shouldn't
 		// show a window which doesn't yet exist (it'll just crash Whim).
@@ -132,7 +132,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	private void Hide()
 	{
 		Logger.Debug("Hiding focus indicator");
-		_focusIndicatorWindow?.Hide();
+		_focusIndicatorWindow?.Hide(_configContext);
 		if (_dispatcherTimer != null)
 		{
 			_dispatcherTimer.Stop();

@@ -23,10 +23,11 @@ public static class WindowExtensions
 	/// Hides the given <paramref name="window"/>.
 	/// </summary>
 	/// <param name="window"></param>
+	/// <param name="configContext"></param>
 	/// <returns></returns>
-	public static bool Hide(this Microsoft.UI.Xaml.Window window)
+	public static bool Hide(this Microsoft.UI.Xaml.Window window, IConfigContext configContext)
 	{
-		return Win32Helper.HideWindow(window.GetHandle());
+		return configContext.NativeManager.HideWindow(window.GetHandle());
 	}
 
 	/// <summary>
@@ -79,8 +80,8 @@ public static class WindowExtensions
 			throw new InitializeWindowException("Window was unexpectedly null");
 		}
 
-		Win32Helper.HideCaptionButtons(hwnd);
-		Win32Helper.SetWindowCorners(hwnd);
+		configContext.NativeManager.HideCaptionButtons(hwnd);
+		configContext.NativeManager.SetWindowCorners(hwnd);
 
 		return window;
 	}
