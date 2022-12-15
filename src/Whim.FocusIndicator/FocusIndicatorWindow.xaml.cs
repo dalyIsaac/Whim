@@ -1,6 +1,4 @@
-﻿using Windows.Win32;
-using Windows.Win32.Foundation;
-using Windows.Win32.UI.WindowsAndMessaging;
+﻿using Windows.Win32.Foundation;
 
 namespace Whim.FocusIndicator;
 
@@ -42,11 +40,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		this.SetIsShownInSwitchers(false);
 
 		// Prevent the window from being activated.
-		_ = PInvoke.SetWindowLong(
-			this.GetHandle(),
-			WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE,
-			(int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE
-		);
+		_configContext.NativeManager.PreventWindowActivation(_window.Handle);
 
 		WindowDeferPosHandle.SetWindowPosFixScaling(
 			_configContext,

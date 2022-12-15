@@ -97,6 +97,12 @@ public interface INativeManager
 	public void HideCaptionButtons(HWND hwnd);
 
 	/// <summary>
+	/// Prevent the window from being activated.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	public void PreventWindowActivation(HWND hwnd);
+
+	/// <summary>
 	/// Returns <see langword="true"/> if the window is a system window.
 	/// </summary>
 	/// <param name="hwnd"></param>

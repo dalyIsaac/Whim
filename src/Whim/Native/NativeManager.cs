@@ -174,6 +174,17 @@ public class NativeManager : INativeManager
 		_ = PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
 	}
 
+	/// <inheritdoc/>
+	public void PreventWindowActivation(HWND hwnd)
+	{
+		int exStyle = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+
+		// Prevent the window from being activated
+		exStyle |= (int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE;
+
+		_ = PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, exStyle);
+	}
+
 	private readonly HashSet<string> _systemClasses =
 		new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
 
