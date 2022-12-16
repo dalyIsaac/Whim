@@ -106,6 +106,12 @@ internal class WindowManager : IWindowManager
 		}
 	}
 
+	public IWindow? CreateWindow(HWND hwnd)
+	{
+		Logger.Debug($"Adding window {hwnd}");
+		return Window.CreateWindow(_configContext, _coreNativeManager, hwnd);
+	}
+
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
@@ -259,7 +265,7 @@ internal class WindowManager : IWindowManager
 			return null;
 		}
 
-		IWindow? window = IWindow.CreateWindow(_configContext, hwnd);
+		IWindow? window = CreateWindow(hwnd);
 
 		if (window == null)
 		{

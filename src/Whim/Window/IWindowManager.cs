@@ -1,4 +1,5 @@
 using System;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -17,6 +18,16 @@ public interface IWindowManager : IDisposable
 	/// Add the top-level windows.
 	/// </summary>
 	public void PostInitialize();
+
+		/// <summary>
+	/// Creates a new window. If the window cannot be created, <see langword="null"/> is returned.
+	/// </summary>
+	/// <remarks>
+	/// This does not add the window to the <see cref="IWindowManager"/> or to the <see cref="IWorkspaceManager"/>.
+	/// </remarks>
+	/// <param name="hWnd">The window handle.</param>
+	/// <returns></returns>
+	public IWindow? CreateWindow(HWND hWnd);
 
 	/// <summary>
 	/// Event for when a window is added by the <see cref="IWindowManager"/>.

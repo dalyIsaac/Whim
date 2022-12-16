@@ -120,15 +120,4 @@ public interface IWindow
 	/// Quits the window.
 	/// </summary>
 	public void Close();
-
-	/// <summary>
-	/// Create a new window. If the window cannot be created, <c>null</c> is returned.
-	/// </summary>
-	/// <param name="hwnd">The handle of the window.</param>
-	/// <param name="configContext">The configuration context.</param>
-	public static IWindow? CreateWindow(IConfigContext configContext, HWND hwnd)
-	{
-		Logger.Debug($"Adding window {hwnd.Value}");
-		return Window.CreateWindow(configContext, hwnd);
-	}
 }

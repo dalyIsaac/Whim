@@ -33,7 +33,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		_plugin = plugin;
 		_activationConfig = _plugin.Config.ActivationConfig;
 
-		_window = this.InitializeBorderlessWindow("Whim.CommandPalette", "CommandPaletteWindow", _configContext);
+		_window = this.InitializeBorderlessWindow(_configContext, "Whim.CommandPalette", "CommandPaletteWindow");
 		this.SetIsShownInSwitchers(false);
 
 		Activated += CommandPaletteWindow_Activated;

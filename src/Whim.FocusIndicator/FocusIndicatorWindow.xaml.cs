@@ -15,7 +15,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 	{
 		_configContext = configContext;
 		FocusIndicatorConfig = focusIndicatorConfig;
-		_window = this.InitializeBorderlessWindow("Whim.FocusIndicator", "FocusIndicatorWindow", configContext);
+		_window = this.InitializeBorderlessWindow(configContext, "Whim.FocusIndicator", "FocusIndicatorWindow");
 
 		Title = FocusIndicatorConfig.Title;
 	}
