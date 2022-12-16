@@ -19,7 +19,7 @@ public interface IWindowManager : IDisposable
 	/// </summary>
 	public void PostInitialize();
 
-		/// <summary>
+	/// <summary>
 	/// Creates a new window. If the window cannot be created, <see langword="null"/> is returned.
 	/// </summary>
 	/// <remarks>
