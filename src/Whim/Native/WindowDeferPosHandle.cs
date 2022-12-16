@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
 /// <summary>
-/// Sets the position of multiple windows at once, using <see cref="PInvoke.DeferWindowPos"/>.
+/// Sets the position of multiple windows at once, using <see cref="INativeManager.DeferWindowPos"/>.
 /// As stated in Raymond Chen's blog post (https://devblogs.microsoft.com/oldnewthing/20050706-26/?p=35023),
 /// this reduces the amount of repainting.
 /// </summary>
@@ -24,14 +23,14 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// This is to be used when setting the position of multiple windows at once.
 	///
 	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block
-	/// or statement, otherwise <see cref="PInvoke.EndDeferWindowPos"/> won't be called.
+	/// or statement, otherwise <see cref="INativeManager.EndDeferWindowPos"/> won't be called.
 	/// </summary>
 	/// <param name="configContext"></param>
 	/// <param name="count">The number of windows to layout.</param>
 	public WindowDeferPosHandle(IConfigContext configContext, int count)
 	{
 		_configContext = configContext;
-		_hWinPosInfo = PInvoke.BeginDeferWindowPos(count);
+		_hWinPosInfo = _configContext.NativeManager.BeginDeferWindowPos(count);
 
 		_toMinimize = new List<IWindow>();
 		_toMaximize = new List<IWindow>();
@@ -62,7 +61,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 			_configContext.NativeManager.ShowWindowNoActivate(w.Handle);
 		}
 
-		PInvoke.EndDeferWindowPos(_hWinPosInfo);
+		_configContext.NativeManager.EndDeferWindowPos(_hWinPosInfo);
 	}
 
 	/// <summary>
@@ -107,7 +106,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 			_toNormal.Add(window);
 		}
 
-		_hWinPosInfo = PInvoke.DeferWindowPos(
+		_hWinPosInfo = _configContext.NativeManager.DeferWindowPos(
 			_hWinPosInfo,
 			window.Handle,
 			(HWND)hwndInsertAfter,

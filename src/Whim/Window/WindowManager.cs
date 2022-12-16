@@ -10,6 +10,7 @@ namespace Whim;
 internal class WindowManager : IWindowManager
 {
 	private readonly IConfigContext _configContext;
+	private readonly ICoreNativeManager _coreNativeManager;
 
 	public event EventHandler<WindowEventArgs>? WindowAdded;
 	public event EventHandler<WindowEventArgs>? WindowFocused;
@@ -25,12 +26,12 @@ internal class WindowManager : IWindowManager
 	private readonly Dictionary<HWND, IWindow> _windows = new();
 
 	/// <summary>
-	/// All the hooks added with <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>.
+	/// All the hooks added with <see cref="ICoreNativeManager.SetWinEventHook"/>.
 	/// </summary>
 	private readonly UnhookWinEventSafeHandle[] _addedHooks = new UnhookWinEventSafeHandle[6];
 
 	/// <summary>
-	/// The delegate for handling all events triggered by <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>.
+	/// The delegate for handling all events triggered by <see cref="ICoreNativeManager.SetWinEventHook"/>.
 	/// </summary>
 	private readonly WINEVENTPROC _hookDelegate;
 
@@ -43,9 +44,10 @@ internal class WindowManager : IWindowManager
 	/// </summary>
 	private bool _disposedValue;
 
-	public WindowManager(IConfigContext configContext)
+	public WindowManager(IConfigContext configContext, ICoreNativeManager coreNativeManager)
 	{
 		_configContext = configContext;
+		_coreNativeManager = coreNativeManager;
 		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
 	}
 
@@ -54,32 +56,32 @@ internal class WindowManager : IWindowManager
 		Logger.Debug("Initializing window manager...");
 
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
-		_addedHooks[0] = _configContext.NativeManager.SetWindowsEventHook(
+		_addedHooks[0] = _coreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_OBJECT_DESTROY,
 			PInvoke.EVENT_OBJECT_HIDE,
 			_hookDelegate
 		);
-		_addedHooks[1] = _configContext.NativeManager.SetWindowsEventHook(
+		_addedHooks[1] = _coreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_OBJECT_CLOAKED,
 			PInvoke.EVENT_OBJECT_UNCLOAKED,
 			_hookDelegate
 		);
-		_addedHooks[2] = _configContext.NativeManager.SetWindowsEventHook(
+		_addedHooks[2] = _coreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_SYSTEM_MOVESIZESTART,
 			PInvoke.EVENT_SYSTEM_MOVESIZEEND,
 			_hookDelegate
 		);
-		_addedHooks[3] = _configContext.NativeManager.SetWindowsEventHook(
+		_addedHooks[3] = _coreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_SYSTEM_FOREGROUND,
 			PInvoke.EVENT_SYSTEM_FOREGROUND,
 			_hookDelegate
 		);
-		_addedHooks[4] = _configContext.NativeManager.SetWindowsEventHook(
+		_addedHooks[4] = _coreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
 			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
 			_hookDelegate
 		);
-		_addedHooks[5] = _configContext.NativeManager.SetWindowsEventHook(
+		_addedHooks[5] = _coreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
 			PInvoke.EVENT_SYSTEM_MINIMIZEEND,
 			_hookDelegate
@@ -166,7 +168,7 @@ internal class WindowManager : IWindowManager
 		&& hwnd != null;
 
 	/// <summary>
-	/// Event hook for <see cref="PInvoke.SetWinEventHook(uint, uint, System.Runtime.InteropServices.SafeHandle, WINEVENTPROC, uint, uint, uint)"/>. <br />
+	/// Event hook for <see cref="ICoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>. <br />
 	///
 	/// For more, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
 	/// </summary>
@@ -361,7 +363,7 @@ internal class WindowManager : IWindowManager
 			_mouseMoveWindow.IsMouseMoving = false;
 
 			// Move the window.
-			if (PInvoke.GetCursorPos(out System.Drawing.Point point))
+			if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
 			{
 				_configContext.WorkspaceManager.MoveWindowToPoint(
 					window,

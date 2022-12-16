@@ -10,6 +10,7 @@ namespace Whim;
 internal class Window : IWindow
 {
 	private readonly IConfigContext _configContext;
+	private readonly ICoreNativeManager _coreNativeManager;
 
 	/// <inheritdoc/>
 	public required HWND Handle { get; init; }
@@ -25,7 +26,7 @@ internal class Window : IWindow
 	{
 		get
 		{
-			PInvoke.GetWindowRect(Handle, out RECT rect);
+			_coreNativeManager.GetWindowRect(Handle, out RECT rect);
 			return new Location<int>()
 			{
 				X = rect.left,
@@ -56,13 +57,13 @@ internal class Window : IWindow
 	public required string ProcessName { get; init; }
 
 	/// <inheritdoc/>
-	public bool IsFocused => PInvoke.GetForegroundWindow() == Handle;
+	public bool IsFocused => _coreNativeManager.GetForegroundWindow() == Handle;
 
 	/// <inheritdoc/>
-	public bool IsMinimized => PInvoke.IsIconic(Handle);
+	public bool IsMinimized => _coreNativeManager.IsWindowMinimized(Handle);
 
 	/// <inheritdoc/>
-	public bool IsMaximized => PInvoke.IsZoomed(Handle);
+	public bool IsMaximized => _coreNativeManager.IsWindowMaximized(Handle);
 
 	/// <inheritdoc/>
 	public bool IsMouseMoving { get; set; }
@@ -71,7 +72,7 @@ internal class Window : IWindow
 	public void BringToTop()
 	{
 		Logger.Debug(ToString());
-		PInvoke.BringWindowToTop(Handle);
+		_coreNativeManager.BringWindowToTop(Handle);
 	}
 
 	/// <inheritdoc/>
@@ -87,7 +88,7 @@ internal class Window : IWindow
 		Logger.Debug(ToString());
 		if (!IsFocused)
 		{
-			PInvoke.SetForegroundWindow(Handle);
+			_coreNativeManager.SetForegroundWindow(Handle);
 		}
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
@@ -105,10 +106,10 @@ internal class Window : IWindow
 			INPUT input = new() { type = INPUT_TYPE.INPUT_MOUSE };
 			INPUT[] inputs = new[] { input };
 			// Send empty mouse event. This makes this thread the last to send input, and hence allows it to pass foreground permission checks
-			_ = PInvoke.SendInput(inputs, sizeof(INPUT));
+			_ = _coreNativeManager.SendInput(inputs, sizeof(INPUT));
 		}
 
-		PInvoke.SetForegroundWindow(Handle);
+		_coreNativeManager.SetForegroundWindow(Handle);
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
@@ -165,10 +166,12 @@ internal class Window : IWindow
 	/// Constructor for the <see cref="IWindow"/> implementation.
 	/// </summary>
 	/// <param name="configContext"></param>
+	/// <param name="coreNativeManager"></param>
 	/// <exception cref="Win32Exception"></exception>
-	private Window(IConfigContext configContext)
+	private Window(IConfigContext configContext, ICoreNativeManager coreNativeManager)
 	{
 		_configContext = configContext;
+		_coreNativeManager = coreNativeManager;
 	}
 
 	/// <summary>
@@ -176,19 +179,16 @@ internal class Window : IWindow
 	/// Otherwise, returns <see langword="null"/>.
 	/// </summary>
 	/// <param name="configContext"></param>
+	/// <param name="coreNativeManager"></param>
 	/// <param name="hwnd">The handle of the window.</param>
 	/// <returns></returns>
-	public static IWindow? CreateWindow(IConfigContext configContext, HWND hwnd)
+	public static IWindow? CreateWindow(IConfigContext configContext, ICoreNativeManager coreNativeManager, HWND hwnd)
 	{
-		int processId;
 		string processName;
 		string processFileName;
-		unsafe
-		{
-			uint pid;
-			_ = PInvoke.GetWindowThreadProcessId(hwnd, &pid);
-			processId = (int)pid;
-		}
+
+		_ = coreNativeManager.GetWindowThreadProcessId(hwnd, out uint pid);
+		int processId = (int)pid;
 
 		Process process = Process.GetProcessById(processId);
 		processName = process.ProcessName;
@@ -207,7 +207,7 @@ internal class Window : IWindow
 			return null;
 		}
 
-		return new Window(configContext)
+		return new Window(configContext, coreNativeManager)
 		{
 			Handle = hwnd,
 			ProcessId = processId,

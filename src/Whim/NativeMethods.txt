@@ -2,9 +2,7 @@
 BringWindowToTop
 CallNextHookEx
 CHILDID_SELF
-CreateDC
 DeferWindowPos
-DeleteDC
 DWM_WINDOW_CORNER_PREFERENCE
 DwmGetWindowAttribute
 DwmSetWindowAttribute
@@ -27,7 +25,6 @@ GetAncestor
 GetClassName
 GetCursorPos
 GetDesktopWindow
-GetDeviceCaps
 GetForegroundWindow
 GetKeyState
 GetMonitorInfo

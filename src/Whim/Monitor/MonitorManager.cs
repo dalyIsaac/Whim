@@ -12,6 +12,7 @@ namespace Whim;
 internal class MonitorManager : IMonitorManager
 {
 	private readonly IConfigContext _configContext;
+	private readonly ICoreNativeManager _coreNativeManager;
 
 	/// <summary>
 	/// The <see cref="IMonitor"/>s of the computer.
@@ -42,9 +43,10 @@ internal class MonitorManager : IMonitorManager
 	/// <exception cref="Exception">
 	/// When no monitors are found, or there is no primary monitor.
 	/// </exception>
-	public MonitorManager(IConfigContext configContext)
+	public MonitorManager(IConfigContext configContext, ICoreNativeManager coreNativeManager)
 	{
 		_configContext = configContext;
+		_coreNativeManager = coreNativeManager;
 
 		// Get the monitors.
 		_monitors = GetCurrentMonitors().OrderBy(m => m.X).ThenBy(m => m.Y).ToArray();
@@ -135,9 +137,9 @@ internal class MonitorManager : IMonitorManager
 	/// </summary>
 	/// <returns></returns>
 	/// <exception cref="Exception">When no monitors are found.</exception>
-	private static IMonitor[] GetCurrentMonitors()
+	private IMonitor[] GetCurrentMonitors()
 	{
-		Screen[] screens = Screen.AllScreens;
+		Screen[] screens = Screen.GetAllScreens(_coreNativeManager);
 
 		IMonitor[] _monitors = new IMonitor[screens.Length];
 		for (int i = 0; i < screens.Length; i++)
@@ -156,7 +158,7 @@ internal class MonitorManager : IMonitorManager
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
 		Logger.Debug($"Getting monitor at point {point}");
-		Screen screen = Screen.FromPoint(point);
+		Screen screen = Screen.FromPoint(_coreNativeManager, point);
 
 		IMonitor? monitor = _monitors.FirstOrDefault(m => m.Name == screen.DeviceName);
 		if (monitor == null)

@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
-using Windows.Win32.UI.Accessibility;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
@@ -49,17 +48,6 @@ public interface INativeManager
 	/// Displays a window in its most recent size and position. The window is not activated.
 	/// </summary>
 	public bool ShowWindowNoActivate(HWND hwnd);
-
-	/// <summary>
-	/// Set the <see cref="PInvoke.SetWinEventHook(uint, uint, SafeHandle, WINEVENTPROC, uint, uint, uint)"/> <br/>.
-	///
-	/// For more, see https://docs.microsoft.com/en-au/windows/win32/api/winuser/nf-winuser-setwineventhook
-	/// </summary>
-	/// <param name="eventMin"></param>
-	/// <param name="eventMax"></param>
-	/// <param name="lpfnWinEventProc"></param>
-	/// <returns></returns>
-	public UnhookWinEventSafeHandle SetWindowsEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc);
 
 	/// <summary>
 	/// Safe wrapper around <see cref="PInvoke.GetClassName"/>.
@@ -158,4 +146,56 @@ public interface INativeManager
 	/// </summary>
 	/// <returns></returns>
 	public IEnumerable<HWND> GetAllWindows();
+
+	/// <summary>
+	/// Allocates memory for a multiple-window position structure and returns the handle to the structure.
+	/// </summary>
+	/// <remarks>
+	/// This uses <see cref="PInvoke.BeginDeferWindowPos(int)"/> <br/>
+	///
+	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-begindeferwindowpos
+	/// </remarks>
+	/// <param name="nNumWindows"></param>
+	/// <returns></returns>
+	public HDWP BeginDeferWindowPos(int nNumWindows);
+
+	/// <summary>
+	/// Updates the specified multiple-window position structure for the specified window.
+	/// </summary>
+	/// <remarks>
+	/// This uses <see cref="PInvoke.DeferWindowPos(HDWP, HWND, HWND, int, int, int, int, SET_WINDOW_POS_FLAGS)"/> <br/>
+	///
+	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-deferwindowpos
+	/// </remarks>
+	/// <param name="hWinPosInfo"></param>
+	/// <param name="hWnd"></param>
+	/// <param name="hWndInsertAfter"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="cx"></param>
+	/// <param name="cy"></param>
+	/// <param name="uFlags"></param>
+	/// <returns></returns>
+	public HDWP DeferWindowPos(
+		HDWP hWinPosInfo,
+		HWND hWnd,
+		HWND hWndInsertAfter,
+		int x,
+		int y,
+		int cx,
+		int cy,
+		SET_WINDOW_POS_FLAGS uFlags
+	);
+
+	/// <summary>
+	/// Simultaneously updates the position, size, shape, content, and translucency of the specified windows in a single-refreshing cycle.
+	/// </summary>
+	/// <remarks>
+	/// This uses <see cref="PInvoke.EndDeferWindowPos(HDWP)"/> <br/>
+	///
+	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-enddeferwindowpos
+	/// </remarks>
+	/// <param name="hWinPosInfo"></param>
+	/// <returns></returns>
+	public BOOL EndDeferWindowPos(HDWP hWinPosInfo);
 }

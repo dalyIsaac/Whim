@@ -14,6 +14,8 @@ namespace Whim;
 internal class ConfigContext : IConfigContext
 {
 	public Logger Logger { get; private set; }
+	public INativeManager NativeManager { get; private set; }
+	internal ICoreNativeManager CoreNativeManager { get; private set; }
 	public IWorkspaceManager WorkspaceManager { get; private set; }
 	public IWindowManager WindowManager { get; private set; }
 	public IMonitorManager MonitorManager { get; private set; }
@@ -21,7 +23,6 @@ internal class ConfigContext : IConfigContext
 	public IFilterManager FilterManager { get; private set; }
 	public ICommandManager CommandManager { get; private set; }
 	public IPluginManager PluginManager { get; private set; }
-	public INativeManager NativeManager { get; private set; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
@@ -32,14 +33,15 @@ internal class ConfigContext : IConfigContext
 	public ConfigContext()
 	{
 		Logger = new Logger();
+		NativeManager = new NativeManager(this);
+		CoreNativeManager = new CoreNativeManager();
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
-		WindowManager = new WindowManager(this);
-		MonitorManager = new MonitorManager(this);
+		WindowManager = new WindowManager(this, CoreNativeManager);
+		MonitorManager = new MonitorManager(this, CoreNativeManager);
 		WorkspaceManager = new WorkspaceManager(this);
-		CommandManager = new CommandManager(this);
+		CommandManager = new CommandManager(this, CoreNativeManager);
 		PluginManager = new PluginManager(this);
-		NativeManager = new NativeManager(this);
 	}
 
 	public void Initialize()

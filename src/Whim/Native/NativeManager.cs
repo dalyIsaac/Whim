@@ -3,14 +3,11 @@ using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
-using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-/// <summary>
-/// Manager for interacting with native Windows APIs.
-/// </summary>
+/// <inheritdoc/>
 public class NativeManager : INativeManager
 {
 	private readonly IConfigContext _configContext;
@@ -77,10 +74,6 @@ public class NativeManager : INativeManager
 		Logger.Debug($"Showing window HWND {hwnd.Value} no activate");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
 	}
-
-	/// <inheritdoc/>
-	public UnhookWinEventSafeHandle SetWindowsEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc) =>
-		PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
 
 	/// <inheritdoc/>
 	public string GetClassName(HWND hwnd)
@@ -238,12 +231,7 @@ public class NativeManager : INativeManager
 		unsafe
 		{
 			int cloaked;
-			HRESULT res = PInvoke.DwmGetWindowAttribute(
-				hwnd,
-				Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
-				&cloaked,
-				sizeof(int)
-			);
+			HRESULT res = PInvoke.DwmGetWindowAttribute(hwnd, DWMWINDOWATTRIBUTE.DWMWA_CLOAKED, &cloaked, sizeof(int));
 			return cloaked != 0 || res.Failed;
 		}
 	}
@@ -341,4 +329,22 @@ public class NativeManager : INativeManager
 
 		return windows;
 	}
+
+	/// <inheritdoc />
+	public HDWP BeginDeferWindowPos(int nNumWindows) => PInvoke.BeginDeferWindowPos(nNumWindows);
+
+	/// <inheritdoc />
+	public HDWP DeferWindowPos(
+		HDWP hWinPosInfo,
+		HWND hWnd,
+		HWND hWndInsertAfter,
+		int x,
+		int y,
+		int cx,
+		int cy,
+		SET_WINDOW_POS_FLAGS uFlags
+	) => PInvoke.DeferWindowPos(hWinPosInfo, hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
+
+	/// <inheritdoc />
+	public BOOL EndDeferWindowPos(HDWP hWinPosInfo) => PInvoke.EndDeferWindowPos(hWinPosInfo);
 }

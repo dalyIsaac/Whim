@@ -1,18 +1,9 @@
-using Windows.Win32;
 using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
 internal static class MonitorInfo
 {
-	internal static unsafe bool GetMonitorInfo(HMONITOR monitor, ref MONITORINFOEXW lpmi)
-	{
-		fixed (MONITORINFOEXW* lmpiLocal = &lpmi)
-		{
-			return PInvoke.GetMonitorInfo(monitor, (MONITORINFO*)lmpiLocal);
-		}
-	}
-
 	internal static ILocation<int> GetLocation(this MONITORINFOEXW monitor)
 	{
 		return monitor.monitorInfo.rcMonitor.ToLocation();
