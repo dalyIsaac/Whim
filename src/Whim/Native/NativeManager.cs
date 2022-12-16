@@ -346,5 +346,5 @@ public class NativeManager : INativeManager
 	) => PInvoke.DeferWindowPos(hWinPosInfo, hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
 
 	/// <inheritdoc />
-	public BOOL EndDeferWindowPos(HDWP hWinPosInfo) => PInvoke.EndDeferWindowPos(hWinPosInfo);
+	public bool EndDeferWindowPos(HDWP hWinPosInfo) => PInvoke.EndDeferWindowPos(hWinPosInfo);
 }

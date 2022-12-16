@@ -197,5 +197,5 @@ public interface INativeManager
 	/// </remarks>
 	/// <param name="hWinPosInfo"></param>
 	/// <returns></returns>
-	public BOOL EndDeferWindowPos(HDWP hWinPosInfo);
+	public bool EndDeferWindowPos(HDWP hWinPosInfo);
 }

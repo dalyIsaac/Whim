@@ -66,13 +66,27 @@ using System.Diagnostics.CodeAnalysis;
 	"Usage",
 	"CA2225:Operator overloads have named alternates",
 	Justification = "Superfluous for this case",
-	Scope = "member",
-	Target = "~M:Windows.Win32.Foundation.HWND.op_Explicit(System.IntPtr)~Windows.Win32.Foundation.HWND"
+	Scope = "namespaceanddescendants",
+	Target = "~N:Windows.Win32.UI"
 )]
 [assembly: SuppressMessage(
-	"Usage",
-	"CA2225:Operator overloads have named alternates",
-	Justification = "Superfluous for this case",
-	Scope = "member",
-	Target = "~M:Windows.Win32.UI.WindowsAndMessaging.HDWP.op_Explicit(System.IntPtr)~Windows.Win32.UI.WindowsAndMessaging.HDWP"
+	"Design",
+	"CA1028:Enum Storage should be Int32",
+	Justification = "This is Windows.Win32 code",
+	Scope = "namespaceanddescendants",
+	Target = "~N:Windows.Win32.UI"
+)]
+[assembly: SuppressMessage(
+	"Naming",
+	"CA1707:Identifiers should not contain underscores",
+	Justification = "This is Windows.Win32 ",
+	Scope = "namespaceanddescendants",
+	Target = "~N:Windows.Win32.UI"
+)]
+[assembly: SuppressMessage(
+	"Design",
+	"CA1069:Enums values should not be duplicated",
+	Justification = "This is Windows.Win32 code",
+	Scope = "namespaceanddescendants",
+	Target = "~N:Windows.Win32.UI"
 )]
