@@ -44,3 +44,28 @@ using System.Diagnostics.CodeAnalysis;
 	Scope = "member",
 	Target = "~M:Whim.IConfigContext.Exit(Whim.ExitEventArgs)"
 )]
+[assembly: SuppressMessage(
+	"Style",
+	"IDE0021:Use block body for constructors",
+	Justification = "It should be allowed for limited cases",
+	Scope = "module"
+)]
+[assembly: SuppressMessage(
+	"Style",
+	"IDE0023:Use block body for conversion operators",
+	Justification = "It should be allowed for limited cases",
+	Scope = "module"
+)]
+[assembly: SuppressMessage(
+	"Style",
+	"IDE0024:Use block body for operators",
+	Justification = "It should be allowed for limited cases",
+	Scope = "module"
+)]
+[assembly: SuppressMessage(
+	"Usage",
+	"CA2225:Operator overloads have named alternates",
+	Justification = "Superfluous for this case",
+	Scope = "member",
+	Target = "~M:Windows.Win32.Foundation.HWND.op_Explicit(System.IntPtr)~Windows.Win32.Foundation.HWND"
+)]
