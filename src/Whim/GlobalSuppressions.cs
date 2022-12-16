@@ -67,26 +67,26 @@ using System.Diagnostics.CodeAnalysis;
 	"CA2225:Operator overloads have named alternates",
 	Justification = "Superfluous for this case",
 	Scope = "namespaceanddescendants",
-	Target = "~N:Windows.Win32.UI"
+	Target = "~N:Windows.Win32"
 )]
 [assembly: SuppressMessage(
 	"Design",
 	"CA1028:Enum Storage should be Int32",
 	Justification = "This is Windows.Win32 code",
 	Scope = "namespaceanddescendants",
-	Target = "~N:Windows.Win32.UI"
+	Target = "~N:Windows.Win32"
 )]
 [assembly: SuppressMessage(
 	"Naming",
 	"CA1707:Identifiers should not contain underscores",
 	Justification = "This is Windows.Win32 ",
 	Scope = "namespaceanddescendants",
-	Target = "~N:Windows.Win32.UI"
+	Target = "~N:Windows.Win32"
 )]
 [assembly: SuppressMessage(
 	"Design",
 	"CA1069:Enums values should not be duplicated",
 	Justification = "This is Windows.Win32 code",
 	Scope = "namespaceanddescendants",
-	Target = "~N:Windows.Win32.UI"
+	Target = "~N:Windows.Win32"
 )]

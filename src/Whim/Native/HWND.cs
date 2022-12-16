@@ -33,7 +33,7 @@ namespace Windows.Win32
 			public static implicit operator IntPtr(HWND value) => value.Value;
 
 			/// <inheritdoc/>
-			public static explicit operator HWND(IntPtr value) => new HWND(value);
+			public static explicit operator HWND(IntPtr value) => new(value);
 
 			/// <inheritdoc/>
 			public static bool operator ==(HWND left, HWND right) => left.Value == right.Value;
