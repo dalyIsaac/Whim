@@ -11,10 +11,7 @@ namespace Windows.Win32
 		[DebuggerDisplay("{Value}")]
 		public readonly struct HWND : IEquatable<HWND>
 		{
-			/// <summary>
-			///
-			/// </summary>
-			public readonly IntPtr Value;
+			internal readonly IntPtr Value;
 
 			/// <summary>
 			/// Creates a new <see cref="HWND"/> from a <see cref="IntPtr"/>.
@@ -45,13 +42,16 @@ namespace Windows.Win32
 			public static bool operator !=(HWND left, HWND right) => !(left == right);
 
 			/// <inheritdoc/>
-			public bool Equals(HWND other) => this.Value == other.Value;
+			public bool Equals(HWND other) => Value == other.Value;
 
 			/// <inheritdoc/>
-			public override bool Equals(object? obj) => obj is HWND other && this.Equals(other);
+			public override bool Equals(object? obj) => obj is HWND other && Equals(other);
 
 			/// <inheritdoc/>
-			public override int GetHashCode() => this.Value.GetHashCode();
+			public override int GetHashCode() => Value.GetHashCode();
+
+			/// <inheritdoc/>
+			public override string ToString() => Value.ToString();
 		}
 	}
 }

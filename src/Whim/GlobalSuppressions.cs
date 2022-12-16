@@ -69,3 +69,10 @@ using System.Diagnostics.CodeAnalysis;
 	Scope = "member",
 	Target = "~M:Windows.Win32.Foundation.HWND.op_Explicit(System.IntPtr)~Windows.Win32.Foundation.HWND"
 )]
+[assembly: SuppressMessage(
+	"Usage",
+	"CA2225:Operator overloads have named alternates",
+	Justification = "Superfluous for this case",
+	Scope = "member",
+	Target = "~M:Windows.Win32.UI.WindowsAndMessaging.HDWP.op_Explicit(System.IntPtr)~Windows.Win32.UI.WindowsAndMessaging.HDWP"
+)]
