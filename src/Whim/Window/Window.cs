@@ -15,7 +15,7 @@ internal class Window : IWindow
 	public required HWND Handle { get; init; }
 
 	/// <inheritdoc/>
-	public string Title => _configContext.NativeManager.GetWindowText(Handle);
+	public string Title => _coreNativeManager.GetWindowText(Handle);
 
 	/// <inheritdoc/>
 	public string WindowClass => _configContext.NativeManager.GetClassName(Handle);

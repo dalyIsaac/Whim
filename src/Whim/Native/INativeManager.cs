@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
@@ -57,28 +56,6 @@ public interface INativeManager
 	public string GetClassName(HWND hwnd);
 
 	/// <summary>
-	/// Safe wrapper around <see cref="PInvoke.GetWindowText"/>.
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <returns></returns>
-	public string GetWindowText(HWND hwnd);
-
-	/// <summary>
-	/// Returns <see langword="true"/> if the window is a splash window.
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <returns></returns>
-	public bool IsSplashScreen(HWND hwnd);
-
-	/// <summary>
-	/// Returns <see langword="true"/> if the window is a standard window.
-	/// Based on https://github.com/microsoft/PowerToys/blob/fa81968dbb58a0697c45335a8f453e5794852348/src/modules/fancyzones/FancyZonesLib/FancyZones.cpp#L381
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <returns></returns>
-	public bool IsStandardWindow(HWND hwnd);
-
-	/// <summary>
 	/// Hides the caption buttons from the given window.
 	/// </summary>
 	/// <param name="hwnd"></param>
@@ -89,30 +66,6 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	public void PreventWindowActivation(HWND hwnd);
-
-	/// <summary>
-	/// Returns <see langword="true"/> if the window is a system window.
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <param name="className">The window's class name.</param>
-	/// <returns></returns>
-	public bool IsSystemWindow(HWND hwnd, string className);
-
-	/// <summary>
-	/// Returns <see langword="true"/> when the window has no visible owner.
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <returns></returns>
-	public bool HasNoVisibleOwner(HWND hwnd);
-
-	/// <summary>
-	/// Returns <see langword="true"/> when the window is a cloaked window.
-	/// For example, and empty <c>ApplicationFrameWindow</c>.
-	/// For more, see https://social.msdn.microsoft.com/Forums/vstudio/en-US/f8341376-6015-4796-8273-31e0be91da62/difference-between-actually-visible-and-not-visiblewhich-are-there-but-we-cant-see-windows-of?forum=vcgeneral
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <returns></returns>
-	public bool IsCloakedWindow(HWND hwnd);
 
 	/// <summary>
 	/// Returns the window's offset.<br/>
@@ -140,12 +93,6 @@ public interface INativeManager
 		HWND hwnd,
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND
 	);
-
-	/// <summary>
-	/// Enumerates over all the <see cref="HWND"/> of all the top-level windows.
-	/// </summary>
-	/// <returns></returns>
-	public IEnumerable<HWND> GetAllWindows();
 
 	/// <summary>
 	/// Allocates memory for a multiple-window position structure and returns the handle to the structure.

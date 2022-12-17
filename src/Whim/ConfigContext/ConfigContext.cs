@@ -34,7 +34,7 @@ internal class ConfigContext : IConfigContext
 	{
 		Logger = new Logger();
 		NativeManager = new NativeManager(this);
-		CoreNativeManager = new CoreNativeManager();
+		CoreNativeManager = new CoreNativeManager(this);
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, CoreNativeManager);

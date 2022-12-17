@@ -49,7 +49,7 @@ internal class KeybindHook : IDisposable
 		Logger.Verbose($"{nCode} {wParam.Value} {lParam.Value}");
 		if (nCode != 0 || ((nuint)wParam != PInvoke.WM_KEYDOWN && (nuint)wParam != PInvoke.WM_SYSKEYDOWN))
 		{
-			return ICoreNativeManager.Instance.CallNextHookEx(nCode, wParam, lParam);
+			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 
 		KBDLLHOOKSTRUCT kbdll = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
@@ -67,7 +67,7 @@ internal class KeybindHook : IDisposable
 			case VIRTUAL_KEY.VK_RCONTROL:
 			case VIRTUAL_KEY.VK_LWIN:
 			case VIRTUAL_KEY.VK_RWIN:
-				return ICoreNativeManager.Instance.CallNextHookEx(nCode, wParam, lParam);
+				return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 			default:
 				break;
 		}
@@ -78,7 +78,7 @@ internal class KeybindHook : IDisposable
 			return (LRESULT)1;
 		}
 
-		return ICoreNativeManager.Instance.CallNextHookEx(nCode, wParam, lParam);
+		return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 	}
 
 	private bool IsModifierPressed(VIRTUAL_KEY key) => (_coreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;

@@ -100,7 +100,7 @@ internal class WindowManager : IWindowManager
 
 	public void PostInitialize()
 	{
-		foreach (HWND hwnd in _configContext.NativeManager.GetAllWindows())
+		foreach (HWND hwnd in _coreNativeManager.GetAllWindows())
 		{
 			AddWindow(hwnd);
 		}
@@ -256,10 +256,10 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
 		if (
-			_configContext.NativeManager.IsSplashScreen(hwnd)
-			|| _configContext.NativeManager.IsCloakedWindow(hwnd)
-			|| !_configContext.NativeManager.IsStandardWindow(hwnd)
-			|| !_configContext.NativeManager.HasNoVisibleOwner(hwnd)
+			_coreNativeManager.IsSplashScreen(hwnd)
+			|| _coreNativeManager.IsCloakedWindow(hwnd)
+			|| !_coreNativeManager.IsStandardWindow(hwnd)
+			|| !_coreNativeManager.HasNoVisibleOwner(hwnd)
 		)
 		{
 			return null;
