@@ -85,11 +85,14 @@ internal class CoreNativeManager : ICoreNativeManager
 	public BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFO lpmi) => PInvoke.GetMonitorInfo(hMonitor, ref lpmi);
 
 	/// <inheritdoc/>
-	public unsafe BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi)
+	public BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi)
 	{
-		fixed (MONITORINFOEXW* lmpiLocal = &lpmi)
+		unsafe
 		{
-			return PInvoke.GetMonitorInfo(hMonitor, (MONITORINFO*)lmpiLocal);
+			fixed (MONITORINFOEXW* lmpiLocal = &lpmi)
+			{
+				return PInvoke.GetMonitorInfo(hMonitor, (MONITORINFO*)lmpiLocal);
+			}
 		}
 	}
 

@@ -195,7 +195,7 @@ internal interface ICoreNativeManager
 	/// <param name="hMonitor"></param>
 	/// <param name="lpmi"></param>
 	/// <returns></returns>
-	public unsafe BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi);
+	public BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi);
 
 	/// <summary>
 	/// Retrieve a handle to the display monitor that contains a specified point.
