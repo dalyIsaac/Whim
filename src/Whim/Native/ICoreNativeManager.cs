@@ -167,17 +167,9 @@ internal interface ICoreNativeManager
 	///
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-systemparametersinfoa
 	/// </remarks>
-	/// <param name="uiAction"></param>
-	/// <param name="uiParam"></param>
-	/// <param name="pvParam"></param>
-	/// <param name="fWinIni"></param>
+	/// <param name="workArea"></param>
 	/// <returns></returns>
-	public unsafe BOOL SystemParametersInfo(
-		SYSTEM_PARAMETERS_INFO_ACTION uiAction,
-		uint uiParam,
-		void* pvParam,
-		SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS fWinIni
-	);
+	public BOOL GetPrimaryDisplayWorkArea(out RECT workArea);
 
 	/// <summary>
 	/// Retrieve information about a display monitor.

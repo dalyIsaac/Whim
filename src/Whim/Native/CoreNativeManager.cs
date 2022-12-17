@@ -68,12 +68,18 @@ internal class CoreNativeManager : ICoreNativeManager
 		PInvoke.GetScaleFactorForMonitor(hmonitor, out pdpiScale);
 
 	/// <inheritdoc/>
-	public unsafe BOOL SystemParametersInfo(
-		SYSTEM_PARAMETERS_INFO_ACTION uiAction,
-		uint uiParam,
-		void* pvParam,
-		SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS fWinIni
-	) => PInvoke.SystemParametersInfo(uiAction, uiParam, pvParam, fWinIni);
+	public BOOL GetPrimaryDisplayWorkArea(out RECT lpRect)
+	{
+		RECT rect = default;
+		BOOL result;
+		unsafe
+		{
+			result = PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA, 0, &rect, 0);
+		}
+
+		lpRect = rect;
+		return result;
+	}
 
 	/// <inheritdoc/>
 	public BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFO lpmi) => PInvoke.GetMonitorInfo(hMonitor, ref lpmi);
