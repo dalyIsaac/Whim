@@ -4,7 +4,6 @@ using System.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Shell.Common;
-using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
@@ -111,20 +110,10 @@ internal partial class Screen
 			{
 				Interlocked.Exchange(ref _currentDesktopChangedCount, DesktopChangedCount);
 
-				if (!_coreNativeManager.HasMultipleMonitors() || _hmonitor == (IntPtr)PRIMARY_MONITOR)
+				if (!_coreNativeManager.HasMultipleMonitors() || _hmonitor == PRIMARY_MONITOR)
 				{
-					// Single monitor system
-					unsafe
-					{
-						RECT rect = new();
-						_coreNativeManager.SystemParametersInfo(
-							SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA,
-							0,
-							&rect,
-							0
-						);
-						_workingArea = rect.ToLocation();
-					}
+					_coreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
+					_workingArea = rect.ToLocation();
 				}
 				else
 				{
