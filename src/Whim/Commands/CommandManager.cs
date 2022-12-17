@@ -5,9 +5,10 @@ using System.Collections.Generic;
 namespace Whim;
 
 /// <inheritdoc />
-public class CommandManager : ICommandManager
+internal class CommandManager : ICommandManager
 {
 	private readonly IConfigContext _configContext;
+	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly ICommandItemContainer _commandItems;
 	private readonly KeybindHook _keybindHook;
 	private bool _disposedValue;
@@ -15,11 +16,12 @@ public class CommandManager : ICommandManager
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CommandManager"/> class.
 	/// </summary>
-	public CommandManager(IConfigContext configContext)
+	public CommandManager(IConfigContext configContext, ICoreNativeManager coreNativeManager)
 	{
 		_configContext = configContext;
+		_coreNativeManager = coreNativeManager;
 		_commandItems = new CommandItemContainer();
-		_keybindHook = new KeybindHook(_commandItems);
+		_keybindHook = new KeybindHook(_coreNativeManager, _commandItems);
 	}
 
 	/// <inheritdoc />

@@ -54,6 +54,11 @@ public interface IConfigContext
 	public IPluginManager PluginManager { get; }
 
 	/// <summary>
+	/// Manager for interacting with native Windows config.
+	/// </summary>
+	public INativeManager NativeManager { get; }
+
+	/// <summary>
 	/// This will be called by the Whim Runner.
 	/// You likely won't need to call it yourself.
 	/// </summary>

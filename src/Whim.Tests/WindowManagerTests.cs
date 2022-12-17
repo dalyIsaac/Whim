@@ -16,13 +16,15 @@ public class WindowManagerTests
 		Mock<IConfigContext> configContextMock = new();
 		configContextMock.Setup(c => c.WorkspaceManager).Returns(workspaceManagerMock.Object);
 
+		Mock<ICoreNativeManager> coreNativeManagerMock = new();
+
 #pragma warning disable CA2000 // Dispose objects before losing scope
-		MonitorManager monitorManager = new(configContextMock.Object);
+		MonitorManager monitorManager = new(configContextMock.Object, coreNativeManagerMock.Object);
 #pragma warning restore CA2000 // Dispose objects before losing scope
 		configContextMock.Setup(c => c.MonitorManager).Returns(monitorManager);
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
-		WindowManager windowManager = new(configContextMock.Object);
+		WindowManager windowManager = new(configContextMock.Object, coreNativeManagerMock.Object);
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
 		// When the window manager calls TriggerWindowFocused

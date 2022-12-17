@@ -71,12 +71,12 @@ public class BarPlugin : IBarPlugin
 	/// </summary>
 	private void ShowAll()
 	{
-		using WindowDeferPosHandle deferPosHandle = new(_monitorBarMap.Count);
+		using WindowDeferPosHandle deferPosHandle = new(_configContext, _monitorBarMap.Count);
 
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
 			deferPosHandle.DeferWindowPos(barWindow.WindowState);
-			Win32Helper.SetWindowCorners(
+			_configContext.NativeManager.SetWindowCorners(
 				barWindow.WindowState.Window.Handle,
 				DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND
 			);

@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
-using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
 /// <summary>
-/// Sets the position of multiple windows at once, using <see cref="PInvoke.DeferWindowPos"/>.
+/// Sets the position of multiple windows at once, using <see cref="INativeManager.DeferWindowPos"/>.
 /// As stated in Raymond Chen's blog post (https://devblogs.microsoft.com/oldnewthing/20050706-26/?p=35023),
 /// this reduces the amount of repainting.
 /// </summary>
 public sealed class WindowDeferPosHandle : IDisposable
 {
+	private readonly IConfigContext _configContext;
 	private HDWP _hWinPosInfo;
 	private readonly List<IWindow> _toMinimize;
 	private readonly List<IWindow> _toMaximize;
@@ -23,12 +23,14 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// This is to be used when setting the position of multiple windows at once.
 	///
 	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block
-	/// or statement, otherwise <see cref="PInvoke.EndDeferWindowPos"/> won't be called.
+	/// or statement, otherwise <see cref="INativeManager.EndDeferWindowPos"/> won't be called.
 	/// </summary>
+	/// <param name="configContext"></param>
 	/// <param name="count">The number of windows to layout.</param>
-	public WindowDeferPosHandle(int count)
+	public WindowDeferPosHandle(IConfigContext configContext, int count)
 	{
-		_hWinPosInfo = PInvoke.BeginDeferWindowPos(count);
+		_configContext = configContext;
+		_hWinPosInfo = _configContext.NativeManager.BeginDeferWindowPos(count);
 
 		_toMinimize = new List<IWindow>();
 		_toMaximize = new List<IWindow>();
@@ -42,7 +44,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 		{
 			if (!w.IsMinimized)
 			{
-				Win32Helper.MinimizeWindow(w.Handle);
+				_configContext.NativeManager.MinimizeWindow(w.Handle);
 			}
 		}
 
@@ -50,16 +52,16 @@ public sealed class WindowDeferPosHandle : IDisposable
 		{
 			if (!w.IsMaximized)
 			{
-				Win32Helper.ShowWindowMaximized(w.Handle);
+				_configContext.NativeManager.ShowWindowMaximized(w.Handle);
 			}
 		}
 
 		foreach (IWindow w in _toNormal)
 		{
-			Win32Helper.ShowWindowNoActivate(w.Handle);
+			_configContext.NativeManager.ShowWindowNoActivate(w.Handle);
 		}
 
-		PInvoke.EndDeferWindowPos(_hWinPosInfo);
+		_configContext.NativeManager.EndDeferWindowPos(_hWinPosInfo);
 	}
 
 	/// <summary>
@@ -77,7 +79,12 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 		IWindow window = windowState.Window;
 
-		ILocation<int> offset = Win32Helper.GetWindowOffset(window.Handle);
+		ILocation<int>? offset = _configContext.NativeManager.GetWindowOffset(window.Handle);
+		if (offset is null)
+		{
+			return;
+		}
+
 		ILocation<int> location = windowState.Location.Add(offset);
 
 		WindowSize windowSize = windowState.WindowSize;
@@ -104,7 +111,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 			_toNormal.Add(window);
 		}
 
-		_hWinPosInfo = PInvoke.DeferWindowPos(
+		_hWinPosInfo = _configContext.NativeManager.DeferWindowPos(
 			_hWinPosInfo,
 			window.Handle,
 			(HWND)hwndInsertAfter,
@@ -119,30 +126,37 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// <summary>
 	/// Set the position of a single window.
 	/// </summary>
+	/// <param name="configContext"></param>
 	/// <param name="windowState"></param>
 	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
-	private static void SetWindowPos(IWindowState windowState, HWND? hwndInsertAfter = null)
+	private static void SetWindowPos(
+		IConfigContext configContext,
+		IWindowState windowState,
+		HWND? hwndInsertAfter = null
+	)
 	{
-		using WindowDeferPosHandle handle = new(1);
+		using WindowDeferPosHandle handle = new(configContext, 1);
 		handle.DeferWindowPos(windowState, hwndInsertAfter);
 	}
 
 	/// <summary>
 	/// Set the position of a single window, while accounting for any scaling issues possible.
-	/// Hopefully one day this will be replaced by <see cref="SetWindowPos(IWindowState, HWND?)"/>.
+	/// Hopefully one day this will be replaced by <see cref="SetWindowPos(IConfigContext, IWindowState, HWND?)"/>.
 	/// </summary>
+	/// <param name="configContext"></param>
 	/// <param name="windowState"></param>
 	/// <param name="monitorManager"></param>
 	/// <param name="monitor"></param>
 	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
 	public static void SetWindowPosFixScaling(
+		IConfigContext configContext,
 		IWindowState windowState,
 		IMonitorManager monitorManager,
 		IMonitor monitor,
 		HWND? hwndInsertAfter = null
 	)
 	{
-		SetWindowPos(windowState, hwndInsertAfter);
+		SetWindowPos(configContext, windowState, hwndInsertAfter);
 
 		if (!monitor.IsPrimary && monitorManager.PrimaryMonitor.ScaleFactor != monitor.ScaleFactor)
 		{
@@ -151,7 +165,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 			// NOTE: I have no idea if the comment above is true - it was generated by GitHub Copilot. Regardless, this hack works.
 			// Any suggestions for a better way to do this are welcome.
-			SetWindowPos(windowState, hwndInsertAfter);
+			SetWindowPos(configContext, windowState, hwndInsertAfter);
 		}
 	}
 }

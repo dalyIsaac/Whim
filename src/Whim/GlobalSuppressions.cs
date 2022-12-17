@@ -44,3 +44,49 @@ using System.Diagnostics.CodeAnalysis;
 	Scope = "member",
 	Target = "~M:Whim.IConfigContext.Exit(Whim.ExitEventArgs)"
 )]
+[assembly: SuppressMessage(
+	"Style",
+	"IDE0021:Use block body for constructors",
+	Justification = "It should be allowed for limited cases",
+	Scope = "module"
+)]
+[assembly: SuppressMessage(
+	"Style",
+	"IDE0023:Use block body for conversion operators",
+	Justification = "It should be allowed for limited cases",
+	Scope = "module"
+)]
+[assembly: SuppressMessage(
+	"Style",
+	"IDE0024:Use block body for operators",
+	Justification = "It should be allowed for limited cases",
+	Scope = "module"
+)]
+[assembly: SuppressMessage(
+	"Usage",
+	"CA2225:Operator overloads have named alternates",
+	Justification = "Superfluous for this case",
+	Scope = "namespaceanddescendants",
+	Target = "~N:Windows.Win32"
+)]
+[assembly: SuppressMessage(
+	"Design",
+	"CA1028:Enum Storage should be Int32",
+	Justification = "This is Windows.Win32 code",
+	Scope = "namespaceanddescendants",
+	Target = "~N:Windows.Win32"
+)]
+[assembly: SuppressMessage(
+	"Naming",
+	"CA1707:Identifiers should not contain underscores",
+	Justification = "This is Windows.Win32 ",
+	Scope = "namespaceanddescendants",
+	Target = "~N:Windows.Win32"
+)]
+[assembly: SuppressMessage(
+	"Design",
+	"CA1069:Enums values should not be duplicated",
+	Justification = "This is Windows.Win32 code",
+	Scope = "namespaceanddescendants",
+	Target = "~N:Windows.Win32"
+)]

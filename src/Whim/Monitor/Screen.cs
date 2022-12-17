@@ -1,16 +1,15 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Threading;
-using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Shell.Common;
-using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
 internal partial class Screen
 {
+	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly HMONITOR _hmonitor;
 
 	private readonly ILocation<int> _bounds;
@@ -18,8 +17,6 @@ internal partial class Screen
 	private ILocation<int> _workingArea = new Location<int>();
 
 	public readonly bool Primary;
-
-	private readonly int _bitDepth;
 
 	/// <summary>
 	///  Instance-based counter used to invalidate <see cref="WorkingArea"/>.
@@ -31,21 +28,19 @@ internal partial class Screen
 	/// </summary>
 	public string DeviceName { get; }
 
-	internal Screen(HMONITOR monitor) : this(monitor, default) { }
-
-	internal unsafe Screen(HMONITOR monitor, HDC hdc)
+	internal unsafe Screen(ICoreNativeManager coreNativeManager, HMONITOR monitor)
 	{
-		HDC screenDC = hdc;
+		_coreNativeManager = coreNativeManager;
 
-		if (!s_multiMonitorSupport || monitor == PRIMARY_MONITOR)
+		if (!_coreNativeManager.HasMultipleMonitors() || monitor == PRIMARY_MONITOR)
 		{
 			// Single monitor system.
 			_bounds = new Location<int>()
 			{
-				X = PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN),
-				Y = PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_YVIRTUALSCREEN),
-				Width = PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CXVIRTUALSCREEN),
-				Height = PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CYVIRTUALSCREEN)
+				X = _coreNativeManager.GetVirtualScreenLeft(),
+				Y = _coreNativeManager.GetVirtualScreenTop(),
+				Width = _coreNativeManager.GetVirtualScreenWidth(),
+				Height = _coreNativeManager.GetVirtualScreenHeight()
 			};
 
 			Primary = true;
@@ -55,37 +50,24 @@ internal partial class Screen
 		{
 			// Multiple monitor system.
 			MONITORINFOEXW info = new() { monitorInfo = new MONITORINFO() { cbSize = (uint)sizeof(MONITORINFOEXW) } };
-			MonitorInfo.GetMonitorInfo(monitor, ref info);
+			_coreNativeManager.GetMonitorInfo(monitor, ref info);
 			_bounds = info.GetLocation();
 			Primary = info.IsPrimary();
 
 			DeviceName = info.GetDeviceName();
-
-			if (hdc.IsNull)
-			{
-				fixed (char* p = DeviceName)
-				{
-					screenDC = (HDC)PInvoke.CreateDCW((PCWSTR)p, null, null).Value;
-				}
-			}
 		}
 
 		_hmonitor = monitor;
-
-		_bitDepth = PInvoke.GetDeviceCaps(screenDC, GET_DEVICE_CAPS_INDEX.BITSPIXEL);
-		_bitDepth *= PInvoke.GetDeviceCaps(screenDC, GET_DEVICE_CAPS_INDEX.PLANES);
-
-		if (hdc != screenDC)
-		{
-			PInvoke.DeleteDC((CreatedHDC)screenDC.Value);
-		}
 	}
 
 	public int ScaleFactor
 	{
 		get
 		{
-			HRESULT result = PInvoke.GetScaleFactorForMonitor(_hmonitor, out DEVICE_SCALE_FACTOR scaleFactor);
+			HRESULT result = _coreNativeManager.GetScaleFactorForMonitor(
+				_hmonitor,
+				out DEVICE_SCALE_FACTOR scaleFactor
+			);
 			return result.Succeeded ? (int)scaleFactor : 100;
 		}
 	}
@@ -94,27 +76,24 @@ internal partial class Screen
 	///  Gets the
 	///  primary display.
 	/// </summary>
-	public static Screen? PrimaryScreen
+	public static Screen? GetPrimaryScreen(ICoreNativeManager coreNativeManager)
 	{
-		get
+		if (coreNativeManager.HasMultipleMonitors())
 		{
-			if (s_multiMonitorSupport)
+			Screen[] screens = GetAllScreens(coreNativeManager);
+			for (int i = 0; i < screens.Length; i++)
 			{
-				Screen[] screens = AllScreens;
-				for (int i = 0; i < screens.Length; i++)
+				if (screens[i].Primary)
 				{
-					if (screens[i].Primary)
-					{
-						return screens[i];
-					}
+					return screens[i];
 				}
+			}
 
-				return null;
-			}
-			else
-			{
-				return new Screen(PRIMARY_MONITOR, default);
-			}
+			return null;
+		}
+		else
+		{
+			return new Screen(coreNativeManager, PRIMARY_MONITOR);
 		}
 	}
 
@@ -131,21 +110,16 @@ internal partial class Screen
 			{
 				Interlocked.Exchange(ref _currentDesktopChangedCount, DesktopChangedCount);
 
-				if (!s_multiMonitorSupport || _hmonitor == (IntPtr)PRIMARY_MONITOR)
+				if (!_coreNativeManager.HasMultipleMonitors() || _hmonitor == PRIMARY_MONITOR)
 				{
-					// Single monitor system
-					unsafe
-					{
-						RECT rect = new();
-						PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA, 0, &rect, 0);
-						_workingArea = rect.ToLocation();
-					}
+					_coreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
+					_workingArea = rect.ToLocation();
 				}
 				else
 				{
 					// Multiple monitor System
 					MONITORINFO info = new() { cbSize = (uint)sizeof(MONITORINFO) };
-					PInvoke.GetMonitorInfo(_hmonitor, ref info);
+					_coreNativeManager.GetMonitorInfo(_hmonitor, ref info);
 					_workingArea = info.rcWork.ToLocation();
 				}
 			}
@@ -255,17 +229,18 @@ internal partial class Screen
 	///  Retrieves a <see cref="Screen"/>
 	///  for the monitor that contains the specified point.
 	/// </summary>
-	public static Screen FromPoint(IPoint<int> point)
+	public static Screen FromPoint(ICoreNativeManager coreNativeManager, IPoint<int> point)
 	{
-		if (s_multiMonitorSupport)
+		if (coreNativeManager.HasMultipleMonitors())
 		{
 			return new Screen(
-				PInvoke.MonitorFromPoint(point.ToSystemPoint(), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
+				coreNativeManager,
+				coreNativeManager.MonitorFromPoint(point.ToSystemPoint(), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
 			);
 		}
 		else
 		{
-			return new Screen(PRIMARY_MONITOR);
+			return new Screen(coreNativeManager, PRIMARY_MONITOR);
 		}
 	}
 }

@@ -13,13 +13,15 @@ namespace Whim;
 /// </summary>
 internal class KeybindHook : IDisposable
 {
+	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly ICommandItemContainer _commandItems;
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
-	public KeybindHook(ICommandItemContainer commandItems)
+	public KeybindHook(ICoreNativeManager coreNativeManager, ICommandItemContainer commandItems)
 	{
+		_coreNativeManager = coreNativeManager;
 		_commandItems = commandItems;
 		_keyboardHook = KeyboardHook;
 	}
@@ -27,7 +29,12 @@ internal class KeybindHook : IDisposable
 	public void Initialize()
 	{
 		Logger.Debug("Initializing keybind manager...");
-		_unhookKeyboardHook = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _keyboardHook, null, 0);
+		_unhookKeyboardHook = _coreNativeManager.SetWindowsHookEx(
+			WINDOWS_HOOK_ID.WH_KEYBOARD_LL,
+			_keyboardHook,
+			null,
+			0
+		);
 	}
 
 	/// <summary>
@@ -42,7 +49,7 @@ internal class KeybindHook : IDisposable
 		Logger.Verbose($"{nCode} {wParam.Value} {lParam.Value}");
 		if (nCode != 0 || ((nuint)wParam != PInvoke.WM_KEYDOWN && (nuint)wParam != PInvoke.WM_SYSKEYDOWN))
 		{
-			return PInvoke.CallNextHookEx(null, nCode, wParam, lParam);
+			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 
 		KBDLLHOOKSTRUCT kbdll = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
@@ -60,7 +67,7 @@ internal class KeybindHook : IDisposable
 			case VIRTUAL_KEY.VK_RCONTROL:
 			case VIRTUAL_KEY.VK_LWIN:
 			case VIRTUAL_KEY.VK_RWIN:
-				return PInvoke.CallNextHookEx(null, nCode, wParam, lParam);
+				return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 			default:
 				break;
 		}
@@ -71,12 +78,12 @@ internal class KeybindHook : IDisposable
 			return (LRESULT)1;
 		}
 
-		return PInvoke.CallNextHookEx(null, nCode, wParam, lParam);
+		return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 	}
 
-	private static bool IsModifierPressed(VIRTUAL_KEY key) => (PInvoke.GetKeyState((int)key) & 0x8000) == 0x8000;
+	private bool IsModifierPressed(VIRTUAL_KEY key) => (_coreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
 
-	private static KeyModifiers GetModifiersPressed()
+	private KeyModifiers GetModifiersPressed()
 	{
 		KeyModifiers modifiers = 0;
 

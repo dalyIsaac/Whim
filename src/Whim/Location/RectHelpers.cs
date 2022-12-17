@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Extension methods for <see cref="RECT"/>.
 /// </summary>
-public static class RectHelpers
+internal static class RectHelpers
 {
 	/// <summary>
 	/// Converts a <see cref="RECT"/> to a <see cref="ILocation{T}"/>.
