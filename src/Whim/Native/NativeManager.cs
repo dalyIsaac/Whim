@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -111,29 +110,27 @@ public class NativeManager : INativeManager
 	}
 
 	/// <inheritdoc/>
-	public ILocation<int> GetWindowOffset(HWND hwnd)
+	public ILocation<int>? GetWindowOffset(HWND hwnd)
 	{
 		if (!PInvoke.GetWindowRect(hwnd, out RECT windowRect))
 		{
 			Logger.Error($"Could not get the window rect for {hwnd.Value}");
-			return new Location<int>();
+			return null;
 		}
-		unsafe
-		{
-			ILocation<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
-			if (extendedFrameLocation == null)
-			{
-				return new Location<int>();
-			}
 
-			return new Location<int>()
-			{
-				X = windowRect.left - extendedFrameLocation.X,
-				Y = windowRect.top - extendedFrameLocation.Y,
-				Width = windowRect.right - windowRect.left - extendedFrameLocation.Width,
-				Height = windowRect.bottom - windowRect.top - extendedFrameLocation.Height
-			};
+		ILocation<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
+		if (extendedFrameLocation == null)
+		{
+			return null;
 		}
+
+		return new Location<int>()
+		{
+			X = windowRect.left - extendedFrameLocation.X,
+			Y = windowRect.top - extendedFrameLocation.Y,
+			Width = windowRect.right - windowRect.left - extendedFrameLocation.Width,
+			Height = windowRect.bottom - windowRect.top - extendedFrameLocation.Height
+		};
 	}
 
 	/// <inheritdoc/>

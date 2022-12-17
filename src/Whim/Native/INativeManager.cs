@@ -74,7 +74,7 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public ILocation<int> GetWindowOffset(HWND hwnd);
+	public ILocation<int>? GetWindowOffset(HWND hwnd);
 
 	/// <summary>
 	/// Returns the window's location from DWM.
