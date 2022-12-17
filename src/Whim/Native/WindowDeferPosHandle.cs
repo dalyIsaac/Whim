@@ -79,7 +79,12 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 		IWindow window = windowState.Window;
 
-		ILocation<int> offset = _configContext.NativeManager.GetWindowOffset(window.Handle);
+		ILocation<int>? offset = _configContext.NativeManager.GetWindowOffset(window.Handle);
+		if (offset is null)
+		{
+			return;
+		}
+
 		ILocation<int> location = windowState.Location.Add(offset);
 
 		WindowSize windowSize = windowState.WindowSize;
