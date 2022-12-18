@@ -13,6 +13,7 @@ internal class MonitorManager : IMonitorManager
 {
 	private readonly IConfigContext _configContext;
 	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly WindowMessageMonitor _windowMessageMonitor;
 
 	/// <summary>
 	/// The <see cref="IMonitor"/>s of the computer.
@@ -47,6 +48,7 @@ internal class MonitorManager : IMonitorManager
 	{
 		_configContext = configContext;
 		_coreNativeManager = coreNativeManager;
+		_windowMessageMonitor = new(_configContext);
 
 		// Get the monitors.
 		_monitors = GetCurrentMonitors().OrderBy(m => m.X).ThenBy(m => m.Y).ToArray();

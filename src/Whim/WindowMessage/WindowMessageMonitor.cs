@@ -1,0 +1,96 @@
+using System;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.Shell;
+
+namespace Whim;
+
+internal class WindowMessageMonitor : IWindowMessageMonitor
+{
+	private const int SUBCLASSID = 4561;
+
+	private readonly IConfigContext _configContext;
+	private readonly SUBCLASSPROC _subclassProc;
+	private readonly Microsoft.UI.Xaml.Window _window;
+	private bool _disposedValue;
+
+	public WindowMessageMonitor(IConfigContext configContext)
+	{
+		_configContext = configContext;
+
+		_window = new();
+		_window.SetIsShownInSwitchers(false);
+
+		HWND hwnd = _window.GetHandle();
+		_configContext.NativeManager.HideWindow(hwnd);
+
+		_subclassProc = new SUBCLASSPROC(WindowProc);
+		PInvoke.SetWindowSubclass(new HWND(hwnd), _subclassProc, SUBCLASSID, 0);
+	}
+
+	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChange;
+
+	private LRESULT WindowProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam, nuint uIdSubclass, nuint dwRefData)
+	{
+		WindowMessageMonitorEventArgs eventArgs =
+			new()
+			{
+				MessagePayload = new()
+				{
+					HWnd = hWnd,
+					UMsg = uMsg,
+					WParam = wParam,
+					LParam = lParam,
+				}
+			};
+
+		switch (wParam.Value)
+		{
+			case PInvoke.WM_DISPLAYCHANGE:
+				DisplayChange?.Invoke(this, eventArgs);
+				break;
+			default:
+				break;
+		}
+
+		if (eventArgs.Handled)
+		{
+			return new LRESULT(eventArgs.Result);
+		}
+
+		// TODO: Switch to CoreNativeManager.
+		return PInvoke.DefSubclassProc(hWnd, uMsg, wParam, lParam);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// TODO: dispose managed state (managed objects)
+			}
+
+			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+			// TODO: set large fields to null
+
+			// TODO: Switch to CoreNativeManager.
+			PInvoke.RemoveWindowSubclass(_window.GetHandle(), _subclassProc, SUBCLASSID);
+			_disposedValue = true;
+		}
+	}
+
+	// Free unmanaged resources
+	~WindowMessageMonitor()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: false);
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+}
