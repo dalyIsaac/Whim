@@ -44,7 +44,7 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 				}
 			};
 
-		switch (wParam.Value)
+		switch (uMsg)
 		{
 			case PInvoke.WM_DISPLAYCHANGE:
 				DisplayChange?.Invoke(this, eventArgs);

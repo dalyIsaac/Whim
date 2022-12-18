@@ -65,8 +65,7 @@ internal class MonitorManager : IMonitorManager
 
 	public void Initialize()
 	{
-		// Listen for changes in the monitors.
-		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;
+		_windowMessageMonitor.DisplayChange += WindowMessageMonitor_DisplayChange;
 	}
 
 	/// <summary>
@@ -84,7 +83,7 @@ internal class MonitorManager : IMonitorManager
 		}
 	}
 
-	private void SystemEvents_DisplaySettingsChanging(object? sender, EventArgs e)
+	private void WindowMessageMonitor_DisplayChange(object? sender, WindowMessageMonitorEventArgs e)
 	{
 		// Get the new monitors.
 		IMonitor[] previousMonitors = _monitors;
@@ -209,7 +208,8 @@ internal class MonitorManager : IMonitorManager
 				Logger.Debug("Disposing monitor manager");
 
 				// dispose managed state (managed objects)
-				SystemEvents.DisplaySettingsChanging -= SystemEvents_DisplaySettingsChanging;
+				_windowMessageMonitor.DisplayChange -= WindowMessageMonitor_DisplayChange;
+				_windowMessageMonitor.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
