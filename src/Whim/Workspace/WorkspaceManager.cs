@@ -80,7 +80,10 @@ internal class WorkspaceManager : IWorkspaceManager
 		int idx = 0;
 		foreach (IMonitor monitor in _configContext.MonitorManager)
 		{
-			Activate(_workspaces[idx], monitor);
+			// Get the workspace for this monitor. If the user hasn't provided enough workspaces, create a new one.
+			IWorkspace workspace = idx < _workspaces.Count ? _workspaces[idx] : WorkspaceFactory(_configContext, $"Workspace {idx + 1}");
+
+			Activate(workspace, monitor);
 			idx++;
 		}
 
@@ -314,6 +317,45 @@ internal class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Monitors
+	public void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
+	{
+		Logger.Debug($"MonitorManager_MonitorsChanged: {e}");
+
+		// If a monitor was removed, remove the workspace from the map.
+		foreach (IMonitor monitor in e.RemovedMonitors)
+		{
+			IWorkspace workspace = _monitorWorkspaceMap[monitor];
+			workspace.Deactivate();
+
+			_monitorWorkspaceMap.Remove(monitor);
+		}
+
+		// If a monitor was added, set it to an inactive workspace.
+		foreach (IMonitor monitor in e.AddedMonitors)
+		{
+			// Try find a workspace which doesn't have a monitor.
+			IWorkspace? workspace = _workspaces.Find(w => GetMonitorForWorkspace(w) == null);
+
+			// If there's no workspace, create one.
+			if (workspace is null)
+			{
+				workspace = _configContext.WorkspaceManager.WorkspaceFactory(
+					_configContext,
+					$"Workspace {_workspaces.Count + 1}"
+				);
+
+				workspace.Initialize();
+			}
+
+			// Add the workspace to the map.
+			Activate(workspace, monitor);
+		}
+
+		// For each workspace which is active in a monitor, do a layout.
+		// This will handle cases when the monitor's properties have changed.
+		LayoutAllActiveWorkspaces();
+	}
+
 	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
 	{
 		_proxyLayoutEngines.Add(proxyLayoutEngine);

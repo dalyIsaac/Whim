@@ -38,4 +38,8 @@ internal class Monitor : IMonitor
 		}.IsPointInside(point);
 
 	public override string ToString() => Screen.ToString();
+
+	public override int GetHashCode() => Screen.GetHashCode();
+
+	public bool Equals(IMonitor? other) => other is Monitor monitor && Screen.Equals(monitor.Screen);
 }

@@ -10,7 +10,8 @@ namespace Whim;
 public class MonitorsChangedEventArgs : EventArgs
 {
 	/// <summary>
-	/// The monitors that were not removed or added.
+	/// The monitors that were not removed or added. These monitors may have had some properties
+	/// changed, like their position, resolution, or scaling factor.
 	/// </summary>
 	public required IEnumerable<IMonitor> UnchangedMonitors { get; init; }
 
