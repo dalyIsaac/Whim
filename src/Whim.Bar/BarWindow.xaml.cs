@@ -36,7 +36,6 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		{
 			throw new BarException("Window was unexpectedly null");
 		}
-		;
 
 		double scaleFactor = _monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
@@ -46,9 +45,9 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 			Window = window,
 			Location = new Location<int>()
 			{
-				X = _monitor.X,
-				Y = _monitor.Y,
-				Width = (int)(_monitor.Width / scale),
+				X = _monitor.WorkingArea.X,
+				Y = _monitor.WorkingArea.Y,
+				Width = (int)(_monitor.WorkingArea.Width / scale),
 				Height = _barConfig.Height
 			},
 			WindowSize = WindowSize.Normal

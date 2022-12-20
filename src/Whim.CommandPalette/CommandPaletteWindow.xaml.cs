@@ -80,7 +80,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		TextEntry.Text = _activationConfig.InitialText;
 		TextEntry.SelectAll();
 		TextEntry.PlaceholderText = _activationConfig.Hint ?? "Start typing...";
-		_maxHeight = (int)(_monitor.Height * _plugin.Config.MaxHeightPercent / 100.0);
+		_maxHeight = (int)(_monitor.WorkingArea.Height * _plugin.Config.MaxHeightPercent / 100.0);
 
 		PopulateItems(items ?? Array.Empty<CommandItem>());
 		UpdateMatches();
@@ -330,13 +330,13 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		double scale = scaleFactor / 100.0;
 		height = (int)(height * scale);
 
-		int x = (_monitor.Width / 2) - (width / 2);
-		int y = (int)(_monitor.Height * _plugin.Config.YPositionPercent / 100.0);
+		int x = (_monitor.WorkingArea.Width / 2) - (width / 2);
+		int y = (int)(_monitor.WorkingArea.Height * _plugin.Config.YPositionPercent / 100.0);
 
 		ILocation<int> windowLocation = new Location<int>()
 		{
-			X = _monitor.X + x,
-			Y = _monitor.Y + y,
+			X = _monitor.WorkingArea.X + x,
+			Y = _monitor.WorkingArea.Y + y,
 			Width = width,
 			Height = height
 		};

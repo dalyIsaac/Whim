@@ -85,8 +85,8 @@ internal class Workspace : IWorkspace
 			{
 				X = 0,
 				Y = 0,
-				Width = monitor.Width,
-				Height = monitor.Height
+				Width = monitor.WorkingArea.Width,
+				Height = monitor.WorkingArea.Height
 			},
 			monitor
 		);
@@ -103,8 +103,8 @@ internal class Workspace : IWorkspace
 			// Adjust the window location to the monitor's coordinates
 			loc.Location = new Location<int>()
 			{
-				X = loc.Location.X + monitor.X,
-				Y = loc.Location.Y + monitor.Y,
+				X = loc.Location.X + monitor.WorkingArea.X,
+				Y = loc.Location.Y + monitor.WorkingArea.Y,
 				Width = loc.Location.Width,
 				Height = loc.Location.Height
 			};

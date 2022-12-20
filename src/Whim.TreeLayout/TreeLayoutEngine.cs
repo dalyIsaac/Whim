@@ -498,8 +498,8 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 				+ (
 					direction switch
 					{
-						Whim.Direction.Left => -1d / monitor.Width,
-						Whim.Direction.Right => nodeLocation.Width + (1d / monitor.Width),
+						Whim.Direction.Left => -1d / monitor.WorkingArea.Width,
+						Whim.Direction.Right => nodeLocation.Width + (1d / monitor.WorkingArea.Width),
 						_ => 0d
 					}
 				),
@@ -508,8 +508,8 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 				+ (
 					direction switch
 					{
-						Whim.Direction.Up => -1d / monitor.Height,
-						Whim.Direction.Down => nodeLocation.Height + (1d / monitor.Height),
+						Whim.Direction.Up => -1d / monitor.WorkingArea.Height,
+						Whim.Direction.Down => nodeLocation.Height + (1d / monitor.WorkingArea.Height),
 						_ => 0d
 					}
 				)

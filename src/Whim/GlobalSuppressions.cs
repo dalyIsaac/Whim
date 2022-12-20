@@ -13,19 +13,6 @@ using System.Diagnostics.CodeAnalysis;
 	Target = "~T:Whim.ILayoutEngine"
 )]
 [assembly: SuppressMessage(
-	"Maintainability",
-	"CA1508:Avoid dead conditional code",
-	Justification = "Check is required for multiple threads",
-	Scope = "member",
-	Target = "~P:Whim.Screen.DesktopChangedCount"
-)]
-[assembly: SuppressMessage(
-	"Design",
-	"CA1000:Do not declare static members on generic types",
-	Justification = "Will be resolved by #51",
-	Scope = "module"
-)]
-[assembly: SuppressMessage(
 	"Design",
 	"CA1051:Do not declare visible instance fields",
 	Justification = "They are used by subclasses",

@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -19,7 +22,7 @@ internal class MonitorManager : IMonitorManager
 	/// This is initialized to make the compiler happy - we should never have a case where there's
 	/// zero <see cref="IMonitor"/>s, as the constructor should throw.
 	/// </summary>
-	private IMonitor[] _monitors = Array.Empty<IMonitor>();
+	private Monitor[] _monitors = Array.Empty<Monitor>();
 	private bool _disposedValue;
 
 	/// <summary>
@@ -50,7 +53,7 @@ internal class MonitorManager : IMonitorManager
 		_windowMessageMonitor = new(_configContext);
 
 		// Get the monitors.
-		_monitors = GetCurrentMonitors().OrderBy(m => m.X).ThenBy(m => m.Y).ToArray();
+		_monitors = GetCurrentMonitors().OrderBy(m => m.Bounds.X).ThenBy(m => m.Bounds.Y).ToArray();
 
 		// Get the initial focused monitor
 		IMonitor? primaryMonitor = _monitors?.FirstOrDefault(m => m.IsPrimary);
@@ -132,24 +135,57 @@ internal class MonitorManager : IMonitorManager
 		);
 	}
 
+	private class MonitorEnumCallback
+	{
+		public List<HMONITOR> Monitors { get; } = new();
+
+		public unsafe BOOL Callback(HMONITOR monitor, HDC _hdc, RECT* _rect, LPARAM _param)
+		{
+			Monitors.Add(monitor);
+			return (BOOL)true;
+		}
+	}
+
+	private HMONITOR GetPrimaryHMonitor()
+	{
+		return _coreNativeManager.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY);
+	}
+
 	/// <summary>
 	/// Gets all the current monitors.
 	/// </summary>
 	/// <returns></returns>
 	/// <exception cref="Exception">When no monitors are found.</exception>
-	private IMonitor[] GetCurrentMonitors()
+	private unsafe Monitor[] GetCurrentMonitors()
 	{
-		Screen[] screens = Screen.GetAllScreens(_coreNativeManager);
+		List<HMONITOR> hmonitors;
+		HMONITOR primaryHMonitor = GetPrimaryHMonitor();
 
-		IMonitor[] _monitors = new IMonitor[screens.Length];
-		for (int i = 0; i < screens.Length; i++)
+		if (_coreNativeManager.HasMultipleMonitors())
 		{
-			_monitors[i] = new Monitor(screens[i]);
+			MonitorEnumCallback closure = new();
+			MONITORENUMPROC proc = new(closure.Callback);
+
+			_coreNativeManager.EnumDisplayMonitors(null, null, proc, (LPARAM)0);
+
+			if (closure.Monitors.Count > 0)
+			{
+				hmonitors = closure.Monitors;
+			}
+			else
+			{
+				hmonitors = new List<HMONITOR>() { primaryHMonitor };
+			}
+		}
+		else
+		{
+			hmonitors = new List<HMONITOR>() { primaryHMonitor };
 		}
 
-		if (_monitors.Length == 0)
+		Monitor[] _monitors = new Monitor[hmonitors.Count];
+		for (int i = 0; i < _monitors.Length; i++)
 		{
-			throw new Exception("No monitors were found");
+			_monitors[i] = new Monitor(_coreNativeManager, hmonitors[i], hmonitors[i] == primaryHMonitor);
 		}
 
 		return _monitors;
@@ -158,9 +194,12 @@ internal class MonitorManager : IMonitorManager
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
 		Logger.Debug($"Getting monitor at point {point}");
-		Screen screen = Screen.FromPoint(_coreNativeManager, point);
+		HMONITOR hmonitor = _coreNativeManager.MonitorFromPoint(
+			point.ToSystemPoint(),
+			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
+		);
 
-		IMonitor? monitor = _monitors.FirstOrDefault(m => m.Name == screen.DeviceName);
+		IMonitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
 		if (monitor == null)
 		{
 			Logger.Error($"No monitor found at point {point}");

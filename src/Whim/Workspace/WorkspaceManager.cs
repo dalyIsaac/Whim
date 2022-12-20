@@ -81,7 +81,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		foreach (IMonitor monitor in _configContext.MonitorManager)
 		{
 			// Get the workspace for this monitor. If the user hasn't provided enough workspaces, create a new one.
-			IWorkspace workspace = idx < _workspaces.Count ? _workspaces[idx] : WorkspaceFactory(_configContext, $"Workspace {idx + 1}");
+			IWorkspace workspace =
+				idx < _workspaces.Count ? _workspaces[idx] : WorkspaceFactory(_configContext, $"Workspace {idx + 1}");
 
 			Activate(workspace, monitor);
 			idx++;
@@ -502,8 +503,8 @@ internal class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		IPoint<int> pointInMonitor = targetMonitor.ToMonitorCoordinates(point);
-		IPoint<double> normalized = targetMonitor.ToUnitSquare(pointInMonitor);
+		IPoint<int> pointInMonitor = targetMonitor.WorkingArea.ToMonitorCoordinates(point);
+		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(pointInMonitor);
 		Logger.Debug($"Normalized location: {normalized}");
 
 		targetWorkspace.MoveWindowToPoint(window, normalized, isPhantom);

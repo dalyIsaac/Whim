@@ -52,8 +52,8 @@ public class TestAddWindow
 		Mock<IWorkspaceManager> workspaceManager = new();
 		Mock<IConfigContext> configContext = new();
 
-		monitor.Setup(m => m.Width).Returns(1920);
-		monitor.Setup(m => m.Height).Returns(1080);
+		monitor.Setup(m => m.WorkingArea.Width).Returns(1920);
+		monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
 		monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
 		configContext.Setup(x => x.MonitorManager).Returns(monitorManager.Object);
 

@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Represents a single display device.
 /// </summary>
-public interface IMonitor : ILocation<int>, IEquatable<IMonitor>
+public interface IMonitor : IEquatable<IMonitor>
 {
 	/// <summary>
 	/// The name of the monitor.
@@ -21,6 +21,20 @@ public interface IMonitor : ILocation<int>, IEquatable<IMonitor>
 	/// The scale factor of this monitor.
 	/// </summary>
 	public int ScaleFactor { get; }
+
+	/// <summary>
+	/// The working area of this monitor.
+	/// </summary>
+	/// <remarks>
+	/// The working area is the desktop area of the display, excluding taskbars,
+	/// docked windows, and docked tool bars.
+	/// </remarks>
+	public ILocation<int> WorkingArea { get; }
+
+	/// <summary>
+	/// The bounds of the monitor.
+	/// </summary>
+	public ILocation<int> Bounds { get; }
 }
 
 /// <summary>
@@ -99,3 +113,4 @@ public static class MonitorHelpers
 		};
 	}
 }
+

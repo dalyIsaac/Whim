@@ -1,45 +1,89 @@
+using System.Diagnostics.CodeAnalysis;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.Shell.Common;
+
 namespace Whim;
 
-/// <summary>
-/// Implementation of <see cref="IMonitor"/>.
-/// </summary>
 internal class Monitor : IMonitor
 {
-	/// <summary>
-	/// Internal representation of a screen, based on the WinForms Screen class.
-	/// This has been ported to <see cref="Screen"/>.
-	/// </summary>
-	internal Screen Screen { get; }
+	private readonly ICoreNativeManager _coreNativeManager;
+	internal readonly HMONITOR _hmonitor;
 
-	/// <summary>
-	///
-	/// </summary>
-	/// <param name="screen"></param>
-	internal Monitor(Screen screen)
+	public Monitor(ICoreNativeManager coreNativeManager, HMONITOR monitor, bool isPrimaryHMonitor)
 	{
-		Screen = screen;
+		_coreNativeManager = coreNativeManager;
+		_hmonitor = monitor;
+
+		UpdateProperties(isPrimaryHMonitor);
 	}
 
-	public string Name => Screen.DeviceName;
-	public int Width => Screen.WorkingArea.Width;
-	public int Height => Screen.WorkingArea.Height;
-	public int X => Screen.WorkingArea.X;
-	public int Y => Screen.WorkingArea.Y;
-	public bool IsPrimary => Screen.Primary;
-	public int ScaleFactor => Screen.ScaleFactor;
+	public string Name { get; private set; }
 
-	public bool IsPointInside(IPoint<int> point) =>
-		new Location<int>()
+	public bool IsPrimary { get; private set; }
+
+	public ILocation<int> Bounds { get; private set; }
+
+	public ILocation<int> WorkingArea { get; private set; }
+
+	public int ScaleFactor { get; private set; }
+
+	[MemberNotNull(nameof(Bounds), nameof(IsPrimary), nameof(Name), nameof(WorkingArea), nameof(ScaleFactor))]
+	internal unsafe void UpdateProperties(bool isPrimaryHMonitor)
+	{
+		if (!_coreNativeManager.HasMultipleMonitors() || isPrimaryHMonitor)
 		{
-			X = X,
-			Y = Y,
-			Width = Width,
-			Height = Height
-		}.IsPointInside(point);
+			// Single monitor system.
+			Bounds = new Location<int>()
+			{
+				X = _coreNativeManager.GetVirtualScreenLeft(),
+				Y = _coreNativeManager.GetVirtualScreenTop(),
+				Width = _coreNativeManager.GetVirtualScreenWidth(),
+				Height = _coreNativeManager.GetVirtualScreenHeight()
+			};
 
-	public override string ToString() => Screen.ToString();
+			IsPrimary = true;
+			Name = "DISPLAY";
 
-	public override int GetHashCode() => Screen.GetHashCode();
+			_coreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
+			WorkingArea = rect.ToLocation();
+		}
+		else
+		{
+			// Multiple monitor system.
+			MONITORINFOEXW infoEx = new() { monitorInfo = new MONITORINFO() { cbSize = (uint)sizeof(MONITORINFOEXW) } };
+			_coreNativeManager.GetMonitorInfo(_hmonitor, ref infoEx);
 
-	public bool Equals(IMonitor? other) => other is Monitor monitor && Screen.Equals(monitor.Screen);
+			Bounds = infoEx.GetLocation();
+			IsPrimary = infoEx.IsPrimary();
+			Name = infoEx.GetDeviceName();
+
+			MONITORINFO info = new() { cbSize = (uint)sizeof(MONITORINFO) };
+			_coreNativeManager.GetMonitorInfo(_hmonitor, ref info);
+			WorkingArea = info.rcWork.ToLocation();
+		}
+
+		HRESULT scaleFactorResult = _coreNativeManager.GetScaleFactorForMonitor(
+			_hmonitor,
+			out DEVICE_SCALE_FACTOR scaleFactor
+		);
+		ScaleFactor = scaleFactorResult.Succeeded ? (int)scaleFactor : 100;
+	}
+
+	public bool Equals(IMonitor? other) => other is Monitor monitor && _hmonitor == monitor._hmonitor;
+
+	public override int GetHashCode() => (int)(nint)_hmonitor;
+
+	public override string ToString()
+	{
+		return GetType().Name
+			+ "[Bounds="
+			+ Bounds.ToString()
+			+ " WorkingArea="
+			+ WorkingArea.ToString()
+			+ " IsPrimary="
+			+ IsPrimary.ToString()
+			+ " Name="
+			+ Name;
+	}
 }
