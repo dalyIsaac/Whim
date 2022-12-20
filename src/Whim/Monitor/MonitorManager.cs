@@ -215,13 +215,29 @@ internal class MonitorManager : IMonitorManager
 			hmonitors = new List<HMONITOR>() { primaryHMonitor };
 		}
 
-		Monitor[] _monitors = new Monitor[hmonitors.Count];
-		for (int i = 0; i < _monitors.Length; i++)
+		Monitor[] currentMonitors = new Monitor[hmonitors.Count];
+		for (int i = 0; i < currentMonitors.Length; i++)
 		{
-			_monitors[i] = new Monitor(_coreNativeManager, hmonitors[i], hmonitors[i] == primaryHMonitor);
+			HMONITOR hmonitor = hmonitors[i];
+			bool isPrimaryHMonitor = hmonitor == primaryHMonitor;
+
+			// Try find the monitor in the list of existing monitors. If we can find it, update
+			// its properties.
+			Monitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
+
+			if (monitor is null)
+			{
+				monitor = new Monitor(_coreNativeManager, hmonitor, isPrimaryHMonitor);
+			}
+			else
+			{
+				monitor.Update(isPrimaryHMonitor);
+			}
+
+			currentMonitors[i] = monitor;
 		}
 
-		return _monitors;
+		return currentMonitors;
 	}
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)

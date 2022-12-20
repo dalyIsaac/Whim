@@ -15,7 +15,7 @@ internal class Monitor : IMonitor
 		_coreNativeManager = coreNativeManager;
 		_hmonitor = monitor;
 
-		UpdateProperties(isPrimaryHMonitor);
+		Update(isPrimaryHMonitor);
 	}
 
 	public string Name { get; private set; }
@@ -29,7 +29,7 @@ internal class Monitor : IMonitor
 	public int ScaleFactor { get; private set; }
 
 	[MemberNotNull(nameof(Bounds), nameof(IsPrimary), nameof(Name), nameof(WorkingArea), nameof(ScaleFactor))]
-	internal unsafe void UpdateProperties(bool isPrimaryHMonitor)
+	internal unsafe void Update(bool isPrimaryHMonitor)
 	{
 		if (!_coreNativeManager.HasMultipleMonitors() || isPrimaryHMonitor)
 		{
