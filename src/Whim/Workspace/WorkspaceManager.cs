@@ -70,6 +70,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug("Initializing workspace manager...");
 
+		_configContext.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+
 		// Ensure there's at least n workspaces, for n monitors.
 		if (_configContext.MonitorManager.Length > _workspaces.Count)
 		{
