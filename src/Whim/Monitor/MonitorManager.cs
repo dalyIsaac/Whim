@@ -68,8 +68,8 @@ internal class MonitorManager : IMonitorManager
 	public void Initialize()
 	{
 		_windowMessageMonitor.DisplayChanged += WindowMessageMonitor_DisplayChanged;
-		_windowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_DisplayChanged;
-		_windowMessageMonitor.DpiChanged += WindowMessageMonitor_DisplayChanged;
+		_windowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_WorkAreaChanged;
+		_windowMessageMonitor.DpiChanged += WindowMessageMonitor_DpiChanged;
 	}
 
 	/// <summary>
@@ -89,6 +89,8 @@ internal class MonitorManager : IMonitorManager
 
 	private void WindowMessageMonitor_DisplayChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{
+		Logger.Debug($"Display changed: {e.MessagePayload}");
+
 		// Get the new monitors.
 		IMonitor[] previousMonitors = _monitors;
 		_monitors = GetCurrentMonitors();
@@ -125,7 +127,6 @@ internal class MonitorManager : IMonitorManager
 			}
 		}
 
-		// Trigger MonitorsChanged event.
 		MonitorsChanged?.Invoke(
 			this,
 			new MonitorsChangedEventArgs()
@@ -137,11 +138,41 @@ internal class MonitorManager : IMonitorManager
 		);
 	}
 
+	private void WindowMessageMonitor_WorkAreaChanged(object? sender, WindowMessageMonitorEventArgs e)
+	{
+		Logger.Debug($"Work area changed: {e.MessagePayload}");
+
+		MonitorsChanged?.Invoke(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				UnchangedMonitors = _monitors,
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				AddedMonitors = Array.Empty<IMonitor>()
+			}
+		);
+	}
+
+	private void WindowMessageMonitor_DpiChanged(object? sender, WindowMessageMonitorEventArgs e)
+	{
+		Logger.Debug($"DPI changed: {e.MessagePayload}");
+
+		MonitorsChanged?.Invoke(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				UnchangedMonitors = _monitors,
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				AddedMonitors = Array.Empty<IMonitor>()
+			}
+		);
+	}
+
 	private class MonitorEnumCallback
 	{
 		public List<HMONITOR> Monitors { get; } = new();
 
-		public unsafe BOOL Callback(HMONITOR monitor, HDC _hdc, RECT* _rect, LPARAM _param)
+		public unsafe BOOL Callback(HMONITOR monitor, HDC hdc, RECT* rect, LPARAM param)
 		{
 			Monitors.Add(monitor);
 			return (BOOL)true;
