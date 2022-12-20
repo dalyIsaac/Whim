@@ -29,4 +29,7 @@ public class WindowMessageMonitorEventArgsPayload
 	/// Additional message information.
 	/// </summary>
 	public required nint LParam { get; init; }
+
+	/// <inheritdoc />
+	public override string ToString() => $"HWnd: {HWnd}, UMsg: {UMsg}, WParam: {WParam}, LParam: {LParam}";
 }

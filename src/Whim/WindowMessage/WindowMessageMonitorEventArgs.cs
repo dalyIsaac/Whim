@@ -28,4 +28,7 @@ public class WindowMessageMonitorEventArgs : EventArgs
 	/// When <see langword="false"/>, the message will continue to be processed by other subclasses.
 	/// </remarks>
 	public bool Handled { get; set; }
+
+	/// <inheritdoc />
+	public override string ToString() => $"Result: {Result}, Handled: {Handled}, {MessagePayload}";
 }

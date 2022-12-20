@@ -12,8 +12,11 @@ internal interface IWindowMessageMonitor : IDisposable
 {
 	/// <summary>
 	/// The <see cref="PInvoke.WM_DISPLAYCHANGE"/> message is sent to all windows when the display
-	/// resolution has changed for a monitor.
+	/// resolution has changed for a monitor, or when a display is added or removed.
 	/// </summary>
+	/// <remarks>
+	/// For more, see https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ms695534(v=vs.85)
+	/// </remarks>
 	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
 
 	/// <summary>
