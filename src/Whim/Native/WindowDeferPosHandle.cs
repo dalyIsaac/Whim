@@ -145,20 +145,18 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// </summary>
 	/// <param name="configContext"></param>
 	/// <param name="windowState"></param>
-	/// <param name="monitorManager"></param>
 	/// <param name="monitor"></param>
 	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
 	public static void SetWindowPosFixScaling(
 		IConfigContext configContext,
 		IWindowState windowState,
-		IMonitorManager monitorManager,
 		IMonitor monitor,
 		HWND? hwndInsertAfter = null
 	)
 	{
 		SetWindowPos(configContext, windowState, hwndInsertAfter);
 
-		if (!monitor.IsPrimary && monitorManager.PrimaryMonitor.ScaleFactor != monitor.ScaleFactor)
+		if (!monitor.IsPrimary && configContext.MonitorManager.PrimaryMonitor.ScaleFactor != monitor.ScaleFactor)
 		{
 			// We need to call SetWindowPos again, as the first call will cause the window to be scaled, and the second call
 			// will cause the window to be positioned correctly.

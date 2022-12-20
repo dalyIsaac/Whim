@@ -351,7 +351,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 				Location = windowLocation,
 				WindowSize = WindowSize.Normal
 			},
-			monitorManager: _configContext.MonitorManager,
 			monitor: _monitor,
 			hwndInsertAfter: _window.Handle
 		);

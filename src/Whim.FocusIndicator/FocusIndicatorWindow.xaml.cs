@@ -50,7 +50,6 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 				Location = borderLocation,
 				WindowSize = WindowSize.Normal
 			},
-			monitorManager: _configContext.MonitorManager,
 			monitor: _configContext.MonitorManager.FocusedMonitor,
 			hwndInsertAfter: new HWND(1)
 		);
