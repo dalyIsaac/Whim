@@ -63,4 +63,18 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		CenterPanel.Children.AddRange(_barConfig.CenterComponents.Select(c => c(_configContext, _monitor, this)));
 		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_configContext, _monitor, this)));
 	}
+
+	internal void UpdateLocation()
+	{
+		double scaleFactor = _monitor.ScaleFactor;
+		double scale = scaleFactor / 100.0;
+
+		WindowState.Location = new Location<int>()
+			{
+				X = _monitor.WorkingArea.X,
+				Y = _monitor.WorkingArea.Y,
+				Width = (int)(_monitor.WorkingArea.Width / scale),
+				Height = _barConfig.Height
+			};
+	}
 }

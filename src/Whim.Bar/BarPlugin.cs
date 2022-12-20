@@ -75,6 +75,7 @@ public class BarPlugin : IBarPlugin
 
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
+			barWindow.UpdateLocation();
 			deferPosHandle.DeferWindowPos(barWindow.WindowState);
 			_configContext.NativeManager.SetWindowCorners(
 				barWindow.WindowState.Window.Handle,
