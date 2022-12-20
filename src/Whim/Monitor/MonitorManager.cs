@@ -67,7 +67,9 @@ internal class MonitorManager : IMonitorManager
 
 	public void Initialize()
 	{
-		_windowMessageMonitor.DisplayChange += WindowMessageMonitor_DisplayChange;
+		_windowMessageMonitor.DisplayChanged += WindowMessageMonitor_DisplayChanged;
+		_windowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_DisplayChanged;
+		_windowMessageMonitor.DpiChanged += WindowMessageMonitor_DisplayChanged;
 	}
 
 	/// <summary>
@@ -85,7 +87,7 @@ internal class MonitorManager : IMonitorManager
 		}
 	}
 
-	private void WindowMessageMonitor_DisplayChange(object? sender, WindowMessageMonitorEventArgs e)
+	private void WindowMessageMonitor_DisplayChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{
 		// Get the new monitors.
 		IMonitor[] previousMonitors = _monitors;
@@ -246,7 +248,7 @@ internal class MonitorManager : IMonitorManager
 				Logger.Debug("Disposing monitor manager");
 
 				// dispose managed state (managed objects)
-				_windowMessageMonitor.DisplayChange -= WindowMessageMonitor_DisplayChange;
+				_windowMessageMonitor.DisplayChanged -= WindowMessageMonitor_DisplayChanged;
 				_windowMessageMonitor.Dispose();
 			}
 

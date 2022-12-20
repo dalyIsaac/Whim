@@ -2,6 +2,7 @@ using System;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Shell;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
@@ -28,7 +29,11 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		PInvoke.SetWindowSubclass(new HWND(hwnd), _subclassProc, SUBCLASSID, 0);
 	}
 
-	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChange;
+	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
+
+	public event EventHandler<WindowMessageMonitorEventArgs>? WorkAreaChanged;
+
+	public event EventHandler<WindowMessageMonitorEventArgs>? DpiChanged;
 
 	private LRESULT WindowProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam, nuint uIdSubclass, nuint dwRefData)
 	{
@@ -47,7 +52,10 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		switch (uMsg)
 		{
 			case PInvoke.WM_DISPLAYCHANGE:
-				DisplayChange?.Invoke(this, eventArgs);
+				DisplayChanged?.Invoke(this, eventArgs);
+				break;
+			case PInvoke.WM_SETTINGCHANGE:
+				WindowProcSettingChange(eventArgs);
 				break;
 			default:
 				break;
@@ -60,6 +68,21 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 
 		// TODO: Switch to CoreNativeManager.
 		return PInvoke.DefSubclassProc(hWnd, uMsg, wParam, lParam);
+	}
+
+	private void WindowProcSettingChange(WindowMessageMonitorEventArgs eventArgs)
+	{
+		switch (eventArgs.MessagePayload.WParam)
+		{
+			case (nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA:
+				WorkAreaChanged?.Invoke(this, eventArgs);
+				break;
+			case (nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_SETLOGICALDPIOVERRIDE:
+				DpiChanged?.Invoke(this, eventArgs);
+				break;
+			default:
+				break;
+		}
 	}
 
 	protected virtual void Dispose(bool disposing)
