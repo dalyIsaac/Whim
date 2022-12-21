@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Whim.Tests;
 
-public class TestMonitor
+public class MonitorHelpersTests
 {
 	public static IEnumerable<object[]> IntToUnitSquareData()
 	{
@@ -83,7 +83,7 @@ public class TestMonitor
 
 	[Theory]
 	[MemberData(nameof(IntToUnitSquareData))]
-	public void IntToUnitSquareTheory(ILocation<int> monitor, IPoint<int> point, IPoint<double> expected)
+	public void ToUnitSquarePointTheory(ILocation<int> monitor, IPoint<int> point, IPoint<double> expected)
 	{
 		// When
 		IPoint<double> actual = monitor.ToUnitSquare(point);
@@ -171,7 +171,7 @@ public class TestMonitor
 
 	[Theory]
 	[MemberData(nameof(DoubleToUnitSquareData))]
-	public void DoubleToUnitSquareTheory(ILocation<int> monitor, ILocation<int> location, ILocation<double> expected)
+	public void ToUnitSquareLocationTheory(ILocation<int> monitor, ILocation<int> location, ILocation<double> expected)
 	{
 		// When
 		ILocation<double> actual = monitor.ToUnitSquare(location);
