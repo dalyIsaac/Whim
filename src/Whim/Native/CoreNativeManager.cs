@@ -10,6 +10,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using System.Collections.Generic;
 using Windows.Win32.Graphics.Dwm;
+using Windows.Win32.UI.Shell;
 
 namespace Whim;
 
@@ -277,4 +278,16 @@ internal class CoreNativeManager : ICoreNativeManager
 			return cloaked != 0 || res.Failed;
 		}
 	}
+
+	/// <inheritdoc/>
+	public BOOL SetWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass, nuint dwRefData) =>
+		PInvoke.SetWindowSubclass(hWnd, pfnSubclass, uIdSubclass, dwRefData);
+
+	/// <inheritdoc/>
+	public BOOL RemoveWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass) =>
+		PInvoke.RemoveWindowSubclass(hWnd, pfnSubclass, uIdSubclass);
+
+	/// <inheritdoc/>
+	public LRESULT DefSubclassProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam) =>
+		PInvoke.DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }

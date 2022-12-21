@@ -11,13 +11,15 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	private const int SUBCLASSID = 4561;
 
 	private readonly IConfigContext _configContext;
+	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly SUBCLASSPROC _subclassProc;
 	private readonly Microsoft.UI.Xaml.Window _window;
 	private bool _disposedValue;
 
-	public WindowMessageMonitor(IConfigContext configContext)
+	public WindowMessageMonitor(IConfigContext configContext, ICoreNativeManager coreNativeManager)
 	{
 		_configContext = configContext;
+		_coreNativeManager = coreNativeManager;
 
 		_window = new();
 		_window.SetIsShownInSwitchers(false);
@@ -26,7 +28,7 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		_configContext.NativeManager.HideWindow(hwnd);
 
 		_subclassProc = new SUBCLASSPROC(WindowProc);
-		PInvoke.SetWindowSubclass(new HWND(hwnd), _subclassProc, SUBCLASSID, 0);
+		_coreNativeManager.SetWindowSubclass(new HWND(hwnd), _subclassProc, SUBCLASSID, 0);
 	}
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
@@ -66,8 +68,7 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 			return new LRESULT(eventArgs.Result);
 		}
 
-		// TODO: Switch to CoreNativeManager.
-		return PInvoke.DefSubclassProc(hWnd, uMsg, wParam, lParam);
+		return _coreNativeManager.DefSubclassProc(hWnd, uMsg, wParam, lParam);
 	}
 
 	private void WindowProcSettingChange(WindowMessageMonitorEventArgs eventArgs)
@@ -91,14 +92,12 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		{
 			if (disposing)
 			{
-				// TODO: dispose managed state (managed objects)
+				// dispose managed state (managed objects)
 			}
 
-			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-			// TODO: set large fields to null
-
-			// TODO: Switch to CoreNativeManager.
-			PInvoke.RemoveWindowSubclass(_window.GetHandle(), _subclassProc, SUBCLASSID);
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_coreNativeManager.RemoveWindowSubclass(_window.GetHandle(), _subclassProc, SUBCLASSID);
 			_disposedValue = true;
 		}
 	}

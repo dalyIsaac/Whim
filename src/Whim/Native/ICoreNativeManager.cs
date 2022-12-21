@@ -7,6 +7,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
+using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
@@ -359,4 +360,77 @@ internal interface ICoreNativeManager
 	/// <param name="className">The window's class name.</param>
 	/// <returns></returns>
 	public bool IsSystemWindow(HWND hwnd, string className);
+
+	/// <summary>Installs or updates a window subclass callback.</summary>
+	/// <param name="hWnd">
+	/// <para>Type: <b>HWND</b> The handle of the window being subclassed.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="pfnSubclass">
+	/// <para>Type: <b><a href="https://docs.microsoft.com/windows/desktop/api/commctrl/nc-commctrl-subclassproc">SUBCLASSPROC</a></b> A pointer to a window procedure. This pointer and the subclass ID uniquely identify this subclass callback. For the callback function prototype, see <a href="https://docs.microsoft.com/windows/desktop/api/commctrl/nc-commctrl-subclassproc">SUBCLASSPROC</a>.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="uIdSubclass">
+	/// <para>Type: <b>UINT_PTR</b> The subclass ID. This ID together with the subclass procedure uniquely identify a subclass. To remove a subclass, pass the subclass procedure and this value to the <a href="https://docs.microsoft.com/windows/desktop/api/commctrl/nf-commctrl-removewindowsubclass">RemoveWindowSubclass</a> function. This value is passed to the subclass procedure in the uIdSubclass parameter.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="dwRefData">
+	/// <para>Type: <b>DWORD_PTR</b> <b>DWORD_PTR</b> to reference data. The meaning of this value is determined by the calling application. This value is passed to the subclass procedure in the dwRefData parameter. A different dwRefData is associated with each combination of window handle, subclass procedure and uIdSubclass.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <returns>
+	/// <para>Type: <b>BOOL</b> <b>TRUE</b> if the subclass callback was successfully installed; otherwise, <b>FALSE</b>.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass">Learn more about this API from docs.microsoft.com</see>.</para>
+	/// </remarks>
+	/// <returns></returns>
+	public BOOL SetWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass, nuint dwRefData);
+
+	/// <summary>Removes a subclass callback from a window.</summary>
+	/// <param name="hWnd">
+	/// <para>Type: <b>HWND</b> The handle of the window being subclassed.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-removewindowsubclass#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="pfnSubclass">
+	/// <para>Type: <b><a href="https://docs.microsoft.com/windows/desktop/api/commctrl/nc-commctrl-subclassproc">SUBCLASSPROC</a></b> A pointer to a window procedure. This pointer and the subclass ID uniquely identify this subclass callback. For the callback function prototype, see <a href="https://docs.microsoft.com/windows/desktop/api/commctrl/nc-commctrl-subclassproc">SUBCLASSPROC</a>.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-removewindowsubclass#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="uIdSubclass">
+	/// <para>Type: <b>UINT_PTR</b> The <b>UINT_PTR</b> subclass ID. This ID and the callback pointer uniquely identify this subclass callback. Note: On 64-bit versions of Windows this is a 64-bit value.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-removewindowsubclass#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <returns>
+	/// <para>Type: <b>BOOL</b> <b>TRUE</b> if the subclass callback was successfully removed; otherwise, <b>FALSE</b>.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-removewindowsubclass">Learn more about this API from docs.microsoft.com</see>.</para>
+	/// </remarks>
+	/// <returns></returns>
+	public BOOL RemoveWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass);
+
+	/// <summary>Calls the next handler in a window's subclass chain. The last handler in the subclass chain calls the original window procedure for the window.</summary>
+	/// <param name="hWnd">
+	/// <para>Type: <b>HWND</b> A handle to the window being subclassed.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//commctrl/nf-commctrl-defsubclassproc#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="uMsg">
+	/// <para>Type: <b>UINT</b> A value of type unsigned <b>int</b> that specifies a window message.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//commctrl/nf-commctrl-defsubclassproc#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="wParam">
+	/// <para>Type: <b>WPARAM</b> Specifies additional message information. The contents of this parameter depend on the value of the window message.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//commctrl/nf-commctrl-defsubclassproc#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="lParam">
+	/// <para>Type: <b>LPARAM</b> Specifies additional message information. The contents of this parameter depend on the value of the window message. Note: On 64-bit versions of Windows LPARAM is a 64-bit value.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//commctrl/nf-commctrl-defsubclassproc#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <returns>
+	/// <para>Type: <b>LRESULT</b> The returned value is specific to the message sent. This value should be ignored.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//commctrl/nf-commctrl-defsubclassproc">Learn more about this API from docs.microsoft.com</see>.</para>
+	/// </remarks>
+	public LRESULT DefSubclassProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam);
 }
