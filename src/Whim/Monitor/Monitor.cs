@@ -54,13 +54,10 @@ internal class Monitor : IMonitor
 			MONITORINFOEXW infoEx = new() { monitorInfo = new MONITORINFO() { cbSize = (uint)sizeof(MONITORINFOEXW) } };
 			_coreNativeManager.GetMonitorInfo(_hmonitor, ref infoEx);
 
-			Bounds = infoEx.GetLocation();
-			IsPrimary = infoEx.IsPrimary();
+			Bounds = infoEx.monitorInfo.rcMonitor.ToLocation();
+			WorkingArea = infoEx.monitorInfo.rcWork.ToLocation();
+			IsPrimary = false;
 			Name = infoEx.GetDeviceName();
-
-			MONITORINFO info = new() { cbSize = (uint)sizeof(MONITORINFO) };
-			_coreNativeManager.GetMonitorInfo(_hmonitor, ref info);
-			WorkingArea = info.rcWork.ToLocation();
 		}
 
 		HRESULT scaleFactorResult = _coreNativeManager.GetScaleFactorForMonitor(
@@ -81,9 +78,12 @@ internal class Monitor : IMonitor
 			+ Bounds.ToString()
 			+ " WorkingArea="
 			+ WorkingArea.ToString()
+			+ " Name="
+			+ Name
+			+ " ScaleFactor="
+			+ ScaleFactor.ToString()
 			+ " IsPrimary="
 			+ IsPrimary.ToString()
-			+ " Name="
-			+ Name;
+			+ "]";
 	}
 }
