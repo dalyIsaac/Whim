@@ -5,12 +5,15 @@ using System.Linq;
 namespace Whim;
 
 /// <summary>
-/// Represents the change in monitors of Windows and Whim.
+/// Represents the change in monitors of Windows and Whim. This may include monitors were added
+/// or removed, or monitors that were unchanged but had some properties changed, like their
+/// position, resolution, work area, or scaling factor.
 /// </summary>
 public class MonitorsChangedEventArgs : EventArgs
 {
 	/// <summary>
-	/// The monitors that were not removed or added.
+	/// The monitors that were not removed or added. These monitors may have had some properties
+	/// changed, like their position, resolution, work area, or scaling factor.
 	/// </summary>
 	public required IEnumerable<IMonitor> UnchangedMonitors { get; init; }
 

@@ -70,6 +70,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug("Initializing workspace manager...");
 
+		_configContext.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+
 		// Ensure there's at least n workspaces, for n monitors.
 		if (_configContext.MonitorManager.Length > _workspaces.Count)
 		{
@@ -80,7 +82,11 @@ internal class WorkspaceManager : IWorkspaceManager
 		int idx = 0;
 		foreach (IMonitor monitor in _configContext.MonitorManager)
 		{
-			Activate(_workspaces[idx], monitor);
+			// Get the workspace for this monitor. If the user hasn't provided enough workspaces, create a new one.
+			IWorkspace workspace =
+				idx < _workspaces.Count ? _workspaces[idx] : WorkspaceFactory(_configContext, $"Workspace {idx + 1}");
+
+			Activate(workspace, monitor);
 			idx++;
 		}
 
@@ -166,8 +172,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		// Get the old workspace for the event.
 		_monitorWorkspaceMap.TryGetValue(focusedMonitor, out IWorkspace? oldWorkspace);
 
-		// Update the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = _monitorWorkspaceMap.Keys.FirstOrDefault(m => _monitorWorkspaceMap[m] == workspace);
+		// Find the monitor which just lost `workspace`.
+		IMonitor? loserMonitor = _monitorWorkspaceMap.FirstOrDefault(m => m.Value == workspace).Key;
 
 		// Update the focused monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
@@ -314,6 +320,45 @@ internal class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Monitors
+	public void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
+	{
+		Logger.Debug($"MonitorManager_MonitorsChanged: {e}");
+
+		// If a monitor was removed, remove the workspace from the map.
+		foreach (IMonitor monitor in e.RemovedMonitors)
+		{
+			IWorkspace workspace = _monitorWorkspaceMap[monitor];
+			workspace.Deactivate();
+
+			_monitorWorkspaceMap.Remove(monitor);
+		}
+
+		// If a monitor was added, set it to an inactive workspace.
+		foreach (IMonitor monitor in e.AddedMonitors)
+		{
+			// Try find a workspace which doesn't have a monitor.
+			IWorkspace? workspace = _workspaces.Find(w => GetMonitorForWorkspace(w) == null);
+
+			// If there's no workspace, create one.
+			if (workspace is null)
+			{
+				workspace = _configContext.WorkspaceManager.WorkspaceFactory(
+					_configContext,
+					$"Workspace {_workspaces.Count + 1}"
+				);
+
+				workspace.Initialize();
+			}
+
+			// Add the workspace to the map.
+			Activate(workspace, monitor);
+		}
+
+		// For each workspace which is active in a monitor, do a layout.
+		// This will handle cases when the monitor's properties have changed.
+		LayoutAllActiveWorkspaces();
+	}
+
 	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
 	{
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
@@ -460,8 +505,8 @@ internal class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		IPoint<int> pointInMonitor = targetMonitor.ToMonitorCoordinates(point);
-		IPoint<double> normalized = targetMonitor.ToUnitSquare(pointInMonitor);
+		IPoint<int> pointInMonitor = targetMonitor.WorkingArea.ToMonitorCoordinates(point);
+		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(pointInMonitor);
 		Logger.Debug($"Normalized location: {normalized}");
 
 		targetWorkspace.MoveWindowToPoint(window, normalized, isPhantom);

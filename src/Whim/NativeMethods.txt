@@ -3,6 +3,7 @@ BringWindowToTop
 CallNextHookEx
 CHILDID_SELF
 DeferWindowPos
+DefSubclassProc
 DWM_WINDOW_CORNER_PREFERENCE
 DwmGetWindowAttribute
 DwmSetWindowAttribute
@@ -46,6 +47,7 @@ MonitorFromPoint
 MONITORINFOEXW
 MONITORINFOF_PRIMARY
 OBJECT_IDENTIFIER
+RemoveWindowSubclass
 SC_CLOSE
 SendInput
 SendNotifyMessage
@@ -53,8 +55,10 @@ SetForegroundWindow
 SetWindowLong
 SetWindowPos
 SetWindowsHookEx
+SetWindowSubclass
 SetWinEventHook
 ShowWindow
+SUBCLASSPROC
 SystemParametersInfo
 UnhookWinEvent
 VIRTUAL_KEY
@@ -62,6 +66,8 @@ WINDOW_EX_STYLE
 WINDOW_STYLE
 WINEVENT_OUTOFCONTEXT
 WINEVENTPROC
+WM_DISPLAYCHANGE
 WM_KEYDOWN
+WM_SETTINGCHANGE
 WM_SYSCOMMAND
 WM_SYSKEYDOWN

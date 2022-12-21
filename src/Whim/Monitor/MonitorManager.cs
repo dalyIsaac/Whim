@@ -1,8 +1,10 @@
-using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -13,13 +15,14 @@ internal class MonitorManager : IMonitorManager
 {
 	private readonly IConfigContext _configContext;
 	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IWindowMessageMonitor _windowMessageMonitor;
 
 	/// <summary>
 	/// The <see cref="IMonitor"/>s of the computer.
 	/// This is initialized to make the compiler happy - we should never have a case where there's
 	/// zero <see cref="IMonitor"/>s, as the constructor should throw.
 	/// </summary>
-	private IMonitor[] _monitors = Array.Empty<IMonitor>();
+	private Monitor[] _monitors = Array.Empty<Monitor>();
 	private bool _disposedValue;
 
 	/// <summary>
@@ -43,13 +46,18 @@ internal class MonitorManager : IMonitorManager
 	/// <exception cref="Exception">
 	/// When no monitors are found, or there is no primary monitor.
 	/// </exception>
-	public MonitorManager(IConfigContext configContext, ICoreNativeManager coreNativeManager)
+	public MonitorManager(
+		IConfigContext configContext,
+		ICoreNativeManager coreNativeManager,
+		IWindowMessageMonitor? windowMessageMonitor = null
+	)
 	{
 		_configContext = configContext;
 		_coreNativeManager = coreNativeManager;
+		_windowMessageMonitor = windowMessageMonitor ?? new WindowMessageMonitor(_configContext, _coreNativeManager);
 
 		// Get the monitors.
-		_monitors = GetCurrentMonitors().OrderBy(m => m.X).ThenBy(m => m.Y).ToArray();
+		_monitors = GetCurrentMonitors().OrderBy(m => m.Bounds.X).ThenBy(m => m.Bounds.Y).ToArray();
 
 		// Get the initial focused monitor
 		IMonitor? primaryMonitor = _monitors?.FirstOrDefault(m => m.IsPrimary);
@@ -63,8 +71,9 @@ internal class MonitorManager : IMonitorManager
 
 	public void Initialize()
 	{
-		// Listen for changes in the monitors.
-		SystemEvents.DisplaySettingsChanging += SystemEvents_DisplaySettingsChanging;
+		_windowMessageMonitor.DisplayChanged += WindowMessageMonitor_DisplayChanged;
+		_windowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_WorkAreaChanged;
+		_windowMessageMonitor.DpiChanged += WindowMessageMonitor_DpiChanged;
 	}
 
 	/// <summary>
@@ -82,8 +91,10 @@ internal class MonitorManager : IMonitorManager
 		}
 	}
 
-	private void SystemEvents_DisplaySettingsChanging(object? sender, EventArgs e)
+	private void WindowMessageMonitor_DisplayChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{
+		Logger.Debug($"Display changed: {e.MessagePayload}");
+
 		// Get the new monitors.
 		IMonitor[] previousMonitors = _monitors;
 		_monitors = GetCurrentMonitors();
@@ -120,7 +131,6 @@ internal class MonitorManager : IMonitorManager
 			}
 		}
 
-		// Trigger MonitorsChanged event.
 		MonitorsChanged?.Invoke(
 			this,
 			new MonitorsChangedEventArgs()
@@ -132,35 +142,117 @@ internal class MonitorManager : IMonitorManager
 		);
 	}
 
+	private void WindowMessageMonitor_WorkAreaChanged(object? sender, WindowMessageMonitorEventArgs e)
+	{
+		Logger.Debug($"Work area changed: {e.MessagePayload}");
+
+		MonitorsChanged?.Invoke(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				UnchangedMonitors = _monitors,
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				AddedMonitors = Array.Empty<IMonitor>()
+			}
+		);
+	}
+
+	private void WindowMessageMonitor_DpiChanged(object? sender, WindowMessageMonitorEventArgs e)
+	{
+		Logger.Debug($"DPI changed: {e.MessagePayload}");
+
+		MonitorsChanged?.Invoke(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				UnchangedMonitors = _monitors,
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				AddedMonitors = Array.Empty<IMonitor>()
+			}
+		);
+	}
+
+	private class MonitorEnumCallback
+	{
+		public List<HMONITOR> Monitors { get; } = new();
+
+		public unsafe BOOL Callback(HMONITOR monitor, HDC hdc, RECT* rect, LPARAM param)
+		{
+			Monitors.Add(monitor);
+			return (BOOL)true;
+		}
+	}
+
+	private HMONITOR GetPrimaryHMonitor()
+	{
+		return _coreNativeManager.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY);
+	}
+
 	/// <summary>
 	/// Gets all the current monitors.
 	/// </summary>
 	/// <returns></returns>
 	/// <exception cref="Exception">When no monitors are found.</exception>
-	private IMonitor[] GetCurrentMonitors()
+	private unsafe Monitor[] GetCurrentMonitors()
 	{
-		Screen[] screens = Screen.GetAllScreens(_coreNativeManager);
+		List<HMONITOR> hmonitors;
+		HMONITOR primaryHMonitor = GetPrimaryHMonitor();
 
-		IMonitor[] _monitors = new IMonitor[screens.Length];
-		for (int i = 0; i < screens.Length; i++)
+		if (_coreNativeManager.HasMultipleMonitors())
 		{
-			_monitors[i] = new Monitor(screens[i]);
+			MonitorEnumCallback closure = new();
+			MONITORENUMPROC proc = new(closure.Callback);
+
+			_coreNativeManager.EnumDisplayMonitors(null, null, proc, (LPARAM)0);
+
+			if (closure.Monitors.Count > 0)
+			{
+				hmonitors = closure.Monitors;
+			}
+			else
+			{
+				hmonitors = new List<HMONITOR>() { primaryHMonitor };
+			}
+		}
+		else
+		{
+			hmonitors = new List<HMONITOR>() { primaryHMonitor };
 		}
 
-		if (_monitors.Length == 0)
+		Monitor[] currentMonitors = new Monitor[hmonitors.Count];
+		for (int i = 0; i < currentMonitors.Length; i++)
 		{
-			throw new Exception("No monitors were found");
+			HMONITOR hmonitor = hmonitors[i];
+			bool isPrimaryHMonitor = hmonitor == primaryHMonitor;
+
+			// Try find the monitor in the list of existing monitors. If we can find it, update
+			// its properties.
+			Monitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
+
+			if (monitor is null)
+			{
+				monitor = new Monitor(_coreNativeManager, hmonitor, isPrimaryHMonitor);
+			}
+			else
+			{
+				monitor.Update(isPrimaryHMonitor);
+			}
+
+			currentMonitors[i] = monitor;
 		}
 
-		return _monitors;
+		return currentMonitors;
 	}
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
 		Logger.Debug($"Getting monitor at point {point}");
-		Screen screen = Screen.FromPoint(_coreNativeManager, point);
+		HMONITOR hmonitor = _coreNativeManager.MonitorFromPoint(
+			point.ToSystemPoint(),
+			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
+		);
 
-		IMonitor? monitor = _monitors.FirstOrDefault(m => m.Name == screen.DeviceName);
+		IMonitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
 		if (monitor == null)
 		{
 			Logger.Error($"No monitor found at point {point}");
@@ -207,7 +299,8 @@ internal class MonitorManager : IMonitorManager
 				Logger.Debug("Disposing monitor manager");
 
 				// dispose managed state (managed objects)
-				SystemEvents.DisplaySettingsChanging -= SystemEvents_DisplaySettingsChanging;
+				_windowMessageMonitor.DisplayChanged -= WindowMessageMonitor_DisplayChanged;
+				_windowMessageMonitor.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

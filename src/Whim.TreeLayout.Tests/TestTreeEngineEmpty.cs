@@ -18,8 +18,8 @@ internal class TestTreeEngineEmpty
 
 	public TestTreeEngineEmpty(bool testTreeLayoutEngine = false)
 	{
-		Monitor.Setup(m => m.Width).Returns(1920);
-		Monitor.Setup(m => m.Height).Returns(1080);
+		Monitor.Setup(m => m.WorkingArea.Width).Returns(1920);
+		Monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
 		MonitorManager.Setup(m => m.FocusedMonitor).Returns(Monitor.Object);
 		ConfigContext.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
 

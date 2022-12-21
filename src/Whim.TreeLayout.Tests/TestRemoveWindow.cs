@@ -14,6 +14,8 @@ public class TestRemoveWindow
 
 	public TestRemoveWindow()
 	{
+		_focusedMonitor.Setup(m => m.WorkingArea).Returns(new Location<int>());
+
 		_monitorManager.Setup(m => m.FocusedMonitor).Returns(_focusedMonitor.Object);
 		_workspaceManager.Setup(x => x.ActiveWorkspace).Returns(_activeWorkspace.Object);
 

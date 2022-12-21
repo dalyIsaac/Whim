@@ -147,6 +147,6 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 
 		IMonitor monitor = _configContext.MonitorManager.GetMonitorAtPoint(location);
-		return monitor.ToUnitSquare(location);
+		return monitor.WorkingArea.ToUnitSquare(location);
 	}
 }

@@ -4,11 +4,6 @@ namespace Whim;
 
 internal static class MonitorInfo
 {
-	internal static ILocation<int> GetLocation(this MONITORINFOEXW monitor)
-	{
-		return monitor.monitorInfo.rcMonitor.ToLocation();
-	}
-
 	internal static string GetDeviceName(this MONITORINFOEXW monitor)
 	{
 		return monitor.szDevice.ToString();

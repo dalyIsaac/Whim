@@ -13,8 +13,8 @@ public class TestGetAdjacentNode
 
 	public TestGetAdjacentNode()
 	{
-		_monitor.Setup(m => m.Width).Returns(1920);
-		_monitor.Setup(m => m.Height).Returns(1080);
+		_monitor.Setup(m => m.WorkingArea.Width).Returns(1920);
+		_monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
 
 		_monitorManager.Setup(m => m.FocusedMonitor).Returns(_monitor.Object);
 		_configContext.Setup(c => c.MonitorManager).Returns(_monitorManager.Object);
