@@ -15,7 +15,7 @@ internal class MonitorManager : IMonitorManager
 {
 	private readonly IConfigContext _configContext;
 	private readonly ICoreNativeManager _coreNativeManager;
-	private readonly WindowMessageMonitor _windowMessageMonitor;
+	private readonly IWindowMessageMonitor _windowMessageMonitor;
 
 	/// <summary>
 	/// The <see cref="IMonitor"/>s of the computer.
@@ -46,11 +46,15 @@ internal class MonitorManager : IMonitorManager
 	/// <exception cref="Exception">
 	/// When no monitors are found, or there is no primary monitor.
 	/// </exception>
-	public MonitorManager(IConfigContext configContext, ICoreNativeManager coreNativeManager)
+	public MonitorManager(
+		IConfigContext configContext,
+		ICoreNativeManager coreNativeManager,
+		IWindowMessageMonitor? windowMessageMonitor = null
+	)
 	{
 		_configContext = configContext;
 		_coreNativeManager = coreNativeManager;
-		_windowMessageMonitor = new(_configContext);
+		_windowMessageMonitor = windowMessageMonitor ?? new WindowMessageMonitor(_configContext, _coreNativeManager);
 
 		// Get the monitors.
 		_monitors = GetCurrentMonitors().OrderBy(m => m.Bounds.X).ThenBy(m => m.Bounds.Y).ToArray();

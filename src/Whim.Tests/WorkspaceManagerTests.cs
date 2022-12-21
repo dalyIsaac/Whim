@@ -26,6 +26,12 @@ public class WorkspaceManagerTests
 			monitorManager.Setup(m => m.FocusedMonitor).Returns(monitors[focusedMonitorIndex].Object);
 		}
 
+		// Set up IEquatable for the monitors.
+		foreach (Mock<IMonitor> mon in monitors)
+		{
+			mon.Setup(m => m.Equals(It.Is((IMonitor m) => mon.Object == m))).Returns(true);
+		}
+
 		Mock<IRouterManager> routerManager = new();
 		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(null as IWorkspace);
 		configContext.Setup(c => c.RouterManager).Returns(routerManager.Object);
@@ -209,24 +215,25 @@ public class WorkspaceManagerTests
 		Mock<IMonitor>[] monitorMocks = new[] { new Mock<IMonitor>() };
 		(var configContext, _, _, _) = CreateMocks(monitorMocks);
 
-		Mock<IWorkspace> workspace0 = new();
-		Mock<IWorkspace> workspace1 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace0.Object, workspace1.Object };
+		Mock<IWorkspace> oldWorkspace = new();
+		Mock<IWorkspace> newWorkspace = new();
+		using WorkspaceManager workspaceManager =
+			new(configContext.Object) { oldWorkspace.Object, newWorkspace.Object };
 
-		workspaceManager.Activate(workspace0.Object);
+		workspaceManager.Activate(oldWorkspace.Object);
 
 		// When a workspace is activated, it is focused on the focused monitor
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
 			h => workspaceManager.MonitorWorkspaceChanged += h,
 			h => workspaceManager.MonitorWorkspaceChanged -= h,
-			() => workspaceManager.Activate(workspace1.Object)
+			() => workspaceManager.Activate(newWorkspace.Object)
 		);
-		Assert.Equal(workspace1.Object, result.Arguments.NewWorkspace);
-		Assert.Equal(workspace0.Object, result.Arguments.OldWorkspace);
+		Assert.Equal(newWorkspace.Object, result.Arguments.NewWorkspace);
+		Assert.Equal(oldWorkspace.Object, result.Arguments.OldWorkspace);
 
-		workspace0.Verify(w => w.Deactivate(), Times.Once);
-		workspace1.Verify(w => w.DoLayout(), Times.Once);
-		workspace1.Verify(w => w.FocusFirstWindow(), Times.Once);
+		oldWorkspace.Verify(w => w.Deactivate(), Times.Once);
+		newWorkspace.Verify(w => w.DoLayout(), Times.Once);
+		newWorkspace.Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
 	[Fact]
@@ -720,6 +727,7 @@ public class WorkspaceManagerTests
 		workspace2.Reset();
 
 		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(monitors[1].Object);
+		monitors[1].Setup(m => m.WorkingArea).Returns(new Location<int>());
 		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
 
 		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });

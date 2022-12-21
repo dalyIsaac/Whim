@@ -172,8 +172,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		// Get the old workspace for the event.
 		_monitorWorkspaceMap.TryGetValue(focusedMonitor, out IWorkspace? oldWorkspace);
 
-		// Update the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = _monitorWorkspaceMap.Keys.FirstOrDefault(m => _monitorWorkspaceMap[m] == workspace);
+		// Find the monitor which just lost `workspace`.
+		IMonitor? loserMonitor = _monitorWorkspaceMap.FirstOrDefault(m => m.Value == workspace).Key;
 
 		// Update the focused monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
