@@ -21,10 +21,10 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 	/// <summary>
 	/// Matcher returns an ordered list of filtered matches for the <paramref name="query"/>.
 	/// </summary>
-	public ICollection<PaletteRowItem> Match(string query, ICollection<CommandItem> items)
+	public ICollection<PaletteRowItem> Match(string query, ICollection<CommandItem> commandItems)
 	{
-		MatcherCommandItem[] matches = new MatcherCommandItem[items.Count];
-		int matchCount = GetFilteredItems(query, items, matches);
+		MatcherCommandItem[] matches = new MatcherCommandItem[commandItems.Count];
+		int matchCount = GetFilteredItems(query, commandItems, matches);
 
 		if (matchCount == 0)
 		{
@@ -34,8 +34,8 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 				return Array.Empty<PaletteRowItem>();
 			}
 
-			// If there are no matches, return the most recently used items.
-			matchCount = GetMostRecentlyUsedItems(items, matches);
+			// If there are no matches and the query is empty, return the most recently used items.
+			matchCount = GetMostRecentlyUsedItems(commandItems, matches);
 		}
 
 		// Sort the matches.
@@ -51,8 +51,12 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 		return rowItems;
 	}
 
+	/// <summary>
+	/// Iterates over the given command <paramref name="items"/> and updates the <paramref name="matches"/>
+	/// array with the filtered matches, with updated text segments.
+	/// </summary>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private int GetFilteredItems(string query, ICollection<CommandItem> items, MatcherCommandItem[] matches)
+	internal int GetFilteredItems(string query, ICollection<CommandItem> items, MatcherCommandItem[] matches)
 	{
 		int matchCount = 0;
 
@@ -65,7 +69,7 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 				continue;
 			}
 
-			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
+			uint count = _commandLastExecutionTime.GetValueOrDefault<string, uint>(item.Command.Identifier, 0);
 			matches[matchCount++] = new MatcherCommandItem()
 			{
 				Item = item,
@@ -77,19 +81,25 @@ public class MostRecentlyUsedMatcher : ICommandPaletteMatcher
 		return matchCount;
 	}
 
+	/// <summary>
+	/// Iterates over the given command <paramref name="items"/> and updates the <paramref name="matches"/>
+	/// array with the last execution time of each command.
+	/// </summary>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private int GetMostRecentlyUsedItems(ICollection<CommandItem> items, MatcherCommandItem[] matches)
+	internal int GetMostRecentlyUsedItems(ICollection<CommandItem> items, MatcherCommandItem[] matches)
 	{
 		int matchCount = 0;
 
 		foreach (CommandItem item in items)
 		{
-			uint count = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value) ? value : 0;
+			uint lastExecutionTime = _commandLastExecutionTime.TryGetValue(item.Command.Identifier, out uint value)
+				? value
+				: 0;
 			matches[matchCount++] = new MatcherCommandItem()
 			{
 				Item = item,
 				TextSegments = Array.Empty<PaletteFilterTextMatch>(),
-				Score = count
+				Score = lastExecutionTime
 			};
 		}
 
