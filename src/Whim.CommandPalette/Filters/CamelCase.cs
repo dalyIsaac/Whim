@@ -11,6 +11,11 @@ public static partial class PaletteFilters
 	/// </summary>
 	public static PaletteFilterTextMatch[]? MatchesCamelCase(string word, string wordToMatchAgainst)
 	{
+		if (string.IsNullOrEmpty(wordToMatchAgainst))
+		{
+			return null;
+		}
+
 		word = word.Trim();
 
 		if (word.Length == 0)
