@@ -220,9 +220,9 @@ internal class Workspace : IWorkspace
 			LastFocusedWindow = null;
 		}
 
-		if (_phantomWindows.ContainsKey(window))
+		if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
 		{
-			bool removePhantomSuccess = RemovePhantomWindow(window);
+			bool removePhantomSuccess = RemovePhantomWindow(phantomLayoutEngine, window);
 			DoLayout();
 			return removePhantomSuccess;
 		}
@@ -252,25 +252,19 @@ internal class Workspace : IWorkspace
 		return success;
 	}
 
-	private bool RemovePhantomWindow(IWindow window)
+	private bool RemovePhantomWindow(ILayoutEngine phantomLayoutEngine, IWindow window)
 	{
 		Logger.Debug($"Removing phantom window {window} from workspace {Name}");
 
-		if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine))
-		{
-			Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
-			return false;
-		}
-
-		if (!ActiveLayoutEngine.ContainsEqual(layoutEngine))
+		if (!ActiveLayoutEngine.ContainsEqual(phantomLayoutEngine))
 		{
 			Logger.Error($"Phantom window {window} is not in the active layout engine {ActiveLayoutEngine}");
 			return false;
 		}
 
-		if (!layoutEngine.Remove(window))
+		if (!phantomLayoutEngine.Remove(window))
 		{
-			Logger.Error($"Phantom window {window} could not be removed from layout engine {layoutEngine}");
+			Logger.Error($"Phantom window {window} could not be removed from layout engine {phantomLayoutEngine}");
 			return false;
 		}
 

@@ -6,6 +6,11 @@ using Xunit;
 
 namespace Whim.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+	"Reliability",
+	"CA2000:Dispose objects before losing scope",
+	Justification = "Unnecessary for tests"
+)]
 public class WorkspaceTests
 {
 	[Fact]
@@ -20,7 +25,7 @@ public class WorkspaceTests
 		configContext.Setup(c => c.WorkspaceManager).Returns(workspaceManager.Object);
 
 #pragma warning disable IDE0017 // Simplify object initialization
-		using Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object);
+		Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object);
 #pragma warning restore IDE0017 // Simplify object initialization
 
 		// When
@@ -43,7 +48,7 @@ public class WorkspaceTests
 		Mock<IWorkspaceManager> workspaceManager = new();
 		configContext.Setup(c => c.WorkspaceManager).Returns(workspaceManager.Object);
 
-		using Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object);
+		Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object);
 
 		// When
 		bool result = workspace.TrySetLayoutEngine("Layout2");
@@ -64,7 +69,7 @@ public class WorkspaceTests
 		workspaceManager.Setup(m => m.GetMonitorForWorkspace(It.IsAny<IWorkspace>())).Returns(null as IMonitor);
 		configContext.Setup(c => c.WorkspaceManager).Returns(workspaceManager.Object);
 
-		using Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object);
+		Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object);
 
 		// When
 		bool result = workspace.TrySetLayoutEngine("Layout");
@@ -87,7 +92,7 @@ public class WorkspaceTests
 		Mock<IWorkspaceManager> workspaceManager = new();
 		configContext.Setup(c => c.WorkspaceManager).Returns(workspaceManager.Object);
 
-		using Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object, layoutEngine2.Object);
+		Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object, layoutEngine2.Object);
 
 		// When
 		bool result = workspace.TrySetLayoutEngine("Layout2");
@@ -178,5 +183,54 @@ public class WorkspaceTests
 		layoutEngine.Verify(e => e.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()), Times.Once);
 		nativeManager.Verify(n => n.ShowWindowNoActivate(It.IsAny<HWND>()), Times.Exactly(showWindowNoActivateTimes));
 		nativeManager.Verify(n => n.EndDeferWindowPos(It.IsAny<HDWP>()), Times.Once);
+	}
+
+	[Fact]
+	public void Initialize()
+	{
+		// Given
+		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
+		proxyLayoutEngine.Setup(p => p(It.IsAny<ILayoutEngine>())).Returns((ILayoutEngine e) => e);
+
+		Mock<ProxyLayoutEngine> proxyLayoutEngine2 = new();
+
+		Mock<IWorkspaceManager> workspaceManager = new();
+		workspaceManager
+			.SetupGet(m => m.ProxyLayoutEngines)
+			.Returns(new ProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
+
+		Mock<IConfigContext> configContext = new();
+		configContext.Setup(c => c.WorkspaceManager).Returns(workspaceManager.Object);
+
+		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<ILayoutEngine> layoutEngine2 = new();
+
+		Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object, layoutEngine2.Object);
+
+		// When
+		workspace.Initialize();
+
+		// Then
+		proxyLayoutEngine.Verify(e => e(layoutEngine.Object), Times.Once);
+		proxyLayoutEngine.Verify(e => e(layoutEngine2.Object), Times.Once);
+		proxyLayoutEngine2.Verify(e => e(layoutEngine.Object), Times.Once);
+		proxyLayoutEngine2.Verify(e => e(layoutEngine2.Object), Times.Once);
+	}
+
+	[Fact]
+	public void WindowFocused_DoesNotContainWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IConfigContext> configContext = new();
+
+		Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object);
+
+		// When
+		workspace.WindowFocused(window.Object);
+
+		// Then
+		Assert.Null(workspace.LastFocusedWindow);
 	}
 }
