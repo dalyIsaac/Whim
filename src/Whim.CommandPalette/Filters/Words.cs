@@ -26,11 +26,6 @@ public static partial class PaletteFilters
 
 	private static PaletteFilterTextMatch[]? MatchesWordsBase(string word, string target, bool contiguous = false)
 	{
-		if (string.IsNullOrEmpty(target))
-		{
-			return null;
-		}
-
 		PaletteFilterTextMatch[]? result = null;
 		int i = 0;
 

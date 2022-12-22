@@ -12,6 +12,12 @@ public class SubstringTests
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesContiguousSubString, word, wordToMatchAgainst, expectedMatches);
 	}
 
+	[Fact]
+	public void MatchesContiguousSubString_NotFound()
+	{
+		FilterTestUtils.FilterNotOk(PaletteFilters.MatchesContiguousSubString, "cmm", "cancelAnimationFrame()");
+	}
+
 	[InlineData("cmm", "cancelAnimationFrame()", new int[] { 0, 1 }, new int[] { 9, 10 }, new int[] { 18, 19 })]
 	[InlineData("abc", "abcabc", new int[] { 0, 3 })]
 	[InlineData("abc", "aaabbbccc", new int[] { 0, 1 }, new int[] { 3, 4 }, new int[] { 6, 7 })]

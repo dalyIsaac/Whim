@@ -11,11 +11,6 @@ public static partial class PaletteFilters
 	/// </summary>
 	public static PaletteFilterTextMatch[]? MatchesCamelCase(string word, string wordToMatchAgainst)
 	{
-		if (string.IsNullOrEmpty(wordToMatchAgainst))
-		{
-			return null;
-		}
-
 		word = word.Trim();
 
 		if (word.Length == 0)
@@ -53,7 +48,7 @@ public static partial class PaletteFilters
 		return result;
 	}
 
-	private static PaletteFilterTextMatch[]? MatchesCamelCaseRecurse(
+	internal static PaletteFilterTextMatch[]? MatchesCamelCaseRecurse(
 		string word,
 		string wordToMatchAgainst,
 		int wordStart,
@@ -94,7 +89,7 @@ public static partial class PaletteFilters
 		}
 	}
 
-	private static CamelCaseAnalysis AnalyzeCamelCaseWord(string word)
+	internal static CamelCaseAnalysis AnalyzeCamelCaseWord(string word)
 	{
 		int upper = 0,
 			lower = 0,
@@ -131,12 +126,12 @@ public static partial class PaletteFilters
 		return new CamelCaseAnalysis(upperPercent, lowerPercent, alphaPercent, numericPercent);
 	}
 
-	private static bool IsUpperCaseWord(CamelCaseAnalysis analysis)
+	internal static bool IsUpperCaseWord(CamelCaseAnalysis analysis)
 	{
 		return analysis.Lower == 0.0f && analysis.Upper > 0.6f;
 	}
 
-	private static bool IsCamelCaseWord(CamelCaseAnalysis analysis)
+	internal static bool IsCamelCaseWord(CamelCaseAnalysis analysis)
 	{
 		return analysis.Lower > 0.2f && analysis.Upper < 0.8f && analysis.Alpha > 0.6f && analysis.Numeric < 0.2f;
 	}
@@ -146,7 +141,7 @@ public static partial class PaletteFilters
 	/// </summary>
 	/// <param name="word"></param>
 	/// <returns></returns>
-	private static bool IsCamelCasePattern(string word)
+	internal static bool IsCamelCasePattern(string word)
 	{
 		int upper = 0;
 		int lower = 0;
@@ -183,7 +178,7 @@ public static partial class PaletteFilters
 	/// <param name="camelCaseWord"></param>
 	/// <param name="startIndex"></param>
 	/// <returns></returns>
-	private static int FindNextCamelCaseAnchor(string camelCaseWord, int startIndex)
+	internal static int FindNextCamelCaseAnchor(string camelCaseWord, int startIndex)
 	{
 		for (int i = startIndex; i < camelCaseWord.Length; i++)
 		{
