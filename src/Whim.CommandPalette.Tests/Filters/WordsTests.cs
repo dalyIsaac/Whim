@@ -37,6 +37,7 @@ public class WordsTests
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesWordsSeparate, query, target, expectedMatches);
 	}
 
+	[InlineData("", "")]
 	[InlineData("alpha", "alp")]
 	[InlineData("x", "alpha")]
 	[InlineData("it", "Git: Pull")]

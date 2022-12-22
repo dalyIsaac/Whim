@@ -58,66 +58,6 @@ internal class Workspace : IWorkspace
 	/// </summary>
 	private readonly Dictionary<IWindow, IWindowState> _windowLocations = new();
 
-	public void DoLayout()
-	{
-		Logger.Debug($"Workspace {Name}");
-
-		// Get the monitor for this workspace
-		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWorkspace(this);
-		if (monitor == null)
-		{
-			Logger.Debug($"No active monitors found for workspace {Name}.");
-			return;
-		}
-
-		// Ensure there's at least one layout engine
-		if (_layoutEngines.Count == 0)
-		{
-			Logger.Fatal($"No layout engines found for workspace {Name}");
-			throw new InvalidOperationException("No layout engines found for workspace " + Name);
-		}
-
-		_windowLocations.Clear();
-
-		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
-		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = monitor.WorkingArea.Width,
-				Height = monitor.WorkingArea.Height
-			},
-			monitor
-		);
-
-		using WindowDeferPosHandle handle = new(_configContext, Windows.Count());
-		foreach (IWindowState loc in locations)
-		{
-			Logger.Verbose($"Setting location of window {loc.Window}");
-			if (loc.Window.IsMouseMoving)
-			{
-				continue;
-			}
-
-			// Adjust the window location to the monitor's coordinates
-			loc.Location = new Location<int>()
-			{
-				X = loc.Location.X + monitor.WorkingArea.X,
-				Y = loc.Location.Y + monitor.WorkingArea.Y,
-				Width = loc.Location.Width,
-				Height = loc.Location.Height
-			};
-
-			Logger.Verbose($"{loc.Window} at {loc.Location}");
-			handle.DeferWindowPos(loc);
-
-			// Update the window location
-			_windowLocations[loc.Window] = loc;
-		}
-		Logger.Verbose($"Layout for workspace {Name} complete");
-	}
-
 	public Workspace(IConfigContext configContext, string name, params ILayoutEngine[] layoutEngines)
 	{
 		_configContext = configContext;
@@ -280,9 +220,9 @@ internal class Workspace : IWorkspace
 			LastFocusedWindow = null;
 		}
 
-		if (_phantomWindows.ContainsKey(window))
+		if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
 		{
-			bool removePhantomSuccess = RemovePhantomWindow(window);
+			bool removePhantomSuccess = RemovePhantomWindow(phantomLayoutEngine, window);
 			DoLayout();
 			return removePhantomSuccess;
 		}
@@ -312,25 +252,19 @@ internal class Workspace : IWorkspace
 		return success;
 	}
 
-	private bool RemovePhantomWindow(IWindow window)
+	private bool RemovePhantomWindow(ILayoutEngine phantomLayoutEngine, IWindow window)
 	{
 		Logger.Debug($"Removing phantom window {window} from workspace {Name}");
 
-		if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine))
-		{
-			Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
-			return false;
-		}
-
-		if (!ActiveLayoutEngine.ContainsEqual(layoutEngine))
+		if (!ActiveLayoutEngine.ContainsEqual(phantomLayoutEngine))
 		{
 			Logger.Error($"Phantom window {window} is not in the active layout engine {ActiveLayoutEngine}");
 			return false;
 		}
 
-		if (!layoutEngine.Remove(window))
+		if (!phantomLayoutEngine.Remove(window))
 		{
-			Logger.Error($"Phantom window {window} could not be removed from layout engine {layoutEngine}");
+			Logger.Error($"Phantom window {window} could not be removed from layout engine {phantomLayoutEngine}");
 			return false;
 		}
 
@@ -429,6 +363,59 @@ internal class Workspace : IWorkspace
 	{
 		_windowLocations.TryGetValue(window, out IWindowState? location);
 		return location;
+	}
+
+	public void DoLayout()
+	{
+		Logger.Debug($"Workspace {Name}");
+
+		// Get the monitor for this workspace
+		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWorkspace(this);
+		if (monitor == null)
+		{
+			Logger.Debug($"No active monitors found for workspace {Name}.");
+			return;
+		}
+
+		_windowLocations.Clear();
+
+		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
+		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = monitor.WorkingArea.Width,
+				Height = monitor.WorkingArea.Height
+			},
+			monitor
+		);
+
+		using WindowDeferPosHandle handle = new(_configContext, Windows.Count());
+		foreach (IWindowState loc in locations)
+		{
+			Logger.Verbose($"Setting location of window {loc.Window}");
+			if (loc.Window.IsMouseMoving)
+			{
+				continue;
+			}
+
+			// Adjust the window location to the monitor's coordinates
+			loc.Location = new Location<int>()
+			{
+				X = loc.Location.X + monitor.WorkingArea.X,
+				Y = loc.Location.Y + monitor.WorkingArea.Y,
+				Width = loc.Location.Width,
+				Height = loc.Location.Height
+			};
+
+			Logger.Verbose($"{loc.Window} at {loc.Location}");
+			handle.DeferWindowPos(loc);
+
+			// Update the window location
+			_windowLocations[loc.Window] = loc;
+		}
+		Logger.Verbose($"Layout for workspace {Name} complete");
 	}
 
 	#region Phantom Windows
