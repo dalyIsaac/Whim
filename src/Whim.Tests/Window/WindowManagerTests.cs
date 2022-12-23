@@ -102,4 +102,62 @@ public class WindowManagerTests
 		workspaceManager.Verify(m => m.WindowRemoved(window.Object), Times.Once);
 		Assert.Equal(window.Object, result.Arguments.Window);
 	}
+
+	[Fact]
+	public void OnWindowMinimizeStart()
+	{
+		// Given
+		Mock<IConfigContext> configContext = new();
+
+		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		workspaceManager.Setup(m => m.WindowMinimizeStart(It.IsAny<IWindow>()));
+
+		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+
+		Mock<ICoreNativeManager> coreNativeManager = new();
+
+		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+
+		Mock<IWindow> window = new();
+
+		// When
+		var result = Assert.Raises<WindowEventArgs>(
+			eh => windowManager.WindowMinimizeStart += eh,
+			eh => windowManager.WindowMinimizeStart -= eh,
+			() => windowManager.OnWindowMinimizeStart(window.Object)
+		);
+
+		// Then
+		workspaceManager.Verify(m => m.WindowMinimizeStart(window.Object), Times.Once);
+		Assert.Equal(window.Object, result.Arguments.Window);
+	}
+
+	[Fact]
+	public void OnWindowMinimizeEnd()
+	{
+		// Given
+		Mock<IConfigContext> configContext = new();
+
+		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		workspaceManager.Setup(m => m.WindowMinimizeEnd(It.IsAny<IWindow>()));
+
+		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+
+		Mock<ICoreNativeManager> coreNativeManager = new();
+
+		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+
+		Mock<IWindow> window = new();
+
+		// When
+		var result = Assert.Raises<WindowEventArgs>(
+			eh => windowManager.WindowMinimizeEnd += eh,
+			eh => windowManager.WindowMinimizeEnd -= eh,
+			() => windowManager.OnWindowMinimizeEnd(window.Object)
+		);
+
+		// Then
+		workspaceManager.Verify(m => m.WindowMinimizeEnd(window.Object), Times.Once);
+		Assert.Equal(window.Object, result.Arguments.Window);
+	}
 }
