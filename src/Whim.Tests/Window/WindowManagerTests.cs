@@ -50,7 +50,8 @@ public class WindowManagerTests
 		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
 		workspaceManager.Setup(m => m.WindowFocused(It.IsAny<IWindow>()));
 
-		Mock<MonitorManager> monitorManager = new(configContext.Object, coreNativeManager.Object, windowMessageMonitor.Object);
+		Mock<MonitorManager> monitorManager =
+			new(configContext.Object, coreNativeManager.Object, windowMessageMonitor.Object);
 		monitorManager.Setup(m => m.WindowFocused(It.IsAny<IWindow>()));
 
 		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
