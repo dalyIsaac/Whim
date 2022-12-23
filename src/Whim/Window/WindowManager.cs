@@ -392,6 +392,7 @@ internal class WindowManager : IWindowManager
 	private void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowMinimizeStart(window);
 		WindowMinimizeStart?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 

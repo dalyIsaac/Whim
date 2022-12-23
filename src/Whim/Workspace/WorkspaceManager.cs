@@ -317,6 +317,23 @@ internal class WorkspaceManager : IWorkspaceManager
 			}
 		}
 	}
+
+	/// <summary>
+	/// Called when a window has started minimizing.
+	/// </summary>
+	/// <param name="window">The window that is minimizing.</param>
+	internal void WindowMinimizeStart(IWindow window)
+	{
+		Logger.Debug($"Window minimize start: {window}");
+
+		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
+		{
+			Logger.Error($"Window {window} was not found in any workspace");
+			return;
+		}
+
+		workspace.RemoveWindow(window);
+	}
 	#endregion
 
 	#region Monitors
