@@ -319,10 +319,10 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 
 	/// <summary>
-	/// Called when a window has started minimizing.
+	/// Called when a window is about to be minimized.
 	/// </summary>
 	/// <param name="window">The window that is minimizing.</param>
-	internal void WindowMinimizeStart(IWindow window)
+	internal virtual void WindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize start: {window}");
 
@@ -333,6 +333,17 @@ internal class WorkspaceManager : IWorkspaceManager
 		}
 
 		workspace.RemoveWindow(window);
+	}
+
+	/// <summary>
+	/// Called when a window is about to be restored.
+	/// </summary>
+	/// <param name="window">The window that is restoring.</param>
+	internal virtual void WindowMinimizeEnd(IWindow window)
+	{
+		Logger.Debug($"Window minimize end: {window}");
+
+		WindowAdded(window);
 	}
 	#endregion
 

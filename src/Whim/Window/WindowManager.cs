@@ -389,16 +389,17 @@ internal class WindowManager : IWindowManager
 		WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
-	private void OnWindowMinimizeStart(IWindow window)
+	internal void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
 		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowMinimizeStart(window);
 		WindowMinimizeStart?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
-	private void OnWindowMinimizeEnd(IWindow window)
+	internal void OnWindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize ended: {window}");
+		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowMinimizeEnd(window);
 		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 }
