@@ -248,7 +248,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// Called when a window has been added by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was added.</param>
-	internal void WindowAdded(IWindow window)
+	internal virtual void WindowAdded(IWindow window)
 	{
 		Logger.Debug($"Adding window {window}");
 		IWorkspace? workspace = _configContext.RouterManager.RouteWindow(window);
@@ -286,7 +286,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// Called when a window has been removed by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was removed.</param>
-	internal void WindowRemoved(IWindow window)
+	internal virtual void WindowRemoved(IWindow window)
 	{
 		Logger.Debug($"Window removed: {window}");
 
@@ -305,7 +305,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// Called when a window has been focused by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was focused.</param>
-	internal void WindowFocused(IWindow window)
+	internal virtual void WindowFocused(IWindow window)
 	{
 		Logger.Debug($"Window focused: {window}");
 

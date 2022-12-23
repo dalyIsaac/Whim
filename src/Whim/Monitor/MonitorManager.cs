@@ -80,7 +80,7 @@ internal class MonitorManager : IMonitorManager
 	/// Called when the window has been focused.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void WindowFocused(IWindow window)
+	internal virtual void WindowFocused(IWindow window)
 	{
 		Logger.Debug($"Focusing on {window}");
 		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWindow(window);

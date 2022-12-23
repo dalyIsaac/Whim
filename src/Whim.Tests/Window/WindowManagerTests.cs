@@ -3,32 +3,102 @@ using Xunit;
 
 namespace Whim.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+	"Reliability",
+	"CA2000:Dispose objects before losing scope",
+	Justification = "Unnecessary for tests"
+)]
 public class WindowManagerTests
 {
 	[Fact]
-	public void OnWindowFocused_MonitorManager_WindowFocused()
+	public void OnWindowAdded()
 	{
 		// Given
-		Mock<IWorkspaceManager> workspaceManagerMock = new();
-		Mock<IMonitor> monitorMock = new();
-		monitorMock.Setup(m => m.Equals(It.Is((IMonitor m) => m == monitorMock.Object))).Returns(true);
-		workspaceManagerMock.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns(monitorMock.Object);
+		Mock<IConfigContext> configContext = new();
 
-		Mock<IConfigContext> configContextMock = new();
-		configContextMock.Setup(c => c.WorkspaceManager).Returns(workspaceManagerMock.Object);
+		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		workspaceManager.Setup(m => m.WindowAdded(It.IsAny<IWindow>()));
 
-		Mock<ICoreNativeManager> coreNativeManagerMock = new();
+		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
 
-		using MonitorManager monitorManager =
-			new(configContextMock.Object, coreNativeManagerMock.Object, new Mock<IWindowMessageMonitor>().Object);
-		configContextMock.Setup(c => c.MonitorManager).Returns(monitorManager);
+		Mock<ICoreNativeManager> coreNativeManager = new();
 
-		using WindowManager windowManager = new(configContextMock.Object, coreNativeManagerMock.Object);
+		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
 
-		// When the window manager calls TriggerWindowFocused
-		windowManager.OnWindowFocused(new Mock<IWindow>().Object);
+		Mock<IWindow> window = new();
 
-		// Then the monitor manager was called and updated the focused monitor.
-		Assert.Equal(monitorMock.Object, monitorManager.FocusedMonitor);
+		// When
+		var result = Assert.Raises<WindowEventArgs>(
+			eh => windowManager.WindowAdded += eh,
+			eh => windowManager.WindowAdded -= eh,
+			() => windowManager.OnWindowAdded(window.Object)
+		);
+
+		// Then
+		workspaceManager.Verify(m => m.WindowAdded(window.Object), Times.Once);
+		Assert.Equal(window.Object, result.Arguments.Window);
+	}
+
+	[Fact]
+	public void OnWindowFocused()
+	{
+		// Given
+		Mock<IConfigContext> configContext = new();
+		Mock<ICoreNativeManager> coreNativeManager = new();
+		Mock<IWindowMessageMonitor> windowMessageMonitor = new();
+
+		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		workspaceManager.Setup(m => m.WindowFocused(It.IsAny<IWindow>()));
+
+		Mock<MonitorManager> monitorManager = new(configContext.Object, coreNativeManager.Object, windowMessageMonitor.Object);
+		monitorManager.Setup(m => m.WindowFocused(It.IsAny<IWindow>()));
+
+		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+		configContext.SetupGet(m => m.MonitorManager).Returns(monitorManager.Object);
+
+		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+
+		Mock<IWindow> window = new();
+
+		// When
+		var result = Assert.Raises<WindowEventArgs>(
+			eh => windowManager.WindowFocused += eh,
+			eh => windowManager.WindowFocused -= eh,
+			() => windowManager.OnWindowFocused(window.Object)
+		);
+
+		// Then
+		workspaceManager.Verify(m => m.WindowFocused(window.Object), Times.Once);
+		monitorManager.Verify(m => m.WindowFocused(window.Object), Times.Once);
+		Assert.Equal(window.Object, result.Arguments.Window);
+	}
+
+	[Fact]
+	public void OnWindowRemoved()
+	{
+		// Given
+		Mock<IConfigContext> configContext = new();
+
+		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		workspaceManager.Setup(m => m.WindowRemoved(It.IsAny<IWindow>()));
+
+		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+
+		Mock<ICoreNativeManager> coreNativeManager = new();
+
+		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+
+		Mock<IWindow> window = new();
+
+		// When
+		var result = Assert.Raises<WindowEventArgs>(
+			eh => windowManager.WindowRemoved += eh,
+			eh => windowManager.WindowRemoved -= eh,
+			() => windowManager.OnWindowRemoved(window.Object)
+		);
+
+		// Then
+		workspaceManager.Verify(m => m.WindowRemoved(window.Object), Times.Once);
+		Assert.Equal(window.Object, result.Arguments.Window);
 	}
 }
