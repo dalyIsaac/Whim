@@ -172,17 +172,6 @@ internal class MonitorManager : IMonitorManager
 		);
 	}
 
-	private class MonitorEnumCallback
-	{
-		public List<HMONITOR> Monitors { get; } = new();
-
-		public unsafe BOOL Callback(HMONITOR monitor, HDC hdc, RECT* rect, LPARAM param)
-		{
-			Monitors.Add(monitor);
-			return (BOOL)true;
-		}
-	}
-
 	private HMONITOR GetPrimaryHMonitor()
 	{
 		return _coreNativeManager.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY);
