@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
 		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>

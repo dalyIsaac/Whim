@@ -5,6 +5,11 @@ using Xunit;
 
 namespace Whim.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+	"Reliability",
+	"CA2000:Dispose objects before losing scope",
+	Justification = "Unnecessary for tests"
+)]
 public class WorkspaceManagerTests
 {
 	public static (Mock<IConfigContext>, Mock<IMonitorManager>, Mock<IMonitor>[], Mock<IRouterManager>) CreateMocks(
@@ -739,5 +744,92 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.DoLayout(), Times.Once());
 
 		window.Verify(w => w.Focus(), Times.Once());
+	}
+
+	[Fact]
+	public void WindowFocused()
+	{
+		// Given
+		Mock<IConfigContext> configContext = new();
+
+		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<Workspace> workspace = new(configContext.Object, "test", layoutEngine.Object);
+		Mock<Workspace> workspace2 = new(configContext.Object, "test", layoutEngine.Object);
+
+		WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
+
+		Mock<IWindow> window = new();
+
+		// When
+		workspaceManager.WindowFocused(window.Object);
+
+		// Then
+		workspace.Verify(w => w.WindowFocused(window.Object), Times.Once());
+		workspace2.Verify(w => w.WindowFocused(window.Object), Times.Once());
+	}
+
+	[Fact]
+	public void WindowMinimizeStart_CouldNotFindWindow()
+	{
+		// Given
+		Mock<IConfigContext> configContext = new();
+		Mock<IWorkspace> workspace = new();
+
+		WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object };
+
+		Mock<IWindow> window = new();
+
+		// When
+		workspaceManager.WindowMinimizeStart(window.Object);
+
+		// Then
+		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
+	}
+
+	[Fact]
+	public void WindowMinimizeStart()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+
+		Mock<IRouterManager> routerManager = new();
+		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+
+		Mock<IConfigContext> configContext = new();
+		configContext.Setup(c => c.RouterManager).Returns(routerManager.Object);
+
+		WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object };
+
+		Mock<IWindow> window = new();
+		workspaceManager.WindowAdded(window.Object);
+
+		// When
+		workspaceManager.WindowMinimizeStart(window.Object);
+
+		// Then
+		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
+	}
+
+	[Fact]
+	public void WindowMinimizeEnd()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+
+		Mock<IRouterManager> routerManager = new();
+		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+
+		Mock<IConfigContext> configContext = new();
+		configContext.Setup(c => c.RouterManager).Returns(routerManager.Object);
+
+		WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object };
+
+		Mock<IWindow> window = new();
+
+		// When
+		workspaceManager.WindowMinimizeEnd(window.Object);
+
+		// Then
+		routerManager.Verify(r => r.RouteWindow(window.Object), Times.Once());
 	}
 }

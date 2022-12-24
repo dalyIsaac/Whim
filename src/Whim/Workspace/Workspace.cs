@@ -87,7 +87,7 @@ internal class Workspace : IWorkspace
 	/// Called when a window is focused, regardless of whether it's in this workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void WindowFocused(IWindow window)
+	internal virtual void WindowFocused(IWindow window)
 	{
 		if (
 			_windows.Contains(window)

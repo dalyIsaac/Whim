@@ -80,7 +80,7 @@ internal class MonitorManager : IMonitorManager
 	/// Called when the window has been focused.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void WindowFocused(IWindow window)
+	internal virtual void WindowFocused(IWindow window)
 	{
 		Logger.Debug($"Focusing on {window}");
 		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWindow(window);
@@ -172,17 +172,6 @@ internal class MonitorManager : IMonitorManager
 		);
 	}
 
-	private class MonitorEnumCallback
-	{
-		public List<HMONITOR> Monitors { get; } = new();
-
-		public unsafe BOOL Callback(HMONITOR monitor, HDC hdc, RECT* rect, LPARAM param)
-		{
-			Monitors.Add(monitor);
-			return (BOOL)true;
-		}
-	}
-
 	private HMONITOR GetPrimaryHMonitor()
 	{
 		return _coreNativeManager.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY);
@@ -195,7 +184,7 @@ internal class MonitorManager : IMonitorManager
 	/// <exception cref="Exception">When no monitors are found.</exception>
 	private unsafe Monitor[] GetCurrentMonitors()
 	{
-		List<HMONITOR> hmonitors;
+		List<HMONITOR> hmonitors = new();
 		HMONITOR primaryHMonitor = GetPrimaryHMonitor();
 
 		if (_coreNativeManager.HasMultipleMonitors())
@@ -205,18 +194,12 @@ internal class MonitorManager : IMonitorManager
 
 			_coreNativeManager.EnumDisplayMonitors(null, null, proc, (LPARAM)0);
 
-			if (closure.Monitors.Count > 0)
-			{
-				hmonitors = closure.Monitors;
-			}
-			else
-			{
-				hmonitors = new List<HMONITOR>() { primaryHMonitor };
-			}
+			hmonitors = closure.Monitors;
 		}
-		else
+
+		if (hmonitors.Count == 0)
 		{
-			hmonitors = new List<HMONITOR>() { primaryHMonitor };
+			hmonitors.Add(primaryHMonitor);
 		}
 
 		Monitor[] currentMonitors = new Monitor[hmonitors.Count];

@@ -248,7 +248,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// Called when a window has been added by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was added.</param>
-	internal void WindowAdded(IWindow window)
+	internal virtual void WindowAdded(IWindow window)
 	{
 		Logger.Debug($"Adding window {window}");
 		IWorkspace? workspace = _configContext.RouterManager.RouteWindow(window);
@@ -286,7 +286,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// Called when a window has been removed by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was removed.</param>
-	internal void WindowRemoved(IWindow window)
+	internal virtual void WindowRemoved(IWindow window)
 	{
 		Logger.Debug($"Window removed: {window}");
 
@@ -305,7 +305,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// Called when a window has been focused by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was focused.</param>
-	internal void WindowFocused(IWindow window)
+	internal virtual void WindowFocused(IWindow window)
 	{
 		Logger.Debug($"Window focused: {window}");
 
@@ -316,6 +316,34 @@ internal class WorkspaceManager : IWorkspaceManager
 				ws.WindowFocused(window);
 			}
 		}
+	}
+
+	/// <summary>
+	/// Called when a window is about to be minimized.
+	/// </summary>
+	/// <param name="window">The window that is minimizing.</param>
+	internal virtual void WindowMinimizeStart(IWindow window)
+	{
+		Logger.Debug($"Window minimize start: {window}");
+
+		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
+		{
+			Logger.Error($"Window {window} was not found in any workspace");
+			return;
+		}
+
+		workspace.RemoveWindow(window);
+	}
+
+	/// <summary>
+	/// Called when a window is about to be restored.
+	/// </summary>
+	/// <param name="window">The window that is restoring.</param>
+	internal virtual void WindowMinimizeEnd(IWindow window)
+	{
+		Logger.Debug($"Window minimize end: {window}");
+
+		WindowAdded(window);
 	}
 	#endregion
 
