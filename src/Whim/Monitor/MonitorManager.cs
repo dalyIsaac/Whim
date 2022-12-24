@@ -184,7 +184,7 @@ internal class MonitorManager : IMonitorManager
 	/// <exception cref="Exception">When no monitors are found.</exception>
 	private unsafe Monitor[] GetCurrentMonitors()
 	{
-		List<HMONITOR> hmonitors;
+		List<HMONITOR> hmonitors = new();
 		HMONITOR primaryHMonitor = GetPrimaryHMonitor();
 
 		if (_coreNativeManager.HasMultipleMonitors())
@@ -194,18 +194,12 @@ internal class MonitorManager : IMonitorManager
 
 			_coreNativeManager.EnumDisplayMonitors(null, null, proc, (LPARAM)0);
 
-			if (closure.Monitors.Count > 0)
-			{
-				hmonitors = closure.Monitors;
-			}
-			else
-			{
-				hmonitors = new List<HMONITOR>() { primaryHMonitor };
-			}
+			hmonitors = closure.Monitors;
 		}
-		else
+
+		if (hmonitors.Count == 0)
 		{
-			hmonitors = new List<HMONITOR>() { primaryHMonitor };
+			hmonitors.Add(primaryHMonitor);
 		}
 
 		Monitor[] currentMonitors = new Monitor[hmonitors.Count];
