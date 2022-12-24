@@ -1,4 +1,7 @@
 using Moq;
+using System;
+using Windows.Win32;
+using Windows.Win32.UI.Accessibility;
 using Xunit;
 
 namespace Whim.Tests;
@@ -159,5 +162,76 @@ public class WindowManagerTests
 		// Then
 		workspaceManager.Verify(m => m.WindowMinimizeEnd(window.Object), Times.Once);
 		Assert.Equal(window.Object, result.Arguments.Window);
+	}
+
+	private static Mock<ICoreNativeManager> CreateInitializeCoreNativeManagerMock()
+	{
+		Mock<ICoreNativeManager> coreNativeManager = new();
+
+		(uint, uint)[] events = new[]
+		{
+			(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_HIDE),
+			(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED),
+			(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND),
+			(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND),
+			(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE),
+			(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND)
+		};
+
+		foreach (var (eventMin, eventMax) in events)
+		{
+			coreNativeManager
+				.Setup(
+					n =>
+						n.SetWinEventHook(eventMin, eventMax, It.IsAny<WINEVENTPROC>())
+				)
+				.Returns(new UnhookWinEventSafeHandle(1));
+		}
+
+		return coreNativeManager;
+	}
+
+
+	[Fact]
+	public void Initialize()
+	{
+		// Given
+		Mock<IConfigContext> configContext = new();
+		Mock<ICoreNativeManager> coreNativeManager = CreateInitializeCoreNativeManagerMock();
+		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+
+		// Then
+		coreNativeManager.Verify(
+			n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()),
+			Times.Exactly(6)
+		);
+	}
+
+	[Fact]
+	public void Initialize_Fail()
+	{
+		// Given
+		Mock<IConfigContext> configContext = new();
+
+		Mock<ICoreNativeManager> coreNativeManager = CreateInitializeCoreNativeManagerMock();
+		coreNativeManager
+			.Setup(
+				n =>
+					n.SetWinEventHook(
+						PInvoke.EVENT_SYSTEM_MINIMIZESTART,
+						PInvoke.EVENT_SYSTEM_MINIMIZEEND,
+						It.IsAny<WINEVENTPROC>()
+					)
+			)
+			.Returns(new UnhookWinEventSafeHandle());
+
+		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+
+		// When
+		// Then
+		Assert.Throws<InvalidOperationException>(windowManager.Initialize);
 	}
 }
