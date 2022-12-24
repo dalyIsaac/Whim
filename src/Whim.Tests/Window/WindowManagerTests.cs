@@ -181,16 +181,12 @@ public class WindowManagerTests
 		foreach (var (eventMin, eventMax) in events)
 		{
 			coreNativeManager
-				.Setup(
-					n =>
-						n.SetWinEventHook(eventMin, eventMax, It.IsAny<WINEVENTPROC>())
-				)
+				.Setup(n => n.SetWinEventHook(eventMin, eventMax, It.IsAny<WINEVENTPROC>()))
 				.Returns(new UnhookWinEventSafeHandle(1));
 		}
 
 		return coreNativeManager;
 	}
-
 
 	[Fact]
 	public void Initialize()
