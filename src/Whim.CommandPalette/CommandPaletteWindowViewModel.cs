@@ -26,7 +26,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	/// Factory to create palette rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private Func<PaletteRowItem, IPaletteRow> _paletteRowFactory;
+	private readonly Func<PaletteRowItem, IPaletteRow> _paletteRowFactory;
 
 	public CommandPalettePlugin Plugin { get; }
 
@@ -136,9 +136,9 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	public event EventHandler? HideRequested;
+	public event EventHandler<EventArgs>? HideRequested;
 
-	public event EventHandler? SetWindowPosRequested;
+	public event EventHandler<EventArgs>? SetWindowPosRequested;
 
 	public CommandPaletteWindowViewModel(
 		IConfigContext configContext,
@@ -167,11 +167,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	/// When the text is empty, typically all items are shown.
 	/// </param>
 	/// <param name="monitor">The monitor to display the command palette on.</param>
-	public void Activate(
-		BaseCommandPaletteActivationConfig config,
-		IEnumerable<CommandItem>? items = null,
-		IMonitor? monitor = null
-	)
+	public void Activate(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items, IMonitor? monitor)
 	{
 		ResetState();
 

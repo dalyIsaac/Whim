@@ -10,11 +10,42 @@ namespace Whim.CommandPalette.Tests;
 )]
 public class CommandPaletteWindowViewModelTests
 {
+	private static (Mock<IConfigContext>, Mock<ICommandManager>, CommandPalettePlugin) CreateStubs()
+	{
+		Mock<ICommandManager> commandManager = new();
+		commandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
+
+		Mock<IMonitor> monitor = new();
+		monitor
+			.Setup(m => m.WorkingArea)
+			.Returns(
+				new Location<int>()
+				{
+					X = 0,
+					Y = 0,
+					Height = 1080,
+					Width = 1920
+				}
+			);
+
+		Mock<IMonitorManager> monitorManager = new();
+		monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
+
+		Mock<IConfigContext> configContext = new();
+		configContext.Setup(c => c.CommandManager).Returns(commandManager.Object);
+		configContext.Setup(c => c.MonitorManager).Returns(monitorManager.Object);
+
+		CommandPalettePlugin plugin = new(configContext.Object, new());
+
+		return (configContext, commandManager, plugin);
+	}
+
 	[Fact]
 	public void Constructor()
 	{
 		// Given
-		Mock<ICommandManager> commandManager = new();
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
 		commandManager
 			.Setup(cm => cm.GetEnumerator())
 			.Returns(
@@ -23,11 +54,6 @@ public class CommandPaletteWindowViewModelTests
 					new CommandItem() { Command = new Command("id", "title", () => { }) }
 				}.GetEnumerator()
 			);
-
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(c => c.CommandManager).Returns(commandManager.Object);
-
-		CommandPalettePlugin plugin = new(configContext.Object, new());
 
 		// When
 		CommandPaletteWindowViewModel vm =
@@ -38,9 +64,62 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void Activate()
+	public void Activate_UseDefaults()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		// When
+		Assert.Raises<EventArgs>(
+			h => vm.SetWindowPosRequested += h,
+			h => vm.SetWindowPosRequested -= h,
+			() => vm.Activate(new BaseCommandPaletteActivationConfig(), new List<CommandItem>(), null)
+		);
+
+		// Then
+		Assert.Equal("", vm.Text);
+		Assert.Equal("Start typing...", vm.PlaceholderText);
+		Assert.Equal((int)(1080 * 0.4), vm.MaxHeight);
+	}
+
+	[Fact]
+	public void Activate_DefineItems()
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() {X = 0, Y = 0, Height = 100, Width = 100});
+
+		BaseCommandPaletteActivationConfig config = new() {
+			Hint = "Hint",
+			InitialText = "Initial text"
+		};
+
+		IEnumerable<CommandItem> commandItems = new List<CommandItem>()
+				{
+					new CommandItem() { Command = new Command("id", "title", () => { }) }
+				};
+
+		// When
+		Assert.Raises<EventArgs>(
+			h => vm.SetWindowPosRequested += h,
+			h => vm.SetWindowPosRequested -= h,
+			() => vm.Activate(config, commandItems, monitor.Object)
+		);
+
+		// Then
+		Assert.Equal("Initial text", vm.Text);
+		Assert.Equal("Hint", vm.PlaceholderText);
+		Assert.Equal((int)(100 * 0.4), vm.MaxHeight);
 	}
 
 	[Fact]
