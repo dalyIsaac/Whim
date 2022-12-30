@@ -332,16 +332,12 @@ public class CommandPaletteWindowViewModelTests
 		CommandPaletteWindowViewModel vm =
 			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
 
-		Command command = new ("id", "title", () => { });
-		CommandItem commandItem = new() {Command = command};
-		vm.PopulateItems(
-			new List<CommandItem>() { commandItem, }
-		);
+		Command command = new("id", "title", () => { });
+		CommandItem commandItem = new() { Command = command };
+		vm.PopulateItems(new List<CommandItem>() { commandItem, });
 
 		// When
-		vm.PopulateItems(
-			new List<CommandItem>() { new CommandItem() { Command = command }, }
-		);
+		vm.PopulateItems(new List<CommandItem>() { new CommandItem() { Command = command }, });
 
 		// Then
 		Assert.Single(vm._allCommands);
@@ -387,17 +383,92 @@ public class CommandPaletteWindowViewModelTests
 	[Fact]
 	public void ExecuteCommand_Free()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		string? callbackText = null;
+		CommandPaletteFreeTextActivationConfig config =
+			new()
+			{
+				InitialText = "text",
+				Callback = (text) =>
+				{
+					callbackText = text;
+				}
+			};
+		plugin.Config.ActivationConfig = config;
+
+		CommandPaletteWindowViewModel vm =
+			new(
+				configContext.Object,
+				plugin,
+				(rowItem) =>
+				{
+					Mock<IPaletteRow> paletteRow = new();
+					paletteRow.Setup(r => r.Model).Returns(rowItem);
+					return paletteRow.Object;
+				}
+			);
+
+		vm.Activate(config, new List<CommandItem>(), null);
+
+		// When
+		Assert.Raises<EventArgs>(h => vm.HideRequested += h, h => vm.HideRequested -= h, vm.ExecuteCommand);
+
+		// Then
+		Assert.Equal("text", callbackText);
 	}
 
 	[Fact]
 	public void ExecuteCommand_Menu()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		bool called = false;
+		IEnumerable<CommandItem> items = new List<CommandItem>()
+		{
+			new CommandItem()
+			{
+				Command = new Command(
+					"id",
+					"title",
+					() =>
+					{
+						called = true;
+					}
+				)
+			},
+		};
+
+		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+
+		CommandPaletteMenuActivationConfig config = new();
+		plugin.Config.ActivationConfig = config;
+
+		CommandPaletteWindowViewModel vm =
+			new(
+				configContext.Object,
+				plugin,
+				(rowItem) =>
+				{
+					Mock<IPaletteRow> paletteRow = new();
+					paletteRow.Setup(r => r.Model).Returns(rowItem);
+					return paletteRow.Object;
+				}
+			);
+
+		// When
+		Assert.Raises<EventArgs>(h => vm.HideRequested += h, h => vm.HideRequested -= h, vm.ExecuteCommand);
+
+		// Then
+		Assert.True(called);
 	}
 
 	[Fact]
-	public void ExecuteCommand_Menu_Hide()
+	public void ExecuteCommand_Menu_Reuse()
 	{
 		// TODO
 	}
