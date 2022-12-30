@@ -73,7 +73,7 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	/// </summary>
 	public void Hide()
 	{
-		_commandPaletteWindow?.Hide();
+		_commandPaletteWindow?.Hide(_configContext);
 	}
 
 	/// <summary>
