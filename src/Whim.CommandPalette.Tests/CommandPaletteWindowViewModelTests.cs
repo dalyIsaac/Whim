@@ -258,13 +258,146 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void UpdateMatches()
+	public void PopulateItems_CannotExecute()
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		// When
+		vm.PopulateItems(
+			new List<CommandItem>()
+			{
+				new CommandItem() { Command = new Command("id", "title", () => { }, () => false) },
+			}
+		);
+
+		// Then
+		Assert.Empty(vm._allCommands);
+	}
+
+	[Fact]
+	public void PopulateItems_AddNew()
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		// When
+		vm.PopulateItems(
+			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
+		);
+
+		// Then
+		Assert.Single(vm._allCommands);
+	}
+
+	[Fact]
+	public void PopulateItems_UpdateExisting()
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		vm.PopulateItems(
+			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
+		);
+
+		// When
+		vm.PopulateItems(
+			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "new title", () => { }) }, }
+		);
+
+		// Then
+		Assert.Single(vm._allCommands);
+		Assert.Equal("new title", vm._allCommands[0].Command.Title);
+	}
+
+	[Fact]
+	public void PopulateItems_SkipEqualCommand()
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		Command command = new ("id", "title", () => { });
+		CommandItem commandItem = new() {Command = command};
+		vm.PopulateItems(
+			new List<CommandItem>() { commandItem, }
+		);
+
+		// When
+		vm.PopulateItems(
+			new List<CommandItem>() { new CommandItem() { Command = command }, }
+		);
+
+		// Then
+		Assert.Single(vm._allCommands);
+		Assert.Equal(commandItem, vm._allCommands[0]);
+	}
+
+	[Fact]
+	public void UpdateMatches_Menu_NoMatches()
 	{
 		// TODO
 	}
 
 	[Fact]
-	public void ExecuteCommand()
+	public void UpdateMatches_Menu_SomeMatches()
+	{
+		// TODO
+	}
+
+	[Fact]
+	public void UpdateMatches_Free()
+	{
+		// TODO
+	}
+
+	[Fact]
+	public void LoadMatches_AddRows()
+	{
+		// TODO
+	}
+
+	[Fact]
+	public void LoadMatches_UpdateRows()
+	{
+		// TODO
+	}
+
+	[Fact]
+	public void LoadMatches_RestoreRows()
+	{
+		// TODO
+	}
+
+	[Fact]
+	public void ExecuteCommand_Free()
+	{
+		// TODO
+	}
+
+	[Fact]
+	public void ExecuteCommand_Menu()
+	{
+		// TODO
+	}
+
+	[Fact]
+	public void ExecuteCommand_Menu_Hide()
 	{
 		// TODO
 	}

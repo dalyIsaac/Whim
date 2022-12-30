@@ -20,7 +20,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="PaletteRows"/> are drawn.
 	/// </summary>
-	private readonly List<CommandItem> _allCommands = new();
+	internal readonly List<CommandItem> _allCommands = new();
 
 	/// <summary>
 	/// Factory to create palette rows to make it possible to use xunit.
@@ -202,7 +202,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	/// <summary>
 	/// Populate <see cref="_allCommands"/> with all the current commands.
 	/// </summary>
-	private void PopulateItems(IEnumerable<CommandItem> items)
+	internal void PopulateItems(IEnumerable<CommandItem> items)
 	{
 		Logger.Debug($"Populating the current list of all commands.");
 
@@ -318,7 +318,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	/// <param name="query">The query text string.</param>
 	/// <param name="menuActivationConfig"></param>
 	/// <returns>The number of processed matches.</returns>
-	private int LoadMatches(string query, CommandPaletteMenuActivationConfig menuActivationConfig)
+	internal int LoadMatches(string query, CommandPaletteMenuActivationConfig menuActivationConfig)
 	{
 		int matchesCount = 0;
 
