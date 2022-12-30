@@ -15,12 +15,18 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	private readonly List<PaletteRow> _unusedRows = new();
+	private readonly List<IPaletteRow> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="PaletteRows"/> are drawn.
 	/// </summary>
 	private readonly List<CommandItem> _allCommands = new();
+
+	/// <summary>
+	/// Factory to create palette rows to make it possible to use xunit.
+	/// It turns out it's annoying to test the Windows App SDK with xunit.
+	/// </summary>
+	private Func<PaletteRowItem, IPaletteRow> _paletteRowFactory;
 
 	public CommandPalettePlugin Plugin { get; }
 
@@ -126,7 +132,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 
 	public bool IsVisible => Monitor != null;
 
-	public readonly ObservableCollection<PaletteRow> PaletteRows = new();
+	public readonly ObservableCollection<IPaletteRow> PaletteRows = new();
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -134,11 +140,17 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 
 	public event EventHandler? SetWindowPosRequested;
 
-	public CommandPaletteWindowViewModel(IConfigContext configContext, CommandPalettePlugin plugin)
+	public CommandPaletteWindowViewModel(
+		IConfigContext configContext,
+		CommandPalettePlugin plugin,
+		Func<PaletteRowItem, IPaletteRow>? paletteRowFactory = null
+	)
 	{
 		_configContext = configContext;
 		Plugin = plugin;
 		_activationConfig = Plugin.Config.ActivationConfig;
+
+		_paletteRowFactory = paletteRowFactory ?? ((PaletteRowItem item) => new PaletteRow(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(_configContext.CommandManager);
@@ -325,7 +337,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				PaletteRow row = _unusedRows[^1];
+				IPaletteRow row = _unusedRows[^1];
 				row.Update(item);
 
 				PaletteRows.Add(row);
@@ -334,7 +346,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 			else
 			{
 				// Add a new row.
-				PaletteRow row = new(item);
+				IPaletteRow row = _paletteRowFactory(item);
 				PaletteRows.Add(row);
 				row.Initialize();
 			}
