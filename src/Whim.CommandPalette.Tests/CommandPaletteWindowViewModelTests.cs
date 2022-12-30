@@ -97,17 +97,24 @@ public class CommandPaletteWindowViewModelTests
 			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
 
 		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() {X = 0, Y = 0, Height = 100, Width = 100});
+		monitor
+			.Setup(m => m.WorkingArea)
+			.Returns(
+				new Location<int>()
+				{
+					X = 0,
+					Y = 0,
+					Height = 100,
+					Width = 100
+				}
+			);
 
-		BaseCommandPaletteActivationConfig config = new() {
-			Hint = "Hint",
-			InitialText = "Initial text"
-		};
+		BaseCommandPaletteActivationConfig config = new() { Hint = "Hint", InitialText = "Initial text" };
 
 		IEnumerable<CommandItem> commandItems = new List<CommandItem>()
-				{
-					new CommandItem() { Command = new Command("id", "title", () => { }) }
-				};
+		{
+			new CommandItem() { Command = new Command("id", "title", () => { }) }
+		};
 
 		// When
 		Assert.Raises<EventArgs>(
@@ -134,11 +141,7 @@ public class CommandPaletteWindowViewModelTests
 
 		// When
 		// Then
-		Assert.Raises<EventArgs>(
-			h => vm.HideRequested += h,
-			h => vm.HideRequested -= h,
-			vm.RequestHide
-		);
+		Assert.Raises<EventArgs>(h => vm.HideRequested += h, h => vm.HideRequested -= h, vm.RequestHide);
 	}
 
 	[Fact]
