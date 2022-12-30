@@ -229,6 +229,35 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
+	public void OnKeyDown_UnhandledKeys()
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		IEnumerable<CommandItem> items = new List<CommandItem>()
+		{
+			new CommandItem() { Command = new Command("id", "title", () => { }) },
+			new CommandItem() { Command = new Command("id2", "title2", () => { }) },
+			new CommandItem() { Command = new Command("id3", "title3", () => { }) }
+		};
+
+		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+
+		plugin.Config.ActivationConfig = new CommandPaletteMenuActivationConfig();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		// When
+		bool result = vm.OnKeyDown(this, Windows.System.VirtualKey.A);
+
+		// Then
+		Assert.Equal(0, vm.SelectedIndex);
+		Assert.False(result);
+	}
+
+	[Fact]
 	public void UpdateMatches()
 	{
 		// TODO
