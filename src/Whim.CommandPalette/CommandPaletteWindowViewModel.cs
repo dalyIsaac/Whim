@@ -239,13 +239,13 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	/// Handles key presses.
 	/// </summary>
 	/// <param name="sender"></param>
-	/// <param name="e"></param>
+	/// <param name="key"></param>
 	/// <returns><see langword="true"/> when the selected item should scroll into view.</returns>
-	public bool OnKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+	public bool OnKeyDown(object sender, Windows.System.VirtualKey key)
 	{
-		Logger.Debug("Command palette key down: {0}", e.Key.ToString());
+		Logger.Debug("Command palette key down: {0}", key.ToString());
 
-		switch (e.Key)
+		switch (key)
 		{
 			case Windows.System.VirtualKey.Down when PaletteRows.Count > 0:
 				// Go down the command palette's list.

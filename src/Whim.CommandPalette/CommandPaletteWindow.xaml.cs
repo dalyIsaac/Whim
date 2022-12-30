@@ -96,7 +96,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// <param name="e"></param>
 	private void TextEntry_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 	{
-		bool scrollIntoView = ViewModel.OnKeyDown(sender, e);
+		bool scrollIntoView = ViewModel.OnKeyDown(sender, e.Key);
 		if (scrollIntoView)
 		{
 			ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);

@@ -3,11 +3,6 @@ using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
 public class CommandPaletteWindowViewModelTests
 {
 	private static (Mock<IConfigContext>, Mock<ICommandManager>, CommandPalettePlugin) CreateStubs()
@@ -145,9 +140,92 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void OnKeyDown()
+	public void OnKeyDown_Escape()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		// When
+		bool? result = null;
+		Assert.Raises<EventArgs>(
+			h => vm.HideRequested += h,
+			h => vm.HideRequested -= h,
+			() =>
+			{
+				result = vm.OnKeyDown(this, Windows.System.VirtualKey.Escape);
+			}
+		);
+
+		// Then
+		Assert.False(result);
+	}
+
+	[Fact]
+	public void OnKeyDown_Enter()
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		string callbackText = "";
+		CommandPaletteFreeTextActivationConfig config =
+			new() { InitialText = "Hello, world!", Callback = (text) => callbackText = text };
+		plugin.Config.ActivationConfig = config;
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		vm.Activate(config, new List<CommandItem>(), null);
+
+		// When
+		bool? result = null;
+		Assert.Raises<EventArgs>(
+			h => vm.HideRequested += h,
+			h => vm.HideRequested -= h,
+			() =>
+			{
+				result = vm.OnKeyDown(this, Windows.System.VirtualKey.Enter);
+			}
+		);
+
+		// Then
+		Assert.False(result);
+		Assert.Equal("Hello, world!", callbackText);
+	}
+
+	[Theory]
+	[InlineData(Windows.System.VirtualKey.Up, 2)]
+	[InlineData(Windows.System.VirtualKey.Down, 1)]
+	public void OnKeyDown_VerticalArrow(Windows.System.VirtualKey key, int expectedIndex)
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		IEnumerable<CommandItem> items = new List<CommandItem>()
+		{
+			new CommandItem() { Command = new Command("id", "title", () => { }) },
+			new CommandItem() { Command = new Command("id2", "title2", () => { }) },
+			new CommandItem() { Command = new Command("id3", "title3", () => { }) }
+		};
+
+		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+
+		plugin.Config.ActivationConfig = new CommandPaletteMenuActivationConfig();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		// When
+		bool result = vm.OnKeyDown(this, key);
+
+		// Then
+		Assert.Equal(expectedIndex, vm.SelectedIndex);
+		Assert.True(result);
 	}
 
 	[Fact]
