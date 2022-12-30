@@ -6,9 +6,8 @@ using System.ComponentModel;
 
 namespace Whim.CommandPalette;
 
-internal class CommandPaletteWindowViewModel : INotifyPropertyChanged, IDisposable
+internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 {
-	private bool _disposedValue;
 	private readonly IConfigContext _configContext;
 	private BaseCommandPaletteActivationConfig _activationConfig;
 
@@ -391,34 +390,5 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged, IDisposab
 	protected virtual void OnPropertyChanged(string? propertyName)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			if (disposing)
-			{
-				// TODO: dispose managed state (managed objects)
-			}
-
-			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-			// TODO: set large fields to null
-			_disposedValue = true;
-		}
-	}
-
-	// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-	// ~CommandPaletteWindowViewModel()
-	// {
-	//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-	//     Dispose(disposing: false);
-	// }
-
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
 	}
 }
