@@ -125,7 +125,20 @@ public class CommandPaletteWindowViewModelTests
 	[Fact]
 	public void RequestHide()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+
+		// When
+		// Then
+		Assert.Raises<EventArgs>(
+			h => vm.HideRequested += h,
+			h => vm.HideRequested -= h,
+			vm.RequestHide
+		);
 	}
 
 	[Fact]
