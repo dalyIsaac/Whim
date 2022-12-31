@@ -8,11 +8,11 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-internal sealed partial class PaletteRow : UserControl, IPaletteRow
+internal sealed partial class PaletteMenuRow : UserControl, IPaletteRow
 {
 	public PaletteRowItem Model { get; private set; }
 
-	public PaletteRow(PaletteRowItem item)
+	public PaletteMenuRow(PaletteRowItem item)
 	{
 		Model = item;
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");

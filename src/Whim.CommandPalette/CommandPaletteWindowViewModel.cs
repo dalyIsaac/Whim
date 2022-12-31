@@ -150,7 +150,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 		Plugin = plugin;
 		_activationConfig = Plugin.Config.ActivationConfig;
 
-		_paletteRowFactory = paletteRowFactory ?? ((PaletteRowItem item) => new PaletteRow(item));
+		_paletteRowFactory = paletteRowFactory ?? ((PaletteRowItem item) => new PaletteMenuRow(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(_configContext.CommandManager);
