@@ -1,4 +1,5 @@
 using Moq;
+using FluentAssertions;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
@@ -381,22 +382,78 @@ public class CommandPaletteWindowViewModelTests
 		// TODO
 	}
 
+	private static PaletteRowText CreatePaletteRowText(string text)
+	{
+		PaletteRowText rowText = new();
+		rowText.Segments.Add(new TextSegment(Text: text, IsHighlighted: false));
+		return rowText;
+	}
+
+	private static CommandPaletteMenuActivationConfig CreateMenuActivationConfig(int itemCount)
+	{
+		List<PaletteRowItem> items = new();
+
+		for (int i = 0; i < itemCount; i++)
+		{
+			items.Add(
+				new PaletteRowItem(
+					CommandItem: new CommandItem() { Command = new Command($"id{i}", $"title{i}", () => { }) },
+					Title: CreatePaletteRowText($"title{i}")
+				)
+			);
+		}
+
+		Mock<ICommandPaletteMatcher> matcher = new();
+		matcher.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<ICollection<CommandItem>>())).Returns(items);
+
+		CommandPaletteMenuActivationConfig config = new() { Matcher = matcher.Object, };
+
+		return config;
+	}
+
 	[Fact]
 	public void LoadMatches_AddRows()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
+		string query = "ti";
+		CommandPaletteMenuActivationConfig config = CreateMenuActivationConfig(2);
+
+		// When
+		vm.LoadMatches(query, config);
+
+		// Then
+		Assert.Equal(2, vm.PaletteRows.Count);
+		Assert.Equal("title0", vm.PaletteRows[0].Model.CommandItem.Command.Title);
+		Assert.Equal("title1", vm.PaletteRows[1].Model.CommandItem.Command.Title);
 	}
 
 	[Fact]
 	public void LoadMatches_UpdateRows()
 	{
-		// TODO
-	}
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
 
-	[Fact]
-	public void LoadMatches_RestoreRows()
-	{
-		// TODO
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
+		string query = "ti";
+
+		vm.LoadMatches(query, CreateMenuActivationConfig(2));
+
+		// When
+		vm.LoadMatches(query, CreateMenuActivationConfig(2));
+
+		// Then
+		Assert.Equal(2, vm.PaletteRows.Count);
+		vm.PaletteRows
+			.Should()
+			.AllSatisfy(r =>
+			{
+				Assert.True(r is PaletteRowStub row && row.IsUpdated);
+			});
 	}
 
 	[Fact]
