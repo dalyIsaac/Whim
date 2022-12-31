@@ -611,6 +611,79 @@ public class CommandPaletteWindowViewModelTests
 	[Fact]
 	public void ExecuteCommand_Menu_Reuse()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel? vm = null;
+
+		int called = 0;
+		string callbackText = string.Empty;
+		IEnumerable<CommandItem> items = new List<CommandItem>()
+		{
+			new CommandItem()
+			{
+				Command = new Command(
+					"id",
+					"title",
+					() =>
+					{
+						called++;
+						vm?.Activate(
+							new CommandPaletteFreeTextActivationConfig()
+							{
+								InitialText = "free text",
+								Callback = (text) =>
+								{
+									callbackText = text;
+								}
+							},
+							null,
+							null
+						);
+					}
+				)
+			},
+		};
+
+		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+
+		CommandPaletteMenuActivationConfig config = new();
+		plugin.Config.ActivationConfig = config;
+
+		vm = new(
+			configContext.Object,
+			plugin,
+			(rowItem) =>
+			{
+				Mock<IPaletteRow> paletteRow = new();
+				paletteRow.Setup(r => r.Model).Returns(rowItem);
+				return paletteRow.Object;
+			}
+		);
+
+		bool hideRequested = false;
+		vm.HideRequested += (sender, args) =>
+		{
+			hideRequested = true;
+		};
+
+		// For the first execution, show the menu
+		// When
+		vm.ExecuteCommand();
+
+		// Then
+		Assert.Equal(1, called);
+		Assert.Empty(callbackText);
+		Assert.False(hideRequested);
+
+		// For the second execution, show the free text
+		// When
+		vm.ExecuteCommand();
+
+		// Then
+		Assert.Equal(1, called);
+		Assert.Equal("free text", callbackText);
+		Assert.True(hideRequested);
 	}
 }
