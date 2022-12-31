@@ -16,6 +16,8 @@
 		<TextBox
 			x:Name="TextEntry"
 			KeyDown="TextEntry_KeyDown"
+			PlaceholderText="{x:Bind Path=ViewModel.PlaceholderText, Mode=OneWay}"
+			Text="{x:Bind Path=ViewModel.Text, Mode=OneWay}"
 			TextChanged="TextEntry_TextChanged" />
 
 		<RelativePanel x:Name="ListViewItemsWrapper" Grid.Row="1">
@@ -33,9 +35,11 @@
 				IsItemClickEnabled="True"
 				IsTabStop="False"
 				ItemClick="CommandListItems_ItemClick"
+				ItemsSource="{x:Bind Path=ViewModel.PaletteRows, Mode=OneWay}"
 				RelativePanel.AlignLeftWithPanel="True"
 				RelativePanel.AlignRightWithPanel="True"
 				RelativePanel.AlignTopWithPanel="True"
+				SelectedIndex="{x:Bind Path=ViewModel.SelectedIndex, Mode=TwoWay}"
 				SelectionMode="Single" />
 		</RelativePanel>
 	</Grid>
