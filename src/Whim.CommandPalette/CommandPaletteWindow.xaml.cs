@@ -74,6 +74,15 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	}
 
 	/// <summary>
+	/// Hide the command palette.
+	/// </summary>
+	public void Hide()
+	{
+		Logger.Debug("Hiding command palette");
+		ViewModel.RequestHide();
+	}
+
+	/// <summary>
 	/// Toggle the visibility of the command palette.
 	/// </summary>
 	public void Toggle()
