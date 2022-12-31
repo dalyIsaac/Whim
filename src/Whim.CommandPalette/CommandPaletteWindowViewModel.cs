@@ -273,7 +273,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	}
 
 	/// <summary>
-	/// Update the matches shown to the user. <br />
+	/// Update the matches shown to the user, with the current <see cref="_activationConfig"/>.
 	///
 	/// This method has been optimized to reduce the execution time.
 	/// </summary>

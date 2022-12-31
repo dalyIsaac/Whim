@@ -1,6 +1,7 @@
 using Moq;
 using FluentAssertions;
 using Xunit;
+using Microsoft.UI.Xaml;
 
 namespace Whim.CommandPalette.Tests;
 
@@ -361,25 +362,84 @@ public class CommandPaletteWindowViewModelTests
 	[Fact]
 	public void UpdateMatches_Menu_NoMatches()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
+
+		vm.Activate(new CommandPaletteMenuActivationConfig(), null, null);
+
+		// When
+		vm.UpdateMatches();
+
+		// Then
+		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
+		Assert.Equal(Visibility.Visible, vm.NoMatchingCommandsTextBlockVisibility);
+		Assert.Equal(Visibility.Collapsed, vm.ListViewItemsVisibility);
 	}
 
 	[Fact]
 	public void UpdateMatches_Menu_SomeMatches()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
+
+		vm.Activate(CreateMenuActivationConfig(3), null, null);
+
+		// When
+		vm.UpdateMatches();
+
+		// Then
+		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
+		Assert.Equal(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
+		Assert.Equal(Visibility.Visible, vm.ListViewItemsVisibility);
+		Assert.Equal(3, vm.PaletteRows.Count);
 	}
 
 	[Fact]
 	public void UpdateMatches_Menu_RemoveUnused()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
+
+		vm.Activate(CreateMenuActivationConfig(3), null, null);
+
+		// When
+		vm.Activate(CreateMenuActivationConfig(2), null, null);
+		vm.UpdateMatches();
+
+		// Then
+		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
+		Assert.Equal(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
+		Assert.Equal(Visibility.Visible, vm.ListViewItemsVisibility);
+		Assert.Equal(2, vm.PaletteRows.Count);
 	}
 
 	[Fact]
 	public void UpdateMatches_Free()
 	{
-		// TODO
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
+
+		vm.Activate(new CommandPaletteFreeTextActivationConfig() { Callback = (text) => { } }, null, null);
+
+		// When
+		vm.UpdateMatches();
+
+		// Then
+		Assert.Equal(Visibility.Collapsed, vm.ListViewItemsWrapperVisibility);
+		Assert.Equal(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
+		Assert.Equal(Visibility.Collapsed, vm.ListViewItemsVisibility);
 	}
 
 	private static PaletteRowText CreatePaletteRowText(string text)
