@@ -35,6 +35,11 @@ public class CommandPaletteWindowViewModelTests
 		return (configContext, commandManager, plugin);
 	}
 
+	private static IPaletteRow PaletteRowFactory(PaletteRowItem item)
+	{
+		return new PaletteRowStub() { Model = item };
+	}
+
 	[Fact]
 	public void Constructor()
 	{
@@ -51,8 +56,7 @@ public class CommandPaletteWindowViewModelTests
 			);
 
 		// When
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		// Then
 		Assert.Single(vm.PaletteRows);
@@ -65,8 +69,7 @@ public class CommandPaletteWindowViewModelTests
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
 			CreateStubs();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		// When
 		Assert.Raises<EventArgs>(
@@ -88,8 +91,7 @@ public class CommandPaletteWindowViewModelTests
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
 			CreateStubs();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		Mock<IMonitor> monitor = new();
 		monitor
@@ -131,8 +133,7 @@ public class CommandPaletteWindowViewModelTests
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
 			CreateStubs();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		// When
 		// Then
@@ -146,8 +147,7 @@ public class CommandPaletteWindowViewModelTests
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
 			CreateStubs();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		// When
 		bool? result = null;
@@ -176,8 +176,7 @@ public class CommandPaletteWindowViewModelTests
 			new() { InitialText = "Hello, world!", Callback = (text) => callbackText = text };
 		plugin.Config.ActivationConfig = config;
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		vm.Activate(config, new List<CommandItem>(), null);
 
@@ -217,8 +216,7 @@ public class CommandPaletteWindowViewModelTests
 
 		plugin.Config.ActivationConfig = new CommandPaletteMenuActivationConfig();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		// When
 		bool result = vm.OnKeyDown(this, key);
@@ -246,8 +244,7 @@ public class CommandPaletteWindowViewModelTests
 
 		plugin.Config.ActivationConfig = new CommandPaletteMenuActivationConfig();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		// When
 		bool result = vm.OnKeyDown(this, Windows.System.VirtualKey.A);
@@ -264,8 +261,7 @@ public class CommandPaletteWindowViewModelTests
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
 			CreateStubs();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		// When
 		vm.PopulateItems(
@@ -286,8 +282,7 @@ public class CommandPaletteWindowViewModelTests
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
 			CreateStubs();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		// When
 		vm.PopulateItems(
@@ -305,8 +300,7 @@ public class CommandPaletteWindowViewModelTests
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
 			CreateStubs();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		vm.PopulateItems(
 			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
@@ -323,14 +317,33 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
+	public void PopulateItems_RemoveExtra()
+	{
+		// Given
+		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
+			CreateStubs();
+
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
+
+		vm.PopulateItems(
+			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
+		);
+
+		// When
+		vm.PopulateItems(new List<CommandItem>());
+
+		// Then
+		Assert.Empty(vm._allCommands);
+	}
+
+	[Fact]
 	public void PopulateItems_SkipEqualCommand()
 	{
 		// Given
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
 			CreateStubs();
 
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, (rowItem) => new Mock<IPaletteRow>().Object);
+		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		Command command = new("id", "title", () => { });
 		CommandItem commandItem = new() { Command = command };
@@ -352,6 +365,12 @@ public class CommandPaletteWindowViewModelTests
 
 	[Fact]
 	public void UpdateMatches_Menu_SomeMatches()
+	{
+		// TODO
+	}
+
+	[Fact]
+	public void UpdateMatches_Menu_RemoveUnused()
 	{
 		// TODO
 	}
@@ -411,7 +430,7 @@ public class CommandPaletteWindowViewModelTests
 				}
 			);
 
-		vm.Activate(config, new List<CommandItem>(), null);
+		vm.Activate(config, null, null);
 
 		// When
 		Assert.Raises<EventArgs>(h => vm.HideRequested += h, h => vm.HideRequested -= h, vm.ExecuteCommand);
