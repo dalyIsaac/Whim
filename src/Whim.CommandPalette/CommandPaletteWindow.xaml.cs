@@ -21,8 +21,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		ViewModel.SetWindowPosRequested += ViewModel_SetWindowPosRequested;
 
 		_window = this.InitializeBorderlessWindow(_configContext, "Whim.CommandPalette", "CommandPaletteWindow");
-		// TODO: Undo
-		// this.SetIsShownInSwitchers(false);
+		this.SetIsShownInSwitchers(false);
 		Activated += CommandPaletteWindow_Activated;
 		Title = CommandPaletteConfig.Title;
 	}
@@ -43,8 +42,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		if (e.WindowActivationState == WindowActivationState.Deactivated)
 		{
 			// Hide the window when it loses focus.
-			// TODO: Undo
-			// ViewModel.RequestHide();
+			ViewModel.RequestHide();
 		}
 	}
 
