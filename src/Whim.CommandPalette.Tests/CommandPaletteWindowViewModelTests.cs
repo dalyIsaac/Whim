@@ -77,7 +77,7 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Raises<EventArgs>(
 			h => vm.SetWindowPosRequested += h,
 			h => vm.SetWindowPosRequested -= h,
-			() => vm.Activate(new BaseCommandPaletteActivationConfig(), new List<CommandItem>(), null)
+			() => vm.Activate(new CommandPaletteMenuActivationConfig(), new List<CommandItem>(), null)
 		);
 
 		// Then
@@ -108,7 +108,11 @@ public class CommandPaletteWindowViewModelTests
 				}
 			);
 
-		BaseCommandPaletteActivationConfig config = new() { Hint = "Hint", InitialText = "Initial text" };
+		BaseCommandPaletteActivationConfig config = new CommandPaletteMenuActivationConfig()
+		{
+			Hint = "Hint",
+			InitialText = "Initial text"
+		};
 
 		IEnumerable<CommandItem> commandItems = new List<CommandItem>()
 		{
