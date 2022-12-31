@@ -410,16 +410,21 @@ public class CommandPaletteWindowViewModelTests
 		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
 		vm.Activate(CreateMenuActivationConfig(3), null, null);
+		vm.Activate(CreateMenuActivationConfig(2), null, null);
 
 		// When
-		vm.Activate(CreateMenuActivationConfig(2), null, null);
+		vm.Activate(CreateMenuActivationConfig(3), null, null);
 		vm.UpdateMatches();
 
 		// Then
 		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
 		Assert.Equal(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
 		Assert.Equal(Visibility.Visible, vm.ListViewItemsVisibility);
-		Assert.Equal(2, vm.PaletteRows.Count);
+		Assert.Equal(3, vm.PaletteRows.Count);
+
+		// First and second element should have been updated
+		Assert.True(vm.PaletteRows[0] is PaletteRowStub stub && stub.IsUpdated);
+		Assert.True(vm.PaletteRows[1] is PaletteRowStub stub2 && stub2.IsUpdated);
 	}
 
 	[Fact]
