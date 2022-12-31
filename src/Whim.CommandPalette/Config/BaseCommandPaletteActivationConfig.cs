@@ -3,7 +3,7 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// Base config for activating the command palette.
 /// </summary>
-public record BaseCommandPaletteActivationConfig
+internal record BaseCommandPaletteActivationConfig
 {
 	/// <summary>
 	/// Text hint to show in the command palette.
