@@ -154,7 +154,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(_configContext.CommandManager);
-		UpdateMatches();
+		Update();
 	}
 
 	/// <summary>
@@ -179,7 +179,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);
 
 		PopulateItems(items ?? Array.Empty<CommandItem>());
-		UpdateMatches();
+		Update();
 	}
 
 	public void RequestHide()
@@ -277,32 +277,26 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	///
 	/// This method has been optimized to reduce the execution time.
 	/// </summary>
-	public void UpdateMatches()
+	public void Update()
 	{
 		Logger.Debug("Updating command palette matches");
 		string query = Text;
 		int matchesCount = 0;
 
-		if (_activationConfig is CommandPaletteMenuActivationConfig menuActivationConfig)
+		// TODO: HERE
+		switch (_activationConfig)
 		{
-			matchesCount = LoadMatches(query, menuActivationConfig);
+			case CommandPaletteMenuActivationConfig menuActivationConfig:
+				matchesCount = UpdateMenuConfig(query, menuActivationConfig);
+				break;
 
-			ListViewItemsWrapperVisibility = Visibility.Visible;
-			if (matchesCount == 0)
-			{
-				NoMatchingCommandsTextBlockVisibility = Visibility.Visible;
-				ListViewItemsVisibility = Visibility.Collapsed;
-			}
-			else
-			{
-				NoMatchingCommandsTextBlockVisibility = Visibility.Collapsed;
-				ListViewItemsVisibility = Visibility.Visible;
-			}
-		}
-		else
-		{
-			NoMatchingCommandsTextBlockVisibility = Visibility.Collapsed;
-			ListViewItemsWrapperVisibility = Visibility.Collapsed;
+			case CommandPaletteFreeTextActivationConfig:
+				UpdateFreeConfig();
+				break;
+
+			default:
+				Logger.Error("Unknown command palette activation config type: {0}", _activationConfig.GetType().Name);
+				return;
 		}
 
 		RemoveUnusedRows(matchesCount);
@@ -313,12 +307,46 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	}
 
 	/// <summary>
+	/// Update the matches shown to the user, when the activation config is a menu.
+	/// </summary>
+	/// <param name="query">The query text.</param>
+	/// <param name="menuActivationConfig">The menu activation config.</param>
+	/// <returns>The number of matches.</returns>
+	private int UpdateMenuConfig(string query, CommandPaletteMenuActivationConfig menuActivationConfig)
+	{
+		int matchesCount = LoadMenuMatches(query, menuActivationConfig);
+
+		ListViewItemsWrapperVisibility = Visibility.Visible;
+		if (matchesCount == 0)
+		{
+			NoMatchingCommandsTextBlockVisibility = Visibility.Visible;
+			ListViewItemsVisibility = Visibility.Collapsed;
+		}
+		else
+		{
+			NoMatchingCommandsTextBlockVisibility = Visibility.Collapsed;
+			ListViewItemsVisibility = Visibility.Visible;
+		}
+
+		return matchesCount;
+	}
+
+	/// <summary>
+	/// Update the menu when the activation config is free.
+	/// </summary>
+	private void UpdateFreeConfig()
+	{
+		NoMatchingCommandsTextBlockVisibility = Visibility.Collapsed;
+		ListViewItemsWrapperVisibility = Visibility.Collapsed;
+	}
+
+	/// <summary>
 	/// Load the matches into the command palette rows.
 	/// </summary>
 	/// <param name="query">The query text string.</param>
 	/// <param name="menuActivationConfig"></param>
 	/// <returns>The number of processed matches.</returns>
-	internal int LoadMatches(string query, CommandPaletteMenuActivationConfig menuActivationConfig)
+	internal int LoadMenuMatches(string query, CommandPaletteMenuActivationConfig menuActivationConfig)
 	{
 		int matchesCount = 0;
 
@@ -357,7 +385,7 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	/// <summary>
 	/// If there are more items than we have space for, remove the last ones.
 	/// </summary>
-	/// <param name="idx"></param>
+	/// <param name="idx">The currently used rows.</param>
 	private void RemoveUnusedRows(int idx)
 	{
 		int count = PaletteRows.Count;
@@ -372,26 +400,41 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 	{
 		Logger.Debug("Executing command");
 
-		if (_activationConfig is CommandPaletteFreeTextActivationConfig freeTextActivationConfig)
+		switch (_activationConfig)
 		{
-			freeTextActivationConfig.Callback(Text);
-			RequestHide();
-			return;
+			case CommandPaletteFreeTextActivationConfig freeTextActivationConfig:
+				ExecuteFreeTextCommand(freeTextActivationConfig);
+				break;
+
+			case CommandPaletteMenuActivationConfig menuActivationConfig:
+				ExecuteMenuCommand(menuActivationConfig);
+				break;
+
+			default:
+				Logger.Error("Unknown command palette activation config type: {0}", _activationConfig.GetType().Name);
+				break;
 		}
-		else if (_activationConfig is CommandPaletteMenuActivationConfig menuActivationConfig)
+	}
+
+	private void ExecuteFreeTextCommand(CommandPaletteFreeTextActivationConfig freeTextActivationConfig)
+	{
+		freeTextActivationConfig.Callback(Text);
+		RequestHide();
+	}
+
+	private void ExecuteMenuCommand(CommandPaletteMenuActivationConfig menuActivationConfig)
+	{
+		CommandItem match = PaletteRows[SelectedIndex].Model.CommandItem;
+
+		// Since the palette window is reused, there's a chance that the _activationConfig
+		// will have been wiped by a free form child command.
+		BaseCommandPaletteActivationConfig currentConfig = _activationConfig;
+		match.Command.TryExecute();
+		menuActivationConfig.Matcher.OnMatchExecuted(match);
+
+		if (_activationConfig == currentConfig)
 		{
-			CommandItem match = PaletteRows[SelectedIndex].Model.CommandItem;
-
-			// Since the palette window is reused, there's a chance that the _activationConfig
-			// will have been wiped by a free form child command.
-			BaseCommandPaletteActivationConfig currentConfig = _activationConfig;
-			match.Command.TryExecute();
-			menuActivationConfig.Matcher.OnMatchExecuted(match);
-
-			if (_activationConfig == currentConfig)
-			{
-				RequestHide();
-			}
+			RequestHide();
 		}
 	}
 

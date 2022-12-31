@@ -364,7 +364,7 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void UpdateMatches_Menu_NoMatches()
+	public void Update_Menu_NoMatches()
 	{
 		// Given
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
@@ -375,7 +375,7 @@ public class CommandPaletteWindowViewModelTests
 		vm.Activate(new CommandPaletteMenuActivationConfig(), null, null);
 
 		// When
-		vm.UpdateMatches();
+		vm.Update();
 
 		// Then
 		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
@@ -384,7 +384,7 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void UpdateMatches_Menu_SomeMatches()
+	public void Update_Menu_SomeMatches()
 	{
 		// Given
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
@@ -395,7 +395,7 @@ public class CommandPaletteWindowViewModelTests
 		vm.Activate(CreateMenuActivationConfig(3), null, null);
 
 		// When
-		vm.UpdateMatches();
+		vm.Update();
 
 		// Then
 		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
@@ -405,7 +405,7 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void UpdateMatches_Menu_RemoveUnused()
+	public void Update_Menu_RemoveUnused()
 	{
 		// Given
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
@@ -418,7 +418,7 @@ public class CommandPaletteWindowViewModelTests
 
 		// When
 		vm.Activate(CreateMenuActivationConfig(3), null, null);
-		vm.UpdateMatches();
+		vm.Update();
 
 		// Then
 		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
@@ -432,7 +432,7 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void UpdateMatches_Free()
+	public void Update_Free()
 	{
 		// Given
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
@@ -443,7 +443,7 @@ public class CommandPaletteWindowViewModelTests
 		vm.Activate(new CommandPaletteFreeTextActivationConfig() { Callback = (text) => { } }, null, null);
 
 		// When
-		vm.UpdateMatches();
+		vm.Update();
 
 		// Then
 		Assert.Equal(Visibility.Collapsed, vm.ListViewItemsWrapperVisibility);
@@ -481,7 +481,7 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void LoadMatches_AddRows()
+	public void LoadMenuMatches_AddRows()
 	{
 		// Given
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
@@ -492,7 +492,7 @@ public class CommandPaletteWindowViewModelTests
 		CommandPaletteMenuActivationConfig config = CreateMenuActivationConfig(2);
 
 		// When
-		vm.LoadMatches(query, config);
+		vm.LoadMenuMatches(query, config);
 
 		// Then
 		Assert.Equal(2, vm.PaletteRows.Count);
@@ -501,7 +501,7 @@ public class CommandPaletteWindowViewModelTests
 	}
 
 	[Fact]
-	public void LoadMatches_UpdateRows()
+	public void LoadMenuMatches_UpdateRows()
 	{
 		// Given
 		(Mock<IConfigContext> configContext, Mock<ICommandManager> commandManager, CommandPalettePlugin plugin) =
@@ -510,10 +510,10 @@ public class CommandPaletteWindowViewModelTests
 		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 		string query = "ti";
 
-		vm.LoadMatches(query, CreateMenuActivationConfig(2));
+		vm.LoadMenuMatches(query, CreateMenuActivationConfig(2));
 
 		// When
-		vm.LoadMatches(query, CreateMenuActivationConfig(2));
+		vm.LoadMenuMatches(query, CreateMenuActivationConfig(2));
 
 		// Then
 		Assert.Equal(2, vm.PaletteRows.Count);

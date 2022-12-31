@@ -113,7 +113,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private void TextEntry_TextChanged(object sender, TextChangedEventArgs e)
 	{
 		ViewModel.Text = TextEntry.Text;
-		ViewModel.UpdateMatches();
+		ViewModel.Update();
 	}
 
 	/// <summary>
