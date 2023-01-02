@@ -26,18 +26,10 @@ public record struct TextSegment(string Text, bool IsHighlighted)
 /// <summary>
 /// The segments which make up the highlighted text.
 /// </summary>
-public record PaletteRowText
+public record Text
 {
 	/// <summary>
 	/// The segments of text.
 	/// </summary>
 	public IList<TextSegment> Segments { get; } = new List<TextSegment>();
 }
-
-/// <summary>
-/// An item stored in the command palette, consisting of a match and associated highlighted title
-/// text.
-/// </summary>
-/// <param name="CommandItem"></param>
-/// <param name="Title"></param>
-public record PaletteRowItem(CommandItem CommandItem, PaletteRowText Title);

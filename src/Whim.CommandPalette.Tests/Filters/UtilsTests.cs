@@ -21,12 +21,7 @@ public class UtilsTests
 	{
 		int[] counters = new int[2];
 		PaletteFilter filter = PaletteFilters.Or(NewFilter(counters, i1, r1), NewFilter(counters, i2, r2));
-		FilterTestUtils.FilterOk(
-			filter,
-			"anything",
-			"anything",
-			new PaletteFilterTextMatch[] { new PaletteFilterTextMatch(0, 8) }
-		);
+		FilterTestUtils.FilterOk(filter, "anything", "anything", new PaletteFilterTextMatch[] { new PaletteFilterTextMatch(0, 8) });
 		Assert.Equal(expected, counters);
 	}
 

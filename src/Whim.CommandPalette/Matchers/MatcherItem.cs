@@ -5,49 +5,52 @@ namespace Whim.CommandPalette;
 
 /// <summary>
 /// A command item, the text matches from the query, and the score of the item for the
-/// <see cref="ICommandPaletteMatcher"/>.
+/// <see cref="IMatcher{T}"/>.
 /// </summary>
-internal record MatcherCommandItem
+internal record MatcherItem<T>
 {
-	public required CommandItem Item { get; init; }
+	public required IPaletteItem<T> Item { get; init; }
 	public required PaletteFilterTextMatch[] TextSegments { get; init; }
 	public required uint Score { get; init; }
 
-	public PaletteRowItem ToRowItem()
+	/// <summary>
+	/// Formats the title of the <see cref="Item"/> with the <see cref="TextSegments"/>.
+	/// </summary>
+	public void FormatTitle()
 	{
-		PaletteRowText title = new();
-		ReadOnlySpan<char> rawTitle = Item.Command.Title.AsSpan();
+		Text formattedTitle = new();
+		ReadOnlySpan<char> rawTitle = Item.Title.AsSpan();
 
 		int start = 0;
 		foreach (PaletteFilterTextMatch match in TextSegments)
 		{
 			if (start < match.Start)
 			{
-				title.Segments.Add(new TextSegment(rawTitle[start..match.Start].ToString(), false));
+				formattedTitle.Segments.Add(new TextSegment(rawTitle[start..match.Start].ToString(), false));
 				start = match.Start;
 			}
 
-			title.Segments.Add(new TextSegment(rawTitle[match.Start..match.End].ToString(), true));
+			formattedTitle.Segments.Add(new TextSegment(rawTitle[match.Start..match.End].ToString(), true));
 			start = match.End;
 		}
 
 		if (start < rawTitle.Length)
 		{
-			title.Segments.Add(new TextSegment(rawTitle[start..].ToString(), false));
+			formattedTitle.Segments.Add(new TextSegment(rawTitle[start..].ToString(), false));
 		}
 
-		return new PaletteRowItem(Item, title);
+		Item.FormattedTitle = formattedTitle;
 	}
 }
 
 /// <summary>
-/// Defines a method to compare <see cref="MatcherCommandItem"/>.
+/// Defines a method to compare <see cref="MatcherItem{T}"/>.
 /// A higher score will be sorted first. For equal scores, the title will be sorted normally.
 /// </summary>
-internal class MatcherCommandItemComparer : IComparer<MatcherCommandItem>
+internal class MatcherItemComparer<T> : IComparer<MatcherItem<T>>
 {
 	/// <inheritdoc />
-	public int Compare(MatcherCommandItem? x, MatcherCommandItem? y)
+	public int Compare(MatcherItem<T>? x, MatcherItem<T>? y)
 	{
 		// We throw here because it should never happen.
 		if (x is null)
@@ -70,6 +73,6 @@ internal class MatcherCommandItemComparer : IComparer<MatcherCommandItem>
 		}
 
 		// Sort by alphabetical order.
-		return string.Compare(x.Item.Command.Title, y.Item.Command.Title, StringComparison.Ordinal);
+		return string.Compare(x.Item.Title, y.Item.Title, StringComparison.Ordinal);
 	}
 }

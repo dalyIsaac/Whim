@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<BuildInParallel>true</BuildInParallel>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;arm64;Any CPU</Platforms>
+		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
+		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+		<UseWinUI>true</UseWinUI>
+		<Version>0.1.0</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="CommandListItem.xaml" />
+		<None Remove="CommandPaletteWindow.xaml" />
+		<None Remove="PaletteItems\PaletteKeybindItem.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221209.1" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="PaletteItems\PaletteKeybindItem.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="CommandPaletteWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Whim.CommandPalette.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+</Project>

@@ -8,5 +8,5 @@ public record CommandPaletteMenuActivationConfig : BaseCommandPaletteActivationC
 	/// <summary>
 	/// The matcher to use to filter the results.
 	/// </summary>
-	public ICommandPaletteMatcher Matcher { get; init; } = new MostRecentlyUsedMatcher();
+	public IMatcher<CommandItem> Matcher { get; init; } = new MostRecentlyUsedMatcher<CommandItem>();
 }

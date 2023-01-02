@@ -1,7 +1,7 @@
 namespace Whim.CommandPalette;
 
 /// <summary>
-/// Represents an option in a <see cref="CommandPaletteSelectActivationConfig"/> select.
+/// Represents an option in a <see cref="CommandPaletteSelectActivationConfig{T}"/> select.
 /// </summary>
 public interface ISelectOption<T>
 {

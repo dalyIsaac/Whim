@@ -472,7 +472,7 @@ public class CommandPaletteWindowViewModelTests
 			);
 		}
 
-		Mock<ICommandPaletteMatcher> matcher = new();
+		Mock<IMatcher> matcher = new();
 		matcher.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<ICollection<CommandItem>>())).Returns(items);
 
 		CommandPaletteMenuActivationConfig config = new() { Matcher = matcher.Object, };
