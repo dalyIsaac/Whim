@@ -9,7 +9,7 @@ public class Command : ICommand
 	private readonly Func<bool>? _condition;
 
 	/// <inheritdoc />
-	public string Identifier { get; }
+	public string Id { get; }
 
 	/// <inheritdoc />
 	public string Title { get; }
@@ -31,7 +31,7 @@ public class Command : ICommand
 	/// </param>
 	public Command(string identifier, string title, Action callback, Func<bool>? condition = null)
 	{
-		Identifier = identifier;
+		Id = identifier;
 		Title = title;
 		_callback = callback;
 		_condition = condition;
@@ -46,7 +46,7 @@ public class Command : ICommand
 	/// <inheritdoc />
 	public bool TryExecute()
 	{
-		Logger.Debug($"Trying to execute command {Identifier}");
+		Logger.Debug($"Trying to execute command {Id}");
 
 		if (CanExecute())
 		{
@@ -54,10 +54,10 @@ public class Command : ICommand
 			return true;
 		}
 
-		Logger.Debug($"Command {Identifier} is not executable right now");
+		Logger.Debug($"Command {Id} is not executable right now");
 		return false;
 	}
 
 	/// <inheritdoc />
-	public override string ToString() => $"{Identifier} ({Title})";
+	public override string ToString() => $"{Id} ({Title})";
 }

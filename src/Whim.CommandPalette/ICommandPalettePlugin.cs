@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
@@ -17,14 +16,7 @@ public interface ICommandPalettePlugin : IPlugin, IDisposable
 	/// <summary>
 	/// Activate the command palette.
 	/// </summary>
-	public void Activate();
-
-	/// <summary>
-	/// Activate the command palette with the given config.
-	/// </summary>
-	/// <param name="config"></param>
-	/// <param name="items"></param>
-	public void ActivateWithConfig(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items = null);
+	public void Activate(BaseVariantConfig? config = null);
 
 	/// <summary>
 	/// Hide the command palette.

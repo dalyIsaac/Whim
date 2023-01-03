@@ -24,18 +24,16 @@ public class CommandPaletteCommandsTests
 		return (configContext, workspaceManager, workspace, plugin);
 	}
 
-	private static List<CommandPaletteFreeTextActivationConfig> VerifyFreeTextActivated(
-		Mock<ICommandPalettePlugin> plugin
-	)
+	private static List<FreeTextVariantConfig> VerifyFreeTextActivated(Mock<ICommandPalettePlugin> plugin)
 	{
-		List<CommandPaletteFreeTextActivationConfig> configs = new();
+		List<FreeTextVariantConfig> configs = new();
 		plugin.Setup(p => p.ActivateWithConfig(Capture.In(configs), It.IsAny<IEnumerable<CommandItem>?>()));
 		return configs;
 	}
 
-	private static List<CommandPaletteMenuActivationConfig> VerifyMenuActivated(Mock<ICommandPalettePlugin> plugin)
+	private static List<MenuVariantConfig> VerifyMenuActivated(Mock<ICommandPalettePlugin> plugin)
 	{
-		List<CommandPaletteMenuActivationConfig> configs = new();
+		List<MenuVariantConfig> configs = new();
 		plugin.Setup(p => p.ActivateWithConfig(Capture.In(configs), It.IsAny<IEnumerable<CommandItem>?>()));
 		return configs;
 	}
@@ -56,16 +54,12 @@ public class CommandPaletteCommandsTests
 		(Mock<IConfigContext> configContext, _, _, Mock<ICommandPalettePlugin> plugin) = CreateMocks();
 		CommandPaletteCommands commands = new(configContext.Object, plugin.Object);
 
-		List<CommandPaletteFreeTextActivationConfig> configs = VerifyFreeTextActivated(plugin);
+		List<FreeTextVariantConfig> configs = VerifyFreeTextActivated(plugin);
 		commands.RenameWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was activated.
 		plugin.Verify(
-			x =>
-				x.ActivateWithConfig(
-					It.IsAny<CommandPaletteFreeTextActivationConfig>(),
-					It.IsAny<IEnumerable<CommandItem>?>()
-				),
+			x => x.ActivateWithConfig(It.IsAny<FreeTextVariantConfig>(), It.IsAny<IEnumerable<CommandItem>?>()),
 			Times.Once
 		);
 
@@ -99,16 +93,12 @@ public class CommandPaletteCommandsTests
 				}
 			);
 
-		List<CommandPaletteFreeTextActivationConfig> configs = VerifyFreeTextActivated(plugin);
+		List<FreeTextVariantConfig> configs = VerifyFreeTextActivated(plugin);
 		commands.CreateWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was activated.
 		plugin.Verify(
-			x =>
-				x.ActivateWithConfig(
-					It.IsAny<CommandPaletteFreeTextActivationConfig>(),
-					It.IsAny<IEnumerable<CommandItem>?>()
-				),
+			x => x.ActivateWithConfig(It.IsAny<FreeTextVariantConfig>(), It.IsAny<IEnumerable<CommandItem>?>()),
 			Times.Once
 		);
 
@@ -133,18 +123,14 @@ public class CommandPaletteCommandsTests
 		) = CreateMocks();
 		CommandPaletteCommands commands = new(configContext.Object, plugin.Object);
 
-		List<CommandPaletteFreeTextActivationConfig> freeTextConfigs = VerifyFreeTextActivated(plugin);
-		List<CommandPaletteMenuActivationConfig> menuConfigs = VerifyMenuActivated(plugin);
+		List<FreeTextVariantConfig> freeTextConfigs = VerifyFreeTextActivated(plugin);
+		List<MenuVariantConfig> menuConfigs = VerifyMenuActivated(plugin);
 
 		commands.MoveWindowToWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was menu activated.
 		plugin.Verify(
-			x =>
-				x.ActivateWithConfig(
-					It.IsAny<CommandPaletteMenuActivationConfig>(),
-					It.IsAny<IEnumerable<CommandItem>?>()
-				),
+			x => x.ActivateWithConfig(It.IsAny<MenuVariantConfig>(), It.IsAny<IEnumerable<CommandItem>?>()),
 			Times.Once
 		);
 	}

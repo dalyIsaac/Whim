@@ -1,9 +1,9 @@
 namespace Whim.CommandPalette;
 
 /// <summary>
-/// A palette item.
+/// An item displayed by a <see cref="IPaletteVariantViewModel"/>.
 /// </summary>
-public interface IPaletteItem<T>
+public interface IVariantItem<T>
 {
 	/// <summary>
 	/// The unique identifier of the palette item.
@@ -21,7 +21,7 @@ public interface IPaletteItem<T>
 	Text FormattedTitle { get; set; }
 
 	/// <summary>
-	/// The underlying item.
+	/// The underlying data.
 	/// </summary>
-	T Item { get; }
+	T Data { get; }
 }

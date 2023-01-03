@@ -77,7 +77,7 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Raises<EventArgs>(
 			h => vm.SetWindowPosRequested += h,
 			h => vm.SetWindowPosRequested -= h,
-			() => vm.Activate(new CommandPaletteMenuActivationConfig(), new List<CommandItem>(), null)
+			() => vm.Activate(new MenuVariantConfig(), new List<CommandItem>(), null)
 		);
 
 		// Then
@@ -108,11 +108,7 @@ public class CommandPaletteWindowViewModelTests
 				}
 			);
 
-		BaseCommandPaletteActivationConfig config = new CommandPaletteMenuActivationConfig()
-		{
-			Hint = "Hint",
-			InitialText = "Initial text"
-		};
+		BaseVariantConfig config = new MenuVariantConfig() { Hint = "Hint", InitialText = "Initial text" };
 
 		IEnumerable<CommandItem> commandItems = new List<CommandItem>()
 		{
@@ -178,7 +174,7 @@ public class CommandPaletteWindowViewModelTests
 			CreateStubs();
 
 		string callbackText = "";
-		CommandPaletteFreeTextActivationConfig config =
+		FreeTextVariantConfig config =
 			new() { InitialText = "Hello, world!", Callback = (text) => callbackText = text };
 		plugin.Config.ActivationConfig = config;
 
@@ -220,7 +216,7 @@ public class CommandPaletteWindowViewModelTests
 
 		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
-		plugin.Config.ActivationConfig = new CommandPaletteMenuActivationConfig();
+		plugin.Config.ActivationConfig = new MenuVariantConfig();
 
 		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
@@ -248,7 +244,7 @@ public class CommandPaletteWindowViewModelTests
 
 		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
-		plugin.Config.ActivationConfig = new CommandPaletteMenuActivationConfig();
+		plugin.Config.ActivationConfig = new MenuVariantConfig();
 
 		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
@@ -372,7 +368,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
-		vm.Activate(new CommandPaletteMenuActivationConfig(), null, null);
+		vm.Activate(new MenuVariantConfig(), null, null);
 
 		// When
 		vm.Update();
@@ -440,7 +436,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 
-		vm.Activate(new CommandPaletteFreeTextActivationConfig() { Callback = (text) => { } }, null, null);
+		vm.Activate(new FreeTextVariantConfig() { Callback = (text) => { } }, null, null);
 
 		// When
 		vm.Update();
@@ -458,7 +454,7 @@ public class CommandPaletteWindowViewModelTests
 		return rowText;
 	}
 
-	private static CommandPaletteMenuActivationConfig CreateMenuActivationConfig(int itemCount)
+	private static MenuVariantConfig CreateMenuActivationConfig(int itemCount)
 	{
 		List<PaletteRowItem> items = new();
 
@@ -475,7 +471,7 @@ public class CommandPaletteWindowViewModelTests
 		Mock<IMatcher> matcher = new();
 		matcher.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<ICollection<CommandItem>>())).Returns(items);
 
-		CommandPaletteMenuActivationConfig config = new() { Matcher = matcher.Object, };
+		MenuVariantConfig config = new() { Matcher = matcher.Object, };
 
 		return config;
 	}
@@ -489,7 +485,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm = new(configContext.Object, plugin, PaletteRowFactory);
 		string query = "ti";
-		CommandPaletteMenuActivationConfig config = CreateMenuActivationConfig(2);
+		MenuVariantConfig config = CreateMenuActivationConfig(2);
 
 		// When
 		vm.LoadMenuMatches(query, config);
@@ -533,7 +529,7 @@ public class CommandPaletteWindowViewModelTests
 			CreateStubs();
 
 		string? callbackText = null;
-		CommandPaletteFreeTextActivationConfig config =
+		FreeTextVariantConfig config =
 			new()
 			{
 				InitialText = "text",
@@ -590,7 +586,7 @@ public class CommandPaletteWindowViewModelTests
 
 		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
-		CommandPaletteMenuActivationConfig config = new();
+		MenuVariantConfig config = new();
 		plugin.Config.ActivationConfig = config;
 
 		CommandPaletteWindowViewModel vm =
@@ -634,7 +630,7 @@ public class CommandPaletteWindowViewModelTests
 					{
 						called++;
 						vm?.Activate(
-							new CommandPaletteFreeTextActivationConfig()
+							new FreeTextVariantConfig()
 							{
 								InitialText = "free text",
 								Callback = (text) =>
@@ -652,7 +648,7 @@ public class CommandPaletteWindowViewModelTests
 
 		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
-		CommandPaletteMenuActivationConfig config = new();
+		MenuVariantConfig config = new();
 		plugin.Config.ActivationConfig = config;
 
 		vm = new(

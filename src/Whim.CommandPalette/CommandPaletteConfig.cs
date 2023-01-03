@@ -26,7 +26,10 @@ public class CommandPaletteConfig
 	public int YPositionPercent { get; set; } = 20;
 
 	/// <summary>
-	/// The configuration for command palette activation.
+	/// The configuration for command palette activation. <br/>
+	///
+	/// Defaults to a <see cref="MenuVariantConfig"/> where <see cref="MenuVariantConfig.Commands"/>
+	/// are set to <see cref="IConfigContext.CommandManager"/>.
 	/// </summary>
-	public BaseCommandPaletteActivationConfig ActivationConfig { get; set; } = new CommandPaletteMenuActivationConfig();
+	public BaseVariantConfig? ActivationConfig { get; set; }
 }

@@ -18,11 +18,11 @@ public class CommandItemsTests
 		CommandItemContainer commandItems = new();
 
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		commandItems.Add(command.Object);
 
-		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Id));
 	}
 
 	/// <summary>
@@ -34,13 +34,13 @@ public class CommandItemsTests
 		CommandItemContainer commandItems = new();
 
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 		commandItems.Add(command.Object, keybind);
 
 		Assert.Equal(command.Object, commandItems.TryGetCommand(keybind));
-		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Id));
 	}
 
 	/// <summary>
@@ -52,11 +52,11 @@ public class CommandItemsTests
 		CommandItemContainer commandItems = new();
 
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 		commandItems.Add(command.Object);
 
 		Mock<ICommand> command2 = new();
-		command2.Setup(c => c.Identifier).Returns("command");
+		command2.Setup(c => c.Id).Returns("command");
 
 		Assert.Throws<ArgumentException>(() => commandItems.Add(command2.Object));
 	}
@@ -72,22 +72,22 @@ public class CommandItemsTests
 
 		// Set up the first command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		commandItems.Add(command.Object, keybind);
 
 		// Set up the second command.
 		Mock<ICommand> command2 = new();
-		command2.Setup(c => c.Identifier).Returns("command2");
+		command2.Setup(c => c.Id).Returns("command2");
 
 		commandItems.Add(command2.Object, keybind);
 
 		// Check that the first command is still there.
-		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Id));
 
 		// Check that the second command is now the one bound to the keybind.
 		Assert.Equal(command2.Object, commandItems.TryGetCommand(keybind));
-		Assert.Equal(command2.Object, commandItems.TryGetCommand(command2.Object.Identifier));
+		Assert.Equal(command2.Object, commandItems.TryGetCommand(command2.Object.Id));
 	}
 
 	/// <summary>
@@ -113,26 +113,26 @@ public class CommandItemsTests
 
 		// Set up the first command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 		commandItems.Add(command.Object, keybind);
 
 		// Set up the second command.
 		Mock<ICommand> command2 = new();
-		command2.Setup(c => c.Identifier).Returns("command2");
+		command2.Setup(c => c.Id).Returns("command2");
 		commandItems.Add(command2.Object);
 
 		// Set the keybind to the second command.
-		commandItems.SetKeybind(command2.Object.Identifier, keybind);
+		commandItems.SetKeybind(command2.Object.Id, keybind);
 
 		// Check that the first command is still there.
-		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Id));
 
 		// Check that the second command is now the one bound to the keybind.
 		Assert.Equal(command2.Object, commandItems.TryGetCommand(keybind));
-		Assert.Equal(keybind, commandItems.TryGetKeybind(command2.Object.Identifier));
+		Assert.Equal(keybind, commandItems.TryGetKeybind(command2.Object.Id));
 
 		// Check that the first command is not bound to the keybind.
-		Assert.Null(commandItems.TryGetKeybind(command.Object.Identifier));
+		Assert.Null(commandItems.TryGetKeybind(command.Object.Id));
 	}
 
 	/// <summary>
@@ -146,7 +146,7 @@ public class CommandItemsTests
 
 		// Set up the command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		commandItems.Add(command.Object, keybind);
 
@@ -154,7 +154,7 @@ public class CommandItemsTests
 		commandItems.RemoveKeybind(keybind);
 
 		// Check that the command is still there.
-		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Id));
 
 		// Check that the keybind is no longer there.
 		Assert.Null(commandItems.TryGetCommand(keybind));
@@ -171,15 +171,15 @@ public class CommandItemsTests
 
 		// Set up the command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		commandItems.Add(command.Object, keybind);
 
 		// Remove the keybind.
-		commandItems.RemoveKeybind(command.Object.Identifier);
+		commandItems.RemoveKeybind(command.Object.Id);
 
 		// Check that the command is still there.
-		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Id));
 
 		// Check that the keybind is no longer there.
 		Assert.Null(commandItems.TryGetCommand(keybind));
@@ -196,15 +196,15 @@ public class CommandItemsTests
 
 		// Set up the command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		commandItems.Add(command.Object, keybind);
 
 		// Remove the command.
-		commandItems.RemoveCommand(command.Object.Identifier);
+		commandItems.RemoveCommand(command.Object.Id);
 
 		// Check that the command is no longer there.
-		Assert.Null(commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Null(commandItems.TryGetCommand(command.Object.Id));
 
 		// Check that the keybind is gone.
 		Assert.Null(commandItems.TryGetCommand(keybind));
@@ -220,13 +220,13 @@ public class CommandItemsTests
 
 		// Set up the command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		// Remove the command.
-		commandItems.RemoveCommand(command.Object.Identifier);
+		commandItems.RemoveCommand(command.Object.Id);
 
 		// Check that the command is no longer there.
-		Assert.Null(commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Null(commandItems.TryGetCommand(command.Object.Id));
 	}
 
 	/// <summary>
@@ -240,7 +240,7 @@ public class CommandItemsTests
 
 		// Set up the command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		commandItems.Add(command.Object, keybind);
 
@@ -248,7 +248,7 @@ public class CommandItemsTests
 		commandItems.Clear();
 
 		// Check that the command is no longer there.
-		Assert.Null(commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Null(commandItems.TryGetCommand(command.Object.Id));
 
 		// Check that the keybind is gone.
 		Assert.Null(commandItems.TryGetCommand(keybind));
@@ -265,7 +265,7 @@ public class CommandItemsTests
 
 		// Set up the command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		commandItems.Add(command.Object, keybind);
 
@@ -273,7 +273,7 @@ public class CommandItemsTests
 		commandItems.ClearKeybinds();
 
 		// Check that the command is still there.
-		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Identifier));
+		Assert.Equal(command.Object, commandItems.TryGetCommand(command.Object.Id));
 
 		// Check that the keybind is no longer there.
 		Assert.Null(commandItems.TryGetCommand(keybind));
@@ -289,24 +289,24 @@ public class CommandItemsTests
 
 		// Set up the first command.
 		Mock<ICommand> command = new();
-		command.Setup(c => c.Identifier).Returns("command");
+		command.Setup(c => c.Id).Returns("command");
 
 		Keybind keybind = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_F);
 		commandItems.Add(command.Object, keybind);
 
 		// Set up the second command.
 		Mock<ICommand> command2 = new();
-		command2.Setup(c => c.Identifier).Returns("command2");
+		command2.Setup(c => c.Id).Returns("command2");
 		commandItems.Add(command2.Object);
 
 		// Set up the third command.
 		Mock<ICommand> command3 = new();
-		command3.Setup(c => c.Identifier).Returns("command3");
+		command3.Setup(c => c.Id).Returns("command3");
 		commandItems.Add(command3.Object);
 
 		// Set up the fourth command.
 		Mock<ICommand> command4 = new();
-		command4.Setup(c => c.Identifier).Returns("command4");
+		command4.Setup(c => c.Id).Returns("command4");
 
 		Keybind keybind4 = new(KeyModifiers.RWin, VIRTUAL_KEY.VK_G);
 		commandItems.Add(command4.Object, keybind4);

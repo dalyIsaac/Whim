@@ -5,7 +5,7 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// Config for activating the command palette with a select.
 /// </summary>
-public record CommandPaletteSelectActivationConfig<T> : BaseCommandPaletteActivationConfig
+public record CommandPaletteSelectActivationConfig<T> : BaseVariantConfig
 {
 	/// <summary>
 	/// Whether this select is a multi-select.
