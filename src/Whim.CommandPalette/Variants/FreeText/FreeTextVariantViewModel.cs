@@ -5,7 +5,7 @@ namespace Whim.CommandPalette;
 
 internal class FreeTextVariantViewModel : IVariantViewModel<FreeTextVariantConfig>
 {
-	private readonly CommandPaletteWindowViewModel _commandPaletteWindowViewModel;
+	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
 	private FreeTextVariantConfig? _activationConfig;
 
 	public string _prompt = "";
@@ -26,7 +26,7 @@ internal class FreeTextVariantViewModel : IVariantViewModel<FreeTextVariantConfi
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	public FreeTextVariantViewModel(CommandPaletteWindowViewModel windowViewModel)
+	public FreeTextVariantViewModel(ICommandPaletteWindowViewModel windowViewModel)
 	{
 		_commandPaletteWindowViewModel = windowViewModel;
 	}

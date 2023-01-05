@@ -9,7 +9,7 @@ public static partial class PaletteFilters
 	/// <summary>
 	/// Returns the matches for the word, where the word is a camel case substring of the wordToMatchAgainst.
 	/// </summary>
-	public static PaletteFilterTextMatch[]? MatchesCamelCase(string word, string wordToMatchAgainst)
+	public static FilterTextMatch[]? MatchesCamelCase(string word, string wordToMatchAgainst)
 	{
 		if (string.IsNullOrEmpty(wordToMatchAgainst))
 		{
@@ -20,7 +20,7 @@ public static partial class PaletteFilters
 
 		if (word.Length == 0)
 		{
-			return Array.Empty<PaletteFilterTextMatch>();
+			return Array.Empty<FilterTextMatch>();
 		}
 
 		if (!IsCamelCasePattern(word) || wordToMatchAgainst.Length > 60)
@@ -39,7 +39,7 @@ public static partial class PaletteFilters
 			wordToMatchAgainst = wordToMatchAgainst.ToLower();
 		}
 
-		PaletteFilterTextMatch[]? result = null;
+		FilterTextMatch[]? result = null;
 		int i = 0;
 
 		word = word.ToLower();
@@ -53,7 +53,7 @@ public static partial class PaletteFilters
 		return result;
 	}
 
-	internal static PaletteFilterTextMatch[]? MatchesCamelCaseRecurse(
+	internal static FilterTextMatch[]? MatchesCamelCaseRecurse(
 		string word,
 		string wordToMatchAgainst,
 		int wordStart,
@@ -62,7 +62,7 @@ public static partial class PaletteFilters
 	{
 		if (wordStart == word.Length)
 		{
-			return Array.Empty<PaletteFilterTextMatch>();
+			return Array.Empty<FilterTextMatch>();
 		}
 		else if (wordMatchStart == wordToMatchAgainst.Length)
 		{
@@ -74,7 +74,7 @@ public static partial class PaletteFilters
 		}
 		else
 		{
-			PaletteFilterTextMatch[]? result = MatchesCamelCaseRecurse(
+			FilterTextMatch[]? result = MatchesCamelCaseRecurse(
 				word,
 				wordToMatchAgainst,
 				wordStart + 1,
@@ -90,7 +90,7 @@ public static partial class PaletteFilters
 				result = MatchesCamelCaseRecurse(word, wordToMatchAgainst, wordStart + 1, nextUpperIndex);
 				nextUpperIndex++;
 			}
-			return result == null ? null : Join(new PaletteFilterTextMatch(wordMatchStart, wordMatchStart + 1), result);
+			return result == null ? null : Join(new FilterTextMatch(wordMatchStart, wordMatchStart + 1), result);
 		}
 	}
 

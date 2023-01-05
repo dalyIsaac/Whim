@@ -5,7 +5,7 @@ using Windows.System;
 
 namespace Whim.CommandPalette;
 
-internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
+internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 {
 	private readonly IConfigContext _configContext;
 	private BaseVariantConfig _activationConfig;
@@ -70,15 +70,20 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 
 	public event EventHandler<EventArgs>? SetWindowPosRequested;
 
-	public CommandPaletteWindowViewModel(IConfigContext configContext, CommandPalettePlugin plugin)
+	public CommandPaletteWindowViewModel(
+		IConfigContext configContext,
+		CommandPalettePlugin plugin,
+		IVariantControl<MenuVariantConfig>? menuVariant = null,
+		IVariantControl<FreeTextVariantConfig>? freeTextVariant = null
+	)
 	{
 		_configContext = configContext;
 		Plugin = plugin;
 		_activationConfig =
 			Plugin.Config.ActivationConfig ?? new MenuVariantConfig() { Commands = configContext.CommandManager };
 
-		_menuVariant = new MenuVariantControl(configContext, this);
-		_freeTextVariant = new FreeTextVariantControl(this);
+		_menuVariant = menuVariant ?? new MenuVariantControl(configContext, this);
+		_freeTextVariant = freeTextVariant ?? new FreeTextVariantControl(this);
 	}
 
 	/// <summary>
@@ -122,11 +127,23 @@ internal class CommandPaletteWindowViewModel : INotifyPropertyChanged
 		_text = "";
 	}
 
-	public void OnKeyDown(VirtualKey key) => _activeVariant?.ViewModel.OnKeyDown(key);
+	public void OnKeyDown(VirtualKey key)
+	{
+		if (key == VirtualKey.Escape)
+		{
+			RequestHide();
+		}
+		else
+		{
+			_activeVariant?.ViewModel.OnKeyDown(key);
+		}
+	}
 
 	public void Update() => _activeVariant?.ViewModel.Update();
 
 	public double GetViewHeight() => _activeVariant?.GetViewHeight() ?? 0;
+
+	public bool IsVariantActive(BaseVariantConfig config) => _activationConfig == config;
 
 	protected virtual void OnPropertyChanged(string? propertyName)
 	{

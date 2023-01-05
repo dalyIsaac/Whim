@@ -21,7 +21,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// <summary>
 	/// Matcher returns an ordered list of filtered matches for the <paramref name="query"/>.
 	/// </summary>
-	public ICollection<IVariantItem<T>> Match(string query, IReadOnlyCollection<IVariantItem<T>> inputItems)
+	public IEnumerable<IVariantItem<T>> Match(string query, IReadOnlyList<IVariantItem<T>> inputItems)
 	{
 		MatcherItem<T>[] matches = new MatcherItem<T>[inputItems.Count];
 		int matchCount = GetFilteredItems(query, inputItems, matches);
@@ -57,14 +57,14 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// array with the filtered matches, with updated text segments.
 	/// </summary>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	internal int GetFilteredItems(string query, IReadOnlyCollection<IVariantItem<T>> items, MatcherItem<T>[] matches)
+	internal int GetFilteredItems(string query, IEnumerable<IVariantItem<T>> items, MatcherItem<T>[] matches)
 	{
 		int matchCount = 0;
 
 		// Get the matches for the query.
 		foreach (IVariantItem<T> item in items)
 		{
-			PaletteFilterTextMatch[]? filterMatches = Filter(query, item.Title);
+			FilterTextMatch[]? filterMatches = Filter(query, item.Title);
 			if (filterMatches == null)
 			{
 				continue;
@@ -87,7 +87,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// array with the last execution time of each command.
 	/// </summary>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	internal int GetMostRecentlyUsedItems(IReadOnlyCollection<IVariantItem<T>> items, MatcherItem<T>[] matches)
+	internal int GetMostRecentlyUsedItems(IEnumerable<IVariantItem<T>> items, MatcherItem<T>[] matches)
 	{
 		int matchCount = 0;
 
@@ -97,7 +97,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 			matches[matchCount++] = new MatcherItem<T>()
 			{
 				Item = item,
-				TextSegments = Array.Empty<PaletteFilterTextMatch>(),
+				TextSegments = Array.Empty<FilterTextMatch>(),
 				Score = lastExecutionTime
 			};
 		}

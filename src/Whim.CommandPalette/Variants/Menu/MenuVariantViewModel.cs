@@ -9,7 +9,7 @@ namespace Whim.CommandPalette;
 
 internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
 {
-	private readonly CommandPaletteWindowViewModel _commandPaletteWindowViewModel;
+	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
 
 	private MenuVariantConfig? _activationConfig;
 
@@ -22,13 +22,13 @@ internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="MenuRows"/> are drawn.
 	/// </summary>
-	internal readonly List<MenuPaletteItem> _allItems = new();
+	internal readonly List<MenuVariantItem> _allItems = new();
 
 	/// <summary>
-	/// Factory to create palette rows to make it possible to use xunit.
+	/// Factory to create menu rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantItem<CommandItem>, IMenuRow> _paletteRowFactory;
+	private readonly Func<IVariantItem<CommandItem>, IMenuRow> _menuRowFactory;
 
 	public readonly ObservableCollection<IMenuRow> MenuRows = new();
 
@@ -92,16 +92,16 @@ internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	public event EventHandler? ScrollIntoViewRequested;
+	public event EventHandler<EventArgs>? ScrollIntoViewRequested;
 
 	public MenuVariantViewModel(
 		IConfigContext configContext,
-		CommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantItem<CommandItem>, IMenuRow>? paletteRowFactory = null
+		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
+		Func<IVariantItem<CommandItem>, IMenuRow>? menuRowFactory = null
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_paletteRowFactory = paletteRowFactory ?? ((IVariantItem<CommandItem> item) => new MenuRow(item));
+		_menuRowFactory = menuRowFactory ?? ((IVariantItem<CommandItem> item) => new MenuRow(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(configContext.CommandManager);
@@ -190,12 +190,11 @@ internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
 
 		// Since the palette window is reused, there's a chance that the _activationConfig
 		// will have been wiped by a free form child command.
-		BaseVariantConfig currentConfig = _activationConfig;
 
 		match.Command.TryExecute();
 		_activationConfig.Matcher.OnMatchExecuted(paletteItem);
 
-		if (_activationConfig == currentConfig)
+		if (_commandPaletteWindowViewModel.IsVariantActive(_activationConfig))
 		{
 			_commandPaletteWindowViewModel.RequestHide();
 		}
@@ -223,12 +222,12 @@ internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
 			{
 				if (_allItems[idx].Data.Command != command)
 				{
-					_allItems[idx] = new MenuPaletteItem(commandItem);
+					_allItems[idx] = new MenuVariantItem(commandItem);
 				}
 			}
 			else
 			{
-				_allItems.Add(new MenuPaletteItem(commandItem));
+				_allItems.Add(new MenuVariantItem(commandItem));
 			}
 
 			idx++;
@@ -270,7 +269,7 @@ internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
 			else
 			{
 				// Add a new row.
-				IMenuRow row = _paletteRowFactory(item);
+				IMenuRow row = _menuRowFactory(item);
 				MenuRows.Add(row);
 				row.Initialize();
 			}

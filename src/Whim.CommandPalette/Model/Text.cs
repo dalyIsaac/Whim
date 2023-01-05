@@ -32,4 +32,9 @@ public record Text
 	/// The segments of text.
 	/// </summary>
 	public IList<TextSegment> Segments { get; } = new List<TextSegment>();
+
+	public static implicit operator Text(string text)
+	{
+		return new() { Segments = { new(text, false) } };
+	}
 }

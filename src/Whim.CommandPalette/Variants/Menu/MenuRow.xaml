@@ -14,28 +14,24 @@
 					<ResourceDictionary x:Key="Dark">
 						<Style x:Key="KeybindBorderStyle" TargetType="Border">
 							<Setter Property="Background" Value="Transparent" />
-							<Setter Property="BorderBrush"
-								Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 							<Setter Property="BorderThickness" Value="1" />
 							<Setter Property="CornerRadius" Value="2" />
 						</Style>
 						<Style x:Key="KeybindTextBlockStyle" TargetType="TextBlock">
-							<Setter Property="Foreground"
-								Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
 
 					<ResourceDictionary x:Key="Light">
 						<Style x:Key="KeybindBorderStyle" TargetType="Border">
 							<Setter Property="Background" Value="Transparent" />
-							<Setter Property="BorderBrush"
-								Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 							<Setter Property="BorderThickness" Value="1" />
 							<Setter Property="CornerRadius" Value="2" />
 						</Style>
 						<Style x:Key="KeybindTextBlockStyle" TargetType="TextBlock">
-							<Setter Property="Foreground"
-								Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
 				</ResourceDictionary.ThemeDictionaries>

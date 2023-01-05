@@ -1,7 +1,7 @@
 namespace Whim.CommandPalette;
 
 /// <summary>
-/// An item displayed by a <see cref="IPaletteVariantViewModel"/>.
+/// An item displayed by a <see cref="IVariantViewModel{T}"/>.
 /// </summary>
 public interface IVariantItem<T>
 {

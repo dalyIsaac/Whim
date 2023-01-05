@@ -10,7 +10,7 @@ namespace Whim.CommandPalette;
 internal record MatcherItem<T>
 {
 	public required IVariantItem<T> Item { get; init; }
-	public required PaletteFilterTextMatch[] TextSegments { get; init; }
+	public required FilterTextMatch[] TextSegments { get; init; }
 	public required uint Score { get; init; }
 
 	/// <summary>
@@ -22,7 +22,7 @@ internal record MatcherItem<T>
 		ReadOnlySpan<char> rawTitle = Item.Title.AsSpan();
 
 		int start = 0;
-		foreach (PaletteFilterTextMatch match in TextSegments)
+		foreach (FilterTextMatch match in TextSegments)
 		{
 			if (start < match.Start)
 			{

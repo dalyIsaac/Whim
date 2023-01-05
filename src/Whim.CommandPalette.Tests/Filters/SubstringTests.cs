@@ -8,7 +8,7 @@ public class SubstringTests
 	[Theory]
 	public void MatchesContiguousSubString_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
-		PaletteFilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
+		FilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesContiguousSubString, word, wordToMatchAgainst, expectedMatches);
 	}
 
@@ -24,7 +24,7 @@ public class SubstringTests
 	[Theory]
 	public void MatchesSubString_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
-		PaletteFilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
+		FilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesSubString, word, wordToMatchAgainst, expectedMatches);
 	}
 

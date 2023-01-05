@@ -10,7 +10,7 @@ public static partial class PaletteFilters
 	/// Matches substrings of the word with beginnings of the words in the target. E.g., "gp" or "g p" will match "Git: Pull".
 	/// Useful in cases where the target is words (e.g., command labels).
 	/// </summary>
-	public static PaletteFilterTextMatch[]? MatchesWordsContiguous(string word, string target)
+	public static FilterTextMatch[]? MatchesWordsContiguous(string word, string target)
 	{
 		return MatchesWordsBase(word, target, true);
 	}
@@ -19,19 +19,19 @@ public static partial class PaletteFilters
 	/// Matches beginning of words supporting non-ASCII languages.
 	/// Matches words with the beginnings of the words in the target. E.g., "pul" will match "Git: Pull".
 	/// </summary>
-	public static PaletteFilterTextMatch[]? MatchesWordsSeparate(string word, string target)
+	public static FilterTextMatch[]? MatchesWordsSeparate(string word, string target)
 	{
 		return MatchesWordsBase(word, target, false);
 	}
 
-	private static PaletteFilterTextMatch[]? MatchesWordsBase(string word, string target, bool contiguous = false)
+	private static FilterTextMatch[]? MatchesWordsBase(string word, string target, bool contiguous = false)
 	{
 		if (string.IsNullOrEmpty(target))
 		{
 			return null;
 		}
 
-		PaletteFilterTextMatch[]? result = null;
+		FilterTextMatch[]? result = null;
 		int i = 0;
 
 		word = word.ToLower();
@@ -44,7 +44,7 @@ public static partial class PaletteFilters
 		return result;
 	}
 
-	private static PaletteFilterTextMatch[]? MatchesWordsRecurse(
+	private static FilterTextMatch[]? MatchesWordsRecurse(
 		string word,
 		string wordToMatchAgainst,
 		int i,
@@ -54,7 +54,7 @@ public static partial class PaletteFilters
 	{
 		if (i == word.Length)
 		{
-			return Array.Empty<PaletteFilterTextMatch>();
+			return Array.Empty<FilterTextMatch>();
 		}
 		else if (j == wordToMatchAgainst.Length)
 		{
@@ -66,7 +66,7 @@ public static partial class PaletteFilters
 		}
 
 		int nextWordIndex = j + 1;
-		PaletteFilterTextMatch[]? result = MatchesWordsRecurse(word, wordToMatchAgainst, i + 1, j + 1, contiguous);
+		FilterTextMatch[]? result = MatchesWordsRecurse(word, wordToMatchAgainst, i + 1, j + 1, contiguous);
 		if (!contiguous)
 		{
 			while (
@@ -91,7 +91,7 @@ public static partial class PaletteFilters
 			return result;
 		}
 
-		return PaletteFilters.Join(new PaletteFilterTextMatch(j, j + 1), result);
+		return PaletteFilters.Join(new FilterTextMatch(j, j + 1), result);
 	}
 
 	private static int NextWord(string word, int start)

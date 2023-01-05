@@ -10,7 +10,7 @@ public interface IMatcher<T>
 	/// <summary>
 	/// Matcher returns an ordered list of filtered matches for the <paramref name="query"/>.
 	/// </summary>
-	public ICollection<IVariantItem<T>> Match(string query, IReadOnlyCollection<IVariantItem<T>> items);
+	public IEnumerable<IVariantItem<T>> Match(string query, IReadOnlyList<IVariantItem<T>> items);
 
 	/// <summary>
 	/// Called when a match has been executed. This is used by the <see cref="IMatcher{T}"/>

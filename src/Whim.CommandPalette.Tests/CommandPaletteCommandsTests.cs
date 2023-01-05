@@ -27,14 +27,14 @@ public class CommandPaletteCommandsTests
 	private static List<FreeTextVariantConfig> VerifyFreeTextActivated(Mock<ICommandPalettePlugin> plugin)
 	{
 		List<FreeTextVariantConfig> configs = new();
-		plugin.Setup(p => p.ActivateWithConfig(Capture.In(configs), It.IsAny<IEnumerable<CommandItem>?>()));
+		plugin.Setup(p => p.Activate(Capture.In(configs)));
 		return configs;
 	}
 
 	private static List<MenuVariantConfig> VerifyMenuActivated(Mock<ICommandPalettePlugin> plugin)
 	{
 		List<MenuVariantConfig> configs = new();
-		plugin.Setup(p => p.ActivateWithConfig(Capture.In(configs), It.IsAny<IEnumerable<CommandItem>?>()));
+		plugin.Setup(p => p.Activate(Capture.In(configs)));
 		return configs;
 	}
 
@@ -45,7 +45,7 @@ public class CommandPaletteCommandsTests
 		CommandPaletteCommands commands = new(configContext.Object, plugin.Object);
 
 		commands.ToggleCommandPaletteCommand.Command.TryExecute();
-		plugin.Verify(x => x.Activate(), Times.Once);
+		plugin.Verify(x => x.Activate(null), Times.Once);
 	}
 
 	[Fact]
@@ -58,10 +58,7 @@ public class CommandPaletteCommandsTests
 		commands.RenameWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was activated.
-		plugin.Verify(
-			x => x.ActivateWithConfig(It.IsAny<FreeTextVariantConfig>(), It.IsAny<IEnumerable<CommandItem>?>()),
-			Times.Once
-		);
+		plugin.Verify(x => x.Activate(It.IsAny<FreeTextVariantConfig>()), Times.Once);
 
 		// Call the callback.
 		configs[0].Callback("New workspace name");
@@ -97,10 +94,7 @@ public class CommandPaletteCommandsTests
 		commands.CreateWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was activated.
-		plugin.Verify(
-			x => x.ActivateWithConfig(It.IsAny<FreeTextVariantConfig>(), It.IsAny<IEnumerable<CommandItem>?>()),
-			Times.Once
-		);
+		plugin.Verify(x => x.Activate(It.IsAny<FreeTextVariantConfig>()), Times.Once);
 
 		// Call the callback.
 		configs[0].Callback("New workspace name");
@@ -129,10 +123,7 @@ public class CommandPaletteCommandsTests
 		commands.MoveWindowToWorkspaceCommand.Command.TryExecute();
 
 		// Verify that the plugin was menu activated.
-		plugin.Verify(
-			x => x.ActivateWithConfig(It.IsAny<MenuVariantConfig>(), It.IsAny<IEnumerable<CommandItem>?>()),
-			Times.Once
-		);
+		plugin.Verify(x => x.Activate(It.IsAny<MenuVariantConfig>()), Times.Once);
 	}
 
 	[Fact]
