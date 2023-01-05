@@ -40,12 +40,12 @@ internal sealed partial class MenuRow : UserControl, IMenuRow
 	{
 		Logger.Debug("Setting title");
 		InlineCollection inlines = CommandTitle.Inlines;
-		IList<TextSegment> segments = Item.FormattedTitle.Segments;
+		IList<PaletteTextSegment> segments = Item.FormattedTitle.Segments;
 
 		int idx;
 		for (idx = 0; idx < segments.Count; idx++)
 		{
-			TextSegment seg = segments[idx];
+			PaletteTextSegment seg = segments[idx];
 			Run run = seg.ToRun();
 
 			if (idx < inlines.Count)

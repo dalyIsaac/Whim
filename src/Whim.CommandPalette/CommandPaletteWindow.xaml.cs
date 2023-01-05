@@ -55,14 +55,14 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		Logger.Debug("Activating command palette");
 		UIElement? control = ViewModel.Activate(config, monitor);
 
-		Content.Children.Clear();
+		PaletteContent.Children.Clear();
 		if (control == null)
 		{
 			Logger.Error("No control to activate");
 			return;
 		}
 
-		Content.Children.Add(control);
+		PaletteContent.Children.Add(control);
 
 		TextEntry.SelectAll();
 		Activate();

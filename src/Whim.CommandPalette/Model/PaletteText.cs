@@ -10,10 +10,10 @@ namespace Whim.CommandPalette;
 /// </summary>
 /// <param name="Text"></param>
 /// <param name="IsHighlighted"></param>
-public record struct TextSegment(string Text, bool IsHighlighted)
+public record struct PaletteTextSegment(string Text, bool IsHighlighted)
 {
 	/// <summary>
-	/// Converts the <see cref="TextSegment"/> to a <see cref="Run"/>.
+	/// Converts the <see cref="PaletteTextSegment"/> to a <see cref="Run"/>.
 	/// </summary>
 	public Run ToRun()
 	{
@@ -26,14 +26,27 @@ public record struct TextSegment(string Text, bool IsHighlighted)
 /// <summary>
 /// The segments which make up the highlighted text.
 /// </summary>
-public record Text
+public record PaletteText
 {
 	/// <summary>
 	/// The segments of text.
 	/// </summary>
-	public IList<TextSegment> Segments { get; } = new List<TextSegment>();
+	public IList<PaletteTextSegment> Segments { get; } = new List<PaletteTextSegment>();
 
-	public static implicit operator Text(string text)
+	/// <summary>
+	/// Converts a <see cref="string"/> to a <see cref="PaletteText"/>.
+	/// </summary>
+	/// <param name="text"></param>
+	public static implicit operator PaletteText(string text)
+	{
+		return FromString(text);
+	}
+
+	/// <summary>
+	/// Converts a <see cref="string"/> to a <see cref="PaletteText"/>.
+	/// </summary>
+	/// <param name="text"></param>
+	public static PaletteText FromString(string text)
 	{
 		return new() { Segments = { new(text, false) } };
 	}

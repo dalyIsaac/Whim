@@ -114,6 +114,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 
 		_activeVariant.ViewModel.Activate(_activationConfig);
+		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
 
 		return _activeVariant.Control;
 	}
@@ -139,7 +140,11 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 	}
 
-	public void Update() => _activeVariant?.ViewModel.Update();
+	public void Update()
+	{
+		_activeVariant?.ViewModel.Update();
+		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
+	}
 
 	public double GetViewHeight() => _activeVariant?.GetViewHeight() ?? 0;
 

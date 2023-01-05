@@ -6,6 +6,7 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// Base interface for all variants of palette view models.
 /// </summary>
+/// <typeparam name="T">Activation config</typeparam>
 public interface IVariantViewModel<T> : INotifyPropertyChanged where T : BaseVariantConfig
 {
 	/// <summary>

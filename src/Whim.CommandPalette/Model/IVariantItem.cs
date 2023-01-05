@@ -18,7 +18,7 @@ public interface IVariantItem<T>
 	/// <summary>
 	/// The formatted title of the palette item.
 	/// </summary>
-	Text FormattedTitle { get; set; }
+	PaletteText FormattedTitle { get; set; }
 
 	/// <summary>
 	/// The underlying data.

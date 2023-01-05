@@ -6,7 +6,7 @@ internal record MenuVariantItem : IVariantItem<CommandItem>
 
 	public string Title => Data.Command.Title;
 
-	public Text FormattedTitle { get; set; }
+	public PaletteText FormattedTitle { get; set; }
 
 	public CommandItem Data { get; }
 

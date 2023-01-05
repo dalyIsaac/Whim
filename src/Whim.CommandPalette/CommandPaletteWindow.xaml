@@ -20,6 +20,6 @@
 			Text="{x:Bind Path=ViewModel.Text, Mode=OneWay}"
 			TextChanged="TextEntry_TextChanged" />
 
-		<RelativePanel x:Name="Content" Grid.Row="1" />
+		<RelativePanel x:Name="PaletteContent" Grid.Row="1" />
 	</Grid>
 </Window>

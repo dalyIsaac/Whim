@@ -18,7 +18,7 @@ internal record MatcherItem<T>
 	/// </summary>
 	public void FormatTitle()
 	{
-		Text formattedTitle = new();
+		PaletteText formattedTitle = new();
 		ReadOnlySpan<char> rawTitle = Item.Title.AsSpan();
 
 		int start = 0;
@@ -26,17 +26,17 @@ internal record MatcherItem<T>
 		{
 			if (start < match.Start)
 			{
-				formattedTitle.Segments.Add(new TextSegment(rawTitle[start..match.Start].ToString(), false));
+				formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[start..match.Start].ToString(), false));
 				start = match.Start;
 			}
 
-			formattedTitle.Segments.Add(new TextSegment(rawTitle[match.Start..match.End].ToString(), true));
+			formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[match.Start..match.End].ToString(), true));
 			start = match.End;
 		}
 
 		if (start < rawTitle.Length)
 		{
-			formattedTitle.Segments.Add(new TextSegment(rawTitle[start..].ToString(), false));
+			formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[start..].ToString(), false));
 		}
 
 		Item.FormattedTitle = formattedTitle;
