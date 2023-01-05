@@ -13,7 +13,13 @@ public class FreeTextVariantViewModelTests
 	) CreateStubs()
 	{
 		Mock<FreeTextVariantCallback> callback = new();
-		FreeTextVariantConfig config = new() { InitialText = "Hello, world!", Callback = callback.Object };
+		FreeTextVariantConfig config =
+			new()
+			{
+				InitialText = "Hello, world!",
+				Callback = callback.Object,
+				Prompt = "Hello, world!"
+			};
 
 		Mock<ICommandPaletteWindowViewModel> windowViewModel = new();
 		windowViewModel.Setup(wvm => wvm.Text).Returns("Hello, world!");

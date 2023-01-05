@@ -9,7 +9,7 @@ internal sealed partial class FreeTextVariantView : UserControl
 	public FreeTextVariantView(FreeTextVariantViewModel viewModel)
 	{
 		ViewModel = viewModel;
-		UIElementExtensions.InitializeComponent(this, "Whim.Component", "Variants/FreeText");
+		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/FreeText/FreeTextVariantView");
 	}
 
 	public double GetViewHeight() => Prompt.ActualHeight;

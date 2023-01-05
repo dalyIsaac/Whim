@@ -2,12 +2,12 @@ using Microsoft.UI.Xaml;
 
 namespace Whim.CommandPalette;
 
-internal class MenuVariantControl : IVariantControl<MenuVariantConfig>
+internal class MenuVariantControl : IVariantControl
 {
 	private readonly MenuVariantView _control;
 	public UIElement Control => _control;
 
-	public IVariantViewModel<MenuVariantConfig> ViewModel { get; }
+	public IVariantViewModel ViewModel { get; }
 
 	public MenuVariantControl(IConfigContext configContext, CommandPaletteWindowViewModel windowViewModel)
 	{

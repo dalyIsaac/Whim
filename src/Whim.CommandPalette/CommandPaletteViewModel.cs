@@ -10,11 +10,11 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	private readonly IConfigContext _configContext;
 	private BaseVariantConfig _activationConfig;
 
-	private readonly IVariantControl<MenuVariantConfig> _menuVariant;
+	private readonly IVariantControl _menuVariant;
 
-	private readonly IVariantControl<FreeTextVariantConfig> _freeTextVariant;
+	private readonly IVariantControl _freeTextVariant;
 
-	private IVariantControl<BaseVariantConfig>? _activeVariant;
+	private IVariantControl? _activeVariant;
 
 	public CommandPalettePlugin Plugin { get; }
 
@@ -73,8 +73,8 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	public CommandPaletteWindowViewModel(
 		IConfigContext configContext,
 		CommandPalettePlugin plugin,
-		IVariantControl<MenuVariantConfig>? menuVariant = null,
-		IVariantControl<FreeTextVariantConfig>? freeTextVariant = null
+		IVariantControl? menuVariant = null,
+		IVariantControl? freeTextVariant = null
 	)
 	{
 		_configContext = configContext;
@@ -102,8 +102,8 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 		_activeVariant = _activationConfig switch
 		{
-			MenuVariantConfig => (IVariantControl<BaseVariantConfig>)_menuVariant,
-			FreeTextVariantConfig => (IVariantControl<BaseVariantConfig>)_freeTextVariant,
+			MenuVariantConfig => _menuVariant,
+			FreeTextVariantConfig => _freeTextVariant,
 			_ => null
 		};
 

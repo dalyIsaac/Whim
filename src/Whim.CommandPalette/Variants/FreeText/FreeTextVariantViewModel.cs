@@ -3,24 +3,12 @@ using Windows.System;
 
 namespace Whim.CommandPalette;
 
-internal class FreeTextVariantViewModel : IVariantViewModel<FreeTextVariantConfig>
+internal class FreeTextVariantViewModel : IVariantViewModel
 {
 	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
 	private FreeTextVariantConfig? _activationConfig;
 
-	public string _prompt = "";
-	public string Prompt
-	{
-		get => _prompt;
-		set
-		{
-			if (Prompt != value)
-			{
-				_prompt = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Prompt)));
-			}
-		}
-	}
+	public string Prompt => _activationConfig?.Prompt ?? "";
 
 	public bool ShowSaveButton => true;
 
@@ -31,9 +19,17 @@ internal class FreeTextVariantViewModel : IVariantViewModel<FreeTextVariantConfi
 		_commandPaletteWindowViewModel = windowViewModel;
 	}
 
-	public void Activate(FreeTextVariantConfig activationConfig)
+	public void Activate(BaseVariantConfig activationConfig)
 	{
-		_activationConfig = activationConfig;
+		if (activationConfig is FreeTextVariantConfig config)
+		{
+			_activationConfig = config;
+			OnPropertyChanged(nameof(Prompt));
+		}
+		else
+		{
+			_activationConfig = null;
+		}
 	}
 
 	public void Hide() { }
@@ -50,4 +46,9 @@ internal class FreeTextVariantViewModel : IVariantViewModel<FreeTextVariantConfi
 	}
 
 	public void Update() { }
+
+	protected virtual void OnPropertyChanged(string propertyName)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+	}
 }

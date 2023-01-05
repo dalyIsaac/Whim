@@ -11,8 +11,8 @@ public class CommandPaletteWindowViewModelTests
 		Mock<IConfigContext>,
 		Mock<ICommandManager>,
 		CommandPalettePlugin,
-		Mock<IVariantControl<MenuVariantConfig>>,
-		Mock<IVariantControl<FreeTextVariantConfig>>
+		Mock<IVariantControl>,
+		Mock<IVariantControl>
 	) CreateStubs()
 	{
 		Mock<ICommandManager> commandManager = new();
@@ -25,10 +25,10 @@ public class CommandPaletteWindowViewModelTests
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-		Mock<IVariantControl<MenuVariantConfig>> menuVariant = new();
+		Mock<IVariantControl> menuVariant = new();
 		menuVariant.Setup(m => m.Control).Returns((UIElement)null);
 
-		Mock<IVariantControl<FreeTextVariantConfig>> freeTextVariant = new();
+		Mock<IVariantControl> freeTextVariant = new();
 		freeTextVariant.Setup(m => m.Control).Returns((UIElement)null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
@@ -44,8 +44,8 @@ public class CommandPaletteWindowViewModelTests
 			Mock<IConfigContext> configContext,
 			Mock<ICommandManager> commandManager,
 			CommandPalettePlugin plugin,
-			Mock<IVariantControl<MenuVariantConfig>> menuVariant,
-			Mock<IVariantControl<FreeTextVariantConfig>> freeTextVariant
+			Mock<IVariantControl> menuVariant,
+			Mock<IVariantControl> freeTextVariant
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
@@ -64,8 +64,8 @@ public class CommandPaletteWindowViewModelTests
 			Mock<IConfigContext> configContext,
 			Mock<ICommandManager> commandManager,
 			CommandPalettePlugin plugin,
-			Mock<IVariantControl<MenuVariantConfig>> menuVariant,
-			Mock<IVariantControl<FreeTextVariantConfig>> freeTextVariant
+			Mock<IVariantControl> menuVariant,
+			Mock<IVariantControl> freeTextVariant
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =

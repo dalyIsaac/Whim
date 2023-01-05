@@ -5,8 +5,7 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// Wrapper for a palette variant control and view model which can be rendered in the palette window.
 /// </summary>
-/// <typeparam name="T">Activation config</typeparam>
-public interface IVariantControl<T> where T : BaseVariantConfig
+public interface IVariantControl
 {
 	/// <summary>
 	/// The control to render.
@@ -16,7 +15,7 @@ public interface IVariantControl<T> where T : BaseVariantConfig
 	/// <summary>
 	/// The view model for the control.
 	/// </summary>
-	IVariantViewModel<T> ViewModel { get; }
+	IVariantViewModel ViewModel { get; }
 
 	/// <summary>
 	/// Gets the height of <see cref="Control"/> in pixels. This is used for manually setting the

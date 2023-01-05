@@ -15,4 +15,9 @@ public record FreeTextVariantConfig : BaseVariantConfig
 	/// The callback to invoke when the user has pressed enter.
 	/// </summary>
 	public required FreeTextVariantCallback Callback { get; init; }
+
+	/// <summary>
+	/// The prompt to display in the command palette.
+	/// </summary>
+	public required string Prompt { get; init; }
 }

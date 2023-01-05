@@ -52,7 +52,8 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 						{
 							Callback = (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
 							Hint = "Enter new workspace name",
-							InitialText = _configContext.WorkspaceManager.ActiveWorkspace.Name
+							InitialText = _configContext.WorkspaceManager.ActiveWorkspace.Name,
+							Prompt = "Rename workspace"
 						}
 					)
 			)
@@ -79,7 +80,8 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 								);
 								_configContext.WorkspaceManager.Add(workspace);
 							},
-							Hint = "Enter new workspace name"
+							Hint = "Enter new workspace name",
+							Prompt = "Create workspace"
 						}
 					)
 			)

@@ -7,7 +7,7 @@ using Windows.System;
 
 namespace Whim.CommandPalette;
 
-internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
+internal class MenuVariantViewModel : IVariantViewModel
 {
 	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
 
@@ -107,12 +107,18 @@ internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
 		PopulateItems(configContext.CommandManager);
 	}
 
-	public void Activate(MenuVariantConfig activationConfig)
+	public void Activate(BaseVariantConfig activationConfig)
 	{
-		_activationConfig = activationConfig;
-
-		PopulateItems(activationConfig.Commands);
-		Update();
+		if (activationConfig is MenuVariantConfig menuVariantConfig)
+		{
+			_activationConfig = menuVariantConfig;
+			PopulateItems(menuVariantConfig.Commands);
+			Update();
+		}
+		else
+		{
+			Logger.Error("Invalid activation config type");
+		}
 	}
 
 	public void Update()
@@ -173,7 +179,6 @@ internal class MenuVariantViewModel : IVariantViewModel<MenuVariantConfig>
 
 		if (scrollIntoView)
 		{
-			// TODO
 			ScrollIntoViewRequested?.Invoke(this, EventArgs.Empty);
 		}
 	}
