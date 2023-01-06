@@ -311,11 +311,7 @@ public class CommandPaletteWindowViewModelTests
 		vm.Activate(config, null);
 
 		// When
-		Assert.Raises<EventArgs>(
-			h => vm.SetWindowPosRequested += h,
-			h => vm.SetWindowPosRequested -= h,
-			vm.Update
-		);
+		Assert.Raises<EventArgs>(h => vm.SetWindowPosRequested += h, h => vm.SetWindowPosRequested -= h, vm.Update);
 
 		// Then
 		viewModel.Verify(x => x.Update(), Times.Once);
