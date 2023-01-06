@@ -13,13 +13,35 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<TextBox
-			x:Name="TextEntry"
-			MaxHeight="{x:Bind local:CommandPaletteWindow.TextEntryHeight}"
-			KeyDown="TextEntry_KeyDown"
-			PlaceholderText="{x:Bind Path=ViewModel.PlaceholderText, Mode=OneWay}"
-			Text="{x:Bind Path=ViewModel.Text, Mode=TwoWay}"
-			TextChanged="TextEntry_TextChanged" />
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="auto" />
+			</Grid.ColumnDefinitions>
+
+			<TextBox
+				x:Name="TextEntry"
+				MaxHeight="{x:Bind local:CommandPaletteWindow.TextEntryHeight}"
+				KeyDown="TextEntry_KeyDown"
+				PlaceholderText="{x:Bind Path=ViewModel.PlaceholderText, Mode=OneWay}"
+				Text="{x:Bind Path=ViewModel.Text, Mode=TwoWay}"
+				TextChanged="TextEntry_TextChanged" />
+
+			<StackPanel
+				Grid.Column="1"
+				Margin="2,0"
+				Orientation="Horizontal"
+				Spacing="2"
+				Visibility="{x:Bind Path=ViewModel.SaveButtonVisibility, Mode=OneWay}">
+				<Button x:Name="Cancel" Content="Cancel" />
+
+				<Button
+					x:Name="Save"
+					Content="Save"
+					Style="{StaticResource AccentButtonStyle}" />
+			</StackPanel>
+		</Grid>
+
 
 		<Grid x:Name="PaletteContent" Grid.Row="1" />
 	</Grid>

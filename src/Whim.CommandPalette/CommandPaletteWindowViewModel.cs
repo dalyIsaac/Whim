@@ -14,6 +14,8 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 	private readonly IVariantControl _freeTextVariant;
 
+	private readonly IVariantControl _selectVariant;
+
 	private IVariantControl? _activeVariant;
 
 	public CommandPalettePlugin Plugin { get; }
@@ -62,6 +64,20 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 	}
 
+	private Visibility _saveButtonVisibility = Visibility.Collapsed;
+	public Visibility SaveButtonVisibility
+	{
+		get => _saveButtonVisibility;
+		set
+		{
+			if (SaveButtonVisibility != value)
+			{
+				_saveButtonVisibility = value;
+				OnPropertyChanged(nameof(SaveButtonVisibility));
+			}
+		}
+	}
+
 	public bool IsVisible => Monitor != null;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -74,7 +90,8 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		IConfigContext configContext,
 		CommandPalettePlugin plugin,
 		IVariantControl? menuVariant = null,
-		IVariantControl? freeTextVariant = null
+		IVariantControl? freeTextVariant = null,
+		IVariantControl? selectVariant = null
 	)
 	{
 		_configContext = configContext;
@@ -84,6 +101,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 		_menuVariant = menuVariant ?? new MenuVariantControl(configContext, this);
 		_freeTextVariant = freeTextVariant ?? new FreeTextVariantControl(this);
+		_selectVariant = selectVariant ?? new SelectVariantControl(this);
 	}
 
 	/// <summary>
@@ -97,6 +115,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		{
 			MenuVariantConfig => _menuVariant,
 			FreeTextVariantConfig => _freeTextVariant,
+			SelectVariantConfig => _selectVariant,
 			_ => null
 		};
 
@@ -109,6 +128,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_activationConfig = config;
 		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 
+		SaveButtonVisibility = _activeVariant.ViewModel.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
 		Text = _activationConfig.InitialText ?? "";
 		PlaceholderText = _activationConfig.Hint ?? "Start typing...";
 		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);
