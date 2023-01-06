@@ -1,0 +1,32 @@
+<UserControl
+	x:Class="Whim.CommandPalette.SelectVariantView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="using:Whim.CommandPalette"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d">
+
+	<RelativePanel x:Name="ListViewItemsWrapper">
+		<TextBlock
+			x:Name="NoMatchingOptionsTextBlock"
+			Padding="12,0,0,0"
+			RelativePanel.AlignLeftWithPanel="True"
+			RelativePanel.AlignVerticalCenterWithPanel="True"
+			Visibility="Collapsed">
+			No matching options
+		</TextBlock>
+
+		<ListView
+			x:Name="ListViewItems"
+			IsItemClickEnabled="True"
+			IsTabStop="False"
+			ItemClick="ListViewItems_ItemClick"
+			ItemsSource="{x:Bind Path=ViewModel.SelectRows, Mode=OneWay}"
+			RelativePanel.AlignLeftWithPanel="True"
+			RelativePanel.AlignRightWithPanel="True"
+			RelativePanel.AlignTopWithPanel="True"
+			SelectedIndex="{x:Bind Path=ViewModel.SelectedIndex, Mode=TwoWay}"
+			SelectionMode="Single" />
+	</RelativePanel>
+</UserControl>

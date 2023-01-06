@@ -8,6 +8,11 @@ namespace Whim.CommandPalette;
 public record SelectVariantConfig : BaseVariantConfig
 {
 	/// <summary>
+	/// The matcher to use to filter the results.
+	/// </summary>
+	public IMatcher<SelectOption> Matcher { get; init; } = new MostRecentlyUsedMatcher<SelectOption>();
+
+	/// <summary>
 	/// Whether this select is a multi-select.
 	/// </summary>
 	public bool IsMultiSelect { get; init; }
@@ -15,5 +20,5 @@ public record SelectVariantConfig : BaseVariantConfig
 	/// <summary>
 	/// The options to display in the select.
 	/// </summary>
-	public required IEnumerable<ISelectOption> Options { get; init; }
+	public required IEnumerable<SelectOption> Options { get; init; }
 }

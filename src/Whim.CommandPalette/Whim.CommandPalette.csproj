@@ -30,6 +30,8 @@
 		<None Remove="CommandPaletteWindow.xaml" />
 		<None Remove="PaletteItems\PaletteKeybindItem.xaml" />
 		<None Remove="Variants\FreeText\FreeTextVariantView.xaml" />
+		<None Remove="Variants\Select\SelectRow.xaml" />
+		<None Remove="Variants\Select\SelectVariantView.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -56,6 +58,18 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="Whim.CommandPalette.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Variants\Select\SelectRow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Variants\Select\SelectVariantView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

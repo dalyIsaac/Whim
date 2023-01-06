@@ -169,10 +169,6 @@ internal class MenuVariantViewModel : IVariantViewModel
 				ExecuteCommand();
 				break;
 
-			case VirtualKey.Escape:
-				_commandPaletteWindowViewModel.RequestHide();
-				break;
-
 			default:
 				break;
 		}

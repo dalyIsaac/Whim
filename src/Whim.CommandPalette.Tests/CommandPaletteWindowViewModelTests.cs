@@ -232,7 +232,7 @@ public class CommandPaletteWindowViewModelTests
 		};
 		yield return new object[]
 		{
-			new SelectVariantConfig() { Options = Array.Empty<ISelectOption>() },
+			new SelectVariantConfig() { Options = Array.Empty<SelectOption>() },
 			true,
 			true
 		};

@@ -1,14 +1,11 @@
 using Microsoft.UI.Xaml;
-using System;
 
 namespace Whim.CommandPalette;
 
 internal class SelectVariantControl : IVariantControl
 {
-	// private readonly SelectVariantView _control;
-#pragma warning disable CS8603 // Possible null reference return.
-	public UIElement Control => null;
-#pragma warning restore CS8603 // Possible null reference return.
+	private readonly SelectVariantView _control;
+	public UIElement Control => _control;
 
 	public IVariantViewModel ViewModel { get; }
 
@@ -16,8 +13,8 @@ internal class SelectVariantControl : IVariantControl
 	{
 		SelectVariantViewModel viewModel = new(windowViewModel);
 		ViewModel = viewModel;
-		// _control = new SelectVariantView(viewModel);
+		_control = new SelectVariantView(viewModel);
 	}
 
-	public double GetViewMaxHeight() => throw new NotImplementedException();
+	public double GetViewMaxHeight() => _control.GetViewMaxHeight();
 }
