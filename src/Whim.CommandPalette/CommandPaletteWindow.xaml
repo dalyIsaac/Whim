@@ -31,8 +31,10 @@
 				Grid.Column="1"
 				Margin="2,0"
 				Orientation="Horizontal"
-				Spacing="2">
+				Spacing="2"
+				Visibility="{x:Bind Path=ViewModel.ShowSaveButton, Mode=OneWay}">
 				<Button x:Name="Cancel" Content="Cancel" />
+
 				<Button
 					x:Name="Save"
 					Content="Save"

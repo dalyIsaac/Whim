@@ -62,6 +62,20 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 	}
 
+	private Visibility _showSaveButton = Visibility.Collapsed;
+	public Visibility ShowSaveButton
+	{
+		get => _showSaveButton;
+		set
+		{
+			if (ShowSaveButton != value)
+			{
+				_showSaveButton = value;
+				OnPropertyChanged(nameof(ShowSaveButton));
+			}
+		}
+	}
+
 	public bool IsVisible => Monitor != null;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -109,6 +123,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_activationConfig = config;
 		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 
+		ShowSaveButton = _activeVariant.ViewModel.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
 		Text = _activationConfig.InitialText ?? "";
 		PlaceholderText = _activationConfig.Hint ?? "Start typing...";
 		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);
