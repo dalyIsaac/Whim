@@ -93,14 +93,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	/// <param name="monitor">The monitor to display the command palette on.</param>
 	public UIElement? Activate(BaseVariantConfig config, IMonitor? monitor)
 	{
-		_activationConfig = config;
-		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
-
-		Text = _activationConfig.InitialText ?? "";
-		PlaceholderText = _activationConfig.Hint ?? "Start typing...";
-		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);
-
-		_activeVariant = _activationConfig switch
+		_activeVariant = config switch
 		{
 			MenuVariantConfig => _menuVariant,
 			FreeTextVariantConfig => _freeTextVariant,
@@ -112,6 +105,13 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 			Logger.Error($"Unknown variant type: {config.GetType().Name}");
 			return null;
 		}
+
+		_activationConfig = config;
+		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
+
+		Text = _activationConfig.InitialText ?? "";
+		PlaceholderText = _activationConfig.Hint ?? "Start typing...";
+		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);
 
 		_activeVariant.ViewModel.Activate(_activationConfig);
 		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
