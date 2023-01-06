@@ -316,4 +316,54 @@ public class CommandPaletteWindowViewModelTests
 		// Then
 		viewModel.Verify(x => x.Update(), Times.Once);
 	}
+
+	[Fact]
+	public void IsVisible_True()
+	{
+		// Given
+		(
+			Mock<IConfigContext> configContext,
+			_,
+			CommandPalettePlugin plugin,
+			Mock<IVariantControl> menuVariant,
+			Mock<IVariantControl> freeTextVariant,
+			_
+		) = CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+
+		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
+
+		vm.Activate(config, null);
+
+		// When
+		bool result = vm.IsVisible;
+
+		// Then
+		Assert.True(result);
+	}
+
+	[Fact]
+	public void IsVisible_False()
+	{
+		// Given
+		(
+			Mock<IConfigContext> configContext,
+			_,
+			CommandPalettePlugin plugin,
+			Mock<IVariantControl> menuVariant,
+			Mock<IVariantControl> freeTextVariant,
+			_
+		) = CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+
+		// When
+		bool result = vm.IsVisible;
+
+		// Then
+		Assert.False(result);
+	}
 }
