@@ -1,19 +1,14 @@
 namespace Whim.CommandPalette;
 
 /// <summary>
-/// Represents an option in a <see cref="CommandPaletteSelectActivationConfig{T}"/> select.
+/// Represents an option in a <see cref="SelectVariantConfig"/> select.
 /// </summary>
-public interface ISelectOption<T>
+public interface ISelectOption
 {
 	/// <summary>
 	/// The text to display for this option.
 	/// </summary>
 	string Text { get; }
-
-	/// <summary>
-	/// The value of this option.
-	/// </summary>
-	T Value { get; }
 
 	/// <summary>
 	/// Whether this option is selected.

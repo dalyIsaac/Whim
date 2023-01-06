@@ -215,8 +215,32 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Equal((int)(100 * 0.4), vm.MaxHeight);
 	}
 
-	[Fact]
-	public void Activate_UnknownConfig()
+	public static IEnumerable<object[]> ActivateData()
+	{
+		yield return new object[] { new UnknownConfig(), false, false };
+		yield return new object[]
+		{
+			new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() },
+			true,
+			false
+		};
+		yield return new object[]
+		{
+			new FreeTextVariantConfig() { Callback = (text) => { }, Prompt = "Prompt" },
+			true,
+			false
+		};
+		yield return new object[]
+		{
+			new SelectVariantConfig() { Options = Array.Empty<ISelectOption>() },
+			true,
+			true
+		};
+	}
+
+	[Theory]
+	[MemberData(nameof(ActivateData))]
+	public void Activate_Variant(BaseVariantConfig config, bool expected, bool showSaveButton)
 	{
 		// Given
 		(
@@ -231,63 +255,12 @@ public class CommandPaletteWindowViewModelTests
 		CommandPaletteWindowViewModel vm =
 			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
 
-		BaseVariantConfig config = new UnknownConfig();
-
 		// When
 		vm.Activate(config, null);
 
 		// Then
-		Assert.False(vm.IsVariantActive(config));
-	}
-
-	[Fact]
-	public void Activate_MenuVariant()
-	{
-		// Given
-		(
-			Mock<IConfigContext> configContext,
-			_,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			_
-		) = CreateStubs();
-
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
-
-		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
-
-		// When
-		vm.Activate(config, null);
-
-		// Then
-		Assert.True(vm.IsVariantActive(config));
-	}
-
-	[Fact]
-	public void Activate_FreeTextVariant()
-	{
-		// Given
-		(
-			Mock<IConfigContext> configContext,
-			_,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantViewModel> viewModel
-		) = CreateStubs();
-
-		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
-
-		FreeTextVariantConfig config = new() { Callback = (text) => { }, Prompt = "Prompt" };
-
-		// When
-		vm.Activate(config, null);
-
-		// Then
-		Assert.True(vm.IsVariantActive(config));
+		Assert.Equal(expected, vm.IsVariantActive(config));
+		Assert.Equal(showSaveButton ? Visibility.Visible : Visibility.Collapsed, vm.SaveButtonVisibility);
 	}
 
 	[Fact]

@@ -32,7 +32,7 @@
 				Margin="2,0"
 				Orientation="Horizontal"
 				Spacing="2"
-				Visibility="{x:Bind Path=ViewModel.ShowSaveButton, Mode=OneWay}">
+				Visibility="{x:Bind Path=ViewModel.SaveButtonVisibility, Mode=OneWay}">
 				<Button x:Name="Cancel" Content="Cancel" />
 
 				<Button
