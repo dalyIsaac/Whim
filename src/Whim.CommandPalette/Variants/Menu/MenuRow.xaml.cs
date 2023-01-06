@@ -8,13 +8,15 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-internal sealed partial class PaletteRow : UserControl, IPaletteRow
+internal sealed partial class MenuRow : UserControl, IMenuRow
 {
-	public PaletteRowItem Model { get; private set; }
+	public static double MenuRowHeight => 24;
 
-	public PaletteRow(PaletteRowItem item)
+	public IVariantItem<CommandItem> Item { get; private set; }
+
+	public MenuRow(IVariantItem<CommandItem> item)
 	{
-		Model = item;
+		Item = item;
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");
 	}
 
@@ -24,10 +26,10 @@ internal sealed partial class PaletteRow : UserControl, IPaletteRow
 		SetKeybinds();
 	}
 
-	public void Update(PaletteRowItem item)
+	public void Update(IVariantItem<CommandItem> item)
 	{
 		Logger.Debug("Updating with a new item");
-		Model = item;
+		Item = item;
 		SetTitle();
 		SetKeybinds();
 	}
@@ -40,12 +42,12 @@ internal sealed partial class PaletteRow : UserControl, IPaletteRow
 	{
 		Logger.Debug("Setting title");
 		InlineCollection inlines = CommandTitle.Inlines;
-		IList<TextSegment> segments = Model.Title.Segments;
+		IList<PaletteTextSegment> segments = Item.FormattedTitle.Segments;
 
 		int idx;
 		for (idx = 0; idx < segments.Count; idx++)
 		{
-			TextSegment seg = segments[idx];
+			PaletteTextSegment seg = segments[idx];
 			Run run = seg.ToRun();
 
 			if (idx < inlines.Count)
@@ -75,9 +77,9 @@ internal sealed partial class PaletteRow : UserControl, IPaletteRow
 	{
 		Logger.Debug("Setting keybinds");
 
-		if (Model.CommandItem.Keybind is not null)
+		if (Item.Data.Keybind is not null)
 		{
-			CommandKeybind.Text = Model.CommandItem.Keybind.ToString();
+			CommandKeybind.Text = Item.Data.Keybind.ToString();
 			CommandKeybindBorder.Visibility = Visibility.Visible;
 		}
 		else

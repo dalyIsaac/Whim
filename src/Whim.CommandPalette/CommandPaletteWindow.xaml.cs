@@ -1,12 +1,13 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
 internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 {
+	public static double TextEntryHeight => 48;
+
 	private readonly IConfigContext _configContext;
 	private readonly IWindow _window;
 
@@ -50,20 +51,20 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// Activate the command palette.
 	/// </summary>
 	/// <param name="config">The configuration for activation.</param>
-	/// <param name="items">
-	/// The items to activate the command palette with. These items will be passed to the
-	/// <see cref="ICommandPaletteMatcher"/> to filter the results.
-	/// When the text is empty, typically all items are shown.
-	/// </param>
 	/// <param name="monitor">The monitor to display the command palette on.</param>
-	public void Activate(
-		BaseCommandPaletteActivationConfig config,
-		IEnumerable<CommandItem>? items = null,
-		IMonitor? monitor = null
-	)
+	public void Activate(BaseVariantConfig config, IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating command palette");
-		ViewModel.Activate(config, items, monitor);
+		UIElement? control = ViewModel.Activate(config, monitor);
+
+		PaletteContent.Children.Clear();
+		if (control == null)
+		{
+			Logger.Error("No control to activate");
+			return;
+		}
+
+		PaletteContent.Children.Add(control);
 
 		TextEntry.SelectAll();
 		Activate();
@@ -103,17 +104,13 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	/// <param name="e"></param>
 	private void TextEntry_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 	{
-		bool scrollIntoView = ViewModel.OnKeyDown(sender, e.Key);
-		if (scrollIntoView)
-		{
-			ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
-		}
+		ViewModel.OnKeyDown(e.Key);
 	}
 
 	private void TextEntry_TextChanged(object sender, TextChangedEventArgs e)
 	{
 		ViewModel.Text = TextEntry.Text;
-		ViewModel.UpdateMatches();
+		ViewModel.Update();
 	}
 
 	/// <summary>
@@ -128,25 +125,13 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 
 		int width = ViewModel.Plugin.Config.MaxWidthPixels;
-		int height = ViewModel.MaxHeight;
 
-		if (NoMatchingCommandsTextBlock.Visibility == Visibility.Visible)
-		{
-			height = (int)(TextEntry.ActualHeight * 2) + 12;
-		}
-		else if (ListViewItems.Items.Count > 0)
-		{
-			DependencyObject? container = ListViewItems.ContainerFromIndex(0);
-			if (container is ListViewItem item)
-			{
-				int fullHeight = (int)(TextEntry.ActualHeight + (item.ActualHeight * ListViewItems.Items.Count));
-				height = Math.Min(ViewModel.MaxHeight, fullHeight);
-			}
-		}
+		double height = TextEntryHeight + ViewModel.GetViewMaxHeight();
+		height = Math.Min(ViewModel.MaxHeight, height);
 
 		int scaleFactor = ViewModel.Monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
-		height = (int)(height * scale);
+		height *= scale;
 
 		int x = (ViewModel.Monitor.WorkingArea.Width / 2) - (width / 2);
 		int y = (int)(ViewModel.Monitor.WorkingArea.Height * ViewModel.Plugin.Config.YPositionPercent / 100.0);
@@ -156,7 +141,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			X = ViewModel.Monitor.WorkingArea.X + x,
 			Y = ViewModel.Monitor.WorkingArea.Y + y,
 			Width = width,
-			Height = height
+			Height = (int)height
 		};
 
 		WindowContainer.MaxHeight = height;
@@ -172,12 +157,5 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			monitor: ViewModel.Monitor,
 			hwndInsertAfter: _window.Handle
 		);
-	}
-
-	private void CommandListItems_ItemClick(object sender, ItemClickEventArgs e)
-	{
-		Logger.Debug("Command palette item clicked");
-		ListViewItems.SelectedItem = e.ClickedItem;
-		ViewModel.ExecuteCommand();
 	}
 }

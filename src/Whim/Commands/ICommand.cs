@@ -8,7 +8,7 @@ public interface ICommand
 	/// <summary>
 	/// The unique identifier. For example, "whim.core.focus_right_window".
 	/// </summary>
-	public string Identifier { get; }
+	public string Id { get; }
 
 	/// <summary>
 	/// The title of the command. For example, "Focus right window".

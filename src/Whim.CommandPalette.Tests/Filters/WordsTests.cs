@@ -33,7 +33,7 @@ public class WordsTests
 	[Theory]
 	public void MatchesWordsSeparate_Ok(string query, string target, params int[][] expected)
 	{
-		PaletteFilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
+		FilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesWordsSeparate, query, target, expectedMatches);
 	}
 
@@ -55,7 +55,7 @@ public class WordsTests
 	[Theory]
 	public void MatchesWordsContiguous_Ok(string query, string target, params int[][] expected)
 	{
-		PaletteFilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
+		FilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesWordsContiguous, query, target, expectedMatches);
 	}
 

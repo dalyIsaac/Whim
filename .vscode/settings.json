@@ -12,5 +12,9 @@
   },
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.exclude": {
+    "src/Whim*/bin": true,
+    "src/Whim*/obj": true
   }
 }

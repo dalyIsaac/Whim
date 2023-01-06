@@ -6,82 +6,52 @@ public class CamelCaseTests
 {
 	public static IEnumerable<object[]> MatchesCamelCase_Ok_Data()
 	{
-		yield return new object[] { "", "anything", Array.Empty<PaletteFilterTextMatch>() };
-		yield return new object[] { "alpha", "alpha", new PaletteFilterTextMatch[] { new(0, 5) } };
-		yield return new object[] { "AlPhA", "alpha", new PaletteFilterTextMatch[] { new(0, 5) } };
-		yield return new object[] { "alpha", "alphasomething", new PaletteFilterTextMatch[] { new(0, 5) } };
-		yield return new object[] { "c", "CamelCaseRocks", new PaletteFilterTextMatch[] { new(0, 1) } };
-		yield return new object[] { "cc", "CamelCaseRocks", new PaletteFilterTextMatch[] { new(0, 1), new(5, 6) } };
+		yield return new object[] { "", "anything", Array.Empty<FilterTextMatch>() };
+		yield return new object[] { "alpha", "alpha", new FilterTextMatch[] { new(0, 5) } };
+		yield return new object[] { "AlPhA", "alpha", new FilterTextMatch[] { new(0, 5) } };
+		yield return new object[] { "alpha", "alphasomething", new FilterTextMatch[] { new(0, 5) } };
+		yield return new object[] { "c", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1) } };
+		yield return new object[] { "cc", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1), new(5, 6) } };
 		yield return new object[]
 		{
 			"ccr",
 			"CamelCaseRocks",
-			new PaletteFilterTextMatch[] { new(0, 1), new(5, 6), new(9, 10) }
+			new FilterTextMatch[] { new(0, 1), new(5, 6), new(9, 10) }
 		};
 		yield return new object[]
 		{
 			"cacr",
 			"CamelCaseRocks",
-			new PaletteFilterTextMatch[] { new(0, 2), new(5, 6), new(9, 10) }
+			new FilterTextMatch[] { new(0, 2), new(5, 6), new(9, 10) }
 		};
 		yield return new object[]
 		{
 			"cacar",
 			"CamelCaseRocks",
-			new PaletteFilterTextMatch[] { new(0, 2), new(5, 7), new(9, 10) }
+			new FilterTextMatch[] { new(0, 2), new(5, 7), new(9, 10) }
 		};
 		yield return new object[]
 		{
 			"ccarocks",
 			"CamelCaseRocks",
-			new PaletteFilterTextMatch[] { new(0, 1), new(5, 7), new(9, 14) }
+			new FilterTextMatch[] { new(0, 1), new(5, 7), new(9, 14) }
 		};
-		yield return new object[] { "cr", "CamelCaseRocks", new PaletteFilterTextMatch[] { new(0, 1), new(9, 10) } };
-		yield return new object[] { "fba", "FooBarAbe", new PaletteFilterTextMatch[] { new(0, 1), new(3, 5) } };
-		yield return new object[] { "fbar", "FooBarAbe", new PaletteFilterTextMatch[] { new(0, 1), new(3, 6) } };
-		yield return new object[] { "fbara", "FooBarAbe", new PaletteFilterTextMatch[] { new(0, 1), new(3, 7) } };
-		yield return new object[]
-		{
-			"fbaa",
-			"FooBarAbe",
-			new PaletteFilterTextMatch[] { new(0, 1), new(3, 5), new(6, 7) }
-		};
-		yield return new object[]
-		{
-			"fbaab",
-			"FooBarAbe",
-			new PaletteFilterTextMatch[] { new(0, 1), new(3, 5), new(6, 8) }
-		};
-		yield return new object[]
-		{
-			"c2d",
-			"canvasCreation2D",
-			new PaletteFilterTextMatch[] { new(0, 1), new(14, 16) }
-		};
+		yield return new object[] { "cr", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1), new(9, 10) } };
+		yield return new object[] { "fba", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5) } };
+		yield return new object[] { "fbar", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 6) } };
+		yield return new object[] { "fbara", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 7) } };
+		yield return new object[] { "fbaa", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5), new(6, 7) } };
+		yield return new object[] { "fbaab", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5), new(6, 8) } };
+		yield return new object[] { "c2d", "canvasCreation2D", new FilterTextMatch[] { new(0, 1), new(14, 16) } };
 		yield return new object[]
 		{
 			"cce",
 			"_canvasCreationEvent",
-			new PaletteFilterTextMatch[] { new(1, 2), new(7, 8), new(15, 16) }
+			new FilterTextMatch[] { new(1, 2), new(7, 8), new(15, 16) }
 		};
-		yield return new object[]
-		{
-			"Debug Console",
-			"Open: Debug Console",
-			new PaletteFilterTextMatch[] { new(6, 19) }
-		};
-		yield return new object[]
-		{
-			"Debug console",
-			"Open: Debug Console",
-			new PaletteFilterTextMatch[] { new(6, 19) }
-		};
-		yield return new object[]
-		{
-			"debug console",
-			"Open: Debug Console",
-			new PaletteFilterTextMatch[] { new(6, 19) }
-		};
+		yield return new object[] { "Debug Console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } };
+		yield return new object[] { "Debug console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } };
+		yield return new object[] { "debug console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } };
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 		yield return new object[]
 		{
@@ -96,7 +66,7 @@ public class CamelCaseTests
 
 	[Theory]
 	[MemberData(nameof(MatchesCamelCase_Ok_Data))]
-	public void MatchesCamelCase_Ok(string word, string wordToMatchAgainst, PaletteFilterTextMatch[]? expected)
+	public void MatchesCamelCase_Ok(string word, string wordToMatchAgainst, FilterTextMatch[]? expected)
 	{
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesCamelCase, word, wordToMatchAgainst, expected);
 	}

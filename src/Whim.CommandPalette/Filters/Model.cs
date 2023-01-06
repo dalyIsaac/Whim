@@ -5,7 +5,7 @@ namespace Whim.CommandPalette;
 /// </summary>
 /// <param name="Start"></param>
 /// <param name="End"></param>
-public record PaletteFilterTextMatch(int Start, int End);
+public record FilterTextMatch(int Start, int End);
 
 /// <summary>
 /// A function that takes a word and returns its matches within the word to match against.
@@ -16,4 +16,4 @@ public record PaletteFilterTextMatch(int Start, int End);
 /// <see langword="null"/> if the input was invalid, otherwise an array of matches.
 /// Valid inputs may return an empty array when there are no matches.
 /// </returns>
-public delegate PaletteFilterTextMatch[]? PaletteFilter(string word, string wordToMatchAgainst);
+public delegate FilterTextMatch[]? PaletteFilter(string word, string wordToMatchAgainst);

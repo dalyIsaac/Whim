@@ -32,7 +32,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.toggle",
 				title: "Toggle command palette",
-				_commandPalettePlugin.Activate
+				() => _commandPalettePlugin.Activate()
 			),
 			Keybind = new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_K)
 		};
@@ -47,12 +47,13 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.rename_workspace",
 				title: "Rename workspace",
 				callback: () =>
-					_commandPalettePlugin.ActivateWithConfig(
-						new CommandPaletteFreeTextActivationConfig()
+					_commandPalettePlugin.Activate(
+						new FreeTextVariantConfig()
 						{
 							Callback = (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
 							Hint = "Enter new workspace name",
-							InitialText = _configContext.WorkspaceManager.ActiveWorkspace.Name
+							InitialText = _configContext.WorkspaceManager.ActiveWorkspace.Name,
+							Prompt = "Rename workspace"
 						}
 					)
 			)
@@ -68,8 +69,8 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.create_workspace",
 				title: "Create workspace",
 				callback: () =>
-					_commandPalettePlugin.ActivateWithConfig(
-						new CommandPaletteFreeTextActivationConfig()
+					_commandPalettePlugin.Activate(
+						new FreeTextVariantConfig()
 						{
 							Callback = (text) =>
 							{
@@ -79,7 +80,8 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 								);
 								_configContext.WorkspaceManager.Add(workspace);
 							},
-							Hint = "Enter new workspace name"
+							Hint = "Enter new workspace name",
+							Prompt = "Create workspace"
 						}
 					)
 			)
@@ -115,9 +117,8 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 						w => MoveWindowToWorkspaceCommandCreator(w)
 					);
 
-					_commandPalettePlugin.ActivateWithConfig(
-						config: new CommandPaletteMenuActivationConfig() { Hint = "Select workspace" },
-						items
+					_commandPalettePlugin.Activate(
+						new MenuVariantConfig() { Hint = "Select workspace", Commands = items }
 					);
 				}
 			)

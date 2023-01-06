@@ -11,7 +11,7 @@ public class PrefixTests
 	[Theory]
 	public void MatchesStrictPrefix_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
-		PaletteFilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
+		FilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesStrictPrefix, word, wordToMatchAgainst, expectedMatches);
 	}
 
@@ -35,7 +35,7 @@ public class PrefixTests
 	[Theory]
 	public void MatchesPrefix_Ok(string word, string wordToMatchAgainst, params int[][] expected)
 	{
-		PaletteFilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
+		FilterTextMatch[] expectedMatches = FilterTestUtils.CreateExpectedMatches(expected);
 		FilterTestUtils.FilterOk(PaletteFilters.MatchesPrefix, word, wordToMatchAgainst, expectedMatches);
 	}
 

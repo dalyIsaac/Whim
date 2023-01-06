@@ -8,7 +8,7 @@ public static partial class PaletteFilters
 	/// Returns prefix matches of the word, compared to the wordToMatchAgainst.
 	/// Cases are matched exactly.
 	/// </summary>
-	public static PaletteFilterTextMatch[]? MatchesStrictPrefix(string word, string wordToMatchAgainst)
+	public static FilterTextMatch[]? MatchesStrictPrefix(string word, string wordToMatchAgainst)
 	{
 		return MatchesPrefixCasingBase(word, wordToMatchAgainst, false);
 	}
@@ -17,16 +17,12 @@ public static partial class PaletteFilters
 	/// Returns exact prefix matches of the word, compared to the wordToMatchAgainst.
 	/// Cases are ignored.
 	/// </summary>
-	public static PaletteFilterTextMatch[]? MatchesPrefix(string word, string wordToMatchAgainst)
+	public static FilterTextMatch[]? MatchesPrefix(string word, string wordToMatchAgainst)
 	{
 		return MatchesPrefixCasingBase(word, wordToMatchAgainst, true);
 	}
 
-	private static PaletteFilterTextMatch[]? MatchesPrefixCasingBase(
-		string word,
-		string wordToMatchAgainst,
-		bool ignoreCase
-	)
+	private static FilterTextMatch[]? MatchesPrefixCasingBase(string word, string wordToMatchAgainst, bool ignoreCase)
 	{
 		if (string.IsNullOrEmpty(wordToMatchAgainst) || wordToMatchAgainst.Length < word.Length)
 		{
@@ -42,8 +38,6 @@ public static partial class PaletteFilters
 			return null;
 		}
 
-		return word.Length > 0
-			? new[] { new PaletteFilterTextMatch(0, word.Length) }
-			: Array.Empty<PaletteFilterTextMatch>();
+		return word.Length > 0 ? new[] { new FilterTextMatch(0, word.Length) } : Array.Empty<FilterTextMatch>();
 	}
 }

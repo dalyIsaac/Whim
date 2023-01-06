@@ -29,6 +29,7 @@
 		<None Remove="CommandListItem.xaml" />
 		<None Remove="CommandPaletteWindow.xaml" />
 		<None Remove="PaletteItems\PaletteKeybindItem.xaml" />
+		<None Remove="Variants\FreeText\FreeTextVariantView.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -55,5 +56,11 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="Whim.CommandPalette.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Variants\FreeText\FreeTextVariantView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 </Project>

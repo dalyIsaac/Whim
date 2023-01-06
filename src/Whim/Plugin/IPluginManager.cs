@@ -11,7 +11,7 @@ public interface IPluginManager : IDisposable
 	/// <summary>
 	/// The currently loaded plugins.
 	/// </summary>
-	public IEnumerable<IPlugin> LoadedPlugins { get; }
+	public IReadOnlyCollection<IPlugin> LoadedPlugins { get; }
 
 	/// <summary>
 	/// Calls all plugins' <see cref="IPlugin.PreInitialize"/> method.

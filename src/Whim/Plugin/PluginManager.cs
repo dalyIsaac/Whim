@@ -9,7 +9,7 @@ internal class PluginManager : IPluginManager
 	private readonly Dictionary<string, IPlugin> _plugins = new();
 	private bool _disposedValue;
 
-	public IEnumerable<IPlugin> LoadedPlugins => _plugins.Values;
+	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.Values;
 
 	public PluginManager(IConfigContext configContext)
 	{

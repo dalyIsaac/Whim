@@ -17,20 +17,20 @@ internal class CommandItemContainer : ICommandItemContainer
 	{
 		Logger.Debug($"Adding command {command}");
 
-		ICommand? existingCommand = TryGetCommand(command.Identifier);
+		ICommand? existingCommand = TryGetCommand(command.Id);
 		if (existingCommand != null && command != existingCommand)
 		{
-			Logger.Error($"Command {command.Identifier} already exists");
-			throw new ArgumentException($"Command {command.Identifier} already exists");
+			Logger.Error($"Command {command.Id} already exists");
+			throw new ArgumentException($"Command {command.Id} already exists");
 		}
 
 		if (keybind != null)
 		{
 			Logger.Debug($"Adding (or overriding) keybind {keybind}");
-			_keybindsMap.Add(keybind, command.Identifier);
+			_keybindsMap.Add(keybind, command.Id);
 		}
 
-		_identifierCommandMap[command.Identifier] = command;
+		_identifierCommandMap[command.Id] = command;
 	}
 
 	public bool SetKeybind(string commandIdentifier, IKeybind keybind)
@@ -86,7 +86,7 @@ internal class CommandItemContainer : ICommandItemContainer
 	public bool RemoveCommand(ICommand command)
 	{
 		Logger.Debug($"Removing command {command}");
-		return RemoveCommand(command.Identifier);
+		return RemoveCommand(command.Id);
 	}
 
 	public void Clear()
@@ -124,7 +124,7 @@ internal class CommandItemContainer : ICommandItemContainer
 	public IKeybind? TryGetKeybind(ICommand command)
 	{
 		Logger.Debug($"Trying to get keybind for command {command}");
-		return TryGetKeybind(command.Identifier);
+		return TryGetKeybind(command.Id);
 	}
 
 	public IEnumerator<CommandItem> GetEnumerator()

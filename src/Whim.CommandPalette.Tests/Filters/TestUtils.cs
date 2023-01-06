@@ -8,10 +8,10 @@ public static class FilterTestUtils
 		PaletteFilter filter,
 		string word,
 		string wordToMatchAgainst,
-		PaletteFilterTextMatch[]? expectedMatches = null
+		FilterTextMatch[]? expectedMatches = null
 	)
 	{
-		PaletteFilterTextMatch[]? actualMatches = filter(word, wordToMatchAgainst);
+		FilterTextMatch[]? actualMatches = filter(word, wordToMatchAgainst);
 
 		if (expectedMatches == null)
 		{
@@ -23,8 +23,8 @@ public static class FilterTestUtils
 		Assert.Equal(expectedMatches.Length, actualMatches!.Length);
 		for (int i = 0; i < expectedMatches.Length; i++)
 		{
-			PaletteFilterTextMatch expected = expectedMatches[i];
-			PaletteFilterTextMatch actual = actualMatches[i];
+			FilterTextMatch expected = expectedMatches[i];
+			FilterTextMatch actual = actualMatches[i];
 
 			Assert.Equal(expected.Start, actual.Start);
 			Assert.Equal(expected.End, actual.End);
@@ -36,13 +36,13 @@ public static class FilterTestUtils
 		FilterOk(filter, word, wordToMatchAgainst, null);
 	}
 
-	public static PaletteFilterTextMatch[] CreateExpectedMatches(params int[][] expected)
+	public static FilterTextMatch[] CreateExpectedMatches(params int[][] expected)
 	{
-		PaletteFilterTextMatch[] result = new PaletteFilterTextMatch[expected.Length];
+		FilterTextMatch[] result = new FilterTextMatch[expected.Length];
 		for (int i = 0; i < expected.Length; i++)
 		{
 			int[] pair = expected[i];
-			result[i] = new PaletteFilterTextMatch(pair[0], pair[1]);
+			result[i] = new FilterTextMatch(pair[0], pair[1]);
 		}
 		return result;
 	}

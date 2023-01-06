@@ -45,25 +45,12 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	/// <summary>
 	/// Activate the command palette.
 	/// </summary>
-	public void Activate()
+	public void Activate(BaseVariantConfig? config = null)
 	{
 		_commandPaletteWindow?.Activate(
-			config: Config.ActivationConfig,
-			items: _configContext.CommandManager,
-			monitor: _configContext.MonitorManager.FocusedMonitor
-		);
-	}
-
-	/// <summary>
-	/// Activate the command palette with the given config.
-	/// </summary>
-	/// <param name="config"></param>
-	/// <param name="items"></param>
-	public void ActivateWithConfig(BaseCommandPaletteActivationConfig config, IEnumerable<CommandItem>? items = null)
-	{
-		_commandPaletteWindow?.Activate(
-			config: config,
-			items: items,
+			config: config
+				?? Config.ActivationConfig
+				?? new MenuVariantConfig() { Commands = _configContext.CommandManager },
 			monitor: _configContext.MonitorManager.FocusedMonitor
 		);
 	}
