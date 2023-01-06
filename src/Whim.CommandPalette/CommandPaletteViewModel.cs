@@ -146,7 +146,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
 	}
 
-	public double GetViewHeight() => _activeVariant?.GetViewHeight() ?? 0;
+	public double GetViewMaxHeight() => _activeVariant?.GetViewMaxHeight() ?? 0;
 
 	public bool IsVariantActive(BaseVariantConfig config) => _activationConfig == config;
 

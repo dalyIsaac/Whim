@@ -16,5 +16,5 @@ internal class FreeTextVariantControl : IVariantControl
 		_control = new FreeTextVariantView(viewModel);
 	}
 
-	public double GetViewHeight() => _control.GetViewHeight();
+	public double GetViewMaxHeight() => FreeTextVariantView.GetViewMaxHeight();
 }

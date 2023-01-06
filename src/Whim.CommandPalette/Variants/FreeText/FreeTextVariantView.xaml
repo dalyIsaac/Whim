@@ -9,6 +9,8 @@
 
 	<TextBlock
 		x:Name="Prompt"
-		Padding="12,0,0,0"
+		Height="{x:Bind local:FreeTextVariantView.ViewHeight}"
+		Padding="12,2,0,0"
+		FontStyle="Italic"
 		Text="{x:Bind Path=ViewModel.Prompt}" />
 </UserControl>

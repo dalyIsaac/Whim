@@ -16,5 +16,5 @@ internal class MenuVariantControl : IVariantControl
 		_control = new MenuVariantView(viewModel);
 	}
 
-	public double GetViewHeight() => _control.GetViewHeight();
+	public double GetViewMaxHeight() => _control.GetViewMaxHeight();
 }

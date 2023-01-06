@@ -10,6 +10,8 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal sealed partial class MenuRow : UserControl, IMenuRow
 {
+	public static double MenuRowHeight => 24;
+
 	public IVariantItem<CommandItem> Item { get; private set; }
 
 	public MenuRow(IVariantItem<CommandItem> item)

@@ -6,6 +6,8 @@ namespace Whim.CommandPalette;
 
 internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 {
+	public static double TextEntryHeight => 48;
+
 	private readonly IConfigContext _configContext;
 	private readonly IWindow _window;
 
@@ -123,11 +125,13 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		}
 
 		int width = ViewModel.Plugin.Config.MaxWidthPixels;
-		int height = Math.Min(ViewModel.MaxHeight, (int)ViewModel.GetViewHeight());
+
+		double height = TextEntryHeight + ViewModel.GetViewMaxHeight();
+		height = Math.Min(ViewModel.MaxHeight, height);
 
 		int scaleFactor = ViewModel.Monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
-		height = (int)(height * scale);
+		height *= scale;
 
 		int x = (ViewModel.Monitor.WorkingArea.Width / 2) - (width / 2);
 		int y = (int)(ViewModel.Monitor.WorkingArea.Height * ViewModel.Plugin.Config.YPositionPercent / 100.0);
@@ -137,7 +141,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			X = ViewModel.Monitor.WorkingArea.X + x,
 			Y = ViewModel.Monitor.WorkingArea.Y + y,
 			Width = width,
-			Height = height
+			Height = (int)height
 		};
 
 		WindowContainer.MaxHeight = height;

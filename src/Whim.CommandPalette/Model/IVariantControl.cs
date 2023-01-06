@@ -22,5 +22,5 @@ public interface IVariantControl
 	/// command palette window height.
 	/// </summary>
 	/// <returns>The height of <see cref="Control"/> in pixels.</returns>
-	double GetViewHeight();
+	double GetViewMaxHeight();
 }

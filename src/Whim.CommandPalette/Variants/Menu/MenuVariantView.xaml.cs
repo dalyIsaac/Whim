@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 
@@ -27,9 +26,8 @@ internal sealed partial class MenuVariantView : UserControl
 		ViewModel.ExecuteCommand();
 	}
 
-	public double GetViewHeight()
+	public double GetViewMaxHeight()
 	{
-		DependencyObject? container = ListViewItems.ContainerFromIndex(0);
-		return (container is ListViewItem item) ? (item.ActualHeight * ListViewItems.Items.Count) : 0;
+		return ViewModel.MenuRows.Count * MenuRow.MenuRowHeight;
 	}
 }
