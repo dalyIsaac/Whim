@@ -14,7 +14,8 @@ public class CommandPaletteWindowViewModelTests
 		Mock<ICommandManager>,
 		CommandPalettePlugin,
 		Mock<IVariantControl>,
-		Mock<IVariantControl>
+		Mock<IVariantControl>,
+		Mock<IVariantViewModel>
 	) CreateStubs()
 	{
 		Mock<ICommandManager> commandManager = new();
@@ -56,7 +57,7 @@ public class CommandPaletteWindowViewModelTests
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
-		return (configContext, commandManager, plugin, menuVariant, freeTextVariant);
+		return (configContext, commandManager, plugin, menuVariant, freeTextVariant, variantViewModel);
 	}
 
 	[Fact]
@@ -68,7 +69,8 @@ public class CommandPaletteWindowViewModelTests
 			Mock<ICommandManager> commandManager,
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant
+			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
@@ -88,17 +90,45 @@ public class CommandPaletteWindowViewModelTests
 			Mock<ICommandManager> commandManager,
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant
+			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
 			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
 
+		// When
+		// Then
 		Assert.Raises<EventArgs>(
 			h => vm.HideRequested += h,
 			h => vm.HideRequested -= h,
 			() => vm.OnKeyDown(VirtualKey.Escape)
 		);
+	}
+
+	[Fact]
+	public void OnKeyDown_OtherKeys()
+	{
+		// Given
+		(
+			Mock<IConfigContext> configContext,
+			Mock<ICommandManager> commandManager,
+			CommandPalettePlugin plugin,
+			Mock<IVariantControl> menuVariant,
+			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantViewModel> viewModel
+		) = CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+
+		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() }, null);
+
+		// When
+		vm.OnKeyDown(VirtualKey.Space);
+
+		// Then
+		viewModel.Verify(x => x.OnKeyDown(VirtualKey.Space), Times.Once);
 	}
 
 	[Fact]
@@ -110,7 +140,8 @@ public class CommandPaletteWindowViewModelTests
 			Mock<ICommandManager> commandManager,
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant
+			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
@@ -138,7 +169,8 @@ public class CommandPaletteWindowViewModelTests
 			Mock<ICommandManager> commandManager,
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant
+			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
@@ -192,7 +224,8 @@ public class CommandPaletteWindowViewModelTests
 			_,
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant
+			Mock<IVariantControl> freeTextVariant,
+			_
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
@@ -216,7 +249,8 @@ public class CommandPaletteWindowViewModelTests
 			_,
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant
+			Mock<IVariantControl> freeTextVariant,
+			_
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
@@ -240,7 +274,8 @@ public class CommandPaletteWindowViewModelTests
 			_,
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant
+			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
@@ -253,5 +288,36 @@ public class CommandPaletteWindowViewModelTests
 
 		// Then
 		Assert.True(vm.IsVariantActive(config));
+	}
+
+	[Fact]
+	public void Update()
+	{
+		// Given
+		(
+			Mock<IConfigContext> configContext,
+			Mock<ICommandManager> commandManager,
+			CommandPalettePlugin plugin,
+			Mock<IVariantControl> menuVariant,
+			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantViewModel> viewModel
+		) = CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+
+		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
+
+		vm.Activate(config, null);
+
+		// When
+		Assert.Raises<EventArgs>(
+			h => vm.SetWindowPosRequested += h,
+			h => vm.SetWindowPosRequested -= h,
+			vm.Update
+		);
+
+		// Then
+		viewModel.Verify(x => x.Update(), Times.Once);
 	}
 }
