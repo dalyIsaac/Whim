@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
@@ -67,14 +67,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="Variants\Select\SelectVariantView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<Page Update="Variants\Select\SelectVariantView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="Variants\FreeText\FreeTextVariantView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<Page Update="Variants\FreeText\FreeTextVariantView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 </Project>

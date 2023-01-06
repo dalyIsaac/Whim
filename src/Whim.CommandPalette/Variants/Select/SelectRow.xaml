@@ -8,7 +8,7 @@
 	mc:Ignorable="d">
 
 	<Grid x:Name="PaletteItemPanel" MaxHeight="{x:Bind local:SelectRow.SelectRowHeight}">
-		<CheckBox IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
+		<CheckBox Checked="CheckBox_Checked" IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
 			<TextBlock x:Name="OptionTitle" />
 		</CheckBox>
 	</Grid>

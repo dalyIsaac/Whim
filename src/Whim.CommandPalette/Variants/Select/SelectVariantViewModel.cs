@@ -17,7 +17,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	private readonly List<ISelectRow> _unusedRows = new();
+	private readonly List<IVariantRow<SelectOption>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
@@ -28,9 +28,9 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// Factory to create select rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantItem<SelectOption>, ISelectRow> _selectRowFactory;
+	private readonly Func<IVariantItem<SelectOption>, IVariantRow<SelectOption>> _selectRowFactory;
 
-	public readonly ObservableCollection<ISelectRow> SelectRows = new();
+	public readonly ObservableCollection<IVariantRow<SelectOption>> SelectRows = new();
 
 	public bool ShowSaveButton => false;
 
@@ -96,7 +96,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantItem<SelectOption>, ISelectRow>? selectRowFactory = null
+		Func<IVariantItem<SelectOption>, IVariantRow<SelectOption>>? selectRowFactory = null
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -249,7 +249,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				ISelectRow row = _unusedRows[^1];
+				IVariantRow<SelectOption> row = _unusedRows[^1];
 				row.Update(item);
 
 				SelectRows.Add(row);
@@ -258,7 +258,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				ISelectRow row = _selectRowFactory(item);
+				IVariantRow<SelectOption> row = _selectRowFactory(item);
 				SelectRows.Add(row);
 				row.Initialize();
 			}
