@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
@@ -30,7 +30,6 @@
 		<None Remove="CommandPaletteWindow.xaml" />
 		<None Remove="PaletteItems\PaletteKeybindItem.xaml" />
 		<None Remove="Variants\FreeText\FreeTextVariantView.xaml" />
-		<None Remove="Variants\Select\SelectRow.xaml" />
 		<None Remove="Variants\Select\SelectVariantView.xaml" />
 	</ItemGroup>
 
@@ -61,9 +60,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="Variants\Select\SelectRow.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<Page Update="Variants\Select\CheckboxRow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 
 	<ItemGroup>

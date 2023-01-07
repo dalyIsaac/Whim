@@ -5,13 +5,13 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-internal sealed partial class SelectRow : UserControl, IVariantRow<SelectOption>
+internal sealed partial class CheckboxRow : UserControl, IVariantRow<SelectOption>
 {
-	public static double SelectRowHeight => 24;
+	public static double CheckboxRowHeight => 24;
 
 	public IVariantItem<SelectOption> Item { get; private set; }
 
-	public SelectRow(IVariantItem<SelectOption> item)
+	public CheckboxRow(IVariantItem<SelectOption> item)
 	{
 		Item = item;
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");
