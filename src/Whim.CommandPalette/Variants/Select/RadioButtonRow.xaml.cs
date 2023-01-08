@@ -5,13 +5,13 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-internal sealed partial class CheckBoxRow : UserControl, IVariantRow<SelectOption>
+internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOption>
 {
-	public static double CheckBoxRowHeight => 24;
+	public static double RadioButtonRowHeight => 24;
 
 	public IVariantItem<SelectOption> Item { get; private set; }
 
-	public CheckBoxRow(IVariantItem<SelectOption> item)
+	public RadioButtonRow(IVariantItem<SelectOption> item)
 	{
 		Item = item;
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");
@@ -29,7 +29,7 @@ internal sealed partial class CheckBoxRow : UserControl, IVariantRow<SelectOptio
 		this.SetTitle(OptionTitle.Inlines);
 	}
 
-	private void CheckBox_Checked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+	private void RadioButton_Checked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
 	{
 		// TODO
 		throw new System.NotImplementedException();

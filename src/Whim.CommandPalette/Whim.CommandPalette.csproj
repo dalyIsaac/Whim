@@ -60,7 +60,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Update="Variants\Select\CheckboxRow.xaml">
+		<Page Update="Variants\Select\CheckBoxRow.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
