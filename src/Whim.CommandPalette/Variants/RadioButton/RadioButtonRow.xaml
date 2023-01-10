@@ -7,10 +7,11 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Grid x:Name="PaletteItemPanel" MaxHeight="{x:Bind local:RadioButtonRow.RadioButtonRowHeight}">
-		<RadioButton Checked="RadioButton_Checked">
-			IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
-			<TextBlock x:Name="OptionTitle" />
-		</RadioButton>
-	</Grid>
+	<RadioButton
+		MaxHeight="{x:Bind local:RadioButtonRow.RadioButtonRowHeight}"
+		Checked="RadioButton_Checked"
+		IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
+		<TextBlock x:Name="OptionTitle" />
+	</RadioButton>
+
 </UserControl>

@@ -11,6 +11,8 @@ internal class SelectVariantViewModel : IVariantViewModel
 {
 	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
 
+	private readonly bool _allowMultiSelect;
+
 	private SelectVariantConfig? _activationConfig;
 
 	/// <summary>
@@ -34,30 +36,30 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public bool ShowSaveButton => false;
 
-	private Visibility _listViewItemsWrapperVisibility = Visibility.Visible;
-	public Visibility ListViewItemsWrapperVisibility
+	private Visibility _selectRowsItemsWrapperVisibility = Visibility.Visible;
+	public Visibility SelectRowsItemsWrapperVisibility
 	{
-		get => _listViewItemsWrapperVisibility;
+		get => _selectRowsItemsWrapperVisibility;
 		set
 		{
-			if (ListViewItemsWrapperVisibility != value)
+			if (SelectRowsItemsWrapperVisibility != value)
 			{
-				_listViewItemsWrapperVisibility = value;
-				OnPropertyChanged(nameof(ListViewItemsWrapperVisibility));
+				_selectRowsItemsWrapperVisibility = value;
+				OnPropertyChanged(nameof(SelectRowsItemsWrapperVisibility));
 			}
 		}
 	}
 
-	private Visibility _listViewItemsVisibility = Visibility.Visible;
-	public Visibility ListViewItemsVisibility
+	private Visibility _selectRowsControlVisibility = Visibility.Visible;
+	public Visibility SelectRowsItemsVisibility
 	{
-		get => _listViewItemsVisibility;
+		get => _selectRowsControlVisibility;
 		set
 		{
-			if (ListViewItemsVisibility != value)
+			if (SelectRowsItemsVisibility != value)
 			{
-				_listViewItemsVisibility = value;
-				OnPropertyChanged(nameof(ListViewItemsVisibility));
+				_selectRowsControlVisibility = value;
+				OnPropertyChanged(nameof(SelectRowsItemsVisibility));
 			}
 		}
 	}
@@ -96,11 +98,13 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantItem<SelectOption>, IVariantRow<SelectOption>>? selectRowFactory = null
+		bool allowMultiSelect,
+		Func<IVariantItem<SelectOption>, IVariantRow<SelectOption>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_selectRowFactory = selectRowFactory ?? ((IVariantItem<SelectOption> item) => new SelectRow(item));
+		_allowMultiSelect = allowMultiSelect;
+		_selectRowFactory = selectRowFactory;
 	}
 
 	public void Activate(BaseVariantConfig activationConfig)
@@ -126,16 +130,16 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 		int matchesCount = LoadSelectMatches(_commandPaletteWindowViewModel.Text, _activationConfig);
 
-		ListViewItemsWrapperVisibility = Visibility.Visible;
+		SelectRowsItemsWrapperVisibility = Visibility.Visible;
 		if (matchesCount == 0)
 		{
 			NoMatchingOptionsTextBlockVisibility = Visibility.Visible;
-			ListViewItemsVisibility = Visibility.Collapsed;
+			SelectRowsItemsVisibility = Visibility.Collapsed;
 		}
 		else
 		{
 			NoMatchingOptionsTextBlockVisibility = Visibility.Collapsed;
-			ListViewItemsVisibility = Visibility.Visible;
+			SelectRowsItemsVisibility = Visibility.Visible;
 		}
 
 		RemoveUnusedRows(matchesCount);
@@ -163,7 +167,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 			case VirtualKey.Enter:
 			case VirtualKey.Space:
-				ToggleSelectedItem();
+				UpdateSelectedItem();
 				break;
 
 			default:
@@ -176,18 +180,26 @@ internal class SelectVariantViewModel : IVariantViewModel
 		}
 	}
 
-	public void ToggleSelectedItem()
+	public void UpdateSelectedItem()
 	{
 		if (_activationConfig == null)
 		{
 			return;
 		}
 
-		IVariantItem<SelectOption> paletteItem = SelectRows[SelectedIndex].Item;
-		SelectOption match = paletteItem.Data;
+		IVariantItem<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
+		SelectOption selectedData = selectedItem.Data;
 
-		match.IsSelected = !match.IsSelected;
-		_activationConfig.Matcher.OnMatchExecuted(paletteItem);
+		if (!_allowMultiSelect && selectedData.IsSelected)
+		{
+			foreach (SelectVariantItem variantItem in _allItems)
+			{
+				variantItem.Data.IsSelected = false;
+			}
+		}
+
+		selectedData.IsSelected = !selectedData.IsSelected;
+		_activationConfig.Matcher.OnMatchExecuted(selectedItem);
 
 		// Since the palette window is reused, there's a chance that the _activationConfig
 		// will have been wiped by a free form child command.
@@ -287,7 +299,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	public void Hide()
 	{
 		NoMatchingOptionsTextBlockVisibility = Visibility.Collapsed;
-		ListViewItemsWrapperVisibility = Visibility.Collapsed;
+		SelectRowsItemsWrapperVisibility = Visibility.Collapsed;
 	}
 
 	protected virtual void OnPropertyChanged(string propertyName)
