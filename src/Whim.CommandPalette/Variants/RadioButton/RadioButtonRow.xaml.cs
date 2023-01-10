@@ -14,7 +14,7 @@ internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOp
 	public RadioButtonRow(IVariantItem<SelectOption> item)
 	{
 		Item = item;
-		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "RadioButton/RadioButtonRow");
+		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/RadioButton/RadioButtonRow");
 	}
 
 	public void Initialize()

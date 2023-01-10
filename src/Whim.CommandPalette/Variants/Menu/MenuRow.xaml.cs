@@ -15,7 +15,7 @@ internal sealed partial class MenuRow : UserControl, IVariantRow<CommandItem>
 	public MenuRow(IVariantItem<CommandItem> item)
 	{
 		Item = item;
-		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");
+		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/Menu/MenuRow");
 	}
 
 	public void Initialize()

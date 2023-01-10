@@ -14,7 +14,7 @@ internal sealed partial class CheckBoxRow : UserControl, IVariantRow<SelectOptio
 	public CheckBoxRow(IVariantItem<SelectOption> item)
 	{
 		Item = item;
-		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "PaletteRow");
+		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/CheckBox/CheckBoxRow");
 	}
 
 	public void Initialize()
