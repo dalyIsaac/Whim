@@ -7,10 +7,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Grid x:Name="PaletteItemPanel" MaxHeight="{x:Bind local:CheckBoxRow.CheckBoxRowHeight}">
-		<CheckBox Checked="CheckBox_Checked"
-			IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
-			<TextBlock x:Name="OptionTitle" />
-		</CheckBox>
-	</Grid>
+	<CheckBox Checked="CheckBox_Checked" IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
+		<TextBlock x:Name="OptionTitle" />
+	</CheckBox>
+
 </UserControl>

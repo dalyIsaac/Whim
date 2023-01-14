@@ -7,8 +7,6 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal sealed partial class CheckBoxRow : UserControl, IVariantRow<SelectOption>
 {
-	public static double CheckBoxRowHeight => 24;
-
 	public IVariantItem<SelectOption> Item { get; private set; }
 
 	public CheckBoxRow(IVariantItem<SelectOption> item)

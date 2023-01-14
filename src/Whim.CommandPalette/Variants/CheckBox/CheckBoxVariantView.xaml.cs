@@ -25,9 +25,4 @@ internal sealed partial class CheckBoxVariantView : UserControl
 		ListViewItems.SelectedItem = e.ClickedItem;
 		ViewModel.UpdateSelectedItem();
 	}
-
-	public double GetViewMaxHeight()
-	{
-		return ViewModel.SelectRows.Count * CheckBoxRow.CheckBoxRowHeight;
-	}
 }

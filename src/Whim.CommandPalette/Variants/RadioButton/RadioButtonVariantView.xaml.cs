@@ -22,9 +22,4 @@ internal sealed partial class RadioButtonVariantView : UserControl
 	{
 		ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
 	}
-
-	public double GetViewMaxHeight()
-	{
-		return ViewModel.SelectRows.Count * RadioButtonRow.RadioButtonRowHeight;
-	}
 }

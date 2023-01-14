@@ -26,6 +26,12 @@
 			RelativePanel.AlignRightWithPanel="True"
 			RelativePanel.AlignTopWithPanel="True"
 			SelectedIndex="{x:Bind Path=ViewModel.SelectedIndex, Mode=TwoWay}"
-			SelectionMode="Single" />
+			SelectionMode="Single">
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<Setter Property="Height" Value="{x:Bind ViewModel.RowHeight}" />
+				</Style>
+			</ListView.ItemContainerStyle>
+		</ListView>
 	</RelativePanel>
 </UserControl>

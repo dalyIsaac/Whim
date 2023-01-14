@@ -7,14 +7,16 @@ internal class RadioButtonVariantControl : IVariantControl
 	private readonly RadioButtonVariantView _control;
 	public UIElement Control => _control;
 
-	public IVariantViewModel ViewModel { get; }
+	private readonly SelectVariantViewModel _viewModel;
+	public IVariantViewModel ViewModel => _viewModel;
 
 	public RadioButtonVariantControl(CommandPaletteWindowViewModel windowViewModel)
 	{
-		SelectVariantViewModel viewModel = new(windowViewModel, false, (item) => new RadioButtonRow(item));
-		ViewModel = viewModel;
-		_control = new RadioButtonVariantView(viewModel);
+		_viewModel = new(windowViewModel, false, RadioButtonRowFactory) { RowHeight = 24 };
+		_control = new RadioButtonVariantView(_viewModel);
 	}
 
-	public double GetViewMaxHeight() => _control.GetViewMaxHeight();
+	private RadioButtonRow RadioButtonRowFactory(IVariantItem<SelectOption> item) => new(_viewModel, item);
+
+	public double GetViewMaxHeight() => _viewModel.GetViewMaxHeight();
 }

@@ -7,14 +7,15 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOption>
 {
-	public static double RadioButtonRowHeight => 24;
+	private readonly SelectVariantViewModel _viewModel;
 
 	public IVariantItem<SelectOption> Item { get; private set; }
 
-	public RadioButtonRow(IVariantItem<SelectOption> item)
+	public RadioButtonRow(SelectVariantViewModel viewModel, IVariantItem<SelectOption> item)
 	{
+		_viewModel = viewModel;
 		Item = item;
-		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/RadioButton/RadioButtonRow");
+		UIElementExtensions.InitializeComponent(component: this, "Whim.CommandPalette", "Variants/RadioButton/RadioButtonRow");
 	}
 
 	public void Initialize()

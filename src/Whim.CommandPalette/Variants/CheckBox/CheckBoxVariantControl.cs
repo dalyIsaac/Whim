@@ -7,14 +7,14 @@ internal class CheckBoxVariantControl : IVariantControl
 	private readonly CheckBoxVariantView _control;
 	public UIElement Control => _control;
 
-	public IVariantViewModel ViewModel { get; }
+	private readonly SelectVariantViewModel _viewModel;
+	public IVariantViewModel ViewModel => _viewModel;
 
 	public CheckBoxVariantControl(CommandPaletteWindowViewModel windowViewModel)
 	{
-		SelectVariantViewModel viewModel = new(windowViewModel, true, (item) => new CheckBoxRow(item));
-		ViewModel = viewModel;
-		_control = new CheckBoxVariantView(viewModel);
+		_viewModel = new(windowViewModel, true, (item) => new CheckBoxRow(item)) { RowHeight = 24 };
+		_control = new CheckBoxVariantView(_viewModel);
 	}
 
-	public double GetViewMaxHeight() => _control.GetViewMaxHeight();
+	public double GetViewMaxHeight() => _viewModel.GetViewMaxHeight();
 }

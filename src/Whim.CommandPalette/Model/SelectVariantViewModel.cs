@@ -34,6 +34,11 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public readonly ObservableCollection<IVariantRow<SelectOption>> SelectRows = new();
 
+	/// <summary>
+	/// The height of the row.
+	/// </summary>
+	public required double RowHeight { get; init; }
+
 	public bool ShowSaveButton => false;
 
 	private Visibility _selectRowsItemsWrapperVisibility = Visibility.Visible;
@@ -294,6 +299,8 @@ internal class SelectVariantViewModel : IVariantViewModel
 		NoMatchingOptionsTextBlockVisibility = Visibility.Collapsed;
 		SelectRowsItemsWrapperVisibility = Visibility.Collapsed;
 	}
+
+	public double GetViewMaxHeight() => SelectRows.Count * RowHeight;
 
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
