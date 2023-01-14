@@ -171,7 +171,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 				break;
 
 			case VirtualKey.Enter:
-			case VirtualKey.Space:
 				UpdateSelectedItem();
 				break;
 
