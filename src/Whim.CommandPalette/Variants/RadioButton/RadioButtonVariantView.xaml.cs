@@ -22,4 +22,11 @@ internal sealed partial class RadioButtonVariantView : UserControl
 	{
 		ListViewItems.ScrollIntoView(ListViewItems.SelectedItem);
 	}
+
+	private void ListViewItems_ItemClick(object sender, ItemClickEventArgs e)
+	{
+		Logger.Debug("Command palette item clicked");
+		ListViewItems.SelectedItem = e.ClickedItem;
+		ViewModel.UpdateSelectedItem();
+	}
 }

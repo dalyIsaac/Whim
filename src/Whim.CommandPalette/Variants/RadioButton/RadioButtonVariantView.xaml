@@ -20,6 +20,7 @@
 		<ListView
 			x:Name="ListViewItems"
 			IsItemClickEnabled="True"
+			ItemClick="ListViewItems_ItemClick"
 			IsTabStop="False"
 			ItemsSource="{x:Bind Path=ViewModel.SelectRows, Mode=OneWay}"
 			RelativePanel.AlignLeftWithPanel="True"
