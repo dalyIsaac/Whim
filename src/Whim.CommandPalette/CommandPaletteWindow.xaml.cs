@@ -11,13 +11,13 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	private readonly IConfigContext _configContext;
 	private readonly IWindow _window;
 
-	public CommandPaletteWindowViewModel ViewModel { get; private set; }
+	public ICommandPaletteWindowViewModel ViewModel { get; private set; }
 
 	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
 	{
 		_configContext = configContext;
 
-		ViewModel = new(_configContext, plugin);
+		ViewModel = new CommandPaletteWindowViewModel(_configContext, plugin);
 		ViewModel.HideRequested += ViewModel_HideRequested;
 		ViewModel.SetWindowPosRequested += ViewModel_SetWindowPosRequested;
 

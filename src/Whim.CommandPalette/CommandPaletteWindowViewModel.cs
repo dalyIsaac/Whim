@@ -14,7 +14,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	private readonly IVariantControl _freeTextVariant;
 	private readonly IVariantControl _selectVariant;
 
-	internal IVariantControl? ActiveVariant { get; private set; }
+	public IVariantControl? ActiveVariant { get; private set; }
 
 	public CommandPalettePlugin Plugin { get; }
 

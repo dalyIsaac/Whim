@@ -10,7 +10,7 @@ internal class SelectVariantControl : IVariantControl
 	private readonly SelectVariantViewModel _viewModel;
 	public IVariantViewModel ViewModel => _viewModel;
 
-	public SelectVariantControl(CommandPaletteWindowViewModel windowViewModel)
+	public SelectVariantControl(ICommandPaletteWindowViewModel windowViewModel)
 	{
 		_viewModel = new(windowViewModel, true,
 		SelectRowFactory) { RowHeight = 24 };
