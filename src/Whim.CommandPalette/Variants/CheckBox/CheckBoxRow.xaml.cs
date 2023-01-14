@@ -26,10 +26,4 @@ internal sealed partial class CheckBoxRow : UserControl, IVariantRow<SelectOptio
 		Item = item;
 		this.SetTitle(OptionTitle.Inlines);
 	}
-
-	private void CheckBox_Checked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-	{
-		// TODO
-		throw new System.NotImplementedException();
-	}
 }

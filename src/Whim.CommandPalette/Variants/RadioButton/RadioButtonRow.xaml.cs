@@ -29,10 +29,4 @@ internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOp
 		Item = item;
 		this.SetTitle(OptionTitle.Inlines);
 	}
-
-	private void RadioButton_Checked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-	{
-		Item.Data.IsSelected = true;
-		// TODO
-	}
 }
