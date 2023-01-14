@@ -15,7 +15,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	private readonly IVariantControl _checkBoxVariant;
 	private readonly IVariantControl _radioButtonVariant;
 
-	private IVariantControl? _activeVariant;
+	internal IVariantControl? ActiveVariant { get; private set; }
 
 	public CommandPalettePlugin Plugin { get; }
 
@@ -77,6 +77,10 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 	}
 
+	public System.Windows.Input.ICommand CancelCommand { get; private set; }
+
+	public System.Windows.Input.ICommand SaveCommand { get; private set; }
+
 	public bool IsVisible => Monitor != null;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -103,6 +107,9 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_freeTextVariant = freeTextVariant ?? new FreeTextVariantControl(this);
 		_checkBoxVariant = checkBoxVariant ?? new CheckBoxVariantControl(this);
 		_radioButtonVariant = radioButtonVariant ?? new RadioButtonVariantControl(this);
+
+		CancelCommand = new CancelCommand(this);
+		SaveCommand = new SaveCommand(this);
 	}
 
 	/// <summary>
@@ -112,7 +119,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	/// <param name="monitor">The monitor to display the command palette on.</param>
 	public UIElement? Activate(BaseVariantConfig config, IMonitor? monitor)
 	{
-		_activeVariant = config switch
+		ActiveVariant = config switch
 		{
 			MenuVariantConfig => _menuVariant,
 			FreeTextVariantConfig => _freeTextVariant,
@@ -121,7 +128,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 			_ => null
 		};
 
-		if (_activeVariant == null)
+		if (ActiveVariant == null)
 		{
 			Logger.Error($"Unknown variant type: {config.GetType().Name}");
 			return null;
@@ -130,15 +137,15 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_activationConfig = config;
 		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 
-		SaveButtonVisibility = _activeVariant.ViewModel.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
+		SaveButtonVisibility = ActiveVariant.ViewModel.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
 		Text = _activationConfig.InitialText ?? "";
 		PlaceholderText = _activationConfig.Hint ?? "Start typing...";
 		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);
 
-		_activeVariant.ViewModel.Activate(_activationConfig);
+		ActiveVariant.ViewModel.Activate(_activationConfig);
 		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
 
-		return _activeVariant.Control;
+		return ActiveVariant.Control;
 	}
 
 	public void RequestHide()
@@ -158,17 +165,17 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 		else
 		{
-			_activeVariant?.ViewModel.OnKeyDown(key);
+			ActiveVariant?.ViewModel.OnKeyDown(key);
 		}
 	}
 
 	public void Update()
 	{
-		_activeVariant?.ViewModel.Update();
+		ActiveVariant?.ViewModel.Update();
 		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
 	}
 
-	public double GetViewMaxHeight() => _activeVariant?.GetViewMaxHeight() ?? 0;
+	public double GetViewMaxHeight() => ActiveVariant?.GetViewMaxHeight() ?? 0;
 
 	public bool IsVariantActive(BaseVariantConfig config) => _activationConfig == config;
 

@@ -33,10 +33,14 @@
 				Orientation="Horizontal"
 				Spacing="2"
 				Visibility="{x:Bind Path=ViewModel.SaveButtonVisibility, Mode=OneWay}">
-				<Button x:Name="Cancel" Content="Cancel" />
+				<Button
+					x:Name="Cancel"
+					Command="{x:Bind Path=ViewModel.CancelCommand}"
+					Content="Cancel" />
 
 				<Button
 					x:Name="Save"
+					Command="{x:Bind Path=ViewModel.SaveCommand}"
 					Content="Save"
 					Style="{StaticResource AccentButtonStyle}" />
 			</StackPanel>

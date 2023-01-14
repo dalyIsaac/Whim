@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using Windows.System;
 
 namespace Whim.CommandPalette;
@@ -39,7 +40,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// </summary>
 	public required double RowHeight { get; init; }
 
-	public bool ShowSaveButton => false;
+	public bool ShowSaveButton => true;
 
 	private Visibility _selectRowsItemsWrapperVisibility = Visibility.Visible;
 	public Visibility SelectRowsItemsWrapperVisibility
@@ -298,6 +299,8 @@ internal class SelectVariantViewModel : IVariantViewModel
 		NoMatchingOptionsTextBlockVisibility = Visibility.Collapsed;
 		SelectRowsItemsWrapperVisibility = Visibility.Collapsed;
 	}
+
+	public void Save() => _activationConfig?.Callback(_allItems.Select(x => x.Data));
 
 	public double GetViewMaxHeight() => SelectRows.Count * RowHeight;
 
