@@ -9,6 +9,7 @@
 
 	<RadioButton
 		Checked="RadioButton_Checked"
+		GroupName="RadioButtonVariant"
 		IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
 		<TextBlock x:Name="OptionTitle" />
 	</RadioButton>
