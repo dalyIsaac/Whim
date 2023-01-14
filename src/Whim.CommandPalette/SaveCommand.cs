@@ -9,8 +9,10 @@ internal class SaveCommand : System.Windows.Input.ICommand
 {
 	private readonly CommandPaletteWindowViewModel _viewModel;
 
+#pragma warning disable CS0067 // The event 'NextLayoutEngineCommand.CanExecuteChanged' is never used
 	/// <inheritdoc/>
 	public event EventHandler? CanExecuteChanged;
+#pragma warning restore CS0067 // The event 'NextLayoutEngineCommand.CanExecuteChanged' is never used
 
 	/// <summary>
 	/// Creates a new instance of <see cref="SaveCommand"/>.

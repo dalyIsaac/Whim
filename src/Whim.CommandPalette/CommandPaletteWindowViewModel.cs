@@ -77,8 +77,6 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 	}
 
-	public System.Windows.Input.ICommand CancelCommand { get; private set; }
-
 	public System.Windows.Input.ICommand SaveCommand { get; private set; }
 
 	public bool IsVisible => Monitor != null;
@@ -108,7 +106,6 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_checkBoxVariant = checkBoxVariant ?? new CheckBoxVariantControl(this);
 		_radioButtonVariant = radioButtonVariant ?? new RadioButtonVariantControl(this);
 
-		CancelCommand = new CancelCommand(this);
 		SaveCommand = new SaveCommand(this);
 	}
 
