@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Whim.CommandPalette;
@@ -64,6 +65,34 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 
 	private bool SetDirectionCondition() => _treeLayoutPlugin.GetTreeLayoutEngine() is not null;
 
+	private void SetDirection(IEnumerable<SelectOption> allItems)
+	{
+		string? direction = null;
+
+		foreach (SelectOption item in allItems)
+		{
+			if (item.IsSelected)
+			{
+				direction = item.Id;
+				break;
+			}
+		}
+
+		if (direction is null)
+		{
+			Logger.Error($"{Name}: No direction selected.");
+			return;
+		}
+
+		if (!Enum.TryParse(direction, out Direction directionEnum))
+		{
+			Logger.Error($"{Name}: Could not parse direction '{direction}'.");
+			return;
+		}
+
+		_treeLayoutPlugin.SetAddWindowDirection(directionEnum);
+	}
+
 	/// <summary>
 	/// Set the direction of the tree layout, using a radio button command palette menu.
 	/// </summary>
@@ -78,7 +107,8 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 						new RadioButtonVariantConfig()
 						{
 							Hint = "Select tree layout direction",
-							Options = CreateSetDirectionSelectOptions()
+							Options = CreateSetDirectionSelectOptions(),
+							Callback = SetDirection
 						}
 					),
 				condition: SetDirectionCondition
