@@ -104,8 +104,9 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 				title: "Set tree layout direction",
 				callback: () =>
 					_commandLayoutPlugin.Activate(
-						new RadioButtonVariantConfig()
+						new SelectVariantConfig()
 						{
+							AllowMultiSelect = false,
 							Hint = "Select tree layout direction",
 							Options = CreateSetDirectionSelectOptions(),
 							Callback = SetDirection

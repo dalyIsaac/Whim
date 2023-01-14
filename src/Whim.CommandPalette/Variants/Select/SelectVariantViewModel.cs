@@ -31,7 +31,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// Factory to create select rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantItem<SelectOption>, IVariantRow<SelectOption>> _selectRowFactory;
+	private readonly Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> _selectRowFactory;
 
 	public readonly ObservableCollection<IVariantRow<SelectOption>> SelectRows = new();
 
@@ -105,7 +105,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
 		bool allowMultiSelect,
-		Func<IVariantItem<SelectOption>, IVariantRow<SelectOption>> selectRowFactory
+		Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -268,7 +268,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRow<SelectOption> row = _selectRowFactory(item);
+				IVariantRow<SelectOption> row = _selectRowFactory(item, activationConfig);
 				SelectRows.Add(row);
 				row.Initialize();
 			}

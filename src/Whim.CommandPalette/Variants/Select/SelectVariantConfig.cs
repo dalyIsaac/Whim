@@ -13,7 +13,7 @@ public delegate void SelectVariantCallback(IEnumerable<SelectOption> allItems);
 /// Config for activating the command palette with radio buttons or CheckBox (referred to as
 /// "Select").
 /// </summary>
-public abstract record SelectVariantConfig : BaseVariantConfig
+public record SelectVariantConfig : BaseVariantConfig
 {
 	/// <summary>
 	/// The matcher to use to filter the results.
@@ -30,4 +30,9 @@ public abstract record SelectVariantConfig : BaseVariantConfig
 	/// All items are passed in, so that the callback can determine which items were selected.
 	/// </summary>
 	public required SelectVariantCallback Callback { get; init; }
+
+	/// <summary>
+	/// Whether the user can select multiple options.
+	/// </summary>
+	public required bool AllowMultiSelect { get; init; }
 }

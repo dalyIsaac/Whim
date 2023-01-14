@@ -3,8 +3,7 @@ using System.ComponentModel;
 namespace Whim.CommandPalette;
 
 /// <summary>
-/// Represents an option in a derivation of a <see cref="SelectVariantConfig"/>
-/// For example, <see cref="CheckBoxVariantConfig"/> or <see cref="RadioButtonVariantConfig"/>).
+/// Represents an option of a <see cref="SelectVariantConfig"/>
 /// </summary>
 public record SelectOption : INotifyPropertyChanged
 {

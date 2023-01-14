@@ -12,8 +12,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 	private readonly IVariantControl _menuVariant;
 	private readonly IVariantControl _freeTextVariant;
-	private readonly IVariantControl _checkBoxVariant;
-	private readonly IVariantControl _radioButtonVariant;
+	private readonly IVariantControl _selectVariant;
 
 	internal IVariantControl? ActiveVariant { get; private set; }
 
@@ -92,8 +91,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		CommandPalettePlugin plugin,
 		IVariantControl? menuVariant = null,
 		IVariantControl? freeTextVariant = null,
-		IVariantControl? checkBoxVariant = null,
-		IVariantControl? radioButtonVariant = null
+		IVariantControl? selectVariant = null
 	)
 	{
 		_configContext = configContext;
@@ -103,8 +101,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 		_menuVariant = menuVariant ?? new MenuVariantControl(configContext, this);
 		_freeTextVariant = freeTextVariant ?? new FreeTextVariantControl(this);
-		_checkBoxVariant = checkBoxVariant ?? new CheckBoxVariantControl(this);
-		_radioButtonVariant = radioButtonVariant ?? new RadioButtonVariantControl(this);
+		_selectVariant = selectVariant ?? new SelectVariantControl(this);
 
 		SaveCommand = new SaveCommand(this);
 	}
@@ -120,8 +117,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		{
 			MenuVariantConfig => _menuVariant,
 			FreeTextVariantConfig => _freeTextVariant,
-			CheckBoxVariantConfig => _checkBoxVariant,
-			RadioButtonVariantConfig => _radioButtonVariant,
+			SelectVariantConfig => _selectVariant,
 			_ => null
 		};
 

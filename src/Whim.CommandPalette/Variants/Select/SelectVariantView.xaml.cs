@@ -3,15 +3,19 @@ using System;
 
 namespace Whim.CommandPalette;
 
-internal sealed partial class CheckBoxVariantView : UserControl
+internal sealed partial class SelectVariantView : UserControl
 {
 	public SelectVariantViewModel ViewModel { get; }
 
-	public CheckBoxVariantView(SelectVariantViewModel viewModel)
+	public SelectVariantView(SelectVariantViewModel viewModel)
 	{
 		ViewModel = viewModel;
 		viewModel.ScrollIntoViewRequested += ViewModel_ScrollIntoViewRequested;
-		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/CheckBox/CheckBoxVariantView");
+		UIElementExtensions.InitializeComponent(
+			this,
+			"Whim.CommandPalette",
+			"Variants/Select/SelectVariantView"
+		);
 	}
 
 	private void ViewModel_ScrollIntoViewRequested(object? sender, EventArgs e)

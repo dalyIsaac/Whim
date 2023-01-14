@@ -30,8 +30,7 @@
 		<None Remove="CommandPaletteWindow.xaml" />
 		<None Remove="PaletteItems\PaletteKeybindItem.xaml" />
 		<None Remove="Variants\FreeText\FreeTextVariantView.xaml" />
-		<None Remove="Variants\RadioButton\CheckBoxVariantView.xaml" />
-		<None Remove="Variants\Select\CheckBoxVariantView.xaml" />
+		<None Remove="Variants\Select\SelectVariantView.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -61,16 +60,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Update="Variants\RadioButton\CheckBoxVariantView.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Variants\Select\CheckBoxRow.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="Variants\Select\CheckBoxVariantView.xaml">
+		<Page Update="Variants\Select\SelectVariantView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
