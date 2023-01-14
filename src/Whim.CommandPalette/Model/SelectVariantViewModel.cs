@@ -190,7 +190,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		IVariantItem<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
 		SelectOption selectedData = selectedItem.Data;
 
-		if (!_allowMultiSelect && selectedData.IsSelected)
+		if (!_allowMultiSelect && !selectedData.IsSelected)
 		{
 			foreach (SelectVariantItem variantItem in _allItems)
 			{
@@ -200,13 +200,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 		selectedData.IsSelected = !selectedData.IsSelected;
 		_activationConfig.Matcher.OnMatchExecuted(selectedItem);
-
-		// Since the palette window is reused, there's a chance that the _activationConfig
-		// will have been wiped by a free form child command.
-		if (_commandPaletteWindowViewModel.IsVariantActive(_activationConfig))
-		{
-			_commandPaletteWindowViewModel.RequestHide();
-		}
 	}
 
 	/// <summary>
