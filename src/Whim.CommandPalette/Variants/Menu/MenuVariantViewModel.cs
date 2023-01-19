@@ -302,7 +302,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		ListViewItemsWrapperVisibility = Visibility.Collapsed;
 	}
 
-	public void Save() {}
+	public void Save() { }
 
 	protected virtual void OnPropertyChanged(string propertyName)
 	{

@@ -25,5 +25,9 @@ internal class SaveCommand : System.Windows.Input.ICommand
 
 	public bool CanExecute(object? parameter) => _viewModel.ActiveVariant != null;
 
-	public void Execute(object? parameter) => _viewModel.ActiveVariant?.ViewModel.Save();
+	public void Execute(object? parameter)
+	{
+		_viewModel.ActiveVariant?.ViewModel.Save();
+		_viewModel.RequestHide();
+	}
 }
