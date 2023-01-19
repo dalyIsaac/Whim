@@ -19,6 +19,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		ViewModel = new CommandPaletteWindowViewModel(_configContext, plugin);
 		ViewModel.HideRequested += ViewModel_HideRequested;
+		ViewModel.FocusTextBoxRequested += ViewModel_FocusTextBoxRequested;
 		ViewModel.SetWindowPosRequested += ViewModel_SetWindowPosRequested;
 
 		_window = this.InitializeBorderlessWindow(_configContext, "Whim.CommandPalette", "CommandPaletteWindow");
@@ -31,6 +32,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	{
 		Logger.Debug("Hiding command palette");
 		_window.Hide();
+	}
+
+	private void ViewModel_FocusTextBoxRequested(object? sender, EventArgs e)
+	{
+		// Focus the text box.
+		TextEntry.Focus(FocusState.Programmatic);
 	}
 
 	private void ViewModel_SetWindowPosRequested(object? sender, EventArgs e)

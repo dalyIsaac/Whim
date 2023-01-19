@@ -7,7 +7,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<CheckBox IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
+	<CheckBox Click="CheckBox_Click" IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
 		<TextBlock x:Name="OptionTitle" />
 	</CheckBox>
 

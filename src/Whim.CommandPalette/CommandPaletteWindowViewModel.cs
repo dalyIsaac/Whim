@@ -84,6 +84,8 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 	public event EventHandler<EventArgs>? HideRequested;
 
+	public event EventHandler<EventArgs>? FocusTextBoxRequested;
+
 	public event EventHandler<EventArgs>? SetWindowPosRequested;
 
 	public CommandPaletteWindowViewModel(
@@ -148,6 +150,12 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 		_monitor = null;
 		_text = "";
+	}
+
+	public void RequestFocusTextBox()
+	{
+		Logger.Debug("Request to focus the command palette text box");
+		FocusTextBoxRequested?.Invoke(this, EventArgs.Empty);
 	}
 
 	public void OnKeyDown(VirtualKey key)

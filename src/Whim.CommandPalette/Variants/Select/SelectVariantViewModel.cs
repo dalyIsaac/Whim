@@ -205,6 +205,23 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 		selectedData.IsSelected = !selectedData.IsSelected;
 		_activationConfig.Matcher.OnMatchExecuted(selectedItem);
+		_commandPaletteWindowViewModel.RequestFocusTextBox();
+	}
+
+	public void VariantRow_OnClick(object sender, RoutedEventArgs e)
+	{
+		if (sender is not IVariantRow<SelectOption> variantRow || _activationConfig == null)
+		{
+			return;
+		}
+
+		int idx = SelectRows.IndexOf(variantRow);
+		if (idx >= 0)
+		{
+			SelectedIndex = idx;
+			_activationConfig.Matcher.OnMatchExecuted(variantRow.Item);
+			_commandPaletteWindowViewModel.RequestFocusTextBox();
+		}
 	}
 
 	/// <summary>

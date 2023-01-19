@@ -7,10 +7,13 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOption>
 {
+	private readonly SelectVariantViewModel _selectVariantViewModel;
+
 	public IVariantItem<SelectOption> Item { get; private set; }
 
-	public RadioButtonRow(IVariantItem<SelectOption> item)
+	public RadioButtonRow(SelectVariantViewModel selectVariantViewModel, IVariantItem<SelectOption> item)
 	{
+		_selectVariantViewModel = selectVariantViewModel;
 		Item = item;
 		UIElementExtensions.InitializeComponent(
 			component: this,
@@ -29,5 +32,10 @@ internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOp
 		Logger.Debug("Updating with a new item");
 		Item = item;
 		this.SetTitle(OptionTitle.Inlines);
+	}
+
+	private void RadioButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+	{
+		_selectVariantViewModel.VariantRow_OnClick(this, e);
 	}
 }

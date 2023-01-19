@@ -11,11 +11,7 @@ internal sealed partial class SelectVariantView : UserControl
 	{
 		ViewModel = viewModel;
 		viewModel.ScrollIntoViewRequested += ViewModel_ScrollIntoViewRequested;
-		UIElementExtensions.InitializeComponent(
-			this,
-			"Whim.CommandPalette",
-			"Variants/Select/SelectVariantView"
-		);
+		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/Select/SelectVariantView");
 	}
 
 	private void ViewModel_ScrollIntoViewRequested(object? sender, EventArgs e)
