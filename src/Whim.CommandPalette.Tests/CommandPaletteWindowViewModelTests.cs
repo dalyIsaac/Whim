@@ -15,6 +15,7 @@ public class CommandPaletteWindowViewModelTests
 		CommandPalettePlugin,
 		Mock<IVariantControl>,
 		Mock<IVariantControl>,
+		Mock<IVariantControl>,
 		Mock<IVariantViewModel>
 	) CreateStubs()
 	{
@@ -54,10 +55,17 @@ public class CommandPaletteWindowViewModelTests
 		Mock<IVariantControl> freeTextVariant = new();
 		freeTextVariant.Setup(m => m.Control).Returns((UIElement)null);
 		freeTextVariant.Setup(m => m.ViewModel).Returns(variantViewModel.Object);
+
+		Mock<IVariantViewModel> selectViewModel = new();
+		selectViewModel.Setup(m => m.ShowSaveButton).Returns(true);
+
+		Mock<IVariantControl> selectVariant = new();
+		selectVariant.Setup(m => m.Control).Returns((UIElement)null);
+		selectVariant.Setup(m => m.ViewModel).Returns(selectViewModel.Object);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
-		return (configContext, commandManager, plugin, menuVariant, freeTextVariant, variantViewModel);
+		return (configContext, commandManager, plugin, menuVariant, freeTextVariant, selectVariant, variantViewModel);
 	}
 
 	[Fact]
@@ -70,11 +78,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		// When
 		// Then
@@ -91,11 +100,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		// When
 		// Then
@@ -116,11 +126,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() }, null);
 
@@ -141,11 +152,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		// When
 		Assert.Raises<EventArgs>(
@@ -170,11 +182,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		Mock<IMonitor> monitor = new();
 		monitor
@@ -236,12 +249,6 @@ public class CommandPaletteWindowViewModelTests
 			true,
 			true
 		};
-		yield return new object[]
-		{
-			new SelectVariantConfig() { Options = Array.Empty<SelectOption>(), Callback = (items) => { } },
-			true,
-			true
-		};
 	}
 
 	[Theory]
@@ -255,11 +262,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			_
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		// When
 		vm.Activate(config, null);
@@ -279,11 +287,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			Mock<IVariantViewModel> viewModel
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
 
@@ -306,11 +315,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			_
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
 
@@ -333,11 +343,12 @@ public class CommandPaletteWindowViewModelTests
 			CommandPalettePlugin plugin,
 			Mock<IVariantControl> menuVariant,
 			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
 			_
 		) = CreateStubs();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object);
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		// When
 		bool result = vm.IsVisible;

@@ -208,7 +208,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
-	public void VariantRow_OnClick(object sender, RoutedEventArgs e)
+	public void VariantRow_OnClick(object sender, RoutedEventArgs _)
 	{
 		if (sender is not IVariantRow<SelectOption> variantRow || _activationConfig == null)
 		{
