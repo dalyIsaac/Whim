@@ -232,23 +232,13 @@ public class CommandPaletteWindowViewModelTests
 		};
 		yield return new object[]
 		{
-			new SelectVariantConfig()
-			{
-				AllowMultiSelect = true,
-				Options = Array.Empty<SelectOption>(),
-				Callback = (items) => { }
-			},
+			new SelectVariantConfig() { Options = Array.Empty<SelectOption>(), Callback = (items) => { } },
 			true,
 			true
 		};
 		yield return new object[]
 		{
-			new SelectVariantConfig()
-			{
-				AllowMultiSelect = false,
-				Options = Array.Empty<SelectOption>(),
-				Callback = (items) => { }
-			},
+			new SelectVariantConfig() { Options = Array.Empty<SelectOption>(), Callback = (items) => { } },
 			true,
 			true
 		};

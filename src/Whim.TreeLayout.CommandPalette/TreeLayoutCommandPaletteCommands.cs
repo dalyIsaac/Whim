@@ -106,7 +106,6 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 					_commandLayoutPlugin.Activate(
 						new SelectVariantConfig()
 						{
-							AllowMultiSelect = false,
 							Hint = "Select tree layout direction",
 							Options = CreateSetDirectionSelectOptions(),
 							Callback = SetDirection

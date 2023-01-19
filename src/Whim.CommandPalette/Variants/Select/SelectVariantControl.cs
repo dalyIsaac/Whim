@@ -18,14 +18,7 @@ internal class SelectVariantControl : IVariantControl
 
 	private IVariantRow<SelectOption> SelectRowFactory(IVariantItem<SelectOption> item, SelectVariantConfig config)
 	{
-		if (config.AllowMultiSelect)
-		{
-			return new CheckBoxRow(_viewModel, item);
-		}
-		else
-		{
-			return new RadioButtonRow(_viewModel, item);
-		}
+		return new RadioButtonRow(_viewModel, item);
 	}
 
 	public double GetViewMaxHeight() => _viewModel.GetViewMaxHeight();
