@@ -215,7 +215,6 @@ internal class MenuVariantViewModel : IVariantViewModel
 
 			if (!command.CanExecute())
 			{
-				// TODO: Add the command, but disable it
 				continue;
 			}
 
