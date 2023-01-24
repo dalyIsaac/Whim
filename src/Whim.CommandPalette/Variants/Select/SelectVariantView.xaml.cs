@@ -22,7 +22,12 @@ internal sealed partial class SelectVariantView : UserControl
 	private void ListViewItems_ItemClick(object sender, ItemClickEventArgs e)
 	{
 		Logger.Debug("Command palette item clicked");
-		ListViewItems.SelectedItem = e.ClickedItem;
-		ViewModel.UpdateSelectedItem();
+		int idx = ViewModel.SelectRows.IndexOf((IVariantRow<SelectOption>)e.ClickedItem);
+
+		if (idx >= 0)
+		{
+			ViewModel.SelectedIndex = idx;
+			ViewModel.UpdateSelectedItem();
+		}
 	}
 }

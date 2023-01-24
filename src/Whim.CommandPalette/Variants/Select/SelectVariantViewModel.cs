@@ -12,7 +12,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 {
 	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
 
-	private readonly bool _allowMultiSelect;
+	private bool _allowMultiSelect;
 
 	private SelectVariantConfig? _activationConfig;
 
@@ -104,12 +104,10 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		bool allowMultiSelect,
 		Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_allowMultiSelect = allowMultiSelect;
 		_selectRowFactory = selectRowFactory;
 	}
 
@@ -118,6 +116,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		if (activationConfig is SelectVariantConfig selectVariantConfig)
 		{
 			_activationConfig = selectVariantConfig;
+			_allowMultiSelect = selectVariantConfig.AllowMultiSelect;
 			PopulateItems(selectVariantConfig.Options);
 			Update();
 		}
@@ -155,19 +154,24 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public void OnKeyDown(VirtualKey key)
 	{
+		if (SelectRows.Count == 0)
+		{
+			return;
+		}
+
 		bool scrollIntoView = false;
 
 		switch (key)
 		{
-			case VirtualKey.Down when SelectRows.Count > 0:
+			case VirtualKey.Down:
 				// Go down the command palette's list.
-				SelectedIndex = (SelectedIndex + 1) % SelectRows.Count;
+				SelectedIndex = (SelectedIndex + 1).Mod(SelectRows.Count);
 				scrollIntoView = true;
 				break;
 
-			case VirtualKey.Up when SelectRows.Count > 0:
+			case VirtualKey.Up:
 				// Go up the command palette's list.
-				SelectedIndex = (SelectedIndex + SelectRows.Count - 1) % SelectRows.Count;
+				SelectedIndex = (SelectedIndex - 1).Mod(SelectRows.Count);
 				scrollIntoView = true;
 				break;
 
@@ -195,22 +199,27 @@ internal class SelectVariantViewModel : IVariantViewModel
 		IVariantItem<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
 		SelectOption selectedData = selectedItem.Data;
 
-		if (!_allowMultiSelect && !selectedData.IsSelected)
+		if (_allowMultiSelect)
+		{
+			selectedData.IsSelected = !selectedData.IsSelected;
+		}
+		else
 		{
 			foreach (SelectVariantItem variantItem in _allItems)
 			{
 				variantItem.Data.IsSelected = false;
 			}
+
+			selectedData.IsSelected = true;
 		}
 
-		selectedData.IsSelected = !selectedData.IsSelected;
 		_activationConfig.Matcher.OnMatchExecuted(selectedItem);
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
-	public void VariantRow_OnClick(object sender, RoutedEventArgs _)
+		public void VariantRow_OnClick(IVariantRow<SelectOption> variantRow)
 	{
-		if (sender is not IVariantRow<SelectOption> variantRow || _activationConfig == null)
+		if (_activationConfig == null)
 		{
 			return;
 		}
@@ -219,8 +228,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		if (idx >= 0)
 		{
 			SelectedIndex = idx;
-			_activationConfig.Matcher.OnMatchExecuted(variantRow.Item);
-			_commandPaletteWindowViewModel.RequestFocusTextBox();
+			UpdateSelectedItem();
 		}
 	}
 

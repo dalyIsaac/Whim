@@ -34,8 +34,8 @@ internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOp
 		this.SetTitle(OptionTitle.Inlines);
 	}
 
-	private void RadioButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+	private void RadioButton_Click(object _, Microsoft.UI.Xaml.RoutedEventArgs e)
 	{
-		_selectVariantViewModel.VariantRow_OnClick(this, e);
+		_selectVariantViewModel.VariantRow_OnClick(this);
 	}
 }

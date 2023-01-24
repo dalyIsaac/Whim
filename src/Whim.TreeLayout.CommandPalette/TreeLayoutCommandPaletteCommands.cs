@@ -108,7 +108,8 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 						{
 							Hint = "Select tree layout direction",
 							Options = CreateSetDirectionSelectOptions(),
-							Callback = SetDirection
+							Callback = SetDirection,
+							AllowMultiSelect = false
 						}
 					),
 				condition: SetDirectionCondition

@@ -245,7 +245,12 @@ public class CommandPaletteWindowViewModelTests
 		};
 		yield return new object[]
 		{
-			new SelectVariantConfig() { Options = Array.Empty<SelectOption>(), Callback = (items) => { } },
+			new SelectVariantConfig()
+			{
+				Options = Array.Empty<SelectOption>(),
+				Callback = (items) => { },
+				AllowMultiSelect = false
+			},
 			true,
 			true
 		};
