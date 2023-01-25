@@ -7,14 +7,21 @@ namespace Whim.CommandPalette.Tests;
 
 public class SelectVariantViewModelTests
 {
-	private static IVariantRow<SelectOption> SelectRowFactory(
-		IVariantItem<SelectOption> variantItem,
-		SelectVariantConfig selectVariantConfig
-	)
+	private static (
+		Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>>,
+		List<Mock<IVariantRow<SelectOption>>>
+	) SelectRowFactoryWithMocks()
 	{
-		Mock<IVariantRow<SelectOption>> variantRowMock = new();
-		variantRowMock.Setup(v => v.Item).Returns(variantItem);
-		return variantRowMock.Object;
+		List<Mock<IVariantRow<SelectOption>>> variantRowMocks = new();
+		IVariantRow<SelectOption> selectRowFactory(IVariantItem<SelectOption> item, SelectVariantConfig config)
+		{
+			Mock<IVariantRow<SelectOption>> variantRowMock = new();
+			variantRowMock.Setup(v => v.Item).Returns(item);
+			variantRowMocks.Add(variantRowMock);
+			return variantRowMock.Object;
+		}
+
+		return (selectRowFactory, variantRowMocks);
 	}
 
 	private static Mock<ICommandPaletteWindowViewModel> CreateStubs()
@@ -30,8 +37,9 @@ public class SelectVariantViewModelTests
 	{
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
+		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
 		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, SelectRowFactory) { RowHeight = 0, };
+			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
 
 		Mock<IEnumerable<SelectOption>> optionsMock = new();
 		optionsMock.Setup(x => x.GetEnumerator()).Returns(new List<SelectOption>().GetEnumerator());
@@ -56,8 +64,9 @@ public class SelectVariantViewModelTests
 	{
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
+		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
 		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, SelectRowFactory) { RowHeight = 0, };
+			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
 
 		// When
 		// Then it doesn't throw
@@ -69,8 +78,9 @@ public class SelectVariantViewModelTests
 	{
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
+		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
 		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, SelectRowFactory) { RowHeight = 0, };
+			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
 
 		// When
 		// Then it doesn't throw
@@ -82,8 +92,9 @@ public class SelectVariantViewModelTests
 	{
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
+		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
 		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, SelectRowFactory) { RowHeight = 0, };
+			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
 
 		Mock<IEnumerable<SelectOption>> optionsMock = new();
 		optionsMock.Setup(x => x.GetEnumerator()).Returns(new List<SelectOption>().GetEnumerator());
@@ -112,8 +123,9 @@ public class SelectVariantViewModelTests
 	{
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
+		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
 		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, SelectRowFactory) { RowHeight = 0, };
+			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
 
 		Mock<IEnumerable<SelectOption>> optionsMock = new();
 		optionsMock
@@ -156,9 +168,11 @@ public class SelectVariantViewModelTests
 	private static (
 		SelectVariantViewModel,
 		SelectVariantConfig,
+		Mock<SelectVariantCallback>,
 		Mock<ICommandPaletteWindowViewModel>,
 		List<SelectOption>,
-		Mock<IMatcher<SelectOption>>
+		Mock<IMatcher<SelectOption>>,
+		List<Mock<IVariantRow<SelectOption>>>
 	) CreateOptionsStubs()
 	{
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
@@ -190,8 +204,9 @@ public class SelectVariantViewModelTests
 				}
 			};
 
+		(var selectRowFactory, var selectRowFactoryResults) = SelectRowFactoryWithMocks();
 		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, SelectRowFactory) { RowHeight = 0, };
+			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
 
 		Mock<SelectVariantCallback> callbackMock = new();
 
@@ -209,7 +224,15 @@ public class SelectVariantViewModelTests
 				AllowMultiSelect = false
 			};
 
-		return (selectVariantViewModel, activationConfig, commandPaletteWindowViewModelMock, options, matcherMock);
+		return (
+			selectVariantViewModel,
+			activationConfig,
+			callbackMock,
+			commandPaletteWindowViewModelMock,
+			options,
+			matcherMock,
+			selectRowFactoryResults
+		);
 	}
 
 	[Fact]
@@ -221,7 +244,9 @@ public class SelectVariantViewModelTests
 			SelectVariantConfig activationConfig,
 			_,
 			_,
-			Mock<IMatcher<SelectOption>> matcherMock
+			_,
+			Mock<IMatcher<SelectOption>> matcherMock,
+			_
 		) = CreateOptionsStubs();
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
@@ -240,7 +265,7 @@ public class SelectVariantViewModelTests
 	public void OnKeyDown_Down()
 	{
 		// Given
-		(SelectVariantViewModel selectVariantViewModel, SelectVariantConfig activationConfig, _, _, _) =
+		(SelectVariantViewModel selectVariantViewModel, SelectVariantConfig activationConfig, _, _, _, _, _) =
 			CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -259,7 +284,7 @@ public class SelectVariantViewModelTests
 	public void OnKeyDown_Up()
 	{
 		// Given
-		(SelectVariantViewModel selectVariantViewModel, SelectVariantConfig activationConfig, _, _, _) =
+		(SelectVariantViewModel selectVariantViewModel, SelectVariantConfig activationConfig, _, _, _, _, _) =
 			CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -281,9 +306,11 @@ public class SelectVariantViewModelTests
 		(
 			SelectVariantViewModel selectVariantViewModel,
 			SelectVariantConfig activationConfig,
+			_,
 			Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock,
 			List<SelectOption> options,
-			Mock<IMatcher<SelectOption>> matcherMock
+			Mock<IMatcher<SelectOption>> matcherMock,
+			_
 		) = CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -305,8 +332,9 @@ public class SelectVariantViewModelTests
 	{
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
+		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
 		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, SelectRowFactory) { RowHeight = 0, };
+			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
 
 		// When
 		// Then it should not throw
@@ -320,9 +348,11 @@ public class SelectVariantViewModelTests
 		(
 			SelectVariantViewModel selectVariantViewModel,
 			SelectVariantConfig activationConfig,
+			_,
 			Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock,
 			List<SelectOption> options,
-			Mock<IMatcher<SelectOption>> matcherMock
+			Mock<IMatcher<SelectOption>> matcherMock,
+			_
 		) = CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -346,9 +376,11 @@ public class SelectVariantViewModelTests
 		(
 			SelectVariantViewModel selectVariantViewModel,
 			SelectVariantConfig activationConfig,
+			_,
 			Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock,
 			_,
-			Mock<IMatcher<SelectOption>> matcherMock
+			Mock<IMatcher<SelectOption>> matcherMock,
+			_
 		) = CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -368,9 +400,11 @@ public class SelectVariantViewModelTests
 		(
 			SelectVariantViewModel selectVariantViewModel,
 			SelectVariantConfig activationConfig,
+			_,
 			Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock,
 			_,
-			Mock<IMatcher<SelectOption>> matcherMock
+			Mock<IMatcher<SelectOption>> matcherMock,
+			_
 		) = CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -391,9 +425,11 @@ public class SelectVariantViewModelTests
 		(
 			SelectVariantViewModel selectVariantViewModel,
 			SelectVariantConfig activationConfig,
+			_,
 			Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock,
 			_,
-			Mock<IMatcher<SelectOption>> matcherMock
+			Mock<IMatcher<SelectOption>> matcherMock,
+			_
 		) = CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -413,9 +449,11 @@ public class SelectVariantViewModelTests
 		(
 			SelectVariantViewModel selectVariantViewModel,
 			SelectVariantConfig activationConfig,
+			_,
 			Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock,
 			List<SelectOption> options,
-			Mock<IMatcher<SelectOption>> matcherMock
+			Mock<IMatcher<SelectOption>> matcherMock,
+			_
 		) = CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -429,5 +467,297 @@ public class SelectVariantViewModelTests
 		Assert.False(options[2].IsSelected);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
+	}
+
+	[Fact]
+	public void PopulateItems_Populate()
+	{
+		// Given
+		(SelectVariantViewModel selectVariantViewModel, _, _, _, List<SelectOption> options, _, _) =
+			CreateOptionsStubs();
+
+		// When
+		selectVariantViewModel.PopulateItems(options);
+
+		// Then
+		Assert.Equal(3, selectVariantViewModel._allItems.Count);
+
+		Assert.Equal("title", selectVariantViewModel._allItems[0].Title);
+		Assert.Equal("title2", selectVariantViewModel._allItems[1].Title);
+		Assert.Equal("title3", selectVariantViewModel._allItems[2].Title);
+	}
+
+	[Fact]
+	public void PopulateItems_UpdateWithNewRow()
+	{
+		// Given
+		(SelectVariantViewModel selectVariantViewModel, _, _, _, List<SelectOption> options, _, _) =
+			CreateOptionsStubs();
+		selectVariantViewModel.PopulateItems(options);
+
+		// When
+		selectVariantViewModel.PopulateItems(
+			new List<SelectOption>
+			{
+				new SelectOption()
+				{
+					Id = "4",
+					Title = "title4",
+					IsSelected = true,
+					IsDisabled = false
+				},
+				new SelectOption()
+				{
+					Id = "5",
+					Title = "title5",
+					IsSelected = false,
+					IsDisabled = false
+				},
+				new SelectOption()
+				{
+					Id = "6",
+					Title = "title6",
+					IsSelected = false,
+					IsDisabled = false
+				},
+			}
+		);
+
+		// Then
+		Assert.Equal(3, selectVariantViewModel._allItems.Count);
+
+		Assert.Equal("title4", selectVariantViewModel._allItems[0].Title);
+		Assert.Equal("title5", selectVariantViewModel._allItems[1].Title);
+		Assert.Equal("title6", selectVariantViewModel._allItems[2].Title);
+	}
+
+	[Fact]
+	public void PopulateItems_UpdateSomeRows()
+	{
+		// Given
+		(SelectVariantViewModel selectVariantViewModel, _, _, _, List<SelectOption> options, _, _) =
+			CreateOptionsStubs();
+		selectVariantViewModel.PopulateItems(options);
+
+		// When
+		selectVariantViewModel.PopulateItems(
+			new List<SelectOption>
+			{
+				options[0],
+				new SelectOption()
+				{
+					Id = "5",
+					Title = "title5",
+					IsSelected = false,
+					IsDisabled = false
+				},
+			}
+		);
+
+		// Then
+		Assert.Equal(2, selectVariantViewModel._allItems.Count);
+
+		Assert.Equal("title", selectVariantViewModel._allItems[0].Title);
+		Assert.Equal("title5", selectVariantViewModel._allItems[1].Title);
+	}
+
+	[Fact]
+	public void LoadSelectMatches_AddNewRows()
+	{
+		// Given
+		(
+			SelectVariantViewModel selectVariantViewModel,
+			SelectVariantConfig activationConfig,
+			_,
+			_,
+			List<SelectOption> options,
+			_,
+			_
+		) = CreateOptionsStubs();
+
+		// When
+		selectVariantViewModel.LoadSelectMatches("test", activationConfig);
+
+		// Then
+		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
+		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].Item.Data);
+		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].Item.Data);
+		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].Item.Data);
+	}
+
+	[Fact]
+	public void LoadSelectMatches_UpdateRows()
+	{
+		// Given
+		(
+			SelectVariantViewModel selectVariantViewModel,
+			SelectVariantConfig activationConfig,
+			_,
+			_,
+			List<SelectOption> options,
+			Mock<IMatcher<SelectOption>> matcherMock,
+			var createdRows
+		) = CreateOptionsStubs();
+		selectVariantViewModel.LoadSelectMatches("test", activationConfig);
+
+		SelectOption newOption =
+			new()
+			{
+				Id = "5",
+				Title = "title5",
+				IsSelected = false,
+				IsDisabled = false
+			};
+
+		List<SelectOption> updatedOptions = new() { options[0], newOption, options[2], };
+
+		List<SelectVariantItem> updatedVariantItems = updatedOptions.Select(o => new SelectVariantItem(o)).ToList();
+
+		matcherMock
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Returns(updatedVariantItems);
+
+		// When
+		selectVariantViewModel.LoadSelectMatches(
+			"test",
+			new SelectVariantConfig()
+			{
+				Options = updatedOptions,
+				AllowMultiSelect = activationConfig.AllowMultiSelect,
+				Callback = activationConfig.Callback,
+				Matcher = activationConfig.Matcher,
+			}
+		);
+
+		// Then
+		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
+		createdRows[1].Verify(r => r.Update(updatedVariantItems[1]));
+	}
+
+	/// <summary>
+	/// Tests <see cref="SelectVariantViewModel.LoadSelectMatches"/> via <see cref="SelectVariantViewModel.Update"/>.
+	/// This test verifies that the unused row is restored, and <see cref="SelectVariantViewModel.RemoveUnusedRows"/> is called.
+	/// </summary>
+	[Fact]
+	public void Update_LoadSelectMatches_RestoreUnusedRow()
+	{
+		// Given
+		(
+			SelectVariantViewModel selectVariantViewModel,
+			SelectVariantConfig activationConfig,
+			_,
+			_,
+			List<SelectOption> options,
+			Mock<IMatcher<SelectOption>> matcherMock,
+			var createdRows
+		) = CreateOptionsStubs();
+
+		// First load
+		selectVariantViewModel.Activate(activationConfig);
+		selectVariantViewModel.Update();
+
+		// Second load
+		SelectOption secondNewOption =
+			new()
+			{
+				Id = "5",
+				Title = "title5",
+				IsSelected = false,
+				IsDisabled = false
+			};
+		List<SelectOption> secondOptions = new() { secondNewOption };
+		List<SelectVariantItem> secondVariantItems = secondOptions.Select(o => new SelectVariantItem(o)).ToList();
+
+		matcherMock
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Returns(secondVariantItems);
+		selectVariantViewModel.Activate(
+			new SelectVariantConfig()
+			{
+				Options = secondOptions,
+				AllowMultiSelect = activationConfig.AllowMultiSelect,
+				Callback = activationConfig.Callback,
+				Matcher = activationConfig.Matcher,
+			}
+		);
+		selectVariantViewModel.Update();
+
+		// When third load
+		SelectOption thirdNewOption =
+			new()
+			{
+				Id = "6",
+				Title = "title6",
+				IsSelected = false,
+				IsDisabled = false
+			};
+		List<SelectOption> thirdOptions = new() { secondNewOption, thirdNewOption };
+		List<SelectVariantItem> thirdVariantItems = thirdOptions.Select(o => new SelectVariantItem(o)).ToList();
+
+		matcherMock
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Returns(thirdVariantItems);
+		selectVariantViewModel.Activate(
+			new SelectVariantConfig()
+			{
+				Options = thirdOptions,
+				AllowMultiSelect = activationConfig.AllowMultiSelect,
+				Callback = activationConfig.Callback,
+				Matcher = activationConfig.Matcher,
+			}
+		);
+		selectVariantViewModel.Update();
+
+		// Then
+		// NOTE: RemoveUnusedRows is called by Update
+		Assert.Equal(2, selectVariantViewModel.SelectRows.Count);
+		createdRows[0].Verify(r => r.Update(thirdVariantItems[0]));
+		createdRows[1].Verify(r => r.Update(thirdVariantItems[1]));
+		Assert.Single(selectVariantViewModel._unusedRows);
+	}
+
+	[Fact]
+	public void Save()
+	{
+		// Given
+		(
+			SelectVariantViewModel selectVariantViewModel,
+			SelectVariantConfig activationConfig,
+			Mock<SelectVariantCallback> callbackMock,
+			_,
+			List<SelectOption> options,
+			_,
+			_
+		) = CreateOptionsStubs();
+
+		// When
+		selectVariantViewModel.Activate(activationConfig);
+		selectVariantViewModel.Update();
+		selectVariantViewModel.Save();
+
+		// Then
+		callbackMock.Verify(c => c.Invoke(It.IsAny<IEnumerable<SelectOption>>()));
+	}
+
+	[Fact]
+	public void GetViewMaxHeight()
+	{
+		// Given
+		(
+			SelectVariantViewModel selectVariantViewModel,
+			SelectVariantConfig activationConfig,
+			_,
+			_,
+			List<SelectOption> options,
+			_,
+			_
+		) = CreateOptionsStubs();
+
+		// When
+		selectVariantViewModel.Activate(activationConfig);
+		selectVariantViewModel.Update();
+
+		// Then
+		Assert.Equal(options.Count * selectVariantViewModel.RowHeight, selectVariantViewModel.GetViewMaxHeight());
 	}
 }

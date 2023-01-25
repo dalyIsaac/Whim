@@ -20,7 +20,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	private readonly List<IVariantRow<SelectOption>> _unusedRows = new();
+	internal readonly List<IVariantRow<SelectOption>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
@@ -217,7 +217,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
-		public void VariantRow_OnClick(IVariantRow<SelectOption> variantRow)
+	public void VariantRow_OnClick(IVariantRow<SelectOption> variantRow)
 	{
 		if (_activationConfig == null)
 		{
@@ -319,11 +319,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		}
 	}
 
-	public void Hide()
-	{
-		NoMatchingOptionsTextBlockVisibility = Visibility.Collapsed;
-		SelectRowsItemsWrapperVisibility = Visibility.Collapsed;
-	}
+	public void Hide() { }
 
 	public void Save() => _activationConfig?.Callback(_allItems.Select(x => x.Data));
 
