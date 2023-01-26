@@ -317,7 +317,7 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.SelectedIndex = 2;
 
 		// When
-		selectVariantViewModel.UpdateSelectedItem();
+		selectVariantViewModel.OnKeyDown(VirtualKey.Enter);
 
 		// Then
 		Assert.False(options[0].IsSelected);
@@ -406,10 +406,8 @@ public class SelectVariantViewModelTests
 			Mock<IMatcher<SelectOption>> matcherMock,
 			_
 		) = CreateOptionsStubs();
-		selectVariantViewModel.Activate(activationConfig);
 
 		// When
-
 		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRow<SelectOption>>().Object);
 
 		// Then
