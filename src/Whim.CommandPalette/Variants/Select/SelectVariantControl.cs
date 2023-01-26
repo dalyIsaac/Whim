@@ -1,23 +1,25 @@
 using Microsoft.UI.Xaml;
-using System;
 
 namespace Whim.CommandPalette;
 
 internal class SelectVariantControl : IVariantControl
 {
-	// private readonly SelectVariantView _control;
-#pragma warning disable CS8603 // Possible null reference return.
-	public UIElement Control => null;
-#pragma warning restore CS8603 // Possible null reference return.
+	private readonly SelectVariantView _control;
+	public UIElement Control => _control;
 
-	public IVariantViewModel ViewModel { get; }
+	private readonly SelectVariantViewModel _viewModel;
+	public IVariantViewModel ViewModel => _viewModel;
 
-	public SelectVariantControl(CommandPaletteWindowViewModel windowViewModel)
+	public SelectVariantControl(ICommandPaletteWindowViewModel windowViewModel)
 	{
-		SelectVariantViewModel viewModel = new(windowViewModel);
-		ViewModel = viewModel;
-		// _control = new SelectVariantView(viewModel);
+		_viewModel = new(windowViewModel, SelectRowFactory) { RowHeight = 24 };
+		_control = new SelectVariantView(_viewModel);
 	}
 
-	public double GetViewMaxHeight() => throw new NotImplementedException();
+	private IVariantRow<SelectOption> SelectRowFactory(IVariantItem<SelectOption> item, SelectVariantConfig config)
+	{
+		return new RadioButtonRow(_viewModel, item);
+	}
+
+	public double GetViewMaxHeight() => _viewModel.GetViewMaxHeight();
 }

@@ -9,7 +9,7 @@ internal class MenuVariantControl : IVariantControl
 
 	public IVariantViewModel ViewModel { get; }
 
-	public MenuVariantControl(IConfigContext configContext, CommandPaletteWindowViewModel windowViewModel)
+	public MenuVariantControl(IConfigContext configContext, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		MenuVariantViewModel viewModel = new(configContext, windowViewModel);
 		ViewModel = viewModel;

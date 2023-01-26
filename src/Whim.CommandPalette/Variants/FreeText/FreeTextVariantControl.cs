@@ -9,7 +9,7 @@ internal class FreeTextVariantControl : IVariantControl
 
 	public IVariantViewModel ViewModel { get; }
 
-	public FreeTextVariantControl(CommandPaletteWindowViewModel windowViewModel)
+	public FreeTextVariantControl(ICommandPaletteWindowViewModel windowViewModel)
 	{
 		FreeTextVariantViewModel viewModel = new(windowViewModel);
 		ViewModel = viewModel;

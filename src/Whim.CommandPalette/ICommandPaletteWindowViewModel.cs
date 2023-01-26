@@ -12,10 +12,16 @@ internal interface ICommandPaletteWindowViewModel : INotifyPropertyChanged
 	string Text { get; set; }
 	string PlaceholderText { get; set; }
 	bool IsVisible { get; }
+	IVariantControl? ActiveVariant { get; }
+	CommandPalettePlugin Plugin { get; }
+	Visibility SaveButtonVisibility { get; }
+	System.Windows.Input.ICommand SaveCommand { get; }
 	event EventHandler<EventArgs>? HideRequested;
+	event EventHandler<EventArgs>? FocusTextBoxRequested;
 	event EventHandler<EventArgs>? SetWindowPosRequested;
 	UIElement? Activate(BaseVariantConfig config, IMonitor? monitor);
 	void RequestHide();
+	void RequestFocusTextBox();
 	void OnKeyDown(VirtualKey key);
 	void Update();
 	double GetViewMaxHeight();

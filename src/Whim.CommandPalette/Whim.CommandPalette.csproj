@@ -30,6 +30,7 @@
 		<None Remove="CommandPaletteWindow.xaml" />
 		<None Remove="PaletteItems\PaletteKeybindItem.xaml" />
 		<None Remove="Variants\FreeText\FreeTextVariantView.xaml" />
+		<None Remove="Variants\Select\SelectVariantView.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -59,8 +60,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="Variants\FreeText\FreeTextVariantView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<Page Update="Variants\Select\SelectVariantView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Variants\FreeText\FreeTextVariantView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 </Project>

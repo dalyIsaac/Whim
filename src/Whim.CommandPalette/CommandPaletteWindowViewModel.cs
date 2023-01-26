@@ -11,12 +11,10 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	private BaseVariantConfig _activationConfig;
 
 	private readonly IVariantControl _menuVariant;
-
 	private readonly IVariantControl _freeTextVariant;
-
 	private readonly IVariantControl _selectVariant;
 
-	private IVariantControl? _activeVariant;
+	public IVariantControl? ActiveVariant { get; private set; }
 
 	public CommandPalettePlugin Plugin { get; }
 
@@ -78,11 +76,15 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 	}
 
+	public System.Windows.Input.ICommand SaveCommand { get; private set; }
+
 	public bool IsVisible => Monitor != null;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	public event EventHandler<EventArgs>? HideRequested;
+
+	public event EventHandler<EventArgs>? FocusTextBoxRequested;
 
 	public event EventHandler<EventArgs>? SetWindowPosRequested;
 
@@ -102,6 +104,8 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_menuVariant = menuVariant ?? new MenuVariantControl(configContext, this);
 		_freeTextVariant = freeTextVariant ?? new FreeTextVariantControl(this);
 		_selectVariant = selectVariant ?? new SelectVariantControl(this);
+
+		SaveCommand = new SaveCommand(this);
 	}
 
 	/// <summary>
@@ -111,7 +115,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	/// <param name="monitor">The monitor to display the command palette on.</param>
 	public UIElement? Activate(BaseVariantConfig config, IMonitor? monitor)
 	{
-		_activeVariant = config switch
+		ActiveVariant = config switch
 		{
 			MenuVariantConfig => _menuVariant,
 			FreeTextVariantConfig => _freeTextVariant,
@@ -119,7 +123,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 			_ => null
 		};
 
-		if (_activeVariant == null)
+		if (ActiveVariant == null)
 		{
 			Logger.Error($"Unknown variant type: {config.GetType().Name}");
 			return null;
@@ -128,15 +132,15 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_activationConfig = config;
 		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 
-		SaveButtonVisibility = _activeVariant.ViewModel.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
+		SaveButtonVisibility = ActiveVariant.ViewModel.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
 		Text = _activationConfig.InitialText ?? "";
 		PlaceholderText = _activationConfig.Hint ?? "Start typing...";
 		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);
 
-		_activeVariant.ViewModel.Activate(_activationConfig);
+		ActiveVariant.ViewModel.Activate(_activationConfig);
 		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
 
-		return _activeVariant.Control;
+		return ActiveVariant.Control;
 	}
 
 	public void RequestHide()
@@ -148,6 +152,12 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_text = "";
 	}
 
+	public void RequestFocusTextBox()
+	{
+		Logger.Debug("Request to focus the command palette text box");
+		FocusTextBoxRequested?.Invoke(this, EventArgs.Empty);
+	}
+
 	public void OnKeyDown(VirtualKey key)
 	{
 		if (key == VirtualKey.Escape)
@@ -156,17 +166,17 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 		else
 		{
-			_activeVariant?.ViewModel.OnKeyDown(key);
+			ActiveVariant?.ViewModel.OnKeyDown(key);
 		}
 	}
 
 	public void Update()
 	{
-		_activeVariant?.ViewModel.Update();
+		ActiveVariant?.ViewModel.Update();
 		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
 	}
 
-	public double GetViewMaxHeight() => _activeVariant?.GetViewMaxHeight() ?? 0;
+	public double GetViewMaxHeight() => ActiveVariant?.GetViewMaxHeight() ?? 0;
 
 	public bool IsVariantActive(BaseVariantConfig config) => _activationConfig == config;
 

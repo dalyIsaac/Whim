@@ -32,4 +32,9 @@ public interface IVariantViewModel : INotifyPropertyChanged
 	/// Handle a key down event.
 	/// </summary>
 	void OnKeyDown(VirtualKey key);
+
+	/// <summary>
+	/// Handle the save button being pressed.
+	/// </summary>
+	void Save();
 }

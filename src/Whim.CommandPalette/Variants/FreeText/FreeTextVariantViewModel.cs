@@ -36,7 +36,21 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 
 	public void OnKeyDown(VirtualKey key)
 	{
-		if (_activationConfig == null || key != VirtualKey.Enter)
+		if (key != VirtualKey.Enter)
+		{
+			return;
+		}
+
+		Execute();
+	}
+
+	public void Update() { }
+
+	public void Save() => Execute();
+
+	private void Execute()
+	{
+		if (_activationConfig == null)
 		{
 			return;
 		}
@@ -44,8 +58,6 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 		_activationConfig.Callback(_commandPaletteWindowViewModel.Text);
 		_commandPaletteWindowViewModel.RequestHide();
 	}
-
-	public void Update() { }
 
 	protected virtual void OnPropertyChanged(string propertyName)
 	{

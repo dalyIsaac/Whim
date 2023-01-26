@@ -27,19 +27,13 @@
 				Text="{x:Bind Path=ViewModel.Text, Mode=TwoWay}"
 				TextChanged="TextEntry_TextChanged" />
 
-			<StackPanel
+			<Button
+				x:Name="Save"
 				Grid.Column="1"
-				Margin="2,0"
-				Orientation="Horizontal"
-				Spacing="2"
-				Visibility="{x:Bind Path=ViewModel.SaveButtonVisibility, Mode=OneWay}">
-				<Button x:Name="Cancel" Content="Cancel" />
-
-				<Button
-					x:Name="Save"
-					Content="Save"
-					Style="{StaticResource AccentButtonStyle}" />
-			</StackPanel>
+				Command="{x:Bind Path=ViewModel.SaveCommand}"
+				Content="Save"
+				Style="{StaticResource AccentButtonStyle}"
+				Visibility="{x:Bind Path=ViewModel.SaveButtonVisibility, Mode=OneWay}" />
 		</Grid>
 
 

@@ -8,7 +8,8 @@ namespace Whim.TreeLayout;
 public interface ITreeLayoutPlugin : IPlugin
 {
 	/// <summary>
-	/// Returns a <see cref="ITreeLayoutEngine"/> if the layout engine is or contains a tree layout engine.
+	/// Returns a <see cref="ITreeLayoutEngine"/> if the currently active layout engine is or contains
+	/// a tree layout engine.
 	/// Otherwise, returns null.
 	/// </summary>
 	public ITreeLayoutEngine? GetTreeLayoutEngine();
