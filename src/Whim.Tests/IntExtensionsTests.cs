@@ -15,4 +15,3 @@ public class IntExtensions
 		Assert.Equal(expected, a.Mod(b));
 	}
 }
-

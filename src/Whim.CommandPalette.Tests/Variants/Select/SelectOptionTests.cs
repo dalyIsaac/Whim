@@ -8,12 +8,14 @@ public class SelectOptionTests
 	public void IsSelected_INotifyPropertyChanged()
 	{
 		// Given
-		SelectOption option = new () {
-			Id = "id",
-			Title = "title",
-			IsDisabled = false,
-			IsSelected = false
-		};
+		SelectOption option =
+			new()
+			{
+				Id = "id",
+				Title = "title",
+				IsDisabled = false,
+				IsSelected = false
+			};
 
 		// When
 		// Then
@@ -24,12 +26,14 @@ public class SelectOptionTests
 	public void IsDisabled_INotifyPropertyChanged()
 	{
 		// Given
-		SelectOption option = new () {
-			Id = "id",
-			Title = "title",
-			IsDisabled = false,
-			IsSelected = false
-		};
+		SelectOption option =
+			new()
+			{
+				Id = "id",
+				Title = "title",
+				IsDisabled = false,
+				IsSelected = false
+			};
 
 		// When
 		// Then
