@@ -54,7 +54,7 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 			setDirectionCommandOptions[i] = new SelectOption()
 			{
 				Id = currentStr,
-				IsDisabled = false,
+				IsEnabled = true,
 				IsSelected = activeTreeLayoutEngine?.AddNodeDirection.Equals(currentDirection) ?? false,
 				Title = currentStr
 			};

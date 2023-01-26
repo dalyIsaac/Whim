@@ -138,7 +138,7 @@ public class SelectVariantViewModelTests
 						Id = "id",
 						Title = "title",
 						IsSelected = false,
-						IsDisabled = false,
+						IsEnabled = false,
 					}
 				}.GetEnumerator()
 			);
@@ -186,21 +186,21 @@ public class SelectVariantViewModelTests
 					Id = "id",
 					Title = "title",
 					IsSelected = false,
-					IsDisabled = false,
+					IsEnabled = false,
 				},
 				new()
 				{
 					Id = "id2",
 					Title = "title2",
 					IsSelected = false,
-					IsDisabled = false,
+					IsEnabled = false,
 				},
 				new SelectOption()
 				{
 					Id = "id3",
 					Title = "title3",
 					IsSelected = false,
-					IsDisabled = false,
+					IsEnabled = false,
 				}
 			};
 
@@ -502,21 +502,21 @@ public class SelectVariantViewModelTests
 					Id = "4",
 					Title = "title4",
 					IsSelected = true,
-					IsDisabled = false
+					IsEnabled = false
 				},
 				new SelectOption()
 				{
 					Id = "5",
 					Title = "title5",
 					IsSelected = false,
-					IsDisabled = false
+					IsEnabled = false
 				},
 				new SelectOption()
 				{
 					Id = "6",
 					Title = "title6",
 					IsSelected = false,
-					IsDisabled = false
+					IsEnabled = false
 				},
 			}
 		);
@@ -547,7 +547,7 @@ public class SelectVariantViewModelTests
 					Id = "5",
 					Title = "title5",
 					IsSelected = false,
-					IsDisabled = false
+					IsEnabled = false
 				},
 			}
 		);
@@ -604,7 +604,7 @@ public class SelectVariantViewModelTests
 				Id = "5",
 				Title = "title5",
 				IsSelected = false,
-				IsDisabled = false
+				IsEnabled = false
 			};
 
 		List<SelectOption> updatedOptions = new() { options[0], newOption, options[2], };
@@ -661,7 +661,7 @@ public class SelectVariantViewModelTests
 				Id = "5",
 				Title = "title5",
 				IsSelected = false,
-				IsDisabled = false
+				IsEnabled = false
 			};
 		List<SelectOption> secondOptions = new() { secondNewOption };
 		List<SelectVariantItem> secondVariantItems = secondOptions.Select(o => new SelectVariantItem(o)).ToList();
@@ -687,7 +687,7 @@ public class SelectVariantViewModelTests
 				Id = "6",
 				Title = "title6",
 				IsSelected = false,
-				IsDisabled = false
+				IsEnabled = false
 			};
 		List<SelectOption> thirdOptions = new() { secondNewOption, thirdNewOption };
 		List<SelectVariantItem> thirdVariantItems = thirdOptions.Select(o => new SelectVariantItem(o)).ToList();

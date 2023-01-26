@@ -7,7 +7,10 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<RadioButton GroupName="RadioButtonVariant" IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}">
+	<RadioButton
+		GroupName="RadioButtonVariant"
+		IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}"
+		IsEnabled="{x:Bind Path=Item.Data.IsEnabled}">
 		<TextBlock
 			x:Name="OptionTitle"
 			RelativePanel.AlignBottomWithPanel="True"

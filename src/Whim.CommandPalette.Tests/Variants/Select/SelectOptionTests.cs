@@ -13,7 +13,7 @@ public class SelectOptionTests
 			{
 				Id = "id",
 				Title = "title",
-				IsDisabled = false,
+				IsEnabled = false,
 				IsSelected = false
 			};
 
@@ -23,7 +23,7 @@ public class SelectOptionTests
 	}
 
 	[Fact]
-	public void IsDisabled_INotifyPropertyChanged()
+	public void IsEnabled_INotifyPropertyChanged()
 	{
 		// Given
 		SelectOption option =
@@ -31,12 +31,12 @@ public class SelectOptionTests
 			{
 				Id = "id",
 				Title = "title",
-				IsDisabled = false,
+				IsEnabled = false,
 				IsSelected = false
 			};
 
 		// When
 		// Then
-		Assert.PropertyChanged(option, nameof(SelectOption.IsDisabled), () => option.IsDisabled = true);
+		Assert.PropertyChanged(option, nameof(SelectOption.IsEnabled), () => option.IsEnabled = true);
 	}
 }

@@ -35,20 +35,20 @@ public record SelectOption : INotifyPropertyChanged
 		}
 	}
 
-	private bool _isDisabled;
+	private bool _isEnabled = true;
 
 	/// <summary>
-	/// Whether this option is disabled.
+	/// Whether this option is enabled.
 	/// </summary>
-	public required bool IsDisabled
+	public required bool IsEnabled
 	{
-		get => _isDisabled;
+		get => _isEnabled;
 		set
 		{
-			if (_isDisabled != value)
+			if (_isEnabled != value)
 			{
-				_isDisabled = value;
-				OnPropertyChanged(new PropertyChangedEventArgs(nameof(IsDisabled)));
+				_isEnabled = value;
+				OnPropertyChanged(new PropertyChangedEventArgs(nameof(IsEnabled)));
 			}
 		}
 	}
