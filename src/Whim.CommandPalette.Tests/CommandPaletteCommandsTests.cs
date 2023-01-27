@@ -18,6 +18,9 @@ public class CommandPaletteCommandsTests
 
 		configContext.SetupGet(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 		workspaceManager.SetupGet(w => w.ActiveWorkspace).Returns(workspace.Object);
+		workspaceManager
+			.Setup(w => w.GetEnumerator())
+			.Returns(new List<IWorkspace>() { new Mock<IWorkspace>().Object }.GetEnumerator());
 
 		Mock<ICommandPalettePlugin> plugin = new();
 

@@ -17,7 +17,7 @@ public class MenuVariantViewModelTests
 		configContext.Setup(c => c.CommandManager).Returns(commandManager.Object);
 
 		Mock<ICommandPaletteWindowViewModel> windowViewModel = new();
-		windowViewModel.Setup(wvm => wvm.IsVariantActive(It.IsAny<BaseVariantConfig>())).Returns(true);
+		windowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(true);
 		windowViewModel.Setup(wvm => wvm.Text).Returns("ti");
 
 		return (configContext, commandManager, windowViewModel);
@@ -271,7 +271,7 @@ public class MenuVariantViewModelTests
 	}
 
 	[Fact]
-	public void ExecuteCommand_Reuse()
+	public void ExecuteCommand_ReuseShouldNotHide()
 	{
 		// Given
 		(
@@ -279,7 +279,7 @@ public class MenuVariantViewModelTests
 			Mock<ICommandManager> commandManager,
 			Mock<ICommandPaletteWindowViewModel> windowViewModel
 		) = CreateStubs();
-		windowViewModel.Setup(wvm => wvm.IsVariantActive(It.IsAny<BaseVariantConfig>())).Returns(false);
+		windowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
 
 		string callbackText = string.Empty;
 		IEnumerable<CommandItem> items = new List<CommandItem>()
@@ -291,7 +291,7 @@ public class MenuVariantViewModelTests
 
 		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
-		windowViewModel.Setup(wvm => wvm.IsVariantActive(It.IsAny<BaseVariantConfig>())).Returns(false);
+		windowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
 
 		// When
 		vm.ExecuteCommand();

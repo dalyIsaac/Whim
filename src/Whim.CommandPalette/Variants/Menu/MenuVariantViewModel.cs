@@ -111,6 +111,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	{
 		if (activationConfig is MenuVariantConfig menuVariantConfig)
 		{
+			Logger.Verbose("Activating menu variant");
 			_activationConfig = menuVariantConfig;
 			PopulateItems(menuVariantConfig.Commands);
 			Update();
@@ -186,16 +187,18 @@ internal class MenuVariantViewModel : IVariantViewModel
 			return;
 		}
 
+		Logger.Verbose($"Executing command at index {SelectedIndex}");
 		IVariantItem<CommandItem> paletteItem = MenuRows[SelectedIndex].Item;
 		CommandItem match = paletteItem.Data;
 
 		// Since the palette window is reused, there's a chance that the _activationConfig
 		// will have been wiped by a free form child command.
+		MenuVariantConfig currentConfig = _activationConfig;
 
+		currentConfig.Matcher.OnMatchExecuted(paletteItem);
 		match.Command.TryExecute();
-		_activationConfig.Matcher.OnMatchExecuted(paletteItem);
 
-		if (_commandPaletteWindowViewModel.IsVariantActive(_activationConfig))
+		if (_commandPaletteWindowViewModel.IsConfigActive(currentConfig))
 		{
 			_commandPaletteWindowViewModel.RequestHide();
 		}
@@ -233,10 +236,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			idx++;
 		}
 
-		for (; idx < _allItems.Count; idx++)
-		{
-			_allItems.RemoveAt(_allItems.Count - 1);
-		}
+		_allItems.RemoveRange(idx, _allItems.Count - idx);
 	}
 
 	/// <summary>

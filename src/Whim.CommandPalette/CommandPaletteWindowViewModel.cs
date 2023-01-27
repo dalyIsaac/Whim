@@ -178,7 +178,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 	public double GetViewMaxHeight() => ActiveVariant?.GetViewMaxHeight() ?? 0;
 
-	public bool IsVariantActive(BaseVariantConfig config) => _activationConfig == config;
+	public bool IsConfigActive(BaseVariantConfig config) => _activationConfig == config;
 
 	protected virtual void OnPropertyChanged(string? propertyName)
 	{

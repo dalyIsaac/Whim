@@ -25,5 +25,5 @@ internal interface ICommandPaletteWindowViewModel : INotifyPropertyChanged
 	void OnKeyDown(VirtualKey key);
 	void Update();
 	double GetViewMaxHeight();
-	bool IsVariantActive(BaseVariantConfig config);
+	bool IsConfigActive(BaseVariantConfig config);
 }
