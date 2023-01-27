@@ -12,6 +12,7 @@ internal interface ICommandPaletteWindowViewModel : INotifyPropertyChanged
 	string Text { get; set; }
 	string PlaceholderText { get; set; }
 	bool IsVisible { get; }
+	BaseVariantConfig ActivationConfig { get; }
 	IVariantControl? ActiveVariant { get; }
 	CommandPalettePlugin Plugin { get; }
 	Visibility SaveButtonVisibility { get; }

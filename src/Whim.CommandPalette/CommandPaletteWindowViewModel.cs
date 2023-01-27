@@ -8,11 +8,12 @@ namespace Whim.CommandPalette;
 internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 {
 	private readonly IConfigContext _configContext;
-	private BaseVariantConfig _activationConfig;
 
 	private readonly IVariantControl _menuVariant;
 	private readonly IVariantControl _freeTextVariant;
 	private readonly IVariantControl _selectVariant;
+
+	public BaseVariantConfig ActivationConfig { get; private set; }
 
 	public IVariantControl? ActiveVariant { get; private set; }
 
@@ -98,7 +99,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	{
 		_configContext = configContext;
 		Plugin = plugin;
-		_activationConfig =
+		ActivationConfig =
 			Plugin.Config.ActivationConfig ?? new MenuVariantConfig() { Commands = configContext.CommandManager };
 
 		_menuVariant = menuVariant ?? new MenuVariantControl(configContext, this);
@@ -129,15 +130,15 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 			return null;
 		}
 
-		_activationConfig = config;
+		ActivationConfig = config;
 		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 
 		SaveButtonVisibility = ActiveVariant.ViewModel.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
-		Text = _activationConfig.InitialText ?? "";
-		PlaceholderText = _activationConfig.Hint ?? "Start typing...";
+		Text = ActivationConfig.InitialText ?? "";
+		PlaceholderText = ActivationConfig.Hint ?? "Start typing...";
 		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);
 
-		ActiveVariant.ViewModel.Activate(_activationConfig);
+		ActiveVariant.ViewModel.Activate(ActivationConfig);
 		SetWindowPosRequested?.Invoke(this, EventArgs.Empty);
 
 		return ActiveVariant.Control;
@@ -178,7 +179,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 	public double GetViewMaxHeight() => ActiveVariant?.GetViewMaxHeight() ?? 0;
 
-	public bool IsConfigActive(BaseVariantConfig config) => _activationConfig == config;
+	public bool IsConfigActive(BaseVariantConfig config) => ActivationConfig == config;
 
 	protected virtual void OnPropertyChanged(string? propertyName)
 	{

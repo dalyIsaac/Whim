@@ -27,7 +27,18 @@ internal class SaveCommand : System.Windows.Input.ICommand
 
 	public void Execute(object? parameter)
 	{
-		_viewModel.ActiveVariant?.ViewModel.Save();
-		_viewModel.RequestHide();
+		if (_viewModel.ActiveVariant == null || _viewModel.ActivationConfig == null)
+		{
+			return;
+		}
+
+		BaseVariantConfig config = _viewModel.ActivationConfig;
+		_viewModel.ActiveVariant.ViewModel.Save();
+
+		// Only hide the palette if the active config is the same as the one that was used to activate it.
+		if (_viewModel.IsConfigActive(config))
+		{
+			_viewModel.RequestHide();
+		}
 	}
 }
