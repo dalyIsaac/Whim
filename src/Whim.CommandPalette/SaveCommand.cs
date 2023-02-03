@@ -27,7 +27,7 @@ internal class SaveCommand : System.Windows.Input.ICommand
 
 	public void Execute(object? parameter)
 	{
-		if (_viewModel.ActiveVariant == null || _viewModel.ActivationConfig == null)
+		if (_viewModel.ActiveVariant == null)
 		{
 			return;
 		}
