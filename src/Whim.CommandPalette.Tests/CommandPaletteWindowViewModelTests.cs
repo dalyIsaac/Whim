@@ -278,7 +278,7 @@ public class CommandPaletteWindowViewModelTests
 		vm.Activate(config, null);
 
 		// Then
-		Assert.Equal(expected, vm.IsVariantActive(config));
+		Assert.Equal(expected, vm.IsConfigActive(config));
 		Assert.Equal(showSaveButton ? Visibility.Visible : Visibility.Collapsed, vm.SaveButtonVisibility);
 	}
 

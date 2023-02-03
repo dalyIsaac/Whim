@@ -12,6 +12,7 @@ internal interface ICommandPaletteWindowViewModel : INotifyPropertyChanged
 	string Text { get; set; }
 	string PlaceholderText { get; set; }
 	bool IsVisible { get; }
+	BaseVariantConfig ActivationConfig { get; }
 	IVariantControl? ActiveVariant { get; }
 	CommandPalettePlugin Plugin { get; }
 	Visibility SaveButtonVisibility { get; }
@@ -25,5 +26,5 @@ internal interface ICommandPaletteWindowViewModel : INotifyPropertyChanged
 	void OnKeyDown(VirtualKey key);
 	void Update();
 	double GetViewMaxHeight();
-	bool IsVariantActive(BaseVariantConfig config);
+	bool IsConfigActive(BaseVariantConfig config);
 }
