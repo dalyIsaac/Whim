@@ -1,6 +1,6 @@
 namespace Whim.CommandPalette;
 
-internal record SelectVariantItem : IVariantModel<SelectOption>
+internal record SelectVariantItem : IVariantRowModel<SelectOption>
 {
 	public string Id => Data.Id;
 

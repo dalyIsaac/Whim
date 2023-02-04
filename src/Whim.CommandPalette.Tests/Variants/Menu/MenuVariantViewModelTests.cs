@@ -23,7 +23,7 @@ public class MenuVariantViewModelTests
 		return (configContext, commandManager, windowViewModel);
 	}
 
-	private static IVariantRow<CommandItem> MenuRowFactory(IVariantModel<CommandItem> item) =>
+	private static IVariantRow<CommandItem> MenuRowFactory(IVariantRowModel<CommandItem> item) =>
 		new MenuRowStub() { Item = item };
 
 	[Fact]
@@ -336,7 +336,7 @@ public class MenuVariantViewModelTests
 
 		Mock<IMatcher<CommandItem>> matcher = new();
 		matcher
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantModel<CommandItem>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<CommandItem>>>()))
 			.Returns(items);
 
 		MenuVariantConfig config = new() { Matcher = matcher.Object, Commands = Array.Empty<CommandItem>() };

@@ -28,7 +28,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// Factory to create menu rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantModel<CommandItem>, IVariantRow<CommandItem>> _menuRowFactory;
+	private readonly Func<IVariantRowModel<CommandItem>, IVariantRow<CommandItem>> _menuRowFactory;
 
 	public readonly ObservableCollection<IVariantRow<CommandItem>> MenuRows = new();
 
@@ -97,11 +97,11 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public MenuVariantViewModel(
 		IConfigContext configContext,
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantModel<CommandItem>, IVariantRow<CommandItem>>? menuRowFactory = null
+		Func<IVariantRowModel<CommandItem>, IVariantRow<CommandItem>>? menuRowFactory = null
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_menuRowFactory = menuRowFactory ?? ((IVariantModel<CommandItem> item) => new MenuRow(item));
+		_menuRowFactory = menuRowFactory ?? ((IVariantRowModel<CommandItem> item) => new MenuRow(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(configContext.CommandManager);
@@ -188,7 +188,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		}
 
 		Logger.Verbose($"Executing command at index {SelectedIndex}");
-		IVariantModel<CommandItem> paletteItem = MenuRows[SelectedIndex].Item;
+		IVariantRowModel<CommandItem> paletteItem = MenuRows[SelectedIndex].Item;
 		CommandItem match = paletteItem.Data;
 
 		// Since the palette window is reused, there's a chance that the _activationConfig
@@ -249,7 +249,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (IVariantModel<CommandItem> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (IVariantRowModel<CommandItem> item in activationConfig.Matcher.Match(query, _allItems))
 		{
 			Logger.Verbose($"Matched {item.Title}");
 			if (matchesCount < MenuRows.Count)

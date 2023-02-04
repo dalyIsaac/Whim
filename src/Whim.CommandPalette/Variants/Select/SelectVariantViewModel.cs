@@ -32,7 +32,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
 	private readonly Func<
-		IVariantModel<SelectOption>,
+		IVariantRowModel<SelectOption>,
 		SelectVariantConfig,
 		IVariantRow<SelectOption>
 	> _selectRowFactory;
@@ -108,7 +108,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantModel<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> selectRowFactory
+		Func<IVariantRowModel<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -200,7 +200,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			return;
 		}
 
-		IVariantModel<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
+		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
 		SelectOption selectedData = selectedItem.Data;
 
 		if (_allowMultiSelect)
@@ -277,7 +277,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (IVariantModel<SelectOption> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (IVariantRowModel<SelectOption> item in activationConfig.Matcher.Match(query, _allItems))
 		{
 			Logger.Verbose($"Matched {item.Title}");
 			if (matchesCount < SelectRows.Count)

@@ -88,7 +88,7 @@ public class MostRecentlyUsedMatcherTests
 		(MenuVariantItem[] items, MatcherItem<CommandItem>[] _) = CreateMocks(new string[] { "A", "B" });
 
 		// When
-		IEnumerable<IVariantModel<CommandItem>> rowItems = matcher.Match("C", items);
+		IEnumerable<IVariantRowModel<CommandItem>> rowItems = matcher.Match("C", items);
 
 		// Then
 		Assert.Empty(rowItems);
@@ -102,7 +102,7 @@ public class MostRecentlyUsedMatcherTests
 		(MenuVariantItem[] items, MatcherItem<CommandItem>[] _) = CreateMocks(new string[] { "A", "B" });
 
 		// When
-		IVariantModel<CommandItem>[] rowItems = matcher.Match("", items).ToArray();
+		IVariantRowModel<CommandItem>[] rowItems = matcher.Match("", items).ToArray();
 
 		// Then
 		Assert.Equal(2, rowItems.Length);
