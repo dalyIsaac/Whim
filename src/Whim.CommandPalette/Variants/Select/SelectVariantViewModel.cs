@@ -200,7 +200,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			return;
 		}
 
-		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
+		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].Model;
 		SelectOption selectedData = selectedItem.Data;
 
 		if (_allowMultiSelect)

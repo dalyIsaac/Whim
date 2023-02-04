@@ -188,7 +188,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		}
 
 		Logger.Verbose($"Executing command at index {SelectedIndex}");
-		IVariantRowModel<CommandItem> paletteItem = MenuRows[SelectedIndex].Item;
+		IVariantRowModel<CommandItem> paletteItem = MenuRows[SelectedIndex].Model;
 		CommandItem match = paletteItem.Data;
 
 		// Since the palette window is reused, there's a chance that the _activationConfig

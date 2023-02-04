@@ -9,7 +9,7 @@ public interface IVariantRowControl<T>
 	/// <summary>
 	/// The item displayed by this row.
 	/// </summary>
-	public IVariantRowModel<T> Item { get; }
+	public IVariantRowModel<T> Model { get; }
 
 	/// <summary>
 	/// Initializes the row. For example, sets the title.

@@ -24,7 +24,7 @@ public class MenuVariantViewModelTests
 	}
 
 	private static IVariantRowControl<CommandItem> MenuRowFactory(IVariantRowModel<CommandItem> item) =>
-		new MenuRowStub() { Item = item };
+		new MenuRowStub() { Model = item };
 
 	[Fact]
 	public void Constructor()
@@ -415,8 +415,8 @@ public class MenuVariantViewModelTests
 
 		// Then
 		Assert.Equal(2, vm.MenuRows.Count);
-		Assert.Equal("title0", vm.MenuRows[0].Item.Title);
-		Assert.Equal("title1", vm.MenuRows[1].Item.Title);
+		Assert.Equal("title0", vm.MenuRows[0].Model.Title);
+		Assert.Equal("title1", vm.MenuRows[1].Model.Title);
 	}
 
 	[Fact]

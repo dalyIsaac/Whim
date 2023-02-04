@@ -16,7 +16,7 @@ public class SelectVariantViewModelTests
 		IVariantRowControl<SelectOption> selectRowFactory(IVariantRowModel<SelectOption> item, SelectVariantConfig config)
 		{
 			Mock<IVariantRowControl<SelectOption>> variantRowMock = new();
-			variantRowMock.Setup(v => v.Item).Returns(item);
+			variantRowMock.Setup(v => v.Model).Returns(item);
 			variantRowMocks.Add(variantRowMock);
 			return variantRowMock.Object;
 		}
@@ -578,9 +578,9 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
-		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].Item.Data);
-		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].Item.Data);
-		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].Item.Data);
+		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].Model.Data);
+		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].Model.Data);
+		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].Model.Data);
 	}
 
 	[Fact]

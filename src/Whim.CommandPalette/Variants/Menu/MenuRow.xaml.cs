@@ -10,11 +10,11 @@ internal sealed partial class MenuRow : UserControl, IVariantRowControl<CommandI
 {
 	public static double MenuRowHeight => 24;
 
-	public IVariantRowModel<CommandItem> Item { get; private set; }
+	public IVariantRowModel<CommandItem> Model { get; private set; }
 
 	public MenuRow(IVariantRowModel<CommandItem> item)
 	{
-		Item = item;
+		Model = item;
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/Menu/MenuRow");
 	}
 
@@ -27,7 +27,7 @@ internal sealed partial class MenuRow : UserControl, IVariantRowControl<CommandI
 	public void Update(IVariantRowModel<CommandItem> item)
 	{
 		Logger.Debug("Updating with a new item");
-		Item = item;
+		Model = item;
 		this.SetTitle(CommandTitle.Inlines);
 		SetKeybinds();
 	}
@@ -36,9 +36,9 @@ internal sealed partial class MenuRow : UserControl, IVariantRowControl<CommandI
 	{
 		Logger.Debug("Setting keybinds");
 
-		if (Item.Data.Keybind is not null)
+		if (Model.Data.Keybind is not null)
 		{
-			CommandKeybind.Text = Item.Data.Keybind.ToString();
+			CommandKeybind.Text = Model.Data.Keybind.ToString();
 			CommandKeybindBorder.Visibility = Visibility.Visible;
 		}
 		else
