@@ -17,7 +17,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	private readonly List<IVariantRow<CommandItem>> _unusedRows = new();
+	private readonly List<IVariantRowControl<CommandItem>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="MenuRows"/> are drawn.
@@ -28,9 +28,9 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// Factory to create menu rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantRowModel<CommandItem>, IVariantRow<CommandItem>> _menuRowFactory;
+	private readonly Func<IVariantRowModel<CommandItem>, IVariantRowControl<CommandItem>> _menuRowFactory;
 
-	public readonly ObservableCollection<IVariantRow<CommandItem>> MenuRows = new();
+	public readonly ObservableCollection<IVariantRowControl<CommandItem>> MenuRows = new();
 
 	public bool ShowSaveButton => false;
 
@@ -97,7 +97,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public MenuVariantViewModel(
 		IConfigContext configContext,
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantRowModel<CommandItem>, IVariantRow<CommandItem>>? menuRowFactory = null
+		Func<IVariantRowModel<CommandItem>, IVariantRowControl<CommandItem>>? menuRowFactory = null
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -260,7 +260,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				IVariantRow<CommandItem> row = _unusedRows[^1];
+				IVariantRowControl<CommandItem> row = _unusedRows[^1];
 				row.Update(item);
 
 				MenuRows.Add(row);
@@ -269,7 +269,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRow<CommandItem> row = _menuRowFactory(item);
+				IVariantRowControl<CommandItem> row = _menuRowFactory(item);
 				MenuRows.Add(row);
 				row.Initialize();
 			}

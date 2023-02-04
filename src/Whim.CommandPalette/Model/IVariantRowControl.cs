@@ -4,7 +4,7 @@ namespace Whim.CommandPalette;
 /// A control that represents a single row in a variant.
 /// </summary>
 /// <typeparam name="T">The variant item's data type.</typeparam>
-public interface IVariantRow<T>
+public interface IVariantRowControl<T>
 {
 	/// <summary>
 	/// The item displayed by this row.

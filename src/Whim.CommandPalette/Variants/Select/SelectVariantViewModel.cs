@@ -20,7 +20,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	internal readonly List<IVariantRow<SelectOption>> _unusedRows = new();
+	internal readonly List<IVariantRowControl<SelectOption>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
@@ -34,10 +34,10 @@ internal class SelectVariantViewModel : IVariantViewModel
 	private readonly Func<
 		IVariantRowModel<SelectOption>,
 		SelectVariantConfig,
-		IVariantRow<SelectOption>
+		IVariantRowControl<SelectOption>
 	> _selectRowFactory;
 
-	public readonly ObservableCollection<IVariantRow<SelectOption>> SelectRows = new();
+	public readonly ObservableCollection<IVariantRowControl<SelectOption>> SelectRows = new();
 
 	/// <summary>
 	/// The height of the row.
@@ -108,7 +108,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantRowModel<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> selectRowFactory
+		Func<IVariantRowModel<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -221,7 +221,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
-	public void VariantRow_OnClick(IVariantRow<SelectOption> variantRow)
+	public void VariantRow_OnClick(IVariantRowControl<SelectOption> variantRow)
 	{
 		if (_activationConfig == null)
 		{
@@ -288,7 +288,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				IVariantRow<SelectOption> row = _unusedRows[^1];
+				IVariantRowControl<SelectOption> row = _unusedRows[^1];
 				row.Update(item);
 
 				SelectRows.Add(row);
@@ -297,7 +297,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRow<SelectOption> row = _selectRowFactory(item, activationConfig);
+				IVariantRowControl<SelectOption> row = _selectRowFactory(item, activationConfig);
 				SelectRows.Add(row);
 				row.Initialize();
 			}
