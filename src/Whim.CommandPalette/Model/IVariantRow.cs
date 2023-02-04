@@ -9,7 +9,7 @@ public interface IVariantRow<T>
 	/// <summary>
 	/// The item displayed by this row.
 	/// </summary>
-	public IVariantItem<T> Item { get; }
+	public IVariantModel<T> Item { get; }
 
 	/// <summary>
 	/// Initializes the row. For example, sets the title.
@@ -20,5 +20,5 @@ public interface IVariantRow<T>
 	/// Updates the row with a new item.
 	/// </summary>
 	/// <param name="item"></param>
-	public void Update(IVariantItem<T> item);
+	public void Update(IVariantModel<T> item);
 }

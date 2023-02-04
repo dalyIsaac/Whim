@@ -8,12 +8,12 @@ namespace Whim.CommandPalette.Tests;
 public class SelectVariantViewModelTests
 {
 	private static (
-		Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>>,
+		Func<IVariantModel<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>>,
 		List<Mock<IVariantRow<SelectOption>>>
 	) SelectRowFactoryWithMocks()
 	{
 		List<Mock<IVariantRow<SelectOption>>> variantRowMocks = new();
-		IVariantRow<SelectOption> selectRowFactory(IVariantItem<SelectOption> item, SelectVariantConfig config)
+		IVariantRow<SelectOption> selectRowFactory(IVariantModel<SelectOption> item, SelectVariantConfig config)
 		{
 			Mock<IVariantRow<SelectOption>> variantRowMock = new();
 			variantRowMock.Setup(v => v.Item).Returns(item);
@@ -212,7 +212,7 @@ public class SelectVariantViewModelTests
 
 		Mock<IMatcher<SelectOption>> matcherMock = new();
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantModel<SelectOption>>>()))
 			.Returns(options.Select(o => new SelectVariantItem(o)));
 
 		SelectVariantConfig activationConfig =
@@ -249,8 +249,8 @@ public class SelectVariantViewModelTests
 			_
 		) = CreateOptionsStubs();
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
-			.Returns(new List<IVariantItem<SelectOption>>());
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantModel<SelectOption>>>()))
+			.Returns(new List<IVariantModel<SelectOption>>());
 
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -323,7 +323,7 @@ public class SelectVariantViewModelTests
 		Assert.False(options[0].IsSelected);
 		Assert.False(options[1].IsSelected);
 		Assert.True(options[2].IsSelected);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Once);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
@@ -365,7 +365,7 @@ public class SelectVariantViewModelTests
 		Assert.False(options[0].IsSelected);
 		Assert.True(options[1].IsSelected);
 		Assert.False(options[2].IsSelected);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Once);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
@@ -389,7 +389,7 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Never);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
@@ -412,7 +412,7 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Never);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
@@ -436,7 +436,7 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Never);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
@@ -463,7 +463,7 @@ public class SelectVariantViewModelTests
 		Assert.False(options[0].IsSelected);
 		Assert.True(options[1].IsSelected);
 		Assert.False(options[2].IsSelected);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Once);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
@@ -612,7 +612,7 @@ public class SelectVariantViewModelTests
 		List<SelectVariantItem> updatedVariantItems = updatedOptions.Select(o => new SelectVariantItem(o)).ToList();
 
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantModel<SelectOption>>>()))
 			.Returns(updatedVariantItems);
 
 		// When
@@ -667,7 +667,7 @@ public class SelectVariantViewModelTests
 		List<SelectVariantItem> secondVariantItems = secondOptions.Select(o => new SelectVariantItem(o)).ToList();
 
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantModel<SelectOption>>>()))
 			.Returns(secondVariantItems);
 		selectVariantViewModel.Activate(
 			new SelectVariantConfig()
@@ -693,7 +693,7 @@ public class SelectVariantViewModelTests
 		List<SelectVariantItem> thirdVariantItems = thirdOptions.Select(o => new SelectVariantItem(o)).ToList();
 
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantModel<SelectOption>>>()))
 			.Returns(thirdVariantItems);
 		selectVariantViewModel.Activate(
 			new SelectVariantConfig()

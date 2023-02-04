@@ -31,7 +31,11 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// Factory to create select rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> _selectRowFactory;
+	private readonly Func<
+		IVariantModel<SelectOption>,
+		SelectVariantConfig,
+		IVariantRow<SelectOption>
+	> _selectRowFactory;
 
 	public readonly ObservableCollection<IVariantRow<SelectOption>> SelectRows = new();
 
@@ -104,7 +108,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> selectRowFactory
+		Func<IVariantModel<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -196,7 +200,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			return;
 		}
 
-		IVariantItem<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
+		IVariantModel<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
 		SelectOption selectedData = selectedItem.Data;
 
 		if (_allowMultiSelect)
@@ -273,7 +277,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (IVariantItem<SelectOption> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (IVariantModel<SelectOption> item in activationConfig.Matcher.Match(query, _allItems))
 		{
 			Logger.Verbose($"Matched {item.Title}");
 			if (matchesCount < SelectRows.Count)

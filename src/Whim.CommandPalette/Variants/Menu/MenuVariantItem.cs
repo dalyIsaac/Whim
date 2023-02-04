@@ -1,6 +1,6 @@
 namespace Whim.CommandPalette;
 
-internal record MenuVariantItem : IVariantItem<CommandItem>
+internal record MenuVariantItem : IVariantModel<CommandItem>
 {
 	public string Id => Data.Command.Id;
 

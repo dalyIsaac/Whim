@@ -9,9 +9,9 @@ internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOp
 {
 	private readonly SelectVariantViewModel _selectVariantViewModel;
 
-	public IVariantItem<SelectOption> Item { get; private set; }
+	public IVariantModel<SelectOption> Item { get; private set; }
 
-	public RadioButtonRow(SelectVariantViewModel selectVariantViewModel, IVariantItem<SelectOption> item)
+	public RadioButtonRow(SelectVariantViewModel selectVariantViewModel, IVariantModel<SelectOption> item)
 	{
 		_selectVariantViewModel = selectVariantViewModel;
 		Item = item;
@@ -27,7 +27,7 @@ internal sealed partial class RadioButtonRow : UserControl, IVariantRow<SelectOp
 		this.SetTitle(OptionTitle.Inlines);
 	}
 
-	public void Update(IVariantItem<SelectOption> item)
+	public void Update(IVariantModel<SelectOption> item)
 	{
 		Logger.Debug("Updating with a new item");
 		Item = item;

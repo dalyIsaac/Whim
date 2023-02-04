@@ -9,7 +9,7 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal record MatcherItem<T>
 {
-	public required IVariantItem<T> Item { get; init; }
+	public required IVariantModel<T> Item { get; init; }
 	public required FilterTextMatch[] TextSegments { get; init; }
 	public required uint Score { get; init; }
 
