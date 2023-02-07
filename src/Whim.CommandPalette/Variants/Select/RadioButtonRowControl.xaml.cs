@@ -5,20 +5,20 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-internal sealed partial class RadioButtonRow : UserControl, IVariantRowControl<SelectOption>
+internal sealed partial class RadioButtonRowControl : UserControl, IVariantRowControl<SelectOption>
 {
 	private readonly SelectVariantViewModel _selectVariantViewModel;
 
 	public IVariantRowModel<SelectOption> Model { get; private set; }
 
-	public RadioButtonRow(SelectVariantViewModel selectVariantViewModel, IVariantRowModel<SelectOption> item)
+	public RadioButtonRowControl(SelectVariantViewModel selectVariantViewModel, IVariantRowModel<SelectOption> item)
 	{
 		_selectVariantViewModel = selectVariantViewModel;
 		Model = item;
 		UIElementExtensions.InitializeComponent(
 			component: this,
 			"Whim.CommandPalette",
-			"Variants/Select/RadioButtonRow"
+			"Variants/Select/RadioButtonRowControl"
 		);
 	}
 

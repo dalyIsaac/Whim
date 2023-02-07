@@ -101,7 +101,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_menuRowFactory = menuRowFactory ?? ((IVariantRowModel<CommandItem> item) => new MenuRow(item));
+		_menuRowFactory = menuRowFactory ?? ((IVariantRowModel<CommandItem> item) => new MenuVariantRowControl(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(configContext.CommandManager);
