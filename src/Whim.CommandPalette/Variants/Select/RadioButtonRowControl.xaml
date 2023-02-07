@@ -9,8 +9,8 @@
 
 	<RadioButton
 		GroupName="RadioButtonVariant"
-		IsChecked="{x:Bind Path=Item.Data.IsSelected, Mode=TwoWay}"
-		IsEnabled="{x:Bind Path=Item.Data.IsEnabled}">
+		IsChecked="{x:Bind Path=Model.Data.IsSelected, Mode=TwoWay}"
+		IsEnabled="{x:Bind Path=Model.Data.IsEnabled}">
 		<TextBlock
 			x:Name="OptionTitle"
 			RelativePanel.AlignBottomWithPanel="True"
