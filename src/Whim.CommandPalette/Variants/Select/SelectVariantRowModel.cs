@@ -1,6 +1,6 @@
 namespace Whim.CommandPalette;
 
-internal record SelectVariantItem : IVariantRowModel<SelectOption>
+internal record SelectVariantRowModel : IVariantRowModel<SelectOption>
 {
 	public string Id => Data.Id;
 
@@ -10,7 +10,7 @@ internal record SelectVariantItem : IVariantRowModel<SelectOption>
 
 	public SelectOption Data { get; }
 
-	public SelectVariantItem(SelectOption data)
+	public SelectVariantRowModel(SelectOption data)
 	{
 		Data = data;
 		FormattedTitle = data.Title;

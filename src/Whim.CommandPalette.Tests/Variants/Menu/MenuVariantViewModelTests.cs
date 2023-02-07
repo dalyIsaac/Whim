@@ -325,12 +325,12 @@ public class MenuVariantViewModelTests
 
 	private static MenuVariantConfig CreateMenuActivationConfig(int itemCount)
 	{
-		List<MenuVariantItem> items = new();
+		List<MenuVariantRowModel> items = new();
 
 		for (int i = 0; i < itemCount; i++)
 		{
 			items.Add(
-				new MenuVariantItem(new CommandItem() { Command = new Command($"id{i}", $"title{i}", () => { }) })
+				new MenuVariantRowModel(new CommandItem() { Command = new Command($"id{i}", $"title{i}", () => { }) })
 			);
 		}
 

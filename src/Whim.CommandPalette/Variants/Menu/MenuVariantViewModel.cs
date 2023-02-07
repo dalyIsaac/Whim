@@ -22,7 +22,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="MenuRows"/> are drawn.
 	/// </summary>
-	internal readonly List<MenuVariantItem> _allItems = new();
+	internal readonly List<MenuVariantRowModel> _allItems = new();
 
 	/// <summary>
 	/// Factory to create menu rows to make it possible to use xunit.
@@ -225,12 +225,12 @@ internal class MenuVariantViewModel : IVariantViewModel
 			{
 				if (_allItems[idx].Data.Command != command)
 				{
-					_allItems[idx] = new MenuVariantItem(commandItem);
+					_allItems[idx] = new MenuVariantRowModel(commandItem);
 				}
 			}
 			else
 			{
-				_allItems.Add(new MenuVariantItem(commandItem));
+				_allItems.Add(new MenuVariantRowModel(commandItem));
 			}
 
 			idx++;

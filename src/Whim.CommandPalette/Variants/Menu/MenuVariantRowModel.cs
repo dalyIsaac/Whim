@@ -1,6 +1,6 @@
 namespace Whim.CommandPalette;
 
-internal record MenuVariantItem : IVariantRowModel<CommandItem>
+internal record MenuVariantRowModel : IVariantRowModel<CommandItem>
 {
 	public string Id => Data.Command.Id;
 
@@ -10,7 +10,7 @@ internal record MenuVariantItem : IVariantRowModel<CommandItem>
 
 	public CommandItem Data { get; }
 
-	public MenuVariantItem(CommandItem data)
+	public MenuVariantRowModel(CommandItem data)
 	{
 		Data = data;
 		FormattedTitle = data.Command.Title;

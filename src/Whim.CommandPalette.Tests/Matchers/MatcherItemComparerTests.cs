@@ -12,7 +12,7 @@ public class MatcherItemComparerTests
 
 		return new MatcherItem<CommandItem>()
 		{
-			Item = new MenuVariantItem(new CommandItem() { Command = command.Object }),
+			Item = new MenuVariantRowModel(new CommandItem() { Command = command.Object }),
 			TextSegments = Array.Empty<FilterTextMatch>(),
 			Score = score
 		};

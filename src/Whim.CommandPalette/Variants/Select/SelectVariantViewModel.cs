@@ -25,7 +25,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
 	/// </summary>
-	internal readonly List<SelectVariantItem> _allItems = new();
+	internal readonly List<SelectVariantRowModel> _allItems = new();
 
 	/// <summary>
 	/// Factory to create select rows to make it possible to use xunit.
@@ -209,7 +209,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		}
 		else
 		{
-			foreach (SelectVariantItem variantItem in _allItems)
+			foreach (SelectVariantRowModel variantItem in _allItems)
 			{
 				variantItem.Data.IsSelected = false;
 			}
@@ -250,12 +250,12 @@ internal class SelectVariantViewModel : IVariantViewModel
 			{
 				if (_allItems[idx].Data != selectOption)
 				{
-					_allItems[idx] = new SelectVariantItem(selectOption);
+					_allItems[idx] = new SelectVariantRowModel(selectOption);
 				}
 			}
 			else
 			{
-				_allItems.Add(new SelectVariantItem(selectOption));
+				_allItems.Add(new SelectVariantRowModel(selectOption));
 			}
 
 			idx++;

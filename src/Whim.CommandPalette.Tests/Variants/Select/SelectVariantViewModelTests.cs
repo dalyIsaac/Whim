@@ -213,7 +213,7 @@ public class SelectVariantViewModelTests
 		Mock<IMatcher<SelectOption>> matcherMock = new();
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
-			.Returns(options.Select(o => new SelectVariantItem(o)));
+			.Returns(options.Select(o => new SelectVariantRowModel(o)));
 
 		SelectVariantConfig activationConfig =
 			new()
@@ -609,7 +609,7 @@ public class SelectVariantViewModelTests
 
 		List<SelectOption> updatedOptions = new() { options[0], newOption, options[2], };
 
-		List<SelectVariantItem> updatedVariantItems = updatedOptions.Select(o => new SelectVariantItem(o)).ToList();
+		List<SelectVariantRowModel> updatedVariantItems = updatedOptions.Select(o => new SelectVariantRowModel(o)).ToList();
 
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
@@ -664,7 +664,7 @@ public class SelectVariantViewModelTests
 				IsEnabled = false
 			};
 		List<SelectOption> secondOptions = new() { secondNewOption };
-		List<SelectVariantItem> secondVariantItems = secondOptions.Select(o => new SelectVariantItem(o)).ToList();
+		List<SelectVariantRowModel> secondVariantItems = secondOptions.Select(o => new SelectVariantRowModel(o)).ToList();
 
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
@@ -690,7 +690,7 @@ public class SelectVariantViewModelTests
 				IsEnabled = false
 			};
 		List<SelectOption> thirdOptions = new() { secondNewOption, thirdNewOption };
-		List<SelectVariantItem> thirdVariantItems = thirdOptions.Select(o => new SelectVariantItem(o)).ToList();
+		List<SelectVariantRowModel> thirdVariantItems = thirdOptions.Select(o => new SelectVariantRowModel(o)).ToList();
 
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
