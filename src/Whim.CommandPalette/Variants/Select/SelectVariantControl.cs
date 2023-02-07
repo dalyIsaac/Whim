@@ -16,7 +16,10 @@ internal class SelectVariantControl : IVariantControl
 		_control = new SelectVariantView(_viewModel);
 	}
 
-	private IVariantRowControl<SelectOption> SelectRowFactory(IVariantRowModel<SelectOption> item, SelectVariantConfig config)
+	private IVariantRowControl<SelectOption> SelectRowFactory(
+		IVariantRowModel<SelectOption> item,
+		SelectVariantConfig config
+	)
 	{
 		return new RadioButtonRowControl(_viewModel, item);
 	}

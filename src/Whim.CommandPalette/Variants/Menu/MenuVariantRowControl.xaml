@@ -7,36 +7,31 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<RelativePanel x:Name="PaletteItemPanel"
-		MaxHeight="{x:Bind local:MenuVariantRowControl.MenuRowHeight}">
+	<RelativePanel x:Name="PaletteItemPanel" MaxHeight="{x:Bind local:MenuVariantRowControl.MenuRowHeight}">
 		<RelativePanel.Resources>
 			<ResourceDictionary>
 				<ResourceDictionary.ThemeDictionaries>
 					<ResourceDictionary x:Key="Dark">
 						<Style x:Key="KeybindBorderStyle" TargetType="Border">
 							<Setter Property="Background" Value="Transparent" />
-							<Setter Property="BorderBrush"
-								Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 							<Setter Property="BorderThickness" Value="1" />
 							<Setter Property="CornerRadius" Value="2" />
 						</Style>
 						<Style x:Key="KeybindTextBlockStyle" TargetType="TextBlock">
-							<Setter Property="Foreground"
-								Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
 
 					<ResourceDictionary x:Key="Light">
 						<Style x:Key="KeybindBorderStyle" TargetType="Border">
 							<Setter Property="Background" Value="Transparent" />
-							<Setter Property="BorderBrush"
-								Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 							<Setter Property="BorderThickness" Value="1" />
 							<Setter Property="CornerRadius" Value="2" />
 						</Style>
 						<Style x:Key="KeybindTextBlockStyle" TargetType="TextBlock">
-							<Setter Property="Foreground"
-								Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+							<Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 						</Style>
 					</ResourceDictionary>
 				</ResourceDictionary.ThemeDictionaries>
