@@ -11,7 +11,7 @@ public class PaletteTextTests
 		string text = "Implicit";
 
 		// When
-		PaletteText paletteText = text;
+		PaletteText paletteText = new(text);
 
 		// Then
 		Assert.Single(paletteText.Segments);
@@ -26,7 +26,7 @@ public class PaletteTextTests
 		string text = "From String";
 
 		// When
-		PaletteText paletteText = PaletteText.FromString(text);
+		PaletteText paletteText = new(text);
 
 		// Then
 		Assert.Single(paletteText.Segments);

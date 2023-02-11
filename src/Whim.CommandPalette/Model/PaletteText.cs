@@ -34,20 +34,19 @@ public record PaletteText
 	public IList<PaletteTextSegment> Segments { get; } = new List<PaletteTextSegment>();
 
 	/// <summary>
-	/// Converts a <see cref="string"/> to a <see cref="PaletteText"/>.
+	/// Creates an empty instance of the <see cref="PaletteText"/> class.
 	/// </summary>
-	/// <param name="text"></param>
-	public static implicit operator PaletteText(string text)
-	{
-		return FromString(text);
-	}
+	public PaletteText() { }
 
 	/// <summary>
-	/// Converts a <see cref="string"/> to a <see cref="PaletteText"/>.
+	/// Creates a new instance of the <see cref="PaletteText"/> class from the specified text.
 	/// </summary>
+	/// <remarks>
+	/// A single segment of text is created, with no highlighting.
+	/// </remarks>
 	/// <param name="text"></param>
-	public static PaletteText FromString(string text)
+	public PaletteText(string text)
 	{
-		return new() { Segments = { new(text, false) } };
+		Segments.Add(new(text, false));
 	}
 }

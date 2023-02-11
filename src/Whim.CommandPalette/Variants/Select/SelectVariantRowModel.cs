@@ -13,6 +13,6 @@ internal record SelectVariantRowModel : IVariantRowModel<SelectOption>
 	public SelectVariantRowModel(SelectOption data)
 	{
 		Data = data;
-		FormattedTitle = data.Title;
+		FormattedTitle = new(data.Title);
 	}
 }
