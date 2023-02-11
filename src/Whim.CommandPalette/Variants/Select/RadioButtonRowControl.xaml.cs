@@ -9,12 +9,12 @@ internal sealed partial class RadioButtonRowControl : UserControl, IVariantRowCo
 {
 	private readonly SelectVariantViewModel _selectVariantViewModel;
 
-	public IVariantRowModel<SelectOption> Model { get; private set; }
+	public IVariantRowViewModel<SelectOption> ViewModel { get; }
 
-	public RadioButtonRowControl(SelectVariantViewModel selectVariantViewModel, IVariantRowModel<SelectOption> item)
+	public RadioButtonRowControl(SelectVariantViewModel selectVariantViewModel, MatcherResult<SelectOption> item)
 	{
 		_selectVariantViewModel = selectVariantViewModel;
-		Model = item;
+		ViewModel = new VariantRowViewModel<SelectOption>(item);
 		UIElementExtensions.InitializeComponent(
 			component: this,
 			"Whim.CommandPalette",
@@ -27,10 +27,10 @@ internal sealed partial class RadioButtonRowControl : UserControl, IVariantRowCo
 		this.SetTitle(OptionTitle.Inlines);
 	}
 
-	public void Update(IVariantRowModel<SelectOption> item)
+	public void Update(MatcherResult<SelectOption> matcherResult)
 	{
 		Logger.Debug("Updating with a new item");
-		Model = item;
+		ViewModel.Update(matcherResult);
 		this.SetTitle(OptionTitle.Inlines);
 	}
 

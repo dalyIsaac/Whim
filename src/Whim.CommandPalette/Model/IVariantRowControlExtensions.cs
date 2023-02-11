@@ -17,7 +17,7 @@ public static class IVariantRowExtensions
 	public static void SetTitle<T>(this IVariantRowControl<T> row, InlineCollection inlines)
 	{
 		Logger.Debug("Setting title");
-		IList<PaletteTextSegment> segments = row.Model.FormattedTitle.Segments;
+		IList<PaletteTextSegment> segments = row.ViewModel.FormattedTitle.Segments;
 
 		int idx;
 		for (idx = 0; idx < segments.Count; idx++)

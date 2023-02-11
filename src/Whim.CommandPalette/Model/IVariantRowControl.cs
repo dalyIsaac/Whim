@@ -9,7 +9,7 @@ public interface IVariantRowControl<T>
 	/// <summary>
 	/// The item displayed by this row.
 	/// </summary>
-	public IVariantRowModel<T> Model { get; }
+	public IVariantRowViewModel<T> ViewModel { get; }
 
 	/// <summary>
 	/// Initializes the row. For example, sets the title.
@@ -17,8 +17,8 @@ public interface IVariantRowControl<T>
 	public void Initialize();
 
 	/// <summary>
-	/// Updates the row with a new item.
+	/// Updates the row with the result from the matcher.
 	/// </summary>
-	/// <param name="item"></param>
-	public void Update(IVariantRowModel<T> item);
+	/// <param name="matcherResult">The new result.</param>
+	public void Update(MatcherResult<T> matcherResult);
 }

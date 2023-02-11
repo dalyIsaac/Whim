@@ -5,19 +5,23 @@ namespace Whim.CommandPalette.Tests;
 
 public class MatcherItemComparerTests
 {
-	private static MatcherItem<CommandItem> CreateMatcherItem(string title, uint score = 0)
+	private static MatcherResult<CommandItem> CreateMatcherItem(string title, uint score = 0)
 	{
 		Mock<ICommand> command = new();
 		command.SetupGet(c => c.Title).Returns(title);
-		return new MatcherItem<CommandItem>(new MenuVariantRowModel(new CommandItem() { Command = command.Object }), Array.Empty<FilterTextMatch>(), score);
+		return new MatcherResult<CommandItem>(
+			new MenuVariantRowModel(new CommandItem() { Command = command.Object }),
+			Array.Empty<FilterTextMatch>(),
+			score
+		);
 	}
 
 	[Fact]
 	public void ThrowWhenXIsNull()
 	{
 		// Given
-		MatcherItem<CommandItem>? x = null;
-		MatcherItem<CommandItem>? y = CreateMatcherItem("y");
+		MatcherResult<CommandItem>? x = null;
+		MatcherResult<CommandItem>? y = CreateMatcherItem("y");
 
 		// When
 		MatcherItemComparer<CommandItem> comparer = new();
@@ -30,8 +34,8 @@ public class MatcherItemComparerTests
 	public void ThrowWhenYIsNull()
 	{
 		// Given
-		MatcherItem<CommandItem>? x = CreateMatcherItem("x");
-		MatcherItem<CommandItem>? y = null;
+		MatcherResult<CommandItem>? x = CreateMatcherItem("x");
+		MatcherResult<CommandItem>? y = null;
 
 		// When
 		MatcherItemComparer<CommandItem> comparer = new();
@@ -44,8 +48,8 @@ public class MatcherItemComparerTests
 	public void ReturnZeroWhenXAndYAreEqual()
 	{
 		// Given
-		MatcherItem<CommandItem>? x = CreateMatcherItem("a");
-		MatcherItem<CommandItem>? y = CreateMatcherItem("a");
+		MatcherResult<CommandItem>? x = CreateMatcherItem("a");
+		MatcherResult<CommandItem>? y = CreateMatcherItem("a");
 
 		// When
 		MatcherItemComparer<CommandItem> comparer = new();
@@ -58,8 +62,8 @@ public class MatcherItemComparerTests
 	public void ReturnMinusOneWhenXHasHigherScore()
 	{
 		// Given
-		MatcherItem<CommandItem>? x = CreateMatcherItem("x", 1);
-		MatcherItem<CommandItem>? y = CreateMatcherItem("y");
+		MatcherResult<CommandItem>? x = CreateMatcherItem("x", 1);
+		MatcherResult<CommandItem>? y = CreateMatcherItem("y");
 
 		// When
 		MatcherItemComparer<CommandItem> comparer = new();
@@ -72,8 +76,8 @@ public class MatcherItemComparerTests
 	public void ReturnOneWhenYHasHigherScore()
 	{
 		// Given
-		MatcherItem<CommandItem>? x = CreateMatcherItem("x");
-		MatcherItem<CommandItem>? y = CreateMatcherItem("y", 1);
+		MatcherResult<CommandItem>? x = CreateMatcherItem("x");
+		MatcherResult<CommandItem>? y = CreateMatcherItem("y", 1);
 
 		// When
 		MatcherItemComparer<CommandItem> comparer = new();
@@ -86,8 +90,8 @@ public class MatcherItemComparerTests
 	public void ReturnMinusOneWhenEqualScoreAndXAlphabeticallyFirst()
 	{
 		// Given
-		MatcherItem<CommandItem>? x = CreateMatcherItem("x");
-		MatcherItem<CommandItem>? y = CreateMatcherItem("y");
+		MatcherResult<CommandItem>? x = CreateMatcherItem("x");
+		MatcherResult<CommandItem>? y = CreateMatcherItem("y");
 
 		// When
 		MatcherItemComparer<CommandItem> comparer = new();
@@ -100,8 +104,8 @@ public class MatcherItemComparerTests
 	public void ReturnOneWhenEqualScoreAndYAlphabeticallyFirst()
 	{
 		// Given
-		MatcherItem<CommandItem>? x = CreateMatcherItem("b");
-		MatcherItem<CommandItem>? y = CreateMatcherItem("a");
+		MatcherResult<CommandItem>? x = CreateMatcherItem("b");
+		MatcherResult<CommandItem>? y = CreateMatcherItem("a");
 
 		// When
 		MatcherItemComparer<CommandItem> comparer = new();

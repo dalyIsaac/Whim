@@ -28,7 +28,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// Factory to create menu rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantRowModel<CommandItem>, IVariantRowControl<CommandItem>> _menuRowFactory;
+	private readonly Func<MatcherResult<CommandItem>, IVariantRowControl<CommandItem>> _menuRowFactory;
 
 	public readonly ObservableCollection<IVariantRowControl<CommandItem>> MenuRows = new();
 
@@ -97,11 +97,11 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public MenuVariantViewModel(
 		IConfigContext configContext,
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantRowModel<CommandItem>, IVariantRowControl<CommandItem>>? menuRowFactory = null
+		Func<MatcherResult<CommandItem>, IVariantRowControl<CommandItem>>? menuRowFactory = null
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_menuRowFactory = menuRowFactory ?? ((IVariantRowModel<CommandItem> item) => new MenuVariantRowControl(item));
+		_menuRowFactory = menuRowFactory ?? ((MatcherResult<CommandItem> item) => new MenuVariantRowControl(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(configContext.CommandManager);
@@ -188,7 +188,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		}
 
 		Logger.Verbose($"Executing command at index {SelectedIndex}");
-		IVariantRowModel<CommandItem> paletteItem = MenuRows[SelectedIndex].Model;
+		IVariantRowViewModel<CommandItem> paletteItem = MenuRows[SelectedIndex].ViewModel;
 		CommandItem match = paletteItem.Data;
 
 		// Since the palette window is reused, there's a chance that the _activationConfig
@@ -249,9 +249,9 @@ internal class MenuVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (IVariantRowModel<CommandItem> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (MatcherResult<CommandItem> item in activationConfig.Matcher.Match(query, _allItems))
 		{
-			Logger.Verbose($"Matched {item.Title}");
+			Logger.Verbose($"Matched {item.Model.Title}");
 			if (matchesCount < MenuRows.Count)
 			{
 				// Update the existing row.
@@ -275,7 +275,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			}
 			matchesCount++;
 
-			Logger.Verbose($"Finished updating {item.Title}");
+			Logger.Verbose($"Finished updating {item.Model.Title}");
 		}
 
 		return matchesCount;

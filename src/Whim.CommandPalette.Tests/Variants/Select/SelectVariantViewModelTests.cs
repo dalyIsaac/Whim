@@ -7,19 +7,29 @@ namespace Whim.CommandPalette.Tests;
 
 public class SelectVariantViewModelTests
 {
+	private static IEnumerable<MatcherResult<SelectOption>> ConvertToMatcherResults(
+		IEnumerable<IVariantRowModel<SelectOption>> variantRowModels
+	)
+	{
+		return variantRowModels.Select(
+			v => new MatcherResult<SelectOption>(v, new[] { new FilterTextMatch(0, v.Title.Length) }, 0)
+		);
+	}
+
 	private static (
-		Func<IVariantRowModel<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>>,
+		Func<MatcherResult<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>>,
 		List<Mock<IVariantRowControl<SelectOption>>>
 	) SelectRowFactoryWithMocks()
 	{
 		List<Mock<IVariantRowControl<SelectOption>>> variantRowMocks = new();
+
 		IVariantRowControl<SelectOption> selectRowFactory(
-			IVariantRowModel<SelectOption> item,
+			MatcherResult<SelectOption> matcherResult,
 			SelectVariantConfig config
 		)
 		{
 			Mock<IVariantRowControl<SelectOption>> variantRowMock = new();
-			variantRowMock.Setup(v => v.Model).Returns(item);
+			variantRowMock.Setup(v => v.ViewModel).Returns(new VariantRowViewModel<SelectOption>(matcherResult));
 			variantRowMocks.Add(variantRowMock);
 			return variantRowMock.Object;
 		}
@@ -216,7 +226,16 @@ public class SelectVariantViewModelTests
 		Mock<IMatcher<SelectOption>> matcherMock = new();
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
-			.Returns(options.Select(o => new SelectVariantRowModel(o)));
+			.Returns(
+				options.Select(
+					o =>
+						new MatcherResult<SelectOption>(
+							new SelectVariantRowModel(o),
+							new[] { new FilterTextMatch(0, o.Title.Length) },
+							0
+						)
+				)
+			);
 
 		SelectVariantConfig activationConfig =
 			new()
@@ -253,7 +272,7 @@ public class SelectVariantViewModelTests
 		) = CreateOptionsStubs();
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
-			.Returns(new List<IVariantRowModel<SelectOption>>());
+			.Returns(new List<MatcherResult<SelectOption>>());
 
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -581,9 +600,9 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
-		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].Model.Data);
-		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].Model.Data);
-		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].Model.Data);
+		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].ViewModel.Data);
+		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].ViewModel.Data);
+		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].ViewModel.Data);
 	}
 
 	[Fact]
@@ -618,7 +637,7 @@ public class SelectVariantViewModelTests
 
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
-			.Returns(updatedVariantItems);
+			.Returns(ConvertToMatcherResults(updatedVariantItems));
 
 		// When
 		selectVariantViewModel.LoadSelectMatches(
@@ -634,7 +653,12 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
-		createdRows[1].Verify(r => r.Update(updatedVariantItems[1]));
+		createdRows[1].Verify(
+			r =>
+				r.Update(
+					It.Is<MatcherResult<SelectOption>>(m => (SelectVariantRowModel)m.Model == updatedVariantItems[1])
+				)
+		);
 	}
 
 	/// <summary>
@@ -675,7 +699,8 @@ public class SelectVariantViewModelTests
 
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
-			.Returns(secondVariantItems);
+			.Returns(ConvertToMatcherResults(secondVariantItems));
+
 		selectVariantViewModel.Activate(
 			new SelectVariantConfig()
 			{
@@ -701,7 +726,8 @@ public class SelectVariantViewModelTests
 
 		matcherMock
 			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
-			.Returns(thirdVariantItems);
+			.Returns(ConvertToMatcherResults(thirdVariantItems));
+
 		selectVariantViewModel.Activate(
 			new SelectVariantConfig()
 			{
@@ -716,8 +742,18 @@ public class SelectVariantViewModelTests
 		// Then
 		// NOTE: RemoveUnusedRows is called by Update
 		Assert.Equal(2, selectVariantViewModel.SelectRows.Count);
-		createdRows[0].Verify(r => r.Update(thirdVariantItems[0]));
-		createdRows[1].Verify(r => r.Update(thirdVariantItems[1]));
+		createdRows[0].Verify(
+			r =>
+				r.Update(
+					It.Is<MatcherResult<SelectOption>>(m => (SelectVariantRowModel)m.Model == thirdVariantItems[0])
+				)
+		);
+		createdRows[1].Verify(
+			r =>
+				r.Update(
+					It.Is<MatcherResult<SelectOption>>(m => (SelectVariantRowModel)m.Model == thirdVariantItems[1])
+				)
+		);
 		Assert.Single(selectVariantViewModel._unusedRows);
 	}
 

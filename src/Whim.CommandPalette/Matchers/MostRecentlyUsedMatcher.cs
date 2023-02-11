@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Whim.CommandPalette;
@@ -21,9 +22,9 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// <summary>
 	/// Matcher returns an ordered list of filtered matches for the <paramref name="query"/>.
 	/// </summary>
-	public IEnumerable<IVariantRowModel<T>> Match(string query, IReadOnlyList<IVariantRowModel<T>> inputItems)
+	public IEnumerable<MatcherResult<T>> Match(string query, IReadOnlyList<IVariantRowModel<T>> inputItems)
 	{
-		MatcherItem<T>[] matches = new MatcherItem<T>[inputItems.Count];
+		MatcherResult<T>[] matches = new MatcherResult<T>[inputItems.Count];
 		int matchCount = GetFilteredItems(query, inputItems, matches);
 
 		if (matchCount == 0)
@@ -31,7 +32,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 			// If there are no matches and the query is not empty, return an empty list.
 			if (!string.IsNullOrEmpty(query))
 			{
-				return Array.Empty<IVariantRowModel<T>>();
+				return Array.Empty<MatcherResult<T>>();
 			}
 
 			// If there are no matches and the query is empty, return the most recently used items.
@@ -41,13 +42,8 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 		// Sort the matches.
 		Array.Sort(matches, 0, matchCount, _sorter);
 
-		// Get the IPaletteItem<T> from the matches.
-		IVariantRowModel<T>[] matchedItems = new IVariantRowModel<T>[matchCount];
-		for (int i = 0; i < matchCount; i++)
-		{
-			matchedItems[i] = matches[i].Model;
-		}
-		return matchedItems;
+		// Return the matches.
+		return matches.Take(matchCount);
 	}
 
 	/// <summary>
@@ -55,7 +51,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// array with the filtered matches, with updated text segments.
 	/// </summary>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	internal int GetFilteredItems(string query, IEnumerable<IVariantRowModel<T>> items, MatcherItem<T>[] matches)
+	internal int GetFilteredItems(string query, IEnumerable<IVariantRowModel<T>> items, MatcherResult<T>[] matches)
 	{
 		int matchCount = 0;
 
@@ -69,7 +65,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 			}
 
 			uint count = _commandLastExecutionTime.GetValueOrDefault<string, uint>(item.Id, 0);
-			matches[matchCount++] = new MatcherItem<T>(item, filterMatches, count);
+			matches[matchCount++] = new MatcherResult<T>(item, filterMatches, count);
 		}
 
 		return matchCount;
@@ -80,14 +76,14 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// array with the last execution time of each command.
 	/// </summary>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	internal int GetMostRecentlyUsedItems(IEnumerable<IVariantRowModel<T>> items, MatcherItem<T>[] matches)
+	internal int GetMostRecentlyUsedItems(IEnumerable<IVariantRowModel<T>> items, MatcherResult<T>[] matches)
 	{
 		int matchCount = 0;
 
 		foreach (IVariantRowModel<T> item in items)
 		{
 			uint lastExecutionTime = _commandLastExecutionTime.TryGetValue(item.Id, out uint value) ? value : 0;
-			matches[matchCount++] = new MatcherItem<T>(item, Array.Empty<FilterTextMatch>(), lastExecutionTime);
+			matches[matchCount++] = new MatcherResult<T>(item, Array.Empty<FilterTextMatch>(), lastExecutionTime);
 		}
 
 		return matchCount;

@@ -32,7 +32,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
 	private readonly Func<
-		IVariantRowModel<SelectOption>,
+		MatcherResult<SelectOption>,
 		SelectVariantConfig,
 		IVariantRowControl<SelectOption>
 	> _selectRowFactory;
@@ -108,7 +108,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantRowModel<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>> selectRowFactory
+		Func<MatcherResult<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -200,7 +200,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			return;
 		}
 
-		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].Model;
+		IVariantRowViewModel<SelectOption> selectedItem = SelectRows[SelectedIndex].ViewModel;
 		SelectOption selectedData = selectedItem.Data;
 
 		if (_allowMultiSelect)
@@ -277,19 +277,19 @@ internal class SelectVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (IVariantRowModel<SelectOption> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (MatcherResult<SelectOption> result in activationConfig.Matcher.Match(query, _allItems))
 		{
-			Logger.Verbose($"Matched {item.Title}");
+			Logger.Verbose($"Matched {result.Model.Title}");
 			if (matchesCount < SelectRows.Count)
 			{
 				// Update the existing row.
-				SelectRows[matchesCount].Update(item);
+				SelectRows[matchesCount].Update(result);
 			}
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
 				IVariantRowControl<SelectOption> row = _unusedRows[^1];
-				row.Update(item);
+				row.Update(result);
 
 				SelectRows.Add(row);
 				_unusedRows.RemoveAt(_unusedRows.Count - 1);
@@ -297,13 +297,13 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRowControl<SelectOption> row = _selectRowFactory(item, activationConfig);
+				IVariantRowControl<SelectOption> row = _selectRowFactory(result, activationConfig);
 				SelectRows.Add(row);
 				row.Initialize();
 			}
 			matchesCount++;
 
-			Logger.Verbose($"Finished updating {item.Title}");
+			Logger.Verbose($"Finished updating {result.Model.Title}");
 		}
 
 		return matchesCount;

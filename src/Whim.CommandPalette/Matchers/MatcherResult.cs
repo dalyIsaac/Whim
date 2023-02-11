@@ -4,22 +4,42 @@ using System.Collections.Generic;
 namespace Whim.CommandPalette;
 
 /// <summary>
-/// A command item, the text matches from the query, and the score of the item for the
-/// <see cref="IMatcher{T}"/>.
+/// A <see cref="IVariantRowModel{T}"/> model, the text matches from the query, and the score of the
+/// result for the <see cref="IMatcher{T}"/>.
 /// </summary>
-internal record MatcherItem<T>
+public record MatcherResult<T>
 {
 	private readonly FilterTextMatch[] _textSegments;
+
+	/// <summary>
+	/// The associated model of the result.
+	/// </summary>
 	public IVariantRowModel<T> Model { get; }
+
+	/// <summary>
+	/// The score of the result.
+	/// </summary>
 	public uint Score { get; }
 
-	public MatcherItem(IVariantRowModel<T> model, FilterTextMatch[] textSegments, uint score)
+	/// <summary>
+	/// Creates a new <see cref="MatcherResult{T}"/>.
+	/// </summary>
+	/// <param name="model">The associated model of the result.</param>
+	/// <param name="textSegments">The text matches from the query.</param>
+	/// <param name="score">The score of the result.</param>
+	public MatcherResult(IVariantRowModel<T> model, FilterTextMatch[] textSegments, uint score)
 	{
 		Model = model;
 		_textSegments = textSegments;
 		Score = score;
 	}
 
+	/// <summary>
+	/// The title of the item, with the matched text segments highlighted.
+	/// </summary>
+	/// <remarks>
+	/// This will re-evaluate each time it is accessed.
+	/// </remarks>
 	public PaletteText FormattedTitle
 	{
 		get
@@ -51,13 +71,13 @@ internal record MatcherItem<T>
 }
 
 /// <summary>
-/// Defines a method to compare <see cref="MatcherItem{T}"/>.
+/// Defines a method to compare <see cref="MatcherResult{T}"/>.
 /// A higher score will be sorted first. For equal scores, the title will be sorted normally.
 /// </summary>
-internal class MatcherItemComparer<T> : IComparer<MatcherItem<T>>
+internal class MatcherItemComparer<T> : IComparer<MatcherResult<T>>
 {
 	/// <inheritdoc />
-	public int Compare(MatcherItem<T>? x, MatcherItem<T>? y)
+	public int Compare(MatcherResult<T>? x, MatcherResult<T>? y)
 	{
 		// We throw here because it should never happen.
 		if (x is null)

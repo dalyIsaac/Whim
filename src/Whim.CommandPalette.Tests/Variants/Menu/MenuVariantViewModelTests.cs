@@ -23,8 +23,8 @@ public class MenuVariantViewModelTests
 		return (configContext, commandManager, windowViewModel);
 	}
 
-	private static IVariantRowControl<CommandItem> MenuRowFactory(IVariantRowModel<CommandItem> item) =>
-		new MenuRowStub() { Model = item };
+	private static IVariantRowControl<CommandItem> MenuRowFactory(MatcherResult<CommandItem> item) =>
+		new MenuRowStub() { ViewModel = new VariantRowViewModel<CommandItem>(item) };
 
 	[Fact]
 	public void Constructor()
@@ -325,12 +325,19 @@ public class MenuVariantViewModelTests
 
 	private static MenuVariantConfig CreateMenuActivationConfig(int itemCount)
 	{
-		List<MenuVariantRowModel> items = new();
+		List<MatcherResult<CommandItem>> items = new();
 
 		for (int i = 0; i < itemCount; i++)
 		{
+			FilterTextMatch[] segments = new FilterTextMatch[] { new FilterTextMatch(0, 1) };
 			items.Add(
-				new MenuVariantRowModel(new CommandItem() { Command = new Command($"id{i}", $"title{i}", () => { }) })
+				new(
+					new MenuVariantRowModel(
+						new CommandItem() { Command = new Command($"id{i}", $"title{i}", () => { }) }
+					),
+					segments,
+					0
+				)
 			);
 		}
 
@@ -415,8 +422,8 @@ public class MenuVariantViewModelTests
 
 		// Then
 		Assert.Equal(2, vm.MenuRows.Count);
-		Assert.Equal("title0", vm.MenuRows[0].Model.Title);
-		Assert.Equal("title1", vm.MenuRows[1].Model.Title);
+		Assert.Equal("title0", vm.MenuRows[0].ViewModel.Title);
+		Assert.Equal("title1", vm.MenuRows[1].ViewModel.Title);
 	}
 
 	[Fact]

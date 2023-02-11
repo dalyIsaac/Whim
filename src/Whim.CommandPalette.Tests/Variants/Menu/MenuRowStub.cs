@@ -4,13 +4,13 @@ internal class MenuRowStub : IVariantRowControl<CommandItem>
 {
 	public bool IsUpdated { get; private set; }
 
-	public required IVariantRowModel<CommandItem> Model { get; set; }
+	public required IVariantRowViewModel<CommandItem> ViewModel { get; init; }
 
 	public void Initialize() { }
 
-	public void Update(IVariantRowModel<CommandItem> item)
+	public void Update(MatcherResult<CommandItem> matcherResult)
 	{
-		Model = item;
+		ViewModel.Update(matcherResult);
 		IsUpdated = true;
 	}
 }

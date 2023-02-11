@@ -10,11 +10,11 @@ internal sealed partial class MenuVariantRowControl : UserControl, IVariantRowCo
 {
 	public static double MenuRowHeight => 24;
 
-	public IVariantRowModel<CommandItem> Model { get; private set; }
+	public IVariantRowViewModel<CommandItem> ViewModel { get; }
 
-	public MenuVariantRowControl(IVariantRowModel<CommandItem> item)
+	public MenuVariantRowControl(MatcherResult<CommandItem> matcherResult)
 	{
-		Model = item;
+		ViewModel = new VariantRowViewModel<CommandItem>(matcherResult);
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/Menu/MenuVariantRowControl");
 	}
 
@@ -24,10 +24,10 @@ internal sealed partial class MenuVariantRowControl : UserControl, IVariantRowCo
 		SetKeybinds();
 	}
 
-	public void Update(IVariantRowModel<CommandItem> item)
+	public void Update(MatcherResult<CommandItem> matcherResult)
 	{
 		Logger.Debug("Updating with a new item");
-		Model = item;
+		ViewModel.Update(matcherResult);
 		this.SetTitle(CommandTitle.Inlines);
 		SetKeybinds();
 	}
@@ -36,9 +36,9 @@ internal sealed partial class MenuVariantRowControl : UserControl, IVariantRowCo
 	{
 		Logger.Debug("Setting keybinds");
 
-		if (Model.Data.Keybind is not null)
+		if (ViewModel.Data.Keybind is not null)
 		{
-			CommandKeybind.Text = Model.Data.Keybind.ToString();
+			CommandKeybind.Text = ViewModel.Data.Keybind.ToString();
 			CommandKeybindBorder.Visibility = Visibility.Visible;
 		}
 		else
