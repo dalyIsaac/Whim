@@ -9,37 +9,44 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal record MatcherItem<T>
 {
-	public required IVariantRowModel<T> Item { get; init; }
-	public required FilterTextMatch[] TextSegments { get; init; }
-	public required uint Score { get; init; }
+	private readonly FilterTextMatch[] _textSegments;
+	public IVariantRowModel<T> Model { get; }
+	public uint Score { get; }
 
-	/// <summary>
-	/// Formats the title of the <see cref="Item"/> with the <see cref="TextSegments"/>.
-	/// </summary>
-	public void FormatTitle()
+	public MatcherItem(IVariantRowModel<T> model, FilterTextMatch[] textSegments, uint score)
 	{
-		PaletteText formattedTitle = new();
-		ReadOnlySpan<char> rawTitle = Item.Title.AsSpan();
+		Model = model;
+		_textSegments = textSegments;
+		Score = score;
+	}
 
-		int start = 0;
-		foreach (FilterTextMatch match in TextSegments)
+	public PaletteText FormattedTitle
+	{
+		get
 		{
-			if (start < match.Start)
+			PaletteText formattedTitle = new();
+			ReadOnlySpan<char> rawTitle = Model.Title.AsSpan();
+
+			int start = 0;
+			foreach (FilterTextMatch match in _textSegments)
 			{
-				formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[start..match.Start].ToString(), false));
-				start = match.Start;
+				if (start < match.Start)
+				{
+					formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[start..match.Start].ToString(), false));
+					start = match.Start;
+				}
+
+				formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[match.Start..match.End].ToString(), true));
+				start = match.End;
 			}
 
-			formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[match.Start..match.End].ToString(), true));
-			start = match.End;
-		}
+			if (start < rawTitle.Length)
+			{
+				formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[start..].ToString(), false));
+			}
 
-		if (start < rawTitle.Length)
-		{
-			formattedTitle.Segments.Add(new PaletteTextSegment(rawTitle[start..].ToString(), false));
+			return formattedTitle;
 		}
-
-		Item.FormattedTitle = formattedTitle;
 	}
 }
 
@@ -73,6 +80,6 @@ internal class MatcherItemComparer<T> : IComparer<MatcherItem<T>>
 		}
 
 		// Sort by alphabetical order.
-		return string.Compare(x.Item.Title, y.Item.Title, StringComparison.Ordinal);
+		return string.Compare(x.Model.Title, y.Model.Title, StringComparison.Ordinal);
 	}
 }

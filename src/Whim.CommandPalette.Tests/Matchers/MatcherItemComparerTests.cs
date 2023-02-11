@@ -9,13 +9,7 @@ public class MatcherItemComparerTests
 	{
 		Mock<ICommand> command = new();
 		command.SetupGet(c => c.Title).Returns(title);
-
-		return new MatcherItem<CommandItem>()
-		{
-			Item = new MenuVariantRowModel(new CommandItem() { Command = command.Object }),
-			TextSegments = Array.Empty<FilterTextMatch>(),
-			Score = score
-		};
+		return new MatcherItem<CommandItem>(new MenuVariantRowModel(new CommandItem() { Command = command.Object }), Array.Empty<FilterTextMatch>(), score);
 	}
 
 	[Fact]

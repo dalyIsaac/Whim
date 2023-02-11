@@ -17,12 +17,7 @@ public class MostRecentlyUsedMatcherTests
 			MenuVariantRowModel menuItem = new(commandItem);
 
 			menuItems[i] = menuItem;
-			matcherItems[i] = new MatcherItem<CommandItem>()
-			{
-				Item = menuItem,
-				Score = 0,
-				TextSegments = Array.Empty<FilterTextMatch>()
-			};
+			matcherItems[i] = new(menuItem, Array.Empty<FilterTextMatch>(), 0);
 		}
 
 		return (menuItems, matcherItems);
@@ -40,7 +35,7 @@ public class MostRecentlyUsedMatcherTests
 
 		// Then
 		Assert.Equal(1, matchCount);
-		Assert.Equal("A", matches[0].Item.Data.Command.Title);
+		Assert.Equal("A", matches[0].Model.Data.Command.Title);
 		Assert.Equal((uint)0, matches[0].Score);
 	}
 
@@ -56,9 +51,9 @@ public class MostRecentlyUsedMatcherTests
 
 		// Then
 		Assert.Equal(2, matchCount);
-		Assert.Equal("A", matches[0].Item.Data.Command.Title);
+		Assert.Equal("A", matches[0].Model.Data.Command.Title);
 		Assert.Equal((uint)0, matches[0].Score);
-		Assert.Equal("B", matches[1].Item.Data.Command.Title);
+		Assert.Equal("B", matches[1].Model.Data.Command.Title);
 		Assert.Equal((uint)0, matches[1].Score);
 	}
 
@@ -75,8 +70,8 @@ public class MostRecentlyUsedMatcherTests
 
 		// Then
 		Assert.Equal(2, matchCount);
-		Assert.Equal("A", matches[0].Item.Data.Command.Title);
-		Assert.Equal("B", matches[1].Item.Data.Command.Title);
+		Assert.Equal("A", matches[0].Model.Data.Command.Title);
+		Assert.Equal("B", matches[1].Model.Data.Command.Title);
 		Assert.True(matches[1].Score > matches[0].Score);
 	}
 

@@ -45,9 +45,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 		IVariantRowModel<T>[] matchedItems = new IVariantRowModel<T>[matchCount];
 		for (int i = 0; i < matchCount; i++)
 		{
-			MatcherItem<T> current = matches[i];
-			current.FormatTitle();
-			matchedItems[i] = current.Item;
+			matchedItems[i] = matches[i].Model;
 		}
 		return matchedItems;
 	}
@@ -71,12 +69,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 			}
 
 			uint count = _commandLastExecutionTime.GetValueOrDefault<string, uint>(item.Id, 0);
-			matches[matchCount++] = new MatcherItem<T>()
-			{
-				Item = item,
-				TextSegments = filterMatches,
-				Score = count
-			};
+			matches[matchCount++] = new MatcherItem<T>(item, filterMatches, count);
 		}
 
 		return matchCount;
@@ -94,12 +87,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 		foreach (IVariantRowModel<T> item in items)
 		{
 			uint lastExecutionTime = _commandLastExecutionTime.TryGetValue(item.Id, out uint value) ? value : 0;
-			matches[matchCount++] = new MatcherItem<T>()
-			{
-				Item = item,
-				TextSegments = Array.Empty<FilterTextMatch>(),
-				Score = lastExecutionTime
-			};
+			matches[matchCount++] = new MatcherItem<T>(item, Array.Empty<FilterTextMatch>(), lastExecutionTime);
 		}
 
 		return matchCount;
