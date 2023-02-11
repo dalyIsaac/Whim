@@ -21,7 +21,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// <summary>
 	/// Matcher returns an ordered list of filtered matches for the <paramref name="query"/>.
 	/// </summary>
-	public IEnumerable<IVariantItem<T>> Match(string query, IReadOnlyList<IVariantItem<T>> inputItems)
+	public IEnumerable<IVariantRowModel<T>> Match(string query, IReadOnlyList<IVariantRowModel<T>> inputItems)
 	{
 		MatcherItem<T>[] matches = new MatcherItem<T>[inputItems.Count];
 		int matchCount = GetFilteredItems(query, inputItems, matches);
@@ -31,7 +31,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 			// If there are no matches and the query is not empty, return an empty list.
 			if (!string.IsNullOrEmpty(query))
 			{
-				return Array.Empty<IVariantItem<T>>();
+				return Array.Empty<IVariantRowModel<T>>();
 			}
 
 			// If there are no matches and the query is empty, return the most recently used items.
@@ -42,7 +42,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 		Array.Sort(matches, 0, matchCount, _sorter);
 
 		// Get the IPaletteItem<T> from the matches.
-		IVariantItem<T>[] matchedItems = new IVariantItem<T>[matchCount];
+		IVariantRowModel<T>[] matchedItems = new IVariantRowModel<T>[matchCount];
 		for (int i = 0; i < matchCount; i++)
 		{
 			MatcherItem<T> current = matches[i];
@@ -57,12 +57,12 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// array with the filtered matches, with updated text segments.
 	/// </summary>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	internal int GetFilteredItems(string query, IEnumerable<IVariantItem<T>> items, MatcherItem<T>[] matches)
+	internal int GetFilteredItems(string query, IEnumerable<IVariantRowModel<T>> items, MatcherItem<T>[] matches)
 	{
 		int matchCount = 0;
 
 		// Get the matches for the query.
-		foreach (IVariantItem<T> item in items)
+		foreach (IVariantRowModel<T> item in items)
 		{
 			FilterTextMatch[]? filterMatches = Filter(query, item.Title);
 			if (filterMatches == null)
@@ -87,11 +87,11 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// array with the last execution time of each command.
 	/// </summary>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	internal int GetMostRecentlyUsedItems(IEnumerable<IVariantItem<T>> items, MatcherItem<T>[] matches)
+	internal int GetMostRecentlyUsedItems(IEnumerable<IVariantRowModel<T>> items, MatcherItem<T>[] matches)
 	{
 		int matchCount = 0;
 
-		foreach (IVariantItem<T> item in items)
+		foreach (IVariantRowModel<T> item in items)
 		{
 			uint lastExecutionTime = _commandLastExecutionTime.TryGetValue(item.Id, out uint value) ? value : 0;
 			matches[matchCount++] = new MatcherItem<T>()
@@ -109,7 +109,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// Called when a match has been executed. This is used by the <see cref="IMatcher{T}"/>
 	/// implementation to update relevant internal state.
 	/// </summary>
-	public void OnMatchExecuted(IVariantItem<T> item)
+	public void OnMatchExecuted(IVariantRowModel<T> item)
 	{
 		_commandLastExecutionTime[item.Id] = (uint)DateTime.Now.Ticks;
 	}

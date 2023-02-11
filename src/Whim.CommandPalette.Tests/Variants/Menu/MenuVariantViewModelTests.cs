@@ -23,8 +23,8 @@ public class MenuVariantViewModelTests
 		return (configContext, commandManager, windowViewModel);
 	}
 
-	private static IVariantRow<CommandItem> MenuRowFactory(IVariantItem<CommandItem> item) =>
-		new MenuRowStub() { Item = item };
+	private static IVariantRowControl<CommandItem> MenuRowFactory(IVariantRowModel<CommandItem> item) =>
+		new MenuRowStub() { Model = item };
 
 	[Fact]
 	public void Constructor()
@@ -325,18 +325,18 @@ public class MenuVariantViewModelTests
 
 	private static MenuVariantConfig CreateMenuActivationConfig(int itemCount)
 	{
-		List<MenuVariantItem> items = new();
+		List<MenuVariantRowModel> items = new();
 
 		for (int i = 0; i < itemCount; i++)
 		{
 			items.Add(
-				new MenuVariantItem(new CommandItem() { Command = new Command($"id{i}", $"title{i}", () => { }) })
+				new MenuVariantRowModel(new CommandItem() { Command = new Command($"id{i}", $"title{i}", () => { }) })
 			);
 		}
 
 		Mock<IMatcher<CommandItem>> matcher = new();
 		matcher
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<CommandItem>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<CommandItem>>>()))
 			.Returns(items);
 
 		MenuVariantConfig config = new() { Matcher = matcher.Object, Commands = Array.Empty<CommandItem>() };
@@ -415,8 +415,8 @@ public class MenuVariantViewModelTests
 
 		// Then
 		Assert.Equal(2, vm.MenuRows.Count);
-		Assert.Equal("title0", vm.MenuRows[0].Item.Title);
-		Assert.Equal("title1", vm.MenuRows[1].Item.Title);
+		Assert.Equal("title0", vm.MenuRows[0].Model.Title);
+		Assert.Equal("title1", vm.MenuRows[1].Model.Title);
 	}
 
 	[Fact]

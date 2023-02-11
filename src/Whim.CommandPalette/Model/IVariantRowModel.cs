@@ -3,7 +3,7 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// An item displayed by a <see cref="IVariantViewModel"/>.
 /// </summary>
-public interface IVariantItem<T>
+public interface IVariantRowModel<T>
 {
 	/// <summary>
 	/// The unique identifier of the palette item.

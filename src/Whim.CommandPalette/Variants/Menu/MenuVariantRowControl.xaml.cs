@@ -6,16 +6,16 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-internal sealed partial class MenuRow : UserControl, IVariantRow<CommandItem>
+internal sealed partial class MenuVariantRowControl : UserControl, IVariantRowControl<CommandItem>
 {
 	public static double MenuRowHeight => 24;
 
-	public IVariantItem<CommandItem> Item { get; private set; }
+	public IVariantRowModel<CommandItem> Model { get; private set; }
 
-	public MenuRow(IVariantItem<CommandItem> item)
+	public MenuVariantRowControl(IVariantRowModel<CommandItem> item)
 	{
-		Item = item;
-		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/Menu/MenuRow");
+		Model = item;
+		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/Menu/MenuVariantRowControl");
 	}
 
 	public void Initialize()
@@ -24,10 +24,10 @@ internal sealed partial class MenuRow : UserControl, IVariantRow<CommandItem>
 		SetKeybinds();
 	}
 
-	public void Update(IVariantItem<CommandItem> item)
+	public void Update(IVariantRowModel<CommandItem> item)
 	{
 		Logger.Debug("Updating with a new item");
-		Item = item;
+		Model = item;
 		this.SetTitle(CommandTitle.Inlines);
 		SetKeybinds();
 	}
@@ -36,9 +36,9 @@ internal sealed partial class MenuRow : UserControl, IVariantRow<CommandItem>
 	{
 		Logger.Debug("Setting keybinds");
 
-		if (Item.Data.Keybind is not null)
+		if (Model.Data.Keybind is not null)
 		{
-			CommandKeybind.Text = Item.Data.Keybind.ToString();
+			CommandKeybind.Text = Model.Data.Keybind.ToString();
 			CommandKeybindBorder.Visibility = Visibility.Visible;
 		}
 		else

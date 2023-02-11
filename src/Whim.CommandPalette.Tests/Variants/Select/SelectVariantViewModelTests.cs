@@ -8,15 +8,18 @@ namespace Whim.CommandPalette.Tests;
 public class SelectVariantViewModelTests
 {
 	private static (
-		Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>>,
-		List<Mock<IVariantRow<SelectOption>>>
+		Func<IVariantRowModel<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>>,
+		List<Mock<IVariantRowControl<SelectOption>>>
 	) SelectRowFactoryWithMocks()
 	{
-		List<Mock<IVariantRow<SelectOption>>> variantRowMocks = new();
-		IVariantRow<SelectOption> selectRowFactory(IVariantItem<SelectOption> item, SelectVariantConfig config)
+		List<Mock<IVariantRowControl<SelectOption>>> variantRowMocks = new();
+		IVariantRowControl<SelectOption> selectRowFactory(
+			IVariantRowModel<SelectOption> item,
+			SelectVariantConfig config
+		)
 		{
-			Mock<IVariantRow<SelectOption>> variantRowMock = new();
-			variantRowMock.Setup(v => v.Item).Returns(item);
+			Mock<IVariantRowControl<SelectOption>> variantRowMock = new();
+			variantRowMock.Setup(v => v.Model).Returns(item);
 			variantRowMocks.Add(variantRowMock);
 			return variantRowMock.Object;
 		}
@@ -172,7 +175,7 @@ public class SelectVariantViewModelTests
 		Mock<ICommandPaletteWindowViewModel>,
 		List<SelectOption>,
 		Mock<IMatcher<SelectOption>>,
-		List<Mock<IVariantRow<SelectOption>>>
+		List<Mock<IVariantRowControl<SelectOption>>>
 	) CreateOptionsStubs()
 	{
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
@@ -212,8 +215,8 @@ public class SelectVariantViewModelTests
 
 		Mock<IMatcher<SelectOption>> matcherMock = new();
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
-			.Returns(options.Select(o => new SelectVariantItem(o)));
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
+			.Returns(options.Select(o => new SelectVariantRowModel(o)));
 
 		SelectVariantConfig activationConfig =
 			new()
@@ -249,8 +252,8 @@ public class SelectVariantViewModelTests
 			_
 		) = CreateOptionsStubs();
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
-			.Returns(new List<IVariantItem<SelectOption>>());
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
+			.Returns(new List<IVariantRowModel<SelectOption>>());
 
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -323,7 +326,7 @@ public class SelectVariantViewModelTests
 		Assert.False(options[0].IsSelected);
 		Assert.False(options[1].IsSelected);
 		Assert.True(options[2].IsSelected);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Once);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
@@ -365,7 +368,7 @@ public class SelectVariantViewModelTests
 		Assert.False(options[0].IsSelected);
 		Assert.True(options[1].IsSelected);
 		Assert.False(options[2].IsSelected);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Once);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
@@ -385,11 +388,11 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(activationConfig);
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRow<SelectOption>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption>>().Object);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Never);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
@@ -408,11 +411,11 @@ public class SelectVariantViewModelTests
 		) = CreateOptionsStubs();
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRow<SelectOption>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption>>().Object);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Never);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
@@ -432,11 +435,11 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(activationConfig);
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRow<SelectOption>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption>>().Object);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Never);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
@@ -463,7 +466,7 @@ public class SelectVariantViewModelTests
 		Assert.False(options[0].IsSelected);
 		Assert.True(options[1].IsSelected);
 		Assert.False(options[2].IsSelected);
-		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantItem<SelectOption>>()), Times.Once);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
@@ -578,9 +581,9 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
-		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].Item.Data);
-		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].Item.Data);
-		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].Item.Data);
+		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].Model.Data);
+		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].Model.Data);
+		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].Model.Data);
 	}
 
 	[Fact]
@@ -609,10 +612,12 @@ public class SelectVariantViewModelTests
 
 		List<SelectOption> updatedOptions = new() { options[0], newOption, options[2], };
 
-		List<SelectVariantItem> updatedVariantItems = updatedOptions.Select(o => new SelectVariantItem(o)).ToList();
+		List<SelectVariantRowModel> updatedVariantItems = updatedOptions
+			.Select(o => new SelectVariantRowModel(o))
+			.ToList();
 
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
 			.Returns(updatedVariantItems);
 
 		// When
@@ -664,10 +669,12 @@ public class SelectVariantViewModelTests
 				IsEnabled = false
 			};
 		List<SelectOption> secondOptions = new() { secondNewOption };
-		List<SelectVariantItem> secondVariantItems = secondOptions.Select(o => new SelectVariantItem(o)).ToList();
+		List<SelectVariantRowModel> secondVariantItems = secondOptions
+			.Select(o => new SelectVariantRowModel(o))
+			.ToList();
 
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
 			.Returns(secondVariantItems);
 		selectVariantViewModel.Activate(
 			new SelectVariantConfig()
@@ -690,10 +697,10 @@ public class SelectVariantViewModelTests
 				IsEnabled = false
 			};
 		List<SelectOption> thirdOptions = new() { secondNewOption, thirdNewOption };
-		List<SelectVariantItem> thirdVariantItems = thirdOptions.Select(o => new SelectVariantItem(o)).ToList();
+		List<SelectVariantRowModel> thirdVariantItems = thirdOptions.Select(o => new SelectVariantRowModel(o)).ToList();
 
 		matcherMock
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantItem<SelectOption>>>()))
+			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<SelectOption>>>()))
 			.Returns(thirdVariantItems);
 		selectVariantViewModel.Activate(
 			new SelectVariantConfig()

@@ -28,6 +28,6 @@ internal sealed partial class MenuVariantView : UserControl
 
 	public double GetViewMaxHeight()
 	{
-		return ViewModel.MenuRows.Count * MenuRow.MenuRowHeight;
+		return ViewModel.MenuRows.Count * MenuVariantRowControl.MenuRowHeight;
 	}
 }

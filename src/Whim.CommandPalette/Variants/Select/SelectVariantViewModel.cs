@@ -20,20 +20,24 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	internal readonly List<IVariantRow<SelectOption>> _unusedRows = new();
+	internal readonly List<IVariantRowControl<SelectOption>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
 	/// </summary>
-	internal readonly List<SelectVariantItem> _allItems = new();
+	internal readonly List<SelectVariantRowModel> _allItems = new();
 
 	/// <summary>
 	/// Factory to create select rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> _selectRowFactory;
+	private readonly Func<
+		IVariantRowModel<SelectOption>,
+		SelectVariantConfig,
+		IVariantRowControl<SelectOption>
+	> _selectRowFactory;
 
-	public readonly ObservableCollection<IVariantRow<SelectOption>> SelectRows = new();
+	public readonly ObservableCollection<IVariantRowControl<SelectOption>> SelectRows = new();
 
 	/// <summary>
 	/// The height of the row.
@@ -104,7 +108,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantItem<SelectOption>, SelectVariantConfig, IVariantRow<SelectOption>> selectRowFactory
+		Func<IVariantRowModel<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -196,7 +200,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			return;
 		}
 
-		IVariantItem<SelectOption> selectedItem = SelectRows[SelectedIndex].Item;
+		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].Model;
 		SelectOption selectedData = selectedItem.Data;
 
 		if (_allowMultiSelect)
@@ -205,7 +209,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		}
 		else
 		{
-			foreach (SelectVariantItem variantItem in _allItems)
+			foreach (SelectVariantRowModel variantItem in _allItems)
 			{
 				variantItem.Data.IsSelected = false;
 			}
@@ -217,7 +221,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
-	public void VariantRow_OnClick(IVariantRow<SelectOption> variantRow)
+	public void VariantRow_OnClick(IVariantRowControl<SelectOption> variantRow)
 	{
 		if (_activationConfig == null)
 		{
@@ -246,12 +250,12 @@ internal class SelectVariantViewModel : IVariantViewModel
 			{
 				if (_allItems[idx].Data != selectOption)
 				{
-					_allItems[idx] = new SelectVariantItem(selectOption);
+					_allItems[idx] = new SelectVariantRowModel(selectOption);
 				}
 			}
 			else
 			{
-				_allItems.Add(new SelectVariantItem(selectOption));
+				_allItems.Add(new SelectVariantRowModel(selectOption));
 			}
 
 			idx++;
@@ -273,7 +277,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (IVariantItem<SelectOption> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (IVariantRowModel<SelectOption> item in activationConfig.Matcher.Match(query, _allItems))
 		{
 			Logger.Verbose($"Matched {item.Title}");
 			if (matchesCount < SelectRows.Count)
@@ -284,7 +288,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				IVariantRow<SelectOption> row = _unusedRows[^1];
+				IVariantRowControl<SelectOption> row = _unusedRows[^1];
 				row.Update(item);
 
 				SelectRows.Add(row);
@@ -293,7 +297,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRow<SelectOption> row = _selectRowFactory(item, activationConfig);
+				IVariantRowControl<SelectOption> row = _selectRowFactory(item, activationConfig);
 				SelectRows.Add(row);
 				row.Initialize();
 			}
