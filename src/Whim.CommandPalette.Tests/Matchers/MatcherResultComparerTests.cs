@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
-public class MatcherItemComparerTests
+public class MatcherResultComparerTests
 {
 	private static MatcherResult<CommandItem> CreateMatcherItem(string title, uint score = 0)
 	{
