@@ -20,19 +20,19 @@ public class SelectVariantViewModelTests
 		Func<
 			MatcherResult<SelectOption>,
 			SelectVariantConfig,
-			IVariantRowControl<SelectOption, SelectVariantRowViewModel>
+			IVariantRowView<SelectOption, SelectVariantRowViewModel>
 		>,
-		List<Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>>
+		List<Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>>>
 	) SelectRowFactoryWithMocks()
 	{
-		List<Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>> variantRowMocks = new();
+		List<Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>>> variantRowMocks = new();
 
-		IVariantRowControl<SelectOption, SelectVariantRowViewModel> selectRowFactory(
+		IVariantRowView<SelectOption, SelectVariantRowViewModel> selectRowFactory(
 			MatcherResult<SelectOption> matcherResult,
 			SelectVariantConfig config
 		)
 		{
-			Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>> variantRowMock = new();
+			Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>> variantRowMock = new();
 			variantRowMock.Setup(v => v.ViewModel).Returns(new SelectVariantRowViewModel(matcherResult));
 			variantRowMocks.Add(variantRowMock);
 			return variantRowMock.Object;
@@ -189,7 +189,7 @@ public class SelectVariantViewModelTests
 		Mock<ICommandPaletteWindowViewModel>,
 		List<SelectOption>,
 		Mock<IMatcher<SelectOption>>,
-		List<Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>>
+		List<Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>>>
 	) CreateOptionsStubs()
 	{
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
@@ -412,7 +412,7 @@ public class SelectVariantViewModelTests
 
 		// When
 		selectVariantViewModel.VariantRow_OnClick(
-			new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object
+			new Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>>().Object
 		);
 
 		// Then
@@ -437,7 +437,7 @@ public class SelectVariantViewModelTests
 
 		// When
 		selectVariantViewModel.VariantRow_OnClick(
-			new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object
+			new Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>>().Object
 		);
 
 		// Then
@@ -463,7 +463,7 @@ public class SelectVariantViewModelTests
 
 		// When
 		selectVariantViewModel.VariantRow_OnClick(
-			new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object
+			new Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>>().Object
 		);
 
 		// Then

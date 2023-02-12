@@ -17,7 +17,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	private readonly List<IVariantRowControl<CommandItem, MenuVariantRowViewModel>> _unusedRows = new();
+	private readonly List<IVariantRowView<CommandItem, MenuVariantRowViewModel>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="MenuRows"/> are drawn.
@@ -30,10 +30,10 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// </summary>
 	private readonly Func<
 		MatcherResult<CommandItem>,
-		IVariantRowControl<CommandItem, MenuVariantRowViewModel>
+		IVariantRowView<CommandItem, MenuVariantRowViewModel>
 	> _menuRowFactory;
 
-	public readonly ObservableCollection<IVariantRowControl<CommandItem, MenuVariantRowViewModel>> MenuRows = new();
+	public readonly ObservableCollection<IVariantRowView<CommandItem, MenuVariantRowViewModel>> MenuRows = new();
 
 	public bool ShowSaveButton => false;
 
@@ -100,12 +100,11 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public MenuVariantViewModel(
 		IConfigContext configContext,
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<MatcherResult<CommandItem>, IVariantRowControl<CommandItem, MenuVariantRowViewModel>>? menuRowFactory =
-			null
+		Func<MatcherResult<CommandItem>, IVariantRowView<CommandItem, MenuVariantRowViewModel>>? menuRowFactory = null
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_menuRowFactory = menuRowFactory ?? ((MatcherResult<CommandItem> item) => new MenuVariantRowControl(item));
+		_menuRowFactory = menuRowFactory ?? ((MatcherResult<CommandItem> item) => new MenuVariantRowView(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(configContext.CommandManager);
@@ -264,7 +263,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				IVariantRowControl<CommandItem, MenuVariantRowViewModel> row = _unusedRows[^1];
+				IVariantRowView<CommandItem, MenuVariantRowViewModel> row = _unusedRows[^1];
 				row.Update(item);
 
 				MenuRows.Add(row);
@@ -273,7 +272,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRowControl<CommandItem, MenuVariantRowViewModel> row = _menuRowFactory(item);
+				IVariantRowView<CommandItem, MenuVariantRowViewModel> row = _menuRowFactory(item);
 				MenuRows.Add(row);
 				row.Initialize();
 			}
