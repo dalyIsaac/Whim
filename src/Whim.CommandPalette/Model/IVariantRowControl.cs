@@ -4,12 +4,13 @@ namespace Whim.CommandPalette;
 /// A control that represents a single row in a variant.
 /// </summary>
 /// <typeparam name="T">The variant item's data type.</typeparam>
-public interface IVariantRowControl<T>
+/// <typeparam name="TVM">The variant item's view model type.</typeparam>
+public interface IVariantRowControl<T, TVM> where TVM : IVariantRowViewModel<T>
 {
 	/// <summary>
 	/// The item displayed by this row.
 	/// </summary>
-	public IVariantRowViewModel<T> ViewModel { get; }
+	public TVM ViewModel { get; }
 
 	/// <summary>
 	/// Initializes the row. For example, sets the title.

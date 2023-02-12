@@ -16,7 +16,7 @@ internal class SelectVariantControl : IVariantControl
 		_control = new SelectVariantView(_viewModel);
 	}
 
-	private IVariantRowControl<SelectOption> SelectRowFactory(
+	private IVariantRowControl<SelectOption, SelectVariantRowViewModel> SelectRowFactory(
 		MatcherResult<SelectOption> item,
 		SelectVariantConfig config
 	)

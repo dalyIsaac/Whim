@@ -17,19 +17,19 @@ public class SelectVariantViewModelTests
 	}
 
 	private static (
-		Func<MatcherResult<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>>,
-		List<Mock<IVariantRowControl<SelectOption>>>
+		Func<MatcherResult<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption, SelectVariantRowViewModel>>,
+		List<Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>>
 	) SelectRowFactoryWithMocks()
 	{
-		List<Mock<IVariantRowControl<SelectOption>>> variantRowMocks = new();
+		List<Mock<IVariantRowControl<SelectOption,  SelectVariantRowViewModel>>> variantRowMocks = new();
 
-		IVariantRowControl<SelectOption> selectRowFactory(
+		IVariantRowControl<SelectOption, SelectVariantRowViewModel> selectRowFactory(
 			MatcherResult<SelectOption> matcherResult,
 			SelectVariantConfig config
 		)
 		{
-			Mock<IVariantRowControl<SelectOption>> variantRowMock = new();
-			variantRowMock.Setup(v => v.ViewModel).Returns(new VariantRowViewModel<SelectOption>(matcherResult));
+			Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>> variantRowMock = new();
+			variantRowMock.Setup(v => v.ViewModel).Returns(new SelectVariantRowViewModel(matcherResult));
 			variantRowMocks.Add(variantRowMock);
 			return variantRowMock.Object;
 		}
@@ -185,7 +185,7 @@ public class SelectVariantViewModelTests
 		Mock<ICommandPaletteWindowViewModel>,
 		List<SelectOption>,
 		Mock<IMatcher<SelectOption>>,
-		List<Mock<IVariantRowControl<SelectOption>>>
+		List<Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>>
 	) CreateOptionsStubs()
 	{
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
@@ -407,7 +407,7 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(activationConfig);
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
@@ -430,7 +430,7 @@ public class SelectVariantViewModelTests
 		) = CreateOptionsStubs();
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
@@ -454,7 +454,7 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(activationConfig);
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
@@ -600,9 +600,9 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
-		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].ViewModel.Data);
-		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].ViewModel.Data);
-		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].ViewModel.Data);
+		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].ViewModel.Model.Data);
+		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].ViewModel.Model.Data);
+		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].ViewModel.Model.Data);
 	}
 
 	[Fact]

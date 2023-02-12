@@ -6,15 +6,15 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-internal sealed partial class MenuVariantRowControl : UserControl, IVariantRowControl<CommandItem>
+internal sealed partial class MenuVariantRowControl : UserControl, IVariantRowControl<CommandItem, MenuVariantRowViewModel>
 {
 	public static double MenuRowHeight => 24;
 
-	public IVariantRowViewModel<CommandItem> ViewModel { get; }
+	public MenuVariantRowViewModel ViewModel { get; }
 
 	public MenuVariantRowControl(MatcherResult<CommandItem> matcherResult)
 	{
-		ViewModel = new VariantRowViewModel<CommandItem>(matcherResult);
+		ViewModel = new MenuVariantRowViewModel(matcherResult);
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/Menu/MenuVariantRowControl");
 	}
 
@@ -36,9 +36,9 @@ internal sealed partial class MenuVariantRowControl : UserControl, IVariantRowCo
 	{
 		Logger.Debug("Setting keybinds");
 
-		if (ViewModel.Data.Keybind is not null)
+		if (ViewModel.Model.Data.Keybind is not null)
 		{
-			CommandKeybind.Text = ViewModel.Data.Keybind.ToString();
+			CommandKeybind.Text = ViewModel.Model.Data.Keybind.ToString();
 			CommandKeybindBorder.Visibility = Visibility.Visible;
 		}
 		else

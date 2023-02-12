@@ -18,5 +18,8 @@ public interface IVariantRowModel<T>
 	/// <summary>
 	/// The underlying data.
 	/// </summary>
+	/// <remarks>
+	/// Do not bind to this property.
+	/// </remarks>
 	T Data { get; }
 }

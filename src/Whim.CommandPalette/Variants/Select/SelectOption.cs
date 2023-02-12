@@ -1,64 +1,27 @@
-using System.ComponentModel;
-
 namespace Whim.CommandPalette;
 
 /// <summary>
 /// Represents an option of a <see cref="SelectVariantConfig"/>
 /// </summary>
-public record SelectOption : INotifyPropertyChanged
+public record SelectOption
 {
 	/// <summary>
 	/// The unique identifier of this option.
 	/// </summary>
-	public required string Id { get; init; }
+	public required string Id { get; set; }
 
 	/// <summary>
 	/// The title to display for this option.
 	/// </summary>
-	public required string Title { get; init; }
-
-	private bool _isSelected;
+	public required string Title { get; set; }
 
 	/// <summary>
 	/// Whether this option is selected.
 	/// </summary>
-	public required bool IsSelected
-	{
-		get => _isSelected;
-		set
-		{
-			if (_isSelected != value)
-			{
-				_isSelected = value;
-				OnPropertyChanged(new PropertyChangedEventArgs(nameof(IsSelected)));
-			}
-		}
-	}
-
-	private bool _isEnabled = true;
+	public bool IsSelected { get; set; }
 
 	/// <summary>
 	/// Whether this option is enabled.
 	/// </summary>
-	public required bool IsEnabled
-	{
-		get => _isEnabled;
-		set
-		{
-			if (_isEnabled != value)
-			{
-				_isEnabled = value;
-				OnPropertyChanged(new PropertyChangedEventArgs(nameof(IsEnabled)));
-			}
-		}
-	}
-
-	/// <inheritdoc/>
-	public event PropertyChangedEventHandler? PropertyChanged;
-
-	/// <inheritdoc/>
-	protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-	{
-		PropertyChanged?.Invoke(this, e);
-	}
+	public bool IsEnabled { get; set; }
 }

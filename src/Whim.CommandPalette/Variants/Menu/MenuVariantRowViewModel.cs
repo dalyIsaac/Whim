@@ -2,29 +2,23 @@ using System.ComponentModel;
 
 namespace Whim.CommandPalette;
 
-internal class VariantRowViewModel<T> : IVariantRowViewModel<T>
+internal class MenuVariantRowViewModel : IVariantRowViewModel<CommandItem>
 {
-	private IVariantRowModel<T> _model;
-
-	public string Id => _model.Id;
-
-	public string Title => _model.Title;
+	public IVariantRowModel<CommandItem> Model { get; private set;}
 
 	public PaletteText FormattedTitle { get; private set; }
 
-	public T Data => _model.Data;
-
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	public VariantRowViewModel(MatcherResult<T> matcherResult)
+	public MenuVariantRowViewModel(MatcherResult<CommandItem> matcherResult)
 	{
-		_model = matcherResult.Model;
+		Model = matcherResult.Model;
 		FormattedTitle = matcherResult.FormattedTitle;
 	}
 
-	public void Update(MatcherResult<T> matcherResult)
+	public void Update(MatcherResult<CommandItem> matcherResult)
 	{
-		_model = matcherResult.Model;
+		Model = matcherResult.Model;
 		FormattedTitle = matcherResult.FormattedTitle;
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
 	}

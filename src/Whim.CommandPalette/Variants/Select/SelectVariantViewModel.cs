@@ -20,7 +20,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	internal readonly List<IVariantRowControl<SelectOption>> _unusedRows = new();
+	internal readonly List<IVariantRowControl<SelectOption, SelectVariantRowViewModel>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
@@ -34,10 +34,10 @@ internal class SelectVariantViewModel : IVariantViewModel
 	private readonly Func<
 		MatcherResult<SelectOption>,
 		SelectVariantConfig,
-		IVariantRowControl<SelectOption>
+		IVariantRowControl<SelectOption, SelectVariantRowViewModel>
 	> _selectRowFactory;
 
-	public readonly ObservableCollection<IVariantRowControl<SelectOption>> SelectRows = new();
+	public readonly ObservableCollection<IVariantRowControl<SelectOption, SelectVariantRowViewModel>> SelectRows = new();
 
 	/// <summary>
 	/// The height of the row.
@@ -108,7 +108,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<MatcherResult<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>> selectRowFactory
+		Func<MatcherResult<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption, SelectVariantRowViewModel>> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -200,7 +200,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			return;
 		}
 
-		IVariantRowViewModel<SelectOption> selectedItem = SelectRows[SelectedIndex].ViewModel;
+		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].ViewModel.Model;
 		SelectOption selectedData = selectedItem.Data;
 
 		if (_allowMultiSelect)
@@ -221,7 +221,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
-	public void VariantRow_OnClick(IVariantRowControl<SelectOption> variantRow)
+	public void VariantRow_OnClick(IVariantRowControl<SelectOption, SelectVariantRowViewModel> variantRow)
 	{
 		if (_activationConfig == null)
 		{
@@ -288,7 +288,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				IVariantRowControl<SelectOption> row = _unusedRows[^1];
+				IVariantRowControl<SelectOption, SelectVariantRowViewModel> row = _unusedRows[^1];
 				row.Update(result);
 
 				SelectRows.Add(row);
@@ -297,7 +297,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRowControl<SelectOption> row = _selectRowFactory(result, activationConfig);
+				IVariantRowControl<SelectOption, SelectVariantRowViewModel> row = _selectRowFactory(result, activationConfig);
 				SelectRows.Add(row);
 				row.Initialize();
 			}

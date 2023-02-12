@@ -5,8 +5,19 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A view model for a single row in a variant.
 /// </summary>
-public interface IVariantRowViewModel<T> : IVariantRowModel<T>, INotifyPropertyChanged
+public interface IVariantRowViewModel<T> : INotifyPropertyChanged
 {
+	/// <summary>
+	/// The model for the palette item.
+	/// </summary>
+	/// <remarks>
+	/// Do not bind to this property. This is only for <see cref="IVariantViewModel"/>
+	/// implementations to use.
+	///
+	/// Similarly, do not update this property. Instead, use <see cref="Update"/>.
+	/// </remarks>
+	IVariantRowModel<T> Model { get; }
+
 	/// <summary>
 	/// The formatted title of the palette item.
 	/// </summary>
