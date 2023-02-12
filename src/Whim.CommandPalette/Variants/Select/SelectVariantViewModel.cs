@@ -37,7 +37,8 @@ internal class SelectVariantViewModel : IVariantViewModel
 		IVariantRowControl<SelectOption, SelectVariantRowViewModel>
 	> _selectRowFactory;
 
-	public readonly ObservableCollection<IVariantRowControl<SelectOption, SelectVariantRowViewModel>> SelectRows = new();
+	public readonly ObservableCollection<IVariantRowControl<SelectOption, SelectVariantRowViewModel>> SelectRows =
+		new();
 
 	/// <summary>
 	/// The height of the row.
@@ -108,7 +109,11 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<MatcherResult<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption, SelectVariantRowViewModel>> selectRowFactory
+		Func<
+			MatcherResult<SelectOption>,
+			SelectVariantConfig,
+			IVariantRowControl<SelectOption, SelectVariantRowViewModel>
+		> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -297,7 +302,10 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRowControl<SelectOption, SelectVariantRowViewModel> row = _selectRowFactory(result, activationConfig);
+				IVariantRowControl<SelectOption, SelectVariantRowViewModel> row = _selectRowFactory(
+					result,
+					activationConfig
+				);
 				SelectRows.Add(row);
 				row.Initialize();
 			}

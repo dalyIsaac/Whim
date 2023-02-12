@@ -28,7 +28,10 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// Factory to create menu rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<MatcherResult<CommandItem>, IVariantRowControl<CommandItem, MenuVariantRowViewModel>> _menuRowFactory;
+	private readonly Func<
+		MatcherResult<CommandItem>,
+		IVariantRowControl<CommandItem, MenuVariantRowViewModel>
+	> _menuRowFactory;
 
 	public readonly ObservableCollection<IVariantRowControl<CommandItem, MenuVariantRowViewModel>> MenuRows = new();
 
@@ -97,7 +100,8 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public MenuVariantViewModel(
 		IConfigContext configContext,
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<MatcherResult<CommandItem>, IVariantRowControl<CommandItem, MenuVariantRowViewModel>>? menuRowFactory = null
+		Func<MatcherResult<CommandItem>, IVariantRowControl<CommandItem, MenuVariantRowViewModel>>? menuRowFactory =
+			null
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;

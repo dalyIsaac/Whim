@@ -15,7 +15,8 @@ public static class IVariantRowExtensions
 	/// <typeparam name="TVM"></typeparam>
 	/// <param name="row"></param>
 	/// <param name="inlines">The inlines to set the title to.</param>
-	public static void SetTitle<T, TVM>(this IVariantRowControl<T, TVM> row, InlineCollection inlines) where TVM : IVariantRowViewModel<T>
+	public static void SetTitle<T, TVM>(this IVariantRowControl<T, TVM> row, InlineCollection inlines)
+		where TVM : IVariantRowViewModel<T>
 	{
 		Logger.Debug("Setting title");
 		IList<PaletteTextSegment> segments = row.ViewModel.FormattedTitle.Segments;

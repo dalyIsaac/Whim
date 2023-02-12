@@ -17,11 +17,15 @@ public class SelectVariantViewModelTests
 	}
 
 	private static (
-		Func<MatcherResult<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption, SelectVariantRowViewModel>>,
+		Func<
+			MatcherResult<SelectOption>,
+			SelectVariantConfig,
+			IVariantRowControl<SelectOption, SelectVariantRowViewModel>
+		>,
 		List<Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>>
 	) SelectRowFactoryWithMocks()
 	{
-		List<Mock<IVariantRowControl<SelectOption,  SelectVariantRowViewModel>>> variantRowMocks = new();
+		List<Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>> variantRowMocks = new();
 
 		IVariantRowControl<SelectOption, SelectVariantRowViewModel> selectRowFactory(
 			MatcherResult<SelectOption> matcherResult,
@@ -407,7 +411,9 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(activationConfig);
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(
+			new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object
+		);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
@@ -430,7 +436,9 @@ public class SelectVariantViewModelTests
 		) = CreateOptionsStubs();
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(
+			new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object
+		);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
@@ -454,7 +462,9 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(activationConfig);
 
 		// When
-		selectVariantViewModel.VariantRow_OnClick(new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object);
+		selectVariantViewModel.VariantRow_OnClick(
+			new Mock<IVariantRowControl<SelectOption, SelectVariantRowViewModel>>().Object
+		);
 
 		// Then
 		Assert.Equal(0, selectVariantViewModel.SelectedIndex);

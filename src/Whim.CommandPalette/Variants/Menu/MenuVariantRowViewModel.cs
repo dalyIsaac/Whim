@@ -4,7 +4,7 @@ namespace Whim.CommandPalette;
 
 internal class MenuVariantRowViewModel : IVariantRowViewModel<CommandItem>
 {
-	public IVariantRowModel<CommandItem> Model { get; private set;}
+	public IVariantRowModel<CommandItem> Model { get; private set; }
 
 	public PaletteText FormattedTitle { get; private set; }
 

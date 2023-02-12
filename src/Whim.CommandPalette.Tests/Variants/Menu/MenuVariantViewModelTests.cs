@@ -23,8 +23,9 @@ public class MenuVariantViewModelTests
 		return (configContext, commandManager, windowViewModel);
 	}
 
-	private static IVariantRowControl<CommandItem, MenuVariantRowViewModel> MenuRowFactory(MatcherResult<CommandItem> item) =>
-		new MenuRowStub() { ViewModel = new MenuVariantRowViewModel(item) };
+	private static IVariantRowControl<CommandItem, MenuVariantRowViewModel> MenuRowFactory(
+		MatcherResult<CommandItem> item
+	) => new MenuRowStub() { ViewModel = new MenuVariantRowViewModel(item) };
 
 	[Fact]
 	public void Constructor()

@@ -6,7 +6,9 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// A palette row is a single command title, and an optional associated keybind.
 /// </summary>
-internal sealed partial class MenuVariantRowControl : UserControl, IVariantRowControl<CommandItem, MenuVariantRowViewModel>
+internal sealed partial class MenuVariantRowControl
+	: UserControl,
+		IVariantRowControl<CommandItem, MenuVariantRowViewModel>
 {
 	public static double MenuRowHeight => 24;
 
