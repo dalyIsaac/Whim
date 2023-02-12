@@ -146,4 +146,13 @@ public class CommandPaletteCommandsTests
 		// Verify that MoveWindowToWorkspace was called with the workspace.
 		workspaceManager.Verify(x => x.MoveWindowToWorkspace(workspace.Object, null), Times.Once);
 	}
+
+	[Fact]
+	public void GetEnumerator()
+	{
+		(Mock<IConfigContext> configContext, _, _, Mock<ICommandPalettePlugin> plugin) = CreateMocks();
+		CommandPaletteCommands commands = new(configContext.Object, plugin.Object);
+
+		Assert.Equal(4, commands.Count());
+	}
 }
