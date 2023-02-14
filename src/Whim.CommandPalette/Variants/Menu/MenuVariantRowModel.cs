@@ -13,6 +13,6 @@ internal record MenuVariantRowModel : IVariantRowModel<CommandItem>
 	public MenuVariantRowModel(CommandItem data)
 	{
 		Data = data;
-		FormattedTitle = data.Command.Title;
+		FormattedTitle = new(data.Command.Title);
 	}
 }

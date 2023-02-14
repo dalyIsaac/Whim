@@ -16,12 +16,12 @@ internal class SelectVariantControl : IVariantControl
 		_control = new SelectVariantView(_viewModel);
 	}
 
-	private IVariantRowControl<SelectOption> SelectRowFactory(
-		IVariantRowModel<SelectOption> item,
+	private IVariantRowView<SelectOption, SelectVariantRowViewModel> SelectRowFactory(
+		MatcherResult<SelectOption> item,
 		SelectVariantConfig config
 	)
 	{
-		return new RadioButtonRowControl(_viewModel, item);
+		return new RadioButtonRowView(_viewModel, item);
 	}
 
 	public double GetViewMaxHeight() => _viewModel.GetViewMaxHeight();

@@ -16,12 +16,10 @@ public interface IVariantRowModel<T>
 	string Title { get; }
 
 	/// <summary>
-	/// The formatted title of the palette item.
-	/// </summary>
-	PaletteText FormattedTitle { get; set; }
-
-	/// <summary>
 	/// The underlying data.
 	/// </summary>
+	/// <remarks>
+	/// Do not bind to this property.
+	/// </remarks>
 	T Data { get; }
 }

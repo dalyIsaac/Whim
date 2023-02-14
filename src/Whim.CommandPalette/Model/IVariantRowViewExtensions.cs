@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Whim.CommandPalette;
 
 /// <summary>
-/// Extension methods for <see cref="IVariantRowControl{T}"/>.
+/// Extension methods for <see cref="IVariantRowView{T,TVM}"/>.
 /// </summary>
 public static class IVariantRowExtensions
 {
@@ -12,12 +12,14 @@ public static class IVariantRowExtensions
 	/// Sets the title of the row.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="TVM"></typeparam>
 	/// <param name="row"></param>
 	/// <param name="inlines">The inlines to set the title to.</param>
-	public static void SetTitle<T>(this IVariantRowControl<T> row, InlineCollection inlines)
+	public static void SetTitle<T, TVM>(this IVariantRowView<T, TVM> row, InlineCollection inlines)
+		where TVM : IVariantRowViewModel<T>
 	{
 		Logger.Debug("Setting title");
-		IList<PaletteTextSegment> segments = row.Model.FormattedTitle.Segments;
+		IList<PaletteTextSegment> segments = row.ViewModel.FormattedTitle.Segments;
 
 		int idx;
 		for (idx = 0; idx < segments.Count; idx++)

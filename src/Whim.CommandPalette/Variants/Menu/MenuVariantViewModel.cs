@@ -17,7 +17,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	private readonly List<IVariantRowControl<CommandItem>> _unusedRows = new();
+	private readonly List<IVariantRowView<CommandItem, MenuVariantRowViewModel>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="MenuRows"/> are drawn.
@@ -28,9 +28,12 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// Factory to create menu rows to make it possible to use xunit.
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
-	private readonly Func<IVariantRowModel<CommandItem>, IVariantRowControl<CommandItem>> _menuRowFactory;
+	private readonly Func<
+		MatcherResult<CommandItem>,
+		IVariantRowView<CommandItem, MenuVariantRowViewModel>
+	> _menuRowFactory;
 
-	public readonly ObservableCollection<IVariantRowControl<CommandItem>> MenuRows = new();
+	public readonly ObservableCollection<IVariantRowView<CommandItem, MenuVariantRowViewModel>> MenuRows = new();
 
 	public bool ShowSaveButton => false;
 
@@ -97,11 +100,11 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public MenuVariantViewModel(
 		IConfigContext configContext,
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantRowModel<CommandItem>, IVariantRowControl<CommandItem>>? menuRowFactory = null
+		Func<MatcherResult<CommandItem>, IVariantRowView<CommandItem, MenuVariantRowViewModel>>? menuRowFactory = null
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_menuRowFactory = menuRowFactory ?? ((IVariantRowModel<CommandItem> item) => new MenuVariantRowControl(item));
+		_menuRowFactory = menuRowFactory ?? ((MatcherResult<CommandItem> item) => new MenuVariantRowView(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(configContext.CommandManager);
@@ -188,7 +191,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		}
 
 		Logger.Verbose($"Executing command at index {SelectedIndex}");
-		IVariantRowModel<CommandItem> paletteItem = MenuRows[SelectedIndex].Model;
+		IVariantRowModel<CommandItem> paletteItem = MenuRows[SelectedIndex].ViewModel.Model;
 		CommandItem match = paletteItem.Data;
 
 		// Since the palette window is reused, there's a chance that the _activationConfig
@@ -249,9 +252,9 @@ internal class MenuVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (IVariantRowModel<CommandItem> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (MatcherResult<CommandItem> item in activationConfig.Matcher.Match(query, _allItems))
 		{
-			Logger.Verbose($"Matched {item.Title}");
+			Logger.Verbose($"Matched {item.Model.Title}");
 			if (matchesCount < MenuRows.Count)
 			{
 				// Update the existing row.
@@ -260,7 +263,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				IVariantRowControl<CommandItem> row = _unusedRows[^1];
+				IVariantRowView<CommandItem, MenuVariantRowViewModel> row = _unusedRows[^1];
 				row.Update(item);
 
 				MenuRows.Add(row);
@@ -269,13 +272,13 @@ internal class MenuVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRowControl<CommandItem> row = _menuRowFactory(item);
+				IVariantRowView<CommandItem, MenuVariantRowViewModel> row = _menuRowFactory(item);
 				MenuRows.Add(row);
 				row.Initialize();
 			}
 			matchesCount++;
 
-			Logger.Verbose($"Finished updating {item.Title}");
+			Logger.Verbose($"Finished updating {item.Model.Title}");
 		}
 
 		return matchesCount;

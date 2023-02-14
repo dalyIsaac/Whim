@@ -20,7 +20,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	internal readonly List<IVariantRowControl<SelectOption>> _unusedRows = new();
+	internal readonly List<IVariantRowView<SelectOption, SelectVariantRowViewModel>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
@@ -32,12 +32,12 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
 	private readonly Func<
-		IVariantRowModel<SelectOption>,
+		MatcherResult<SelectOption>,
 		SelectVariantConfig,
-		IVariantRowControl<SelectOption>
+		IVariantRowView<SelectOption, SelectVariantRowViewModel>
 	> _selectRowFactory;
 
-	public readonly ObservableCollection<IVariantRowControl<SelectOption>> SelectRows = new();
+	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = new();
 
 	/// <summary>
 	/// The height of the row.
@@ -108,7 +108,11 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public SelectVariantViewModel(
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<IVariantRowModel<SelectOption>, SelectVariantConfig, IVariantRowControl<SelectOption>> selectRowFactory
+		Func<
+			MatcherResult<SelectOption>,
+			SelectVariantConfig,
+			IVariantRowView<SelectOption, SelectVariantRowViewModel>
+		> selectRowFactory
 	)
 	{
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
@@ -200,7 +204,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 			return;
 		}
 
-		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].Model;
+		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].ViewModel.Model;
 		SelectOption selectedData = selectedItem.Data;
 
 		if (_allowMultiSelect)
@@ -221,7 +225,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
-	public void VariantRow_OnClick(IVariantRowControl<SelectOption> variantRow)
+	public void VariantRow_OnClick(IVariantRowView<SelectOption, SelectVariantRowViewModel> variantRow)
 	{
 		if (_activationConfig == null)
 		{
@@ -277,19 +281,19 @@ internal class SelectVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (IVariantRowModel<SelectOption> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (MatcherResult<SelectOption> result in activationConfig.Matcher.Match(query, _allItems))
 		{
-			Logger.Verbose($"Matched {item.Title}");
+			Logger.Verbose($"Matched {result.Model.Title}");
 			if (matchesCount < SelectRows.Count)
 			{
 				// Update the existing row.
-				SelectRows[matchesCount].Update(item);
+				SelectRows[matchesCount].Update(result);
 			}
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				IVariantRowControl<SelectOption> row = _unusedRows[^1];
-				row.Update(item);
+				IVariantRowView<SelectOption, SelectVariantRowViewModel> row = _unusedRows[^1];
+				row.Update(result);
 
 				SelectRows.Add(row);
 				_unusedRows.RemoveAt(_unusedRows.Count - 1);
@@ -297,13 +301,16 @@ internal class SelectVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRowControl<SelectOption> row = _selectRowFactory(item, activationConfig);
+				IVariantRowView<SelectOption, SelectVariantRowViewModel> row = _selectRowFactory(
+					result,
+					activationConfig
+				);
 				SelectRows.Add(row);
 				row.Initialize();
 			}
 			matchesCount++;
 
-			Logger.Verbose($"Finished updating {item.Title}");
+			Logger.Verbose($"Finished updating {result.Model.Title}");
 		}
 
 		return matchesCount;
