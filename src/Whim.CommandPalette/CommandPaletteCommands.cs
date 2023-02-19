@@ -130,17 +130,20 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 			)
 		};
 
-			private string MoveMultipleWindowsToWorkspaceCommandIdentifier => $"{Name}.move_multiple_windows_to_workspace";
+	private string MoveMultipleWindowsToWorkspaceCommandIdentifier => $"{Name}.move_multiple_windows_to_workspace";
 
 	/// <summary>
 	/// Creates the select options for moving multiple windows to a workspace.
 	/// </summary>
 	public SelectOption[] CreateMoveWindowsToWorkspaceSelectOptions()
 	{
-		// The windows active in the current workspace.
-		IEnumerable<IWindow> activeWindows = _configContext.WorkspaceManager.ActiveWorkspace.Windows;
+		// All the windows in all the workspaces.
+		IEnumerable<IWindow> windows = _configContext.WorkspaceManager
+			.Select(w => w.Windows)
+			.SelectMany(w => w)
+			.OrderBy(w => w.Title);
 
-		return activeWindows
+		return windows
 			.Select(
 				w =>
 					new SelectOption()
