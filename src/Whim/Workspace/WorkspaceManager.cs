@@ -432,11 +432,6 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
-		if (ActiveWorkspace == workspace)
-		{
-			return;
-		}
-
 		_windowWorkspaceMap[window] = workspace;
 		ActiveWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
