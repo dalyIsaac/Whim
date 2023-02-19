@@ -21,6 +21,10 @@ internal class SelectVariantControl : IVariantControl
 		SelectVariantConfig config
 	)
 	{
+		if (config.AllowMultiSelect)
+		{
+			return new CheckBoxRowView(_viewModel, item);
+		}
 		return new RadioButtonRowView(_viewModel, item);
 	}
 
