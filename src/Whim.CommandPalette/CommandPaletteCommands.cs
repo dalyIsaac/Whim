@@ -113,14 +113,112 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 				title: "Move window to workspace",
 				callback: () =>
 				{
-					IEnumerable<CommandItem> items = _configContext.WorkspaceManager.Select(
-						w => MoveWindowToWorkspaceCommandCreator(w)
-					);
+					IWorkspace activeWorkspace = _configContext.WorkspaceManager.ActiveWorkspace;
+					List<CommandItem> items = new();
+					foreach (IWorkspace workspace in _configContext.WorkspaceManager)
+					{
+						if (workspace != activeWorkspace)
+						{
+							items.Add(MoveWindowToWorkspaceCommandCreator(workspace));
+						}
+					}
 
 					_commandPalettePlugin.Activate(
 						new MenuVariantConfig() { Hint = "Select workspace", Commands = items }
 					);
 				}
+			)
+		};
+
+			private string MoveMultipleWindowsToWorkspaceCommandIdentifier => $"{Name}.move_multiple_windows_to_workspace";
+
+	/// <summary>
+	/// Creates the select options for moving multiple windows to a workspace.
+	/// </summary>
+	public SelectOption[] CreateMoveWindowsToWorkspaceSelectOptions()
+	{
+		// The windows active in the current workspace.
+		IEnumerable<IWindow> activeWindows = _configContext.WorkspaceManager.ActiveWorkspace.Windows;
+
+		return activeWindows
+			.Select(
+				w =>
+					new SelectOption()
+					{
+						Id = $"{MoveMultipleWindowsToWorkspaceCommandIdentifier}.windows.{w.Title}",
+						Title = w.Title,
+						IsEnabled = true,
+						IsSelected = false
+					}
+			)
+			.ToArray();
+	}
+
+	/// <summary>
+	/// Move multiple windows to workspace command creator.
+	/// </summary>
+	/// <param name="windows"></param>
+	/// <param name="workspace"></param>
+	/// <returns>The move multiple windows to workspace command.</returns>
+	public CommandItem MoveMultipleWindowsToWorkspaceCreator(IEnumerable<IWindow> windows, IWorkspace workspace) =>
+		new()
+		{
+			Command = new Command(
+				identifier: $"{MoveMultipleWindowsToWorkspaceCommandIdentifier}.workspaces.{workspace.Name}",
+				title: workspace.Name,
+				callback: () =>
+				{
+					foreach (IWindow window in windows)
+					{
+						_configContext.WorkspaceManager.MoveWindowToWorkspace(workspace, window);
+					}
+				}
+			)
+		};
+
+	/// <summary>
+	/// Callback to activate a menu variant to select the workspace to move the windows to.
+	/// </summary>
+	public void MoveMultipleWindowsToWorkspaceCallback(IEnumerable<SelectOption> options)
+	{
+		IEnumerable<string> selectedWindowNames = options.Where(o => o.IsSelected).Select(o => o.Title);
+
+		IEnumerable<IWindow> windows = _configContext.WorkspaceManager.ActiveWorkspace.Windows.Where(
+			w => selectedWindowNames.Contains(w.Title)
+		);
+
+		IWorkspace activeWorkspace = _configContext.WorkspaceManager.ActiveWorkspace;
+		List<CommandItem> items = new();
+		foreach (IWorkspace workspace in _configContext.WorkspaceManager)
+		{
+			if (workspace != activeWorkspace)
+			{
+				items.Add(MoveMultipleWindowsToWorkspaceCreator(windows, workspace));
+			}
+		}
+
+		_commandPalettePlugin.Activate(new MenuVariantConfig() { Hint = "Select workspace", Commands = items });
+	}
+
+	/// <summary>
+	/// Moves the current window to a given workspace.
+	/// </summary>
+	public CommandItem MoveMultipleWindowsToWorkspace =>
+		new()
+		{
+			Command = new Command(
+				identifier: MoveMultipleWindowsToWorkspaceCommandIdentifier,
+				title: "Move multiple windows to workspace",
+				callback: () =>
+					_commandPalettePlugin.Activate(
+						new SelectVariantConfig()
+						{
+							Hint = "Select windows",
+							Options = CreateMoveWindowsToWorkspaceSelectOptions(),
+							AllowMultiSelect = true,
+							Callback = MoveMultipleWindowsToWorkspaceCallback
+						}
+					)
 			)
 		};
 
@@ -131,6 +229,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 		yield return RenameWorkspaceCommand;
 		yield return CreateWorkspaceCommand;
 		yield return MoveWindowToWorkspaceCommand;
+		yield return MoveMultipleWindowsToWorkspace;
 	}
 
 	/// <inheritdoc />
