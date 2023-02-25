@@ -204,12 +204,11 @@ internal class SelectVariantViewModel : IVariantViewModel
 			return;
 		}
 
-		IVariantRowModel<SelectOption> selectedItem = SelectRows[SelectedIndex].ViewModel.Model;
-		SelectOption selectedData = selectedItem.Data;
+		SelectVariantRowViewModel selectedItem = SelectRows[SelectedIndex].ViewModel;
 
 		if (_allowMultiSelect)
 		{
-			selectedData.IsSelected = !selectedData.IsSelected;
+			selectedItem.IsSelected = !selectedItem.IsSelected;
 		}
 		else
 		{
@@ -218,10 +217,10 @@ internal class SelectVariantViewModel : IVariantViewModel
 				variantItem.Data.IsSelected = false;
 			}
 
-			selectedData.IsSelected = true;
+			selectedItem.IsSelected = true;
 		}
 
-		_activationConfig.Matcher.OnMatchExecuted(selectedItem);
+		_activationConfig.Matcher.OnMatchExecuted(selectedItem.Model);
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
