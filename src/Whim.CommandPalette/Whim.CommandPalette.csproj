@@ -14,6 +14,7 @@
 		<AnalysisModeStyle>All</AnalysisModeStyle>
 		<AnalysisModeUsage>All</AnalysisModeUsage>
 		<BuildInParallel>true</BuildInParallel>
+		<Description>An extensible window manager for Windows.</Description>
 		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<GenerateLibraryLayout>true</GenerateLibraryLayout>
@@ -21,6 +22,7 @@
 		<Platforms>x64;arm64;Any CPU</Platforms>
 		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
 		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<UseWinUI>true</UseWinUI>
 		<Version>0.1.0</Version>
 	</PropertyGroup>
