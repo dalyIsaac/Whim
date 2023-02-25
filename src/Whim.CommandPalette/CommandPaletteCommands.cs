@@ -186,9 +186,9 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	{
 		IEnumerable<string> selectedWindowNames = options.Where(o => o.IsSelected).Select(o => o.Title);
 
-		IEnumerable<IWindow> windows = _configContext.WorkspaceManager.SelectMany(w => w.Windows).Where(
-			w => selectedWindowNames.Contains(w.Title)
-		);
+		IEnumerable<IWindow> windows = _configContext.WorkspaceManager
+			.SelectMany(w => w.Windows)
+			.Where(w => selectedWindowNames.Contains(w.Title));
 
 		IEnumerable<CommandItem> items = _configContext.WorkspaceManager.Select(
 			w => MoveMultipleWindowsToWorkspaceCreator(windows, w)
