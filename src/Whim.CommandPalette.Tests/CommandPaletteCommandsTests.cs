@@ -153,6 +153,6 @@ public class CommandPaletteCommandsTests
 		(Mock<IConfigContext> configContext, _, _, Mock<ICommandPalettePlugin> plugin) = CreateMocks();
 		CommandPaletteCommands commands = new(configContext.Object, plugin.Object);
 
-		Assert.Equal(4, commands.Count());
+		Assert.Equal(5, commands.Count());
 	}
 }

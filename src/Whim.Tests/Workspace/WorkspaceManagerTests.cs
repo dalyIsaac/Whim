@@ -1,6 +1,7 @@
 using Moq;
 using System;
 using System.Linq;
+using Windows.Web.AtomPub;
 using Xunit;
 
 namespace Whim.Tests;
@@ -438,23 +439,28 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void MoveWindowToWorkspace_AlreadyInWorkspace()
+	public void MoveWindowToWorkspace_CannotFindWindow()
 	{
+		// Given
 		(var configContext, _, var monitors, _) = CreateMocks();
 
+		// Workspaces
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		Mock<IWorkspace> workspace3 = new();
+		using WorkspaceManager workspaceManager =
+			new(configContext.Object) { workspace.Object, workspace2.Object, workspace3.Object };
 
+		// Windows
 		Mock<IWindow> window = new();
-		workspaceManager.WindowAdded(window.Object);
 		workspace.Reset();
 		workspace2.Reset();
+		workspace3.Reset();
 
+		// When
 		workspaceManager.MoveWindowToWorkspace(workspace.Object, window.Object);
 
+		// Then
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
 	}
@@ -462,21 +468,30 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToWorkspace_Success()
 	{
+		// Given
 		(var configContext, _, var monitors, _) = CreateMocks();
 
+		// Workspaces
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
+		Mock<IWorkspace> workspace3 = new();
+
+		// Workspace manager
 		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
 		workspaceManager.Activate(workspace.Object, monitors[0].Object);
 		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
 
+		// Windows
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
 		workspace.Reset();
 		workspace2.Reset();
+		workspace3.Reset();
 
+		// When
 		workspaceManager.MoveWindowToWorkspace(workspace2.Object, window.Object);
 
+		// Then
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 
