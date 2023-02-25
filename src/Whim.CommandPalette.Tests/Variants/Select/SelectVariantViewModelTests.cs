@@ -190,7 +190,7 @@ public class SelectVariantViewModelTests
 		List<SelectOption>,
 		Mock<IMatcher<SelectOption>>,
 		List<Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>>>
-	) CreateOptionsStubs()
+	) CreateOptionsStubs(bool allowMultiSelect = false)
 	{
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
 		commandPaletteWindowViewModelMock.Setup(c => c.Text).Returns("ti");
@@ -247,7 +247,7 @@ public class SelectVariantViewModelTests
 				Callback = callbackMock.Object,
 				Options = options,
 				Matcher = matcherMock.Object,
-				AllowMultiSelect = false
+				AllowMultiSelect = allowMultiSelect
 			};
 
 		return (
@@ -368,7 +368,7 @@ public class SelectVariantViewModelTests
 	}
 
 	[Fact]
-	public void UpdateSelectedItem_SingleSelect_NotSelected()
+	public void UpdateSelectedItem_SingleSelect()
 	{
 		// Given
 		(
@@ -393,6 +393,36 @@ public class SelectVariantViewModelTests
 		Assert.False(options[2].IsSelected);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
+	}
+
+	[Fact]
+	public void UpdateSelectedItem_MultiSelect()
+	{
+		// Given
+		(
+			SelectVariantViewModel selectVariantViewModel,
+			SelectVariantConfig activationConfig,
+			_,
+			Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock,
+			List<SelectOption> options,
+			Mock<IMatcher<SelectOption>> matcherMock,
+			_
+		) = CreateOptionsStubs(allowMultiSelect: true);
+		selectVariantViewModel.Activate(activationConfig);
+
+		// When
+		selectVariantViewModel.SelectedIndex = 1;
+		selectVariantViewModel.UpdateSelectedItem();
+
+		selectVariantViewModel.SelectedIndex = 2;
+		selectVariantViewModel.UpdateSelectedItem();
+
+		// Then
+		Assert.False(options[0].IsSelected);
+		Assert.True(options[1].IsSelected);
+		Assert.True(options[2].IsSelected);
+		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Exactly(2));
+		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Exactly(2));
 	}
 
 	[Fact]
