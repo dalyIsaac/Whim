@@ -8,7 +8,7 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal sealed partial class MenuVariantRowView : UserControl, IVariantRowView<CommandItem, MenuVariantRowViewModel>
 {
-	public static double MenuRowHeight => 24;
+	public static double MenuRowHeight => 36;
 
 	public MenuVariantRowViewModel ViewModel { get; }
 

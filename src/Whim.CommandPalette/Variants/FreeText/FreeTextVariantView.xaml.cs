@@ -4,7 +4,7 @@ namespace Whim.CommandPalette;
 
 internal sealed partial class FreeTextVariantView : UserControl
 {
-	public static double ViewHeight => 24;
+	public static double ViewHeight => 36;
 
 	public FreeTextVariantViewModel ViewModel { get; }
 
