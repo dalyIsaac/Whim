@@ -12,7 +12,7 @@ internal class SelectVariantControl : IVariantControl
 
 	public SelectVariantControl(ICommandPaletteWindowViewModel windowViewModel)
 	{
-		_viewModel = new(windowViewModel, SelectRowFactory) { RowHeight = 24 };
+		_viewModel = new(windowViewModel, SelectRowFactory) { RowHeight = 36 };
 		_control = new SelectVariantView(_viewModel);
 	}
 
@@ -21,6 +21,10 @@ internal class SelectVariantControl : IVariantControl
 		SelectVariantConfig config
 	)
 	{
+		if (config.AllowMultiSelect)
+		{
+			return new CheckBoxRowView(_viewModel, item);
+		}
 		return new RadioButtonRowView(_viewModel, item);
 	}
 

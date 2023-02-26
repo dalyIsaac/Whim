@@ -432,13 +432,15 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
-		if (ActiveWorkspace == workspace)
+		// Find the current workspace for the window.
+		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? currentWorkspace))
 		{
+			Logger.Error($"Window {window} was not found in any workspace");
 			return;
 		}
 
 		_windowWorkspaceMap[window] = workspace;
-		ActiveWorkspace.RemoveWindow(window);
+		currentWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
 
 		// Hide the window from the current layout. If the new workspace is active, then the
