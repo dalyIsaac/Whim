@@ -36,3 +36,22 @@ public class PaletteTextSegmentTests
 		Assert.AreEqual(FontWeights.Normal, run.FontWeight);
 	}
 }
+
+[TestClass]
+public class PaletteTextTests
+{
+	[TestMethod]
+	public void PaletteText_FromString()
+	{
+		// Arrange
+		string text = "From String";
+
+		// Act
+		PaletteText paletteText = new(text);
+
+		// Assert
+		Assert.AreEqual(1, paletteText.Segments.Count);
+		Assert.AreEqual("From String", paletteText.Segments[0].Text);
+		Assert.IsFalse(paletteText.Segments[0].IsHighlighted);
+	}
+}
