@@ -7,7 +7,7 @@ namespace Whim.CommandPalette.WinUITests.Filters;
 [TestClass]
 public class CamelCaseTests
 {
-		public static IEnumerable<object[]> MatchesCamelCase_Ok_Data()
+	public static IEnumerable<object[]> MatchesCamelCase_Ok_Data()
 	{
 		yield return new object[] { "", "anything", Array.Empty<FilterTextMatch>() };
 		yield return new object[] { "alpha", "alpha", new FilterTextMatch[] { new(0, 5) } };
@@ -103,7 +103,10 @@ public class CamelCaseTests
 	[DataRow(0, 0, false)]
 	public void IsUpperCaseWord(float upperPercent, int upperCount, bool expected)
 	{
-		Assert.AreEqual(expected, PaletteFilters.IsUpperCaseWord(new CamelCaseAnalysis(upperPercent, upperCount, 0, 0)));
+		Assert.AreEqual(
+			expected,
+			PaletteFilters.IsUpperCaseWord(new CamelCaseAnalysis(upperPercent, upperCount, 0, 0))
+		);
 	}
 
 	[DataTestMethod]
