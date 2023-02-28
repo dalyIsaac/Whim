@@ -1,10 +1,13 @@
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests.Filters;
 
+[TestClass]
 public class CamelCaseTests
 {
-	public static IEnumerable<object[]> MatchesCamelCase_Ok_Data()
+		public static IEnumerable<object[]> MatchesCamelCase_Ok_Data()
 	{
 		yield return new object[] { "", "anything", Array.Empty<FilterTextMatch>() };
 		yield return new object[] { "alpha", "alpha", new FilterTextMatch[] { new(0, 5) } };
@@ -64,64 +67,64 @@ public class CamelCaseTests
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 	}
 
-	[Theory]
-	[MemberData(nameof(MatchesCamelCase_Ok_Data))]
-	public void MatchesCamelCase_Ok(string word, string wordToMatchAgainst, FilterTextMatch[]? expected)
+	[DataTestMethod]
+	[DynamicData(nameof(MatchesCamelCase_Ok_Data), DynamicDataSourceType.Method)]
+	public void MatchesCamelCase_Ok(string word, string wordToMatchAgainst, FilterTextMatch[]? expectedMatches)
 	{
-		FilterTestUtils.FilterOk(PaletteFilters.MatchesCamelCase, word, wordToMatchAgainst, expected);
+		FilterTestUtils.FilterOk(PaletteFilters.MatchesCamelCase, word, wordToMatchAgainst, expectedMatches);
 	}
 
-	[InlineData("", "")]
-	[InlineData("alpha", "alph")]
-	[Theory]
+	[DataTestMethod]
+	[DataRow("", "")]
+	[DataRow("alpha", "alph")]
 	public void MatchesCamelCase_NotOk(string word, string wordToMatchAgainst)
 	{
 		FilterTestUtils.FilterNotOk(PaletteFilters.MatchesCamelCase, word, wordToMatchAgainst);
 	}
 
-	[InlineData("alpha", true)]
-	[InlineData("Alpha", true)]
-	[InlineData("Alpha Beta", true)]
-	[InlineData("Alpha Beta Gamma Delta Zeta", true)]
-	[InlineData("A B C D E F", false)]
-	[InlineData("ALPHABETAGAMMADELTAEPSILONZETA", true)]
-	[InlineData("alphabetagammadeltaepsilonzeta", true)]
-	[InlineData("AlphaBetaGammaDeltaEpsilonZetaEta", false)]
-	[Theory]
+	[DataTestMethod]
+	[DataRow("alpha", true)]
+	[DataRow("Alpha", true)]
+	[DataRow("Alpha Beta", true)]
+	[DataRow("Alpha Beta Gamma Delta Zeta", true)]
+	[DataRow("A B C D E F", false)]
+	[DataRow("ALPHABETAGAMMADELTAEPSILONZETA", true)]
+	[DataRow("alphabetagammadeltaepsilonzeta", true)]
+	[DataRow("AlphaBetaGammaDeltaEpsilonZetaEta", false)]
 	public void IsCamelCasePattern(string word, bool expected)
 	{
-		Assert.Equal(expected, PaletteFilters.IsCamelCasePattern(word));
+		Assert.AreEqual(expected, PaletteFilters.IsCamelCasePattern(word));
 	}
 
-	[InlineData(0.8f, 0, true)]
-	[InlineData(0.8f, 1, false)]
-	[InlineData(0, 1, false)]
-	[InlineData(0, 0, false)]
-	[Theory]
+	[DataTestMethod]
+	[DataRow(0.8f, 0, true)]
+	[DataRow(0.8f, 1, false)]
+	[DataRow(0, 1, false)]
+	[DataRow(0, 0, false)]
 	public void IsUpperCaseWord(float upperPercent, int upperCount, bool expected)
 	{
-		Assert.Equal(expected, PaletteFilters.IsUpperCaseWord(new CamelCaseAnalysis(upperPercent, upperCount, 0, 0)));
+		Assert.AreEqual(expected, PaletteFilters.IsUpperCaseWord(new CamelCaseAnalysis(upperPercent, upperCount, 0, 0)));
 	}
 
-	[InlineData(0, 1, 1, 0, true)]
-	[InlineData(0.8f, 0.2, 1, 0, false)]
-	[InlineData(0, 1, 0, 0, false)]
-	[InlineData(0, 0, 0, 0, false)]
-	[InlineData(0.7f, 0.3f, 0.5f, 0.2f, false)]
-	[Theory]
+	[DataTestMethod]
+	[DataRow(0, 1, 1, 0, true)]
+	[DataRow(0.8f, 0.2f, 1, 0, false)]
+	[DataRow(0, 1, 0, 0, false)]
+	[DataRow(0, 0, 0, 0, false)]
+	[DataRow(0.7f, 0.3f, 0.5f, 0.2f, false)]
 	public void IsCamelCaseWord(float upper, float lower, float alpha, float numeric, bool expected)
 	{
-		Assert.Equal(expected, PaletteFilters.IsCamelCaseWord(new CamelCaseAnalysis(upper, lower, alpha, numeric)));
+		Assert.AreEqual(expected, PaletteFilters.IsCamelCaseWord(new CamelCaseAnalysis(upper, lower, alpha, numeric)));
 	}
 
-	[InlineData("a", 0, 1)]
-	[InlineData("alpha", 0, 5)]
-	[InlineData("alphaBeta", 0, 5)]
-	[InlineData("alpha0", 0, 5)]
-	[InlineData("alpha beta", 0, 6)]
-	[Theory]
+	[DataTestMethod]
+	[DataRow("a", 0, 1)]
+	[DataRow("alpha", 0, 5)]
+	[DataRow("alphaBeta", 0, 5)]
+	[DataRow("alpha0", 0, 5)]
+	[DataRow("alpha beta", 0, 6)]
 	public void FindNextCamelCaseAnchor(string camelCaseWord, int startIndex, int nextAnchor)
 	{
-		Assert.Equal(nextAnchor, PaletteFilters.FindNextCamelCaseAnchor(camelCaseWord, startIndex));
+		Assert.AreEqual(nextAnchor, PaletteFilters.FindNextCamelCaseAnchor(camelCaseWord, startIndex));
 	}
 }
