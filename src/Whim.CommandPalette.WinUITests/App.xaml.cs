@@ -37,5 +37,5 @@ public partial class App : Application
 		Microsoft.VisualStudio.TestPlatform.TestExecutor.UnitTestClient.Run(Environment.CommandLine);
 	}
 
-	private Window m_window;
+	private Window? m_window;
 }
