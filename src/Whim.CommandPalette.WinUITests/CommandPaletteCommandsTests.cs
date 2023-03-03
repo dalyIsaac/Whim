@@ -1,9 +1,12 @@
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Xunit;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Whim.CommandPalette.Tests;
 
+[TestClass]
 public class CommandPaletteCommandsTests
 {
 	private class MocksBuilder
@@ -60,7 +63,7 @@ public class CommandPaletteCommandsTests
 		return configs;
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ToggleCommandPaletteCommand()
 	{
 		// Given
@@ -74,7 +77,7 @@ public class CommandPaletteCommandsTests
 		mocks.Plugin.Verify(x => x.Activate(null), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void RenameWorkspaceCommand()
 	{
 		// Given
@@ -94,7 +97,7 @@ public class CommandPaletteCommandsTests
 		mocks.ConfigContext.VerifySet(x => x.WorkspaceManager.ActiveWorkspace.Name = "New workspace name", Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void CreateWorkspaceCommand()
 	{
 		// Given
@@ -126,10 +129,10 @@ public class CommandPaletteCommandsTests
 		mocks.ConfigContext.Verify(x => x.WorkspaceManager.Add(newWorkspace.Object), Times.Once);
 
 		// Verify the workspace name.
-		Assert.Equal("New workspace name", newWorkspace.Object.Name);
+		Assert.AreEqual("New workspace name", newWorkspace.Object.Name);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void MoveWindowToWorkspaceCommand()
 	{
 		// Given
@@ -146,7 +149,7 @@ public class CommandPaletteCommandsTests
 		mocks.Plugin.Verify(x => x.Activate(It.IsAny<MenuVariantConfig>()), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void MoveWindowToWorkspaceCommandCreator()
 	{
 		// Given
@@ -161,7 +164,7 @@ public class CommandPaletteCommandsTests
 		mocks.WorkspaceManager.Verify(x => x.MoveWindowToWorkspace(mocks.Workspace.Object, null), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void CreateMoveWindowsToWorkspaceOptions()
 	{
 		// Given
@@ -172,15 +175,15 @@ public class CommandPaletteCommandsTests
 		SelectOption[] options = commands.CreateMoveWindowsToWorkspaceOptions();
 
 		// Then
-		Assert.Equal(3, options.Length);
-		Assert.Equal("Window 0", options[0].Title);
-		Assert.Equal("Window 1", options[1].Title);
-		Assert.Equal("Window 2", options[2].Title);
+		Assert.AreEqual(3, options.Length);
+		Assert.AreEqual("Window 0", options[0].Title);
+		Assert.AreEqual("Window 1", options[1].Title);
+		Assert.AreEqual("Window 2", options[2].Title);
 		options.Should().OnlyContain(x => x.IsEnabled);
 		options.Should().OnlyContain(x => !x.IsSelected);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void MoveMultipleWindowsToWorkspaceCreator()
 	{
 		// Given
@@ -202,7 +205,7 @@ public class CommandPaletteCommandsTests
 		);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void MoveMultipleWindowsToWorkspaceCallback()
 	{
 		// Given
@@ -249,7 +252,7 @@ public class CommandPaletteCommandsTests
 		);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void MoveMultipleWindowsToWorkspace()
 	{
 		// Given
@@ -277,7 +280,7 @@ public class CommandPaletteCommandsTests
 		);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void GetEnumerator()
 	{
 		// Given
@@ -285,6 +288,6 @@ public class CommandPaletteCommandsTests
 		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
 
 		// Then
-		Assert.Equal(5, commands.Count());
+		Assert.AreEqual(5, commands.Count());
 	}
 }

@@ -1,7 +1,12 @@
-using Xunit;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Whim.CommandPalette.Tests;
 
+[TestClass]
 public class MostRecentlyUsedMatcherTests
 {
 	private static void ActionSink() { }
@@ -23,7 +28,7 @@ public class MostRecentlyUsedMatcherTests
 		return (menuItems, matcherItems);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void GetFilteredItems()
 	{
 		// Given
@@ -34,12 +39,12 @@ public class MostRecentlyUsedMatcherTests
 		int matchCount = matcher.GetFilteredItems("A", items, matches);
 
 		// Then
-		Assert.Equal(1, matchCount);
-		Assert.Equal("A", matches[0].Model.Data.Command.Title);
-		Assert.Equal((uint)0, matches[0].Score);
+		Assert.AreEqual(1, matchCount);
+		Assert.AreEqual("A", matches[0].Model.Data.Command.Title);
+		Assert.AreEqual((uint)0, matches[0].Score);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void GetMostRecentlyUsedItems()
 	{
 		// Given
@@ -50,14 +55,14 @@ public class MostRecentlyUsedMatcherTests
 		int matchCount = matcher.GetMostRecentlyUsedItems(items, matches);
 
 		// Then
-		Assert.Equal(2, matchCount);
-		Assert.Equal("A", matches[0].Model.Data.Command.Title);
-		Assert.Equal((uint)0, matches[0].Score);
-		Assert.Equal("B", matches[1].Model.Data.Command.Title);
-		Assert.Equal((uint)0, matches[1].Score);
+		Assert.AreEqual(2, matchCount);
+		Assert.AreEqual("A", matches[0].Model.Data.Command.Title);
+		Assert.AreEqual((uint)0, matches[0].Score);
+		Assert.AreEqual("B", matches[1].Model.Data.Command.Title);
+		Assert.AreEqual((uint)0, matches[1].Score);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void GetMostRecentlyUsedItems_WithLastExecutionTime()
 	{
 		// Given
@@ -69,13 +74,13 @@ public class MostRecentlyUsedMatcherTests
 		int matchCount = matcher.GetMostRecentlyUsedItems(items, matches);
 
 		// Then
-		Assert.Equal(2, matchCount);
-		Assert.Equal("A", matches[0].Model.Data.Command.Title);
-		Assert.Equal("B", matches[1].Model.Data.Command.Title);
-		Assert.True(matches[1].Score > matches[0].Score);
+		Assert.AreEqual(2, matchCount);
+		Assert.AreEqual("A", matches[0].Model.Data.Command.Title);
+		Assert.AreEqual("B", matches[1].Model.Data.Command.Title);
+		Assert.IsTrue(matches[1].Score > matches[0].Score);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Match_NoMatches_PopulatedQuery()
 	{
 		// Given
@@ -86,10 +91,10 @@ public class MostRecentlyUsedMatcherTests
 		IEnumerable<MatcherResult<CommandItem>> rowItems = matcher.Match("C", items);
 
 		// Then
-		Assert.Empty(rowItems);
+		rowItems.Should().BeEmpty();
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Match_NoMatches_EmptyQuery()
 	{
 		// Given
@@ -100,8 +105,8 @@ public class MostRecentlyUsedMatcherTests
 		MatcherResult<CommandItem>[] rowItems = matcher.Match("", items).ToArray();
 
 		// Then
-		Assert.Equal(2, rowItems.Length);
-		Assert.Equal("A", rowItems.ElementAt(0).Model.Data.Command.Title);
-		Assert.Equal("B", rowItems.ElementAt(1).Model.Data.Command.Title);
+		Assert.AreEqual(2, rowItems.Length);
+		Assert.AreEqual("A", rowItems.ElementAt(0).Model.Data.Command.Title);
+		Assert.AreEqual("B", rowItems.ElementAt(1).Model.Data.Command.Title);
 	}
 }

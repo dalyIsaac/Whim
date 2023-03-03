@@ -1,12 +1,13 @@
 #pragma warning disable CA2000 // Dispose objects before losing scope
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
+[TestClass]
 public class CommandPalettePluginTests
 {
-	[Fact]
+	[TestMethod]
 	public void PreInitialize_ShouldIgnoreTitleMatch()
 	{
 		// Given

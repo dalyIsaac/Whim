@@ -1,12 +1,16 @@
+using FluentAssertions;
 using Microsoft.UI.Xaml;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
 using Windows.System;
-using Xunit;
 
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests;
 
 public record UnknownConfig : BaseVariantConfig { }
 
+[TestClass]
 public class CommandPaletteWindowViewModelTests
 {
 	private static (
@@ -68,7 +72,7 @@ public class CommandPaletteWindowViewModelTests
 		return (configContext, commandManager, plugin, menuVariant, freeTextVariant, selectVariant, variantViewModel);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void RequestHide()
 	{
 		// Given
@@ -87,10 +91,12 @@ public class CommandPaletteWindowViewModelTests
 
 		// When
 		// Then
-		Assert.Raises<EventArgs>(h => vm.HideRequested += h, h => vm.HideRequested -= h, vm.RequestHide);
+		using var monitoredSubject = vm.Monitor();
+		vm.RequestHide();
+		monitoredSubject.Should().Raise(nameof(vm.HideRequested));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_Escape()
 	{
 		// Given
@@ -109,14 +115,12 @@ public class CommandPaletteWindowViewModelTests
 
 		// When
 		// Then
-		Assert.Raises<EventArgs>(
-			h => vm.HideRequested += h,
-			h => vm.HideRequested -= h,
-			() => vm.OnKeyDown(VirtualKey.Escape)
-		);
+		using var monitoredSubject = vm.Monitor();
+		vm.OnKeyDown(VirtualKey.Escape);
+		monitoredSubject.Should().Raise(nameof(vm.HideRequested));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_OtherKeys()
 	{
 		// Given
@@ -142,7 +146,7 @@ public class CommandPaletteWindowViewModelTests
 		viewModel.Verify(x => x.OnKeyDown(VirtualKey.Space), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Activate_UseDefaults()
 	{
 		// Given
@@ -160,19 +164,19 @@ public class CommandPaletteWindowViewModelTests
 			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
 
 		// When
-		Assert.Raises<EventArgs>(
-			h => vm.SetWindowPosRequested += h,
-			h => vm.SetWindowPosRequested -= h,
-			() => vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() }, null)
-		);
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() }, null);
+			monitoredSubject.Should().Raise(nameof(vm.SetWindowPosRequested));
+		}
 
 		// Then
-		Assert.Equal("", vm.Text);
-		Assert.Equal("Start typing...", vm.PlaceholderText);
-		Assert.Equal((int)(1080 * 0.4), vm.MaxHeight);
+		Assert.AreEqual("", vm.Text);
+		Assert.AreEqual("Start typing...", vm.PlaceholderText);
+		Assert.AreEqual((int)(1080 * 0.4), vm.MaxHeight);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Activate_DefineItems()
 	{
 		// Given
@@ -216,16 +220,16 @@ public class CommandPaletteWindowViewModelTests
 		};
 
 		// When
-		Assert.Raises<EventArgs>(
-			h => vm.SetWindowPosRequested += h,
-			h => vm.SetWindowPosRequested -= h,
-			() => vm.Activate(config, monitor.Object)
-		);
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.Activate(config, monitor.Object);
+			monitoredSubject.Should().Raise(nameof(vm.SetWindowPosRequested));
+		}
 
 		// Then
-		Assert.Equal("Initial text", vm.Text);
-		Assert.Equal("Hint", vm.PlaceholderText);
-		Assert.Equal((int)(100 * 0.4), vm.MaxHeight);
+		Assert.AreEqual("Initial text", vm.Text);
+		Assert.AreEqual("Hint", vm.PlaceholderText);
+		Assert.AreEqual((int)(100 * 0.4), vm.MaxHeight);
 	}
 
 	public static IEnumerable<object[]> ActivateData()
@@ -256,8 +260,8 @@ public class CommandPaletteWindowViewModelTests
 		};
 	}
 
-	[Theory]
-	[MemberData(nameof(ActivateData))]
+	[DataTestMethod]
+	[DynamicData(nameof(ActivateData), DynamicDataSourceType.Method)]
 	public void Activate_Variant(BaseVariantConfig config, bool expected, bool showSaveButton)
 	{
 		// Given
@@ -278,11 +282,11 @@ public class CommandPaletteWindowViewModelTests
 		vm.Activate(config, null);
 
 		// Then
-		Assert.Equal(expected, vm.IsConfigActive(config));
-		Assert.Equal(showSaveButton ? Visibility.Visible : Visibility.Collapsed, vm.SaveButtonVisibility);
+		Assert.AreEqual(expected, vm.IsConfigActive(config));
+		Assert.AreEqual(showSaveButton ? Visibility.Visible : Visibility.Collapsed, vm.SaveButtonVisibility);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Update()
 	{
 		// Given
@@ -304,13 +308,17 @@ public class CommandPaletteWindowViewModelTests
 		vm.Activate(config, null);
 
 		// When
-		Assert.Raises<EventArgs>(h => vm.SetWindowPosRequested += h, h => vm.SetWindowPosRequested -= h, vm.Update);
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.Update();
+			monitoredSubject.Should().Raise(nameof(vm.SetWindowPosRequested));
+		}
 
 		// Then
 		viewModel.Verify(x => x.Update(), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void IsVisible_True()
 	{
 		// Given
@@ -335,10 +343,10 @@ public class CommandPaletteWindowViewModelTests
 		bool result = vm.IsVisible;
 
 		// Then
-		Assert.True(result);
+		Assert.IsTrue(result);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void IsVisible_False()
 	{
 		// Given
@@ -359,6 +367,6 @@ public class CommandPaletteWindowViewModelTests
 		bool result = vm.IsVisible;
 
 		// Then
-		Assert.False(result);
+		Assert.IsFalse(result);
 	}
 }

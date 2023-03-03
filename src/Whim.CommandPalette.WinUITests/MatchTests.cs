@@ -1,15 +1,16 @@
-﻿using Moq;
-using Xunit;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Whim.CommandPalette.Tests;
 
+[TestClass]
 public class MatchTests
 {
-	[Fact]
+	[TestMethod]
 	public void Match_NoKeybind()
 	{
 		CommandItem match = new() { Command = new Mock<ICommand>().Object };
 
-		Assert.Null(match.Keybind);
+		Assert.IsNull(match.Keybind);
 	}
 }

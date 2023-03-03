@@ -1,11 +1,12 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
+[TestClass]
 public class SaveCommandTests
 {
-	[Fact]
+	[TestMethod]
 	public void CanExecute_WhenActiveVariantIsNull_ReturnsFalse()
 	{
 		// Given
@@ -16,10 +17,10 @@ public class SaveCommandTests
 		SaveCommand command = new(viewModelMock.Object);
 
 		// Then
-		Assert.False(command.CanExecute(null));
+		Assert.IsFalse(command.CanExecute(null));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void CanExecute_WhenActiveVariantIsNotNull_ReturnsTrue()
 	{
 		// Given
@@ -30,10 +31,10 @@ public class SaveCommandTests
 		SaveCommand command = new(viewModelMock.Object);
 
 		// Then
-		Assert.True(command.CanExecute(null));
+		Assert.IsTrue(command.CanExecute(null));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Execute_WhenActiveVariantIsNull_ReturnsEarly()
 	{
 		// Given
@@ -48,7 +49,7 @@ public class SaveCommandTests
 		viewModelMock.Verify(x => x.RequestHide(), Times.Never);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Execute_DoesNotHide()
 	{
 		// Given
@@ -68,7 +69,7 @@ public class SaveCommandTests
 		viewModelMock.Verify(x => x.RequestHide(), Times.Never);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Execute_Hides()
 	{
 		// Given
