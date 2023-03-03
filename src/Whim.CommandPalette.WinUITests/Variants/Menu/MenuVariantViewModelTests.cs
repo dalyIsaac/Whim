@@ -1,11 +1,14 @@
 using FluentAssertions;
 using Microsoft.UI.Xaml;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
 using Windows.System;
-using Xunit;
 
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests;
 
+[TestClass]
 public class MenuVariantViewModelTests
 {
 	private static (Mock<IConfigContext>, Mock<ICommandManager>, Mock<ICommandPaletteWindowViewModel>) CreateStubs()
@@ -27,7 +30,7 @@ public class MenuVariantViewModelTests
 		MatcherResult<CommandItem> item
 	) => new MenuRowStub() { ViewModel = new MenuVariantRowViewModel(item) };
 
-	[Fact]
+	[TestMethod]
 	public void Constructor()
 	{
 		// Given
@@ -49,12 +52,12 @@ public class MenuVariantViewModelTests
 		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
 
 		// Then
-		Assert.Single(vm._allItems);
+		Assert.AreEqual(1, vm._allItems.Count);
 	}
 
-	[Theory]
-	[InlineData(VirtualKey.Up, 2)]
-	[InlineData(VirtualKey.Down, 1)]
+	[DataTestMethod]
+	[DataRow(VirtualKey.Up, 2)]
+	[DataRow(VirtualKey.Down, 1)]
 	public void OnKeyDown_VerticalArrow(VirtualKey key, int expectedIndex)
 	{
 		// Given
@@ -76,17 +79,17 @@ public class MenuVariantViewModelTests
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
-		Assert.Raises<EventArgs>(
-			h => vm.ScrollIntoViewRequested += h,
-			h => vm.ScrollIntoViewRequested -= h,
-			() => vm.OnKeyDown(key)
-		);
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.OnKeyDown(key);
+			monitoredSubject.Should().Raise(nameof(vm.ScrollIntoViewRequested));
+		}
 
 		// Then
-		Assert.Equal(expectedIndex, vm.SelectedIndex);
+		Assert.AreEqual(expectedIndex, vm.SelectedIndex);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_UnhandledKeys()
 	{
 		// Given
@@ -111,10 +114,10 @@ public class MenuVariantViewModelTests
 		vm.OnKeyDown(VirtualKey.Escape);
 
 		// Then
-		Assert.Equal(0, vm.SelectedIndex);
+		Assert.AreEqual(0, vm.SelectedIndex);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void PopulateItems_CannotExecute()
 	{
 		// Given
@@ -135,10 +138,10 @@ public class MenuVariantViewModelTests
 		);
 
 		// Then
-		Assert.Empty(vm._allItems);
+		vm._allItems.Should().BeEmpty();
 	}
 
-	[Fact]
+	[TestMethod]
 	public void PopulateItems_AddNew()
 	{
 		// Given
@@ -156,10 +159,10 @@ public class MenuVariantViewModelTests
 		);
 
 		// Then
-		Assert.Single(vm._allItems);
+		Assert.AreEqual(1, vm._allItems.Count);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void PopulateItems_UpdateExisting()
 	{
 		// Given
@@ -181,11 +184,11 @@ public class MenuVariantViewModelTests
 		);
 
 		// Then
-		Assert.Single(vm._allItems);
-		Assert.Equal("new title", vm._allItems[0].Data.Command.Title);
+		Assert.AreEqual(1, vm._allItems.Count);
+		Assert.AreEqual("new title", vm._allItems[0].Data.Command.Title);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void PopulateItems_RemoveExtra()
 	{
 		// Given
@@ -205,10 +208,10 @@ public class MenuVariantViewModelTests
 		vm.PopulateItems(new List<CommandItem>());
 
 		// Then
-		Assert.Empty(vm._allItems);
+		vm._allItems.Should().BeEmpty();
 	}
 
-	[Fact]
+	[TestMethod]
 	public void PopulateItems_SkipEqualCommand()
 	{
 		// Given
@@ -228,11 +231,11 @@ public class MenuVariantViewModelTests
 		vm.PopulateItems(new List<CommandItem>() { new CommandItem() { Command = command }, });
 
 		// Then
-		Assert.Single(vm._allItems);
-		Assert.Equal(commandItem, vm._allItems[0].Data);
+		Assert.AreEqual(1, vm._allItems.Count);
+		Assert.AreEqual(commandItem, vm._allItems[0].Data);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ExecuteCommand()
 	{
 		// Given
@@ -267,11 +270,11 @@ public class MenuVariantViewModelTests
 		vm.ExecuteCommand();
 
 		// Then
-		Assert.True(called);
+		Assert.IsTrue(called);
 		windowViewModel.Verify(wvm => wvm.RequestHide());
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ExecuteCommand_ReuseShouldNotHide()
 	{
 		// Given
@@ -301,7 +304,7 @@ public class MenuVariantViewModelTests
 		windowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Update_NoMatches()
 	{
 		// Given
@@ -319,9 +322,9 @@ public class MenuVariantViewModelTests
 		vm.Update();
 
 		// Then
-		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
-		Assert.Equal(Visibility.Visible, vm.NoMatchingCommandsTextBlockVisibility);
-		Assert.Equal(Visibility.Collapsed, vm.ListViewItemsVisibility);
+		Assert.AreEqual(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
+		Assert.AreEqual(Visibility.Visible, vm.NoMatchingCommandsTextBlockVisibility);
+		Assert.AreEqual(Visibility.Collapsed, vm.ListViewItemsVisibility);
 	}
 
 	private static MenuVariantConfig CreateMenuActivationConfig(int itemCount)
@@ -351,7 +354,7 @@ public class MenuVariantViewModelTests
 		return config;
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Update_SomeMatches()
 	{
 		// Given
@@ -368,13 +371,13 @@ public class MenuVariantViewModelTests
 		vm.Update();
 
 		// Then
-		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
-		Assert.Equal(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
-		Assert.Equal(Visibility.Visible, vm.ListViewItemsVisibility);
-		Assert.Equal(3, vm.MenuRows.Count);
+		Assert.AreEqual(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
+		Assert.AreEqual(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
+		Assert.AreEqual(Visibility.Visible, vm.ListViewItemsVisibility);
+		Assert.AreEqual(3, vm.MenuRows.Count);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Update_RemoveUnused()
 	{
 		// Given
@@ -394,17 +397,17 @@ public class MenuVariantViewModelTests
 		vm.Update();
 
 		// Then
-		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
-		Assert.Equal(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
-		Assert.Equal(Visibility.Visible, vm.ListViewItemsVisibility);
-		Assert.Equal(3, vm.MenuRows.Count);
+		Assert.AreEqual(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
+		Assert.AreEqual(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
+		Assert.AreEqual(Visibility.Visible, vm.ListViewItemsVisibility);
+		Assert.AreEqual(3, vm.MenuRows.Count);
 
 		// First and second element should have been updated
-		Assert.True(vm.MenuRows[0] is MenuRowStub stub && stub.IsUpdated);
-		Assert.True(vm.MenuRows[1] is MenuRowStub stub2 && stub2.IsUpdated);
+		Assert.IsTrue(vm.MenuRows[0] is MenuRowStub stub && stub.IsUpdated);
+		Assert.IsTrue(vm.MenuRows[1] is MenuRowStub stub2 && stub2.IsUpdated);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void LoadMenuMatches_AddRows()
 	{
 		// Given
@@ -422,12 +425,12 @@ public class MenuVariantViewModelTests
 		vm.LoadMenuMatches(query, config);
 
 		// Then
-		Assert.Equal(2, vm.MenuRows.Count);
-		Assert.Equal("title0", vm.MenuRows[0].ViewModel.Model.Title);
-		Assert.Equal("title1", vm.MenuRows[1].ViewModel.Model.Title);
+		Assert.AreEqual(2, vm.MenuRows.Count);
+		Assert.AreEqual("title0", vm.MenuRows[0].ViewModel.Model.Title);
+		Assert.AreEqual("title1", vm.MenuRows[1].ViewModel.Model.Title);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void LoadMenuMatches_UpdateRows()
 	{
 		// Given
@@ -446,12 +449,12 @@ public class MenuVariantViewModelTests
 		vm.LoadMenuMatches(query, CreateMenuActivationConfig(2));
 
 		// Then
-		Assert.Equal(2, vm.MenuRows.Count);
+		Assert.AreEqual(2, vm.MenuRows.Count);
 		vm.MenuRows
 			.Should()
 			.AllSatisfy(r =>
 			{
-				Assert.True(r is MenuRowStub row && row.IsUpdated);
+				Assert.IsTrue(r is MenuRowStub row && row.IsUpdated);
 			});
 	}
 }

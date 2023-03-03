@@ -1,4 +1,4 @@
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests;
 
 internal class MenuRowStub : IVariantRowView<CommandItem, MenuVariantRowViewModel>
 {

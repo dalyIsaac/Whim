@@ -1,8 +1,12 @@
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Xunit;
+using System;
+using System.ComponentModel;
 
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests;
 
+[TestClass]
 public class SelectVariantRowViewModelTests
 {
 	private static Mock<IVariantRowModel<SelectOption>> CreateModelMock(bool isSelected, bool IsEnabled)
@@ -23,7 +27,7 @@ public class SelectVariantRowViewModelTests
 		return modelMock;
 	}
 
-	[Fact]
+	[TestMethod]
 	public void IsSelected_WhenSetToTrue_SetsIsSelectedOnModel()
 	{
 		// Given
@@ -33,13 +37,17 @@ public class SelectVariantRowViewModelTests
 		SelectVariantRowViewModel vm = new(matcherResult);
 
 		// When
-		Assert.PropertyChanged(vm, nameof(vm.IsSelected), () => vm.IsSelected = true);
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.IsSelected = true;
+			monitoredSubject.Should().RaisePropertyChangeFor(vm => vm.IsSelected);
+		}
 
 		// Then
-		Assert.True(modelMock.Object.Data.IsSelected);
+		Assert.IsTrue(modelMock.Object.Data.IsSelected);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void IsSelected_WhenSetToFalse_SetsIsSelectedOnModel()
 	{
 		// Given
@@ -49,13 +57,17 @@ public class SelectVariantRowViewModelTests
 		SelectVariantRowViewModel vm = new(matcherResult);
 
 		// When
-		Assert.PropertyChanged(vm, nameof(vm.IsSelected), () => vm.IsSelected = false);
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.IsSelected = false;
+			monitoredSubject.Should().RaisePropertyChangeFor(vm => vm.IsSelected);
+		}
 
 		// Then
-		Assert.False(modelMock.Object.Data.IsSelected);
+		Assert.IsFalse(modelMock.Object.Data.IsSelected);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void IsEnabled_WhenSetToTrue_SetsIsEnabledOnModel()
 	{
 		// Given
@@ -65,13 +77,17 @@ public class SelectVariantRowViewModelTests
 		SelectVariantRowViewModel vm = new(matcherResult);
 
 		// When
-		Assert.PropertyChanged(vm, nameof(vm.IsEnabled), () => vm.IsEnabled = true);
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.IsEnabled = true;
+			monitoredSubject.Should().RaisePropertyChangeFor(vm => vm.IsEnabled);
+		}
 
 		// Then
-		Assert.True(modelMock.Object.Data.IsEnabled);
+		Assert.IsTrue(modelMock.Object.Data.IsEnabled);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void IsEnabled_WhenSetToFalse_SetsIsEnabledOnModel()
 	{
 		// Given
@@ -81,13 +97,17 @@ public class SelectVariantRowViewModelTests
 		SelectVariantRowViewModel vm = new(matcherResult);
 
 		// When
-		Assert.PropertyChanged(vm, nameof(vm.IsEnabled), () => vm.IsEnabled = false);
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.IsEnabled = false;
+			monitoredSubject.Should().RaisePropertyChangeFor(vm => vm.IsEnabled);
+		}
 
 		// Then
-		Assert.False(modelMock.Object.Data.IsEnabled);
+		Assert.IsFalse(modelMock.Object.Data.IsEnabled);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Update_UpdatesModel()
 	{
 		// Given
@@ -105,10 +125,17 @@ public class SelectVariantRowViewModelTests
 		MatcherResult<SelectOption> newMatcherResult = new(newModelMock.Object, matches, 0);
 
 		// When
-		Assert.PropertyChanged(vm, string.Empty, () => vm.Update(newMatcherResult));
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.Update(newMatcherResult);
+			monitoredSubject
+				.Should()
+				.Raise("PropertyChanged")
+				.WithArgs<PropertyChangedEventArgs>(args => args.PropertyName == string.Empty);
+		}
 
 		// Then
-		Assert.Same(newModelMock.Object, vm.Model);
-		Assert.Equal(1, vm.FormattedTitle.Segments.Count);
+		Assert.AreSame(newModelMock.Object, vm.Model);
+		Assert.AreEqual(1, vm.FormattedTitle.Segments.Count);
 	}
 }

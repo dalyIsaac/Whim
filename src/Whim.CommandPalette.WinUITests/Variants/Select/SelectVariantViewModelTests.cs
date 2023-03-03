@@ -1,10 +1,15 @@
+using FluentAssertions;
 using Microsoft.UI.Xaml;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Windows.System;
-using Xunit;
 
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests;
 
+[TestClass]
 public class SelectVariantViewModelTests
 {
 	private static IEnumerable<MatcherResult<SelectOption>> ConvertToMatcherResults(
@@ -49,7 +54,7 @@ public class SelectVariantViewModelTests
 		return commandPaletteWindowViewModelMock;
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Activate_SelectVariantConfig()
 	{
 		// Given
@@ -76,7 +81,7 @@ public class SelectVariantViewModelTests
 		optionsMock.Verify(x => x.GetEnumerator(), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Activate_BaseVariantConfig()
 	{
 		// Given
@@ -90,7 +95,7 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(new Mock<BaseVariantConfig>().Object);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Update_NotActivated()
 	{
 		// Given
@@ -104,7 +109,7 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Update();
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Update_Activated_NoMatches()
 	{
 		// Given
@@ -130,12 +135,12 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Update();
 
 		// Then
-		Assert.Equal(-1, selectVariantViewModel.SelectedIndex);
-		Assert.Equal(Visibility.Collapsed, selectVariantViewModel.SelectRowsItemsVisibility);
-		Assert.Equal(Visibility.Visible, selectVariantViewModel.NoMatchingOptionsTextBlockVisibility);
+		Assert.AreEqual(-1, selectVariantViewModel.SelectedIndex);
+		Assert.AreEqual(Visibility.Collapsed, selectVariantViewModel.SelectRowsItemsVisibility);
+		Assert.AreEqual(Visibility.Visible, selectVariantViewModel.NoMatchingOptionsTextBlockVisibility);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Update_Activated_Matches()
 	{
 		// Given
@@ -174,9 +179,9 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Update();
 
 		// Then
-		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
-		Assert.Equal(Visibility.Visible, selectVariantViewModel.SelectRowsItemsVisibility);
-		Assert.Equal(Visibility.Collapsed, selectVariantViewModel.NoMatchingOptionsTextBlockVisibility);
+		Assert.AreEqual(0, selectVariantViewModel.SelectedIndex);
+		Assert.AreEqual(Visibility.Visible, selectVariantViewModel.SelectRowsItemsVisibility);
+		Assert.AreEqual(Visibility.Collapsed, selectVariantViewModel.NoMatchingOptionsTextBlockVisibility);
 	}
 
 	/// <summary>
@@ -261,7 +266,7 @@ public class SelectVariantViewModelTests
 		);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_NoRows()
 	{
 		// Given
@@ -284,10 +289,10 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.OnKeyDown(VirtualKey.Down);
 
 		// Then
-		Assert.Equal(-1, selectVariantViewModel.SelectedIndex);
+		Assert.AreEqual(-1, selectVariantViewModel.SelectedIndex);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_Down()
 	{
 		// Given
@@ -295,18 +300,17 @@ public class SelectVariantViewModelTests
 			CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
-		// When
-		Assert.Raises<EventArgs>(
-			h => selectVariantViewModel.ScrollIntoViewRequested += h,
-			h => selectVariantViewModel.ScrollIntoViewRequested -= h,
-			() => selectVariantViewModel.OnKeyDown(VirtualKey.Down)
-		);
+		using (var monitoredSubject = selectVariantViewModel.Monitor())
+		{
+			selectVariantViewModel.OnKeyDown(VirtualKey.Down);
+			monitoredSubject.Should().Raise(nameof(selectVariantViewModel.ScrollIntoViewRequested));
+		}
 
 		// Then
-		Assert.Equal(1, selectVariantViewModel.SelectedIndex);
+		Assert.AreEqual(1, selectVariantViewModel.SelectedIndex);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_Up()
 	{
 		// Given
@@ -315,17 +319,17 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(activationConfig);
 
 		// When
-		Assert.Raises<EventArgs>(
-			h => selectVariantViewModel.ScrollIntoViewRequested += h,
-			h => selectVariantViewModel.ScrollIntoViewRequested -= h,
-			() => selectVariantViewModel.OnKeyDown(VirtualKey.Up)
-		);
+		using (var monitoredSubject = selectVariantViewModel.Monitor())
+		{
+			selectVariantViewModel.OnKeyDown(VirtualKey.Up);
+			monitoredSubject.Should().Raise(nameof(selectVariantViewModel.ScrollIntoViewRequested));
+		}
 
 		// Then
-		Assert.Equal(2, selectVariantViewModel.SelectedIndex);
+		Assert.AreEqual(2, selectVariantViewModel.SelectedIndex);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_Enter()
 	{
 		// Given
@@ -346,14 +350,14 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.OnKeyDown(VirtualKey.Enter);
 
 		// Then
-		Assert.False(options[0].IsSelected);
-		Assert.False(options[1].IsSelected);
-		Assert.True(options[2].IsSelected);
+		Assert.IsFalse(options[0].IsSelected);
+		Assert.IsFalse(options[1].IsSelected);
+		Assert.IsTrue(options[2].IsSelected);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void UpdateSelectedItem_NotActivated()
 	{
 		// Given
@@ -367,7 +371,7 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.UpdateSelectedItem();
 	}
 
-	[Fact]
+	[TestMethod]
 	public void UpdateSelectedItem_SingleSelect()
 	{
 		// Given
@@ -388,14 +392,14 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.UpdateSelectedItem();
 
 		// Then
-		Assert.False(options[0].IsSelected);
-		Assert.True(options[1].IsSelected);
-		Assert.False(options[2].IsSelected);
+		Assert.IsFalse(options[0].IsSelected);
+		Assert.IsTrue(options[1].IsSelected);
+		Assert.IsFalse(options[2].IsSelected);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void UpdateSelectedItem_MultiSelect()
 	{
 		// Given
@@ -418,14 +422,14 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.UpdateSelectedItem();
 
 		// Then
-		Assert.False(options[0].IsSelected);
-		Assert.True(options[1].IsSelected);
-		Assert.True(options[2].IsSelected);
+		Assert.IsFalse(options[0].IsSelected);
+		Assert.IsTrue(options[1].IsSelected);
+		Assert.IsTrue(options[2].IsSelected);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Exactly(2));
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Exactly(2));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void VariantRow_OnClick_NotIVariantRow()
 	{
 		// Given
@@ -446,12 +450,12 @@ public class SelectVariantViewModelTests
 		);
 
 		// Then
-		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
+		Assert.AreEqual(0, selectVariantViewModel.SelectedIndex);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void VariantRow_OnClick_NotActivated()
 	{
 		// Given
@@ -471,12 +475,12 @@ public class SelectVariantViewModelTests
 		);
 
 		// Then
-		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
+		Assert.AreEqual(0, selectVariantViewModel.SelectedIndex);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void VariantRow_OnClick_UnknownVariantRow()
 	{
 		// Given
@@ -497,12 +501,12 @@ public class SelectVariantViewModelTests
 		);
 
 		// Then
-		Assert.Equal(0, selectVariantViewModel.SelectedIndex);
+		Assert.AreEqual(0, selectVariantViewModel.SelectedIndex);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Never);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Never);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void VariantRow_OnClick_Success()
 	{
 		// Given
@@ -521,15 +525,15 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.VariantRow_OnClick(selectVariantViewModel.SelectRows[1]);
 
 		// Then
-		Assert.Equal(1, selectVariantViewModel.SelectedIndex);
-		Assert.False(options[0].IsSelected);
-		Assert.True(options[1].IsSelected);
-		Assert.False(options[2].IsSelected);
+		Assert.AreEqual(1, selectVariantViewModel.SelectedIndex);
+		Assert.IsFalse(options[0].IsSelected);
+		Assert.IsTrue(options[1].IsSelected);
+		Assert.IsFalse(options[2].IsSelected);
 		matcherMock.Verify(m => m.OnMatchExecuted(It.IsAny<IVariantRowModel<SelectOption>>()), Times.Once);
 		commandPaletteWindowViewModelMock.Verify(c => c.RequestFocusTextBox(), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void PopulateItems_Populate()
 	{
 		// Given
@@ -540,14 +544,14 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.PopulateItems(options);
 
 		// Then
-		Assert.Equal(3, selectVariantViewModel._allItems.Count);
+		Assert.AreEqual(3, selectVariantViewModel._allItems.Count);
 
-		Assert.Equal("title", selectVariantViewModel._allItems[0].Title);
-		Assert.Equal("title2", selectVariantViewModel._allItems[1].Title);
-		Assert.Equal("title3", selectVariantViewModel._allItems[2].Title);
+		Assert.AreEqual("title", selectVariantViewModel._allItems[0].Title);
+		Assert.AreEqual("title2", selectVariantViewModel._allItems[1].Title);
+		Assert.AreEqual("title3", selectVariantViewModel._allItems[2].Title);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void PopulateItems_UpdateWithNewRow()
 	{
 		// Given
@@ -584,14 +588,14 @@ public class SelectVariantViewModelTests
 		);
 
 		// Then
-		Assert.Equal(3, selectVariantViewModel._allItems.Count);
+		Assert.AreEqual(3, selectVariantViewModel._allItems.Count);
 
-		Assert.Equal("title4", selectVariantViewModel._allItems[0].Title);
-		Assert.Equal("title5", selectVariantViewModel._allItems[1].Title);
-		Assert.Equal("title6", selectVariantViewModel._allItems[2].Title);
+		Assert.AreEqual("title4", selectVariantViewModel._allItems[0].Title);
+		Assert.AreEqual("title5", selectVariantViewModel._allItems[1].Title);
+		Assert.AreEqual("title6", selectVariantViewModel._allItems[2].Title);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void PopulateItems_UpdateSomeRows()
 	{
 		// Given
@@ -615,13 +619,13 @@ public class SelectVariantViewModelTests
 		);
 
 		// Then
-		Assert.Equal(2, selectVariantViewModel._allItems.Count);
+		Assert.AreEqual(2, selectVariantViewModel._allItems.Count);
 
-		Assert.Equal("title", selectVariantViewModel._allItems[0].Title);
-		Assert.Equal("title5", selectVariantViewModel._allItems[1].Title);
+		Assert.AreEqual("title", selectVariantViewModel._allItems[0].Title);
+		Assert.AreEqual("title5", selectVariantViewModel._allItems[1].Title);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void LoadSelectMatches_AddNewRows()
 	{
 		// Given
@@ -639,13 +643,13 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.LoadSelectMatches("test", activationConfig);
 
 		// Then
-		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
-		Assert.Equal(options[0], selectVariantViewModel.SelectRows[0].ViewModel.Model.Data);
-		Assert.Equal(options[1], selectVariantViewModel.SelectRows[1].ViewModel.Model.Data);
-		Assert.Equal(options[2], selectVariantViewModel.SelectRows[2].ViewModel.Model.Data);
+		Assert.AreEqual(3, selectVariantViewModel.SelectRows.Count);
+		Assert.AreEqual(options[0], selectVariantViewModel.SelectRows[0].ViewModel.Model.Data);
+		Assert.AreEqual(options[1], selectVariantViewModel.SelectRows[1].ViewModel.Model.Data);
+		Assert.AreEqual(options[2], selectVariantViewModel.SelectRows[2].ViewModel.Model.Data);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void LoadSelectMatches_UpdateRows()
 	{
 		// Given
@@ -692,7 +696,7 @@ public class SelectVariantViewModelTests
 		);
 
 		// Then
-		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
+		Assert.AreEqual(3, selectVariantViewModel.SelectRows.Count);
 		createdRows[1].Verify(
 			r =>
 				r.Update(
@@ -705,7 +709,7 @@ public class SelectVariantViewModelTests
 	/// Tests <see cref="SelectVariantViewModel.LoadSelectMatches"/> via <see cref="SelectVariantViewModel.Update"/>.
 	/// This test verifies that the unused row is restored, and <see cref="SelectVariantViewModel.RemoveUnusedRows"/> is called.
 	/// </summary>
-	[Fact]
+	[TestMethod]
 	public void Update_LoadSelectMatches_RestoreUnusedRow()
 	{
 		// Given
@@ -781,7 +785,7 @@ public class SelectVariantViewModelTests
 
 		// Then
 		// NOTE: RemoveUnusedRows is called by Update
-		Assert.Equal(2, selectVariantViewModel.SelectRows.Count);
+		Assert.AreEqual(2, selectVariantViewModel.SelectRows.Count);
 		createdRows[0].Verify(
 			r =>
 				r.Update(
@@ -794,10 +798,10 @@ public class SelectVariantViewModelTests
 					It.Is<MatcherResult<SelectOption>>(m => (SelectVariantRowModel)m.Model == thirdVariantItems[1])
 				)
 		);
-		Assert.Single(selectVariantViewModel._unusedRows);
+		Assert.AreEqual(1, selectVariantViewModel._unusedRows.Count);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void Save()
 	{
 		// Given
@@ -820,7 +824,7 @@ public class SelectVariantViewModelTests
 		callbackMock.Verify(c => c.Invoke(It.IsAny<IEnumerable<SelectOption>>()));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void GetViewMaxHeight()
 	{
 		// Given
@@ -839,6 +843,6 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Update();
 
 		// Then
-		Assert.Equal(options.Count * selectVariantViewModel.RowHeight, selectVariantViewModel.GetViewMaxHeight());
+		Assert.AreEqual(options.Count * selectVariantViewModel.RowHeight, selectVariantViewModel.GetViewMaxHeight());
 	}
 }

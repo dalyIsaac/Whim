@@ -1,11 +1,15 @@
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Xunit;
+using System;
+using System.ComponentModel;
 
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests;
 
+[TestClass]
 public class MenuVariantRowViewModelTests
 {
-	[Fact]
+	[TestMethod]
 	public void Update_UpdatesModel()
 	{
 		// Given
@@ -23,10 +27,17 @@ public class MenuVariantRowViewModelTests
 		MatcherResult<CommandItem> newMatcherResult = new(newModelMock.Object, matches, 0);
 
 		// When
-		Assert.PropertyChanged(vm, string.Empty, () => vm.Update(newMatcherResult));
+		using (var monitoredSubject = vm.Monitor())
+		{
+			vm.Update(newMatcherResult);
+			monitoredSubject
+				.Should()
+				.Raise("PropertyChanged")
+				.WithArgs<PropertyChangedEventArgs>(args => args.PropertyName == string.Empty);
+		}
 
 		// Then
-		Assert.Equal(newModelMock.Object, vm.Model);
-		Assert.Equal(1, vm.FormattedTitle.Segments.Count);
+		Assert.AreEqual(newModelMock.Object, vm.Model);
+		Assert.AreEqual(1, vm.FormattedTitle.Segments.Count);
 	}
 }

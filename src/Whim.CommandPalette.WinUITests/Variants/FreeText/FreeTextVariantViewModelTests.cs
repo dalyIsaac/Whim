@@ -1,9 +1,10 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Windows.System;
-using Xunit;
 
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests;
 
+[TestClass]
 public class FreeTextVariantViewModelTests
 {
 	private static (
@@ -27,7 +28,7 @@ public class FreeTextVariantViewModelTests
 		return (callback, config, windowViewModel);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_Enter()
 	{
 		// Given
@@ -48,7 +49,7 @@ public class FreeTextVariantViewModelTests
 		windowViewModel.Verify(w => w.RequestHide(), Times.Once);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_Enter_NoActivationConfig()
 	{
 		// Given
@@ -66,7 +67,7 @@ public class FreeTextVariantViewModelTests
 		callback.Verify(c => c("Hello, world!"), Times.Never);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void OnKeyDown_NotEnter()
 	{
 		// Given

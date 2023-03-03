@@ -4,6 +4,7 @@ using System;
 
 namespace Whim.CommandPalette.WinUITests;
 
+[TestClass]
 public class MatcherResultComparerTests
 {
 	private static MatcherResult<CommandItem> CreateMatcherItem(string title, uint score = 0)
