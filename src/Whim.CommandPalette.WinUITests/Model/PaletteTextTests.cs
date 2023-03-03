@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Documents;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestTools.UnitTesting.AppContainer;
 
-namespace Whim.CommandPalette.WinUITests.Model;
+namespace Whim.CommandPalette.WinUITests;
 
 [TestClass]
 public class PaletteTextSegmentTests

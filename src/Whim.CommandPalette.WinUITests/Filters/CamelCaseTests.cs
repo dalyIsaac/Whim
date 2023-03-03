@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace Whim.CommandPalette.WinUITests.Filters;
+namespace Whim.CommandPalette.WinUITests;
 
 [TestClass]
 public class CamelCaseTests
