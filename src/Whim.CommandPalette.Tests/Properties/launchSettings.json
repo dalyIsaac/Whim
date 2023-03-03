@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Whim.CommandPalette.Tests (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Whim.CommandPalette.Tests (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

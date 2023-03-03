@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
@@ -13,18 +12,27 @@
 		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
 		<AnalysisModeStyle>All</AnalysisModeStyle>
 		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Authors>Isaac Daly</Authors>
 		<BuildInParallel>true</BuildInParallel>
 		<Description>An extensible window manager for Windows.</Description>
-		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnableMsixTooling>true</EnableMsixTooling>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-		<GenerateLibraryLayout>true</GenerateLibraryLayout>
-		<ImplicitUsings>enable</ImplicitUsings>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<Nullable>enable</Nullable>
+		<OutputType>WinExe</OutputType>
 		<Platforms>x64;arm64;Any CPU</Platforms>
+		<PublishProfile>win10-$(Platform).pubxml</PublishProfile>
+		<RootNamespace>Whim.CommandPalette.Tests</RootNamespace>
+		<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
 		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
-		<Version>0.1.0</Version>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<UseWinUI>true</UseWinUI>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectCapability Include="TestContainer" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="coverlet.msbuild" Version="3.2.0">
@@ -36,17 +44,29 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="FluentAssertions" Version="6.10.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-		<PackageReference Include="Moq" Version="4.18.4" />
-		<PackageReference Include="xunit" Version="2.4.2" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-			<PrivateAssets>all</PrivateAssets>
+		<PackageReference Include="Microsoft.TestPlatform.TestHost">
+			<Version>17.5.0</Version>
+			<ExcludeAssets>build</ExcludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230217.4" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+		<PackageReference Include="Moq" Version="4.18.4" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.0.2" />
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+
+	<ItemGroup
+		Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
 	</ItemGroup>
 
+	<PropertyGroup
+		Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+	</PropertyGroup>
 </Project>

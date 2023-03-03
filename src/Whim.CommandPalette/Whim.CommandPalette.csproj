@@ -59,7 +59,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Whim.CommandPalette.Tests" />
-		<InternalsVisibleTo Include="Whim.CommandPalette.WinUITests" />
+		<InternalsVisibleTo Include="Whim.CommandPalette.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 
