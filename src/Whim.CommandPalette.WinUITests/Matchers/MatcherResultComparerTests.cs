@@ -1,7 +1,8 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Xunit;
+using System;
 
-namespace Whim.CommandPalette.Tests;
+namespace Whim.CommandPalette.WinUITests;
 
 public class MatcherResultComparerTests
 {
@@ -16,7 +17,7 @@ public class MatcherResultComparerTests
 		);
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ThrowWhenXIsNull()
 	{
 		// Given
@@ -27,10 +28,10 @@ public class MatcherResultComparerTests
 		MatcherItemComparer<CommandItem> comparer = new();
 
 		// Then
-		Assert.Throws<ArgumentNullException>(() => comparer.Compare(x, y));
+		Assert.ThrowsException<ArgumentNullException>(() => comparer.Compare(x, y));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ThrowWhenYIsNull()
 	{
 		// Given
@@ -41,10 +42,10 @@ public class MatcherResultComparerTests
 		MatcherItemComparer<CommandItem> comparer = new();
 
 		// Then
-		Assert.Throws<ArgumentNullException>(() => comparer.Compare(x, y));
+		Assert.ThrowsException<ArgumentNullException>(() => comparer.Compare(x, y));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ReturnZeroWhenXAndYAreEqual()
 	{
 		// Given
@@ -55,10 +56,10 @@ public class MatcherResultComparerTests
 		MatcherItemComparer<CommandItem> comparer = new();
 
 		// Then
-		Assert.Equal(0, comparer.Compare(x, y));
+		Assert.AreEqual(0, comparer.Compare(x, y));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ReturnMinusOneWhenXHasHigherScore()
 	{
 		// Given
@@ -69,10 +70,10 @@ public class MatcherResultComparerTests
 		MatcherItemComparer<CommandItem> comparer = new();
 
 		// Then
-		Assert.Equal(-1, comparer.Compare(x, y));
+		Assert.AreEqual(-1, comparer.Compare(x, y));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ReturnOneWhenYHasHigherScore()
 	{
 		// Given
@@ -83,10 +84,10 @@ public class MatcherResultComparerTests
 		MatcherItemComparer<CommandItem> comparer = new();
 
 		// Then
-		Assert.Equal(1, comparer.Compare(x, y));
+		Assert.AreEqual(1, comparer.Compare(x, y));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ReturnMinusOneWhenEqualScoreAndXAlphabeticallyFirst()
 	{
 		// Given
@@ -97,10 +98,10 @@ public class MatcherResultComparerTests
 		MatcherItemComparer<CommandItem> comparer = new();
 
 		// Then
-		Assert.Equal(-1, comparer.Compare(x, y));
+		Assert.AreEqual(-1, comparer.Compare(x, y));
 	}
 
-	[Fact]
+	[TestMethod]
 	public void ReturnOneWhenEqualScoreAndYAlphabeticallyFirst()
 	{
 		// Given
@@ -111,6 +112,6 @@ public class MatcherResultComparerTests
 		MatcherItemComparer<CommandItem> comparer = new();
 
 		// Then
-		Assert.Equal(1, comparer.Compare(x, y));
+		Assert.AreEqual(1, comparer.Compare(x, y));
 	}
 }
