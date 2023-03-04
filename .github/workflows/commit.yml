@@ -27,6 +27,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup VSTest Path
+        uses: darenm/Setup-VSTest@v1.2
+
       - name: Restore dependencies
         run: |
           dotnet restore Whim.sln -p:Configuration=$env:Configuration
@@ -45,9 +48,9 @@ jobs:
         run: |
           dotnet tool run xstyler --recursive --d . --passive --config ./.xamlstylerrc
 
-      # - name: Check analyzers
-      #   run: |
-      #     dotnet format analyzers Whim.sln --verify-no-changes --no-restore
+      - name: Check analyzers
+        run: |
+          dotnet format analyzers Whim.sln --verify-no-changes --no-restore
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
@@ -65,7 +68,14 @@ jobs:
 
       - name: Test
         run: |
-          dotnet test Whim.sln -p:CollectCoverage=true -p:CoverletOutputFormat=opencover
+          dotnet test Whim.sln -p:CollectCoverage=true -p:CoverletOutputFormat=opencover --filter "FullyQualifiedName!~Whim.CommandPalette.Tests"
+
+      - name: MSTest
+        run: |
+          $directory = "\bin\" + $env:Platform + "\" + $env:Configuration + "\net7.0-windows10.0.19041.0\win10-" + $env:Platform
+          $flags = "--logger:""console;verbosity=normal"" /InIsolation /EnableCodeCoverage"
+
+          vstest.console.exe .\src\Whim.CommandPalette.Tests$directory\Whim.CommandPalette.Tests.build.appxrecipe $flags
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
