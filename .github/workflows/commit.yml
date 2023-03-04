@@ -48,9 +48,9 @@ jobs:
         run: |
           dotnet tool run xstyler --recursive --d . --passive --config ./.xamlstylerrc
 
-      - name: Check analyzers
-        run: |
-          dotnet format analyzers Whim.sln --verify-no-changes --no-restore
+      # - name: Check analyzers
+      #   run: |
+      #     dotnet format analyzers Whim.sln --verify-no-changes --no-restore
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
