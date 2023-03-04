@@ -27,14 +27,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup VSTest Path
-        uses: darenm/Setup-VSTest@v1.2
-
       - name: Restore dependencies
-        run: |
-          dotnet restore Whim.sln -p:Configuration=$env:Configuration
         env:
           Configuration: ${{ matrix.configuration }}
+        run: |
+          dotnet restore Whim.sln -p:Configuration=$env:Configuration
 
       - name: Install dotnet tools
         run: |
@@ -56,26 +53,32 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Build
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
         run: |
           msbuild Whim.sln `
             -p:Configuration=$env:Configuration `
             -p:Platform=$env:Platform `
             -p:BuildInParallel=true `
             -maxCpuCount
-        env:
-          Configuration: ${{ matrix.configuration }}
-          Platform: ${{ matrix.platform }}
+
+      - name: Setup VSTest Path
+        uses: darenm/Setup-VSTest@v1.2
 
       - name: Test
         run: |
           dotnet test Whim.sln -p:CollectCoverage=true -p:CoverletOutputFormat=opencover --filter "FullyQualifiedName!~Whim.CommandPalette.Tests"
 
       - name: MSTest
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
         run: |
           $directory = "\bin\" + $env:Platform + "\" + $env:Configuration + "\net7.0-windows10.0.19041.0\win10-" + $env:Platform
           $flags = "--logger:""console;verbosity=normal"" /InIsolation /EnableCodeCoverage"
 
-          vstest.console.exe .\src\Whim.CommandPalette.Tests$directory\Whim.CommandPalette.Tests.build.appxrecipe $flags
+          vstest.console.exe src\Whim.CommandPalette.Tests$directory\Whim.CommandPalette.Tests.build.appxrecipe $flags
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
