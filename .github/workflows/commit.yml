@@ -85,7 +85,7 @@ jobs:
         if: matrix.platform == 'x64'
         run: |
           $directory = "bin\" + $env:Platform + "\" + $env:Configuration + "\net7.0-windows10.0.19041.0"
-          vstest.console.exe src\Whim.CommandPalette.Tests\$directory\Whim.CommandPalette.Tests.build.appxrecipe /InIsolation /EnableCodeCoverage
+          vstest.console.exe src\Whim.CommandPalette.Tests\$directory\Whim.CommandPalette.Tests.build.appxrecipe /InIsolation /EnableCodeCoverage /collect:"Code Coverage;Format=opencover"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
