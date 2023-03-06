@@ -15,71 +15,80 @@ namespace Whim.Tests;
 )]
 public class MonitorManagerTests
 {
-	private static (Mock<IConfigContext>, Mock<ICoreNativeManager>, Mock<IWindowMessageMonitor>) CreateStubs()
+	private class MocksBuilder
 	{
-		Mock<IConfigContext> configContextMock = new();
+		public Mock<IConfigContext> ConfigContext { get; }
+		public Mock<IWorkspaceManager> WorkspaceManager { get; }
+		public Mock<ICoreNativeManager> CoreNativeManager { get; }
+		public Mock<IWindowMessageMonitor> WindowMessageMonitor { get; }
 
-		Mock<ICoreNativeManager> coreNativeManagerMock = new();
-		coreNativeManagerMock.Setup(m => m.HasMultipleMonitors()).Returns(true);
-		coreNativeManagerMock
-			.Setup(
-				m =>
-					m.EnumDisplayMonitors(
-						It.IsAny<SafeHandle>(),
-						It.IsAny<RECT?>(),
-						It.IsAny<MONITORENUMPROC>(),
-						It.IsAny<LPARAM>()
-					)
-			)
-			.Callback<SafeHandle, RECT?, MONITORENUMPROC, LPARAM>(
-				(hdc, rect, callback, param) =>
-				{
-					RECT monitor1Rect =
-						new()
-						{
-							left = 1920,
-							top = 0,
-							right = 3840,
-							bottom = 1080
-						};
+		public MocksBuilder()
+		{
+			ConfigContext = new();
 
-					RECT monitor2Rect =
-						new()
-						{
-							left = 0,
-							top = 0,
-							right = 1920,
-							bottom = 1080
-						};
-					unsafe
+			WorkspaceManager = new();
+			ConfigContext.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
+
+			CoreNativeManager = new();
+			CoreNativeManager.Setup(m => m.HasMultipleMonitors()).Returns(true);
+			CoreNativeManager
+				.Setup(
+					m =>
+						m.EnumDisplayMonitors(
+							It.IsAny<SafeHandle>(),
+							It.IsAny<RECT?>(),
+							It.IsAny<MONITORENUMPROC>(),
+							It.IsAny<LPARAM>()
+						)
+				)
+				.Callback<SafeHandle, RECT?, MONITORENUMPROC, LPARAM>(
+					(hdc, rect, callback, param) =>
 					{
-						callback.Invoke(new HMONITOR(1), (HDC)0, &monitor1Rect, (LPARAM)0);
-						callback.Invoke(new HMONITOR(2), (HDC)0, &monitor2Rect, (LPARAM)0);
+						RECT monitor1Rect =
+							new()
+							{
+								left = 1920,
+								top = 0,
+								right = 3840,
+								bottom = 1080
+							};
+
+						RECT monitor2Rect =
+							new()
+							{
+								left = 0,
+								top = 0,
+								right = 1920,
+								bottom = 1080
+							};
+						unsafe
+						{
+							callback.Invoke(new HMONITOR(1), (HDC)0, &monitor1Rect, (LPARAM)0);
+							callback.Invoke(new HMONITOR(2), (HDC)0, &monitor2Rect, (LPARAM)0);
+						}
 					}
-				}
-			);
-		coreNativeManagerMock
-			.Setup(n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY))
-			.Returns(new HMONITOR(1));
+				);
+			CoreNativeManager
+				.Setup(n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY))
+				.Returns(new HMONITOR(1));
 
-		Mock<IWindowMessageMonitor> windowMessageMonitorMock = new();
-
-		return (configContextMock, coreNativeManagerMock, windowMessageMonitorMock);
+			WindowMessageMonitor = new();
+		}
 	}
 
 	[Fact]
 	public void Create()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContextMock,
-			Mock<ICoreNativeManager> coreNativeManagerMock,
-			Mock<IWindowMessageMonitor> windowMessageMonitorMock
-		) = CreateStubs();
+		MocksBuilder mocksBuilder = new();
 
 		// When
 		MonitorManager monitorManager =
-			new(configContextMock.Object, coreNativeManagerMock.Object, windowMessageMonitorMock.Object);
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
 
 		// Then
 		Assert.Equal(new HMONITOR(1), (monitorManager.PrimaryMonitor as Monitor)!._hmonitor);
@@ -90,12 +99,8 @@ public class MonitorManagerTests
 	public void Create_NoPrimaryMonitorFound()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContextMock,
-			Mock<ICoreNativeManager> coreNativeManagerMock,
-			Mock<IWindowMessageMonitor> windowMessageMonitorMock
-		) = CreateStubs();
-		coreNativeManagerMock
+		MocksBuilder mocksBuilder = new();
+		mocksBuilder.CoreNativeManager
 			.Setup(n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY))
 			.Returns(new HMONITOR(0));
 
@@ -104,9 +109,9 @@ public class MonitorManagerTests
 		var result = Assert.Throws<Exception>(
 			() =>
 				new MonitorManager(
-					configContextMock.Object,
-					coreNativeManagerMock.Object,
-					windowMessageMonitorMock.Object
+					mocksBuilder.ConfigContext.Object,
+					mocksBuilder.CoreNativeManager.Object,
+					mocksBuilder.WindowMessageMonitor.Object
 				)
 		);
 	}
@@ -115,27 +120,27 @@ public class MonitorManagerTests
 	public void Initialize()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContextMock,
-			Mock<ICoreNativeManager> coreNativeManagerMock,
-			Mock<IWindowMessageMonitor> windowMessageMonitorMock
-		) = CreateStubs();
+		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
-			new(configContextMock.Object, coreNativeManagerMock.Object, windowMessageMonitorMock.Object);
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
 
 		// When
 		monitorManager.Initialize();
 
 		// Then
-		windowMessageMonitorMock.VerifyAdd(
+		mocksBuilder.WindowMessageMonitor.VerifyAdd(
 			m => m.DisplayChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
-		windowMessageMonitorMock.VerifyAdd(
+		mocksBuilder.WindowMessageMonitor.VerifyAdd(
 			m => m.WorkAreaChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
-		windowMessageMonitorMock.VerifyAdd(
+		mocksBuilder.WindowMessageMonitor.VerifyAdd(
 			m => m.DpiChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
@@ -145,49 +150,52 @@ public class MonitorManagerTests
 	public void WindowFocused_NullMonitor()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContextMock,
-			Mock<ICoreNativeManager> coreNativeManagerMock,
-			Mock<IWindowMessageMonitor> windowMessageMonitorMock
-		) = CreateStubs();
-		Mock<IWorkspaceManager> workspaceManagerMock = new();
-		workspaceManagerMock.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns((IMonitor?)null);
-		configContextMock.SetupGet(c => c.WorkspaceManager).Returns(workspaceManagerMock.Object);
+		MocksBuilder mocksBuilder = new();
+
+		mocksBuilder.WorkspaceManager.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns((IMonitor?)null);
+		mocksBuilder.ConfigContext.SetupGet(c => c.WorkspaceManager).Returns(mocksBuilder.WorkspaceManager.Object);
 
 		MonitorManager monitorManager =
-			new(configContextMock.Object, coreNativeManagerMock.Object, windowMessageMonitorMock.Object);
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
 
 		// When
 		monitorManager.WindowFocused(new Mock<IWindow>().Object);
 
 		// Then
-		workspaceManagerMock.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+		mocksBuilder.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
 	}
 
 	[Fact]
 	public void WindowFocused()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContextMock,
-			Mock<ICoreNativeManager> coreNativeManagerMock,
-			Mock<IWindowMessageMonitor> windowMessageMonitorMock
-		) = CreateStubs();
-		Mock<IWorkspaceManager> workspaceManagerMock = new();
+		MocksBuilder mocksBuilder = new();
+
 		Mock<IMonitor> monitorMock = new();
 		monitorMock.Setup(m => m.Equals(null)).Returns(false);
 		monitorMock.Setup(m => m.Equals(It.IsAny<IMonitor>())).Returns(true);
-		workspaceManagerMock.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns(monitorMock.Object);
-		configContextMock.SetupGet(c => c.WorkspaceManager).Returns(workspaceManagerMock.Object);
+
+		mocksBuilder.WorkspaceManager
+			.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>()))
+			.Returns(monitorMock.Object);
+		mocksBuilder.ConfigContext.SetupGet(c => c.WorkspaceManager).Returns(mocksBuilder.WorkspaceManager.Object);
 
 		MonitorManager monitorManager =
-			new(configContextMock.Object, coreNativeManagerMock.Object, windowMessageMonitorMock.Object);
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
 
 		// When
 		monitorManager.WindowFocused(new Mock<IWindow>().Object);
 
 		// Then
-		workspaceManagerMock.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+		mocksBuilder.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
 		Assert.Equal(monitorMock.Object, monitorManager.FocusedMonitor);
 	}
 }

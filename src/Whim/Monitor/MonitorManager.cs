@@ -106,6 +106,7 @@ internal class MonitorManager : IMonitorManager
 		HashSet<IMonitor> previousMonitorsSet = new(previousMonitors);
 		HashSet<IMonitor> currentMonitorsSet = new(_monitors);
 
+		// For each monitor in the previous set, check if it's in the current set.
 		foreach (IMonitor monitor in previousMonitorsSet)
 		{
 			if (currentMonitorsSet.Contains(monitor))
@@ -118,6 +119,7 @@ internal class MonitorManager : IMonitorManager
 			}
 		}
 
+		// For each monitor in the current set, check if it's in the previous set.
 		foreach (IMonitor monitor in currentMonitorsSet)
 		{
 			if (!previousMonitorsSet.Contains(monitor))
@@ -131,6 +133,7 @@ internal class MonitorManager : IMonitorManager
 			}
 		}
 
+		// Notify listeners of the unchanged, removed, and added monitors.
 		MonitorsChanged?.Invoke(
 			this,
 			new MonitorsChangedEventArgs()
