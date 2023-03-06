@@ -57,7 +57,7 @@ internal class MonitorManager : IMonitorManager
 		_windowMessageMonitor = windowMessageMonitor ?? new WindowMessageMonitor(_configContext, _coreNativeManager);
 
 		// Get the monitors.
-		_monitors = GetCurrentMonitors().OrderBy(m => m.Bounds.X).ThenBy(m => m.Bounds.Y).ToArray();
+		_monitors = GetCurrentMonitors().OrderBy(m => m.WorkingArea.X).ThenBy(m => m.WorkingArea.Y).ToArray();
 
 		// Get the initial focused monitor
 		IMonitor? primaryMonitor = _monitors?.FirstOrDefault(m => m.IsPrimary);
