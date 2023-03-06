@@ -60,11 +60,8 @@ internal class MonitorManager : IMonitorManager
 		_monitors = GetCurrentMonitors().OrderBy(m => m.WorkingArea.X).ThenBy(m => m.WorkingArea.Y).ToArray();
 
 		// Get the initial focused monitor
-		IMonitor? primaryMonitor = _monitors?.FirstOrDefault(m => m.IsPrimary);
-		if (primaryMonitor == null)
-		{
-			throw new Exception("No primary monitor found.");
-		}
+		IMonitor? primaryMonitor =
+			(_monitors?.FirstOrDefault(m => m.IsPrimary)) ?? throw new Exception("No primary monitor found.");
 		FocusedMonitor = primaryMonitor;
 		PrimaryMonitor = primaryMonitor;
 	}
