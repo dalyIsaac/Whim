@@ -1,7 +1,9 @@
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -48,9 +50,6 @@ public class MonitorManagerTests
 					}
 				}
 			);
-			CoreNativeManager
-				.Setup(n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY))
-				.Returns(new HMONITOR(1));
 
 			WindowMessageMonitor = new();
 		}
@@ -86,10 +85,35 @@ public class MonitorManagerTests
 					}
 				);
 
+			var potentialPrimaryMonitors = monitorRects.Where(r => r.left == 0 && r.top == 0);
+			if (potentialPrimaryMonitors.Count() != 1)
+			{
+				throw new Exception("No primary monitor found");
+			}
+			RECT primaryRect = potentialPrimaryMonitors.First();
+
+			CoreNativeManager.Setup(c => c.GetVirtualScreenLeft()).Returns(primaryRect.left);
+			CoreNativeManager.Setup(c => c.GetVirtualScreenTop()).Returns(primaryRect.top);
+			CoreNativeManager.Setup(c => c.GetVirtualScreenWidth()).Returns(primaryRect.right - primaryRect.left);
+			CoreNativeManager
+				.Setup(expression: c => c.GetVirtualScreenHeight())
+				.Returns(primaryRect.bottom - primaryRect.top);
+			CoreNativeManager.Setup(c => c.GetPrimaryDisplayWorkArea(out primaryRect));
+
 			if (_monitorRects.Length > 1)
 			{
 				for (int i = 0; i < _monitorRects.Length; i++)
 				{
+					if (primaryRect.Equals(_monitorRects[i]))
+					{
+						CoreNativeManager
+							.Setup(
+								n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
+							)
+							.Returns(new HMONITOR(i + 1));
+						continue;
+					}
+
 					CoreNativeManager
 						.Setup(m => m.GetMonitorInfo(new HMONITOR(i + 1), ref It.Ref<MONITORINFOEXW>.IsAny))
 						.Callback(
@@ -102,22 +126,6 @@ public class MonitorManagerTests
 							}
 						);
 				}
-			}
-			else
-			{
-				RECT monitorRect = _monitorRects[0];
-				CoreNativeManager.Setup(c => c.GetVirtualScreenLeft()).Returns(monitorRect.left);
-				CoreNativeManager.Setup(c => c.GetVirtualScreenTop()).Returns(monitorRect.top);
-				CoreNativeManager.Setup(c => c.GetVirtualScreenWidth()).Returns(monitorRect.right - monitorRect.left);
-				CoreNativeManager.Setup(c => c.GetVirtualScreenHeight()).Returns(monitorRect.bottom - monitorRect.top);
-				CoreNativeManager
-					.Setup(c => c.GetPrimaryDisplayWorkArea(out It.Ref<RECT>.IsAny))
-					.Callback<RECT>(
-						(rect) =>
-						{
-							rect = monitorRect;
-						}
-					);
 			}
 		}
 	}
@@ -251,6 +259,76 @@ public class MonitorManagerTests
 		// Given
 		MocksBuilder mocksBuilder = new();
 
-		// TODO
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		RECT right =
+			new()
+			{
+				left = 1920,
+				top = 0,
+				right = 3840,
+				bottom = 1080
+			};
+		RECT leftTop =
+			new()
+			{
+				left = 0,
+				top = 0,
+				right = 1920,
+				bottom = 1080
+			};
+		RECT leftBottom =
+			new()
+			{
+				left = 0,
+				top = 1080,
+				right = 1920,
+				bottom = 2160
+			};
+		RECT[] monitorRects = new[] { right, leftTop, leftBottom };
+		mocksBuilder.UpdateGetCurrentMonitors(monitorRects);
+
+		// When
+		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
+			h => monitorManager.MonitorsChanged += h,
+			h => monitorManager.MonitorsChanged -= h,
+			() =>
+				mocksBuilder.WindowMessageMonitor.Raise(
+					m => m.DisplayChanged += null,
+					new WindowMessageMonitorEventArgs()
+					{
+						MessagePayload = new WindowMessageMonitorEventArgsPayload()
+						{
+							HWnd = new HWND(1),
+							UMsg = 0,
+							WParam = 0,
+							LParam = 0
+						},
+						Handled = false,
+						Result = IntPtr.Zero
+					}
+				)
+		);
+
+		// Then
+		List<IMonitor> monitors = monitorManager.ToList();
+		Assert.Equal(3, monitors.Count);
+
+		Assert.Equal(leftTop.ToLocation(), monitors[0].WorkingArea);
+		Assert.Equal(leftBottom.ToLocation(), monitors[1].WorkingArea);
+		Assert.Equal(right.ToLocation(), monitors[2].WorkingArea);
+
+		Assert.Equal(2, raisedEvent.Arguments.UnchangedMonitors.Count());
+		Assert.Single(raisedEvent.Arguments.AddedMonitors);
+		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
+
+		IMonitor first = raisedEvent.Arguments.UnchangedMonitors.First();
+		Assert.Equal(leftTop.ToLocation(), first.WorkingArea);
 	}
 }
