@@ -101,6 +101,7 @@ public class MonitorManagerTests
 				.Returns(primaryRect.bottom - primaryRect.top);
 			CoreNativeManager.Setup(c => c.GetPrimaryDisplayWorkArea(out primaryRect));
 
+			// The HMONITORs are non-zero, because MONITOR_DEFAULTTONULL is 0x00000000
 			if (_monitorRects.Length > 1)
 			{
 				for (int i = 0; i < _monitorRects.Length; i++)
@@ -464,5 +465,217 @@ public class MonitorManagerTests
 			.Select(m => m.Bounds)
 			.Should()
 			.BeEquivalentTo(expectedRemovedRects.Select(r => r.ToLocation()));
+	}
+
+	[Fact]
+	public void GetMonitorAtPoint_Error_ReturnsFirstMonitor()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+		Point<int> point = new() { X = 10 * 1000, Y = 10 * 1000 };
+
+		mocksBuilder.CoreNativeManager
+			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
+			.Returns((HMONITOR)0);
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		IMonitor monitor = monitorManager.GetMonitorAtPoint(point);
+
+		// Then
+		Assert.Equal(monitorManager.First(), monitor);
+	}
+
+	[Fact]
+	public void GetMonitorAtPoint_MultipleMonitors_ReturnsCorrectMonitor()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+		Point<int> point = new() { X = 1930, Y = 10 };
+
+		mocksBuilder.CoreNativeManager
+			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
+			.Returns((HMONITOR)2);
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		IMonitor monitor = monitorManager.GetMonitorAtPoint(point);
+
+		// Then
+		Assert.Equal(monitorManager.ElementAt(1), monitor);
+	}
+
+	[Fact]
+	public void GetPreviousMonitor_Error_ReturnsFirstMonitor()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		IMonitor monitor = monitorManager.GetPreviousMonitor(new Mock<IMonitor>().Object);
+
+		// Then
+		Assert.Equal(monitorManager.First(), monitor);
+	}
+
+	[Fact]
+	public void GetPreviousMonitor_MultipleMonitors_ReturnsCorrectMonitor()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		IMonitor monitor = monitorManager.GetPreviousMonitor(monitorManager.ElementAt(1));
+
+		// Then
+		Assert.Equal(monitorManager.First(), monitor);
+	}
+
+	[Fact]
+	public void GetPreviousMonitor_MultipleMonitors_Mod()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		IMonitor monitor = monitorManager.GetPreviousMonitor(monitorManager.ElementAt(0));
+
+		// Then
+		Assert.Equal(monitorManager.ElementAt(1), monitor);
+	}
+
+	[Fact]
+	public void GetNextMonitor_Error_ReturnsFirstMonitor()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		IMonitor monitor = monitorManager.GetNextMonitor(new Mock<IMonitor>().Object);
+
+		// Then
+		Assert.Equal(monitorManager.First(), monitor);
+	}
+
+	[Fact]
+	public void GetNextMonitor_MultipleMonitors_ReturnsCorrectMonitor()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		IMonitor monitor = monitorManager.GetNextMonitor(monitorManager.First());
+
+		// Then
+		Assert.Equal(monitorManager.ElementAt(1), monitor);
+	}
+
+	[Fact]
+	public void GetNextMonitor_MultipleMonitors_Mod()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		IMonitor monitor = monitorManager.GetNextMonitor(monitorManager.ElementAt(1));
+
+		// Then
+		Assert.Equal(monitorManager.First(), monitor);
+	}
+
+	[Fact]
+	public void Dispose()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		monitorManager.Dispose();
+
+		// Then
+		mocksBuilder.WindowMessageMonitor.VerifyRemove(
+			wmm => wmm.DisplayChanged -= It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
+			Times.Once
+		);
+		mocksBuilder.WindowMessageMonitor.Verify(wmm => wmm.Dispose(), Times.Once);
 	}
 }

@@ -61,8 +61,7 @@ internal class MonitorManager : IMonitorManager
 
 		// Get the initial focused monitor
 		IMonitor? primaryMonitor =
-			(_monitors?.FirstOrDefault(m => m.IsPrimary))
-			?? throw new InvalidOperationException("No primary monitor found.");
+			(_monitors?.FirstOrDefault(m => m.IsPrimary)) ?? throw new Exception("No primary monitor found.");
 		FocusedMonitor = primaryMonitor;
 		PrimaryMonitor = primaryMonitor;
 	}
@@ -131,21 +130,16 @@ internal class MonitorManager : IMonitorManager
 			}
 		}
 
-		MonitorsChangedEventArgs monitorEventArgs =
-			new()
+		// Notify listeners of the unchanged, removed, and added monitors.
+		MonitorsChanged?.Invoke(
+			this,
+			new MonitorsChangedEventArgs()
 			{
 				UnchangedMonitors = unchangedMonitors,
 				RemovedMonitors = removedMonitors,
 				AddedMonitors = addedMonitors
-			};
-
-		if (!monitorEventArgs.CurrentMonitors.Any())
-		{
-			throw new InvalidOperationException("No monitors found.");
-		}
-
-		// Notify listeners of the unchanged, removed, and added monitors.
-		MonitorsChanged?.Invoke(this, monitorEventArgs);
+			}
+		);
 	}
 
 	private void WindowMessageMonitor_WorkAreaChanged(object? sender, WindowMessageMonitorEventArgs e)
