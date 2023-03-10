@@ -57,14 +57,11 @@ internal class MonitorManager : IMonitorManager
 		_windowMessageMonitor = windowMessageMonitor ?? new WindowMessageMonitor(_configContext, _coreNativeManager);
 
 		// Get the monitors.
-		_monitors = GetCurrentMonitors().OrderBy(m => m.Bounds.X).ThenBy(m => m.Bounds.Y).ToArray();
+		_monitors = GetCurrentMonitors();
 
 		// Get the initial focused monitor
-		IMonitor? primaryMonitor = _monitors?.FirstOrDefault(m => m.IsPrimary);
-		if (primaryMonitor == null)
-		{
-			throw new Exception("No primary monitor found.");
-		}
+		IMonitor? primaryMonitor =
+			(_monitors?.FirstOrDefault(m => m.IsPrimary)) ?? throw new Exception("No primary monitor found.");
 		FocusedMonitor = primaryMonitor;
 		PrimaryMonitor = primaryMonitor;
 	}
@@ -106,6 +103,7 @@ internal class MonitorManager : IMonitorManager
 		HashSet<IMonitor> previousMonitorsSet = new(previousMonitors);
 		HashSet<IMonitor> currentMonitorsSet = new(_monitors);
 
+		// For each monitor in the previous set, check if it's in the current set.
 		foreach (IMonitor monitor in previousMonitorsSet)
 		{
 			if (currentMonitorsSet.Contains(monitor))
@@ -118,6 +116,7 @@ internal class MonitorManager : IMonitorManager
 			}
 		}
 
+		// For each monitor in the current set, check if it's in the previous set.
 		foreach (IMonitor monitor in currentMonitorsSet)
 		{
 			if (!previousMonitorsSet.Contains(monitor))
@@ -131,6 +130,7 @@ internal class MonitorManager : IMonitorManager
 			}
 		}
 
+		// Notify listeners of the unchanged, removed, and added monitors.
 		MonitorsChanged?.Invoke(
 			this,
 			new MonitorsChangedEventArgs()
@@ -224,7 +224,7 @@ internal class MonitorManager : IMonitorManager
 			currentMonitors[i] = monitor;
 		}
 
-		return currentMonitors;
+		return currentMonitors.OrderBy(m => m.WorkingArea.X).ThenBy(m => m.WorkingArea.Y).ToArray();
 	}
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
