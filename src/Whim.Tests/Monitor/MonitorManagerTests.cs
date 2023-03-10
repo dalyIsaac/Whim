@@ -468,6 +468,54 @@ public class MonitorManagerTests
 	}
 
 	[Fact]
+	public void WindowMessageMonitor_WorkAreaChanged()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
+			h => monitorManager.MonitorsChanged += h,
+			h => monitorManager.MonitorsChanged -= h,
+			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.WorkAreaChanged += null, WindowMessageMonitorEventArgs)
+		);
+
+		// Then
+		Assert.Equal(raisedEvent.Arguments.UnchangedMonitors, monitorManager.ToList());
+	}
+
+	[Fact]
+	public void WindowMessaageMonitor_DpiChanged()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
+			h => monitorManager.MonitorsChanged += h,
+			h => monitorManager.MonitorsChanged -= h,
+			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.DpiChanged += null, WindowMessageMonitorEventArgs)
+		);
+
+		// Then
+		Assert.Equal(raisedEvent.Arguments.UnchangedMonitors, monitorManager.ToList());
+	}
+
+	[Fact]
 	public void GetMonitorAtPoint_Error_ReturnsFirstMonitor()
 	{
 		// Given
@@ -478,7 +526,6 @@ public class MonitorManagerTests
 			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
 			.Returns((HMONITOR)0);
 
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -505,7 +552,6 @@ public class MonitorManagerTests
 			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
 			.Returns((HMONITOR)1);
 
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -526,8 +572,6 @@ public class MonitorManagerTests
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
-
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -548,8 +592,6 @@ public class MonitorManagerTests
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
-
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -570,8 +612,6 @@ public class MonitorManagerTests
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
-
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -592,8 +632,6 @@ public class MonitorManagerTests
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
-
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -614,8 +652,6 @@ public class MonitorManagerTests
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
-
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -636,8 +672,6 @@ public class MonitorManagerTests
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
-
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -658,8 +692,6 @@ public class MonitorManagerTests
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
-
-		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -677,5 +709,24 @@ public class MonitorManagerTests
 			Times.Once
 		);
 		mocksBuilder.WindowMessageMonitor.Verify(wmm => wmm.Dispose(), Times.Once);
+	}
+
+	[Fact]
+	public void Length()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+
+		// When
+		int length = monitorManager.Length;
+
+		// Then
+		Assert.Equal(2, length);
 	}
 }
