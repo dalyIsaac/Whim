@@ -101,7 +101,7 @@ public class MonitorManagerTests
 				.Returns(primaryRect.bottom - primaryRect.top);
 			CoreNativeManager.Setup(c => c.GetPrimaryDisplayWorkArea(out primaryRect));
 
-			// The HMONITORs are non-zero, because MONITOR_DEFAULTTONULL is 0x00000000
+			// The HMONITORs are non-zero
 			if (_monitorRects.Length > 1)
 			{
 				for (int i = 0; i < _monitorRects.Length; i++)
