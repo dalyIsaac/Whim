@@ -503,7 +503,7 @@ public class MonitorManagerTests
 
 		mocksBuilder.CoreNativeManager
 			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
-			.Returns((HMONITOR)2);
+			.Returns((HMONITOR)1);
 
 		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
