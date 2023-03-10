@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -127,6 +128,12 @@ public class MonitorManagerTests
 						);
 				}
 			}
+			else
+			{
+				CoreNativeManager
+					.Setup(n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY))
+					.Returns(new HMONITOR(1));
+			}
 		}
 	}
 
@@ -145,8 +152,8 @@ public class MonitorManagerTests
 			);
 
 		// Then
-		Assert.Equal(new HMONITOR(1), (monitorManager.PrimaryMonitor as Monitor)!._hmonitor);
-		Assert.Equal(new HMONITOR(1), (monitorManager.FocusedMonitor as Monitor)!._hmonitor);
+		Assert.Equal(new HMONITOR(2), (monitorManager.PrimaryMonitor as Monitor)!._hmonitor);
+		Assert.Equal(new HMONITOR(2), (monitorManager.FocusedMonitor as Monitor)!._hmonitor);
 	}
 
 	[Fact]
@@ -253,12 +260,27 @@ public class MonitorManagerTests
 		Assert.Equal(monitorMock.Object, monitorManager.FocusedMonitor);
 	}
 
+	private static WindowMessageMonitorEventArgs WindowMessageMonitorEventArgs =>
+		new()
+		{
+			MessagePayload = new WindowMessageMonitorEventArgsPayload()
+			{
+				HWnd = new HWND(1),
+				UMsg = 0,
+				WParam = 0,
+				LParam = 0
+			},
+			Handled = false,
+			Result = IntPtr.Zero
+		};
+
 	[Fact]
 	public void WindowMessageMonitor_DisplayChanged_AddMonitor_HasMultipleMonitors()
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
 
+		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
 				mocksBuilder.ConfigContext.Object,
@@ -267,6 +289,7 @@ public class MonitorManagerTests
 			);
 		monitorManager.Initialize();
 
+		// Set up the monitor manager to be given a new monitor
 		RECT right =
 			new()
 			{
@@ -298,22 +321,7 @@ public class MonitorManagerTests
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() =>
-				mocksBuilder.WindowMessageMonitor.Raise(
-					m => m.DisplayChanged += null,
-					new WindowMessageMonitorEventArgs()
-					{
-						MessagePayload = new WindowMessageMonitorEventArgsPayload()
-						{
-							HWnd = new HWND(1),
-							UMsg = 0,
-							WParam = 0,
-							LParam = 0
-						},
-						Handled = false,
-						Result = IntPtr.Zero
-					}
-				)
+			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -328,7 +336,133 @@ public class MonitorManagerTests
 		Assert.Single(raisedEvent.Arguments.AddedMonitors);
 		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
 
-		IMonitor first = raisedEvent.Arguments.UnchangedMonitors.First();
-		Assert.Equal(leftTop.ToLocation(), first.WorkingArea);
+		RECT[] expectedUnchangedRects = new[] { leftTop, right };
+		raisedEvent.Arguments.UnchangedMonitors
+			.Select(m => m.Bounds)
+			.Should()
+			.BeEquivalentTo(expectedUnchangedRects.Select(r => r.ToLocation()));
+
+		RECT[] expectedAddedRects = new[] { leftBottom };
+		raisedEvent.Arguments.AddedMonitors
+			.Select(m => m.Bounds)
+			.Should()
+			.BeEquivalentTo(expectedAddedRects.Select(r => r.ToLocation()));
+	}
+
+	[Fact]
+	public void WindowMessageMonitor_DisplayChanged_AddMonitor_HasSingleMonitor()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with a single monitor
+		RECT primaryRect =
+			new()
+			{
+				left = 0,
+				top = 0,
+				right = 1920,
+				bottom = 1080
+			};
+		mocksBuilder.UpdateGetCurrentMonitors(new[] { primaryRect });
+
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// Set up the monitor manager to be given a new monitor
+		RECT right =
+			new()
+			{
+				left = 1920,
+				top = 0,
+				right = 3840,
+				bottom = 1080
+			};
+		mocksBuilder.UpdateGetCurrentMonitors(new[] { primaryRect, right });
+
+		// When
+		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
+			h => monitorManager.MonitorsChanged += h,
+			h => monitorManager.MonitorsChanged -= h,
+			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
+		);
+
+		// Then
+		List<IMonitor> monitors = monitorManager.ToList();
+		Assert.Equal(2, monitors.Count);
+
+		Assert.Equal(primaryRect.ToLocation(), monitors[0].WorkingArea);
+		Assert.Equal(right.ToLocation(), monitors[1].WorkingArea);
+
+		Assert.Single(raisedEvent.Arguments.UnchangedMonitors);
+		Assert.Single(raisedEvent.Arguments.AddedMonitors);
+		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
+
+		RECT[] expectedUnchangedRects = new[] { primaryRect };
+		raisedEvent.Arguments.UnchangedMonitors
+			.Select(m => m.Bounds)
+			.Should()
+			.BeEquivalentTo(expectedUnchangedRects.Select(r => r.ToLocation()));
+
+		RECT[] expectedAddedRects = new[] { right };
+		raisedEvent.Arguments.AddedMonitors
+			.Select(m => m.Bounds)
+			.Should()
+			.BeEquivalentTo(expectedAddedRects.Select(r => r.ToLocation()));
+	}
+
+	[Fact]
+	public void WindowMessageMonitor_DisplayChanged_RemoveMonitor_HasMultipleMonitors()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// Set up the monitor manager to have only one monitor
+		RECT left =
+			new()
+			{
+				left = 0,
+				top = 0,
+				right = 1920,
+				bottom = 1080
+			};
+		mocksBuilder.UpdateGetCurrentMonitors(new[] { left });
+
+		// When
+		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
+			h => monitorManager.MonitorsChanged += h,
+			h => monitorManager.MonitorsChanged -= h,
+			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
+		);
+
+		// Then
+		List<IMonitor> monitors = monitorManager.ToList();
+		Assert.Single(monitors);
+
+		Assert.Equal(left.ToLocation(), monitors[0].WorkingArea);
+
+		Assert.Single(raisedEvent.Arguments.UnchangedMonitors);
+		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
+		Assert.Single(raisedEvent.Arguments.RemovedMonitors);
+
+		RECT[] expectedRemovedRects = new[] { left };
+		raisedEvent.Arguments.RemovedMonitors
+			.Select(m => m.Bounds)
+			.Should()
+			.BeEquivalentTo(expectedRemovedRects.Select(r => r.ToLocation()));
 	}
 }

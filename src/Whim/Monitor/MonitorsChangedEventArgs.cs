@@ -11,6 +11,8 @@ namespace Whim;
 /// </summary>
 public class MonitorsChangedEventArgs : EventArgs
 {
+	private IEnumerable<IMonitor>? _currentMonitors;
+
 	/// <summary>
 	/// The monitors that were not removed or added. These monitors may have had some properties
 	/// changed, like their position, resolution, work area, or scaling factor.
@@ -35,7 +37,14 @@ public class MonitorsChangedEventArgs : EventArgs
 	/// <summary>
 	/// The new monitors. This is derived from <see cref="UnchangedMonitors"/> and <see cref="AddedMonitors"/>.
 	/// </summary>
-	public IEnumerable<IMonitor> CurrentMonitors => Concat(UnchangedMonitors, AddedMonitors);
+	public IEnumerable<IMonitor> CurrentMonitors
+	{
+		get
+		{
+			_currentMonitors ??= Concat(UnchangedMonitors, AddedMonitors);
+			return _currentMonitors;
+		}
+	}
 
 	private static IEnumerable<IMonitor> Concat(IEnumerable<IMonitor> first, IEnumerable<IMonitor> second)
 	{
