@@ -6,7 +6,7 @@ namespace Whim.CommandPalette;
 
 internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 {
-	public static double TextEntryHeight => 48;
+	public static double TextEntryHeight => 32;
 
 	private readonly IConfigContext _configContext;
 	private readonly IWindow _window;

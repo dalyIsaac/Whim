@@ -7,6 +7,11 @@ internal sealed partial class MenuVariantView : UserControl
 {
 	public MenuVariantViewModel ViewModel { get; }
 
+	/// <summary>
+	/// The height of a row, including the surrounding padding/margin.
+	/// </summary>
+	public static double RowHeight => MenuVariantRowView.MenuRowHeight + (2 * 2);
+
 	public MenuVariantView(MenuVariantViewModel viewModel)
 	{
 		ViewModel = viewModel;
@@ -26,8 +31,6 @@ internal sealed partial class MenuVariantView : UserControl
 		ViewModel.ExecuteCommand();
 	}
 
-	public double GetViewMaxHeight()
-	{
-		return ViewModel.MenuRows.Count * MenuVariantRowView.MenuRowHeight;
-	}
+	public double GetViewMaxHeight() =>
+		ViewModel.MenuRows.Count == 0 ? RowHeight : RowHeight * ViewModel.MenuRows.Count;
 }

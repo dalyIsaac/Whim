@@ -39,26 +39,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = new();
 
-	/// <summary>
-	/// The height of the row.
-	/// </summary>
-	public required double RowHeight { get; init; }
-
 	public bool ShowSaveButton => true;
-
-	private Visibility _selectRowsItemsWrapperVisibility = Visibility.Visible;
-	public Visibility SelectRowsItemsWrapperVisibility
-	{
-		get => _selectRowsItemsWrapperVisibility;
-		set
-		{
-			if (SelectRowsItemsWrapperVisibility != value)
-			{
-				_selectRowsItemsWrapperVisibility = value;
-				OnPropertyChanged(nameof(SelectRowsItemsWrapperVisibility));
-			}
-		}
-	}
 
 	private Visibility _selectRowsControlVisibility = Visibility.Visible;
 	public Visibility SelectRowsItemsVisibility
@@ -143,7 +124,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 		int matchesCount = LoadSelectMatches(_commandPaletteWindowViewModel.Text, _activationConfig);
 
-		SelectRowsItemsWrapperVisibility = Visibility.Visible;
 		if (matchesCount == 0)
 		{
 			NoMatchingOptionsTextBlockVisibility = Visibility.Visible;
@@ -332,8 +312,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 	public void Hide() { }
 
 	public void Save() => _activationConfig?.Callback(_allItems.Select(x => x.Data));
-
-	public double GetViewMaxHeight() => SelectRows.Count * RowHeight;
 
 	protected virtual void OnPropertyChanged(string propertyName)
 	{

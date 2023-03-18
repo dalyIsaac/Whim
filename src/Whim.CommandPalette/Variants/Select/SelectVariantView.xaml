@@ -13,7 +13,7 @@
 			Padding="12,0,0,0"
 			RelativePanel.AlignLeftWithPanel="True"
 			RelativePanel.AlignVerticalCenterWithPanel="True"
-			Visibility="Collapsed">
+			Visibility="{x:Bind Path=ViewModel.NoMatchingOptionsTextBlockVisibility, Mode=OneWay}">
 			No matching options
 		</TextBlock>
 
@@ -27,10 +27,10 @@
 			RelativePanel.AlignRightWithPanel="True"
 			RelativePanel.AlignTopWithPanel="True"
 			SelectedIndex="{x:Bind Path=ViewModel.SelectedIndex, Mode=TwoWay}"
-			SelectionMode="Single">
+			SelectionMode="Single"
+			Visibility="{x:Bind Path=ViewModel.SelectRowsItemsVisibility, Mode=OneWay}">
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem">
-					<Setter Property="Height" Value="{x:Bind ViewModel.RowHeight}" />
 					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 					<Setter Property="VerticalContentAlignment" Value="Stretch" />
 				</Style>

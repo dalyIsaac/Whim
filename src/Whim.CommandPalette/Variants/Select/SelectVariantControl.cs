@@ -12,7 +12,7 @@ internal class SelectVariantControl : IVariantControl
 
 	public SelectVariantControl(ICommandPaletteWindowViewModel windowViewModel)
 	{
-		_viewModel = new(windowViewModel, SelectRowFactory) { RowHeight = 36 };
+		_viewModel = new(windowViewModel, SelectRowFactory);
 		_control = new SelectVariantView(_viewModel);
 	}
 
@@ -28,5 +28,5 @@ internal class SelectVariantControl : IVariantControl
 		return new RadioButtonRowView(_viewModel, item);
 	}
 
-	public double GetViewMaxHeight() => _viewModel.GetViewMaxHeight();
+	public double GetViewMaxHeight() => _control.GetViewMaxHeight();
 }
