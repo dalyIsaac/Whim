@@ -50,7 +50,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		if (e.WindowActivationState == WindowActivationState.Deactivated)
 		{
 			// Hide the window when it loses focus.
-			// ViewModel.RequestHide();
+			ViewModel.RequestHide();
 		}
 	}
 
