@@ -41,20 +41,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public bool ShowSaveButton => true;
 
-	private Visibility _selectRowsItemsWrapperVisibility = Visibility.Visible;
-	public Visibility SelectRowsItemsWrapperVisibility
-	{
-		get => _selectRowsItemsWrapperVisibility;
-		set
-		{
-			if (SelectRowsItemsWrapperVisibility != value)
-			{
-				_selectRowsItemsWrapperVisibility = value;
-				OnPropertyChanged(nameof(SelectRowsItemsWrapperVisibility));
-			}
-		}
-	}
-
 	private Visibility _selectRowsControlVisibility = Visibility.Visible;
 	public Visibility SelectRowsItemsVisibility
 	{
@@ -138,7 +124,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 		int matchesCount = LoadSelectMatches(_commandPaletteWindowViewModel.Text, _activationConfig);
 
-		SelectRowsItemsWrapperVisibility = Visibility.Visible;
 		if (matchesCount == 0)
 		{
 			NoMatchingOptionsTextBlockVisibility = Visibility.Visible;
