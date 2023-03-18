@@ -7,7 +7,10 @@ internal sealed partial class SelectVariantView : UserControl
 {
 	public SelectVariantViewModel ViewModel { get; }
 
-	public static double NonIdealStateHeight => 36;
+	/// <summary>
+	/// The height of a row, including the surrounding padding/margin.
+	/// </summary>
+	public static double RowHeight => 40;
 
 	public SelectVariantView(SelectVariantViewModel viewModel)
 	{
@@ -33,19 +36,6 @@ internal sealed partial class SelectVariantView : UserControl
 		}
 	}
 
-	public double GetViewMaxHeight()
-	{
-		if (ViewModel.SelectRows.Count == 0)
-		{
-			return NonIdealStateHeight;
-		}
-
-		// On first render, there'll be no items, so return maximum possible height.
-		if (ListViewItems.ContainerFromIndex(0) is not ListViewItem listViewItem)
-		{
-			return double.PositiveInfinity;
-		}
-
-		return listViewItem.ActualHeight * ListViewItems.Items.Count;
-	}
+	public double GetViewMaxHeight() =>
+		ViewModel.SelectRows.Count == 0 ? RowHeight : RowHeight * ViewModel.SelectRows.Count;
 }

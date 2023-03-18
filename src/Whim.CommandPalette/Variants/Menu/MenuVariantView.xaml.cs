@@ -7,7 +7,10 @@ internal sealed partial class MenuVariantView : UserControl
 {
 	public MenuVariantViewModel ViewModel { get; }
 
-	public static double NonIdealStateHeight => 36;
+	/// <summary>
+	/// The height of a row, including the surrounding padding/margin.
+	/// </summary>
+	public static double RowHeight => MenuVariantRowView.MenuRowHeight + (2 * 2);
 
 	public MenuVariantView(MenuVariantViewModel viewModel)
 	{
@@ -28,19 +31,6 @@ internal sealed partial class MenuVariantView : UserControl
 		ViewModel.ExecuteCommand();
 	}
 
-	public double GetViewMaxHeight()
-	{
-		if (ViewModel.MenuRows.Count == 0)
-		{
-			return NonIdealStateHeight;
-		}
-
-		// On first render, there'll be no items, so return maximum possible height.
-		if (ListViewItems.ContainerFromIndex(0) is not ListViewItem listViewItem)
-		{
-			return double.PositiveInfinity;
-		}
-
-		return listViewItem.ActualHeight * ListViewItems.Items.Count;
-	}
+	public double GetViewMaxHeight() =>
+		ViewModel.MenuRows.Count == 0 ? RowHeight : RowHeight * ViewModel.MenuRows.Count;
 }
