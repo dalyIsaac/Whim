@@ -55,8 +55,7 @@ public class SelectVariantViewModelTests
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
 		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
-		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
+		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		Mock<IEnumerable<SelectOption>> optionsMock = new();
 		optionsMock.Setup(x => x.GetEnumerator()).Returns(new List<SelectOption>().GetEnumerator());
@@ -82,8 +81,7 @@ public class SelectVariantViewModelTests
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
 		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
-		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
+		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		// When
 		// Then it doesn't throw
@@ -96,8 +94,7 @@ public class SelectVariantViewModelTests
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
 		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
-		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
+		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		// When
 		// Then it doesn't throw
@@ -110,8 +107,7 @@ public class SelectVariantViewModelTests
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
 		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
-		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
+		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		Mock<IEnumerable<SelectOption>> optionsMock = new();
 		optionsMock.Setup(x => x.GetEnumerator()).Returns(new List<SelectOption>().GetEnumerator());
@@ -141,8 +137,7 @@ public class SelectVariantViewModelTests
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
 		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
-		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
+		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		Mock<IEnumerable<SelectOption>> optionsMock = new();
 		optionsMock
@@ -222,8 +217,7 @@ public class SelectVariantViewModelTests
 			};
 
 		(var selectRowFactory, var selectRowFactoryResults) = SelectRowFactoryWithMocks();
-		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
+		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		Mock<SelectVariantCallback> callbackMock = new();
 
@@ -359,8 +353,7 @@ public class SelectVariantViewModelTests
 		// Given
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
 		(var selectRowFactory, _) = SelectRowFactoryWithMocks();
-		SelectVariantViewModel selectVariantViewModel =
-			new(commandPaletteWindowViewModelMock.Object, selectRowFactory) { RowHeight = 0, };
+		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		// When
 		// Then it should not throw
@@ -818,27 +811,5 @@ public class SelectVariantViewModelTests
 
 		// Then
 		callbackMock.Verify(c => c.Invoke(It.IsAny<IEnumerable<SelectOption>>()));
-	}
-
-	[Fact]
-	public void GetViewMaxHeight()
-	{
-		// Given
-		(
-			SelectVariantViewModel selectVariantViewModel,
-			SelectVariantConfig activationConfig,
-			_,
-			_,
-			List<SelectOption> options,
-			_,
-			_
-		) = CreateOptionsStubs();
-
-		// When
-		selectVariantViewModel.Activate(activationConfig);
-		selectVariantViewModel.Update();
-
-		// Then
-		Assert.Equal(options.Count * selectVariantViewModel.RowHeight, selectVariantViewModel.GetViewMaxHeight());
 	}
 }

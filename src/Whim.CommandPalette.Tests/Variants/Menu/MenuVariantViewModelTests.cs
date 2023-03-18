@@ -319,7 +319,6 @@ public class MenuVariantViewModelTests
 		vm.Update();
 
 		// Then
-		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
 		Assert.Equal(Visibility.Visible, vm.NoMatchingCommandsTextBlockVisibility);
 		Assert.Equal(Visibility.Collapsed, vm.ListViewItemsVisibility);
 	}
@@ -368,7 +367,6 @@ public class MenuVariantViewModelTests
 		vm.Update();
 
 		// Then
-		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
 		Assert.Equal(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
 		Assert.Equal(Visibility.Visible, vm.ListViewItemsVisibility);
 		Assert.Equal(3, vm.MenuRows.Count);
@@ -394,7 +392,6 @@ public class MenuVariantViewModelTests
 		vm.Update();
 
 		// Then
-		Assert.Equal(Visibility.Visible, vm.ListViewItemsWrapperVisibility);
 		Assert.Equal(Visibility.Collapsed, vm.NoMatchingCommandsTextBlockVisibility);
 		Assert.Equal(Visibility.Visible, vm.ListViewItemsVisibility);
 		Assert.Equal(3, vm.MenuRows.Count);
