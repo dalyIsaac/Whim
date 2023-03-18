@@ -7,7 +7,7 @@ internal sealed partial class MenuVariantView : UserControl
 {
 	public MenuVariantViewModel ViewModel { get; }
 
-	public double NonIdealStateHeight => 36;
+	public static double NonIdealStateHeight => 36;
 
 	public MenuVariantView(MenuVariantViewModel viewModel)
 	{

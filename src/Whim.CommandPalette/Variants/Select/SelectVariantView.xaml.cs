@@ -7,6 +7,8 @@ internal sealed partial class SelectVariantView : UserControl
 {
 	public SelectVariantViewModel ViewModel { get; }
 
+	public static double NonIdealStateHeight => 36;
+
 	public SelectVariantView(SelectVariantViewModel viewModel)
 	{
 		ViewModel = viewModel;
@@ -29,5 +31,21 @@ internal sealed partial class SelectVariantView : UserControl
 			ViewModel.SelectedIndex = idx;
 			ViewModel.UpdateSelectedItem();
 		}
+	}
+
+	public double GetViewMaxHeight()
+	{
+		if (ViewModel.SelectRows.Count == 0)
+		{
+			return NonIdealStateHeight;
+		}
+
+		// On first render, there'll be no items, so return maximum possible height.
+		if (ListViewItems.ContainerFromIndex(0) is not ListViewItem listViewItem)
+		{
+			return double.PositiveInfinity;
+		}
+
+		return listViewItem.ActualHeight * ListViewItems.Items.Count;
 	}
 }

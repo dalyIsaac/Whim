@@ -30,7 +30,6 @@
 			SelectionMode="Single">
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem">
-					<Setter Property="Height" Value="{x:Bind ViewModel.RowHeight}" />
 					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 					<Setter Property="VerticalContentAlignment" Value="Stretch" />
 				</Style>
