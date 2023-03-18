@@ -37,20 +37,6 @@ internal class MenuVariantViewModel : IVariantViewModel
 
 	public bool ShowSaveButton => false;
 
-	private Visibility _listViewItemsWrapperVisibility = Visibility.Visible;
-	public Visibility ListViewItemsWrapperVisibility
-	{
-		get => _listViewItemsWrapperVisibility;
-		set
-		{
-			if (ListViewItemsWrapperVisibility != value)
-			{
-				_listViewItemsWrapperVisibility = value;
-				OnPropertyChanged(nameof(ListViewItemsWrapperVisibility));
-			}
-		}
-	}
-
 	private Visibility _listViewItemsVisibility = Visibility.Visible;
 	public Visibility ListViewItemsVisibility
 	{
@@ -134,7 +120,6 @@ internal class MenuVariantViewModel : IVariantViewModel
 
 		int matchesCount = LoadMenuMatches(_commandPaletteWindowViewModel.Text, _activationConfig);
 
-		ListViewItemsWrapperVisibility = Visibility.Visible;
 		if (matchesCount == 0)
 		{
 			NoMatchingCommandsTextBlockVisibility = Visibility.Visible;
@@ -301,7 +286,6 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public void Hide()
 	{
 		NoMatchingCommandsTextBlockVisibility = Visibility.Collapsed;
-		ListViewItemsWrapperVisibility = Visibility.Collapsed;
 	}
 
 	public void Save() { }

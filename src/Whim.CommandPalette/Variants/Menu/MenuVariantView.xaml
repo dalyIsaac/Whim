@@ -13,7 +13,7 @@
 			Padding="12,0,0,0"
 			RelativePanel.AlignLeftWithPanel="True"
 			RelativePanel.AlignVerticalCenterWithPanel="True"
-			Visibility="Collapsed">
+			Visibility="{x:Bind Path=ViewModel.NoMatchingCommandsTextBlockVisibility, Mode=OneWay}">
 			No matching commands
 		</TextBlock>
 
@@ -27,6 +27,7 @@
 			RelativePanel.AlignRightWithPanel="True"
 			RelativePanel.AlignTopWithPanel="True"
 			SelectedIndex="{x:Bind Path=ViewModel.SelectedIndex, Mode=TwoWay}"
-			SelectionMode="Single" />
+			SelectionMode="Single"
+			Visibility="{x:Bind Path=ViewModel.ListViewItemsVisibility, Mode=OneWay}" />
 	</RelativePanel>
 </UserControl>

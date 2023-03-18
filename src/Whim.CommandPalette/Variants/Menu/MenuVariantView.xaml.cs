@@ -7,6 +7,8 @@ internal sealed partial class MenuVariantView : UserControl
 {
 	public MenuVariantViewModel ViewModel { get; }
 
+	public double NonIdealStateHeight => 36;
+
 	public MenuVariantView(MenuVariantViewModel viewModel)
 	{
 		ViewModel = viewModel;
@@ -28,6 +30,17 @@ internal sealed partial class MenuVariantView : UserControl
 
 	public double GetViewMaxHeight()
 	{
-		return ViewModel.MenuRows.Count * MenuVariantRowView.MenuRowHeight;
+		if (ViewModel.MenuRows.Count == 0)
+		{
+			return NonIdealStateHeight;
+		}
+
+		// On first render, there'll be no items, so return maximum possible height.
+		if (ListViewItems.ContainerFromIndex(0) is not ListViewItem listViewItem)
+		{
+			return double.PositiveInfinity;
+		}
+
+		return listViewItem.ActualHeight * ListViewItems.Items.Count;
 	}
 }
