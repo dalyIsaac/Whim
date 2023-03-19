@@ -7,13 +7,10 @@ namespace Whim.CommandPalette;
 /// </summary>
 internal sealed partial class CheckBoxRowView : UserControl, IVariantRowView<SelectOption, SelectVariantRowViewModel>
 {
-	private readonly SelectVariantViewModel _selectVariantViewModel;
-
 	public SelectVariantRowViewModel ViewModel { get; }
 
-	public CheckBoxRowView(SelectVariantViewModel selectVariantViewModel, MatcherResult<SelectOption> item)
+	public CheckBoxRowView(MatcherResult<SelectOption> item)
 	{
-		_selectVariantViewModel = selectVariantViewModel;
 		ViewModel = new SelectVariantRowViewModel(item);
 		UIElementExtensions.InitializeComponent(
 			component: this,
@@ -32,10 +29,5 @@ internal sealed partial class CheckBoxRowView : UserControl, IVariantRowView<Sel
 		Logger.Debug("Updating with a new item");
 		ViewModel.Update(matcherResult);
 		this.SetTitle(OptionTitle.Inlines);
-	}
-
-	private void CheckBox_Click(object _, Microsoft.UI.Xaml.RoutedEventArgs e)
-	{
-		_selectVariantViewModel.VariantRow_OnClick(this);
 	}
 }

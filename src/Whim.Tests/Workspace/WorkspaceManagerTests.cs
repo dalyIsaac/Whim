@@ -1,7 +1,6 @@
 using Moq;
 using System;
 using System.Linq;
-using Windows.Web.AtomPub;
 using Xunit;
 
 namespace Whim.Tests;
