@@ -35,19 +35,15 @@ internal static class ConfigLoader
 	/// <exception cref="ConfigLoaderException"></exception>
 	private static string ReadFile(this Assembly assembly, string filename)
 	{
-		string? templateName = assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith(filename));
-		if (templateName == null)
-		{
-			throw new ConfigLoaderException($"Could not find file \"{filename}\" in assembly {assembly.FullName}");
-		}
+		string templateName =
+			assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith(filename))
+			?? throw new ConfigLoaderException($"Could not find file \"{filename}\" in assembly {assembly.FullName}");
 
-		using Stream? stream = assembly.GetManifestResourceStream(templateName);
-		if (stream == null)
-		{
-			throw new ConfigLoaderException(
+		using Stream stream =
+			assembly.GetManifestResourceStream(templateName)
+			?? throw new ConfigLoaderException(
 				$"Could not find manifest resource stream for \"{filename}\" in assembly {assembly.FullName}"
 			);
-		}
 
 		using StreamReader reader = new(stream);
 		return reader.ReadToEnd();
@@ -65,12 +61,9 @@ internal static class ConfigLoader
 
 		// Replace WHIM_PATH with the assembly's path.
 		string? assemblyPath = Path.GetDirectoryName(assembly.Location);
-		if (assemblyPath == null)
-		{
-			throw new ConfigLoaderException($"Could not find assembly path for assembly {assembly.FullName}");
-		}
-
-		return template.Replace("WHIM_PATH", assemblyPath);
+		return assemblyPath == null
+			? throw new ConfigLoaderException($"Could not find assembly path for assembly {assembly.FullName}")
+			: template.Replace("WHIM_PATH", assemblyPath);
 	}
 
 	/// <summary>
@@ -80,11 +73,9 @@ internal static class ConfigLoader
 	/// <exception cref="ConfigLoaderException"></exception>
 	private static void CreateConfig()
 	{
-		Assembly? assembly = Assembly.GetAssembly(typeof(ConfigLoader));
-		if (assembly is null)
-		{
-			throw new ConfigLoaderException("Could not find assembly for ConfigLoader");
-		}
+		Assembly assembly =
+			Assembly.GetAssembly(typeof(ConfigLoader))
+			?? throw new ConfigLoaderException("Could not find assembly for ConfigLoader");
 
 		string template = assembly.ReadTemplateConfigFile();
 		string omnisharpJson = assembly.ReadFile("omnisharp.json");

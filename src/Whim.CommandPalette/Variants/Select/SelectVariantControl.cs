@@ -23,9 +23,9 @@ internal class SelectVariantControl : IVariantControl
 	{
 		if (config.AllowMultiSelect)
 		{
-			return new CheckBoxRowView(_viewModel, item);
+			return new CheckBoxRowView(item);
 		}
-		return new RadioButtonRowView(_viewModel, item);
+		return new RadioButtonRowView(item);
 	}
 
 	public double GetViewMaxHeight() => _control.GetViewMaxHeight();

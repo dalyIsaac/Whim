@@ -204,21 +204,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
 
-	public void VariantRow_OnClick(IVariantRowView<SelectOption, SelectVariantRowViewModel> variantRow)
-	{
-		if (_activationConfig == null)
-		{
-			return;
-		}
-
-		int idx = SelectRows.IndexOf(variantRow);
-		if (idx >= 0)
-		{
-			SelectedIndex = idx;
-			UpdateSelectedItem();
-		}
-	}
-
 	/// <summary>
 	/// Populate <see cref="_allItems"/> with all the current commands.
 	/// </summary>

@@ -31,11 +31,9 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "BarWindow");
 
-		IWindow? window = _configContext.WindowManager.CreateWindow(this.GetHandle());
-		if (window == null)
-		{
-			throw new BarException("Window was unexpectedly null");
-		}
+		IWindow window =
+			_configContext.WindowManager.CreateWindow(this.GetHandle())
+			?? throw new BarException("Window was unexpectedly null");
 
 		double scaleFactor = _monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
