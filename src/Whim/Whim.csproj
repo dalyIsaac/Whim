@@ -36,7 +36,7 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230313.1" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
 		<PackageReference Include="Serilog" Version="2.12.0" />
 		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
 		<PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />

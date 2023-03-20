@@ -83,7 +83,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.5.0" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230313.1" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
