@@ -33,7 +33,7 @@ internal class ConfirmCommand : System.Windows.Input.ICommand
 		}
 
 		BaseVariantConfig config = _viewModel.ActivationConfig;
-		_viewModel.ActiveVariant.ViewModel.Save();
+		_viewModel.ActiveVariant.ViewModel.Confirm();
 
 		// Only hide the palette if the active config is the same as the one that was used to activate it.
 		if (_viewModel.IsConfigActive(config))

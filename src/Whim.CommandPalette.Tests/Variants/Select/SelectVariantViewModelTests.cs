@@ -703,7 +703,7 @@ public class SelectVariantViewModelTests
 		// When
 		selectVariantViewModel.Activate(activationConfig);
 		selectVariantViewModel.Update();
-		selectVariantViewModel.Save();
+		selectVariantViewModel.Confirm();
 
 		// Then
 		callbackMock.Verify(c => c.Invoke(It.IsAny<IEnumerable<SelectOption>>()));

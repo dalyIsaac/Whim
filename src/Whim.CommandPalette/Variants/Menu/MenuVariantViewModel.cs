@@ -288,7 +288,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		NoMatchingCommandsTextBlockVisibility = Visibility.Collapsed;
 	}
 
-	public void Save() { }
+	public void Confirm() { }
 
 	protected virtual void OnPropertyChanged(string propertyName)
 	{

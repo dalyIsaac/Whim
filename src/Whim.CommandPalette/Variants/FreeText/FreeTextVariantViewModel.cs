@@ -46,7 +46,7 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 
 	public void Update() { }
 
-	public void Save() => Execute();
+	public void Confirm() => Execute();
 
 	private void Execute()
 	{
