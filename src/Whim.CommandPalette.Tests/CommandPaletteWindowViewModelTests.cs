@@ -57,7 +57,7 @@ public class CommandPaletteWindowViewModelTests
 		freeTextVariant.Setup(m => m.ViewModel).Returns(variantViewModel.Object);
 
 		Mock<IVariantViewModel> selectViewModel = new();
-		selectViewModel.Setup(m => m.ShowSaveButton).Returns(true);
+		selectViewModel.Setup(m => m.ConfirmButtonText).Returns("Save");
 
 		Mock<IVariantControl> selectVariant = new();
 		selectVariant.Setup(m => m.Control).Returns((UIElement)null);
@@ -230,18 +230,18 @@ public class CommandPaletteWindowViewModelTests
 
 	public static IEnumerable<object[]> ActivateData()
 	{
-		yield return new object[] { new UnknownConfig(), false, false };
+		yield return new object[] { new UnknownConfig(), false, "Confirm" };
 		yield return new object[]
 		{
 			new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() },
 			true,
-			false
+			"Confirm"
 		};
 		yield return new object[]
 		{
 			new FreeTextVariantConfig() { Callback = (text) => { }, Prompt = "Prompt" },
 			true,
-			false
+			"Confirm"
 		};
 		yield return new object[]
 		{
@@ -249,16 +249,17 @@ public class CommandPaletteWindowViewModelTests
 			{
 				Options = Array.Empty<SelectOption>(),
 				Callback = (items) => { },
-				AllowMultiSelect = false
+				AllowMultiSelect = false,
+				ConfirmButtonText = "Save"
 			},
 			true,
-			true
+			"Save"
 		};
 	}
 
 	[Theory]
 	[MemberData(nameof(ActivateData))]
-	public void Activate_Variant(BaseVariantConfig config, bool expected, bool showSaveButton)
+	public void Activate_Variant(BaseVariantConfig config, bool expected, string confirmButtonText)
 	{
 		// Given
 		(
@@ -279,7 +280,7 @@ public class CommandPaletteWindowViewModelTests
 
 		// Then
 		Assert.Equal(expected, vm.IsConfigActive(config));
-		Assert.Equal(showSaveButton ? Visibility.Visible : Visibility.Collapsed, vm.SaveButtonVisibility);
+		Assert.Equal(confirmButtonText, vm.ConfirmButtonText);
 	}
 
 	[Fact]
