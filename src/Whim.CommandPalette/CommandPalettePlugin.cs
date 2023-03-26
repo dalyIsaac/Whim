@@ -50,7 +50,7 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 		_commandPaletteWindow?.Activate(
 			config: config
 				?? Config.ActivationConfig
-				?? new MenuVariantConfig() { Commands = _configContext.CommandManager },
+				?? new MenuVariantConfig() { Commands = _configContext.CommandManager, ConfirmButtonText = "Execute" },
 			monitor: _configContext.MonitorManager.FocusedMonitor
 		);
 	}
