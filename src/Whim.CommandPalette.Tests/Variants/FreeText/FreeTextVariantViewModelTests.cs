@@ -100,4 +100,21 @@ public class FreeTextVariantViewModelTests
 		// Then
 		mocks.Callback.Verify(c => c("Hello, world!"), Times.Never);
 	}
+
+	[Fact]
+	public void Confirm()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+
+		vm.Activate(mocks.Config);
+
+		// When
+		vm.Confirm();
+
+		// Then
+		mocks.Callback.Verify(c => c("Hello, world!"), Times.Once);
+		mocks.WindowViewModel.Verify(w => w.RequestHide(), Times.Once);
+	}
 }
