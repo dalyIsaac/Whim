@@ -63,21 +63,21 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 	}
 
-	private Visibility _saveButtonVisibility = Visibility.Collapsed;
-	public Visibility SaveButtonVisibility
+	private string _confirmButtonText = "Confirm";
+	public string ConfirmButtonText
 	{
-		get => _saveButtonVisibility;
+		get => _confirmButtonText;
 		set
 		{
-			if (SaveButtonVisibility != value)
+			if (ConfirmButtonText != value)
 			{
-				_saveButtonVisibility = value;
-				OnPropertyChanged(nameof(SaveButtonVisibility));
+				_confirmButtonText = value;
+				OnPropertyChanged(nameof(ConfirmButtonText));
 			}
 		}
 	}
 
-	public System.Windows.Input.ICommand SaveCommand { get; private set; }
+	public System.Windows.Input.ICommand ConfirmCommand { get; private set; }
 
 	public bool IsVisible => Monitor != null;
 
@@ -106,7 +106,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		_freeTextVariant = freeTextVariant ?? new FreeTextVariantControl(this);
 		_selectVariant = selectVariant ?? new SelectVariantControl(this);
 
-		SaveCommand = new SaveCommand(this);
+		ConfirmCommand = new ConfirmCommand(this);
 	}
 
 	/// <summary>
@@ -133,7 +133,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		ActivationConfig = config;
 		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
 
-		SaveButtonVisibility = ActiveVariant.ViewModel.ShowSaveButton ? Visibility.Visible : Visibility.Collapsed;
+		ConfirmButtonText = ActivationConfig.ConfirmButtonText ?? "Confirm";
 		Text = ActivationConfig.InitialText ?? "";
 		PlaceholderText = ActivationConfig.Hint ?? "Start typing...";
 		MaxHeight = (int)(Monitor.WorkingArea.Height * Plugin.Config.MaxHeightPercent / 100.0);

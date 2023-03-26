@@ -5,7 +5,7 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// Command to save the changes made in the palette.
 /// </summary>
-internal class SaveCommand : System.Windows.Input.ICommand
+internal class ConfirmCommand : System.Windows.Input.ICommand
 {
 	private readonly ICommandPaletteWindowViewModel _viewModel;
 
@@ -15,10 +15,10 @@ internal class SaveCommand : System.Windows.Input.ICommand
 #pragma warning restore CS0067 // The event 'NextLayoutEngineCommand.CanExecuteChanged' is never used
 
 	/// <summary>
-	/// Creates a new instance of <see cref="SaveCommand"/>.
+	/// Creates a new instance of <see cref="ConfirmCommand"/>.
 	/// </summary>
 	/// <param name="viewModel"></param>
-	public SaveCommand(ICommandPaletteWindowViewModel viewModel)
+	public ConfirmCommand(ICommandPaletteWindowViewModel viewModel)
 	{
 		_viewModel = viewModel;
 	}

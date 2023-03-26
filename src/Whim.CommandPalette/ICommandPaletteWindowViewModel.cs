@@ -15,8 +15,8 @@ internal interface ICommandPaletteWindowViewModel : INotifyPropertyChanged
 	BaseVariantConfig ActivationConfig { get; }
 	IVariantControl? ActiveVariant { get; }
 	CommandPalettePlugin Plugin { get; }
-	Visibility SaveButtonVisibility { get; }
-	System.Windows.Input.ICommand SaveCommand { get; }
+	string ConfirmButtonText { get; }
+	System.Windows.Input.ICommand ConfirmCommand { get; }
 	event EventHandler<EventArgs>? HideRequested;
 	event EventHandler<EventArgs>? FocusTextBoxRequested;
 	event EventHandler<EventArgs>? SetWindowPosRequested;

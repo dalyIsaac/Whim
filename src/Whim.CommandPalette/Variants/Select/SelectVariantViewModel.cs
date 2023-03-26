@@ -39,7 +39,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 
 	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = new();
 
-	public bool ShowSaveButton => true;
+	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 
 	private Visibility _selectRowsControlVisibility = Visibility.Visible;
 	public Visibility SelectRowsItemsVisibility

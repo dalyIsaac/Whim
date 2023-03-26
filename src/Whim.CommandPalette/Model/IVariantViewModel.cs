@@ -9,9 +9,9 @@ namespace Whim.CommandPalette;
 public interface IVariantViewModel : INotifyPropertyChanged
 {
 	/// <summary>
-	/// Whether to show the save button.
+	/// The text for the confirm button. Typically "Save" or "Execute".
 	/// </summary>
-	bool ShowSaveButton { get; }
+	string? ConfirmButtonText { get; }
 
 	/// <summary>
 	/// Activate this variant.

@@ -10,7 +10,7 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 
 	public string Prompt => _activationConfig?.Prompt ?? "";
 
-	public bool ShowSaveButton => true;
+	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 

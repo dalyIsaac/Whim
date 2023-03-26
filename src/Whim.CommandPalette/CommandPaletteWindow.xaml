@@ -28,12 +28,11 @@
 				TextChanged="TextEntry_TextChanged" />
 
 			<Button
-				x:Name="Save"
+				x:Name="Confirm"
 				Grid.Column="1"
-				Command="{x:Bind Path=ViewModel.SaveCommand}"
-				Content="Save"
-				Style="{StaticResource AccentButtonStyle}"
-				Visibility="{x:Bind Path=ViewModel.SaveButtonVisibility, Mode=OneWay}" />
+				Command="{x:Bind Path=ViewModel.ConfirmCommand}"
+				Content="{x:Bind Path=ViewModel.ConfirmButtonText, Mode=OneWay}"
+				Style="{StaticResource AccentButtonStyle}" />
 		</Grid>
 
 
