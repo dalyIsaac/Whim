@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
-public class SaveCommandTests
+public class ExecuteCommandTests
 {
 	[Fact]
 	public void CanExecute_WhenActiveVariantIsNull_ReturnsFalse()
