@@ -294,8 +294,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 		}
 	}
 
-	public void Hide() { }
-
 	public void Confirm() => _activationConfig?.Callback(_allItems.Select(x => x.Data));
 
 	protected virtual void OnPropertyChanged(string propertyName)

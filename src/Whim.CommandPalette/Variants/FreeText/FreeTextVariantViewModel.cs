@@ -32,8 +32,6 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 		}
 	}
 
-	public void Hide() { }
-
 	public void OnKeyDown(VirtualKey key)
 	{
 		if (key != VirtualKey.Enter)

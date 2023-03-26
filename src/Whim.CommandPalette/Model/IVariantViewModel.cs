@@ -24,11 +24,6 @@ public interface IVariantViewModel : INotifyPropertyChanged
 	void Update();
 
 	/// <summary>
-	/// Hide this variant.
-	/// </summary>
-	void Hide();
-
-	/// <summary>
 	/// Handle a key down event.
 	/// </summary>
 	void OnKeyDown(VirtualKey key);

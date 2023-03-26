@@ -283,11 +283,6 @@ internal class MenuVariantViewModel : IVariantViewModel
 		}
 	}
 
-	public void Hide()
-	{
-		NoMatchingCommandsTextBlockVisibility = Visibility.Collapsed;
-	}
-
 	public void Confirm() { }
 
 	protected virtual void OnPropertyChanged(string propertyName)
