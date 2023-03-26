@@ -25,6 +25,35 @@ public class FreeTextVariantViewModelTests
 	}
 
 	[Fact]
+	public void NotFreeTextVariantConfig()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+
+		// When
+		vm.Activate(new UnknownConfig());
+
+		// Then
+		Assert.Equal(string.Empty, vm.Prompt);
+		Assert.Null(vm.ConfirmButtonText);
+	}
+
+	[Fact]
+	public void PromptDefaultsToEmptyString()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+
+		// When
+		string prompt = vm.Prompt;
+
+		// Then
+		Assert.Equal("", prompt);
+	}
+
+	[Fact]
 	public void OnKeyDown_Enter()
 	{
 		// Given
