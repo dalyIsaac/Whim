@@ -283,7 +283,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		}
 	}
 
-	public void Confirm() { }
+	public void Confirm() => ExecuteCommand();
 
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
