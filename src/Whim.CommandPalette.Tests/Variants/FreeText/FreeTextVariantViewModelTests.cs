@@ -14,7 +14,8 @@ public class FreeTextVariantViewModelTests
 
 		public MocksBuilder()
 		{
-			Config = new FreeTextVariantConfig() {
+			Config = new FreeTextVariantConfig()
+			{
 				InitialText = "Hello, world!",
 				Callback = Callback.Object,
 				Prompt = "Hello, world!"
