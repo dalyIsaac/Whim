@@ -49,7 +49,7 @@ public class MenuVariantViewModelTests
 	}
 
 	[Fact]
-	public void NotMenuVariantConfig()
+	public void Activate_NotMenuVariantConfig()
 	{
 		// Given
 		MocksBuilder mocks = new();
@@ -61,6 +61,29 @@ public class MenuVariantViewModelTests
 		// Then
 		Assert.Empty(vm._allItems);
 		Assert.Null(vm.ConfirmButtonText);
+	}
+
+	[Fact]
+	public void Activate_MenuVariantConfig()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		IEnumerable<CommandItem> items = new List<CommandItem>()
+		{
+			new CommandItem() { Command = new Command("id", "title", () => { }) },
+			new CommandItem() { Command = new Command("id2", "title2", () => { }) },
+			new CommandItem() { Command = new Command("id3", "title3", () => { }) }
+		};
+		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+
+		// When
+		vm.Activate(new MenuVariantConfig() { Commands = items, ConfirmButtonText = "Execute" });
+
+		// Then
+		Assert.Equal(3, vm._allItems.Count);
+		Assert.Equal("Execute", vm.ConfirmButtonText);
 	}
 
 	[Theory]
