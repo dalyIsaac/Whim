@@ -362,4 +362,30 @@ public class CommandPaletteWindowViewModelTests
 		// Then
 		Assert.False(result);
 	}
+
+	[Fact]
+	public void RequestFocusTextBox()
+	{
+		// Given
+		(
+			Mock<IConfigContext> configContext,
+			_,
+			CommandPalettePlugin plugin,
+			Mock<IVariantControl> menuVariant,
+			Mock<IVariantControl> freeTextVariant,
+			Mock<IVariantControl> selectVariant,
+			_
+		) = CreateStubs();
+
+		CommandPaletteWindowViewModel vm =
+			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+
+		// When
+		// Then
+		Assert.Raises<EventArgs>(
+			h => vm.FocusTextBoxRequested += h,
+			h => vm.FocusTextBoxRequested -= h,
+			vm.RequestFocusTextBox
+		);
+	}
 }
