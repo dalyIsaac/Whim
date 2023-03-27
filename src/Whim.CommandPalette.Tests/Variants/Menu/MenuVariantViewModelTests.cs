@@ -8,19 +8,19 @@ namespace Whim.CommandPalette.Tests;
 
 public class MenuVariantViewModelTests
 {
-	private static (Mock<IConfigContext>, Mock<ICommandManager>, Mock<ICommandPaletteWindowViewModel>) CreateStubs()
+	private class MocksBuilder
 	{
-		Mock<ICommandManager> commandManager = new();
-		commandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
+		public Mock<IConfigContext> ConfigContext { get; } = new();
+		public Mock<ICommandManager> CommandManager { get; } = new();
+		public Mock<ICommandPaletteWindowViewModel> WindowViewModel { get; } = new();
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(c => c.CommandManager).Returns(commandManager.Object);
-
-		Mock<ICommandPaletteWindowViewModel> windowViewModel = new();
-		windowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(true);
-		windowViewModel.Setup(wvm => wvm.Text).Returns("ti");
-
-		return (configContext, commandManager, windowViewModel);
+		public MocksBuilder()
+		{
+			ConfigContext.Setup(c => c.CommandManager).Returns(CommandManager.Object);
+			CommandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
+			WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(true);
+			WindowViewModel.Setup(wvm => wvm.Text).Returns("ti");
+		}
 	}
 
 	private static IVariantRowView<CommandItem, MenuVariantRowViewModel> MenuRowFactory(
@@ -31,12 +31,8 @@ public class MenuVariantViewModelTests
 	public void Constructor()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-		commandManager
+		MocksBuilder mocks = new();
+		mocks.CommandManager
 			.Setup(cm => cm.GetEnumerator())
 			.Returns(
 				new List<CommandItem>()
@@ -46,10 +42,25 @@ public class MenuVariantViewModelTests
 			);
 
 		// When
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		// Then
 		Assert.Single(vm._allItems);
+	}
+
+	[Fact]
+	public void NotMenuVariantConfig()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+
+		// When
+		vm.Activate(new UnknownConfig());
+
+		// Then
+		Assert.Empty(vm._allItems);
+		Assert.Null(vm.ConfirmButtonText);
 	}
 
 	[Theory]
@@ -58,21 +69,16 @@ public class MenuVariantViewModelTests
 	public void OnKeyDown_VerticalArrow(VirtualKey key, int expectedIndex)
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
+		MocksBuilder mocks = new();
 		IEnumerable<CommandItem> items = new List<CommandItem>()
 		{
 			new CommandItem() { Command = new Command("id", "title", () => { }) },
 			new CommandItem() { Command = new Command("id2", "title2", () => { }) },
 			new CommandItem() { Command = new Command("id3", "title3", () => { }) }
 		};
-		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
@@ -90,21 +96,16 @@ public class MenuVariantViewModelTests
 	public void OnKeyDown_UnhandledKeys()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
+		MocksBuilder mocks = new();
 		IEnumerable<CommandItem> items = new List<CommandItem>()
 		{
 			new CommandItem() { Command = new Command("id", "title", () => { }) },
 			new CommandItem() { Command = new Command("id2", "title2", () => { }) },
 			new CommandItem() { Command = new Command("id3", "title3", () => { }) }
 		};
-		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
@@ -115,16 +116,44 @@ public class MenuVariantViewModelTests
 	}
 
 	[Fact]
+	public void OnKeyDown_Enter()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		bool called = false;
+		IEnumerable<CommandItem> items = new List<CommandItem>()
+		{
+			new CommandItem()
+			{
+				Command = new Command(
+					"id",
+					"title",
+					() =>
+					{
+						called = true;
+					}
+				)
+			},
+		};
+		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		vm.Activate(new MenuVariantConfig() { Commands = items });
+
+		// When
+		vm.OnKeyDown(VirtualKey.Enter);
+
+		// Then
+		Assert.Equal(0, vm.SelectedIndex);
+		Assert.True(called);
+	}
+
+	[Fact]
 	public void PopulateItems_CannotExecute()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		// When
 		vm.PopulateItems(
@@ -142,13 +171,8 @@ public class MenuVariantViewModelTests
 	public void PopulateItems_AddNew()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		// When
 		vm.PopulateItems(
@@ -163,13 +187,8 @@ public class MenuVariantViewModelTests
 	public void PopulateItems_UpdateExisting()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		vm.PopulateItems(
 			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
@@ -189,13 +208,8 @@ public class MenuVariantViewModelTests
 	public void PopulateItems_RemoveExtra()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		vm.PopulateItems(
 			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
@@ -212,13 +226,8 @@ public class MenuVariantViewModelTests
 	public void PopulateItems_SkipEqualCommand()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		Command command = new("id", "title", () => { });
 		CommandItem commandItem = new() { Command = command };
@@ -236,12 +245,7 @@ public class MenuVariantViewModelTests
 	public void ExecuteCommand()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
+		MocksBuilder mocks = new();
 		bool called = false;
 		IEnumerable<CommandItem> items = new List<CommandItem>()
 		{
@@ -258,9 +262,9 @@ public class MenuVariantViewModelTests
 			},
 		};
 
-		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
@@ -268,19 +272,15 @@ public class MenuVariantViewModelTests
 
 		// Then
 		Assert.True(called);
-		windowViewModel.Verify(wvm => wvm.RequestHide());
+		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide());
 	}
 
 	[Fact]
 	public void ExecuteCommand_ReuseShouldNotHide()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-		windowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
+		MocksBuilder mocks = new();
+		mocks.WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
 
 		string callbackText = string.Empty;
 		IEnumerable<CommandItem> items = new List<CommandItem>()
@@ -288,30 +288,73 @@ public class MenuVariantViewModelTests
 			new CommandItem() { Command = new Command("id", "title", () => { }) },
 		};
 
-		commandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
-		windowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
+		mocks.WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
 
 		// When
 		vm.ExecuteCommand();
 
 		// Then
-		windowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
+		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
+	}
+
+	[Fact]
+	public void ExecuteCommand_NotActivated()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+
+		// When
+		vm.ExecuteCommand();
+
+		// Then
+		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
+	}
+
+	[Fact]
+	public void Confirm()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		bool called = false;
+		IEnumerable<CommandItem> items = new List<CommandItem>()
+		{
+			new CommandItem()
+			{
+				Command = new Command(
+					"id",
+					"title",
+					() =>
+					{
+						called = true;
+					}
+				)
+			},
+		};
+
+		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		vm.Activate(new MenuVariantConfig() { Commands = items });
+
+		// When
+		vm.Confirm();
+
+		// Then
+		Assert.True(called);
+		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide());
 	}
 
 	[Fact]
 	public void Update_NoMatches()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() });
 
@@ -354,13 +397,8 @@ public class MenuVariantViewModelTests
 	public void Update_SomeMatches()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 		vm.Activate(CreateMenuActivationConfig(3));
 
 		// When
@@ -376,13 +414,8 @@ public class MenuVariantViewModelTests
 	public void Update_RemoveUnused()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		vm.Activate(CreateMenuActivationConfig(3));
 		vm.Activate(CreateMenuActivationConfig(2));
@@ -405,13 +438,8 @@ public class MenuVariantViewModelTests
 	public void LoadMenuMatches_AddRows()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 		string query = "ti";
 		MenuVariantConfig config = CreateMenuActivationConfig(2);
 
@@ -428,13 +456,8 @@ public class MenuVariantViewModelTests
 	public void LoadMenuMatches_UpdateRows()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			Mock<ICommandPaletteWindowViewModel> windowViewModel
-		) = CreateStubs();
-
-		MenuVariantViewModel vm = new(configContext.Object, windowViewModel.Object, MenuRowFactory);
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.ConfigContext.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 		string query = "ti";
 
 		vm.LoadMenuMatches(query, CreateMenuActivationConfig(2));
