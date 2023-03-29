@@ -14,4 +14,9 @@ public abstract record BaseVariantConfig
 	/// The text to pre-fill the command palette with.
 	/// </summary>
 	public string? InitialText { get; init; }
+
+	/// <summary>
+	/// The confirm button text.
+	/// </summary>
+	public string ConfirmButtonText { get; init; } = "Confirm";
 }

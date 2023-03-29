@@ -9,9 +9,9 @@ namespace Whim.CommandPalette;
 public interface IVariantViewModel : INotifyPropertyChanged
 {
 	/// <summary>
-	/// Whether to show the save button.
+	/// The text for the confirm button. Typically "Save" or "Execute".
 	/// </summary>
-	bool ShowSaveButton { get; }
+	string? ConfirmButtonText { get; }
 
 	/// <summary>
 	/// Activate this variant.
@@ -24,17 +24,12 @@ public interface IVariantViewModel : INotifyPropertyChanged
 	void Update();
 
 	/// <summary>
-	/// Hide this variant.
-	/// </summary>
-	void Hide();
-
-	/// <summary>
 	/// Handle a key down event.
 	/// </summary>
 	void OnKeyDown(VirtualKey key);
 
 	/// <summary>
-	/// Handle the save button being pressed.
+	/// Handle the confirm button being pressed.
 	/// </summary>
-	void Save();
+	void Confirm();
 }

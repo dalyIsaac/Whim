@@ -10,7 +10,7 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 
 	public string Prompt => _activationConfig?.Prompt ?? "";
 
-	public bool ShowSaveButton => true;
+	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -32,8 +32,6 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 		}
 	}
 
-	public void Hide() { }
-
 	public void OnKeyDown(VirtualKey key)
 	{
 		if (key != VirtualKey.Enter)
@@ -46,7 +44,7 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 
 	public void Update() { }
 
-	public void Save() => Execute();
+	public void Confirm() => Execute();
 
 	private void Execute()
 	{

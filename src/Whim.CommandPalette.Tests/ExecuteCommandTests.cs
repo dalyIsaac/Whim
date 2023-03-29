@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
-public class SaveCommandTests
+public class ExecuteCommandTests
 {
 	[Fact]
 	public void CanExecute_WhenActiveVariantIsNull_ReturnsFalse()
@@ -13,7 +13,7 @@ public class SaveCommandTests
 		viewModelMock.Setup(x => x.ActiveVariant).Returns((IVariantControl?)null);
 
 		// When
-		SaveCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock.Object);
 
 		// Then
 		Assert.False(command.CanExecute(null));
@@ -27,7 +27,7 @@ public class SaveCommandTests
 		viewModelMock.Setup(x => x.ActiveVariant).Returns(new Mock<IVariantControl>().Object);
 
 		// When
-		SaveCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock.Object);
 
 		// Then
 		Assert.True(command.CanExecute(null));
@@ -41,7 +41,7 @@ public class SaveCommandTests
 		viewModelMock.Setup(x => x.ActiveVariant).Returns((IVariantControl?)null);
 
 		// When
-		SaveCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock.Object);
 		command.Execute(null);
 
 		// Then
@@ -61,7 +61,7 @@ public class SaveCommandTests
 		viewModelMock.Setup(x => x.ActivationConfig).Returns(new Mock<BaseVariantConfig>().Object);
 
 		// When
-		SaveCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock.Object);
 		command.Execute(null);
 
 		// Then
@@ -82,7 +82,7 @@ public class SaveCommandTests
 		viewModelMock.Setup(x => x.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(true);
 
 		// When
-		SaveCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock.Object);
 		command.Execute(null);
 
 		// Then

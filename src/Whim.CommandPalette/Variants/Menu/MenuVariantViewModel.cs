@@ -35,7 +35,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 
 	public readonly ObservableCollection<IVariantRowView<CommandItem, MenuVariantRowViewModel>> MenuRows = new();
 
-	public bool ShowSaveButton => false;
+	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 
 	private Visibility _listViewItemsVisibility = Visibility.Visible;
 	public Visibility ListViewItemsVisibility
@@ -283,12 +283,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		}
 	}
 
-	public void Hide()
-	{
-		NoMatchingCommandsTextBlockVisibility = Visibility.Collapsed;
-	}
-
-	public void Save() { }
+	public void Confirm() => ExecuteCommand();
 
 	protected virtual void OnPropertyChanged(string propertyName)
 	{

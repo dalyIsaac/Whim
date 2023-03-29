@@ -84,8 +84,10 @@ public class SelectVariantViewModelTests
 		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		// When
-		// Then it doesn't throw
 		selectVariantViewModel.Activate(new Mock<BaseVariantConfig>().Object);
+
+		// Then it doesn't throw
+		Assert.Null(selectVariantViewModel.ConfirmButtonText);
 	}
 
 	[Fact]
@@ -97,8 +99,10 @@ public class SelectVariantViewModelTests
 		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModelMock.Object, selectRowFactory);
 
 		// When
-		// Then it doesn't throw
 		selectVariantViewModel.Update();
+
+		// Then it doesn't throw
+		Assert.Null(selectVariantViewModel.ConfirmButtonText);
 	}
 
 	[Fact]
@@ -117,7 +121,8 @@ public class SelectVariantViewModelTests
 			{
 				Callback = (items) => { },
 				Options = optionsMock.Object,
-				AllowMultiSelect = false
+				AllowMultiSelect = false,
+				ConfirmButtonText = "Call"
 			};
 
 		selectVariantViewModel.Activate(activationConfig);
@@ -129,6 +134,7 @@ public class SelectVariantViewModelTests
 		Assert.Equal(-1, selectVariantViewModel.SelectedIndex);
 		Assert.Equal(Visibility.Collapsed, selectVariantViewModel.SelectRowsItemsVisibility);
 		Assert.Equal(Visibility.Visible, selectVariantViewModel.NoMatchingOptionsTextBlockVisibility);
+		Assert.Equal("Call", selectVariantViewModel.ConfirmButtonText);
 	}
 
 	[Fact]
@@ -703,7 +709,7 @@ public class SelectVariantViewModelTests
 		// When
 		selectVariantViewModel.Activate(activationConfig);
 		selectVariantViewModel.Update();
-		selectVariantViewModel.Save();
+		selectVariantViewModel.Confirm();
 
 		// Then
 		callbackMock.Verify(c => c.Invoke(It.IsAny<IEnumerable<SelectOption>>()));
