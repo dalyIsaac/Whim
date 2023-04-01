@@ -266,8 +266,10 @@ public class WorkspaceManagerTests
 		Mock<IWorkspace> workspace2 = new();
 		MocksBuilder mocks = new(new[] { workspace, workspace2 });
 		IMonitor monitor = mocks.Monitors[0].Object;
+		IMonitor monitor2 = mocks.Monitors[1].Object;
 
 		mocks.WorkspaceManager.Activate(workspace.Object, monitor);
+		mocks.WorkspaceManager.Activate(workspace2.Object, monitor2);
 
 		// When a workspace is activated on a monitor which already has a workspace activated, then
 		// an event is raised
@@ -277,9 +279,9 @@ public class WorkspaceManagerTests
 			() => mocks.WorkspaceManager.Activate(workspace2.Object, monitor)
 		);
 
+		Assert.Equal(monitor, result.Arguments.Monitor);
 		Assert.Equal(workspace2.Object, result.Arguments.NewWorkspace);
 		Assert.Equal(workspace.Object, result.Arguments.OldWorkspace);
-		Assert.Equal(monitor, result.Arguments.Monitor);
 	}
 
 	[Fact]
