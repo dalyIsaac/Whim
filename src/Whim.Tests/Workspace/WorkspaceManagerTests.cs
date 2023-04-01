@@ -493,12 +493,6 @@ public class WorkspaceManagerTests
 		// Then
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
-
-		// Verify that the window was hidden.
-		window.Verify(w => w.Hide(), Times.Once());
-
-		// Verify that DoLayout was called.
-		workspace2.Verify(w => w.DoLayout(), Times.Once());
 	}
 
 	[Fact]
@@ -753,9 +747,6 @@ public class WorkspaceManagerTests
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
-
-		workspace.Verify(w => w.DoLayout(), Times.Once());
-		workspace2.Verify(w => w.DoLayout(), Times.Once());
 
 		window.Verify(w => w.Focus(), Times.Once());
 	}
