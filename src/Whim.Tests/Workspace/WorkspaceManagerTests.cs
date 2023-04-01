@@ -12,57 +12,57 @@ namespace Whim.Tests;
 )]
 public class WorkspaceManagerTests
 {
-	public static (Mock<IConfigContext>, Mock<IMonitorManager>, Mock<IMonitor>[], Mock<IRouterManager>) CreateMocks(
-		Mock<IMonitor>[]? monitors = null,
-		int focusedMonitorIndex = 0
-	)
+	private class MocksBuilder
 	{
-		Mock<IConfigContext> configContext = new();
+		public Mock<IConfigContext> ConfigContext { get; } = new();
+		public Mock<IMonitorManager> MonitorManager { get; } = new();
+		public Mock<IMonitor>[] Monitors { get; }
+		public Mock<IRouterManager> RouterManager { get; } = new();
 
-		Mock<IMonitorManager> monitorManager = new();
-		configContext.Setup(c => c.MonitorManager).Returns(monitorManager.Object);
-
-		monitors ??= new[] { new Mock<IMonitor>(), new Mock<IMonitor>() };
-		monitorManager.Setup(m => m.Length).Returns(monitors.Length);
-		monitorManager.Setup(m => m.GetEnumerator()).Returns(monitors.Select(m => m.Object).GetEnumerator());
-
-		if (monitors.Length > 0)
+		public MocksBuilder(Mock<IMonitor>[]? monitors = null, int focusedMonitorIndex = 0)
 		{
-			monitorManager.Setup(m => m.FocusedMonitor).Returns(monitors[focusedMonitorIndex].Object);
+			ConfigContext.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
+
+			Monitors = monitors ?? new[] { new Mock<IMonitor>(), new Mock<IMonitor>() };
+			MonitorManager.Setup(m => m.Length).Returns(Monitors.Length);
+			MonitorManager.Setup(m => m.GetEnumerator()).Returns(Monitors.Select(m => m.Object).GetEnumerator());
+
+			if (Monitors.Length > 0)
+			{
+				MonitorManager.Setup(m => m.FocusedMonitor).Returns(Monitors[focusedMonitorIndex].Object);
+			}
+
+			// Set up IEquatable for the monitors.
+			foreach (Mock<IMonitor> mon in Monitors)
+			{
+				mon.Setup(m => m.Equals(It.Is((IMonitor m) => mon.Object == m))).Returns(true);
+			}
+
+			RouterManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(null as IWorkspace);
+			ConfigContext.Setup(c => c.RouterManager).Returns(RouterManager.Object);
 		}
-
-		// Set up IEquatable for the monitors.
-		foreach (Mock<IMonitor> mon in monitors)
-		{
-			mon.Setup(m => m.Equals(It.Is((IMonitor m) => mon.Object == m))).Returns(true);
-		}
-
-		Mock<IRouterManager> routerManager = new();
-		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(null as IWorkspace);
-		configContext.Setup(c => c.RouterManager).Returns(routerManager.Object);
-
-		return (configContext, monitorManager, monitors, routerManager);
 	}
 
 	[Fact]
 	public void Initialize_RequireAtLeastNWorkspace()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
-		using WorkspaceManager workspaceManager = new(configContext.Object);
+		using WorkspaceManager workspaceManager = new(mocks.ConfigContext.Object);
 		Assert.Throws<InvalidOperationException>(workspaceManager.Initialize);
 	}
 
 	[Fact]
 	public void Initialize_Success()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
 
 		// Given the workspace manager has two workspaces
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
 
 		// When the workspace manager is initialized, then MonitorWorkspaceChanged events are raised, and
 		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
@@ -79,10 +79,10 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void Add()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object);
+		using WorkspaceManager workspaceManager = new(mocks.ConfigContext.Object);
 
 		// When a workspace is added, then WorkspaceAdded is raised
 		Assert.Raises<WorkspaceEventArgs>(
@@ -95,11 +95,12 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void Remove_Workspace_RequireAtLeastNWorkspace()
 	{
-		(var configContext, _, _, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
 
 		// When a workspace is removed, it returns false, as there must be at least N workspaces,
 		// where N is the number of monitors
@@ -109,11 +110,12 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void Remove_Workspace_NotFound()
 	{
-		(var configContext, _, _, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
 
 		// When a workspace is removed, it returns false, as the workspace was not found
 		Assert.False(workspaceManager.Remove(new Mock<IWorkspace>().Object));
@@ -123,11 +125,11 @@ public class WorkspaceManagerTests
 	public void Remove_Workspace_Success()
 	{
 		Mock<IMonitor>[] monitorMocks = new[] { new Mock<IMonitor>() };
-		(var configContext, _, _, _) = CreateMocks(monitorMocks);
+		MocksBuilder mocks = new(monitorMocks);
 
 		Mock<IWorkspace> workspace = new();
 		using WorkspaceManager workspaceManager =
-			new(configContext.Object) { workspace.Object, new Mock<IWorkspace>().Object, };
+			new(mocks.ConfigContext.Object) { workspace.Object, new Mock<IWorkspace>().Object, };
 
 		// When a workspace is removed, it returns true, and WorkspaceRemoved is raised
 		var result = Assert.Raises<WorkspaceEventArgs>(
@@ -141,11 +143,12 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void Remove_String_NotFound()
 	{
-		(var configContext, _, _, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
 
 		// When a workspace is removed, it returns false, as the workspace was not found
 		Assert.False(workspaceManager.Remove("not found"));
@@ -155,12 +158,12 @@ public class WorkspaceManagerTests
 	public void Remove_String_Success()
 	{
 		Mock<IMonitor>[] monitorMocks = new[] { new Mock<IMonitor>() };
-		(var configContext, _, _, _) = CreateMocks(monitorMocks);
+		MocksBuilder mocks = new(monitorMocks);
 
 		Mock<IWorkspace> workspace = new();
 		workspace.Setup(w => w.Name).Returns("workspace");
 		using WorkspaceManager workspaceManager =
-			new(configContext.Object) { workspace.Object, new Mock<IWorkspace>().Object, };
+			new(mocks.ConfigContext.Object) { workspace.Object, new Mock<IWorkspace>().Object, };
 
 		// When a workspace is removed, it returns true, and WorkspaceRemoved is raised
 		var result = Assert.Raises<WorkspaceEventArgs>(
@@ -174,20 +177,20 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void TryGet_Null()
 	{
-		(var configContext, _, _, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
-		using WorkspaceManager workspaceManager = new(configContext.Object);
+		using WorkspaceManager workspaceManager = new(mocks.ConfigContext.Object);
 		Assert.Null(workspaceManager.TryGet("not found"));
 	}
 
 	[Fact]
 	public void TryGet_Success()
 	{
-		(var configContext, _, _, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		workspace.Setup(w => w.Name).Returns("workspace");
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object };
+		using WorkspaceManager workspaceManager = new(mocks.ConfigContext.Object) { workspace.Object };
 
 		Assert.Equal(workspace.Object, workspaceManager.TryGet("workspace"));
 	}
@@ -196,10 +199,10 @@ public class WorkspaceManagerTests
 	public void Activate_NoOldWorkspace()
 	{
 		Mock<IMonitor>[] monitorMocks = new[] { new Mock<IMonitor>() };
-		(var configContext, _, _, _) = CreateMocks(monitorMocks);
+		MocksBuilder mocks = new(monitorMocks);
 
 		Mock<IWorkspace> workspace = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object };
+		using WorkspaceManager workspaceManager = new(mocks.ConfigContext.Object) { workspace.Object };
 
 		// When a workspace is activated, it is focused on the focused monitor
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
@@ -218,12 +221,12 @@ public class WorkspaceManagerTests
 	public void Activate_WithOldWorkspace()
 	{
 		Mock<IMonitor>[] monitorMocks = new[] { new Mock<IMonitor>() };
-		(var configContext, _, _, _) = CreateMocks(monitorMocks);
+		MocksBuilder mocks = new(monitorMocks);
 
 		Mock<IWorkspace> oldWorkspace = new();
 		Mock<IWorkspace> newWorkspace = new();
 		using WorkspaceManager workspaceManager =
-			new(configContext.Object) { oldWorkspace.Object, newWorkspace.Object };
+			new(mocks.ConfigContext.Object) { oldWorkspace.Object, newWorkspace.Object };
 
 		workspaceManager.Activate(oldWorkspace.Object);
 
@@ -245,10 +248,10 @@ public class WorkspaceManagerTests
 	public void GetMonitorForWorkspace_NoWorkspace()
 	{
 		Mock<IMonitor>[] monitorMocks = new[] { new Mock<IMonitor>() };
-		(var configContext, _, _, _) = CreateMocks(monitorMocks);
+		MocksBuilder mocks = new(monitorMocks);
 
 		Mock<IWorkspace> workspace = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, };
+		using WorkspaceManager workspaceManager = new(mocks.ConfigContext.Object) { workspace.Object, };
 		workspaceManager.Activate(workspace.Object);
 
 		// Get the monitor for a workspace which isn't in the workspace manager
@@ -258,28 +261,30 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void GetMonitorForWorkspace_Success()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
 		workspaceManager.Activate(workspace.Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		// Get the monitor for a workspace which is in the workspace manager
-		Assert.Equal(monitors[0].Object, workspaceManager.GetMonitorForWorkspace(workspace.Object));
+		Assert.Equal(mocks.Monitors[0].Object, workspaceManager.GetMonitorForWorkspace(workspace.Object));
 	}
 
 	[Fact]
 	public void LayoutAllActiveWorkspaces()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 		workspace.Reset();
 		workspace2.Reset();
 
@@ -292,13 +297,14 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void WindowAdded_NoRouter()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 		workspace.Reset();
 		workspace2.Reset();
 
@@ -312,18 +318,19 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void WindowAdded_Router()
 	{
-		(var configContext, _, var monitors, var router) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 		workspace.Reset();
 		workspace2.Reset();
 
 		Mock<IWindow> window = new();
-		router.Setup(r => r.RouteWindow(window.Object)).Returns(workspace2.Object);
+		mocks.RouterManager.Setup(r => r.RouteWindow(window.Object)).Returns(workspace2.Object);
 
 		workspaceManager.WindowAdded(window.Object);
 
@@ -334,19 +341,20 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void WindowAdded_RouterToActive()
 	{
-		(var configContext, _, var monitors, var router) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 		workspace.Reset();
 		workspace2.Reset();
 
 		Mock<IWindow> window = new();
-		router.Setup(r => r.RouteWindow(window.Object)).Returns<IWorkspace?>(null);
-		router.Setup(r => r.RouteToActiveWorkspace).Returns(true);
+		mocks.RouterManager.Setup(r => r.RouteWindow(window.Object)).Returns<IWorkspace?>(null);
+		mocks.RouterManager.Setup(r => r.RouteToActiveWorkspace).Returns(true);
 
 		workspaceManager.WindowAdded(window.Object);
 
@@ -357,13 +365,14 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void WindowRemoved_NotFound()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 		workspace.Reset();
 		workspace2.Reset();
 
@@ -377,13 +386,14 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void WindowRemoved_Found()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
@@ -399,13 +409,14 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToWorkspace_NoWindow()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 		workspace.Reset();
 		workspace2.Reset();
 
@@ -418,13 +429,14 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToWorkspace_PhantomWindow()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.AddPhantomWindow(workspace.Object, window.Object);
@@ -441,14 +453,14 @@ public class WorkspaceManagerTests
 	public void MoveWindowToWorkspace_CannotFindWindow()
 	{
 		// Given
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		// Workspaces
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
 		Mock<IWorkspace> workspace3 = new();
 		using WorkspaceManager workspaceManager =
-			new(configContext.Object) { workspace.Object, workspace2.Object, workspace3.Object };
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object, workspace3.Object };
 
 		// Windows
 		Mock<IWindow> window = new();
@@ -468,7 +480,7 @@ public class WorkspaceManagerTests
 	public void MoveWindowToWorkspace_Success()
 	{
 		// Given
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		// Workspaces
 		Mock<IWorkspace> workspace = new();
@@ -476,9 +488,10 @@ public class WorkspaceManagerTests
 		Mock<IWorkspace> workspace3 = new();
 
 		// Workspace manager
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		// Windows
 		Mock<IWindow> window = new();
@@ -498,17 +511,18 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToMonitor_NoWindow()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 		workspace.Reset();
 		workspace2.Reset();
 
-		workspaceManager.MoveWindowToMonitor(monitors[0].Object);
+		workspaceManager.MoveWindowToMonitor(mocks.Monitors[0].Object);
 
 		workspace.Verify(w => w.RemoveWindow(It.IsAny<IWindow>()), Times.Never());
 		workspace2.Verify(w => w.AddWindow(It.IsAny<IWindow>()), Times.Never());
@@ -517,18 +531,19 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToMonitor_NoOldMonitor()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 		workspace.Reset();
 		workspace2.Reset();
 
 		Mock<IWindow> window = new();
-		workspaceManager.MoveWindowToMonitor(monitors[0].Object, window.Object);
+		workspaceManager.MoveWindowToMonitor(mocks.Monitors[0].Object, window.Object);
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
@@ -537,20 +552,21 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToMonitor_OldMonitorIsNewMonitor()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
 		workspace.Reset();
 		workspace2.Reset();
 
-		workspaceManager.MoveWindowToMonitor(monitors[0].Object, window.Object);
+		workspaceManager.MoveWindowToMonitor(mocks.Monitors[0].Object, window.Object);
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
@@ -559,13 +575,14 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToMonitor_WorkspaceForMonitorNotFound()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
@@ -581,20 +598,21 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToMonitor_Success()
 	{
-		(var configContext, _, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
 		workspace.Reset();
 		workspace2.Reset();
 
-		workspaceManager.MoveWindowToMonitor(monitors[1].Object, window.Object);
+		workspaceManager.MoveWindowToMonitor(mocks.Monitors[1].Object, window.Object);
 
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
@@ -603,15 +621,16 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToPreviousMonitor_Success()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
-		monitorManager.Setup(m => m.GetPreviousMonitor(monitors[0].Object)).Returns(monitors[1].Object);
+		mocks.MonitorManager.Setup(m => m.GetPreviousMonitor(mocks.Monitors[0].Object)).Returns(mocks.Monitors[1].Object);
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
@@ -627,15 +646,16 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToNextMonitor_Success()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
-		monitorManager.Setup(m => m.GetNextMonitor(monitors[0].Object)).Returns(monitors[1].Object);
+		mocks.MonitorManager.Setup(m => m.GetNextMonitor(mocks.Monitors[0].Object)).Returns(mocks.Monitors[1].Object);
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
@@ -651,17 +671,17 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToPoint_TargetWorkspaceNotFound()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
+		using WorkspaceManager workspaceManager = new(mocks.ConfigContext.Object) { workspace.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
 		workspace.Reset();
 
-		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(new Mock<IMonitor>().Object);
+		mocks.MonitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(new Mock<IMonitor>().Object);
 
 		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
@@ -674,19 +694,20 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToPoint_PhantomWindow()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.AddPhantomWindow(workspace.Object, window.Object);
 		workspace.Reset();
 		workspace2.Reset();
 
-		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(monitors[1].Object);
+		mocks.MonitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(mocks.Monitors[1].Object);
 
 		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
@@ -700,18 +721,19 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToPoint_CannotRemoveWindow()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
 		workspace.Reset();
 
-		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(monitors[1].Object);
+		mocks.MonitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(mocks.Monitors[1].Object);
 		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(false);
 
 		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
@@ -726,21 +748,22 @@ public class WorkspaceManagerTests
 	[Fact]
 	public void MoveWindowToPoint_Success()
 	{
-		(var configContext, var monitorManager, var monitors, _) = CreateMocks();
+		MocksBuilder mocks = new();
 
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		using WorkspaceManager workspaceManager = new(configContext.Object) { workspace.Object, workspace2.Object };
-		workspaceManager.Activate(workspace.Object, monitors[0].Object);
-		workspaceManager.Activate(workspace2.Object, monitors[1].Object);
+		using WorkspaceManager workspaceManager =
+			new(mocks.ConfigContext.Object) { workspace.Object, workspace2.Object };
+		workspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		workspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		workspaceManager.WindowAdded(window.Object);
 		workspace.Reset();
 		workspace2.Reset();
 
-		monitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(monitors[1].Object);
-		monitors[1].Setup(m => m.WorkingArea).Returns(new Location<int>());
+		mocks.MonitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(mocks.Monitors[1].Object);
+		mocks.Monitors[1].Setup(m => m.WorkingArea).Returns(new Location<int>());
 		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
 
 		workspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
