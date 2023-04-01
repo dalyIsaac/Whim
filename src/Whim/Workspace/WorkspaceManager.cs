@@ -254,7 +254,11 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		if (!_configContext.RouterManager.RouteToActiveWorkspace && workspace == null)
 		{
-			workspace = GetWorkspaceForWindowLocation(window);
+			IMonitor? monitor = _configContext.MonitorManager.GetMonitorAtPoint(window.Center);
+			if (monitor is not null)
+			{
+				workspace = GetWorkspaceForMonitor(monitor);
+			}
 		}
 		workspace ??= ActiveWorkspace;
 
@@ -262,17 +266,6 @@ internal class WorkspaceManager : IWorkspaceManager
 		workspace.AddWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
-	}
-
-	private IWorkspace? GetWorkspaceForWindowLocation(IWindow window)
-	{
-		IMonitor? monitor = _configContext.MonitorManager.GetMonitorAtPoint(window.Center);
-		if (monitor is null)
-		{
-			return null;
-		}
-
-		return GetWorkspaceForMonitor(monitor);
 	}
 
 	/// <summary>

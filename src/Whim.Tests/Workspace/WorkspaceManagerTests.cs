@@ -5,11 +5,6 @@ using Xunit;
 
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
 public class WorkspaceManagerTests
 {
 	private class MocksBuilder
@@ -349,6 +344,32 @@ public class WorkspaceManagerTests
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
 		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+
+		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
+
+		// Reset the mocks
+		workspace.Reset();
+		workspace2.Reset();
+
+		// When a window is added
+		Mock<IWindow> window = new();
+		mocks.WorkspaceManager.WindowAdded(window.Object);
+
+		// Then the window is added to the active workspace
+		workspace.Verify(w => w.AddWindow(window.Object), Times.Once());
+		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+	}
+
+	[Fact]
+	public void WindowAdded_NoRouter_GetMonitorAtWindowCenter()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+
+		mocks.MonitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(mocks.Monitors[0].Object);
 
 		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
 		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
