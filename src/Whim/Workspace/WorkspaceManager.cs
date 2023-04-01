@@ -538,8 +538,6 @@ internal class WorkspaceManager : IWorkspaceManager
 		_windowWorkspaceMap[window] = targetWorkspace;
 
 		// Trigger layouts.
-		ActiveWorkspace.DoLayout();
-		targetWorkspace.DoLayout();
 		window.Focus();
 	}
 

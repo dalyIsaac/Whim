@@ -343,6 +343,8 @@ internal class Workspace : IWorkspace
 		{
 			layoutEngine.AddWindowAtPoint(window, point, isPhantom);
 		}
+
+		DoLayout();
 	}
 
 	public override string ToString() => Name;
