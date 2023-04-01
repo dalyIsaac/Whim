@@ -258,12 +258,6 @@ internal class WorkspaceManager : IWorkspaceManager
 		}
 		workspace ??= ActiveWorkspace;
 
-		if (workspace == null)
-		{
-			Logger.Error($"No active workspace found.");
-			return;
-		}
-
 		_windowWorkspaceMap[window] = workspace;
 		workspace.AddWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
