@@ -183,11 +183,10 @@ internal class WorkspaceManager : IWorkspaceManager
 		// Hide all the windows from the old workspace.
 		oldWorkspace?.Deactivate();
 
-		// Layout the losing monitor.
+		// Send out an event about the losing monitor.
 		if (loserMonitor != null && oldWorkspace != null)
 		{
 			_monitorWorkspaceMap[loserMonitor] = oldWorkspace;
-			oldWorkspace.DoLayout();
 			MonitorWorkspaceChanged?.Invoke(
 				this,
 				new MonitorWorkspaceChangedEventArgs()

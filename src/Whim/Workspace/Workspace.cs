@@ -359,6 +359,7 @@ internal class Workspace : IWorkspace
 		}
 
 		_windowLocations.Clear();
+		DoLayout();
 	}
 
 	public IWindowState? TryGetWindowLocation(IWindow window)
