@@ -107,9 +107,11 @@ public class WorkspaceManagerTests
 		Mock<IWorkspace> workspace2 = new();
 		MocksBuilder mocks = new(new[] { workspace, workspace2 });
 
-		// When a workspace is removed, it returns false, as there must be at least two workspaces,
-		// since there are two monitors
-		Assert.False(mocks.WorkspaceManager.Remove(workspace.Object));
+		// When a workspace is removed
+		bool result = mocks.WorkspaceManager.Remove(workspace.Object);
+
+		//Then it returns false, as there must be at least two workspaces, since there are two monitors
+		Assert.False(result);
 	}
 
 	[Fact]
@@ -118,10 +120,14 @@ public class WorkspaceManagerTests
 		// Given
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+		Mock<IWorkspace> workspace3 = new();
+		MocksBuilder mocks = new(new[] { workspace, workspace2, workspace3 });
 
-		// When a workspace is removed, it returns false, as the workspace was not found
-		Assert.False(mocks.WorkspaceManager.Remove(new Mock<IWorkspace>().Object));
+		// When a workspace is removed
+		bool result = mocks.WorkspaceManager.Remove(new Mock<IWorkspace>().Object);
+
+		// Then it returns false, as the workspace was not found
+		Assert.False(result);
 	}
 
 	[Fact]
@@ -129,16 +135,23 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
 		Mock<IMonitor>[] monitorMocks = new[] { new Mock<IMonitor>() };
-		MocksBuilder mocks = new(new Mock<IWorkspace>[] { workspace, new Mock<IWorkspace>() }, monitorMocks);
+		MocksBuilder mocks = new(new Mock<IWorkspace>[] { workspace, workspace2 }, monitorMocks);
 
-		// When a workspace is removed, it returns true, and WorkspaceRemoved is raised
+		Mock<IWindow> window = new();
+		workspace.Setup(w => w.Windows).Returns(new[] { window.Object });
+
+		// When a workspace is removed, it returns true, WorkspaceRemoved is raised
 		var result = Assert.Raises<WorkspaceEventArgs>(
 			h => mocks.WorkspaceManager.WorkspaceRemoved += h,
 			h => mocks.WorkspaceManager.WorkspaceRemoved -= h,
-			() => mocks.WorkspaceManager.Remove(workspace.Object)
+			() => Assert.True(mocks.WorkspaceManager.Remove(workspace.Object))
 		);
 		Assert.Equal(workspace.Object, result.Arguments.Workspace);
+
+		// and the window is added to the last remaining workspace
+		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once);
 	}
 
 	[Fact]
