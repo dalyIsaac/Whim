@@ -27,6 +27,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// </summary>
 	private readonly HashSet<IWindow> _phantomWindows = new();
 
+	internal IEnumerable<IWindow> PhantomWindows => _phantomWindows;
+
 	/// <summary>
 	/// Maps monitors to their active workspace.
 	/// </summary>
@@ -537,6 +539,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		_phantomWindows.Remove(window);
 		_windowWorkspaceMap.Remove(window);
 	}
+	#endregion
 
 	protected virtual void Dispose(bool disposing)
 	{
@@ -565,5 +568,4 @@ internal class WorkspaceManager : IWorkspaceManager
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
 	}
-	#endregion
 }

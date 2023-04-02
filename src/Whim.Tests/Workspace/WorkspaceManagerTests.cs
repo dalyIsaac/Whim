@@ -203,6 +203,42 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void SquareBracket_Get()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		workspace.Setup(w => w.Name).Returns("workspace");
+		MocksBuilder mocks = new(new[] { workspace });
+
+		// When getting a workspace which does exist, then the workspace is returned
+		Assert.Equal(workspace.Object, mocks.WorkspaceManager["workspace"]);
+	}
+
+	[Fact]
+	public void GetEnumerator()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+
+		// When enumerating the workspaces, then the workspaces are returned
+		Assert.Equal(new[] { workspace.Object, workspace2.Object }, mocks.WorkspaceManager);
+	}
+
+	[Fact]
+	public void IEnumerable_GetEnumerator()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+
+		// When enumerating the workspaces, then the workspaces are returned
+		Assert.Equal(new[] { workspace.Object, workspace2.Object }, mocks.WorkspaceManager);
+	}
+
+	[Fact]
 	public void Activate_NoOldWorkspace()
 	{
 		// Given
@@ -1113,5 +1149,54 @@ public class WorkspaceManagerTests
 			h => mocks.WorkspaceManager.WorkspaceRenamed -= h,
 			() => mocks.WorkspaceManager.TriggerWorkspaceRenamed(eventArgs)
 		);
+	}
+
+	[Fact]
+	public void AddPhantomWindow()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWindow> window = new();
+		MocksBuilder mocks = new(new[] { workspace });
+
+		// When a phantom window is added
+		mocks.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
+
+		// Then the phantom window is added to the list
+		Assert.Contains(window.Object, mocks.WorkspaceManager.PhantomWindows);
+	}
+
+	[Fact]
+	public void RemovePhantomWindow()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWindow> window = new();
+		MocksBuilder mocks = new(new[] { workspace });
+
+		mocks.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
+
+		// When a phantom window is removed
+		mocks.WorkspaceManager.RemovePhantomWindow(window.Object);
+
+		// Then the phantom window is removed from the list
+		Assert.DoesNotContain(window.Object, mocks.WorkspaceManager.PhantomWindows);
+		Assert.Null(mocks.WorkspaceManager.GetMonitorForWindow(window.Object));
+	}
+
+	[Fact]
+	public void DoesDispose()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+
+		// When the workspace manager is disposed
+		mocks.WorkspaceManager.Dispose();
+
+		// Then the workspaces are disposed
+		workspace.Verify(w => w.Dispose(), Times.Once());
+		workspace2.Verify(w => w.Dispose(), Times.Once());
 	}
 }
