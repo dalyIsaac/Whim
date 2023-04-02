@@ -20,8 +20,8 @@ internal class Workspace : IWorkspace
 				new WorkspaceRenamedEventArgs()
 				{
 					Workspace = this,
-					OldName = oldName,
-					NewName = _name
+					PreviousName = oldName,
+					CurrentName = _name
 				}
 			);
 		}

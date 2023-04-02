@@ -10,12 +10,12 @@ public class WorkspaceRenamedEventArgs : EventArgs
 	/// <summary>
 	/// The old name of the workspace.
 	/// </summary>
-	public required string OldName { get; init; }
+	public required string PreviousName { get; init; }
 
 	/// <summary>
 	/// The new name of the workspace.
 	/// </summary>
-	public required string NewName { get; init; }
+	public required string CurrentName { get; init; }
 
 	/// <summary>
 	/// The workspace that was renamed.

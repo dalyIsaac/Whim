@@ -1056,4 +1056,60 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.DoLayout(), Times.Once());
 		workspace3.Verify(w => w.DoLayout(), Times.Exactly(2));
 	}
+
+	[Fact]
+	public void AddProxyLayoutEngine()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
+
+		// When a proxy layout engine is added
+		mocks.WorkspaceManager.AddProxyLayoutEngine(proxyLayoutEngine.Object);
+
+		// Then the proxy layout engine is added to the list
+		Assert.Contains(proxyLayoutEngine.Object, mocks.WorkspaceManager.ProxyLayoutEngines);
+	}
+
+	[Fact]
+	public void TriggerActiveLayoutEngineChanged()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		ActiveLayoutEngineChangedEventArgs eventArgs =
+			new()
+			{
+				Workspace = new Mock<IWorkspace>().Object,
+				PreviousLayoutEngine = new Mock<ILayoutEngine>().Object,
+				CurrentLayoutEngine = new Mock<ILayoutEngine>().Object
+			};
+
+		// When the active layout engine is changed, then the event is triggered
+		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
+			h => mocks.WorkspaceManager.ActiveLayoutEngineChanged += h,
+			h => mocks.WorkspaceManager.ActiveLayoutEngineChanged -= h,
+			() => mocks.WorkspaceManager.TriggerActiveLayoutEngineChanged(eventArgs)
+		);
+	}
+
+	[Fact]
+	public void TriggerWorkspaceRenamed()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		WorkspaceRenamedEventArgs eventArgs =
+			new()
+			{
+				Workspace = new Mock<IWorkspace>().Object,
+				PreviousName = "Previous",
+				CurrentName = "Current"
+			};
+
+		// When the workspace is renamed, then the event is triggered
+		Assert.Raises<WorkspaceRenamedEventArgs>(
+			h => mocks.WorkspaceManager.WorkspaceRenamed += h,
+			h => mocks.WorkspaceManager.WorkspaceRenamed -= h,
+			() => mocks.WorkspaceManager.TriggerWorkspaceRenamed(eventArgs)
+		);
+	}
 }
