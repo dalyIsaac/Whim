@@ -13,6 +13,18 @@ namespace Whim.Tests;
 )]
 public class WorkspaceTests
 {
+	private class MocksBuilder
+	{
+		public Mock<IConfigContext> ConfigContext { get; } = new();
+		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
+		public Mock<ILayoutEngine> LayoutEngine { get; } = new();
+
+		public MocksBuilder()
+		{
+			ConfigContext.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
+		}
+	}
+
 	[Fact]
 	public void Rename()
 	{
@@ -218,19 +230,37 @@ public class WorkspaceTests
 	}
 
 	[Fact]
-	public void WindowFocused_DoesNotContainWindow()
+	public void WindowFocused_ContainsWindow()
 	{
-		// Given
+		// Given the window is in the workspace
+		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> layoutEngine = new();
-		Mock<IConfigContext> configContext = new();
 
-		Workspace workspace = new(configContext.Object, "Workspace", layoutEngine.Object);
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddWindow(window.Object);
 
 		// When
 		workspace.WindowFocused(window.Object);
 
 		// Then
-		Assert.Null(workspace.LastFocusedWindow);
+		Assert.Equal(window.Object, workspace.LastFocusedWindow);
+	}
+
+	[Fact]
+	public void WindowFocused_IsPhantomWindow()
+	{
+		// Given the window is in the workspace
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
+		mocks.LayoutEngine.Setup(l => l.ContainsEqual(It.IsAny<ILayoutEngine>())).Returns(true);
+
+		// When
+		workspace.WindowFocused(window.Object);
+
+		// Then
+		Assert.Equal(window.Object, workspace.LastFocusedWindow);
 	}
 }
