@@ -217,12 +217,12 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Getting monitor for active workspace {workspace}");
 
 		// Linear search for the monitor that contains the workspace.
-		foreach (IMonitor monitor in _configContext.MonitorManager)
+		foreach ((IMonitor m, IWorkspace w) in _monitorWorkspaceMap)
 		{
-			if (_monitorWorkspaceMap[monitor] == workspace)
+			if (w == workspace)
 			{
-				Logger.Debug($"Found monitor {monitor} for workspace {workspace}");
-				return monitor;
+				Logger.Debug($"Found monitor {m} for workspace {workspace}");
+				return m;
 			}
 		}
 
@@ -356,11 +356,7 @@ internal class WorkspaceManager : IWorkspaceManager
 			// If there's no workspace, create one.
 			if (workspace is null)
 			{
-				workspace = _configContext.WorkspaceManager.WorkspaceFactory(
-					_configContext,
-					$"Workspace {_workspaces.Count + 1}"
-				);
-
+				workspace = WorkspaceFactory(_configContext, $"Workspace {_workspaces.Count + 1}");
 				workspace.Initialize();
 			}
 

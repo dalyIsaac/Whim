@@ -957,4 +957,103 @@ public class WorkspaceManagerTests
 		// Then the window is routed to the workspace
 		routerManager.Verify(r => r.RouteWindow(window.Object), Times.Once());
 	}
+
+	[Fact]
+	public void MonitorManager_MonitorsChanged_Removed()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+
+		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+
+		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
+
+		// When a monitor is removed
+		mocks.WorkspaceManager.MonitorManager_MonitorsChanged(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				AddedMonitors = Array.Empty<IMonitor>(),
+				RemovedMonitors = new IMonitor[] { mocks.Monitors[0].Object },
+				UnchangedMonitors = new IMonitor[] { mocks.Monitors[1].Object }
+			}
+		);
+
+		// Then the workspace is deactivated
+		workspace.Verify(w => w.Deactivate(), Times.Once());
+	}
+
+	[Fact]
+	public void MonitorManager_MonitorsChanged_Added_CreateWorkspace()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+
+		Mock<IMonitor> monitor = new();
+
+		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+
+		Mock<Func<IConfigContext, string, IWorkspace>> workspaceFactory = new();
+		workspaceFactory
+			.Setup(f => f(mocks.ConfigContext.Object, It.IsAny<string>()))
+			.Returns(new Mock<IWorkspace>().Object);
+		mocks.WorkspaceManager.WorkspaceFactory = workspaceFactory.Object;
+
+		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
+
+		// When a monitor is added
+		mocks.WorkspaceManager.MonitorManager_MonitorsChanged(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				AddedMonitors = new IMonitor[] { monitor.Object },
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = new IMonitor[] { mocks.Monitors[0].Object, mocks.Monitors[1].Object }
+			}
+		);
+
+		// Then a new workspace is created
+		workspaceFactory.Verify(f => f(mocks.ConfigContext.Object, "Workspace 3"), Times.Once());
+	}
+
+	[Fact]
+	public void MonitorManager_MonitorsChanged_Added_UseExistingWorkspace()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+		Mock<IWorkspace> workspace3 = new();
+
+		Mock<IMonitor> monitor = new();
+
+		MocksBuilder mocks = new(new[] { workspace, workspace2, workspace3 });
+
+		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
+
+		// Reset the mocks
+		workspace.Reset();
+		workspace2.Reset();
+		workspace3.Reset();
+
+		// When a monitor is added
+		mocks.WorkspaceManager.MonitorManager_MonitorsChanged(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				AddedMonitors = new IMonitor[] { monitor.Object },
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = new IMonitor[] { mocks.Monitors[0].Object, mocks.Monitors[1].Object }
+			}
+		);
+
+		// Then the workspace is activated
+		workspace.Verify(w => w.DoLayout(), Times.Once());
+		workspace2.Verify(w => w.DoLayout(), Times.Once());
+		workspace3.Verify(w => w.DoLayout(), Times.Exactly(2));
+	}
 }
