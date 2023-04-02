@@ -807,6 +807,7 @@ public class WorkspaceManagerTests
 		MocksBuilder mocks = new(new[] { workspace, workspace2 });
 
 		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		mocks.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
@@ -832,6 +833,7 @@ public class WorkspaceManagerTests
 		MocksBuilder mocks = new(new[] { workspace, workspace2 });
 
 		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		mocks.WorkspaceManager.WindowAdded(window.Object);
@@ -844,7 +846,7 @@ public class WorkspaceManagerTests
 		mocks.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
 		// Then nothing happens
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
+		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
 	}
 
