@@ -263,4 +263,19 @@ public class WorkspaceTests
 		// Then
 		Assert.Equal(window.Object, workspace.LastFocusedWindow);
 	}
+
+	[Fact]
+	public void FocusFirstWindow()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		mocks.LayoutEngine.Setup(l => l.GetFirstWindow()).Returns(new Mock<IWindow>().Object);
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+
+		// When FocusFirstWindow is called
+		workspace.FocusFirstWindow();
+
+		// Then the LayoutEngine's GetFirstWindow method is called
+		mocks.LayoutEngine.Verify(l => l.GetFirstWindow(), Times.Once);
+	}
 }
