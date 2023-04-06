@@ -9,81 +9,72 @@ public record UnknownConfig : BaseVariantConfig { }
 
 public class CommandPaletteWindowViewModelTests
 {
-	private static (
-		Mock<IConfigContext>,
-		Mock<ICommandManager>,
-		CommandPalettePlugin,
-		Mock<IVariantControl>,
-		Mock<IVariantControl>,
-		Mock<IVariantControl>,
-		Mock<IVariantViewModel>
-	) CreateStubs()
+	private class MocksBuilder
 	{
-		Mock<ICommandManager> commandManager = new();
-		commandManager.Setup(x => x.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
+		public Mock<IConfigContext> ConfigContext { get; } = new();
+		public Mock<ICommandManager> CommandManager { get; } = new();
+		public CommandPalettePlugin Plugin { get; }
+		public Mock<IVariantControl> MenuVariant { get; } = new();
+		public Mock<IVariantControl> FreeTextVariant { get; } = new();
+		public Mock<IVariantControl> SelectVariant { get; } = new();
+		public Mock<IVariantViewModel> VariantViewModel { get; } = new();
 
-		Mock<IMonitor> monitor = new();
-		monitor
-			.Setup(m => m.WorkingArea)
-			.Returns(
-				new Location<int>()
-				{
-					X = 0,
-					Y = 0,
-					Height = 1080,
-					Width = 1920
-				}
-			);
+		public MocksBuilder()
+		{
+			CommandManager.Setup(x => x.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
 
-		Mock<IMonitorManager> monitorManager = new();
-		monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
+			Mock<IMonitor> monitor = new();
+			monitor
+				.Setup(m => m.WorkingArea)
+				.Returns(
+					new Location<int>()
+					{
+						X = 0,
+						Y = 0,
+						Height = 1080,
+						Width = 1920
+					}
+				);
 
-		Mock<IConfigContext> configContext = new();
-		configContext.SetupGet(x => x.CommandManager).Returns(commandManager.Object);
-		configContext.SetupGet(x => x.MonitorManager).Returns(monitorManager.Object);
+			Mock<IMonitorManager> monitorManager = new();
+			monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
 
-		CommandPalettePlugin plugin = new(configContext.Object, new CommandPaletteConfig());
+			ConfigContext.SetupGet(x => x.CommandManager).Returns(CommandManager.Object);
+			ConfigContext.SetupGet(x => x.MonitorManager).Returns(monitorManager.Object);
+
+			Plugin = new(ConfigContext.Object, new CommandPaletteConfig(ConfigContext.Object));
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-		Mock<IVariantViewModel> variantViewModel = new();
+			MenuVariant.Setup(m => m.Control).Returns((UIElement)null);
+			MenuVariant.Setup(m => m.ViewModel).Returns(VariantViewModel.Object);
 
-		Mock<IVariantControl> menuVariant = new();
-		menuVariant.Setup(m => m.Control).Returns((UIElement)null);
-		menuVariant.Setup(m => m.ViewModel).Returns(variantViewModel.Object);
+			FreeTextVariant.Setup(m => m.Control).Returns((UIElement)null);
+			FreeTextVariant.Setup(m => m.ViewModel).Returns(VariantViewModel.Object);
 
-		Mock<IVariantControl> freeTextVariant = new();
-		freeTextVariant.Setup(m => m.Control).Returns((UIElement)null);
-		freeTextVariant.Setup(m => m.ViewModel).Returns(variantViewModel.Object);
+			VariantViewModel.Setup(m => m.ConfirmButtonText).Returns("Save");
 
-		Mock<IVariantViewModel> selectViewModel = new();
-		selectViewModel.Setup(m => m.ConfirmButtonText).Returns("Save");
-
-		Mock<IVariantControl> selectVariant = new();
-		selectVariant.Setup(m => m.Control).Returns((UIElement)null);
-		selectVariant.Setup(m => m.ViewModel).Returns(selectViewModel.Object);
+			SelectVariant.Setup(m => m.Control).Returns((UIElement)null);
+			SelectVariant.Setup(m => m.ViewModel).Returns(VariantViewModel.Object);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-
-		return (configContext, commandManager, plugin, menuVariant, freeTextVariant, selectVariant, variantViewModel);
+		}
 	}
 
 	[Fact]
 	public void RequestHide()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			Mock<IVariantViewModel> viewModel
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		// When
 		// Then
@@ -94,18 +85,16 @@ public class CommandPaletteWindowViewModelTests
 	public void OnKeyDown_Escape()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			Mock<IVariantViewModel> viewModel
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		// When
 		// Then
@@ -120,18 +109,16 @@ public class CommandPaletteWindowViewModelTests
 	public void OnKeyDown_OtherKeys()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			Mock<IVariantViewModel> viewModel
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() }, null);
 
@@ -139,25 +126,23 @@ public class CommandPaletteWindowViewModelTests
 		vm.OnKeyDown(VirtualKey.Space);
 
 		// Then
-		viewModel.Verify(x => x.OnKeyDown(VirtualKey.Space), Times.Once);
+		mocks.VariantViewModel.Verify(x => x.OnKeyDown(VirtualKey.Space), Times.Once);
 	}
 
 	[Fact]
 	public void Activate_UseDefaults()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			Mock<IVariantViewModel> viewModel
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		// When
 		Assert.Raises<EventArgs>(
@@ -176,18 +161,16 @@ public class CommandPaletteWindowViewModelTests
 	public void Activate_DefineItems()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			Mock<IVariantViewModel> viewModel
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		Mock<IMonitor> monitor = new();
 		monitor
@@ -262,18 +245,16 @@ public class CommandPaletteWindowViewModelTests
 	public void Activate_Variant(BaseVariantConfig config, bool expected, string confirmButtonText)
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			_,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			_
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		// When
 		vm.Activate(config, null);
@@ -287,18 +268,16 @@ public class CommandPaletteWindowViewModelTests
 	public void Update()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			Mock<ICommandManager> commandManager,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			Mock<IVariantViewModel> viewModel
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
 
@@ -308,25 +287,23 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Raises<EventArgs>(h => vm.SetWindowPosRequested += h, h => vm.SetWindowPosRequested -= h, vm.Update);
 
 		// Then
-		viewModel.Verify(x => x.Update(), Times.Once);
+		mocks.VariantViewModel.Verify(x => x.Update(), Times.Once);
 	}
 
 	[Fact]
 	public void IsVisible_True()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			_,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			_
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
 
@@ -343,18 +320,16 @@ public class CommandPaletteWindowViewModelTests
 	public void IsVisible_False()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			_,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			_
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		// When
 		bool result = vm.IsVisible;
@@ -367,18 +342,16 @@ public class CommandPaletteWindowViewModelTests
 	public void RequestFocusTextBox()
 	{
 		// Given
-		(
-			Mock<IConfigContext> configContext,
-			_,
-			CommandPalettePlugin plugin,
-			Mock<IVariantControl> menuVariant,
-			Mock<IVariantControl> freeTextVariant,
-			Mock<IVariantControl> selectVariant,
-			_
-		) = CreateStubs();
+		MocksBuilder mocks = new();
 
 		CommandPaletteWindowViewModel vm =
-			new(configContext.Object, plugin, menuVariant.Object, freeTextVariant.Object, selectVariant.Object);
+			new(
+				mocks.ConfigContext.Object,
+				mocks.Plugin,
+				mocks.MenuVariant.Object,
+				mocks.FreeTextVariant.Object,
+				mocks.SelectVariant.Object
+			);
 
 		// When
 		// Then
