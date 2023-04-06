@@ -16,7 +16,11 @@ public class CommandPaletteConfig
 	/// <param name="configContext"></param>
 	public CommandPaletteConfig(IConfigContext configContext)
 	{
-		ActivationConfig = new MenuVariantConfig() { Commands = configContext.CommandManager, ConfirmButtonText = "Execute" };
+		ActivationConfig = new MenuVariantConfig()
+		{
+			Commands = configContext.CommandManager,
+			ConfirmButtonText = "Execute"
+		};
 	}
 
 	/// <summary>
