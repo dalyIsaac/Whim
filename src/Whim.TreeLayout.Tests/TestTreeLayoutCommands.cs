@@ -58,4 +58,20 @@ public class TestTreeLayoutCommands
 
 		plugin.Verify(x => x.SetAddWindowDirection(Direction.Down), Times.Once);
 	}
+
+	[Fact]
+	public void TestSplitFocusedWindowCommand()
+	{
+		Mock<ITreeLayoutPlugin> plugin = CreateCommands();
+		Mock<ITreeLayoutEngine> engine = new();
+		plugin.Setup(x => x.GetTreeLayoutEngine()).Returns(engine.Object);
+
+		TreeLayoutCommands commands = new(plugin.Object);
+		CommandItem item = commands.SplitFocusedWindowCommand;
+
+		item.Command.TryExecute();
+
+		plugin.Verify(x => x.GetTreeLayoutEngine(), Times.Once);
+		engine.Verify(x => x.SplitFocusedWindow(), Times.Once);
+	}
 }
