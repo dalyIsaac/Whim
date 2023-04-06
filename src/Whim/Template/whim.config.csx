@@ -78,7 +78,7 @@ void DoConfig(IConfigContext configContext)
 	configContext.PluginManager.AddPlugin(focusIndicatorPlugin);
 
 	// Command palette.
-	CommandPaletteConfig commandPaletteConfig = new();
+	CommandPaletteConfig commandPaletteConfig = new(configContext);
 	CommandPalettePlugin commandPalettePlugin = new(configContext, commandPaletteConfig);
 	configContext.PluginManager.AddPlugin(commandPalettePlugin);
 

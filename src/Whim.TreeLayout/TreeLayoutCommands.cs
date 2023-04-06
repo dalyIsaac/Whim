@@ -27,6 +27,7 @@ public class TreeLayoutCommands : IEnumerable<CommandItem>
 		yield return AddTreeDirectionRightCommand;
 		yield return AddTreeDirectionUpCommand;
 		yield return AddTreeDirectionDownCommand;
+		yield return SplitFocusedWindowCommand;
 	}
 
 	/// <inheritdoc/>
@@ -81,6 +82,19 @@ public class TreeLayoutCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.add_tree_direction_down",
 				title: "Add windows below the current window",
 				callback: () => _plugin.SetAddWindowDirection(Direction.Down)
+			)
+		};
+
+	/// <summary>
+	/// Split the focused window in two, and insert a phantom window in the direction.
+	/// </summary>
+	public CommandItem SplitFocusedWindowCommand =>
+		new()
+		{
+			Command = new Command(
+				identifier: $"{Name}.split_focused_window",
+				title: "Split the focused window",
+				callback: () => _plugin.GetTreeLayoutEngine()?.SplitFocusedWindow()
 			)
 		};
 }

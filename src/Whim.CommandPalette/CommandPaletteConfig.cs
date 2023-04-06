@@ -11,6 +11,15 @@ public class CommandPaletteConfig
 	internal const string Title = "Whim Command Palette";
 
 	/// <summary>
+	/// Creates a new instance of <see cref="CommandPaletteConfig"/>.
+	/// </summary>
+	/// <param name="configContext"></param>
+	public CommandPaletteConfig(IConfigContext configContext)
+	{
+		ActivationConfig = new MenuVariantConfig() { Commands = configContext.CommandManager, ConfirmButtonText = "Execute" };
+	}
+
+	/// <summary>
 	/// The maximum height of the command palette window, as a percentage of the monitor height.
 	/// </summary>
 	public int MaxHeightPercent { get; set; } = 40;
@@ -31,5 +40,5 @@ public class CommandPaletteConfig
 	/// Defaults to a <see cref="MenuVariantConfig"/> where <see cref="MenuVariantConfig.Commands"/>
 	/// are set to <see cref="IConfigContext.CommandManager"/>.
 	/// </summary>
-	public BaseVariantConfig? ActivationConfig { get; set; }
+	public BaseVariantConfig ActivationConfig { get; set; }
 }
