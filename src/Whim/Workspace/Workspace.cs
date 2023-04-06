@@ -447,6 +447,7 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
 
+		// TODO: Shouldn't this be the other way around?
 		if (engine.ContainsEqual(ActiveLayoutEngine))
 		{
 			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
