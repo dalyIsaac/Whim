@@ -14,7 +14,7 @@ public class CommandPalettePluginTests
 		Mock<IConfigContext> configContextMock = new();
 		configContextMock.Setup(x => x.FilterManager).Returns(filterManagerMock.Object);
 
-		CommandPaletteConfig commandPaletteConfig = new();
+		CommandPaletteConfig commandPaletteConfig = new(configContextMock.Object);
 		CommandPalettePlugin commandPalettePlugin = new(configContextMock.Object, commandPaletteConfig);
 
 		// When
