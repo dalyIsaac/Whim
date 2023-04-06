@@ -20,8 +20,8 @@ internal class Workspace : IWorkspace
 				new WorkspaceRenamedEventArgs()
 				{
 					Workspace = this,
-					OldName = oldName,
-					NewName = _name
+					PreviousName = oldName,
+					CurrentName = _name
 				}
 			);
 		}
@@ -343,6 +343,8 @@ internal class Workspace : IWorkspace
 		{
 			layoutEngine.AddWindowAtPoint(window, point, isPhantom);
 		}
+
+		DoLayout();
 	}
 
 	public override string ToString() => Name;
@@ -357,6 +359,7 @@ internal class Workspace : IWorkspace
 		}
 
 		_windowLocations.Clear();
+		DoLayout();
 	}
 
 	public IWindowState? TryGetWindowLocation(IWindow window)
@@ -444,6 +447,7 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
 
+		// TODO: Shouldn't this be the other way around?
 		if (engine.ContainsEqual(ActiveLayoutEngine))
 		{
 			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
