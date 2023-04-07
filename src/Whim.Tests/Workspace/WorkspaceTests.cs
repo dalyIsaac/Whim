@@ -22,6 +22,7 @@ public class WorkspaceTests
 		public MocksBuilder()
 		{
 			ConfigContext.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
+			LayoutEngine.Setup(l => l.ContainsEqual(LayoutEngine.Object)).Returns(true);
 		}
 	}
 
@@ -393,8 +394,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
 
-		// When AddWindow is called
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
+
+		// Reset mocks
+		window.Reset();
+
+		// When AddWindow is called
 		workspace.AddWindow(window.Object);
 
 		// Then the window is added to the layout engine
