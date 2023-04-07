@@ -222,7 +222,11 @@ internal class Workspace : IWorkspace
 
 		if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
 		{
-			bool removePhantomSuccess = RemovePhantomWindow(phantomLayoutEngine, window);
+			bool removePhantomSuccess = phantomLayoutEngine.Remove(window);
+			if (removePhantomSuccess)
+			{
+				_phantomWindows.Remove(window);
+			}
 			DoLayout();
 			return removePhantomSuccess;
 		}
@@ -250,25 +254,6 @@ internal class Workspace : IWorkspace
 		}
 
 		return success;
-	}
-
-	private bool RemovePhantomWindow(ILayoutEngine phantomLayoutEngine, IWindow window)
-	{
-		Logger.Debug($"Removing phantom window {window} from workspace {Name}");
-
-		if (!ActiveLayoutEngine.ContainsEqual(phantomLayoutEngine))
-		{
-			Logger.Error($"Phantom window {window} is not in the active layout engine {ActiveLayoutEngine}");
-			return false;
-		}
-
-		if (!phantomLayoutEngine.Remove(window))
-		{
-			Logger.Error($"Phantom window {window} could not be removed from layout engine {phantomLayoutEngine}");
-			return false;
-		}
-
-		return true;
 	}
 
 	public void FocusWindowInDirection(Direction direction, IWindow window)
@@ -426,7 +411,7 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Adding phantom window {window} in workspace {Name}");
 
-		if (engine.ContainsEqual(ActiveLayoutEngine))
+		if (!ActiveLayoutEngine.ContainsEqual(engine))
 		{
 			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
 			return;
@@ -447,8 +432,7 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
 
-		// TODO: Shouldn't this be the other way around?
-		if (engine.ContainsEqual(ActiveLayoutEngine))
+		if (!ActiveLayoutEngine.ContainsEqual(engine))
 		{
 			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
 			return;

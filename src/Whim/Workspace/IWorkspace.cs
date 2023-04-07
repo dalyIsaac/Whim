@@ -142,6 +142,13 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Add a phantom window. This can only be done by the active layout engine.
 	/// </summary>
+	/// <remarks>
+	/// Phantom windows are placeholder windows that represent a space in the
+	/// current layout engine.
+	///
+	/// They are designed to let a layout engine reserve a space, for a new window,
+	/// or for a window that is being moved around.
+	/// </remarks>
 	/// <param name="engine">The layout engine to add the phantom window to.</param>
 	/// <param name="window">The phantom window to add.</param>
 	public void AddPhantomWindow(ILayoutEngine engine, IWindow window);
