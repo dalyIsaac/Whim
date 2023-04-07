@@ -343,6 +343,11 @@ internal class Workspace : IWorkspace
 			window.Hide();
 		}
 
+		foreach (IWindow window in _phantomWindows.Keys)
+		{
+			window.Hide();
+		}
+
 		_windowLocations.Clear();
 		DoLayout();
 	}
