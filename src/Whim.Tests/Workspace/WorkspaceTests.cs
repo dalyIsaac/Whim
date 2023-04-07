@@ -323,12 +323,16 @@ public class WorkspaceTests
 		Mock<ILayoutEngine> layoutEngine = new();
 		Workspace workspace =
 			new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object, layoutEngine.Object);
-		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, new Mock<IWindow>().Object);
+
+		Mock<IWindow> phantomWindow = new();
+		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, phantomWindow.Object);
+		workspace.WindowFocused(phantomWindow.Object);
 
 		// When NextLayoutEngine is called
 		workspace.NextLayoutEngine();
 
 		// Then the active layout engine is set to the next one
+		Assert.Null(workspace.LastFocusedWindow);
 		Assert.True(Object.ReferenceEquals(layoutEngine.Object, workspace.ActiveLayoutEngine));
 		mocks.LayoutEngine.Verify(l => l.HidePhantomWindows(), Times.Once);
 	}
@@ -377,6 +381,10 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object, layoutEngine.Object);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, new Mock<IWindow>().Object);
+
+		Mock<IWindow> phantomWindow = new();
+		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, phantomWindow.Object);
+		workspace.WindowFocused(phantomWindow.Object);
 
 		// When PreviousLayoutEngine is called
 		workspace.PreviousLayoutEngine();
