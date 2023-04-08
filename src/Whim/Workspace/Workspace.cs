@@ -422,7 +422,7 @@ internal class Workspace : IWorkspace
 		DoLayout();
 	}
 
-	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false)
+	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window)
 	{
 		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
 
@@ -447,10 +447,7 @@ internal class Workspace : IWorkspace
 		_phantomWindows.Remove(window);
 		_configContext.WorkspaceManager.RemovePhantomWindow(window);
 
-		if (doLayout)
-		{
-			DoLayout();
-		}
+		DoLayout();
 	}
 	#endregion
 

@@ -158,8 +158,7 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="engine">The layout engine to remove the phantom window from.</param>
 	/// <param name="window">The phantom window to remove.</param>
-	/// <param name="doLayout">Indicates whether to do a layout after removing the phantom window.</param>
-	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false);
+	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window);
 	#endregion
 
 	/// <summary>
