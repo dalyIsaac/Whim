@@ -403,6 +403,7 @@ public class WorkspaceTests
 		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
 
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
+		mocks.WorkspaceManager.Reset();
 
 		// Reset mocks
 		window.Reset();
@@ -412,7 +413,7 @@ public class WorkspaceTests
 
 		// Then the window is added to the layout engine
 		mocks.LayoutEngine.Verify(l => l.Add(window.Object), Times.Never);
-		mocks.LayoutEngine.Verify(l => l.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()), Times.Never);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
 	}
 
 	[Fact]
@@ -458,11 +459,12 @@ public class WorkspaceTests
 
 		// When RemoveWindow is called
 		workspace.RemoveWindow(window.Object);
-		workspace.RemoveWindow(window.Object);
+		bool result = workspace.RemoveWindow(window.Object);
 
 		// Then the window is removed from the layout engine
+		Assert.False(result);
 		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Never);
-		mocks.LayoutEngine.Verify(l => l.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()), Times.Never);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
 	}
 
 	[Fact]
@@ -474,26 +476,93 @@ public class WorkspaceTests
 		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
 
 		// When RemoveWindow is called
-		workspace.RemoveWindow(window.Object);
+		bool result = workspace.RemoveWindow(window.Object);
 
 		// Then the window is removed from the layout engine
 		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Never);
-		mocks.LayoutEngine.Verify(l => l.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()), Times.Never);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
 	}
 
 	[Fact]
-	public void RemoveWindow_Fail_DidNotRemoveFromLayoutEngine()
+	public void RemoveWindow_Fails_CannotRemovePhantomWindow()
 	{
 		// Given
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
 
+		// Phantom window is added
+		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
+		mocks.WorkspaceManager.Reset();
+		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(false);
+
 		// When RemoveWindow is called
-		workspace.RemoveWindow(window.Object);
+		bool result = workspace.RemoveWindow(window.Object);
 
 		// Then the window is removed from the layout engine
-		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Never);
-		mocks.LayoutEngine.Verify(l => l.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()), Times.Never);
+		Assert.False(result);
+		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Once);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
+	}
+
+	[Fact]
+	public void RemoveWindow_Success_RemovesPhantomWindow()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+
+		// Phantom window is added
+		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
+		mocks.WorkspaceManager.Reset();
+		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(true);
+
+		// When RemoveWindow is called
+		bool result = workspace.RemoveWindow(window.Object);
+
+		// Then the window is removed from the layout engine
+		Assert.True(result);
+		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Once);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Once);
+	}
+
+	[Fact]
+	public void RemoveWindow_Fails_DidNotRemoveFromLayoutEngine()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddWindow(window.Object);
+		mocks.WorkspaceManager.Reset();
+
+		// When RemoveWindow is called
+		bool result = workspace.RemoveWindow(window.Object);
+
+		// Then the window is removed from the layout engine
+		Assert.False(result);
+		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Once);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
+	}
+
+	[Fact]
+	public void RemoveWindow_Success()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddWindow(window.Object);
+		mocks.WorkspaceManager.Reset();
+		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(true);
+
+		// When RemoveWindow is called
+		bool result = workspace.RemoveWindow(window.Object);
+
+		// Then the window is removed from the layout engine
+		Assert.True(result);
+		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Once);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Once);
 	}
 }

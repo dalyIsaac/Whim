@@ -226,8 +226,8 @@ internal class Workspace : IWorkspace
 			if (removePhantomSuccess)
 			{
 				_phantomWindows.Remove(window);
+				DoLayout();
 			}
-			DoLayout();
 			return removePhantomSuccess;
 		}
 
