@@ -641,4 +641,55 @@ public class WorkspaceTests
 		// Then the layout engine is told to swap the window
 		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(Direction.Up, window.Object), Times.Once);
 	}
+
+	[Fact]
+	public void MoveWindowEdgeInDirection_Fails_WindowIsNull()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		double delta = 0.3;
+
+		// When MoveWindowEdgeInDirection is called
+		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, null);
+
+		// Then the layout engine is not told to move the window
+		mocks.LayoutEngine.Verify(
+			l => l.MoveWindowEdgeInDirection(Direction.Up, delta, It.IsAny<IWindow>()),
+			Times.Never
+		);
+	}
+
+	[Fact]
+	public void MoveWindowEdgeInDirection_Fails_DoesNotContainWindow()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		double delta = 0.3;
+
+		// When MoveWindowEdgeInDirection is called
+		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object);
+
+		// Then the layout engine is not told to move the window
+		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Never);
+	}
+
+	[Fact]
+	public void MoveWindowEdgeInDirection_Success()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddWindow(window.Object);
+		double delta = 0.3;
+
+		// When MoveWindowEdgeInDirection is called
+		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object);
+
+		// Then the layout engine is told to move the window
+		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Once);
+	}
 }
