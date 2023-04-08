@@ -84,7 +84,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	public abstract void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window);
 
 	/// <inheritdoc/>
-	public abstract void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom);
+	public abstract void AddWindowAtPoint(IWindow window, IPoint<double> point);
 
 	/// <inheritdoc/>
 	public void HidePhantomWindows() { }

@@ -62,8 +62,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
-	/// <param name="isPhantom">Whether the window is a phantom window.</param>
-	public void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom = false);
+	public void AddWindowAtPoint(IWindow window, IPoint<double> point);
 
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type

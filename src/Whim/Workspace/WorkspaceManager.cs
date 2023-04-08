@@ -518,7 +518,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(pointInMonitor);
 		Logger.Debug($"Normalized location: {normalized}");
 
-		targetWorkspace.MoveWindowToPoint(window, normalized, isPhantom);
+		targetWorkspace.MoveWindowToPoint(window, normalized);
 		_windowWorkspaceMap[window] = targetWorkspace;
 
 		// Trigger layouts.

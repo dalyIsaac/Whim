@@ -106,7 +106,7 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The origin window
 	/// </param>
-	public void FocusWindowInDirection(Direction direction, IWindow window);
+	public void FocusWindowInDirection(Direction direction, IWindow? window = null);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
@@ -130,18 +130,24 @@ public interface IWorkspace : IDisposable
 	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null);
 
 	/// <summary>
-	/// Moves the given <paramref name="window"/> to the given <paramref name="point"/>.
+	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
-	/// <param name="isPhantom">Indicates whether the window being moved is a phantom window.</param>
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom = false);
+	public void MoveWindowToPoint(IWindow window, IPoint<double> point);
 	#endregion
 
 	#region Phantom Windows
 	/// <summary>
 	/// Add a phantom window. This can only be done by the active layout engine.
 	/// </summary>
+	/// <remarks>
+	/// Phantom windows are placeholder windows that represent a space in the
+	/// current layout engine.
+	///
+	/// They are designed to let a layout engine reserve a space, for a new window,
+	/// or for a window that is being moved around.
+	/// </remarks>
 	/// <param name="engine">The layout engine to add the phantom window to.</param>
 	/// <param name="window">The phantom window to add.</param>
 	public void AddPhantomWindow(ILayoutEngine engine, IWindow window);
@@ -152,8 +158,7 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="engine">The layout engine to remove the phantom window from.</param>
 	/// <param name="window">The phantom window to remove.</param>
-	/// <param name="doLayout">Indicates whether to do a layout after removing the phantom window.</param>
-	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window, bool doLayout = false);
+	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window);
 	#endregion
 
 	/// <summary>

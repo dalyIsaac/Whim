@@ -831,7 +831,7 @@ public class WorkspaceManagerTests
 
 		// Then the window is not removed from the old workspace and not added to the new workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
+		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 	}
 
 	[Fact]
@@ -857,7 +857,7 @@ public class WorkspaceManagerTests
 
 		// Then nothing happens
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
+		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 	}
 
 	[Fact]
@@ -883,7 +883,7 @@ public class WorkspaceManagerTests
 
 		// Then nothing happens
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
+		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 	}
 
 	[Fact]
@@ -911,7 +911,7 @@ public class WorkspaceManagerTests
 
 		// Then the window is removed from the old workspace and added to the new workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>(), false), Times.Never());
+		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 
 		window.Verify(w => w.Focus(), Times.Once());
 	}

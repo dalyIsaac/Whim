@@ -616,12 +616,12 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom)
+	public void AddWindowAtPoint(IWindow window, IPoint<double> point)
 	{
 		if (Root == null)
 		{
 			// Add the window normally.
-			MoveWindowToPointAddWindow(window, isPhantom, null);
+			MoveWindowToPointAddWindow(window, null);
 			return;
 		}
 
@@ -656,7 +656,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 			AddNodeDirection = point.Y < nodeLocation.Y + (nodeLocation.Height / 2) ? Direction.Up : Direction.Down;
 		}
 
-		MoveWindowToPointAddWindow(window, isPhantom, node.Window);
+		MoveWindowToPointAddWindow(window, node.Window);
 
 		// Restore the old direction.
 		AddNodeDirection = oldAddNodeDirection;
@@ -668,11 +668,10 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	/// Otherwise, it calls <see cref="AddWindow(IWindow, IWindow?)"/>.
 	/// </summary>
 	/// <param name="window">The window to add.</param>
-	/// <param name="isPhantom">Whether the window is a phantom window.</param>
 	/// <param name="focusedWindow">The focused window.</param>
-	private void MoveWindowToPointAddWindow(IWindow window, bool isPhantom, IWindow? focusedWindow)
+	private void MoveWindowToPointAddWindow(IWindow window, IWindow? focusedWindow)
 	{
-		if (isPhantom)
+		if (_phantomWindows.Contains(window))
 		{
 			// We don't actually care about this phantom window, as we'll spawn a new one.
 			window.Close();

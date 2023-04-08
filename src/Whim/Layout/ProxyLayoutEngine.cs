@@ -83,8 +83,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	public virtual void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
 
 	/// <inheritdoc/>
-	public virtual void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom) =>
-		InnerLayoutEngine.AddWindowAtPoint(window, point, isPhantom);
+	public virtual void AddWindowAtPoint(IWindow window, IPoint<double> point) =>
+		InnerLayoutEngine.AddWindowAtPoint(window, point);
 
 	/// <summary>
 	/// Checks to see if this <cref name="ILayoutEngine"/>
