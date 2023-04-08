@@ -596,4 +596,49 @@ public class WorkspaceTests
 		// Then the layout engine is told to focus the window
 		mocks.LayoutEngine.Verify(l => l.FocusWindowInDirection(Direction.Up, window.Object), Times.Once);
 	}
+
+	[Fact]
+	public void SwapWindowInDirection_Fails_WindowIsNull()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+
+		// When SwapWindowInDirection is called
+		workspace.SwapWindowInDirection(Direction.Up, null);
+
+		// Then the layout engine is not told to swap the window
+		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(Direction.Up, It.IsAny<IWindow>()), Times.Never);
+	}
+
+	[Fact]
+	public void SwapWindowInDirection_Fails_DoesNotContainWindow()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+
+		// When SwapWindowInDirection is called
+		workspace.SwapWindowInDirection(Direction.Up, window.Object);
+
+		// Then the layout engine is not told to swap the window
+		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(Direction.Up, window.Object), Times.Never);
+	}
+
+	[Fact]
+	public void SwapWindowInDirection_Success()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddWindow(window.Object);
+
+		// When SwapWindowInDirection is called
+		workspace.SwapWindowInDirection(Direction.Up, window.Object);
+
+		// Then the layout engine is told to swap the window
+		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(Direction.Up, window.Object), Times.Once);
+	}
 }
