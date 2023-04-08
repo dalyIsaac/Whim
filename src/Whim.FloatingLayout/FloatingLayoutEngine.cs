@@ -52,9 +52,9 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <summary>
 	/// This method is called when a window is moved.
 	/// </summary>
-	public override void AddWindowAtPoint(IWindow window, IPoint<double> point, bool isPhantom = false)
+	public override void AddWindowAtPoint(IWindow window, IPoint<double> point)
 	{
-		Logger.Debug($"Adding window {window} at point {point}. isPhantom={isPhantom}");
+		Logger.Debug($"Adding window {window} at point {point}");
 		if (_floatingLayoutConfig.IsWindowFloating(window))
 		{
 			UpdateFloatingWindow(window);

@@ -692,4 +692,38 @@ public class WorkspaceTests
 		// Then the layout engine is told to move the window
 		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Once);
 	}
+
+	[Fact]
+	public void MoveWindowToPoint_Success_PhantomWindow()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddWindow(window.Object);
+		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
+
+		// When MoveWindowToPoint is called
+		workspace.MoveWindowToPoint(window.Object, point);
+
+		// Then the layout engine is told to move the window
+		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(window.Object, point), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowToPoint_Success()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace = new(mocks.ConfigContext.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddWindow(window.Object);
+		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
+
+		// When MoveWindowToPoint is called
+		workspace.MoveWindowToPoint(window.Object, point);
+
+		// Then the layout engine is told to move the window
+		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(window.Object, point), Times.Once);
+	}
 }

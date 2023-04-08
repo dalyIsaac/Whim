@@ -307,22 +307,15 @@ internal class Workspace : IWorkspace
 		}
 	}
 
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom)
+	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
-
-		// Double check isPhantom.
-		if (_phantomWindows.ContainsKey(window) && !isPhantom)
-		{
-			Logger.Error($"Window {window} is a phantom window but is not being moved to a phantom point");
-			return;
-		}
 
 		_windows.Add(window);
 
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
-			layoutEngine.AddWindowAtPoint(window, point, isPhantom);
+			layoutEngine.AddWindowAtPoint(window, point);
 		}
 
 		DoLayout();

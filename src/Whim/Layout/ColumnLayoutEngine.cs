@@ -143,7 +143,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override void AddWindowAtPoint(IWindow window, IPoint<double> point, bool _isPhantom)
+	public override void AddWindowAtPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");
 

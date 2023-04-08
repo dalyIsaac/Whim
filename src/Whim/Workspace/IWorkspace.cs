@@ -130,12 +130,11 @@ public interface IWorkspace : IDisposable
 	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null);
 
 	/// <summary>
-	/// Moves the given <paramref name="window"/> to the given <paramref name="point"/>.
+	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
-	/// <param name="isPhantom">Indicates whether the window being moved is a phantom window.</param>
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom = false);
+	public void MoveWindowToPoint(IWindow window, IPoint<double> point);
 	#endregion
 
 	#region Phantom Windows
