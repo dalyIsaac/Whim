@@ -256,59 +256,55 @@ internal class Workspace : IWorkspace
 		return success;
 	}
 
-	public void FocusWindowInDirection(Direction direction, IWindow window)
+	private IWindow? GetValidWindow(IWindow? window)
 	{
-		Logger.Debug($"Focusing window {window} in workspace {Name}");
+		window ??= LastFocusedWindow;
+
+		if (window == null)
+		{
+			Logger.Error($"Could not find a valid window in workspace {Name} to perform action");
+			return null;
+		}
 
 		if (!ContainsWindow(window))
 		{
 			Logger.Error($"Window {window} does not exist in workspace {Name}");
-			return;
+			return null;
 		}
 
-		ActiveLayoutEngine.FocusWindowInDirection(direction, window);
+		return window;
+	}
+
+	public void FocusWindowInDirection(Direction direction, IWindow? window = null)
+	{
+		Logger.Debug($"Focusing window {window} in workspace {Name}");
+
+		if (GetValidWindow(window) is IWindow validWindow)
+		{
+			ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+		}
 	}
 
 	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
-		window ??= LastFocusedWindow;
-		if (window == null)
-		{
-			Logger.Error($"No window to swap in workspace {Name}");
-			return;
-		}
-
 		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
 
-		if (!ContainsWindow(window))
+		if (GetValidWindow(window) is IWindow validWindow)
 		{
-			Logger.Error($"Window {window} does not exist in workspace {Name}");
-			return;
+			ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+			DoLayout();
 		}
-
-		ActiveLayoutEngine.SwapWindowInDirection(direction, window);
-		DoLayout();
 	}
 
 	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null)
 	{
-		window ??= LastFocusedWindow;
-		if (window == null)
-		{
-			Logger.Error($"No window to move in workspace {Name}");
-			return;
-		}
-
 		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edge} by {delta}");
 
-		if (!ContainsWindow(window))
+		if (GetValidWindow(window) is IWindow validWindow)
 		{
-			Logger.Error($"Window {window} does not exist in workspace {Name}");
-			return;
+			ActiveLayoutEngine.MoveWindowEdgeInDirection(edge, delta, validWindow);
+			DoLayout();
 		}
-
-		ActiveLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
-		DoLayout();
 	}
 
 	public void MoveWindowToPoint(IWindow window, IPoint<double> point, bool isPhantom)

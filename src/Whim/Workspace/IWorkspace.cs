@@ -106,7 +106,7 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The origin window
 	/// </param>
-	public void FocusWindowInDirection(Direction direction, IWindow window);
+	public void FocusWindowInDirection(Direction direction, IWindow? window = null);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
