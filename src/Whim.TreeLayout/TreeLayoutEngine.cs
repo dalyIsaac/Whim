@@ -600,7 +600,6 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 
 		_phantomWindows.Add(phantomNode.Window);
 		_configContext.WorkspaceManager.ActiveWorkspace.AddPhantomWindow(this, phantomNode.Window);
-		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
 		phantomNode.Focus();
 	}
 
