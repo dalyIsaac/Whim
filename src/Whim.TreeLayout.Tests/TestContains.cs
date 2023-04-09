@@ -21,7 +21,7 @@ public class TestContains
 	{
 		TestTreeEngine testTreeEngine = new(true);
 		testTreeEngine.ActiveWorkspace.Setup(w => w.LastFocusedWindow).Returns(testTreeEngine.LeftWindow.Object);
-		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper(new Mock<IConfigContext>().Object);
+		(testTreeEngine.Engine as WrapTreeLayoutEngine)!.SplitFocusedWindowWrapper(new Mock<IContext>().Object);
 
 		SplitNode root = (SplitNode)testTreeEngine.Engine.Root!;
 		SplitNode left = (SplitNode)root[0].node;

@@ -9,7 +9,7 @@ public class TestGetAdjacentNode
 
 	private readonly Mock<IMonitor> _monitor = new();
 	private readonly Mock<IMonitorManager> _monitorManager = new();
-	private readonly Mock<IConfigContext> _configContext = new();
+	private readonly Mock<IContext> _context = new();
 
 	public TestGetAdjacentNode()
 	{
@@ -17,7 +17,7 @@ public class TestGetAdjacentNode
 		_monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
 
 		_monitorManager.Setup(m => m.FocusedMonitor).Returns(_monitor.Object);
-		_configContext.Setup(c => c.MonitorManager).Returns(_monitorManager.Object);
+		_context.Setup(c => c.MonitorManager).Returns(_monitorManager.Object);
 	}
 
 	#region GetAdjacentNode

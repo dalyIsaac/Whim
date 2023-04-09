@@ -40,12 +40,12 @@ public class WorkspaceModel : INotifyPropertyChanged
 	/// <summary>
 	/// Initializes a new instance of the <see cref="WorkspaceModel"/> class.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="viewModel"></param>
 	/// <param name="workspace"></param>
 	/// <param name="activeOnMonitor"></param>
 	public WorkspaceModel(
-		IConfigContext configContext,
+		IContext context,
 		WorkspaceWidgetViewModel viewModel,
 		IWorkspace workspace,
 		bool activeOnMonitor
@@ -53,7 +53,7 @@ public class WorkspaceModel : INotifyPropertyChanged
 	{
 		Workspace = workspace;
 		ActiveOnMonitor = activeOnMonitor;
-		SwitchWorkspaceCommand = new SwitchWorkspaceCommand(configContext, viewModel, this);
+		SwitchWorkspaceCommand = new SwitchWorkspaceCommand(context, viewModel, this);
 	}
 
 	/// <inheritdoc/>

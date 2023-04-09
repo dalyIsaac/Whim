@@ -19,17 +19,17 @@ public class MonitorManagerTests
 	{
 		private RECT[] _monitorRects;
 
-		public Mock<IConfigContext> ConfigContext { get; }
+		public Mock<IContext> Context { get; }
 		public Mock<IWorkspaceManager> WorkspaceManager { get; }
 		public Mock<ICoreNativeManager> CoreNativeManager { get; }
 		public Mock<IWindowMessageMonitor> WindowMessageMonitor { get; }
 
 		public MocksBuilder()
 		{
-			ConfigContext = new();
+			Context = new();
 
 			WorkspaceManager = new();
-			ConfigContext.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
+			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 
 			CoreNativeManager = new();
 			UpdateGetCurrentMonitors(
@@ -147,7 +147,7 @@ public class MonitorManagerTests
 		// When
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -171,7 +171,7 @@ public class MonitorManagerTests
 		var result = Assert.Throws<Exception>(
 			() =>
 				new MonitorManager(
-					mocksBuilder.ConfigContext.Object,
+					mocksBuilder.Context.Object,
 					mocksBuilder.CoreNativeManager.Object,
 					mocksBuilder.WindowMessageMonitor.Object
 				)
@@ -185,7 +185,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -215,11 +215,11 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 
 		mocksBuilder.WorkspaceManager.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns((IMonitor?)null);
-		mocksBuilder.ConfigContext.SetupGet(c => c.WorkspaceManager).Returns(mocksBuilder.WorkspaceManager.Object);
+		mocksBuilder.Context.SetupGet(c => c.WorkspaceManager).Returns(mocksBuilder.WorkspaceManager.Object);
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -244,11 +244,11 @@ public class MonitorManagerTests
 		mocksBuilder.WorkspaceManager
 			.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>()))
 			.Returns(monitorMock.Object);
-		mocksBuilder.ConfigContext.SetupGet(c => c.WorkspaceManager).Returns(mocksBuilder.WorkspaceManager.Object);
+		mocksBuilder.Context.SetupGet(c => c.WorkspaceManager).Returns(mocksBuilder.WorkspaceManager.Object);
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -284,7 +284,7 @@ public class MonitorManagerTests
 		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -369,7 +369,7 @@ public class MonitorManagerTests
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -426,7 +426,7 @@ public class MonitorManagerTests
 		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -474,7 +474,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -498,7 +498,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -528,7 +528,7 @@ public class MonitorManagerTests
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -554,7 +554,7 @@ public class MonitorManagerTests
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -574,7 +574,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -594,7 +594,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -614,7 +614,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -634,7 +634,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -654,7 +654,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -674,7 +674,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -694,7 +694,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);
@@ -718,7 +718,7 @@ public class MonitorManagerTests
 		MocksBuilder mocksBuilder = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.ConfigContext.Object,
+				mocksBuilder.Context.Object,
 				mocksBuilder.CoreNativeManager.Object,
 				mocksBuilder.WindowMessageMonitor.Object
 			);

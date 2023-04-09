@@ -9,7 +9,7 @@ public class WorkspaceManagerTests
 {
 	private class MocksBuilder
 	{
-		public Mock<IConfigContext> ConfigContext { get; } = new();
+		public Mock<IContext> Context { get; } = new();
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IMonitor>[] Monitors { get; }
 		public Mock<IRouterManager> RouterManager { get; } = new();
@@ -21,7 +21,7 @@ public class WorkspaceManagerTests
 			int focusedMonitorIndex = 0
 		)
 		{
-			ConfigContext.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
+			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
 
 			Monitors = monitors ?? new[] { new Mock<IMonitor>(), new Mock<IMonitor>() };
 			MonitorManager.Setup(m => m.Length).Returns(Monitors.Length);
@@ -39,9 +39,9 @@ public class WorkspaceManagerTests
 			}
 
 			RouterManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(null as IWorkspace);
-			ConfigContext.Setup(c => c.RouterManager).Returns(RouterManager.Object);
+			Context.Setup(c => c.RouterManager).Returns(RouterManager.Object);
 
-			WorkspaceManager = new(ConfigContext.Object);
+			WorkspaceManager = new(Context.Object);
 			foreach (Mock<IWorkspace> workspace in workspaces ?? Array.Empty<Mock<IWorkspace>>())
 			{
 				WorkspaceManager.Add(workspace.Object);
@@ -923,8 +923,8 @@ public class WorkspaceManagerTests
 		MocksBuilder mocks = new();
 
 		Mock<ILayoutEngine> layoutEngine = new();
-		Mock<Workspace> workspace = new(mocks.ConfigContext.Object, "test", layoutEngine.Object);
-		Mock<Workspace> workspace2 = new(mocks.ConfigContext.Object, "test", layoutEngine.Object);
+		Mock<Workspace> workspace = new(mocks.Context.Object, "test", layoutEngine.Object);
+		Mock<Workspace> workspace2 = new(mocks.Context.Object, "test", layoutEngine.Object);
 
 		mocks.WorkspaceManager.Add(workspace.Object);
 		mocks.WorkspaceManager.Add(workspace2.Object);
@@ -963,7 +963,7 @@ public class WorkspaceManagerTests
 
 		Mock<IRouterManager> routerManager = new();
 		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
-		mocks.ConfigContext.Setup(c => c.RouterManager).Returns(routerManager.Object);
+		mocks.Context.Setup(c => c.RouterManager).Returns(routerManager.Object);
 
 		// A window is added to the workspace
 		Mock<IWindow> window = new();
@@ -985,7 +985,7 @@ public class WorkspaceManagerTests
 
 		Mock<IRouterManager> routerManager = new();
 		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
-		mocks.ConfigContext.Setup(c => c.RouterManager).Returns(routerManager.Object);
+		mocks.Context.Setup(c => c.RouterManager).Returns(routerManager.Object);
 
 		Mock<IWindow> window = new();
 
@@ -1034,10 +1034,8 @@ public class WorkspaceManagerTests
 
 		MocksBuilder mocks = new(new[] { workspace, workspace2 });
 
-		Mock<Func<IConfigContext, string, IWorkspace>> workspaceFactory = new();
-		workspaceFactory
-			.Setup(f => f(mocks.ConfigContext.Object, It.IsAny<string>()))
-			.Returns(new Mock<IWorkspace>().Object);
+		Mock<Func<IContext, string, IWorkspace>> workspaceFactory = new();
+		workspaceFactory.Setup(f => f(mocks.Context.Object, It.IsAny<string>())).Returns(new Mock<IWorkspace>().Object);
 		mocks.WorkspaceManager.WorkspaceFactory = workspaceFactory.Object;
 
 		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
@@ -1055,7 +1053,7 @@ public class WorkspaceManagerTests
 		);
 
 		// Then a new workspace is created
-		workspaceFactory.Verify(f => f(mocks.ConfigContext.Object, "Workspace 3"), Times.Once());
+		workspaceFactory.Verify(f => f(mocks.Context.Object, "Workspace 3"), Times.Once());
 	}
 
 	[Fact]

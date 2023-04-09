@@ -32,6 +32,6 @@ public partial class DateTimeWidget : UserControl
 	/// <returns></returns>
 	public static BarComponent CreateComponent(int interval = 100, string format = "HH:mm:ss dd-MMM-yyyy")
 	{
-		return new BarComponent((configContext, monitor, window) => new DateTimeWidget(interval, format));
+		return new BarComponent((context, monitor, window) => new DateTimeWidget(interval, format));
 	}
 }

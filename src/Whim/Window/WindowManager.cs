@@ -9,7 +9,7 @@ namespace Whim;
 
 internal class WindowManager : IWindowManager
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
 
 	public event EventHandler<WindowEventArgs>? WindowAdded;
@@ -44,9 +44,9 @@ internal class WindowManager : IWindowManager
 	/// </summary>
 	private bool _disposedValue;
 
-	public WindowManager(IConfigContext configContext, ICoreNativeManager coreNativeManager)
+	public WindowManager(IContext context, ICoreNativeManager coreNativeManager)
 	{
-		_configContext = configContext;
+		_context = context;
 		_coreNativeManager = coreNativeManager;
 		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
 	}
@@ -109,7 +109,7 @@ internal class WindowManager : IWindowManager
 	public IWindow? CreateWindow(HWND hwnd)
 	{
 		Logger.Debug($"Adding window {hwnd}");
-		return Window.CreateWindow(_configContext, _coreNativeManager, hwnd);
+		return Window.CreateWindow(_context, _coreNativeManager, hwnd);
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -272,7 +272,7 @@ internal class WindowManager : IWindowManager
 			Logger.Debug($"Window {hwnd.Value} could not be created");
 			return null;
 		}
-		else if (_configContext.FilterManager.ShouldBeIgnored(window))
+		else if (_context.FilterManager.ShouldBeIgnored(window))
 		{
 			Logger.Debug($"Window {window} is filtered");
 			return null;
@@ -299,7 +299,7 @@ internal class WindowManager : IWindowManager
 	internal void OnWindowAdded(IWindow window)
 	{
 		Logger.Debug($"Window added: {window}");
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowAdded(window);
+		(_context.WorkspaceManager as WorkspaceManager)?.WindowAdded(window);
 		WindowAdded?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
@@ -312,8 +312,8 @@ internal class WindowManager : IWindowManager
 	internal void OnWindowFocused(IWindow window)
 	{
 		Logger.Debug($"Window focused: {window}");
-		(_configContext.MonitorManager as MonitorManager)?.WindowFocused(window);
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowFocused(window);
+		(_context.MonitorManager as MonitorManager)?.WindowFocused(window);
+		(_context.WorkspaceManager as WorkspaceManager)?.WindowFocused(window);
 		WindowFocused?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
@@ -328,7 +328,7 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Window hidden: {window}");
 
-		if (_configContext.WorkspaceManager.GetMonitorForWindow(window) == null)
+		if (_context.WorkspaceManager.GetMonitorForWindow(window) == null)
 		{
 			Logger.Debug($"Window {window} is not on a monitor, ignoring event");
 			return;
@@ -341,7 +341,7 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Window removed: {window}");
 		_windows.Remove(window.Handle);
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowRemoved(window);
+		(_context.WorkspaceManager as WorkspaceManager)?.WindowRemoved(window);
 		WindowRemoved?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
@@ -371,10 +371,7 @@ internal class WindowManager : IWindowManager
 			// Move the window.
 			if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
 			{
-				_configContext.WorkspaceManager.MoveWindowToPoint(
-					window,
-					new Point<int>() { X = point.X, Y = point.Y }
-				);
+				_context.WorkspaceManager.MoveWindowToPoint(window, new Point<int>() { X = point.X, Y = point.Y });
 			}
 
 			_mouseMoveWindow = null;
@@ -392,14 +389,14 @@ internal class WindowManager : IWindowManager
 	internal void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowMinimizeStart(window);
+		(_context.WorkspaceManager as WorkspaceManager)?.WindowMinimizeStart(window);
 		WindowMinimizeStart?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	internal void OnWindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize ended: {window}");
-		(_configContext.WorkspaceManager as WorkspaceManager)?.WindowMinimizeEnd(window);
+		(_context.WorkspaceManager as WorkspaceManager)?.WindowMinimizeEnd(window);
 		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 }

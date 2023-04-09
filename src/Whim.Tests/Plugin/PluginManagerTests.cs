@@ -12,20 +12,14 @@ namespace Whim.Tests;
 )]
 public class PluginManagerTests
 {
-	private static (
-		Mock<IConfigContext>,
-		Mock<ICommandManager>,
-		Mock<IPlugin>,
-		Mock<IPlugin>,
-		Mock<IPlugin>
-	) CreateStubs()
+	private static (Mock<IContext>, Mock<ICommandManager>, Mock<IPlugin>, Mock<IPlugin>, Mock<IPlugin>) CreateStubs()
 	{
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 
 		Mock<ICommandManager> commandManager = new();
 		commandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
 
-		configContext.Setup(cc => cc.CommandManager).Returns(commandManager.Object);
+		context.Setup(cc => cc.CommandManager).Returns(commandManager.Object);
 
 		Mock<IPlugin> plugin1 = new();
 		plugin1.Setup(p => p.Name).Returns("Plugin1");
@@ -36,7 +30,7 @@ public class PluginManagerTests
 		Mock<IPlugin> plugin3 = new();
 		plugin3.Setup(p => p.Name).Returns("Plugin3");
 
-		return (configContext, commandManager, plugin1, plugin2, plugin3);
+		return (context, commandManager, plugin1, plugin2, plugin3);
 	}
 
 	[Fact]
@@ -44,14 +38,14 @@ public class PluginManagerTests
 	{
 		// Given
 		(
-			Mock<IConfigContext> configContext,
+			Mock<IContext> context,
 			Mock<ICommandManager> commandManager,
 			Mock<IPlugin> plugin1,
 			Mock<IPlugin> plugin2,
 			Mock<IPlugin> plugin3
 		) = CreateStubs();
 
-		PluginManager pluginManager = new(configContext.Object);
+		PluginManager pluginManager = new(context.Object);
 		pluginManager.AddPlugin(plugin1.Object);
 		pluginManager.AddPlugin(plugin2.Object);
 		pluginManager.AddPlugin(plugin3.Object);
@@ -69,10 +63,10 @@ public class PluginManagerTests
 	public void PostInitialize()
 	{
 		// Given
-		(Mock<IConfigContext> configContext, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
+		(Mock<IContext> context, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
 			CreateStubs();
 
-		PluginManager pluginManager = new(configContext.Object);
+		PluginManager pluginManager = new(context.Object);
 		pluginManager.AddPlugin(plugin1.Object);
 		pluginManager.AddPlugin(plugin2.Object);
 		pluginManager.AddPlugin(plugin3.Object);
@@ -90,10 +84,10 @@ public class PluginManagerTests
 	public void AddPlugin()
 	{
 		// Given
-		(Mock<IConfigContext> configContext, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
+		(Mock<IContext> context, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
 			CreateStubs();
 
-		PluginManager pluginManager = new(configContext.Object);
+		PluginManager pluginManager = new(context.Object);
 
 		// When
 		pluginManager.AddPlugin(plugin1.Object);
@@ -108,12 +102,12 @@ public class PluginManagerTests
 	public void AddPlugin_DuplicateName()
 	{
 		// Given
-		(Mock<IConfigContext> configContext, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
+		(Mock<IContext> context, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
 			CreateStubs();
 
 		plugin2.Setup(p => p.Name).Returns("Plugin1");
 
-		PluginManager pluginManager = new(configContext.Object);
+		PluginManager pluginManager = new(context.Object);
 
 		// When
 		pluginManager.AddPlugin(plugin1.Object);
@@ -127,10 +121,10 @@ public class PluginManagerTests
 	public void Contains()
 	{
 		// Given
-		(Mock<IConfigContext> configContext, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
+		(Mock<IContext> context, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
 			CreateStubs();
 
-		PluginManager pluginManager = new(configContext.Object);
+		PluginManager pluginManager = new(context.Object);
 		pluginManager.AddPlugin(plugin1.Object);
 		pluginManager.AddPlugin(plugin2.Object);
 		pluginManager.AddPlugin(plugin3.Object);

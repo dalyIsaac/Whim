@@ -5,14 +5,14 @@ namespace Whim;
 
 internal class RouterManager : IRouterManager
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly List<Router> _routers = new();
 
 	public bool RouteToActiveWorkspace { get; set; }
 
-	public RouterManager(IConfigContext configContext)
+	public RouterManager(IContext context)
 	{
-		_configContext = configContext;
+		_context = context;
 	}
 
 	public void Add(Router router)
@@ -35,7 +35,7 @@ internal class RouterManager : IRouterManager
 		{
 			if (window.ProcessName.ToLower() == processName)
 			{
-				return _configContext.WorkspaceManager.TryGet(workspaceName);
+				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -65,7 +65,7 @@ internal class RouterManager : IRouterManager
 		{
 			if (window.Title.ToLower() == title)
 			{
-				return _configContext.WorkspaceManager.TryGet(workspaceName);
+				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -95,7 +95,7 @@ internal class RouterManager : IRouterManager
 		{
 			if (regex.IsMatch(window.Title))
 			{
-				return _configContext.WorkspaceManager.TryGet(workspaceName);
+				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});
@@ -142,7 +142,7 @@ internal class RouterManager : IRouterManager
 		{
 			if (window.WindowClass.ToLower() == windowClass)
 			{
-				return _configContext.WorkspaceManager.TryGet(workspaceName);
+				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
 			return null;
 		});

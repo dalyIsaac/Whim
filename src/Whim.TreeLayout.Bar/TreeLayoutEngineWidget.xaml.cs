@@ -18,10 +18,10 @@ public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 	/// </summary>
 	public TreeLayoutEngineWidgetViewModel ViewModel { get; }
 
-	internal TreeLayoutEngineWidget(IConfigContext configContext, IMonitor monitor, Microsoft.UI.Xaml.Window window)
+	internal TreeLayoutEngineWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window)
 	{
 		_window = window;
-		ViewModel = new TreeLayoutEngineWidgetViewModel(configContext, monitor);
+		ViewModel = new TreeLayoutEngineWidgetViewModel(context, monitor);
 		window.Closed += Window_Closed;
 		UIElementExtensions.InitializeComponent(this, "Whim.TreeLayout.Bar", "TreeLayoutEngineWidget");
 	}
@@ -36,9 +36,7 @@ public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 	/// </summary>
 	public static BarComponent CreateComponent()
 	{
-		return new BarComponent(
-			(configContext, monitor, window) => new TreeLayoutEngineWidget(configContext, monitor, window)
-		);
+		return new BarComponent((context, monitor, window) => new TreeLayoutEngineWidget(context, monitor, window));
 	}
 
 	/// <inheritdoc/>

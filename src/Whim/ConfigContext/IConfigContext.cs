@@ -5,13 +5,13 @@ namespace Whim;
 /// <summary>
 /// This is the core of Whim. <br/>
 ///
-/// <c>IConfigContext</c> consists of managers which contain and control Whim's state, and thus
+/// <c>IContext</c> consists of managers which contain and control Whim's state, and thus
 /// functionality. <br/>
 ///
-/// <c>IConfigContext</c> also contains other associated state and functionality, like the
+/// <c>IContext</c> also contains other associated state and functionality, like the
 /// <see cref="Logger"/>.
 /// </summary>
-public interface IConfigContext
+public interface IContext
 {
 	/// <summary>
 	/// Whim's <see cref="Logger"/> instances.
@@ -68,17 +68,17 @@ public interface IConfigContext
 	public void Initialize();
 
 	/// <summary>
-	/// This event is fired when the config context is shutting down.
+	/// This event is fired when the context is shutting down.
 	/// </summary>
 	public event EventHandler<ExitEventArgs>? Exiting;
 
 	/// <summary>
-	/// This event is fired after the config context has been shut down.
+	/// This event is fired after the context has been shut down.
 	/// </summary>
 	public event EventHandler<ExitEventArgs>? Exited;
 
 	/// <summary>
-	/// This is called to shutdown the config context.
+	/// This is called to shutdown the context.
 	/// </summary>
 	/// <param name="args">
 	/// The shutdown event arguments. If this is not provided, we assume

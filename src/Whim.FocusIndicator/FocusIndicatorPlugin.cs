@@ -8,7 +8,7 @@ namespace Whim.FocusIndicator;
 /// <inheritdoc/>
 public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
 	private FocusIndicatorWindow? _focusIndicatorWindow;
 	private DispatcherTimer? _dispatcherTimer;
@@ -20,44 +20,44 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	/// <summary>
 	/// Creates a new instance of the focus indicator plugin.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="focusIndicatorConfig"></param>
-	public FocusIndicatorPlugin(IConfigContext configContext, FocusIndicatorConfig focusIndicatorConfig)
+	public FocusIndicatorPlugin(IContext context, FocusIndicatorConfig focusIndicatorConfig)
 	{
-		_configContext = configContext;
+		_context = context;
 		_focusIndicatorConfig = focusIndicatorConfig;
 	}
 
 	/// <inheritdoc/>
 	public void PreInitialize()
 	{
-		_configContext.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
+		_context.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 
 		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
 
-		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 
-		_configContext.WindowManager.WindowAdded += WindowManager_EventSink;
-		_configContext.WindowManager.WindowRemoved += WindowManager_EventSink;
-		_configContext.WindowManager.WindowMoveStart += WindowManager_EventSink;
-		_configContext.WindowManager.WindowMoved += WindowManager_EventSink;
-		_configContext.WindowManager.WindowMinimizeStart += WindowManager_EventSink;
-		_configContext.WindowManager.WindowMinimizeEnd += WindowManager_EventSink;
+		_context.WindowManager.WindowAdded += WindowManager_EventSink;
+		_context.WindowManager.WindowRemoved += WindowManager_EventSink;
+		_context.WindowManager.WindowMoveStart += WindowManager_EventSink;
+		_context.WindowManager.WindowMoved += WindowManager_EventSink;
+		_context.WindowManager.WindowMinimizeStart += WindowManager_EventSink;
+		_context.WindowManager.WindowMinimizeEnd += WindowManager_EventSink;
 	}
 
 	/// <inheritdoc/>
 	public void PostInitialize()
 	{
 		// The window must be created on the UI thread (so don't do it in the constructor).
-		_focusIndicatorWindow = new FocusIndicatorWindow(_configContext, _focusIndicatorConfig);
+		_focusIndicatorWindow = new FocusIndicatorWindow(_context, _focusIndicatorConfig);
 
 		// Activate the window so it renders.
 		_focusIndicatorWindow.Activate();
-		_focusIndicatorWindow.Hide(_configContext);
+		_focusIndicatorWindow.Hide(_context);
 
 		// Only subscribe to workspace changes once the indicator window has been created - we shouldn't
 		// show a window which doesn't yet exist (it'll just crash Whim).
-		_configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
+		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
@@ -98,7 +98,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	private void Show(IWindow? window = null)
 	{
 		Logger.Debug("Showing focus indicator");
-		IWorkspace activeWorkspace = _configContext.WorkspaceManager.ActiveWorkspace;
+		IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
 		window ??= activeWorkspace.LastFocusedWindow;
 		if (window == null)
 		{
@@ -132,7 +132,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	private void Hide()
 	{
 		Logger.Debug("Hiding focus indicator");
-		_focusIndicatorWindow?.Hide(_configContext);
+		_focusIndicatorWindow?.Hide(_context);
 		if (_dispatcherTimer != null)
 		{
 			_dispatcherTimer.Stop();
@@ -148,13 +148,13 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_configContext.WindowManager.WindowFocused -= WindowManager_WindowFocused;
-				_configContext.WindowManager.WindowAdded -= WindowManager_EventSink;
-				_configContext.WindowManager.WindowRemoved -= WindowManager_EventSink;
-				_configContext.WindowManager.WindowMoveStart -= WindowManager_EventSink;
-				_configContext.WindowManager.WindowMoved -= WindowManager_EventSink;
-				_configContext.WindowManager.WindowMinimizeStart -= WindowManager_EventSink;
-				_configContext.WindowManager.WindowMinimizeEnd -= WindowManager_EventSink;
+				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
+				_context.WindowManager.WindowAdded -= WindowManager_EventSink;
+				_context.WindowManager.WindowRemoved -= WindowManager_EventSink;
+				_context.WindowManager.WindowMoveStart -= WindowManager_EventSink;
+				_context.WindowManager.WindowMoved -= WindowManager_EventSink;
+				_context.WindowManager.WindowMinimizeStart -= WindowManager_EventSink;
+				_context.WindowManager.WindowMinimizeEnd -= WindowManager_EventSink;
 				_focusIndicatorWindow?.Close();
 			}
 

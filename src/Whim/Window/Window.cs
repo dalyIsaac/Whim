@@ -8,7 +8,7 @@ namespace Whim;
 
 internal class Window : IWindow
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
 
 	/// <inheritdoc/>
@@ -18,7 +18,7 @@ internal class Window : IWindow
 	public string Title => _coreNativeManager.GetWindowText(Handle);
 
 	/// <inheritdoc/>
-	public string WindowClass => _configContext.NativeManager.GetClassName(Handle);
+	public string WindowClass => _context.NativeManager.GetClassName(Handle);
 
 	/// <inheritdoc/>
 	public ILocation<int> Location
@@ -78,7 +78,7 @@ internal class Window : IWindow
 	public void Close()
 	{
 		Logger.Debug(ToString());
-		_configContext.NativeManager.QuitWindow(Handle);
+		_context.NativeManager.QuitWindow(Handle);
 	}
 
 	/// <inheritdoc/>
@@ -92,7 +92,7 @@ internal class Window : IWindow
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
-		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(this);
+		(_context.WindowManager as WindowManager)?.OnWindowFocused(this);
 	}
 
 	/// <inheritdoc/>
@@ -112,14 +112,14 @@ internal class Window : IWindow
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
-		(_configContext.WindowManager as WindowManager)?.OnWindowFocused(this);
+		(_context.WindowManager as WindowManager)?.OnWindowFocused(this);
 	}
 
 	/// <inheritdoc/>
 	public void Hide()
 	{
 		Logger.Debug(ToString());
-		_configContext.NativeManager.HideWindow(Handle);
+		_context.NativeManager.HideWindow(Handle);
 	}
 
 	/// <inheritdoc/>
@@ -144,32 +144,32 @@ internal class Window : IWindow
 	public void ShowMaximized()
 	{
 		Logger.Debug(ToString());
-		_configContext.NativeManager.ShowWindowMaximized(Handle);
+		_context.NativeManager.ShowWindowMaximized(Handle);
 	}
 
 	/// <inheritdoc/>
 	public void ShowMinimized()
 	{
 		Logger.Debug(ToString());
-		_configContext.NativeManager.ShowWindowMinimized(Handle);
+		_context.NativeManager.ShowWindowMinimized(Handle);
 	}
 
 	/// <inheritdoc/>
 	public void ShowNormal()
 	{
 		Logger.Debug(ToString());
-		_configContext.NativeManager.ShowWindowNoActivate(Handle);
+		_context.NativeManager.ShowWindowNoActivate(Handle);
 	}
 
 	/// <summary>
 	/// Constructor for the <see cref="IWindow"/> implementation.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="coreNativeManager"></param>
 	/// <exception cref="Win32Exception"></exception>
-	private Window(IConfigContext configContext, ICoreNativeManager coreNativeManager)
+	private Window(IContext context, ICoreNativeManager coreNativeManager)
 	{
-		_configContext = configContext;
+		_context = context;
 		_coreNativeManager = coreNativeManager;
 	}
 
@@ -177,11 +177,11 @@ internal class Window : IWindow
 	/// Tries to create a new <see cref="IWindow"/> with the given <paramref name="hwnd"/>.
 	/// Otherwise, returns <see langword="null"/>.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="coreNativeManager"></param>
 	/// <param name="hwnd">The handle of the window.</param>
 	/// <returns></returns>
-	public static IWindow? CreateWindow(IConfigContext configContext, ICoreNativeManager coreNativeManager, HWND hwnd)
+	public static IWindow? CreateWindow(IContext context, ICoreNativeManager coreNativeManager, HWND hwnd)
 	{
 		string processName;
 		string processFileName;
@@ -206,7 +206,7 @@ internal class Window : IWindow
 			return null;
 		}
 
-		return new Window(configContext, coreNativeManager)
+		return new Window(context, coreNativeManager)
 		{
 			Handle = hwnd,
 			ProcessId = processId,

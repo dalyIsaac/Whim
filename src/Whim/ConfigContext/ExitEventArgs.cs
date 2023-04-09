@@ -3,7 +3,7 @@ using System;
 namespace Whim;
 
 /// <summary>
-/// Event arguments for the <see cref="IConfigContext.Exiting"/> event.
+/// Event arguments for the <see cref="IContext.Exiting"/> event.
 /// </summary>
 public class ExitEventArgs : EventArgs
 {

@@ -15,13 +15,13 @@ public interface IPluginManager : IDisposable
 
 	/// <summary>
 	/// Calls all plugins' <see cref="IPlugin.PreInitialize"/> method.
-	/// This runs before the rest of the config context has been initialized.
+	/// This runs before the rest of the context has been initialized.
 	/// </summary>
 	public void PreInitialize();
 
 	/// <summary>
 	/// Calls all plugins' <see cref="IPlugin.PostInitialize"/> method.
-	/// This runs after the rest of the config context has been initialized.
+	/// This runs after the rest of the context has been initialized.
 	///
 	/// <br />
 	///

@@ -9,7 +9,7 @@ namespace Whim.TreeLayout.Bar;
 /// </summary>
 public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly IMonitor _monitor;
 	private bool _disposedValue;
 
@@ -56,17 +56,17 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 	/// <summary>
 	/// Initializes a new instance of <see cref="TreeLayoutEngineWidgetViewModel"/>.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="monitor"></param>
-	public TreeLayoutEngineWidgetViewModel(IConfigContext configContext, IMonitor monitor)
+	public TreeLayoutEngineWidgetViewModel(IContext context, IMonitor monitor)
 	{
-		_configContext = configContext;
+		_context = context;
 		_monitor = monitor;
 		ToggleDirectionCommand = new ToggleDirectionCommand(this);
 		UpdateNodeDirection();
 
-		_configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
-		_configContext.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
+		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
+		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
 	}
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
@@ -81,13 +81,13 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 	private void UpdateNodeDirection()
 	{
-		if (_monitor != _configContext.MonitorManager.FocusedMonitor)
+		if (_monitor != _context.MonitorManager.FocusedMonitor)
 		{
 			DirectionValue = null;
 			return;
 		}
 
-		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
+		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
 		ITreeLayoutEngine? engine = rootEngine.GetLayoutEngine<TreeLayoutEngine>();
 
 		if (engine is null)
@@ -109,7 +109,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 			return;
 		}
 
-		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
+		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
 		ITreeLayoutEngine? engine = rootEngine.GetLayoutEngine<TreeLayoutEngine>();
 
 		if (engine is null)
@@ -154,8 +154,8 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_configContext.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
-				_configContext.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
+				_context.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
+				_context.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

@@ -8,21 +8,21 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 {
 	public static double TextEntryHeight => 32;
 
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly IWindow _window;
 
 	public ICommandPaletteWindowViewModel ViewModel { get; private set; }
 
-	public CommandPaletteWindow(IConfigContext configContext, CommandPalettePlugin plugin)
+	public CommandPaletteWindow(IContext context, CommandPalettePlugin plugin)
 	{
-		_configContext = configContext;
+		_context = context;
 
-		ViewModel = new CommandPaletteWindowViewModel(_configContext, plugin);
+		ViewModel = new CommandPaletteWindowViewModel(_context, plugin);
 		ViewModel.HideRequested += ViewModel_HideRequested;
 		ViewModel.FocusTextBoxRequested += ViewModel_FocusTextBoxRequested;
 		ViewModel.SetWindowPosRequested += ViewModel_SetWindowPosRequested;
 
-		_window = this.InitializeBorderlessWindow(_configContext, "Whim.CommandPalette", "CommandPaletteWindow");
+		_window = this.InitializeBorderlessWindow(_context, "Whim.CommandPalette", "CommandPaletteWindow");
 		this.SetIsShownInSwitchers(false);
 		Activated += CommandPaletteWindow_Activated;
 		Title = CommandPaletteConfig.Title;
@@ -154,7 +154,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		WindowContainer.MaxHeight = height;
 
 		WindowDeferPosHandle.SetWindowPosFixScaling(
-			_configContext,
+			_context,
 			windowState: new WindowState()
 			{
 				Window = _window,

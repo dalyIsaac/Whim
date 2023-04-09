@@ -7,7 +7,7 @@ namespace Whim.TreeLayout;
 /// <inheritdoc />
 public partial class TreeLayoutEngine : ITreeLayoutEngine
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
 	private readonly HashSet<IWindow> _phantomWindows = new();
 
@@ -31,11 +31,11 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	/// <summary>
 	/// Creates a new tree layout engine.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="name"></param>
-	public TreeLayoutEngine(IConfigContext configContext, string name = "Tree")
+	public TreeLayoutEngine(IContext context, string name = "Tree")
 	{
-		_configContext = configContext;
+		_context = context;
 		Name = name;
 	}
 
@@ -55,7 +55,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
 		// Get the focused window node
-		focusedWindow ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		focusedWindow ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
 		WindowNode node = new(window);
 		if (AddLeafNode(node, focusedWindow))
@@ -82,7 +82,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		IWindow window = newLeaf.Window;
 
 		// Get the focused window node
-		focusedWindow ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		focusedWindow ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
 		// If the engine doesn't have the focused window, set the focused window to null.
 		// This can occur when the focused window was a floating window.
@@ -198,7 +198,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		parent.Replace(phantomNode, windowNode);
 		phantomNode.Close();
 		_phantomWindows.Remove(phantomNode.Window);
-		_configContext.WorkspaceManager.ActiveWorkspace.RemovePhantomWindow(this, phantomNode.Window);
+		_context.WorkspaceManager.ActiveWorkspace.RemovePhantomWindow(this, phantomNode.Window);
 	}
 
 	/// <inheritdoc/>
@@ -219,7 +219,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		if (removingNode is PhantomNode phantomNode)
 		{
 			_phantomWindows.Remove(phantomNode.Window);
-			_configContext.WorkspaceManager.ActiveWorkspace.RemovePhantomWindow(this, phantomNode.Window);
+			_context.WorkspaceManager.ActiveWorkspace.RemovePhantomWindow(this, phantomNode.Window);
 		}
 
 		// Remove the node from the tree.
@@ -485,7 +485,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		}
 
 		// We use this monitor to determine the delta we use for the internal calculations.
-		IMonitor monitor = _configContext.MonitorManager.FocusedMonitor;
+		IMonitor monitor = _context.MonitorManager.FocusedMonitor;
 
 		// Get the coordinates of the node.
 		ILocation<double> nodeLocation = GetNodeLocation(node);
@@ -525,7 +525,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	public void FlipAndMerge()
 	{
 		Logger.Debug($"Flipping and merging split node for the focused window in layout engine {Name}");
-		IWindow? focusedWindow = _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		IWindow? focusedWindow = _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
 		if (focusedWindow == null)
 		{
@@ -551,7 +551,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 			// There is no grandparent, so just flip.
 			parent.Flip();
 
-			_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+			_context.WorkspaceManager.ActiveWorkspace.DoLayout();
 			return;
 		}
 
@@ -559,7 +559,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		SplitNode grandparent = parent.Parent;
 		grandparent.MergeChild(parent);
 
-		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
 	/// <summary>
@@ -583,7 +583,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		Logger.Debug($"Splitting focused window in layout engine {Name} with focused window {focusedWindow}");
 
 		// Create the phantom window.
-		phantomNode ??= PhantomNode.CreatePhantomNode(_configContext);
+		phantomNode ??= PhantomNode.CreatePhantomNode(_context);
 		if (phantomNode == null)
 		{
 			Logger.Error($"Could not create phantom node for layout engine {Name}");
@@ -599,7 +599,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		}
 
 		_phantomWindows.Add(phantomNode.Window);
-		_configContext.WorkspaceManager.ActiveWorkspace.AddPhantomWindow(this, phantomNode.Window);
+		_context.WorkspaceManager.ActiveWorkspace.AddPhantomWindow(this, phantomNode.Window);
 		phantomNode.Focus();
 	}
 

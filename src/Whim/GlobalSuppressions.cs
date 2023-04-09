@@ -29,7 +29,7 @@ using System.Diagnostics.CodeAnalysis;
 	"CA1716:Identifiers should not match keywords",
 	Justification = "Not concerned about Visual Basic",
 	Scope = "member",
-	Target = "~M:Whim.IConfigContext.Exit(Whim.ExitEventArgs)"
+	Target = "~M:Whim.IContext.Exit(Whim.ExitEventArgs)"
 )]
 [assembly: SuppressMessage(
 	"Style",

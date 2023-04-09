@@ -5,7 +5,7 @@ namespace Whim.TreeLayout;
 /// <inheritdoc/>
 public class TreeLayoutPlugin : ITreeLayoutPlugin
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
 	/// <inheritdoc/>
 	public string Name => "whim.tree_layout";
@@ -13,9 +13,9 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TreeLayoutPlugin"/> class.
 	/// </summary>
-	public TreeLayoutPlugin(IConfigContext configContext)
+	public TreeLayoutPlugin(IContext context)
 	{
-		_configContext = configContext;
+		_context = context;
 	}
 
 	/// <inheritdoc />
@@ -30,7 +30,7 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	/// <inheritdoc/>
 	public ITreeLayoutEngine? GetTreeLayoutEngine()
 	{
-		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
+		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
 		return rootEngine.GetLayoutEngine<ITreeLayoutEngine>();
 	}
 

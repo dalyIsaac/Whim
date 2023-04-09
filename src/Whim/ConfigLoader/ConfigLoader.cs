@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace Whim;
 
 /// <summary>
-/// Applies the user's config to the <see cref="IConfigContext"/>.
+/// Applies the user's config to the <see cref="IContext"/>.
 /// </summary>
-/// <param name="configContext">The <see cref="IConfigContext"/> to operate on.</param>
-public delegate void DoConfig(IConfigContext configContext);
+/// <param name="context">The <see cref="IContext"/> to operate on.</param>
+public delegate void DoConfig(IContext context);
 
 internal static class ConfigLoader
 {
@@ -86,11 +86,11 @@ internal static class ConfigLoader
 	}
 
 	/// <summary>
-	/// Acquires and evaluates the user's <see cref="IConfigContext"/>.
+	/// Acquires and evaluates the user's <see cref="IContext"/>.
 	/// </summary>
-	/// <returns>The <see cref="IConfigContext"/>.</returns>
+	/// <returns>The <see cref="IContext"/>.</returns>
 	/// <exception cref="ConfigLoaderException"></exception>
-	internal static DoConfig LoadConfigContext()
+	internal static DoConfig LoadContext()
 	{
 		// Ensure the Whim directory exists.
 		FileHelper.EnsureWhimDirExists();

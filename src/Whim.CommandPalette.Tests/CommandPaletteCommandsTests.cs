@@ -8,7 +8,7 @@ public class CommandPaletteCommandsTests
 {
 	private class MocksBuilder
 	{
-		public Mock<IConfigContext> ConfigContext { get; }
+		public Mock<IContext> Context { get; }
 		public Mock<IWorkspaceManager> WorkspaceManager { get; }
 		public Mock<IWorkspace> Workspace { get; }
 		public Mock<IWorkspace> OtherWorkspace { get; }
@@ -18,14 +18,14 @@ public class CommandPaletteCommandsTests
 
 		public MocksBuilder()
 		{
-			ConfigContext = new();
+			Context = new();
 			WorkspaceManager = new();
 			Workspace = new();
 			Workspace.SetupGet(w => w.Name).Returns("Workspace");
 			OtherWorkspace = new();
 			OtherWorkspace.SetupGet(w => w.Name).Returns("Other workspace");
 
-			ConfigContext.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
+			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 			WorkspaceManager.SetupGet(w => w.ActiveWorkspace).Returns(Workspace.Object);
 			WorkspaceManager
 				.Setup(w => w.GetEnumerator())
@@ -65,7 +65,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 
 		// When
 		commands.ToggleCommandPaletteCommand.Command.TryExecute();
@@ -79,7 +79,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 
 		List<FreeTextVariantConfig> configs = VerifyFreeTextActivated(mocks.Plugin);
 		commands.RenameWorkspaceCommand.Command.TryExecute();
@@ -91,7 +91,7 @@ public class CommandPaletteCommandsTests
 		configs[0].Callback("New workspace name");
 
 		// Verify that the workspace name was changed.
-		mocks.ConfigContext.VerifySet(x => x.WorkspaceManager.ActiveWorkspace.Name = "New workspace name", Times.Once);
+		mocks.Context.VerifySet(x => x.WorkspaceManager.ActiveWorkspace.Name = "New workspace name", Times.Once);
 	}
 
 	[Fact]
@@ -99,7 +99,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 
 		// Set up the workspace factory.
 		Mock<IWorkspace> newWorkspace = new();
@@ -123,7 +123,7 @@ public class CommandPaletteCommandsTests
 		configs[0].Callback("New workspace name");
 
 		// Verify that the workspace was created.
-		mocks.ConfigContext.Verify(x => x.WorkspaceManager.Add(newWorkspace.Object), Times.Once);
+		mocks.Context.Verify(x => x.WorkspaceManager.Add(newWorkspace.Object), Times.Once);
 
 		// Verify the workspace name.
 		Assert.Equal("New workspace name", newWorkspace.Object.Name);
@@ -134,7 +134,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 
 		List<FreeTextVariantConfig> freeTextConfigs = VerifyFreeTextActivated(mocks.Plugin);
 		List<MenuVariantConfig> menuConfigs = VerifyMenuActivated(mocks.Plugin);
@@ -151,7 +151,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 
 		// When
 		CommandItem item = commands.MoveWindowToWorkspaceCommandCreator(mocks.Workspace.Object);
@@ -168,7 +168,7 @@ public class CommandPaletteCommandsTests
 		MocksBuilder mocks = new();
 
 		// When
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 		SelectOption[] options = commands.CreateMoveWindowsToWorkspaceOptions();
 
 		// Then
@@ -187,7 +187,7 @@ public class CommandPaletteCommandsTests
 		MocksBuilder mocks = new();
 
 		// When
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 		CommandItem item = commands.MoveMultipleWindowsToWorkspaceCreator(mocks.WindowsArray, mocks.Workspace.Object);
 
 		// Then
@@ -231,7 +231,7 @@ public class CommandPaletteCommandsTests
 			};
 
 		// When
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 		commands.MoveMultipleWindowsToWorkspaceCallback(options);
 
 		// Then
@@ -256,7 +256,7 @@ public class CommandPaletteCommandsTests
 		MocksBuilder mocks = new();
 
 		// When
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 		CommandItem item = commands.MoveMultipleWindowsToWorkspace;
 
 		// Then
@@ -282,7 +282,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		CommandPaletteCommands commands = new(mocks.ConfigContext.Object, mocks.Plugin.Object);
+		CommandPaletteCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
 
 		// Then
 		Assert.Equal(5, commands.Count());

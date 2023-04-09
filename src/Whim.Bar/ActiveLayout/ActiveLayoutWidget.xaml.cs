@@ -15,7 +15,7 @@ public partial class ActiveLayoutWidget : UserControl
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ActiveLayoutWidget"/> class.
 	/// </summary>
-	public ActiveLayoutWidget(IConfigContext config, IMonitor monitor)
+	public ActiveLayoutWidget(IContext config, IMonitor monitor)
 	{
 		ViewModel = new ActiveLayoutWidgetViewModel(config, monitor);
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "ActiveLayout/ActiveLayoutWidget");
@@ -26,6 +26,6 @@ public partial class ActiveLayoutWidget : UserControl
 	/// </summary>
 	public static BarComponent CreateComponent()
 	{
-		return new BarComponent((configContext, monitor, window) => new ActiveLayoutWidget(configContext, monitor));
+		return new BarComponent((context, monitor, window) => new ActiveLayoutWidget(context, monitor));
 	}
 }

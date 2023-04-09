@@ -8,22 +8,22 @@ namespace Whim.Bar;
 /// </summary>
 public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private bool _disposedValue;
 
 	/// <summary>
 	/// The title of the last focused window.
 	/// </summary>
-	public string? Value => _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Title;
+	public string? Value => _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Title;
 
 	/// <summary>
 	/// Creates a new instance of the view model <see cref="FocusedWindowWidgetViewModel"/>.
 	/// </summary>
-	/// <param name="configContext"></param>
-	public FocusedWindowWidgetViewModel(IConfigContext configContext)
+	/// <param name="context"></param>
+	public FocusedWindowWidgetViewModel(IContext context)
 	{
-		_configContext = configContext;
-		_configContext.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_context = context;
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
 	/// <inheritdoc/>
@@ -43,7 +43,7 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_configContext.WindowManager.WindowFocused -= WindowManager_WindowFocused;
+				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

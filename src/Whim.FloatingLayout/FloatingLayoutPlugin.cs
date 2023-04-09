@@ -5,7 +5,7 @@ namespace Whim.FloatingLayout;
 /// <inheritdoc />
 public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly FloatingLayoutConfig _floatingLayoutConfig;
 
 	/// <inheritdoc />
@@ -14,19 +14,19 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	/// <summary>
 	/// Creates a new instance of the floating layout plugin.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="floatingLayoutConfig"></param>
-	public FloatingLayoutPlugin(IConfigContext configContext, FloatingLayoutConfig? floatingLayoutConfig = null)
+	public FloatingLayoutPlugin(IContext context, FloatingLayoutConfig? floatingLayoutConfig = null)
 	{
-		_configContext = configContext;
+		_context = context;
 		_floatingLayoutConfig = floatingLayoutConfig ?? new FloatingLayoutConfig();
 	}
 
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_configContext.WorkspaceManager.AddProxyLayoutEngine(
-			layout => new FloatingLayoutEngine(_configContext, _floatingLayoutConfig, layout)
+		_context.WorkspaceManager.AddProxyLayoutEngine(
+			layout => new FloatingLayoutEngine(_context, _floatingLayoutConfig, layout)
 		);
 	}
 
@@ -43,7 +43,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	public void MarkWindowAsFloating(IWindow? window = null)
 	{
 		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
+		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
 		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
@@ -52,7 +52,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 		}
 
 		floatingLayoutEngine.MarkWindowAsFloating(window);
-		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
 	/// <summary>
@@ -62,7 +62,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	public void MarkWindowAsDocked(IWindow? window = null)
 	{
 		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
+		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
 		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
@@ -71,7 +71,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 		}
 
 		floatingLayoutEngine.MarkWindowAsDocked(window);
-		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
 	/// <summary>
@@ -81,7 +81,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
 		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _configContext.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
+		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
 		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
@@ -90,6 +90,6 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 		}
 
 		floatingLayoutEngine.ToggleWindowFloating(window);
-		_configContext.WorkspaceManager.ActiveWorkspace.DoLayout();
+		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 }

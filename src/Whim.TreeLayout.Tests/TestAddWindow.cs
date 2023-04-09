@@ -12,10 +12,10 @@ public class TestAddWindow
 		Mock<IWorkspaceManager> workspaceManager = new();
 		workspaceManager.Setup(w => w.ActiveWorkspace).Returns(workspace.Object);
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
+		Mock<IContext> context = new();
+		context.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 
-		TreeLayoutEngine engine = new(configContext.Object);
+		TreeLayoutEngine engine = new(context.Object);
 
 		Mock<IWindow> window = new();
 		engine.Add(window.Object);
@@ -50,17 +50,17 @@ public class TestAddWindow
 		Mock<IMonitorManager> monitorManager = new();
 		Mock<IWorkspace> activeWorkspace = new();
 		Mock<IWorkspaceManager> workspaceManager = new();
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 
 		monitor.Setup(m => m.WorkingArea.Width).Returns(1920);
 		monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
 		monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
-		configContext.Setup(x => x.MonitorManager).Returns(monitorManager.Object);
+		context.Setup(x => x.MonitorManager).Returns(monitorManager.Object);
 
 		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(activeWorkspace.Object);
-		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
+		context.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 
-		TreeLayoutEngine engine = new(configContext.Object) { AddNodeDirection = Direction.Right };
+		TreeLayoutEngine engine = new(context.Object) { AddNodeDirection = Direction.Right };
 
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
@@ -95,10 +95,10 @@ public class TestAddWindow
 		Mock<IWorkspaceManager> workspaceManager = new();
 		workspaceManager.Setup(w => w.ActiveWorkspace).Returns(workspace.Object);
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
+		Mock<IContext> context = new();
+		context.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 
-		TreeLayoutEngine engine = new(configContext.Object) { window.Object };
+		TreeLayoutEngine engine = new(context.Object) { window.Object };
 
 		Assert.Equal(engine.Root, new WindowNode(window.Object));
 		Assert.Single(engine);

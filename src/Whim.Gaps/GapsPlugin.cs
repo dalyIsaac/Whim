@@ -5,7 +5,7 @@ namespace Whim.Gaps;
 /// <inheritdoc />
 public class GapsPlugin : IGapsPlugin
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
 	/// <summary>
 	/// The configuration for the gaps plugin.
@@ -18,18 +18,18 @@ public class GapsPlugin : IGapsPlugin
 	/// <summary>
 	/// Creates a new instance of the gaps plugin.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="gapsConfig"></param>
-	public GapsPlugin(IConfigContext configContext, GapsConfig gapsConfig)
+	public GapsPlugin(IContext context, GapsConfig gapsConfig)
 	{
-		_configContext = configContext;
+		_context = context;
 		GapsConfig = gapsConfig;
 	}
 
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new GapsLayoutEngine(GapsConfig, layout));
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new GapsLayoutEngine(GapsConfig, layout));
 	}
 
 	/// <inheritdoc />
@@ -43,7 +43,7 @@ public class GapsPlugin : IGapsPlugin
 	public void UpdateOuterGap(int delta)
 	{
 		GapsConfig.OuterGap += delta;
-		_configContext.WorkspaceManager.LayoutAllActiveWorkspaces();
+		_context.WorkspaceManager.LayoutAllActiveWorkspaces();
 	}
 
 	/// <summary>
@@ -53,7 +53,7 @@ public class GapsPlugin : IGapsPlugin
 	public void UpdateInnerGap(int delta)
 	{
 		GapsConfig.InnerGap += delta;
-		_configContext.WorkspaceManager.LayoutAllActiveWorkspaces();
+		_context.WorkspaceManager.LayoutAllActiveWorkspaces();
 	}
 
 	/// <inheritdoc />

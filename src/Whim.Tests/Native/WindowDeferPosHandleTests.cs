@@ -15,11 +15,11 @@ public class WindowDeferPosHandleTests
 		Mock<INativeManager> nativeManager = new();
 		nativeManager.Setup(n => n.BeginDeferWindowPos(It.IsAny<int>())).Returns((HDWP)1);
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(c => c.NativeManager).Returns(nativeManager.Object);
+		Mock<IContext> context = new();
+		context.Setup(c => c.NativeManager).Returns(nativeManager.Object);
 
 		// When
-		using WindowDeferPosHandle handle = new(configContext.Object, 2);
+		using WindowDeferPosHandle handle = new(context.Object, 2);
 
 		// Then
 		nativeManager.Verify(n => n.BeginDeferWindowPos(2), Times.Once);
@@ -111,10 +111,10 @@ public class WindowDeferPosHandleTests
 			.Returns((HDWP)2);
 		nativeManager.Setup(n => n.GetWindowOffset(It.IsAny<HWND>())).Returns(new Location<int>());
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(c => c.NativeManager).Returns(nativeManager.Object);
+		Mock<IContext> context = new();
+		context.Setup(c => c.NativeManager).Returns(nativeManager.Object);
 
-		WindowDeferPosHandle handle = new(configContext.Object, 1);
+		WindowDeferPosHandle handle = new(context.Object, 1);
 
 		// When
 		handle.DeferWindowPos(windowState, hwndInsertAfter);
@@ -149,10 +149,10 @@ public class WindowDeferPosHandleTests
 		nativeManager.Setup(n => n.BeginDeferWindowPos(It.IsAny<int>())).Returns((HDWP)1);
 		nativeManager.Setup(n => n.GetWindowOffset(It.IsAny<HWND>())).Returns((Location<int>?)null);
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(c => c.NativeManager).Returns(nativeManager.Object);
+		Mock<IContext> context = new();
+		context.Setup(c => c.NativeManager).Returns(nativeManager.Object);
 
-		using WindowDeferPosHandle handle = new(configContext.Object, 1);
+		using WindowDeferPosHandle handle = new(context.Object, 1);
 
 		// When
 		handle.DeferWindowPos(
@@ -188,15 +188,15 @@ public class WindowDeferPosHandleTests
 		Mock<INativeManager> nativeManager = new();
 		nativeManager.Setup(n => n.BeginDeferWindowPos(It.IsAny<int>())).Returns((HDWP)1);
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(c => c.NativeManager).Returns(nativeManager.Object);
+		Mock<IContext> context = new();
+		context.Setup(c => c.NativeManager).Returns(nativeManager.Object);
 
 		Mock<IMonitor> monitor = new();
 		monitor.Setup(m => m.IsPrimary).Returns(true);
 
 		// When
 		WindowDeferPosHandle.SetWindowPosFixScaling(
-			configContext.Object,
+			context.Object,
 			new WindowState()
 			{
 				Location = new Location<int>(),
@@ -224,13 +224,13 @@ public class WindowDeferPosHandleTests
 		Mock<IMonitorManager> monitorManager = new();
 		monitorManager.SetupGet(m => m.PrimaryMonitor).Returns(monitor.Object);
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(c => c.NativeManager).Returns(nativeManager.Object);
-		configContext.Setup(c => c.MonitorManager).Returns(monitorManager.Object);
+		Mock<IContext> context = new();
+		context.Setup(c => c.NativeManager).Returns(nativeManager.Object);
+		context.Setup(c => c.MonitorManager).Returns(monitorManager.Object);
 
 		// When
 		WindowDeferPosHandle.SetWindowPosFixScaling(
-			configContext.Object,
+			context.Object,
 			new WindowState()
 			{
 				Location = new Location<int>(),
@@ -257,9 +257,9 @@ public class WindowDeferPosHandleTests
 		Mock<IMonitorManager> monitorManager = new();
 		monitorManager.SetupGet(m => m.PrimaryMonitor).Returns(primaryMonitor.Object);
 
-		Mock<IConfigContext> configContext = new();
-		configContext.Setup(c => c.NativeManager).Returns(nativeManager.Object);
-		configContext.Setup(c => c.MonitorManager).Returns(monitorManager.Object);
+		Mock<IContext> context = new();
+		context.Setup(c => c.NativeManager).Returns(nativeManager.Object);
+		context.Setup(c => c.MonitorManager).Returns(monitorManager.Object);
 
 		Mock<IMonitor> monitor = new();
 		monitor.SetupGet(m => m.IsPrimary).Returns(false);
@@ -267,7 +267,7 @@ public class WindowDeferPosHandleTests
 
 		// When
 		WindowDeferPosHandle.SetWindowPosFixScaling(
-			configContext.Object,
+			context.Object,
 			new WindowState()
 			{
 				Location = new Location<int>(),

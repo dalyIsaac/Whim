@@ -7,7 +7,7 @@ namespace Whim.Bar;
 /// </summary>
 public class NextLayoutEngineCommand : System.Windows.Input.ICommand
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly ActiveLayoutWidgetViewModel _viewModel;
 
 #pragma warning disable CS0067 // The event 'NextLayoutEngineCommand.CanExecuteChanged' is never used
@@ -18,11 +18,11 @@ public class NextLayoutEngineCommand : System.Windows.Input.ICommand
 	/// <summary>
 	/// Creates a new instance of <see cref="NextLayoutEngineCommand"/>.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="viewModel"></param>
-	public NextLayoutEngineCommand(IConfigContext configContext, ActiveLayoutWidgetViewModel viewModel)
+	public NextLayoutEngineCommand(IContext context, ActiveLayoutWidgetViewModel viewModel)
 	{
-		_configContext = configContext;
+		_context = context;
 		_viewModel = viewModel;
 	}
 
@@ -33,6 +33,6 @@ public class NextLayoutEngineCommand : System.Windows.Input.ICommand
 	public void Execute(object? parameter)
 	{
 		Logger.Debug("Switching to next layout engine");
-		_configContext.WorkspaceManager.GetWorkspaceForMonitor(_viewModel.Monitor)?.NextLayoutEngine();
+		_context.WorkspaceManager.GetWorkspaceForMonitor(_viewModel.Monitor)?.NextLayoutEngine();
 	}
 }

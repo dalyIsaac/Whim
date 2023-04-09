@@ -9,7 +9,7 @@ namespace Whim.Bar;
 /// </summary>
 public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
 	/// <summary>
 	/// The monitor that the widget is displayed on.
@@ -24,7 +24,7 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// The name of the active layout engine.
 	/// </summary>
 	public string ActiveLayoutEngine =>
-		_configContext.WorkspaceManager.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
+		_context.WorkspaceManager.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
 
 	/// <summary>
 	/// Command to switch to the next layout engine.
@@ -34,19 +34,19 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <summary>
 	///
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="monitor"></param>
-	public ActiveLayoutWidgetViewModel(IConfigContext configContext, IMonitor monitor)
+	public ActiveLayoutWidgetViewModel(IContext context, IMonitor monitor)
 	{
-		_configContext = configContext;
+		_context = context;
 		Monitor = monitor;
-		NextLayoutEngineCommand = new NextLayoutEngineCommand(configContext, this);
+		NextLayoutEngineCommand = new NextLayoutEngineCommand(context, this);
 
-		_configContext.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
-		_configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
-		_configContext.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
+		_context.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
+		_context.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
+		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
 
-		foreach (IWorkspace workspace in _configContext.WorkspaceManager)
+		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
 			_workspaces.Add(workspace);
 		}
@@ -70,9 +70,9 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_configContext.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
-				_configContext.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
-				_configContext.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
+				_context.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
+				_context.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
+				_context.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

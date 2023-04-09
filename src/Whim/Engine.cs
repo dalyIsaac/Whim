@@ -1,20 +1,20 @@
 namespace Whim;
 
 /// <summary>
-/// Exposes the Whim <see cref="IConfigContext"/>.
+/// Exposes the Whim <see cref="IContext"/>.
 /// </summary>
 public static class Engine
 {
-	private static IConfigContext? _configContext;
+	private static IContext? _context;
 
 	/// <summary>
-	/// Get the <see cref="IConfigContext"/>.
+	/// Get the <see cref="IContext"/>.
 	/// </summary>
-	/// <returns>The <see cref="IConfigContext"/>.</returns>
-	public static IConfigContext CreateConfigContext()
+	/// <returns>The <see cref="IContext"/>.</returns>
+	public static IContext CreateContext()
 	{
-		_configContext ??= new ConfigContext();
+		_context ??= new Context();
 
-		return _configContext;
+		return _context;
 	}
 }

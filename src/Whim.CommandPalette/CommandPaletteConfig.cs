@@ -13,14 +13,10 @@ public class CommandPaletteConfig
 	/// <summary>
 	/// Creates a new instance of <see cref="CommandPaletteConfig"/>.
 	/// </summary>
-	/// <param name="configContext"></param>
-	public CommandPaletteConfig(IConfigContext configContext)
+	/// <param name="context"></param>
+	public CommandPaletteConfig(IContext context)
 	{
-		ActivationConfig = new MenuVariantConfig()
-		{
-			Commands = configContext.CommandManager,
-			ConfirmButtonText = "Execute"
-		};
+		ActivationConfig = new MenuVariantConfig() { Commands = context.CommandManager, ConfirmButtonText = "Execute" };
 	}
 
 	/// <summary>
@@ -42,7 +38,7 @@ public class CommandPaletteConfig
 	/// The configuration for command palette activation. <br/>
 	///
 	/// Defaults to a <see cref="MenuVariantConfig"/> where <see cref="MenuVariantConfig.Commands"/>
-	/// are set to <see cref="IConfigContext.CommandManager"/>.
+	/// are set to <see cref="IContext.CommandManager"/>.
 	/// </summary>
 	public BaseVariantConfig ActivationConfig { get; set; }
 }

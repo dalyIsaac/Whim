@@ -11,17 +11,17 @@ public class CommandPalettePluginTests
 	{
 		// Given
 		Mock<IFilterManager> filterManagerMock = new();
-		Mock<IConfigContext> configContextMock = new();
-		configContextMock.Setup(x => x.FilterManager).Returns(filterManagerMock.Object);
+		Mock<IContext> contextMock = new();
+		contextMock.Setup(x => x.FilterManager).Returns(filterManagerMock.Object);
 
-		CommandPaletteConfig commandPaletteConfig = new(configContextMock.Object);
-		CommandPalettePlugin commandPalettePlugin = new(configContextMock.Object, commandPaletteConfig);
+		CommandPaletteConfig commandPaletteConfig = new(contextMock.Object);
+		CommandPalettePlugin commandPalettePlugin = new(contextMock.Object, commandPaletteConfig);
 
 		// When
 		commandPalettePlugin.PreInitialize();
 
 		// Then
-		configContextMock.Verify(x => x.FilterManager.IgnoreTitleMatch(CommandPaletteConfig.Title), Times.Once);
+		contextMock.Verify(x => x.FilterManager.IgnoreTitleMatch(CommandPaletteConfig.Title), Times.Once);
 	}
 }
 
