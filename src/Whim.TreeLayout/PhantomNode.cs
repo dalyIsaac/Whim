@@ -38,7 +38,7 @@ public class PhantomNode : LeafNode
 	/// <returns></returns>
 	public static PhantomNode? CreatePhantomNode(IConfigContext configContext, SplitNode? parent = null)
 	{
-		PhantomWindow phantomWindow = new();
+		PhantomWindow phantomWindow = new(configContext);
 
 		IWindow? windowModel = configContext.WindowManager.CreateWindow(phantomWindow.GetHandle());
 
