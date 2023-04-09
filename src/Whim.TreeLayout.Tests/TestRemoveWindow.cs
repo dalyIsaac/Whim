@@ -9,7 +9,7 @@ public class TestRemoveWindow
 	private readonly Mock<IWorkspaceManager> _workspaceManager = new();
 	private readonly Mock<IMonitor> _focusedMonitor = new();
 	private readonly Mock<IMonitorManager> _monitorManager = new();
-	private readonly Mock<IConfigContext> _configContext = new();
+	private readonly Mock<IContext> _context = new();
 	private readonly TreeLayoutEngine _engine;
 
 	public TestRemoveWindow()
@@ -19,10 +19,10 @@ public class TestRemoveWindow
 		_monitorManager.Setup(m => m.FocusedMonitor).Returns(_focusedMonitor.Object);
 		_workspaceManager.Setup(x => x.ActiveWorkspace).Returns(_activeWorkspace.Object);
 
-		_configContext.Setup(x => x.MonitorManager).Returns(_monitorManager.Object);
-		_configContext.Setup(c => c.WorkspaceManager).Returns(_workspaceManager.Object);
+		_context.Setup(x => x.MonitorManager).Returns(_monitorManager.Object);
+		_context.Setup(c => c.WorkspaceManager).Returns(_workspaceManager.Object);
 
-		_engine = new TreeLayoutEngine(_configContext.Object);
+		_engine = new TreeLayoutEngine(_context.Object);
 	}
 
 	[Fact]

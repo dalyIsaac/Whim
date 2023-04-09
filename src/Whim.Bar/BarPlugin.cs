@@ -7,7 +7,7 @@ namespace Whim.Bar;
 /// <inheritdoc/>
 public class BarPlugin : IBarPlugin
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly BarConfig _barConfig;
 
 	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = new();
@@ -19,28 +19,28 @@ public class BarPlugin : IBarPlugin
 	/// <summary>
 	/// Create the bar plugin.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="barConfig"></param>
-	public BarPlugin(IConfigContext configContext, BarConfig barConfig)
+	public BarPlugin(IContext context, BarConfig barConfig)
 	{
-		_configContext = configContext;
+		_context = context;
 		_barConfig = barConfig;
 	}
 
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_configContext.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
-		_configContext.FilterManager.IgnoreTitleMatch("Whim Bar");
-		_configContext.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
+		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+		_context.FilterManager.IgnoreTitleMatch("Whim Bar");
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
 	}
 
 	/// <inheritdoc />
 	public void PostInitialize()
 	{
-		foreach (IMonitor monitor in _configContext.MonitorManager)
+		foreach (IMonitor monitor in _context.MonitorManager)
 		{
-			BarWindow barWindow = new(_configContext, _barConfig, monitor);
+			BarWindow barWindow = new(_context, _barConfig, monitor);
 			_monitorBarMap.Add(monitor, barWindow);
 		}
 
@@ -59,7 +59,7 @@ public class BarPlugin : IBarPlugin
 		// Add the new monitors
 		foreach (IMonitor monitor in e.AddedMonitors)
 		{
-			BarWindow barWindow = new(_configContext, _barConfig, monitor);
+			BarWindow barWindow = new(_context, _barConfig, monitor);
 			_monitorBarMap.Add(monitor, barWindow);
 		}
 
@@ -71,13 +71,13 @@ public class BarPlugin : IBarPlugin
 	/// </summary>
 	private void ShowAll()
 	{
-		using WindowDeferPosHandle deferPosHandle = new(_configContext, _monitorBarMap.Count);
+		using WindowDeferPosHandle deferPosHandle = new(_context, _monitorBarMap.Count);
 
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
 			barWindow.UpdateLocation();
 			deferPosHandle.DeferWindowPos(barWindow.WindowState);
-			_configContext.NativeManager.SetWindowCorners(
+			_context.NativeManager.SetWindowCorners(
 				barWindow.WindowState.Window.Handle,
 				DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND
 			);
@@ -97,7 +97,7 @@ public class BarPlugin : IBarPlugin
 				}
 
 				_monitorBarMap.Clear();
-				_configContext.MonitorManager.MonitorsChanged -= MonitorManager_MonitorsChanged;
+				_context.MonitorManager.MonitorsChanged -= MonitorManager_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

@@ -8,7 +8,7 @@ namespace Whim.Bar;
 /// </summary>
 public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly WorkspaceWidgetViewModel _viewModel;
 	private readonly WorkspaceModel _workspace;
 	private bool _disposedValue;
@@ -19,16 +19,12 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 	/// <summary>
 	/// Creates a new instance of <see cref="SwitchWorkspaceCommand"/>.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="viewModel"></param>
 	/// <param name="workspace"></param>
-	public SwitchWorkspaceCommand(
-		IConfigContext configContext,
-		WorkspaceWidgetViewModel viewModel,
-		WorkspaceModel workspace
-	)
+	public SwitchWorkspaceCommand(IContext context, WorkspaceWidgetViewModel viewModel, WorkspaceModel workspace)
 	{
-		_configContext = configContext;
+		_context = context;
 		_viewModel = viewModel;
 		_workspace = workspace;
 		_workspace.PropertyChanged += Workspace_PropertyChanged;
@@ -52,7 +48,7 @@ public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 		if (parameter is WorkspaceModel)
 		{
 			Logger.Debug($"Activating workspace {_workspace.Workspace} on monitor {_viewModel.Monitor}");
-			_configContext.WorkspaceManager.Activate(_workspace.Workspace, _viewModel.Monitor);
+			_context.WorkspaceManager.Activate(_workspace.Workspace, _viewModel.Monitor);
 		}
 	}
 

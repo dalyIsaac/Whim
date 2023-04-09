@@ -10,16 +10,16 @@ namespace Whim.CommandPalette;
 /// </summary>
 public class CommandPaletteCommands : IEnumerable<CommandItem>
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly ICommandPalettePlugin _commandPalettePlugin;
 	private string Name => _commandPalettePlugin.Name;
 
 	/// <summary>
 	/// Creates a new instance of the command palette commands.
 	/// </summary>
-	public CommandPaletteCommands(IConfigContext configContext, ICommandPalettePlugin commandPalettePlugin)
+	public CommandPaletteCommands(IContext context, ICommandPalettePlugin commandPalettePlugin)
 	{
-		_configContext = configContext;
+		_context = context;
 		_commandPalettePlugin = commandPalettePlugin;
 	}
 
@@ -50,9 +50,9 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 					_commandPalettePlugin.Activate(
 						new FreeTextVariantConfig()
 						{
-							Callback = (text) => _configContext.WorkspaceManager.ActiveWorkspace.Name = text,
+							Callback = (text) => _context.WorkspaceManager.ActiveWorkspace.Name = text,
 							Hint = "Enter new workspace name",
-							InitialText = _configContext.WorkspaceManager.ActiveWorkspace.Name,
+							InitialText = _context.WorkspaceManager.ActiveWorkspace.Name,
 							Prompt = "Rename workspace"
 						}
 					)
@@ -74,11 +74,8 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 						{
 							Callback = (text) =>
 							{
-								IWorkspace workspace = _configContext.WorkspaceManager.WorkspaceFactory(
-									_configContext,
-									text
-								);
-								_configContext.WorkspaceManager.Add(workspace);
+								IWorkspace workspace = _context.WorkspaceManager.WorkspaceFactory(_context, text);
+								_context.WorkspaceManager.Add(workspace);
 							},
 							Hint = "Enter new workspace name",
 							Prompt = "Create workspace"
@@ -98,7 +95,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.move_window_to_workspace",
 				title: $"Move window to workspace \"{workspace.Name}\"",
-				callback: () => _configContext.WorkspaceManager.MoveWindowToWorkspace(workspace)
+				callback: () => _context.WorkspaceManager.MoveWindowToWorkspace(workspace)
 			)
 		};
 
@@ -113,9 +110,9 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 				title: "Move window to workspace",
 				callback: () =>
 				{
-					IWorkspace activeWorkspace = _configContext.WorkspaceManager.ActiveWorkspace;
+					IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
 					List<CommandItem> items = new();
-					foreach (IWorkspace workspace in _configContext.WorkspaceManager)
+					foreach (IWorkspace workspace in _context.WorkspaceManager)
 					{
 						if (workspace != activeWorkspace)
 						{
@@ -138,7 +135,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	public SelectOption[] CreateMoveWindowsToWorkspaceOptions()
 	{
 		// All the windows in all the workspaces.
-		IEnumerable<IWindow> windows = _configContext.WorkspaceManager
+		IEnumerable<IWindow> windows = _context.WorkspaceManager
 			.Select(w => w.Windows)
 			.SelectMany(w => w)
 			.OrderBy(w => w.Title);
@@ -173,7 +170,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 				{
 					foreach (IWindow window in windows)
 					{
-						_configContext.WorkspaceManager.MoveWindowToWorkspace(workspace, window);
+						_context.WorkspaceManager.MoveWindowToWorkspace(workspace, window);
 					}
 				}
 			)
@@ -186,11 +183,11 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	{
 		IEnumerable<string> selectedWindowNames = options.Where(o => o.IsSelected).Select(o => o.Title);
 
-		IEnumerable<IWindow> windows = _configContext.WorkspaceManager
+		IEnumerable<IWindow> windows = _context.WorkspaceManager
 			.SelectMany(w => w.Windows)
 			.Where(w => selectedWindowNames.Contains(w.Title));
 
-		IEnumerable<CommandItem> items = _configContext.WorkspaceManager.Select(
+		IEnumerable<CommandItem> items = _context.WorkspaceManager.Select(
 			w => MoveMultipleWindowsToWorkspaceCreator(windows, w)
 		);
 

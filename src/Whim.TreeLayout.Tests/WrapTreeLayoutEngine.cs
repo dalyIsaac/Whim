@@ -8,13 +8,13 @@ namespace Whim.TreeLayout.Tests;
 /// </summary>
 internal class WrapTreeLayoutEngine : TreeLayoutEngine
 {
-	public WrapTreeLayoutEngine(IConfigContext configContext) : base(configContext) { }
+	public WrapTreeLayoutEngine(IContext context) : base(context) { }
 
-	internal void SplitFocusedWindowWrapper(IConfigContext configContext, IWindow? focusedWindow = null)
+	internal void SplitFocusedWindowWrapper(IContext context, IWindow? focusedWindow = null)
 	{
 		Mock<IWindow> windowModel = new();
 
-		PhantomNode phantomNode = new WrapPhantomNode(configContext, windowModel.Object);
+		PhantomNode phantomNode = new WrapPhantomNode(context, windowModel.Object);
 
 		SplitFocusedWindow(focusedWindow, phantomNode);
 	}

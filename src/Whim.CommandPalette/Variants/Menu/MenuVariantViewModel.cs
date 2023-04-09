@@ -84,7 +84,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public event EventHandler<EventArgs>? ScrollIntoViewRequested;
 
 	public MenuVariantViewModel(
-		IConfigContext configContext,
+		IContext context,
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
 		Func<MatcherResult<CommandItem>, IVariantRowView<CommandItem, MenuVariantRowViewModel>>? menuRowFactory = null
 	)
@@ -93,7 +93,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 		_menuRowFactory = menuRowFactory ?? ((MatcherResult<CommandItem> item) => new MenuVariantRowView(item));
 
 		// Populate the commands to reduce the first render time.
-		PopulateItems(configContext.CommandManager);
+		PopulateItems(context.CommandManager);
 	}
 
 	public void Activate(BaseVariantConfig activationConfig)

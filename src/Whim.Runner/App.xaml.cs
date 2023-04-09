@@ -14,7 +14,7 @@ public partial class App : Application
 	/// <summary>
 	/// This will be initialized in <see cref="OnLaunched"/>.
 	/// </summary>
-	private IConfigContext? _configContext;
+	private IContext? _context;
 
 	/// <summary>
 	/// Initializes the Whim application.
@@ -39,25 +39,25 @@ public partial class App : Application
 	{
 		try
 		{
-			_configContext = Engine.CreateConfigContext();
+			_context = Engine.CreateContext();
 
-			_configContext.Exited += ConfigContext_Exited;
-			_configContext.Initialize();
+			_context.Exited += Context_Exited;
+			_context.Initialize();
 
 			return;
 		}
 		catch (Exception ex)
 		{
-			_configContext?.Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = ex.ToString() });
+			_context?.Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = ex.ToString() });
 		}
 	}
 
-	private void ConfigContext_Exited(object? sender, ExitEventArgs e)
+	private void Context_Exited(object? sender, ExitEventArgs e)
 	{
-		if (_configContext is not null)
+		if (_context is not null)
 		{
-			_configContext.Exited -= ConfigContext_Exited;
-			_configContext = null;
+			_context.Exited -= Context_Exited;
+			_context = null;
 		}
 
 		if (e.Reason == ExitReason.User)
@@ -73,7 +73,7 @@ public partial class App : Application
 	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
 	{
 		Logger.Error(e.Exception.ToString());
-		_configContext?.Exit();
+		_context?.Exit();
 	}
 
 	// Add when Windows App SDK supports the application exit event.
@@ -81,7 +81,7 @@ public partial class App : Application
 	//private void Application_Exit(object sender, ExitEventArgs e)
 	//{
 	//	Logger.Information("Application exiting");
-	//	_configContext.Quit();
+	//	_context.Quit();
 	//	Logger.Information("Application disposed");
 	//}
 }

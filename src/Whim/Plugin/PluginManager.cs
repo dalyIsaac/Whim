@@ -5,15 +5,15 @@ namespace Whim;
 
 internal class PluginManager : IPluginManager
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly Dictionary<string, IPlugin> _plugins = new();
 	private bool _disposedValue;
 
 	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.Values;
 
-	public PluginManager(IConfigContext configContext)
+	public PluginManager(IContext context)
 	{
-		_configContext = configContext;
+		_context = context;
 	}
 
 	public void PreInitialize()
@@ -33,7 +33,7 @@ internal class PluginManager : IPluginManager
 		foreach (IPlugin plugin in _plugins.Values)
 		{
 			plugin.PostInitialize();
-			_configContext.CommandManager.LoadCommands(plugin.Commands);
+			_context.CommandManager.LoadCommands(plugin.Commands);
 		}
 	}
 

@@ -11,7 +11,7 @@ public record FileSinkConfig : SinkConfig
 	public required FileSinkConfigRollingInterval RollingInterval { get; init; }
 
 	/// <summary>
-	/// The filename of the file log. The path is determined by <see cref="IConfigContext"/>.
+	/// The filename of the file log. The path is determined by <see cref="IContext"/>.
 	/// </summary>
 	public required string FileName { get; init; }
 }

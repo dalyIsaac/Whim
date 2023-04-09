@@ -9,49 +9,49 @@ namespace Whim.TreeLayout;
 /// </summary>
 public class PhantomNode : LeafNode
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly Microsoft.UI.Xaml.Window? _phantomWindow;
 
 	/// <summary>
 	/// Creates a new phantom node.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="windowModel"></param>
 	/// <param name="phantomWindow"></param>
 	/// <param name="parent"></param>
 	protected PhantomNode(
-		IConfigContext configContext,
+		IContext context,
 		IWindow windowModel,
 		Microsoft.UI.Xaml.Window? phantomWindow,
 		SplitNode? parent = null
 	) : base(windowModel, parent)
 	{
-		_configContext = configContext;
+		_context = context;
 		_phantomWindow = phantomWindow;
 	}
 
 	/// <summary>
 	/// Creates a new phantom window. If the window model could not be retrieved, <see langword="null"/> is returned.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="parent"></param>
 	/// <returns></returns>
-	public static PhantomNode? CreatePhantomNode(IConfigContext configContext, SplitNode? parent = null)
+	public static PhantomNode? CreatePhantomNode(IContext context, SplitNode? parent = null)
 	{
-		PhantomWindow phantomWindow = new(configContext);
+		PhantomWindow phantomWindow = new(context);
 
-		IWindow? windowModel = configContext.WindowManager.CreateWindow(phantomWindow.GetHandle());
+		IWindow? windowModel = context.WindowManager.CreateWindow(phantomWindow.GetHandle());
 
 		if (windowModel == null)
 		{
 			return null;
 		}
 
-		return new PhantomNode(configContext, windowModel, phantomWindow, parent);
+		return new PhantomNode(context, windowModel, phantomWindow, parent);
 	}
 
 	/// <inheritdoc/>
-	public void Hide() => _phantomWindow?.Hide(_configContext);
+	public void Hide() => _phantomWindow?.Hide(_context);
 
 	/// <inheritdoc/>
 	public void Close() => _phantomWindow?.Close();

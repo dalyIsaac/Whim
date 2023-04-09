@@ -10,22 +10,22 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 {
 	private const int SUBCLASSID = 4561;
 
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly SUBCLASSPROC _subclassProc;
 	private readonly Microsoft.UI.Xaml.Window _window;
 	private bool _disposedValue;
 
-	public WindowMessageMonitor(IConfigContext configContext, ICoreNativeManager coreNativeManager)
+	public WindowMessageMonitor(IContext context, ICoreNativeManager coreNativeManager)
 	{
-		_configContext = configContext;
+		_context = context;
 		_coreNativeManager = coreNativeManager;
 
 		_window = new();
 		_window.SetIsShownInSwitchers(false);
 
 		HWND hwnd = _window.GetHandle();
-		_configContext.NativeManager.HideWindow(hwnd);
+		_context.NativeManager.HideWindow(hwnd);
 
 		_subclassProc = new SUBCLASSPROC(WindowProc);
 		_coreNativeManager.SetWindowSubclass(new HWND(hwnd), _subclassProc, SUBCLASSID, 0);

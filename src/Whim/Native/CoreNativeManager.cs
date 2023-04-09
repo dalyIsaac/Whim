@@ -16,11 +16,11 @@ namespace Whim;
 
 internal class CoreNativeManager : ICoreNativeManager
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
-	public CoreNativeManager(IConfigContext configContext)
+	public CoreNativeManager(IContext context)
 	{
-		_configContext = configContext;
+		_context = context;
 	}
 
 	/// <inheritdoc/>
@@ -154,7 +154,7 @@ internal class CoreNativeManager : ICoreNativeManager
 	/// <inheritdoc/>
 	public bool IsSplashScreen(HWND hwnd)
 	{
-		string classname = _configContext.NativeManager.GetClassName(hwnd);
+		string classname = _context.NativeManager.GetClassName(hwnd);
 		if (classname.Length == 0)
 		{
 			return false;
@@ -212,7 +212,7 @@ internal class CoreNativeManager : ICoreNativeManager
 			return false;
 		}
 
-		string className = _configContext.NativeManager.GetClassName(hwnd);
+		string className = _context.NativeManager.GetClassName(hwnd);
 		if (IsSystemWindow(hwnd, className))
 		{
 			return false;

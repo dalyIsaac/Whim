@@ -7,7 +7,7 @@ namespace Whim.CommandPalette;
 
 internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
 	private readonly IVariantControl _menuVariant;
 	private readonly IVariantControl _freeTextVariant;
@@ -90,19 +90,19 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 	public event EventHandler<EventArgs>? SetWindowPosRequested;
 
 	public CommandPaletteWindowViewModel(
-		IConfigContext configContext,
+		IContext context,
 		CommandPalettePlugin plugin,
 		IVariantControl? menuVariant = null,
 		IVariantControl? freeTextVariant = null,
 		IVariantControl? selectVariant = null
 	)
 	{
-		_configContext = configContext;
+		_context = context;
 		Plugin = plugin;
 		ActivationConfig =
-			Plugin.Config.ActivationConfig ?? new MenuVariantConfig() { Commands = configContext.CommandManager };
+			Plugin.Config.ActivationConfig ?? new MenuVariantConfig() { Commands = context.CommandManager };
 
-		_menuVariant = menuVariant ?? new MenuVariantControl(configContext, this);
+		_menuVariant = menuVariant ?? new MenuVariantControl(context, this);
 		_freeTextVariant = freeTextVariant ?? new FreeTextVariantControl(this);
 		_selectVariant = selectVariant ?? new SelectVariantControl(this);
 
@@ -131,7 +131,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 
 		ActivationConfig = config;
-		Monitor = monitor ?? _configContext.MonitorManager.FocusedMonitor;
+		Monitor = monitor ?? _context.MonitorManager.FocusedMonitor;
 
 		ConfirmButtonText = ActivationConfig.ConfirmButtonText ?? "Confirm";
 		Text = ActivationConfig.InitialText ?? "";

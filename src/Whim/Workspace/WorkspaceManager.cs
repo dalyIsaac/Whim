@@ -10,7 +10,7 @@ namespace Whim;
 /// </summary>
 internal class WorkspaceManager : IWorkspaceManager
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/>s stored by this manager.
@@ -46,16 +46,16 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
-	public Func<IConfigContext, string, IWorkspace> WorkspaceFactory { get; set; } =
-		(configContext, name) =>
+	public Func<IContext, string, IWorkspace> WorkspaceFactory { get; set; } =
+		(context, name) =>
 		{
-			return new Workspace(configContext, name, new ColumnLayoutEngine());
+			return new Workspace(context, name, new ColumnLayoutEngine());
 		};
 
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
-	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_configContext.MonitorManager.FocusedMonitor];
+	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_context.MonitorManager.FocusedMonitor];
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
 
@@ -63,30 +63,30 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
 
-	public WorkspaceManager(IConfigContext configContext)
+	public WorkspaceManager(IContext context)
 	{
-		_configContext = configContext;
+		_context = context;
 	}
 
 	public void Initialize()
 	{
 		Logger.Debug("Initializing workspace manager...");
 
-		_configContext.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
 		// Ensure there's at least n workspaces, for n monitors.
-		if (_configContext.MonitorManager.Length > _workspaces.Count)
+		if (_context.MonitorManager.Length > _workspaces.Count)
 		{
 			throw new InvalidOperationException("There must be at least as many workspaces as monitors.");
 		}
 
 		// Assign workspaces to monitors.
 		int idx = 0;
-		foreach (IMonitor monitor in _configContext.MonitorManager)
+		foreach (IMonitor monitor in _context.MonitorManager)
 		{
 			// Get the workspace for this monitor. If the user hasn't provided enough workspaces, create a new one.
 			IWorkspace workspace =
-				idx < _workspaces.Count ? _workspaces[idx] : WorkspaceFactory(_configContext, $"Workspace {idx + 1}");
+				idx < _workspaces.Count ? _workspaces[idx] : WorkspaceFactory(_context, $"Workspace {idx + 1}");
 
 			Activate(workspace, monitor);
 			idx++;
@@ -117,9 +117,9 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug($"Removing workspace {workspace}");
 
-		if (_workspaces.Count - 1 < _configContext.MonitorManager.Length)
+		if (_workspaces.Count - 1 < _context.MonitorManager.Length)
 		{
-			Logger.Debug($"There must be at least {_configContext.MonitorManager.Length} workspaces.");
+			Logger.Debug($"There must be at least {_context.MonitorManager.Length} workspaces.");
 			return false;
 		}
 
@@ -169,7 +169,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug($"Activating workspace {workspace}");
 
-		focusedMonitor ??= _configContext.MonitorManager.FocusedMonitor;
+		focusedMonitor ??= _context.MonitorManager.FocusedMonitor;
 
 		// Get the old workspace for the event.
 		_monitorWorkspaceMap.TryGetValue(focusedMonitor, out IWorkspace? oldWorkspace);
@@ -252,11 +252,11 @@ internal class WorkspaceManager : IWorkspaceManager
 	internal virtual void WindowAdded(IWindow window)
 	{
 		Logger.Debug($"Adding window {window}");
-		IWorkspace? workspace = _configContext.RouterManager.RouteWindow(window);
+		IWorkspace? workspace = _context.RouterManager.RouteWindow(window);
 
-		if (!_configContext.RouterManager.RouteToActiveWorkspace && workspace == null)
+		if (!_context.RouterManager.RouteToActiveWorkspace && workspace == null)
 		{
-			IMonitor? monitor = _configContext.MonitorManager.GetMonitorAtPoint(window.Center);
+			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(window.Center);
 			if (monitor is not null)
 			{
 				workspace = GetWorkspaceForMonitor(monitor);
@@ -358,7 +358,7 @@ internal class WorkspaceManager : IWorkspaceManager
 			// If there's no workspace, create one.
 			if (workspace is null)
 			{
-				workspace = WorkspaceFactory(_configContext, $"Workspace {_workspaces.Count + 1}");
+				workspace = WorkspaceFactory(_context, $"Workspace {_workspaces.Count + 1}");
 				workspace.Initialize();
 			}
 
@@ -466,8 +466,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Moving window {window} to previous monitor");
 
 		// Get the previous monitor.
-		IMonitor monitor = _configContext.MonitorManager.FocusedMonitor;
-		IMonitor previousMonitor = _configContext.MonitorManager.GetPreviousMonitor(monitor);
+		IMonitor monitor = _context.MonitorManager.FocusedMonitor;
+		IMonitor previousMonitor = _context.MonitorManager.GetPreviousMonitor(monitor);
 
 		MoveWindowToMonitor(previousMonitor, window);
 	}
@@ -477,8 +477,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Moving window {window} to next monitor");
 
 		// Get the next monitor.
-		IMonitor monitor = _configContext.MonitorManager.FocusedMonitor;
-		IMonitor nextMonitor = _configContext.MonitorManager.GetNextMonitor(monitor);
+		IMonitor monitor = _context.MonitorManager.FocusedMonitor;
+		IMonitor nextMonitor = _context.MonitorManager.GetNextMonitor(monitor);
 
 		MoveWindowToMonitor(nextMonitor, window);
 	}
@@ -488,7 +488,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Moving window {window} to location {point}");
 
 		// Get the monitor.
-		IMonitor targetMonitor = _configContext.MonitorManager.GetMonitorAtPoint(point);
+		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);
 
 		// Get the target workspace.
 		IWorkspace? targetWorkspace = GetWorkspaceForMonitor(targetMonitor);

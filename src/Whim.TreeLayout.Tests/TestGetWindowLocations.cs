@@ -99,7 +99,7 @@ public class TestGetWindowLocations
 	[Fact]
 	public void IWindow_GetEnumerator_Null()
 	{
-		TreeLayoutEngine engine = new(new Mock<IConfigContext>().Object);
+		TreeLayoutEngine engine = new(new Mock<IContext>().Object);
 		Assert.Empty(engine);
 	}
 }

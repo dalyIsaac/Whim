@@ -23,11 +23,11 @@ public static class WindowExtensions
 	/// Hides the given <paramref name="window"/>.
 	/// </summary>
 	/// <param name="window"></param>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <returns></returns>
-	public static bool Hide(this Microsoft.UI.Xaml.Window window, IConfigContext configContext)
+	public static bool Hide(this Microsoft.UI.Xaml.Window window, IContext context)
 	{
-		return configContext.NativeManager.HideWindow(window.GetHandle());
+		return context.NativeManager.HideWindow(window.GetHandle());
 	}
 
 	/// <summary>
@@ -56,7 +56,7 @@ public static class WindowExtensions
 	/// Initializes the given <paramref name="uiWindow"/> as a borderless window.
 	/// </summary>
 	/// <param name="uiWindow"></param>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="componentNamespace"></param>
 	/// <param name="componentPath"></param>
 	/// <returns></returns>
@@ -66,7 +66,7 @@ public static class WindowExtensions
 	/// </exception>
 	public static IWindow InitializeBorderlessWindow(
 		this Microsoft.UI.Xaml.Window uiWindow,
-		IConfigContext configContext,
+		IContext context,
 		string componentNamespace,
 		string componentPath
 	)
@@ -75,11 +75,11 @@ public static class WindowExtensions
 
 		HWND hwnd = new(WinRT.Interop.WindowNative.GetWindowHandle(uiWindow));
 		IWindow window =
-			configContext.WindowManager.CreateWindow(GetHandle(uiWindow))
+			context.WindowManager.CreateWindow(GetHandle(uiWindow))
 			?? throw new InitializeWindowException("Window was unexpectedly null");
 
-		configContext.NativeManager.HideCaptionButtons(hwnd);
-		configContext.NativeManager.SetWindowCorners(hwnd);
+		context.NativeManager.HideCaptionButtons(hwnd);
+		context.NativeManager.SetWindowCorners(hwnd);
 
 		return window;
 	}

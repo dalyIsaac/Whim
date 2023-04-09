@@ -17,16 +17,16 @@ public class WindowManagerTests
 	public void OnWindowAdded()
 	{
 		// Given
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 
-		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		Mock<WorkspaceManager> workspaceManager = new(context.Object);
 		workspaceManager.Setup(m => m.WindowAdded(It.IsAny<IWindow>()));
 
-		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+		context.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
 
 		Mock<ICoreNativeManager> coreNativeManager = new();
 
-		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+		WindowManager windowManager = new(context.Object, coreNativeManager.Object);
 
 		Mock<IWindow> window = new();
 
@@ -46,21 +46,21 @@ public class WindowManagerTests
 	public void OnWindowFocused()
 	{
 		// Given
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 		Mock<ICoreNativeManager> coreNativeManager = new();
 		Mock<IWindowMessageMonitor> windowMessageMonitor = new();
 
-		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		Mock<WorkspaceManager> workspaceManager = new(context.Object);
 		workspaceManager.Setup(m => m.WindowFocused(It.IsAny<IWindow>()));
 
 		Mock<MonitorManager> monitorManager =
-			new(configContext.Object, coreNativeManager.Object, windowMessageMonitor.Object);
+			new(context.Object, coreNativeManager.Object, windowMessageMonitor.Object);
 		monitorManager.Setup(m => m.WindowFocused(It.IsAny<IWindow>()));
 
-		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
-		configContext.SetupGet(m => m.MonitorManager).Returns(monitorManager.Object);
+		context.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+		context.SetupGet(m => m.MonitorManager).Returns(monitorManager.Object);
 
-		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+		WindowManager windowManager = new(context.Object, coreNativeManager.Object);
 
 		Mock<IWindow> window = new();
 
@@ -81,16 +81,16 @@ public class WindowManagerTests
 	public void OnWindowRemoved()
 	{
 		// Given
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 
-		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		Mock<WorkspaceManager> workspaceManager = new(context.Object);
 		workspaceManager.Setup(m => m.WindowRemoved(It.IsAny<IWindow>()));
 
-		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+		context.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
 
 		Mock<ICoreNativeManager> coreNativeManager = new();
 
-		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+		WindowManager windowManager = new(context.Object, coreNativeManager.Object);
 
 		Mock<IWindow> window = new();
 
@@ -110,16 +110,16 @@ public class WindowManagerTests
 	public void OnWindowMinimizeStart()
 	{
 		// Given
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 
-		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		Mock<WorkspaceManager> workspaceManager = new(context.Object);
 		workspaceManager.Setup(m => m.WindowMinimizeStart(It.IsAny<IWindow>()));
 
-		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+		context.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
 
 		Mock<ICoreNativeManager> coreNativeManager = new();
 
-		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+		WindowManager windowManager = new(context.Object, coreNativeManager.Object);
 
 		Mock<IWindow> window = new();
 
@@ -139,16 +139,16 @@ public class WindowManagerTests
 	public void OnWindowMinimizeEnd()
 	{
 		// Given
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 
-		Mock<WorkspaceManager> workspaceManager = new(configContext.Object);
+		Mock<WorkspaceManager> workspaceManager = new(context.Object);
 		workspaceManager.Setup(m => m.WindowMinimizeEnd(It.IsAny<IWindow>()));
 
-		configContext.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
+		context.SetupGet(m => m.WorkspaceManager).Returns(workspaceManager.Object);
 
 		Mock<ICoreNativeManager> coreNativeManager = new();
 
-		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+		WindowManager windowManager = new(context.Object, coreNativeManager.Object);
 
 		Mock<IWindow> window = new();
 
@@ -192,9 +192,9 @@ public class WindowManagerTests
 	public void Initialize()
 	{
 		// Given
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 		Mock<ICoreNativeManager> coreNativeManager = CreateInitializeCoreNativeManagerMock();
-		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+		WindowManager windowManager = new(context.Object, coreNativeManager.Object);
 
 		// When
 		windowManager.Initialize();
@@ -210,7 +210,7 @@ public class WindowManagerTests
 	public void Initialize_Fail()
 	{
 		// Given
-		Mock<IConfigContext> configContext = new();
+		Mock<IContext> context = new();
 
 		Mock<ICoreNativeManager> coreNativeManager = CreateInitializeCoreNativeManagerMock();
 		coreNativeManager
@@ -224,7 +224,7 @@ public class WindowManagerTests
 			)
 			.Returns(new UnhookWinEventSafeHandle());
 
-		WindowManager windowManager = new(configContext.Object, coreNativeManager.Object);
+		WindowManager windowManager = new(context.Object, coreNativeManager.Object);
 
 		// When
 		// Then

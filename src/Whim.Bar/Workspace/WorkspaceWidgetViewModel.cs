@@ -9,7 +9,7 @@ namespace Whim.Bar;
 /// </summary>
 public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private bool _disposedValue;
 
 	/// <summary>
@@ -25,23 +25,23 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <summary>
 	/// Creates a new instance of <see cref="WorkspaceWidgetViewModel"/>.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="monitor"></param>
-	public WorkspaceWidgetViewModel(IConfigContext configContext, IMonitor monitor)
+	public WorkspaceWidgetViewModel(IContext context, IMonitor monitor)
 	{
-		_configContext = configContext;
+		_context = context;
 		Monitor = monitor;
 
-		_configContext.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
-		_configContext.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
-		_configContext.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
-		_configContext.WorkspaceManager.WorkspaceRenamed += WorkspaceManager_WorkspaceRenamed;
+		_context.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
+		_context.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
+		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
+		_context.WorkspaceManager.WorkspaceRenamed += WorkspaceManager_WorkspaceRenamed;
 
 		// Populate the list of workspaces
-		foreach (IWorkspace workspace in _configContext.WorkspaceManager)
+		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
-			IMonitor? monitorForWorkspace = _configContext.WorkspaceManager.GetMonitorForWorkspace(workspace);
-			Workspaces.Add(new WorkspaceModel(configContext, this, workspace, Monitor == monitorForWorkspace));
+			IMonitor? monitorForWorkspace = _context.WorkspaceManager.GetMonitorForWorkspace(workspace);
+			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor == monitorForWorkspace));
 		}
 	}
 
@@ -61,8 +61,8 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 			return;
 		}
 
-		IMonitor? monitorForWorkspace = _configContext.WorkspaceManager.GetMonitorForWorkspace(args.Workspace);
-		Workspaces.Add(new WorkspaceModel(_configContext, this, args.Workspace, Monitor == monitorForWorkspace));
+		IMonitor? monitorForWorkspace = _context.WorkspaceManager.GetMonitorForWorkspace(args.Workspace);
+		Workspaces.Add(new WorkspaceModel(_context, this, args.Workspace, Monitor == monitorForWorkspace));
 	}
 
 	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
@@ -118,9 +118,9 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_configContext.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
-				_configContext.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
-				_configContext.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
+				_context.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
+				_context.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
+				_context.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

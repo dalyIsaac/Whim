@@ -11,7 +11,7 @@ public class CommandPaletteWindowViewModelTests
 {
 	private class MocksBuilder
 	{
-		public Mock<IConfigContext> ConfigContext { get; } = new();
+		public Mock<IContext> Context { get; } = new();
 		public Mock<ICommandManager> CommandManager { get; } = new();
 		public CommandPalettePlugin Plugin { get; }
 		public Mock<IVariantControl> MenuVariant { get; } = new();
@@ -39,10 +39,10 @@ public class CommandPaletteWindowViewModelTests
 			Mock<IMonitorManager> monitorManager = new();
 			monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
 
-			ConfigContext.SetupGet(x => x.CommandManager).Returns(CommandManager.Object);
-			ConfigContext.SetupGet(x => x.MonitorManager).Returns(monitorManager.Object);
+			Context.SetupGet(x => x.CommandManager).Returns(CommandManager.Object);
+			Context.SetupGet(x => x.MonitorManager).Returns(monitorManager.Object);
 
-			Plugin = new(ConfigContext.Object, new CommandPaletteConfig(ConfigContext.Object));
+			Plugin = new(Context.Object, new CommandPaletteConfig(Context.Object));
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
@@ -69,7 +69,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -89,7 +89,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -113,7 +113,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -137,7 +137,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -165,7 +165,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -249,7 +249,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -272,7 +272,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -298,7 +298,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -324,7 +324,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,
@@ -346,7 +346,7 @@ public class CommandPaletteWindowViewModelTests
 
 		CommandPaletteWindowViewModel vm =
 			new(
-				mocks.ConfigContext.Object,
+				mocks.Context.Object,
 				mocks.Plugin,
 				mocks.MenuVariant.Object,
 				mocks.FreeTextVariant.Object,

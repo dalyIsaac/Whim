@@ -9,11 +9,7 @@ namespace Whim.Bar;
 /// Delegate for creating a component.
 /// A component will subscribe to <see cref="Microsoft.UI.Xaml.Window.Closed"/> if it has resources to dispose.
 /// </summary>
-public delegate UserControl BarComponent(
-	IConfigContext configContext,
-	IMonitor monitor,
-	Microsoft.UI.Xaml.Window window
-);
+public delegate UserControl BarComponent(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window);
 
 /// <summary>
 /// Configuration for the bar plugin.

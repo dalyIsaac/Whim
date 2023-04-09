@@ -7,7 +7,7 @@ namespace Whim.FloatingLayout;
 /// </summary>
 public class FloatingLayoutEngine : BaseProxyLayoutEngine
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly FloatingLayoutConfig _floatingLayoutConfig;
 
 	private readonly Dictionary<IWindow, ILocation<double>> _windowToLocation = new();
@@ -15,16 +15,16 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <summary>
 	/// Creates a new instance of the proxy layout engine <see cref="FloatingLayoutEngine"/>.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="floatingLayoutConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
 	public FloatingLayoutEngine(
-		IConfigContext configContext,
+		IContext context,
 		FloatingLayoutConfig floatingLayoutConfig,
 		ILayoutEngine innerLayoutEngine
 	) : base(innerLayoutEngine)
 	{
-		_configContext = configContext;
+		_context = context;
 		_floatingLayoutConfig = floatingLayoutConfig;
 	}
 
@@ -72,7 +72,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="window"></param>
 	public void MarkWindowAsFloating(IWindow? window = null)
 	{
-		window ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Marking window {window} as floating");
 
 		if (window != null)
@@ -89,7 +89,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="window"></param>
 	public void MarkWindowAsDocked(IWindow? window = null)
 	{
-		window ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Marking window {window} as docked");
 
 		if (window != null)
@@ -107,7 +107,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="window"></param>
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
-		window ??= _configContext.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Toggling window {window} floating");
 
 		if (window == null)
@@ -140,13 +140,13 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 	private ILocation<double>? GetUnitLocation(IWindow window)
 	{
-		ILocation<int>? location = _configContext.NativeManager.DwmGetWindowLocation(window.Handle);
+		ILocation<int>? location = _context.NativeManager.DwmGetWindowLocation(window.Handle);
 		if (location == null)
 		{
 			return null;
 		}
 
-		IMonitor monitor = _configContext.MonitorManager.GetMonitorAtPoint(location);
+		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(location);
 		return monitor.WorkingArea.ToUnitSquare(location);
 	}
 }

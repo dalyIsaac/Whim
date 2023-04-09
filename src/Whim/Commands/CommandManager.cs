@@ -7,7 +7,7 @@ namespace Whim;
 /// <inheritdoc />
 internal class CommandManager : ICommandManager
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly ICommandItemContainer _commandItems;
 	private readonly KeybindHook _keybindHook;
@@ -16,9 +16,9 @@ internal class CommandManager : ICommandManager
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CommandManager"/> class.
 	/// </summary>
-	public CommandManager(IConfigContext configContext, ICoreNativeManager coreNativeManager)
+	public CommandManager(IContext context, ICoreNativeManager coreNativeManager)
 	{
-		_configContext = configContext;
+		_context = context;
 		_coreNativeManager = coreNativeManager;
 		_commandItems = new CommandItemContainer();
 		_keybindHook = new KeybindHook(_coreNativeManager, _commandItems);
@@ -28,7 +28,7 @@ internal class CommandManager : ICommandManager
 	public void Initialize()
 	{
 		_keybindHook.Initialize();
-		LoadCommands(new CoreCommands(_configContext));
+		LoadCommands(new CoreCommands(_context));
 	}
 
 	/// <inheritdoc />

@@ -9,15 +9,15 @@ namespace Whim;
 /// <inheritdoc/>
 public class NativeManager : INativeManager
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="NativeManager"/> class.
 	/// </summary>
-	/// <param name="configContext"></param>
-	public NativeManager(IConfigContext configContext)
+	/// <param name="context"></param>
+	public NativeManager(IContext context)
 	{
-		_configContext = configContext;
+		_context = context;
 	}
 
 	private const int _bufferCapacity = 255;

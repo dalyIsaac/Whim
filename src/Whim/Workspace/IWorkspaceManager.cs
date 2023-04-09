@@ -22,7 +22,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <b>NOTE</b>: This will not add the workspace to the manager, nor will it activate it.
 	/// Call <see cref="Add"/>.
 	/// </summary>
-	public Func<IConfigContext, string, IWorkspace> WorkspaceFactory { get; set; }
+	public Func<IContext, string, IWorkspace> WorkspaceFactory { get; set; }
 
 	/// <summary>
 	/// Initialize the event listeners.

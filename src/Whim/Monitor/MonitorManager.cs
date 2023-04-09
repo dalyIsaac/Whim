@@ -13,7 +13,7 @@ namespace Whim;
 /// </summary>
 internal class MonitorManager : IMonitorManager
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly IWindowMessageMonitor _windowMessageMonitor;
 
@@ -47,14 +47,14 @@ internal class MonitorManager : IMonitorManager
 	/// When no monitors are found, or there is no primary monitor.
 	/// </exception>
 	public MonitorManager(
-		IConfigContext configContext,
+		IContext context,
 		ICoreNativeManager coreNativeManager,
 		IWindowMessageMonitor? windowMessageMonitor = null
 	)
 	{
-		_configContext = configContext;
+		_context = context;
 		_coreNativeManager = coreNativeManager;
-		_windowMessageMonitor = windowMessageMonitor ?? new WindowMessageMonitor(_configContext, _coreNativeManager);
+		_windowMessageMonitor = windowMessageMonitor ?? new WindowMessageMonitor(_context, _coreNativeManager);
 
 		// Get the monitors.
 		_monitors = GetCurrentMonitors();
@@ -80,7 +80,7 @@ internal class MonitorManager : IMonitorManager
 	internal virtual void WindowFocused(IWindow window)
 	{
 		Logger.Debug($"Focusing on {window}");
-		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWindow(window);
+		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(window);
 
 		if (monitor != null)
 		{

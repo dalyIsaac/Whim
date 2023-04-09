@@ -3,15 +3,15 @@ using System;
 namespace Whim;
 
 /// <summary>
-/// Implementation of <see cref="IConfigContext"/>. This is the core of Whim. <br/>
+/// Implementation of <see cref="IContext"/>. This is the core of Whim. <br/>
 ///
-/// <c>ConfigContext</c> consists of managers which contain and control Whim's state, and thus
+/// <c>Context</c> consists of managers which contain and control Whim's state, and thus
 /// functionality. <br/>
 ///
-/// <c>ConfigContext</c> also contains other associated state and functionality, like the
+/// <c>Context</c> also contains other associated state and functionality, like the
 /// <see cref="Logger"/>.
 /// </summary>
-internal class ConfigContext : IConfigContext
+internal class Context : IContext
 {
 	public Logger Logger { get; private set; }
 	public INativeManager NativeManager { get; private set; }
@@ -28,9 +28,9 @@ internal class ConfigContext : IConfigContext
 	public event EventHandler<ExitEventArgs>? Exited;
 
 	/// <summary>
-	/// Create a new <see cref="IConfigContext"/>.
+	/// Create a new <see cref="IContext"/>.
 	/// </summary>
-	public ConfigContext()
+	public Context()
 	{
 		Logger = new Logger();
 		NativeManager = new NativeManager(this);
@@ -46,8 +46,8 @@ internal class ConfigContext : IConfigContext
 
 	public void Initialize()
 	{
-		// Load the config context.
-		DoConfig doConfig = ConfigLoader.LoadConfigContext();
+		// Load the context.
+		DoConfig doConfig = ConfigLoader.LoadContext();
 		doConfig(this);
 
 		// Initialize the managers.
@@ -69,7 +69,7 @@ internal class ConfigContext : IConfigContext
 
 	public void Exit(ExitEventArgs? args = null)
 	{
-		Logger.Debug("Exiting config context...");
+		Logger.Debug("Exiting context...");
 		args ??= new ExitEventArgs() { Reason = ExitReason.User };
 
 		Exiting?.Invoke(this, args);

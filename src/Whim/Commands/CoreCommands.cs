@@ -40,14 +40,14 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// </summary>
 	public static double MoveWindowEdgeDelta { get; set; } = 0.05;
 
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
 	/// <summary>
 	/// Creates a new instance of the core commands command.
 	/// </summary>
-	public CoreCommands(IConfigContext configContext)
+	public CoreCommands(IContext context)
 	{
-		_configContext = configContext;
+		_context = context;
 	}
 
 	/// <inheritdoc/>
@@ -85,10 +85,10 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// <summary>
 	/// Action to focus the last focused window in the specified direction command.
 	/// </summary>
-	public static Action FocusWindowInDirection(IConfigContext configContext, Direction direction) =>
+	public static Action FocusWindowInDirection(IContext context, Direction direction) =>
 		() =>
 		{
-			IWorkspace workspace = configContext.WorkspaceManager.ActiveWorkspace;
+			IWorkspace workspace = context.WorkspaceManager.ActiveWorkspace;
 			if (workspace.LastFocusedWindow == null)
 			{
 				return;
@@ -100,10 +100,10 @@ public class CoreCommands : IEnumerable<CommandItem>
 	/// <summary>
 	/// Action to swap the last focused window with the window in the specified direction command.
 	/// </summary>
-	public static Action SwapWindowInDirection(IConfigContext configContext, Direction direction) =>
+	public static Action SwapWindowInDirection(IContext context, Direction direction) =>
 		() =>
 		{
-			configContext.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
+			context.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
 		};
 
 	/// <summary>
@@ -115,7 +115,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.focus_window_in_direction.left",
 				title: "Focus the window in the left direction",
-				callback: FocusWindowInDirection(_configContext, Direction.Left)
+				callback: FocusWindowInDirection(_context, Direction.Left)
 			),
 			Keybind = new Keybind(WinAlt, VIRTUAL_KEY.VK_LEFT)
 		};
@@ -129,7 +129,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.focus_window_in_direction.right",
 				title: "Focus the window in the right direction",
-				callback: FocusWindowInDirection(_configContext, Direction.Right)
+				callback: FocusWindowInDirection(_context, Direction.Right)
 			),
 			Keybind = new Keybind(WinAlt, VIRTUAL_KEY.VK_RIGHT)
 		};
@@ -143,7 +143,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.focus_window_in_direction.up",
 				title: "Focus the window in the up direction",
-				callback: FocusWindowInDirection(_configContext, Direction.Up)
+				callback: FocusWindowInDirection(_context, Direction.Up)
 			),
 			Keybind = new Keybind(WinAlt, VIRTUAL_KEY.VK_UP)
 		};
@@ -157,7 +157,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.focus_window_in_direction.down",
 				title: "Focus the window in the down direction",
-				callback: FocusWindowInDirection(_configContext, Direction.Down)
+				callback: FocusWindowInDirection(_context, Direction.Down)
 			),
 			Keybind = new Keybind(WinAlt, VIRTUAL_KEY.VK_DOWN)
 		};
@@ -171,7 +171,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.swap_window_in_direction.left",
 				title: "Swap the window with the window to the left",
-				callback: SwapWindowInDirection(_configContext, Direction.Left)
+				callback: SwapWindowInDirection(_context, Direction.Left)
 			),
 			Keybind = new Keybind(WinCtrl, VIRTUAL_KEY.VK_LEFT)
 		};
@@ -185,7 +185,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.swap_window_in_direction.right",
 				title: "Swap the window with the window to the right",
-				callback: SwapWindowInDirection(_configContext, Direction.Right)
+				callback: SwapWindowInDirection(_context, Direction.Right)
 			),
 			Keybind = new Keybind(WinCtrl, VIRTUAL_KEY.VK_RIGHT)
 		};
@@ -199,7 +199,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.swap_window_in_direction.up",
 				title: "Swap the window with the window to the up",
-				callback: SwapWindowInDirection(_configContext, Direction.Up)
+				callback: SwapWindowInDirection(_context, Direction.Up)
 			),
 			Keybind = new Keybind(WinCtrl, VIRTUAL_KEY.VK_UP)
 		};
@@ -213,7 +213,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.swap_window_in_direction.down",
 				title: "Swap the window with the window to the down",
-				callback: SwapWindowInDirection(_configContext, Direction.Down)
+				callback: SwapWindowInDirection(_context, Direction.Down)
 			),
 			Keybind = new Keybind(WinCtrl, VIRTUAL_KEY.VK_DOWN)
 		};
@@ -228,7 +228,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
 				callback: () =>
-					_configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
 						Direction.Left,
 						MoveWindowEdgeDelta
 					)
@@ -246,7 +246,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
 				callback: () =>
-					_configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
 						Direction.Left,
 						-MoveWindowEdgeDelta
 					)
@@ -264,7 +264,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
 				callback: () =>
-					_configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
 						Direction.Right,
 						-MoveWindowEdgeDelta
 					)
@@ -282,7 +282,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
 				callback: () =>
-					_configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
 						Direction.Right,
 						MoveWindowEdgeDelta
 					)
@@ -300,7 +300,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.move_window_top_edge_up",
 				title: "Move the current window's top edge up",
 				callback: () =>
-					_configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
 						Direction.Up,
 						MoveWindowEdgeDelta
 					)
@@ -318,7 +318,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.move_window_top_edge_down",
 				title: "Move the current window's top edge down",
 				callback: () =>
-					_configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
 						Direction.Up,
 						-MoveWindowEdgeDelta
 					)
@@ -336,7 +336,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
 				callback: () =>
-					_configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
 						Direction.Down,
 						-MoveWindowEdgeDelta
 					)
@@ -354,7 +354,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 				identifier: $"{Name}.move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
 				callback: () =>
-					_configContext.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
 						Direction.Down,
 						MoveWindowEdgeDelta
 					)
@@ -371,7 +371,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.move_window_to_previous_monitor",
 				title: "Move the window to the previous monitor",
-				callback: () => _configContext.WorkspaceManager.MoveWindowToPreviousMonitor()
+				callback: () => _context.WorkspaceManager.MoveWindowToPreviousMonitor()
 			),
 			Keybind = new Keybind(WinShift, VIRTUAL_KEY.VK_LEFT)
 		};
@@ -385,7 +385,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.move_window_to_next_monitor",
 				title: "Move the window to the next monitor",
-				callback: () => _configContext.WorkspaceManager.MoveWindowToNextMonitor()
+				callback: () => _context.WorkspaceManager.MoveWindowToNextMonitor()
 			),
 			Keybind = new Keybind(WinShift, VIRTUAL_KEY.VK_RIGHT)
 		};
@@ -399,7 +399,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.close_current_workspace",
 				title: "Close the current workspace",
-				callback: () => _configContext.WorkspaceManager.Remove(_configContext.WorkspaceManager.ActiveWorkspace)
+				callback: () => _context.WorkspaceManager.Remove(_context.WorkspaceManager.ActiveWorkspace)
 			),
 			Keybind = new Keybind(WinCtrl, VIRTUAL_KEY.VK_W)
 		};
@@ -410,11 +410,7 @@ public class CoreCommands : IEnumerable<CommandItem>
 	public CommandItem ExitWhim =>
 		new()
 		{
-			Command = new Command(
-				identifier: $"{Name}.exit_whim",
-				title: "Exit Whim",
-				callback: () => _configContext.Exit()
-			),
+			Command = new Command(identifier: $"{Name}.exit_whim", title: "Exit Whim", callback: () => _context.Exit()),
 			Keybind = null
 		};
 }

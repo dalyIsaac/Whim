@@ -6,7 +6,7 @@ namespace Whim;
 
 internal class Workspace : IWorkspace
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 
 	private string _name;
 	public string Name
@@ -16,7 +16,7 @@ internal class Workspace : IWorkspace
 		{
 			string oldName = _name;
 			_name = value;
-			(_configContext.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
+			(_context.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
 				new WorkspaceRenamedEventArgs()
 				{
 					Workspace = this,
@@ -58,9 +58,9 @@ internal class Workspace : IWorkspace
 	/// </summary>
 	private readonly Dictionary<IWindow, IWindowState> _windowLocations = new();
 
-	public Workspace(IConfigContext configContext, string name, params ILayoutEngine[] layoutEngines)
+	public Workspace(IContext context, string name, params ILayoutEngine[] layoutEngines)
 	{
-		_configContext = configContext;
+		_context = context;
 		_name = name;
 
 		if (layoutEngines.Length == 0)
@@ -74,7 +74,7 @@ internal class Workspace : IWorkspace
 	public void Initialize()
 	{
 		// Apply the proxy layout engines
-		foreach (ProxyLayoutEngine proxyLayout in _configContext.WorkspaceManager.ProxyLayoutEngines)
+		foreach (ProxyLayoutEngine proxyLayout in _context.WorkspaceManager.ProxyLayoutEngines)
 		{
 			for (int i = 0; i < _layoutEngines.Count; i++)
 			{
@@ -121,7 +121,7 @@ internal class Workspace : IWorkspace
 			LastFocusedWindow = null;
 		}
 
-		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
+		_context.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -173,7 +173,7 @@ internal class Workspace : IWorkspace
 			return true;
 		}
 
-		_configContext.WorkspaceManager.TriggerActiveLayoutEngineChanged(
+		_context.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -352,7 +352,7 @@ internal class Workspace : IWorkspace
 		Logger.Debug($"Workspace {Name}");
 
 		// Get the monitor for this workspace
-		IMonitor? monitor = _configContext.WorkspaceManager.GetMonitorForWorkspace(this);
+		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
 		if (monitor == null)
 		{
 			Logger.Debug($"No active monitors found for workspace {Name}.");
@@ -373,7 +373,7 @@ internal class Workspace : IWorkspace
 			monitor
 		);
 
-		using WindowDeferPosHandle handle = new(_configContext, Windows.Count());
+		using WindowDeferPosHandle handle = new(_context, Windows.Count());
 		foreach (IWindowState loc in locations)
 		{
 			Logger.Verbose($"Setting location of window {loc.Window}");
@@ -418,7 +418,7 @@ internal class Workspace : IWorkspace
 		}
 
 		_phantomWindows.Add(window, engine);
-		_configContext.WorkspaceManager.AddPhantomWindow(this, window);
+		_context.WorkspaceManager.AddPhantomWindow(this, window);
 		DoLayout();
 	}
 
@@ -445,7 +445,7 @@ internal class Workspace : IWorkspace
 		}
 
 		_phantomWindows.Remove(window);
-		_configContext.WorkspaceManager.RemovePhantomWindow(window);
+		_context.WorkspaceManager.RemovePhantomWindow(window);
 
 		DoLayout();
 	}
@@ -472,7 +472,7 @@ internal class Workspace : IWorkspace
 				Logger.Debug($"Disposing workspace {Name}");
 
 				// dispose managed state (managed objects)
-				bool isWorkspaceActive = _configContext.WorkspaceManager.GetMonitorForWorkspace(this) != null;
+				bool isWorkspaceActive = _context.WorkspaceManager.GetMonitorForWorkspace(this) != null;
 
 				// If the workspace isn't active on the monitor, show all the windows in as minimized.
 				if (!isWorkspaceActive)

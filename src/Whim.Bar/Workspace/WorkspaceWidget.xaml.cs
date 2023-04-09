@@ -16,10 +16,10 @@ public partial class WorkspaceWidget : UserControl, IDisposable
 	/// </summary>
 	public WorkspaceWidgetViewModel ViewModel { get; }
 
-	internal WorkspaceWidget(IConfigContext configContext, IMonitor monitor, Microsoft.UI.Xaml.Window window)
+	internal WorkspaceWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window)
 	{
 		_window = window;
-		ViewModel = new WorkspaceWidgetViewModel(configContext, monitor);
+		ViewModel = new WorkspaceWidgetViewModel(context, monitor);
 		window.Closed += Window_Closed;
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "Workspace/WorkspaceWidget");
 	}
@@ -34,9 +34,7 @@ public partial class WorkspaceWidget : UserControl, IDisposable
 	/// </summary>
 	public static BarComponent CreateComponent()
 	{
-		return new BarComponent(
-			(configContext, monitor, window) => new WorkspaceWidget(configContext, monitor, window)
-		);
+		return new BarComponent((context, monitor, window) => new WorkspaceWidget(context, monitor, window));
 	}
 
 	/// <inheritdoc/>

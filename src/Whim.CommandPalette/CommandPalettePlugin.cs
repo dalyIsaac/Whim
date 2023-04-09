@@ -6,7 +6,7 @@ namespace Whim.CommandPalette;
 /// <inheritdoc />
 public class CommandPalettePlugin : ICommandPalettePlugin
 {
-	private readonly IConfigContext _configContext;
+	private readonly IContext _context;
 	private CommandPaletteWindow? _commandPaletteWindow;
 	private bool _disposedValue;
 
@@ -21,25 +21,25 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	/// <summary>
 	/// Creates a new instance of the command palette plugin.
 	/// </summary>
-	/// <param name="configContext"></param>
+	/// <param name="context"></param>
 	/// <param name="commandPaletteConfig"></param>
-	public CommandPalettePlugin(IConfigContext configContext, CommandPaletteConfig commandPaletteConfig)
+	public CommandPalettePlugin(IContext context, CommandPaletteConfig commandPaletteConfig)
 	{
-		_configContext = configContext;
+		_context = context;
 		Config = commandPaletteConfig;
 	}
 
 	/// <inheritdoc/>
 	public void PreInitialize()
 	{
-		_configContext.FilterManager.IgnoreTitleMatch(CommandPaletteConfig.Title);
+		_context.FilterManager.IgnoreTitleMatch(CommandPaletteConfig.Title);
 	}
 
 	/// <inheritdoc/>
 	public void PostInitialize()
 	{
 		// The window must be created on the UI thread (so don't do it in the constructor).
-		_commandPaletteWindow = new CommandPaletteWindow(_configContext, this);
+		_commandPaletteWindow = new CommandPaletteWindow(_context, this);
 	}
 
 	/// <summary>
@@ -49,7 +49,7 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	{
 		_commandPaletteWindow?.Activate(
 			config: config ?? Config.ActivationConfig,
-			monitor: _configContext.MonitorManager.FocusedMonitor
+			monitor: _context.MonitorManager.FocusedMonitor
 		);
 	}
 
@@ -95,5 +95,5 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	}
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands => new CommandPaletteCommands(_configContext, this);
+	public IEnumerable<CommandItem> Commands => new CommandPaletteCommands(_context, this);
 }
