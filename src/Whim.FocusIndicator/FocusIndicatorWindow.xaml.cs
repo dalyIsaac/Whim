@@ -42,16 +42,15 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		// Prevent the window from being activated.
 		_context.NativeManager.PreventWindowActivation(_window.Handle);
 
-		WindowDeferPosHandle.SetWindowPosFixScaling(
-			_context,
-			windowState: new WindowState()
+		using WindowDeferPosHandle windowDeferPos = new(_context);
+		windowDeferPos.DeferWindowPos(
+			new WindowState()
 			{
 				Window = _window,
 				Location = borderLocation,
 				WindowSize = WindowSize.Normal
 			},
-			monitor: _context.MonitorManager.FocusedMonitor,
-			hwndInsertAfter: new HWND(1)
+			new HWND(1)
 		);
 	}
 }
