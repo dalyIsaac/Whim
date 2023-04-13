@@ -6,6 +6,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Accessibility;
+using Windows.Win32.UI.HiDpi;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -143,22 +144,6 @@ internal interface ICoreNativeManager
 	/// <param name="dwData"></param>
 	/// <returns></returns>
 	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData);
-
-	/// <summary>
-	/// Gets the scale factor of a specific monitor.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetScaleFactorForMonitor(HMONITOR, out Windows.Win32.UI.Shell.Common.DEVICE_SCALE_FACTOR)"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/shellscalingapi/nf-shellscalingapi-getscalefactorformonitor
-	/// </remarks>
-	/// <param name="hMonitor"></param>
-	/// <param name="scaleFactor"></param>
-	/// <returns></returns>
-	public HRESULT GetScaleFactorForMonitor(
-		HMONITOR hMonitor,
-		out Windows.Win32.UI.Shell.Common.DEVICE_SCALE_FACTOR scaleFactor
-	);
 
 	/// <summary>
 	/// Retrieves the size of the work area on the primary display monitor.
@@ -433,4 +418,18 @@ internal interface ICoreNativeManager
 	/// <para><see href="https://docs.microsoft.com/windows/win32/api//commctrl/nf-commctrl-defsubclassproc">Learn more about this API from docs.microsoft.com</see>.</para>
 	/// </remarks>
 	public LRESULT DefSubclassProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam);
+
+	/// <summary>Queries the dots per inch (dpi) of a display.</summary>
+	/// <param name="hmonitor">Handle of the monitor being queried.</param>
+	/// <param name="dpiType">The type of DPI being queried. Possible values are from the <a href="https://docs.microsoft.com/windows/desktop/api/shellscalingapi/ne-shellscalingapi-monitor_dpi_type">MONITOR_DPI_TYPE</a> enumeration.</param>
+	/// <param name="dpiX">The value of the DPI along the X axis. This value always refers to the horizontal edge, even when the screen is rotated.</param>
+	/// <param name="dpiY">The value of the DPI along the Y axis. This value always refers to the vertical edge, even when the screen is rotated.</param>
+	/// <returns>
+	/// <para>This function returns one of the following values. </para>
+	/// <para>This doc was truncated.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//shellscalingapi/nf-shellscalingapi-getdpiformonitor">Learn more about this API from docs.microsoft.com</see>.</para>
+	/// </remarks>
+	public HRESULT GetDpiForMonitor(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, out uint dpiX, out uint dpiY);
 }
