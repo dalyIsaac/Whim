@@ -13,16 +13,16 @@ namespace Whim;
 /// </summary>
 internal class Context : IContext
 {
-	public Logger Logger { get; private set; }
-	public INativeManager NativeManager { get; private set; }
-	internal ICoreNativeManager CoreNativeManager { get; private set; }
-	public IWorkspaceManager WorkspaceManager { get; private set; }
-	public IWindowManager WindowManager { get; private set; }
-	public IMonitorManager MonitorManager { get; private set; }
-	public IRouterManager RouterManager { get; private set; }
-	public IFilterManager FilterManager { get; private set; }
-	public ICommandManager CommandManager { get; private set; }
-	public IPluginManager PluginManager { get; private set; }
+	public Logger Logger { get; }
+	public INativeManager NativeManager { get; }
+	internal ICoreNativeManager CoreNativeManager { get; }
+	public IWorkspaceManager WorkspaceManager { get; }
+	public IWindowManager WindowManager { get; }
+	public IMonitorManager MonitorManager { get; }
+	public IRouterManager RouterManager { get; }
+	public IFilterManager FilterManager { get; }
+	public ICommandManager CommandManager { get; }
+	public IPluginManager PluginManager { get; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
