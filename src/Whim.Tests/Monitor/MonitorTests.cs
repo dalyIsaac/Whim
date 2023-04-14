@@ -1,6 +1,7 @@
 using Moq;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.HiDpi;
 using Windows.Win32.UI.Shell.Common;
 using Xunit;
 
@@ -26,9 +27,18 @@ public class MonitorTests
 			};
 		nativeManagerMock.Setup(nm => nm.GetPrimaryDisplayWorkArea(out rect)).Returns((BOOL)true);
 
-		DEVICE_SCALE_FACTOR scaleFactor = DEVICE_SCALE_FACTOR.SCALE_150_PERCENT;
+		uint effectiveDpiX = 144;
+		uint effectiveDpiY = 144;
 		nativeManagerMock
-			.Setup(nm => nm.GetScaleFactorForMonitor(It.IsAny<HMONITOR>(), out scaleFactor))
+			.Setup(
+				nm =>
+					nm.GetDpiForMonitor(
+						It.IsAny<HMONITOR>(),
+						It.IsAny<MONITOR_DPI_TYPE>(),
+						out effectiveDpiX,
+						out effectiveDpiY
+					)
+			)
 			.Returns((HRESULT)0);
 
 		HMONITOR hmonitor = new(1);
@@ -130,9 +140,18 @@ public class MonitorTests
 			)
 			.Returns((BOOL)true);
 
-		DEVICE_SCALE_FACTOR scaleFactor = DEVICE_SCALE_FACTOR.SCALE_150_PERCENT;
+		uint effectiveDpiX = 144;
+		uint effectiveDpiY = 144;
 		nativeManagerMock
-			.Setup(nm => nm.GetScaleFactorForMonitor(It.IsAny<HMONITOR>(), out scaleFactor))
+			.Setup(
+				nm =>
+					nm.GetDpiForMonitor(
+						It.IsAny<HMONITOR>(),
+						It.IsAny<MONITOR_DPI_TYPE>(),
+						out effectiveDpiX,
+						out effectiveDpiY
+					)
+			)
 			.Returns((HRESULT)0);
 
 		HMONITOR hmonitor = new(1);
@@ -225,22 +244,6 @@ public class MonitorTests
 			"Monitor[Bounds=(X: 0, Y: 0, Width: 1920, Height: 1080) WorkingArea=(X: 10, Y: 10, Width: 1900, Height: 1060) Name=DISPLAY ScaleFactor=150 IsPrimary=True]",
 			monitor.ToString()
 		);
-	}
-
-	[Fact]
-	public void ScaleFactor_Failure()
-	{
-		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
-		nativeManagerMock
-			.Setup(nm => nm.GetScaleFactorForMonitor(It.IsAny<HMONITOR>(), out It.Ref<DEVICE_SCALE_FACTOR>.IsAny))
-			.Returns((HRESULT)(-1));
-
-		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
-
-		// Then
-		Assert.Equal(100, monitor.ScaleFactor);
 	}
 
 	[Fact]
