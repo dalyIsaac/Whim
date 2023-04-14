@@ -53,7 +53,10 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_context, _monitor, this)));
 	}
 
-	internal void UpdateLocation() => GetUpdatedLocation();
+	internal void UpdateLocation()
+	{
+		WindowState.Location = GetUpdatedLocation();
+	}
 
 	private Location<int> GetUpdatedLocation()
 	{
