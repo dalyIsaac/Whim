@@ -2,7 +2,6 @@ using Moq;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.HiDpi;
-using Windows.Win32.UI.Shell.Common;
 using Xunit;
 
 namespace Whim.Tests;
@@ -80,7 +79,7 @@ public class MonitorTests
 			},
 			monitor.WorkingArea
 		);
-		Assert.Equal((int)DEVICE_SCALE_FACTOR.SCALE_150_PERCENT, monitor.ScaleFactor);
+		Assert.Equal(150, monitor.ScaleFactor);
 	}
 
 	[Fact]
@@ -117,7 +116,7 @@ public class MonitorTests
 			},
 			monitor.WorkingArea
 		);
-		Assert.Equal((int)DEVICE_SCALE_FACTOR.SCALE_150_PERCENT, monitor.ScaleFactor);
+		Assert.Equal(150, monitor.ScaleFactor);
 	}
 
 	[Fact]
@@ -183,7 +182,7 @@ public class MonitorTests
 			},
 			monitor.WorkingArea
 		);
-		Assert.Equal((int)DEVICE_SCALE_FACTOR.SCALE_150_PERCENT, monitor.ScaleFactor);
+		Assert.Equal(150, monitor.ScaleFactor);
 	}
 
 	[Fact]
