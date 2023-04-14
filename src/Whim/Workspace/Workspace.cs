@@ -373,7 +373,7 @@ internal class Workspace : IWorkspace
 			monitor
 		);
 
-		using WindowDeferPosHandle handle = new(_context, Windows.Count());
+		using WindowDeferPosHandle handle = new(_context);
 		foreach (IWindowState loc in locations)
 		{
 			Logger.Verbose($"Setting location of window {loc.Window}");

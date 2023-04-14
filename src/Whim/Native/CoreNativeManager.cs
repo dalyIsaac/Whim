@@ -1,16 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Dwm;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Accessibility;
-using Windows.Win32.UI.Shell.Common;
-using Windows.Win32.UI.WindowsAndMessaging;
+using Windows.Win32.UI.HiDpi;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using System.Collections.Generic;
-using Windows.Win32.Graphics.Dwm;
 using Windows.Win32.UI.Shell;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
@@ -63,10 +63,6 @@ internal class CoreNativeManager : ICoreNativeManager
 	/// <inheritdoc/>
 	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData) =>
 		PInvoke.EnumDisplayMonitors(hdc, lprcClip, lpfnEnum, dwData);
-
-	/// <inheritdoc/>
-	public HRESULT GetScaleFactorForMonitor(HMONITOR hmonitor, out DEVICE_SCALE_FACTOR pdpiScale) =>
-		PInvoke.GetScaleFactorForMonitor(hmonitor, out pdpiScale);
 
 	/// <inheritdoc/>
 	public BOOL GetPrimaryDisplayWorkArea(out RECT lpRect)
@@ -290,4 +286,8 @@ internal class CoreNativeManager : ICoreNativeManager
 	/// <inheritdoc/>
 	public LRESULT DefSubclassProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam) =>
 		PInvoke.DefSubclassProc(hWnd, uMsg, wParam, lParam);
+
+	/// <inheritdoc/>
+	public HRESULT GetDpiForMonitor(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, out uint dpiX, out uint dpiY) =>
+		PInvoke.GetDpiForMonitor(hmonitor, dpiType, out dpiX, out dpiY);
 }

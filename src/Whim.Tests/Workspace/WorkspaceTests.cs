@@ -1,5 +1,6 @@
 using Moq;
 using System;
+using System.Collections.Generic;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Xunit;
@@ -162,11 +163,15 @@ public class WorkspaceTests
 		monitor.SetupGet(m => m.WorkingArea).Returns(new Location<int>());
 		monitor.SetupGet(m => m.Bounds).Returns(new Location<int>());
 
+		Mock<IMonitorManager> monitorManager = new();
+		monitorManager.Setup(m => m.GetEnumerator()).Returns(new List<IMonitor>() { monitor.Object }.GetEnumerator());
+
 		Mock<IWorkspaceManager> workspaceManager = new();
 		workspaceManager.Setup(m => m.GetMonitorForWorkspace(It.IsAny<IWorkspace>())).Returns(monitor.Object);
 
 		Mock<IContext> context = new();
 		context.Setup(c => c.WorkspaceManager).Returns(workspaceManager.Object);
+		context.Setup(c => c.MonitorManager).Returns(monitorManager.Object);
 		context.Setup(c => c.NativeManager).Returns(nativeManager.Object);
 
 		Mock<IWindow> window = new();
@@ -194,8 +199,11 @@ public class WorkspaceTests
 
 		// Then
 		layoutEngine.Verify(e => e.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()), Times.Once);
-		nativeManager.Verify(n => n.ShowWindowNoActivate(It.IsAny<HWND>()), Times.Exactly(showWindowNoActivateTimes));
-		nativeManager.Verify(n => n.EndDeferWindowPos(It.IsAny<HDWP>()), Times.Once);
+		nativeManager.Verify(
+			n => n.ShowWindowNoActivate(It.IsAny<HWND>()),
+			Times.Exactly(showWindowNoActivateTimes * 2)
+		);
+		nativeManager.Verify(n => n.EndDeferWindowPos(It.IsAny<HDWP>()), Times.Exactly(2));
 	}
 
 	[Fact]
@@ -787,7 +795,11 @@ public class WorkspaceTests
 		nativeManager.Setup(n => n.BeginDeferWindowPos(It.IsAny<int>())).Returns((HDWP)1);
 		nativeManager.Setup(n => n.GetWindowOffset(It.IsAny<HWND>())).Returns(new Location<int>());
 
+		Mock<IMonitorManager> monitorManager = new();
+		monitorManager.Setup(m => m.GetEnumerator()).Returns(new List<IMonitor>() { monitor.Object }.GetEnumerator());
+
 		mocks.Context.Setup(c => c.NativeManager).Returns(nativeManager.Object);
+		mocks.Context.Setup(c => c.MonitorManager).Returns(monitorManager.Object);
 
 		Mock<IWindow> window = new();
 

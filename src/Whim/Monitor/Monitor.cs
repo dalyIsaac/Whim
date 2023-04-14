@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
-using Windows.Win32.UI.Shell.Common;
+using Windows.Win32.UI.HiDpi;
 
 namespace Whim;
 
@@ -60,11 +60,15 @@ internal class Monitor : IMonitor
 			Name = infoEx.GetDeviceName();
 		}
 
-		HRESULT scaleFactorResult = _coreNativeManager.GetScaleFactorForMonitor(
+		// Get the scale factor.
+		// We assume that monitors have the same DPI in the x and y directions.
+		_coreNativeManager.GetDpiForMonitor(
 			_hmonitor,
-			out DEVICE_SCALE_FACTOR scaleFactor
+			MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI,
+			out uint effectiveDpiX,
+			out uint _
 		);
-		ScaleFactor = scaleFactorResult.Succeeded ? (int)scaleFactor : 100;
+		ScaleFactor = (int)((double)effectiveDpiX / 96 * 100);
 	}
 
 	public bool Equals(IMonitor? other) => other is Monitor monitor && _hmonitor == monitor._hmonitor;

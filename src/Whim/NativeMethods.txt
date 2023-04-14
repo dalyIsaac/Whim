@@ -26,10 +26,10 @@ GetAncestor
 GetClassName
 GetCursorPos
 GetDesktopWindow
+GetDpiForMonitor
 GetForegroundWindow
 GetKeyState
 GetMonitorInfo
-GetScaleFactorForMonitor
 GetShellWindow
 GetSystemMetrics
 GetWindow

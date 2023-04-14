@@ -35,19 +35,10 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 			_context.WindowManager.CreateWindow(this.GetHandle())
 			?? throw new BarException("Window was unexpectedly null");
 
-		double scaleFactor = _monitor.ScaleFactor;
-		double scale = scaleFactor / 100.0;
-
 		WindowState = new WindowState()
 		{
 			Window = window,
-			Location = new Location<int>()
-			{
-				X = _monitor.WorkingArea.X,
-				Y = _monitor.WorkingArea.Y,
-				Width = (int)(_monitor.WorkingArea.Width / scale),
-				Height = _barConfig.Height
-			},
+			Location = GetUpdatedLocation(),
 			WindowSize = WindowSize.Normal
 		};
 
@@ -64,15 +55,20 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 
 	internal void UpdateLocation()
 	{
+		WindowState.Location = GetUpdatedLocation();
+	}
+
+	private Location<int> GetUpdatedLocation()
+	{
 		double scaleFactor = _monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
 
-		WindowState.Location = new Location<int>()
+		return new Location<int>()
 		{
 			X = _monitor.WorkingArea.X,
 			Y = _monitor.WorkingArea.Y,
-			Width = (int)(_monitor.WorkingArea.Width / scale),
-			Height = _barConfig.Height
+			Width = _monitor.WorkingArea.Width,
+			Height = (int)(_barConfig.Height * scale)
 		};
 	}
 }

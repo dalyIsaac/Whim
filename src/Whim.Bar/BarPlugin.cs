@@ -71,8 +71,7 @@ public class BarPlugin : IBarPlugin
 	/// </summary>
 	private void ShowAll()
 	{
-		using WindowDeferPosHandle deferPosHandle = new(_context, _monitorBarMap.Count);
-
+		using WindowDeferPosHandle deferPosHandle = new(_context);
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
 			barWindow.UpdateLocation();
