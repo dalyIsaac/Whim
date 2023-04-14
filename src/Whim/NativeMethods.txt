@@ -8,9 +8,7 @@ DWM_WINDOW_CORNER_PREFERENCE
 DwmGetWindowAttribute
 DwmSetWindowAttribute
 EndDeferWindowPos
-ENUM_DISPLAY_SETTINGS_MODE
 EnumDisplayMonitors
-EnumDisplaySettings
 EnumWindows
 EVENT_OBJECT_CLOAKED
 EVENT_OBJECT_DESTROY
@@ -32,8 +30,6 @@ GetDpiForMonitor
 GetForegroundWindow
 GetKeyState
 GetMonitorInfo
-GetMonitorInfo
-GetScaleFactorForMonitor
 GetShellWindow
 GetSystemMetrics
 GetWindow
