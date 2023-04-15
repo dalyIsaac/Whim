@@ -10,6 +10,8 @@ namespace Whim;
 /// </summary>
 internal class WorkspaceManager : IWorkspaceManager
 {
+	private bool _initialized;
+
 	private readonly IContext _context;
 
 	/// <summary>
@@ -97,6 +99,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			workspace.Initialize();
 		}
+
+		_initialized = true;
 	}
 
 	#region Workspaces
@@ -105,7 +109,20 @@ internal class WorkspaceManager : IWorkspaceManager
 	public void Add(IWorkspace workspace)
 	{
 		Logger.Debug($"Adding workspace {workspace}");
+
+		if (_workspaces.Contains(workspace))
+		{
+			Logger.Debug($"Workspace {workspace} already exists");
+			return;
+		}
+
 		_workspaces.Add(workspace);
+
+		if (_initialized)
+		{
+			workspace.Initialize();
+		}
+
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 	}
 
