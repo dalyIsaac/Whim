@@ -46,6 +46,8 @@ public class WorkspaceManagerTests
 			{
 				WorkspaceManager.Add(workspace.Object);
 			}
+
+			Context.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager);
 		}
 	}
 
@@ -80,10 +82,11 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void Add()
+	public void Add_AfterInitialize()
 	{
-		// Given
-		MocksBuilder mocks = new();
+		// Given the workspace manager is already initialized
+		MocksBuilder mocks = new(new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() });
+		mocks.WorkspaceManager.Initialize();
 		Mock<IWorkspace> workspace = new();
 
 		// When a workspace is added, then WorkspaceAdded is raised
@@ -92,6 +95,37 @@ public class WorkspaceManagerTests
 			h => mocks.WorkspaceManager.WorkspaceAdded -= h,
 			() => mocks.WorkspaceManager.Add(workspace.Object)
 		);
+
+		workspace.Verify(w => w.Initialize(), Times.Once);
+	}
+
+	[Fact]
+	public void Add_BeforeInitialize()
+	{
+		// Given the workspace manager is not initialized
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace1 = new();
+		MocksBuilder mocks = new(new[] { workspace, workspace1 });
+
+		// When
+		mocks.WorkspaceManager.Initialize();
+
+		// Then
+		workspace.Verify(w => w.Initialize(), Times.Once);
+	}
+
+	[Fact]
+	public void Add_SameWorkspaceTwice()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		MocksBuilder mocks = new(new[] { workspace });
+
+		// When a workspace is added
+		mocks.WorkspaceManager.Add(workspace.Object);
+
+		// Then the length is still 1
+		Assert.Single(mocks.WorkspaceManager);
 	}
 
 	[Fact]
