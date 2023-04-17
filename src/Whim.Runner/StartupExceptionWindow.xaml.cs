@@ -7,6 +7,8 @@ namespace Whim.Runner;
 /// </summary>
 public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 {
+	private readonly App _app;
+
 	/// <summary>
 	/// The exception message.
 	/// </summary>
@@ -15,10 +17,12 @@ public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 	/// <summary>
 	/// Exposes the exception encountered during startup to the user.
 	/// </summary>
+	/// <param name="app"></param>
 	/// <param name="exitEventArgs"></param>
-	public StartupExceptionWindow(ExitEventArgs exitEventArgs)
+	public StartupExceptionWindow(App app, ExitEventArgs exitEventArgs)
 	{
 		InitializeComponent();
+		_app = app;
 		Title = "Whim Startup Error";
 
 		Message = exitEventArgs.Message ?? "Unknown error occurred";
@@ -27,5 +31,6 @@ public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 	private void Quit_Click(object sender, RoutedEventArgs e)
 	{
 		Close();
+		_app.Exit();
 	}
 }
