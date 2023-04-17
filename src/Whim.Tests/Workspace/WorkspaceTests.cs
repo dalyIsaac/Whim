@@ -763,7 +763,7 @@ public class WorkspaceTests
 		workspace.Deactivate();
 
 		// Then the windows are hidden and DoLayout is called
-		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Once);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
 		window.Verify(w => w.Hide(), Times.Once);
 		window2.Verify(w => w.Hide(), Times.Once);
 		phantomWindow.Verify(w => w.Hide(), Times.Once);
