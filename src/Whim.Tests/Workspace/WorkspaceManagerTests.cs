@@ -306,6 +306,10 @@ public class WorkspaceManagerTests
 
 		mocks.WorkspaceManager.Activate(oldWorkspace.Object);
 
+		// Reset mocks
+		oldWorkspace.Reset();
+		newWorkspace.Reset();
+
 		// When a workspace is activated when there is another workspace activated, then the old
 		// workspace is deactivated, the new workspace is activated, and an event is raised
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
@@ -337,6 +341,10 @@ public class WorkspaceManagerTests
 		mocks.WorkspaceManager.Activate(workspace.Object, monitor);
 		mocks.WorkspaceManager.Activate(workspace2.Object, monitor2);
 
+		// Reset mocks
+		workspace.Reset();
+		workspace2.Reset();
+
 		// When a workspace is activated on a monitor which already has a workspace activated, then
 		// an event is raised
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
@@ -351,7 +359,7 @@ public class WorkspaceManagerTests
 
 		workspace.Verify(w => w.Deactivate(), Times.Never);
 		workspace.Verify(w => w.DoLayout(), Times.Once);
-		workspace.Verify(w => w.FocusFirstWindow(), Times.Once);
+		workspace.Verify(w => w.FocusFirstWindow(), Times.Never);
 
 		workspace2.Verify(w => w.Deactivate(), Times.Never);
 		workspace2.Verify(w => w.DoLayout(), Times.Once);
