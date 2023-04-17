@@ -319,6 +319,7 @@ public class WorkspaceManagerTests
 		// The old workspace is deactivated, the new workspace is laid out, and the first window is
 		// focused.
 		oldWorkspace.Verify(w => w.Deactivate(), Times.Once);
+		oldWorkspace.Verify(w => w.DoLayout(), Times.Never);
 		newWorkspace.Verify(w => w.DoLayout(), Times.Once);
 		newWorkspace.Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
@@ -347,6 +348,14 @@ public class WorkspaceManagerTests
 		Assert.Equal(monitor, result.Arguments.Monitor);
 		Assert.Equal(workspace2.Object, result.Arguments.NewWorkspace);
 		Assert.Equal(workspace.Object, result.Arguments.OldWorkspace);
+
+		workspace.Verify(w => w.Deactivate(), Times.Never);
+		workspace.Verify(w => w.DoLayout(), Times.Once);
+		workspace.Verify(w => w.FocusFirstWindow(), Times.Once);
+
+		workspace2.Verify(w => w.Deactivate(), Times.Never);
+		workspace2.Verify(w => w.DoLayout(), Times.Once);
+		workspace2.Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
 	[Fact]

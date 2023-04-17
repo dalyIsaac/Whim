@@ -199,13 +199,11 @@ internal class WorkspaceManager : IWorkspaceManager
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
 		_monitorWorkspaceMap[focusedMonitor] = workspace;
 
-		// Hide all the windows from the old workspace.
-		oldWorkspace?.Deactivate();
-
 		// Send out an event about the losing monitor.
 		if (loserMonitor != null && oldWorkspace != null)
 		{
 			_monitorWorkspaceMap[loserMonitor] = oldWorkspace;
+			oldWorkspace.DoLayout();
 			MonitorWorkspaceChanged?.Invoke(
 				this,
 				new MonitorWorkspaceChangedEventArgs()
@@ -215,6 +213,11 @@ internal class WorkspaceManager : IWorkspaceManager
 					NewWorkspace = oldWorkspace
 				}
 			);
+		}
+		else
+		{
+			// Hide all the windows from the old workspace.
+			oldWorkspace?.Deactivate();
 		}
 
 		// Layout the new workspace.
