@@ -66,7 +66,7 @@ public partial class App : Application
 		}
 		else
 		{
-			new StartupExceptionWindow(e).Activate();
+			new StartupExceptionWindow(this, e).Activate();
 		}
 	}
 
