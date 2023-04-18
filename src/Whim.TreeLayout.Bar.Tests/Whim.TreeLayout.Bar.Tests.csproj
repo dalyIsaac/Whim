@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
@@ -18,38 +19,34 @@
 		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Platforms>x64;arm64;Any CPU</Platforms>
-		<RootNamespace>Whim.TreeLayout.Bar</RootNamespace>
-		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
 		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
-		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-		<UseWinUI>true</UseWinUI>
 		<Version>0.1.0</Version>
 	</PropertyGroup>
+
 	<ItemGroup>
-		<None Remove="TreeLayoutEngineWidget.xaml" />
+		<PackageReference Include="coverlet.msbuild" Version="3.2.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="3.2.0">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="FluentAssertions" Version="6.10.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+		<PackageReference Include="Moq" Version="4.18.4" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230313.1" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+		<ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Whim\Whim.csproj" />
-		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
-		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<InternalsVisibleTo Include="Whim.TreeLayout.Bar.Tests" />
-		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="TreeLayoutEngineWidget.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
 </Project>
