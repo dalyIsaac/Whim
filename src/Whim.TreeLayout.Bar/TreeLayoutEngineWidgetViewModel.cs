@@ -23,14 +23,14 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 	/// <summary>
 	/// The string representation of <see cref="DirectionValue"/>.
 	/// </summary>
-	public string? AddNodeDirection => _directionValue.ToString();
+	public string? AddNodeDirection => _directionValue?.ToString();
 
 	/// <summary>
 	/// The direction in which windows will be added. If this is <see langword="null"/>, then the
 	/// monitor for this widget is not focused, or does not have a <see cref="ITreeLayoutEngine"/>
 	/// as the active layout engine.
 	/// </summary>
-	private Direction? DirectionValue
+	internal Direction? DirectionValue
 	{
 		get => _directionValue;
 		set
@@ -87,7 +87,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		}
 
 		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(_monitor);
-		ITreeLayoutEngine? engine = workspace?.ActiveLayoutEngine.GetLayoutEngine<TreeLayoutEngine>();
+		ITreeLayoutEngine? engine = workspace?.ActiveLayoutEngine.GetLayoutEngine<ITreeLayoutEngine>();
 
 		if (engine is null)
 		{
@@ -109,7 +109,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		}
 
 		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(_monitor);
-		ITreeLayoutEngine? engine = workspace?.ActiveLayoutEngine.GetLayoutEngine<TreeLayoutEngine>();
+		ITreeLayoutEngine? engine = workspace?.ActiveLayoutEngine.GetLayoutEngine<ITreeLayoutEngine>();
 
 		if (engine is null)
 		{
