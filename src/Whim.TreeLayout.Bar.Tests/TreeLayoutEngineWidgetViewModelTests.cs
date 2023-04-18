@@ -158,6 +158,21 @@ public class TreeLayoutEngineWidgetViewModelTests
 	}
 
 	[Fact]
+	public void ToggleDirection_InvalidDirection()
+	{
+		// Given
+		MocksBuilder mocks = new(true);
+		mocks.TreeLayoutEngine.SetupGet(t => t.AddNodeDirection).Returns((Direction)42);
+		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+
+		// When
+		viewModel.ToggleDirection();
+
+		// Then
+		mocks.TreeLayoutEngine.VerifySet(t => t.AddNodeDirection = It.IsAny<Direction>(), Times.Never);
+	}
+
+	[Fact]
 	public void WorkspaceManager_MonitorWorkspaceChanged_Success()
 	{
 		// Given
