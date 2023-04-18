@@ -63,7 +63,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		_context = context;
 		_monitor = monitor;
 		ToggleDirectionCommand = new ToggleDirectionCommand(this);
-		UpdateNodeDirection();
+		UpdateNodeDirection(monitor);
 
 		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
@@ -71,24 +71,23 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
 	{
-		UpdateNodeDirection();
+		UpdateNodeDirection(e.Monitor);
 	}
 
 	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
 	{
-		UpdateNodeDirection();
+		UpdateNodeDirection(_context.MonitorManager.FocusedMonitor);
 	}
 
-	private void UpdateNodeDirection()
+	private void UpdateNodeDirection(IMonitor updatedMonitor)
 	{
-		if (_monitor != _context.MonitorManager.FocusedMonitor)
+		if (_monitor != updatedMonitor)
 		{
-			DirectionValue = null;
 			return;
 		}
 
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		ITreeLayoutEngine? engine = rootEngine.GetLayoutEngine<TreeLayoutEngine>();
+		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(_monitor);
+		ITreeLayoutEngine? engine = workspace?.ActiveLayoutEngine.GetLayoutEngine<TreeLayoutEngine>();
 
 		if (engine is null)
 		{
@@ -109,8 +108,8 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 			return;
 		}
 
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		ITreeLayoutEngine? engine = rootEngine.GetLayoutEngine<TreeLayoutEngine>();
+		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(_monitor);
+		ITreeLayoutEngine? engine = workspace?.ActiveLayoutEngine.GetLayoutEngine<TreeLayoutEngine>();
 
 		if (engine is null)
 		{
