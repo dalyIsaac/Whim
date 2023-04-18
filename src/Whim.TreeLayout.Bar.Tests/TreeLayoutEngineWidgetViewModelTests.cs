@@ -227,4 +227,25 @@ public class TreeLayoutEngineWidgetViewModelTests
 		// Then
 		Assert.Equal(Direction.Down, viewModel.DirectionValue);
 	}
+
+	[Fact]
+	public void Dispose()
+	{
+		// Given
+		MocksBuilder mocks = new(true);
+		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+
+		// When
+		viewModel.Dispose();
+
+		// Then
+		mocks.WorkspaceManager.VerifyRemove(
+			x => x.MonitorWorkspaceChanged -= It.IsAny<EventHandler<MonitorWorkspaceChangedEventArgs>>(),
+			Times.Once
+		);
+		mocks.WorkspaceManager.VerifyRemove(
+			x => x.ActiveLayoutEngineChanged -= It.IsAny<EventHandler<ActiveLayoutEngineChangedEventArgs>>(),
+			Times.Once
+		);
+	}
 }
