@@ -207,7 +207,6 @@ public class TreeLayoutEngineWidgetViewModelTests
 		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
 
 		// When
-		mocks.WorkspaceManager.Reset();
 		mocks.WorkspaceManager.Raise(
 			x => x.MonitorWorkspaceChanged += null,
 			new MonitorWorkspaceChangedEventArgs()
@@ -219,7 +218,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 		);
 
 		// Then should not have called anything
-		mocks.WorkspaceManager.Verify(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Never);
+		mocks.WorkspaceManager.Verify(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
 	}
 
 	[Fact]
