@@ -248,4 +248,18 @@ public class TreeLayoutEngineWidgetViewModelTests
 			Times.Once
 		);
 	}
+
+	[Fact]
+	public void ToggleDirectionCommand()
+	{
+		// Given
+		MocksBuilder mocks = new(true);
+		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+
+		// When
+		viewModel.ToggleDirectionCommand.Execute(null);
+
+		// Then
+		mocks.TreeLayoutEngine.VerifySet(t => t.AddNodeDirection = It.IsAny<Direction>(), Times.Once);
+	}
 }
