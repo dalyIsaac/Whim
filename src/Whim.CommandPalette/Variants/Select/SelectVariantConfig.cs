@@ -10,8 +10,7 @@ namespace Whim.CommandPalette;
 public delegate void SelectVariantCallback(IEnumerable<SelectOption> allItems);
 
 /// <summary>
-/// Config for activating the command palette with radio buttons or CheckBox (referred to as
-/// "Select").
+/// Config for activating the command palette with checkboxes (referred to as "Select").
 /// </summary>
 public record SelectVariantConfig : BaseVariantConfig
 {

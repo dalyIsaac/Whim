@@ -99,7 +99,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
 		_selectRowFactory =
 			selectRowFactory
-			?? ((MatcherResult<SelectOption> item, SelectVariantConfig config) => new CheckBoxRowView(item));
+			?? ((MatcherResult<SelectOption> item, SelectVariantConfig config) => new SelectVariantRowView(item));
 	}
 
 	public void Activate(BaseVariantConfig activationConfig)
