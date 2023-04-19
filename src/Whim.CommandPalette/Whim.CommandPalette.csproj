@@ -69,12 +69,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Update="Variants\Select\RadioButtonRowView.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
-
-	<ItemGroup>
 		<Page Update="Variants\Select\SelectVariantView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
