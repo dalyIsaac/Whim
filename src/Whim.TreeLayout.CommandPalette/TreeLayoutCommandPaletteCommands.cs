@@ -41,9 +41,9 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 		_commandLayoutPlugin = commandLayoutPlugin;
 	}
 
-	private SelectOption[] CreateSetDirectionSelectOptions()
+	internal CommandItem[] CreateSetDirectionCommandItems()
 	{
-		SelectOption[] setDirectionCommandOptions = new SelectOption[_directions.Length];
+		CommandItem[] setDirectionCommandItems = new CommandItem[_directions.Length];
 		ITreeLayoutEngine? activeTreeLayoutEngine = _treeLayoutPlugin.GetTreeLayoutEngine();
 
 		for (int i = 0; i < _directions.Length; i++)
@@ -51,42 +51,27 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 			Direction currentDirection = _directions[i];
 			string currentStr = currentDirection.ToString();
 
-			setDirectionCommandOptions[i] = new SelectOption()
+			setDirectionCommandItems[i] = new CommandItem()
 			{
-				Id = currentStr,
-				IsEnabled = true,
-				IsSelected = activeTreeLayoutEngine?.AddNodeDirection.Equals(currentDirection) ?? false,
-				Title = currentStr
+				Command = new Command(
+					identifier: $"{Name}.set_direction.{currentStr}",
+					title: currentStr,
+					callback: () => SetDirection(currentStr),
+					condition: SetDirectionCondition
+				)
 			};
 		}
 
-		return setDirectionCommandOptions;
+		return setDirectionCommandItems;
 	}
 
 	private bool SetDirectionCondition() => _treeLayoutPlugin.GetTreeLayoutEngine() is not null;
 
-	private void SetDirection(IEnumerable<SelectOption> allItems)
+	internal void SetDirection(string directionString)
 	{
-		string? direction = null;
-
-		foreach (SelectOption item in allItems)
+		if (!Enum.TryParse(directionString, out Direction directionEnum))
 		{
-			if (item.IsSelected)
-			{
-				direction = item.Id;
-				break;
-			}
-		}
-
-		if (direction is null)
-		{
-			Logger.Error($"{Name}: No direction selected.");
-			return;
-		}
-
-		if (!Enum.TryParse(direction, out Direction directionEnum))
-		{
-			Logger.Error($"{Name}: Could not parse direction '{direction}'.");
+			Logger.Error($"{Name}: Could not parse direction '{directionString}'.");
 			return;
 		}
 
@@ -104,12 +89,10 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 				title: "Set tree layout direction",
 				callback: () =>
 					_commandLayoutPlugin.Activate(
-						new SelectVariantConfig()
+						new MenuVariantConfig()
 						{
 							Hint = "Select tree layout direction",
-							Options = CreateSetDirectionSelectOptions(),
-							Callback = SetDirection,
-							AllowMultiSelect = false
+							Commands = CreateSetDirectionCommandItems(),
 						}
 					),
 				condition: SetDirectionCondition

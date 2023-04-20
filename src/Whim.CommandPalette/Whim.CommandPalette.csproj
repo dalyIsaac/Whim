@@ -28,11 +28,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="CommandListItem.xaml" />
 		<None Remove="CommandPaletteWindow.xaml" />
-		<None Remove="PaletteItems\PaletteKeybindItem.xaml" />
 		<None Remove="Variants\FreeText\FreeTextVariantView.xaml" />
-		<None Remove="Variants\Select\CheckBoxVariantRowView.xaml" />
+		<None Remove="Variants\Menu\MenuVariantRowView.xaml" />
+		<None Remove="Variants\Menu\MenuVariantView.xaml" />
+		<None Remove="Variants\Select\SelectVariantRowView.xaml" />
 		<None Remove="Variants\Select\SelectVariantView.xaml" />
 	</ItemGroup>
 
@@ -46,9 +46,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Update="PaletteItems\PaletteKeybindItem.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
+		<InternalsVisibleTo Include="Whim.CommandPalette.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -58,18 +57,25 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="Whim.CommandPalette.Tests" />
-		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="Variants\Select\CheckBoxRowView.xaml">
+		<Page Update="Variants\FreeText\FreeTextVariantView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Update="Variants\Select\RadioButtonRowView.xaml">
+		<Page Update="Variants\Menu\MenuVariantRowView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Variants\Menu\MenuVariantView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Variants\Select\SelectVariantRowView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
@@ -80,9 +86,4 @@
 		</Page>
 	</ItemGroup>
 
-	<ItemGroup>
-		<Page Update="Variants\FreeText\FreeTextVariantView.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
 </Project>

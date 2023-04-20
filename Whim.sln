@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout.CommandPale
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout.Bar.Tests", "src\Whim.TreeLayout.Bar.Tests\Whim.TreeLayout.Bar.Tests.csproj", "{860D3B0C-E324-4E3D-84DE-20356E21DE3F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout.CommandPalette.Tests", "src\Whim.TreeLayout.CommandPalette.Tests\Whim.TreeLayout.CommandPalette.Tests.csproj", "{A555B1EF-2392-437F-A0FB-576AE4A22D48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -255,6 +257,18 @@ Global
 		{860D3B0C-E324-4E3D-84DE-20356E21DE3F}.Release|arm64.Build.0 = Release|arm64
 		{860D3B0C-E324-4E3D-84DE-20356E21DE3F}.Release|x64.ActiveCfg = Release|x64
 		{860D3B0C-E324-4E3D-84DE-20356E21DE3F}.Release|x64.Build.0 = Release|x64
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Debug|arm64.ActiveCfg = Debug|arm64
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Debug|arm64.Build.0 = Debug|arm64
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Debug|x64.ActiveCfg = Debug|x64
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Debug|x64.Build.0 = Debug|x64
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Release|arm64.ActiveCfg = Release|arm64
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Release|arm64.Build.0 = Release|arm64
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Release|x64.ActiveCfg = Release|x64
+		{A555B1EF-2392-437F-A0FB-576AE4A22D48}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
