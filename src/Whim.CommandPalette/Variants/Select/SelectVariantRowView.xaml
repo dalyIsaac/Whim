@@ -7,8 +7,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<CheckBox IsChecked="{x:Bind Path=ViewModel.IsSelected, Mode=TwoWay}"
-		IsEnabled="{x:Bind Path=ViewModel.IsEnabled}">
+	<CheckBox IsChecked="{x:Bind Path=ViewModel.IsSelected, Mode=TwoWay}" IsEnabled="{x:Bind Path=ViewModel.IsEnabled}">
 		<TextBlock
 			x:Name="OptionTitle"
 			RelativePanel.AlignBottomWithPanel="True"
