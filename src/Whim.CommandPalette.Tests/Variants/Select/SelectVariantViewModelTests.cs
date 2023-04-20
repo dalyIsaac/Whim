@@ -60,13 +60,7 @@ public class SelectVariantViewModelTests
 		Mock<IEnumerable<SelectOption>> optionsMock = new();
 		optionsMock.Setup(x => x.GetEnumerator()).Returns(new List<SelectOption>().GetEnumerator());
 
-		SelectVariantConfig activationConfig =
-			new()
-			{
-				Callback = (items) => { },
-				Options = optionsMock.Object,
-				AllowMultiSelect = false
-			};
+		SelectVariantConfig activationConfig = new() { Callback = (items) => { }, Options = optionsMock.Object, };
 
 		// When
 		selectVariantViewModel.Activate(activationConfig);
@@ -121,7 +115,6 @@ public class SelectVariantViewModelTests
 			{
 				Callback = (items) => { },
 				Options = optionsMock.Object,
-				AllowMultiSelect = false,
 				ConfirmButtonText = "Call"
 			};
 
@@ -161,13 +154,7 @@ public class SelectVariantViewModelTests
 				}.GetEnumerator()
 			);
 
-		SelectVariantConfig activationConfig =
-			new()
-			{
-				Callback = (items) => { },
-				Options = optionsMock.Object,
-				AllowMultiSelect = false
-			};
+		SelectVariantConfig activationConfig = new() { Callback = (items) => { }, Options = optionsMock.Object, };
 
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -191,7 +178,7 @@ public class SelectVariantViewModelTests
 		List<SelectOption>,
 		Mock<IMatcher<SelectOption>>,
 		List<Mock<IVariantRowView<SelectOption, SelectVariantRowViewModel>>>
-	) CreateOptionsStubs(bool allowMultiSelect = false)
+	) CreateOptionsStubs()
 	{
 		Mock<ICommandPaletteWindowViewModel> commandPaletteWindowViewModelMock = CreateStubs();
 		commandPaletteWindowViewModelMock.Setup(c => c.Text).Returns("ti");
@@ -247,7 +234,6 @@ public class SelectVariantViewModelTests
 				Callback = callbackMock.Object,
 				Options = options,
 				Matcher = matcherMock.Object,
-				AllowMultiSelect = allowMultiSelect
 			};
 
 		return (
@@ -406,7 +392,7 @@ public class SelectVariantViewModelTests
 			List<SelectOption> options,
 			Mock<IMatcher<SelectOption>> matcherMock,
 			_
-		) = CreateOptionsStubs(allowMultiSelect: true);
+		) = CreateOptionsStubs();
 		selectVariantViewModel.Activate(activationConfig);
 
 		// When
@@ -580,7 +566,6 @@ public class SelectVariantViewModelTests
 			new SelectVariantConfig()
 			{
 				Options = updatedOptions,
-				AllowMultiSelect = activationConfig.AllowMultiSelect,
 				Callback = activationConfig.Callback,
 				Matcher = activationConfig.Matcher,
 			}
@@ -640,7 +625,6 @@ public class SelectVariantViewModelTests
 			new SelectVariantConfig()
 			{
 				Options = secondOptions,
-				AllowMultiSelect = activationConfig.AllowMultiSelect,
 				Callback = activationConfig.Callback,
 				Matcher = activationConfig.Matcher,
 			}
@@ -667,7 +651,6 @@ public class SelectVariantViewModelTests
 			new SelectVariantConfig()
 			{
 				Options = thirdOptions,
-				AllowMultiSelect = activationConfig.AllowMultiSelect,
 				Callback = activationConfig.Callback,
 				Matcher = activationConfig.Matcher,
 			}

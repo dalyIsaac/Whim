@@ -270,7 +270,6 @@ public class CommandPaletteCommandsTests
 							&& c.Options
 								.Select(y => y.Title)
 								.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
-							&& c.AllowMultiSelect
 					)
 				),
 			Times.Once

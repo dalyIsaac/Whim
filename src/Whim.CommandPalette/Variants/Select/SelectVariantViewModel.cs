@@ -12,8 +12,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 {
 	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
 
-	private bool _allowMultiSelect;
-
 	private SelectVariantConfig? _activationConfig;
 
 	/// <summary>
@@ -107,7 +105,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 		if (activationConfig is SelectVariantConfig selectVariantConfig)
 		{
 			_activationConfig = selectVariantConfig;
-			_allowMultiSelect = selectVariantConfig.AllowMultiSelect;
 			PopulateItems(selectVariantConfig.Options);
 			Update();
 		}
@@ -187,21 +184,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		}
 
 		SelectVariantRowViewModel selectedItem = SelectRows[SelectedIndex].ViewModel;
-
-		if (_allowMultiSelect)
-		{
-			selectedItem.IsSelected = !selectedItem.IsSelected;
-		}
-		else
-		{
-			foreach (SelectVariantRowModel variantItem in _allItems)
-			{
-				variantItem.Data.IsSelected = false;
-			}
-
-			selectedItem.IsSelected = true;
-		}
-
+		selectedItem.IsSelected = !selectedItem.IsSelected;
 		_activationConfig.Matcher.OnMatchExecuted(selectedItem.Model);
 		_commandPaletteWindowViewModel.RequestFocusTextBox();
 	}
