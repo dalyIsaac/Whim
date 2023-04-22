@@ -91,9 +91,9 @@ void DoConfig(IContext context)
     context.PluginManager.AddPlugin(treeLayoutPlugin);
 
     // Tree layout bar.
-    TreeLayoutBarPlugin treeLayoutBarPlugin = new();
+    TreeLayoutBarPlugin treeLayoutBarPlugin = new(treeLayoutPlugin);
     context.PluginManager.AddPlugin(treeLayoutBarPlugin);
-    rightComponents.Add(treeLayoutBarPlugin.CreateComponent(treeLayoutPlugin));
+    rightComponents.Add(treeLayoutBarPlugin.CreateComponent());
 
     // Tree layout command palette.
     TreeLayoutCommandPalettePlugin treeLayoutCommandPalettePlugin = new(context, treeLayoutPlugin, commandPalettePlugin);

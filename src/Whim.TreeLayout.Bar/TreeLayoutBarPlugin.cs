@@ -9,11 +9,22 @@ namespace Whim.TreeLayout.Bar;
 /// </summary>
 public class TreeLayoutBarPlugin : IPlugin
 {
+	private readonly TreeLayoutPlugin _plugin;
+
 	/// <inheritdoc/>
 	public string Name => "whim.tree_layout.bar";
 
 	/// <inheritdoc/>
 	public IEnumerable<CommandItem> Commands => Array.Empty<CommandItem>();
+
+	/// <summary>
+	/// Create a new instance of the <see cref="TreeLayoutBarPlugin"/> class.
+	/// </summary>
+	/// <param name="plugin"></param>
+	public TreeLayoutBarPlugin(TreeLayoutPlugin plugin)
+	{
+		_plugin = plugin;
+	}
 
 	/// <inheritdoc/>
 	public void PreInitialize() { }
@@ -24,12 +35,11 @@ public class TreeLayoutBarPlugin : IPlugin
 	/// <summary>
 	/// Create the tree layout engine bar component.
 	/// </summary>
-	/// <param name="plugin"></param>
 	/// <returns></returns>
-	public static BarComponent CreateComponent(ITreeLayoutPlugin plugin)
+	public BarComponent CreateComponent()
 	{
 		return new BarComponent(
-			(context, monitor, window) => new TreeLayoutEngineWidget(context, plugin, monitor, window)
+			(context, monitor, window) => new TreeLayoutEngineWidget(context, _plugin, monitor, window)
 		);
 	}
 }
