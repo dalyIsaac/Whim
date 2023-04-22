@@ -8,7 +8,7 @@ public class TestFocusWindowInDirection
 	[Fact]
 	public void IllegalWindow()
 	{
-		TestTreeEngine testTreeEngine = new();
+		TestTreeEngineMocks testTreeEngine = new();
 
 		// Try to focus a window that doesn't exist.
 		Mock<IWindow> illegalWindow = new();
@@ -21,7 +21,7 @@ public class TestFocusWindowInDirection
 	[Fact]
 	public void NoAdjacentWindow()
 	{
-		TestTreeEngine testTreeEngine = new();
+		TestTreeEngineMocks testTreeEngine = new();
 
 		// Set the currently focused window.
 		testTreeEngine.ActiveWorkspace
@@ -38,7 +38,7 @@ public class TestFocusWindowInDirection
 	[Fact]
 	public void FocusLeftWindow()
 	{
-		TestTreeEngine testTreeEngine = new();
+		TestTreeEngineMocks testTreeEngine = new();
 
 		// Set the currently focused window.
 		testTreeEngine.ActiveWorkspace

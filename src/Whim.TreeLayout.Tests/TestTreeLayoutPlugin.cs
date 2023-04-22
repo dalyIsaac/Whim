@@ -5,36 +5,68 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestTreeLayoutPlugin
 {
-	public static (Mock<IContext>, Mock<IWorkspaceManager>, Mock<IWorkspace>, Mock<ITreeLayoutEngine>) CreateMocks()
+	private class MocksWrapper
 	{
-		Mock<IContext> context = new();
-		Mock<IWorkspaceManager> workspaceManager = new();
-		Mock<IWorkspace> workspace = new();
-		Mock<ITreeLayoutEngine> layoutEngine = new();
+		public Mock<IContext> Context { get; }
+		public Mock<IWorkspaceManager> WorkspaceManager { get; }
+		public Mock<IWorkspace> Workspace { get; }
+		public TreeLayoutEngine LayoutEngine { get; }
+		public Mock<IMonitor> Monitor { get; }
 
-		context.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
-		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(workspace.Object);
-		workspace.Setup(x => x.ActiveLayoutEngine).Returns(layoutEngine.Object);
-		layoutEngine.Setup(x => x.GetLayoutEngine<ITreeLayoutEngine>()).Returns(layoutEngine.Object);
+		public MocksWrapper()
+		{
+			Context = new();
+			WorkspaceManager = new();
+			Workspace = new();
+			LayoutEngine = new(Context.Object, "test");
+			Monitor = new();
 
-		return (context, workspaceManager, workspace, layoutEngine);
+			Context.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
+			WorkspaceManager.Setup(x => x.ActiveWorkspace).Returns(Workspace.Object);
+			WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(Monitor.Object)).Returns(Workspace.Object);
+			Workspace.Setup(x => x.ActiveLayoutEngine).Returns(LayoutEngine);
+		}
 	}
 
 	[Fact]
-	public void TestGetTreeLayoutEngine()
+	public void Commands()
 	{
-		(Mock<IContext> context, _, _, _) = CreateMocks();
-		TreeLayoutPlugin plugin = new(context.Object);
-		ITreeLayoutEngine? engine = plugin.GetTreeLayoutEngine();
-		Assert.NotNull(engine);
+		// Given
+		MocksWrapper mocks = new();
+		TreeLayoutPlugin plugin = new(mocks.Context.Object);
+
+		// When
+		IEnumerable<CommandItem> commands = plugin.Commands;
+
+		// Then
+		Assert.NotNull(commands);
 	}
 
 	[Fact]
-	public void TestSetAddWindowDirection()
+	public void SetAddWindowDirection()
 	{
-		(Mock<IContext> context, _, _, Mock<ITreeLayoutEngine> layoutEngine) = CreateMocks();
-		TreeLayoutPlugin plugin = new(context.Object);
-		plugin.SetAddWindowDirection(Direction.Left);
-		layoutEngine.VerifySet(x => x.AddNodeDirection = Direction.Left);
+		// Given
+		MocksWrapper mocks = new();
+		TreeLayoutPlugin plugin = new(mocks.Context.Object);
+
+		// When
+		plugin.SetAddWindowDirection(mocks.Monitor.Object, Direction.Left);
+
+		// Then
+		Assert.Equal(Direction.Left, mocks.LayoutEngine.AddNodeDirection);
+	}
+
+	[Fact]
+	public void GetAddWindowDirection()
+	{
+		// Given
+		MocksWrapper mocks = new();
+		TreeLayoutPlugin plugin = new(mocks.Context.Object);
+
+		// When
+		Direction? direction = plugin.GetAddWindowDirection(mocks.Monitor.Object);
+
+		// Then
+		Assert.Equal(Direction.Right, direction);
 	}
 }

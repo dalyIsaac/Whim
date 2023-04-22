@@ -3,9 +3,9 @@ using Moq;
 namespace Whim.TreeLayout.Tests;
 
 /// <summary>
-/// This is a populated TreeLayoutEngine, with the dimensions matching <see cref="TestTree"/>.
+/// This contains a <see cref="TreeLayoutEngine" />, with the dimensions matching <see cref="TestTree"/>.
 /// </summary>
-internal class TestTreeEngineEmpty
+internal class TestTreeEngineEmptyMocks
 {
 	public Mock<IMonitor> Monitor = new();
 	public Mock<IMonitorManager> MonitorManager = new();
@@ -16,7 +16,7 @@ internal class TestTreeEngineEmpty
 
 	public TreeLayoutEngine Engine;
 
-	public TestTreeEngineEmpty(bool testTreeLayoutEngine = false)
+	public TestTreeEngineEmptyMocks()
 	{
 		Monitor.Setup(m => m.WorkingArea.Width).Returns(1920);
 		Monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
@@ -27,7 +27,13 @@ internal class TestTreeEngineEmpty
 		Context.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 		Context.Setup(x => x.WindowManager).Returns(WindowManager.Object);
 
-		Engine = testTreeLayoutEngine ? new WrapTreeLayoutEngine(Context.Object) : new TreeLayoutEngine(Context.Object);
-		Engine.AddNodeDirection = Direction.Right;
+		Engine = new TreeLayoutEngine(Context.Object) { AddNodeDirection = Direction.Right };
+	}
+
+	public void SplitFocusedWindowWrapper(IContext context, IWindow? focusedWindow = null)
+	{
+		Mock<IWindow> windowModel = new();
+		PhantomNode phantomNode = new WrapPhantomNode(context, windowModel.Object);
+		Engine.SplitFocusedWindow(focusedWindow, phantomNode);
 	}
 }

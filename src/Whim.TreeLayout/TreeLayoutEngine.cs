@@ -12,12 +12,12 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	private readonly HashSet<IWindow> _phantomWindows = new();
 
 	/// <inheritdoc/>
-	public Node? Root { get; private set; }
+	internal Node? Root { get; private set; }
 
 	/// <summary>
 	/// The direction which we will use for any following operations.
 	/// </summary>
-	public Direction AddNodeDirection { get; set; } = Direction.Right;
+	internal Direction AddNodeDirection { get; set; } = Direction.Right;
 
 	/// <inheritdoc/>
 	public string Name { get; set; }
@@ -39,18 +39,22 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		Name = name;
 	}
 
-	/// <inheritdoc/>
-	public void Add(IWindow window, Direction direction)
-	{
-		AddNodeDirection = direction;
-		Add(window);
-	}
-
-	/// <inheritdoc/>
+	/// <summary>
+	/// Add the <paramref name="window"/> to the layout engine.
+	/// The direction it is added in is determined by this instance's <see cref="AddNodeDirection"/> property.
+	/// </summary>
+	/// <param name="window">The window to add.</param>
 	public void Add(IWindow window) => AddWindow(window);
 
-	/// <inheritdoc/>
-	public WindowNode? AddWindow(IWindow window, IWindow? focusedWindow = null)
+	/// <summary>
+	/// Adds a window to the layout engine, and returns the node that represents it.
+	/// The <paramref name="window"/> is added in the direction specified by this instance's
+	/// <see cref="AddNodeDirection"/> property.
+	/// </summary>
+	/// <param name="window">The window to add.</param>
+	/// <param name="focusedWindow">The currently focused window from whom to get the node.</param>
+	/// <returns>The node that represents the window.</returns>
+	internal WindowNode? AddWindow(IWindow window, IWindow? focusedWindow = null)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
@@ -473,8 +477,17 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		parentNode.AdjustChildWeight(adjacentAncestorNode, -relativeDelta);
 	}
 
-	/// <inheritdoc/>
-	public LeafNode? GetAdjacentNode(LeafNode node, Direction direction)
+	/// <summary>
+	/// Gets the adjacent node in the given <paramref name="direction"/>.
+	/// </summary>
+	/// <param name="node">The node to get the adjacent node for.</param>
+	/// <param name="direction">The direction to get the adjacent node in.</param>
+	/// <returns>
+	/// The adjacent node in the given <paramref name="direction"/>.
+	/// <see langword="null"/> if there is no adjacent node in the given <paramref name="direction"/>,
+	/// or an error occurred.
+	/// </returns>
+	internal LeafNode? GetAdjacentNode(LeafNode node, Direction direction)
 	{
 		Logger.Debug($"Getting node in direction {direction} for window {node}");
 
@@ -578,7 +591,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	/// </summary>
 	/// <param name="focusedWindow"></param>
 	/// <param name="phantomNode"></param>
-	protected void SplitFocusedWindow(IWindow? focusedWindow = null, PhantomNode? phantomNode = null)
+	internal void SplitFocusedWindow(IWindow? focusedWindow = null, PhantomNode? phantomNode = null)
 	{
 		Logger.Debug($"Splitting focused window in layout engine {Name} with focused window {focusedWindow}");
 

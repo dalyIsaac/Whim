@@ -25,22 +25,39 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	public void PostInitialize() { }
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands => new TreeLayoutCommands(this);
+	public IEnumerable<CommandItem> Commands => new TreeLayoutCommands(_context, this);
 
-	/// <inheritdoc/>
-	public ITreeLayoutEngine? GetTreeLayoutEngine()
+	private ITreeLayoutEngine? GetTreeLayoutEngine(IMonitor monitor)
 	{
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		return rootEngine.GetLayoutEngine<ITreeLayoutEngine>();
+		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+		return workspace?.ActiveLayoutEngine.GetLayoutEngine<ITreeLayoutEngine>();
 	}
 
 	/// <inheritdoc />
-	public void SetAddWindowDirection(Direction direction)
+	public void SetAddWindowDirection(IMonitor monitor, Direction direction)
 	{
-		ITreeLayoutEngine? engine = GetTreeLayoutEngine();
-		if (engine != null)
+		if (GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine)
 		{
-			engine.AddNodeDirection = direction;
+			treeLayoutEngine.AddNodeDirection = direction;
+		}
+	}
+
+	/// <inheritdoc />
+	public Direction? GetAddWindowDirection(IMonitor monitor) =>
+		GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine ? treeLayoutEngine.AddNodeDirection : null;
+
+	/// <inheritdoc />
+	public void SplitFocusedWindow()
+	{
+		IMonitor? monitor = _context.MonitorManager.FocusedMonitor;
+		if (monitor is null)
+		{
+			return;
+		}
+
+		if (GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine)
+		{
+			treeLayoutEngine.SplitFocusedWindow();
 		}
 	}
 }

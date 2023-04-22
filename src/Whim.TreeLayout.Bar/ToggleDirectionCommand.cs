@@ -3,7 +3,7 @@
 namespace Whim.TreeLayout.Bar;
 
 /// <summary>
-/// Command for toggling <see cref="ITreeLayoutEngine.AddNodeDirection"/>.
+/// Command for toggling the direction to add new windows in.
 /// </summary>
 public class ToggleDirectionCommand : System.Windows.Input.ICommand
 {

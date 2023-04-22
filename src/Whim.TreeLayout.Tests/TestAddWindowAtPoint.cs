@@ -8,7 +8,7 @@ public class TestAddWindowAtPoint
 	[Fact]
 	public void NullRoot()
 	{
-		TestTreeEngineEmpty emptyEngine = new();
+		TestTreeEngineEmptyMocks emptyEngine = new();
 		Mock<IWindow> window = new();
 
 		emptyEngine.Engine.AddWindowAtPoint(window.Object, new Point<double>() { X = 0, Y = 0 });
@@ -19,7 +19,7 @@ public class TestAddWindowAtPoint
 	[Fact]
 	public void InvalidPoint()
 	{
-		TestTreeEngineEmpty emptyEngine = new();
+		TestTreeEngineEmptyMocks emptyEngine = new();
 		Mock<IWindow> rootWindow = new();
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
@@ -32,7 +32,7 @@ public class TestAddWindowAtPoint
 	[Fact]
 	public void NoParent()
 	{
-		TestTreeEngineEmpty emptyEngine = new();
+		TestTreeEngineEmptyMocks emptyEngine = new();
 		Mock<IWindow> rootWindow = new();
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
@@ -46,7 +46,7 @@ public class TestAddWindowAtPoint
 	[Fact]
 	public void Right()
 	{
-		TestTreeEngineEmpty emptyEngine = new();
+		TestTreeEngineEmptyMocks emptyEngine = new();
 		Mock<IWindow> rootWindow = new();
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
@@ -70,7 +70,7 @@ public class TestAddWindowAtPoint
 	[Fact]
 	public void Left()
 	{
-		TestTreeEngineEmpty emptyEngine = new();
+		TestTreeEngineEmptyMocks emptyEngine = new();
 		Mock<IWindow> rootWindow = new();
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
 
@@ -94,7 +94,7 @@ public class TestAddWindowAtPoint
 	[Fact]
 	public void Up()
 	{
-		TestTreeEngineEmpty emptyEngine = new();
+		TestTreeEngineEmptyMocks emptyEngine = new();
 		emptyEngine.Engine.AddNodeDirection = Direction.Down;
 		Mock<IWindow> rootWindow = new();
 		emptyEngine.Engine.AddWindow(rootWindow.Object);
@@ -118,7 +118,7 @@ public class TestAddWindowAtPoint
 	[Fact]
 	public void Down()
 	{
-		TestTreeEngineEmpty emptyEngine = new();
+		TestTreeEngineEmptyMocks emptyEngine = new();
 		emptyEngine.Engine.AddNodeDirection = Direction.Up;
 		Mock<IWindow> rootWindow = new();
 		emptyEngine.Engine.AddWindow(rootWindow.Object);

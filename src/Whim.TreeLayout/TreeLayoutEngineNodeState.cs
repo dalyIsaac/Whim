@@ -6,7 +6,7 @@ namespace Whim.TreeLayout;
 /// <summary>
 /// The state of a node.
 /// </summary>
-public class NodeState
+internal class NodeState
 {
 	/// <summary>
 	/// The node.
@@ -37,7 +37,7 @@ public class NodeState
 	}
 }
 
-public partial class TreeLayoutEngine
+public  partial class TreeLayoutEngine
 {
 	/// <summary>
 	/// Gets the <see cref="WindowState"/> for all windows, within the unit square.
@@ -45,7 +45,7 @@ public partial class TreeLayoutEngine
 	/// <param name="node">The root node of the tree.</param>
 	/// <param name="location">The location of the root node.</param>
 	/// <returns></returns>
-	public static IEnumerable<NodeState> GetWindowLocations(Node node, ILocation<int> location)
+	internal static IEnumerable<NodeState> GetWindowLocations(Node node, ILocation<int> location)
 	{
 		// If the node is a leaf node, then we can return the location, and break.
 		if (node is LeafNode)

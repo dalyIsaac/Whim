@@ -9,7 +9,7 @@ namespace Whim.TreeLayout;
 /// SplitNodes dictate the layout of the windows. They have a specific direction, and
 /// children.
 /// </summary>
-public class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
+internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 {
 	/// <summary>
 	/// When <see langword="true"/>, the <see cref="_children"/> are split

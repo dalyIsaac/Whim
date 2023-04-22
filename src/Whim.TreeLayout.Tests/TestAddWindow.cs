@@ -26,7 +26,7 @@ public class TestAddWindow
 	[Fact]
 	public void Add_TestTree()
 	{
-		TestTreeEngine testEngine = new();
+		TestTreeEngineMocks testEngine = new();
 
 		TestTree tree =
 			new(

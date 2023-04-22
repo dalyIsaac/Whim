@@ -1,24 +1,37 @@
 namespace Whim.TreeLayout;
 
 /// <summary>
-/// TreeLayoutPlugin provides commands and functionality for the <see cref="ITreeLayoutEngine"/>.
-/// TreeLayoutPlugin does not load the <see cref="ITreeLayoutEngine"/> - that is done when creating
+/// TreeLayoutPlugin provides commands and functionality for the <see cref="TreeLayoutEngine"/>.
+/// TreeLayoutPlugin does not load the <see cref="TreeLayoutEngine"/> - that is done when creating
 /// a workspace via <see cref="IWorkspace.CreateWorkspace"/>, or in <see cref="IWorkspaceManager.WorkspaceFactory"/>.
 /// </summary>
 public interface ITreeLayoutPlugin : IPlugin
 {
 	/// <summary>
-	/// Returns a <see cref="ITreeLayoutEngine"/> if the currently active layout engine is or contains
-	/// a tree layout engine.
-	/// Otherwise, returns null.
+	/// Set the direction in which to add new windows to the tree layout for the given
+	/// <paramref name="monitor"/>.
+	///
+	/// This will only work if the <paramref name="monitor"/>'s current workspace's active layout
+	/// engine is or contains a tree layout engine.
 	/// </summary>
-	public ITreeLayoutEngine? GetTreeLayoutEngine();
+	/// <param name="monitor"></param>
+	/// <param name="direction"></param>
+	public void SetAddWindowDirection(IMonitor monitor, Direction direction);
 
 	/// <summary>
-	/// Set the direction in which to add new windows to the tree layout.
+	/// Get the current direction for adding new windows to the tree layout for the given
+	/// <paramref name="monitor"/>.
 	///
-	/// This will only work if the layout engine is or contains a tree layout engine.
+	/// This will only work if the <paramref name="monitor"/>'s current workspace's active layout
+	/// engine is or contains a tree layout engine.
 	/// </summary>
-	/// <param name="direction">The direction.</param>
-	public void SetAddWindowDirection(Direction direction);
+	/// <param name="monitor"></param>
+	/// <returns></returns>
+	public Direction? GetAddWindowDirection(IMonitor monitor);
+
+	/// <summary>
+	/// Split the focused window in two, with the space in the direction of the tree layout filled
+	/// by a phantom window.
+	/// </summary>
+	public void SplitFocusedWindow();
 }

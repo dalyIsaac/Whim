@@ -3,7 +3,7 @@ namespace Whim.TreeLayout;
 /// <summary>
 /// A leaf node in the <see cref="ITreeLayoutEngine"/>
 /// </summary>
-public abstract class LeafNode : Node
+internal abstract class LeafNode : Node
 {
 	/// <summary>
 	/// The window contained by the node.

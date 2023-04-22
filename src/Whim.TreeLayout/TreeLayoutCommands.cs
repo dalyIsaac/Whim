@@ -8,15 +8,18 @@ namespace Whim.TreeLayout;
 /// </summary>
 public class TreeLayoutCommands : IEnumerable<CommandItem>
 {
+	private readonly IContext _context;
 	private readonly ITreeLayoutPlugin _plugin;
 	private string Name => _plugin.Name;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TreeLayoutCommands"/> class.
 	/// </summary>
-	/// <param name="plugin">The plugin.</param>
-	public TreeLayoutCommands(ITreeLayoutPlugin plugin)
+	/// <param name="context"></param>
+	/// <param name="plugin"></param>
+	public TreeLayoutCommands(IContext context, ITreeLayoutPlugin plugin)
 	{
+		_context = context;
 		_plugin = plugin;
 	}
 
@@ -42,7 +45,7 @@ public class TreeLayoutCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.add_tree_direction_left",
 				title: "Add windows to the left of the current window",
-				callback: () => _plugin.SetAddWindowDirection(Direction.Left)
+				callback: () => _plugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Left)
 			)
 		};
 
@@ -55,7 +58,7 @@ public class TreeLayoutCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.add_tree_direction_right",
 				title: "Add windows to the right of the current window",
-				callback: () => _plugin.SetAddWindowDirection(Direction.Right)
+				callback: () => _plugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Right)
 			)
 		};
 
@@ -68,7 +71,7 @@ public class TreeLayoutCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.add_tree_direction_up",
 				title: "Add windows above the current window",
-				callback: () => _plugin.SetAddWindowDirection(Direction.Up)
+				callback: () => _plugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Up)
 			)
 		};
 
@@ -81,7 +84,7 @@ public class TreeLayoutCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.add_tree_direction_down",
 				title: "Add windows below the current window",
-				callback: () => _plugin.SetAddWindowDirection(Direction.Down)
+				callback: () => _plugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Down)
 			)
 		};
 
@@ -94,7 +97,7 @@ public class TreeLayoutCommands : IEnumerable<CommandItem>
 			Command = new Command(
 				identifier: $"{Name}.split_focused_window",
 				title: "Split the focused window",
-				callback: () => _plugin.GetTreeLayoutEngine()?.SplitFocusedWindow()
+				callback: _plugin.SplitFocusedWindow
 			)
 		};
 }
