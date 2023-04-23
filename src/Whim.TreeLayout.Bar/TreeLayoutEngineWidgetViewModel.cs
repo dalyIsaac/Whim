@@ -53,11 +53,21 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		_plugin.AddWindowDirectionChanged += Plugin_AddWindowDirectionChanged;
 	}
 
-	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e) =>
-		OnPropertyChanged(string.Empty);
+	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
+	{
+		if (e.Monitor == _monitor)
+		{
+			OnPropertyChanged(string.Empty);
+		}
+	}
 
-	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e) =>
-		OnPropertyChanged(string.Empty);
+	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
+	{
+		if (e.Workspace == _context.WorkspaceManager.GetWorkspaceForMonitor(_monitor))
+		{
+			OnPropertyChanged(string.Empty);
+		}
+	}
 
 	private void Plugin_AddWindowDirectionChanged(object? sender, AddWindowDirectionChangedEventArgs e) =>
 		OnPropertyChanged(string.Empty);
@@ -75,14 +85,25 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 			return;
 		}
 
-		Direction nextDirection = direction switch
+		Direction nextDirection;
+		switch (direction)
 		{
-			Direction.Left => Direction.Up,
-			Direction.Up => Direction.Right,
-			Direction.Right => Direction.Down,
-			Direction.Down => Direction.Left,
-			_ => throw new InvalidOperationException("Invalid direction"),
-		};
+			case Direction.Left:
+				nextDirection = Direction.Up;
+				break;
+			case Direction.Up:
+				nextDirection = Direction.Right;
+				break;
+			case Direction.Right:
+				nextDirection = Direction.Down;
+				break;
+			case Direction.Down:
+				nextDirection = Direction.Left;
+				break;
+			default:
+				Logger.Error($"Invalid direction {direction}");
+				return;
+		}
 
 		_plugin.SetAddWindowDirection(_monitor, nextDirection);
 	}
