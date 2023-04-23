@@ -653,7 +653,7 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void MoveWindowToWorkspace_Success()
+	public void MoveWindowToWorkspace_Success_WindowNotHidden()
 	{
 		// Given
 		Mock<IWindow> window = new();
@@ -673,6 +673,7 @@ public class WorkspaceManagerTests
 		workspace.Reset();
 		workspace2.Reset();
 		workspace3.Reset();
+		window.Reset();
 
 		// When a window in a workspace is moved to another workspace
 		mocks.WorkspaceManager.MoveWindowToWorkspace(workspace2.Object, window.Object);
@@ -680,6 +681,42 @@ public class WorkspaceManagerTests
 		// Then the window is removed from the first workspace and added to the second
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
+		window.Verify(w => w.Hide(), Times.Never());
+	}
+
+	[Fact]
+	public void MoveWindowToWorkspace_Success_WindowHidden()
+	{
+		// Given
+		Mock<IWindow> window = new();
+
+		// there are 3 workspaces
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+		Mock<IWorkspace> workspace3 = new();
+
+		// and there are 3 monitors
+		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>(), new Mock<IMonitor>(), new Mock<IMonitor>(), };
+
+		MocksBuilder mocks = new(new[] { workspace, workspace2, workspace3 }, monitors);
+
+		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
+		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[1].Object);
+
+		// and the window is added
+		mocks.WorkspaceManager.WindowAdded(window.Object);
+		workspace.Reset();
+		workspace2.Reset();
+		workspace3.Reset();
+		window.Reset();
+
+		// When a window in a workspace is moved to another workspace
+		mocks.WorkspaceManager.MoveWindowToWorkspace(workspace2.Object, window.Object);
+
+		// Then the window is removed from the first workspace and added to the third
+		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
+		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
+		window.Verify(w => w.Hide(), Times.Once());
 	}
 
 	[Fact]
