@@ -50,12 +50,16 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
+		_plugin.AddWindowDirectionChanged += Plugin_AddWindowDirectionChanged;
 	}
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e) =>
 		OnPropertyChanged(string.Empty);
 
 	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e) =>
+		OnPropertyChanged(string.Empty);
+
+	private void Plugin_AddWindowDirectionChanged(object? sender, AddWindowDirectionChangedEventArgs e) =>
 		OnPropertyChanged(string.Empty);
 
 	/// <summary>
