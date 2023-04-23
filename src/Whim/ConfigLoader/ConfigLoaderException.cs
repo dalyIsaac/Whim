@@ -12,14 +12,17 @@ public class ConfigLoaderException : Exception
 	public ConfigLoaderException() { }
 
 	/// <inheritdoc/>
-	public ConfigLoaderException(string message) : base(message) { }
+	public ConfigLoaderException(string message)
+		: base(message) { }
 
 	/// <inheritdoc/>
-	public ConfigLoaderException(string message, Exception inner) : base(message, inner) { }
+	public ConfigLoaderException(string message, Exception inner)
+		: base(message, inner) { }
 
 	/// <inheritdoc/>
 	protected ConfigLoaderException(
 		System.Runtime.Serialization.SerializationInfo info,
 		System.Runtime.Serialization.StreamingContext context
-	) : base(info, context) { }
+	)
+		: base(info, context) { }
 }

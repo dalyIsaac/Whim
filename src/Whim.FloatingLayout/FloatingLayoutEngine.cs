@@ -22,7 +22,8 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		IContext context,
 		FloatingLayoutConfig floatingLayoutConfig,
 		ILayoutEngine innerLayoutEngine
-	) : base(innerLayoutEngine)
+	)
+		: base(innerLayoutEngine)
 	{
 		_context = context;
 		_floatingLayoutConfig = floatingLayoutConfig;

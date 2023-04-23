@@ -5,7 +5,8 @@ namespace Whim.CommandPalette;
 /// </summary>
 /// <typeparam name="T">The variant item's data type.</typeparam>
 /// <typeparam name="TVM">The variant item's view model type.</typeparam>
-public interface IVariantRowView<T, TVM> where TVM : IVariantRowViewModel<T>
+public interface IVariantRowView<T, TVM>
+	where TVM : IVariantRowViewModel<T>
 {
 	/// <summary>
 	/// The item displayed by this row.

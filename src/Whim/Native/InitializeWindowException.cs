@@ -15,14 +15,16 @@ public class InitializeWindowException : System.Exception
 	/// Constructs a new InitializeWindowException.
 	/// </summary>
 	/// <param name="message">The message that describes the error.</param>
-	public InitializeWindowException(string message) : base(message) { }
+	public InitializeWindowException(string message)
+		: base(message) { }
 
 	/// <summary>
 	/// Constructs a new InitializeWindowException.
 	/// </summary>
 	/// <param name="message">The message that describes the error.</param>
 	/// <param name="inner">The exception that is the cause of the current exception.</param>
-	public InitializeWindowException(string message, System.Exception inner) : base(message, inner) { }
+	public InitializeWindowException(string message, System.Exception inner)
+		: base(message, inner) { }
 
 	/// <summary>
 	/// Constructs a new InitializeWindowException.
@@ -32,5 +34,6 @@ public class InitializeWindowException : System.Exception
 	protected InitializeWindowException(
 		System.Runtime.Serialization.SerializationInfo info,
 		System.Runtime.Serialization.StreamingContext context
-	) : base(info, context) { }
+	)
+		: base(info, context) { }
 }

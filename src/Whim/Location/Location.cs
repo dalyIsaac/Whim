@@ -4,7 +4,8 @@ using System.Numerics;
 namespace Whim;
 
 /// <inheritdoc />
-public record Location<T> : ILocation<T>, IEquatable<Location<T>> where T : INumber<T>
+public record Location<T> : ILocation<T>, IEquatable<Location<T>>
+	where T : INumber<T>
 {
 	/// <inheritdoc />
 	public T X { get; set; } = T.Zero;

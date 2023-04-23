@@ -12,13 +12,16 @@ namespace Whim;
 public class VeryObservableCollection<T> : ObservableCollection<T>
 {
 	/// <inheritdoc/>
-	public VeryObservableCollection() : base() { }
+	public VeryObservableCollection()
+		: base() { }
 
 	/// <inheritdoc/>
-	public VeryObservableCollection(IEnumerable<T> collection) : base(collection) { }
+	public VeryObservableCollection(IEnumerable<T> collection)
+		: base(collection) { }
 
 	/// <inheritdoc/>
-	public VeryObservableCollection(List<T> list) : base(list) { }
+	public VeryObservableCollection(List<T> list)
+		: base(list) { }
 
 	/// <inheritdoc/>
 	protected override void OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

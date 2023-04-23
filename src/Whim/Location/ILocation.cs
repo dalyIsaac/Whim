@@ -5,7 +5,8 @@ namespace Whim;
 /// <summary>
 /// The location of an item, where the origin is in the top-left of the primary monitor.
 /// </summary>
-public interface ILocation<T> : IPoint<T> where T : INumber<T>
+public interface ILocation<T> : IPoint<T>
+	where T : INumber<T>
 {
 	/// <summary>
 	/// The width of the item, in pixels.

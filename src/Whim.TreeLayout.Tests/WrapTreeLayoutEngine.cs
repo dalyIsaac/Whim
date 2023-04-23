@@ -8,7 +8,8 @@ namespace Whim.TreeLayout.Tests;
 /// </summary>
 internal class WrapTreeLayoutEngine : TreeLayoutEngine
 {
-	public WrapTreeLayoutEngine(IContext context) : base(context) { }
+	public WrapTreeLayoutEngine(IContext context)
+		: base(context) { }
 
 	internal void SplitFocusedWindowWrapper(IContext context, IWindow? focusedWindow = null)
 	{
