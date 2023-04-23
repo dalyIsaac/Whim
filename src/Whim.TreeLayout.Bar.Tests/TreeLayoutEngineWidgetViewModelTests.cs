@@ -242,6 +242,29 @@ public class TreeLayoutEngineWidgetViewModelTests
 	}
 
 	[Fact]
+	public void Plugin_AddWindowDirectionChanged_Success()
+	{
+		// Given
+		MocksWrapper mocks = new(Direction.Right);
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
+
+		// When
+		mocks.Plugin.Raise(
+			x => x.AddWindowDirectionChanged += null,
+			new AddWindowDirectionChangedEventArgs()
+			{
+				TreeLayoutEngine = new Mock<ITreeLayoutEngine>().Object,
+				CurrentDirection = Direction.Down,
+				PreviousDirection = Direction.Right
+			}
+		);
+
+		// Then
+		Assert.Equal(Direction.Down.ToString(), viewModel.AddNodeDirection);
+	}
+
+	[Fact]
 	public void Dispose()
 	{
 		// Given
