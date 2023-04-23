@@ -5,7 +5,7 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestGetAdjacentNode
 {
-	private readonly TestTreeEngine _testEngine = new();
+	private readonly TestTreeEngineMocks _testEngine = new();
 
 	private readonly Mock<IMonitor> _monitor = new();
 	private readonly Mock<IMonitorManager> _monitorManager = new();

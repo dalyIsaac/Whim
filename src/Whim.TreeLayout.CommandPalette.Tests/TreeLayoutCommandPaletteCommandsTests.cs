@@ -8,9 +8,18 @@ public class TreeLayoutCommandPaletteCommandsTests
 {
 	private class MocksBuilder
 	{
+		public Mock<IContext> Context { get; } = new();
 		public Mock<IPlugin> TreeLayoutCommandPalettePlugin { get; } = new();
 		public Mock<ITreeLayoutPlugin> TreeLayoutPlugin { get; } = new();
 		public Mock<ICommandPalettePlugin> CommandPalettePlugin { get; } = new();
+		public Mock<IMonitorManager> MonitorManager { get; } = new();
+		public Mock<IMonitor> Monitor { get; } = new();
+
+		public MocksBuilder()
+		{
+			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
+			MonitorManager.Setup(m => m.FocusedMonitor).Returns(Monitor.Object);
+		}
 	}
 
 	[Fact]
@@ -20,12 +29,13 @@ public class TreeLayoutCommandPaletteCommandsTests
 		MocksBuilder mocks = new();
 		TreeLayoutCommandPalettePluginCommands commands =
 			new(
+				mocks.Context.Object,
 				mocks.TreeLayoutCommandPalettePlugin.Object,
 				mocks.TreeLayoutPlugin.Object,
 				mocks.CommandPalettePlugin.Object
 			);
 
-		mocks.TreeLayoutPlugin.Setup(t => t.GetTreeLayoutEngine()).Returns(new Mock<ITreeLayoutEngine>().Object);
+		mocks.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(mocks.Monitor.Object)).Returns(Direction.Left);
 
 		// When
 		commands.SetDirectionCommand.Command.TryExecute();
@@ -41,12 +51,13 @@ public class TreeLayoutCommandPaletteCommandsTests
 		MocksBuilder mocks = new();
 		TreeLayoutCommandPalettePluginCommands commands =
 			new(
+				mocks.Context.Object,
 				mocks.TreeLayoutCommandPalettePlugin.Object,
 				mocks.TreeLayoutPlugin.Object,
 				mocks.CommandPalettePlugin.Object
 			);
 
-		mocks.TreeLayoutPlugin.Setup(t => t.GetTreeLayoutEngine()).Returns((ITreeLayoutEngine?)null);
+		mocks.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(mocks.Monitor.Object)).Returns((Direction?)null);
 
 		// When
 		commands.SetDirectionCommand.Command.TryExecute();
@@ -62,6 +73,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 		MocksBuilder mocks = new();
 		TreeLayoutCommandPalettePluginCommands commands =
 			new(
+				mocks.Context.Object,
 				mocks.TreeLayoutCommandPalettePlugin.Object,
 				mocks.TreeLayoutPlugin.Object,
 				mocks.CommandPalettePlugin.Object
@@ -85,6 +97,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 		MocksBuilder mocks = new();
 		TreeLayoutCommandPalettePluginCommands commands =
 			new(
+				mocks.Context.Object,
 				mocks.TreeLayoutCommandPalettePlugin.Object,
 				mocks.TreeLayoutPlugin.Object,
 				mocks.CommandPalettePlugin.Object
@@ -94,7 +107,10 @@ public class TreeLayoutCommandPaletteCommandsTests
 		commands.SetDirection(direction);
 
 		// Then
-		mocks.TreeLayoutPlugin.Verify(t => t.SetAddWindowDirection(expectedDirection), Times.Once);
+		mocks.TreeLayoutPlugin.Verify(
+			t => t.SetAddWindowDirection(mocks.Monitor.Object, expectedDirection),
+			Times.Once
+		);
 	}
 
 	[Fact]
@@ -104,6 +120,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 		MocksBuilder mocks = new();
 		TreeLayoutCommandPalettePluginCommands commands =
 			new(
+				mocks.Context.Object,
 				mocks.TreeLayoutCommandPalettePlugin.Object,
 				mocks.TreeLayoutPlugin.Object,
 				mocks.CommandPalettePlugin.Object
@@ -113,6 +130,9 @@ public class TreeLayoutCommandPaletteCommandsTests
 		commands.SetDirection("welp");
 
 		// Then
-		mocks.TreeLayoutPlugin.Verify(t => t.SetAddWindowDirection(It.IsAny<Direction>()), Times.Never);
+		mocks.TreeLayoutPlugin.Verify(
+			t => t.SetAddWindowDirection(It.IsAny<IMonitor>(), It.IsAny<Direction>()),
+			Times.Never
+		);
 	}
 }

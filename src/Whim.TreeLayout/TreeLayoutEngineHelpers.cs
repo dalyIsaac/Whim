@@ -13,7 +13,7 @@ public partial class TreeLayoutEngine
 	/// </param>
 	/// <param name="searchPoint">The point of the leaf node to search for.</param>
 	/// <returns>The node which contains the given <paramref name="searchPoint"/>.</returns>
-	public static LeafNode? GetNodeContainingPoint(
+	internal static LeafNode? GetNodeContainingPoint(
 		Node root,
 		ILocation<double> rootLocation,
 		IPoint<double> searchPoint
@@ -86,7 +86,7 @@ public partial class TreeLayoutEngine
 	/// <param name="node">The node to get the location for.</param>
 	/// <param name="location">A location to scale the node's location to.</param>
 	/// <returns>Location of the node. Used for recursion.</returns>
-	public static ILocation<double> GetNodeLocation(Node node, Location<double>? location = null)
+	internal static ILocation<double> GetNodeLocation(Node node, Location<double>? location = null)
 	{
 		location ??= new Location<double>()
 		{

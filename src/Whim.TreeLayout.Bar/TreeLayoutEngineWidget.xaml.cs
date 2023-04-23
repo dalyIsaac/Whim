@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using System;
-using Whim.Bar;
 
 namespace Whim.TreeLayout.Bar;
 
@@ -18,10 +17,15 @@ public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 	/// </summary>
 	public TreeLayoutEngineWidgetViewModel ViewModel { get; }
 
-	internal TreeLayoutEngineWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window)
+	internal TreeLayoutEngineWidget(
+		IContext context,
+		ITreeLayoutPlugin plugin,
+		IMonitor monitor,
+		Microsoft.UI.Xaml.Window window
+	)
 	{
 		_window = window;
-		ViewModel = new TreeLayoutEngineWidgetViewModel(context, monitor);
+		ViewModel = new TreeLayoutEngineWidgetViewModel(context, plugin, monitor);
 		window.Closed += Window_Closed;
 		UIElementExtensions.InitializeComponent(this, "Whim.TreeLayout.Bar", "TreeLayoutEngineWidget");
 	}
@@ -29,14 +33,6 @@ public sealed partial class TreeLayoutEngineWidget : UserControl, IDisposable
 	private void Window_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
 	{
 		ViewModel.Dispose();
-	}
-
-	/// <summary>
-	/// Create the tree layout engine bar component.
-	/// </summary>
-	public static BarComponent CreateComponent()
-	{
-		return new BarComponent((context, monitor, window) => new TreeLayoutEngineWidget(context, monitor, window));
 	}
 
 	/// <inheritdoc/>

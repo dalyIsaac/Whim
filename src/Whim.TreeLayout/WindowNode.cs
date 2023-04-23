@@ -7,7 +7,7 @@ namespace Whim.TreeLayout;
 /// Unlike <see cref="PhantomNode"/>s, <see cref="WindowNode"/>s are common
 /// to all layout engines within a <see cref="IWorkspace"/>.
 /// </summary>
-public class WindowNode : LeafNode
+internal class WindowNode : LeafNode
 {
 	/// <summary>
 	/// Creates a new window node for the given <paramref name="window"/>/

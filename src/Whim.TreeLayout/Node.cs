@@ -5,7 +5,7 @@ namespace Whim.TreeLayout;
 /// <summary>
 /// Base class for a node in a tree.
 /// </summary>
-public abstract class Node
+internal abstract class Node
 {
 	/// <summary>
 	/// The parent of this <see cref="Node"/>.

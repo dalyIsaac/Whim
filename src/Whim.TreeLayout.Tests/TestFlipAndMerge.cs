@@ -5,7 +5,7 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestFlipAndMerge
 {
-	private readonly TestTreeEngineEmpty _testTreeEngine = new();
+	private readonly TestTreeEngineEmptyMocks _testTreeEngine = new();
 
 	[Fact]
 	public void FlipAndMerge()

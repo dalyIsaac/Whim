@@ -7,7 +7,7 @@ namespace Whim.TreeLayout;
 /// As such phantom nodes have to manage the window itself, instead of relying
 /// on the <see cref="IWindowManager"/>.
 /// </summary>
-public class PhantomNode : LeafNode
+internal class PhantomNode : LeafNode
 {
 	private readonly IContext _context;
 	private readonly Microsoft.UI.Xaml.Window? _phantomWindow;

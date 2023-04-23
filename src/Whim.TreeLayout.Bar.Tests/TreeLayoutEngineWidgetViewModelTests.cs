@@ -11,36 +11,24 @@ namespace Whim.TreeLayout.Bar.Tests;
 )]
 public class TreeLayoutEngineWidgetViewModelTests
 {
-	private class MocksBuilder
+	private class MocksWrapper
 	{
 		public Mock<IContext> Context { get; } = new();
+		public Mock<ITreeLayoutPlugin> Plugin { get; } = new();
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IMonitor> Monitor { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();
 		public Mock<IWorkspace> Workspace2 { get; } = new();
-		public Mock<ITreeLayoutEngine> TreeLayoutEngine { get; } = new();
-		public Mock<ITreeLayoutEngine> TreeLayoutEngine2 { get; } = new();
 
-		public MocksBuilder(bool canGetLayoutEngine)
+		public MocksWrapper(Direction? direction = null)
 		{
 			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 			Context.SetupGet(x => x.MonitorManager).Returns(MonitorManager.Object);
 
 			MonitorManager.Setup(x => x.FocusedMonitor).Returns(Monitor.Object);
 
-			WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(Monitor.Object)).Returns(Workspace.Object);
-
-			Workspace.SetupGet(x => x.ActiveLayoutEngine).Returns(TreeLayoutEngine.Object);
-			Workspace2.SetupGet(x => x.ActiveLayoutEngine).Returns(TreeLayoutEngine2.Object);
-
-			TreeLayoutEngine2.SetupGet(x => x.AddNodeDirection).Returns(Direction.Down);
-
-			if (canGetLayoutEngine)
-			{
-				TreeLayoutEngine.Setup(t => t.GetLayoutEngine<ITreeLayoutEngine>()).Returns(TreeLayoutEngine.Object);
-				TreeLayoutEngine2.Setup(t => t.GetLayoutEngine<ITreeLayoutEngine>()).Returns(TreeLayoutEngine2.Object);
-			}
+			Plugin.Setup(x => x.GetAddWindowDirection(Monitor.Object)).Returns(direction);
 		}
 	}
 
@@ -48,8 +36,9 @@ public class TreeLayoutEngineWidgetViewModelTests
 	public void IsVisible_WhenDirectionValueIsNull_ReturnsCollapsed()
 	{
 		// Given
-		MocksBuilder mocks = new(false);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+		MocksWrapper mocks = new();
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		Visibility actual = viewModel.IsVisible;
@@ -62,9 +51,9 @@ public class TreeLayoutEngineWidgetViewModelTests
 	public void IsVisible_WhenDirectionValueIsNotNull_ReturnsVisible()
 	{
 		// Given
-		MocksBuilder mocks = new(false);
+		MocksWrapper mocks = new(Direction.Left);
 		TreeLayoutEngineWidgetViewModel viewModel =
-			new(mocks.Context.Object, mocks.Monitor.Object) { DirectionValue = Direction.Left };
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		Visibility actual = viewModel.IsVisible;
@@ -77,8 +66,9 @@ public class TreeLayoutEngineWidgetViewModelTests
 	public void AddNodeDirection_WhenDirectionValueIsNull_ReturnsNull()
 	{
 		// Given
-		MocksBuilder mocks = new(false);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+		MocksWrapper mocks = new();
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		string? actual = viewModel.AddNodeDirection;
@@ -98,9 +88,9 @@ public class TreeLayoutEngineWidgetViewModelTests
 	)
 	{
 		// Given
-		MocksBuilder mocks = new(true);
+		MocksWrapper mocks = new(direction);
 		TreeLayoutEngineWidgetViewModel viewModel =
-			new(mocks.Context.Object, mocks.Monitor.Object) { DirectionValue = direction };
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		string? actual = viewModel.AddNodeDirection;
@@ -113,14 +103,15 @@ public class TreeLayoutEngineWidgetViewModelTests
 	public void ToggleDirection_WhenDirectionValueIsNull_DoesNothing()
 	{
 		// Given
-		MocksBuilder mocks = new(false);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+		MocksWrapper mocks = new();
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		viewModel.ToggleDirection();
 
 		// Then
-		Assert.Null(viewModel.DirectionValue);
+		Assert.Null(viewModel.AddNodeDirection);
 	}
 
 	[InlineData(Direction.Left, Direction.Up)]
@@ -131,58 +122,58 @@ public class TreeLayoutEngineWidgetViewModelTests
 	public void ToggleDirection_WhenDirectionValueIsNotNull_TogglesDirection(Direction initial, Direction expected)
 	{
 		// Given
-		MocksBuilder mocks = new(true);
+		MocksWrapper mocks = new(initial);
 		TreeLayoutEngineWidgetViewModel viewModel =
-			new(mocks.Context.Object, mocks.Monitor.Object) { DirectionValue = initial };
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		viewModel.ToggleDirection();
 
 		// Then
-		mocks.TreeLayoutEngine.VerifySet(t => t.AddNodeDirection = expected, Times.Once);
+		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, expected), Times.Once);
 	}
 
 	[Fact]
 	public void ToggleDirection_EngineIsNull()
 	{
 		// Given
-		MocksBuilder mocks = new(true);
-		mocks.TreeLayoutEngine.Setup(t => t.GetLayoutEngine<ITreeLayoutEngine>()).Returns((ITreeLayoutEngine?)null);
+		MocksWrapper mocks = new(Direction.Left);
+		mocks.Plugin.Setup(p => p.GetAddWindowDirection(mocks.Monitor.Object)).Returns((Direction?)null);
 		TreeLayoutEngineWidgetViewModel viewModel =
-			new(mocks.Context.Object, mocks.Monitor.Object) { DirectionValue = Direction.Left };
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		viewModel.ToggleDirection();
 
 		// Then
-		mocks.TreeLayoutEngine.VerifySet(t => t.AddNodeDirection = It.IsAny<Direction>(), Times.Never);
-		Assert.Null(viewModel.DirectionValue);
+		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, It.IsAny<Direction>()), Times.Never);
+		Assert.Null(viewModel.AddNodeDirection);
 	}
 
 	[Fact]
 	public void ToggleDirection_InvalidDirection()
 	{
 		// Given
-		MocksBuilder mocks = new(true);
-		mocks.TreeLayoutEngine.SetupGet(t => t.AddNodeDirection).Returns((Direction)42);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+		MocksWrapper mocks = new();
+		mocks.Plugin.Setup(p => p.GetAddWindowDirection(mocks.Monitor.Object)).Returns((Direction)42);
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		viewModel.ToggleDirection();
 
 		// Then
-		mocks.TreeLayoutEngine.VerifySet(t => t.AddNodeDirection = It.IsAny<Direction>(), Times.Never);
+		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, It.IsAny<Direction>()), Times.Never);
 	}
 
 	[Fact]
 	public void WorkspaceManager_MonitorWorkspaceChanged_Success()
 	{
 		// Given
-		MocksBuilder mocks = new(true);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
-		mocks.WorkspaceManager
-			.Setup(x => x.GetWorkspaceForMonitor(mocks.Monitor.Object))
-			.Returns(mocks.Workspace2.Object);
+		MocksWrapper mocks = new(Direction.Right);
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
+		mocks.Plugin.Setup(p => p.GetAddWindowDirection(mocks.Monitor.Object)).Returns(Direction.Down);
 
 		// When
 		mocks.WorkspaceManager.Raise(
@@ -196,15 +187,16 @@ public class TreeLayoutEngineWidgetViewModelTests
 		);
 
 		// Then
-		Assert.Equal(Direction.Down, viewModel.DirectionValue);
+		Assert.Equal(Direction.Down.ToString(), viewModel.AddNodeDirection);
 	}
 
 	[Fact]
 	public void WorkspaceManager_MonitorWorkspaceChanged_WrongMonitor()
 	{
 		// Given
-		MocksBuilder mocks = new(true);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+		MocksWrapper mocks = new();
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		mocks.WorkspaceManager.Raise(
@@ -218,16 +210,21 @@ public class TreeLayoutEngineWidgetViewModelTests
 		);
 
 		// Then should not have called anything
-		mocks.WorkspaceManager.Verify(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
+		mocks.WorkspaceManager.Verify(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Never);
 	}
 
 	[Fact]
 	public void WorkspaceManager_ActiveLayoutEngineChanged_Success()
 	{
 		// Given
-		MocksBuilder mocks = new(true);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
-		mocks.Workspace.SetupGet(x => x.ActiveLayoutEngine).Returns(mocks.TreeLayoutEngine2.Object);
+		MocksWrapper mocks = new(Direction.Right);
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
+
+		mocks.WorkspaceManager
+			.Setup(wm => wm.GetWorkspaceForMonitor(mocks.Monitor.Object))
+			.Returns(mocks.Workspace.Object);
+		mocks.Plugin.Setup(p => p.GetAddWindowDirection(It.IsAny<IMonitor>())).Returns(Direction.Down);
 
 		// When
 		mocks.WorkspaceManager.Raise(
@@ -235,21 +232,47 @@ public class TreeLayoutEngineWidgetViewModelTests
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = mocks.Workspace.Object,
-				CurrentLayoutEngine = mocks.TreeLayoutEngine2.Object,
-				PreviousLayoutEngine = mocks.TreeLayoutEngine.Object
+				CurrentLayoutEngine = new Mock<ITreeLayoutEngine>().Object,
+				PreviousLayoutEngine = new Mock<ITreeLayoutEngine>().Object
 			}
 		);
 
 		// Then
-		Assert.Equal(Direction.Down, viewModel.DirectionValue);
+		Assert.Equal(Direction.Down.ToString(), viewModel.AddNodeDirection);
+	}
+
+	[Fact]
+	public void Plugin_AddWindowDirectionChanged_Success()
+	{
+		// Given
+		MocksWrapper mocks = new(Direction.Right);
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
+
+		mocks.Plugin.Setup(p => p.GetAddWindowDirection(It.IsAny<IMonitor>())).Returns(Direction.Down);
+
+		// When
+		mocks.Plugin.Raise(
+			x => x.AddWindowDirectionChanged += null,
+			new AddWindowDirectionChangedEventArgs()
+			{
+				TreeLayoutEngine = new Mock<ITreeLayoutEngine>().Object,
+				CurrentDirection = Direction.Down,
+				PreviousDirection = Direction.Right
+			}
+		);
+
+		// Then
+		Assert.Equal(Direction.Down.ToString(), viewModel.AddNodeDirection);
 	}
 
 	[Fact]
 	public void Dispose()
 	{
 		// Given
-		MocksBuilder mocks = new(true);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+		MocksWrapper mocks = new();
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		viewModel.Dispose();
@@ -269,13 +292,14 @@ public class TreeLayoutEngineWidgetViewModelTests
 	public void ToggleDirectionCommand()
 	{
 		// Given
-		MocksBuilder mocks = new(true);
-		TreeLayoutEngineWidgetViewModel viewModel = new(mocks.Context.Object, mocks.Monitor.Object);
+		MocksWrapper mocks = new(Direction.Left);
+		TreeLayoutEngineWidgetViewModel viewModel =
+			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
 		// When
 		viewModel.ToggleDirectionCommand.Execute(null);
 
 		// Then
-		mocks.TreeLayoutEngine.VerifySet(t => t.AddNodeDirection = It.IsAny<Direction>(), Times.Once);
+		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, It.IsAny<Direction>()), Times.Once);
 	}
 }

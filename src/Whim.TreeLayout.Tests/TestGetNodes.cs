@@ -32,14 +32,14 @@ public class TestGetNodes
 	[Fact]
 	public void GetFirstWindow()
 	{
-		TestTreeEngine engine = new();
+		TestTreeEngineMocks engine = new();
 		Assert.NotNull(engine.Engine.GetFirstWindow());
 	}
 
 	[Fact]
 	public void GetFirstWindow_Null()
 	{
-		TestTreeEngineEmpty emptyEngine = new();
+		TestTreeEngineEmptyMocks emptyEngine = new();
 		Assert.Null(emptyEngine.Engine.GetFirstWindow());
 	}
 

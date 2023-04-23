@@ -8,6 +8,7 @@ public class ToggleDirectionCommandTests
 	private class MocksBuilder
 	{
 		public Mock<IContext> Context { get; } = new();
+		public Mock<ITreeLayoutPlugin> Plugin { get; } = new();
 		public Mock<IMonitor> Monitor { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();
@@ -22,7 +23,7 @@ public class ToggleDirectionCommandTests
 
 			TreeLayoutEngine.Setup(t => t.GetLayoutEngine<ITreeLayoutEngine>()).Returns(TreeLayoutEngine.Object);
 
-			ViewModel = new TreeLayoutEngineWidgetViewModel(Context.Object, Monitor.Object);
+			ViewModel = new TreeLayoutEngineWidgetViewModel(Context.Object, Plugin.Object, Monitor.Object);
 		}
 	}
 
@@ -45,13 +46,13 @@ public class ToggleDirectionCommandTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		mocks.ViewModel.DirectionValue = Direction.Up;
+		mocks.Plugin.Setup(p => p.GetAddWindowDirection(mocks.Monitor.Object)).Returns(Direction.Up);
 		ToggleDirectionCommand command = new(mocks.ViewModel);
 
 		// When
 		command.Execute(null);
 
 		// Then
-		mocks.TreeLayoutEngine.VerifySet(t => t.AddNodeDirection = Direction.Right);
+		mocks.Plugin.Verify(p => p.SetAddWindowDirection(mocks.Monitor.Object, Direction.Right));
 	}
 }

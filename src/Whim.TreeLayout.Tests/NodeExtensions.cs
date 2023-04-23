@@ -1,6 +1,6 @@
 namespace Whim.TreeLayout.Tests;
 
-public static class NodeExtensions
+internal static class NodeExtensions
 {
 	/// <summary>
 	/// Returns the weight of the node. This functionality is only needed

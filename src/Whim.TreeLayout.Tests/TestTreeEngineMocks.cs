@@ -4,9 +4,9 @@ using Xunit;
 namespace Whim.TreeLayout.Tests;
 
 /// <summary>
-/// This is a populated TreeLayoutEngine, with the dimensions matching <see cref="TestTree"/>.
+/// This contains a populated <see cref="TreeLayoutEngine" />, with the dimensions matching <see cref="TestTree"/>.
 /// </summary>
-internal class TestTreeEngine
+internal class TestTreeEngineMocks
 {
 	public Mock<IMonitor> Monitor = new();
 	public Mock<IMonitorManager> MonitorManager = new();
@@ -51,14 +51,7 @@ internal class TestTreeEngine
 	public WindowNode RightTopLeftBottomRightBottomNode;
 	public TreeLayoutEngine Engine;
 
-	/// <summary>
-	/// </summary>
-	/// <param name="testTreeLayoutEngine">
-	/// If true, then the engine will be created with a TestTreeLayoutEngine,
-	/// which allows us to test SplitFocusedWindow without having to move onto
-	/// the UI thread.
-	/// </param>
-	public TestTreeEngine(bool testTreeLayoutEngine = false)
+	public TestTreeEngineMocks()
 	{
 		Monitor.Setup(m => m.WorkingArea.Width).Returns(1920);
 		Monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
@@ -69,8 +62,7 @@ internal class TestTreeEngine
 		Context.Setup(x => x.WindowManager).Returns(WindowManager.Object);
 		Context.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 
-		Engine = testTreeLayoutEngine ? new WrapTreeLayoutEngine(Context.Object) : new TreeLayoutEngine(Context.Object);
-		Engine.AddNodeDirection = Direction.Right;
+		Engine = new TreeLayoutEngine(Context.Object) { AddNodeDirection = Direction.Right };
 
 		LeftWindow.Setup(m => m.ToString()).Returns("leftWindow");
 		RightTopLeftTopWindow.Setup(m => m.ToString()).Returns("rightTopLeftTopWindow");
@@ -151,5 +143,12 @@ internal class TestTreeEngine
 			RightTopLeftBottomRightTopWindow.Object,
 			RightTopLeftBottomRightBottomWindow.Object
 		};
+	}
+
+	public void SplitFocusedWindowWrapper(IContext context, IWindow? focusedWindow = null)
+	{
+		Mock<IWindow> windowModel = new();
+		PhantomNode phantomNode = new WrapPhantomNode(context, windowModel.Object);
+		Engine.SplitFocusedWindow(focusedWindow, phantomNode);
 	}
 }

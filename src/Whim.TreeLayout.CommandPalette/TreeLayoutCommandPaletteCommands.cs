@@ -10,6 +10,7 @@ namespace Whim.TreeLayout.CommandPalette;
 /// </summary>
 public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 {
+	private readonly IContext _context;
 	private readonly IPlugin _treeLayoutCommandPalettePlugin;
 	private readonly ITreeLayoutPlugin _treeLayoutPlugin;
 	private readonly ICommandPalettePlugin _commandLayoutPlugin;
@@ -27,15 +28,18 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 	/// <summary>
 	/// Creates a new instance of the tree layout's command palette commands.
 	/// </summary>
+	/// <param name="context"></param>
 	/// <param name="treeLayoutCommandPalettePlugin"></param>
 	/// <param name="treeLayoutPlugin"></param>
 	/// <param name="commandLayoutPlugin"></param>
 	public TreeLayoutCommandPalettePluginCommands(
+		IContext context,
 		IPlugin treeLayoutCommandPalettePlugin,
 		ITreeLayoutPlugin treeLayoutPlugin,
 		ICommandPalettePlugin commandLayoutPlugin
 	)
 	{
+		_context = context;
 		_treeLayoutCommandPalettePlugin = treeLayoutCommandPalettePlugin;
 		_treeLayoutPlugin = treeLayoutPlugin;
 		_commandLayoutPlugin = commandLayoutPlugin;
@@ -44,7 +48,6 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 	internal CommandItem[] CreateSetDirectionCommandItems()
 	{
 		CommandItem[] setDirectionCommandItems = new CommandItem[_directions.Length];
-		ITreeLayoutEngine? activeTreeLayoutEngine = _treeLayoutPlugin.GetTreeLayoutEngine();
 
 		for (int i = 0; i < _directions.Length; i++)
 		{
@@ -65,7 +68,8 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 		return setDirectionCommandItems;
 	}
 
-	private bool SetDirectionCondition() => _treeLayoutPlugin.GetTreeLayoutEngine() is not null;
+	private bool SetDirectionCondition() =>
+		_treeLayoutPlugin.GetAddWindowDirection(_context.MonitorManager.FocusedMonitor) != null;
 
 	internal void SetDirection(string directionString)
 	{
@@ -75,7 +79,7 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 			return;
 		}
 
-		_treeLayoutPlugin.SetAddWindowDirection(directionEnum);
+		_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, directionEnum);
 	}
 
 	/// <summary>

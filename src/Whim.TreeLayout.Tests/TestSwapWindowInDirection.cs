@@ -4,7 +4,7 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestSwapWindowInDirection
 {
-	private readonly TestTreeEngine _testEngine = new();
+	private readonly TestTreeEngineMocks _testEngine = new();
 
 	[Fact]
 	public void RightTopLeftBottomLeft_Left()

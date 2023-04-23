@@ -4,7 +4,7 @@ namespace Whim.TreeLayout.Tests;
 /// TestSplitNode is used only to wrap the <see cref="SplitNode"/> class, so
 /// we can initialize the nodes and weights.
 /// </summary>
-public class TestSplitNode : SplitNode
+internal class TestSplitNode : SplitNode
 {
 	public TestSplitNode(bool isHorizontal = true, SplitNode? parent = null)
 		: base(isHorizontal, parent) { }

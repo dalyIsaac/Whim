@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 
 namespace Whim.Bar;
 
@@ -14,55 +13,28 @@ public delegate UserControl BarComponent(IContext context, IMonitor monitor, Mic
 /// <summary>
 /// Configuration for the bar plugin.
 /// </summary>
+/// <remarks>
+/// The components lists can be changed up until when Whim is initialized.
+/// </remarks>
 public class BarConfig : INotifyPropertyChanged
 {
 	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	private List<BarComponent> _leftComponents;
-
 	/// <summary>
 	/// The components to display on the left side of the bar.
 	/// </summary>
-	public IEnumerable<BarComponent> LeftComponents
-	{
-		get => _leftComponents;
-		set
-		{
-			_leftComponents = value.ToList();
-			OnPropertyChanged(nameof(LeftComponents));
-		}
-	}
-
-	private List<BarComponent> _centerComponents;
+	internal IList<BarComponent> LeftComponents;
 
 	/// <summary>
 	/// The components to display in the center of the bar.
 	/// </summary>
-	public IEnumerable<BarComponent> CenterComponents
-	{
-		get => _centerComponents;
-		set
-		{
-			_centerComponents = value.ToList();
-			OnPropertyChanged(nameof(CenterComponents));
-		}
-	}
-
-	private List<BarComponent> _rightComponents;
+	internal IList<BarComponent> CenterComponents;
 
 	/// <summary>
 	/// The components to display on the right side of the bar.
 	/// </summary>
-	public IEnumerable<BarComponent> RightComponents
-	{
-		get => _rightComponents;
-		set
-		{
-			_rightComponents = value.ToList();
-			OnPropertyChanged(nameof(RightComponents));
-		}
-	}
+	internal IList<BarComponent> RightComponents;
 
 	private int _height = 48;
 
@@ -95,13 +67,13 @@ public class BarConfig : INotifyPropertyChanged
 	/// <param name="centerComponents">The components to display in the center of the bar.</param>
 	/// <param name="rightComponents">The components to display on the right side of the bar.</param>
 	public BarConfig(
-		IEnumerable<BarComponent>? leftComponents = null,
-		IEnumerable<BarComponent>? centerComponents = null,
-		IEnumerable<BarComponent>? rightComponents = null
+		IList<BarComponent> leftComponents,
+		IList<BarComponent> centerComponents,
+		IList<BarComponent> rightComponents
 	)
 	{
-		_leftComponents = (leftComponents ?? Enumerable.Empty<BarComponent>()).ToList();
-		_centerComponents = (centerComponents ?? Enumerable.Empty<BarComponent>()).ToList();
-		_rightComponents = (rightComponents ?? Enumerable.Empty<BarComponent>()).ToList();
+		LeftComponents = leftComponents;
+		CenterComponents = centerComponents;
+		RightComponents = rightComponents;
 	}
 }
