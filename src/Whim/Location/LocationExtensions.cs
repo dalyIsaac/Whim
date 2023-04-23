@@ -13,7 +13,8 @@ public static class LocationExtensions
 	/// <param name="location">The location to add to.</param>
 	/// <param name="other">The location to add.</param>
 	/// <returns>A new <see cref="ILocation{T}"/> with the given <paramref name="other"/> added to this one.</returns>
-	public static ILocation<T> Add<T>(this ILocation<T> location, ILocation<T> other) where T : INumber<T> =>
+	public static ILocation<T> Add<T>(this ILocation<T> location, ILocation<T> other)
+		where T : INumber<T> =>
 		new Location<T>()
 		{
 			X = location.X + other.X,

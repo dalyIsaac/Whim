@@ -14,7 +14,8 @@ public class BarLayoutEngine : BaseProxyLayoutEngine
 	/// </summary>
 	/// <param name="barConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public BarLayoutEngine(BarConfig barConfig, ILayoutEngine innerLayoutEngine) : base(innerLayoutEngine)
+	public BarLayoutEngine(BarConfig barConfig, ILayoutEngine innerLayoutEngine)
+		: base(innerLayoutEngine)
 	{
 		_barConfig = barConfig;
 	}

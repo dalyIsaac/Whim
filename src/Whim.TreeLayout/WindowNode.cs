@@ -14,7 +14,8 @@ public class WindowNode : LeafNode
 	/// </summary>
 	/// <param name="window"></param>
 	/// <param name="parent"></param>
-	public WindowNode(IWindow window, SplitNode? parent = null) : base(window, parent) { }
+	public WindowNode(IWindow window, SplitNode? parent = null)
+		: base(window, parent) { }
 
 	/// <summary>
 	/// Gets the string representation of the window.

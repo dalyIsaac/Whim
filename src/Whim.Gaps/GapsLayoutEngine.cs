@@ -14,7 +14,8 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 	/// </summary>
 	/// <param name="gapsConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public GapsLayoutEngine(GapsConfig gapsConfig, ILayoutEngine innerLayoutEngine) : base(innerLayoutEngine)
+	public GapsLayoutEngine(GapsConfig gapsConfig, ILayoutEngine innerLayoutEngine)
+		: base(innerLayoutEngine)
 	{
 		_gapsConfig = gapsConfig;
 	}

@@ -24,7 +24,8 @@ public class PhantomNode : LeafNode
 		IWindow windowModel,
 		Microsoft.UI.Xaml.Window? phantomWindow,
 		SplitNode? parent = null
-	) : base(windowModel, parent)
+	)
+		: base(windowModel, parent)
 	{
 		_context = context;
 		_phantomWindow = phantomWindow;

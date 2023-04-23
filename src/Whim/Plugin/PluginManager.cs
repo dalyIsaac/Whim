@@ -37,7 +37,8 @@ internal class PluginManager : IPluginManager
 		}
 	}
 
-	public T AddPlugin<T>(T plugin) where T : IPlugin
+	public T AddPlugin<T>(T plugin)
+		where T : IPlugin
 	{
 		if (Contains(plugin.Name))
 		{

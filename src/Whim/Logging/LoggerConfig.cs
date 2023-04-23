@@ -37,7 +37,8 @@ public class LoggerConfig
 	///
 	/// The default log file name is <c>whim.log</c>.
 	/// </summary>
-	public LoggerConfig() : this("whim.log") { }
+	public LoggerConfig()
+		: this("whim.log") { }
 
 	/// <summary>
 	/// Initializes the <see cref="LoggerConfig"/> with the given base minimum log level.

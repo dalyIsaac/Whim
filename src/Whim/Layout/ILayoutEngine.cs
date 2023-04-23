@@ -72,7 +72,8 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// <returns>
 	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
-	public T? GetLayoutEngine<T>() where T : ILayoutEngine
+	public T? GetLayoutEngine<T>()
+		where T : ILayoutEngine
 	{
 		if (this is T layoutEngine)
 		{
