@@ -232,7 +232,6 @@ public class CommandPaletteWindowViewModelTests
 			{
 				Options = Array.Empty<SelectOption>(),
 				Callback = (items) => { },
-				AllowMultiSelect = false,
 				ConfirmButtonText = "Save"
 			},
 			true,

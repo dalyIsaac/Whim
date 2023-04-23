@@ -209,7 +209,6 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 						{
 							Hint = "Select windows",
 							Options = CreateMoveWindowsToWorkspaceOptions(),
-							AllowMultiSelect = true,
 							Callback = MoveMultipleWindowsToWorkspaceCallback
 						}
 					)

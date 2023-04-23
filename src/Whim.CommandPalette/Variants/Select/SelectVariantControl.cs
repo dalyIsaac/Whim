@@ -12,20 +12,8 @@ internal class SelectVariantControl : IVariantControl
 
 	public SelectVariantControl(ICommandPaletteWindowViewModel windowViewModel)
 	{
-		_viewModel = new(windowViewModel, SelectRowFactory);
+		_viewModel = new(windowViewModel);
 		_control = new SelectVariantView(_viewModel);
-	}
-
-	private IVariantRowView<SelectOption, SelectVariantRowViewModel> SelectRowFactory(
-		MatcherResult<SelectOption> item,
-		SelectVariantConfig config
-	)
-	{
-		if (config.AllowMultiSelect)
-		{
-			return new CheckBoxRowView(item);
-		}
-		return new RadioButtonRowView(item);
 	}
 
 	public double GetViewMaxHeight() => _control.GetViewMaxHeight();
