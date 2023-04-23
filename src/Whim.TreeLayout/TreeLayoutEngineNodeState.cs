@@ -37,7 +37,7 @@ internal class NodeState
 	}
 }
 
-public  partial class TreeLayoutEngine
+public partial class TreeLayoutEngine
 {
 	/// <summary>
 	/// Gets the <see cref="WindowState"/> for all windows, within the unit square.

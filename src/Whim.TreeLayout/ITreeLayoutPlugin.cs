@@ -1,3 +1,5 @@
+using System;
+
 namespace Whim.TreeLayout;
 
 /// <summary>
@@ -7,6 +9,12 @@ namespace Whim.TreeLayout;
 /// </summary>
 public interface ITreeLayoutPlugin : IPlugin
 {
+	/// <summary>
+	/// Event raised when the direction in which to add new windows to the tree layout for a
+	/// monitor changes.
+	/// </summary>
+	public event EventHandler<AddWindowDirectionChangedEventArgs>? AddWindowDirectionChanged;
+
 	/// <summary>
 	/// Set the direction in which to add new windows to the tree layout for the given
 	/// <paramref name="monitor"/>.

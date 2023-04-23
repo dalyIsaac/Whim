@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim.TreeLayout;
@@ -9,6 +10,9 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 
 	/// <inheritdoc/>
 	public string Name => "whim.tree_layout";
+
+	/// <inheritdoc/>
+	public event EventHandler<AddWindowDirectionChangedEventArgs>? AddWindowDirectionChanged;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TreeLayoutPlugin"/> class.
@@ -39,6 +43,15 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 		if (GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine)
 		{
 			treeLayoutEngine.AddNodeDirection = direction;
+			AddWindowDirectionChanged?.Invoke(
+				this,
+				new AddWindowDirectionChangedEventArgs()
+				{
+					TreeLayoutEngine = treeLayoutEngine,
+					CurrentDirection = direction,
+					PreviousDirection = treeLayoutEngine.AddNodeDirection
+				}
+			);
 		}
 	}
 
