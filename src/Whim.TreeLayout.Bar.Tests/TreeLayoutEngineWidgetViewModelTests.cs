@@ -249,6 +249,8 @@ public class TreeLayoutEngineWidgetViewModelTests
 		TreeLayoutEngineWidgetViewModel viewModel =
 			new(mocks.Context.Object, mocks.Plugin.Object, mocks.Monitor.Object);
 
+		mocks.Plugin.Setup(p => p.GetAddWindowDirection(It.IsAny<IMonitor>())).Returns(Direction.Down);
+
 		// When
 		mocks.Plugin.Raise(
 			x => x.AddWindowDirectionChanged += null,
