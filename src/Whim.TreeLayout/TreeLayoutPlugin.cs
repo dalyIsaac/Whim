@@ -62,12 +62,7 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	/// <inheritdoc />
 	public void SplitFocusedWindow()
 	{
-		IMonitor? monitor = _context.MonitorManager.FocusedMonitor;
-		if (monitor is null)
-		{
-			return;
-		}
-
+		IMonitor monitor = _context.MonitorManager.FocusedMonitor;
 		if (GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine)
 		{
 			treeLayoutEngine.SplitFocusedWindow();

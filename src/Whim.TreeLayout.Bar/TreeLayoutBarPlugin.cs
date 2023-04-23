@@ -9,7 +9,7 @@ namespace Whim.TreeLayout.Bar;
 /// </summary>
 public class TreeLayoutBarPlugin : IPlugin
 {
-	private readonly TreeLayoutPlugin _plugin;
+	private readonly ITreeLayoutPlugin _plugin;
 
 	/// <inheritdoc/>
 	public string Name => "whim.tree_layout.bar";
@@ -21,7 +21,7 @@ public class TreeLayoutBarPlugin : IPlugin
 	/// Create a new instance of the <see cref="TreeLayoutBarPlugin"/> class.
 	/// </summary>
 	/// <param name="plugin"></param>
-	public TreeLayoutBarPlugin(TreeLayoutPlugin plugin)
+	public TreeLayoutBarPlugin(ITreeLayoutPlugin plugin)
 	{
 		_plugin = plugin;
 	}

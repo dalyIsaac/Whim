@@ -94,4 +94,18 @@ public class TestTreeLayoutCommands
 		// Then
 		mocks.Plugin.Verify(x => x.SplitFocusedWindow(), Times.Once);
 	}
+
+	[Fact]
+	public void GetEnumerator()
+	{
+		// Given
+		MocksWrapper mocks = new();
+		TreeLayoutCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
+
+		// When
+		IEnumerable<CommandItem> items = commands;
+
+		// Then
+		Assert.Equal(5, items.Count());
+	}
 }
