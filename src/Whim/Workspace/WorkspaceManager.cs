@@ -150,14 +150,25 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 
-		// Remap windows to the last workspace
-		IWorkspace lastWorkspace = _workspaces[^1];
+		// Remap windows to the first workspace which isn't active.
+		IWorkspace workspaceToActivate = _workspaces[^1];
+		foreach (IWorkspace w in _workspaces)
+		{
+			if (!_monitorWorkspaceMap.ContainsValue(w))
+			{
+				workspaceToActivate = w;
+				break;
+			}
+		}
 
 		foreach (IWindow window in workspace.Windows)
 		{
-			lastWorkspace.AddWindow(window);
-			_windowWorkspaceMap[window] = lastWorkspace;
+			workspaceToActivate.AddWindow(window);
+			_windowWorkspaceMap[window] = workspaceToActivate;
 		}
+
+		// Activate the last workspace
+		Activate(workspaceToActivate);
 
 		return wasFound;
 	}
