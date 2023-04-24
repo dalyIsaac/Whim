@@ -141,6 +141,7 @@ public class WorkspaceManagerTests
 
 		//Then it returns false, as there must be at least two workspaces, since there are two monitors
 		Assert.False(result);
+		workspace2.Verify(w => w.DoLayout(), Times.Never);
 	}
 
 	[Fact]
@@ -181,6 +182,7 @@ public class WorkspaceManagerTests
 
 		// and the window is added to the last remaining workspace
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once);
+		workspace2.Verify(w => w.DoLayout(), Times.Once);
 	}
 
 	[Fact]
