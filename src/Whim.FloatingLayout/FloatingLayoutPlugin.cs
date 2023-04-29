@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
@@ -34,7 +32,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	public void PostInitialize() { }
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands => new FloatingLayoutCommands(this);
+	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window

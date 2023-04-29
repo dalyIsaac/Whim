@@ -1,6 +1,6 @@
 namespace Whim.CommandPalette.Tests;
 
-internal class MenuRowStub : IVariantRowView<CommandItem, MenuVariantRowViewModel>
+internal class MenuRowStub : IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel>
 {
 	public bool IsUpdated { get; private set; }
 
@@ -8,7 +8,7 @@ internal class MenuRowStub : IVariantRowView<CommandItem, MenuVariantRowViewMode
 
 	public void Initialize() { }
 
-	public void Update(MatcherResult<CommandItem> matcherResult)
+	public void Update(MatcherResult<MenuVariantRowModelData> matcherResult)
 	{
 		ViewModel.Update(matcherResult);
 		IsUpdated = true;

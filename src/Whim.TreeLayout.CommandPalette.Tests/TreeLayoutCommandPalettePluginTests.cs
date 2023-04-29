@@ -22,11 +22,9 @@ public class TreeLayoutCommandPalettePluginTests
 		TreeLayoutCommandPalettePlugin plugin =
 			new(mocks.Context.Object, mocks.TreeLayoutPlugin.Object, mocks.CommandPalettePlugin.Object);
 
-		// When
-		IEnumerable<CommandItem> commands = plugin.Commands;
-
 		// Then
-		Assert.Single(commands);
-		Assert.Equal("Set tree layout direction", commands.First().Command.Title);
+		Assert.NotEmpty(plugin.PluginCommands.Commands);
+		Assert.NotEmpty(plugin.PluginCommands.Keybinds);
+		Assert.Equal("Set tree layout direction", plugin.PluginCommands.Commands.First().Title);
 	}
 }

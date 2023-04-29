@@ -47,6 +47,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" />
+		<ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
 	</ItemGroup>
 
 </Project>

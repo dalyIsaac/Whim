@@ -23,6 +23,16 @@ internal class PluginManager : IPluginManager
 		foreach (IPlugin plugin in _plugins.Values)
 		{
 			plugin.PreInitialize();
+
+			foreach (ICommand command in plugin.PluginCommands.Commands)
+			{
+				_context.CommandManager.Add(command);
+			}
+
+			foreach ((string commandId, IKeybind keybind) in plugin.PluginCommands.Keybinds)
+			{
+				_context.KeybindManager.AddKeybind(commandId, keybind);
+			}
 		}
 	}
 
@@ -33,7 +43,6 @@ internal class PluginManager : IPluginManager
 		foreach (IPlugin plugin in _plugins.Values)
 		{
 			plugin.PostInitialize();
-			_context.CommandManager.LoadCommands(plugin.Commands);
 		}
 	}
 

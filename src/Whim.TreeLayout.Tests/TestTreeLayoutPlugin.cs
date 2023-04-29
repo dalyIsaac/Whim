@@ -41,11 +41,9 @@ public class TestTreeLayoutPlugin
 		MocksWrapper mocks = new();
 		TreeLayoutPlugin plugin = new(mocks.Context.Object);
 
-		// When
-		IEnumerable<CommandItem> commands = plugin.Commands;
-
 		// Then
-		Assert.NotNull(commands);
+		Assert.NotEmpty(plugin.PluginCommands.Commands);
+		Assert.NotEmpty(plugin.PluginCommands.Keybinds);
 	}
 
 	[Fact]

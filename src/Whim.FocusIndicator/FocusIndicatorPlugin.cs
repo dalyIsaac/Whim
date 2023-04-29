@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Whim.FocusIndicator;
@@ -173,5 +172,5 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	}
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands { get; } = Array.Empty<CommandItem>();
+	public IPluginCommands PluginCommands => new PluginCommands(Name);
 }

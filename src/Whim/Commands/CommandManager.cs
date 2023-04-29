@@ -4,108 +4,43 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-/// <inheritdoc />
 internal class CommandManager : ICommandManager
 {
-	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
-	private readonly ICommandItemContainer _commandItems;
-	private readonly KeybindHook _keybindHook;
-	private bool _disposedValue;
+	private readonly Dictionary<string, ICommand> _commands = new();
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref="CommandManager"/> class.
-	/// </summary>
-	public CommandManager(IContext context, ICoreNativeManager coreNativeManager)
+	public int Count => _commands.Count;
+
+	public bool IsReadOnly => false;
+
+	public void Add(ICommand item)
 	{
-		_context = context;
-		_coreNativeManager = coreNativeManager;
-		_commandItems = new CommandItemContainer();
-		_keybindHook = new KeybindHook(_coreNativeManager, _commandItems);
-	}
-
-	/// <inheritdoc />
-	public void Initialize()
-	{
-		_keybindHook.Initialize();
-		LoadCommands(new CoreCommands(_context));
-	}
-
-	/// <inheritdoc />
-	public void Add(ICommand command, IKeybind? keybind = null) => _commandItems.Add(command, keybind);
-
-	/// <inheritdoc />
-	public bool SetKeybind(string commandIdentifier, IKeybind keybind) =>
-		_commandItems.SetKeybind(commandIdentifier, keybind);
-
-	/// <inheritdoc />
-	public void Clear() => _commandItems.Clear();
-
-	/// <inheritdoc />
-	public void ClearKeybinds() => _commandItems.ClearKeybinds();
-
-	/// <inheritdoc />
-	public bool RemoveKeybind(IKeybind keybind) => _commandItems.RemoveKeybind(keybind);
-
-	/// <inheritdoc />
-	public bool RemoveKeybind(string commandIdentifier) => _commandItems.RemoveKeybind(commandIdentifier);
-
-	/// <inheritdoc />
-	public bool RemoveCommand(string commandIdentifier) => _commandItems.RemoveCommand(commandIdentifier);
-
-	/// <inheritdoc />
-	public bool RemoveCommand(ICommand command) => _commandItems.RemoveCommand(command);
-
-	/// <inheritdoc />
-	public ICommand? TryGetCommand(string commandIdentifier) => _commandItems?.TryGetCommand(commandIdentifier);
-
-	/// <inheritdoc />
-	public ICommand? TryGetCommand(IKeybind keybind) => _commandItems?.TryGetCommand(keybind);
-
-	/// <inheritdoc />
-	public IKeybind? TryGetKeybind(string commandIdentifier) => _commandItems?.TryGetKeybind(commandIdentifier);
-
-	/// <inheritdoc />
-	public IKeybind? TryGetKeybind(ICommand command) => _commandItems?.TryGetKeybind(command);
-
-	/// <inheritdoc />
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
+		if (_commands.ContainsKey(item.Id))
 		{
-			if (disposing)
-			{
-				Logger.Debug("Disposing command manager");
-
-				// dispose managed state (managed objects)
-				_keybindHook.Dispose();
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			_disposedValue = true;
+			throw new InvalidOperationException($"Command with id '{item.Id}' already exists.");
 		}
+
+		_commands.Add(item.Id, item);
 	}
 
-	/// <inheritdoc />
-	public void Dispose()
+	public ICommand? TryGetCommand(string commandId)
 	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
-	}
-
-	/// <inheritdoc />
-	public IEnumerator<CommandItem> GetEnumerator() => _commandItems.GetEnumerator();
-
-	IEnumerator IEnumerable.GetEnumerator() => _commandItems.GetEnumerator();
-
-	/// <inheritdoc />
-	public void LoadCommands(IEnumerable<CommandItem> commands)
-	{
-		foreach ((ICommand command, IKeybind? keybind) in commands)
+		if (_commands.TryGetValue(commandId, out ICommand? command))
 		{
-			Add(command, keybind);
+			return command;
 		}
+
+		return null;
 	}
+
+	public void Clear() => _commands.Clear();
+
+	public bool Contains(ICommand item) => _commands.ContainsKey(item.Id);
+
+	public void CopyTo(ICommand[] array, int arrayIndex) => _commands.Values.CopyTo(array, arrayIndex);
+
+	public IEnumerator<ICommand> GetEnumerator() => _commands.Values.GetEnumerator();
+
+	public bool Remove(ICommand item) => _commands.Remove(item.Id);
+
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

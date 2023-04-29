@@ -9,27 +9,24 @@ namespace Whim;
 
 /// <summary>
 /// Responsible is responsible for hooking into windows and handling keybinds.
-/// This is used as part of <see cref="CommandManager"/>.
 /// </summary>
 internal class KeybindHook : IDisposable
 {
-	private readonly ICoreNativeManager _coreNativeManager;
-	private readonly ICommandItemContainer _commandItems;
+	private readonly Context _context;
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
-	public KeybindHook(ICoreNativeManager coreNativeManager, ICommandItemContainer commandItems)
+	public KeybindHook(Context context)
 	{
-		_coreNativeManager = coreNativeManager;
-		_commandItems = commandItems;
+		_context = context;
 		_keyboardHook = KeyboardHook;
 	}
 
-	public void Initialize()
+	public void PostInitialize()
 	{
 		Logger.Debug("Initializing keybind manager...");
-		_unhookKeyboardHook = _coreNativeManager.SetWindowsHookEx(
+		_unhookKeyboardHook = _context.CoreNativeManager.SetWindowsHookEx(
 			WINDOWS_HOOK_ID.WH_KEYBOARD_LL,
 			_keyboardHook,
 			null,
@@ -49,7 +46,7 @@ internal class KeybindHook : IDisposable
 		Logger.Verbose($"{nCode} {wParam.Value} {lParam.Value}");
 		if (nCode != 0 || ((nuint)wParam != PInvoke.WM_KEYDOWN && (nuint)wParam != PInvoke.WM_SYSKEYDOWN))
 		{
-			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+			return _context.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 
 		KBDLLHOOKSTRUCT kbdll = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
@@ -67,7 +64,7 @@ internal class KeybindHook : IDisposable
 			case VIRTUAL_KEY.VK_RCONTROL:
 			case VIRTUAL_KEY.VK_LWIN:
 			case VIRTUAL_KEY.VK_RWIN:
-				return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+				return _context.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 			default:
 				break;
 		}
@@ -78,10 +75,11 @@ internal class KeybindHook : IDisposable
 			return (LRESULT)1;
 		}
 
-		return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		return _context.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 	}
 
-	private bool IsModifierPressed(VIRTUAL_KEY key) => (_coreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
+	private bool IsModifierPressed(VIRTUAL_KEY key) =>
+		(_context.CoreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
 
 	private KeyModifiers GetModifiersPressed()
 	{
@@ -133,14 +131,18 @@ internal class KeybindHook : IDisposable
 			return false;
 		}
 
-		ICommand? command = _commandItems.TryGetCommand(keybind);
-		if (command == null)
+		ICommand[] commands = _context.KeybindManager.GetCommands(keybind);
+
+		if (commands.Length == 0)
 		{
 			Logger.Verbose($"No handler for {keybind}");
 			return false;
 		}
 
-		command.TryExecute();
+		foreach (ICommand command in commands)
+		{
+			command.TryExecute();
+		}
 
 		return true;
 	}

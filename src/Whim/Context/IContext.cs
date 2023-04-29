@@ -44,9 +44,14 @@ public interface IContext
 	public IFilterManager FilterManager { get; }
 
 	/// <summary>
-	/// Whim's <see cref="ICommandManager"/> instances.
+	/// Whim's <see cref="ICommand"/>s.
 	/// </summary>
 	public ICommandManager CommandManager { get; }
+
+	/// <summary>
+	/// Whim's keybinds.
+	/// </summary>
+	public IKeybindManager KeybindManager { get; }
 
 	/// <summary>
 	/// Whim's <see cref="IPluginManager"/> instances.

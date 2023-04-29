@@ -1,6 +1,5 @@
 using Moq;
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Whim.Tests;
@@ -15,9 +14,7 @@ public class PluginManagerTests
 	private static (Mock<IContext>, Mock<ICommandManager>, Mock<IPlugin>, Mock<IPlugin>, Mock<IPlugin>) CreateStubs()
 	{
 		Mock<IContext> context = new();
-
 		Mock<ICommandManager> commandManager = new();
-		commandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
 
 		context.Setup(cc => cc.CommandManager).Returns(commandManager.Object);
 

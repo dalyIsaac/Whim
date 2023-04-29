@@ -1,23 +1,16 @@
-using System;
 using System.Collections.Generic;
 
 namespace Whim;
 
 /// <summary>
 /// ICommandManager is responsible for managing all the commands for Whim.
-/// This involves handling keybindings, dispatching commands, and providing
-/// access to the commands themselves.
 /// </summary>
-public interface ICommandManager : ICommandItemContainer, IDisposable
+public interface ICommandManager : ICollection<ICommand>
 {
 	/// <summary>
-	/// Initialize the keyboard hook.
+	/// Tries to get the command with the given identifier.
 	/// </summary>
-	public void Initialize();
-
-	/// <summary>
-	/// Loads the given commmands and keybinds.
-	/// </summary>
-	/// <param name="commands"></param>
-	public void LoadCommands(IEnumerable<CommandItem> commands);
+	/// <param name="commandId">The identifier of the command to get</param>
+	/// <returns>The command with the given identifier, or null if not found.</returns>
+	public ICommand? TryGetCommand(string commandId);
 }

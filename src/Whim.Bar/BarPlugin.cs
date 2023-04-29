@@ -114,5 +114,5 @@ public class BarPlugin : IBarPlugin
 	}
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands { get; } = Array.Empty<CommandItem>();
+	public IPluginCommands PluginCommands => new PluginCommands(Name);
 }

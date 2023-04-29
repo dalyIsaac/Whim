@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -8,43 +7,28 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// The commands for the command palette plugin.
 /// </summary>
-public class CommandPaletteCommands : IEnumerable<CommandItem>
+public class CommandPaletteCommands : PluginCommands
 {
 	private readonly IContext _context;
 	private readonly ICommandPalettePlugin _commandPalettePlugin;
-	private string Name => _commandPalettePlugin.Name;
 
 	/// <summary>
 	/// Creates a new instance of the command palette commands.
 	/// </summary>
 	public CommandPaletteCommands(IContext context, ICommandPalettePlugin commandPalettePlugin)
+		: base(commandPalettePlugin.Name)
 	{
 		_context = context;
 		_commandPalettePlugin = commandPalettePlugin;
-	}
 
-	/// <summary>
-	/// Toggle command palette command.
-	/// </summary>
-	public CommandItem ToggleCommandPaletteCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.toggle",
+		Add(
+				identifier: "toggle",
 				title: "Toggle command palette",
-				() => _commandPalettePlugin.Activate()
-			),
-			Keybind = new Keybind(CoreCommands.WinShift, VIRTUAL_KEY.VK_K)
-		};
-
-	/// <summary>
-	/// Rename workspace command.
-	/// </summary>
-	public CommandItem RenameWorkspaceCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.rename_workspace",
+				() => _commandPalettePlugin.Activate(),
+				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_K)
+			)
+			.Add(
+				identifier: "rename_workspace",
 				title: "Rename workspace",
 				callback: () =>
 					_commandPalettePlugin.Activate(
@@ -57,16 +41,8 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 						}
 					)
 			)
-		};
-
-	/// <summary>
-	/// Create workspace command.
-	/// </summary>
-	public CommandItem CreateWorkspaceCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.create_workspace",
+			.Add(
+				identifier: "create_workspace",
 				title: "Create workspace",
 				callback: () =>
 					_commandPalettePlugin.Activate(
@@ -82,36 +58,13 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 						}
 					)
 			)
-		};
-
-	/// <summary>
-	/// Move window to workspace command creator.
-	/// </summary>
-	/// <param name="workspace">The workspace to move the window to.</param>
-	/// <returns>The move window to workspace command.</returns>
-	public CommandItem MoveWindowToWorkspaceCommandCreator(IWorkspace workspace) =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.move_window_to_workspace",
-				title: $"Move window to workspace \"{workspace.Name}\"",
-				callback: () => _context.WorkspaceManager.MoveWindowToWorkspace(workspace)
-			)
-		};
-
-	/// <summary>
-	/// Move window to workspace command.
-	/// </summary>
-	public CommandItem MoveWindowToWorkspaceCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.move_window_to_workspace",
+			.Add(
+				identifier: "move_window_to_workspace",
 				title: "Move window to workspace",
 				callback: () =>
 				{
 					IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
-					List<CommandItem> items = new();
+					List<ICommand> items = new();
 					foreach (IWorkspace workspace in _context.WorkspaceManager)
 					{
 						if (workspace != activeWorkspace)
@@ -125,9 +78,48 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 					);
 				}
 			)
-		};
+			.Add(
+				identifier: "move_multiple_windows_to_workspace",
+				title: "Move multiple windows to workspace",
+				callback: () =>
+				{
+					IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
+					List<ICommand> items = new();
+					foreach (IWorkspace workspace in _context.WorkspaceManager)
+					{
+						if (workspace != activeWorkspace)
+						{
+							items.Add(MoveMultipleWindowsToWorkspaceCreator(activeWorkspace.Windows, workspace));
+						}
+					}
 
-	private string MoveMultipleWindowsToWorkspaceCommandIdentifier => $"{Name}.move_multiple_windows_to_workspace";
+					_commandPalettePlugin.Activate(
+						new MenuVariantConfig() { Hint = "Select workspace", Commands = items }
+					);
+				}
+			);
+	}
+
+	/// <summary>
+	/// Move multiple windows to workspace command creator.
+	/// </summary>
+	/// <param name="windows"></param>
+	/// <param name="workspace"></param>
+	/// <returns>The move multiple windows to workspace command.</returns>
+	internal ICommand MoveMultipleWindowsToWorkspaceCreator(IEnumerable<IWindow> windows, IWorkspace workspace) =>
+		new Command(
+			identifier: $"{PluginName}.move_multiple_windows_to_workspace.{workspace.Name}",
+			title: workspace.Name,
+			callback: () =>
+				_commandPalettePlugin.Activate(
+					new SelectVariantConfig()
+					{
+						Hint = "Select windows",
+						Options = CreateMoveWindowsToWorkspaceOptions(),
+						Callback = MoveMultipleWindowsToWorkspaceCallback
+					}
+				)
+		);
 
 	/// <summary>
 	/// Creates the select options for moving multiple windows to a workspace.
@@ -145,7 +137,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 				w =>
 					new SelectOption()
 					{
-						Id = $"{MoveMultipleWindowsToWorkspaceCommandIdentifier}.windows.{w.Title}",
+						Id = $"{PluginName}.move_multiple_windows_to_workspace.{w.Title}",
 						Title = w.Title,
 						IsEnabled = true,
 						IsSelected = false
@@ -153,28 +145,6 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 			)
 			.ToArray();
 	}
-
-	/// <summary>
-	/// Move multiple windows to workspace command creator.
-	/// </summary>
-	/// <param name="windows"></param>
-	/// <param name="workspace"></param>
-	/// <returns>The move multiple windows to workspace command.</returns>
-	public CommandItem MoveMultipleWindowsToWorkspaceCreator(IEnumerable<IWindow> windows, IWorkspace workspace) =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{MoveMultipleWindowsToWorkspaceCommandIdentifier}.workspaces.{workspace.Name}",
-				title: workspace.Name,
-				callback: () =>
-				{
-					foreach (IWindow window in windows)
-					{
-						_context.WorkspaceManager.MoveWindowToWorkspace(workspace, window);
-					}
-				}
-			)
-		};
 
 	/// <summary>
 	/// Callback to activate a menu variant to select the workspace to move the windows to.
@@ -187,7 +157,7 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 			.SelectMany(w => w.Windows)
 			.Where(w => selectedWindowNames.Contains(w.Title));
 
-		IEnumerable<CommandItem> items = _context.WorkspaceManager.Select(
+		IEnumerable<ICommand> items = _context.WorkspaceManager.Select(
 			w => MoveMultipleWindowsToWorkspaceCreator(windows, w)
 		);
 
@@ -195,36 +165,14 @@ public class CommandPaletteCommands : IEnumerable<CommandItem>
 	}
 
 	/// <summary>
-	/// Moves the current window to a given workspace.
+	/// Move window to workspace command creator.
 	/// </summary>
-	public CommandItem MoveMultipleWindowsToWorkspace =>
-		new()
-		{
-			Command = new Command(
-				identifier: MoveMultipleWindowsToWorkspaceCommandIdentifier,
-				title: "Move multiple windows to workspace",
-				callback: () =>
-					_commandPalettePlugin.Activate(
-						new SelectVariantConfig()
-						{
-							Hint = "Select windows",
-							Options = CreateMoveWindowsToWorkspaceOptions(),
-							Callback = MoveMultipleWindowsToWorkspaceCallback
-						}
-					)
-			)
-		};
-
-	/// <inheritdoc />
-	public IEnumerator<CommandItem> GetEnumerator()
-	{
-		yield return ToggleCommandPaletteCommand;
-		yield return RenameWorkspaceCommand;
-		yield return CreateWorkspaceCommand;
-		yield return MoveWindowToWorkspaceCommand;
-		yield return MoveMultipleWindowsToWorkspace;
-	}
-
-	/// <inheritdoc />
-	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+	/// <param name="workspace">The workspace to move the window to.</param>
+	/// <returns>The move window to workspace command.</returns>
+	internal ICommand MoveWindowToWorkspaceCommandCreator(IWorkspace workspace) =>
+		new Command(
+			identifier: $"{PluginName}.move_window_to_workspace.{workspace.Name}",
+			title: $"Move window to workspace \"{workspace.Name}\"",
+			callback: () => _context.WorkspaceManager.MoveWindowToWorkspace(workspace)
+		);
 }

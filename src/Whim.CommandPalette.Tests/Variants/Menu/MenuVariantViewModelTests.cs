@@ -17,14 +17,13 @@ public class MenuVariantViewModelTests
 		public MocksBuilder()
 		{
 			Context.Setup(c => c.CommandManager).Returns(CommandManager.Object);
-			CommandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
 			WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(true);
 			WindowViewModel.Setup(wvm => wvm.Text).Returns("ti");
 		}
 	}
 
-	private static IVariantRowView<CommandItem, MenuVariantRowViewModel> MenuRowFactory(
-		MatcherResult<CommandItem> item
+	private static IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel> MenuRowFactory(
+		MatcherResult<MenuVariantRowModelData> item
 	) => new MenuRowStub() { ViewModel = new MenuVariantRowViewModel(item) };
 
 	[Fact]
@@ -34,12 +33,7 @@ public class MenuVariantViewModelTests
 		MocksBuilder mocks = new();
 		mocks.CommandManager
 			.Setup(cm => cm.GetEnumerator())
-			.Returns(
-				new List<CommandItem>()
-				{
-					new CommandItem() { Command = new Command("id", "title", () => { }) }
-				}.GetEnumerator()
-			);
+			.Returns(new List<ICommand>() { new Command("id", "title", () => { }) }.GetEnumerator());
 
 		// When
 		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
@@ -68,11 +62,11 @@ public class MenuVariantViewModelTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		IEnumerable<CommandItem> items = new List<CommandItem>()
+		IEnumerable<ICommand> items = new List<ICommand>()
 		{
-			new CommandItem() { Command = new Command("id", "title", () => { }) },
-			new CommandItem() { Command = new Command("id2", "title2", () => { }) },
-			new CommandItem() { Command = new Command("id3", "title3", () => { }) }
+			new Command("id", "title", () => { }),
+			new Command("id2", "title2", () => { }),
+			new Command("id3", "title3", () => { })
 		};
 		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
@@ -93,11 +87,11 @@ public class MenuVariantViewModelTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		IEnumerable<CommandItem> items = new List<CommandItem>()
+		IEnumerable<ICommand> items = new List<ICommand>()
 		{
-			new CommandItem() { Command = new Command("id", "title", () => { }) },
-			new CommandItem() { Command = new Command("id2", "title2", () => { }) },
-			new CommandItem() { Command = new Command("id3", "title3", () => { }) }
+			new Command("id", "title", () => { }),
+			new Command("id2", "title2", () => { }),
+			new Command("id3", "title3", () => { })
 		};
 		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
@@ -120,11 +114,11 @@ public class MenuVariantViewModelTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		IEnumerable<CommandItem> items = new List<CommandItem>()
+		IEnumerable<ICommand> items = new List<ICommand>()
 		{
-			new CommandItem() { Command = new Command("id", "title", () => { }) },
-			new CommandItem() { Command = new Command("id2", "title2", () => { }) },
-			new CommandItem() { Command = new Command("id3", "title3", () => { }) }
+			new Command("id", "title", () => { }),
+			new Command("id2", "title2", () => { }),
+			new Command("id3", "title3", () => { })
 		};
 		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
@@ -144,19 +138,16 @@ public class MenuVariantViewModelTests
 		// Given
 		MocksBuilder mocks = new();
 		bool called = false;
-		IEnumerable<CommandItem> items = new List<CommandItem>()
+		IEnumerable<ICommand> items = new List<ICommand>()
 		{
-			new CommandItem()
-			{
-				Command = new Command(
-					"id",
-					"title",
-					() =>
-					{
-						called = true;
-					}
-				)
-			},
+			new Command(
+				"id",
+				"title",
+				() =>
+				{
+					called = true;
+				}
+			)
 		};
 		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
@@ -179,12 +170,7 @@ public class MenuVariantViewModelTests
 		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		// When
-		vm.PopulateItems(
-			new List<CommandItem>()
-			{
-				new CommandItem() { Command = new Command("id", "title", () => { }, () => false) },
-			}
-		);
+		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }, () => false) });
 
 		// Then
 		Assert.Empty(vm._allItems);
@@ -198,9 +184,7 @@ public class MenuVariantViewModelTests
 		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		// When
-		vm.PopulateItems(
-			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
-		);
+		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
 
 		// Then
 		Assert.Single(vm._allItems);
@@ -213,14 +197,10 @@ public class MenuVariantViewModelTests
 		MocksBuilder mocks = new();
 		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
-		vm.PopulateItems(
-			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
-		);
+		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
 
 		// When
-		vm.PopulateItems(
-			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "new title", () => { }) }, }
-		);
+		vm.PopulateItems(new List<ICommand>() { new Command("id", "new title", () => { }) });
 
 		// Then
 		Assert.Single(vm._allItems);
@@ -234,12 +214,10 @@ public class MenuVariantViewModelTests
 		MocksBuilder mocks = new();
 		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
-		vm.PopulateItems(
-			new List<CommandItem>() { new CommandItem() { Command = new Command("id", "title", () => { }) }, }
-		);
+		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
 
 		// When
-		vm.PopulateItems(new List<CommandItem>());
+		vm.PopulateItems(new List<ICommand>());
 
 		// Then
 		Assert.Empty(vm._allItems);
@@ -253,15 +231,14 @@ public class MenuVariantViewModelTests
 		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
 		Command command = new("id", "title", () => { });
-		CommandItem commandItem = new() { Command = command };
-		vm.PopulateItems(new List<CommandItem>() { commandItem, });
+		vm.PopulateItems(new List<ICommand>() { command });
 
 		// When
-		vm.PopulateItems(new List<CommandItem>() { new CommandItem() { Command = command }, });
+		vm.PopulateItems(new List<ICommand>() { command });
 
 		// Then
 		Assert.Single(vm._allItems);
-		Assert.Equal(commandItem, vm._allItems[0].Data);
+		Assert.Equal(command, vm._allItems[0].Data.Command);
 	}
 
 	[Fact]
@@ -270,19 +247,16 @@ public class MenuVariantViewModelTests
 		// Given
 		MocksBuilder mocks = new();
 		bool called = false;
-		IEnumerable<CommandItem> items = new List<CommandItem>()
+		IEnumerable<ICommand> items = new List<ICommand>()
 		{
-			new CommandItem()
-			{
-				Command = new Command(
-					"id",
-					"title",
-					() =>
-					{
-						called = true;
-					}
-				)
-			},
+			new Command(
+				"id",
+				"title",
+				() =>
+				{
+					called = true;
+				}
+			)
 		};
 
 		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
@@ -306,10 +280,7 @@ public class MenuVariantViewModelTests
 		mocks.WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
 
 		string callbackText = string.Empty;
-		IEnumerable<CommandItem> items = new List<CommandItem>()
-		{
-			new CommandItem() { Command = new Command("id", "title", () => { }) },
-		};
+		IEnumerable<ICommand> items = new List<ICommand>() { new Command("id", "title", () => { }) };
 
 		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
 
@@ -344,19 +315,16 @@ public class MenuVariantViewModelTests
 		// Given
 		MocksBuilder mocks = new();
 		bool called = false;
-		IEnumerable<CommandItem> items = new List<CommandItem>()
+		IEnumerable<ICommand> items = new List<ICommand>()
 		{
-			new CommandItem()
-			{
-				Command = new Command(
-					"id",
-					"title",
-					() =>
-					{
-						called = true;
-					}
-				)
-			},
+			new Command(
+				"id",
+				"title",
+				() =>
+				{
+					called = true;
+				}
+			)
 		};
 
 		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
@@ -379,7 +347,7 @@ public class MenuVariantViewModelTests
 		MocksBuilder mocks = new();
 		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
 
-		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() });
+		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<ICommand>() });
 
 		// When
 		vm.Update();
@@ -391,28 +359,22 @@ public class MenuVariantViewModelTests
 
 	private static MenuVariantConfig CreateMenuActivationConfig(int itemCount)
 	{
-		List<MatcherResult<CommandItem>> items = new();
+		List<MatcherResult<MenuVariantRowModelData>> items = new();
 
 		for (int i = 0; i < itemCount; i++)
 		{
 			FilterTextMatch[] segments = new FilterTextMatch[] { new FilterTextMatch(0, 1) };
-			items.Add(
-				new(
-					new MenuVariantRowModel(
-						new CommandItem() { Command = new Command($"id{i}", $"title{i}", () => { }) }
-					),
-					segments,
-					0
-				)
-			);
+			items.Add(new(new MenuVariantRowModel(new Command($"id{i}", $"title{i}", () => { }), null), segments, 0));
 		}
 
-		Mock<IMatcher<CommandItem>> matcher = new();
+		Mock<IMatcher<MenuVariantRowModelData>> matcher = new();
 		matcher
-			.Setup(m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<CommandItem>>>()))
+			.Setup(
+				m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<MenuVariantRowModelData>>>())
+			)
 			.Returns(items);
 
-		MenuVariantConfig config = new() { Matcher = matcher.Object, Commands = Array.Empty<CommandItem>() };
+		MenuVariantConfig config = new() { Matcher = matcher.Object, Commands = Array.Empty<ICommand>() };
 		return config;
 	}
 

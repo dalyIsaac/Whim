@@ -2,21 +2,21 @@ using System.ComponentModel;
 
 namespace Whim.CommandPalette;
 
-internal class MenuVariantRowViewModel : IVariantRowViewModel<CommandItem>
+internal class MenuVariantRowViewModel : IVariantRowViewModel<MenuVariantRowModelData>
 {
-	public IVariantRowModel<CommandItem> Model { get; private set; }
+	public IVariantRowModel<MenuVariantRowModelData> Model { get; private set; }
 
 	public PaletteText FormattedTitle { get; private set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	public MenuVariantRowViewModel(MatcherResult<CommandItem> matcherResult)
+	public MenuVariantRowViewModel(MatcherResult<MenuVariantRowModelData> matcherResult)
 	{
 		Model = matcherResult.Model;
 		FormattedTitle = matcherResult.FormattedTitle;
 	}
 
-	public void Update(MatcherResult<CommandItem> matcherResult)
+	public void Update(MatcherResult<MenuVariantRowModelData> matcherResult)
 	{
 		Model = matcherResult.Model;
 		FormattedTitle = matcherResult.FormattedTitle;

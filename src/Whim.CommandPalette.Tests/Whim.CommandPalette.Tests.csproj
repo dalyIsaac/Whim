@@ -47,6 +47,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
+		<ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
 	</ItemGroup>
 
 </Project>

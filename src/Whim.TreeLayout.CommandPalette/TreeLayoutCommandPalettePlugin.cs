@@ -33,7 +33,7 @@ public class TreeLayoutCommandPalettePlugin : IPlugin
 	}
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands =>
+	public IPluginCommands PluginCommands =>
 		new TreeLayoutCommandPalettePluginCommands(_context, this, _treeLayoutPlugin, _commandLayoutPlugin);
 
 	/// <inheritdoc/>

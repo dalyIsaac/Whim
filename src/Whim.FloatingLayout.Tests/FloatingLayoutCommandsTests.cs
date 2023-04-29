@@ -1,46 +1,59 @@
 using Moq;
+using Whim.TestUtilities;
 using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
 public class FloatingLayoutCommandsTests
 {
-	private static Mock<IFloatingLayoutPlugin> CreateFloatingLayoutPluginMock()
-	{
-		Mock<IFloatingLayoutPlugin> plugin = new();
-		return plugin;
-	}
-
 	[Fact]
 	public void ToggleWindowFloatingCommand()
 	{
-		Mock<IFloatingLayoutPlugin> plugin = CreateFloatingLayoutPluginMock();
+		// Given
+		Mock<IFloatingLayoutPlugin> plugin = new();
 		FloatingLayoutCommands commands = new(plugin.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.ToggleWindowFloatingCommand.Command.TryExecute();
+		ICommand command = testUtils.GetCommand("whim.floating_layout.toggle_window_floating");
 
+		// When
+		command.TryExecute();
+
+		// Then
 		plugin.Verify(p => p.ToggleWindowFloating(null), Times.Once);
 	}
 
 	[Fact]
 	public void MarkWindowAsFloatingCommand()
 	{
-		Mock<IFloatingLayoutPlugin> plugin = CreateFloatingLayoutPluginMock();
+		// Given
+		Mock<IFloatingLayoutPlugin> plugin = new();
 		FloatingLayoutCommands commands = new(plugin.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.MarkWindowAsFloatingCommand.Command.TryExecute();
+		ICommand command = testUtils.GetCommand("whim.floating_layout.mark_window_as_floating");
 
+		// When
+		command.TryExecute();
+
+		// Then
 		plugin.Verify(p => p.MarkWindowAsFloating(null), Times.Once);
 	}
 
 	[Fact]
 	public void MarkWindowAsDockedCommand()
 	{
-		Mock<IFloatingLayoutPlugin> plugin = CreateFloatingLayoutPluginMock();
+		// Given
+		Mock<IFloatingLayoutPlugin> plugin = new();
 		FloatingLayoutCommands commands = new(plugin.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.MarkWindowAsDockedCommand.Command.TryExecute();
+		ICommand command = testUtils.GetCommand("whim.floating_layout.mark_window_as_docked");
 
+		// When
+		command.TryExecute();
+
+		// Then
 		plugin.Verify(p => p.MarkWindowAsDocked(null), Times.Once);
 	}
 }

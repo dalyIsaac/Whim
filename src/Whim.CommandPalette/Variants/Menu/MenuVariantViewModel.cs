@@ -9,6 +9,7 @@ namespace Whim.CommandPalette;
 
 internal class MenuVariantViewModel : IVariantViewModel
 {
+	private readonly IContext _context;
 	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
 
 	private MenuVariantConfig? _activationConfig;
@@ -17,7 +18,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	private readonly List<IVariantRowView<CommandItem, MenuVariantRowViewModel>> _unusedRows = new();
+	private readonly List<IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel>> _unusedRows = new();
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="MenuRows"/> are drawn.
@@ -29,11 +30,12 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// It turns out it's annoying to test the Windows App SDK with xunit.
 	/// </summary>
 	private readonly Func<
-		MatcherResult<CommandItem>,
-		IVariantRowView<CommandItem, MenuVariantRowViewModel>
+		MatcherResult<MenuVariantRowModelData>,
+		IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel>
 	> _menuRowFactory;
 
-	public readonly ObservableCollection<IVariantRowView<CommandItem, MenuVariantRowViewModel>> MenuRows = new();
+	public readonly ObservableCollection<IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel>> MenuRows =
+		new();
 
 	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 
@@ -86,11 +88,16 @@ internal class MenuVariantViewModel : IVariantViewModel
 	public MenuVariantViewModel(
 		IContext context,
 		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<MatcherResult<CommandItem>, IVariantRowView<CommandItem, MenuVariantRowViewModel>>? menuRowFactory = null
+		Func<
+			MatcherResult<MenuVariantRowModelData>,
+			IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel>
+		>? menuRowFactory = null
 	)
 	{
+		_context = context;
 		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_menuRowFactory = menuRowFactory ?? ((MatcherResult<CommandItem> item) => new MenuVariantRowView(item));
+		_menuRowFactory =
+			menuRowFactory ?? ((MatcherResult<MenuVariantRowModelData> item) => new MenuVariantRowView(item));
 
 		// Populate the commands to reduce the first render time.
 		PopulateItems(context.CommandManager);
@@ -176,8 +183,8 @@ internal class MenuVariantViewModel : IVariantViewModel
 		}
 
 		Logger.Verbose($"Executing command at index {SelectedIndex}");
-		IVariantRowModel<CommandItem> paletteItem = MenuRows[SelectedIndex].ViewModel.Model;
-		CommandItem match = paletteItem.Data;
+		IVariantRowModel<MenuVariantRowModelData> paletteItem = MenuRows[SelectedIndex].ViewModel.Model;
+		MenuVariantRowModelData match = paletteItem.Data;
 
 		// Since the palette window is reused, there's a chance that the _activationConfig
 		// will have been wiped by a free form child command.
@@ -195,15 +202,13 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// <summary>
 	/// Populate <see cref="_allItems"/> with all the current commands.
 	/// </summary>
-	internal void PopulateItems(IEnumerable<CommandItem> items)
+	internal void PopulateItems(IEnumerable<ICommand> commands)
 	{
 		Logger.Debug($"Populating the current list of all commands.");
 
 		int idx = 0;
-		foreach (CommandItem commandItem in items)
+		foreach (ICommand command in commands)
 		{
-			(ICommand command, IKeybind? keybind) = commandItem;
-
 			if (!command.CanExecute())
 			{
 				continue;
@@ -213,12 +218,15 @@ internal class MenuVariantViewModel : IVariantViewModel
 			{
 				if (_allItems[idx].Data.Command != command)
 				{
-					_allItems[idx] = new MenuVariantRowModel(commandItem);
+					_allItems[idx] = new MenuVariantRowModel(
+						command,
+						_context.KeybindManager.TryGetKeybind(command.Id)
+					);
 				}
 			}
 			else
 			{
-				_allItems.Add(new MenuVariantRowModel(commandItem));
+				_allItems.Add(new MenuVariantRowModel(command, _context.KeybindManager.TryGetKeybind(command.Id)));
 			}
 
 			idx++;
@@ -237,7 +245,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	{
 		int matchesCount = 0;
 
-		foreach (MatcherResult<CommandItem> item in activationConfig.Matcher.Match(query, _allItems))
+		foreach (MatcherResult<MenuVariantRowModelData> item in activationConfig.Matcher.Match(query, _allItems))
 		{
 			Logger.Verbose($"Matched {item.Model.Title}");
 			if (matchesCount < MenuRows.Count)
@@ -248,7 +256,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			else if (_unusedRows.Count > 0)
 			{
 				// Restoring the unused row.
-				IVariantRowView<CommandItem, MenuVariantRowViewModel> row = _unusedRows[^1];
+				IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel> row = _unusedRows[^1];
 				row.Update(item);
 
 				MenuRows.Add(row);
@@ -257,7 +265,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 			else
 			{
 				// Add a new row.
-				IVariantRowView<CommandItem, MenuVariantRowViewModel> row = _menuRowFactory(item);
+				IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel> row = _menuRowFactory(item);
 				MenuRows.Add(row);
 				row.Initialize();
 			}

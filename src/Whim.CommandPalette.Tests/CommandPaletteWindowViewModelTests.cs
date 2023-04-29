@@ -21,7 +21,7 @@ public class CommandPaletteWindowViewModelTests
 
 		public MocksBuilder()
 		{
-			CommandManager.Setup(x => x.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
+			CommandManager.Setup(x => x.GetEnumerator()).Returns(new List<ICommand>().GetEnumerator());
 
 			Mock<IMonitor> monitor = new();
 			monitor
@@ -120,7 +120,7 @@ public class CommandPaletteWindowViewModelTests
 				mocks.SelectVariant.Object
 			);
 
-		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() }, null);
+		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<ICommand>() }, null);
 
 		// When
 		vm.OnKeyDown(VirtualKey.Space);
@@ -148,7 +148,7 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Raises<EventArgs>(
 			h => vm.SetWindowPosRequested += h,
 			h => vm.SetWindowPosRequested -= h,
-			() => vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() }, null)
+			() => vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<ICommand>() }, null)
 		);
 
 		// Then
@@ -188,15 +188,12 @@ public class CommandPaletteWindowViewModelTests
 		MenuVariantConfig config =
 			new()
 			{
-				Commands = Array.Empty<CommandItem>(),
+				Commands = Array.Empty<ICommand>(),
 				InitialText = "Initial text",
 				Hint = "Hint"
 			};
 
-		IEnumerable<CommandItem> commandItems = new List<CommandItem>()
-		{
-			new CommandItem() { Command = new Command("id", "title", () => { }) }
-		};
+		IEnumerable<ICommand> ICommands = new List<ICommand>() { new Command("id", "title", () => { }) };
 
 		// When
 		Assert.Raises<EventArgs>(
@@ -216,7 +213,7 @@ public class CommandPaletteWindowViewModelTests
 		yield return new object[] { new UnknownConfig(), false, "Confirm" };
 		yield return new object[]
 		{
-			new MenuVariantConfig() { Commands = Array.Empty<CommandItem>() },
+			new MenuVariantConfig() { Commands = Array.Empty<ICommand>() },
 			true,
 			"Confirm"
 		};
@@ -278,7 +275,7 @@ public class CommandPaletteWindowViewModelTests
 				mocks.SelectVariant.Object
 			);
 
-		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
+		MenuVariantConfig config = new() { Commands = Array.Empty<ICommand>() };
 
 		vm.Activate(config, null);
 
@@ -304,7 +301,7 @@ public class CommandPaletteWindowViewModelTests
 				mocks.SelectVariant.Object
 			);
 
-		MenuVariantConfig config = new() { Commands = Array.Empty<CommandItem>() };
+		MenuVariantConfig config = new() { Commands = Array.Empty<ICommand>() };
 
 		vm.Activate(config, null);
 

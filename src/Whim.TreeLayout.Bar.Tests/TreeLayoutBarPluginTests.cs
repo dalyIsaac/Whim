@@ -33,11 +33,9 @@ public class TreeLayoutBarPluginTests
 		MocksBuilder mocks = new();
 		TreeLayoutBarPlugin plugin = new(mocks.TreeLayoutPlugin.Object);
 
-		// When
-		IEnumerable<CommandItem> commands = plugin.Commands;
-
 		// Then
-		Assert.Empty(commands);
+		Assert.Empty(plugin.PluginCommands.Commands);
+		Assert.Empty(plugin.PluginCommands.Keybinds);
 	}
 
 	[Fact]

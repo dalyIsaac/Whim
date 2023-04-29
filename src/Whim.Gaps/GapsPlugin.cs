@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Whim.Gaps;
 
 /// <inheritdoc />
@@ -57,5 +55,5 @@ public class GapsPlugin : IGapsPlugin
 	}
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands => new GapsCommands(this);
+	public IPluginCommands PluginCommands => new GapsCommands(this);
 }
