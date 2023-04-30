@@ -21,10 +21,10 @@ public class CommandPaletteCommands : PluginCommands
 		_context = context;
 		_commandPalettePlugin = commandPalettePlugin;
 
-		Add(
+		_ = Add(
 				identifier: "toggle",
 				title: "Toggle command palette",
-				() => _commandPalettePlugin.Toggle(),
+				_commandPalettePlugin.Toggle,
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_K)
 			)
 			.Add(
