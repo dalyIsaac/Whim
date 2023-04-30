@@ -34,6 +34,7 @@ public class CommandPaletteCommandsTests
 				.Returns(new List<IWorkspace>() { Workspace.Object, OtherWorkspace.Object }.GetEnumerator());
 
 			Plugin = new();
+			Plugin.SetupGet(p => p.Name).Returns("whim.command_palette");
 
 			Windows = new Mock<IWindow>[3];
 			Windows[0] = new();
@@ -69,7 +70,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand("toggle");
+		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand("whim.command_palette.toggle");
 
 		// When
 		command.TryExecute();
@@ -83,7 +84,9 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand("rename_workspace");
+		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.command_palette.rename_workspace"
+		);
 
 		List<FreeTextVariantConfig> configs = VerifyFreeTextActivated(wrapper.Plugin);
 		command.TryExecute();
@@ -103,7 +106,9 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand("create_workspace");
+		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.command_palette.create_workspace"
+		);
 
 		// Setup the workspace factory
 		Mock<IWorkspace> newWorkspace = new();
@@ -138,7 +143,9 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand("move_window_to_workspace");
+		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.command_palette.move_window_to_workspace"
+		);
 		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
 
 		List<FreeTextVariantConfig> freeTextConfigs = VerifyFreeTextActivated(wrapper.Plugin);
@@ -263,7 +270,7 @@ public class CommandPaletteCommandsTests
 		// Given
 		Wrapper wrapper = new();
 		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
-			"move_multiple_windows_to_workspace"
+			"whim.command_palette.move_multiple_windows_to_workspace"
 		);
 
 		// When

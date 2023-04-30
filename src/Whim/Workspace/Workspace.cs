@@ -256,6 +256,12 @@ internal class Workspace : IWorkspace
 		return success;
 	}
 
+	/// <summary>
+	/// Returns the window to process. If the window is null, the last focused window is used.
+	/// If the given window is not null, it is checked if it exists in the workspace.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
 	private IWindow? GetValidWindow(IWindow? window)
 	{
 		window ??= LastFocusedWindow;

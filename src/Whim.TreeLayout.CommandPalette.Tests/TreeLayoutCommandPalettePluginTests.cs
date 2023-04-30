@@ -24,7 +24,7 @@ public class TreeLayoutCommandPalettePluginTests
 
 		// Then
 		Assert.NotEmpty(plugin.PluginCommands.Commands);
-		Assert.NotEmpty(plugin.PluginCommands.Keybinds);
+		Assert.Empty(plugin.PluginCommands.Keybinds);
 		Assert.Equal("Set tree layout direction", plugin.PluginCommands.Commands.First().Title);
 	}
 }

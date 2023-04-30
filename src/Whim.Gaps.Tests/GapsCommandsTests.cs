@@ -17,6 +17,7 @@ public class GapsCommandsTests
 			Plugin = new();
 			Config = new();
 
+			Plugin.SetupGet(p => p.Name).Returns("whim.gaps");
 			Plugin.SetupGet(p => p.GapsConfig).Returns(Config);
 
 			GapsCommands gapsCommands = new(Plugin.Object);
@@ -24,8 +25,8 @@ public class GapsCommandsTests
 		}
 	}
 
-	[InlineData("whim.gaps.increase_outer_gap", 1)]
-	[InlineData("whim.gaps.decrease_outer_gap", -1)]
+	[InlineData("whim.gaps.outer.increase", 1)]
+	[InlineData("whim.gaps.outer.decrease", -1)]
 	[Theory]
 	public void OuterGapCommands(string commandId, int mul)
 	{
@@ -40,8 +41,8 @@ public class GapsCommandsTests
 		wrapper.Plugin.Verify(p => p.UpdateOuterGap(expectedDelta), Times.Once);
 	}
 
-	[InlineData("whim.gaps.increase_inner_gap", 1)]
-	[InlineData("whim.gaps.decrease_inner_gap", -1)]
+	[InlineData("whim.gaps.inner.increase", 1)]
+	[InlineData("whim.gaps.inner.decrease", -1)]
 	[Theory]
 	public void InnerGapCommands(string commandId, int mul)
 	{

@@ -22,6 +22,8 @@ public class TreeLayoutCommandPaletteCommandsTests
 			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
 			MonitorManager.Setup(m => m.FocusedMonitor).Returns(Monitor.Object);
 
+			TreeLayoutCommandPalettePlugin.Setup(t => t.Name).Returns("whim.tree_layout.command_palette");
+
 			TreeLayoutCommandPalettePluginCommands commands =
 				new(
 					Context.Object,

@@ -72,19 +72,19 @@ public class CoreCommandsTests
 
 		// Then
 		mocks.Context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction, mocks.Window.Object),
+			x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction, null),
 			Times.Once
 		);
 	}
 
-	[InlineData("whim.core.move_left_edge_left", Direction.Left, true)]
-	[InlineData("whim.core.move_left_edge_right", Direction.Left, false)]
-	[InlineData("whim.core.move_right_edge_left", Direction.Right, false)]
-	[InlineData("whim.core.move_right_edge_right", Direction.Right, true)]
-	[InlineData("whim.core.move_top_edge_up", Direction.Up, true)]
-	[InlineData("whim.core.move_top_edge_down", Direction.Up, false)]
-	[InlineData("whim.core.move_bottom_edge_up", Direction.Down, false)]
-	[InlineData("whim.core.move_bottom_edge_down", Direction.Down, true)]
+	[InlineData("whim.core.move_window_left_edge_left", Direction.Left, true)]
+	[InlineData("whim.core.move_window_left_edge_right", Direction.Left, false)]
+	[InlineData("whim.core.move_window_right_edge_left", Direction.Right, false)]
+	[InlineData("whim.core.move_window_right_edge_right", Direction.Right, true)]
+	[InlineData("whim.core.move_window_top_edge_up", Direction.Up, true)]
+	[InlineData("whim.core.move_window_top_edge_down", Direction.Up, false)]
+	[InlineData("whim.core.move_window_bottom_edge_up", Direction.Down, false)]
+	[InlineData("whim.core.move_window_bottom_edge_down", Direction.Down, true)]
 	[Theory]
 	public void MoveWindowEdge(string commandName, Direction direction, bool positive)
 	{
@@ -101,7 +101,7 @@ public class CoreCommandsTests
 
 		// Then
 		mocks.Context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(direction, delta, mocks.Window.Object),
+			x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(direction, delta, null),
 			Times.Once
 		);
 	}
@@ -120,7 +120,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToPreviousMonitor(mocks.Window.Object), Times.Once);
+		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToPreviousMonitor(null), Times.Once);
 	}
 
 	[Fact]
@@ -137,7 +137,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToNextMonitor(mocks.Window.Object), Times.Once);
+		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToNextMonitor(null), Times.Once);
 	}
 
 	[Fact]

@@ -12,11 +12,16 @@ public class MenuVariantViewModelTests
 	{
 		public Mock<IContext> Context { get; } = new();
 		public Mock<ICommandManager> CommandManager { get; } = new();
+		public Mock<IKeybindManager> KeybindManager { get; } = new();
 		public Mock<ICommandPaletteWindowViewModel> WindowViewModel { get; } = new();
 
 		public MocksBuilder()
 		{
 			Context.Setup(c => c.CommandManager).Returns(CommandManager.Object);
+			Context.Setup(c => c.KeybindManager).Returns(KeybindManager.Object);
+
+			CommandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<ICommand>().GetEnumerator());
+
 			WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(true);
 			WindowViewModel.Setup(wvm => wvm.Text).Returns("ti");
 		}
