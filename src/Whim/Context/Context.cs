@@ -60,7 +60,7 @@ internal class Context : IContext
 
 		foreach ((string name, IKeybind keybind) in coreCommands.Keybinds)
 		{
-			KeybindManager.AddKeybind(name, keybind);
+			KeybindManager.Add(name, keybind);
 		}
 
 		// Load the context.

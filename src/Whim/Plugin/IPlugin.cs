@@ -32,7 +32,7 @@ public interface IPlugin
 	/// The commands and keybinds for this plugin. These are registered during <see cref="IPluginManager.PreInitialize"/>.
 	/// </summary>
 	/// <remarks>
-	/// Keybindings can be overridden by the user using <see cref="IKeybindManager.AddKeybind"/>.
+	/// Keybindings can be overridden by the user using <see cref="IKeybindManager.Add"/>.
 	/// </remarks>
 	public IPluginCommands PluginCommands { get; }
 }

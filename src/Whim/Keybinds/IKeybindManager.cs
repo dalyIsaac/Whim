@@ -13,20 +13,21 @@ public interface IKeybindManager
 	/// </remarks>
 	/// <param name="commandId">The identifier of the command to bind to.</param>
 	/// <param name="keybind">The keybind to add.</param>
-	IKeybindManager AddKeybind(string commandId, IKeybind keybind);
+	void Add(string commandId, IKeybind keybind);
 
 	/// <summary>
 	/// Removes a keybind.
 	/// </summary>
 	/// <param name="commandId">The identifier of the command to remove the keybind from.</param>
-	IKeybindManager RemoveKeybind(string commandId);
+	/// <returns><c>true</c> if the keybind was removed; otherwise, <c>false</c>.</returns>
+	bool Remove(string commandId);
 
 	/// <summary>
 	/// Gets the keybind for the given command.
 	/// </summary>
 	/// <param name="commandId">The identifier of the command to get the keybind for.</param>
 	/// <returns>The keybind for the given command.</returns>
-	IKeybind? TryGetKeybind(string commandId);
+	IKeybind? TryGet(string commandId);
 
 	/// <summary>
 	/// Gets all the commands bound to the given keybind.

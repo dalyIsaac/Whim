@@ -14,7 +14,7 @@ internal class KeybindManager : IKeybindManager
 		_context = context;
 	}
 
-	public IKeybindManager AddKeybind(string commandId, IKeybind keybind)
+	public void Add(string commandId, IKeybind keybind)
 	{
 		Logger.Debug($"Adding keybind '{keybind}' for command '{commandId}'");
 
@@ -25,8 +25,6 @@ internal class KeybindManager : IKeybindManager
 
 		_keybindsCommandsMap[keybind].Add(commandId);
 		_commandsKeybindsMap.Add(commandId, keybind);
-
-		return this;
 	}
 
 	public ICommand[] GetCommands(IKeybind keybind)
@@ -45,6 +43,10 @@ internal class KeybindManager : IKeybindManager
 				{
 					commands.Add(command);
 				}
+				else
+				{
+					Logger.Warning($"Command '{commandId}' not found");
+				}
 			}
 
 			return commands.ToArray();
@@ -53,24 +55,25 @@ internal class KeybindManager : IKeybindManager
 		return Array.Empty<ICommand>();
 	}
 
-	public IKeybind? TryGetKeybind(string commandId)
+	public IKeybind? TryGet(string commandId)
 	{
 		Logger.Debug($"Getting keybind for command '{commandId}'");
 
 		return _commandsKeybindsMap.TryGetValue(commandId, out IKeybind? keybind) ? keybind : null;
 	}
 
-	public IKeybindManager RemoveKeybind(string commandId)
+	public bool Remove(string commandId)
 	{
 		Logger.Debug($"Removing keybind for command '{commandId}'");
 
-		IKeybind? keybind = TryGetKeybind(commandId);
-		if (keybind is not null)
+		IKeybind? keybind = TryGet(commandId);
+		if (keybind is null)
 		{
-			_commandsKeybindsMap.Remove(commandId);
-			_keybindsCommandsMap[keybind].Remove(commandId);
+			return false;
 		}
 
-		return this;
+		_commandsKeybindsMap.Remove(commandId);
+		_keybindsCommandsMap[keybind].Remove(commandId);
+		return true;
 	}
 }
