@@ -70,7 +70,15 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	/// </summary>
 	public void Toggle()
 	{
-		_commandPaletteWindow?.Toggle();
+		Logger.Debug("Toggling command palette");
+		if (_commandPaletteWindow?.ViewModel.IsVisible == true)
+		{
+			_commandPaletteWindow.ViewModel.RequestHide();
+		}
+		else
+		{
+			Activate();
+		}
 	}
 
 	/// <inheritdoc/>
