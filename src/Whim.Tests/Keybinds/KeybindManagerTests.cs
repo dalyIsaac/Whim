@@ -88,8 +88,8 @@ public class KeybindManagerTests
 		wrapper.CommandManager.Setup(commandManager => commandManager.TryGetCommand("command")).Returns(command);
 
 		// When
-		keybindManager.Add("command", keybind);
-		ICommand[] allCommands = keybindManager.GetCommands(new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_B));
+		keybindManager.Add("command2", keybind);
+		ICommand[] allCommands = keybindManager.GetCommands(keybind);
 
 		// Then
 		Assert.Empty(allCommands);
@@ -127,7 +127,7 @@ public class KeybindManagerTests
 		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
 
 		// When
-		IKeybind? keybind = keybindManager.TryGet("command");
+		IKeybind? keybind = keybindManager.TryGetKeybind("command");
 
 		// Then
 		Assert.Null(keybind);
@@ -143,7 +143,7 @@ public class KeybindManagerTests
 
 		// When
 		keybindManager.Add("command", keybind);
-		IKeybind? result = keybindManager.TryGet("command");
+		IKeybind? result = keybindManager.TryGetKeybind("command");
 
 		// Then
 		Assert.Equal(keybind, result);

@@ -218,12 +218,15 @@ internal class MenuVariantViewModel : IVariantViewModel
 			{
 				if (_allItems[idx].Data.Command != command)
 				{
-					_allItems[idx] = new MenuVariantRowModel(command, _context.KeybindManager.TryGet(command.Id));
+					_allItems[idx] = new MenuVariantRowModel(
+						command,
+						_context.KeybindManager.TryGetKeybind(command.Id)
+					);
 				}
 			}
 			else
 			{
-				_allItems.Add(new MenuVariantRowModel(command, _context.KeybindManager.TryGet(command.Id)));
+				_allItems.Add(new MenuVariantRowModel(command, _context.KeybindManager.TryGetKeybind(command.Id)));
 			}
 
 			idx++;

@@ -55,7 +55,7 @@ internal class KeybindManager : IKeybindManager
 		return Array.Empty<ICommand>();
 	}
 
-	public IKeybind? TryGet(string commandId)
+	public IKeybind? TryGetKeybind(string commandId)
 	{
 		Logger.Debug($"Getting keybind for command '{commandId}'");
 
@@ -66,7 +66,7 @@ internal class KeybindManager : IKeybindManager
 	{
 		Logger.Debug($"Removing keybind for command '{commandId}'");
 
-		IKeybind? keybind = TryGet(commandId);
+		IKeybind? keybind = TryGetKeybind(commandId);
 		if (keybind is null)
 		{
 			return false;

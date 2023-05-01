@@ -27,7 +27,7 @@ public interface IKeybindManager
 	/// </summary>
 	/// <param name="commandId">The identifier of the command to get the keybind for.</param>
 	/// <returns>The keybind for the given command.</returns>
-	IKeybind? TryGet(string commandId);
+	IKeybind? TryGetKeybind(string commandId);
 
 	/// <summary>
 	/// Gets all the commands bound to the given keybind.
