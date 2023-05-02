@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
 
@@ -18,6 +17,9 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	/// </summary>
 	public CommandPaletteConfig Config { get; }
 
+	/// <inheritdoc />
+	public IPluginCommands PluginCommands { get; }
+
 	/// <summary>
 	/// Creates a new instance of the command palette plugin.
 	/// </summary>
@@ -27,6 +29,8 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	{
 		_context = context;
 		Config = commandPaletteConfig;
+
+		PluginCommands = new CommandPaletteCommands(_context, this);
 	}
 
 	/// <inheritdoc/>
@@ -66,7 +70,15 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	/// </summary>
 	public void Toggle()
 	{
-		_commandPaletteWindow?.Toggle();
+		Logger.Debug("Toggling command palette");
+		if (_commandPaletteWindow?.ViewModel.IsVisible == true)
+		{
+			_commandPaletteWindow.ViewModel.RequestHide();
+		}
+		else
+		{
+			Activate();
+		}
 	}
 
 	/// <inheritdoc/>
@@ -93,7 +105,4 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
 	}
-
-	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands => new CommandPaletteCommands(_context, this);
 }

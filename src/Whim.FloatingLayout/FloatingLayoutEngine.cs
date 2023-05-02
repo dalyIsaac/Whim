@@ -2,10 +2,8 @@ using System.Collections.Generic;
 
 namespace Whim.FloatingLayout;
 
-/// <summary>
-/// A proxy layout engine to allow windows to be free-floating.
-/// </summary>
-public class FloatingLayoutEngine : BaseProxyLayoutEngine
+/// <inheritdoc />
+public class FloatingLayoutEngine : BaseProxyLayoutEngine, IFloatingLayoutEngine
 {
 	private readonly IContext _context;
 	private readonly FloatingLayoutConfig _floatingLayoutConfig;
@@ -67,10 +65,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		InnerLayoutEngine.AddWindowAtPoint(window, point);
 	}
 
-	/// <summary>
-	/// Mark the given <paramref name="window"/> as a floating window.
-	/// </summary>
-	/// <param name="window"></param>
+	/// <inheritdoc />
 	public void MarkWindowAsFloating(IWindow? window = null)
 	{
 		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
@@ -84,10 +79,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 	}
 
-	/// <summary>
-	/// Mark the given <paramref name="window"/> as a docked window.
-	/// </summary>
-	/// <param name="window"></param>
+	/// <inheritdoc />
 	public void MarkWindowAsDocked(IWindow? window = null)
 	{
 		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
@@ -102,10 +94,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 	}
 
-	/// <summary>
-	/// Toggle the floating state of the given <paramref name="window"/>.
-	/// </summary>
-	/// <param name="window"></param>
+	/// <inheritdoc />
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
 		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;

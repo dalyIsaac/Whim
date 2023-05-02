@@ -27,7 +27,7 @@ internal interface ICoreNativeManager
 	/// <param name="eventMax"></param>
 	/// <param name="lpfnWinEventProc"></param>
 	/// <returns></returns>
-	public UnhookWinEventSafeHandle SetWinEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc);
+	UnhookWinEventSafeHandle SetWinEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc);
 
 	/// <summary>
 	/// Set the <see cref="PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID, HOOKPROC, SafeHandle, uint)"/> <br/>
@@ -39,7 +39,7 @@ internal interface ICoreNativeManager
 	/// <param name="hmod"></param>
 	/// <param name="dwThreadId"></param>
 	/// <returns></returns>
-	public UnhookWindowsHookExSafeHandle SetWindowsHookEx(
+	UnhookWindowsHookExSafeHandle SetWindowsHookEx(
 		WINDOWS_HOOK_ID idHook,
 		HOOKPROC lpfn,
 		SafeHandle? hmod,
@@ -55,7 +55,7 @@ internal interface ICoreNativeManager
 	/// <param name="wParam"></param>
 	/// <param name="lParam"></param>
 	/// <returns></returns>
-	public LRESULT CallNextHookEx(int nCode, WPARAM wParam, LPARAM lParam);
+	LRESULT CallNextHookEx(int nCode, WPARAM wParam, LPARAM lParam);
 
 	/// <summary>
 	/// Set the <see cref="PInvoke.GetKeyState(int)"/> <br/>
@@ -64,7 +64,7 @@ internal interface ICoreNativeManager
 	/// </summary>
 	/// <param name="nVirtKey"></param>
 	/// <returns></returns>
-	public short GetKeyState(int nVirtKey);
+	short GetKeyState(int nVirtKey);
 
 	/// <summary>
 	/// Set the <see cref="PInvoke.GetCursorPos(out System.Drawing.Point)"/> <br/>
@@ -73,7 +73,7 @@ internal interface ICoreNativeManager
 	/// </summary>
 	/// <param name="lpPoint"></param>
 	/// <returns></returns>
-	public BOOL GetCursorPos(out System.Drawing.Point lpPoint);
+	BOOL GetCursorPos(out System.Drawing.Point lpPoint);
 
 	/// <summary>
 	/// Get the coordinates for the left-side of the virtual screen.
@@ -84,7 +84,7 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
 	/// </remarks>
 	/// <returns></returns>
-	public int GetVirtualScreenLeft();
+	int GetVirtualScreenLeft();
 
 	/// <summary>
 	/// Get the coordinates for the top-side of the virtual screen.
@@ -95,7 +95,7 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
 	/// </remarks>
 	/// <returns></returns>
-	public int GetVirtualScreenTop();
+	int GetVirtualScreenTop();
 
 	/// <summary>
 	/// Get the width of the virtual screen.
@@ -106,7 +106,7 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
 	/// </remarks>
 	/// <returns></returns>
-	public int GetVirtualScreenWidth();
+	int GetVirtualScreenWidth();
 
 	/// <summary>
 	/// Get the height of the virtual screen.
@@ -117,7 +117,7 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
 	/// </remarks>
 	/// <returns></returns>
-	public int GetVirtualScreenHeight();
+	int GetVirtualScreenHeight();
 
 	/// <summary>
 	/// Whether the desktop has multiple monitors.
@@ -128,7 +128,7 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
 	/// </remarks>
 	/// <returns></returns>
-	public bool HasMultipleMonitors();
+	bool HasMultipleMonitors();
 
 	/// <summary>
 	/// Enumerates display monitors (including invisible pseudo-monitors associated with the mirroring drivers) that intersect a region formed by the intersection of a specified clipping rectangle and the visible region of a device context.
@@ -143,7 +143,7 @@ internal interface ICoreNativeManager
 	/// <param name="lpfnEnum"></param>
 	/// <param name="dwData"></param>
 	/// <returns></returns>
-	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData);
+	BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData);
 
 	/// <summary>
 	/// Retrieves the size of the work area on the primary display monitor.
@@ -155,7 +155,7 @@ internal interface ICoreNativeManager
 	/// </remarks>
 	/// <param name="workArea"></param>
 	/// <returns></returns>
-	public BOOL GetPrimaryDisplayWorkArea(out RECT workArea);
+	BOOL GetPrimaryDisplayWorkArea(out RECT workArea);
 
 	/// <summary>
 	/// Retrieve information about a display monitor.
@@ -168,7 +168,7 @@ internal interface ICoreNativeManager
 	/// <param name="hMonitor"></param>
 	/// <param name="lpmi"></param>
 	/// <returns></returns>
-	public BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFO lpmi);
+	BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFO lpmi);
 
 	/// <summary>
 	/// Retrieve information about a display monitor.
@@ -181,7 +181,7 @@ internal interface ICoreNativeManager
 	/// <param name="hMonitor"></param>
 	/// <param name="lpmi"></param>
 	/// <returns></returns>
-	public BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi);
+	BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi);
 
 	/// <summary>
 	/// Retrieve a handle to the display monitor that contains a specified point.
@@ -194,7 +194,7 @@ internal interface ICoreNativeManager
 	/// <param name="pt"></param>
 	/// <param name="dwFlags"></param>
 	/// <returns></returns>
-	public HMONITOR MonitorFromPoint(Point pt, MONITOR_FROM_FLAGS dwFlags);
+	HMONITOR MonitorFromPoint(Point pt, MONITOR_FROM_FLAGS dwFlags);
 
 	/// <summary>
 	/// Retrieves the dimensions of the bounding rectangle of the specified window. The dimensions are given in screen coordinates that are relative to the upper-left corner of the screen.
@@ -207,7 +207,7 @@ internal interface ICoreNativeManager
 	/// <param name="hWnd"></param>
 	/// <param name="lpRect"></param>
 	/// <returns></returns>
-	public BOOL GetWindowRect(HWND hWnd, out RECT lpRect);
+	BOOL GetWindowRect(HWND hWnd, out RECT lpRect);
 
 	/// <summary>
 	/// Retrieves a handle to the foreground window (the window with which the user is currently working). The system assigns a slightly higher priority to the thread that creates the foreground window than it does to other threads.
@@ -218,7 +218,7 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getforegroundwindow
 	/// </remarks>
 	/// <returns></returns>
-	public HWND GetForegroundWindow();
+	HWND GetForegroundWindow();
 
 	/// <summary>
 	/// Determines whether the specified window is minimized (iconic).
@@ -230,7 +230,7 @@ internal interface ICoreNativeManager
 	/// </remarks>
 	/// <param name="hWnd"></param>
 	/// <returns></returns>
-	public BOOL IsWindowMinimized(HWND hWnd);
+	BOOL IsWindowMinimized(HWND hWnd);
 
 	/// <summary>
 	/// Determines whether a window is maximized.
@@ -242,7 +242,7 @@ internal interface ICoreNativeManager
 	/// </remarks>
 	/// <param name="hWnd"></param>
 	/// <returns></returns>
-	public BOOL IsWindowMaximized(HWND hWnd);
+	BOOL IsWindowMaximized(HWND hWnd);
 
 	/// <summary>
 	/// Brings the thread that created the specified window into the foreground and activates the window. Keyboard input is directed to the window, and various visual cues are changed for the user. The system assigns a slightly higher priority to the thread that created the foreground window than it does to other threads.
@@ -254,7 +254,7 @@ internal interface ICoreNativeManager
 	/// </remarks>
 	/// <param name="hWnd"></param>
 	/// <returns></returns>
-	public BOOL SetForegroundWindow(HWND hWnd);
+	BOOL SetForegroundWindow(HWND hWnd);
 
 	/// <summary>
 	/// Synthesizes keystrokes, mouse motions, and button clicks.
@@ -267,7 +267,7 @@ internal interface ICoreNativeManager
 	/// <param name="pInputs"></param>
 	/// <param name="cbSize"></param>
 	/// <returns></returns>
-	public uint SendInput(Span<INPUT> pInputs, int cbSize);
+	uint SendInput(Span<INPUT> pInputs, int cbSize);
 
 	/// <summary>
 	/// Brings the specified window to the top of the Z order. If the window is a top-level window, it is activated. If the window is a child window, the top-level parent window associated with the child window is activated.
@@ -279,7 +279,7 @@ internal interface ICoreNativeManager
 	/// </remarks>
 	/// <param name="hWnd"></param>
 	/// <returns></returns>
-	public BOOL BringWindowToTop(HWND hWnd);
+	BOOL BringWindowToTop(HWND hWnd);
 
 	/// <summary>
 	/// Retrieves the identifier of the thread that created the specified window and, optionally, the identifier of the process that created the window.
@@ -292,27 +292,27 @@ internal interface ICoreNativeManager
 	/// <param name="hWnd"></param>
 	/// <param name="lpdwProcessId"></param>
 	/// <returns></returns>
-	public uint GetWindowThreadProcessId(HWND hWnd, out uint lpdwProcessId);
+	uint GetWindowThreadProcessId(HWND hWnd, out uint lpdwProcessId);
 
 	/// <summary>
 	/// Safe wrapper around <see cref="PInvoke.GetWindowText"/>.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public string GetWindowText(HWND hwnd);
+	string GetWindowText(HWND hwnd);
 
 	/// <summary>
 	/// Returns <see langword="true"/> if the window is a splash window.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public bool IsSplashScreen(HWND hwnd);
+	bool IsSplashScreen(HWND hwnd);
 
 	/// <summary>
 	/// Enumerates over all the <see cref="HWND"/> of all the top-level windows.
 	/// </summary>
 	/// <returns></returns>
-	public IEnumerable<HWND> GetAllWindows();
+	IEnumerable<HWND> GetAllWindows();
 
 	/// <summary>
 	/// Returns <see langword="true"/> when the window is a cloaked window.
@@ -321,7 +321,7 @@ internal interface ICoreNativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public bool IsCloakedWindow(HWND hwnd);
+	bool IsCloakedWindow(HWND hwnd);
 
 	/// <summary>
 	/// Returns <see langword="true"/> if the window is a standard window.
@@ -329,14 +329,14 @@ internal interface ICoreNativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public bool IsStandardWindow(HWND hwnd);
+	bool IsStandardWindow(HWND hwnd);
 
 	/// <summary>
 	/// Returns <see langword="true"/> when the window has no visible owner.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public bool HasNoVisibleOwner(HWND hwnd);
+	bool HasNoVisibleOwner(HWND hwnd);
 
 	/// <summary>
 	/// Returns <see langword="true"/> if the window is a system window.
@@ -344,7 +344,7 @@ internal interface ICoreNativeManager
 	/// <param name="hwnd"></param>
 	/// <param name="className">The window's class name.</param>
 	/// <returns></returns>
-	public bool IsSystemWindow(HWND hwnd, string className);
+	bool IsSystemWindow(HWND hwnd, string className);
 
 	/// <summary>Installs or updates a window subclass callback.</summary>
 	/// <param name="hWnd">
@@ -370,7 +370,7 @@ internal interface ICoreNativeManager
 	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass">Learn more about this API from docs.microsoft.com</see>.</para>
 	/// </remarks>
 	/// <returns></returns>
-	public BOOL SetWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass, nuint dwRefData);
+	BOOL SetWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass, nuint dwRefData);
 
 	/// <summary>Removes a subclass callback from a window.</summary>
 	/// <param name="hWnd">
@@ -392,7 +392,7 @@ internal interface ICoreNativeManager
 	/// <para><see href="https://docs.microsoft.com/windows/win32/api/commctrl/nf-commctrl-removewindowsubclass">Learn more about this API from docs.microsoft.com</see>.</para>
 	/// </remarks>
 	/// <returns></returns>
-	public BOOL RemoveWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass);
+	BOOL RemoveWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass);
 
 	/// <summary>Calls the next handler in a window's subclass chain. The last handler in the subclass chain calls the original window procedure for the window.</summary>
 	/// <param name="hWnd">
@@ -417,7 +417,7 @@ internal interface ICoreNativeManager
 	/// <remarks>
 	/// <para><see href="https://docs.microsoft.com/windows/win32/api//commctrl/nf-commctrl-defsubclassproc">Learn more about this API from docs.microsoft.com</see>.</para>
 	/// </remarks>
-	public LRESULT DefSubclassProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT DefSubclassProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam);
 
 	/// <summary>Queries the dots per inch (dpi) of a display.</summary>
 	/// <param name="hmonitor">Handle of the monitor being queried.</param>
@@ -431,5 +431,16 @@ internal interface ICoreNativeManager
 	/// <remarks>
 	/// <para><see href="https://docs.microsoft.com/windows/win32/api//shellscalingapi/nf-shellscalingapi-getdpiformonitor">Learn more about this API from docs.microsoft.com</see>.</para>
 	/// </remarks>
-	public HRESULT GetDpiForMonitor(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, out uint dpiX, out uint dpiY);
+	HRESULT GetDpiForMonitor(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, out uint dpiX, out uint dpiY);
+
+	/// <summary>
+	/// Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
+	/// </summary>
+	/// <typeparam name="T">The type of the object to which the data is to be copied. This must be a formatted class or a structure.</typeparam>
+	/// <param name="ptr">A pointer to an unmanaged block of memory.</param>
+	/// <returns>A managed object that contains the data that the ptr parameter points to.</returns>
+	/// <exception cref="ArgumentException">The layout of T is not sequential or explicit.</exception>
+	/// <exception cref="MissingMethodException">The class specified by T does not have an accessible parameterless constructor.</exception>
+	T PtrToStructure<T>(nint ptr)
+		where T : struct;
 }

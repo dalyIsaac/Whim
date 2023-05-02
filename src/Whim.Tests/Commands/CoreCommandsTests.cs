@@ -1,302 +1,197 @@
 using Moq;
+using Whim.TestUtilities;
 using Xunit;
 
 namespace Whim.Tests;
 
 public class CoreCommandsTests
 {
-	private static (Mock<IContext>, Mock<IWorkspace>, Mock<IWindow>) CreateMocks()
+	private class MocksWrapper
 	{
-		Mock<IContext> context = new();
-		Mock<IWorkspaceManager> workspaceManager = new();
-		Mock<IWorkspace> workspace = new();
-		Mock<ILayoutEngine> layoutEngine = new();
-		Mock<IWindow> window = new();
+		public Mock<IContext> Context { get; }
+		public Mock<IWorkspaceManager> WorkspaceManager { get; }
+		public Mock<IWorkspace> Workspace { get; }
+		public Mock<ILayoutEngine> LayoutEngine { get; }
+		public Mock<IWindow> Window { get; }
 
-		workspace.SetupGet(w => w.LastFocusedWindow).Returns(window.Object);
-		workspace.SetupGet(w => w.ActiveLayoutEngine).Returns(layoutEngine.Object);
-		workspaceManager.SetupGet(x => x.ActiveWorkspace).Returns(workspace.Object);
-		context.SetupGet(x => x.WorkspaceManager).Returns(workspaceManager.Object);
+		public MocksWrapper()
+		{
+			Context = new Mock<IContext>();
+			WorkspaceManager = new Mock<IWorkspaceManager>();
+			Workspace = new Mock<IWorkspace>();
+			LayoutEngine = new Mock<ILayoutEngine>();
+			Window = new Mock<IWindow>();
 
-		return (context, workspace, window);
+			Workspace.SetupGet(x => x.LastFocusedWindow).Returns(Window.Object);
+			Workspace.SetupGet(x => x.ActiveLayoutEngine).Returns(LayoutEngine.Object);
+			WorkspaceManager.SetupGet(x => x.ActiveWorkspace).Returns(Workspace.Object);
+			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
+		}
 	}
 
-	[Fact]
-	public void FocusWindowInDirectionLeftCommand()
+	[InlineData("whim.core.focus_window_in_direction.left", Direction.Left)]
+	[InlineData("whim.core.focus_window_in_direction.right", Direction.Right)]
+	[InlineData("whim.core.focus_window_in_direction.up", Direction.Up)]
+	[InlineData("whim.core.focus_window_in_direction.down", Direction.Down)]
+	[Theory]
+	public void FocusWindowInDirection(string commandName, Direction direction)
 	{
-		(Mock<IContext> context, _, Mock<IWindow> window) = CreateMocks();
-		CoreCommands commands = new(context.Object);
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.FocusWindowInDirectionLeft.Command.TryExecute();
-		context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(Direction.Left, window.Object),
+		ICommand command = testUtils.GetCommand(commandName);
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.Context.Verify(
+			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(direction, mocks.Window.Object),
 			Times.Once
 		);
 	}
 
 	[Fact]
-	public void FocusWindowInDirectionRightCommand()
+	public void FocusWindowInDirection_NoLastFocusedWindow()
 	{
-		(Mock<IContext> context, _, Mock<IWindow> window) = CreateMocks();
-		CoreCommands commands = new(context.Object);
+		// Given
+		MocksWrapper mocks = new();
+		mocks.Workspace.SetupGet(x => x.LastFocusedWindow).Returns((IWindow?)null);
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.FocusWindowInDirectionRight.Command.TryExecute();
-		context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(Direction.Right, window.Object),
+		ICommand command = testUtils.GetCommand("whim.core.focus_window_in_direction.left");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.Context.Verify(
+			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(Direction.Left, null),
+			Times.Never
+		);
+	}
+
+	[InlineData("whim.core.swap_window_in_direction.left", Direction.Left)]
+	[InlineData("whim.core.swap_window_in_direction.right", Direction.Right)]
+	[InlineData("whim.core.swap_window_in_direction.up", Direction.Up)]
+	[InlineData("whim.core.swap_window_in_direction.down", Direction.Down)]
+	[Theory]
+	public void SwapWindowInDirection(string commandName, Direction direction)
+	{
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand(commandName);
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.Context.Verify(
+			x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction, null),
+			Times.Once
+		);
+	}
+
+	[InlineData("whim.core.move_window_left_edge_left", Direction.Left, true)]
+	[InlineData("whim.core.move_window_left_edge_right", Direction.Left, false)]
+	[InlineData("whim.core.move_window_right_edge_left", Direction.Right, false)]
+	[InlineData("whim.core.move_window_right_edge_right", Direction.Right, true)]
+	[InlineData("whim.core.move_window_top_edge_up", Direction.Up, true)]
+	[InlineData("whim.core.move_window_top_edge_down", Direction.Up, false)]
+	[InlineData("whim.core.move_window_bottom_edge_up", Direction.Down, false)]
+	[InlineData("whim.core.move_window_bottom_edge_down", Direction.Down, true)]
+	[Theory]
+	public void MoveWindowEdge(string commandName, Direction direction, bool positive)
+	{
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
+		double delta = (positive ? 1 : -1) * CoreCommands.MoveWindowEdgeDelta;
+
+		ICommand command = testUtils.GetCommand(commandName);
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.Context.Verify(
+			x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(direction, delta, null),
 			Times.Once
 		);
 	}
 
 	[Fact]
-	public void FocusWindowInDirectionUpCommand()
+	public void MoveWindowToPreviousMonitor()
 	{
-		(Mock<IContext> context, _, Mock<IWindow> window) = CreateMocks();
-		CoreCommands commands = new(context.Object);
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.FocusWindowInDirectionUp.Command.TryExecute();
-		context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(Direction.Up, window.Object),
-			Times.Once
-		);
+		ICommand command = testUtils.GetCommand("whim.core.move_window_to_previous_monitor");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToPreviousMonitor(null), Times.Once);
 	}
 
 	[Fact]
-	public void FocusWindowInDirectionDownCommand()
+	public void MoveWindowToNextMonitor()
 	{
-		(Mock<IContext> context, _, Mock<IWindow> window) = CreateMocks();
-		CoreCommands commands = new(context.Object);
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.FocusWindowInDirectionDown.Command.TryExecute();
-		context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(Direction.Down, window.Object),
-			Times.Once
-		);
+		ICommand command = testUtils.GetCommand("whim.core.move_window_to_next_monitor");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToNextMonitor(null), Times.Once);
 	}
 
 	[Fact]
-	public void SwapWindowInDirectionLeftCommand()
+	public void CloseCurrentWorkspace()
 	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.SwapWindowInDirectionLeft.Command.TryExecute();
-		context.Verify(x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Left, null), Times.Once);
+		ICommand command = testUtils.GetCommand("whim.core.close_current_workspace");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.Context.Verify(x => x.WorkspaceManager.Remove(mocks.Workspace.Object), Times.Once);
 	}
 
 	[Fact]
-	public void SwapWindowInDirectionRightCommand()
+	public void ExitWhim()
 	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
 
-		commands.SwapWindowInDirectionRight.Command.TryExecute();
-		context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Right, null),
-			Times.Once
-		);
-	}
+		ICommand command = testUtils.GetCommand("whim.core.exit_whim");
 
-	[Fact]
-	public void SwapWindowInDirectionUpCommand()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
+		// When
+		command.TryExecute();
 
-		commands.SwapWindowInDirectionUp.Command.TryExecute();
-		context.Verify(x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Up, null), Times.Once);
-	}
-
-	[Fact]
-	public void SwapWindowInDirectionDownCommand()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.SwapWindowInDirectionDown.Command.TryExecute();
-		context.Verify(x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(Direction.Down, null), Times.Once);
-	}
-
-	[Fact]
-	public void MoveWindowLeftEdgeLeft()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowLeftEdgeLeft.Command.TryExecute();
-		context.Verify(
-			x =>
-				x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-					Direction.Left,
-					CoreCommands.MoveWindowEdgeDelta,
-					null
-				),
-			Times.Once
-		);
-	}
-
-	[Fact]
-	public void MoveWindowLeftEdgeRight()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowLeftEdgeRight.Command.TryExecute();
-		context.Verify(
-			x =>
-				x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-					Direction.Left,
-					-CoreCommands.MoveWindowEdgeDelta,
-					null
-				),
-			Times.Once
-		);
-	}
-
-	[Fact]
-	public void MoveWindowRightEdgeLeft()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowRightEdgeLeft.Command.TryExecute();
-		context.Verify(
-			x =>
-				x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-					Direction.Right,
-					-CoreCommands.MoveWindowEdgeDelta,
-					null
-				),
-			Times.Once
-		);
-	}
-
-	[Fact]
-	public void MoveWindowRightEdgeRight()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowRightEdgeRight.Command.TryExecute();
-		context.Verify(
-			x =>
-				x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-					Direction.Right,
-					CoreCommands.MoveWindowEdgeDelta,
-					null
-				),
-			Times.Once
-		);
-	}
-
-	[Fact]
-	public void MoveWindowTopEdgeUp()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowTopEdgeUp.Command.TryExecute();
-		context.Verify(
-			x =>
-				x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-					Direction.Up,
-					CoreCommands.MoveWindowEdgeDelta,
-					null
-				),
-			Times.Once
-		);
-	}
-
-	[Fact]
-	public void MoveWindowTopEdgeDown()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowTopEdgeDown.Command.TryExecute();
-		context.Verify(
-			x =>
-				x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-					Direction.Up,
-					-CoreCommands.MoveWindowEdgeDelta,
-					null
-				),
-			Times.Once
-		);
-	}
-
-	[Fact]
-	public void MoveWindowBottomEdgeUp()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowBottomEdgeUp.Command.TryExecute();
-		context.Verify(
-			x =>
-				x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-					Direction.Down,
-					-CoreCommands.MoveWindowEdgeDelta,
-					null
-				),
-			Times.Once
-		);
-	}
-
-	[Fact]
-	public void MoveWindowBottomEdgeDown()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowBottomEdgeDown.Command.TryExecute();
-		context.Verify(
-			x =>
-				x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-					Direction.Down,
-					CoreCommands.MoveWindowEdgeDelta,
-					null
-				),
-			Times.Once
-		);
-	}
-
-	[Fact]
-	public void MoveWindowToPreviousMonitorCommand()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowToPreviousMonitor.Command.TryExecute();
-		context.Verify(x => x.WorkspaceManager.MoveWindowToPreviousMonitor(null), Times.Once);
-	}
-
-	[Fact]
-	public void MoveWindowToNextMonitorCommand()
-	{
-		(Mock<IContext> context, _, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.MoveWindowToNextMonitor.Command.TryExecute();
-		context.Verify(x => x.WorkspaceManager.MoveWindowToNextMonitor(null), Times.Once);
-	}
-
-	[Fact]
-	public void CloseCurrentWorkspaceCommand()
-	{
-		(Mock<IContext> context, Mock<IWorkspace> workspace, _) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.CloseCurrentWorkspace.Command.TryExecute();
-		context.Verify(x => x.WorkspaceManager.Remove(workspace.Object), Times.Once);
-	}
-
-	[Fact]
-	public void ExitWhimCommand()
-	{
-		(Mock<IContext> context, _, Mock<IWindow> window) = CreateMocks();
-		CoreCommands commands = new(context.Object);
-
-		commands.ExitWhim.Command.TryExecute();
-		context.Verify(x => x.Exit(null), Times.Once);
+		// Then
+		mocks.Context.Verify(x => x.Exit(null), Times.Once);
 	}
 }

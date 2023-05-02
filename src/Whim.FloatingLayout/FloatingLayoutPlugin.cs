@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
@@ -34,7 +32,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	public void PostInitialize() { }
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands => new FloatingLayoutCommands(this);
+	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window
@@ -44,7 +42,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	{
 		// Get the currently active floating layout engine.
 		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
+		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
 			Logger.Error("Could not find floating layout engine");
@@ -63,7 +61,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	{
 		// Get the currently active floating layout engine.
 		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
+		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
 			Logger.Error("Could not find floating layout engine");
@@ -82,7 +80,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	{
 		// Get the currently active floating layout engine.
 		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
+		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
 			Logger.Error("Could not find floating layout engine");

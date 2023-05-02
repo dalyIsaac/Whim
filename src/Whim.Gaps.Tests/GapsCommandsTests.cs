@@ -1,61 +1,59 @@
 using Moq;
+using Whim.TestUtilities;
 using Xunit;
 
 namespace Whim.Gaps.Tests;
 
 public class GapsCommandsTests
 {
-	private static (Mock<IGapsPlugin>, GapsConfig) CreateMocks()
+	private class Wrapper
 	{
-		Mock<IGapsPlugin> plugin = new();
-		GapsConfig config = new();
+		public Mock<IGapsPlugin> Plugin { get; }
+		public GapsConfig Config { get; }
+		public ICommand Command { get; }
 
-		plugin.SetupGet(p => p.GapsConfig).Returns(config);
+		public Wrapper(string commandId)
+		{
+			Plugin = new();
+			Config = new();
 
-		return (plugin, config);
+			Plugin.SetupGet(p => p.Name).Returns("whim.gaps");
+			Plugin.SetupGet(p => p.GapsConfig).Returns(Config);
+
+			GapsCommands gapsCommands = new(Plugin.Object);
+			Command = new PluginCommandsTestUtils(gapsCommands).GetCommand(commandId);
+		}
 	}
 
-	[Fact]
-	public void IncreaseOuterGapCommand()
+	[InlineData("whim.gaps.outer.increase", 1)]
+	[InlineData("whim.gaps.outer.decrease", -1)]
+	[Theory]
+	public void OuterGapCommands(string commandId, int mul)
 	{
-		(Mock<IGapsPlugin> plugin, GapsConfig config) = CreateMocks();
-		GapsCommands commands = new(plugin.Object);
+		// Given
+		Wrapper wrapper = new(commandId);
+		int expectedDelta = wrapper.Config.DefaultOuterDelta * mul;
 
-		commands.IncreaseOuterGapCommand.Command.TryExecute();
+		// When
+		wrapper.Command.TryExecute();
 
-		plugin.Verify(p => p.UpdateOuterGap(config.DefaultOuterDelta), Times.Once);
+		// Then
+		wrapper.Plugin.Verify(p => p.UpdateOuterGap(expectedDelta), Times.Once);
 	}
 
-	[Fact]
-	public void DecreaseOuterGapCommand()
+	[InlineData("whim.gaps.inner.increase", 1)]
+	[InlineData("whim.gaps.inner.decrease", -1)]
+	[Theory]
+	public void InnerGapCommands(string commandId, int mul)
 	{
-		(Mock<IGapsPlugin> plugin, GapsConfig config) = CreateMocks();
-		GapsCommands commands = new(plugin.Object);
+		// Given
+		Wrapper wrapper = new(commandId);
+		int expectedDelta = wrapper.Config.DefaultInnerDelta * mul;
 
-		commands.DecreaseOuterGapCommand.Command.TryExecute();
+		// When
+		wrapper.Command.TryExecute();
 
-		plugin.Verify(p => p.UpdateOuterGap(-config.DefaultOuterDelta), Times.Once);
-	}
-
-	[Fact]
-	public void IncreaseInnerGapCommand()
-	{
-		(Mock<IGapsPlugin> plugin, GapsConfig config) = CreateMocks();
-		GapsCommands commands = new(plugin.Object);
-
-		commands.IncreaseInnerGapCommand.Command.TryExecute();
-
-		plugin.Verify(p => p.UpdateInnerGap(config.DefaultInnerDelta), Times.Once);
-	}
-
-	[Fact]
-	public void DecreaseInnerGapCommand()
-	{
-		(Mock<IGapsPlugin> plugin, GapsConfig config) = CreateMocks();
-		GapsCommands commands = new(plugin.Object);
-
-		commands.DecreaseInnerGapCommand.Command.TryExecute();
-
-		plugin.Verify(p => p.UpdateInnerGap(-config.DefaultInnerDelta), Times.Once);
+		// Then
+		wrapper.Plugin.Verify(p => p.UpdateInnerGap(expectedDelta), Times.Once);
 	}
 }

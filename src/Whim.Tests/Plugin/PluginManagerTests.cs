@@ -1,7 +1,7 @@
 using Moq;
 using System;
-using System.Collections.Generic;
 using Xunit;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.Tests;
 
@@ -12,106 +12,132 @@ namespace Whim.Tests;
 )]
 public class PluginManagerTests
 {
-	private static (Mock<IContext>, Mock<ICommandManager>, Mock<IPlugin>, Mock<IPlugin>, Mock<IPlugin>) CreateStubs()
+	private class MocksWrapper
 	{
-		Mock<IContext> context = new();
+		public Mock<IContext> Context { get; } = new();
+		public Mock<ICommandManager> CommandManager { get; } = new();
+		public Mock<IKeybindManager> KeybindManager { get; } = new();
+		public Mock<IPlugin> Plugin1 { get; } = new();
+		public Mock<IPlugin> Plugin2 { get; } = new();
+		public Mock<IPlugin> Plugin3 { get; } = new();
+		public PluginCommands PluginCommands1 { get; } = new("Plugin1");
+		public PluginCommands PluginCommands2 { get; } = new("Plugin2");
+		public PluginCommands PluginCommands3 { get; } = new("Plugin3");
 
-		Mock<ICommandManager> commandManager = new();
-		commandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<CommandItem>().GetEnumerator());
+		public MocksWrapper()
+		{
+			Context.Setup(cc => cc.CommandManager).Returns(CommandManager.Object);
+			Context.Setup(cc => cc.KeybindManager).Returns(KeybindManager.Object);
 
-		context.Setup(cc => cc.CommandManager).Returns(commandManager.Object);
+			Plugin1.Setup(p => p.Name).Returns("Plugin1");
+			Plugin2.Setup(p => p.Name).Returns("Plugin2");
+			Plugin3.Setup(p => p.Name).Returns("Plugin3");
 
-		Mock<IPlugin> plugin1 = new();
-		plugin1.Setup(p => p.Name).Returns("Plugin1");
+			Plugin1.Setup(p => p.PluginCommands).Returns(PluginCommands1);
+			Plugin2.Setup(p => p.PluginCommands).Returns(PluginCommands2);
+			Plugin3.Setup(p => p.PluginCommands).Returns(PluginCommands3);
 
-		Mock<IPlugin> plugin2 = new();
-		plugin2.Setup(p => p.Name).Returns("Plugin2");
-
-		Mock<IPlugin> plugin3 = new();
-		plugin3.Setup(p => p.Name).Returns("Plugin3");
-
-		return (context, commandManager, plugin1, plugin2, plugin3);
+			PluginCommands1.Add("command1", "Command 1", () => { });
+			PluginCommands2
+				.Add("command2", "Command 2", () => { }, keybind: new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A))
+				.Add("command22", "Command 2.2", () => { });
+			PluginCommands3.Add(
+				"command3",
+				"Command 3",
+				() => { },
+				keybind: new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)
+			);
+		}
 	}
 
 	[Fact]
 	public void PreInitialize()
 	{
 		// Given
-		(
-			Mock<IContext> context,
-			Mock<ICommandManager> commandManager,
-			Mock<IPlugin> plugin1,
-			Mock<IPlugin> plugin2,
-			Mock<IPlugin> plugin3
-		) = CreateStubs();
+		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(context.Object);
-		pluginManager.AddPlugin(plugin1.Object);
-		pluginManager.AddPlugin(plugin2.Object);
-		pluginManager.AddPlugin(plugin3.Object);
+		PluginManager pluginManager = new(mocks.Context.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
 
 		// When
 		pluginManager.PreInitialize();
 
 		// Then
-		plugin1.Verify(p => p.PreInitialize(), Times.Once);
-		plugin2.Verify(p => p.PreInitialize(), Times.Once);
-		plugin3.Verify(p => p.PreInitialize(), Times.Once);
+		mocks.Plugin1.Verify(p => p.PreInitialize(), Times.Once);
+		mocks.Plugin2.Verify(p => p.PreInitialize(), Times.Once);
+		mocks.Plugin3.Verify(p => p.PreInitialize(), Times.Once);
 	}
 
 	[Fact]
 	public void PostInitialize()
 	{
 		// Given
-		(Mock<IContext> context, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
-			CreateStubs();
+		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(context.Object);
-		pluginManager.AddPlugin(plugin1.Object);
-		pluginManager.AddPlugin(plugin2.Object);
-		pluginManager.AddPlugin(plugin3.Object);
+		PluginManager pluginManager = new(mocks.Context.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
 
 		// When
 		pluginManager.PostInitialize();
 
 		// Then
-		plugin1.Verify(p => p.PostInitialize(), Times.Once);
-		plugin2.Verify(p => p.PostInitialize(), Times.Once);
-		plugin3.Verify(p => p.PostInitialize(), Times.Once);
+		mocks.Plugin1.Verify(p => p.PostInitialize(), Times.Once);
+		mocks.Plugin2.Verify(p => p.PostInitialize(), Times.Once);
+		mocks.Plugin3.Verify(p => p.PostInitialize(), Times.Once);
 	}
 
 	[Fact]
 	public void AddPlugin()
 	{
 		// Given
-		(Mock<IContext> context, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
-			CreateStubs();
+		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(context.Object);
+		PluginManager pluginManager = new(mocks.Context.Object);
 
 		// When
-		pluginManager.AddPlugin(plugin1.Object);
-		pluginManager.AddPlugin(plugin2.Object);
-		pluginManager.AddPlugin(plugin3.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
 
 		// Then
 		Assert.Equal(3, pluginManager.LoadedPlugins.Count);
+
+		// mocks.CommandManager.Verify(cm => cm.Add()
+		// I want to verify that the command passed into Add is equivalent to the one created in the mocks
+		mocks.CommandManager.Verify(cm => cm.Add(It.IsAny<ICommand>()), Times.Exactly(4));
+		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin1.command1")), Times.Once);
+		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin2.command2")), Times.Once);
+		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin2.command22")), Times.Once);
+		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin3.command3")), Times.Once);
+
+		mocks.KeybindManager.Verify(km => km.Add(It.IsAny<string>(), It.IsAny<Keybind>()), Times.Exactly(2));
+		mocks.KeybindManager.Verify(
+			km => km.Add("Plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A)),
+			Times.Once
+		);
+		mocks.KeybindManager.Verify(
+			km => km.Add("Plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)),
+			Times.Once
+		);
 	}
 
 	[Fact]
 	public void AddPlugin_DuplicateName()
 	{
 		// Given
-		(Mock<IContext> context, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
-			CreateStubs();
+		MocksWrapper mocks = new();
 
-		plugin2.Setup(p => p.Name).Returns("Plugin1");
+		mocks.Plugin2.Setup(p => p.Name).Returns("Plugin1");
 
-		PluginManager pluginManager = new(context.Object);
+		PluginManager pluginManager = new(mocks.Context.Object);
 
 		// When
-		pluginManager.AddPlugin(plugin1.Object);
-		Assert.Throws<InvalidOperationException>(() => pluginManager.AddPlugin(plugin2.Object));
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		Assert.Throws<InvalidOperationException>(() => pluginManager.AddPlugin(mocks.Plugin2.Object));
 
 		// Then
 		Assert.Equal(1, pluginManager.LoadedPlugins.Count);
@@ -121,13 +147,12 @@ public class PluginManagerTests
 	public void Contains()
 	{
 		// Given
-		(Mock<IContext> context, _, Mock<IPlugin> plugin1, Mock<IPlugin> plugin2, Mock<IPlugin> plugin3) =
-			CreateStubs();
+		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(context.Object);
-		pluginManager.AddPlugin(plugin1.Object);
-		pluginManager.AddPlugin(plugin2.Object);
-		pluginManager.AddPlugin(plugin3.Object);
+		PluginManager pluginManager = new(mocks.Context.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
 
 		// When
 		bool contains1 = pluginManager.Contains("Plugin1");

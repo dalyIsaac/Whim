@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Whim.Bar;
 
 namespace Whim.TreeLayout.Bar;
@@ -15,7 +13,7 @@ public class TreeLayoutBarPlugin : IPlugin
 	public string Name => "whim.tree_layout.bar";
 
 	/// <inheritdoc/>
-	public IEnumerable<CommandItem> Commands => Array.Empty<CommandItem>();
+	public IPluginCommands PluginCommands => new PluginCommands(Name);
 
 	/// <summary>
 	/// Create a new instance of the <see cref="TreeLayoutBarPlugin"/> class.

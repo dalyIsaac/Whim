@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Whim.TreeLayout;
 
@@ -29,7 +28,7 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	public void PostInitialize() { }
 
 	/// <inheritdoc />
-	public IEnumerable<CommandItem> Commands => new TreeLayoutCommands(_context, this);
+	public IPluginCommands PluginCommands => new TreeLayoutCommands(_context, this);
 
 	private ITreeLayoutEngine? GetTreeLayoutEngine(IMonitor monitor)
 	{

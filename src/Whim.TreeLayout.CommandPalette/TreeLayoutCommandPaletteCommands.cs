@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Whim.CommandPalette;
 
 namespace Whim.TreeLayout.CommandPalette;
@@ -8,14 +6,10 @@ namespace Whim.TreeLayout.CommandPalette;
 /// <summary>
 /// Commands to interact with the tree layout via the command palette.
 /// </summary>
-public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
+public class TreeLayoutCommandPalettePluginCommands : PluginCommands
 {
 	private readonly IContext _context;
-	private readonly IPlugin _treeLayoutCommandPalettePlugin;
 	private readonly ITreeLayoutPlugin _treeLayoutPlugin;
-	private readonly ICommandPalettePlugin _commandLayoutPlugin;
-
-	private string Name => _treeLayoutCommandPalettePlugin.Name;
 
 	private readonly Direction[] _directions = new Direction[]
 	{
@@ -26,7 +20,7 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 	};
 
 	/// <summary>
-	/// Creates a new instance of the tree layout's command palette commands.
+	/// Create the tree layout command palette plugin commands.
 	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="treeLayoutCommandPalettePlugin"></param>
@@ -38,34 +32,44 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 		ITreeLayoutPlugin treeLayoutPlugin,
 		ICommandPalettePlugin commandLayoutPlugin
 	)
+		: base(treeLayoutCommandPalettePlugin.Name)
 	{
 		_context = context;
-		_treeLayoutCommandPalettePlugin = treeLayoutCommandPalettePlugin;
 		_treeLayoutPlugin = treeLayoutPlugin;
-		_commandLayoutPlugin = commandLayoutPlugin;
+
+		Add(
+			identifier: "set_direction",
+			title: "Set tree layout direction",
+			callback: () =>
+				commandLayoutPlugin.Activate(
+					new MenuVariantConfig()
+					{
+						Hint = "Select tree layout direction",
+						Commands = CreateSetDirectionCommands(),
+					}
+				),
+			condition: SetDirectionCondition
+		);
 	}
 
-	internal CommandItem[] CreateSetDirectionCommandItems()
+	internal ICommand[] CreateSetDirectionCommands()
 	{
-		CommandItem[] setDirectionCommandItems = new CommandItem[_directions.Length];
+		ICommand[] setDirectionCommands = new ICommand[_directions.Length];
 
 		for (int i = 0; i < _directions.Length; i++)
 		{
 			Direction currentDirection = _directions[i];
 			string currentStr = currentDirection.ToString();
 
-			setDirectionCommandItems[i] = new CommandItem()
-			{
-				Command = new Command(
-					identifier: $"{Name}.set_direction.{currentStr}",
-					title: currentStr,
-					callback: () => SetDirection(currentStr),
-					condition: SetDirectionCondition
-				)
-			};
+			setDirectionCommands[i] = new Command(
+				identifier: $"set_direction.{currentStr}",
+				title: currentStr,
+				callback: () => SetDirection(currentStr),
+				condition: SetDirectionCondition
+			);
 		}
 
-		return setDirectionCommandItems;
+		return setDirectionCommands;
 	}
 
 	private bool SetDirectionCondition() =>
@@ -75,40 +79,10 @@ public class TreeLayoutCommandPalettePluginCommands : IEnumerable<CommandItem>
 	{
 		if (!Enum.TryParse(directionString, out Direction directionEnum))
 		{
-			Logger.Error($"{Name}: Could not parse direction '{directionString}'.");
+			Logger.Error($"Could not parse direction '{directionString}'.");
 			return;
 		}
 
 		_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, directionEnum);
 	}
-
-	/// <summary>
-	/// Set the direction of the tree layout, using a radio button command palette menu.
-	/// </summary>
-	public CommandItem SetDirectionCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.set_direction",
-				title: "Set tree layout direction",
-				callback: () =>
-					_commandLayoutPlugin.Activate(
-						new MenuVariantConfig()
-						{
-							Hint = "Select tree layout direction",
-							Commands = CreateSetDirectionCommandItems(),
-						}
-					),
-				condition: SetDirectionCondition
-			)
-		};
-
-	/// <inheritdoc/>
-	public IEnumerator<CommandItem> GetEnumerator()
-	{
-		yield return SetDirectionCommand;
-	}
-
-	/// <inheritdoc/>
-	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

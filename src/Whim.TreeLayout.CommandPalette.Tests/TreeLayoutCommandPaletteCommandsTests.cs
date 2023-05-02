@@ -1,12 +1,13 @@
 using Moq;
 using Whim.CommandPalette;
+using Whim.TestUtilities;
 using Xunit;
 
 namespace Whim.TreeLayout.CommandPalette.Tests;
 
 public class TreeLayoutCommandPaletteCommandsTests
 {
-	private class MocksBuilder
+	private class Wrapper
 	{
 		public Mock<IContext> Context { get; } = new();
 		public Mock<IPlugin> TreeLayoutCommandPalettePlugin { get; } = new();
@@ -14,11 +15,29 @@ public class TreeLayoutCommandPaletteCommandsTests
 		public Mock<ICommandPalettePlugin> CommandPalettePlugin { get; } = new();
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IMonitor> Monitor { get; } = new();
+		public TreeLayoutCommandPalettePluginCommands Commands { get; }
 
-		public MocksBuilder()
+		public Wrapper()
 		{
 			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
 			MonitorManager.Setup(m => m.FocusedMonitor).Returns(Monitor.Object);
+
+			TreeLayoutCommandPalettePlugin.Setup(t => t.Name).Returns("whim.tree_layout.command_palette");
+
+			TreeLayoutCommandPalettePluginCommands commands =
+				new(
+					Context.Object,
+					TreeLayoutCommandPalettePlugin.Object,
+					TreeLayoutPlugin.Object,
+					CommandPalettePlugin.Object
+				);
+
+			Commands = new(
+				Context.Object,
+				TreeLayoutCommandPalettePlugin.Object,
+				TreeLayoutPlugin.Object,
+				CommandPalettePlugin.Object
+			);
 		}
 	}
 
@@ -26,61 +45,44 @@ public class TreeLayoutCommandPaletteCommandsTests
 	public void SetDirectionCommand_Activates()
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutCommandPalettePluginCommands commands =
-			new(
-				mocks.Context.Object,
-				mocks.TreeLayoutCommandPalettePlugin.Object,
-				mocks.TreeLayoutPlugin.Object,
-				mocks.CommandPalettePlugin.Object
-			);
-
-		mocks.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(mocks.Monitor.Object)).Returns(Direction.Left);
+		Wrapper wrapper = new();
+		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.tree_layout.command_palette.set_direction"
+		);
+		wrapper.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(wrapper.Monitor.Object)).Returns(Direction.Left);
 
 		// When
-		commands.SetDirectionCommand.Command.TryExecute();
+		command.TryExecute();
 
 		// Then
-		mocks.CommandPalettePlugin.Verify(c => c.Activate(It.IsAny<MenuVariantConfig>()), Times.Once);
+		wrapper.CommandPalettePlugin.Verify(c => c.Activate(It.IsAny<MenuVariantConfig>()), Times.Once);
 	}
 
 	[Fact]
 	public void SetDirectionCommand_Activates_Fails()
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutCommandPalettePluginCommands commands =
-			new(
-				mocks.Context.Object,
-				mocks.TreeLayoutCommandPalettePlugin.Object,
-				mocks.TreeLayoutPlugin.Object,
-				mocks.CommandPalettePlugin.Object
-			);
-
-		mocks.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(mocks.Monitor.Object)).Returns((Direction?)null);
+		Wrapper wrapper = new();
+		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.tree_layout.command_palette.set_direction"
+		);
+		wrapper.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(wrapper.Monitor.Object)).Returns((Direction?)null);
 
 		// When
-		commands.SetDirectionCommand.Command.TryExecute();
+		command.TryExecute();
 
 		// Then
-		mocks.CommandPalettePlugin.Verify(c => c.Activate(It.IsAny<MenuVariantConfig>()), Times.Never);
+		wrapper.CommandPalettePlugin.Verify(c => c.Activate(It.IsAny<MenuVariantConfig>()), Times.Never);
 	}
 
 	[Fact]
 	public void CreateSetDirectionCommandItems()
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutCommandPalettePluginCommands commands =
-			new(
-				mocks.Context.Object,
-				mocks.TreeLayoutCommandPalettePlugin.Object,
-				mocks.TreeLayoutPlugin.Object,
-				mocks.CommandPalettePlugin.Object
-			);
+		Wrapper wrapper = new();
 
 		// When
-		CommandItem[] commandItems = commands.CreateSetDirectionCommandItems();
+		ICommand[] commandItems = wrapper.Commands.CreateSetDirectionCommands();
 
 		// Then
 		Assert.Equal(4, commandItems.Length);
@@ -94,21 +96,14 @@ public class TreeLayoutCommandPaletteCommandsTests
 	public void SetDirection(string direction, Direction expectedDirection)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutCommandPalettePluginCommands commands =
-			new(
-				mocks.Context.Object,
-				mocks.TreeLayoutCommandPalettePlugin.Object,
-				mocks.TreeLayoutPlugin.Object,
-				mocks.CommandPalettePlugin.Object
-			);
+		Wrapper wrapper = new();
 
 		// When
-		commands.SetDirection(direction);
+		wrapper.Commands.SetDirection(direction);
 
 		// Then
-		mocks.TreeLayoutPlugin.Verify(
-			t => t.SetAddWindowDirection(mocks.Monitor.Object, expectedDirection),
+		wrapper.TreeLayoutPlugin.Verify(
+			t => t.SetAddWindowDirection(wrapper.Monitor.Object, expectedDirection),
 			Times.Once
 		);
 	}
@@ -117,20 +112,13 @@ public class TreeLayoutCommandPaletteCommandsTests
 	public void SetDirectionCommand_FailsWhenNoActiveTreeLayoutEngine()
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutCommandPalettePluginCommands commands =
-			new(
-				mocks.Context.Object,
-				mocks.TreeLayoutCommandPalettePlugin.Object,
-				mocks.TreeLayoutPlugin.Object,
-				mocks.CommandPalettePlugin.Object
-			);
+		Wrapper wrapper = new();
 
 		// When
-		commands.SetDirection("welp");
+		wrapper.Commands.SetDirection("welp");
 
 		// Then
-		mocks.TreeLayoutPlugin.Verify(
+		wrapper.TreeLayoutPlugin.Verify(
 			t => t.SetAddWindowDirection(It.IsAny<IMonitor>(), It.IsAny<Direction>()),
 			Times.Never
 		);

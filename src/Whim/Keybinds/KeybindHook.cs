@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -9,24 +8,23 @@ namespace Whim;
 
 /// <summary>
 /// Responsible is responsible for hooking into windows and handling keybinds.
-/// This is used as part of <see cref="CommandManager"/>.
 /// </summary>
 internal class KeybindHook : IDisposable
 {
+	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
-	private readonly ICommandItemContainer _commandItems;
 	private readonly HOOKPROC _keyboardHook;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
-	public KeybindHook(ICoreNativeManager coreNativeManager, ICommandItemContainer commandItems)
+	public KeybindHook(IContext context, ICoreNativeManager coreNativeManager)
 	{
+		_context = context;
 		_coreNativeManager = coreNativeManager;
-		_commandItems = commandItems;
 		_keyboardHook = KeyboardHook;
 	}
 
-	public void Initialize()
+	public void PostInitialize()
 	{
 		Logger.Debug("Initializing keybind manager...");
 		_unhookKeyboardHook = _coreNativeManager.SetWindowsHookEx(
@@ -52,7 +50,7 @@ internal class KeybindHook : IDisposable
 			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 
-		KBDLLHOOKSTRUCT kbdll = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
+		KBDLLHOOKSTRUCT kbdll = _coreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
 
 		// If one of the following keys are pressed, and they're the only key pressed,
@@ -73,6 +71,12 @@ internal class KeybindHook : IDisposable
 		}
 
 		KeyModifiers modifiers = GetModifiersPressed();
+		if (modifiers == KeyModifiers.None)
+		{
+			Logger.Verbose("No modifiers");
+			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		}
+
 		if (DoKeyboardEvent(new Keybind(modifiers, key)))
 		{
 			return (LRESULT)1;
@@ -127,20 +131,18 @@ internal class KeybindHook : IDisposable
 	private bool DoKeyboardEvent(Keybind keybind)
 	{
 		Logger.Verbose(keybind.ToString());
-		if (keybind.Modifiers == KeyModifiers.None)
-		{
-			Logger.Verbose("No modifiers");
-			return false;
-		}
+		ICommand[] commands = _context.KeybindManager.GetCommands(keybind);
 
-		ICommand? command = _commandItems.TryGetCommand(keybind);
-		if (command == null)
+		if (commands.Length == 0)
 		{
 			Logger.Verbose($"No handler for {keybind}");
 			return false;
 		}
 
-		command.TryExecute();
+		foreach (ICommand command in commands)
+		{
+			command.TryExecute();
+		}
 
 		return true;
 	}

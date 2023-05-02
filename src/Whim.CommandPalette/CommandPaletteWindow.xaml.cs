@@ -89,22 +89,6 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 	}
 
 	/// <summary>
-	/// Toggle the visibility of the command palette.
-	/// </summary>
-	public void Toggle()
-	{
-		Logger.Debug("Toggling command palette");
-		if (ViewModel.IsVisible)
-		{
-			ViewModel.RequestHide();
-		}
-		else
-		{
-			Activate();
-		}
-	}
-
-	/// <summary>
 	/// Handler for when the user presses down a key.
 	/// </summary>
 	/// <param name="sender"></param>

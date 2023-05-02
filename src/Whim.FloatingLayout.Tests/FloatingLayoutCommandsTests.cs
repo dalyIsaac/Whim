@@ -1,46 +1,62 @@
 using Moq;
+using Whim.TestUtilities;
 using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
 public class FloatingLayoutCommandsTests
 {
-	private static Mock<IFloatingLayoutPlugin> CreateFloatingLayoutPluginMock()
+	private class Wrapper
 	{
-		Mock<IFloatingLayoutPlugin> plugin = new();
-		return plugin;
+		public Mock<IFloatingLayoutPlugin> Plugin { get; }
+		public ICommand Command { get; }
+
+		public Wrapper(string id)
+		{
+			Plugin = new();
+			Plugin.SetupGet(p => p.Name).Returns("whim.floating_layout");
+
+			FloatingLayoutCommands commands = new(Plugin.Object);
+			Command = new PluginCommandsTestUtils(commands).GetCommand(id);
+		}
 	}
 
 	[Fact]
 	public void ToggleWindowFloatingCommand()
 	{
-		Mock<IFloatingLayoutPlugin> plugin = CreateFloatingLayoutPluginMock();
-		FloatingLayoutCommands commands = new(plugin.Object);
+		// Given
+		Wrapper wrapper = new("whim.floating_layout.toggle_window_floating");
 
-		commands.ToggleWindowFloatingCommand.Command.TryExecute();
+		// When
+		wrapper.Command.TryExecute();
 
-		plugin.Verify(p => p.ToggleWindowFloating(null), Times.Once);
+		// Then
+		wrapper.Plugin.Verify(p => p.ToggleWindowFloating(null), Times.Once);
 	}
 
 	[Fact]
 	public void MarkWindowAsFloatingCommand()
 	{
-		Mock<IFloatingLayoutPlugin> plugin = CreateFloatingLayoutPluginMock();
-		FloatingLayoutCommands commands = new(plugin.Object);
+		// Given
+		Wrapper wrapper = new("whim.floating_layout.mark_window_as_floating");
 
-		commands.MarkWindowAsFloatingCommand.Command.TryExecute();
+		// When
+		wrapper.Command.TryExecute();
 
-		plugin.Verify(p => p.MarkWindowAsFloating(null), Times.Once);
+		// Then
+		wrapper.Plugin.Verify(p => p.MarkWindowAsFloating(null), Times.Once);
 	}
 
 	[Fact]
 	public void MarkWindowAsDockedCommand()
 	{
-		Mock<IFloatingLayoutPlugin> plugin = CreateFloatingLayoutPluginMock();
-		FloatingLayoutCommands commands = new(plugin.Object);
+		// Given
+		Wrapper wrapper = new("whim.floating_layout.mark_window_as_docked");
 
-		commands.MarkWindowAsDockedCommand.Command.TryExecute();
+		// When
+		wrapper.Command.TryExecute();
 
-		plugin.Verify(p => p.MarkWindowAsDocked(null), Times.Once);
+		// Then
+		wrapper.Plugin.Verify(p => p.MarkWindowAsDocked(null), Times.Once);
 	}
 }

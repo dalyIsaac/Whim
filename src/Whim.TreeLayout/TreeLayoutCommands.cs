@@ -1,103 +1,59 @@
-using System.Collections;
-using System.Collections.Generic;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.TreeLayout;
 
 /// <summary>
 /// The commands for the tree layout plugin.
 /// </summary>
-public class TreeLayoutCommands : IEnumerable<CommandItem>
+public class TreeLayoutCommands : PluginCommands
 {
 	private readonly IContext _context;
-	private readonly ITreeLayoutPlugin _plugin;
-	private string Name => _plugin.Name;
+	private readonly ITreeLayoutPlugin _treeLayoutPlugin;
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="TreeLayoutCommands"/> class.
+	/// Creates a new instance of the tree layout commands.
 	/// </summary>
 	/// <param name="context"></param>
-	/// <param name="plugin"></param>
-	public TreeLayoutCommands(IContext context, ITreeLayoutPlugin plugin)
+	/// <param name="treeLayoutPlugin"></param>
+	public TreeLayoutCommands(IContext context, ITreeLayoutPlugin treeLayoutPlugin)
+		: base(treeLayoutPlugin.Name)
 	{
 		_context = context;
-		_plugin = plugin;
-	}
+		_treeLayoutPlugin = treeLayoutPlugin;
 
-	/// <inheritdoc/>
-	public IEnumerator<CommandItem> GetEnumerator()
-	{
-		yield return AddTreeDirectionLeftCommand;
-		yield return AddTreeDirectionRightCommand;
-		yield return AddTreeDirectionUpCommand;
-		yield return AddTreeDirectionDownCommand;
-		yield return SplitFocusedWindowCommand;
-	}
-
-	/// <inheritdoc/>
-	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-	/// <summary>
-	/// Add tree direction left command.
-	/// </summary>
-	public CommandItem AddTreeDirectionLeftCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.add_tree_direction_left",
+		Add(
+				identifier: "add_tree_direction_left",
 				title: "Add windows to the left of the current window",
-				callback: () => _plugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Left)
+				callback: () =>
+					_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Left),
+				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_LEFT)
 			)
-		};
-
-	/// <summary>
-	/// Add tree direction right command.
-	/// </summary>
-	public CommandItem AddTreeDirectionRightCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.add_tree_direction_right",
+			.Add(
+				identifier: "add_tree_direction_right",
 				title: "Add windows to the right of the current window",
-				callback: () => _plugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Right)
+				callback: () =>
+					_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Right),
+				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
-		};
-
-	/// <summary>
-	/// Add tree direction up command.
-	/// </summary>
-	public CommandItem AddTreeDirectionUpCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.add_tree_direction_up",
+			.Add(
+				identifier: "add_tree_direction_up",
 				title: "Add windows above the current window",
-				callback: () => _plugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Up)
+				callback: () =>
+					_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Up),
+				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_UP)
 			)
-		};
-
-	/// <summary>
-	/// Add tree direction down command.
-	/// </summary>
-	public CommandItem AddTreeDirectionDownCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.add_tree_direction_down",
+			.Add(
+				identifier: "add_tree_direction_down",
 				title: "Add windows below the current window",
-				callback: () => _plugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Down)
+				callback: () =>
+					_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, Direction.Down),
+				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_DOWN)
 			)
-		};
-
-	/// <summary>
-	/// Split the focused window in two, and insert a phantom window in the direction.
-	/// </summary>
-	public CommandItem SplitFocusedWindowCommand =>
-		new()
-		{
-			Command = new Command(
-				identifier: $"{Name}.split_focused_window",
+			.Add(
+				identifier: "split_focused_window",
 				title: "Split the focused window",
-				callback: _plugin.SplitFocusedWindow
-			)
-		};
+				callback: _treeLayoutPlugin.SplitFocusedWindow,
+				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_S)
+			);
+	}
 }

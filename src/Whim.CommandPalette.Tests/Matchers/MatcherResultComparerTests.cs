@@ -5,12 +5,12 @@ namespace Whim.CommandPalette.Tests;
 
 public class MatcherResultComparerTests
 {
-	private static MatcherResult<CommandItem> CreateMatcherItem(string title, uint score = 0)
+	private static MatcherResult<MenuVariantRowModelData> CreateMatcherItem(string title, uint score = 0)
 	{
 		Mock<ICommand> command = new();
 		command.SetupGet(c => c.Title).Returns(title);
-		return new MatcherResult<CommandItem>(
-			new MenuVariantRowModel(new CommandItem() { Command = command.Object }),
+		return new MatcherResult<MenuVariantRowModelData>(
+			new MenuVariantRowModel(command.Object, null),
 			Array.Empty<FilterTextMatch>(),
 			score
 		);
@@ -20,11 +20,11 @@ public class MatcherResultComparerTests
 	public void ThrowWhenXIsNull()
 	{
 		// Given
-		MatcherResult<CommandItem>? x = null;
-		MatcherResult<CommandItem>? y = CreateMatcherItem("y");
+		MatcherResult<MenuVariantRowModelData>? x = null;
+		MatcherResult<MenuVariantRowModelData>? y = CreateMatcherItem("y");
 
 		// When
-		MatcherItemComparer<CommandItem> comparer = new();
+		MatcherItemComparer<MenuVariantRowModelData> comparer = new();
 
 		// Then
 		Assert.Throws<ArgumentNullException>(() => comparer.Compare(x, y));
@@ -34,11 +34,11 @@ public class MatcherResultComparerTests
 	public void ThrowWhenYIsNull()
 	{
 		// Given
-		MatcherResult<CommandItem>? x = CreateMatcherItem("x");
-		MatcherResult<CommandItem>? y = null;
+		MatcherResult<MenuVariantRowModelData>? x = CreateMatcherItem("x");
+		MatcherResult<MenuVariantRowModelData>? y = null;
 
 		// When
-		MatcherItemComparer<CommandItem> comparer = new();
+		MatcherItemComparer<MenuVariantRowModelData> comparer = new();
 
 		// Then
 		Assert.Throws<ArgumentNullException>(() => comparer.Compare(x, y));
@@ -48,11 +48,11 @@ public class MatcherResultComparerTests
 	public void ReturnZeroWhenXAndYAreEqual()
 	{
 		// Given
-		MatcherResult<CommandItem>? x = CreateMatcherItem("a");
-		MatcherResult<CommandItem>? y = CreateMatcherItem("a");
+		MatcherResult<MenuVariantRowModelData>? x = CreateMatcherItem("a");
+		MatcherResult<MenuVariantRowModelData>? y = CreateMatcherItem("a");
 
 		// When
-		MatcherItemComparer<CommandItem> comparer = new();
+		MatcherItemComparer<MenuVariantRowModelData> comparer = new();
 
 		// Then
 		Assert.Equal(0, comparer.Compare(x, y));
@@ -62,11 +62,11 @@ public class MatcherResultComparerTests
 	public void ReturnMinusOneWhenXHasHigherScore()
 	{
 		// Given
-		MatcherResult<CommandItem>? x = CreateMatcherItem("x", 1);
-		MatcherResult<CommandItem>? y = CreateMatcherItem("y");
+		MatcherResult<MenuVariantRowModelData>? x = CreateMatcherItem("x", 1);
+		MatcherResult<MenuVariantRowModelData>? y = CreateMatcherItem("y");
 
 		// When
-		MatcherItemComparer<CommandItem> comparer = new();
+		MatcherItemComparer<MenuVariantRowModelData> comparer = new();
 
 		// Then
 		Assert.Equal(-1, comparer.Compare(x, y));
@@ -76,11 +76,11 @@ public class MatcherResultComparerTests
 	public void ReturnOneWhenYHasHigherScore()
 	{
 		// Given
-		MatcherResult<CommandItem>? x = CreateMatcherItem("x");
-		MatcherResult<CommandItem>? y = CreateMatcherItem("y", 1);
+		MatcherResult<MenuVariantRowModelData>? x = CreateMatcherItem("x");
+		MatcherResult<MenuVariantRowModelData>? y = CreateMatcherItem("y", 1);
 
 		// When
-		MatcherItemComparer<CommandItem> comparer = new();
+		MatcherItemComparer<MenuVariantRowModelData> comparer = new();
 
 		// Then
 		Assert.Equal(1, comparer.Compare(x, y));
@@ -90,11 +90,11 @@ public class MatcherResultComparerTests
 	public void ReturnMinusOneWhenEqualScoreAndXAlphabeticallyFirst()
 	{
 		// Given
-		MatcherResult<CommandItem>? x = CreateMatcherItem("x");
-		MatcherResult<CommandItem>? y = CreateMatcherItem("y");
+		MatcherResult<MenuVariantRowModelData>? x = CreateMatcherItem("x");
+		MatcherResult<MenuVariantRowModelData>? y = CreateMatcherItem("y");
 
 		// When
-		MatcherItemComparer<CommandItem> comparer = new();
+		MatcherItemComparer<MenuVariantRowModelData> comparer = new();
 
 		// Then
 		Assert.Equal(-1, comparer.Compare(x, y));
@@ -104,11 +104,11 @@ public class MatcherResultComparerTests
 	public void ReturnOneWhenEqualScoreAndYAlphabeticallyFirst()
 	{
 		// Given
-		MatcherResult<CommandItem>? x = CreateMatcherItem("b");
-		MatcherResult<CommandItem>? y = CreateMatcherItem("a");
+		MatcherResult<MenuVariantRowModelData>? x = CreateMatcherItem("b");
+		MatcherResult<MenuVariantRowModelData>? y = CreateMatcherItem("a");
 
 		// When
-		MatcherItemComparer<CommandItem> comparer = new();
+		MatcherItemComparer<MenuVariantRowModelData> comparer = new();
 
 		// Then
 		Assert.Equal(1, comparer.Compare(x, y));

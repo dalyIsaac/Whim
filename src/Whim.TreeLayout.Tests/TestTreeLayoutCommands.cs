@@ -1,4 +1,5 @@
 using Moq;
+using Whim.TestUtilities;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
@@ -11,12 +12,15 @@ public class TestTreeLayoutCommands
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IMonitor> Monitor { get; } = new();
 		public Mock<ITreeLayoutPlugin> Plugin { get; } = new();
+		public ICommand Command { get; }
 
-		public MocksWrapper()
+		public MocksWrapper(string id)
 		{
 			Context.SetupGet(x => x.MonitorManager).Returns(MonitorManager.Object);
-
+			Plugin.SetupGet(p => p.Name).Returns("whim.tree_layout");
 			MonitorManager.Setup(x => x.FocusedMonitor).Returns(Monitor.Object);
+
+			Command = new PluginCommandsTestUtils(new TreeLayoutCommands(Context.Object, Plugin.Object)).GetCommand(id);
 		}
 	}
 
@@ -24,12 +28,10 @@ public class TestTreeLayoutCommands
 	public void TestAddTreeDirectionLeftCommand()
 	{
 		// Given
-		MocksWrapper mocks = new();
-		TreeLayoutCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
-		CommandItem item = commands.AddTreeDirectionLeftCommand;
+		MocksWrapper mocks = new("whim.tree_layout.add_tree_direction_left");
 
 		// When
-		item.Command.TryExecute();
+		mocks.Command.TryExecute();
 
 		// Then
 		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, Direction.Left), Times.Once);
@@ -39,12 +41,10 @@ public class TestTreeLayoutCommands
 	public void TestAddTreeDirectionRightCommand()
 	{
 		// Given
-		MocksWrapper mocks = new();
-		TreeLayoutCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
-		CommandItem item = commands.AddTreeDirectionRightCommand;
+		MocksWrapper mocks = new("whim.tree_layout.add_tree_direction_right");
 
 		// When
-		item.Command.TryExecute();
+		mocks.Command.TryExecute();
 
 		// Then
 		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, Direction.Right), Times.Once);
@@ -54,12 +54,10 @@ public class TestTreeLayoutCommands
 	public void TestAddTreeDirectionUpCommand()
 	{
 		// Given
-		MocksWrapper mocks = new();
-		TreeLayoutCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
-		CommandItem item = commands.AddTreeDirectionUpCommand;
+		MocksWrapper mocks = new("whim.tree_layout.add_tree_direction_up");
 
 		// When
-		item.Command.TryExecute();
+		mocks.Command.TryExecute();
 
 		// Then
 		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, Direction.Up), Times.Once);
@@ -69,12 +67,10 @@ public class TestTreeLayoutCommands
 	public void TestAddTreeDirectionDownCommand()
 	{
 		// Given
-		MocksWrapper mocks = new();
-		TreeLayoutCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
-		CommandItem item = commands.AddTreeDirectionDownCommand;
+		MocksWrapper mocks = new("whim.tree_layout.add_tree_direction_down");
 
 		// When
-		item.Command.TryExecute();
+		mocks.Command.TryExecute();
 
 		// Then
 		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, Direction.Down), Times.Once);
@@ -84,28 +80,12 @@ public class TestTreeLayoutCommands
 	public void TestSplitFocusedWindowCommand()
 	{
 		// Given
-		MocksWrapper mocks = new();
-		TreeLayoutCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
-		CommandItem item = commands.SplitFocusedWindowCommand;
+		MocksWrapper mocks = new("whim.tree_layout.split_focused_window");
 
 		// When
-		item.Command.TryExecute();
+		mocks.Command.TryExecute();
 
 		// Then
 		mocks.Plugin.Verify(x => x.SplitFocusedWindow(), Times.Once);
-	}
-
-	[Fact]
-	public void GetEnumerator()
-	{
-		// Given
-		MocksWrapper mocks = new();
-		TreeLayoutCommands commands = new(mocks.Context.Object, mocks.Plugin.Object);
-
-		// When
-		IEnumerable<CommandItem> items = commands;
-
-		// Then
-		Assert.Equal(5, items.Count());
 	}
 }

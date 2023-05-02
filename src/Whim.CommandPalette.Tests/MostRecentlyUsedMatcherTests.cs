@@ -6,15 +6,16 @@ public class MostRecentlyUsedMatcherTests
 {
 	private static void ActionSink() { }
 
-	private static (MenuVariantRowModel[], MatcherResult<CommandItem>[]) CreateMocks(string[] items)
+	private static (MenuVariantRowModel[], MatcherResult<MenuVariantRowModelData>[]) CreateMocks(string[] items)
 	{
 		MenuVariantRowModel[] menuItems = new MenuVariantRowModel[items.Length];
-		MatcherResult<CommandItem>[] matcherItems = new MatcherResult<CommandItem>[items.Length];
+		MatcherResult<MenuVariantRowModelData>[] matcherItems = new MatcherResult<MenuVariantRowModelData>[
+			items.Length
+		];
 
 		for (int i = 0; i < items.Length; i++)
 		{
-			CommandItem commandItem = new() { Command = new Command(items[i], items[i], ActionSink), };
-			MenuVariantRowModel menuItem = new(commandItem);
+			MenuVariantRowModel menuItem = new(new Command(items[i], items[i], ActionSink), null);
 
 			menuItems[i] = menuItem;
 			matcherItems[i] = new(menuItem, Array.Empty<FilterTextMatch>(), 0);
@@ -27,8 +28,10 @@ public class MostRecentlyUsedMatcherTests
 	public void GetFilteredItems()
 	{
 		// Given
-		MostRecentlyUsedMatcher<CommandItem> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<CommandItem>[] matches) = CreateMocks(new string[] { "A", "B" });
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(
+			new string[] { "A", "B" }
+		);
 
 		// When
 		int matchCount = matcher.GetFilteredItems("A", items, matches);
@@ -43,8 +46,10 @@ public class MostRecentlyUsedMatcherTests
 	public void GetMostRecentlyUsedItems()
 	{
 		// Given
-		MostRecentlyUsedMatcher<CommandItem> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<CommandItem>[] matches) = CreateMocks(new string[] { "A", "B" });
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(
+			new string[] { "A", "B" }
+		);
 
 		// When
 		int matchCount = matcher.GetMostRecentlyUsedItems(items, matches);
@@ -61,8 +66,10 @@ public class MostRecentlyUsedMatcherTests
 	public void GetMostRecentlyUsedItems_WithLastExecutionTime()
 	{
 		// Given
-		MostRecentlyUsedMatcher<CommandItem> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<CommandItem>[] matches) = CreateMocks(new string[] { "A", "B" });
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(
+			new string[] { "A", "B" }
+		);
 		matcher.OnMatchExecuted(items[1]);
 
 		// When
@@ -79,11 +86,13 @@ public class MostRecentlyUsedMatcherTests
 	public void Match_NoMatches_PopulatedQuery()
 	{
 		// Given
-		MostRecentlyUsedMatcher<CommandItem> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<CommandItem>[] _) = CreateMocks(new string[] { "A", "B" });
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(
+			new string[] { "A", "B" }
+		);
 
 		// When
-		IEnumerable<MatcherResult<CommandItem>> rowItems = matcher.Match("C", items);
+		IEnumerable<MatcherResult<MenuVariantRowModelData>> rowItems = matcher.Match("C", items);
 
 		// Then
 		Assert.Empty(rowItems);
@@ -93,11 +102,13 @@ public class MostRecentlyUsedMatcherTests
 	public void Match_NoMatches_EmptyQuery()
 	{
 		// Given
-		MostRecentlyUsedMatcher<CommandItem> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<CommandItem>[] _) = CreateMocks(new string[] { "A", "B" });
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(
+			new string[] { "A", "B" }
+		);
 
 		// When
-		MatcherResult<CommandItem>[] rowItems = matcher.Match("", items).ToArray();
+		MatcherResult<MenuVariantRowModelData>[] rowItems = matcher.Match("", items).ToArray();
 
 		// Then
 		Assert.Equal(2, rowItems.Length);

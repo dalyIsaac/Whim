@@ -1,6 +1,14 @@
 namespace Whim.CommandPalette;
 
-internal record MenuVariantRowModel : IVariantRowModel<CommandItem>
+/// <summary>
+/// The <see cref="MenuVariantRowModel"/> deals with both a <see cref="ICommand"/> and its
+/// <see cref="IKeybind"/> (if it has one).
+/// </summary>
+/// <param name="Command"></param>
+/// <param name="Keybind"></param>
+public record MenuVariantRowModelData(ICommand Command, IKeybind? Keybind = null);
+
+internal record MenuVariantRowModel : IVariantRowModel<MenuVariantRowModelData>
 {
 	public string Id => Data.Command.Id;
 
@@ -8,11 +16,11 @@ internal record MenuVariantRowModel : IVariantRowModel<CommandItem>
 
 	public PaletteText FormattedTitle { get; set; }
 
-	public CommandItem Data { get; }
+	public MenuVariantRowModelData Data { get; }
 
-	public MenuVariantRowModel(CommandItem data)
+	public MenuVariantRowModel(ICommand command, IKeybind? keybind)
 	{
-		Data = data;
-		FormattedTitle = new(data.Command.Title);
+		Data = new MenuVariantRowModelData(command, keybind);
+		FormattedTitle = new(command.Title);
 	}
 }

@@ -13,6 +13,12 @@ using System.Diagnostics.CodeAnalysis;
 	Target = "~T:Whim.ILayoutEngine"
 )]
 [assembly: SuppressMessage(
+	"Naming",
+	"CA1710:Identifiers should have correct suffix",
+	Scope = "type",
+	Target = "~T:Whim.ICommandManager"
+)]
+[assembly: SuppressMessage(
 	"Design",
 	"CA1051:Do not declare visible instance fields",
 	Justification = "They are used by subclasses",

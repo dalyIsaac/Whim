@@ -10,10 +10,11 @@ public record MenuVariantConfig : BaseVariantConfig
 	/// <summary>
 	/// The matcher to use to filter the results.
 	/// </summary>
-	public IMatcher<CommandItem> Matcher { get; init; } = new MostRecentlyUsedMatcher<CommandItem>();
+	public IMatcher<MenuVariantRowModelData> Matcher { get; init; } =
+		new MostRecentlyUsedMatcher<MenuVariantRowModelData>();
 
 	/// <summary>
 	/// The commands for this menu.
 	/// </summary>
-	public required IEnumerable<CommandItem> Commands { get; init; }
+	public required IEnumerable<ICommand> Commands { get; init; }
 }
