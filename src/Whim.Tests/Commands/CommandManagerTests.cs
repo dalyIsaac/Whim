@@ -148,4 +148,17 @@ public class CommandManagerTests
 		Assert.Null(commandManager.TryGetCommand(command.Object.Id));
 		Assert.Empty(commandManager);
 	}
+
+	[Fact]
+	public void IsReadOnly()
+	{
+		// Given
+		ICommandManager commandManager = new CommandManager();
+
+		// When
+		bool result = commandManager.IsReadOnly;
+
+		// Then
+		Assert.False(result);
+	}
 }

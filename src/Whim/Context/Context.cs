@@ -45,7 +45,7 @@ internal class Context : IContext
 		CommandManager = new CommandManager();
 		PluginManager = new PluginManager(this);
 		KeybindManager = new KeybindManager(this);
-		KeybindHook = new KeybindHook(this);
+		KeybindHook = new KeybindHook(this, CoreNativeManager);
 	}
 
 	public void Initialize()
