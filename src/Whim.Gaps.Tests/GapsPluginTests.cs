@@ -5,74 +5,93 @@ namespace Whim.Gaps.Test;
 
 public class GapsPluginTests
 {
-	private static (Mock<IContext>, Mock<IWorkspaceManager>, GapsConfig) CreateMocks()
+	private class Wrapper
 	{
-		Mock<IContext> context = new();
-		Mock<IWorkspaceManager> workspaceManager = new();
-		GapsConfig gapsConfig = new() { InnerGap = 10, OuterGap = 10 };
+		public Mock<IContext> Context { get; }
+		public Mock<IWorkspaceManager> WorkspaceManager { get; }
+		public GapsConfig GapsConfig { get; }
 
-		context.SetupGet(x => x.WorkspaceManager).Returns(workspaceManager.Object);
+		public Wrapper()
+		{
+			Context = new();
+			WorkspaceManager = new();
+			GapsConfig = new() { InnerGap = 10, OuterGap = 10 };
 
-		return (context, workspaceManager, gapsConfig);
+			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
+		}
 	}
 
 	[Fact]
 	public void UpdateOuterGap_IncreasesOuterGapByDelta()
 	{
-		// Arrange
-		(Mock<IContext> context, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) = CreateMocks();
-		GapsPlugin plugin = new(context.Object, gapsConfig);
+		// Given
+		Wrapper wrapper = new();
+		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
 
-		// Act
+		// When
 		plugin.UpdateOuterGap(10);
 
-		// Assert
-		Assert.Equal(20, gapsConfig.OuterGap);
-		workspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+		// Then
+		Assert.Equal(20, wrapper.GapsConfig.OuterGap);
+		wrapper.WorkspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
 	}
 
 	[Fact]
 	public void UpdateInnerGap_IncreasesInnerGapByDelta()
 	{
-		// Arrange
-		(Mock<IContext> context, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) = CreateMocks();
-		GapsPlugin plugin = new(context.Object, gapsConfig);
+		// Given
+		Wrapper wrapper = new();
+		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
 
-		// Act
+		// When
 		plugin.UpdateInnerGap(10);
 
-		// Assert
-		Assert.Equal(20, gapsConfig.InnerGap);
-		workspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+		// Then
+		Assert.Equal(20, wrapper.GapsConfig.InnerGap);
+		wrapper.WorkspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
 	}
 
 	[Fact]
 	public void UpdateOuterGap_WithNegativeDelta_DecreasesOuterGapByDelta()
 	{
-		// Arrange
-		(Mock<IContext> context, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) = CreateMocks();
-		GapsPlugin plugin = new(context.Object, gapsConfig);
+		// Given
+		Wrapper wrapper = new();
+		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
 
-		// Act
+		// When
 		plugin.UpdateOuterGap(-10);
 
-		// Assert
-		Assert.Equal(0, gapsConfig.OuterGap);
-		workspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+		// Then
+		Assert.Equal(0, wrapper.GapsConfig.OuterGap);
+		wrapper.WorkspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
 	}
 
 	[Fact]
 	public void UpdateInnerGap_WithNegativeDelta_DecreasesInnerGapByDelta()
 	{
-		// Arrange
-		(Mock<IContext> context, Mock<IWorkspaceManager> workspaceManager, GapsConfig gapsConfig) = CreateMocks();
-		GapsPlugin plugin = new(context.Object, gapsConfig);
+		// Given
+		Wrapper wrapper = new();
+		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
 
-		// Act
+		// When
 		plugin.UpdateInnerGap(-10);
 
-		// Assert
-		Assert.Equal(0, gapsConfig.InnerGap);
-		workspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+		// Then
+		Assert.Equal(0, wrapper.GapsConfig.InnerGap);
+		wrapper.WorkspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+	}
+
+	[Fact]
+	public void PluginCommands()
+	{
+		// Given
+		Wrapper wrapper = new();
+		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
+
+		// When
+		IPluginCommands pluginCommands = plugin.PluginCommands;
+
+		// Then
+		Assert.Equal(4, pluginCommands.Commands.Count());
 	}
 }

@@ -53,6 +53,27 @@ public class CoreCommandsTests
 		);
 	}
 
+	[Fact]
+	public void FocusWindowInDirection_NoLastFocusedWindow()
+	{
+		// Given
+		MocksWrapper mocks = new();
+		mocks.Workspace.SetupGet(x => x.LastFocusedWindow).Returns((IWindow?)null);
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand("whim.core.focus_window_in_direction.left");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.Context.Verify(
+			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(Direction.Left, null),
+			Times.Never
+		);
+	}
+
 	[InlineData("whim.core.swap_window_in_direction.left", Direction.Left)]
 	[InlineData("whim.core.swap_window_in_direction.right", Direction.Right)]
 	[InlineData("whim.core.swap_window_in_direction.up", Direction.Up)]

@@ -1,6 +1,7 @@
 using Moq;
 using System;
 using Xunit;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.Tests;
 
@@ -15,21 +16,37 @@ public class PluginManagerTests
 	{
 		public Mock<IContext> Context { get; } = new();
 		public Mock<ICommandManager> CommandManager { get; } = new();
+		public Mock<IKeybindManager> KeybindManager { get; } = new();
 		public Mock<IPlugin> Plugin1 { get; } = new();
 		public Mock<IPlugin> Plugin2 { get; } = new();
 		public Mock<IPlugin> Plugin3 { get; } = new();
+		public PluginCommands PluginCommands1 { get; } = new("Plugin1");
+		public PluginCommands PluginCommands2 { get; } = new("Plugin2");
+		public PluginCommands PluginCommands3 { get; } = new("Plugin3");
 
 		public MocksWrapper()
 		{
 			Context.Setup(cc => cc.CommandManager).Returns(CommandManager.Object);
+			Context.Setup(cc => cc.KeybindManager).Returns(KeybindManager.Object);
 
 			Plugin1.Setup(p => p.Name).Returns("Plugin1");
 			Plugin2.Setup(p => p.Name).Returns("Plugin2");
 			Plugin3.Setup(p => p.Name).Returns("Plugin3");
 
-			Plugin1.Setup(p => p.PluginCommands).Returns(new PluginCommands("Plugin1"));
-			Plugin2.Setup(p => p.PluginCommands).Returns(new PluginCommands("Plugin2"));
-			Plugin3.Setup(p => p.PluginCommands).Returns(new PluginCommands("Plugin3"));
+			Plugin1.Setup(p => p.PluginCommands).Returns(PluginCommands1);
+			Plugin2.Setup(p => p.PluginCommands).Returns(PluginCommands2);
+			Plugin3.Setup(p => p.PluginCommands).Returns(PluginCommands3);
+
+			PluginCommands1.Add("command1", "Command 1", () => { });
+			PluginCommands2
+				.Add("command2", "Command 2", () => { }, keybind: new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A))
+				.Add("command22", "Command 2.2", () => { });
+			PluginCommands3.Add(
+				"command3",
+				"Command 3",
+				() => { },
+				keybind: new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)
+			);
 		}
 	}
 
@@ -88,6 +105,24 @@ public class PluginManagerTests
 
 		// Then
 		Assert.Equal(3, pluginManager.LoadedPlugins.Count);
+
+		// mocks.CommandManager.Verify(cm => cm.Add()
+		// I want to verify that the command passed into Add is equivalent to the one created in the mocks
+		mocks.CommandManager.Verify(cm => cm.Add(It.IsAny<ICommand>()), Times.Exactly(4));
+		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin1.command1")), Times.Once);
+		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin2.command2")), Times.Once);
+		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin2.command22")), Times.Once);
+		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin3.command3")), Times.Once);
+
+		mocks.KeybindManager.Verify(km => km.Add(It.IsAny<string>(), It.IsAny<Keybind>()), Times.Exactly(2));
+		mocks.KeybindManager.Verify(
+			km => km.Add("Plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A)),
+			Times.Once
+		);
+		mocks.KeybindManager.Verify(
+			km => km.Add("Plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)),
+			Times.Once
+		);
 	}
 
 	[Fact]

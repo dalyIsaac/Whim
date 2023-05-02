@@ -42,7 +42,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	{
 		// Get the currently active floating layout engine.
 		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
+		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
 			Logger.Error("Could not find floating layout engine");
@@ -61,7 +61,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	{
 		// Get the currently active floating layout engine.
 		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
+		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
 			Logger.Error("Could not find floating layout engine");
@@ -80,7 +80,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	{
 		// Get the currently active floating layout engine.
 		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		FloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<FloatingLayoutEngine>();
+		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
 		if (floatingLayoutEngine == null)
 		{
 			Logger.Error("Could not find floating layout engine");
