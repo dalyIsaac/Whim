@@ -9,6 +9,7 @@ public class PluginCommands : IPluginCommands
 	private readonly List<ICommand> _commands = new();
 	private readonly List<(string commandId, IKeybind keybind)> _keybinds = new();
 
+	/// <inheritdoc />
 	public string PluginName { get; init; }
 
 	/// <inheritdoc />

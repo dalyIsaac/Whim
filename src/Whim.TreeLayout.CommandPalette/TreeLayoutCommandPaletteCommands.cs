@@ -19,6 +19,13 @@ public class TreeLayoutCommandPalettePluginCommands : PluginCommands
 		Direction.Down,
 	};
 
+	/// <summary>
+	/// Create the tree layout command palette plugin commands.
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="treeLayoutCommandPalettePlugin"></param>
+	/// <param name="treeLayoutPlugin"></param>
+	/// <param name="commandLayoutPlugin"></param>
 	public TreeLayoutCommandPalettePluginCommands(
 		IContext context,
 		IPlugin treeLayoutCommandPalettePlugin,
