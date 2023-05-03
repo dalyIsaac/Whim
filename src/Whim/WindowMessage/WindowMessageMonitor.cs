@@ -28,7 +28,8 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		_context.NativeManager.HideWindow(hwnd);
 
 		_subclassProc = new SUBCLASSPROC(WindowProc);
-		_coreNativeManager.SetWindowSubclass(new HWND(hwnd), _subclassProc, SUBCLASSID, 0);
+		_coreNativeManager.SetWindowSubclass(hwnd, _subclassProc, SUBCLASSID, 0);
+		_coreNativeManager.WTSRegisterSessionNotification(hwnd, PInvoke.NOTIFY_FOR_ALL_SESSIONS);
 	}
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
@@ -36,6 +37,8 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	public event EventHandler<WindowMessageMonitorEventArgs>? WorkAreaChanged;
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? DpiChanged;
+
+	public event EventHandler<WindowMessageMonitorEventArgs>? SessionChanged;
 
 	private LRESULT WindowProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam, nuint uIdSubclass, nuint dwRefData)
 	{
@@ -54,10 +57,15 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		switch (uMsg)
 		{
 			case PInvoke.WM_DISPLAYCHANGE:
+				Logger.Debug("Display changed");
 				DisplayChanged?.Invoke(this, eventArgs);
 				break;
 			case PInvoke.WM_SETTINGCHANGE:
 				WindowProcSettingChange(eventArgs);
+				break;
+			case PInvoke.WM_WTSSESSION_CHANGE:
+				Logger.Debug("Session changed");
+				SessionChanged?.Invoke(this, eventArgs);
 				break;
 			default:
 				break;
@@ -76,9 +84,11 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		switch (eventArgs.MessagePayload.WParam)
 		{
 			case (nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA:
+				Logger.Debug("Work area changed");
 				WorkAreaChanged?.Invoke(this, eventArgs);
 				break;
 			case (nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_SETLOGICALDPIOVERRIDE:
+				Logger.Debug("DPI changed");
 				DpiChanged?.Invoke(this, eventArgs);
 				break;
 			default:

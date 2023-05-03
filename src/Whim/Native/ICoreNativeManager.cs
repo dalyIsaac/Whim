@@ -1,3 +1,4 @@
+using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,7 +15,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 namespace Whim;
 
 /// <summary>
-/// Manager for interacting with native Windows APIs, for internal Whim core use only.
+/// Manager for interacting with native Windows APIs, or Windows App SDK APIs, for internal Whim core use only.
 /// </summary>
 internal interface ICoreNativeManager
 {
@@ -443,4 +444,26 @@ internal interface ICoreNativeManager
 	/// <exception cref="MissingMethodException">The class specified by T does not have an accessible parameterless constructor.</exception>
 	T PtrToStructure<T>(nint ptr)
 		where T : struct;
+
+	/// <summary>Registers the specified window to receive session change notifications.</summary>
+	/// <param name="hWnd">Handle of the window to receive session change notifications.</param>
+	/// <param name="dwFlags">
+	/// <para>Specifies which session notifications are to be received. This parameter can be one of the following values.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//wtsapi32/nf-wtsapi32-wtsregistersessionnotification#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <returns>
+	/// <para>If the function succeeds, the return value is <b>TRUE</b>. Otherwise, it is <b>FALSE</b>. To get extended error information, call <a href="/windows/desktop/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//wtsapi32/nf-wtsapi32-wtsregistersessionnotification">Learn more about this API from docs.microsoft.com</see>.</para>
+	/// </remarks>
+	BOOL WTSRegisterSessionNotification(HWND hWnd, uint dwFlags);
+
+	/// <summary>
+	/// Adds a task to the <see cref="DispatcherQueue" /> which will be executed on the thread associated
+	/// with the <see cref="DispatcherQueue" />.
+	/// </summary>
+	/// <param name="callback">The task to execute.</param>
+	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
+	bool TryEnqueue(DispatcherQueueHandler callback);
 }
