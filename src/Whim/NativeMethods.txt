@@ -74,3 +74,4 @@ WM_SYSCOMMAND
 WM_SYSKEYDOWN
 WM_WTSSESSION_CHANGE
 WTSRegisterSessionNotification
+WTSUnRegisterSessionNotification

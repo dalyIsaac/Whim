@@ -42,7 +42,7 @@ internal class MonitorManager : IMonitorManager
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
 	/// <summary>
-	///
+	/// Creates a new instance of <see cref="MonitorManager"/>.
 	/// </summary>
 	/// <exception cref="Exception">
 	/// When no monitors are found, or there is no primary monitor.

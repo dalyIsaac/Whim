@@ -459,6 +459,16 @@ internal interface ICoreNativeManager
 	/// </remarks>
 	BOOL WTSRegisterSessionNotification(HWND hWnd, uint dwFlags);
 
+	/// <summary>Unregisters the specified window so that it receives no further session change notifications.</summary>
+	/// <param name="hWnd">Handle of the window to be unregistered from receiving session notifications.</param>
+	/// <returns>
+	/// <para>If the function succeeds, the return value is <b>TRUE</b>. Otherwise, it is <b>FALSE</b>. To get extended error information, call <a href="/windows/desktop/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//wtsapi32/nf-wtsapi32-wtsunregistersessionnotification">Learn more about this API from docs.microsoft.com</see>.</para>
+	/// </remarks>
+	BOOL WTSUnRegisterSessionNotification(HWND hWnd);
+
 	/// <summary>
 	/// Adds a task to the <see cref="DispatcherQueue" /> which will be executed on the thread associated
 	/// with the <see cref="DispatcherQueue" />.
@@ -466,4 +476,10 @@ internal interface ICoreNativeManager
 	/// <param name="callback">The task to execute.</param>
 	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
 	bool TryEnqueue(DispatcherQueueHandler callback);
+
+	/// <summary>
+	/// Creates a <see cref="Microsoft.UI.Xaml.Window" /> window, and returns its <see cref="HWND" />.
+	/// </summary>
+	/// <returns>The <see cref="HWND" /> of the created window.</returns>
+	HWND CreateWindow();
 }

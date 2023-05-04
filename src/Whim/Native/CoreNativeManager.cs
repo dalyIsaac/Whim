@@ -301,6 +301,17 @@ internal class CoreNativeManager : ICoreNativeManager
 		PInvoke.WTSRegisterSessionNotification(hWnd, dwFlags);
 
 	/// <inheritdoc/>
+	public BOOL WTSUnRegisterSessionNotification(HWND hWnd) => PInvoke.WTSUnRegisterSessionNotification(hWnd);
+
+	/// <inheritdoc/>
 	public bool TryEnqueue(DispatcherQueueHandler callback) =>
 		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
+
+	/// <inheritdoc/>
+	public HWND CreateWindow()
+	{
+		Microsoft.UI.Xaml.Window window = new();
+		window.SetIsShownInSwitchers(false);
+		return window.GetHandle();
+	}
 }
