@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.UI.Dispatching;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -204,6 +205,10 @@ public class MonitorManagerTests
 		);
 		mocksBuilder.WindowMessageMonitor.VerifyAdd(
 			m => m.DpiChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
+			Times.Once
+		);
+		mocksBuilder.WindowMessageMonitor.VerifyAdd(
+			m => m.SessionChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
 	}
@@ -492,7 +497,7 @@ public class MonitorManagerTests
 	}
 
 	[Fact]
-	public void WindowMessaageMonitor_DpiChanged()
+	public void WindowMessageMonitor_DpiChanged()
 	{
 		// Given
 		MocksBuilder mocksBuilder = new();
@@ -513,6 +518,26 @@ public class MonitorManagerTests
 
 		// Then
 		Assert.Equal(raisedEvent.Arguments.UnchangedMonitors, monitorManager.ToList());
+	}
+
+	[Fact]
+	public void WindowMessageMonitor_SessionChanged()
+	{
+		// Given
+		MocksBuilder mocksBuilder = new();
+		MonitorManager monitorManager =
+			new(
+				mocksBuilder.Context.Object,
+				mocksBuilder.CoreNativeManager.Object,
+				mocksBuilder.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		// When
+		mocksBuilder.WindowMessageMonitor.Raise(m => m.SessionChanged += null, WindowMessageMonitorEventArgs);
+
+		// Then
+		mocksBuilder.CoreNativeManager.Verify(cnm => cnm.TryEnqueue(It.IsAny<DispatcherQueueHandler>()), Times.Once);
 	}
 
 	[Fact]

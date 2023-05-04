@@ -53,4 +53,10 @@ public class MonitorsChangedEventArgs : EventArgs
 		result.AddRange(second);
 		return result;
 	}
+
+	/// <inheritdoc />
+	public override string ToString()
+	{
+		return $"Unchanged: {UnchangedMonitors.Count()}, Removed: {RemovedMonitors.Count()}, Added: {AddedMonitors.Count()}";
+	}
 }

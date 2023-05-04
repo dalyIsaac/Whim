@@ -38,4 +38,12 @@ internal interface IWindowMessageMonitor : IDisposable
 	/// message by listening for the <see cref="PInvoke.WM_SETTINGCHANGE"/> message.
 	/// </remarks>
 	public event EventHandler<WindowMessageMonitorEventArgs>? DpiChanged;
+
+	/// <summary>
+	/// This event is raised when the session has changed.
+	/// </summary>
+	/// <remarks>
+	/// For more, see https://learn.microsoft.com/en-us/windows/win32/termserv/wm-wtssession-change
+	/// </remarks>
+	public event EventHandler<WindowMessageMonitorEventArgs>? SessionChanged;
 }

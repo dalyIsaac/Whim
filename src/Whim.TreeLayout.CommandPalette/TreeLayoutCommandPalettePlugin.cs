@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Whim.CommandPalette;
 
 namespace Whim.TreeLayout.CommandPalette;

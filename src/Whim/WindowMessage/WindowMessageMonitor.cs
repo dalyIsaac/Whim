@@ -13,7 +13,7 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly SUBCLASSPROC _subclassProc;
-	private readonly Microsoft.UI.Xaml.Window _window;
+	private readonly HWND _windowHwnd;
 	private bool _disposedValue;
 
 	public WindowMessageMonitor(IContext context, ICoreNativeManager coreNativeManager)
@@ -21,14 +21,12 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		_context = context;
 		_coreNativeManager = coreNativeManager;
 
-		_window = new();
-		_window.SetIsShownInSwitchers(false);
-
-		HWND hwnd = _window.GetHandle();
-		_context.NativeManager.HideWindow(hwnd);
+		_windowHwnd = coreNativeManager.CreateWindow();
+		_context.NativeManager.HideWindow(_windowHwnd);
 
 		_subclassProc = new SUBCLASSPROC(WindowProc);
-		_coreNativeManager.SetWindowSubclass(new HWND(hwnd), _subclassProc, SUBCLASSID, 0);
+		_coreNativeManager.SetWindowSubclass(_windowHwnd, _subclassProc, SUBCLASSID, 0);
+		_coreNativeManager.WTSRegisterSessionNotification(_windowHwnd, PInvoke.NOTIFY_FOR_ALL_SESSIONS);
 	}
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
@@ -36,6 +34,8 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	public event EventHandler<WindowMessageMonitorEventArgs>? WorkAreaChanged;
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? DpiChanged;
+
+	public event EventHandler<WindowMessageMonitorEventArgs>? SessionChanged;
 
 	private LRESULT WindowProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam, nuint uIdSubclass, nuint dwRefData)
 	{
@@ -54,10 +54,15 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		switch (uMsg)
 		{
 			case PInvoke.WM_DISPLAYCHANGE:
+				Logger.Debug("Display changed");
 				DisplayChanged?.Invoke(this, eventArgs);
 				break;
 			case PInvoke.WM_SETTINGCHANGE:
 				WindowProcSettingChange(eventArgs);
+				break;
+			case PInvoke.WM_WTSSESSION_CHANGE:
+				Logger.Debug("Session changed");
+				SessionChanged?.Invoke(this, eventArgs);
 				break;
 			default:
 				break;
@@ -76,9 +81,11 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		switch (eventArgs.MessagePayload.WParam)
 		{
 			case (nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA:
+				Logger.Debug("Work area changed");
 				WorkAreaChanged?.Invoke(this, eventArgs);
 				break;
 			case (nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_SETLOGICALDPIOVERRIDE:
+				Logger.Debug("DPI changed");
 				DpiChanged?.Invoke(this, eventArgs);
 				break;
 			default:
@@ -97,7 +104,8 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			_coreNativeManager.RemoveWindowSubclass(_window.GetHandle(), _subclassProc, SUBCLASSID);
+			_coreNativeManager.RemoveWindowSubclass(_windowHwnd, _subclassProc, SUBCLASSID);
+			_coreNativeManager.WTSUnRegisterSessionNotification(_windowHwnd);
 			_disposedValue = true;
 		}
 	}

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 
@@ -41,7 +42,7 @@ internal class MonitorManager : IMonitorManager
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
 	/// <summary>
-	///
+	/// Creates a new instance of <see cref="MonitorManager"/>.
 	/// </summary>
 	/// <exception cref="Exception">
 	/// When no monitors are found, or there is no primary monitor.
@@ -68,9 +69,10 @@ internal class MonitorManager : IMonitorManager
 
 	public void Initialize()
 	{
-		_windowMessageMonitor.DisplayChanged += WindowMessageMonitor_DisplayChanged;
-		_windowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_WorkAreaChanged;
-		_windowMessageMonitor.DpiChanged += WindowMessageMonitor_DpiChanged;
+		_windowMessageMonitor.DisplayChanged += WindowMessageMonitor_MonitorsChanged;
+		_windowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_MonitorsChanged;
+		_windowMessageMonitor.DpiChanged += WindowMessageMonitor_MonitorsChanged;
+		_windowMessageMonitor.SessionChanged += WindowMessageMonitor_SessionChanged;
 	}
 
 	/// <summary>
@@ -88,9 +90,21 @@ internal class MonitorManager : IMonitorManager
 		}
 	}
 
-	private void WindowMessageMonitor_DisplayChanged(object? sender, WindowMessageMonitorEventArgs e)
+	private void WindowMessageMonitor_SessionChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{
-		Logger.Debug($"Display changed: {e.MessagePayload}");
+		// If we update monitors too quickly, the reported working area can sometimes be the
+		// monitor's bounds, which is incorrect. So, we wait a bit before updating the monitors.
+		// This gives Windows some to figure out the correct working area.
+		_coreNativeManager.TryEnqueue(async () =>
+		{
+			await Task.Delay(5000).ConfigureAwait(true);
+			WindowMessageMonitor_MonitorsChanged(sender, e);
+		});
+	}
+
+	private void WindowMessageMonitor_MonitorsChanged(object? sender, WindowMessageMonitorEventArgs e)
+	{
+		Logger.Debug($"Monitors changed: {e.MessagePayload}");
 
 		// Get the new monitors.
 		IMonitor[] previousMonitors = _monitors;
@@ -138,36 +152,6 @@ internal class MonitorManager : IMonitorManager
 				UnchangedMonitors = unchangedMonitors,
 				RemovedMonitors = removedMonitors,
 				AddedMonitors = addedMonitors
-			}
-		);
-	}
-
-	private void WindowMessageMonitor_WorkAreaChanged(object? sender, WindowMessageMonitorEventArgs e)
-	{
-		Logger.Debug($"Work area changed: {e.MessagePayload}");
-
-		MonitorsChanged?.Invoke(
-			this,
-			new MonitorsChangedEventArgs()
-			{
-				UnchangedMonitors = _monitors,
-				RemovedMonitors = Array.Empty<IMonitor>(),
-				AddedMonitors = Array.Empty<IMonitor>()
-			}
-		);
-	}
-
-	private void WindowMessageMonitor_DpiChanged(object? sender, WindowMessageMonitorEventArgs e)
-	{
-		Logger.Debug($"DPI changed: {e.MessagePayload}");
-
-		MonitorsChanged?.Invoke(
-			this,
-			new MonitorsChangedEventArgs()
-			{
-				UnchangedMonitors = _monitors,
-				RemovedMonitors = Array.Empty<IMonitor>(),
-				AddedMonitors = Array.Empty<IMonitor>()
 			}
 		);
 	}
@@ -282,7 +266,7 @@ internal class MonitorManager : IMonitorManager
 				Logger.Debug("Disposing monitor manager");
 
 				// dispose managed state (managed objects)
-				_windowMessageMonitor.DisplayChanged -= WindowMessageMonitor_DisplayChanged;
+				_windowMessageMonitor.DisplayChanged -= WindowMessageMonitor_MonitorsChanged;
 				_windowMessageMonitor.Dispose();
 			}
 

@@ -1,3 +1,4 @@
+using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -294,4 +295,23 @@ internal class CoreNativeManager : ICoreNativeManager
 	/// <inheritdoc/>
 	public T PtrToStructure<T>(IntPtr ptr)
 		where T : struct => Marshal.PtrToStructure<T>(ptr);
+
+	/// <inheritdoc/>
+	public BOOL WTSRegisterSessionNotification(HWND hWnd, uint dwFlags) =>
+		PInvoke.WTSRegisterSessionNotification(hWnd, dwFlags);
+
+	/// <inheritdoc/>
+	public BOOL WTSUnRegisterSessionNotification(HWND hWnd) => PInvoke.WTSUnRegisterSessionNotification(hWnd);
+
+	/// <inheritdoc/>
+	public bool TryEnqueue(DispatcherQueueHandler callback) =>
+		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
+
+	/// <inheritdoc/>
+	public HWND CreateWindow()
+	{
+		Microsoft.UI.Xaml.Window window = new();
+		window.SetIsShownInSwitchers(false);
+		return window.GetHandle();
+	}
 }
