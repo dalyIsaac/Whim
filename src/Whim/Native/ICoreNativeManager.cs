@@ -478,8 +478,11 @@ internal interface ICoreNativeManager
 	bool TryEnqueue(DispatcherQueueHandler callback);
 
 	/// <summary>
-	/// Creates a <see cref="Microsoft.UI.Xaml.Window" /> window, and returns its <see cref="HWND" />.
+	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.
 	/// </summary>
-	/// <returns>The <see cref="HWND" /> of the created window.</returns>
-	HWND CreateWindow();
+	/// <remarks>
+	/// The first time this is called, the window will be created.
+	/// </remarks>
+	/// <returns>The <see cref="HWND" /> of the window.</returns>
+	HWND WindowMessageMonitorWindowHandle { get; }
 }
