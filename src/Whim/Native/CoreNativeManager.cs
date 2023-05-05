@@ -307,11 +307,20 @@ internal class CoreNativeManager : ICoreNativeManager
 	public bool TryEnqueue(DispatcherQueueHandler callback) =>
 		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
 
+	private Microsoft.UI.Xaml.Window? _window;
+
 	/// <inheritdoc/>
-	public HWND CreateWindow()
+	public HWND WindowMessageMonitorWindowHandle
 	{
-		Microsoft.UI.Xaml.Window window = new();
-		window.SetIsShownInSwitchers(false);
-		return window.GetHandle();
+		get
+		{
+			if (_window == null)
+			{
+				_window = new();
+				_window.SetIsShownInSwitchers(false);
+			}
+
+			return _window.GetHandle();
+		}
 	}
 }
