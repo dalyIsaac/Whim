@@ -8,6 +8,14 @@ namespace Whim;
 /// </summary>
 public static class FileHelper
 {
+	private static void EnsureDirExists(string dirName)
+	{
+		if (!Directory.Exists(dirName))
+		{
+			Directory.CreateDirectory(dirName);
+		}
+	}
+
 	/// <summary>
 	/// Gets the Whim path: <c>~/.whim</c>
 	/// </summary>
@@ -18,13 +26,7 @@ public static class FileHelper
 	/// <summary>
 	/// Ensures that the Whim directory exists. If it does not, it is created.
 	/// </summary>
-	public static void EnsureWhimDirExists()
-	{
-		if (!Directory.Exists(GetWhimDir()))
-		{
-			Directory.CreateDirectory(GetWhimDir());
-		}
-	}
+	public static void EnsureWhimDirExists() => EnsureDirExists(GetWhimDir());
 
 	/// <summary>
 	/// Gets a file path in the Whim directory.
@@ -34,8 +36,19 @@ public static class FileHelper
 	public static string GetWhimFileDir(string fileName) => Path.Combine(GetWhimDir(), fileName);
 
 	/// <summary>
+	/// Gets the path to the saved state directory.
+	/// </summary>
+	/// <returns></returns>
+	public static string GetSavedStateDir() => Path.Combine(GetWhimDir(), "state");
+
+	/// <summary>
+	/// Ensures that the saved state directory exists. If it does not, it is created.
+	/// </summary>
+	public static void EnsureSavedStateDirExists() => EnsureDirExists(GetSavedStateDir());
+
+	/// <summary>
 	/// Gets the path to the JSON file of the saved plugins state.
 	/// </summary>
 	/// <returns></returns>
-	public static string GetSavedPluginsStatePath() => Path.Combine(GetWhimDir(), "plugins-state.json");
+	public static string GetSavedPluginsStatePath() => Path.Combine(GetSavedStateDir(), "plugins.json");
 }

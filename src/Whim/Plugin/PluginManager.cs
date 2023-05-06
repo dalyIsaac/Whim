@@ -42,6 +42,14 @@ internal class PluginManager : IPluginManager
 
 	private void LoadSavedState()
 	{
+		FileHelper.EnsureSavedStateDirExists();
+
+		// If the saved state dir doesn't yet exist, we don't need to load anything.
+		if (!Directory.Exists(FileHelper.GetSavedPluginsStatePath()))
+		{
+			return;
+		}
+
 		using FileStream pluginFileStream = File.OpenRead(FileHelper.GetSavedPluginsStatePath());
 		PluginManagerSavedState? savedState = JsonSerializer.Deserialize<PluginManagerSavedState>(pluginFileStream);
 
