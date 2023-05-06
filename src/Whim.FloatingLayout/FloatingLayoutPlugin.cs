@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
@@ -90,4 +92,10 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 		floatingLayoutEngine.ToggleWindowFloating(window);
 		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
+
+	/// <inheritdoc />
+	public void LoadState(JsonElement pluginSavedState) { }
+
+	/// <inheritdoc />
+	public JsonElement? SaveState() => null;
 }

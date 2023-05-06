@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Whim.CommandPalette;
 
@@ -104,5 +106,28 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
+	}
+
+	/// <inheritdoc/>
+	public void LoadState(JsonElement state)
+	{
+		// Get the activation config from the state.
+		if (state.TryGetProperty("activationConfig", out JsonElement activationConfig))
+		{
+			Config.ActivationConfig.Matcher.LoadState(activationConfig);
+		}
+	}
+
+	/// <inheritdoc/>
+	public JsonElement? SaveState()
+	{
+		Dictionary<string, JsonElement> state = new();
+
+		if (Config.ActivationConfig.Matcher.SaveState() is JsonElement activationConfig)
+		{
+			state.Add("activationConfig", activationConfig);
+		}
+
+		return JsonSerializer.SerializeToElement(state);
 	}
 }

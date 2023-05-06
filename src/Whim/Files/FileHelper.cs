@@ -37,5 +37,5 @@ public static class FileHelper
 	/// Gets the path to the JSON file of the saved plugins state.
 	/// </summary>
 	/// <returns></returns>
-	public static string GetSavedPluginsStatePath() => Path.Combine(GetWhimDir(), "plugins.json");
+	public static string GetSavedPluginsStatePath() => Path.Combine(GetWhimDir(), "plugins-state.json");
 }

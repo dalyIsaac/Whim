@@ -48,5 +48,5 @@ public interface IPlugin
 	/// Save the plugin's state as a <see cref="JsonElement"/>.
 	/// </summary>
 	/// <returns>The plugin's state.</returns>
-	JsonElement SaveState();
+	JsonElement? SaveState();
 }

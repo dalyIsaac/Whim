@@ -42,9 +42,8 @@ internal class PluginManager : IPluginManager
 
 	private void LoadSavedState()
 	{
-		PluginManagerSavedState? savedState = JsonSerializer.Deserialize<PluginManagerSavedState>(
-			FileHelper.GetSavedPluginsStatePath()
-		);
+		using FileStream pluginFileStream = File.OpenRead(FileHelper.GetSavedPluginsStatePath());
+		PluginManagerSavedState? savedState = JsonSerializer.Deserialize<PluginManagerSavedState>(pluginFileStream);
 
 		if (savedState is null)
 		{
@@ -113,14 +112,18 @@ internal class PluginManager : IPluginManager
 
 	private void SaveState()
 	{
-		PluginManagerSavedState savedState = new();
+		PluginManagerSavedState pluginManagerSavedState = new();
 
 		foreach (IPlugin plugin in _plugins)
 		{
-			savedState.Plugins[plugin.Name] = plugin.SaveState();
+			JsonElement? state = plugin.SaveState();
+			if (state is JsonElement savedState)
+			{
+				pluginManagerSavedState.Plugins[plugin.Name] = savedState;
+			}
 		}
 
-		File.WriteAllText(FileHelper.GetSavedPluginsStatePath(), JsonSerializer.Serialize(savedState));
+		File.WriteAllText(FileHelper.GetSavedPluginsStatePath(), JsonSerializer.Serialize(pluginManagerSavedState));
 	}
 
 	public void Dispose()

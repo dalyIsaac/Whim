@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Whim.CommandPalette;
 
 namespace Whim.TreeLayout.CommandPalette;
@@ -40,4 +41,10 @@ public class TreeLayoutCommandPalettePlugin : IPlugin
 
 	/// <inheritdoc/>
 	public void PreInitialize() { }
+
+	/// <inheritdoc />
+	public void LoadState(JsonElement state) { }
+
+	/// <inheritdoc />
+	public JsonElement? SaveState() => null;
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
 using System.ComponentModel;
+using System.Text.Json;
 
 namespace Whim.FocusIndicator;
 
@@ -173,4 +174,10 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new PluginCommands(Name);
+
+	/// <inheritdoc />
+	public void LoadState(JsonElement state) { }
+
+	/// <inheritdoc />
+	public JsonElement? SaveState() => null;
 }

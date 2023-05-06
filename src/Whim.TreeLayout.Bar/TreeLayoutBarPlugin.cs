@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Whim.Bar;
 
 namespace Whim.TreeLayout.Bar;
@@ -40,4 +41,10 @@ public class TreeLayoutBarPlugin : IPlugin
 			(context, monitor, window) => new TreeLayoutEngineWidget(context, _plugin, monitor, window)
 		);
 	}
+
+	/// <inheritdoc />
+	public void LoadState(JsonElement state) { }
+
+	/// <inheritdoc />
+	public JsonElement? SaveState() => null;
 }

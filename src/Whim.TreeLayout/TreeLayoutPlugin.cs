@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 
 namespace Whim.TreeLayout;
 
@@ -67,4 +68,10 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 			treeLayoutEngine.SplitFocusedWindow();
 		}
 	}
+
+	/// <inheritdoc />
+	public void LoadState(JsonElement state) { }
+
+	/// <inheritdoc />
+	public JsonElement? SaveState() => null;
 }
