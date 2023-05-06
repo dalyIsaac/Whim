@@ -11,24 +11,34 @@ public interface IPluginManager : IDisposable
 	/// <summary>
 	/// The currently loaded plugins.
 	/// </summary>
-	public IReadOnlyCollection<IPlugin> LoadedPlugins { get; }
+	IReadOnlyCollection<IPlugin> LoadedPlugins { get; }
 
 	/// <summary>
 	/// Calls all plugins' <see cref="IPlugin.PreInitialize"/> method.
 	/// This runs before the rest of the context has been initialized.
 	/// </summary>
-	public void PreInitialize();
+	void PreInitialize();
 
 	/// <summary>
-	/// Calls all plugins' <see cref="IPlugin.PostInitialize"/> method.
-	/// This runs after the rest of the context has been initialized.
+	/// Performs the following:
 	///
-	/// <br />
+	/// <list type="number">
 	///
-	/// This will also register all the commands for the plugins, specified in
-	/// <see cref="IPlugin.PluginCommands"/>.
+	/// <item>
+	/// <description>
+	/// Calls <see cref="IPlugin.PostInitialize"/> for all plugins.
+	/// </description>
+	/// </item>
+	///
+	/// <item>
+	/// <description>
+	/// Loads the state of all plugins from <see cref="IPlugin.LoadState"/>, from the last JSON saved state.
+	/// </description>
+	/// </item>
+	///
+	/// </list>
 	/// </summary>
-	public void PostInitialize();
+	void PostInitialize();
 
 	/// <summary>
 	/// Adds a plugin, registers its commands and keybinds from <see cref="IPlugin.PluginCommands"/>.
@@ -42,7 +52,7 @@ public interface IPluginManager : IDisposable
 	/// </summary>
 	/// <param name="plugin">The plugin to add.</param>
 	/// <returns>The plugin that was added.</returns>
-	public T AddPlugin<T>(T plugin)
+	T AddPlugin<T>(T plugin)
 		where T : IPlugin;
 
 	/// <summary>
@@ -50,5 +60,5 @@ public interface IPluginManager : IDisposable
 	/// </summary>
 	/// <param name="pluginName">The name of the plugin.</param>
 	/// <returns>Whether the plugin manager includes a plugin with the given name.</returns>
-	public bool Contains(string pluginName);
+	bool Contains(string pluginName);
 }

@@ -30,10 +30,14 @@ internal class PluginManager : IPluginManager
 	{
 		Logger.Debug("Post-initializing plugin manager...");
 
+		// Call PostInitialize for all plugins.
 		foreach (IPlugin plugin in _plugins.Values)
 		{
 			plugin.PostInitialize();
 		}
+
+		// Load the state of all plugins.
+		// TODO
 	}
 
 	public T AddPlugin<T>(T plugin)
@@ -74,6 +78,8 @@ internal class PluginManager : IPluginManager
 				Logger.Debug("Disposing plugin manager");
 				foreach (IPlugin plugin in _plugins.Values)
 				{
+					// TODO: Save the state of all plugins.
+
 					if (plugin is IDisposable disposable)
 					{
 						disposable.Dispose();
