@@ -41,6 +41,10 @@ public interface IPlugin
 	/// <summary>
 	/// Load the plugin's state from <paramref name="state"/>.
 	/// </summary>
+	/// <remarks>
+	/// State is loaded after <see cref="PostInitialize"/> and the user's configuration has been loaded.
+	/// Thus, be careful on how you interact with the user's configuration.
+	/// </remarks>
 	/// <param name="state">The plugin's state.</param>
 	void LoadState(JsonElement state);
 
