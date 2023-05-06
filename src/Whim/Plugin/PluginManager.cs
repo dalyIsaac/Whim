@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 
 namespace Whim;
 
 internal class PluginManager : IPluginManager
 {
 	private readonly IContext _context;
-	private readonly Dictionary<string, IPlugin> _plugins = new();
+	private readonly List<IPlugin> _plugins = new();
 	private bool _disposedValue;
 
-	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.Values;
+	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.AsReadOnly();
 
 	public PluginManager(IContext context)
 	{
@@ -20,7 +22,7 @@ internal class PluginManager : IPluginManager
 	{
 		Logger.Debug("Pre-initializing plugin manager...");
 
-		foreach (IPlugin plugin in _plugins.Values)
+		foreach (IPlugin plugin in _plugins)
 		{
 			plugin.PreInitialize();
 		}
@@ -30,14 +32,32 @@ internal class PluginManager : IPluginManager
 	{
 		Logger.Debug("Post-initializing plugin manager...");
 
-		// Call PostInitialize for all plugins.
-		foreach (IPlugin plugin in _plugins.Values)
+		foreach (IPlugin plugin in _plugins)
 		{
 			plugin.PostInitialize();
 		}
 
-		// Load the state of all plugins.
-		// TODO
+		LoadSavedState();
+	}
+
+	private void LoadSavedState()
+	{
+		PluginManagerSavedState? savedState = JsonSerializer.Deserialize<PluginManagerSavedState>(
+			FileHelper.GetSavedPluginsStatePath()
+		);
+
+		if (savedState is null)
+		{
+			return;
+		}
+
+		foreach (IPlugin plugin in _plugins)
+		{
+			if (savedState.Plugins.TryGetValue(plugin.Name, out JsonElement pluginSavedState))
+			{
+				plugin.LoadState(pluginSavedState);
+			}
+		}
 	}
 
 	public T AddPlugin<T>(T plugin)
@@ -48,7 +68,7 @@ internal class PluginManager : IPluginManager
 			throw new InvalidOperationException($"Plugin with name '{plugin.Name}' already exists.");
 		}
 
-		_plugins.Add(plugin.Name, plugin);
+		_plugins.Add(plugin);
 
 		// Add the commands and keybinds.
 		foreach (ICommand command in plugin.PluginCommands.Commands)
@@ -66,7 +86,7 @@ internal class PluginManager : IPluginManager
 
 	public bool Contains(string pluginName)
 	{
-		return _plugins.ContainsKey(pluginName);
+		return _plugins.Exists(plugin => plugin.Name == pluginName);
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -76,10 +96,10 @@ internal class PluginManager : IPluginManager
 			if (disposing)
 			{
 				Logger.Debug("Disposing plugin manager");
-				foreach (IPlugin plugin in _plugins.Values)
-				{
-					// TODO: Save the state of all plugins.
+				SaveState();
 
+				foreach (IPlugin plugin in _plugins)
+				{
 					if (plugin is IDisposable disposable)
 					{
 						disposable.Dispose();
@@ -89,6 +109,18 @@ internal class PluginManager : IPluginManager
 
 			_disposedValue = true;
 		}
+	}
+
+	private void SaveState()
+	{
+		PluginManagerSavedState savedState = new();
+
+		foreach (IPlugin plugin in _plugins)
+		{
+			savedState.Plugins[plugin.Name] = plugin.SaveState();
+		}
+
+		File.WriteAllText(FileHelper.GetSavedPluginsStatePath(), JsonSerializer.Serialize(savedState));
 	}
 
 	public void Dispose()
