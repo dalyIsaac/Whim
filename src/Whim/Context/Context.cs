@@ -13,6 +13,7 @@ namespace Whim;
 /// </summary>
 internal class Context : IContext
 {
+	internal IFileManager FileManager { get; }
 	public Logger Logger { get; }
 	public INativeManager NativeManager { get; }
 	internal ICoreNativeManager CoreNativeManager { get; }
@@ -34,6 +35,7 @@ internal class Context : IContext
 	/// </summary>
 	public Context()
 	{
+		FileManager = new FileManager();
 		Logger = new Logger();
 		NativeManager = new NativeManager(this);
 		CoreNativeManager = new CoreNativeManager(this);
@@ -63,8 +65,9 @@ internal class Context : IContext
 			KeybindManager.Add(name, keybind);
 		}
 
-		// Load the context.
-		DoConfig doConfig = ConfigLoader.LoadContext();
+		// Load the user's config.
+		ConfigLoader configLoader = new(FileManager);
+		DoConfig doConfig = configLoader.LoadConfig();
 		doConfig(this);
 
 		// Initialize the managers.

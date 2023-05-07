@@ -13,18 +13,25 @@ namespace Whim;
 /// <param name="context">The <see cref="IContext"/> to operate on.</param>
 public delegate void DoConfig(IContext context);
 
-internal static class ConfigLoader
+internal class ConfigLoader
 {
-	private static readonly string ConfigFilePath = FileHelper.GetWhimFileDir("whim.config.csx");
+	private readonly IFileManager _fileManager;
+	private readonly string _configFilePath;
 
-	private static bool DoesConfigExist() => File.Exists(ConfigFilePath);
+	private bool DoesConfigExist() => File.Exists(_configFilePath);
 
 	/// <summary>
 	/// Loads the Whim config from the Whim config file, if it exists.
 	/// Otherwise, it will create a new Whim config file.
 	/// </summary>
 	/// <returns>The Whim config.</returns>
-	private static string LoadRawConfig() => File.ReadAllText(ConfigFilePath);
+	private string LoadRawConfig() => File.ReadAllText(_configFilePath);
+
+	public ConfigLoader(IFileManager fileManager)
+	{
+		_fileManager = fileManager;
+		_configFilePath = _fileManager.GetWhimFileDir("whim.config.csx");
+	}
 
 	/// <summary>
 	/// Read the given <paramref name="filename"/> from the assembly's resources and return it as a string.
@@ -33,7 +40,7 @@ internal static class ConfigLoader
 	/// <param name="filename"></param>
 	/// <returns></returns>
 	/// <exception cref="ConfigLoaderException"></exception>
-	private static string ReadFile(this Assembly assembly, string filename)
+	private static string ReadFile(Assembly assembly, string filename)
 	{
 		string templateName =
 			assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith(filename))
@@ -54,10 +61,10 @@ internal static class ConfigLoader
 	/// </summary>
 	/// <returns>The Whim template.</returns>
 	/// <exception cref="ConfigLoaderException"></exception>
-	private static string ReadTemplateConfigFile(this Assembly assembly)
+	private static string ReadTemplateConfigFile(Assembly assembly)
 	{
 		// Load the Whim template from the assembly's resources.
-		string template = assembly.ReadFile("whim.config.csx");
+		string template = ReadFile(assembly, "whim.config.csx");
 
 		// Replace WHIM_PATH with the assembly's path.
 		string? assemblyPath = Path.GetDirectoryName(assembly.Location);
@@ -71,29 +78,29 @@ internal static class ConfigLoader
 	/// This will throw if any null values are encountered.
 	/// </summary>
 	/// <exception cref="ConfigLoaderException"></exception>
-	private static void CreateConfig()
+	private void CreateConfig()
 	{
 		Assembly assembly =
 			Assembly.GetAssembly(typeof(ConfigLoader))
 			?? throw new ConfigLoaderException("Could not find assembly for ConfigLoader");
 
-		string template = assembly.ReadTemplateConfigFile();
-		string omnisharpJson = assembly.ReadFile("omnisharp.json");
+		string template = ReadTemplateConfigFile(assembly);
+		string omnisharpJson = ReadFile(assembly, "omnisharp.json");
 
 		// Save the files.
-		File.WriteAllText(ConfigFilePath, template);
-		File.WriteAllText(FileHelper.GetWhimFileDir("omnisharp.json"), omnisharpJson);
+		File.WriteAllText(_configFilePath, template);
+		File.WriteAllText(_fileManager.GetWhimFileDir("omnisharp.json"), omnisharpJson);
 	}
 
 	/// <summary>
-	/// Acquires and evaluates the user's <see cref="IContext"/>.
+	/// Acquires and evaluates the user's config.
 	/// </summary>
 	/// <returns>The <see cref="IContext"/>.</returns>
 	/// <exception cref="ConfigLoaderException"></exception>
-	internal static DoConfig LoadContext()
+	internal DoConfig LoadConfig()
 	{
 		// Ensure the Whim directory exists.
-		FileHelper.EnsureWhimDirExists();
+		_fileManager.EnsureDirExists(_fileManager.WhimDir);
 
 		// Acquire the Whim config.
 		bool configExists = DoesConfigExist();
