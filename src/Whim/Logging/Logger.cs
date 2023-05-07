@@ -31,7 +31,12 @@ public class Logger : IDisposable
 	/// The config for the logger.
 	/// NOTE: Changes to this will only take effect if set prior to <see cref="Initialize"/>.
 	/// </summary>
-	public LoggerConfig Config { get; set; } = new LoggerConfig();
+	public LoggerConfig Config { get; set; }
+
+	internal Logger()
+	{
+		Config = new LoggerConfig();
+	}
 
 	/// <summary>
 	/// Initializes the <see cref="Logger"/> with the file and debug sink.
@@ -68,12 +73,7 @@ public class Logger : IDisposable
 	/// <param name="sourceLineNumber">The line number in the source file.</param>
 	/// <returns>The message with caller information added.</returns>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private static string AddCaller(
-		string message,
-		[CallerMemberName] string memberName = "",
-		[CallerFilePath] string sourceFilePath = "",
-		[CallerLineNumber] int sourceLineNumber = 0
-	)
+	private static string AddCaller(string message, string memberName, string sourceFilePath, int sourceLineNumber)
 	{
 		string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
 		string fileLocation = $"{fileName}:{sourceLineNumber}";
