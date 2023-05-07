@@ -33,19 +33,15 @@ public class Logger : IDisposable
 	/// </summary>
 	public LoggerConfig Config { get; set; }
 
-	/// <summary>
-	/// Initialize the <see cref="Logger"/> with the <see cref="LoggerConfig"/>.
-	/// </summary>
-	/// <param name="config"></param>
-	public Logger(LoggerConfig? config = null)
+	internal Logger()
 	{
-		Config = config ?? new LoggerConfig();
+		Config = new LoggerConfig();
 	}
 
 	/// <summary>
 	/// Initializes the <see cref="Logger"/> with the file and debug sink.
 	/// </summary>
-	public void Initialize()
+	public void Initialize(IFileManager fileManager)
 	{
 		Logger.instance = this;
 		FileSinkConfig? fileSink = Config.FileSink;
@@ -55,7 +51,7 @@ public class Logger : IDisposable
 
 		if (fileSink != null)
 		{
-			string loggerFilePath = Path.Combine(FileHelper.GetWhimDir(), fileSink.FileName);
+			string loggerFilePath = fileManager.GetWhimFileDir(fileSink.FileName);
 			_loggerConfiguration.WriteTo.File(loggerFilePath, levelSwitch: fileSink.MinLogLevelSwitch);
 		}
 
@@ -77,12 +73,7 @@ public class Logger : IDisposable
 	/// <param name="sourceLineNumber">The line number in the source file.</param>
 	/// <returns>The message with caller information added.</returns>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private static string AddCaller(
-		string message,
-		[CallerMemberName] string memberName = "",
-		[CallerFilePath] string sourceFilePath = "",
-		[CallerLineNumber] int sourceLineNumber = 0
-	)
+	private static string AddCaller(string message, string memberName, string sourceFilePath, int sourceLineNumber)
 	{
 		string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
 		string fileLocation = $"{fileName}:{sourceLineNumber}";
