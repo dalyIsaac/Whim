@@ -71,7 +71,7 @@ internal class Context : IContext
 		doConfig(this);
 
 		// Initialize the managers.
-		Logger.Initialize();
+		Logger.Initialize(FileManager);
 
 		Logger.Debug("Initializing...");
 		PluginManager.PreInitialize();

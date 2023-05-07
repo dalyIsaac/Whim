@@ -31,21 +31,12 @@ public class Logger : IDisposable
 	/// The config for the logger.
 	/// NOTE: Changes to this will only take effect if set prior to <see cref="Initialize"/>.
 	/// </summary>
-	public LoggerConfig Config { get; set; }
-
-	/// <summary>
-	/// Initialize the <see cref="Logger"/> with the <see cref="LoggerConfig"/>.
-	/// </summary>
-	/// <param name="config"></param>
-	public Logger(LoggerConfig? config = null)
-	{
-		Config = config ?? new LoggerConfig();
-	}
+	public LoggerConfig Config { get; set; } = new LoggerConfig();
 
 	/// <summary>
 	/// Initializes the <see cref="Logger"/> with the file and debug sink.
 	/// </summary>
-	public void Initialize()
+	public void Initialize(IFileManager fileManager)
 	{
 		Logger.instance = this;
 		FileSinkConfig? fileSink = Config.FileSink;
@@ -55,7 +46,7 @@ public class Logger : IDisposable
 
 		if (fileSink != null)
 		{
-			string loggerFilePath = Path.Combine(FileHelper.GetWhimDir(), fileSink.FileName);
+			string loggerFilePath = fileManager.GetWhimFileDir(fileSink.FileName);
 			_loggerConfiguration.WriteTo.File(loggerFilePath, levelSwitch: fileSink.MinLogLevelSwitch);
 		}
 
