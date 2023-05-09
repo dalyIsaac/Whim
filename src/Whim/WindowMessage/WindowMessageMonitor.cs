@@ -13,7 +13,6 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly SUBCLASSPROC _subclassProc;
-	private readonly HWND _windowHwnd;
 	private bool _disposedValue;
 
 	public WindowMessageMonitor(IContext context, ICoreNativeManager coreNativeManager)
@@ -21,12 +20,19 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 		_context = context;
 		_coreNativeManager = coreNativeManager;
 
-		_windowHwnd = coreNativeManager.CreateWindow();
-		_context.NativeManager.HideWindow(_windowHwnd);
+		_context.NativeManager.HideWindow(_coreNativeManager.WindowMessageMonitorWindowHandle);
 
 		_subclassProc = new SUBCLASSPROC(WindowProc);
-		_coreNativeManager.SetWindowSubclass(_windowHwnd, _subclassProc, SUBCLASSID, 0);
-		_coreNativeManager.WTSRegisterSessionNotification(_windowHwnd, PInvoke.NOTIFY_FOR_ALL_SESSIONS);
+		_coreNativeManager.SetWindowSubclass(
+			_coreNativeManager.WindowMessageMonitorWindowHandle,
+			_subclassProc,
+			SUBCLASSID,
+			0
+		);
+		_coreNativeManager.WTSRegisterSessionNotification(
+			_coreNativeManager.WindowMessageMonitorWindowHandle,
+			PInvoke.NOTIFY_FOR_ALL_SESSIONS
+		);
 	}
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
@@ -104,8 +110,12 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			_coreNativeManager.RemoveWindowSubclass(_windowHwnd, _subclassProc, SUBCLASSID);
-			_coreNativeManager.WTSUnRegisterSessionNotification(_windowHwnd);
+			_coreNativeManager.RemoveWindowSubclass(
+				_coreNativeManager.WindowMessageMonitorWindowHandle,
+				_subclassProc,
+				SUBCLASSID
+			);
+			_coreNativeManager.WTSUnRegisterSessionNotification(_coreNativeManager.WindowMessageMonitorWindowHandle);
 			_disposedValue = true;
 		}
 	}

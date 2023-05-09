@@ -25,64 +25,16 @@ public class LoggerConfig
 	/// <summary>
 	/// The configuration for the file sink.
 	/// </summary>
-	public FileSinkConfig? FileSink { get; }
+	public FileSinkConfig? FileSink { get; init; } =
+		new FileSinkConfig()
+		{
+			FileName = "whim.log",
+			MinLogLevel = LogLevel.Error,
+			RollingInterval = FileSinkConfigRollingInterval.Day
+		};
 
 	/// <summary>
 	/// The configuration for the debug sink (what Visual Studio connects to).
 	/// </summary>
-	public SinkConfig? DebugSink { get; }
-
-	/// <summary>
-	/// Initializes the default <see cref="LoggerConfig"/>.<br/>
-	///
-	/// The default log file name is <c>whim.log</c>.
-	/// </summary>
-	public LoggerConfig()
-		: this("whim.log") { }
-
-	/// <summary>
-	/// Initializes the <see cref="LoggerConfig"/> with the given base minimum log level.
-	/// The file and debug sink will both have the same minimum log level.
-	/// </summary>
-	/// <param name="baseMinLogLevel">The base minimum log level.</param>
-	public LoggerConfig(LogLevel baseMinLogLevel)
-	{
-		FileSink = new FileSinkConfig()
-		{
-			FileName = "whim.log",
-			MinLogLevel = baseMinLogLevel,
-			RollingInterval = FileSinkConfigRollingInterval.Day
-		};
-		DebugSink = new SinkConfig() { MinLogLevel = LogLevel.Debug };
-		BaseMinLogLevel = baseMinLogLevel;
-	}
-
-	/// <summary>
-	/// Initializes the <see cref="LoggerConfig"/> with a custom log file name.
-	/// </summary>
-	/// <param name="logFileName"></param>
-	/// <param name="baseMinLogLevel">Sets <see cref="BaseMinLogLevel"/></param>
-	public LoggerConfig(string logFileName, LogLevel baseMinLogLevel = LogLevel.Error)
-	{
-		FileSink = new FileSinkConfig()
-		{
-			FileName = logFileName,
-			MinLogLevel = baseMinLogLevel,
-			RollingInterval = FileSinkConfigRollingInterval.Day
-		};
-		DebugSink = new SinkConfig() { MinLogLevel = LogLevel.Debug };
-		BaseMinLogLevel = baseMinLogLevel;
-	}
-
-	/// <summary>
-	/// Initializes the <see cref="LoggerConfig"/> with custom file sink and optional debug sink
-	/// configs.
-	/// </summary>
-	/// <param name="fileSinkConfig"><see cref="FileSinkConfig"/></param>
-	/// <param name="debugSink"><see cref="DebugSink"/></param>
-	public LoggerConfig(FileSinkConfig? fileSinkConfig = null, SinkConfig? debugSink = null)
-	{
-		FileSink = fileSinkConfig;
-		DebugSink = debugSink;
-	}
+	public SinkConfig? DebugSink { get; } = new SinkConfig() { MinLogLevel = LogLevel.Error };
 }

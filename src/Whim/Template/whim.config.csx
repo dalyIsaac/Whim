@@ -44,7 +44,7 @@ IWorkspace CreateWorkspace(IContext context, string name)
 /// <param name="context"></param>
 void DoConfig(IContext context)
 {
-    // context.Logger.Config = new LoggerConfig(LogLevel.Debug);
+    context.Logger.Config = new LoggerConfig() { BaseMinLogLevel = LogLevel.Error };
 
     context.WorkspaceManager.WorkspaceFactory = CreateWorkspace;
 
