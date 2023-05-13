@@ -1,4 +1,5 @@
 using Moq;
+using System.Text.Json;
 using Whim.Bar;
 using Xunit;
 
@@ -50,5 +51,19 @@ public class TreeLayoutBarPluginTests
 
 		// Then
 		Assert.NotNull(component);
+	}
+
+	[Fact]
+	public void SaveState()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		TreeLayoutBarPlugin plugin = new(mocks.TreeLayoutPlugin.Object);
+
+		// When
+		JsonElement? state = plugin.SaveState();
+
+		// Then
+		Assert.Null(state);
 	}
 }

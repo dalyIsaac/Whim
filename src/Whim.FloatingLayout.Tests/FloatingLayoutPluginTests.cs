@@ -1,4 +1,5 @@
 using Moq;
+using System.Text.Json;
 using Windows.Win32.Foundation;
 using Xunit;
 
@@ -115,5 +116,19 @@ public class FloatingLayoutPluginTests
 
 		// Then
 		wrapper.FloatingLayoutEngine.Verify(x => x.ToggleWindowFloating(window), Times.Never);
+	}
+
+	[Fact]
+	public void SaveState()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object, wrapper.FloatingLayoutConfig);
+
+		// When
+		JsonElement? json = plugin.SaveState();
+
+		// Then
+		Assert.Null(json);
 	}
 }

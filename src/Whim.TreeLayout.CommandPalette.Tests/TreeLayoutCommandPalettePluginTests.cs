@@ -1,4 +1,5 @@
 using Moq;
+using System.Text.Json;
 using Whim.CommandPalette;
 using Xunit;
 
@@ -26,5 +27,20 @@ public class TreeLayoutCommandPalettePluginTests
 		Assert.NotEmpty(plugin.PluginCommands.Commands);
 		Assert.Empty(plugin.PluginCommands.Keybinds);
 		Assert.Equal("Set tree layout direction", plugin.PluginCommands.Commands.First().Title);
+	}
+
+	[Fact]
+	public void SaveState()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		TreeLayoutCommandPalettePlugin plugin =
+			new(mocks.Context.Object, mocks.TreeLayoutPlugin.Object, mocks.CommandPalettePlugin.Object);
+
+		// When
+		JsonElement? state = plugin.SaveState();
+
+		// Then
+		Assert.Null(state);
 	}
 }
