@@ -2,6 +2,9 @@ using Moq;
 using System;
 using Xunit;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
+using System.IO;
+using System.Text.Json;
+using System.Collections.Generic;
 
 namespace Whim.Tests;
 
@@ -31,6 +34,7 @@ public class PluginManagerTests
 			Context.Setup(cc => cc.KeybindManager).Returns(KeybindManager.Object);
 
 			FileManager.Setup(fm => fm.SavedStateDir).Returns("C:\\Users\\test\\.whim\\state");
+			FileManager.Setup(fm => fm.OpenRead(It.IsAny<string>())).Returns(CreateSavedStateStream());
 
 			Plugin1.Setup(p => p.Name).Returns("Plugin1");
 			Plugin2.Setup(p => p.Name).Returns("Plugin2");
@@ -50,6 +54,19 @@ public class PluginManagerTests
 				() => { },
 				keybind: new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)
 			);
+		}
+
+		private static MemoryStream CreateSavedStateStream()
+		{
+			PluginManagerSavedState savedState = new();
+			savedState.Plugins.Add("Plugin1", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
+			savedState.Plugins.Add("Plugin2", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
+
+			MemoryStream stream = new();
+			stream.Write(JsonSerializer.SerializeToUtf8Bytes(savedState));
+			stream.Position = 0;
+
+			return stream;
 		}
 	}
 
@@ -74,7 +91,104 @@ public class PluginManagerTests
 	}
 
 	[Fact]
-	public void PostInitialize()
+	public void PostInitialize_FileDoesNotExist()
+	{
+		// Given
+		MocksWrapper mocks = new();
+
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
+
+		mocks.FileManager.Setup(fm => fm.FileExists(It.IsAny<string>())).Returns(false);
+
+		// When
+		pluginManager.PostInitialize();
+
+		// Then
+		mocks.FileManager.Verify(fm => fm.EnsureDirExists(mocks.FileManager.Object.SavedStateDir), Times.Once);
+		mocks.FileManager.Verify(fm => fm.OpenRead(It.IsAny<string>()), Times.Never);
+		mocks.Plugin1.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Never);
+	}
+
+	[Fact]
+	public void PostInitialize_SavedStateIsEmpty()
+	{
+		// Given
+		MocksWrapper mocks = new();
+
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
+
+		mocks.FileManager.Setup(fm => fm.FileExists(It.IsAny<string>())).Returns(true);
+		mocks.FileManager.Setup(fm => fm.OpenRead(It.IsAny<string>())).Returns(new MemoryStream());
+
+		// When
+		pluginManager.PostInitialize();
+
+		// Then
+		mocks.FileManager.Verify(fm => fm.EnsureDirExists(mocks.FileManager.Object.SavedStateDir), Times.Once);
+		mocks.FileManager.Verify(fm => fm.OpenRead(It.IsAny<string>()), Times.Once);
+		mocks.Plugin1.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Never);
+	}
+
+	[Fact]
+	public void PostInitialize_SavedStateIsNull()
+	{
+		// Given
+		MocksWrapper mocks = new();
+
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
+
+		MemoryStream stream = new();
+		stream.Write(System.Text.Encoding.ASCII.GetBytes("null"));
+
+		mocks.FileManager.Setup(fm => fm.FileExists(It.IsAny<string>())).Returns(true);
+		mocks.FileManager.Setup(fm => fm.OpenRead(It.IsAny<string>())).Returns(new MemoryStream());
+
+		// When
+		pluginManager.PostInitialize();
+
+		// Then
+		mocks.FileManager.Verify(fm => fm.EnsureDirExists(mocks.FileManager.Object.SavedStateDir), Times.Once);
+		mocks.FileManager.Verify(fm => fm.OpenRead(It.IsAny<string>()), Times.Once);
+		mocks.Plugin1.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Never);
+	}
+
+	[Fact]
+	public void PostInitialize_SavedStateFileExists()
+	{
+		// Given
+		MocksWrapper mocks = new();
+
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
+
+		mocks.FileManager.Setup(fm => fm.FileExists(It.IsAny<string>())).Returns(true);
+
+		// When
+		pluginManager.PostInitialize();
+
+		// Then
+		mocks.Plugin1.Verify(p => p.PostInitialize(), Times.Once);
+		mocks.Plugin2.Verify(p => p.PostInitialize(), Times.Once);
+		mocks.Plugin3.Verify(p => p.PostInitialize(), Times.Once);
+		mocks.FileManager.Verify(fm => fm.EnsureDirExists(mocks.FileManager.Object.SavedStateDir), Times.Once);
+		mocks.FileManager.Verify(fm => fm.OpenRead(It.IsAny<string>()), Times.Once);
+		mocks.Plugin1.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Once);
+		mocks.Plugin2.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Once);
+	}
+
+	[Fact]
+	public void PostInitialize_Success()
 	{
 		// Given
 		MocksWrapper mocks = new();

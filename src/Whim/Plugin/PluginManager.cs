@@ -9,7 +9,7 @@ internal class PluginManager : IPluginManager
 {
 	private readonly IContext _context;
 	private readonly IFileManager _fileManager;
-	private readonly string _savedStateFileName;
+	private readonly string _savedStateFilePath;
 	private readonly List<IPlugin> _plugins = new();
 	private bool _disposedValue;
 
@@ -19,7 +19,7 @@ internal class PluginManager : IPluginManager
 	{
 		_context = context;
 		_fileManager = fileManager;
-		_savedStateFileName = Path.Combine(_fileManager.SavedStateDir, "plugins.json");
+		_savedStateFilePath = Path.Combine(_fileManager.SavedStateDir, "plugins.json");
 	}
 
 	public void PreInitialize()
@@ -49,13 +49,23 @@ internal class PluginManager : IPluginManager
 		_fileManager.EnsureDirExists(_fileManager.SavedStateDir);
 
 		// If the saved plugin state file doesn't yet exist, we don't need to load anything.
-		if (!File.Exists(_savedStateFileName))
+		if (!_fileManager.FileExists(_savedStateFilePath))
 		{
 			return;
 		}
 
-		using FileStream pluginFileStream = File.OpenRead(_savedStateFileName);
-		PluginManagerSavedState? savedState = JsonSerializer.Deserialize<PluginManagerSavedState>(pluginFileStream);
+		using Stream pluginFileStream = _fileManager.OpenRead(_savedStateFilePath);
+
+		PluginManagerSavedState? savedState = null;
+		try
+		{
+			savedState = JsonSerializer.Deserialize<PluginManagerSavedState>(pluginFileStream);
+		}
+		catch (Exception ex)
+		{
+			Logger.Error($"Failed to load plugin state file: {ex}");
+			return;
+		}
 
 		if (savedState is null)
 		{
@@ -135,7 +145,7 @@ internal class PluginManager : IPluginManager
 			}
 		}
 
-		File.WriteAllText(_savedStateFileName, JsonSerializer.Serialize(pluginManagerSavedState));
+		File.WriteAllText(_savedStateFilePath, JsonSerializer.Serialize(pluginManagerSavedState));
 	}
 
 	public void Dispose()
