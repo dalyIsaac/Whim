@@ -11,6 +11,9 @@ internal class FileManager : IFileManager
 		Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim");
 
 	/// <inheritdoc />
+	public string SavedStateDir => Path.Combine(WhimDir, "state");
+
+	/// <inheritdoc />
 	public void EnsureDirExists(string dir)
 	{
 		if (!Directory.Exists(dir))
@@ -20,5 +23,14 @@ internal class FileManager : IFileManager
 	}
 
 	/// <inheritdoc />
+	public bool FileExists(string filePath) => File.Exists(filePath);
+
+	/// <inheritdoc />
 	public string GetWhimFileDir(string fileName) => Path.Combine(WhimDir, fileName);
+
+	/// <inheritdoc />
+	public Stream OpenRead(string filePath) => File.OpenRead(filePath);
+
+	/// <inheritdoc />
+	public void WriteAllText(string filePath, string contents) => File.WriteAllText(filePath, contents);
 }

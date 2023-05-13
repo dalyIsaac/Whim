@@ -1,26 +1,32 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 
 namespace Whim;
 
 internal class PluginManager : IPluginManager
 {
 	private readonly IContext _context;
-	private readonly Dictionary<string, IPlugin> _plugins = new();
+	private readonly IFileManager _fileManager;
+	private readonly string _savedStateFilePath;
+	private readonly List<IPlugin> _plugins = new();
 	private bool _disposedValue;
 
-	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.Values;
+	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.AsReadOnly();
 
-	public PluginManager(IContext context)
+	public PluginManager(IContext context, IFileManager fileManager)
 	{
 		_context = context;
+		_fileManager = fileManager;
+		_savedStateFilePath = Path.Combine(_fileManager.SavedStateDir, "plugins.json");
 	}
 
 	public void PreInitialize()
 	{
 		Logger.Debug("Pre-initializing plugin manager...");
 
-		foreach (IPlugin plugin in _plugins.Values)
+		foreach (IPlugin plugin in _plugins)
 		{
 			plugin.PreInitialize();
 		}
@@ -30,9 +36,48 @@ internal class PluginManager : IPluginManager
 	{
 		Logger.Debug("Post-initializing plugin manager...");
 
-		foreach (IPlugin plugin in _plugins.Values)
+		foreach (IPlugin plugin in _plugins)
 		{
 			plugin.PostInitialize();
+		}
+
+		LoadSavedState();
+	}
+
+	private void LoadSavedState()
+	{
+		_fileManager.EnsureDirExists(_fileManager.SavedStateDir);
+
+		// If the saved plugin state file doesn't yet exist, we don't need to load anything.
+		if (!_fileManager.FileExists(_savedStateFilePath))
+		{
+			return;
+		}
+
+		using Stream pluginFileStream = _fileManager.OpenRead(_savedStateFilePath);
+
+		PluginManagerSavedState? savedState = null;
+		try
+		{
+			savedState = JsonSerializer.Deserialize<PluginManagerSavedState>(pluginFileStream);
+		}
+		catch (Exception ex)
+		{
+			Logger.Error($"Failed to load plugin state file: {ex}");
+			return;
+		}
+
+		if (savedState is null)
+		{
+			return;
+		}
+
+		foreach (IPlugin plugin in _plugins)
+		{
+			if (savedState.Plugins.TryGetValue(plugin.Name, out JsonElement pluginSavedState))
+			{
+				plugin.LoadState(pluginSavedState);
+			}
 		}
 	}
 
@@ -44,7 +89,7 @@ internal class PluginManager : IPluginManager
 			throw new InvalidOperationException($"Plugin with name '{plugin.Name}' already exists.");
 		}
 
-		_plugins.Add(plugin.Name, plugin);
+		_plugins.Add(plugin);
 
 		// Add the commands and keybinds.
 		foreach (ICommand command in plugin.PluginCommands.Commands)
@@ -62,7 +107,7 @@ internal class PluginManager : IPluginManager
 
 	public bool Contains(string pluginName)
 	{
-		return _plugins.ContainsKey(pluginName);
+		return _plugins.Exists(plugin => plugin.Name == pluginName);
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -72,7 +117,9 @@ internal class PluginManager : IPluginManager
 			if (disposing)
 			{
 				Logger.Debug("Disposing plugin manager");
-				foreach (IPlugin plugin in _plugins.Values)
+				SaveState();
+
+				foreach (IPlugin plugin in _plugins)
 				{
 					if (plugin is IDisposable disposable)
 					{
@@ -83,6 +130,22 @@ internal class PluginManager : IPluginManager
 
 			_disposedValue = true;
 		}
+	}
+
+	private void SaveState()
+	{
+		PluginManagerSavedState pluginManagerSavedState = new();
+
+		foreach (IPlugin plugin in _plugins)
+		{
+			JsonElement? state = plugin.SaveState();
+			if (state is JsonElement savedState)
+			{
+				pluginManagerSavedState.Plugins[plugin.Name] = savedState;
+			}
+		}
+
+		_fileManager.WriteAllText(_savedStateFilePath, JsonSerializer.Serialize(pluginManagerSavedState));
 	}
 
 	public void Dispose()

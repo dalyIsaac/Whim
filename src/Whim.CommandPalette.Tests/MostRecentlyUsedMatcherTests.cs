@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
@@ -114,5 +115,106 @@ public class MostRecentlyUsedMatcherTests
 		Assert.Equal(2, rowItems.Length);
 		Assert.Equal("A", rowItems.ElementAt(0).Model.Data.Command.Title);
 		Assert.Equal("B", rowItems.ElementAt(1).Model.Data.Command.Title);
+	}
+
+	[Fact]
+	public void LoadState_IsNotObject()
+	{
+		// Given
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+
+		// When
+		matcher.LoadState(new JsonElement());
+
+		// Then
+		Assert.Empty(matcher._commandLastExecutionTime);
+	}
+
+	[Fact]
+	public void LoadState_ValueIsNotNumber()
+	{
+		// Given
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+
+		// When
+		matcher.LoadState(
+			JsonDocument
+				.Parse(
+					@"{
+					""A"": ""B""
+				}"
+				)
+				.RootElement
+		);
+
+		// Then
+		Assert.Empty(matcher._commandLastExecutionTime);
+	}
+
+	[Fact]
+	public void LoadState()
+	{
+		// Given
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(
+			new string[] { "C", "D" }
+		);
+
+		// When
+		matcher.Match("", items);
+
+		matcher.LoadState(
+			JsonDocument
+				.Parse(
+					@"{
+					""A"": 1,
+					""B"": 2
+				}"
+				)
+				.RootElement
+		);
+
+		// Then
+		Assert.Equal(2, matcher._commandLastExecutionTime.Count);
+		Assert.Equal<uint>(1, matcher._commandLastExecutionTime["A"]);
+		Assert.Equal<uint>(2, matcher._commandLastExecutionTime["B"]);
+	}
+
+	[Fact]
+	public void SaveState_NoItems()
+	{
+		// Given
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+
+		// When
+		JsonElement? state = matcher.SaveState();
+
+		// Then
+		Assert.Null(state);
+	}
+
+	[Fact]
+	public void SaveState()
+	{
+		// Given
+		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(
+			new string[] { "A", "B" }
+		);
+		matcher.Match("", items);
+		matcher.OnMatchExecuted(items[1]);
+
+		// When
+		JsonElement? state = matcher.SaveState();
+
+		// Then
+		Assert.NotNull(state);
+
+		Dictionary<string, uint> commandLastExecutionTime = JsonSerializer.Deserialize<Dictionary<string, uint>>(
+			state?.GetRawText()!
+		)!;
+
+		Assert.Single(commandLastExecutionTime);
+		Assert.True(commandLastExecutionTime["B"] > 0);
 	}
 }

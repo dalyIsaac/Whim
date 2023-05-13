@@ -1,4 +1,5 @@
 using Moq;
+using System.Text.Json;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
@@ -72,5 +73,19 @@ public class TestTreeLayoutPlugin
 
 		// Then
 		Assert.Equal(Direction.Right, direction);
+	}
+
+	[Fact]
+	public void SaveState()
+	{
+		// Given
+		MocksWrapper mocks = new();
+		TreeLayoutPlugin plugin = new(mocks.Context.Object);
+
+		// When
+		JsonElement? state = plugin.SaveState();
+
+		// Then
+		Assert.Null(state);
 	}
 }

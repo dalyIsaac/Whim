@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace Whim.CommandPalette;
 
@@ -12,7 +13,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 {
 	private static readonly MatcherItemComparer<T> _sorter = new();
 
-	private readonly Dictionary<string, uint> _commandLastExecutionTime = new();
+	internal readonly Dictionary<string, uint> _commandLastExecutionTime = new();
 
 	/// <summary>
 	/// The filter to use when matching commands.
@@ -96,5 +97,37 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	public void OnMatchExecuted(IVariantRowModel<T> item)
 	{
 		_commandLastExecutionTime[item.Id] = (uint)DateTime.Now.Ticks;
+	}
+
+	/// <inheritdoc/>
+	public void LoadState(JsonElement state)
+	{
+		_commandLastExecutionTime.Clear();
+
+		if (state.ValueKind != JsonValueKind.Object)
+		{
+			return;
+		}
+
+		foreach (JsonProperty property in state.EnumerateObject())
+		{
+			if (property.Value.ValueKind != JsonValueKind.Number)
+			{
+				continue;
+			}
+
+			_commandLastExecutionTime[property.Name] = (uint)property.Value.GetUInt64();
+		}
+	}
+
+	/// <inheritdoc/>
+	public JsonElement? SaveState()
+	{
+		if (_commandLastExecutionTime.Count == 0)
+		{
+			return null;
+		}
+
+		return JsonSerializer.SerializeToElement(_commandLastExecutionTime);
 	}
 }

@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Whim.Gaps;
 
 /// <inheritdoc />
@@ -56,4 +58,10 @@ public class GapsPlugin : IGapsPlugin
 
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new GapsCommands(this);
+
+	/// <inheritdoc />
+	public void LoadState(JsonElement state) { }
+
+	/// <inheritdoc />
+	public JsonElement? SaveState() => null;
 }

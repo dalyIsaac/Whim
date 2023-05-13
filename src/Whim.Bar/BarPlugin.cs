@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using Windows.Win32.Graphics.Dwm;
 
 namespace Whim.Bar;
@@ -82,6 +83,12 @@ public class BarPlugin : IBarPlugin
 			);
 		}
 	}
+
+	/// <inheritdoc />
+	public void LoadState(JsonElement pluginSavedState) { }
+
+	/// <inheritdoc />
+	public JsonElement? SaveState() => null;
 
 	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)

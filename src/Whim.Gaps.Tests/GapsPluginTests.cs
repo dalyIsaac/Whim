@@ -1,4 +1,5 @@
 using Moq;
+using System.Text.Json;
 using Xunit;
 
 namespace Whim.Gaps.Test;
@@ -93,5 +94,19 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(4, pluginCommands.Commands.Count());
+	}
+
+	[Fact]
+	public void SaveState()
+	{
+		// Given
+		Wrapper wrapper = new();
+		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
+
+		// When
+		JsonElement? state = plugin.SaveState();
+
+		// Then
+		Assert.Null(state);
 	}
 }
