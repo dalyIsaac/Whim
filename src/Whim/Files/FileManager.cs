@@ -30,4 +30,7 @@ internal class FileManager : IFileManager
 
 	/// <inheritdoc />
 	public Stream OpenRead(string filePath) => File.OpenRead(filePath);
+
+	/// <inheritdoc />
+	public void WriteAllText(string filePath, string contents) => File.WriteAllText(filePath, contents);
 }

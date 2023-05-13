@@ -43,4 +43,11 @@ public interface IFileManager
 	/// <param name="filePath">The file path.</param>
 	/// <returns>The file stream.</returns>
 	Stream OpenRead(string filePath);
+
+	/// <summary>
+	/// WRites the given <paramref name="contents"/> to the given <paramref name="filePath"/>.
+	/// </summary>
+	/// <param name="filePath">The file path.</param>
+	/// <param name="contents">The contents to write.</param>
+	void WriteAllText(string filePath, string contents);
 }

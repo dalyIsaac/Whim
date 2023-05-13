@@ -27,6 +27,7 @@ public class PluginManagerTests
 		public PluginCommands PluginCommands1 { get; } = new("Plugin1");
 		public PluginCommands PluginCommands2 { get; } = new("Plugin2");
 		public PluginCommands PluginCommands3 { get; } = new("Plugin3");
+		public string WrittenTextContents { get; private set; } = string.Empty;
 
 		public MocksWrapper()
 		{
@@ -35,6 +36,9 @@ public class PluginManagerTests
 
 			FileManager.Setup(fm => fm.SavedStateDir).Returns("C:\\Users\\test\\.whim\\state");
 			FileManager.Setup(fm => fm.OpenRead(It.IsAny<string>())).Returns(CreateSavedStateStream());
+			FileManager
+				.Setup(fm => fm.WriteAllText(It.IsAny<string>(), It.IsAny<string>()))
+				.Callback<string, string>((filePath, contents) => WrittenTextContents = contents);
 
 			Plugin1.Setup(p => p.Name).Returns("Plugin1");
 			Plugin2.Setup(p => p.Name).Returns("Plugin2");
@@ -43,6 +47,13 @@ public class PluginManagerTests
 			Plugin1.Setup(p => p.PluginCommands).Returns(PluginCommands1);
 			Plugin2.Setup(p => p.PluginCommands).Returns(PluginCommands2);
 			Plugin3.Setup(p => p.PluginCommands).Returns(PluginCommands3);
+
+			JsonElement savedPluginState = JsonSerializer.SerializeToElement(new Dictionary<string, object>());
+			Plugin1.Setup(p => p.SaveState()).Returns(savedPluginState);
+			Plugin2.Setup(p => p.SaveState()).Returns(savedPluginState);
+
+			Plugin1.As<IDisposable>();
+			Plugin2.As<IDisposable>();
 
 			PluginCommands1.Add("command1", "Command 1", () => { });
 			PluginCommands2
@@ -282,5 +293,30 @@ public class PluginManagerTests
 		Assert.True(contains2);
 		Assert.True(contains3);
 		Assert.False(contains4);
+	}
+
+	[Fact]
+	public void Dispose()
+	{
+		// Given
+		MocksWrapper mocks = new();
+
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		pluginManager.AddPlugin(mocks.Plugin1.Object);
+		pluginManager.AddPlugin(mocks.Plugin2.Object);
+		pluginManager.AddPlugin(mocks.Plugin3.Object);
+
+		// When
+		pluginManager.Dispose();
+
+		// Then
+		mocks.FileManager.Verify(
+			fm => fm.WriteAllText($"{mocks.FileManager.Object.SavedStateDir}\\plugins.json", It.IsAny<string>()),
+			Times.Once
+		);
+		Assert.Equal("""{"Plugins":{"Plugin1":{},"Plugin2":{}}}""", mocks.WrittenTextContents);
+
+		mocks.Plugin1.As<IDisposable>().Verify(p => p.Dispose(), Times.Once);
+		mocks.Plugin2.As<IDisposable>().Verify(p => p.Dispose(), Times.Once);
 	}
 }

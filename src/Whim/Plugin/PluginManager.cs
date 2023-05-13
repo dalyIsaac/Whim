@@ -145,7 +145,7 @@ internal class PluginManager : IPluginManager
 			}
 		}
 
-		File.WriteAllText(_savedStateFilePath, JsonSerializer.Serialize(pluginManagerSavedState));
+		_fileManager.WriteAllText(_savedStateFilePath, JsonSerializer.Serialize(pluginManagerSavedState));
 	}
 
 	public void Dispose()
