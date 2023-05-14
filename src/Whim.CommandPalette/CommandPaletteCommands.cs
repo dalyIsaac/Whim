@@ -95,10 +95,6 @@ public class CommandPaletteCommands : PluginCommands
 				identifier: "remove_window",
 				title: "Select window to remove from Whim",
 				callback: () =>
-				{
-					var commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(
-						w => RemoveWindowCommandCreator(w)
-					);
 					_commandPalettePlugin.Activate(
 						new MenuVariantConfig()
 						{
@@ -108,8 +104,7 @@ public class CommandPaletteCommands : PluginCommands
 							),
 							ConfirmButtonText = "Remove"
 						}
-					);
-				}
+					)
 			);
 	}
 
