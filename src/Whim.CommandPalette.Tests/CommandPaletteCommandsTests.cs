@@ -291,4 +291,48 @@ public class CommandPaletteCommandsTests
 			Times.Once
 		);
 	}
+
+	[Fact]
+	public void RemoveWindow()
+	{
+		// Given
+		Wrapper wrapper = new();
+		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.command_palette.remove_window"
+		);
+
+		// When
+		command.TryExecute();
+
+		// Then
+		wrapper.Plugin.Verify(
+			x =>
+				x.Activate(
+					It.Is<MenuVariantConfig>(
+						c =>
+							c.Hint == "Select window"
+							&& c.ConfirmButtonText == "Remove"
+							&& c.Commands
+								.Select(c => c.Title)
+								.SequenceEqual(new string[] { "Remove \"Window 0\"", "Remove \"Window 1\"" })
+					)
+				),
+			Times.Once
+		);
+	}
+
+	[Fact]
+	public void RemoveWindowCommandCreator()
+	{
+		// Given
+		Wrapper wrapper = new();
+		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
+
+		// When
+		ICommand command = commands.RemoveWindowCommandCreator(wrapper.Windows[0].Object);
+		command.TryExecute();
+
+		// Then
+		wrapper.Workspace.Verify(x => x.RemoveWindow(wrapper.Windows[0].Object), Times.Once);
+	}
 }
