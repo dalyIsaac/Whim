@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
-using System.ComponentModel;
 using System.Text.Json;
 
 namespace Whim.FocusIndicator;
@@ -33,16 +32,12 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	{
 		_context.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 
-		_focusIndicatorConfig.PropertyChanged += FocusIndicatorConfig_PropertyChanged;
-
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
-
-		_context.WindowManager.WindowAdded += WindowManager_EventSink;
-		_context.WindowManager.WindowRemoved += WindowManager_EventSink;
-		_context.WindowManager.WindowMoveStart += WindowManager_EventSink;
-		_context.WindowManager.WindowMoved += WindowManager_EventSink;
-		_context.WindowManager.WindowMinimizeStart += WindowManager_EventSink;
-		_context.WindowManager.WindowMinimizeEnd += WindowManager_EventSink;
+		_context.WindowManager.WindowFocused += WindowManager_EventSink_Show;
+		_context.WindowManager.WindowAdded += WindowManager_EventSink_Show;
+		_context.WindowManager.WindowRemoved += WindowManager_EventSink_Show;
+		_context.WindowManager.WindowMoveStart += WindowManager_EventSink_Hide;
+		_context.WindowManager.WindowMinimizeStart += WindowManager_EventSink_Hide;
+		_context.WindowManager.WindowMinimizeEnd += WindowManager_EventSink_Show;
 	}
 
 	/// <inheritdoc/>
@@ -60,40 +55,13 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
-	{
-		_focusIndicatorConfig.IsVisible = true;
-	}
+	private void DispatcherTimer_Tick(object? sender, object e) => Hide();
 
-	private void DispatcherTimer_Tick(object? sender, object e)
-	{
-		_focusIndicatorConfig.IsVisible = false;
-	}
+	private void WindowManager_EventSink_Show(object? sender, WindowEventArgs e) => Show();
 
-	private void WindowManager_EventSink(object? sender, WindowEventArgs e)
-	{
-		Show();
-	}
+	private void WindowManager_EventSink_Hide(object? sender, WindowEventArgs e) => Hide();
 
-	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
-	{
-		Show();
-	}
-
-	private void FocusIndicatorConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-	{
-		if (e.PropertyName == nameof(FocusIndicatorConfig.IsVisible))
-		{
-			if (_focusIndicatorConfig.IsVisible)
-			{
-				Show();
-			}
-			else
-			{
-				Hide();
-			}
-		}
-	}
+	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e) => Show();
 
 	private void Show(IWindow? window = null)
 	{
@@ -148,13 +116,12 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
-				_context.WindowManager.WindowAdded -= WindowManager_EventSink;
-				_context.WindowManager.WindowRemoved -= WindowManager_EventSink;
-				_context.WindowManager.WindowMoveStart -= WindowManager_EventSink;
-				_context.WindowManager.WindowMoved -= WindowManager_EventSink;
-				_context.WindowManager.WindowMinimizeStart -= WindowManager_EventSink;
-				_context.WindowManager.WindowMinimizeEnd -= WindowManager_EventSink;
+				_context.WindowManager.WindowFocused -= WindowManager_EventSink_Show;
+				_context.WindowManager.WindowAdded -= WindowManager_EventSink_Show;
+				_context.WindowManager.WindowRemoved -= WindowManager_EventSink_Show;
+				_context.WindowManager.WindowMoveStart -= WindowManager_EventSink_Show;
+				_context.WindowManager.WindowMinimizeStart -= WindowManager_EventSink_Show;
+				_context.WindowManager.WindowMinimizeEnd -= WindowManager_EventSink_Show;
 				_focusIndicatorWindow?.Close();
 			}
 
