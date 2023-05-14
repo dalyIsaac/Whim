@@ -55,22 +55,6 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 		}
 	}
 
-	private bool _isVisible;
-
-	/// <summary>
-	/// When <see langword="true"/>, the focus indicator is visible.
-	/// Updating this will cause the plugin to redraw the indicator.
-	/// </summary>
-	public bool IsVisible
-	{
-		get => _isVisible;
-		set
-		{
-			_isVisible = value;
-			OnPropertyChanged(nameof(IsVisible));
-		}
-	}
-
 	/// <summary>
 	/// When <see langword="true"/>, the focus indicator will be visible for
 	/// <see cref="FadeTimeout"/>.
