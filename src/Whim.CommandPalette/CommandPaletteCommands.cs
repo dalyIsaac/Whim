@@ -90,6 +90,21 @@ public class CommandPaletteCommands : PluginCommands
 							Callback = MoveMultipleWindowsToWorkspaceCallback
 						}
 					)
+			)
+			.Add(
+				identifier: "remove_window",
+				title: "Select window to remove from Whim",
+				callback: () =>
+					_commandPalettePlugin.Activate(
+						new MenuVariantConfig()
+						{
+							Hint = "Select window",
+							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(
+								w => RemoveWindowCommandCreator(w)
+							),
+							ConfirmButtonText = "Remove"
+						}
+					)
 			);
 	}
 
@@ -165,5 +180,22 @@ public class CommandPaletteCommands : PluginCommands
 			identifier: $"{PluginName}.move_window_to_workspace.{workspace.Name}",
 			title: $"Move window to workspace \"{workspace.Name}\"",
 			callback: () => _context.WorkspaceManager.MoveWindowToWorkspace(workspace)
+		);
+
+	/// <summary>
+	/// Untrack window command creator.
+	/// </summary>
+	/// <remarks>
+	/// Creates a command to remove a window from the active workspace. This is useful as Whim can
+	/// sometimes not realise that a window has been closed in niche cases.
+	/// For example, when waking/closing from sleep.
+	/// </remarks>
+	/// <param name="window">The window to untrack.</param>
+	/// <returns>The untrack window command.</returns>
+	internal ICommand RemoveWindowCommandCreator(IWindow window) =>
+		new Command(
+			identifier: $"{PluginName}.remove_window.{window.Title}",
+			title: $"Remove \"{window.Title}\"",
+			callback: () => _context.WorkspaceManager.ActiveWorkspace.RemoveWindow(window)
 		);
 }
