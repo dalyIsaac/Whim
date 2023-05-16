@@ -7,7 +7,6 @@ namespace Whim.FocusIndicator;
 /// <inheritdoc/>
 public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 {
-	private bool _isVisible;
 	private bool _isEnabled = true;
 	private readonly IContext _context;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
@@ -17,6 +16,9 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 
 	/// <inheritdoc />
 	public string Name => "whim.focus_indicator";
+
+	/// <inheritdoc />
+	public bool IsVisible { get; private set; }
 
 	/// <summary>
 	/// Creates a new instance of the focus indicator plugin.
@@ -110,7 +112,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			return;
 		}
 
-		_isVisible = true;
+		IsVisible = true;
 		_focusIndicatorWindow?.Activate(windowLocation);
 
 		// If the fade is enabled, start the timer.
@@ -130,7 +132,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	{
 		Logger.Debug("Hiding focus indicator");
 		_focusIndicatorWindow?.Hide(_context);
-		_isVisible = false;
+		IsVisible = false;
 
 		if (_dispatcherTimer != null)
 		{
@@ -142,7 +144,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	/// <inheritdoc/>
 	public void Toggle()
 	{
-		if (_isVisible)
+		if (IsVisible)
 		{
 			Hide();
 		}
