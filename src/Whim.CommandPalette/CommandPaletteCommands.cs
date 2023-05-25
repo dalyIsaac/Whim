@@ -27,6 +27,7 @@ public class CommandPaletteCommands : PluginCommands
 				_commandPalettePlugin.Toggle,
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_K)
 			)
+			.Add(identifier: "activate_workspace", title: "Activate workspace", callback: ActivateWorkspaceCallback)
 			.Add(
 				identifier: "rename_workspace",
 				title: "Rename workspace",
@@ -106,6 +107,34 @@ public class CommandPaletteCommands : PluginCommands
 						}
 					)
 			);
+	}
+
+	private void ActivateWorkspaceCallback()
+	{
+		IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
+		List<ICommand> items = new();
+		foreach (IWorkspace workspace in _context.WorkspaceManager)
+		{
+			if (workspace != activeWorkspace)
+			{
+				items.Add(
+					new Command(
+						identifier: $"{PluginName}.activate_workspace.{workspace.Name}",
+						title: workspace.Name,
+						callback: () => _context.WorkspaceManager.Activate(workspace)
+					)
+				);
+			}
+		}
+
+		_commandPalettePlugin.Activate(
+			new MenuVariantConfig()
+			{
+				Hint = "Select workspace",
+				Commands = items,
+				ConfirmButtonText = "Activate"
+			}
+		);
 	}
 
 	/// <summary>
