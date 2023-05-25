@@ -368,6 +368,72 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
+	[InlineData(0, 2)]
+	[InlineData(2, 1)]
+	[Theory]
+	public void ActivatePrevious(int currentIdx, int prevIdx)
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[]
+		{
+			new Mock<IWorkspace>(),
+			new Mock<IWorkspace>(),
+			new Mock<IWorkspace>()
+		};
+
+		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
+		MocksBuilder mocks = new(workspaces, monitors);
+
+		mocks.WorkspaceManager.Activate(workspaces[currentIdx].Object);
+
+		// Reset mocks
+		workspaces[currentIdx].Reset();
+
+		// When the previous workspace is activated, then the previous workspace is activated
+		mocks.WorkspaceManager.ActivatePrevious();
+
+		workspaces[currentIdx].Verify(w => w.Deactivate(), Times.Once);
+		workspaces[currentIdx].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[currentIdx].Verify(w => w.FocusFirstWindow(), Times.Never);
+
+		workspaces[prevIdx].Verify(w => w.Deactivate(), Times.Never);
+		workspaces[prevIdx].Verify(w => w.DoLayout(), Times.Once);
+		workspaces[prevIdx].Verify(w => w.FocusFirstWindow(), Times.Once);
+	}
+
+	[InlineData(0, 1)]
+	[InlineData(2, 0)]
+	[Theory]
+	public void ActivateNext(int currentIdx, int nextIdx)
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[]
+		{
+			new Mock<IWorkspace>(),
+			new Mock<IWorkspace>(),
+			new Mock<IWorkspace>()
+		};
+
+		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
+		MocksBuilder mocks = new(workspaces, monitors);
+
+		mocks.WorkspaceManager.Activate(workspaces[currentIdx].Object);
+
+		// Reset mocks
+		workspaces[currentIdx].Reset();
+
+		// When the next workspace is activated, then the next workspace is activated
+		mocks.WorkspaceManager.ActivateNext();
+
+		workspaces[currentIdx].Verify(w => w.Deactivate(), Times.Once);
+		workspaces[currentIdx].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[currentIdx].Verify(w => w.FocusFirstWindow(), Times.Never);
+
+		workspaces[nextIdx].Verify(w => w.Deactivate(), Times.Never);
+		workspaces[nextIdx].Verify(w => w.DoLayout(), Times.Once);
+		workspaces[nextIdx].Verify(w => w.FocusFirstWindow(), Times.Once);
+	}
+
 	[Fact]
 	public void GetMonitorForWorkspace_NoWorkspace()
 	{

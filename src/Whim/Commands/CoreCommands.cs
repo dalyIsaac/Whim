@@ -17,7 +17,19 @@ internal class CoreCommands : PluginCommands
 	{
 		_context = context;
 
-		Add(
+		_ = Add(
+				identifier: "activate_previous_workspace",
+				title: "Activate the previous workspace",
+				callback: () => _context.WorkspaceManager.ActivatePrevious(),
+				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_LEFT)
+			)
+			.Add(
+				identifier: "activate_next_workspace",
+				title: "Activate the next workspace",
+				callback: () => _context.WorkspaceManager.ActivateNext(),
+				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_RIGHT)
+			)
+			.Add(
 				identifier: "focus_window_in_direction.left",
 				title: "Focus the window in the left direction",
 				callback: FocusWindowInDirection(Direction.Left),
