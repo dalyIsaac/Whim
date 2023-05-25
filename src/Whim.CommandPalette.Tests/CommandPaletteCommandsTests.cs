@@ -66,6 +66,29 @@ public class CommandPaletteCommandsTests
 	}
 
 	[Fact]
+	public void ActivateWorkspace()
+	{
+		// Given
+		Wrapper wrapper = new();
+		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.command_palette.activate_workspace"
+		);
+
+		List<MenuVariantConfig> configs = VerifyMenuActivated(wrapper.Plugin);
+		command.TryExecute();
+
+		// Verify that the plugin was activated.
+		wrapper.Plugin.Verify(p => p.Activate(It.IsAny<MenuVariantConfig>()), Times.Once);
+
+		// Call the callback.
+		ICommand activeWorkspaceCommand = configs[0].Commands.First();
+		activeWorkspaceCommand.TryExecute();
+
+		// Verify that the workspace was activated.
+		wrapper.WorkspaceManager.Verify(w => w.Activate(wrapper.OtherWorkspace.Object, null), Times.Once);
+	}
+
+	[Fact]
 	public void ToggleCommandPalette()
 	{
 		// Given

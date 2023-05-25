@@ -107,6 +107,24 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null);
 
 	/// <summary>
+	/// Activates the previous workspace in the given monitor, or the focused monitor (if provided).
+	/// </summary>
+	/// <param name="monitor">
+	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
+	/// the focused monitor.
+	/// </param>
+	public void ActivatePrevious(IMonitor? monitor = null);
+
+	/// <summary>
+	/// Activates the next workspace in the given monitor, or the focused monitor (if provided).
+	/// </summary>
+	/// <param name="monitor">
+	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
+	/// the focused monitor.
+	/// </param>
+	public void ActivateNext(IMonitor? monitor = null);
+
+	/// <summary>
 	/// Retrieves the monitor for the active workspace.
 	/// </summary>
 	/// <param name="workspace"></param>

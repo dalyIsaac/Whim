@@ -29,6 +29,40 @@ public class CoreCommandsTests
 		}
 	}
 
+	[Fact]
+	public void ActivatePrevoiusWorkspace()
+	{
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand("whim.core.activate_previous_workspace");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.WorkspaceManager.Verify(x => x.ActivatePrevious(null), Times.Once);
+	}
+
+	[Fact]
+	public void ActivateNextWorkspace()
+	{
+		// Given
+		MocksWrapper mocks = new();
+		CoreCommands commands = new(mocks.Context.Object);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand("whim.core.activate_next_workspace");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		mocks.WorkspaceManager.Verify(x => x.ActivateNext(null), Times.Once);
+	}
+
 	[InlineData("whim.core.focus_window_in_direction.left", Direction.Left)]
 	[InlineData("whim.core.focus_window_in_direction.right", Direction.Right)]
 	[InlineData("whim.core.focus_window_in_direction.up", Direction.Up)]
