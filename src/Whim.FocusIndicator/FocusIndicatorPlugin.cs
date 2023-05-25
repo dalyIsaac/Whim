@@ -7,6 +7,7 @@ namespace Whim.FocusIndicator;
 /// <inheritdoc/>
 public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 {
+	private bool _isEnabled = true;
 	private readonly IContext _context;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
 	private FocusIndicatorWindow? _focusIndicatorWindow;
@@ -15,6 +16,9 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 
 	/// <inheritdoc />
 	public string Name => "whim.focus_indicator";
+
+	/// <inheritdoc />
+	public bool IsVisible { get; private set; }
 
 	/// <summary>
 	/// Creates a new instance of the focus indicator plugin.
@@ -57,13 +61,38 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 
 	private void DispatcherTimer_Tick(object? sender, object e) => Hide();
 
-	private void WindowManager_EventSink_Show(object? sender, WindowEventArgs e) => Show();
+	private void WindowManager_EventSink_Show(object? sender, WindowEventArgs e)
+	{
+		if (!_isEnabled)
+		{
+			Logger.Debug("Focus indicator is disabled");
+			return;
+		}
 
-	private void WindowManager_EventSink_Hide(object? sender, WindowEventArgs e) => Hide();
+		if (_context.WorkspaceManager.GetMonitorForWindow(e.Window) == null)
+		{
+			Logger.Debug($"Window {e.Window} is not registered in the workspace manager");
+			return;
+		}
+
+		Show();
+	}
+
+	private void WindowManager_EventSink_Hide(object? sender, WindowEventArgs e)
+	{
+		if (!_isEnabled)
+		{
+			Logger.Debug("Focus indicator is disabled");
+			return;
+		}
+
+		Hide();
+	}
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e) => Show();
 
-	private void Show(IWindow? window = null)
+	/// <inheritdoc/>
+	public void Show(IWindow? window = null)
 	{
 		Logger.Debug("Showing focus indicator");
 		IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
@@ -83,6 +112,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			return;
 		}
 
+		IsVisible = true;
 		_focusIndicatorWindow?.Activate(windowLocation);
 
 		// If the fade is enabled, start the timer.
@@ -97,14 +127,47 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		}
 	}
 
+	/// <inheritdoc/>
 	private void Hide()
 	{
 		Logger.Debug("Hiding focus indicator");
 		_focusIndicatorWindow?.Hide(_context);
+		IsVisible = false;
+
 		if (_dispatcherTimer != null)
 		{
 			_dispatcherTimer.Stop();
 			_dispatcherTimer.Tick -= DispatcherTimer_Tick;
+		}
+	}
+
+	/// <inheritdoc/>
+	public void Toggle()
+	{
+		if (IsVisible)
+		{
+			Hide();
+		}
+		else
+		{
+			Show();
+		}
+	}
+
+	/// <inheritdoc/>
+	public void ToggleFade() => _focusIndicatorConfig.FadeEnabled = !_focusIndicatorConfig.FadeEnabled;
+
+	/// <inheritdoc/>
+	public void ToggleEnabled()
+	{
+		_isEnabled = !_isEnabled;
+		if (_isEnabled)
+		{
+			Show();
+		}
+		else
+		{
+			Hide();
 		}
 	}
 
@@ -140,7 +203,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	}
 
 	/// <inheritdoc />
-	public IPluginCommands PluginCommands => new PluginCommands(Name);
+	public IPluginCommands PluginCommands => new FocusIndicatorCommands(this);
 
 	/// <inheritdoc />
 	public void LoadState(JsonElement state) { }
