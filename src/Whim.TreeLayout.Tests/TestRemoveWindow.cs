@@ -7,16 +7,16 @@ public class TestRemoveWindow
 {
 	private readonly Mock<IWorkspace> _activeWorkspace = new();
 	private readonly Mock<IWorkspaceManager> _workspaceManager = new();
-	private readonly Mock<IMonitor> _focusedMonitor = new();
+	private readonly Mock<IMonitor> _activeMonitor = new();
 	private readonly Mock<IMonitorManager> _monitorManager = new();
 	private readonly Mock<IContext> _context = new();
 	private readonly TreeLayoutEngine _engine;
 
 	public TestRemoveWindow()
 	{
-		_focusedMonitor.Setup(m => m.WorkingArea).Returns(new Location<int>());
+		_activeMonitor.Setup(m => m.WorkingArea).Returns(new Location<int>());
 
-		_monitorManager.Setup(m => m.FocusedMonitor).Returns(_focusedMonitor.Object);
+		_monitorManager.Setup(m => m.ActiveMonitor).Returns(_activeMonitor.Object);
 		_workspaceManager.Setup(x => x.ActiveWorkspace).Returns(_activeWorkspace.Object);
 
 		_context.Setup(x => x.MonitorManager).Returns(_monitorManager.Object);

@@ -57,7 +57,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
-	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_context.MonitorManager.FocusedMonitor];
+	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_context.MonitorManager.ActiveMonitor];
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
 
@@ -193,22 +193,22 @@ internal class WorkspaceManager : IWorkspaceManager
 		return _workspaces.Find(w => w.Name == workspaceName);
 	}
 
-	public void Activate(IWorkspace workspace, IMonitor? focusedMonitor = null)
+	public void Activate(IWorkspace workspace, IMonitor? activeMonitor = null)
 	{
 		Logger.Debug($"Activating workspace {workspace}");
 
-		focusedMonitor ??= _context.MonitorManager.FocusedMonitor;
+		activeMonitor ??= _context.MonitorManager.ActiveMonitor;
 
 		// Get the old workspace for the event.
-		_monitorWorkspaceMap.TryGetValue(focusedMonitor, out IWorkspace? oldWorkspace);
+		_monitorWorkspaceMap.TryGetValue(activeMonitor, out IWorkspace? oldWorkspace);
 
 		// Find the monitor which just lost `workspace`.
 		IMonitor? loserMonitor = _monitorWorkspaceMap.FirstOrDefault(m => m.Value == workspace).Key;
 
-		// Update the focused monitor. Having this line before the old workspace is deactivated
+		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
-		_monitorWorkspaceMap[focusedMonitor] = workspace;
+		_monitorWorkspaceMap[activeMonitor] = workspace;
 
 		// Send out an event about the losing monitor.
 		if (loserMonitor != null && oldWorkspace != null)
@@ -238,7 +238,7 @@ internal class WorkspaceManager : IWorkspaceManager
 			this,
 			new MonitorWorkspaceChangedEventArgs()
 			{
-				Monitor = focusedMonitor,
+				Monitor = activeMonitor,
 				OldWorkspace = oldWorkspace,
 				NewWorkspace = workspace
 			}
@@ -502,7 +502,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Moving window {window} to previous monitor");
 
 		// Get the previous monitor.
-		IMonitor monitor = _context.MonitorManager.FocusedMonitor;
+		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		IMonitor previousMonitor = _context.MonitorManager.GetPreviousMonitor(monitor);
 
 		MoveWindowToMonitor(previousMonitor, window);
@@ -513,7 +513,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Moving window {window} to next monitor");
 
 		// Get the next monitor.
-		IMonitor monitor = _context.MonitorManager.FocusedMonitor;
+		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		IMonitor nextMonitor = _context.MonitorManager.GetNextMonitor(monitor);
 
 		MoveWindowToMonitor(nextMonitor, window);
