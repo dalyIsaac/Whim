@@ -245,34 +245,34 @@ internal class WorkspaceManager : IWorkspaceManager
 		);
 	}
 
-	public void ActivatePrevious(IMonitor? focusedMonitor = null)
+	public void ActivatePrevious(IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating previous workspace");
 
-		focusedMonitor ??= _context.MonitorManager.FocusedMonitor;
-		IWorkspace currentWorkspace = _monitorWorkspaceMap[focusedMonitor];
+		monitor ??= _context.MonitorManager.ActiveMonitor;
+		IWorkspace currentWorkspace = _monitorWorkspaceMap[monitor];
 
 		int idx = _workspaces.IndexOf(currentWorkspace);
 		int prevIdx = (idx - 1).Mod(_workspaces.Count);
 
 		IWorkspace prevWorkspace = _workspaces[prevIdx];
 
-		Activate(prevWorkspace, focusedMonitor);
+		Activate(prevWorkspace, monitor);
 	}
 
-	public void ActivateNext(IMonitor? focusedMonitor = null)
+	public void ActivateNext(IMonitor? monitor = null)
 	{
 		Logger.Debug("Activating next workspace");
 
-		focusedMonitor ??= _context.MonitorManager.FocusedMonitor;
-		IWorkspace currentWorkspace = _monitorWorkspaceMap[focusedMonitor];
+		monitor ??= _context.MonitorManager.ActiveMonitor;
+		IWorkspace currentWorkspace = _monitorWorkspaceMap[monitor];
 
 		int idx = _workspaces.IndexOf(currentWorkspace);
 		int nextIdx = (idx + 1).Mod(_workspaces.Count);
 
 		IWorkspace nextWorkspace = _workspaces[nextIdx];
 
-		Activate(nextWorkspace, focusedMonitor);
+		Activate(nextWorkspace, monitor);
 	}
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
