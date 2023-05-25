@@ -26,7 +26,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 			Context.SetupGet(x => x.MonitorManager).Returns(MonitorManager.Object);
 
-			MonitorManager.Setup(x => x.FocusedMonitor).Returns(Monitor.Object);
+			MonitorManager.Setup(x => x.ActiveMonitor).Returns(Monitor.Object);
 
 			Plugin.Setup(x => x.GetAddWindowDirection(Monitor.Object)).Returns(direction);
 		}

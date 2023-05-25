@@ -31,7 +31,7 @@ public class TestTreeLayoutPlugin
 			WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(Monitor.Object)).Returns(Workspace.Object);
 			Workspace.Setup(x => x.ActiveLayoutEngine).Returns(LayoutEngine);
 
-			MonitorManager.Setup(x => x.FocusedMonitor).Returns(Monitor.Object);
+			MonitorManager.Setup(x => x.ActiveMonitor).Returns(Monitor.Object);
 		}
 	}
 

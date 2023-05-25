@@ -55,7 +55,7 @@ internal class TestTreeEngineMocks
 	{
 		Monitor.Setup(m => m.WorkingArea.Width).Returns(1920);
 		Monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
-		MonitorManager.Setup(m => m.FocusedMonitor).Returns(Monitor.Object);
+		MonitorManager.Setup(m => m.ActiveMonitor).Returns(Monitor.Object);
 		Context.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
 
 		WorkspaceManager.Setup(x => x.ActiveWorkspace).Returns(ActiveWorkspace.Object);

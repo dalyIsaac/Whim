@@ -20,7 +20,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 		public Wrapper()
 		{
 			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
-			MonitorManager.Setup(m => m.FocusedMonitor).Returns(Monitor.Object);
+			MonitorManager.Setup(m => m.ActiveMonitor).Returns(Monitor.Object);
 
 			TreeLayoutCommandPalettePlugin.Setup(t => t.Name).Returns("whim.tree_layout.command_palette");
 

@@ -155,7 +155,7 @@ public class MonitorManagerTests
 
 		// Then
 		Assert.Equal(new HMONITOR(2), (monitorManager.PrimaryMonitor as Monitor)!._hmonitor);
-		Assert.Equal(new HMONITOR(2), (monitorManager.FocusedMonitor as Monitor)!._hmonitor);
+		Assert.Equal(new HMONITOR(2), (monitorManager.ActiveMonitor as Monitor)!._hmonitor);
 	}
 
 	[Fact]
@@ -263,7 +263,7 @@ public class MonitorManagerTests
 
 		// Then
 		mocksBuilder.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
-		Assert.Equal(monitorMock.Object, monitorManager.FocusedMonitor);
+		Assert.Equal(monitorMock.Object, monitorManager.ActiveMonitor);
 	}
 
 	private static WindowMessageMonitorEventArgs WindowMessageMonitorEventArgs =>

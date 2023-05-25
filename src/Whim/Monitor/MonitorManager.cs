@@ -29,7 +29,7 @@ internal class MonitorManager : IMonitorManager
 	/// <summary>
 	/// The <see cref="IMonitor"/> which currently has focus.
 	/// </summary>
-	public IMonitor FocusedMonitor { get; private set; }
+	public IMonitor ActiveMonitor { get; private set; }
 
 	public IMonitor PrimaryMonitor { get; private set; }
 
@@ -60,10 +60,10 @@ internal class MonitorManager : IMonitorManager
 		// Get the monitors.
 		_monitors = GetCurrentMonitors();
 
-		// Get the initial focused monitor
+		// Get the initial active monitor
 		IMonitor? primaryMonitor =
 			(_monitors?.FirstOrDefault(m => m.IsPrimary)) ?? throw new Exception("No primary monitor found.");
-		FocusedMonitor = primaryMonitor;
+		ActiveMonitor = primaryMonitor;
 		PrimaryMonitor = primaryMonitor;
 	}
 
@@ -86,7 +86,7 @@ internal class MonitorManager : IMonitorManager
 
 		if (monitor != null)
 		{
-			FocusedMonitor = monitor;
+			ActiveMonitor = monitor;
 		}
 	}
 
