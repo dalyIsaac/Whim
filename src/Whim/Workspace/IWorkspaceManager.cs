@@ -97,12 +97,12 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public IWorkspace? this[string workspaceName] { get; }
 
 	/// <summary>
-	/// Activates the given workspace in the focused monitor, or the given monitor (if provided).
+	/// Activates the given workspace in the active monitor, or the given monitor (if provided).
 	/// </summary>
 	/// <param name="workspace">The workspace to activate.</param>
 	/// <param name="monitor">
 	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
-	/// the focused monitor.
+	/// the active monitor.
 	/// </param>
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null);
 

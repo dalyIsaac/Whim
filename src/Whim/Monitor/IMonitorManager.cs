@@ -14,9 +14,9 @@ public interface IMonitorManager : IEnumerable<IMonitor>, IDisposable
 	public int Length { get; }
 
 	/// <summary>
-	/// The currently focused <see cref="IMonitor"/>.
+	/// The currently active <see cref="IMonitor"/>.
 	/// </summary>
-	public IMonitor FocusedMonitor { get; }
+	public IMonitor ActiveMonitor { get; }
 
 	/// <summary>
 	/// The primary <see cref="IMonitor"/>.

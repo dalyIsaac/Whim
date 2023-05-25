@@ -55,7 +55,7 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	{
 		_commandPaletteWindow?.Activate(
 			config: config ?? Config.ActivationConfig,
-			monitor: _context.MonitorManager.FocusedMonitor
+			monitor: _context.MonitorManager.ActiveMonitor
 		);
 	}
 

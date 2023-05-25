@@ -73,7 +73,7 @@ public class TreeLayoutCommandPalettePluginCommands : PluginCommands
 	}
 
 	private bool SetDirectionCondition() =>
-		_treeLayoutPlugin.GetAddWindowDirection(_context.MonitorManager.FocusedMonitor) != null;
+		_treeLayoutPlugin.GetAddWindowDirection(_context.MonitorManager.ActiveMonitor) != null;
 
 	internal void SetDirection(string directionString)
 	{
@@ -83,6 +83,6 @@ public class TreeLayoutCommandPalettePluginCommands : PluginCommands
 			return;
 		}
 
-		_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.FocusedMonitor, directionEnum);
+		_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.ActiveMonitor, directionEnum);
 	}
 }

@@ -54,7 +54,7 @@ public class TestAddWindow
 
 		monitor.Setup(m => m.WorkingArea.Width).Returns(1920);
 		monitor.Setup(m => m.WorkingArea.Height).Returns(1080);
-		monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
+		monitorManager.Setup(m => m.ActiveMonitor).Returns(monitor.Object);
 		context.Setup(x => x.MonitorManager).Returns(monitorManager.Object);
 
 		workspaceManager.Setup(x => x.ActiveWorkspace).Returns(activeWorkspace.Object);

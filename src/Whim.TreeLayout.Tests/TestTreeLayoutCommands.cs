@@ -18,7 +18,7 @@ public class TestTreeLayoutCommands
 		{
 			Context.SetupGet(x => x.MonitorManager).Returns(MonitorManager.Object);
 			Plugin.SetupGet(p => p.Name).Returns("whim.tree_layout");
-			MonitorManager.Setup(x => x.FocusedMonitor).Returns(Monitor.Object);
+			MonitorManager.Setup(x => x.ActiveMonitor).Returns(Monitor.Object);
 
 			Command = new PluginCommandsTestUtils(new TreeLayoutCommands(Context.Object, Plugin.Object)).GetCommand(id);
 		}

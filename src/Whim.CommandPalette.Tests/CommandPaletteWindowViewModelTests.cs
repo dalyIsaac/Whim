@@ -37,7 +37,7 @@ public class CommandPaletteWindowViewModelTests
 				);
 
 			Mock<IMonitorManager> monitorManager = new();
-			monitorManager.Setup(m => m.FocusedMonitor).Returns(monitor.Object);
+			monitorManager.Setup(m => m.ActiveMonitor).Returns(monitor.Object);
 
 			Context.SetupGet(x => x.CommandManager).Returns(CommandManager.Object);
 			Context.SetupGet(x => x.MonitorManager).Returns(monitorManager.Object);

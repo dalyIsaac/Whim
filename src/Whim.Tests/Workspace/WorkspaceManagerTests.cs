@@ -18,7 +18,7 @@ public class WorkspaceManagerTests
 		public MocksBuilder(
 			Mock<IWorkspace>[]? workspaces = null,
 			Mock<IMonitor>[]? monitors = null,
-			int focusedMonitorIndex = 0
+			int activeMonitorIndex = 0
 		)
 		{
 			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
@@ -29,7 +29,7 @@ public class WorkspaceManagerTests
 
 			if (Monitors.Length > 0)
 			{
-				MonitorManager.Setup(m => m.FocusedMonitor).Returns(Monitors[focusedMonitorIndex].Object);
+				MonitorManager.Setup(m => m.ActiveMonitor).Returns(Monitors[activeMonitorIndex].Object);
 			}
 
 			// Set up IEquatable for the monitors.
@@ -283,7 +283,7 @@ public class WorkspaceManagerTests
 		MocksBuilder mocks = new(new[] { workspace }, monitorMocks);
 
 		// When a workspace is activated when there are no other workspaces activated, then it is
-		// focused on the focused monitor and raises an event,
+		// focused on the active monitor and raises an event,
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
 			h => mocks.WorkspaceManager.MonitorWorkspaceChanged += h,
 			h => mocks.WorkspaceManager.MonitorWorkspaceChanged -= h,

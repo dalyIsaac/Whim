@@ -498,7 +498,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		}
 
 		// We use this monitor to determine the delta we use for the internal calculations.
-		IMonitor monitor = _context.MonitorManager.FocusedMonitor;
+		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 
 		// Get the coordinates of the node.
 		ILocation<double> nodeLocation = GetNodeLocation(node);
