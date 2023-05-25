@@ -9,6 +9,11 @@ namespace Whim;
 public interface IKeybind
 {
 	/// <summary>
+	/// The value for the key modifier <c>Win</c> command.
+	/// </summary>
+	public const KeyModifiers Win = KeyModifiers.LWin;
+
+	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Alt</c> command.
 	/// </summary>
 	public const KeyModifiers WinAlt = KeyModifiers.LWin | KeyModifiers.LAlt;

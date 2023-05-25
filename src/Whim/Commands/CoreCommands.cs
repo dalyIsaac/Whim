@@ -45,25 +45,25 @@ internal class CoreCommands : PluginCommands
 				identifier: "swap_window_in_direction.left",
 				title: "Swap the window with the window to the left",
 				callback: SwapWindowInDirection(Direction.Left),
-				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_LEFT)
+				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.right",
 				title: "Swap the window with the window to the right",
 				callback: SwapWindowInDirection(Direction.Right),
-				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_RIGHT)
+				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.up",
 				title: "Swap the window with the window to the up",
 				callback: SwapWindowInDirection(Direction.Up),
-				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_UP)
+				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_UP)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.down",
 				title: "Swap the window with the window to the down",
 				callback: SwapWindowInDirection(Direction.Down),
-				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_DOWN)
+				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_DOWN)
 			)
 			.Add(
 				identifier: "move_window_left_edge_left",
