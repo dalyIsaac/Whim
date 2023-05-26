@@ -85,14 +85,14 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 		if (args.OldWorkspace != null)
 		{
-			WorkspaceModel? oldWorkspace = Workspaces.FirstOrDefault(w => w.Name == args.OldWorkspace.Name);
+			WorkspaceModel? oldWorkspace = Workspaces.FirstOrDefault(model => model.Workspace == args.OldWorkspace);
 			if (oldWorkspace != null)
 			{
 				oldWorkspace.ActiveOnMonitor = false;
 			}
 		}
 
-		WorkspaceModel? newWorkspace = Workspaces.FirstOrDefault(w => w.Name == args.NewWorkspace.Name);
+		WorkspaceModel? newWorkspace = Workspaces.FirstOrDefault(model => model.Workspace == args.NewWorkspace);
 		if (newWorkspace != null)
 		{
 			newWorkspace.ActiveOnMonitor = true;
