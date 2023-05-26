@@ -52,8 +52,7 @@ public class TreeLayoutCommands : PluginCommands
 			.Add(
 				identifier: "split_focused_window",
 				title: "Split the focused window",
-				callback: _treeLayoutPlugin.SplitFocusedWindow,
-				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_S)
+				callback: _treeLayoutPlugin.SplitFocusedWindow
 			);
 	}
 }
