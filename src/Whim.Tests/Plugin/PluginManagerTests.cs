@@ -25,9 +25,9 @@ public class PluginManagerTests
 		public Mock<IPlugin> Plugin1 { get; } = new();
 		public Mock<IPlugin> Plugin2 { get; } = new();
 		public Mock<IPlugin> Plugin3 { get; } = new();
-		public PluginCommands PluginCommands1 { get; } = new("Plugin1");
-		public PluginCommands PluginCommands2 { get; } = new("Plugin2");
-		public PluginCommands PluginCommands3 { get; } = new("Plugin3");
+		public PluginCommands PluginCommands1 { get; } = new("whim.plugin1");
+		public PluginCommands PluginCommands2 { get; } = new("whim.plugin2");
+		public PluginCommands PluginCommands3 { get; } = new("whim.plugin3");
 		public string WrittenTextContents { get; private set; } = string.Empty;
 
 		public MocksWrapper()
@@ -41,9 +41,9 @@ public class PluginManagerTests
 				.Setup(fm => fm.WriteAllText(It.IsAny<string>(), It.IsAny<string>()))
 				.Callback<string, string>((filePath, contents) => WrittenTextContents = contents);
 
-			Plugin1.Setup(p => p.Name).Returns("Plugin1");
-			Plugin2.Setup(p => p.Name).Returns("Plugin2");
-			Plugin3.Setup(p => p.Name).Returns("Plugin3");
+			Plugin1.Setup(p => p.Name).Returns("whim.plugin1");
+			Plugin2.Setup(p => p.Name).Returns("whim.plugin2");
+			Plugin3.Setup(p => p.Name).Returns("whim.plugin3");
 
 			Plugin1.Setup(p => p.PluginCommands).Returns(PluginCommands1);
 			Plugin2.Setup(p => p.PluginCommands).Returns(PluginCommands2);
@@ -71,8 +71,8 @@ public class PluginManagerTests
 		private static MemoryStream CreateSavedStateStream()
 		{
 			PluginManagerSavedState savedState = new();
-			savedState.Plugins.Add("Plugin1", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
-			savedState.Plugins.Add("Plugin2", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
+			savedState.Plugins.Add("whim.plugin1", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
+			savedState.Plugins.Add("whim.plugin2", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
 
 			MemoryStream stream = new();
 			stream.Write(JsonSerializer.SerializeToUtf8Bytes(savedState));
@@ -238,55 +238,59 @@ public class PluginManagerTests
 		// I want to verify that the command passed into Add is equivalent to the one created in the mocks
 		Assert.Equal(4, mocks.CommandManager.Count);
 		List<ICommand> commands = mocks.CommandManager.ToList();
-		Assert.Equal("Plugin1.command1", commands[0].Id);
-		Assert.Equal("Plugin2.command2", commands[1].Id);
-		Assert.Equal("Plugin2.command22", commands[2].Id);
-		Assert.Equal("Plugin3.command3", commands[3].Id);
+		Assert.Equal("whim.plugin1.command1", commands[0].Id);
+		Assert.Equal("whim.plugin2.command2", commands[1].Id);
+		Assert.Equal("whim.plugin2.command22", commands[2].Id);
+		Assert.Equal("whim.plugin3.command3", commands[3].Id);
 
 		mocks.KeybindManager.Verify(km => km.Add(It.IsAny<string>(), It.IsAny<Keybind>()), Times.Exactly(2));
 		mocks.KeybindManager.Verify(
-			km => km.Add("Plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A)),
+			km => km.Add("whim.plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A)),
 			Times.Once
 		);
 		mocks.KeybindManager.Verify(
-			km => km.Add("Plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)),
+			km => km.Add("whim.plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)),
 			Times.Once
 		);
 	}
 
-	[Fact]
-	public void AddPlugin_DuplicateName()
+	[InlineData("whim.plugin1", "Plugin with name 'whim.plugin1' already exists.")]
+	[InlineData("whim.custom", "Name 'whim.custom' is reserved for user-defined commands.")]
+	[InlineData("whim", "Name 'whim' is reserved for internal use.")]
+	[InlineData("", "Plugin name cannot be empty.")]
+	[InlineData(
+		"Hello world",
+		"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
+	)]
+	[InlineData(
+		"whim.name.",
+		"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
+	)]
+	[InlineData(
+		"whim.name..",
+		"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
+	)]
+	[InlineData(
+		"whim..name",
+		"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
+	)]
+	[Theory]
+	public void AddPlugin_InvalidName(string name, string expectedMessage)
 	{
 		// Given
 		MocksWrapper mocks = new();
 
-		mocks.Plugin2.Setup(p => p.Name).Returns("Plugin1");
+		mocks.Plugin2.Setup(p => p.Name).Returns(name);
 
 		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 
 		// When
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		Assert.Throws<InvalidOperationException>(() => pluginManager.AddPlugin(mocks.Plugin2.Object));
+		Exception ex = Assert.Throws<InvalidOperationException>(() => pluginManager.AddPlugin(mocks.Plugin2.Object));
 
 		// Then
+		Assert.Equal(expectedMessage, ex.Message);
 		Assert.Equal(1, pluginManager.LoadedPlugins.Count);
-	}
-
-	[Fact]
-	public void AddPlugin_ReservedName()
-	{
-		// Given
-		MocksWrapper mocks = new();
-
-		mocks.Plugin2.Setup(p => p.Name).Returns("whim.custom");
-
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-
-		// When
-		Assert.Throws<InvalidOperationException>(() => pluginManager.AddPlugin(mocks.Plugin2.Object));
-
-		// Then
-		Assert.Equal(0, pluginManager.LoadedPlugins.Count);
 	}
 
 	[Fact]
@@ -301,10 +305,10 @@ public class PluginManagerTests
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
 
 		// When
-		bool contains1 = pluginManager.Contains("Plugin1");
-		bool contains2 = pluginManager.Contains("Plugin2");
-		bool contains3 = pluginManager.Contains("Plugin3");
-		bool contains4 = pluginManager.Contains("Plugin4");
+		bool contains1 = pluginManager.Contains("whim.plugin1");
+		bool contains2 = pluginManager.Contains("whim.plugin2");
+		bool contains3 = pluginManager.Contains("whim.plugin3");
+		bool contains4 = pluginManager.Contains("whim.plugin4");
 
 		// Then
 		Assert.True(contains1);
@@ -332,7 +336,7 @@ public class PluginManagerTests
 			fm => fm.WriteAllText($"{mocks.FileManager.Object.SavedStateDir}\\plugins.json", It.IsAny<string>()),
 			Times.Once
 		);
-		Assert.Equal("""{"Plugins":{"Plugin1":{},"Plugin2":{}}}""", mocks.WrittenTextContents);
+		Assert.Equal("""{"Plugins":{"whim.plugin1":{},"whim.plugin2":{}}}""", mocks.WrittenTextContents);
 
 		mocks.Plugin1.As<IDisposable>().Verify(p => p.Dispose(), Times.Once);
 		mocks.Plugin2.As<IDisposable>().Verify(p => p.Dispose(), Times.Once);

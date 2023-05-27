@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Whim;
 
-internal class PluginManager : IPluginManager
+internal partial class PluginManager : IPluginManager
 {
 	private readonly IContext _context;
 	private readonly IFileManager _fileManager;
@@ -13,6 +14,9 @@ internal class PluginManager : IPluginManager
 	private readonly string _savedStateFilePath;
 	private readonly List<IPlugin> _plugins = new();
 	private bool _disposedValue;
+
+	[GeneratedRegex(@"^\w+\.\w+(\.\w+)*$")]
+	private static partial Regex PluginNameRegex();
 
 	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.AsReadOnly();
 
@@ -86,13 +90,20 @@ internal class PluginManager : IPluginManager
 	public T AddPlugin<T>(T plugin)
 		where T : IPlugin
 	{
-		if (Contains(plugin.Name))
+		switch (plugin.Name)
 		{
-			throw new InvalidOperationException($"Plugin with name '{plugin.Name}' already exists.");
-		}
-		else if (plugin.Name == "whim.custom")
-		{
-			throw new InvalidOperationException("Name 'whim.custom' is reserved for user-defined commands.");
+			case "whim.custom":
+				throw new InvalidOperationException("Name 'whim.custom' is reserved for user-defined commands.");
+			case "whim":
+				throw new InvalidOperationException("Name 'whim' is reserved for internal use.");
+			case string name when Contains(name):
+				throw new InvalidOperationException($"Plugin with name '{plugin.Name}' already exists.");
+			case string name when string.IsNullOrWhiteSpace(name):
+				throw new InvalidOperationException("Plugin name cannot be empty.");
+			case string name when !PluginNameRegex().IsMatch(name):
+				throw new InvalidOperationException(
+					"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
+				);
 		}
 
 		_plugins.Add(plugin);
@@ -158,6 +169,6 @@ internal class PluginManager : IPluginManager
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		Dispose(disposing: true);
-		System.GC.SuppressFinalize(this);
+		GC.SuppressFinalize(this);
 	}
 }
