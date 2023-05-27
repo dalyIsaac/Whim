@@ -1,7 +1,7 @@
 using Moq;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class RouteEventTests
 {

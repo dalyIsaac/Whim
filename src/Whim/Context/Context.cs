@@ -22,7 +22,8 @@ internal class Context : IContext
 	public IMonitorManager MonitorManager { get; }
 	public IRouterManager RouterManager { get; }
 	public IFilterManager FilterManager { get; }
-	public ICommandManager CommandManager { get; }
+	private readonly CommandManager _commandManager;
+	public ICommandManager CommandManager => _commandManager;
 	public IPluginManager PluginManager { get; }
 	public IKeybindManager KeybindManager { get; }
 	internal KeybindHook KeybindHook { get; }
@@ -44,8 +45,8 @@ internal class Context : IContext
 		WindowManager = new WindowManager(this, CoreNativeManager);
 		MonitorManager = new MonitorManager(this, CoreNativeManager);
 		WorkspaceManager = new WorkspaceManager(this);
-		CommandManager = new CommandManager();
-		PluginManager = new PluginManager(this, FileManager);
+		_commandManager = new CommandManager();
+		PluginManager = new PluginManager(this, FileManager, _commandManager);
 		KeybindManager = new KeybindManager(this);
 		KeybindHook = new KeybindHook(this, CoreNativeManager);
 	}
@@ -57,7 +58,7 @@ internal class Context : IContext
 
 		foreach (ICommand command in coreCommands.Commands)
 		{
-			CommandManager.Add(command);
+			_commandManager.AddPluginCommand(command);
 		}
 
 		foreach ((string name, IKeybind keybind) in coreCommands.Keybinds)
