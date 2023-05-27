@@ -1096,6 +1096,29 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void WindowFocused_ActivateWorkspace()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+		Mock<IMonitor> monitor = new();
+		MocksBuilder mocks = new(workspaces, new Mock<IMonitor>[] { monitor });
+
+		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IWindow> window = new();
+
+		mocks.WorkspaceManager.Activate(workspaces[0].Object, monitor.Object);
+		workspaces[0].Reset();
+
+		// When a window is added to the first workspace, the second workspace is activated, and the window is focused
+		mocks.WorkspaceManager.WindowAdded(window.Object);
+		mocks.WorkspaceManager.Activate(workspaces[1].Object, monitor.Object);
+		mocks.WorkspaceManager.WindowFocused(window.Object);
+
+		// Then the first workspace is activated
+		workspaces[0].Verify(w => w.DoLayout(), Times.Once());
+	}
+
+	[Fact]
 	public void WindowMinimizeStart_CouldNotFindWindow()
 	{
 		// Given

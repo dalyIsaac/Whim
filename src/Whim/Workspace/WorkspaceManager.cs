@@ -365,6 +365,12 @@ internal class WorkspaceManager : IWorkspaceManager
 				ws.WindowFocused(window);
 			}
 		}
+
+		_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceFocused);
+		if (workspaceFocused != null && workspaceFocused != ActiveWorkspace)
+		{
+			Activate(workspaceFocused);
+		}
 	}
 
 	/// <summary>
