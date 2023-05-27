@@ -90,6 +90,10 @@ internal class PluginManager : IPluginManager
 		{
 			throw new InvalidOperationException($"Plugin with name '{plugin.Name}' already exists.");
 		}
+		else if (plugin.Name == "whim.custom")
+		{
+			throw new InvalidOperationException("Name 'whim.custom' is reserved for user-defined commands.");
+		}
 
 		_plugins.Add(plugin);
 

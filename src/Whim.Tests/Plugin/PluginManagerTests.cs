@@ -273,6 +273,23 @@ public class PluginManagerTests
 	}
 
 	[Fact]
+	public void AddPlugin_ReservedName()
+	{
+		// Given
+		MocksWrapper mocks = new();
+
+		mocks.Plugin2.Setup(p => p.Name).Returns("whim.custom");
+
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+
+		// When
+		Assert.Throws<InvalidOperationException>(() => pluginManager.AddPlugin(mocks.Plugin2.Object));
+
+		// Then
+		Assert.Equal(0, pluginManager.LoadedPlugins.Count);
+	}
+
+	[Fact]
 	public void Contains()
 	{
 		// Given
