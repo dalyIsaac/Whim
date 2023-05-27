@@ -5,6 +5,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Whim.Tests;
 
@@ -18,7 +19,7 @@ public class PluginManagerTests
 	private class MocksWrapper
 	{
 		public Mock<IContext> Context { get; } = new();
-		public Mock<ICommandManager> CommandManager { get; } = new();
+		public CommandManager CommandManager { get; } = new();
 		public Mock<IKeybindManager> KeybindManager { get; } = new();
 		public Mock<IFileManager> FileManager { get; } = new();
 		public Mock<IPlugin> Plugin1 { get; } = new();
@@ -31,7 +32,7 @@ public class PluginManagerTests
 
 		public MocksWrapper()
 		{
-			Context.Setup(cc => cc.CommandManager).Returns(CommandManager.Object);
+			Context.Setup(cc => cc.CommandManager).Returns(CommandManager);
 			Context.Setup(cc => cc.KeybindManager).Returns(KeybindManager.Object);
 
 			FileManager.Setup(fm => fm.SavedStateDir).Returns("C:\\Users\\test\\.whim\\state");
@@ -87,7 +88,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -107,7 +108,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -129,7 +130,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -152,7 +153,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -178,7 +179,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -204,7 +205,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -224,7 +225,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 
 		// When
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
@@ -234,13 +235,13 @@ public class PluginManagerTests
 		// Then
 		Assert.Equal(3, pluginManager.LoadedPlugins.Count);
 
-		// mocks.CommandManager.Verify(cm => cm.Add()
 		// I want to verify that the command passed into Add is equivalent to the one created in the mocks
-		mocks.CommandManager.Verify(cm => cm.Add(It.IsAny<ICommand>()), Times.Exactly(4));
-		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin1.command1")), Times.Once);
-		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin2.command2")), Times.Once);
-		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin2.command22")), Times.Once);
-		mocks.CommandManager.Verify(cm => cm.Add(It.Is<ICommand>(c => c.Id == "Plugin3.command3")), Times.Once);
+		Assert.Equal(4, mocks.CommandManager.Count);
+		List<ICommand> commands = mocks.CommandManager.ToList();
+		Assert.Equal("Plugin1.command1", commands[0].Id);
+		Assert.Equal("Plugin2.command2", commands[1].Id);
+		Assert.Equal("Plugin2.command22", commands[2].Id);
+		Assert.Equal("Plugin3.command3", commands[3].Id);
 
 		mocks.KeybindManager.Verify(km => km.Add(It.IsAny<string>(), It.IsAny<Keybind>()), Times.Exactly(2));
 		mocks.KeybindManager.Verify(
@@ -261,7 +262,7 @@ public class PluginManagerTests
 
 		mocks.Plugin2.Setup(p => p.Name).Returns("Plugin1");
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 
 		// When
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
@@ -277,7 +278,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -301,7 +302,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);

@@ -10,9 +10,12 @@ internal class CommandManager : ICommandManager
 
 	public int Count => _commands.Count;
 
-	public bool IsReadOnly => false;
-
-	public void Add(ICommand item)
+	/// <summary>
+	/// Add a command from a plugin.
+	/// </summary>
+	/// <param name="item"></param>
+	/// <exception cref="InvalidOperationException"></exception>
+	internal void AddPluginCommand(ICommand item)
 	{
 		if (_commands.ContainsKey(item.Id))
 		{
@@ -21,6 +24,9 @@ internal class CommandManager : ICommandManager
 
 		_commands.Add(item.Id, item);
 	}
+
+	public void Add(string identifier, string title, Action callback, Func<bool>? condition = null) =>
+		AddPluginCommand(new Command($"whim.custom.{identifier}", title, callback, condition));
 
 	public ICommand? TryGetCommand(string commandId)
 	{
@@ -32,15 +38,7 @@ internal class CommandManager : ICommandManager
 		return null;
 	}
 
-	public void Clear() => _commands.Clear();
-
-	public bool Contains(ICommand item) => _commands.ContainsKey(item.Id);
-
-	public void CopyTo(ICommand[] array, int arrayIndex) => _commands.Values.CopyTo(array, arrayIndex);
-
 	public IEnumerator<ICommand> GetEnumerator() => _commands.Values.GetEnumerator();
-
-	public bool Remove(ICommand item) => _commands.Remove(item.Id);
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

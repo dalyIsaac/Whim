@@ -9,16 +9,18 @@ internal class PluginManager : IPluginManager
 {
 	private readonly IContext _context;
 	private readonly IFileManager _fileManager;
+	private readonly CommandManager _commandManager;
 	private readonly string _savedStateFilePath;
 	private readonly List<IPlugin> _plugins = new();
 	private bool _disposedValue;
 
 	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.AsReadOnly();
 
-	public PluginManager(IContext context, IFileManager fileManager)
+	public PluginManager(IContext context, IFileManager fileManager, CommandManager commandManager)
 	{
 		_context = context;
 		_fileManager = fileManager;
+		_commandManager = commandManager;
 		_savedStateFilePath = Path.Combine(_fileManager.SavedStateDir, "plugins.json");
 	}
 
@@ -94,7 +96,7 @@ internal class PluginManager : IPluginManager
 		// Add the commands and keybinds.
 		foreach (ICommand command in plugin.PluginCommands.Commands)
 		{
-			_context.CommandManager.Add(command);
+			_commandManager.AddPluginCommand(command);
 		}
 
 		foreach ((string commandId, IKeybind keybind) in plugin.PluginCommands.Keybinds)
