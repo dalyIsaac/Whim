@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Whim.Bar;
@@ -17,8 +16,6 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	public IMonitor Monitor { get; }
 
 	private bool _disposedValue;
-
-	private readonly HashSet<IWorkspace> _workspaces = new();
 
 	/// <summary>
 	/// The name of the active layout engine.
@@ -42,18 +39,20 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		Monitor = monitor;
 		NextLayoutEngineCommand = new NextLayoutEngineCommand(context, this);
 
-		_context.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
-		_context.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
 		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
-
-		foreach (IWorkspace workspace in _context.WorkspaceManager)
-		{
-			_workspaces.Add(workspace);
-		}
+		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 	}
 
-	private void WorkspaceManager_ActiveWorkspaceChanged(object? sender, EventArgs e) =>
+	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, EventArgs e) =>
 		OnPropertyChanged(nameof(ActiveLayoutEngine));
+
+	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
+	{
+		if (e.Monitor == Monitor)
+		{
+			OnPropertyChanged(nameof(ActiveLayoutEngine));
+		}
+	}
 
 	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -70,9 +69,8 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
-				_context.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
 				_context.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
+				_context.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
@@ -87,20 +85,5 @@ public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
-	}
-
-	private void WorkspaceManager_WorkspaceAdded(object? sender, WorkspaceEventArgs e)
-	{
-		_workspaces.Add(e.Workspace);
-	}
-
-	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs e)
-	{
-		_workspaces.Remove(e.Workspace);
-	}
-
-	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, EventArgs e)
-	{
-		OnPropertyChanged(nameof(ActiveLayoutEngine));
 	}
 }
