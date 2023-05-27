@@ -56,7 +56,7 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WorkspaceManager_WorkspaceAdded(object? sender, WorkspaceEventArgs args)
 	{
-		if (Workspaces.Any(w => w.Name == args.Workspace.Name))
+		if (Workspaces.Any(model => model.Workspace == args.Workspace))
 		{
 			return;
 		}
@@ -67,13 +67,13 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
 	{
-		WorkspaceModel? workspace = Workspaces.FirstOrDefault(w => w.Name == args.Workspace.Name);
-		if (workspace == null)
+		WorkspaceModel? workspaceModel = Workspaces.FirstOrDefault(model => model.Workspace == args.Workspace);
+		if (workspaceModel == null)
 		{
 			return;
 		}
 
-		Workspaces.Remove(workspace);
+		Workspaces.Remove(workspaceModel);
 	}
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
@@ -83,19 +83,23 @@ public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 			return;
 		}
 
+		// Set the old workspace's model to not be active on the monitor
 		if (args.OldWorkspace != null)
 		{
-			WorkspaceModel? oldWorkspace = Workspaces.FirstOrDefault(model => model.Workspace == args.OldWorkspace);
-			if (oldWorkspace != null)
+			WorkspaceModel? oldWorkspaceModel = Workspaces.FirstOrDefault(
+				model => model.Workspace == args.OldWorkspace
+			);
+			if (oldWorkspaceModel != null)
 			{
-				oldWorkspace.ActiveOnMonitor = false;
+				oldWorkspaceModel.ActiveOnMonitor = false;
 			}
 		}
 
-		WorkspaceModel? newWorkspace = Workspaces.FirstOrDefault(model => model.Workspace == args.NewWorkspace);
-		if (newWorkspace != null)
+		// Set the new workspace's model to be active on the monitor
+		WorkspaceModel? newWorkspaceModel = Workspaces.FirstOrDefault(model => model.Workspace == args.NewWorkspace);
+		if (newWorkspaceModel != null)
 		{
-			newWorkspace.ActiveOnMonitor = true;
+			newWorkspaceModel.ActiveOnMonitor = true;
 		}
 	}
 
