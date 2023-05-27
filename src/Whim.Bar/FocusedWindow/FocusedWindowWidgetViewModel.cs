@@ -30,7 +30,7 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	/// <inheritdoc/>
-	protected virtual void OnPropertyChanged(string propertyName)
+	protected virtual void OnPropertyChanged(string propertyName) =>
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
