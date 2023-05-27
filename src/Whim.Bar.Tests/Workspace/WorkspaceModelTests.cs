@@ -19,6 +19,7 @@ public class WorkspaceModelTests
 				.Setup(wm => wm.GetEnumerator())
 				.Returns(new List<IWorkspace> { Workspace.Object }.GetEnumerator());
 			ViewModel = new WorkspaceWidgetViewModel(Context.Object, new Mock<IMonitor>().Object);
+			Workspace.SetupGet(w => w.Name).Returns("name");
 		}
 	}
 
@@ -49,6 +50,7 @@ public class WorkspaceModelTests
 
 		// When
 		// Then
+		Assert.Equal(model.Name, wrapper.Workspace.Object.Name);
 		Assert.PropertyChanged(
 			model,
 			nameof(model.Name),
