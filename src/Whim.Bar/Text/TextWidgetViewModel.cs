@@ -25,15 +25,6 @@ public class TextWidgetViewModel : INotifyPropertyChanged
 		}
 	}
 
-	/// <inheritdoc/>
-	public event PropertyChangedEventHandler? PropertyChanged;
-
-	/// <inheritdoc/>
-	protected virtual void OnPropertyChanged(string propertyName)
-	{
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-	}
-
 	/// <summary>
 	/// Creates a new instance of <see cref="TextWidgetViewModel"/> with the given text.
 	/// </summary>
@@ -41,5 +32,14 @@ public class TextWidgetViewModel : INotifyPropertyChanged
 	public TextWidgetViewModel(string? value)
 	{
 		_value = value ?? string.Empty;
+	}
+
+	/// <inheritdoc/>
+	public event PropertyChangedEventHandler? PropertyChanged;
+
+	/// <inheritdoc/>
+	protected virtual void OnPropertyChanged(string propertyName)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }
