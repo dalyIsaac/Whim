@@ -13,6 +13,7 @@ public class TextWidgetViewModelTests
 		// When
 		// Then
 		Assert.PropertyChanged(viewModel, nameof(viewModel.Value), () => viewModel.Value = "test");
+		Assert.Equal("test", viewModel.Value);
 	}
 
 	[Fact]
@@ -24,5 +25,6 @@ public class TextWidgetViewModelTests
 		// When
 		// Then
 		Assert.PropertyChanged(viewModel, nameof(viewModel.Value), () => viewModel.Value = "test2");
+		Assert.Equal("test2", viewModel.Value);
 	}
 }
