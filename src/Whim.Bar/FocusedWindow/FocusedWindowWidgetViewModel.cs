@@ -10,19 +10,35 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IContext _context;
 	private bool _disposedValue;
+	private readonly IMonitor _monitor;
+
+	private string? _title;
 
 	/// <summary>
 	/// The title of the last focused window.
 	/// </summary>
-	public string? Value => _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Title;
+	public string? Title
+	{
+		private set
+		{
+			if (_title != value)
+			{
+				_title = value;
+				OnPropertyChanged(nameof(Title));
+			}
+		}
+		get => _title;
+	}
 
 	/// <summary>
 	/// Creates a new instance of the view model <see cref="FocusedWindowWidgetViewModel"/>.
 	/// </summary>
 	/// <param name="context"></param>
-	public FocusedWindowWidgetViewModel(IContext context)
+	/// <param name="monitor"></param>
+	public FocusedWindowWidgetViewModel(IContext context, IMonitor monitor)
 	{
 		_context = context;
+		_monitor = monitor;
 		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
@@ -60,6 +76,7 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
 	{
-		OnPropertyChanged(nameof(Value));
+		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(e.Window);
+		Title = monitor == _monitor ? e.Window.Title : null;
 	}
 }

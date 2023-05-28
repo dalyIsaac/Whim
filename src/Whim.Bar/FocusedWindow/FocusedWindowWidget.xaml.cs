@@ -12,9 +12,9 @@ public partial class FocusedWindowWidget : UserControl
 	/// </summary>
 	public FocusedWindowWidgetViewModel ViewModel { get; private set; }
 
-	internal FocusedWindowWidget(IContext context)
+	internal FocusedWindowWidget(IContext context, IMonitor monitor)
 	{
-		ViewModel = new FocusedWindowWidgetViewModel(context);
+		ViewModel = new FocusedWindowWidgetViewModel(context, monitor);
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "FocusedWindow/FocusedWindowWidget");
 	}
 
@@ -23,6 +23,6 @@ public partial class FocusedWindowWidget : UserControl
 	/// </summary>
 	public static BarComponent CreateComponent()
 	{
-		return new BarComponent((context, monitor, window) => new FocusedWindowWidget(context));
+		return new BarComponent((context, monitor, window) => new FocusedWindowWidget(context, monitor));
 	}
 }

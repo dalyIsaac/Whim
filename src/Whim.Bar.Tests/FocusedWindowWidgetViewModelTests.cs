@@ -36,7 +36,7 @@ public class FocusedWindowWidgetViewModelTests
 		// Then
 		Assert.PropertyChanged(
 			viewModel,
-			nameof(viewModel.Value),
+			nameof(viewModel.Title),
 			() =>
 			{
 				wrapper.WindowManager.Raise(
