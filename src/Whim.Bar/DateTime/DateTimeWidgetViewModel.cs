@@ -7,7 +7,7 @@ namespace Whim.Bar;
 /// <summary>
 /// View model containing the current date and time.
 /// </summary>
-public class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
+internal class DateTimeWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly DispatcherTimer _timer = new();
 	private readonly string _format;

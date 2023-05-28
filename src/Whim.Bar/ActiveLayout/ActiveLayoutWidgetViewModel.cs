@@ -6,7 +6,7 @@ namespace Whim.Bar;
 /// <summary>
 /// View model containing the active layout.
 /// </summary>
-public class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
+internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IContext _context;
 

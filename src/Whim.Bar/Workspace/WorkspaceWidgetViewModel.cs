@@ -7,7 +7,7 @@ namespace Whim.Bar;
 /// <summary>
 /// View model containing the workspaces for a given monitor.
 /// </summary>
-public class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
+internal class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IContext _context;
 	private bool _disposedValue;

@@ -10,7 +10,7 @@ public partial class DateTimeWidget : UserControl
 	/// <summary>
 	/// The date time view model.
 	/// </summary>
-	public DateTimeWidgetViewModel ViewModel { get; private set; }
+	internal DateTimeWidgetViewModel ViewModel { get; private set; }
 
 	/// <summary>
 	/// Create the date time widget.

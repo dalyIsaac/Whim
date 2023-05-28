@@ -6,11 +6,12 @@ namespace Whim.Bar;
 /// <summary>
 /// View model containing the focused window.
 /// </summary>
-public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
+internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IContext _context;
 	private bool _disposedValue;
 	private readonly IMonitor _monitor;
+	private readonly Func<IWindow, string> _getTitle;
 
 	private string? _title;
 
@@ -35,10 +36,12 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="monitor"></param>
-	public FocusedWindowWidgetViewModel(IContext context, IMonitor monitor)
+	/// <param name="getTitle">The function to get the title of the window.</param>
+	public FocusedWindowWidgetViewModel(IContext context, IMonitor monitor, Func<IWindow, string> getTitle)
 	{
 		_context = context;
 		_monitor = monitor;
+		_getTitle = getTitle;
 		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
@@ -77,6 +80,14 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
 	{
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(e.Window);
-		Title = monitor == _monitor ? e.Window.Title : null;
+
+		if (monitor == _monitor)
+		{
+			Title = _getTitle(e.Window);
+		}
+		else
+		{
+			Title = null;
+		}
 	}
 }
