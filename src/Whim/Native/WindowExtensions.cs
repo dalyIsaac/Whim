@@ -94,8 +94,6 @@ public static class WindowExtensions
 	/// <param name="window"></param>
 	public static void SetSystemBackdrop(this Microsoft.UI.Xaml.Window window)
 	{
-		window.SystemBackdrop = MicaController.IsSupported()
-			? new MicaBackdrop() { Kind = MicaKind.BaseAlt }
-			: new DesktopAcrylicBackdrop() { };
+		window.SystemBackdrop = MicaController.IsSupported() ? new MicaBackdrop() : new DesktopAcrylicBackdrop() { };
 	}
 }
