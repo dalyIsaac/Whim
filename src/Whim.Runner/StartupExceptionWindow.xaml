@@ -6,7 +6,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+	<Grid>
 		<StackPanel
 			MaxWidth="1200"
 			Margin="24"
@@ -16,10 +16,7 @@
 			<TextBlock FontSize="20" Text="Whim has shut down after encountering unexpected exception:" />
 
 			<!--  Text block  -->
-			<StackPanel
-				Padding="20"
-				Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}"
-				CornerRadius="8">
+			<StackPanel Padding="20" CornerRadius="8">
 				<TextBlock
 					FontFamily="Cascadia Code"
 					IsTextSelectionEnabled="True"
