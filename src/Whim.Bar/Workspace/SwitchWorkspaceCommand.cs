@@ -6,7 +6,7 @@ namespace Whim.Bar;
 /// <summary>
 /// Command for switching workspace.
 /// </summary>
-public class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
+internal class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposable
 {
 	private readonly IContext _context;
 	private readonly WorkspaceWidgetViewModel _viewModel;
