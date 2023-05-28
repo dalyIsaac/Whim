@@ -49,6 +49,13 @@ public partial class FocusedWindowWidget : UserControl
 	public static string GetShortTitle(IWindow window)
 	{
 		string[] parts = window.Title.Split(_titleSeparators, StringSplitOptions.RemoveEmptyEntries);
-		return parts[^1].Trim();
+		return parts[0].Trim();
 	}
+
+	/// <summary>
+	/// Returns the process name of the window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	public static string GetProcessName(IWindow window) => window.ProcessName;
 }
