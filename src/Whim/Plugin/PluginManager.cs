@@ -15,7 +15,7 @@ internal partial class PluginManager : IPluginManager
 	private readonly List<IPlugin> _plugins = new();
 	private bool _disposedValue;
 
-	[GeneratedRegex(@"^([a-zA-Z0-9_]+\.)*[a-zA-Z0-9_]+$")]
+	[GeneratedRegex(@"^\w+\.\w+(\.\w+)*$")]
 	private static partial Regex PluginNameRegex();
 
 	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.AsReadOnly();
