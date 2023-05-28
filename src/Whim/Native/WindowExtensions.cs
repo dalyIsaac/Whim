@@ -1,5 +1,7 @@
 using Microsoft.UI;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml.Media;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -82,5 +84,18 @@ public static class WindowExtensions
 		context.NativeManager.SetWindowCorners(hwnd);
 
 		return window;
+	}
+
+	/// <summary>
+	/// Sets the given <paramref name="window"/>'s <see cref="Microsoft.UI.Xaml.Window.SystemBackdrop"/>
+	/// to a <see cref="MicaBackdrop"/> if the current system supports it, otherwise a
+	/// <see cref="DesktopAcrylicBackdrop"/>.
+	/// </summary>
+	/// <param name="window"></param>
+	public static void SetSystemBackdrop(this Microsoft.UI.Xaml.Window window)
+	{
+		window.SystemBackdrop = MicaController.IsSupported()
+			? new MicaBackdrop() { Kind = MicaKind.BaseAlt }
+			: new DesktopAcrylicBackdrop() { };
 	}
 }

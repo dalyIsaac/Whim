@@ -17,6 +17,9 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		FocusIndicatorConfig = focusIndicatorConfig;
 		_window = this.InitializeBorderlessWindow(context, "Whim.FocusIndicator", "FocusIndicatorWindow");
 
+		this.SetIsShownInSwitchers(false);
+		this.SetSystemBackdrop();
+
 		Title = FocusIndicatorConfig.Title;
 	}
 
@@ -36,8 +39,6 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 			Height = focusedWindowLocation.Height + (borderSize * 2),
 			Width = focusedWindowLocation.Width + (borderSize * 2)
 		};
-
-		this.SetIsShownInSwitchers(false);
 
 		// Prevent the window from being activated.
 		_context.NativeManager.PreventWindowActivation(_window.Handle);

@@ -26,6 +26,8 @@ public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 		Title = "Whim Startup Error";
 
 		Message = exitEventArgs.Message ?? "Unknown error occurred";
+
+		this.SetSystemBackdrop();
 	}
 
 	private void Quit_Click(object sender, RoutedEventArgs e)

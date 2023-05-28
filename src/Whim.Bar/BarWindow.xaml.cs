@@ -46,6 +46,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		Title = "Whim Bar";
 		_context.NativeManager.HideCaptionButtons(WindowState.Window.Handle);
 		this.SetIsShownInSwitchers(false);
+		this.SetSystemBackdrop();
 
 		// Set up the bar.
 		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c(_context, _monitor, this)));
