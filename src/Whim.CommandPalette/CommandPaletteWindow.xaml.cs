@@ -24,6 +24,8 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		_window = this.InitializeBorderlessWindow(_context, "Whim.CommandPalette", "CommandPaletteWindow");
 		this.SetIsShownInSwitchers(false);
+		this.SetSystemBackdrop();
+
 		Activated += CommandPaletteWindow_Activated;
 		Title = CommandPaletteConfig.Title;
 	}

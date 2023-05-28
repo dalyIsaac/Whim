@@ -22,7 +22,7 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	private Color _color = Colors.Red;
+	private Color _color = Colors.Transparent;
 
 	/// <summary>
 	/// The color of the focus indicator.
