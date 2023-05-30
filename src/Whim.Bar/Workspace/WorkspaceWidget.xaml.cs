@@ -14,7 +14,7 @@ public partial class WorkspaceWidget : UserControl, IDisposable
 	/// <summary>
 	/// The workspace view model.
 	/// </summary>
-	public WorkspaceWidgetViewModel ViewModel { get; }
+	internal WorkspaceWidgetViewModel ViewModel { get; }
 
 	internal WorkspaceWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window)
 	{

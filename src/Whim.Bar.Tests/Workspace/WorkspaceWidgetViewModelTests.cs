@@ -183,4 +183,57 @@ public class WorkspaceWidgetViewModelTests
 			}
 		);
 	}
+
+	[Fact]
+	public void WorkspaceManager_WorkspaceRenamed_NonExistingWorkspace()
+	{
+		// Given
+		Wrapper wrapper = new();
+		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		Mock<IWorkspace> renamedWorkspace = new();
+
+		// Verify that property changed is not raised
+
+		bool propertyChangedRaised = false;
+		WorkspaceModel model = viewModel.Workspaces[0];
+
+		// When
+		model.PropertyChanged += (sender, args) => propertyChangedRaised = true;
+
+		wrapper.WorkspaceManager.Raise(
+			wm => wm.WorkspaceRenamed += null,
+			new WorkspaceRenamedEventArgs()
+			{
+				Workspace = renamedWorkspace.Object,
+				PreviousName = "Old Name",
+				CurrentName = "New Name"
+			}
+		);
+
+		// Then
+		Assert.False(propertyChangedRaised);
+	}
+
+	[Fact]
+	public void Dispose()
+	{
+		// Given
+		Wrapper wrapper = new();
+		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+
+		// When
+		viewModel.Dispose();
+
+		// Then
+		wrapper.WorkspaceManager.VerifyRemove(wm => wm.WorkspaceAdded -= It.IsAny<EventHandler<WorkspaceEventArgs>>());
+		wrapper.WorkspaceManager.VerifyRemove(
+			wm => wm.WorkspaceRemoved -= It.IsAny<EventHandler<WorkspaceEventArgs>>()
+		);
+		wrapper.WorkspaceManager.VerifyRemove(
+			wm => wm.MonitorWorkspaceChanged -= It.IsAny<EventHandler<MonitorWorkspaceChangedEventArgs>>()
+		);
+		wrapper.WorkspaceManager.VerifyRemove(
+			wm => wm.WorkspaceRenamed -= It.IsAny<EventHandler<WorkspaceRenamedEventArgs>>()
+		);
+	}
 }

@@ -5,7 +5,7 @@ namespace Whim.Bar;
 /// <summary>
 /// Workspace model for the bar.
 /// </summary>
-public class WorkspaceModel : INotifyPropertyChanged
+internal class WorkspaceModel : INotifyPropertyChanged
 {
 	/// <summary>
 	/// The workspace.

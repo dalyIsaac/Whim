@@ -6,23 +6,42 @@ namespace Whim.Bar;
 /// <summary>
 /// View model containing the focused window.
 /// </summary>
-public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
+internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
 	private readonly IContext _context;
 	private bool _disposedValue;
+	private readonly IMonitor _monitor;
+	private readonly Func<IWindow, string> _getTitle;
+
+	private string? _title;
 
 	/// <summary>
 	/// The title of the last focused window.
 	/// </summary>
-	public string? Value => _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Title;
+	public string? Title
+	{
+		private set
+		{
+			if (_title != value)
+			{
+				_title = value;
+				OnPropertyChanged(nameof(Title));
+			}
+		}
+		get => _title;
+	}
 
 	/// <summary>
 	/// Creates a new instance of the view model <see cref="FocusedWindowWidgetViewModel"/>.
 	/// </summary>
 	/// <param name="context"></param>
-	public FocusedWindowWidgetViewModel(IContext context)
+	/// <param name="monitor"></param>
+	/// <param name="getTitle">The function to get the title of the window.</param>
+	public FocusedWindowWidgetViewModel(IContext context, IMonitor monitor, Func<IWindow, string> getTitle)
 	{
 		_context = context;
+		_monitor = monitor;
+		_getTitle = getTitle;
 		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
@@ -60,6 +79,15 @@ public class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
 	{
-		OnPropertyChanged(nameof(Value));
+		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(e.Window);
+
+		if (monitor == _monitor)
+		{
+			Title = _getTitle(e.Window);
+		}
+		else
+		{
+			Title = null;
+		}
 	}
 }

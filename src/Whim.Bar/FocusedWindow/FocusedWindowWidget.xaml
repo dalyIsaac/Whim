@@ -13,7 +13,7 @@
 			RelativePanel.AlignLeftWithPanel="True"
 			RelativePanel.AlignRightWithPanel="True"
 			RelativePanel.AlignVerticalCenterWithPanel="True"
-			Text="{x:Bind Path=ViewModel.Value, Mode=OneWay}"
+			Text="{x:Bind Path=ViewModel.Title, Mode=OneWay}"
 			TextTrimming="CharacterEllipsis"
 			TextWrapping="NoWrap" />
 	</RelativePanel>

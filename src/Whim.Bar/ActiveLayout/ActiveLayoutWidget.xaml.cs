@@ -10,7 +10,7 @@ public partial class ActiveLayoutWidget : UserControl
 	/// <summary>
 	/// The view model for the active layout widget.
 	/// </summary>
-	public ActiveLayoutWidgetViewModel ViewModel { get; private set; }
+	internal ActiveLayoutWidgetViewModel ViewModel { get; private set; }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ActiveLayoutWidget"/> class.

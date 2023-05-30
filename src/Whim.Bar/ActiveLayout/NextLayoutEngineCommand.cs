@@ -5,7 +5,7 @@ namespace Whim.Bar;
 /// <summary>
 /// Command to switch to the next layout engine.
 /// </summary>
-public class NextLayoutEngineCommand : System.Windows.Input.ICommand
+internal class NextLayoutEngineCommand : System.Windows.Input.ICommand
 {
 	private readonly IContext _context;
 	private readonly ActiveLayoutWidgetViewModel _viewModel;
