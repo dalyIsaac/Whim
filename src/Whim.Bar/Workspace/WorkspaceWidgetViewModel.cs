@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Linq;
 
 namespace Whim.Bar;
@@ -7,7 +6,7 @@ namespace Whim.Bar;
 /// <summary>
 /// View model containing the workspaces for a given monitor.
 /// </summary>
-internal class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
+internal class WorkspaceWidgetViewModel : IDisposable
 {
 	private readonly IContext _context;
 	private bool _disposedValue;
@@ -43,15 +42,6 @@ internal class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 			IMonitor? monitorForWorkspace = _context.WorkspaceManager.GetMonitorForWorkspace(workspace);
 			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor == monitorForWorkspace));
 		}
-	}
-
-	/// <inheritdoc/>
-	public event PropertyChangedEventHandler? PropertyChanged;
-
-	/// <inheritdoc/>
-	protected virtual void OnPropertyChanged(string? propertyName)
-	{
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
 	private void WorkspaceManager_WorkspaceAdded(object? sender, WorkspaceEventArgs args)
@@ -125,6 +115,7 @@ internal class WorkspaceWidgetViewModel : INotifyPropertyChanged, IDisposable
 				_context.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
 				_context.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
 				_context.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
+				_context.WorkspaceManager.WorkspaceRenamed -= WorkspaceManager_WorkspaceRenamed;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
