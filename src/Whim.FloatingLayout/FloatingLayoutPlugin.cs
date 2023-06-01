@@ -6,7 +6,6 @@ namespace Whim.FloatingLayout;
 public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 {
 	private readonly IContext _context;
-	private readonly FloatingLayoutConfig _floatingLayoutConfig;
 
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
@@ -15,19 +14,15 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	/// Creates a new instance of the floating layout plugin.
 	/// </summary>
 	/// <param name="context"></param>
-	/// <param name="floatingLayoutConfig"></param>
-	public FloatingLayoutPlugin(IContext context, FloatingLayoutConfig? floatingLayoutConfig = null)
+	public FloatingLayoutPlugin(IContext context)
 	{
 		_context = context;
-		_floatingLayoutConfig = floatingLayoutConfig ?? new FloatingLayoutConfig();
 	}
 
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WorkspaceManager.AddProxyLayoutEngine(
-			layout => new FloatingLayoutEngine(_context, _floatingLayoutConfig, layout)
-		);
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, layout));
 	}
 
 	/// <inheritdoc />
