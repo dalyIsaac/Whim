@@ -456,6 +456,11 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 	#endregion
 
+	public IWorkspace? GetWorkspaceForWindow(IWindow window)
+	{
+		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? workspace : null;
+	}
+
 	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args)
 	{
 		ActiveLayoutEngineChanged?.Invoke(this, args);
