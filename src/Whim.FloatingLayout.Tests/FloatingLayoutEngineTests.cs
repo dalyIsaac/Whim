@@ -245,6 +245,26 @@ public class FloatingLayoutEngineTests
 	}
 
 	[Fact]
+	public void UpdateWindowLocation_CouldNotGetLocation()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine = new(wrapper.Context.Object, wrapper.InnerLayoutEngine.Object);
+		Mock<IWindow> window = new();
+
+		// Mark the window as floating, and reset the mocks
+		engine.MarkWindowAsFloating(window.Object);
+		wrapper.NativeManager.Invocations.Clear();
+		wrapper.NativeManager.Setup(x => x.DwmGetWindowLocation(It.IsAny<HWND>())).Returns((ILocation<int>?)null);
+
+		// When
+		engine.UpdateWindowLocation(window.Object);
+
+		// Then
+		wrapper.NativeManager.Verify(x => x.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
+	}
+
+	[Fact]
 	public void DoLayout()
 	{
 		// Given
