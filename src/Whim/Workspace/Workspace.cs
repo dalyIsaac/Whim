@@ -317,6 +317,10 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
 
+		if (_phantomWindows.ContainsKey(window))
+		{
+			return;
+		}
 		if (_windows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
