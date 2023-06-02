@@ -6,32 +6,24 @@ namespace Whim.FloatingLayout;
 public class FloatingLayoutEngine : BaseProxyLayoutEngine, IFloatingLayoutEngine
 {
 	private readonly IContext _context;
-	private readonly FloatingLayoutConfig _floatingLayoutConfig;
-
-	private readonly Dictionary<IWindow, ILocation<double>> _windowToLocation = new();
+	private readonly Dictionary<IWindow, ILocation<double>> _floatingWindowLocations = new();
 
 	/// <summary>
 	/// Creates a new instance of the proxy layout engine <see cref="FloatingLayoutEngine"/>.
 	/// </summary>
 	/// <param name="context"></param>
-	/// <param name="floatingLayoutConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public FloatingLayoutEngine(
-		IContext context,
-		FloatingLayoutConfig floatingLayoutConfig,
-		ILayoutEngine innerLayoutEngine
-	)
+	public FloatingLayoutEngine(IContext context, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_context = context;
-		_floatingLayoutConfig = floatingLayoutConfig;
 	}
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
 		// Iterate over all windows in _windowToLocation.
-		foreach ((IWindow window, ILocation<double> loc) in _windowToLocation)
+		foreach ((IWindow window, ILocation<double> loc) in _floatingWindowLocations)
 		{
 			yield return new WindowState()
 			{
@@ -54,10 +46,9 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine, IFloatingLayoutEngine
 	public override void AddWindowAtPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Adding window {window} at point {point}");
-		if (_floatingLayoutConfig.IsWindowFloating(window))
+		if (_floatingWindowLocations.ContainsKey(window))
 		{
 			UpdateFloatingWindow(window);
-			_floatingLayoutConfig.MarkWindowAsFloating(window);
 			return;
 		}
 
@@ -75,7 +66,6 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine, IFloatingLayoutEngine
 		{
 			InnerLayoutEngine.Remove(window);
 			UpdateFloatingWindow(window);
-			_floatingLayoutConfig.MarkWindowAsFloating(window);
 		}
 	}
 
@@ -85,13 +75,19 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine, IFloatingLayoutEngine
 		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Marking window {window} as docked");
 
-		if (window != null)
+		if (window == null)
 		{
-			ILocation<double> location = _windowToLocation[window];
-			InnerLayoutEngine.AddWindowAtPoint(window, location);
-			_windowToLocation.Remove(window);
-			_floatingLayoutConfig.MarkWindowAsDocked(window);
+			return;
 		}
+
+		if (!_floatingWindowLocations.TryGetValue(window, out ILocation<double>? location))
+		{
+			Logger.Error($"Could not obtain location for floating window {window}");
+			return;
+		}
+
+		InnerLayoutEngine.AddWindowAtPoint(window, location);
+		_floatingWindowLocations.Remove(window);
 	}
 
 	/// <inheritdoc />
@@ -105,13 +101,23 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine, IFloatingLayoutEngine
 			return;
 		}
 
-		if (_floatingLayoutConfig.IsWindowFloating(window))
+		if (_floatingWindowLocations.ContainsKey(window))
 		{
 			MarkWindowAsDocked(window);
 		}
 		else
 		{
 			MarkWindowAsFloating(window);
+		}
+	}
+
+	/// <inheritdoc />
+	public void UpdateWindowLocation(IWindow window)
+	{
+		Logger.Debug($"Updating location for window {window}");
+		if (_floatingWindowLocations.ContainsKey(window))
+		{
+			UpdateFloatingWindow(window);
 		}
 	}
 
@@ -125,7 +131,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine, IFloatingLayoutEngine
 			return;
 		}
 
-		_windowToLocation[window] = location;
+		_floatingWindowLocations[window] = location;
 	}
 
 	private ILocation<double>? GetUnitLocation(IWindow window)

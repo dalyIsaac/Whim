@@ -1,12 +1,13 @@
+using System;
 using System.Text.Json;
 
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
-public class FloatingLayoutPlugin : IFloatingLayoutPlugin
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
 {
 	private readonly IContext _context;
-	private readonly FloatingLayoutConfig _floatingLayoutConfig;
+	private bool disposedValue;
 
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
@@ -15,19 +16,16 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	/// Creates a new instance of the floating layout plugin.
 	/// </summary>
 	/// <param name="context"></param>
-	/// <param name="floatingLayoutConfig"></param>
-	public FloatingLayoutPlugin(IContext context, FloatingLayoutConfig? floatingLayoutConfig = null)
+	public FloatingLayoutPlugin(IContext context)
 	{
 		_context = context;
-		_floatingLayoutConfig = floatingLayoutConfig ?? new FloatingLayoutConfig();
 	}
 
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WorkspaceManager.AddProxyLayoutEngine(
-			layout => new FloatingLayoutEngine(_context, _floatingLayoutConfig, layout)
-		);
+		_context.WindowManager.WindowMoved += WindowManager_WindowMoved;
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, layout));
 	}
 
 	/// <inheritdoc />
@@ -35,6 +33,26 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
+
+	private void WindowManager_WindowMoved(object? sender, WindowEventArgs e)
+	{
+		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(e.Window);
+		if (workspace == null)
+		{
+			Logger.Error($"Could not find workspace for window {e.Window}");
+			return;
+		}
+
+		ILayoutEngine rootEngine = workspace.ActiveLayoutEngine;
+		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
+		if (floatingLayoutEngine == null)
+		{
+			Logger.Debug("Could not find floating layout engine");
+			return;
+		}
+
+		floatingLayoutEngine.UpdateWindowLocation(e.Window);
+	}
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window
@@ -98,4 +116,29 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
+
+	/// <inheritdoc />
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_context.WindowManager.WindowMoved -= WindowManager_WindowMoved;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc />
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
 }

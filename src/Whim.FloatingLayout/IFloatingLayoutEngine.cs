@@ -22,4 +22,11 @@ public interface IFloatingLayoutEngine : ILayoutEngine
 	/// </summary>
 	/// <param name="window"></param>
 	void ToggleWindowFloating(IWindow? window = null);
+
+	/// <summary>
+	/// Updates the internally stored location of the given <paramref name="window"/>.
+	/// If the window is not floating, the window is ignored.
+	/// </summary>
+	/// <param name="window"></param>
+	void UpdateWindowLocation(IWindow window);
 }

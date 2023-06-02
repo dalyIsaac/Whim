@@ -701,9 +701,26 @@ public class WorkspaceTests
 	{
 		// Given
 		MocksBuilder mocks = new();
+		Mock<IWindow> phantomWindow = new();
+		Workspace workspace = new(mocks.Context.Object, "Workspace", mocks.LayoutEngine.Object);
+		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, phantomWindow.Object);
+		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
+
+		// When MoveWindowToPoint is called
+		workspace.MoveWindowToPoint(phantomWindow.Object, point);
+
+		// Then the layout engine is told to move the window
+		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(phantomWindow.Object, point), Times.Never);
+		mocks.LayoutEngine.Verify(l => l.Remove(phantomWindow.Object), Times.Never);
+	}
+
+	[Fact]
+	public void MoveWindowToPoint_Success_AddWindow()
+	{
+		// Given
+		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace = new(mocks.Context.Object, "Workspace", mocks.LayoutEngine.Object);
-		workspace.AddWindow(window.Object);
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
 		// When MoveWindowToPoint is called
@@ -711,22 +728,28 @@ public class WorkspaceTests
 
 		// Then the layout engine is told to move the window
 		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(window.Object, point), Times.Once);
+		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Never);
 	}
 
 	[Fact]
-	public void MoveWindowToPoint_Success()
+	public void MoveWindowToPoint_Success_WindowAlreadyExists()
 	{
 		// Given
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
+
 		Workspace workspace = new(mocks.Context.Object, "Workspace", mocks.LayoutEngine.Object);
+
 		workspace.AddWindow(window.Object);
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
+
+		mocks.LayoutEngine.Reset();
 
 		// When MoveWindowToPoint is called
 		workspace.MoveWindowToPoint(window.Object, point);
 
-		// Then the layout engine is told to move the window
+		// Then the layout engine is told to remove and add the window
+		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Once);
 		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(window.Object, point), Times.Once);
 	}
 

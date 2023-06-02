@@ -1012,6 +1012,7 @@ public class WorkspaceManagerTests
 		mocks.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
 		// Then nothing happens
+		mocks.MonitorManager.Verify(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never());
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 	}
@@ -1038,36 +1039,71 @@ public class WorkspaceManagerTests
 		mocks.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
 		// Then nothing happens
+		mocks.Monitors[0].VerifyGet(m => m.WorkingArea, Times.Never());
+		mocks.Monitors[1].VerifyGet(m => m.WorkingArea, Times.Never());
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 	}
 
 	[Fact]
-	public void MoveWindowToPoint_Success()
+	public void MoveWindowToPoint_Success_DifferentWorkspace()
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+		Mock<IWorkspace> activeWorkspace = new();
+		Mock<IWorkspace> targetWorkspace = new();
+		MocksBuilder mocks = new(new[] { activeWorkspace, targetWorkspace });
 
-		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
-		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
+		mocks.WorkspaceManager.Activate(activeWorkspace.Object, mocks.Monitors[0].Object);
+		mocks.WorkspaceManager.Activate(targetWorkspace.Object, mocks.Monitors[1].Object);
 
 		Mock<IWindow> window = new();
 		mocks.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
+		activeWorkspace.Reset();
+		targetWorkspace.Reset();
 
 		mocks.MonitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(mocks.Monitors[1].Object);
 		mocks.Monitors[1].Setup(m => m.WorkingArea).Returns(new Location<int>());
-		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
+		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
 
 		// When a window is moved to a point
 		mocks.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
 
 		// Then the window is removed from the old workspace and added to the new workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
+		activeWorkspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
+		activeWorkspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
+
+		Assert.Equal(targetWorkspace.Object, mocks.WorkspaceManager.GetWorkspaceForWindow(window.Object));
+
+		window.Verify(w => w.Focus(), Times.Once());
+	}
+
+	[Fact]
+	public void MoveWindowToPoint_Success_SameWorkspace()
+	{
+		// Given
+		Mock<IWorkspace> activeWorkspace = new();
+		Mock<IWorkspace> anotherWorkspace = new();
+		MocksBuilder mocks = new(new[] { activeWorkspace, anotherWorkspace });
+
+		mocks.WorkspaceManager.Activate(activeWorkspace.Object, mocks.Monitors[0].Object);
+
+		Mock<IWindow> window = new();
+		mocks.WorkspaceManager.WindowAdded(window.Object);
+		activeWorkspace.Reset();
+
+		mocks.MonitorManager.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(mocks.Monitors[0].Object);
+		mocks.Monitors[0].Setup(m => m.WorkingArea).Returns(new Location<int>());
+		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
+
+		// When a window is moved to a point
+		mocks.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
+
+		// Then the window is removed from the old workspace and added to the new workspace
+		activeWorkspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
+		activeWorkspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Once());
+		anotherWorkspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
+
+		Assert.Equal(activeWorkspace.Object, mocks.WorkspaceManager.GetWorkspaceForWindow(window.Object));
 
 		window.Verify(w => w.Focus(), Times.Once());
 	}

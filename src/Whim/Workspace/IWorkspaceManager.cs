@@ -139,8 +139,17 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
 
 	/// <summary>
+	/// Retrieves the workspace for the given window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
+	public IWorkspace? GetWorkspaceForWindow(IWindow window);
+
+	/// <summary>
 	/// Retrieves the monitor for the given window.
 	/// </summary>
+	/// <param name="window"></param>
+	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
 	public IMonitor? GetMonitorForWindow(IWindow window);
 
 	/// <summary>

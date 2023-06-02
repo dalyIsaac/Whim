@@ -317,11 +317,25 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
 
-		_windows.Add(window);
-
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
+		if (_phantomWindows.ContainsKey(window))
 		{
-			layoutEngine.AddWindowAtPoint(window, point);
+			return;
+		}
+		if (_windows.Contains(window))
+		{
+			// The window is already in the workspace, so move it in just the active layout engine
+			ActiveLayoutEngine.Remove(window);
+			ActiveLayoutEngine.AddWindowAtPoint(window, point);
+		}
+		else
+		{
+			// The window is new to the workspace, so add it to all layout engines
+			_windows.Add(window);
+
+			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			{
+				layoutEngine.AddWindowAtPoint(window, point);
+			}
 		}
 
 		DoLayout();
