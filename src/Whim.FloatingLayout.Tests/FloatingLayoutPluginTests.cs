@@ -15,6 +15,7 @@ public class FloatingLayoutPluginTests
 	private class Wrapper
 	{
 		public Mock<IContext> Context { get; } = new();
+		public Mock<IWindowManager> WindowManager { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();
@@ -22,6 +23,7 @@ public class FloatingLayoutPluginTests
 
 		public Wrapper(bool findFloatingLayoutEngine = true)
 		{
+			Context.SetupGet(x => x.WindowManager).Returns(WindowManager.Object);
 			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 			Context.SetupGet(x => x.NativeManager).Returns(NativeManager.Object);
 
@@ -36,20 +38,6 @@ public class FloatingLayoutPluginTests
 
 	[Fact]
 	public void PreInitialize()
-	{
-		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
-
-		// When
-		plugin.PreInitialize();
-
-		// Then
-		wrapper.WorkspaceManager.Verify(x => x.AddProxyLayoutEngine(It.IsAny<ProxyLayoutEngine>()), Times.Once);
-	}
-
-	[Fact]
-	public void Ctor_DefaultConfig()
 	{
 		// Given
 		Wrapper wrapper = new();
