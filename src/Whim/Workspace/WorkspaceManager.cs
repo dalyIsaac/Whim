@@ -559,6 +559,13 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug($"Moving window {window} to location {point}");
 
+		// Duck out if the window is a phantom window.
+		bool isPhantom = _phantomWindows.Contains(window);
+		if (isPhantom)
+		{
+			Logger.Error($"Window {window} is a phantom window and cannot be moved");
+			return;
+		}
 		// Get the monitor.
 		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);
 
@@ -573,14 +580,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor}");
 		Logger.Debug($"Active workspace is {ActiveWorkspace}");
 
-		bool isPhantom = _phantomWindows.Contains(window);
-		if (isPhantom && targetWorkspace != ActiveWorkspace)
-		{
-			Logger.Error($"Window {window} is a phantom window and cannot be moved");
-			return;
-		}
-
-		if (!ActiveWorkspace.RemoveWindow(window))
+		// If the window is being moved to a different workspace, remove it from the current workspace.
+		if (targetWorkspace != ActiveWorkspace && !ActiveWorkspace.RemoveWindow(window))
 		{
 			Logger.Error($"Could not remove window {window} from workspace {ActiveWorkspace}");
 			return;
@@ -588,10 +589,15 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		IPoint<int> pointInMonitor = targetMonitor.WorkingArea.ToMonitorCoordinates(point);
 		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(pointInMonitor);
-		Logger.Debug($"Normalized location: {normalized}");
 
+		Logger.Debug($"Normalized location: {normalized}");
 		targetWorkspace.MoveWindowToPoint(window, normalized);
-		_windowWorkspaceMap[window] = targetWorkspace;
+
+		// If the window is being moved to a different workspace, update the reference in the window map.
+		if (targetWorkspace != ActiveWorkspace)
+		{
+			_windowWorkspaceMap[window] = targetWorkspace;
+		}
 
 		// Trigger layouts.
 		window.Focus();

@@ -317,7 +317,17 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
 
-		_windows.Add(window);
+		if (_windows.Contains(window))
+		{
+			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			{
+				layoutEngine.Remove(window);
+			}
+		}
+		else
+		{
+			_windows.Add(window);
+		}
 
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
