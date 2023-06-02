@@ -36,17 +36,10 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
 
 	private void WindowManager_WindowMoved(object? sender, WindowEventArgs e)
 	{
-		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(e.Window);
-		if (monitor == null)
-		{
-			Logger.Error($"Could not find monitor for window {e.Window}");
-			return;
-		}
-
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(e.Window);
 		if (workspace == null)
 		{
-			Logger.Error($"Could not find workspace for monitor {monitor}");
+			Logger.Error($"Could not find workspace for window {e.Window}");
 			return;
 		}
 
