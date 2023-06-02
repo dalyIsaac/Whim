@@ -5,6 +5,11 @@ using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+	"Reliability",
+	"CA2000:Dispose objects before losing scope",
+	Justification = "Unnecessary for tests"
+)]
 public class FloatingLayoutPluginTests
 {
 	private class Wrapper
@@ -14,7 +19,6 @@ public class FloatingLayoutPluginTests
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();
 		public Mock<IFloatingLayoutEngine> FloatingLayoutEngine { get; } = new();
-		public FloatingLayoutConfig FloatingLayoutConfig { get; } = new();
 
 		public Wrapper(bool findFloatingLayoutEngine = true)
 		{
@@ -35,7 +39,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = new(wrapper.Context.Object, wrapper.FloatingLayoutConfig);
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
 
 		// When
 		plugin.PreInitialize();
@@ -63,7 +67,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = new(wrapper.Context.Object, wrapper.FloatingLayoutConfig);
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
 		IWindow window = Mock.Of<IWindow>();
 
 		// When
@@ -78,7 +82,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		Wrapper wrapper = new(findFloatingLayoutEngine: false);
-		FloatingLayoutPlugin plugin = new(wrapper.Context.Object, wrapper.FloatingLayoutConfig);
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
 		IWindow window = Mock.Of<IWindow>();
 
 		// When
@@ -93,7 +97,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = new(wrapper.Context.Object, wrapper.FloatingLayoutConfig);
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
 		IWindow window = Mock.Of<IWindow>();
 
 		// When
@@ -108,7 +112,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		Wrapper wrapper = new(findFloatingLayoutEngine: false);
-		FloatingLayoutPlugin plugin = new(wrapper.Context.Object, wrapper.FloatingLayoutConfig);
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
 		IWindow window = Mock.Of<IWindow>();
 
 		// When
@@ -123,7 +127,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = new(wrapper.Context.Object, wrapper.FloatingLayoutConfig);
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
 
 		// When
 		JsonElement? json = plugin.SaveState();
