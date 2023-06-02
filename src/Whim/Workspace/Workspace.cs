@@ -319,19 +319,19 @@ internal class Workspace : IWorkspace
 
 		if (_windows.Contains(window))
 		{
-			foreach (ILayoutEngine layoutEngine in _layoutEngines)
-			{
-				layoutEngine.Remove(window);
-			}
+			// The window is already in the workspace, so move it in just the active layout engine
+			ActiveLayoutEngine.Remove(window);
+			ActiveLayoutEngine.AddWindowAtPoint(window, point);
 		}
 		else
 		{
+			// The window is new to the workspace, so add it to all layout engines
 			_windows.Add(window);
-		}
 
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
-		{
-			layoutEngine.AddWindowAtPoint(window, point);
+			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			{
+				layoutEngine.AddWindowAtPoint(window, point);
+			}
 		}
 
 		DoLayout();
