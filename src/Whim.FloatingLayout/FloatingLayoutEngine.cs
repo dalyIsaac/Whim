@@ -111,6 +111,16 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine, IFloatingLayoutEngine
 		}
 	}
 
+	/// <inheritdoc />
+	public void UpdateWindowLocation(IWindow window)
+	{
+		Logger.Debug($"Updating location for window {window}");
+		if (_floatingWindowLocations.ContainsKey(window))
+		{
+			UpdateFloatingWindow(window);
+		}
+	}
+
 	private void UpdateFloatingWindow(IWindow window)
 	{
 		// Since the window is floating, we update the location, and return.

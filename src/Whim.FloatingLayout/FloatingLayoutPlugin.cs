@@ -1,11 +1,13 @@
+using System;
 using System.Text.Json;
 
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
-public class FloatingLayoutPlugin : IFloatingLayoutPlugin
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
 {
 	private readonly IContext _context;
+	private bool disposedValue;
 
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
@@ -22,6 +24,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
+		_context.WindowManager.WindowMoved += WindowManager_WindowMoved;
 		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, layout));
 	}
 
@@ -30,6 +33,33 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
+
+	private void WindowManager_WindowMoved(object? sender, WindowEventArgs e)
+	{
+		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(e.Window);
+		if (monitor == null)
+		{
+			Logger.Error($"Could not find monitor for window {e.Window}");
+			return;
+		}
+
+		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+		if (workspace == null)
+		{
+			Logger.Error($"Could not find workspace for monitor {monitor}");
+			return;
+		}
+
+		ILayoutEngine rootEngine = workspace.ActiveLayoutEngine;
+		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
+		if (floatingLayoutEngine == null)
+		{
+			Logger.Debug("Could not find floating layout engine");
+			return;
+		}
+
+		floatingLayoutEngine.UpdateWindowLocation(e.Window);
+	}
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window
@@ -93,4 +123,29 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
+
+	/// <inheritdoc />
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_context.WindowManager.WindowMoved -= WindowManager_WindowMoved;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc />
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
 }
