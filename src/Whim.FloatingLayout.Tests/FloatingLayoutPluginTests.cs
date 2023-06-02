@@ -37,6 +37,20 @@ public class FloatingLayoutPluginTests
 	}
 
 	[Fact]
+	public void Name()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
+
+		// When
+		string name = plugin.Name;
+
+		// Then
+		Assert.Equal("whim.floating_layout", name);
+	}
+
+	[Fact]
 	public void PreInitialize()
 	{
 		// Given
@@ -122,5 +136,96 @@ public class FloatingLayoutPluginTests
 
 		// Then
 		Assert.Null(json);
+	}
+
+	[Fact]
+	public void WindowManager_WindowMoved_NoWorkspaceForWindow()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
+		plugin.PreInitialize();
+
+		wrapper.WorkspaceManager.Setup(w => w.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns((IWorkspace?)null);
+
+		// When
+		wrapper.WindowManager.Raise(
+			wm => wm.WindowMoved += null,
+			new WindowEventArgs() { Window = new Mock<IWindow>().Object }
+		);
+
+		// Then
+		wrapper.Workspace.Verify(x => x.ActiveLayoutEngine.GetLayoutEngine<IFloatingLayoutEngine>(), Times.Never);
+		wrapper.FloatingLayoutEngine.Verify(x => x.UpdateWindowLocation(It.IsAny<IWindow>()), Times.Never);
+	}
+
+	[Fact]
+	public void WindowManager_WindowMoved_NoLayoutEngine()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
+		plugin.PreInitialize();
+
+		wrapper.WorkspaceManager
+			.Setup(w => w.GetWorkspaceForWindow(It.IsAny<IWindow>()))
+			.Returns(wrapper.Workspace.Object);
+		wrapper.Workspace
+			.Setup(w => w.ActiveLayoutEngine.GetLayoutEngine<IFloatingLayoutEngine>())
+			.Returns((IFloatingLayoutEngine?)null);
+
+		// When
+		wrapper.WindowManager.Raise(
+			wm => wm.WindowMoved += null,
+			new WindowEventArgs() { Window = new Mock<IWindow>().Object }
+		);
+
+		// Then
+		wrapper.Workspace.Verify(x => x.ActiveLayoutEngine.GetLayoutEngine<IFloatingLayoutEngine>(), Times.Once);
+		wrapper.FloatingLayoutEngine.Verify(x => x.UpdateWindowLocation(It.IsAny<IWindow>()), Times.Never);
+	}
+
+	[Fact]
+	public void WindowManager_WindowMoved()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
+		plugin.PreInitialize();
+
+		wrapper.WorkspaceManager
+			.Setup(w => w.GetWorkspaceForWindow(It.IsAny<IWindow>()))
+			.Returns(wrapper.Workspace.Object);
+		wrapper.Workspace
+			.Setup(w => w.ActiveLayoutEngine.GetLayoutEngine<IFloatingLayoutEngine>())
+			.Returns(wrapper.FloatingLayoutEngine.Object);
+
+		// When
+		wrapper.WindowManager.Raise(
+			wm => wm.WindowMoved += null,
+			new WindowEventArgs() { Window = new Mock<IWindow>().Object }
+		);
+
+		// Then
+		wrapper.Workspace.Verify(x => x.ActiveLayoutEngine.GetLayoutEngine<IFloatingLayoutEngine>(), Times.Once);
+		wrapper.FloatingLayoutEngine.Verify(x => x.UpdateWindowLocation(It.IsAny<IWindow>()), Times.Once);
+	}
+
+	[Fact]
+	public void Dispose()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutPlugin plugin = new(wrapper.Context.Object);
+		plugin.PreInitialize();
+
+		// When
+		plugin.Dispose();
+
+		// Then
+		wrapper.WindowManager.VerifyRemove(
+			wm => wm.WindowMoved -= It.IsAny<EventHandler<WindowEventArgs>>(),
+			Times.Once
+		);
 	}
 }
