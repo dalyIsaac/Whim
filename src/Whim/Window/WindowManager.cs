@@ -214,6 +214,9 @@ internal class WindowManager : IWindowManager
 		Logger.Verbose($"Windows event 0x{eventType:X4} for {window}");
 		switch (eventType)
 		{
+			// `EVENT_OBJECT_SHOW` is handled by the code above to `AddWindow`.
+			case PInvoke.EVENT_OBJECT_SHOW:
+				break;
 			case PInvoke.EVENT_SYSTEM_FOREGROUND:
 			case PInvoke.EVENT_OBJECT_UNCLOAKED:
 				OnWindowFocused(window);
