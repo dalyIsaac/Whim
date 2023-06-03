@@ -13,7 +13,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 {
 	private static readonly MatcherItemComparer<T> _sorter = new();
 
-	internal readonly Dictionary<string, uint> _commandLastExecutionTime = new();
+	internal readonly Dictionary<string, long> _commandLastExecutionTime = new();
 
 	/// <summary>
 	/// The filter to use when matching commands.
@@ -65,7 +65,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 				continue;
 			}
 
-			uint count = _commandLastExecutionTime.GetValueOrDefault<string, uint>(item.Id, 0);
+			long count = _commandLastExecutionTime.GetValueOrDefault<string, long>(item.Id, 0);
 			matches[matchCount++] = new MatcherResult<T>(item, filterMatches, count);
 		}
 
@@ -83,7 +83,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 
 		foreach (IVariantRowModel<T> item in items)
 		{
-			uint lastExecutionTime = _commandLastExecutionTime.TryGetValue(item.Id, out uint value) ? value : 0;
+			long lastExecutionTime = _commandLastExecutionTime.TryGetValue(item.Id, out long value) ? value : 0;
 			matches[matchCount++] = new MatcherResult<T>(item, Array.Empty<FilterTextMatch>(), lastExecutionTime);
 		}
 
@@ -96,7 +96,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 	/// </summary>
 	public void OnMatchExecuted(IVariantRowModel<T> item)
 	{
-		_commandLastExecutionTime[item.Id] = (uint)DateTime.Now.Ticks;
+		_commandLastExecutionTime[item.Id] = DateTime.Now.Ticks;
 	}
 
 	/// <inheritdoc/>
@@ -116,7 +116,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 				continue;
 			}
 
-			_commandLastExecutionTime[property.Name] = (uint)property.Value.GetUInt64();
+			_commandLastExecutionTime[property.Name] = property.Value.GetInt64();
 		}
 	}
 
