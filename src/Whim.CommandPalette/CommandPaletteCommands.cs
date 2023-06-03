@@ -168,7 +168,7 @@ public class CommandPaletteCommands : PluginCommands
 	/// <param name="windows"></param>
 	/// <param name="workspace"></param>
 	/// <returns>The move multiple windows to workspace command.</returns>
-	internal ICommand MoveMultipleWindowsToWorkspaceCreator(IEnumerable<IWindow> windows, IWorkspace workspace) =>
+	internal ICommand MoveMultipleWindowsToWorkspaceCreator(IReadOnlyList<IWindow> windows, IWorkspace workspace) =>
 		new Command(
 			identifier: $"{PluginName}.move_multiple_windows_to_workspace.{workspace.Name}",
 			title: workspace.Name,
@@ -188,15 +188,15 @@ public class CommandPaletteCommands : PluginCommands
 	{
 		IEnumerable<string> selectedWindowNames = options.Where(o => o.IsSelected).Select(o => o.Title);
 
-		IEnumerable<IWindow> windows = _context.WorkspaceManager
+		IReadOnlyList<IWorkspace> workspaces = _context.WorkspaceManager.ToArray();
+		IReadOnlyList<IWindow> windows = workspaces
 			.SelectMany(w => w.Windows)
-			.Where(w => selectedWindowNames.Contains(w.Title));
+			.Where(w => selectedWindowNames.Contains(w.Title))
+			.ToArray();
 
-		IEnumerable<ICommand> items = _context.WorkspaceManager.Select(
-			w => MoveMultipleWindowsToWorkspaceCreator(windows, w)
-		);
+		IEnumerable<ICommand> commands = workspaces.Select(w => MoveMultipleWindowsToWorkspaceCreator(windows, w));
 
-		_commandPalettePlugin.Activate(new MenuVariantConfig() { Hint = "Select workspace", Commands = items });
+		_commandPalettePlugin.Activate(new MenuVariantConfig() { Hint = "Select workspace", Commands = commands });
 	}
 
 	/// <summary>
