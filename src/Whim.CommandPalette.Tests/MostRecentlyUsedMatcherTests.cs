@@ -40,7 +40,7 @@ public class MostRecentlyUsedMatcherTests
 		// Then
 		Assert.Equal(1, matchCount);
 		Assert.Equal("A", matches[0].Model.Data.Command.Title);
-		Assert.Equal((uint)0, matches[0].Score);
+		Assert.Equal(0, matches[0].Score);
 	}
 
 	[Fact]
@@ -58,9 +58,9 @@ public class MostRecentlyUsedMatcherTests
 		// Then
 		Assert.Equal(2, matchCount);
 		Assert.Equal("A", matches[0].Model.Data.Command.Title);
-		Assert.Equal((uint)0, matches[0].Score);
+		Assert.Equal(0, matches[0].Score);
 		Assert.Equal("B", matches[1].Model.Data.Command.Title);
-		Assert.Equal((uint)0, matches[1].Score);
+		Assert.Equal(0, matches[1].Score);
 	}
 
 	[Fact]
@@ -176,8 +176,8 @@ public class MostRecentlyUsedMatcherTests
 
 		// Then
 		Assert.Equal(2, matcher._commandLastExecutionTime.Count);
-		Assert.Equal<uint>(1, matcher._commandLastExecutionTime["A"]);
-		Assert.Equal<uint>(2, matcher._commandLastExecutionTime["B"]);
+		Assert.Equal<long>(1, matcher._commandLastExecutionTime["A"]);
+		Assert.Equal<long>(2, matcher._commandLastExecutionTime["B"]);
 	}
 
 	[Fact]
@@ -210,7 +210,7 @@ public class MostRecentlyUsedMatcherTests
 		// Then
 		Assert.NotNull(state);
 
-		Dictionary<string, uint> commandLastExecutionTime = JsonSerializer.Deserialize<Dictionary<string, uint>>(
+		Dictionary<string, long> commandLastExecutionTime = JsonSerializer.Deserialize<Dictionary<string, long>>(
 			state?.GetRawText()!
 		)!;
 

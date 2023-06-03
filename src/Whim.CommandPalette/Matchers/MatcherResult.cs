@@ -19,7 +19,7 @@ public record MatcherResult<T>
 	/// <summary>
 	/// The score of the result.
 	/// </summary>
-	public uint Score { get; }
+	public long Score { get; }
 
 	/// <summary>
 	/// Creates a new <see cref="MatcherResult{T}"/>.
@@ -27,7 +27,7 @@ public record MatcherResult<T>
 	/// <param name="model">The associated model of the result.</param>
 	/// <param name="textSegments">The text matches from the query.</param>
 	/// <param name="score">The score of the result.</param>
-	public MatcherResult(IVariantRowModel<T> model, FilterTextMatch[] textSegments, uint score)
+	public MatcherResult(IVariantRowModel<T> model, FilterTextMatch[] textSegments, long score)
 	{
 		Model = model;
 		_textSegments = textSegments;
