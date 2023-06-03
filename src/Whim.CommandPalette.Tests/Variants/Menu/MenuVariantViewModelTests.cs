@@ -314,6 +314,26 @@ public class MenuVariantViewModelTests
 		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
 	}
 
+	[InlineData(-1)]
+	[InlineData(1)]
+	[Theory]
+	public void ExecuteCommand_InvalidSelectedIndex(int index)
+	{
+		// Given
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		vm.Activate(
+			new MenuVariantConfig() { Commands = new List<ICommand>() { new Command("id", "title", () => { }) } }
+		);
+		vm.SelectedIndex = index;
+
+		// When
+		vm.ExecuteCommand();
+
+		// Then
+		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
+	}
+
 	[Fact]
 	public void Confirm()
 	{
@@ -360,6 +380,20 @@ public class MenuVariantViewModelTests
 		// Then
 		Assert.Equal(Visibility.Visible, vm.NoMatchingCommandsTextBlockVisibility);
 		Assert.Equal(Visibility.Collapsed, vm.ListViewItemsVisibility);
+	}
+
+	[Fact]
+	public void Update_NotActivated()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+
+		// When
+		vm.Update();
+
+		// Then
+		Assert.Empty(vm._allItems);
 	}
 
 	private static MenuVariantConfig CreateMenuActivationConfig(int itemCount)

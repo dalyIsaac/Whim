@@ -182,6 +182,12 @@ internal class MenuVariantViewModel : IVariantViewModel
 			return;
 		}
 
+		if (SelectedIndex < 0 || SelectedIndex >= MenuRows.Count)
+		{
+			Logger.Error($"Invalid index {SelectedIndex}");
+			return;
+		}
+
 		Logger.Verbose($"Executing command at index {SelectedIndex}");
 		IVariantRowModel<MenuVariantRowModelData> paletteItem = MenuRows[SelectedIndex].ViewModel.Model;
 		MenuVariantRowModelData match = paletteItem.Data;
