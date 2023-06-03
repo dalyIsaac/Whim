@@ -27,7 +27,7 @@ public partial class FocusedWindowWidget : UserControl
 	/// <param name="getTitle">
 	/// The function to get the title of the window. Defaults to <see cref="GetTitle(IWindow)"/>.
 	/// </param>
-	public static BarComponent CreateComponent(Func<IWindow, string>? getTitle)
+	public static BarComponent CreateComponent(Func<IWindow, string>? getTitle = null)
 	{
 		return new BarComponent(
 			(context, monitor, window) => new FocusedWindowWidget(context, monitor, getTitle ?? GetTitle)
