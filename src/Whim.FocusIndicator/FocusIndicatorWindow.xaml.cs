@@ -1,4 +1,4 @@
-﻿using Windows.Win32.Foundation;
+﻿using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim.FocusIndicator;
 
@@ -53,19 +53,8 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 				Location = borderLocation,
 				WindowSize = WindowSize.Normal
 			},
-			windowState.Window.Handle
-		);
-
-		// Layout the actual window. This is to ensure that the focus indicator window is always
-		// behind the actual window.
-		windowDeferPos.DeferWindowPos(
-			new WindowState()
-			{
-				Window = windowState.Window,
-				Location = windowState.Location,
-				WindowSize = windowState.WindowSize
-			},
-			(HWND)0
+			windowState.Window.Handle,
+			SET_WINDOW_POS_FLAGS.SWP_NOREDRAW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
 		);
 	}
 }

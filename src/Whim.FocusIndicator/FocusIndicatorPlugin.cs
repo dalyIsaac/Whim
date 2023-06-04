@@ -56,8 +56,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 
 		// Only subscribe to workspace changes once the indicator window has been created - we shouldn't
 		// show a window which doesn't yet exist (it'll just crash Whim).
-		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
-		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
+		_context.WorkspaceManager.WorkspaceLayoutCompleted += WorkspaceManager_WorkspaceLayoutCompleted;
 	}
 
 	private void DispatcherTimer_Tick(object? sender, object e) => Hide();
@@ -90,13 +89,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		Hide();
 	}
 
-	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
-	{
-		Logger.Debug("Active layout engine changed");
-		Show();
-	}
-
-	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e) => Show();
+	private void WorkspaceManager_WorkspaceLayoutCompleted(object? sender, WorkspaceEventArgs e) => Show();
 
 	/// <inheritdoc/>
 	public void Show(IWindow? window = null)
@@ -192,8 +185,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 				_context.WindowManager.WindowMoveStart -= WindowManager_EventSink_Show;
 				_context.WindowManager.WindowMinimizeStart -= WindowManager_EventSink_Show;
 				_context.WindowManager.WindowMinimizeEnd -= WindowManager_EventSink_Show;
-				_context.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
-				_context.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
+				_context.WorkspaceManager.WorkspaceLayoutCompleted -= WorkspaceManager_WorkspaceLayoutCompleted;
 				_focusIndicatorWindow?.Close();
 			}
 
