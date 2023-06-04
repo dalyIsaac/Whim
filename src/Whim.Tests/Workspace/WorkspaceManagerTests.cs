@@ -1251,7 +1251,7 @@ public class WorkspaceManagerTests
 
 		Mock<Func<IContext, string, IWorkspace>> workspaceFactory = new();
 		workspaceFactory.Setup(f => f(mocks.Context.Object, It.IsAny<string>())).Returns(new Mock<IWorkspace>().Object);
-		mocks.WorkspaceManager.WorkspaceFactory = workspaceFactory.Object;
+		mocks.WorkspaceManager.WorkspaceConfigCreator = workspaceFactory.Object;
 
 		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
 		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);

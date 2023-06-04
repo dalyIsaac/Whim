@@ -15,14 +15,9 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public IWorkspace ActiveWorkspace { get; }
 
 	/// <summary>
-	/// Creates a workspace, named with the provided string.
-	///
-	/// <br/>
-	///
-	/// <b>NOTE</b>: This will not add the workspace to the manager, nor will it activate it.
-	/// Call <see cref="Add"/>.
+	/// Creates the default layout engines to add to a workspace.
 	/// </summary>
-	public Func<IContext, string, IWorkspace> WorkspaceFactory { get; set; }
+	public Func<IList<ILayoutEngine>> CreateDefaultLayoutEngines { get; set; }
 
 	/// <summary>
 	/// Initialize the event listeners.
@@ -65,7 +60,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
 
 	/// <summary>
-	/// Triggered when workspace is renamed.
+	/// Event for when a workspace is renamed.
 	/// </summary>
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
@@ -76,10 +71,17 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public void LayoutAllActiveWorkspaces();
 
 	/// <summary>
-	/// The <see cref="IWorkspace"/> to add.
+	/// Add a new workspace.
 	/// </summary>
-	/// <param name="workspace"></param>
-	public void Add(IWorkspace workspace);
+	/// <param name="name">
+	/// The name of the workspace. Defaults to <see langword="null"/>, which will generate the name
+	/// <c>Workspace {n}</c>.
+	/// </param>
+	/// <param name="layoutEngines">
+	/// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
+	/// use the <see cref="CreateDefaultLayoutEngines"/> function.
+	/// </param>
+	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null);
 
 	/// <summary>
 	/// Tries to remove the given workspace.
@@ -174,26 +176,6 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The proxy layout engines.
 	/// </summary>
 	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get; }
-
-	/// <summary>
-	/// Used by <see cref="IWorkspace"/> to trigger <see cref="ActiveLayoutEngineChanged"/>.
-	/// </summary>
-	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args);
-
-	/// <summary>
-	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceRenamed"/>.
-	/// </summary>
-	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args);
-
-	/// <summary>
-	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceLayoutStarted"/>.
-	/// </summary>
-	public void TriggerWorkspaceLayoutStarted(WorkspaceEventArgs args);
-
-	/// <summary>
-	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceLayoutCompleted"/>.
-	/// </summary>
-	public void TriggerWorkspaceLayoutCompleted(WorkspaceEventArgs args);
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.

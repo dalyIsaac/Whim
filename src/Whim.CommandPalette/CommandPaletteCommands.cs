@@ -49,11 +49,7 @@ public class CommandPaletteCommands : PluginCommands
 					_commandPalettePlugin.Activate(
 						new FreeTextVariantConfig()
 						{
-							Callback = (text) =>
-							{
-								IWorkspace workspace = _context.WorkspaceManager.WorkspaceFactory(_context, text);
-								_context.WorkspaceManager.Add(workspace);
-							},
+							Callback = (name) => _context.WorkspaceManager.Add(name),
 							Hint = "Enter new workspace name",
 							Prompt = "Create workspace"
 						}

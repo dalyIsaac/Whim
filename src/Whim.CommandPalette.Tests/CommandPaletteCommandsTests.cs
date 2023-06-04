@@ -136,7 +136,7 @@ public class CommandPaletteCommandsTests
 		// Setup the workspace factory
 		Mock<IWorkspace> newWorkspace = new();
 		wrapper.WorkspaceManager
-			.SetupGet(x => x.WorkspaceFactory)
+			.SetupGet(x => x.WorkspaceConfigCreator)
 			.Returns(
 				(_, name) =>
 				{
