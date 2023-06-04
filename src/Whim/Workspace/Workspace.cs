@@ -407,6 +407,8 @@ internal class Workspace : IWorkspace
 			_windowLocations[loc.Window] = loc;
 		}
 		Logger.Verbose($"Layout for workspace {Name} complete");
+
+		_context.WorkspaceManager.TriggerWorkspaceLayout(new WorkspaceEventArgs() { Workspace = this });
 	}
 
 	#region Phantom Windows

@@ -45,6 +45,11 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
 
 	/// <summary>
+	/// Event for when <see cref="IWorkspace.DoLayout"/> has been called.
+	/// </summary>
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayout;
+
+	/// <summary>
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
@@ -174,6 +179,11 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceRenamed"/>.
 	/// </summary>
 	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args);
+
+	/// <summary>
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceLayout"/>.
+	/// </summary>
+	public void TriggerWorkspaceLayout(WorkspaceEventArgs args);
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.
