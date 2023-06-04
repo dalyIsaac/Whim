@@ -73,7 +73,11 @@ public partial class App : Application
 	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
 	{
 		Logger.Error(e.Exception.ToString());
+		e.Handled = true;
+
+#if DEBUG
 		_context?.Exit();
+#endif
 	}
 
 	// Add when Windows App SDK supports the application exit event.
