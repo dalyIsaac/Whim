@@ -19,6 +19,13 @@ public sealed class WindowDeferPosHandle : IDisposable
 	private readonly List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> _windowStates =
 		new();
 
+	public const SET_WINDOW_POS_FLAGS DefaultFlags =
+		SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
+		| SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
+		| SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
+		| SET_WINDOW_POS_FLAGS.SWP_NOZORDER
+		| SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
+
 	/// <summary>
 	/// Create a new <see cref="WindowDeferPosHandle"/> to set the position of multiple windows at once.
 	///
@@ -37,8 +44,8 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// <param name="windowState"></param>
 	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
 	/// <param name="flags">
-	/// The flags to use when setting the window position.
-	/// If the window is maximized or minimized, additional flags will be added by Whim.
+	/// The flags to use when setting the window position. This overrides the default flags Whim sets,
+	/// except when the window is maximized or minimized.
 	/// </param>
 	public void DeferWindowPos(
 		IWindowState windowState,
@@ -122,13 +129,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 			WindowSize windowSize = windowState.WindowSize;
 
-			SET_WINDOW_POS_FLAGS uFlags =
-				flags
-				?? SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
-					| SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
-					| SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
-					| SET_WINDOW_POS_FLAGS.SWP_NOZORDER
-					| SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
+			SET_WINDOW_POS_FLAGS uFlags = flags ?? DefaultFlags;
 
 			if (windowSize == WindowSize.Maximized)
 			{

@@ -1365,6 +1365,36 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void TriggerWorkspaceLayoutStarted()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		WorkspaceEventArgs eventArgs = new() { Workspace = new Mock<IWorkspace>().Object, };
+
+		// When the workspace layout is started, then the event is triggered
+		Assert.Raises<WorkspaceEventArgs>(
+			h => mocks.WorkspaceManager.WorkspaceLayoutStarted += h,
+			h => mocks.WorkspaceManager.WorkspaceLayoutStarted -= h,
+			() => mocks.WorkspaceManager.TriggerWorkspaceLayoutStarted(eventArgs)
+		);
+	}
+
+	[Fact]
+	public void TriggerWorkspaceLayoutCompleted()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		WorkspaceEventArgs eventArgs = new() { Workspace = new Mock<IWorkspace>().Object, };
+
+		// When the workspace layout is ended, then the event is triggered
+		Assert.Raises<WorkspaceEventArgs>(
+			h => mocks.WorkspaceManager.WorkspaceLayoutCompleted += h,
+			h => mocks.WorkspaceManager.WorkspaceLayoutCompleted -= h,
+			() => mocks.WorkspaceManager.TriggerWorkspaceLayoutCompleted(eventArgs)
+		);
+	}
+
+	[Fact]
 	public void AddPhantomWindow()
 	{
 		// Given
