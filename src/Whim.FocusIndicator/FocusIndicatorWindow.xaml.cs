@@ -26,10 +26,10 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 	/// <summary>
 	/// Activates the window behind the given window.
 	/// </summary>
-	/// <param name="windowLocation">The location of the window.</param>
-	public void Activate(IWindowState windowLocation)
+	/// <param name="windowState">The window to show the indicator for.</param>
+	public void Activate(IWindowState windowState)
 	{
-		ILocation<int> focusedWindowLocation = windowLocation.Location;
+		ILocation<int> focusedWindowLocation = windowState.Location;
 		int borderSize = FocusIndicatorConfig.BorderSize;
 
 		ILocation<int> borderLocation = new Location<int>()
@@ -44,6 +44,8 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		_context.NativeManager.PreventWindowActivation(_window.Handle);
 
 		using WindowDeferPosHandle windowDeferPos = new(_context);
+
+		// Layout the focus indicator window.
 		windowDeferPos.DeferWindowPos(
 			new WindowState()
 			{
@@ -51,7 +53,19 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 				Location = borderLocation,
 				WindowSize = WindowSize.Normal
 			},
-			new HWND(1)
+			windowState.Window.Handle
+		);
+
+		// Layout the actual window. This is to ensure that the focus indicator window is always
+		// behind the actual window.
+		windowDeferPos.DeferWindowPos(
+			new WindowState()
+			{
+				Window = windowState.Window,
+				Location = windowState.Location,
+				WindowSize = windowState.WindowSize
+			},
+			(HWND)0
 		);
 	}
 }
