@@ -45,6 +45,11 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
 
 	/// <summary>
+	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
+	/// </summary>
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+
+	/// <summary>
 	/// Event for when <see cref="IWorkspace.DoLayout"/> has completed.
 	/// </summary>
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
@@ -181,7 +186,12 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args);
 
 	/// <summary>
-	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceLayout"/>.
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceLayoutStarted"/>.
+	/// </summary>
+	public void TriggerWorkspaceLayoutStarted(WorkspaceEventArgs args);
+
+	/// <summary>
+	/// Used by <see cref="IWorkspace"/> to trigger <see cref="WorkspaceLayoutCompleted"/>.
 	/// </summary>
 	public void TriggerWorkspaceLayoutCompleted(WorkspaceEventArgs args);
 

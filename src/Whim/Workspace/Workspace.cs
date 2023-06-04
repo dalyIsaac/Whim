@@ -360,6 +360,8 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Workspace {Name}");
 
+		_context.WorkspaceManager.TriggerWorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
+
 		// Get the monitor for this workspace
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
 		if (monitor == null)
