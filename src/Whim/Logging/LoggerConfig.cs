@@ -29,7 +29,7 @@ public class LoggerConfig
 		new FileSinkConfig()
 		{
 			FileName = "whim.log",
-			MinLogLevel = LogLevel.Error,
+			MinLogLevel = LogLevel.Verbose,
 			RollingInterval = FileSinkConfigRollingInterval.Day
 		};
 

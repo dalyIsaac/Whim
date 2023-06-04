@@ -109,10 +109,9 @@ internal class Workspace : IWorkspace
 		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
-	private void UpdateLayoutEngine(int delta)
+	private void UpdateLayoutEngine(int nextIdx)
 	{
 		int prevIdx = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Count);
 
 		// If the LastFocusedWindow is a phantom window, remove it.
 		// This is because phantom windows belong to a specific layout engine.
@@ -121,6 +120,10 @@ internal class Workspace : IWorkspace
 			LastFocusedWindow = null;
 		}
 
+		_layoutEngines[prevIdx].HidePhantomWindows();
+		_activeLayoutEngineIndex = nextIdx;
+		DoLayout();
+
 		_context.WorkspaceManager.TriggerActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
@@ -129,60 +132,47 @@ internal class Workspace : IWorkspace
 				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
 			}
 		);
-
-		_layoutEngines[prevIdx].HidePhantomWindows();
-		DoLayout();
 	}
 
 	public void NextLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine(1);
+		UpdateLayoutEngine((_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Count));
 	}
 
 	public void PreviousLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine(-1);
+		UpdateLayoutEngine((_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Count));
 	}
 
 	public bool TrySetLayoutEngine(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
-		int prevIdx = -1;
+		int nextIdx = -1;
 		for (int idx = 0; idx < _layoutEngines.Count; idx++)
 		{
 			ILayoutEngine engine = _layoutEngines[idx];
 			if (engine.Name == name)
 			{
-				prevIdx = _activeLayoutEngineIndex;
-				_activeLayoutEngineIndex = idx;
+				nextIdx = idx;
 				break;
 			}
 		}
 
-		if (prevIdx == -1)
+		if (nextIdx == -1)
 		{
 			Logger.Error($"Layout engine {name} not found for workspace {Name}");
 			return false;
 		}
-		else if (_activeLayoutEngineIndex == prevIdx)
+		else if (_activeLayoutEngineIndex == nextIdx)
 		{
 			Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
 			return true;
 		}
 
-		_context.WorkspaceManager.TriggerActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = this,
-				PreviousLayoutEngine = _layoutEngines[prevIdx],
-				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
-			}
-		);
-
-		DoLayout();
+		UpdateLayoutEngine(nextIdx);
 		return true;
 	}
 
@@ -370,6 +360,8 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Workspace {Name}");
 
+		_context.WorkspaceManager.TriggerWorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
+
 		// Get the monitor for this workspace
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
 		if (monitor == null)
@@ -392,31 +384,35 @@ internal class Workspace : IWorkspace
 			monitor
 		);
 
-		using WindowDeferPosHandle handle = new(_context);
-		foreach (IWindowState loc in locations)
+		using (WindowDeferPosHandle handle = new(_context))
 		{
-			Logger.Verbose($"Setting location of window {loc.Window}");
-			if (loc.Window.IsMouseMoving)
+			foreach (IWindowState loc in locations)
 			{
-				continue;
+				Logger.Verbose($"Setting location of window {loc.Window}");
+				if (loc.Window.IsMouseMoving)
+				{
+					continue;
+				}
+
+				// Adjust the window location to the monitor's coordinates
+				loc.Location = new Location<int>()
+				{
+					X = loc.Location.X + monitor.WorkingArea.X,
+					Y = loc.Location.Y + monitor.WorkingArea.Y,
+					Width = loc.Location.Width,
+					Height = loc.Location.Height
+				};
+
+				Logger.Verbose($"{loc.Window} at {loc.Location}");
+				handle.DeferWindowPos(loc);
+
+				// Update the window location
+				_windowLocations[loc.Window] = loc;
 			}
-
-			// Adjust the window location to the monitor's coordinates
-			loc.Location = new Location<int>()
-			{
-				X = loc.Location.X + monitor.WorkingArea.X,
-				Y = loc.Location.Y + monitor.WorkingArea.Y,
-				Width = loc.Location.Width,
-				Height = loc.Location.Height
-			};
-
-			Logger.Verbose($"{loc.Window} at {loc.Location}");
-			handle.DeferWindowPos(loc);
-
-			// Update the window location
-			_windowLocations[loc.Window] = loc;
+			Logger.Verbose($"Layout for workspace {Name} complete");
 		}
-		Logger.Verbose($"Layout for workspace {Name} complete");
+
+		_context.WorkspaceManager.TriggerWorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
 	#region Phantom Windows

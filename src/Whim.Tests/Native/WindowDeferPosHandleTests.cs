@@ -6,6 +6,16 @@ using Xunit;
 
 namespace Whim.Tests;
 
+public record struct DeferWindowPosTestData(
+	IWindowState WindowState,
+	HWND? HwndInsertAfter,
+	SET_WINDOW_POS_FLAGS? Flags,
+	SET_WINDOW_POS_FLAGS ExpectedFlags,
+	int ExpectedNormalCallCount,
+	int ExpectedMinimizedCallCount,
+	int ExpectedMaximizedCallCount
+);
+
 public class WindowDeferPosHandleTests
 {
 	private class MocksBuilder
@@ -37,62 +47,82 @@ public class WindowDeferPosHandleTests
 
 	public static IEnumerable<object[]> DeferWindowPos_Data()
 	{
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 		yield return new object[]
 		{
-			new WindowState()
-			{
-				Location = new Location<int>(),
-				Window = new Mock<IWindow>().Object,
-				WindowSize = WindowSize.Normal
-			},
-			null,
-			COMMON_FLAGS,
-			1,
-			0,
-			0
+			new DeferWindowPosTestData(
+				new WindowState()
+				{
+					Location = new Location<int>(),
+					Window = new Mock<IWindow>().Object,
+					WindowSize = WindowSize.Normal
+				},
+				null,
+				null,
+				COMMON_FLAGS,
+				1,
+				0,
+				0
+			)
 		};
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+
 		yield return new object[]
 		{
-			new WindowState()
-			{
-				Location = new Location<int>(),
-				Window = new Mock<IWindow>().Object,
-				WindowSize = WindowSize.Minimized
-			},
-			(HWND)1,
-			COMMON_FLAGS | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE,
-			0,
-			1,
-			0
+			new DeferWindowPosTestData(
+				new WindowState()
+				{
+					Location = new Location<int>(),
+					Window = new Mock<IWindow>().Object,
+					WindowSize = WindowSize.Minimized
+				},
+				(HWND)1,
+				null,
+				COMMON_FLAGS | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE,
+				0,
+				1,
+				0
+			)
 		};
+
 		yield return new object[]
 		{
-			new WindowState()
-			{
-				Location = new Location<int>(),
-				Window = new Mock<IWindow>().Object,
-				WindowSize = WindowSize.Maximized
-			},
-			(HWND)3,
-			COMMON_FLAGS | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE,
-			0,
-			0,
-			1
+			new DeferWindowPosTestData(
+				new WindowState()
+				{
+					Location = new Location<int>(),
+					Window = new Mock<IWindow>().Object,
+					WindowSize = WindowSize.Maximized
+				},
+				(HWND)3,
+				null,
+				COMMON_FLAGS | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE,
+				0,
+				0,
+				1
+			)
+		};
+
+		yield return new object[]
+		{
+			new DeferWindowPosTestData(
+				new WindowState()
+				{
+					Location = new Location<int>(),
+					Window = new Mock<IWindow>().Object,
+					WindowSize = WindowSize.Normal
+				},
+				(HWND)4,
+				SET_WINDOW_POS_FLAGS.SWP_NOREDRAW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE,
+				SET_WINDOW_POS_FLAGS.SWP_NOREDRAW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE,
+				1,
+				0,
+				0
+			)
 		};
 	}
 
 	[Theory]
 	[MemberData(nameof(DeferWindowPos_Data))]
-	public void DeferWindowPos(
-		WindowState windowState,
-		HWND? hwndInsertAfter,
-		SET_WINDOW_POS_FLAGS expectedFlags,
-		int expectedNormalCallCount,
-		int expectedMinimizedCallCount,
-		int expectedMaximizedCallCount
-	)
+	public void DeferWindowPos(DeferWindowPosTestData data)
 	{
 		// Given
 		MocksBuilder mocks = new();
@@ -118,7 +148,7 @@ public class WindowDeferPosHandleTests
 		WindowDeferPosHandle handle = new(mocks.Context.Object);
 
 		// When
-		handle.DeferWindowPos(windowState, hwndInsertAfter);
+		handle.DeferWindowPos(data.WindowState, data.HwndInsertAfter, data.Flags);
 		handle.Dispose();
 
 		// Then
@@ -126,28 +156,28 @@ public class WindowDeferPosHandleTests
 			n =>
 				n.DeferWindowPos(
 					(HDWP)1,
-					windowState.Window.Handle,
-					hwndInsertAfter ?? (HWND)1,
-					windowState.Location.X,
-					windowState.Location.Y,
-					windowState.Location.Width,
-					windowState.Location.Height,
-					expectedFlags
+					data.WindowState.Window.Handle,
+					data.HwndInsertAfter ?? (HWND)1,
+					data.WindowState.Location.X,
+					data.WindowState.Location.Y,
+					data.WindowState.Location.Width,
+					data.WindowState.Location.Height,
+					data.ExpectedFlags
 				),
 			Times.Exactly(2)
 		);
 		mocks.NativeManager.Verify(n => n.EndDeferWindowPos(It.IsAny<HDWP>()), Times.Exactly(2));
 		mocks.NativeManager.Verify(
 			n => n.ShowWindowNoActivate(It.IsAny<HWND>()),
-			Times.Exactly(expectedNormalCallCount * 2)
+			Times.Exactly(data.ExpectedNormalCallCount * 2)
 		);
 		mocks.NativeManager.Verify(
 			n => n.MinimizeWindow(It.IsAny<HWND>()),
-			Times.Exactly(expectedMinimizedCallCount * 2)
+			Times.Exactly(data.ExpectedMinimizedCallCount * 2)
 		);
 		mocks.NativeManager.Verify(
 			n => n.ShowWindowMaximized(It.IsAny<HWND>()),
-			Times.Exactly(expectedMaximizedCallCount * 2)
+			Times.Exactly(data.ExpectedMaximizedCallCount * 2)
 		);
 	}
 

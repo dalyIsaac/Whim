@@ -16,7 +16,18 @@ namespace Whim;
 public sealed class WindowDeferPosHandle : IDisposable
 {
 	private readonly IContext _context;
-	private readonly List<(IWindowState windowState, HWND hwndInsertAfter)> _windowStates = new();
+	private readonly List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> _windowStates =
+		new();
+
+	/// <summary>
+	/// The default flags to use when setting the window position.
+	/// </summary>
+	public const SET_WINDOW_POS_FLAGS DefaultFlags =
+		SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
+		| SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
+		| SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
+		| SET_WINDOW_POS_FLAGS.SWP_NOZORDER
+		| SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
 
 	/// <summary>
 	/// Create a new <see cref="WindowDeferPosHandle"/> to set the position of multiple windows at once.
@@ -35,14 +46,22 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// </summary>
 	/// <param name="windowState"></param>
 	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
-	public void DeferWindowPos(IWindowState windowState, HWND? hwndInsertAfter = null)
+	/// <param name="flags">
+	/// The flags to use when setting the window position. This overrides the default flags Whim sets,
+	/// except when the window is maximized or minimized.
+	/// </param>
+	public void DeferWindowPos(
+		IWindowState windowState,
+		HWND? hwndInsertAfter = null,
+		SET_WINDOW_POS_FLAGS? flags = null
+	)
 	{
 		// We use HWND_BOTTOM, as modifying the Z-order of a window
 		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
 		// causes the relevant window to be focused, when the user hasn't
 		// actually changed the focus.
 		HWND targetHwndInsertAfter = hwndInsertAfter ?? (HWND)1; // HWND_BOTTOM
-		_windowStates.Add((windowState, targetHwndInsertAfter));
+		_windowStates.Add((windowState, targetHwndInsertAfter, flags));
 	}
 
 	/// <inheritdoc />
@@ -66,8 +85,8 @@ public sealed class WindowDeferPosHandle : IDisposable
 			using InternalWindowDeferPosHandle handle = new(_context, count);
 			for (int j = 0; j < count; j++)
 			{
-				(IWindowState windowState, HWND hwndInsertAfter) = _windowStates[j];
-				handle.DeferWindowPos(windowState, hwndInsertAfter);
+				(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags) = _windowStates[j];
+				handle.DeferWindowPos(windowState, hwndInsertAfter, flags);
 			}
 		}
 	}
@@ -99,7 +118,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 			_toNormal = new List<IWindow>();
 		}
 
-		public void DeferWindowPos(IWindowState windowState, HWND hwndInsertAfter)
+		public void DeferWindowPos(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)
 		{
 			IWindow window = windowState.Window;
 
@@ -113,22 +132,17 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 			WindowSize windowSize = windowState.WindowSize;
 
-			SET_WINDOW_POS_FLAGS flags =
-				SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
-				| SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
-				| SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
-				| SET_WINDOW_POS_FLAGS.SWP_NOZORDER
-				| SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
+			SET_WINDOW_POS_FLAGS uFlags = flags ?? DefaultFlags;
 
 			if (windowSize == WindowSize.Maximized)
 			{
 				_toMaximize.Add(window);
-				flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+				uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
 			}
 			else if (windowSize == WindowSize.Minimized)
 			{
 				_toMinimize.Add(window);
-				flags = flags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+				uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
 			}
 			else
 			{
@@ -143,7 +157,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 				location.Y,
 				location.Width,
 				location.Height,
-				flags
+				uFlags
 			);
 		}
 

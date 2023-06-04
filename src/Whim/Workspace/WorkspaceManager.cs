@@ -48,6 +48,10 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
+
 	public Func<IContext, string, IWorkspace> WorkspaceFactory { get; set; } =
 		(context, name) =>
 		{
@@ -469,6 +473,16 @@ internal class WorkspaceManager : IWorkspaceManager
 	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args)
 	{
 		WorkspaceRenamed?.Invoke(this, args);
+	}
+
+	public void TriggerWorkspaceLayoutStarted(WorkspaceEventArgs args)
+	{
+		WorkspaceLayoutStarted?.Invoke(this, args);
+	}
+
+	public void TriggerWorkspaceLayoutCompleted(WorkspaceEventArgs args)
+	{
+		WorkspaceLayoutCompleted?.Invoke(this, args);
 	}
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
