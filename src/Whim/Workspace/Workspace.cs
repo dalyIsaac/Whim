@@ -382,33 +382,35 @@ internal class Workspace : IWorkspace
 			monitor
 		);
 
-		using WindowDeferPosHandle handle = new(_context);
-		foreach (IWindowState loc in locations)
+		using (WindowDeferPosHandle handle = new(_context))
 		{
-			Logger.Verbose($"Setting location of window {loc.Window}");
-			if (loc.Window.IsMouseMoving)
+			foreach (IWindowState loc in locations)
 			{
-				continue;
+				Logger.Verbose($"Setting location of window {loc.Window}");
+				if (loc.Window.IsMouseMoving)
+				{
+					continue;
+				}
+
+				// Adjust the window location to the monitor's coordinates
+				loc.Location = new Location<int>()
+				{
+					X = loc.Location.X + monitor.WorkingArea.X,
+					Y = loc.Location.Y + monitor.WorkingArea.Y,
+					Width = loc.Location.Width,
+					Height = loc.Location.Height
+				};
+
+				Logger.Verbose($"{loc.Window} at {loc.Location}");
+				handle.DeferWindowPos(loc);
+
+				// Update the window location
+				_windowLocations[loc.Window] = loc;
 			}
-
-			// Adjust the window location to the monitor's coordinates
-			loc.Location = new Location<int>()
-			{
-				X = loc.Location.X + monitor.WorkingArea.X,
-				Y = loc.Location.Y + monitor.WorkingArea.Y,
-				Width = loc.Location.Width,
-				Height = loc.Location.Height
-			};
-
-			Logger.Verbose($"{loc.Window} at {loc.Location}");
-			handle.DeferWindowPos(loc);
-
-			// Update the window location
-			_windowLocations[loc.Window] = loc;
+			Logger.Verbose($"Layout for workspace {Name} complete");
 		}
-		Logger.Verbose($"Layout for workspace {Name} complete");
 
-		_context.WorkspaceManager.TriggerWorkspaceLayout(new WorkspaceEventArgs() { Workspace = this });
+		_context.WorkspaceManager.TriggerWorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
 	#region Phantom Windows
