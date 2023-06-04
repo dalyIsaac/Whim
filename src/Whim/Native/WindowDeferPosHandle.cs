@@ -19,6 +19,9 @@ public sealed class WindowDeferPosHandle : IDisposable
 	private readonly List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> _windowStates =
 		new();
 
+	/// <summary>
+	/// The default flags to use when setting the window position.
+	/// </summary>
 	public const SET_WINDOW_POS_FLAGS DefaultFlags =
 		SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
 		| SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
