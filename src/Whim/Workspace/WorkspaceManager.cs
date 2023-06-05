@@ -21,8 +21,9 @@ internal record WorkspaceManagerTriggers
 /// </summary>
 internal class WorkspaceManager : IWorkspaceManager
 {
+	private bool _initialized;
 	private readonly IContext _context;
-	private readonly WorkspaceManagerTriggers _triggers;
+	protected readonly WorkspaceManagerTriggers _triggers;
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/>s stored by this manager.
@@ -93,6 +94,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug("Initializing workspace manager...");
 
+		_initialized = true;
+
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
 		// Ensure there's at least n workspaces, for n monitors.
@@ -136,6 +139,12 @@ internal class WorkspaceManager : IWorkspaceManager
 			);
 
 		_workspaces.Add(workspace);
+
+		if (_initialized)
+		{
+			workspace.Initialize();
+		}
+
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 	}
 

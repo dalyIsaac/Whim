@@ -10,6 +10,9 @@ public class WorkspaceManagerTests
 {
 	private class WorkspaceManagerTestWrapper : WorkspaceManager
 	{
+		// Yes, I know it's bad to have `_triggers` be `internal` in `WorkspaceManager`.
+		public WorkspaceManagerTriggers InternalTriggers => _triggers;
+
 		public WorkspaceManagerTestWrapper(IContext context)
 			: base(context) { }
 
@@ -95,17 +98,19 @@ public class WorkspaceManagerTests
 	{
 		// Given the workspace manager is already initialized
 		MocksBuilder mocks = new(new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() });
-		mocks.WorkspaceManager.Initialize();
-		Mock<IWorkspace> workspace = new();
+		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
 
 		// When a workspace is added, then WorkspaceAdded is raised
+		mocks.WorkspaceManager.AddProxyLayoutEngine(proxyLayoutEngine.Object);
+		mocks.WorkspaceManager.Initialize();
 		Assert.Raises<WorkspaceEventArgs>(
 			h => mocks.WorkspaceManager.WorkspaceAdded += h,
 			h => mocks.WorkspaceManager.WorkspaceAdded -= h,
-			() => mocks.WorkspaceManager.Add(workspace.Object)
+			() => mocks.WorkspaceManager.Add("new workspace")
 		);
 
-		workspace.Verify(w => w.Initialize(), Times.Once);
+		// Verify that the workspace was initialized
+		proxyLayoutEngine.Verify(p => p(It.IsAny<ILayoutEngine>()), Times.Once);
 	}
 
 	[Fact]
@@ -124,20 +129,6 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void Add_SameWorkspaceTwice()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		MocksBuilder mocks = new(new[] { workspace });
-
-		// When a workspace is added
-		mocks.WorkspaceManager.Add(workspace.Object);
-
-		// Then the length is still 1
-		Assert.Single(mocks.WorkspaceManager);
-	}
-
-	[Fact]
 	public void Remove_Workspace_RequireAtLeastNWorkspace()
 	{
 		// Given the workspace manager has two workspaces and there are two monitors
@@ -148,7 +139,7 @@ public class WorkspaceManagerTests
 		// When a workspace is removed
 		bool result = mocks.WorkspaceManager.Remove(workspace.Object);
 
-		//Then it returns false, as there must be at least two workspaces, since there are two monitors
+		// Then it returns false, as there must be at least two workspaces, since there are two monitors
 		Assert.False(result);
 		workspace2.Verify(w => w.DoLayout(), Times.Never);
 	}
@@ -1124,8 +1115,20 @@ public class WorkspaceManagerTests
 		MocksBuilder mocks = new();
 
 		Mock<ILayoutEngine> layoutEngine = new();
-		Mock<Workspace> workspace = new(mocks.Context.Object, "test", layoutEngine.Object);
-		Mock<Workspace> workspace2 = new(mocks.Context.Object, "test", layoutEngine.Object);
+		Mock<Workspace> workspace =
+			new(
+				mocks.Context.Object,
+				mocks.WorkspaceManager.InternalTriggers,
+				"test",
+				new ILayoutEngine[] { layoutEngine.Object }
+			);
+		Mock<Workspace> workspace2 =
+			new(
+				mocks.Context.Object,
+				mocks.WorkspaceManager.InternalTriggers,
+				"test",
+				new ILayoutEngine[] { layoutEngine.Object }
+			);
 
 		mocks.WorkspaceManager.Add(workspace.Object);
 		mocks.WorkspaceManager.Add(workspace2.Object);
@@ -1253,12 +1256,14 @@ public class WorkspaceManagerTests
 		// Given
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-
 		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>());
 
 		MocksBuilder mocks = new(new[] { workspace, workspace2 });
+		mocks.Context.Setup(c => c.NativeManager).Returns(new Mock<INativeManager>().Object);
 
 		Mock<Func<IList<ILayoutEngine>>> CreateDefaultLayoutEngines = new();
+		CreateDefaultLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
 		mocks.WorkspaceManager.CreateDefaultLayoutEngines = CreateDefaultLayoutEngines.Object;
 
 		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
