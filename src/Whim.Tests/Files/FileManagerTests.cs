@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class FileManagerTests
 {

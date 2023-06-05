@@ -27,7 +27,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// <summary>
 	/// The <see cref="IWorkspace"/>s stored by this manager.
 	/// </summary>
-	private readonly List<IWorkspace> _workspaces = new();
+	protected readonly List<IWorkspace> _workspaces = new();
 
 	/// <summary>
 	/// Maps windows to their workspace.

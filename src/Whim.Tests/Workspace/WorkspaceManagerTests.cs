@@ -1,5 +1,6 @@
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -7,13 +8,21 @@ namespace Whim.Tests;
 
 public class WorkspaceManagerTests
 {
+	private class WorkspaceManagerTestWrapper : WorkspaceManager
+	{
+		public WorkspaceManagerTestWrapper(IContext context)
+			: base(context) { }
+
+		public void Add(IWorkspace workspace) => _workspaces.Add(workspace);
+	}
+
 	private class MocksBuilder
 	{
 		public Mock<IContext> Context { get; } = new();
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IMonitor>[] Monitors { get; }
 		public Mock<IRouterManager> RouterManager { get; } = new();
-		public WorkspaceManager WorkspaceManager { get; }
+		public WorkspaceManagerTestWrapper WorkspaceManager { get; }
 
 		public MocksBuilder(
 			Mock<IWorkspace>[]? workspaces = null,
@@ -1249,9 +1258,8 @@ public class WorkspaceManagerTests
 
 		MocksBuilder mocks = new(new[] { workspace, workspace2 });
 
-		Mock<Func<IContext, string, IWorkspace>> workspaceFactory = new();
-		workspaceFactory.Setup(f => f(mocks.Context.Object, It.IsAny<string>())).Returns(new Mock<IWorkspace>().Object);
-		mocks.WorkspaceManager.WorkspaceConfigCreator = workspaceFactory.Object;
+		Mock<Func<IList<ILayoutEngine>>> CreateDefaultLayoutEngines = new();
+		mocks.WorkspaceManager.CreateDefaultLayoutEngines = CreateDefaultLayoutEngines.Object;
 
 		mocks.WorkspaceManager.Activate(workspace.Object, mocks.Monitors[0].Object);
 		mocks.WorkspaceManager.Activate(workspace2.Object, mocks.Monitors[1].Object);
@@ -1268,7 +1276,7 @@ public class WorkspaceManagerTests
 		);
 
 		// Then a new workspace is created
-		workspaceFactory.Verify(f => f(mocks.Context.Object, "Workspace 3"), Times.Once());
+		CreateDefaultLayoutEngines.Verify(f => f(), Times.Once());
 	}
 
 	[Fact]
@@ -1320,78 +1328,6 @@ public class WorkspaceManagerTests
 
 		// Then the proxy layout engine is added to the list
 		Assert.Contains(proxyLayoutEngine.Object, mocks.WorkspaceManager.ProxyLayoutEngines);
-	}
-
-	[Fact]
-	public void TriggerActiveLayoutEngineChanged()
-	{
-		// Given
-		MocksBuilder mocks = new();
-		ActiveLayoutEngineChangedEventArgs eventArgs =
-			new()
-			{
-				Workspace = new Mock<IWorkspace>().Object,
-				PreviousLayoutEngine = new Mock<ILayoutEngine>().Object,
-				CurrentLayoutEngine = new Mock<ILayoutEngine>().Object
-			};
-
-		// When the active layout engine is changed, then the event is triggered
-		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
-			h => mocks.WorkspaceManager.ActiveLayoutEngineChanged += h,
-			h => mocks.WorkspaceManager.ActiveLayoutEngineChanged -= h,
-			() => mocks.WorkspaceManager.TriggerActiveLayoutEngineChanged(eventArgs)
-		);
-	}
-
-	[Fact]
-	public void TriggerWorkspaceRenamed()
-	{
-		// Given
-		MocksBuilder mocks = new();
-		WorkspaceRenamedEventArgs eventArgs =
-			new()
-			{
-				Workspace = new Mock<IWorkspace>().Object,
-				PreviousName = "Previous",
-				CurrentName = "Current"
-			};
-
-		// When the workspace is renamed, then the event is triggered
-		Assert.Raises<WorkspaceRenamedEventArgs>(
-			h => mocks.WorkspaceManager.WorkspaceRenamed += h,
-			h => mocks.WorkspaceManager.WorkspaceRenamed -= h,
-			() => mocks.WorkspaceManager.TriggerWorkspaceRenamed(eventArgs)
-		);
-	}
-
-	[Fact]
-	public void TriggerWorkspaceLayoutStarted()
-	{
-		// Given
-		MocksBuilder mocks = new();
-		WorkspaceEventArgs eventArgs = new() { Workspace = new Mock<IWorkspace>().Object, };
-
-		// When the workspace layout is started, then the event is triggered
-		Assert.Raises<WorkspaceEventArgs>(
-			h => mocks.WorkspaceManager.WorkspaceLayoutStarted += h,
-			h => mocks.WorkspaceManager.WorkspaceLayoutStarted -= h,
-			() => mocks.WorkspaceManager.TriggerWorkspaceLayoutStarted(eventArgs)
-		);
-	}
-
-	[Fact]
-	public void TriggerWorkspaceLayoutCompleted()
-	{
-		// Given
-		MocksBuilder mocks = new();
-		WorkspaceEventArgs eventArgs = new() { Workspace = new Mock<IWorkspace>().Object, };
-
-		// When the workspace layout is ended, then the event is triggered
-		Assert.Raises<WorkspaceEventArgs>(
-			h => mocks.WorkspaceManager.WorkspaceLayoutCompleted += h,
-			h => mocks.WorkspaceManager.WorkspaceLayoutCompleted -= h,
-			() => mocks.WorkspaceManager.TriggerWorkspaceLayoutCompleted(eventArgs)
-		);
 	}
 
 	[Fact]
