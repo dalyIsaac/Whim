@@ -470,6 +470,11 @@ internal class Workspace : IWorkspace
 			Logger.Verbose($"Layout for workspace {Name} complete");
 		}
 
+		foreach (IWindow window in _minimizedWindows)
+		{
+			window.ShowMinimized();
+		}
+
 		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
