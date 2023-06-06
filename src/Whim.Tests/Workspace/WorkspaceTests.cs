@@ -235,6 +235,42 @@ public class WorkspaceTests
 	}
 
 	[Fact]
+	public void Initialize_AlreadyInitialized()
+	{
+		// Given
+		MocksBuilder mocks = new();
+
+		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
+		proxyLayoutEngine.Setup(p => p(It.IsAny<ILayoutEngine>())).Returns((ILayoutEngine e) => e);
+		Mock<ProxyLayoutEngine> proxyLayoutEngine2 = new();
+		mocks.WorkspaceManager
+			.SetupGet(m => m.ProxyLayoutEngines)
+			.Returns(new ProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
+
+		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<ILayoutEngine> layoutEngine2 = new();
+
+		Workspace workspace =
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new ILayoutEngine[] { layoutEngine.Object, layoutEngine2.Object }
+			);
+
+		workspace.Initialize();
+
+		// When
+		workspace.Initialize();
+
+		// Then it shouldn't run an extra time
+		proxyLayoutEngine.Verify(e => e(layoutEngine.Object), Times.Once);
+		proxyLayoutEngine.Verify(e => e(layoutEngine2.Object), Times.Once);
+		proxyLayoutEngine2.Verify(e => e(layoutEngine.Object), Times.Once);
+		proxyLayoutEngine2.Verify(e => e(layoutEngine2.Object), Times.Once);
+	}
+
+	[Fact]
 	public void WindowFocused_ContainsWindow()
 	{
 		// Given the window is in the workspace
