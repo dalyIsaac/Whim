@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -165,18 +164,16 @@ internal class Window : IWindow
 	/// <returns></returns>
 	public static IWindow? CreateWindow(IContext context, ICoreNativeManager coreNativeManager, HWND hwnd)
 	{
-		string processName;
-		string processFileName;
-
 		_ = coreNativeManager.GetWindowThreadProcessId(hwnd, out uint pid);
 		int processId = (int)pid;
-
-		Process process = Process.GetProcessById(processId);
-		processName = process.ProcessName;
+		string processName;
+		string? processPath;
+		string processFileName;
 
 		try
 		{
-			processFileName = Path.GetFileName(process.MainModule?.FileName) ?? "--NA--";
+			(processName, processPath) = coreNativeManager.GetProcessNameAndPath(processId);
+			processFileName = Path.GetFileName(processPath) ?? "--NA--";
 		}
 		catch (Win32Exception ex)
 		{
@@ -184,6 +181,7 @@ internal class Window : IWindow
 			// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process?view=net-6.0#remarks
 			// The exception will usually have a message of:
 			// "Unable to enumerate the process modules."
+			// This will be thrown by Path.GetFileName.
 			Logger.Error($"Could not create a Window instance for {hwnd.Value}, {ex.Message}");
 			return null;
 		}
