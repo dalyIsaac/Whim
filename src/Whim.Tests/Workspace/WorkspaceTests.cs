@@ -271,6 +271,41 @@ public class WorkspaceTests
 	}
 
 	[Fact]
+	public void ContainsWindow_False()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+
+		// When
+		bool result = workspace.ContainsWindow(window.Object);
+
+		// Then
+		Assert.False(result);
+	}
+
+	[Fact]
+	public void ContainsWindow_True()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+		workspace.AddWindow(window.Object);
+
+		// When
+		bool result = workspace.ContainsWindow(window.Object);
+
+		// Then
+		Assert.True(result);
+	}
+
+	[Fact]
 	public void WindowFocused_ContainsWindow()
 	{
 		// Given the window is in the workspace
