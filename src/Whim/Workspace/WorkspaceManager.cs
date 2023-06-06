@@ -6,18 +6,29 @@ using System.Linq;
 namespace Whim;
 
 /// <summary>
+/// Functions to trigger <see cref="WorkspaceManager"/> events, for within <see cref="Workspace"/>.
+/// </summary>
+internal record WorkspaceManagerTriggers
+{
+	public required Action<ActiveLayoutEngineChangedEventArgs> ActiveLayoutEngineChanged { get; init; }
+	public required Action<WorkspaceRenamedEventArgs> WorkspaceRenamed { get; init; }
+	public required Action<WorkspaceEventArgs> WorkspaceLayoutStarted { get; init; }
+	public required Action<WorkspaceEventArgs> WorkspaceLayoutCompleted { get; init; }
+}
+
+/// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
 /// </summary>
 internal class WorkspaceManager : IWorkspaceManager
 {
 	private bool _initialized;
-
 	private readonly IContext _context;
+	protected readonly WorkspaceManagerTriggers _triggers;
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/>s stored by this manager.
 	/// </summary>
-	private readonly List<IWorkspace> _workspaces = new();
+	protected readonly List<IWorkspace> _workspaces = new();
 
 	/// <summary>
 	/// Maps windows to their workspace.
@@ -52,11 +63,8 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
 
-	public Func<IContext, string, IWorkspace> WorkspaceFactory { get; set; } =
-		(context, name) =>
-		{
-			return new Workspace(context, name, new ColumnLayoutEngine());
-		};
+	public Func<IList<ILayoutEngine>> CreateLayoutEngines { get; set; } =
+		() => new ILayoutEngine[] { new ColumnLayoutEngine() };
 
 	/// <summary>
 	/// The active workspace.
@@ -72,11 +80,21 @@ internal class WorkspaceManager : IWorkspaceManager
 	public WorkspaceManager(IContext context)
 	{
 		_context = context;
+		_triggers = new WorkspaceManagerTriggers()
+		{
+			ActiveLayoutEngineChanged = (ActiveLayoutEngineChangedEventArgs e) =>
+				ActiveLayoutEngineChanged?.Invoke(this, e),
+			WorkspaceRenamed = (WorkspaceRenamedEventArgs e) => WorkspaceRenamed?.Invoke(this, e),
+			WorkspaceLayoutStarted = (WorkspaceEventArgs e) => WorkspaceLayoutStarted?.Invoke(this, e),
+			WorkspaceLayoutCompleted = (WorkspaceEventArgs e) => WorkspaceLayoutCompleted?.Invoke(this, e)
+		};
 	}
 
 	public void Initialize()
 	{
 		Logger.Debug("Initializing workspace manager...");
+
+		_initialized = true;
 
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
@@ -92,7 +110,9 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			// Get the workspace for this monitor. If the user hasn't provided enough workspaces, create a new one.
 			IWorkspace workspace =
-				idx < _workspaces.Count ? _workspaces[idx] : WorkspaceFactory(_context, $"Workspace {idx + 1}");
+				idx < _workspaces.Count
+					? _workspaces[idx]
+					: new Workspace(_context, _triggers, $"Workspace {idx + 1}", CreateLayoutEngines());
 
 			Activate(workspace, monitor);
 			idx++;
@@ -103,22 +123,20 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			workspace.Initialize();
 		}
-
-		_initialized = true;
 	}
 
 	#region Workspaces
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
-	public void Add(IWorkspace workspace)
+	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null)
 	{
-		Logger.Debug($"Adding workspace {workspace}");
-
-		if (_workspaces.Contains(workspace))
-		{
-			Logger.Debug($"Workspace {workspace} already exists");
-			return;
-		}
+		Workspace workspace =
+			new(
+				_context,
+				_triggers,
+				name ?? $"Workspace {_workspaces.Count + 1}",
+				layoutEngines ?? CreateLayoutEngines()
+			);
 
 		_workspaces.Add(workspace);
 
@@ -429,7 +447,12 @@ internal class WorkspaceManager : IWorkspaceManager
 			// If there's no workspace, create one.
 			if (workspace is null)
 			{
-				workspace = WorkspaceFactory(_context, $"Workspace {_workspaces.Count + 1}");
+				workspace = new Workspace(
+					_context,
+					_triggers,
+					$"Workspace {_workspaces.Count + 1}",
+					CreateLayoutEngines()
+				);
 				workspace.Initialize();
 			}
 
@@ -463,26 +486,6 @@ internal class WorkspaceManager : IWorkspaceManager
 	public IWorkspace? GetWorkspaceForWindow(IWindow window)
 	{
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? workspace : null;
-	}
-
-	public void TriggerActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args)
-	{
-		ActiveLayoutEngineChanged?.Invoke(this, args);
-	}
-
-	public void TriggerWorkspaceRenamed(WorkspaceRenamedEventArgs args)
-	{
-		WorkspaceRenamed?.Invoke(this, args);
-	}
-
-	public void TriggerWorkspaceLayoutStarted(WorkspaceEventArgs args)
-	{
-		WorkspaceLayoutStarted?.Invoke(this, args);
-	}
-
-	public void TriggerWorkspaceLayoutCompleted(WorkspaceEventArgs args)
-	{
-		WorkspaceLayoutCompleted?.Invoke(this, args);
 	}
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)

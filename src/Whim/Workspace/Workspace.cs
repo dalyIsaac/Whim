@@ -6,7 +6,9 @@ namespace Whim;
 
 internal class Workspace : IWorkspace
 {
+	private bool _initialized;
 	private readonly IContext _context;
+	private readonly WorkspaceManagerTriggers _triggers;
 
 	private string _name;
 	public string Name
@@ -16,7 +18,7 @@ internal class Workspace : IWorkspace
 		{
 			string oldName = _name;
 			_name = value;
-			(_context.WorkspaceManager as WorkspaceManager)?.TriggerWorkspaceRenamed(
+			_triggers.WorkspaceRenamed(
 				new WorkspaceRenamedEventArgs()
 				{
 					Workspace = this,
@@ -32,7 +34,7 @@ internal class Workspace : IWorkspace
 	/// </summary>
 	public IWindow? LastFocusedWindow { get; private set; }
 
-	private readonly List<ILayoutEngine> _layoutEngines = new();
+	private readonly ILayoutEngine[] _layoutEngines;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
@@ -58,25 +60,39 @@ internal class Workspace : IWorkspace
 	/// </summary>
 	private readonly Dictionary<IWindow, IWindowState> _windowLocations = new();
 
-	public Workspace(IContext context, string name, params ILayoutEngine[] layoutEngines)
+	public Workspace(
+		IContext context,
+		WorkspaceManagerTriggers triggers,
+		string name,
+		IEnumerable<ILayoutEngine> layoutEngines
+	)
 	{
 		_context = context;
-		_name = name;
+		_triggers = triggers;
 
-		if (layoutEngines.Length == 0)
+		_name = name;
+		_layoutEngines = layoutEngines.ToArray();
+
+		if (_layoutEngines.Length == 0)
 		{
 			throw new ArgumentException("At least one layout engine must be provided.");
 		}
-
-		_layoutEngines = layoutEngines.ToList();
 	}
 
 	public void Initialize()
 	{
+		if (_initialized)
+		{
+			Logger.Error($"Workspace {Name} has already been initialized.");
+			return;
+		}
+
+		_initialized = true;
+
 		// Apply the proxy layout engines
 		foreach (ProxyLayoutEngine proxyLayout in _context.WorkspaceManager.ProxyLayoutEngines)
 		{
-			for (int i = 0; i < _layoutEngines.Count; i++)
+			for (int i = 0; i < _layoutEngines.Length; i++)
 			{
 				_layoutEngines[i] = proxyLayout(_layoutEngines[i]);
 			}
@@ -124,7 +140,7 @@ internal class Workspace : IWorkspace
 		_activeLayoutEngineIndex = nextIdx;
 		DoLayout();
 
-		_context.WorkspaceManager.TriggerActiveLayoutEngineChanged(
+		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -137,13 +153,13 @@ internal class Workspace : IWorkspace
 	public void NextLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine((_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Count));
+		UpdateLayoutEngine((_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Length));
 	}
 
 	public void PreviousLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine((_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Count));
+		UpdateLayoutEngine((_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Length));
 	}
 
 	public bool TrySetLayoutEngine(string name)
@@ -151,7 +167,7 @@ internal class Workspace : IWorkspace
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
 		int nextIdx = -1;
-		for (int idx = 0; idx < _layoutEngines.Count; idx++)
+		for (int idx = 0; idx < _layoutEngines.Length; idx++)
 		{
 			ILayoutEngine engine = _layoutEngines[idx];
 			if (engine.Name == name)
@@ -360,8 +376,6 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Workspace {Name}");
 
-		_context.WorkspaceManager.TriggerWorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
-
 		// Get the monitor for this workspace
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
 		if (monitor == null)
@@ -370,6 +384,7 @@ internal class Workspace : IWorkspace
 			return;
 		}
 
+		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
 		_windowLocations.Clear();
 
 		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
@@ -412,7 +427,7 @@ internal class Workspace : IWorkspace
 			Logger.Verbose($"Layout for workspace {Name} complete");
 		}
 
-		_context.WorkspaceManager.TriggerWorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
 	#region Phantom Windows

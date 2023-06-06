@@ -160,16 +160,4 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">The phantom window to remove.</param>
 	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window);
 	#endregion
-
-	/// <summary>
-	/// Creates a new workspace.
-	/// </summary>
-	/// <param name="context"></param>
-	/// <param name="name">The name of the workspace.</param>
-	/// <param name="layoutEngines">The layout engines to load into the workspace.</param>
-	/// <returns></returns>
-	public static IWorkspace CreateWorkspace(IContext context, string name, params ILayoutEngine[] layoutEngines)
-	{
-		return new Workspace(context, name, layoutEngines);
-	}
 }

@@ -133,18 +133,6 @@ public class CommandPaletteCommandsTests
 			"whim.command_palette.create_workspace"
 		);
 
-		// Setup the workspace factory
-		Mock<IWorkspace> newWorkspace = new();
-		wrapper.WorkspaceManager
-			.SetupGet(x => x.WorkspaceFactory)
-			.Returns(
-				(_, name) =>
-				{
-					newWorkspace.SetupGet(w => w.Name).Returns(name);
-					return newWorkspace.Object;
-				}
-			);
-
 		List<FreeTextVariantConfig> configs = VerifyFreeTextActivated(wrapper.Plugin);
 		command.TryExecute();
 
@@ -155,10 +143,7 @@ public class CommandPaletteCommandsTests
 		configs[0].Callback("New workspace name");
 
 		// Verify that the workspace was created.
-		wrapper.Context.Verify(x => x.WorkspaceManager.Add(newWorkspace.Object), Times.Once);
-
-		// Verify the workspace name.
-		Assert.Equal("New workspace name", newWorkspace.Object.Name);
+		wrapper.Context.Verify(x => x.WorkspaceManager.Add("New workspace name", null), Times.Once);
 	}
 
 	[Fact]
