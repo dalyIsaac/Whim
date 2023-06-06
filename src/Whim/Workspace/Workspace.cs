@@ -42,15 +42,21 @@ internal class Workspace : IWorkspace
 
 	/// <summary>
 	/// All the windows in this workspace which are common to every layout engine.
-	/// The intersection of <see cref="_windows"/> and <see cref="_phantomWindows"/>
+	/// The intersection of <see cref="_normalWindows"/> and <see cref="_phantomWindows"/>
 	/// is the empty set.
 	/// </summary>
-	private readonly HashSet<IWindow> _windows = new();
-	public IEnumerable<IWindow> Windows => _windows;
+	private readonly HashSet<IWindow> _normalWindows = new();
+
+	/// <summary>
+	/// All the minimized windows in this workspace.
+	/// </summary>
+	private readonly HashSet<IWindow> _minimizedWindows = new();
+
+	public IEnumerable<IWindow> Windows => _normalWindows.Concat(_minimizedWindows);
 
 	/// <summary>
 	/// Phantom windows are specific to a single layout engine.
-	/// The intersection of <see cref="_windows"/> and <see cref="_phantomWindows"/>
+	/// The intersection of <see cref="_normalWindows"/> and <see cref="_phantomWindows"/>
 	/// is the empty set.
 	/// </summary>
 	private readonly Dictionary<IWindow, ILayoutEngine> _phantomWindows = new();
@@ -106,7 +112,7 @@ internal class Workspace : IWorkspace
 	internal virtual void WindowFocused(IWindow window)
 	{
 		if (
-			_windows.Contains(window)
+			_normalWindows.Contains(window)
 			|| (
 				_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
 				&& layoutEngine != null
@@ -117,6 +123,43 @@ internal class Workspace : IWorkspace
 			LastFocusedWindow = window;
 			Logger.Debug($"Focused window {window} in workspace {Name}");
 		}
+	}
+
+	/// <summary>
+	/// Called when a window is about to be minimized.
+	/// </summary>
+	/// <param name="window"></param>
+	internal virtual void WindowMinimizeStart(IWindow window)
+	{
+		if (!_normalWindows.Contains(window))
+		{
+			Logger.Error($"Window {window} is not a normal window in workspace {Name}");
+		}
+
+		_normalWindows.Remove(window);
+		_minimizedWindows.Add(window);
+
+		foreach (ILayoutEngine layoutEngine in _layoutEngines)
+		{
+			layoutEngine.Remove(window);
+		}
+
+		DoLayout();
+	}
+
+	/// <summary>
+	/// Called when a window is about to be unminimized.
+	/// </summary>
+	/// <param name="window"></param>
+	internal virtual void WindowMinimizeEnd(IWindow window)
+	{
+		if (!_minimizedWindows.Contains(window))
+		{
+			Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
+		}
+
+		_minimizedWindows.Remove(window);
+		AddWindow(window);
 	}
 
 	public void FocusFirstWindow()
@@ -202,13 +245,13 @@ internal class Workspace : IWorkspace
 			return;
 		}
 
-		if (_windows.Contains(window))
+		if (_normalWindows.Contains(window))
 		{
 			Logger.Error($"Window {window} already exists in workspace {Name}");
 			return;
 		}
 
-		_windows.Add(window);
+		_normalWindows.Add(window);
 		foreach (ILayoutEngine layoutEngine in _layoutEngines)
 		{
 			layoutEngine.Add(window);
@@ -237,7 +280,7 @@ internal class Workspace : IWorkspace
 			return removePhantomSuccess;
 		}
 
-		if (!_windows.Contains(window))
+		if (!_normalWindows.Contains(window))
 		{
 			Logger.Error($"Window {window} already does not exist in workspace {Name}");
 			return false;
@@ -255,7 +298,7 @@ internal class Workspace : IWorkspace
 
 		if (success)
 		{
-			_windows.Remove(window);
+			_normalWindows.Remove(window);
 			DoLayout();
 		}
 
@@ -327,7 +370,7 @@ internal class Workspace : IWorkspace
 		{
 			return;
 		}
-		if (_windows.Contains(window))
+		if (_normalWindows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
 			ActiveLayoutEngine.Remove(window);
@@ -336,7 +379,7 @@ internal class Workspace : IWorkspace
 		else
 		{
 			// The window is new to the workspace, so add it to all layout engines
-			_windows.Add(window);
+			_normalWindows.Add(window);
 
 			foreach (ILayoutEngine layoutEngine in _layoutEngines)
 			{
@@ -487,7 +530,7 @@ internal class Workspace : IWorkspace
 	/// <param name="window">The window to check for.</param>
 	/// <returns>True when the workspace contains the provided <paramref name="window"/>.</returns>
 	public bool ContainsWindow(IWindow window) =>
-		_windows.Contains(window)
+		_normalWindows.Contains(window)
 		|| (
 			_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
 			&& ActiveLayoutEngine.ContainsEqual(phantomEngine)

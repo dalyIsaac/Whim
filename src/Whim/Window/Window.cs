@@ -123,24 +123,6 @@ internal class Window : IWindow
 	}
 
 	/// <inheritdoc/>
-	public void ShowInCurrentState()
-	{
-		Logger.Debug(ToString());
-		if (IsMinimized)
-		{
-			ShowMinimized();
-		}
-		else if (IsMaximized)
-		{
-			ShowMaximized();
-		}
-		else
-		{
-			ShowNormal();
-		}
-	}
-
-	/// <inheritdoc/>
 	public void ShowMaximized()
 	{
 		Logger.Debug(ToString());
