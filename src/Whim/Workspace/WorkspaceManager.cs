@@ -63,7 +63,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
 
-	public Func<IList<ILayoutEngine>> CreateDefaultLayoutEngines { get; set; } =
+	public Func<IList<ILayoutEngine>> CreateLayoutEngines { get; set; } =
 		() => new ILayoutEngine[] { new ColumnLayoutEngine() };
 
 	/// <summary>
@@ -112,7 +112,7 @@ internal class WorkspaceManager : IWorkspaceManager
 			IWorkspace workspace =
 				idx < _workspaces.Count
 					? _workspaces[idx]
-					: new Workspace(_context, _triggers, $"Workspace {idx + 1}", CreateDefaultLayoutEngines());
+					: new Workspace(_context, _triggers, $"Workspace {idx + 1}", CreateLayoutEngines());
 
 			Activate(workspace, monitor);
 			idx++;
@@ -135,7 +135,7 @@ internal class WorkspaceManager : IWorkspaceManager
 				_context,
 				_triggers,
 				name ?? $"Workspace {_workspaces.Count + 1}",
-				layoutEngines ?? CreateDefaultLayoutEngines()
+				layoutEngines ?? CreateLayoutEngines()
 			);
 
 		_workspaces.Add(workspace);
@@ -451,7 +451,7 @@ internal class WorkspaceManager : IWorkspaceManager
 					_context,
 					_triggers,
 					$"Workspace {_workspaces.Count + 1}",
-					CreateDefaultLayoutEngines()
+					CreateLayoutEngines()
 				);
 				workspace.Initialize();
 			}

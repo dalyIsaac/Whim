@@ -32,7 +32,7 @@ void DoConfig(IContext context)
 {
 	context.Logger.Config = new LoggerConfig();
 
-	context.WorkspaceManager.CreateDefaultLayoutEngines = () => new ILayoutEngine[]
+	context.WorkspaceManager.CreateLayoutEngines = () => new ILayoutEngine[]
 	{
 		new TreeLayoutEngine(context),
 		new ColumnLayoutEngine()

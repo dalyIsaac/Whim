@@ -1274,9 +1274,9 @@ public class WorkspaceManagerTests
 
 		Wrapper wrapper = new(new[] { workspace, workspace2 });
 
-		Mock<Func<IList<ILayoutEngine>>> CreateDefaultLayoutEngines = new();
-		CreateDefaultLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
-		wrapper.WorkspaceManager.CreateDefaultLayoutEngines = CreateDefaultLayoutEngines.Object;
+		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
+		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
 		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
@@ -1293,7 +1293,7 @@ public class WorkspaceManagerTests
 		);
 
 		// Then a new workspace is created
-		CreateDefaultLayoutEngines.Verify(f => f(), Times.Once());
+		CreateLayoutEngines.Verify(f => f(), Times.Once());
 	}
 
 	[Fact]
@@ -1437,9 +1437,9 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		Mock<Func<IList<ILayoutEngine>>> CreateDefaultLayoutEngines = new();
-		CreateDefaultLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
-		wrapper.WorkspaceManager.CreateDefaultLayoutEngines = CreateDefaultLayoutEngines.Object;
+		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
+		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		// When creating a workspace
 		wrapper.WorkspaceManager.Add("workspace");
@@ -1459,9 +1459,9 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		Mock<Func<IList<ILayoutEngine>>> CreateDefaultLayoutEngines = new();
-		CreateDefaultLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
-		wrapper.WorkspaceManager.CreateDefaultLayoutEngines = CreateDefaultLayoutEngines.Object;
+		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
+		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		// When
 		wrapper.WorkspaceManager.Add("workspace");

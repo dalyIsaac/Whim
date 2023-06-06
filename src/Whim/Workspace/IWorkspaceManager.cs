@@ -17,7 +17,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <summary>
 	/// Creates the default layout engines to add to a workspace.
 	/// </summary>
-	public Func<IList<ILayoutEngine>> CreateDefaultLayoutEngines { get; set; }
+	public Func<IList<ILayoutEngine>> CreateLayoutEngines { get; set; }
 
 	/// <summary>
 	/// Initialize the event listeners.
@@ -79,7 +79,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// </param>
 	/// <param name="layoutEngines">
 	/// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
-	/// use the <see cref="CreateDefaultLayoutEngines"/> function.
+	/// use the <see cref="CreateLayoutEngines"/> function.
 	/// </param>
 	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null);
 
