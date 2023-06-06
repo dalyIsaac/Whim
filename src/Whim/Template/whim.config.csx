@@ -30,64 +30,64 @@ using Microsoft.UI.Xaml.Media;
 /// <param name="context"></param>
 void DoConfig(IContext context)
 {
-    context.Logger.Config = new LoggerConfig();
+	context.Logger.Config = new LoggerConfig();
 
-    context.WorkspaceManager.CreateDefaultLayoutEngines = () => new ILayoutEngine[]
-    {
-        new TreeLayoutEngine(context),
-        new ColumnLayoutEngine()
-    };
+	context.WorkspaceManager.CreateDefaultLayoutEngines = () => new ILayoutEngine[]
+	{
+		new TreeLayoutEngine(context),
+		new ColumnLayoutEngine()
+	};
 
-    // Add workspaces.
-    context.WorkspaceManager.Add("1");
-    context.WorkspaceManager.Add("2");
-    context.WorkspaceManager.Add("3");
-    context.WorkspaceManager.Add("4");
+	// Add workspaces.
+	context.WorkspaceManager.Add("1");
+	context.WorkspaceManager.Add("2");
+	context.WorkspaceManager.Add("3");
+	context.WorkspaceManager.Add("4");
 
-    // Bar plugin.
-    List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
-    List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
-    List<BarComponent> rightComponents = new()
-    {
-        ActiveLayoutWidget.CreateComponent(),
-        DateTimeWidget.CreateComponent()
-    };
+	// Bar plugin.
+	List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
+	List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
+	List<BarComponent> rightComponents = new()
+	{
+		ActiveLayoutWidget.CreateComponent(),
+		DateTimeWidget.CreateComponent()
+	};
 
-    BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
-    BarPlugin barPlugin = new(context, barConfig);
-    context.PluginManager.AddPlugin(barPlugin);
+	BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
+	BarPlugin barPlugin = new(context, barConfig);
+	context.PluginManager.AddPlugin(barPlugin);
 
-    // Floating window plugin.
-    FloatingLayoutPlugin floatingLayoutPlugin = new(context);
-    context.PluginManager.AddPlugin(floatingLayoutPlugin);
+	// Floating window plugin.
+	FloatingLayoutPlugin floatingLayoutPlugin = new(context);
+	context.PluginManager.AddPlugin(floatingLayoutPlugin);
 
-    // Gap plugin.
-    GapsConfig gapsConfig = new() { OuterGap = 0, InnerGap = 10 };
-    GapsPlugin gapsPlugin = new(context, gapsConfig);
-    context.PluginManager.AddPlugin(gapsPlugin);
+	// Gap plugin.
+	GapsConfig gapsConfig = new() { OuterGap = 0, InnerGap = 10 };
+	GapsPlugin gapsPlugin = new(context, gapsConfig);
+	context.PluginManager.AddPlugin(gapsPlugin);
 
-    // Focus indicator.
-    FocusIndicatorConfig focusIndicatorConfig = new() { Color = new SolidColorBrush(Colors.Red), FadeEnabled = true };
-    FocusIndicatorPlugin focusIndicatorPlugin = new(context, focusIndicatorConfig);
-    context.PluginManager.AddPlugin(focusIndicatorPlugin);
+	// Focus indicator.
+	FocusIndicatorConfig focusIndicatorConfig = new() { Color = new SolidColorBrush(Colors.Red), FadeEnabled = true };
+	FocusIndicatorPlugin focusIndicatorPlugin = new(context, focusIndicatorConfig);
+	context.PluginManager.AddPlugin(focusIndicatorPlugin);
 
-    // Command palette.
-    CommandPaletteConfig commandPaletteConfig = new(context);
-    CommandPalettePlugin commandPalettePlugin = new(context, commandPaletteConfig);
-    context.PluginManager.AddPlugin(commandPalettePlugin);
+	// Command palette.
+	CommandPaletteConfig commandPaletteConfig = new(context);
+	CommandPalettePlugin commandPalettePlugin = new(context, commandPaletteConfig);
+	context.PluginManager.AddPlugin(commandPalettePlugin);
 
-    // Tree layout.
-    TreeLayoutPlugin treeLayoutPlugin = new(context);
-    context.PluginManager.AddPlugin(treeLayoutPlugin);
+	// Tree layout.
+	TreeLayoutPlugin treeLayoutPlugin = new(context);
+	context.PluginManager.AddPlugin(treeLayoutPlugin);
 
-    // Tree layout bar.
-    TreeLayoutBarPlugin treeLayoutBarPlugin = new(treeLayoutPlugin);
-    context.PluginManager.AddPlugin(treeLayoutBarPlugin);
-    rightComponents.Add(treeLayoutBarPlugin.CreateComponent());
+	// Tree layout bar.
+	TreeLayoutBarPlugin treeLayoutBarPlugin = new(treeLayoutPlugin);
+	context.PluginManager.AddPlugin(treeLayoutBarPlugin);
+	rightComponents.Add(treeLayoutBarPlugin.CreateComponent());
 
-    // Tree layout command palette.
-    TreeLayoutCommandPalettePlugin treeLayoutCommandPalettePlugin = new(context, treeLayoutPlugin, commandPalettePlugin);
-    context.PluginManager.AddPlugin(treeLayoutCommandPalettePlugin);
+	// Tree layout command palette.
+	TreeLayoutCommandPalettePlugin treeLayoutCommandPalettePlugin = new(context, treeLayoutPlugin, commandPalettePlugin);
+	context.PluginManager.AddPlugin(treeLayoutCommandPalettePlugin);
 }
 
 #pragma warning disable CS8974 // Methods should not return 'this'.
