@@ -73,10 +73,10 @@ public interface IWorkspace : IDisposable
 	public bool RemoveWindow(IWindow window);
 
 	/// <summary>
-	/// Indicates whether the workspace contains the window.
+	/// Returns true when the workspace contains the provided <paramref name="window"/>.
 	/// </summary>
-	/// <param name="window"></param>
-	/// <returns></returns>
+	/// <param name="window">The window to check for.</param>
+	/// <returns>True when the workspace contains the provided <paramref name="window"/>.</returns>
 	public bool ContainsWindow(IWindow window);
 
 	/// <summary>
