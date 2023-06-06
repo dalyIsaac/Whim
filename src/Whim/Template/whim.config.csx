@@ -21,22 +21,8 @@ using Whim.TreeLayout;
 using Whim.TreeLayout.Bar;
 using Whim.TreeLayout.CommandPalette;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-
-/// <summary>
-/// Returns a new workspace with <paramref name="name"/> and layout engines.
-/// </summary>
-/// <param name="context"></param>
-/// <param name="name"></param>
-/// <returns></returns>
-IWorkspace CreateWorkspace(IContext context, string name)
-{
-    return IWorkspace.CreateWorkspace(
-        context,
-        name,
-        new TreeLayoutEngine(context),
-        new ColumnLayoutEngine(),
-        new ColumnLayoutEngine("Right to left", false));
-}
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media;
 
 /// <summary>
 /// This is what's called when Whim is loaded.
@@ -44,15 +30,19 @@ IWorkspace CreateWorkspace(IContext context, string name)
 /// <param name="context"></param>
 void DoConfig(IContext context)
 {
-    context.Logger.Config = new LoggerConfig() { BaseMinLogLevel = LogLevel.Error };
+    context.Logger.Config = new LoggerConfig();
 
-    context.WorkspaceManager.WorkspaceFactory = CreateWorkspace;
+    context.WorkspaceManager.CreateDefaultLayoutEngines = () => new ILayoutEngine[]
+    {
+        new TreeLayoutEngine(context),
+        new ColumnLayoutEngine()
+    };
 
     // Add workspaces.
-    context.WorkspaceManager.Add(CreateWorkspace(context, "1"));
-    context.WorkspaceManager.Add(CreateWorkspace(context, "2"));
-    context.WorkspaceManager.Add(CreateWorkspace(context, "3"));
-    context.WorkspaceManager.Add(CreateWorkspace(context, "4"));
+    context.WorkspaceManager.Add("1");
+    context.WorkspaceManager.Add("2");
+    context.WorkspaceManager.Add("3");
+    context.WorkspaceManager.Add("4");
 
     // Bar plugin.
     List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
@@ -77,7 +67,7 @@ void DoConfig(IContext context)
     context.PluginManager.AddPlugin(gapsPlugin);
 
     // Focus indicator.
-    FocusIndicatorConfig focusIndicatorConfig = new() { FadeEnabled = true };
+    FocusIndicatorConfig focusIndicatorConfig = new() { Color = new SolidColorBrush(Colors.Red), FadeEnabled = true };
     FocusIndicatorPlugin focusIndicatorPlugin = new(context, focusIndicatorConfig);
     context.PluginManager.AddPlugin(focusIndicatorPlugin);
 
