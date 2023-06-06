@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Whim;
 
-internal class Workspace : IWorkspace
+internal class Workspace : IWorkspace, IInternalWorkspace
 {
 	private bool _initialized;
 	private readonly IContext _context;
@@ -105,11 +105,7 @@ internal class Workspace : IWorkspace
 		}
 	}
 
-	/// <summary>
-	/// Called when a window is focused, regardless of whether it's in this workspace.
-	/// </summary>
-	/// <param name="window"></param>
-	internal virtual void WindowFocused(IWindow window)
+	public void WindowFocused(IWindow window)
 	{
 		if (
 			_normalWindows.Contains(window)
@@ -125,11 +121,7 @@ internal class Workspace : IWorkspace
 		}
 	}
 
-	/// <summary>
-	/// Called when a window is about to be minimized.
-	/// </summary>
-	/// <param name="window"></param>
-	internal virtual void WindowMinimizeStart(IWindow window)
+	public void WindowMinimizeStart(IWindow window)
 	{
 		if (!_normalWindows.Contains(window))
 		{
@@ -147,11 +139,7 @@ internal class Workspace : IWorkspace
 		DoLayout();
 	}
 
-	/// <summary>
-	/// Called when a window is about to be unminimized.
-	/// </summary>
-	/// <param name="window"></param>
-	internal virtual void WindowMinimizeEnd(IWindow window)
+	public void WindowMinimizeEnd(IWindow window)
 	{
 		if (!_minimizedWindows.Contains(window))
 		{

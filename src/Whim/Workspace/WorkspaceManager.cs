@@ -382,7 +382,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		foreach (IWorkspace workspace in _workspaces)
 		{
-			if (workspace is Workspace ws)
+			if (workspace is IInternalWorkspace ws)
 			{
 				ws.WindowFocused(window);
 			}
@@ -409,7 +409,7 @@ internal class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		if (workspace is Workspace ws)
+		if (workspace is IInternalWorkspace ws)
 		{
 			ws.WindowMinimizeStart(window);
 		}
@@ -429,7 +429,7 @@ internal class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		if (workspace is Workspace ws)
+		if (workspace is IInternalWorkspace ws)
 		{
 			ws.WindowMinimizeEnd(window);
 		}
