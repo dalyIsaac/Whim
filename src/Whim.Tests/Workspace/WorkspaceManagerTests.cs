@@ -25,6 +25,7 @@ public class WorkspaceManagerTests
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IMonitor>[] Monitors { get; }
 		public Mock<IRouterManager> RouterManager { get; } = new();
+		public Mock<INativeManager> NativeManager { get; } = new();
 		public WorkspaceManagerTestWrapper WorkspaceManager { get; }
 
 		public Wrapper(
@@ -34,6 +35,8 @@ public class WorkspaceManagerTests
 		)
 		{
 			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
+			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
+			Context.Setup(c => c.RouterManager).Returns(RouterManager.Object);
 
 			Monitors = monitors ?? new[] { new Mock<IMonitor>(), new Mock<IMonitor>() };
 			MonitorManager.Setup(m => m.Length).Returns(Monitors.Length);
@@ -48,10 +51,10 @@ public class WorkspaceManagerTests
 			foreach (Mock<IMonitor> mon in Monitors)
 			{
 				mon.Setup(m => m.Equals(It.Is((IMonitor m) => mon.Object == m))).Returns(true);
+				mon.Setup(m => m.WorkingArea).Returns(new Location<int>());
 			}
 
 			RouterManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(null as IWorkspace);
-			Context.Setup(c => c.RouterManager).Returns(RouterManager.Object);
 
 			WorkspaceManager = new(Context.Object);
 			foreach (Mock<IWorkspace> workspace in workspaces ?? Array.Empty<Mock<IWorkspace>>())
@@ -1072,7 +1075,6 @@ public class WorkspaceManagerTests
 		wrapper.MonitorManager
 			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
 			.Returns(wrapper.Monitors[1].Object);
-		wrapper.Monitors[1].Setup(m => m.WorkingArea).Returns(new Location<int>());
 		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
 
 		// When a window is moved to a point
@@ -1104,7 +1106,6 @@ public class WorkspaceManagerTests
 		wrapper.MonitorManager
 			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
 			.Returns(wrapper.Monitors[0].Object);
-		wrapper.Monitors[0].Setup(m => m.WorkingArea).Returns(new Location<int>());
 		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
 
 		// When a window is moved to a point
@@ -1272,7 +1273,6 @@ public class WorkspaceManagerTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>());
 
 		Wrapper wrapper = new(new[] { workspace, workspace2 });
-		wrapper.Context.Setup(c => c.NativeManager).Returns(new Mock<INativeManager>().Object);
 
 		Mock<Func<IList<ILayoutEngine>>> CreateDefaultLayoutEngines = new();
 		CreateDefaultLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
@@ -1394,5 +1394,85 @@ public class WorkspaceManagerTests
 		// Then the workspaces are disposed
 		workspace.Verify(w => w.Dispose(), Times.Once());
 		workspace2.Verify(w => w.Dispose(), Times.Once());
+	}
+
+	[Fact]
+	public void WorkspaceManagerTriggers_ActiveLayoutEngineChanged()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+
+		// Then changing the layout engine should trigger the event
+		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
+			h => wrapper.WorkspaceManager.ActiveLayoutEngineChanged += h,
+			h => wrapper.WorkspaceManager.ActiveLayoutEngineChanged -= h,
+			workspace.NextLayoutEngine
+		);
+	}
+
+	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceRenamed()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+
+		// Then renaming the workspace should trigger the event
+		Assert.Raises<WorkspaceRenamedEventArgs>(
+			h => wrapper.WorkspaceManager.WorkspaceRenamed += h,
+			h => wrapper.WorkspaceManager.WorkspaceRenamed -= h,
+			() => workspace.Name = "new name"
+		);
+	}
+
+	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceLayoutStarted()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		Mock<Func<IList<ILayoutEngine>>> CreateDefaultLayoutEngines = new();
+		CreateDefaultLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateDefaultLayoutEngines = CreateDefaultLayoutEngines.Object;
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		wrapper.WorkspaceManager.Activate(workspace);
+
+		// Then starting the layout should trigger the event
+		Assert.Raises<WorkspaceEventArgs>(
+			h => wrapper.WorkspaceManager.WorkspaceLayoutStarted += h,
+			h => wrapper.WorkspaceManager.WorkspaceLayoutStarted -= h,
+			workspace.DoLayout
+		);
+	}
+
+	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceLayoutCompleted()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		Mock<Func<IList<ILayoutEngine>>> CreateDefaultLayoutEngines = new();
+		CreateDefaultLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateDefaultLayoutEngines = CreateDefaultLayoutEngines.Object;
+
+		// When
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		wrapper.WorkspaceManager.Activate(workspace);
+
+		// Then completing the layout should trigger the event
+		Assert.Raises<WorkspaceEventArgs>(
+			h => wrapper.WorkspaceManager.WorkspaceLayoutCompleted += h,
+			h => wrapper.WorkspaceManager.WorkspaceLayoutCompleted -= h,
+			workspace.DoLayout
+		);
 	}
 }

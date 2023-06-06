@@ -376,8 +376,6 @@ internal class Workspace : IWorkspace
 	{
 		Logger.Debug($"Workspace {Name}");
 
-		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
-
 		// Get the monitor for this workspace
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
 		if (monitor == null)
@@ -386,6 +384,7 @@ internal class Workspace : IWorkspace
 			return;
 		}
 
+		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
 		_windowLocations.Clear();
 
 		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
