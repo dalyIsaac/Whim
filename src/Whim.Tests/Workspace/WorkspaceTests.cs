@@ -422,6 +422,23 @@ public class WorkspaceTests
 	}
 
 	[Fact]
+	public void WindowFocused_DoesNotContainWindow()
+	{
+		// Given the window is not in the workspace
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+
+		// When
+		workspace.WindowFocused(window.Object);
+
+		// Then
+		Assert.Null(workspace.LastFocusedWindow);
+	}
+
+	[Fact]
 	public void FocusFirstWindow()
 	{
 		// Given
