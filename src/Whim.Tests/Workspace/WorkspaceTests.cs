@@ -1122,4 +1122,76 @@ public class WorkspaceTests
 		// Then the window is minimized
 		window.Verify(w => w.ShowMinimized(), Times.Once);
 	}
+
+	[Fact]
+	public void WindowMinimizeStart()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+		workspace.AddWindow(window.Object);
+
+		// When WindowMinimizeStart is called
+		workspace.WindowMinimizeStart(window.Object);
+
+		// Then
+		mocks.LayoutEngine.Verify(e => e.Remove(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void WindowMinimizeStart_Twice()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+		workspace.AddWindow(window.Object);
+
+		// When WindowMinimizeStart is called
+		workspace.WindowMinimizeStart(window.Object);
+		workspace.WindowMinimizeStart(window.Object);
+
+		// Then the window is only removed the first time
+		mocks.LayoutEngine.Verify(e => e.Remove(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void WindowMinimizeEnd()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+		workspace.AddWindow(window.Object);
+		workspace.WindowMinimizeStart(window.Object);
+		mocks.LayoutEngine.Invocations.Clear();
+
+		// When WindowMinimizeEnd is called
+		workspace.WindowMinimizeEnd(window.Object);
+
+		// Then
+		mocks.LayoutEngine.Verify(e => e.Add(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void WindowMinimizeEnd_NotMinimized()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+		workspace.AddWindow(window.Object);
+		mocks.LayoutEngine.Invocations.Clear();
+
+		// When WindowMinimizeEnd is called
+		workspace.WindowMinimizeEnd(window.Object);
+
+		// Then
+		mocks.LayoutEngine.Verify(e => e.Add(window.Object), Times.Never);
+	}
 }

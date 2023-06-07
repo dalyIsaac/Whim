@@ -126,6 +126,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (!_normalWindows.Contains(window))
 		{
 			Logger.Error($"Window {window} is not a normal window in workspace {Name}");
+			return;
 		}
 
 		_normalWindows.Remove(window);
@@ -144,6 +145,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (!_minimizedWindows.Contains(window))
 		{
 			Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
+			return;
 		}
 
 		_minimizedWindows.Remove(window);
