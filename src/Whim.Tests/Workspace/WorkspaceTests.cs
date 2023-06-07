@@ -725,6 +725,25 @@ public class WorkspaceTests
 	}
 
 	[Fact]
+	public void FocusWindowInDirection_Fails_WindowIsMinimized()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+
+		workspace.AddWindow(window.Object);
+		workspace.WindowMinimizeStart(window.Object);
+
+		// When FocusWindowInDirection is called
+		workspace.FocusWindowInDirection(Direction.Up, window.Object);
+
+		// Then the layout engine is not told to focus the window
+		mocks.LayoutEngine.Verify(l => l.FocusWindowInDirection(Direction.Up, window.Object), Times.Never);
+	}
+
+	[Fact]
 	public void FocusWindowInDirection_Success()
 	{
 		// Given
