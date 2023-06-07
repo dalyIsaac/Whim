@@ -1204,7 +1204,7 @@ public class WorkspaceManagerTests
 		// When a window is minimized
 		wrapper.WorkspaceManager.WindowMinimizeStart(window.Object);
 
-		// Then the window is removed from the workspace
+		// Then the workspace is notified
 		internalWorkspace.Verify(w => w.WindowMinimizeStart(window.Object), Times.Once());
 	}
 
@@ -1230,6 +1230,28 @@ public class WorkspaceManagerTests
 
 		// Then the window is routed to the workspace
 		internalWorkspace.Verify(w => w.WindowMinimizeEnd(window.Object), Times.Once());
+	}
+
+	[Fact]
+	public void WindowMinizeEnd_Fail()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
+
+		Wrapper wrapper = new(new[] { workspace });
+
+		Mock<IRouterManager> routerManager = new();
+		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		wrapper.Context.Setup(c => c.RouterManager).Returns(routerManager.Object);
+
+		Mock<IWindow> window = new();
+
+		// When a window which isn't tracked is restored
+		wrapper.WorkspaceManager.WindowMinimizeEnd(window.Object);
+
+		// Then the workspace is not notified
+		internalWorkspace.Verify(w => w.WindowMinimizeEnd(window.Object), Times.Never());
 	}
 
 	[Fact]
