@@ -1,7 +1,6 @@
 using Moq;
 using System.ComponentModel;
 using Windows.Win32.Foundation;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;
 
 namespace Whim.Tests;

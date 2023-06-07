@@ -512,7 +512,7 @@ public class WorkspaceTests
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
-		mocks.WorkspaceManager.Reset();
+		mocks.WorkspaceManager.Invocations.Clear();
 
 		// Reset mocks
 		window.Reset();
@@ -607,7 +607,7 @@ public class WorkspaceTests
 
 		// Phantom window is added
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
-		mocks.WorkspaceManager.Reset();
+		mocks.WorkspaceManager.Invocations.Clear();
 		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(false);
 
 		// When RemoveWindow is called
@@ -630,7 +630,7 @@ public class WorkspaceTests
 
 		// Phantom window is added
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
-		mocks.WorkspaceManager.Reset();
+		mocks.WorkspaceManager.Invocations.Clear();
 		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(true);
 
 		// When RemoveWindow is called
@@ -651,7 +651,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 		workspace.AddWindow(window.Object);
-		mocks.WorkspaceManager.Reset();
+		mocks.WorkspaceManager.Invocations.Clear();
 
 		// When RemoveWindow is called
 		bool result = workspace.RemoveWindow(window.Object);
@@ -672,7 +672,7 @@ public class WorkspaceTests
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 		workspace.AddWindow(window.Object);
 		workspace.WindowFocused(window.Object);
-		mocks.WorkspaceManager.Reset();
+		mocks.WorkspaceManager.Invocations.Clear();
 		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(true);
 
 		// When RemoveWindow is called
@@ -694,9 +694,10 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 		workspace.AddWindow(window.Object);
-		workspace.WindowFocused(window.Object);
-		mocks.WorkspaceManager.Reset();
-		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(true);
+		workspace.WindowMinimizeStart(window.Object);
+
+		mocks.WorkspaceManager.Invocations.Clear();
+		mocks.LayoutEngine.Invocations.Clear();
 
 		// When RemoveWindow is called
 		bool result = workspace.RemoveWindow(window.Object);
@@ -931,7 +932,7 @@ public class WorkspaceTests
 		workspace.AddWindow(window.Object);
 		workspace.AddWindow(window2.Object);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, phantomWindow.Object);
-		mocks.WorkspaceManager.Reset();
+		mocks.WorkspaceManager.Invocations.Clear();
 
 		// When Deactivate is called
 		workspace.Deactivate();
