@@ -409,4 +409,74 @@ public class WindowTests
 		// Then
 		Assert.Null(window);
 	}
+
+	[Fact]
+	public void Equals_Null()
+	{
+		// Given
+		Wrapper wrapper = new();
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		bool equals = window.Equals(null);
+
+		// Then
+		Assert.False(equals);
+	}
+
+	[Fact]
+	public void Equals_WrongType()
+	{
+		// Given
+		Wrapper wrapper = new();
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		bool equals = window.Equals(new object());
+
+		// Then
+		Assert.False(equals);
+	}
+
+	[Fact]
+	public void Equals_NotWindow()
+	{
+		// Given
+		Wrapper wrapper = new();
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		bool equals = window.Equals(new Mock<IWindow>().Object);
+
+		// Then
+		Assert.False(equals);
+	}
+
+	[Fact]
+	public void Equals_Success()
+	{
+		// Given
+		Wrapper wrapper = new();
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		bool equals = window.Equals(window);
+
+		// Then
+		Assert.True(equals);
+	}
+
+	[Fact]
+	public void GetHashCode_Success()
+	{
+		// Given
+		Wrapper wrapper = new();
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		int hashCode = window.GetHashCode();
+
+		// Then
+		Assert.Equal(hashCode, 123.GetHashCode());
+	}
 }
