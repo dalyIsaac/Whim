@@ -685,6 +685,29 @@ public class WorkspaceTests
 	}
 
 	[Fact]
+	public void RemoveWindow_MinimizedWindow()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		window.Setup(w => w.IsMinimized).Returns(true);
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+		workspace.AddWindow(window.Object);
+		workspace.WindowFocused(window.Object);
+		mocks.WorkspaceManager.Reset();
+		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(true);
+
+		// When RemoveWindow is called
+		bool result = workspace.RemoveWindow(window.Object);
+
+		// Then the window is not removed from the layout engine
+		Assert.True(result);
+		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Never);
+		mocks.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Once);
+	}
+
+	[Fact]
 	public void FocusWindowInDirection_Fails_DoesNotContainWindow()
 	{
 		// Given

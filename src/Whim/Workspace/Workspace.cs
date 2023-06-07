@@ -278,26 +278,29 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		bool success = true;
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
+		if (isNormalWindow)
 		{
-			if (!layoutEngine.Remove(window))
+			foreach (ILayoutEngine layoutEngine in _layoutEngines)
 			{
-				Logger.Error($"Window {window} could not be removed from layout engine {layoutEngine}");
-				success = false;
+				if (!layoutEngine.Remove(window))
+				{
+					Logger.Error($"Window {window} could not be removed from layout engine {layoutEngine}");
+					success = false;
+				}
 			}
+
+			if (success)
+			{
+				_normalWindows.Remove(window);
+			}
+		}
+		else
+		{
+			_minimizedWindows.Remove(window);
 		}
 
 		if (success)
 		{
-			if (isNormalWindow)
-			{
-				_normalWindows.Remove(window);
-			}
-			else
-			{
-				_minimizedWindows.Remove(window);
-			}
-
 			DoLayout();
 		}
 
