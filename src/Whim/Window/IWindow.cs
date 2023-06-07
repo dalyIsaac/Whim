@@ -98,20 +98,6 @@ public interface IWindow
 	public void ShowMinimized();
 
 	/// <summary>
-	/// Shows the window in the current state. <br/>
-	///
-	/// If the window is minimized, the window is shown minimized
-	/// (see <see cref="ShowMinimized"/>)<br/>
-	///
-	/// If the window is maximized, the window is shown maximized
-	/// (see <see cref="ShowMaximized"/>). <br/>
-	///
-	/// Otherwise, the window is shown in its most recent size and position
-	/// (see <see cref="ShowNormal"/>).
-	/// </summary>
-	public void ShowInCurrentState();
-
-	/// <summary>
 	/// Brings the window to the top.
 	/// </summary>
 	public void BringToTop();

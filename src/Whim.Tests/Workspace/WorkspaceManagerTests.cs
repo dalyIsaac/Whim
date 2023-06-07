@@ -1127,21 +1127,11 @@ public class WorkspaceManagerTests
 		// Given
 		Wrapper wrapper = new();
 
-		Mock<ILayoutEngine> layoutEngine = new();
-		Mock<Workspace> workspace =
-			new(
-				wrapper.Context.Object,
-				wrapper.WorkspaceManager.InternalTriggers,
-				"test",
-				new ILayoutEngine[] { layoutEngine.Object }
-			);
-		Mock<Workspace> workspace2 =
-			new(
-				wrapper.Context.Object,
-				wrapper.WorkspaceManager.InternalTriggers,
-				"test",
-				new ILayoutEngine[] { layoutEngine.Object }
-			);
+		Mock<IWorkspace> workspace = new();
+		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
+
+		Mock<IWorkspace> workspace2 = new();
+		Mock<IInternalWorkspace> internalWorkspace2 = workspace2.As<IInternalWorkspace>();
 
 		wrapper.WorkspaceManager.Add(workspace.Object);
 		wrapper.WorkspaceManager.Add(workspace2.Object);
@@ -1152,8 +1142,8 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.WindowFocused(window.Object);
 
 		// Then the window is focused in all workspaces
-		workspace.Verify(w => w.WindowFocused(window.Object), Times.Once());
-		workspace2.Verify(w => w.WindowFocused(window.Object), Times.Once());
+		internalWorkspace.Verify(w => w.WindowFocused(window.Object), Times.Once());
+		internalWorkspace2.Verify(w => w.WindowFocused(window.Object), Times.Once());
 	}
 
 	[Fact]
@@ -1199,6 +1189,8 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Mock<IWorkspace> workspace = new();
+		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
+
 		Wrapper wrapper = new(new[] { workspace });
 
 		Mock<IRouterManager> routerManager = new();
@@ -1212,8 +1204,8 @@ public class WorkspaceManagerTests
 		// When a window is minimized
 		wrapper.WorkspaceManager.WindowMinimizeStart(window.Object);
 
-		// Then the window is removed from the workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
+		// Then the workspace is notified
+		internalWorkspace.Verify(w => w.WindowMinimizeStart(window.Object), Times.Once());
 	}
 
 	[Fact]
@@ -1221,6 +1213,32 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Mock<IWorkspace> workspace = new();
+		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
+
+		Wrapper wrapper = new(new[] { workspace });
+
+		Mock<IRouterManager> routerManager = new();
+		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		wrapper.Context.Setup(c => c.RouterManager).Returns(routerManager.Object);
+
+		// A window is added to the workspace
+		Mock<IWindow> window = new();
+		wrapper.WorkspaceManager.WindowAdded(window.Object);
+
+		// When a window is restored
+		wrapper.WorkspaceManager.WindowMinimizeEnd(window.Object);
+
+		// Then the window is routed to the workspace
+		internalWorkspace.Verify(w => w.WindowMinimizeEnd(window.Object), Times.Once());
+	}
+
+	[Fact]
+	public void WindowMinizeEnd_Fail()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
+
 		Wrapper wrapper = new(new[] { workspace });
 
 		Mock<IRouterManager> routerManager = new();
@@ -1229,11 +1247,11 @@ public class WorkspaceManagerTests
 
 		Mock<IWindow> window = new();
 
-		// When a window is restored
+		// When a window which isn't tracked is restored
 		wrapper.WorkspaceManager.WindowMinimizeEnd(window.Object);
 
-		// Then the window is routed to the workspace
-		routerManager.Verify(r => r.RouteWindow(window.Object), Times.Once());
+		// Then the workspace is not notified
+		internalWorkspace.Verify(w => w.WindowMinimizeEnd(window.Object), Times.Never());
 	}
 
 	[Fact]

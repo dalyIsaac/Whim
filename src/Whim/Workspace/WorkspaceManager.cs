@@ -382,7 +382,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		foreach (IWorkspace workspace in _workspaces)
 		{
-			if (workspace is Workspace ws)
+			if (workspace is IInternalWorkspace ws)
 			{
 				ws.WindowFocused(window);
 			}
@@ -409,7 +409,10 @@ internal class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		workspace.RemoveWindow(window);
+		if (workspace is IInternalWorkspace ws)
+		{
+			ws.WindowMinimizeStart(window);
+		}
 	}
 
 	/// <summary>
@@ -420,7 +423,16 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		Logger.Debug($"Window minimize end: {window}");
 
-		WindowAdded(window);
+		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
+		{
+			Logger.Error($"Window {window} was not found in any workspace");
+			return;
+		}
+
+		if (workspace is IInternalWorkspace ws)
+		{
+			ws.WindowMinimizeEnd(window);
+		}
 	}
 	#endregion
 

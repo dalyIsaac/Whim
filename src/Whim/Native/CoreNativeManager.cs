@@ -1,6 +1,7 @@
 using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using Windows.Win32;
@@ -322,5 +323,12 @@ internal class CoreNativeManager : ICoreNativeManager
 
 			return _window.GetHandle();
 		}
+	}
+
+	/// <inheritdoc/>
+	public (string processName, string? processPath) GetProcessNameAndPath(int processId)
+	{
+		using Process process = Process.GetProcessById(processId);
+		return (process.ProcessName, process.MainModule?.FileName);
 	}
 }

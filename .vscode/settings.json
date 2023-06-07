@@ -16,5 +16,6 @@
   "files.exclude": {
     "src/Whim*/bin": true,
     "src/Whim*/obj": true
-  }
+  },
+  "dotnet.defaultSolution": "Whim.sln"
 }

@@ -485,4 +485,11 @@ internal interface ICoreNativeManager
 	/// </remarks>
 	/// <returns>The <see cref="HWND" /> of the window.</returns>
 	HWND WindowMessageMonitorWindowHandle { get; }
+
+	/// <summary>
+	/// Get the process name and process path for the given process ID.
+	/// </summary>
+	/// <param name="processId">The process ID.</param>
+	/// <returns>The process name and process path.</returns>
+	(string processName, string? processPath) GetProcessNameAndPath(int processId);
 }
