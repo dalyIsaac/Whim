@@ -900,6 +900,29 @@ public class WorkspaceTests
 	}
 
 	[Fact]
+	public void MoveWindowToPoint_Success_WindowIsMinimized()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
+
+		workspace.AddWindow(window.Object);
+		workspace.WindowMinimizeStart(window.Object);
+
+		mocks.LayoutEngine.Invocations.Clear();
+
+		// When MoveWindowToPoint is called
+		workspace.MoveWindowToPoint(window.Object, point);
+
+		// Then the layout engine is told to move the window
+		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(window.Object, point), Times.Once);
+		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Never);
+	}
+
+	[Fact]
 	public void MoveWindowToPoint_Success_WindowAlreadyExists()
 	{
 		// Given
@@ -1020,6 +1043,29 @@ public class WorkspaceTests
 
 		// Then the result is as expected
 		Assert.NotNull(result);
+	}
+
+	[Fact]
+	public void TryGetWindowLocation_MinimizedWindow()
+	{
+		// Given
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+
+		// When
+		workspace.AddWindow(window.Object);
+		workspace.WindowMinimizeStart(window.Object);
+		IWindowState windowState = workspace.TryGetWindowLocation(window.Object)!;
+
+		// Then
+		Assert.Equal(window.Object, windowState.Window);
+		Assert.Equal(0, windowState.Location.X);
+		Assert.Equal(0, windowState.Location.Y);
+		Assert.Equal(0, windowState.Location.Width);
+		Assert.Equal(0, windowState.Location.Height);
+		Assert.Equal(WindowSize.Minimized, windowState.WindowSize);
 	}
 
 	[Fact]
