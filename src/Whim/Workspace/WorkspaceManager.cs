@@ -93,14 +93,20 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void Initialize()
 	{
-		Logger.Debug("Initializing workspace manager...");
-
-		_initialized = true;
-
-		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
-
 		lock (_workspaceManagerLock)
 		{
+			if (_initialized)
+			{
+				Logger.Error("Workspace manager has already been initialized.");
+				return;
+			}
+
+			Logger.Debug("Initializing workspace manager...");
+
+			_initialized = true;
+
+			_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+
 			// Ensure there's at least n workspaces, for n monitors.
 			if (_context.MonitorManager.Length > _workspaces.Count)
 			{

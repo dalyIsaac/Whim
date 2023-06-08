@@ -6,6 +6,7 @@ namespace Whim;
 
 internal class Workspace : IWorkspace, IInternalWorkspace
 {
+	private readonly object _workspaceLock = new();
 	private bool _initialized;
 	private readonly IContext _context;
 	private readonly WorkspaceManagerTriggers _triggers;
@@ -16,16 +17,19 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		get => _name;
 		set
 		{
-			string oldName = _name;
-			_name = value;
-			_triggers.WorkspaceRenamed(
-				new WorkspaceRenamedEventArgs()
-				{
-					Workspace = this,
-					PreviousName = oldName,
-					CurrentName = _name
-				}
-			);
+			lock (_workspaceLock)
+			{
+				string oldName = _name;
+				_name = value;
+				_triggers.WorkspaceRenamed(
+					new WorkspaceRenamedEventArgs()
+					{
+						Workspace = this,
+						PreviousName = oldName,
+						CurrentName = _name
+					}
+				);
+			}
 		}
 	}
 
@@ -38,7 +42,16 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
-	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
+	public ILayoutEngine ActiveLayoutEngine
+	{
+		get
+		{
+			lock (_workspaceLock)
+			{
+				return _layoutEngines[_activeLayoutEngineIndex];
+			}
+		}
+	}
 
 	/// <summary>
 	/// All the windows in this workspace which are common to every layout engine.
@@ -87,224 +100,257 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void Initialize()
 	{
-		if (_initialized)
+		lock (_workspaceLock)
 		{
-			Logger.Error($"Workspace {Name} has already been initialized.");
-			return;
-		}
-
-		_initialized = true;
-
-		// Apply the proxy layout engines
-		foreach (ProxyLayoutEngine proxyLayout in _context.WorkspaceManager.ProxyLayoutEngines)
-		{
-			for (int i = 0; i < _layoutEngines.Length; i++)
+			if (_initialized)
 			{
-				_layoutEngines[i] = proxyLayout(_layoutEngines[i]);
+				Logger.Error($"Workspace {Name} has already been initialized.");
+				return;
+			}
+
+			_initialized = true;
+
+			// Apply the proxy layout engines
+			foreach (ProxyLayoutEngine proxyLayout in _context.WorkspaceManager.ProxyLayoutEngines)
+			{
+				for (int i = 0; i < _layoutEngines.Length; i++)
+				{
+					_layoutEngines[i] = proxyLayout(_layoutEngines[i]);
+				}
 			}
 		}
 	}
 
 	public void WindowFocused(IWindow window)
 	{
-		if (
-			_normalWindows.Contains(window)
-			|| (
-				_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
-				&& layoutEngine != null
-				&& ActiveLayoutEngine.ContainsEqual(layoutEngine)
-			)
-		)
+		lock (_workspaceLock)
 		{
-			LastFocusedWindow = window;
-			Logger.Debug($"Focused window {window} in workspace {Name}");
+			if (
+				_normalWindows.Contains(window)
+				|| (
+					_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
+					&& layoutEngine != null
+					&& ActiveLayoutEngine.ContainsEqual(layoutEngine)
+				)
+			)
+			{
+				LastFocusedWindow = window;
+				Logger.Debug($"Focused window {window} in workspace {Name}");
+			}
 		}
 	}
 
 	public void WindowMinimizeStart(IWindow window)
 	{
-		if (!_normalWindows.Contains(window))
+		lock (_workspaceLock)
 		{
-			Logger.Error($"Window {window} is not a normal window in workspace {Name}");
-			return;
+			if (!_normalWindows.Contains(window))
+			{
+				Logger.Error($"Window {window} is not a normal window in workspace {Name}");
+				return;
+			}
+
+			_normalWindows.Remove(window);
+			_minimizedWindows.Add(window);
+
+			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			{
+				layoutEngine.Remove(window);
+			}
+
+			DoLayout();
 		}
-
-		_normalWindows.Remove(window);
-		_minimizedWindows.Add(window);
-
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
-		{
-			layoutEngine.Remove(window);
-		}
-
-		DoLayout();
 	}
 
 	public void WindowMinimizeEnd(IWindow window)
 	{
-		if (!_minimizedWindows.Contains(window))
+		lock (_workspaceLock)
 		{
-			Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
-			return;
-		}
+			if (!_minimizedWindows.Contains(window))
+			{
+				Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
+				return;
+			}
 
-		_minimizedWindows.Remove(window);
-		AddWindow(window);
+			_minimizedWindows.Remove(window);
+			AddWindow(window);
+		}
 	}
 
 	public void FocusFirstWindow()
 	{
-		Logger.Debug($"Focusing first window in workspace {Name}");
-		ActiveLayoutEngine.GetFirstWindow()?.Focus();
+		lock (_workspaceLock)
+		{
+			Logger.Debug($"Focusing first window in workspace {Name}");
+			ActiveLayoutEngine.GetFirstWindow()?.Focus();
+		}
 	}
 
 	private void UpdateLayoutEngine(int nextIdx)
 	{
-		int prevIdx = _activeLayoutEngineIndex;
-
-		// If the LastFocusedWindow is a phantom window, remove it.
-		// This is because phantom windows belong to a specific layout engine.
-		if (LastFocusedWindow != null && _phantomWindows.ContainsKey(LastFocusedWindow))
+		lock (_workspaceLock)
 		{
-			LastFocusedWindow = null;
-		}
+			int prevIdx = _activeLayoutEngineIndex;
 
-		_layoutEngines[prevIdx].HidePhantomWindows();
-		_activeLayoutEngineIndex = nextIdx;
-		DoLayout();
-
-		_triggers.ActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
+			// If the LastFocusedWindow is a phantom window, remove it.
+			// This is because phantom windows belong to a specific layout engine.
+			if (LastFocusedWindow != null && _phantomWindows.ContainsKey(LastFocusedWindow))
 			{
-				Workspace = this,
-				PreviousLayoutEngine = _layoutEngines[prevIdx],
-				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
+				LastFocusedWindow = null;
 			}
-		);
+
+			_layoutEngines[prevIdx].HidePhantomWindows();
+			_activeLayoutEngineIndex = nextIdx;
+			DoLayout();
+
+			_triggers.ActiveLayoutEngineChanged(
+				new ActiveLayoutEngineChangedEventArgs()
+				{
+					Workspace = this,
+					PreviousLayoutEngine = _layoutEngines[prevIdx],
+					CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
+				}
+			);
+		}
 	}
 
 	public void NextLayoutEngine()
 	{
-		Logger.Debug(Name);
-		UpdateLayoutEngine((_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Length));
+		lock (_workspaceLock)
+		{
+			Logger.Debug(Name);
+			UpdateLayoutEngine((_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Length));
+		}
 	}
 
 	public void PreviousLayoutEngine()
 	{
-		Logger.Debug(Name);
-		UpdateLayoutEngine((_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Length));
+		lock (_workspaceLock)
+		{
+			Logger.Debug(Name);
+			UpdateLayoutEngine((_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Length));
+		}
 	}
 
 	public bool TrySetLayoutEngine(string name)
 	{
-		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
-
-		int nextIdx = -1;
-		for (int idx = 0; idx < _layoutEngines.Length; idx++)
+		lock (_workspaceLock)
 		{
-			ILayoutEngine engine = _layoutEngines[idx];
-			if (engine.Name == name)
+			Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
+
+			int nextIdx = -1;
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				nextIdx = idx;
-				break;
+				ILayoutEngine engine = _layoutEngines[idx];
+				if (engine.Name == name)
+				{
+					nextIdx = idx;
+					break;
+				}
 			}
-		}
 
-		if (nextIdx == -1)
-		{
-			Logger.Error($"Layout engine {name} not found for workspace {Name}");
-			return false;
-		}
-		else if (_activeLayoutEngineIndex == nextIdx)
-		{
-			Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
+			if (nextIdx == -1)
+			{
+				Logger.Error($"Layout engine {name} not found for workspace {Name}");
+				return false;
+			}
+			else if (_activeLayoutEngineIndex == nextIdx)
+			{
+				Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
+				return true;
+			}
+
+			UpdateLayoutEngine(nextIdx);
 			return true;
 		}
-
-		UpdateLayoutEngine(nextIdx);
-		return true;
 	}
 
 	public void AddWindow(IWindow window)
 	{
-		Logger.Debug($"Adding window {window} to workspace {Name}");
-
-		if (_phantomWindows.ContainsKey(window))
+		lock (_workspaceLock)
 		{
-			Logger.Verbose($"Phantom window {window} is already in workspace {Name}");
-			return;
-		}
+			Logger.Debug($"Adding window {window} to workspace {Name}");
 
-		if (_normalWindows.Contains(window))
-		{
-			Logger.Error($"Window {window} already exists in workspace {Name}");
-			return;
-		}
+			if (_phantomWindows.ContainsKey(window))
+			{
+				Logger.Verbose($"Phantom window {window} is already in workspace {Name}");
+				return;
+			}
 
-		_normalWindows.Add(window);
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
-		{
-			layoutEngine.Add(window);
+			if (_normalWindows.Contains(window))
+			{
+				Logger.Error($"Window {window} already exists in workspace {Name}");
+				return;
+			}
+
+			_normalWindows.Add(window);
+			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			{
+				layoutEngine.Add(window);
+			}
+			DoLayout();
+			window.Focus();
 		}
-		DoLayout();
-		window.Focus();
 	}
 
 	public bool RemoveWindow(IWindow window)
 	{
-		Logger.Debug($"Removing window {window} from workspace {Name}");
-
-		if (LastFocusedWindow == window)
+		lock (_workspaceLock)
 		{
-			LastFocusedWindow = null;
-		}
+			Logger.Debug($"Removing window {window} from workspace {Name}");
 
-		if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
-		{
-			bool removePhantomSuccess = phantomLayoutEngine.Remove(window);
-			if (removePhantomSuccess)
+			if (LastFocusedWindow == window)
 			{
-				_phantomWindows.Remove(window);
-				DoLayout();
+				LastFocusedWindow = null;
 			}
-			return removePhantomSuccess;
-		}
 
-		bool isNormalWindow = _normalWindows.Contains(window);
-		if (!isNormalWindow && !_minimizedWindows.Contains(window))
-		{
-			Logger.Error($"Window {window} already does not exist in workspace {Name}");
-			return false;
-		}
-
-		bool success = true;
-		if (isNormalWindow)
-		{
-			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
 			{
-				if (!layoutEngine.Remove(window))
+				bool removePhantomSuccess = phantomLayoutEngine.Remove(window);
+				if (removePhantomSuccess)
 				{
-					Logger.Error($"Window {window} could not be removed from layout engine {layoutEngine}");
-					success = false;
+					_phantomWindows.Remove(window);
+					DoLayout();
 				}
+				return removePhantomSuccess;
+			}
+
+			bool isNormalWindow = _normalWindows.Contains(window);
+			if (!isNormalWindow && !_minimizedWindows.Contains(window))
+			{
+				Logger.Error($"Window {window} already does not exist in workspace {Name}");
+				return false;
+			}
+
+			bool success = true;
+			if (isNormalWindow)
+			{
+				foreach (ILayoutEngine layoutEngine in _layoutEngines)
+				{
+					if (!layoutEngine.Remove(window))
+					{
+						Logger.Error($"Window {window} could not be removed from layout engine {layoutEngine}");
+						success = false;
+					}
+				}
+
+				if (success)
+				{
+					_normalWindows.Remove(window);
+				}
+			}
+			else
+			{
+				_minimizedWindows.Remove(window);
 			}
 
 			if (success)
 			{
-				_normalWindows.Remove(window);
+				DoLayout();
 			}
-		}
-		else
-		{
-			_minimizedWindows.Remove(window);
-		}
 
-		if (success)
-		{
-			DoLayout();
+			return success;
 		}
-
-		return success;
 	}
 
 	/// <summary>
@@ -350,223 +396,252 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
-		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
-
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		lock (_workspaceLock)
 		{
-			ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
-			DoLayout();
+			Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
+
+			if (GetValidVisibleWindow(window) is IWindow validWindow)
+			{
+				ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+				DoLayout();
+			}
 		}
 	}
 
 	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null)
 	{
-		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edge} by {delta}");
-
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		lock (_workspaceLock)
 		{
-			ActiveLayoutEngine.MoveWindowEdgeInDirection(edge, delta, validWindow);
-			DoLayout();
+			Logger.Debug($"Moving window {window} in workspace {Name} in direction {edge} by {delta}");
+
+			if (GetValidVisibleWindow(window) is IWindow validWindow)
+			{
+				ActiveLayoutEngine.MoveWindowEdgeInDirection(edge, delta, validWindow);
+				DoLayout();
+			}
 		}
 	}
 
 	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
-		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
+		lock (_workspaceLock)
+		{
+			Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
 
-		if (_phantomWindows.ContainsKey(window))
-		{
-			return;
-		}
-		if (_normalWindows.Contains(window))
-		{
-			// The window is already in the workspace, so move it in just the active layout engine
-			ActiveLayoutEngine.Remove(window);
-			ActiveLayoutEngine.AddWindowAtPoint(window, point);
-		}
-		else
-		{
-			// If the window is minimized, remove it from the minimized list, and treat it as a new window
-			if (_minimizedWindows.Contains(window))
+			if (_phantomWindows.ContainsKey(window))
 			{
-				_minimizedWindows.Remove(window);
+				return;
+			}
+			if (_normalWindows.Contains(window))
+			{
+				// The window is already in the workspace, so move it in just the active layout engine
+				ActiveLayoutEngine.Remove(window);
+				ActiveLayoutEngine.AddWindowAtPoint(window, point);
+			}
+			else
+			{
+				// If the window is minimized, remove it from the minimized list, and treat it as a new window
+				if (_minimizedWindows.Contains(window))
+				{
+					_minimizedWindows.Remove(window);
+				}
+
+				// The window is new to the workspace, so add it to all layout engines
+				_normalWindows.Add(window);
+
+				foreach (ILayoutEngine layoutEngine in _layoutEngines)
+				{
+					layoutEngine.AddWindowAtPoint(window, point);
+				}
 			}
 
-			// The window is new to the workspace, so add it to all layout engines
-			_normalWindows.Add(window);
-
-			foreach (ILayoutEngine layoutEngine in _layoutEngines)
-			{
-				layoutEngine.AddWindowAtPoint(window, point);
-			}
+			DoLayout();
 		}
-
-		DoLayout();
 	}
 
 	public override string ToString() => Name;
 
 	public void Deactivate()
 	{
-		Logger.Debug($"Deactivating workspace {Name}");
-
-		foreach (IWindow window in Windows)
+		lock (_workspaceLock)
 		{
-			window.Hide();
-		}
+			Logger.Debug($"Deactivating workspace {Name}");
 
-		foreach (IWindow window in _phantomWindows.Keys)
-		{
-			window.Hide();
-		}
+			foreach (IWindow window in Windows)
+			{
+				window.Hide();
+			}
 
-		_windowLocations.Clear();
+			foreach (IWindow window in _phantomWindows.Keys)
+			{
+				window.Hide();
+			}
+
+			_windowLocations.Clear();
+		}
 	}
 
 	public IWindowState? TryGetWindowLocation(IWindow window)
 	{
-		_windowLocations.TryGetValue(window, out IWindowState? location);
-
-		if (location is null && _minimizedWindows.Contains(window))
+		lock (_workspaceLock)
 		{
-			location = new WindowState()
-			{
-				Window = window,
-				Location = new Location<int>()
-				{
-					X = 0,
-					Y = 0,
-					Width = 0,
-					Height = 0
-				},
-				WindowSize = WindowSize.Minimized
-			};
-		}
+			_windowLocations.TryGetValue(window, out IWindowState? location);
 
-		return location;
+			if (location is null && _minimizedWindows.Contains(window))
+			{
+				location = new WindowState()
+				{
+					Window = window,
+					Location = new Location<int>()
+					{
+						X = 0,
+						Y = 0,
+						Width = 0,
+						Height = 0
+					},
+					WindowSize = WindowSize.Minimized
+				};
+			}
+
+			return location;
+		}
 	}
 
 	public void DoLayout()
 	{
-		Logger.Debug($"Workspace {Name}");
-
-		// Get the monitor for this workspace
-		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
-		if (monitor == null)
+		lock (_workspaceLock)
 		{
-			Logger.Debug($"No active monitors found for workspace {Name}.");
-			return;
-		}
+			Logger.Debug($"Workspace {Name}");
 
-		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
-		_windowLocations.Clear();
-
-		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
-		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
-			new Location<int>()
+			// Get the monitor for this workspace
+			IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
+			if (monitor == null)
 			{
-				X = 0,
-				Y = 0,
-				Width = monitor.WorkingArea.Width,
-				Height = monitor.WorkingArea.Height
-			},
-			monitor
-		);
-
-		using (WindowDeferPosHandle handle = new(_context))
-		{
-			foreach (IWindowState loc in locations)
-			{
-				Logger.Verbose($"Setting location of window {loc.Window}");
-				if (loc.Window.IsMouseMoving)
-				{
-					continue;
-				}
-
-				// Adjust the window location to the monitor's coordinates
-				loc.Location = new Location<int>()
-				{
-					X = loc.Location.X + monitor.WorkingArea.X,
-					Y = loc.Location.Y + monitor.WorkingArea.Y,
-					Width = loc.Location.Width,
-					Height = loc.Location.Height
-				};
-
-				Logger.Verbose($"{loc.Window} at {loc.Location}");
-				handle.DeferWindowPos(loc);
-
-				// Update the window location
-				_windowLocations[loc.Window] = loc;
+				Logger.Debug($"No active monitors found for workspace {Name}.");
+				return;
 			}
-			Logger.Verbose($"Layout for workspace {Name} complete");
-		}
 
-		foreach (IWindow window in _minimizedWindows)
-		{
-			window.ShowMinimized();
-		}
+			_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
+			_windowLocations.Clear();
 
-		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+			Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
+			IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
+				new Location<int>()
+				{
+					X = 0,
+					Y = 0,
+					Width = monitor.WorkingArea.Width,
+					Height = monitor.WorkingArea.Height
+				},
+				monitor
+			);
+
+			using (WindowDeferPosHandle handle = new(_context))
+			{
+				foreach (IWindowState loc in locations)
+				{
+					Logger.Verbose($"Setting location of window {loc.Window}");
+					if (loc.Window.IsMouseMoving)
+					{
+						continue;
+					}
+
+					// Adjust the window location to the monitor's coordinates
+					loc.Location = new Location<int>()
+					{
+						X = loc.Location.X + monitor.WorkingArea.X,
+						Y = loc.Location.Y + monitor.WorkingArea.Y,
+						Width = loc.Location.Width,
+						Height = loc.Location.Height
+					};
+
+					Logger.Verbose($"{loc.Window} at {loc.Location}");
+					handle.DeferWindowPos(loc);
+
+					// Update the window location
+					_windowLocations[loc.Window] = loc;
+				}
+				Logger.Verbose($"Layout for workspace {Name} complete");
+			}
+
+			foreach (IWindow window in _minimizedWindows)
+			{
+				window.ShowMinimized();
+			}
+
+			_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		}
 	}
 
 	#region Phantom Windows
 	public void AddPhantomWindow(ILayoutEngine engine, IWindow window)
 	{
-		Logger.Debug($"Adding phantom window {window} in workspace {Name}");
-
-		if (!ActiveLayoutEngine.ContainsEqual(engine))
+		lock (_workspaceLock)
 		{
-			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
-			return;
-		}
+			Logger.Debug($"Adding phantom window {window} in workspace {Name}");
 
-		if (_phantomWindows.ContainsKey(window))
-		{
-			Logger.Error($"Phantom window {window} already exists in workspace {Name}");
-			return;
-		}
+			if (!ActiveLayoutEngine.ContainsEqual(engine))
+			{
+				Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
+				return;
+			}
 
-		_phantomWindows.Add(window, engine);
-		_context.WorkspaceManager.AddPhantomWindow(this, window);
-		DoLayout();
+			if (_phantomWindows.ContainsKey(window))
+			{
+				Logger.Error($"Phantom window {window} already exists in workspace {Name}");
+				return;
+			}
+
+			_phantomWindows.Add(window, engine);
+			_context.WorkspaceManager.AddPhantomWindow(this, window);
+			DoLayout();
+		}
 	}
 
 	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window)
 	{
-		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
-
-		if (!ActiveLayoutEngine.ContainsEqual(engine))
+		lock (_workspaceLock)
 		{
-			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
-			return;
+			Logger.Debug($"Removing phantom window {window} in workspace {Name}");
+
+			if (!ActiveLayoutEngine.ContainsEqual(engine))
+			{
+				Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
+				return;
+			}
+
+			if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine))
+			{
+				Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
+				return;
+			}
+
+			if (phantomEngine != engine)
+			{
+				Logger.Error($"Phantom window {window} does not belong to layout engine {engine} in workspace {Name}");
+				return;
+			}
+
+			_phantomWindows.Remove(window);
+			_context.WorkspaceManager.RemovePhantomWindow(window);
+
+			DoLayout();
 		}
-
-		if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine))
-		{
-			Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
-			return;
-		}
-
-		if (phantomEngine != engine)
-		{
-			Logger.Error($"Phantom window {window} does not belong to layout engine {engine} in workspace {Name}");
-			return;
-		}
-
-		_phantomWindows.Remove(window);
-		_context.WorkspaceManager.RemovePhantomWindow(window);
-
-		DoLayout();
 	}
 	#endregion
 
-	public bool ContainsWindow(IWindow window) =>
-		_normalWindows.Contains(window)
-		|| _minimizedWindows.Contains(window)
-		|| (
-			_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
-			&& ActiveLayoutEngine.ContainsEqual(phantomEngine)
-		);
+	public bool ContainsWindow(IWindow window)
+	{
+		lock (_workspaceLock)
+		{
+			return _normalWindows.Contains(window)
+				|| _minimizedWindows.Contains(window)
+				|| (
+					_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
+					&& ActiveLayoutEngine.ContainsEqual(phantomEngine)
+				);
+		}
+	}
 
 	protected virtual void Dispose(bool disposing)
 	{
@@ -574,17 +649,20 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			if (disposing)
 			{
-				Logger.Debug($"Disposing workspace {Name}");
-
-				// dispose managed state (managed objects)
-				bool isWorkspaceActive = _context.WorkspaceManager.GetMonitorForWorkspace(this) != null;
-
-				// If the workspace isn't active on the monitor, show all the windows in as minimized.
-				if (!isWorkspaceActive)
+				lock (_workspaceLock)
 				{
-					foreach (IWindow window in Windows)
+					Logger.Debug($"Disposing workspace {Name}");
+
+					// dispose managed state (managed objects)
+					bool isWorkspaceActive = _context.WorkspaceManager.GetMonitorForWorkspace(this) != null;
+
+					// If the workspace isn't active on the monitor, show all the windows in as minimized.
+					if (!isWorkspaceActive)
 					{
-						window.ShowMinimized();
+						foreach (IWindow window in Windows)
+						{
+							window.ShowMinimized();
+						}
 					}
 				}
 			}
