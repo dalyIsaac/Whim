@@ -21,6 +21,7 @@ internal record WorkspaceManagerTriggers
 /// </summary>
 internal class WorkspaceManager : IWorkspaceManager
 {
+	private readonly object _workspaceManagerLock = new();
 	private bool _initialized;
 	private readonly IContext _context;
 	protected readonly WorkspaceManagerTriggers _triggers;
@@ -98,7 +99,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			// Ensure there's at least n workspaces, for n monitors.
 			if (_context.MonitorManager.Length > _workspaces.Count)
@@ -133,7 +134,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Workspace workspace =
 				new(
@@ -156,7 +157,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IEnumerator<IWorkspace> GetEnumerator()
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			return _workspaces.GetEnumerator();
 		}
@@ -166,7 +167,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public bool Remove(IWorkspace workspace)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Removing workspace {workspace}");
 
@@ -212,7 +213,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public bool Remove(string workspaceName)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Trying to remove workspace {workspaceName}");
 
@@ -229,7 +230,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? TryGet(string workspaceName)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Trying to get workspace {workspaceName}");
 			return _workspaces.Find(w => w.Name == workspaceName);
@@ -238,7 +239,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void Activate(IWorkspace workspace, IMonitor? activeMonitor = null)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Activating workspace {workspace}");
 
@@ -293,7 +294,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void ActivatePrevious(IMonitor? monitor = null)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug("Activating previous workspace");
 
@@ -311,7 +312,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void ActivateNext(IMonitor? monitor = null)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug("Activating next workspace");
 
@@ -329,7 +330,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Getting monitor for active workspace {workspace}");
 
@@ -350,7 +351,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void LayoutAllActiveWorkspaces()
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug("Layout all active workspaces");
 
@@ -370,7 +371,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// <param name="window">The window that was added.</param>
 	internal virtual void WindowAdded(IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Adding window {window}");
 			IWorkspace? workspace = _context.RouterManager.RouteWindow(window);
@@ -398,7 +399,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// <param name="window">The window that was removed.</param>
 	internal virtual void WindowRemoved(IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Window removed: {window}");
 
@@ -420,7 +421,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// <param name="window">The window that was focused.</param>
 	internal virtual void WindowFocused(IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Window focused: {window}");
 
@@ -446,7 +447,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// <param name="window">The window that is minimizing.</param>
 	internal virtual void WindowMinimizeStart(IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Window minimize start: {window}");
 
@@ -469,7 +470,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// <param name="window">The window that is restoring.</param>
 	internal virtual void WindowMinimizeEnd(IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Window minimize end: {window}");
 
@@ -490,7 +491,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	#region Monitors
 	public void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"MonitorManager_MonitorsChanged: {e}");
 
@@ -533,7 +534,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			_proxyLayoutEngines.Add(proxyLayoutEngine);
 		}
@@ -541,7 +542,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			return _monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? workspace) ? workspace : null;
 		}
@@ -549,7 +550,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IMonitor? GetMonitorForWindow(IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace)
 				? GetMonitorForWorkspace(workspace)
@@ -560,7 +561,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? GetWorkspaceForWindow(IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? workspace : null;
 		}
@@ -568,7 +569,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			window ??= ActiveWorkspace.LastFocusedWindow;
 			if (window == null)
@@ -605,7 +606,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			window ??= ActiveWorkspace.LastFocusedWindow;
 			if (window == null)
@@ -641,7 +642,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToPreviousMonitor(IWindow? window = null)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Moving window {window} to previous monitor");
 
@@ -655,7 +656,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToNextMonitor(IWindow? window = null)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Moving window {window} to next monitor");
 
@@ -669,7 +670,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Moving window {window} to location {point}");
 
@@ -721,7 +722,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	#region Phantom Windows
 	public void AddPhantomWindow(IWorkspace workspace, IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Adding phantom window {window} to workspace {workspace}");
 			_phantomWindows.Add(window);
@@ -731,7 +732,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void RemovePhantomWindow(IWindow window)
 	{
-		lock (_workspaces)
+		lock (_workspaceManagerLock)
 		{
 			Logger.Debug($"Removing phantom window {window}");
 			_phantomWindows.Remove(window);
@@ -746,7 +747,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			if (disposing)
 			{
-				lock (_workspaces)
+				lock (_workspaceManagerLock)
 				{
 					Logger.Debug("Disposing workspace manager");
 
