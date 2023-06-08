@@ -14,6 +14,7 @@ namespace Whim;
 /// </summary>
 internal class MonitorManager : IMonitorManager
 {
+	private readonly object _monitorManagerLock = new();
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly IWindowMessageMonitor _windowMessageMonitor;
@@ -81,12 +82,15 @@ internal class MonitorManager : IMonitorManager
 	/// <param name="window"></param>
 	internal virtual void WindowFocused(IWindow window)
 	{
-		Logger.Debug($"Focusing on {window}");
-		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(window);
-
-		if (monitor != null)
+		lock (_monitorManagerLock)
 		{
-			ActiveMonitor = monitor;
+			Logger.Debug($"Focusing on {window}");
+			IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(window);
+
+			if (monitor != null)
+			{
+				ActiveMonitor = monitor;
+			}
 		}
 	}
 
@@ -104,56 +108,59 @@ internal class MonitorManager : IMonitorManager
 
 	private void WindowMessageMonitor_MonitorsChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{
-		Logger.Debug($"Monitors changed: {e.MessagePayload}");
-
-		// Get the new monitors.
-		IMonitor[] previousMonitors = _monitors;
-		_monitors = GetCurrentMonitors();
-
-		List<IMonitor> unchangedMonitors = new();
-		List<IMonitor> removedMonitors = new();
-		List<IMonitor> addedMonitors = new();
-
-		HashSet<IMonitor> previousMonitorsSet = new(previousMonitors);
-		HashSet<IMonitor> currentMonitorsSet = new(_monitors);
-
-		// For each monitor in the previous set, check if it's in the current set.
-		foreach (IMonitor monitor in previousMonitorsSet)
+		lock (_monitorManagerLock)
 		{
-			if (currentMonitorsSet.Contains(monitor))
+			Logger.Debug($"Monitors changed: {e.MessagePayload}");
+
+			// Get the new monitors.
+			IMonitor[] previousMonitors = _monitors;
+			_monitors = GetCurrentMonitors();
+
+			List<IMonitor> unchangedMonitors = new();
+			List<IMonitor> removedMonitors = new();
+			List<IMonitor> addedMonitors = new();
+
+			HashSet<IMonitor> previousMonitorsSet = new(previousMonitors);
+			HashSet<IMonitor> currentMonitorsSet = new(_monitors);
+
+			// For each monitor in the previous set, check if it's in the current set.
+			foreach (IMonitor monitor in previousMonitorsSet)
 			{
-				unchangedMonitors.Add(monitor);
+				if (currentMonitorsSet.Contains(monitor))
+				{
+					unchangedMonitors.Add(monitor);
+				}
+				else
+				{
+					removedMonitors.Add(monitor);
+				}
 			}
-			else
+
+			// For each monitor in the current set, check if it's in the previous set.
+			foreach (IMonitor monitor in currentMonitorsSet)
 			{
-				removedMonitors.Add(monitor);
+				if (!previousMonitorsSet.Contains(monitor))
+				{
+					addedMonitors.Add(monitor);
+				}
+
+				if (monitor.IsPrimary)
+				{
+					PrimaryMonitor = monitor;
+				}
 			}
+
+			// Notify listeners of the unchanged, removed, and added monitors.
+			MonitorsChanged?.Invoke(
+				this,
+				new MonitorsChangedEventArgs()
+				{
+					UnchangedMonitors = unchangedMonitors,
+					RemovedMonitors = removedMonitors,
+					AddedMonitors = addedMonitors
+				}
+			);
 		}
-
-		// For each monitor in the current set, check if it's in the previous set.
-		foreach (IMonitor monitor in currentMonitorsSet)
-		{
-			if (!previousMonitorsSet.Contains(monitor))
-			{
-				addedMonitors.Add(monitor);
-			}
-
-			if (monitor.IsPrimary)
-			{
-				PrimaryMonitor = monitor;
-			}
-		}
-
-		// Notify listeners of the unchanged, removed, and added monitors.
-		MonitorsChanged?.Invoke(
-			this,
-			new MonitorsChangedEventArgs()
-			{
-				UnchangedMonitors = unchangedMonitors,
-				RemovedMonitors = removedMonitors,
-				AddedMonitors = addedMonitors
-			}
-		);
 	}
 
 	private HMONITOR GetPrimaryHMonitor()
@@ -213,48 +220,57 @@ internal class MonitorManager : IMonitorManager
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
-		Logger.Debug($"Getting monitor at point {point}");
-		HMONITOR hmonitor = _coreNativeManager.MonitorFromPoint(
-			point.ToSystemPoint(),
-			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
-		);
-
-		IMonitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
-		if (monitor == null)
+		lock (_monitorManagerLock)
 		{
-			Logger.Error($"No monitor found at point {point}");
-			return _monitors[0];
-		}
+			Logger.Debug($"Getting monitor at point {point}");
+			HMONITOR hmonitor = _coreNativeManager.MonitorFromPoint(
+				point.ToSystemPoint(),
+				MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
+			);
 
-		return monitor;
+			IMonitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
+			if (monitor == null)
+			{
+				Logger.Error($"No monitor found at point {point}");
+				return _monitors[0];
+			}
+
+			return monitor;
+		}
 	}
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor)
 	{
-		Logger.Debug($"Getting previous monitor for {monitor}");
-
-		int index = Array.IndexOf(_monitors, monitor);
-		if (index == -1)
+		lock (_monitorManagerLock)
 		{
-			Logger.Error($"Monitor {monitor} not found.");
-			return _monitors[0];
-		}
+			Logger.Debug($"Getting previous monitor for {monitor}");
 
-		return _monitors[(index - 1).Mod(_monitors.Length)];
+			int index = Array.IndexOf(_monitors, monitor);
+			if (index == -1)
+			{
+				Logger.Error($"Monitor {monitor} not found.");
+				return _monitors[0];
+			}
+
+			return _monitors[(index - 1).Mod(_monitors.Length)];
+		}
 	}
 
 	public IMonitor GetNextMonitor(IMonitor monitor)
 	{
-		Logger.Debug($"Getting next monitor for {monitor}");
-
-		int index = Array.IndexOf(_monitors, monitor);
-		if (index == -1)
+		lock (_monitorManagerLock)
 		{
-			Logger.Error($"Monitor {monitor} not found.");
-			return _monitors[0];
-		}
+			Logger.Debug($"Getting next monitor for {monitor}");
 
-		return _monitors[(index + 1).Mod(_monitors.Length)];
+			int index = Array.IndexOf(_monitors, monitor);
+			if (index == -1)
+			{
+				Logger.Error($"Monitor {monitor} not found.");
+				return _monitors[0];
+			}
+
+			return _monitors[(index + 1).Mod(_monitors.Length)];
+		}
 	}
 
 	protected virtual void Dispose(bool disposing)
