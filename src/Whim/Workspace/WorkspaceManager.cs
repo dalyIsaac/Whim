@@ -479,16 +479,19 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
 	{
+		Logger.Debug($"Adding proxy layout engine: {proxyLayoutEngine}");
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
 	}
 
 	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
 	{
+		Logger.Debug($"Getting workspace for monitor: {monitor}");
 		return _monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? workspace) ? workspace : null;
 	}
 
 	public IMonitor? GetMonitorForWindow(IWindow window)
 	{
+		Logger.Debug($"Getting monitor for window: {window}");
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace)
 			? GetMonitorForWorkspace(workspace)
 			: null;
@@ -497,12 +500,15 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? GetWorkspaceForWindow(IWindow window)
 	{
+		Logger.Debug($"Getting workspace for window: {window}");
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? workspace : null;
 	}
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
 	{
 		window ??= ActiveWorkspace.LastFocusedWindow;
+		Logger.Debug($"Moving window {window} to workspace {workspace}");
+
 		if (window == null)
 		{
 			Logger.Error("No window was found");
@@ -537,6 +543,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
 	{
 		window ??= ActiveWorkspace.LastFocusedWindow;
+		Logger.Debug($"Moving window {window} to monitor {monitor}");
+
 		if (window == null)
 		{
 			Logger.Error("No window was found");
