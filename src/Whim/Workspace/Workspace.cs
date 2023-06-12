@@ -6,6 +6,7 @@ namespace Whim;
 
 internal class Workspace : IWorkspace, IInternalWorkspace
 {
+	private readonly object _lock = new();
 	private bool _initialized;
 	private readonly IContext _context;
 	private readonly WorkspaceManagerTriggers _triggers;
