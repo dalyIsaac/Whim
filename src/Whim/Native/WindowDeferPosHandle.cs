@@ -38,6 +38,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// <param name="context"></param>
 	public WindowDeferPosHandle(IContext context)
 	{
+		Logger.Debug("Creating new WindowDeferPosHandle");
 		_context = context;
 	}
 
@@ -56,6 +57,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 		SET_WINDOW_POS_FLAGS? flags = null
 	)
 	{
+		Logger.Debug($"Adding window {windowState} after {hwndInsertAfter} with flags {flags}");
 		// We use HWND_BOTTOM, as modifying the Z-order of a window
 		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
 		// causes the relevant window to be focused, when the user hasn't
@@ -67,6 +69,8 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// <inheritdoc />
 	public void Dispose()
 	{
+		Logger.Debug("Disposing WindowDeferPosHandle");
+
 		// Check to see if any monitors have non-100% scaling.
 		// If so, we need to set the window position twice.
 		int numPasses = 1;
@@ -79,6 +83,8 @@ public sealed class WindowDeferPosHandle : IDisposable
 			}
 		}
 
+		Logger.Debug($"Setting window position {numPasses} times");
+
 		int count = _windowStates.Count;
 		for (int i = 0; i < numPasses; i++)
 		{
@@ -89,6 +95,8 @@ public sealed class WindowDeferPosHandle : IDisposable
 				handle.DeferWindowPos(windowState, hwndInsertAfter, flags);
 			}
 		}
+
+		Logger.Debug("Finished setting window position");
 	}
 
 	private sealed class InternalWindowDeferPosHandle : IDisposable
@@ -110,6 +118,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 		/// <param name="count"></param>
 		public InternalWindowDeferPosHandle(IContext context, int count)
 		{
+			Logger.Debug("Creating new InternalWindowDeferPosHandle");
 			_context = context;
 			_hWinPosInfo = context.NativeManager.BeginDeferWindowPos(count);
 
@@ -163,6 +172,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 		public void Dispose()
 		{
+			Logger.Debug("Disposing InternalWindowDeferPosHandle");
 			foreach (IWindow w in _toMinimize)
 			{
 				if (!w.IsMinimized)
@@ -185,6 +195,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 			}
 
 			_context.NativeManager.EndDeferWindowPos(_hWinPosInfo);
+			Logger.Debug("Disposed InternalWindowDeferPosHandle");
 		}
 	}
 }
