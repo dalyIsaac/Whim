@@ -49,7 +49,7 @@ public partial class FocusedWindowWidget : UserControl
 	public static string GetShortTitle(IWindow window)
 	{
 		string[] parts = window.Title.Split(_titleSeparators, StringSplitOptions.RemoveEmptyEntries);
-		return parts[0].Trim();
+		return parts.Length > 0 ? parts[0].Trim() : window.Title;
 	}
 
 	/// <summary>
