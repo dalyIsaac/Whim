@@ -111,8 +111,8 @@ public class WorkspaceWidgetViewModelTests
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = wrapper.Monitor.Object,
-				OldWorkspace = wrapper.Workspace.Object,
-				NewWorkspace = new Mock<IWorkspace>().Object
+				PreviousWorkspace = wrapper.Workspace.Object,
+				CurrentWorkspace = new Mock<IWorkspace>().Object
 			}
 		);
 
@@ -147,8 +147,8 @@ public class WorkspaceWidgetViewModelTests
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = wrapper.Monitor.Object,
-				OldWorkspace = existingModel.Workspace,
-				NewWorkspace = addedWorkspaceModel.Workspace
+				PreviousWorkspace = existingModel.Workspace,
+				CurrentWorkspace = addedWorkspaceModel.Workspace
 			}
 		);
 

@@ -62,7 +62,7 @@ public class ActiveLayoutWidgetViewModelTests
 					new MonitorWorkspaceChangedEventArgs()
 					{
 						Monitor = wrapper.Monitor.Object,
-						NewWorkspace = wrapper.Workspace.Object
+						CurrentWorkspace = wrapper.Workspace.Object
 					}
 				)
 		);

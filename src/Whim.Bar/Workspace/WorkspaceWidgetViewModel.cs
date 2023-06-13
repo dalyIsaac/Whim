@@ -74,10 +74,10 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		}
 
 		// Set the old workspace's model to not be active on the monitor
-		if (args.OldWorkspace != null)
+		if (args.PreviousWorkspace != null)
 		{
 			WorkspaceModel? oldWorkspaceModel = Workspaces.FirstOrDefault(
-				model => model.Workspace == args.OldWorkspace
+				model => model.Workspace == args.PreviousWorkspace
 			);
 			if (oldWorkspaceModel != null)
 			{
@@ -86,7 +86,9 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		}
 
 		// Set the new workspace's model to be active on the monitor
-		WorkspaceModel? newWorkspaceModel = Workspaces.FirstOrDefault(model => model.Workspace == args.NewWorkspace);
+		WorkspaceModel? newWorkspaceModel = Workspaces.FirstOrDefault(
+			model => model.Workspace == args.CurrentWorkspace
+		);
 		if (newWorkspaceModel != null)
 		{
 			newWorkspaceModel.ActiveOnMonitor = true;

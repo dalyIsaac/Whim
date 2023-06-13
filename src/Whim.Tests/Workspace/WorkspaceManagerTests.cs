@@ -169,8 +169,8 @@ public class WorkspaceManagerTests
 		// Given
 		Mock<IWorkspace> workspace = new();
 		Mock<IWorkspace> workspace2 = new();
-		Mock<IMonitor>[] monitorwrapper = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(new Mock<IWorkspace>[] { workspace, workspace2 }, monitorwrapper);
+		Mock<IMonitor>[] monitorWrapper = new[] { new Mock<IMonitor>() };
+		Wrapper wrapper = new(new Mock<IWorkspace>[] { workspace, workspace2 }, monitorWrapper);
 
 		Mock<IWindow> window = new();
 		workspace.Setup(w => w.Windows).Returns(new[] { window.Object });
@@ -278,12 +278,12 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void Activate_NoOldWorkspace()
+	public void Activate_NoPreviousWorkspace()
 	{
 		// Given
-		Mock<IMonitor>[] monitorwrapper = new[] { new Mock<IMonitor>() };
+		Mock<IMonitor>[] monitorWrapper = new[] { new Mock<IMonitor>() };
 		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new(new[] { workspace }, monitorwrapper);
+		Wrapper wrapper = new(new[] { workspace }, monitorWrapper);
 
 		// When a workspace is activated when there are no other workspaces activated, then it is
 		// focused on the active monitor and raises an event,
@@ -292,8 +292,8 @@ public class WorkspaceManagerTests
 			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged -= h,
 			() => wrapper.WorkspaceManager.Activate(workspace.Object)
 		);
-		Assert.Equal(workspace.Object, result.Arguments.NewWorkspace);
-		Assert.Null(result.Arguments.OldWorkspace);
+		Assert.Equal(workspace.Object, result.Arguments.CurrentWorkspace);
+		Assert.Null(result.Arguments.PreviousWorkspace);
 
 		// Layout is done, and the first window is focused.
 		workspace.Verify(w => w.DoLayout(), Times.Once);
@@ -301,36 +301,36 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void Activate_WithOldWorkspace()
+	public void Activate_WithPreviousWorkspace()
 	{
 		// Given
-		Mock<IWorkspace> oldWorkspace = new();
-		Mock<IWorkspace> newWorkspace = new();
-		Mock<IMonitor>[] monitorwrapper = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(new[] { oldWorkspace, newWorkspace }, monitorwrapper);
+		Mock<IWorkspace> previousWorkspace = new();
+		Mock<IWorkspace> currentWorkspace = new();
+		Mock<IMonitor>[] monitorWrapper = new[] { new Mock<IMonitor>() };
+		Wrapper wrapper = new(new[] { previousWorkspace, currentWorkspace }, monitorWrapper);
 
-		wrapper.WorkspaceManager.Activate(oldWorkspace.Object);
+		wrapper.WorkspaceManager.Activate(previousWorkspace.Object);
 
 		// Reset wrapper
-		oldWorkspace.Reset();
-		newWorkspace.Reset();
+		previousWorkspace.Reset();
+		currentWorkspace.Reset();
 
 		// When a workspace is activated when there is another workspace activated, then the old
 		// workspace is deactivated, the new workspace is activated, and an event is raised
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
 			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged += h,
 			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged -= h,
-			() => wrapper.WorkspaceManager.Activate(newWorkspace.Object)
+			() => wrapper.WorkspaceManager.Activate(currentWorkspace.Object)
 		);
-		Assert.Equal(newWorkspace.Object, result.Arguments.NewWorkspace);
-		Assert.Equal(oldWorkspace.Object, result.Arguments.OldWorkspace);
+		Assert.Equal(currentWorkspace.Object, result.Arguments.CurrentWorkspace);
+		Assert.Equal(previousWorkspace.Object, result.Arguments.PreviousWorkspace);
 
 		// The old workspace is deactivated, the new workspace is laid out, and the first window is
 		// focused.
-		oldWorkspace.Verify(w => w.Deactivate(), Times.Once);
-		oldWorkspace.Verify(w => w.DoLayout(), Times.Never);
-		newWorkspace.Verify(w => w.DoLayout(), Times.Once);
-		newWorkspace.Verify(w => w.FocusFirstWindow(), Times.Once);
+		previousWorkspace.Verify(w => w.Deactivate(), Times.Once);
+		previousWorkspace.Verify(w => w.DoLayout(), Times.Never);
+		currentWorkspace.Verify(w => w.DoLayout(), Times.Once);
+		currentWorkspace.Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
 	[Fact]
@@ -359,8 +359,8 @@ public class WorkspaceManagerTests
 		);
 
 		Assert.Equal(monitor, result.Arguments.Monitor);
-		Assert.Equal(workspace2.Object, result.Arguments.NewWorkspace);
-		Assert.Equal(workspace.Object, result.Arguments.OldWorkspace);
+		Assert.Equal(workspace2.Object, result.Arguments.CurrentWorkspace);
+		Assert.Equal(workspace.Object, result.Arguments.PreviousWorkspace);
 
 		workspace.Verify(w => w.Deactivate(), Times.Never);
 		workspace.Verify(w => w.DoLayout(), Times.Once);
@@ -442,8 +442,8 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Mock<IWorkspace> workspace = new();
-		Mock<IMonitor>[] monitorwrapper = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(new[] { workspace }, monitorwrapper);
+		Mock<IMonitor>[] monitorWrapper = new[] { new Mock<IMonitor>() };
+		Wrapper wrapper = new(new[] { workspace }, monitorWrapper);
 
 		wrapper.WorkspaceManager.Activate(workspace.Object);
 
@@ -817,7 +817,7 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void MoveWindowToMonitor_NoOldMonitor()
+	public void MoveWindowToMonitor_NoPreviousMonitor()
 	{
 		// Given there are 2 workspaces
 		Mock<IWorkspace> workspace = new();
@@ -843,7 +843,7 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void MoveWindowToMonitor_OldMonitorIsNewMonitor()
+	public void MoveWindowToMonitor_PreviousMonitorIsNewMonitor()
 	{
 		// Given there are 2 workspaces, and the window has been added
 		Mock<IWorkspace> workspace = new();

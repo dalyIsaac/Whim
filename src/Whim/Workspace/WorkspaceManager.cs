@@ -242,8 +242,8 @@ internal class WorkspaceManager : IWorkspaceManager
 				new MonitorWorkspaceChangedEventArgs()
 				{
 					Monitor = loserMonitor,
-					OldWorkspace = workspace,
-					NewWorkspace = oldWorkspace
+					PreviousWorkspace = workspace,
+					CurrentWorkspace = oldWorkspace
 				}
 			);
 		}
@@ -261,8 +261,8 @@ internal class WorkspaceManager : IWorkspaceManager
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = activeMonitor,
-				OldWorkspace = oldWorkspace,
-				NewWorkspace = workspace
+				PreviousWorkspace = oldWorkspace,
+				CurrentWorkspace = workspace
 			}
 		);
 	}
