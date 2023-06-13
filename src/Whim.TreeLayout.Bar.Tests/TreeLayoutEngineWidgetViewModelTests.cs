@@ -181,8 +181,8 @@ public class TreeLayoutEngineWidgetViewModelTests
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = mocks.Monitor.Object,
-				NewWorkspace = mocks.Workspace2.Object,
-				OldWorkspace = mocks.Workspace.Object
+				CurrentWorkspace = mocks.Workspace2.Object,
+				PreviousWorkspace = mocks.Workspace.Object
 			}
 		);
 
@@ -204,8 +204,8 @@ public class TreeLayoutEngineWidgetViewModelTests
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = new Mock<IMonitor>().Object,
-				NewWorkspace = mocks.Workspace2.Object,
-				OldWorkspace = mocks.Workspace.Object
+				CurrentWorkspace = mocks.Workspace2.Object,
+				PreviousWorkspace = mocks.Workspace.Object
 			}
 		);
 

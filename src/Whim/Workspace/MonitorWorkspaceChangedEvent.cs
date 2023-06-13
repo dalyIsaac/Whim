@@ -15,10 +15,10 @@ public class MonitorWorkspaceChangedEventArgs : EventArgs
 	/// <summary>
 	/// The previously shown workspace.
 	/// </summary>
-	public IWorkspace? OldWorkspace { get; init; }
+	public IWorkspace? PreviousWorkspace { get; init; }
 
 	/// <summary>
 	/// The new workspace shown on the monitor.
 	/// </summary>
-	public required IWorkspace NewWorkspace { get; init; }
+	public required IWorkspace CurrentWorkspace { get; init; }
 }
