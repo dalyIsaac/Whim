@@ -34,6 +34,20 @@ public class FocusedWindowWidgetTests
 	}
 
 	[Fact]
+	public void GetShortTitle_NoParts()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		window.SetupGet(w => w.Title).Returns("");
+
+		// When
+		string title = FocusedWindowWidget.GetShortTitle(window.Object);
+
+		// Then
+		Assert.Equal("", title);
+	}
+
+	[Fact]
 	public void GetProcessName()
 	{
 		// Given
