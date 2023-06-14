@@ -69,7 +69,20 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
-	public IWorkspace ActiveWorkspace => _monitorWorkspaceMap[_context.MonitorManager.ActiveMonitor];
+	public IWorkspace ActiveWorkspace
+	{
+		get
+		{
+			if (_monitorWorkspaceMap.ContainsKey(_context.MonitorManager.ActiveMonitor))
+			{
+				return _monitorWorkspaceMap[_context.MonitorManager.ActiveMonitor];
+			}
+			else
+			{
+				return _workspaces[0];
+			}
+		}
+	}
 
 	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
 
@@ -272,7 +285,12 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug("Activating previous workspace");
 
 		monitor ??= _context.MonitorManager.ActiveMonitor;
-		IWorkspace currentWorkspace = _monitorWorkspaceMap[monitor];
+		IWorkspace? currentWorkspace = GetWorkspaceForMonitor(monitor);
+		if (currentWorkspace == null)
+		{
+			Logger.Debug($"No workspace found for monitor {monitor}");
+			return;
+		}
 
 		int idx = _workspaces.IndexOf(currentWorkspace);
 		int prevIdx = (idx - 1).Mod(_workspaces.Count);
@@ -287,7 +305,12 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug("Activating next workspace");
 
 		monitor ??= _context.MonitorManager.ActiveMonitor;
-		IWorkspace currentWorkspace = _monitorWorkspaceMap[monitor];
+		IWorkspace? currentWorkspace = GetWorkspaceForMonitor(monitor);
+		if (currentWorkspace == null)
+		{
+			Logger.Debug($"No workspace found for monitor {monitor}");
+			return;
+		}
 
 		int idx = _workspaces.IndexOf(currentWorkspace);
 		int nextIdx = (idx + 1).Mod(_workspaces.Count);
@@ -444,10 +467,16 @@ internal class WorkspaceManager : IWorkspaceManager
 		// If a monitor was removed, remove the workspace from the map.
 		foreach (IMonitor monitor in e.RemovedMonitors)
 		{
-			IWorkspace workspace = _monitorWorkspaceMap[monitor];
-			workspace.Deactivate();
-
+			IWorkspace? workspace = GetWorkspaceForMonitor(monitor);
 			_monitorWorkspaceMap.Remove(monitor);
+
+			if (workspace is null)
+			{
+				Logger.Error($"Could not find workspace for monitor {monitor}");
+				continue;
+			}
+
+			workspace.Deactivate();
 		}
 
 		// If a monitor was added, set it to an inactive workspace.
