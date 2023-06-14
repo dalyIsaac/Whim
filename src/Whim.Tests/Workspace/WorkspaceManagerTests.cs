@@ -404,6 +404,38 @@ public class WorkspaceManagerTests
 		workspaces[prevIdx].Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
+	[Fact]
+	public void ActivePrevious_CannotFindActiveMonitor()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[]
+		{
+			new Mock<IWorkspace>(),
+			new Mock<IWorkspace>(),
+			new Mock<IWorkspace>()
+		};
+
+		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
+		Wrapper wrapper = new(workspaces, monitors);
+
+		wrapper.WorkspaceManager.Activate(workspaces[0].Object);
+
+		// Reset wrapper
+		workspaces[0].Reset();
+		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(new Mock<IMonitor>().Object);
+
+		// When the previous workspace is activated, then the previous workspace is activated
+		wrapper.WorkspaceManager.ActivatePrevious();
+
+		workspaces[0].Verify(w => w.Deactivate(), Times.Never);
+		workspaces[0].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[0].Verify(w => w.FocusFirstWindow(), Times.Never);
+
+		workspaces[1].Verify(w => w.Deactivate(), Times.Never);
+		workspaces[1].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[1].Verify(w => w.FocusFirstWindow(), Times.Never);
+	}
+
 	[InlineData(0, 1)]
 	[InlineData(2, 0)]
 	[Theory]
@@ -435,6 +467,38 @@ public class WorkspaceManagerTests
 		workspaces[nextIdx].Verify(w => w.Deactivate(), Times.Never);
 		workspaces[nextIdx].Verify(w => w.DoLayout(), Times.Once);
 		workspaces[nextIdx].Verify(w => w.FocusFirstWindow(), Times.Once);
+	}
+
+	[Fact]
+	public void ActivateNext_CannotFindActiveMonitor()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[]
+		{
+			new Mock<IWorkspace>(),
+			new Mock<IWorkspace>(),
+			new Mock<IWorkspace>()
+		};
+
+		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
+		Wrapper wrapper = new(workspaces, monitors);
+
+		wrapper.WorkspaceManager.Activate(workspaces[0].Object);
+
+		// Reset wrapper
+		workspaces[0].Reset();
+		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(new Mock<IMonitor>().Object);
+
+		// When the next workspace is activated, then the next workspace is activated
+		wrapper.WorkspaceManager.ActivateNext();
+
+		workspaces[0].Verify(w => w.Deactivate(), Times.Never);
+		workspaces[0].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[0].Verify(w => w.FocusFirstWindow(), Times.Never);
+
+		workspaces[1].Verify(w => w.Deactivate(), Times.Never);
+		workspaces[1].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[1].Verify(w => w.FocusFirstWindow(), Times.Never);
 	}
 
 	[Fact]
@@ -1266,13 +1330,13 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
 		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
 
-		// When a monitor is removed
+		// When a monitor is removed, and a monitor not tracked in the WorkspaceManager is removed
 		wrapper.WorkspaceManager.MonitorManager_MonitorsChanged(
 			this,
 			new MonitorsChangedEventArgs()
 			{
 				AddedMonitors = Array.Empty<IMonitor>(),
-				RemovedMonitors = new IMonitor[] { wrapper.Monitors[0].Object },
+				RemovedMonitors = new IMonitor[] { wrapper.Monitors[0].Object, new Mock<IMonitor>().Object },
 				UnchangedMonitors = new IMonitor[] { wrapper.Monitors[1].Object }
 			}
 		);
@@ -1492,5 +1556,38 @@ public class WorkspaceManagerTests
 			h => wrapper.WorkspaceManager.WorkspaceLayoutCompleted -= h,
 			workspace.DoLayout
 		);
+	}
+
+	[Fact]
+	public void ActiveWorkspace_CannotFindMonitor()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+		Wrapper wrapper = new(workspaces);
+
+		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(new Mock<IMonitor>().Object);
+
+		// When the active monitor can't be found inside the WorkspaceManager
+		IWorkspace activeWorkspace = wrapper.WorkspaceManager.ActiveWorkspace;
+
+		// Then the first workspace is returned
+		Assert.Equal(workspaces[0].Object, activeWorkspace);
+	}
+
+	[Fact]
+	public void ActiveWorkspace_CanFindMonitor()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+		Wrapper wrapper = new(workspaces);
+
+		wrapper.WorkspaceManager.Initialize();
+		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(wrapper.Monitors[1].Object);
+
+		// When the active monitor can be found inside the WorkspaceManager
+		IWorkspace activeWorkspace = wrapper.WorkspaceManager.ActiveWorkspace;
+
+		// Then the workspace is returned
+		Assert.Equal(workspaces[1].Object, activeWorkspace);
 	}
 }
