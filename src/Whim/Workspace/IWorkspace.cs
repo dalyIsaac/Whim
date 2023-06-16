@@ -100,34 +100,33 @@ public interface IWorkspace : IDisposable
 	void FocusFirstWindow();
 
 	/// <summary>
-	/// Focuses the <paramref name="window"/> in the <paramref name="direction"/>.
+	/// Focuses the window in the <paramref name="direction"/>, relative to the given
+	/// <paramref name="window"/>.
 	/// </summary>
+	/// <param name="window">The origin window.</param>
 	/// <param name="direction">The direction to focus in.</param>
-	/// <param name="window">
-	/// The origin window
-	/// </param>
-	void FocusWindowInDirection(Direction direction, IWindow? window = null);
+	void FocusWindowInDirection(IWindow window, Direction direction);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
 	/// </summary>
-	/// <param name="direction">The direction to swap the window in.</param>
 	/// <param name="window">
 	/// The window to swap. If null, the currently focused window is swapped.
 	/// </param>
-	void SwapWindowInDirection(Direction direction, IWindow? window = null);
+	/// <param name="direction">The direction to swap the window in.</param>
+	void SwapWindowInDirection(IWindow window, Direction direction);
 
 	/// <summary>
 	/// Change the <paramref name="window"/>'s <paramref name="edge"/> direction by
 	/// the specified <paramref name="delta"/>.
 	/// </summary>
-	/// <param name="edge">The edge to change.</param>
-	/// <param name="delta">The percentage to change the edge by.</param>
 	/// <param name="window">
 	/// The window to change the edge of. If null, the currently focused window is
 	/// used.
 	/// </param>
-	void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null);
+	/// <param name="edge">The edge to change.</param>
+	/// <param name="delta">The percentage to change the edge by.</param>
+	void MoveWindowEdgeInDirection(IWindow window, Direction edge, double delta);
 
 	/// <summary>
 	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.

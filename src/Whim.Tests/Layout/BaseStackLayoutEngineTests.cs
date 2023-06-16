@@ -16,13 +16,13 @@ public class BaseStackLayoutEngineTests
 		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
 			throw new System.NotImplementedException();
 
-		public override void FocusWindowInDirection(Direction direction, IWindow window) =>
+		public override void FocusWindowInDirection(IWindow window, Direction direction) =>
 			throw new System.NotImplementedException();
 
-		public override void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) =>
+		public override void MoveWindowEdgeInDirection(IWindow window, Direction edge, double fractionDelta) =>
 			throw new System.NotImplementedException();
 
-		public override void SwapWindowInDirection(Direction direction, IWindow window) =>
+		public override void SwapWindowInDirection(IWindow window, Direction direction) =>
 			throw new System.NotImplementedException();
 	}
 

@@ -75,13 +75,13 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	public IWindow? GetFirstWindow() => _stack.FirstOrDefault();
 
 	/// <inheritdoc/>
-	public abstract void FocusWindowInDirection(Direction direction, IWindow window);
+	public abstract void FocusWindowInDirection(IWindow window, Direction direction);
 
 	/// <inheritdoc/>
-	public abstract void SwapWindowInDirection(Direction direction, IWindow window);
+	public abstract void SwapWindowInDirection(IWindow window, Direction direction);
 
 	/// <inheritdoc/>
-	public abstract void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window);
+	public abstract void MoveWindowEdgeInDirection(IWindow window, Direction edge, double fractionDelta);
 
 	/// <inheritdoc/>
 	public abstract void AddWindowAtPoint(IWindow window, IPoint<double> point);

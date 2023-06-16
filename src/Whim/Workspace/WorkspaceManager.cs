@@ -533,9 +533,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? workspace : null;
 	}
 
-	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
+	public void MoveWindowToWorkspace(IWindow window, IWorkspace workspace)
 	{
-		window ??= ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
 		if (window == null)
@@ -569,9 +568,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		}
 	}
 
-	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
+	public void MoveWindowToMonitor(IWindow window, IMonitor monitor)
 	{
-		window ??= ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Moving window {window} to monitor {monitor}");
 
 		if (window == null)
@@ -601,10 +599,10 @@ internal class WorkspaceManager : IWorkspaceManager
 			return;
 		}
 
-		MoveWindowToWorkspace(workspace, window);
+		MoveWindowToWorkspace(window, workspace);
 	}
 
-	public void MoveWindowToPreviousMonitor(IWindow? window = null)
+	public void MoveWindowToPreviousMonitor(IWindow window)
 	{
 		Logger.Debug($"Moving window {window} to previous monitor");
 
@@ -612,10 +610,10 @@ internal class WorkspaceManager : IWorkspaceManager
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		IMonitor previousMonitor = _context.MonitorManager.GetPreviousMonitor(monitor);
 
-		MoveWindowToMonitor(previousMonitor, window);
+		MoveWindowToMonitor(window, previousMonitor);
 	}
 
-	public void MoveWindowToNextMonitor(IWindow? window = null)
+	public void MoveWindowToNextMonitor(IWindow window)
 	{
 		Logger.Debug($"Moving window {window} to next monitor");
 
@@ -623,7 +621,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		IMonitor nextMonitor = _context.MonitorManager.GetNextMonitor(monitor);
 
-		MoveWindowToMonitor(nextMonitor, window);
+		MoveWindowToMonitor(window, nextMonitor);
 	}
 
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point)

@@ -80,93 +80,77 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
-				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-						Direction.Left,
-						MoveWindowEdgeDelta
-					),
+				callback: MoveWindowEdgeInDirection(Direction.Left, true),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_H)
 			)
 			.Add(
 				identifier: "move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
-				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-						Direction.Left,
-						-MoveWindowEdgeDelta
-					),
+				callback: MoveWindowEdgeInDirection(Direction.Left, false),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_J)
 			)
 			.Add(
 				identifier: "move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
-				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-						Direction.Right,
-						-MoveWindowEdgeDelta
-					),
+				callback: MoveWindowEdgeInDirection(Direction.Right, false),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_K)
 			)
 			.Add(
 				identifier: "move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
-				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-						Direction.Right,
-						MoveWindowEdgeDelta
-					),
+				callback: MoveWindowEdgeInDirection(Direction.Right, true),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_L)
 			)
 			.Add(
 				identifier: "move_window_top_edge_up",
 				title: "Move the current window's top edge up",
-				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-						Direction.Up,
-						MoveWindowEdgeDelta
-					),
+				callback: MoveWindowEdgeInDirection(Direction.Up, true),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_U)
 			)
 			.Add(
 				identifier: "move_window_top_edge_down",
 				title: "Move the current window's top edge down",
-				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-						Direction.Up,
-						-MoveWindowEdgeDelta
-					),
+				callback: MoveWindowEdgeInDirection(Direction.Up, false),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_I)
 			)
 			.Add(
 				identifier: "move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
-				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-						Direction.Down,
-						-MoveWindowEdgeDelta
-					),
+				callback: MoveWindowEdgeInDirection(Direction.Down, false),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_O)
 			)
 			.Add(
 				identifier: "move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
-				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
-						Direction.Down,
-						MoveWindowEdgeDelta
-					),
+				callback: MoveWindowEdgeInDirection(Direction.Down, true),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_P)
 			)
 			.Add(
 				identifier: "move_window_to_previous_monitor",
 				title: "Move the window to the previous monitor",
-				callback: () => _context.WorkspaceManager.MoveWindowToPreviousMonitor(),
+				callback: () =>
+				{
+					IWindow? window = _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+
+					if (window != null)
+					{
+						_context.WorkspaceManager.MoveWindowToPreviousMonitor(window);
+					}
+				},
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "move_window_to_next_monitor",
 				title: "Move the window to the next monitor",
-				callback: () => _context.WorkspaceManager.MoveWindowToNextMonitor(),
+				callback: () =>
+				{
+					IWindow? window = _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+
+					if (window != null)
+					{
+						_context.WorkspaceManager.MoveWindowToNextMonitor(window);
+					}
+				},
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
@@ -190,7 +174,7 @@ internal class CoreCommands : PluginCommands
 				return;
 			}
 
-			workspace.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
+			workspace.FocusWindowInDirection(workspace.LastFocusedWindow, direction);
 		};
 
 	/// <summary>
@@ -199,6 +183,31 @@ internal class CoreCommands : PluginCommands
 	internal Action SwapWindowInDirection(Direction direction) =>
 		() =>
 		{
-			_context.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
+			IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
+			IWindow? window = workspace.LastFocusedWindow;
+
+			if (window != null)
+			{
+				workspace.SwapWindowInDirection(window, direction);
+			}
+		};
+
+	/// <summary>
+	/// Action to move the last focused window's edge in the specified direction command.
+	/// </summary>
+	internal Action MoveWindowEdgeInDirection(Direction edge, bool moveEdgeInDirection) =>
+		() =>
+		{
+			IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
+			IWindow? window = workspace.LastFocusedWindow;
+
+			if (window != null)
+			{
+				workspace.MoveWindowEdgeInDirection(
+					window,
+					edge,
+					moveEdgeInDirection ? MoveWindowEdgeDelta : -MoveWindowEdgeDelta
+				);
+			}
 		};
 }

@@ -171,6 +171,10 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
+		Mock<IWindow> window = new();
+
+		wrapper.Workspace.Setup(w => w.LastFocusedWindow).Returns(window.Object);
+
 		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
 
 		// When
@@ -178,7 +182,10 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Verify that MoveWindowToWorkspace was called with the workspace.
-		wrapper.WorkspaceManager.Verify(x => x.MoveWindowToWorkspace(wrapper.Workspace.Object, null), Times.Once);
+		wrapper.WorkspaceManager.Verify(
+			x => x.MoveWindowToWorkspace(window.Object, wrapper.Workspace.Object),
+			Times.Once
+		);
 	}
 
 	[Fact]
@@ -216,11 +223,11 @@ public class CommandPaletteCommandsTests
 		// Then
 		command.TryExecute();
 		wrapper.WorkspaceManager.Verify(
-			x => x.MoveWindowToWorkspace(wrapper.Workspace.Object, wrapper.Windows[0].Object),
+			x => x.MoveWindowToWorkspace(wrapper.Windows[0].Object, wrapper.Workspace.Object),
 			Times.Once
 		);
 		wrapper.WorkspaceManager.Verify(
-			x => x.MoveWindowToWorkspace(wrapper.Workspace.Object, wrapper.Windows[1].Object),
+			x => x.MoveWindowToWorkspace(wrapper.Windows[1].Object, wrapper.Workspace.Object),
 			Times.Once
 		);
 	}

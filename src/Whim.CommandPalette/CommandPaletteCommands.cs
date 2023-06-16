@@ -172,7 +172,7 @@ public class CommandPaletteCommands : PluginCommands
 			{
 				foreach (IWindow window in windows)
 				{
-					_context.WorkspaceManager.MoveWindowToWorkspace(workspace, window);
+					_context.WorkspaceManager.MoveWindowToWorkspace(window, workspace);
 				}
 			}
 		);
@@ -204,7 +204,14 @@ public class CommandPaletteCommands : PluginCommands
 		new Command(
 			identifier: $"{PluginName}.move_window_to_workspace.{workspace.Name}",
 			title: $"Move window to workspace \"{workspace.Name}\"",
-			callback: () => _context.WorkspaceManager.MoveWindowToWorkspace(workspace)
+			callback: () =>
+			{
+				IWindow? window = _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+				if (window != null)
+				{
+					_context.WorkspaceManager.MoveWindowToWorkspace(window, workspace);
+				}
+			}
 		);
 
 	/// <summary>

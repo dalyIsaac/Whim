@@ -12,7 +12,7 @@ public class TestFocusWindowInDirection
 
 		// Try to focus a window that doesn't exist.
 		Mock<IWindow> illegalWindow = new();
-		testTreeEngine.Engine.FocusWindowInDirection(Direction.Left, illegalWindow.Object);
+		testTreeEngine.Engine.FocusWindowInDirection(illegalWindow.Object, Direction.Left);
 
 		// Verify that the window was not focused.
 		illegalWindow.Verify(w => w.Focus(), Times.Never);
@@ -29,7 +29,7 @@ public class TestFocusWindowInDirection
 			.Returns(testTreeEngine.RightBottomWindow.Object);
 
 		// Try to focus to the left of the left window.
-		testTreeEngine.Engine.FocusWindowInDirection(Direction.Left, testTreeEngine.LeftWindow.Object);
+		testTreeEngine.Engine.FocusWindowInDirection(testTreeEngine.LeftWindow.Object, Direction.Left);
 
 		// Verify that the window was not focused.
 		testTreeEngine.LeftWindow.Verify(w => w.Focus(), Times.Never);
@@ -46,7 +46,7 @@ public class TestFocusWindowInDirection
 			.Returns(testTreeEngine.RightBottomWindow.Object);
 
 		// Try to focus to the left of the right window.
-		testTreeEngine.Engine.FocusWindowInDirection(Direction.Left, testTreeEngine.RightBottomWindow.Object);
+		testTreeEngine.Engine.FocusWindowInDirection(testTreeEngine.RightBottomWindow.Object, Direction.Left);
 
 		// Verify that the window was focused.
 		testTreeEngine.LeftWindow.Verify(w => w.Focus(), Times.Once);

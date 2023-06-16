@@ -30,26 +30,29 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// It's recommended that this method is not called directly, but rather
 	/// through the <see cref="IWorkspace.FocusWindowInDirection"/> method.
 	/// </summary>
-	/// <param name="direction">The direction to focus in.</param>
 	/// <param name="window">The origin window</param>
-	public void FocusWindowInDirection(Direction direction, IWindow window);
+	/// <param name="direction">The direction to focus in.</param>
+	public void FocusWindowInDirection(IWindow window, Direction direction);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
 	/// It's recommended that this method is not called directly, but rather
 	/// through <see cref="IWorkspace.SwapWindowInDirection"/>.
 	/// </summary>
-	/// <param name="direction">The direction to swap the window in.</param>
 	/// <param name="window">The window to swap.</param>
-	public void SwapWindowInDirection(Direction direction, IWindow window);
+	/// <param name="direction">The direction to swap the window in.</param>
+	public void SwapWindowInDirection(IWindow window, Direction direction);
 
 	/// <summary>
 	/// Change the focused window's edge by the specified <paramref name="fractionDelta"/>.
 	/// </summary>
-	/// <param name="edge">The edge to change.</param>
-	/// <param name="fractionDelta">The percentage to change the edge by.</param>
 	/// <param name="window">The window to change the edge of.</param>
-	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window);
+	/// <param name="edge">The edge to change.</param>
+	/// <param name="fractionDelta">
+	/// The percentage to change the edge by. Positive values will move the edge in the direction
+	/// of the edge, negative values will move the edge in the opposite direction.
+	/// </param>
+	public void MoveWindowEdgeInDirection(IWindow window, Direction edge, double fractionDelta);
 
 	/// <summary>
 	/// Hides all phantom windows belonging to the layout engine.

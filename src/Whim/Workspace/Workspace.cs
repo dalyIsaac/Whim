@@ -308,64 +308,55 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	/// <summary>
-	/// Returns the window to process. If the window is null, the last focused window is used.
-	/// If the given window is not null, it is checked if it exists in the workspace.
+	/// Returns whether the <paramref name="window"/> is a visible window in this workspace.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private IWindow? GetValidVisibleWindow(IWindow? window)
+	private bool IsWindowVisible(IWindow window)
 	{
-		window ??= LastFocusedWindow;
-
-		if (window == null)
-		{
-			Logger.Error($"Could not find a valid window in workspace {Name} to perform action");
-			return null;
-		}
-
 		if (!ContainsWindow(window))
 		{
 			Logger.Error($"Window {window} does not exist in workspace {Name}");
-			return null;
+			return false;
 		}
 
 		if (_minimizedWindows.Contains(window))
 		{
 			Logger.Error($"Window {window} is minimized in workspace {Name}");
-			return null;
+			return false;
 		}
 
-		return window;
+		return true;
 	}
 
-	public void FocusWindowInDirection(Direction direction, IWindow? window = null)
+	public void FocusWindowInDirection(IWindow window, Direction direction)
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		if (IsWindowVisible(window))
 		{
-			ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+			ActiveLayoutEngine.FocusWindowInDirection(window, direction);
 		}
 	}
 
-	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
+	public void SwapWindowInDirection(IWindow window, Direction direction)
 	{
 		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
 
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		if (IsWindowVisible(window))
 		{
-			ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+			ActiveLayoutEngine.SwapWindowInDirection(window, direction);
 			DoLayout();
 		}
 	}
 
-	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null)
+	public void MoveWindowEdgeInDirection(IWindow window, Direction edge, double fractionDelta)
 	{
-		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edge} by {delta}");
+		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edge} by {fractionDelta}");
 
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		if (IsWindowVisible(window))
 		{
-			ActiveLayoutEngine.MoveWindowEdgeInDirection(edge, delta, validWindow);
+			ActiveLayoutEngine.MoveWindowEdgeInDirection(window, edge, fractionDelta);
 			DoLayout();
 		}
 	}

@@ -13,7 +13,7 @@ public class TestMoveWindowEdgeInDirection
 		TestTree tree = new();
 		TestTreeEngineMocks testEngine = new();
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Left, 0.1, testEngine.LeftWindow.Object);
+		testEngine.Engine.MoveWindowEdgeInDirection(testEngine.LeftWindow.Object, Direction.Left, 0.1);
 		Assert.Equal(tree.Left.GetWeight(), testEngine.LeftNode.GetWeight());
 		Assert.Equal(tree.Root.GetWeight(), testEngine.Engine.Root?.GetWeight());
 	}
@@ -26,7 +26,7 @@ public class TestMoveWindowEdgeInDirection
 	{
 		TestTreeEngineMocks testEngine = new();
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Right, 0.1, testEngine.LeftWindow.Object);
+		testEngine.Engine.MoveWindowEdgeInDirection(testEngine.LeftWindow.Object, Direction.Right, 0.1);
 		Assert.Equal(0.5 + 0.1, testEngine.LeftNode.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.RightBottomNode.Parent?.GetWeight());
 	}
@@ -40,9 +40,9 @@ public class TestMoveWindowEdgeInDirection
 		TestTreeEngineMocks testEngine = new();
 
 		testEngine.Engine.MoveWindowEdgeInDirection(
+			testEngine.RightTopLeftBottomLeftWindow.Object,
 			Direction.Left,
-			0.1,
-			testEngine.RightTopLeftBottomLeftWindow.Object
+			0.1
 		);
 		Assert.Equal(0.5 + 0.1, testEngine.RightBottomNode.Parent?.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.LeftNode.GetWeight());
@@ -56,7 +56,7 @@ public class TestMoveWindowEdgeInDirection
 	{
 		TestTreeEngineMocks testEngine = new();
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Up, 0.1, testEngine.RightBottomWindow.Object);
+		testEngine.Engine.MoveWindowEdgeInDirection(testEngine.RightBottomWindow.Object, Direction.Up, 0.1);
 		Assert.Equal(0.5 + 0.1, testEngine.RightBottomNode.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.RightTopLeftTopNode.Parent?.Parent?.GetWeight());
 	}
@@ -69,7 +69,7 @@ public class TestMoveWindowEdgeInDirection
 	{
 		TestTreeEngineMocks testEngine = new();
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Down, 0.1, testEngine.RightTopRight3Window.Object);
+		testEngine.Engine.MoveWindowEdgeInDirection(testEngine.RightTopRight3Window.Object, Direction.Down, 0.1);
 		Assert.Equal(0.5 + 0.1, testEngine.RightTopRight3Node.Parent?.Parent?.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.RightBottomNode.GetWeight());
 	}

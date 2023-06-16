@@ -716,29 +716,6 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void MoveWindowToWorkspace_NoWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
-
-		// When a window which is not in a workspace is moved to a workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace.Object);
-
-		// Then the window is not added to the workspace
-		workspace.Verify(w => w.RemoveWindow(It.IsAny<IWindow>()), Times.Never());
-		workspace2.Verify(w => w.AddWindow(It.IsAny<IWindow>()), Times.Never());
-	}
-
-	[Fact]
 	public void MoveWindowToWorkspace_PhantomWindow()
 	{
 		// Given
@@ -756,7 +733,7 @@ public class WorkspaceManagerTests
 		workspace2.Reset();
 
 		// and moved to a workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace.Object, window.Object);
+		wrapper.WorkspaceManager.MoveWindowToWorkspace(window.Object, workspace.Object);
 
 		// Then the window is not removed or added to any workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
@@ -782,7 +759,7 @@ public class WorkspaceManagerTests
 		workspace3.Reset();
 
 		// When a window not in any workspace is moved to a workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace.Object, window.Object);
+		wrapper.WorkspaceManager.MoveWindowToWorkspace(window.Object, workspace.Object);
 
 		// Then the window is not removed or added to any workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
@@ -813,7 +790,7 @@ public class WorkspaceManagerTests
 		window.Reset();
 
 		// When a window in a workspace is moved to another workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace2.Object, window.Object);
+		wrapper.WorkspaceManager.MoveWindowToWorkspace(window.Object, workspace2.Object);
 
 		// Then the window is removed from the first workspace and added to the second
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
@@ -848,36 +825,12 @@ public class WorkspaceManagerTests
 		window.Reset();
 
 		// When a window in a workspace is moved to another workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace2.Object, window.Object);
+		wrapper.WorkspaceManager.MoveWindowToWorkspace(window.Object, workspace2.Object);
 
 		// Then the window is removed from the first workspace and added to the third
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 		window.Verify(w => w.Hide(), Times.Once());
-	}
-
-	[Fact]
-	public void MoveWindowToMonitor_NoWindow()
-	{
-		// Given there are 2 workspaces
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
-
-		// When there is no focused window
-		wrapper.WorkspaceManager.MoveWindowToMonitor(wrapper.Monitors[0].Object);
-
-		// Then the window is not added to the workspace
-		workspace.Verify(w => w.RemoveWindow(It.IsAny<IWindow>()), Times.Never());
-		workspace2.Verify(w => w.AddWindow(It.IsAny<IWindow>()), Times.Never());
 	}
 
 	[Fact]
@@ -899,7 +852,7 @@ public class WorkspaceManagerTests
 		Mock<IWindow> window = new();
 
 		// When a window which is not in a workspace is moved to a monitor
-		wrapper.WorkspaceManager.MoveWindowToMonitor(wrapper.Monitors[0].Object, window.Object);
+		wrapper.WorkspaceManager.MoveWindowToMonitor(window.Object, wrapper.Monitors[0].Object);
 
 		// Then the window is not added to the workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
@@ -924,7 +877,7 @@ public class WorkspaceManagerTests
 		workspace2.Reset();
 
 		// When a window which is in a workspace is moved to the same monitor
-		wrapper.WorkspaceManager.MoveWindowToMonitor(wrapper.Monitors[0].Object, window.Object);
+		wrapper.WorkspaceManager.MoveWindowToMonitor(window.Object, wrapper.Monitors[0].Object);
 
 		// Then the window is not added to the workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
@@ -949,7 +902,7 @@ public class WorkspaceManagerTests
 		workspace2.Reset();
 
 		// When a window which is in a workspace is moved to a monitor which isn't registered
-		wrapper.WorkspaceManager.MoveWindowToMonitor(new Mock<IMonitor>().Object, window.Object);
+		wrapper.WorkspaceManager.MoveWindowToMonitor(window.Object, new Mock<IMonitor>().Object);
 
 		// Then the window is not added to the workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
@@ -973,7 +926,7 @@ public class WorkspaceManagerTests
 		workspace2.Reset();
 
 		// When a window which is in a workspace is moved to a monitor
-		wrapper.WorkspaceManager.MoveWindowToMonitor(wrapper.Monitors[1].Object, window.Object);
+		wrapper.WorkspaceManager.MoveWindowToMonitor(window.Object, wrapper.Monitors[1].Object);
 
 		// Then the window is removed from the old workspace and added to the new workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());

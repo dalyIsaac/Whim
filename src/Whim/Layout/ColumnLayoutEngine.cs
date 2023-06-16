@@ -85,7 +85,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override void FocusWindowInDirection(Direction direction, IWindow window)
+	public override void FocusWindowInDirection(IWindow window, Direction direction)
 	{
 		Logger.Debug($"Focusing window {window} in layout engine {Name}");
 
@@ -110,7 +110,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override void SwapWindowInDirection(Direction direction, IWindow window)
+	public override void SwapWindowInDirection(IWindow window, Direction direction)
 	{
 		Logger.Debug($"Swapping window {window} in layout engine {Name} in direction {direction}");
 
@@ -137,7 +137,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window)
+	public override void MoveWindowEdgeInDirection(IWindow window, Direction edge, double fractionDelta)
 	{
 		// Not implemented.
 	}

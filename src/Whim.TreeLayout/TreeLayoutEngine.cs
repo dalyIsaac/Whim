@@ -295,7 +295,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public void FocusWindowInDirection(Direction direction, IWindow window)
+	public void FocusWindowInDirection(IWindow window, Direction direction)
 	{
 		Logger.Debug($"Focusing window {window} in direction {direction} in layout engine {Name}");
 
@@ -310,7 +310,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public void SwapWindowInDirection(Direction direction, IWindow window)
+	public void SwapWindowInDirection(IWindow window, Direction direction)
 	{
 		Logger.Debug($"Swapping window {window} in direction {direction} in layout engine {Name}");
 
@@ -404,7 +404,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	private const double MAX_RELATIVE_DELTA = 0.5;
 
 	/// <inheritdoc/>
-	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window)
+	public void MoveWindowEdgeInDirection(IWindow window, Direction edge, double fractionDelta)
 	{
 		Logger.Debug($"Moving window {window} edge in direction {edge} by {fractionDelta} in layout engine {Name}");
 

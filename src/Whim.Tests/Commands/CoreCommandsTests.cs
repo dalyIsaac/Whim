@@ -82,29 +82,8 @@ public class CoreCommandsTests
 
 		// Then
 		mocks.Context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(direction, mocks.Window.Object),
+			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(mocks.Window.Object, direction),
 			Times.Once
-		);
-	}
-
-	[Fact]
-	public void FocusWindowInDirection_NoLastFocusedWindow()
-	{
-		// Given
-		MocksWrapper mocks = new();
-		mocks.Workspace.SetupGet(x => x.LastFocusedWindow).Returns((IWindow?)null);
-		CoreCommands commands = new(mocks.Context.Object);
-		PluginCommandsTestUtils testUtils = new(commands);
-
-		ICommand command = testUtils.GetCommand("whim.core.focus_window_in_direction.left");
-
-		// When
-		command.TryExecute();
-
-		// Then
-		mocks.Context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.FocusWindowInDirection(Direction.Left, null),
-			Times.Never
 		);
 	}
 
@@ -127,7 +106,7 @@ public class CoreCommandsTests
 
 		// Then
 		mocks.Context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction, null),
+			x => x.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(mocks.Window.Object, direction),
 			Times.Once
 		);
 	}
@@ -156,7 +135,7 @@ public class CoreCommandsTests
 
 		// Then
 		mocks.Context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(direction, delta, null),
+			x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(mocks.Window.Object, direction, delta),
 			Times.Once
 		);
 	}
@@ -175,7 +154,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToPreviousMonitor(null), Times.Once);
+		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToPreviousMonitor(mocks.Window.Object), Times.Once);
 	}
 
 	[Fact]
@@ -192,7 +171,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToNextMonitor(null), Times.Once);
+		mocks.Context.Verify(x => x.WorkspaceManager.MoveWindowToNextMonitor(mocks.Window.Object), Times.Once);
 	}
 
 	[Fact]

@@ -51,12 +51,12 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	public virtual IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
 
 	/// <inheritdoc/>
-	public virtual void FocusWindowInDirection(Direction direction, IWindow window) =>
-		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+	public virtual void FocusWindowInDirection(IWindow window, Direction direction) =>
+		InnerLayoutEngine.FocusWindowInDirection(window, direction);
 
 	/// <inheritdoc/>
-	public virtual void SwapWindowInDirection(Direction direction, IWindow window) =>
-		InnerLayoutEngine.SwapWindowInDirection(direction, window);
+	public virtual void SwapWindowInDirection(IWindow window, Direction direction) =>
+		InnerLayoutEngine.SwapWindowInDirection(window, direction);
 
 	/// <inheritdoc/>
 	public virtual void Clear() => InnerLayoutEngine.Clear();
@@ -73,8 +73,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	/// <inheritdoc/>
-	public virtual void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) =>
-		InnerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
+	public virtual void MoveWindowEdgeInDirection(IWindow window, Direction edge, double fractionDelta) =>
+		InnerLayoutEngine.MoveWindowEdgeInDirection(window, edge, fractionDelta);
 
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);

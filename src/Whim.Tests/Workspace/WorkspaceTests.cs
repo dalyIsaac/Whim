@@ -814,10 +814,10 @@ public class WorkspaceTests
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 
 		// When FocusWindowInDirection is called
-		workspace.FocusWindowInDirection(Direction.Up, window.Object);
+		workspace.FocusWindowInDirection(window.Object, Direction.Up);
 
 		// Then the layout engine is not told to focus the window
-		mocks.LayoutEngine.Verify(l => l.FocusWindowInDirection(Direction.Up, window.Object), Times.Never);
+		mocks.LayoutEngine.Verify(l => l.FocusWindowInDirection(window.Object, Direction.Up), Times.Never);
 	}
 
 	[Fact]
@@ -833,10 +833,10 @@ public class WorkspaceTests
 		workspace.WindowMinimizeStart(window.Object);
 
 		// When FocusWindowInDirection is called
-		workspace.FocusWindowInDirection(Direction.Up, window.Object);
+		workspace.FocusWindowInDirection(window.Object, Direction.Up);
 
 		// Then the layout engine is not told to focus the window
-		mocks.LayoutEngine.Verify(l => l.FocusWindowInDirection(Direction.Up, window.Object), Times.Never);
+		mocks.LayoutEngine.Verify(l => l.FocusWindowInDirection(window.Object, Direction.Up), Times.Never);
 	}
 
 	[Fact]
@@ -850,25 +850,10 @@ public class WorkspaceTests
 		workspace.AddWindow(window.Object);
 
 		// When FocusWindowInDirection is called
-		workspace.FocusWindowInDirection(Direction.Up, window.Object);
+		workspace.FocusWindowInDirection(window.Object, Direction.Up);
 
 		// Then the layout engine is told to focus the window
-		mocks.LayoutEngine.Verify(l => l.FocusWindowInDirection(Direction.Up, window.Object), Times.Once);
-	}
-
-	[Fact]
-	public void SwapWindowInDirection_Fails_WindowIsNull()
-	{
-		// Given
-		MocksBuilder mocks = new();
-		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
-
-		// When SwapWindowInDirection is called
-		workspace.SwapWindowInDirection(Direction.Up, null);
-
-		// Then the layout engine is not told to swap the window
-		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(Direction.Up, It.IsAny<IWindow>()), Times.Never);
+		mocks.LayoutEngine.Verify(l => l.FocusWindowInDirection(window.Object, Direction.Up), Times.Once);
 	}
 
 	[Fact]
@@ -881,10 +866,10 @@ public class WorkspaceTests
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 
 		// When SwapWindowInDirection is called
-		workspace.SwapWindowInDirection(Direction.Up, window.Object);
+		workspace.SwapWindowInDirection(window.Object, Direction.Up);
 
 		// Then the layout engine is not told to swap the window
-		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(Direction.Up, window.Object), Times.Never);
+		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(window.Object, Direction.Up), Times.Never);
 	}
 
 	[Fact]
@@ -898,29 +883,10 @@ public class WorkspaceTests
 		workspace.AddWindow(window.Object);
 
 		// When SwapWindowInDirection is called
-		workspace.SwapWindowInDirection(Direction.Up, window.Object);
+		workspace.SwapWindowInDirection(window.Object, Direction.Up);
 
 		// Then the layout engine is told to swap the window
-		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(Direction.Up, window.Object), Times.Once);
-	}
-
-	[Fact]
-	public void MoveWindowEdgeInDirection_Fails_WindowIsNull()
-	{
-		// Given
-		MocksBuilder mocks = new();
-		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
-		double delta = 0.3;
-
-		// When MoveWindowEdgeInDirection is called
-		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, null);
-
-		// Then the layout engine is not told to move the window
-		mocks.LayoutEngine.Verify(
-			l => l.MoveWindowEdgeInDirection(Direction.Up, delta, It.IsAny<IWindow>()),
-			Times.Never
-		);
+		mocks.LayoutEngine.Verify(l => l.SwapWindowInDirection(window.Object, Direction.Up), Times.Once);
 	}
 
 	[Fact]
@@ -934,10 +900,10 @@ public class WorkspaceTests
 		double delta = 0.3;
 
 		// When MoveWindowEdgeInDirection is called
-		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object);
+		workspace.MoveWindowEdgeInDirection(window.Object, Direction.Up, delta);
 
 		// Then the layout engine is not told to move the window
-		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Never);
+		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(window.Object, Direction.Up, delta), Times.Never);
 	}
 
 	[Fact]
@@ -952,10 +918,10 @@ public class WorkspaceTests
 		double delta = 0.3;
 
 		// When MoveWindowEdgeInDirection is called
-		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object);
+		workspace.MoveWindowEdgeInDirection(window.Object, Direction.Up, delta);
 
 		// Then the layout engine is told to move the window
-		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Once);
+		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(window.Object, Direction.Up, delta), Times.Once);
 	}
 
 	[Fact]

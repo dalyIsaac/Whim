@@ -180,22 +180,19 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.
 	/// </summary>
+	/// <param name="window">The window to move.</param>
 	/// <param name="workspace">The workspace to move the window to.</param>
-	/// <param name="window">
-	/// The window to move. If <see langword="null"/>, this will default to
-	/// the focused/active window.
-	/// </param>
-	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null);
+	public void MoveWindowToWorkspace(IWindow window, IWorkspace workspace);
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="monitor"/>.
 	/// </summary>
-	/// <param name="monitor">The monitor to move the window to.</param>
 	/// <param name="window">
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
-	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null);
+	/// <param name="monitor">The monitor to move the window to.</param>
+	public void MoveWindowToMonitor(IWindow window, IMonitor monitor);
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the previous monitor.
@@ -204,7 +201,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
-	public void MoveWindowToPreviousMonitor(IWindow? window = null);
+	public void MoveWindowToPreviousMonitor(IWindow window);
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the next monitor.
@@ -213,7 +210,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
-	public void MoveWindowToNextMonitor(IWindow? window = null);
+	public void MoveWindowToNextMonitor(IWindow window);
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="point"/>.
