@@ -404,7 +404,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	private const double MAX_RELATIVE_DELTA = 0.5;
 
 	/// <inheritdoc/>
-	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window)
+	public void MoveWindowEdgeInDirectionFraction(Direction edge, double fractionDelta, IWindow window)
 	{
 		Logger.Debug($"Moving window {window} edge in direction {edge} by {fractionDelta} in layout engine {Name}");
 

@@ -49,7 +49,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// <param name="edge">The edge to change.</param>
 	/// <param name="fractionDelta">The percentage to change the edge by.</param>
 	/// <param name="window">The window to change the edge of.</param>
-	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window);
+	public void MoveWindowEdgeInDirectionFraction(Direction edge, double fractionDelta, IWindow window);
 
 	/// <summary>
 	/// Hides all phantom windows belonging to the layout engine.

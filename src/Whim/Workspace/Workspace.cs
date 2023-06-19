@@ -365,7 +365,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine.MoveWindowEdgeInDirection(edge, delta, validWindow);
+			ActiveLayoutEngine.MoveWindowEdgeInDirectionFraction(edge, delta, validWindow);
 			DoLayout();
 		}
 	}
