@@ -10,7 +10,7 @@ internal class CoreCommands : PluginCommands
 	/// <summary>
 	/// The delta for moving a window's edges.
 	/// </summary>
-	public static double MoveWindowEdgeDelta { get; set; } = 0.05;
+	public static double MoveWindowEdgeDelta { get; set; } = 40;
 
 	public CoreCommands(IContext context)
 		: base("whim.core")

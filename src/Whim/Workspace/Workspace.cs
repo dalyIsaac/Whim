@@ -361,11 +361,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow? window = null)
 	{
-		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edge} by {delta}");
+		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edge} by {delta}px");
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine.MoveWindowEdgeInDirectionFraction(edge, delta, validWindow);
+			ActiveLayoutEngine.MoveWindowEdgeInDirection(edge, delta, validWindow);
 			DoLayout();
 		}
 	}
