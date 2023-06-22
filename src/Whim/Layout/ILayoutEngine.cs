@@ -10,7 +10,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// <summary>
 	/// The name of the layout engine.
 	/// </summary>
-	public string Name { get; }
+	string Name { get; }
 
 	/// <summary>
 	/// Performs a layout inside the available <paramref name="location"/>.
@@ -18,12 +18,12 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// <param name="location">The available area to do a layout inside.</param>
 	/// <param name="monitor">The monitor which the layout is being done for.</param>
 	/// <returns></returns>
-	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
+	IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
 	/// <summary>
 	/// Retrieves the first window in the layout engine.
 	/// </summary>
-	public IWindow? GetFirstWindow();
+	IWindow? GetFirstWindow();
 
 	/// <summary>
 	/// Focuses the <paramref name="window"/> in the <paramref name="direction"/>.
@@ -32,7 +32,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// </summary>
 	/// <param name="direction">The direction to focus in.</param>
 	/// <param name="window">The origin window</param>
-	public void FocusWindowInDirection(Direction direction, IWindow window);
+	void FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
@@ -41,20 +41,24 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// </summary>
 	/// <param name="direction">The direction to swap the window in.</param>
 	/// <param name="window">The window to swap.</param>
-	public void SwapWindowInDirection(Direction direction, IWindow window);
+	void SwapWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
-	/// Change the focused window's edge by the specified <paramref name="fractionDelta"/>.
+	/// Changes the focused window's edge by the specified <paramref name="pixelDelta"/>.
 	/// </summary>
 	/// <param name="edge">The edge to change.</param>
-	/// <param name="fractionDelta">The percentage to change the edge by.</param>
+	/// <param name="pixelDelta">
+	/// The number of pixels to change the edge by. When positive, the edge will move in the
+	/// <paramref name="edge"/> direction. When negative, the edge will move in the opposite
+	/// direction.
+	/// </param>
 	/// <param name="window">The window to change the edge of.</param>
-	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window);
+	void MoveWindowEdgeInDirection(Direction edge, double pixelDelta, IWindow window);
 
 	/// <summary>
 	/// Hides all phantom windows belonging to the layout engine.
 	/// </summary>
-	public void HidePhantomWindows();
+	void HidePhantomWindows();
 
 	/// <summary>
 	/// Move the <paramref name="window"/> to the <paramref name="point"/>.
@@ -62,7 +66,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
-	public void AddWindowAtPoint(IWindow window, IPoint<double> point);
+	void AddWindowAtPoint(IWindow window, IPoint<double> point);
 
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type
@@ -72,7 +76,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// <returns>
 	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
-	public T? GetLayoutEngine<T>()
+	T? GetLayoutEngine<T>()
 		where T : ILayoutEngine
 	{
 		if (this is T layoutEngine)
@@ -96,7 +100,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// <returns>
 	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
 	/// </returns>
-	public bool ContainsEqual(ILayoutEngine layoutEngine)
+	bool ContainsEqual(ILayoutEngine layoutEngine)
 	{
 		if (this == layoutEngine)
 		{

@@ -11,6 +11,11 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
 	private readonly HashSet<IWindow> _phantomWindows = new();
 
+	/// <summary>
+	/// Cheekily keep track of the last location passed to <see cref="DoLayout" />.
+	/// </summary>
+	private ILocation<int>? _location;
+
 	/// <inheritdoc/>
 	internal Node? Root { get; private set; }
 
@@ -275,6 +280,8 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	/// <inheritdoc/>
 	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
+		_location = location;
+
 		if (Root == null)
 		{
 			yield break;
@@ -398,15 +405,16 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	/// <summary>
-	/// The maximum relative delta for moving a window's edge, within its parent.
-	/// </summary>
-	private const double MAX_RELATIVE_DELTA = 0.5;
-
 	/// <inheritdoc/>
-	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window)
+	public void MoveWindowEdgeInDirection(Direction edge, double pixelDelta, IWindow window)
 	{
-		Logger.Debug($"Moving window {window} edge in direction {edge} by {fractionDelta} in layout engine {Name}");
+		Logger.Debug($"Moving window {window} edge in direction {edge} by {pixelDelta}px in layout engine {Name}");
+
+		if (_location is null)
+		{
+			Logger.Error($"DoLayout has not been called in layout engine {Name}");
+			return;
+		}
 
 		if (!_windows.TryGetValue(window, out LeafNode? focusedNode))
 		{
@@ -434,16 +442,12 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 			return;
 		}
 
-		// Adjust the weight of the focused node.
-		// First, we need to find the location of the parent node.
-		ILocation<double> parentLocation = GetNodeLocation(parentNode);
-
 		bool? isWidth = edge switch
 		{
-			Whim.Direction.Left => true,
-			Whim.Direction.Right => true,
-			Whim.Direction.Up => false,
-			Whim.Direction.Down => false,
+			Direction.Left => true,
+			Direction.Right => true,
+			Direction.Up => false,
+			Direction.Down => false,
 			_ => null
 		};
 
@@ -453,21 +457,16 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 			return;
 		}
 
-		double relativeDelta = fractionDelta / ((bool)isWidth ? parentLocation.Width : parentLocation.Height);
+		// Adjust the weight of the focused node.
+		// First, we need to find the location of the parent node.
+		ILocation<double> parentLocation = GetNodeLocation(parentNode);
 
-		// We cap the relative delta to MAX_RELATIVE_DELTA of the parent node's weight, to avoid nasty cases.
-		if (relativeDelta > MAX_RELATIVE_DELTA)
-		{
-			Logger.Debug($"Capping relative delta of {relativeDelta} to {MAX_RELATIVE_DELTA * 100}%");
-			relativeDelta = MAX_RELATIVE_DELTA;
-		}
-		else if (relativeDelta < -MAX_RELATIVE_DELTA)
-		{
-			Logger.Debug($"Capping relative delta of {relativeDelta} to {-MAX_RELATIVE_DELTA * 100}%");
-			relativeDelta = -MAX_RELATIVE_DELTA;
-		}
+		// Figure out what the relative delta of pixelDelta is, first given the unit square, then
+		// given the dimensions of the praent node.
+		double unitSquareDelta = pixelDelta / ((bool)isWidth ? _location.Width : _location.Height);
+		double relativeDelta = unitSquareDelta / ((bool)isWidth ? parentLocation.Width : parentLocation.Height);
 
-		// Now we can adjust the weight.
+		// Now we can adjust the weights.
 		int parentDepth = parentNode.Depth;
 
 		Node focusedAncestorNode = focusedNodeLineage[focusedNodeLineage.Length - parentDepth - 2];
