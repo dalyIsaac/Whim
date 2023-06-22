@@ -410,6 +410,12 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	{
 		Logger.Debug($"Moving window {window} edge in direction {edge} by {pixelDelta}px in layout engine {Name}");
 
+		if (_location is null)
+		{
+			Logger.Error($"DoLayout has not been called in layout engine {Name}");
+			return;
+		}
+
 		if (!_windows.TryGetValue(window, out LeafNode? focusedNode))
 		{
 			Logger.Error($"Could not find node for focused window in layout engine {Name}");
@@ -451,16 +457,14 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 			return;
 		}
 
-		if (_location is null)
-		{
-			Logger.Error($"DoLayout has not been called in layout engine {Name}");
-			return;
-		}
+		// Adjust the weight of the focused node.
+		// First, we need to find the location of the parent node.
+		ILocation<double> parentLocation = GetNodeLocation(parentNode);
 
-		// Figure out what the relative delta of pixelDelta is, given the dimension of the parent node.
-		// To do this, we need to know the ratio of the delta to the location. Here, we rely on
-		// the last known location passed to DoLayout.
-		double relativeDelta = pixelDelta / (isWidth.Value ? _location.Width : _location.Height);
+		// Figure out what the relative delta of pixelDelta is, first given the unit square, then
+		// given the dimensions of the praent node.
+		double unitSquareDelta = pixelDelta / ((bool)isWidth ? _location.Width : _location.Height);
+		double relativeDelta = unitSquareDelta / ((bool)isWidth ? parentLocation.Width : parentLocation.Height);
 
 		// Now we can adjust the weights.
 		int parentDepth = parentNode.Depth;

@@ -127,6 +127,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return;
 		}
 
+		// TODO: These two if statements can be combined/removed
 		int newNodeIndex = index + (direction.IsPositiveIndex() ? 1 : 0);
 
 		// Bound the index.
@@ -362,8 +363,8 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return null;
 		}
 
-		double weight,
-			precedingWeight;
+		double weight;
+		double precedingWeight;
 
 		if (EqualWeight)
 		{

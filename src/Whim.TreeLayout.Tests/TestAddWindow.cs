@@ -46,6 +46,7 @@ public class TestAddWindow
 	[Fact]
 	public void Add_UnequalSplitNode()
 	{
+		// Given
 		Mock<IMonitor> monitor = new();
 		Mock<IMonitorManager> monitorManager = new();
 		Mock<IWorkspace> activeWorkspace = new();
@@ -61,6 +62,9 @@ public class TestAddWindow
 		context.Setup(x => x.WorkspaceManager).Returns(workspaceManager.Object);
 
 		TreeLayoutEngine engine = new(context.Object) { AddNodeDirection = Direction.Right };
+		IWindowState[] _ = engine
+			.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object)
+			.ToArray();
 
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
@@ -70,10 +74,13 @@ public class TestAddWindow
 		engine.Add(window2.Object);
 
 		workspaceManager.Setup(w => w.ActiveWorkspace.LastFocusedWindow).Returns(window1.Object);
-		engine.MoveWindowEdgeInDirectionFraction(Direction.Right, 0.1, window1.Object);
+
+		// When
+		engine.MoveWindowEdgeInDirection(Direction.Right, 192, window1.Object);
 
 		engine.Add(window3.Object);
 
+		// Then
 		SplitNode root = (engine.Root as SplitNode)!;
 		Assert.Equal(0.3d, root[0].weight);
 		Assert.Equal(0.3d, root[1].weight);

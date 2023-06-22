@@ -918,7 +918,7 @@ public class WorkspaceTests
 
 		// Then the layout engine is not told to move the window
 		mocks.LayoutEngine.Verify(
-			l => l.MoveWindowEdgeInDirectionFraction(Direction.Up, delta, It.IsAny<IWindow>()),
+			l => l.MoveWindowEdgeInDirection(Direction.Up, delta, It.IsAny<IWindow>()),
 			Times.Never
 		);
 	}
@@ -937,10 +937,7 @@ public class WorkspaceTests
 		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object);
 
 		// Then the layout engine is not told to move the window
-		mocks.LayoutEngine.Verify(
-			l => l.MoveWindowEdgeInDirectionFraction(Direction.Up, delta, window.Object),
-			Times.Never
-		);
+		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Never);
 	}
 
 	[Fact]
@@ -958,10 +955,7 @@ public class WorkspaceTests
 		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object);
 
 		// Then the layout engine is told to move the window
-		mocks.LayoutEngine.Verify(
-			l => l.MoveWindowEdgeInDirectionFraction(Direction.Up, delta, window.Object),
-			Times.Once
-		);
+		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Once);
 	}
 
 	[Fact]
