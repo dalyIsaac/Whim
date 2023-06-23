@@ -420,40 +420,46 @@ internal class WindowManager : IWindowManager
 		int bottomEdgeDelta =
 			newLocation.Y + newLocation.Height - (windowState.Location.Y + windowState.Location.Height);
 
-		int movedEdgeCount = 0;
-		int movedEdgeDelta = 0;
-		Direction movedEdge = Direction.Right;
+		int movedEdgeCountX = 0;
+		int movedEdgeCountY = 0;
+		int movedEdgeDeltaX = 0;
+		int movedEdgeDeltaY = 0;
+		Direction movedEdge = Direction.None;
 		if (leftEdgeDelta != 0)
 		{
-			movedEdge = Direction.Left;
-			movedEdgeDelta = leftEdgeDelta;
-			movedEdgeCount++;
+			movedEdge |= Direction.Left;
+			movedEdgeDeltaX = leftEdgeDelta;
+			movedEdgeCountX++;
 		}
 		if (topEdgeDelta != 0)
 		{
-			movedEdge = Direction.Up;
-			movedEdgeDelta = topEdgeDelta;
-			movedEdgeCount++;
+			movedEdge |= Direction.Up;
+			movedEdgeDeltaY = topEdgeDelta;
+			movedEdgeCountY++;
 		}
 		if (rightEdgeDelta != 0)
 		{
-			movedEdge = Direction.Right;
-			movedEdgeDelta = rightEdgeDelta;
-			movedEdgeCount++;
+			movedEdge |= Direction.Right;
+			movedEdgeDeltaX = rightEdgeDelta;
+			movedEdgeCountX++;
 		}
 		if (bottomEdgeDelta != 0)
 		{
-			movedEdge = Direction.Down;
-			movedEdgeDelta = bottomEdgeDelta;
-			movedEdgeCount++;
+			movedEdge |= Direction.Down;
+			movedEdgeDeltaY = bottomEdgeDelta;
+			movedEdgeCountY++;
 		}
 
-		if (movedEdgeCount != 1)
+		if (movedEdgeCountX > 1 || movedEdgeCountY > 1)
 		{
 			return false;
 		}
 
-		workspace.MoveWindowEdgeInDirection(movedEdge, movedEdgeDelta, window);
+		workspace.MoveWindowEdgesInDirection(
+			movedEdge,
+			new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, },
+			window
+		);
 		return true;
 	}
 

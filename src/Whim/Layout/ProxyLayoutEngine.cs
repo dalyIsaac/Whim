@@ -73,8 +73,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	/// <inheritdoc/>
-	public virtual void MoveWindowEdgeInDirection(Direction edge, double delta, IWindow window) =>
-		InnerLayoutEngine.MoveWindowEdgeInDirection(edge, delta, window);
+	public virtual void MoveWindowEdgesInDirection(Direction edge, IPoint<int> pixelDeltas, IWindow window) =>
+		InnerLayoutEngine.MoveWindowEdgesInDirection(edge, pixelDeltas, window);
 
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);

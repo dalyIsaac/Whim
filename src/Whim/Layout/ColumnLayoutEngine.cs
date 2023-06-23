@@ -137,7 +137,7 @@ public class ColumnLayoutEngine : BaseStackLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override void MoveWindowEdgeInDirection(Direction edge, double pixelDelta, IWindow window)
+	public override void MoveWindowEdgesInDirection(Direction edge, IPoint<int> pixelDelta, IWindow window)
 	{
 		// Not implemented.
 	}
