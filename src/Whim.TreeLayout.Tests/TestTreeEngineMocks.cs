@@ -136,7 +136,11 @@ internal class TestTreeEngineMocks
 		RightTopNode = RightTopRightNode.Parent!;
 		RightNode = RightBottomNode.Parent!;
 
-		Engine.MoveWindowEdgeInDirection(Direction.Down, 54, RightTopLeftBottomRightTopWindow.Object);
+		Engine.MoveWindowEdgesInDirection(
+			Direction.Down,
+			new Point<int>() { X = 0, Y = 54 },
+			RightTopLeftBottomRightTopWindow.Object
+		);
 	}
 
 	public IWindow[] GetWindows()

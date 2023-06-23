@@ -452,7 +452,7 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 
 	private void MoveSingleWindowEdgeInDirection(
 		double delta,
-		bool isWidth,
+		bool isXAxis,
 		Node[] focusedNodeLineage,
 		LeafNode? adjacentNode
 	)
@@ -487,8 +487,8 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 
 		// Figure out what the relative delta of pixelDelta is, first given the unit square, then
 		// given the dimensions of the parent node.
-		double unitSquareDelta = delta / (isWidth ? _location.Width : _location.Height);
-		double relativeDelta = unitSquareDelta / (isWidth ? parentLocation.Width : parentLocation.Height);
+		double unitSquareDelta = delta / (isXAxis ? _location.Width : _location.Height);
+		double relativeDelta = unitSquareDelta / (isXAxis ? parentLocation.Width : parentLocation.Height);
 
 		// Now we can adjust the weights.
 		int parentDepth = parentNode.Depth;
