@@ -371,16 +371,90 @@ internal class WindowManager : IWindowManager
 
 			_mouseMoveWindow.IsMouseMoving = false;
 
-			// Move the window.
-			if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
+			// Detect if just one edge has moved. If so, we can just move the window's edge.
+			// Otherwise, we need to move the entire window.
+			if (!TryMoveWindowEdgeInDirection(window))
 			{
-				_context.WorkspaceManager.MoveWindowToPoint(window, new Point<int>() { X = point.X, Y = point.Y });
+				if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
+				{
+					_context.WorkspaceManager.MoveWindowToPoint(window, new Point<int>() { X = point.X, Y = point.Y });
+				}
 			}
 
 			_mouseMoveWindow = null;
 
 			WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window });
 		}
+	}
+
+	/// <summary>
+	/// Tries to move the given window's edge in the given direction.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	private bool TryMoveWindowEdgeInDirection(IWindow window)
+	{
+		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(window);
+		if (workspace is null)
+		{
+			return false;
+		}
+
+		IWindowState? windowState = workspace.TryGetWindowLocation(window);
+		if (windowState is null)
+		{
+			return false;
+		}
+
+		// Get the new window position.
+		ILocation<int>? newLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
+		if (newLocation is null)
+		{
+			return false;
+		}
+
+		// Find the one edge to move.
+		int leftEdgeDelta = windowState.Location.X - newLocation.X;
+		int topEdgeDelta = windowState.Location.Y - newLocation.Y;
+		int rightEdgeDelta = newLocation.X + newLocation.Width - (windowState.Location.X + windowState.Location.Width);
+		int bottomEdgeDelta =
+			newLocation.Y + newLocation.Height - (windowState.Location.Y + windowState.Location.Height);
+
+		int movedEdgeCount = 0;
+		int movedEdgeDelta = 0;
+		Direction movedEdge = Direction.Right;
+		if (leftEdgeDelta != 0)
+		{
+			movedEdge = Direction.Left;
+			movedEdgeDelta = leftEdgeDelta;
+			movedEdgeCount++;
+		}
+		if (topEdgeDelta != 0)
+		{
+			movedEdge = Direction.Up;
+			movedEdgeDelta = topEdgeDelta;
+			movedEdgeCount++;
+		}
+		if (rightEdgeDelta != 0)
+		{
+			movedEdge = Direction.Right;
+			movedEdgeDelta = rightEdgeDelta;
+			movedEdgeCount++;
+		}
+		if (bottomEdgeDelta != 0)
+		{
+			movedEdge = Direction.Down;
+			movedEdgeDelta = bottomEdgeDelta;
+			movedEdgeCount++;
+		}
+
+		if (movedEdgeCount != 1)
+		{
+			return false;
+		}
+
+		workspace.MoveWindowEdgeInDirection(movedEdge, movedEdgeDelta, window);
+		return true;
 	}
 
 	private void OnWindowMoved(IWindow window)
