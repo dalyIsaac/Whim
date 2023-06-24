@@ -34,7 +34,7 @@ public class TestMoveWindowEdgesInDirection
 		// Given
 		TestTreeEngineMocks testEngine = new();
 		testEngine.Engine.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object);
-		IPoint<int> pixelDeltas = new Point<int>() { X = -192, Y = 0 };
+		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
 
 		// When
 		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Right, pixelDeltas, testEngine.LeftWindow.Object);
@@ -99,7 +99,7 @@ public class TestMoveWindowEdgesInDirection
 		// Given
 		TestTreeEngineMocks testEngine = new();
 		testEngine.Engine.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object);
-		IPoint<int> pixelDeltas = new Point<int>() { X = 0, Y = -108 };
+		IPoint<int> pixelDeltas = new Point<int>() { X = 0, Y = 108 };
 
 		// When
 		testEngine.Engine.MoveWindowEdgesInDirection(
