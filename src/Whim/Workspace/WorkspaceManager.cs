@@ -19,7 +19,7 @@ internal record WorkspaceManagerTriggers
 /// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
 /// </summary>
-internal class WorkspaceManager : IWorkspaceManager
+internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 {
 	private bool _initialized;
 	private readonly IContext _context;
@@ -40,7 +40,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// </summary>
 	private readonly HashSet<IWindow> _phantomWindows = new();
 
-	internal IEnumerable<IWindow> PhantomWindows => _phantomWindows;
+	public IEnumerable<IWindow> PhantomWindows => _phantomWindows;
 
 	/// <summary>
 	/// Maps monitors to their active workspace.
@@ -351,11 +351,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	#endregion
 
 	#region Windows
-	/// <summary>
-	/// Called when a window has been added by the <see cref="IWindowManager"/>.
-	/// </summary>
-	/// <param name="window">The window that was added.</param>
-	internal virtual void WindowAdded(IWindow window)
+	public void WindowAdded(IWindow window)
 	{
 		Logger.Debug($"Adding window {window}");
 		IWorkspace? workspace = _context.RouterManager.RouteWindow(window);
@@ -376,11 +372,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
-	/// <summary>
-	/// Called when a window has been removed by the <see cref="IWindowManager"/>.
-	/// </summary>
-	/// <param name="window">The window that was removed.</param>
-	internal virtual void WindowRemoved(IWindow window)
+	public void WindowRemoved(IWindow window)
 	{
 		Logger.Debug($"Window removed: {window}");
 
@@ -395,11 +387,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
 	}
 
-	/// <summary>
-	/// Called when a window has been focused by the <see cref="IWindowManager"/>.
-	/// </summary>
-	/// <param name="window">The window that was focused.</param>
-	internal virtual void WindowFocused(IWindow window)
+	public void WindowFocused(IWindow window)
 	{
 		Logger.Debug($"Window focused: {window}");
 
@@ -418,11 +406,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		}
 	}
 
-	/// <summary>
-	/// Called when a window is about to be minimized.
-	/// </summary>
-	/// <param name="window">The window that is minimizing.</param>
-	internal virtual void WindowMinimizeStart(IWindow window)
+	public void WindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize start: {window}");
 
@@ -438,11 +422,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		}
 	}
 
-	/// <summary>
-	/// Called when a window is about to be restored.
-	/// </summary>
-	/// <param name="window">The window that is restoring.</param>
-	internal virtual void WindowMinimizeEnd(IWindow window)
+	public void WindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize end: {window}");
 
@@ -690,7 +670,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 	#endregion
 
-	protected virtual void Dispose(bool disposing)
+	protected void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
 		{

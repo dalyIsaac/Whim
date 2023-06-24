@@ -44,7 +44,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	void SwapWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
-	/// Changes the focused window's edges by the specified <paramref name="pixelDeltas"/>.
+	/// Moves the focused window's edges by the specified <paramref name="pixelDeltas"/>.
 	/// </summary>
 	/// <param name="edges">The edges to change.</param>
 	/// <param name="pixelDeltas">

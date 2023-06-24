@@ -12,7 +12,7 @@ namespace Whim;
 /// <summary>
 /// Implementation of <see cref="IMonitorManager"/>.
 /// </summary>
-internal class MonitorManager : IMonitorManager
+internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 {
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
@@ -75,11 +75,7 @@ internal class MonitorManager : IMonitorManager
 		_windowMessageMonitor.SessionChanged += WindowMessageMonitor_SessionChanged;
 	}
 
-	/// <summary>
-	/// Called when the window has been focused.
-	/// </summary>
-	/// <param name="window"></param>
-	internal virtual void WindowFocused(IWindow window)
+	public void WindowFocused(IWindow window)
 	{
 		Logger.Debug($"Focusing on {window}");
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(window);
