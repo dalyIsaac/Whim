@@ -11,13 +11,7 @@ public class TestGetWindowLocations
 	{
 		TestTree tree = new();
 
-		ILocation<int> screen = new Location<int>()
-		{
-			X = 0,
-			Y = 0,
-			Width = 1920,
-			Height = 1080
-		};
+		ILocation<int> screen = new Location<int>() { Width = 1920, Height = 1080 };
 
 		NodeState[] locations = TreeLayoutEngine.GetWindowLocations(tree.Root, screen).ToArray();
 		ILocation<int>[] actual = locations.Select(x => x.Location).ToArray();
@@ -31,13 +25,7 @@ public class TestGetWindowLocations
 	public void DoLayout_NullRoot()
 	{
 		TestTreeEngineEmptyMocks testTreeEngine = new();
-		ILocation<int> screen = new Location<int>()
-		{
-			X = 0,
-			Y = 0,
-			Width = 1920,
-			Height = 1080
-		};
+		ILocation<int> screen = new Location<int>() { Width = 1920, Height = 1080 };
 
 		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen, new Mock<IMonitor>().Object);
 
@@ -47,13 +35,7 @@ public class TestGetWindowLocations
 	[Fact]
 	public void DoLayout_TestTreeEngine()
 	{
-		ILocation<int> screen = new Location<int>()
-		{
-			X = 0,
-			Y = 0,
-			Width = 1920,
-			Height = 1080
-		};
+		ILocation<int> screen = new Location<int>() { Width = 1920, Height = 1080 };
 		TestTreeEngineMocks testTreeEngine = new();
 
 		IEnumerable<IWindowState> actual = testTreeEngine.Engine.DoLayout(screen, new Mock<IMonitor>().Object);

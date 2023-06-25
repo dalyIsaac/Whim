@@ -7,73 +7,38 @@ public class LocationTests
 	[Fact]
 	public void IsPointInside_ReturnsTrue_WhenPointIsInside()
 	{
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 10,
-				Height = 10
-			};
+		Location<int> location = new() { Width = 10, Height = 10 };
 		Assert.True(location.IsPointInside(new Point<int>() { X = 5, Y = 5 }));
 	}
 
 	[Fact]
 	public void IsPointInside_ReturnsFalse_WhenPointIsOutside()
 	{
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 10,
-				Height = 10
-			};
+		Location<int> location = new() { Width = 10, Height = 10 };
 		Assert.False(location.IsPointInside(new Point<int>() { X = 15, Y = 15 }));
 	}
 
 	[Fact]
 	public void IsPointInside_ReturnsFalse_WhenPointIsOutsideX()
 	{
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 10,
-				Height = 10
-			};
+		Location<int> location = new() { Width = 10, Height = 10 };
 		Assert.False(location.IsPointInside(new Point<int>() { X = -5, Y = 5 }));
 	}
 
 	[Fact]
 	public void IsPointInside_ReturnsFalse_WhenPointIsOutsideY()
 	{
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 10,
-				Height = 10
-			};
+		Location<int> location = new() { Width = 10, Height = 10 };
 		Assert.False(location.IsPointInside(new Point<int>() { X = 5, Y = -5 }));
 	}
 
 	[Fact]
 	public void IsPointInside_ReturnsTrue_WhenPointIsOnEdge()
 	{
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 10,
-				Height = 10
-			};
+		Location<int> location = new() { Width = 10, Height = 10 };
 
 		// Extreme boundaries.
-		Assert.True(location.IsPointInside(new Point<int>() { X = 0, Y = 0 }));
+		Assert.True(location.IsPointInside(new Point<int>()));
 		Assert.False(location.IsPointInside(new Point<int>() { X = 10, Y = 10 }));
 		Assert.False(location.IsPointInside(new Point<int>() { X = 0, Y = 10 }));
 		Assert.False(location.IsPointInside(new Point<int>() { X = 10, Y = 0 }));
@@ -94,14 +59,7 @@ public class LocationTests
 	[Fact]
 	public void Add_ReturnsNewLocation_WhenLocationsAreAdded()
 	{
-		Location<int> location1 =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 10,
-				Height = 10
-			};
+		Location<int> location1 = new() { Width = 10, Height = 10 };
 		Location<int> location2 =
 			new()
 			{

@@ -50,13 +50,7 @@ internal class TestTreeEngineMocks
 	public Mock<IWindow> RightTopLeftBottomRightBottomWindow = new();
 	public WindowNode RightTopLeftBottomRightBottomNode;
 
-	public ILocation<int> DoLayoutLocation = new Location<int>()
-	{
-		X = 0,
-		Y = 0,
-		Width = 1920,
-		Height = 1080
-	};
+	public ILocation<int> DoLayoutLocation = new Location<int>() { Width = 1920, Height = 1080 };
 	public TreeLayoutEngine Engine;
 
 	public TestTreeEngineMocks()

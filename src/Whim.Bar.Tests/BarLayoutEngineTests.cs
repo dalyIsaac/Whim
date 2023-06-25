@@ -23,13 +23,7 @@ public class BarLayoutEngineTests
 		Mock<IMonitor> monitor = new();
 		monitor.SetupGet(m => m.ScaleFactor).Returns(100);
 
-		ILocation<int> location = new Location<int>()
-		{
-			X = 0,
-			Y = 0,
-			Width = 1920,
-			Height = 1080
-		};
+		ILocation<int> location = new Location<int>() { Width = 1920, Height = 1080 };
 
 		BarLayoutEngine engine = new(config, layoutEngine.Object);
 

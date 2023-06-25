@@ -1054,7 +1054,7 @@ public class WorkspaceManagerTests
 			.Returns(new Mock<IMonitor>().Object);
 
 		// When a window which is in a workspace is moved to a point which doesn't correspond to any workspaces
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
+		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
 
 		// Then the window is not removed from the old workspace and not added to the new workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
@@ -1082,7 +1082,7 @@ public class WorkspaceManagerTests
 			.Returns(wrapper.Monitors[1].Object);
 
 		// When a phantom is moved
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
+		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
 
 		// Then nothing happens
 		wrapper.MonitorManager.Verify(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never());
@@ -1111,7 +1111,7 @@ public class WorkspaceManagerTests
 		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(false);
 
 		// When a window is moved to a point, but the window cannot be removed from the old workspace
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
+		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
 
 		// Then nothing happens
 		wrapper.Monitors[0].VerifyGet(m => m.WorkingArea, Times.Never());
@@ -1142,7 +1142,7 @@ public class WorkspaceManagerTests
 		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
 
 		// When a window is moved to a point
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
+		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
 
 		// Then the window is removed from the old workspace and added to the new workspace
 		activeWorkspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
@@ -1173,7 +1173,7 @@ public class WorkspaceManagerTests
 		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
 
 		// When a window is moved to a point
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>() { X = 0, Y = 0 });
+		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
 
 		// Then the window is removed from the old workspace and added to the new workspace
 		activeWorkspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
