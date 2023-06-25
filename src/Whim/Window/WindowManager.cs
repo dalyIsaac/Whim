@@ -363,9 +363,7 @@ internal class WindowManager : IWindowManager
 
 			_mouseMoveWindow.IsMouseMoving = false;
 
-			// Detect if just one edge has moved. If so, we can just move the window's edge.
-			// Otherwise, we need to move the entire window.
-			if (!TryMoveWindowEdgeInDirection(window))
+			if (!TryMoveWindowEdgesInDirection(window))
 			{
 				if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
 				{
@@ -380,11 +378,11 @@ internal class WindowManager : IWindowManager
 	}
 
 	/// <summary>
-	/// Tries to move the given window's edge in the given direction.
+	/// Tries to move the given window's edges in the direction of the mouse movement.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private bool TryMoveWindowEdgeInDirection(IWindow window)
+	private bool TryMoveWindowEdgesInDirection(IWindow window)
 	{
 		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(window);
 		if (workspace is null)

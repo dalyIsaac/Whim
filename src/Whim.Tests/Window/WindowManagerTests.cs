@@ -555,4 +555,98 @@ public class WindowManagerTests
 		// Then
 		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowMinimizeEnd(It.IsAny<IWindow>()), Times.Once);
 	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoveEnd_WindowNotMoving()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+
+		// Then
+		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()), Times.Never);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgeInDirection_NoWorkspace()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns<IWindow>(null);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+
+		// Then
+		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()), Times.Never);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgeInDirection_DoesNotContainWindowState()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		Mock<IWorkspace> workspace = new();
+		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+
+		// Then
+		workspace.Verify(w => w.TryGetWindowLocation(It.IsAny<IWindow>()), Times.Once);
+		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Never);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoved_CannotGetNewWindowLocation()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		Mock<IWorkspace> workspace = new();
+		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+
+		workspace
+			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.Returns(
+				new WindowState()
+				{
+					Location = new Location<int>(),
+					WindowSize = WindowSize.Normal,
+					Window = new Mock<IWindow>().Object
+				}
+			);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+
+		// Then
+		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
+	}
 }
