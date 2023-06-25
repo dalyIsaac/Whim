@@ -5,6 +5,36 @@ namespace Whim.TreeLayout.Tests;
 
 public class TestMoveWindowEdgesInDirection
 {
+	[Fact]
+	public void MoveWindowEdgesInDirection_CannotFindWindow()
+	{
+		// Given
+		TestTreeEngineMocks testEngine = new();
+		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelDeltas, new Mock<IWindow>().Object);
+
+		// Then
+		Assert.Equal(0.5, testEngine.LeftNode.GetWeight());
+		Assert.Equal(0.5, testEngine.RightBottomNode.GetWeight());
+	}
+
+	[Fact]
+	public void MoveWindowEdgesInDirection_DoLayoutHasNotBeenCalled()
+	{
+		// Given
+		TestTreeEngineMocks testEngine = new();
+		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelDeltas, testEngine.LeftWindow.Object);
+
+		// Then
+		Assert.Equal(0.5, testEngine.LeftNode.GetWeight());
+		Assert.Equal(0.5, testEngine.RightBottomNode.GetWeight());
+	}
+
 	/// <summary>
 	/// You can't move the left node further left.
 	/// </summary>
