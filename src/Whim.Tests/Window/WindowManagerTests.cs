@@ -481,12 +481,78 @@ public class WindowManagerTests
 		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
 
 		// When
-		// Then
 		windowManager.Initialize();
+
+		// Then
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
 		);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoved()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+
+		// Then
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMinimizeStart()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowMinimizeStart += h,
+			h => windowManager.WindowMinimizeStart -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MINIMIZESTART, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowMinimizeStart(It.IsAny<IWindow>()), Times.Once);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMinimizeEnd()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowMinimizeEnd += h,
+			h => windowManager.WindowMinimizeEnd -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MINIMIZEEND, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowMinimizeEnd(It.IsAny<IWindow>()), Times.Once);
 	}
 }
