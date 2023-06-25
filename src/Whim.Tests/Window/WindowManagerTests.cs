@@ -1,6 +1,7 @@
 using Moq;
 using System;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
 using Xunit;
 
@@ -26,6 +27,8 @@ public class WindowManagerTests
 		public Mock<ICoreNativeManager> CoreNativeManager = new();
 		public Mock<IWindowMessageMonitor> WindowMessageMonitor = new();
 
+		public WINEVENTPROC? WinEventProc;
+
 		public Wrapper()
 		{
 			InternalMonitorManager = new();
@@ -43,6 +46,12 @@ public class WindowManagerTests
 
 			Context.SetupGet(m => m.WorkspaceManager).Returns(WorkspaceManager.Object);
 			Context.SetupGet(m => m.MonitorManager).Returns(MonitorManager.Object);
+
+			// Capture the delegate passed to SetWinEventHook
+			CoreNativeManager
+				.Setup(n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()))
+				.Callback<uint, uint, WINEVENTPROC>((_, _, proc) => WinEventProc = proc)
+				.Returns(new UnhookWinEventSafeHandle(1));
 		}
 	}
 
@@ -219,5 +228,64 @@ public class WindowManagerTests
 		// When
 		// Then
 		Assert.Throws<InvalidOperationException>(windowManager.Initialize);
+	}
+
+	[InlineData(PInvoke.CHILDID_SELF + 1, 0, 0)]
+	[InlineData(PInvoke.CHILDID_SELF, 1, 0)]
+	[InlineData(PInvoke.CHILDID_SELF, 0, null)]
+	[Theory]
+	public void WindowsEventHook_IsEventWindowValid_False(int idObject, int idChild, int? hwndValue)
+	{
+		// Given
+		Wrapper wrapper = new();
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke(
+			(HWINEVENTHOOK)0,
+			PInvoke.EVENT_OBJECT_SHOW,
+			hwndValue == null ? HWND.Null : (HWND)hwndValue,
+			idObject,
+			idChild,
+			0,
+			0
+		);
+
+		// Then
+		wrapper.InternalWorkspaceManager.Verify(m => m.WindowAdded(It.IsAny<IWindow>()), Times.Never);
+	}
+
+	[InlineData(true, false, true, true)]
+	[InlineData(false, true, true, true)]
+	[InlineData(false, false, false, true)]
+	[InlineData(false, false, true, false)]
+	[Theory]
+	public void WindowsEventHook_AddWindow_Fail(
+		bool isSplashScreen,
+		bool isCloakedWindow,
+		bool isStandardWindow,
+		bool hasNoVisibleOwner
+	)
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.CoreNativeManager.Setup(cnm => cnm.IsSplashScreen(hwnd)).Returns(isSplashScreen);
+		wrapper.CoreNativeManager.Setup(cnm => cnm.IsCloakedWindow(hwnd)).Returns(isCloakedWindow);
+		wrapper.CoreNativeManager.Setup(cnm => cnm.IsStandardWindow(hwnd)).Returns(isStandardWindow);
+		wrapper.CoreNativeManager.Setup(cnm => cnm.HasNoVisibleOwner(hwnd)).Returns(hasNoVisibleOwner);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+
+		// Then
+		wrapper.CoreNativeManager.Verify(
+			cnm => cnm.GetWindowThreadProcessId(hwnd, out It.Ref<uint>.IsAny),
+			Times.Never
+		);
 	}
 }
