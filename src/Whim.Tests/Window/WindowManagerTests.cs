@@ -834,9 +834,91 @@ public class WindowManagerTests
 		// When
 		windowManager.Initialize();
 		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0)
+		);
 
 		// Then
 		workspace.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnwindowMoveEnd_GetCursorPos()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		Mock<IWorkspace> workspace = new();
+		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+
+		workspace
+			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.Returns(
+				new WindowState()
+				{
+					Location = new Location<int>()
+					{
+						X = 4,
+						Y = 4,
+						Width = 4,
+						Height = 4
+					},
+					WindowSize = WindowSize.Normal,
+					Window = new Mock<IWindow>().Object
+				}
+			);
+
+		wrapper.NativeManager
+			.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()))
+			.Returns(
+				new Location<int>()
+				{
+					X = 5,
+					Y = 5,
+					Width = 4,
+					Height = 4
+				}
+			);
+
+		System.Drawing.Point point = new(10, 10);
+		wrapper.CoreNativeManager.Setup(nm => nm.GetCursorPos(out point)).Returns(true);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.WorkspaceManager.Verify(w => w.MoveWindowToPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<int>>()));
+	}
+
+	[Fact]
+	public void PostInitialize()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.GetAllWindows())
+			.Returns(new List<HWND>() { new(1), new(2), new(3) });
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.PostInitialize();
+
+		// Then
+		wrapper.CoreNativeManager.Verify(cnm => cnm.IsSplashScreen(It.IsAny<HWND>()), Times.Exactly(3));
 	}
 }
