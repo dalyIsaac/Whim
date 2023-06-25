@@ -384,15 +384,18 @@ internal class WindowManager : IWindowManager
 	/// <returns></returns>
 	private bool TryMoveWindowEdgesInDirection(IWindow window)
 	{
+		Logger.Debug("Trying to move window edges in direction of mouse movement");
 		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(window);
 		if (workspace is null)
 		{
+			Logger.Debug($"Could not find workspace for window {window}, failed to move window edges");
 			return false;
 		}
 
 		IWindowState? windowState = workspace.TryGetWindowLocation(window);
 		if (windowState is null)
 		{
+			Logger.Debug($"Could not find window state for window {window}, failed to move window edges");
 			return false;
 		}
 
@@ -400,6 +403,7 @@ internal class WindowManager : IWindowManager
 		ILocation<int>? newLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
 		if (newLocation is null)
 		{
+			Logger.Debug($"Could not get new window location for window {window}, failed to move window edges");
 			return false;
 		}
 
@@ -442,6 +446,7 @@ internal class WindowManager : IWindowManager
 
 		if (movedEdgeCountX > 1 || movedEdgeCountY > 1)
 		{
+			Logger.Debug($"Window {window} moved more than one edge in the same axis, failed to move window edges");
 			return false;
 		}
 
@@ -450,6 +455,7 @@ internal class WindowManager : IWindowManager
 			new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, },
 			window
 		);
+
 		return true;
 	}
 
