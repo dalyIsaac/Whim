@@ -101,7 +101,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 				nextDirection = Direction.Left;
 				break;
 			default:
-				Logger.Error($"Invalid direction {direction}");
+				Logger.Error($"We don't support adding windows in {direction}");
 				return;
 		}
 

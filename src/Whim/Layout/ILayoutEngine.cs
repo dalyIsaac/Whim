@@ -44,16 +44,16 @@ public interface ILayoutEngine : ICollection<IWindow>
 	void SwapWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
-	/// Changes the focused window's edge by the specified <paramref name="pixelDelta"/>.
+	/// Moves the focused window's edges by the specified <paramref name="pixelDeltas"/>.
 	/// </summary>
-	/// <param name="edge">The edge to change.</param>
-	/// <param name="pixelDelta">
-	/// The number of pixels to change the edge by. When positive, the edge will move in the
-	/// <paramref name="edge"/> direction. When negative, the edge will move in the opposite
-	/// direction.
+	/// <param name="edges">The edges to change.</param>
+	/// <param name="pixelDeltas">
+	/// The number of pixels to change the edge by. The <paramref name="edges"/> directions are
+	/// associated with the <paramref name="pixelDeltas"/>.
+	/// When a value is positive, then the edge will move in the direction of the <paramref name="edges"/>.
 	/// </param>
-	/// <param name="window">The window to change the edge of.</param>
-	void MoveWindowEdgeInDirection(Direction edge, double pixelDelta, IWindow window);
+	/// <param name="window"></param>
+	void MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelDeltas, IWindow window);
 
 	/// <summary>
 	/// Hides all phantom windows belonging to the layout engine.

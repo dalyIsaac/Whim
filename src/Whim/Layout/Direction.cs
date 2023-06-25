@@ -1,29 +1,57 @@
+using System;
+
 namespace Whim;
 
 /// <summary>
 /// A direction in the coordinate space.
 /// </summary>
+[Flags]
 public enum Direction
 {
 	/// <summary>
-	/// The up direction.
+	/// No direction.
 	/// </summary>
-	Up,
-
-	/// <summary>
-	/// The down direction.
-	/// </summary>
-	Down,
+	None = 0,
 
 	/// <summary>
 	/// The left direction.
 	/// </summary>
-	Left,
+	Left = 1,
 
 	/// <summary>
 	/// The right direction.
 	/// </summary>
-	Right,
+	Right = 2,
+
+	/// <summary>
+	/// The up direction.
+	/// </summary>
+	Up = 4,
+
+	/// <summary>
+	/// The down direction.
+	/// </summary>
+	Down = 8,
+
+	/// <summary>
+	/// The left + up direction.
+	/// </summary>
+	LeftUp = Left | Up,
+
+	/// <summary>
+	/// The left + down direction.
+	/// </summary>
+	LeftDown = Left | Down,
+
+	/// <summary>
+	/// The right + up direction.
+	/// </summary>
+	RightUp = Right | Up,
+
+	/// <summary>
+	/// The right + down direction.
+	/// </summary>
+	RightDown = Right | Down,
 }
 
 /// <summary>
@@ -34,5 +62,6 @@ public static class DirectionHelpers
 	/// <summary>
 	/// Returns true when the given direction is horizontal. Otherwise, returns false.
 	/// </summary>
-	public static bool IsHorizontal(this Direction direction) => direction is Direction.Left or Direction.Right;
+	public static bool IsHorizontal(this Direction direction) =>
+		direction == Direction.Left || direction == Direction.Right;
 }
