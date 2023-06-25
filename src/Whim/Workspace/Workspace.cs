@@ -432,13 +432,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			location = new WindowState()
 			{
 				Window = window,
-				Location = new Location<int>()
-				{
-					X = 0,
-					Y = 0,
-					Width = 0,
-					Height = 0
-				},
+				Location = new Location<int>(),
 				WindowSize = WindowSize.Minimized
 			};
 		}
@@ -463,13 +457,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
 		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = monitor.WorkingArea.Width,
-				Height = monitor.WorkingArea.Height
-			},
+			new Location<int>() { Width = monitor.WorkingArea.Width, Height = monitor.WorkingArea.Height },
 			monitor
 		);
 

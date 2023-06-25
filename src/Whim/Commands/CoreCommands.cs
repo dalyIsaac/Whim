@@ -123,7 +123,7 @@ internal class CoreCommands : PluginCommands
 				callback: () =>
 					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Up,
-						new Point<int>() { X = 0, Y = MoveWindowEdgeDelta }
+						new Point<int>() { Y = MoveWindowEdgeDelta }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_U)
 			)
@@ -133,7 +133,7 @@ internal class CoreCommands : PluginCommands
 				callback: () =>
 					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Up,
-						new Point<int>() { X = 0, Y = -MoveWindowEdgeDelta }
+						new Point<int>() { Y = -MoveWindowEdgeDelta }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_I)
 			)
@@ -143,7 +143,7 @@ internal class CoreCommands : PluginCommands
 				callback: () =>
 					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Down,
-						new Point<int>() { X = 0, Y = -MoveWindowEdgeDelta }
+						new Point<int>() { Y = -MoveWindowEdgeDelta }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_O)
 			)
@@ -153,7 +153,7 @@ internal class CoreCommands : PluginCommands
 				callback: () =>
 					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Down,
-						new Point<int>() { X = 0, Y = MoveWindowEdgeDelta }
+						new Point<int>() { Y = MoveWindowEdgeDelta }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_P)
 			)

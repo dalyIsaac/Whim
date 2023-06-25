@@ -24,14 +24,7 @@ public class ColumnLayoutEngineTests
 	{
 		ColumnLayoutEngine engine = new() { CreateWindow() };
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Single(result);
@@ -48,14 +41,7 @@ public class ColumnLayoutEngineTests
 	{
 		ColumnLayoutEngine engine = new() { CreateWindow(), CreateWindow(), CreateWindow() };
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(3, result.Length);
@@ -84,14 +70,7 @@ public class ColumnLayoutEngineTests
 	{
 		ColumnLayoutEngine engine = new(leftToRight: false) { CreateWindow() };
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Single(result);
@@ -108,14 +87,7 @@ public class ColumnLayoutEngineTests
 	{
 		ColumnLayoutEngine engine = new(leftToRight: false) { CreateWindow(), CreateWindow(), CreateWindow() };
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(3, result.Length);
@@ -320,16 +292,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Up, leftWindow.Object);
 
 		IWindowState[] windows = engine
-			.DoLayout(
-				new Location<int>()
-				{
-					X = 0,
-					Y = 0,
-					Width = 1920,
-					Height = 1080
-				},
-				new Mock<IMonitor>().Object
-			)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -356,16 +319,7 @@ public class ColumnLayoutEngineTests
 		engine.SwapWindowInDirection(Direction.Left, notFoundWindow.Object);
 
 		IWindowState[] windows = engine
-			.DoLayout(
-				new Location<int>()
-				{
-					X = 0,
-					Y = 0,
-					Width = 1920,
-					Height = 1080
-				},
-				new Mock<IMonitor>().Object
-			)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -390,14 +344,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] windows = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -422,14 +369,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] windows = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -454,14 +394,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] windows = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -486,14 +419,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] windows = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -518,14 +444,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] windows = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -550,14 +469,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] windows = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -582,14 +494,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] windows = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(2, windows.Length);
@@ -614,14 +519,7 @@ public class ColumnLayoutEngineTests
 
 		engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
 
-		Location<int> location =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			};
+		Location<int> location = new() { Width = 1920, Height = 1080 };
 		IWindowState[] windows = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
 
 		Assert.Equal(2, windows.Length);

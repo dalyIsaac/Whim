@@ -5,13 +5,7 @@ namespace Whim.TreeLayout.Tests;
 /// </summary>
 internal static class TestTreeWindowState
 {
-	public static ILocation<double> Left = new Location<double>()
-	{
-		X = 0,
-		Y = 0,
-		Width = 0.5,
-		Height = 1
-	};
+	public static ILocation<double> Left = new Location<double>() { Width = 0.5, Height = 1 };
 	public static ILocation<double> RightBottom = new Location<double>()
 	{
 		X = 0.5,

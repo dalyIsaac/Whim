@@ -25,23 +25,11 @@ public class FloatingLayoutEngineTests
 
 			WorkspaceManager.SetupGet(x => x.ActiveWorkspace).Returns(Workspace.Object);
 
-			NativeManager
-				.Setup(x => x.DwmGetWindowLocation(It.IsAny<HWND>()))
-				.Returns(new Location<int>() { X = 0, Y = 0 });
+			NativeManager.Setup(x => x.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(new Location<int>());
 
 			MonitorManager.Setup(x => x.GetMonitorAtPoint(It.IsAny<ILocation<int>>())).Returns(Monitor.Object);
 
-			Monitor
-				.Setup(x => x.WorkingArea)
-				.Returns(
-					new Location<int>()
-					{
-						X = 0,
-						Y = 0,
-						Width = 1,
-						Height = 1
-					}
-				);
+			Monitor.Setup(x => x.WorkingArea).Returns(new Location<int>() { Width = 1, Height = 1 });
 		}
 	}
 

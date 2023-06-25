@@ -5,13 +5,7 @@ namespace Whim.TreeLayout.Tests;
 public class TestGetNodeContainingPoint
 {
 	private readonly TestTree _testTree = new();
-	private readonly ILocation<double> rootLocation = new Location<double>()
-	{
-		X = 0,
-		Y = 0,
-		Width = 100,
-		Height = 100
-	};
+	private readonly ILocation<double> rootLocation = new Location<double>() { Width = 100, Height = 100 };
 
 	[InlineData(-5, 0)]
 	[InlineData(0, -5)]

@@ -7,10 +7,10 @@ public record Point<T> : IPoint<T>
 	where T : INumber<T>
 {
 	/// <inheritdoc />
-	public required T X { get; init; }
+	public T X { get; init; } = T.Zero;
 
 	/// <inheritdoc />
-	public required T Y { get; init; }
+	public T Y { get; init; } = T.Zero;
 
 	/// <inheritdoc />
 	public override string ToString() => $"({X}, {Y})";
