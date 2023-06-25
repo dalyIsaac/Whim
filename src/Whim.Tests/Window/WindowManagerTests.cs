@@ -33,6 +33,9 @@ public class WindowManagerTests
 
 		public WINEVENTPROC? WinEventProc;
 
+		private uint _processId = 1;
+		public uint ProcessId => _processId;
+
 		public Wrapper()
 		{
 			InternalMonitorManager = new();
@@ -67,6 +70,9 @@ public class WindowManagerTests
 			CoreNativeManager.Setup(cnm => cnm.IsStandardWindow(hwnd)).Returns(true);
 			CoreNativeManager.Setup(cnm => cnm.HasNoVisibleOwner(hwnd)).Returns(true);
 			NativeManager.Setup(nm => nm.GetClassName(It.IsAny<HWND>())).Returns("WindowClass");
+
+			CoreNativeManager.Setup(cnm => cnm.GetWindowThreadProcessId(hwnd, out _processId));
+			CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath((int)ProcessId)).Returns(("name", "path"));
 		}
 	}
 
@@ -312,9 +318,9 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		uint processId = 1;
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetWindowThreadProcessId(hwnd, out processId));
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath((int)processId)).Throws(new Win32Exception());
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.GetProcessNameAndPath((int)wrapper.ProcessId))
+			.Throws(new Win32Exception());
 
 		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
 
@@ -335,9 +341,6 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		uint processId = 1;
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetWindowThreadProcessId(hwnd, out processId));
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath((int)processId)).Returns(("name", "path"));
 		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(true);
 
 		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
@@ -359,9 +362,6 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		uint processId = 1;
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetWindowThreadProcessId(hwnd, out processId));
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath((int)processId)).Returns(("name", "path"));
 		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(false);
 		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMinimized(hwnd)).Returns(true);
 
@@ -375,5 +375,30 @@ public class WindowManagerTests
 		wrapper.InternalWorkspaceManager.Verify(m => m.WindowAdded(It.IsAny<IWindow>()), Times.Never);
 		wrapper.FilterManager.Verify(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>()), Times.Once);
 		wrapper.InternalWorkspaceManager.Verify(iwm => iwm.WindowAdded(It.IsAny<IWindow>()), Times.Never);
+	}
+
+	[InlineData(PInvoke.EVENT_SYSTEM_FOREGROUND)]
+	[InlineData(PInvoke.EVENT_OBJECT_UNCLOAKED)]
+	[Theory]
+	public void WindowsEventHook_OnWindowFocused(uint eventType)
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowFocused += h,
+			h => windowManager.WindowFocused -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.InternalMonitorManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
+		wrapper.InternalWorkspaceManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
 	}
 }
