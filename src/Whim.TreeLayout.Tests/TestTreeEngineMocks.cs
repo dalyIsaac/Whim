@@ -49,6 +49,14 @@ internal class TestTreeEngineMocks
 
 	public Mock<IWindow> RightTopLeftBottomRightBottomWindow = new();
 	public WindowNode RightTopLeftBottomRightBottomNode;
+
+	public ILocation<int> DoLayoutLocation = new Location<int>()
+	{
+		X = 0,
+		Y = 0,
+		Width = 1920,
+		Height = 1080
+	};
 	public TreeLayoutEngine Engine;
 
 	public TestTreeEngineMocks()
@@ -63,6 +71,8 @@ internal class TestTreeEngineMocks
 		Context.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 
 		Engine = new TreeLayoutEngine(Context.Object) { AddNodeDirection = Direction.Right };
+		Mock<IMonitor> doLayoutMonitor = new();
+		IWindowState[] _ = Engine.DoLayout(DoLayoutLocation, doLayoutMonitor.Object).ToArray();
 
 		LeftWindow.Setup(m => m.ToString()).Returns("leftWindow");
 		RightTopLeftTopWindow.Setup(m => m.ToString()).Returns("rightTopLeftTopWindow");
@@ -126,7 +136,11 @@ internal class TestTreeEngineMocks
 		RightTopNode = RightTopRightNode.Parent!;
 		RightNode = RightBottomNode.Parent!;
 
-		Engine.MoveWindowEdgeInDirection(Direction.Down, 0.05, RightTopLeftBottomRightTopWindow.Object);
+		Engine.MoveWindowEdgesInDirection(
+			Direction.Down,
+			new Point<int>() { X = 0, Y = 54 },
+			RightTopLeftBottomRightTopWindow.Object
+		);
 	}
 
 	public IWindow[] GetWindows()

@@ -132,22 +132,26 @@ public class CoreCommandsTests
 		);
 	}
 
-	[InlineData("whim.core.move_window_left_edge_left", Direction.Left, true)]
-	[InlineData("whim.core.move_window_left_edge_right", Direction.Left, false)]
-	[InlineData("whim.core.move_window_right_edge_left", Direction.Right, false)]
-	[InlineData("whim.core.move_window_right_edge_right", Direction.Right, true)]
-	[InlineData("whim.core.move_window_top_edge_up", Direction.Up, true)]
-	[InlineData("whim.core.move_window_top_edge_down", Direction.Up, false)]
-	[InlineData("whim.core.move_window_bottom_edge_up", Direction.Down, false)]
-	[InlineData("whim.core.move_window_bottom_edge_down", Direction.Down, true)]
+	[InlineData("whim.core.move_window_left_edge_left", Direction.Left, 1, 0)]
+	[InlineData("whim.core.move_window_left_edge_right", Direction.Left, -1, 0)]
+	[InlineData("whim.core.move_window_right_edge_left", Direction.Right, -1, 0)]
+	[InlineData("whim.core.move_window_right_edge_right", Direction.Right, 1, 0)]
+	[InlineData("whim.core.move_window_top_edge_up", Direction.Up, 0, 1)]
+	[InlineData("whim.core.move_window_top_edge_down", Direction.Up, 0, -1)]
+	[InlineData("whim.core.move_window_bottom_edge_up", Direction.Down, 0, -1)]
+	[InlineData("whim.core.move_window_bottom_edge_down", Direction.Down, 0, 1)]
 	[Theory]
-	public void MoveWindowEdge(string commandName, Direction direction, bool positive)
+	public void MoveWindowEdgesInDirection(string commandName, Direction direction, int x, int y)
 	{
 		// Given
 		MocksWrapper mocks = new();
 		CoreCommands commands = new(mocks.Context.Object);
 		PluginCommandsTestUtils testUtils = new(commands);
-		double delta = (positive ? 1 : -1) * CoreCommands.MoveWindowEdgeDelta;
+		IPoint<int> pixelDeltas = new Point<int>()
+		{
+			X = x * CoreCommands.MoveWindowEdgeDelta,
+			Y = y * CoreCommands.MoveWindowEdgeDelta
+		};
 
 		ICommand command = testUtils.GetCommand(commandName);
 
@@ -156,7 +160,7 @@ public class CoreCommandsTests
 
 		// Then
 		mocks.Context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(direction, delta, null),
+			x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(direction, pixelDeltas, null),
 			Times.Once
 		);
 	}

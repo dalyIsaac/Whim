@@ -905,43 +905,46 @@ public class WorkspaceTests
 	}
 
 	[Fact]
-	public void MoveWindowEdgeInDirection_Fails_WindowIsNull()
+	public void MoveWindowEdgesInDirection_Fails_WindowIsNull()
 	{
 		// Given
 		MocksBuilder mocks = new();
 		Workspace workspace =
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
-		double delta = 0.3;
+		IPoint<int> pixelDeltas = new Point<int>() { X = 3, Y = 0 };
 
-		// When MoveWindowEdgeInDirection is called
-		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, null);
+		// When MoveWindowEdgesInDirection is called
+		workspace.MoveWindowEdgesInDirection(Direction.Up, pixelDeltas, null);
 
 		// Then the layout engine is not told to move the window
 		mocks.LayoutEngine.Verify(
-			l => l.MoveWindowEdgeInDirection(Direction.Up, delta, It.IsAny<IWindow>()),
+			l => l.MoveWindowEdgesInDirection(Direction.Up, pixelDeltas, It.IsAny<IWindow>()),
 			Times.Never
 		);
 	}
 
 	[Fact]
-	public void MoveWindowEdgeInDirection_Fails_DoesNotContainWindow()
+	public void MoveWindowEdgesInDirection_Fails_DoesNotContainWindow()
 	{
 		// Given
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
-		double delta = 0.3;
+		IPoint<int> pixelDeltas = new Point<int>() { X = 3, Y = 0 };
 
-		// When MoveWindowEdgeInDirection is called
-		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object);
+		// When MoveWindowEdgesInDirection is called
+		workspace.MoveWindowEdgesInDirection(Direction.Up, pixelDeltas, window.Object);
 
 		// Then the layout engine is not told to move the window
-		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Never);
+		mocks.LayoutEngine.Verify(
+			l => l.MoveWindowEdgesInDirection(Direction.Up, pixelDeltas, window.Object),
+			Times.Never
+		);
 	}
 
 	[Fact]
-	public void MoveWindowEdgeInDirection_Success()
+	public void MoveWindowEdgesInDirection_Success()
 	{
 		// Given
 		MocksBuilder mocks = new();
@@ -949,13 +952,16 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 		workspace.AddWindow(window.Object);
-		double delta = 0.3;
+		IPoint<int> pixelDeltas = new Point<int>() { X = 3, Y = 0 };
 
-		// When MoveWindowEdgeInDirection is called
-		workspace.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object);
+		// When MoveWindowEdgesInDirection is called
+		workspace.MoveWindowEdgesInDirection(Direction.Up, pixelDeltas, window.Object);
 
 		// Then the layout engine is told to move the window
-		mocks.LayoutEngine.Verify(l => l.MoveWindowEdgeInDirection(Direction.Up, delta, window.Object), Times.Once);
+		mocks.LayoutEngine.Verify(
+			l => l.MoveWindowEdgesInDirection(Direction.Up, pixelDeltas, window.Object),
+			Times.Once
+		);
 	}
 
 	[Fact]

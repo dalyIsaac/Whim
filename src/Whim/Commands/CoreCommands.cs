@@ -10,7 +10,7 @@ internal class CoreCommands : PluginCommands
 	/// <summary>
 	/// The delta for moving a window's edges.
 	/// </summary>
-	public static double MoveWindowEdgeDelta { get; set; } = 0.05;
+	public static int MoveWindowEdgeDelta { get; set; } = 40;
 
 	public CoreCommands(IContext context)
 		: base("whim.core")
@@ -81,9 +81,9 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
 				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Left,
-						MoveWindowEdgeDelta
+						new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_H)
 			)
@@ -91,9 +91,9 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
 				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Left,
-						-MoveWindowEdgeDelta
+						new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_J)
 			)
@@ -101,9 +101,9 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
 				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Right,
-						-MoveWindowEdgeDelta
+						new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_K)
 			)
@@ -111,9 +111,9 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
 				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Right,
-						MoveWindowEdgeDelta
+						new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_L)
 			)
@@ -121,9 +121,9 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_up",
 				title: "Move the current window's top edge up",
 				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Up,
-						MoveWindowEdgeDelta
+						new Point<int>() { X = 0, Y = MoveWindowEdgeDelta }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_U)
 			)
@@ -131,9 +131,9 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_down",
 				title: "Move the current window's top edge down",
 				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Up,
-						-MoveWindowEdgeDelta
+						new Point<int>() { X = 0, Y = -MoveWindowEdgeDelta }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_I)
 			)
@@ -141,9 +141,9 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
 				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Down,
-						-MoveWindowEdgeDelta
+						new Point<int>() { X = 0, Y = -MoveWindowEdgeDelta }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_O)
 			)
@@ -151,9 +151,9 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
 				callback: () =>
-					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgeInDirection(
+					_context.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(
 						Direction.Down,
-						MoveWindowEdgeDelta
+						new Point<int>() { X = 0, Y = MoveWindowEdgeDelta }
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_P)
 			)

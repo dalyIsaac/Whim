@@ -1,19 +1,56 @@
+using Moq;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
-public class TestMoveWindowEdgeInDirection
+public class TestMoveWindowEdgesInDirection
 {
+	[Fact]
+	public void MoveWindowEdgesInDirection_CannotFindWindow()
+	{
+		// Given
+		TestTreeEngineMocks testEngine = new();
+		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelDeltas, new Mock<IWindow>().Object);
+
+		// Then
+		Assert.Equal(0.5, testEngine.LeftNode.GetWeight());
+		Assert.Equal(0.5, testEngine.RightBottomNode.GetWeight());
+	}
+
+	[Fact]
+	public void MoveWindowEdgesInDirection_DoLayoutHasNotBeenCalled()
+	{
+		// Given
+		TestTreeEngineMocks testEngine = new();
+		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelDeltas, testEngine.LeftWindow.Object);
+
+		// Then
+		Assert.Equal(0.5, testEngine.LeftNode.GetWeight());
+		Assert.Equal(0.5, testEngine.RightBottomNode.GetWeight());
+	}
+
 	/// <summary>
 	/// You can't move the left node further left.
 	/// </summary>
 	[Fact]
-	public void MoveWindowEdgeInDirection_Left_Left()
+	public void MoveWindowEdgesInDirection_Left_Left()
 	{
+		// Given
 		TestTree tree = new();
 		TestTreeEngineMocks testEngine = new();
+		testEngine.Engine.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object);
+		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Left, 0.1, testEngine.LeftWindow.Object);
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelDeltas, testEngine.LeftWindow.Object);
+
+		// Then
 		Assert.Equal(tree.Left.GetWeight(), testEngine.LeftNode.GetWeight());
 		Assert.Equal(tree.Root.GetWeight(), testEngine.Engine.Root?.GetWeight());
 	}
@@ -22,11 +59,17 @@ public class TestMoveWindowEdgeInDirection
 	/// Move the left node further right.
 	/// </summary>
 	[Fact]
-	public void MoveWindowEdgeInDirection_Left_Right()
+	public void MoveWindowEdgesInDirection_Left_Right()
 	{
+		// Given
 		TestTreeEngineMocks testEngine = new();
+		testEngine.Engine.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object);
+		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Right, 0.1, testEngine.LeftWindow.Object);
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Right, pixelDeltas, testEngine.LeftWindow.Object);
+
+		// Then
 		Assert.Equal(0.5 + 0.1, testEngine.LeftNode.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.RightBottomNode.Parent?.GetWeight());
 	}
@@ -35,15 +78,23 @@ public class TestMoveWindowEdgeInDirection
 	/// Move RightTopLeftBottomLeft to the left.
 	/// </summary>
 	[Fact]
-	public void MoveWindowEdgeInDirection_RightTopLeftBottomLeft_Left()
+	public void MoveWindowEdgesInDirection_RightTopLeftBottomLeft_Left()
 	{
+		// Given
 		TestTreeEngineMocks testEngine = new();
+		IWindowState[] _ = testEngine.Engine
+			.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object)
+			.ToArray();
+		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
 
-		testEngine.Engine.MoveWindowEdgeInDirection(
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(
 			Direction.Left,
-			0.1,
+			pixelDeltas,
 			testEngine.RightTopLeftBottomLeftWindow.Object
 		);
+
+		// Then
 		Assert.Equal(0.5 + 0.1, testEngine.RightBottomNode.Parent?.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.LeftNode.GetWeight());
 	}
@@ -52,11 +103,19 @@ public class TestMoveWindowEdgeInDirection
 	/// Move RightBottom up.
 	/// </summary>
 	[Fact]
-	public void MoveWindowEdgeInDirection_RightBottom_Up()
+	public void MoveWindowEdgesInDirection_RightBottom_Up()
 	{
+		// Given
 		TestTreeEngineMocks testEngine = new();
+		IWindowState[] _ = testEngine.Engine
+			.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object)
+			.ToArray();
+		IPoint<int> pixelDeltas = new Point<int>() { X = 0, Y = 108 };
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Up, 0.1, testEngine.RightBottomWindow.Object);
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Up, pixelDeltas, testEngine.RightBottomWindow.Object);
+
+		// Then
 		Assert.Equal(0.5 + 0.1, testEngine.RightBottomNode.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.RightTopLeftTopNode.Parent?.Parent?.GetWeight());
 	}
@@ -65,11 +124,21 @@ public class TestMoveWindowEdgeInDirection
 	/// Move RightTopRight3 down.
 	/// </summary>
 	[Fact]
-	public void MoveWindowEdgeInDirection_RightTopRight3_Down()
+	public void MoveWindowEdgesInDirection_RightTopRight3_Down()
 	{
+		// Given
 		TestTreeEngineMocks testEngine = new();
+		testEngine.Engine.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object);
+		IPoint<int> pixelDeltas = new Point<int>() { X = 0, Y = 108 };
 
-		testEngine.Engine.MoveWindowEdgeInDirection(Direction.Down, 0.1, testEngine.RightTopRight3Window.Object);
+		// When
+		testEngine.Engine.MoveWindowEdgesInDirection(
+			Direction.Down,
+			pixelDeltas,
+			testEngine.RightTopRight3Window.Object
+		);
+
+		// Then
 		Assert.Equal(0.5 + 0.1, testEngine.RightTopRight3Node.Parent?.Parent?.GetWeight());
 		Assert.Equal(0.5 - 0.1, testEngine.RightBottomNode.GetWeight());
 	}

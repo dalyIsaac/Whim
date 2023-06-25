@@ -11,6 +11,11 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	private readonly Dictionary<IWindow, LeafNode> _windows = new();
 	private readonly HashSet<IWindow> _phantomWindows = new();
 
+	/// <summary>
+	/// Cheekily keep track of the last location passed to <see cref="DoLayout" />.
+	/// </summary>
+	private ILocation<int>? _location;
+
 	/// <inheritdoc/>
 	internal Node? Root { get; private set; }
 
@@ -275,6 +280,8 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	/// <inheritdoc/>
 	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
+		_location = location;
+
 		if (Root == null)
 		{
 			yield break;
@@ -398,15 +405,10 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	/// <summary>
-	/// The maximum relative delta for moving a window's edge, within its parent.
-	/// </summary>
-	private const double MAX_RELATIVE_DELTA = 0.5;
-
-	/// <inheritdoc/>
-	public void MoveWindowEdgeInDirection(Direction edge, double fractionDelta, IWindow window)
+	/// <inheritdoc />
+	public void MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelDeltas, IWindow window)
 	{
-		Logger.Debug($"Moving window {window} edge in direction {edge} by {fractionDelta} in layout engine {Name}");
+		Logger.Debug($"Moving window {window} edges in direction {edges} by {pixelDeltas} in layout engine {Name}");
 
 		if (!_windows.TryGetValue(window, out LeafNode? focusedNode))
 		{
@@ -414,7 +416,53 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 			return;
 		}
 
-		LeafNode? adjacentNode = GetAdjacentNode(focusedNode, edge);
+		// Get the adjacent nodes.
+		LeafNode? xAdjacentNode = null;
+		LeafNode? yAdjacentNode = null;
+
+		if (edges.HasFlag(Direction.Left))
+		{
+			xAdjacentNode = GetAdjacentNode(focusedNode, Direction.Left);
+		}
+		else if (edges.HasFlag(Direction.Right))
+		{
+			xAdjacentNode = GetAdjacentNode(focusedNode, Direction.Right);
+		}
+
+		if (edges.HasFlag(Direction.Up))
+		{
+			yAdjacentNode = GetAdjacentNode(focusedNode, Direction.Up);
+		}
+		else if (edges.HasFlag(Direction.Down))
+		{
+			yAdjacentNode = GetAdjacentNode(focusedNode, Direction.Down);
+		}
+
+		if (xAdjacentNode == null && yAdjacentNode == null)
+		{
+			Logger.Error($"Could not find adjacent node for focused window in layout engine {Name}");
+			return;
+		}
+
+		// For each adjacent node, move the window edge in the given direction.
+		Node[] focusedNodeLineage = focusedNode.Lineage.ToArray();
+		MoveSingleWindowEdgeInDirection(pixelDeltas.X, true, focusedNodeLineage, xAdjacentNode);
+		MoveSingleWindowEdgeInDirection(pixelDeltas.Y, false, focusedNodeLineage, yAdjacentNode);
+	}
+
+	private void MoveSingleWindowEdgeInDirection(
+		double delta,
+		bool isXAxis,
+		Node[] focusedNodeLineage,
+		LeafNode? adjacentNode
+	)
+	{
+		if (_location is null)
+		{
+			Logger.Error($"DoLayout has not been called in layout engine {Name}");
+			return;
+		}
+
 		if (adjacentNode == null)
 		{
 			Logger.Error($"Could not find adjacent node for focused window in layout engine {Name}");
@@ -422,7 +470,6 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		}
 
 		// Get the common parent node.
-		Node[] focusedNodeLineage = focusedNode.Lineage.ToArray();
 		Node[] adjacentNodeLineage = adjacentNode.Lineage.ToArray();
 		SplitNode? parentNode = Node.GetCommonParent(focusedNodeLineage, adjacentNodeLineage);
 
@@ -438,36 +485,12 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		// First, we need to find the location of the parent node.
 		ILocation<double> parentLocation = GetNodeLocation(parentNode);
 
-		bool? isWidth = edge switch
-		{
-			Whim.Direction.Left => true,
-			Whim.Direction.Right => true,
-			Whim.Direction.Up => false,
-			Whim.Direction.Down => false,
-			_ => null
-		};
+		// Figure out what the relative delta of pixelDelta is, first given the unit square, then
+		// given the dimensions of the parent node.
+		double unitSquareDelta = delta / (isXAxis ? _location.Width : _location.Height);
+		double relativeDelta = unitSquareDelta / (isXAxis ? parentLocation.Width : parentLocation.Height);
 
-		if (isWidth == null)
-		{
-			Logger.Error($"Invalid edge {edge} in layout engine {Name}");
-			return;
-		}
-
-		double relativeDelta = fractionDelta / ((bool)isWidth ? parentLocation.Width : parentLocation.Height);
-
-		// We cap the relative delta to MAX_RELATIVE_DELTA of the parent node's weight, to avoid nasty cases.
-		if (relativeDelta > MAX_RELATIVE_DELTA)
-		{
-			Logger.Debug($"Capping relative delta of {relativeDelta} to {MAX_RELATIVE_DELTA * 100}%");
-			relativeDelta = MAX_RELATIVE_DELTA;
-		}
-		else if (relativeDelta < -MAX_RELATIVE_DELTA)
-		{
-			Logger.Debug($"Capping relative delta of {relativeDelta} to {-MAX_RELATIVE_DELTA * 100}%");
-			relativeDelta = -MAX_RELATIVE_DELTA;
-		}
-
-		// Now we can adjust the weight.
+		// Now we can adjust the weights.
 		int parentDepth = parentNode.Depth;
 
 		Node focusedAncestorNode = focusedNodeLineage[focusedNodeLineage.Length - parentDepth - 2];
@@ -504,31 +527,32 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		ILocation<double> nodeLocation = GetNodeLocation(node);
 
 		// Next, we figure out the adjacent point of the nodeLocation.
-		IPoint<double> adjacentLocation = new Point<double>()
-		{
-			X =
-				nodeLocation.X
-				+ (
-					direction switch
-					{
-						Whim.Direction.Left => -1d / monitor.WorkingArea.Width,
-						Whim.Direction.Right => nodeLocation.Width + (1d / monitor.WorkingArea.Width),
-						_ => 0d
-					}
-				),
-			Y =
-				nodeLocation.Y
-				+ (
-					direction switch
-					{
-						Whim.Direction.Up => -1d / monitor.WorkingArea.Height,
-						Whim.Direction.Down => nodeLocation.Height + (1d / monitor.WorkingArea.Height),
-						_ => 0d
-					}
-				)
-		};
+		double x = nodeLocation.X;
+		double y = nodeLocation.Y;
 
-		return GetNodeContainingPoint(Root, new Location<double>() { Height = 1, Width = 1 }, adjacentLocation);
+		if (direction.HasFlag(Direction.Left))
+		{
+			x -= 1d / monitor.WorkingArea.Width;
+		}
+		else if (direction.HasFlag(Direction.Right))
+		{
+			x += nodeLocation.Width + (1d / monitor.WorkingArea.Width);
+		}
+
+		if (direction.HasFlag(Direction.Up))
+		{
+			y -= 1d / monitor.WorkingArea.Height;
+		}
+		else if (direction.HasFlag(Direction.Down))
+		{
+			y += nodeLocation.Height + (1d / monitor.WorkingArea.Height);
+		}
+
+		return GetNodeContainingPoint(
+			Root,
+			new Location<double>() { Height = 1, Width = 1 },
+			new Point<double>() { X = x, Y = y }
+		);
 	}
 
 	/// <summary>
