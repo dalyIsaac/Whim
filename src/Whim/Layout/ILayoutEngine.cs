@@ -50,6 +50,7 @@ public interface ILayoutEngine : ICollection<IWindow>
 	/// <param name="pixelDeltas">
 	/// The number of pixels to change the edge by. The <paramref name="edges"/> directions are
 	/// associated with the <paramref name="pixelDeltas"/>.
+	/// When a value is positive, then the edge will move in the direction of the <paramref name="edges"/>.
 	/// </param>
 	/// <param name="window"></param>
 	void MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelDeltas, IWindow window);
