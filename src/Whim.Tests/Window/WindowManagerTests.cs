@@ -401,4 +401,48 @@ public class WindowManagerTests
 		wrapper.InternalMonitorManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
 		wrapper.InternalWorkspaceManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
 	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowHidden_IgnoreWindow()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0);
+
+		// Then
+		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowHidden()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		wrapper.WorkspaceManager
+			.Setup(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()))
+			.Returns(new Mock<IMonitor>().Object);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowRemoved += h,
+			h => windowManager.WindowRemoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowRemoved(It.IsAny<IWindow>()), Times.Once);
+	}
 }

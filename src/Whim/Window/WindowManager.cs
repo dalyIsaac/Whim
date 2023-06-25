@@ -286,15 +286,7 @@ internal class WindowManager : IWindowManager
 			return null;
 		}
 
-		// Try add the window to the dictionary.
-		if (!_windows.TryAdd(hwnd, window))
-		{
-			Logger.Debug($"Failed to add {window}");
-			return null;
-		}
-
-		Logger.Debug($"Added {window}");
-
+		_windows[hwnd] = window;
 		OnWindowAdded(window);
 		return window;
 	}
