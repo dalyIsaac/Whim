@@ -445,4 +445,48 @@ public class WindowManagerTests
 		// Then
 		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowRemoved(It.IsAny<IWindow>()), Times.Once);
 	}
+
+	[InlineData(PInvoke.EVENT_OBJECT_DESTROY)]
+	[InlineData(PInvoke.EVENT_OBJECT_CLOAKED)]
+	[Theory]
+	public void WindowsEventHook_OnWindowRemoved(uint eventType)
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowRemoved += h,
+			h => windowManager.WindowRemoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowRemoved(It.IsAny<IWindow>()), Times.Once);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoveStart()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		// Then
+		windowManager.Initialize();
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowMoveStart += h,
+			h => windowManager.WindowMoveStart -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
+		);
+	}
 }
