@@ -1,5 +1,6 @@
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -591,7 +592,8 @@ public class WindowManagerTests
 		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()), Times.Never);
+		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()), Times.Once);
+		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Never);
 	}
 
 	[Fact]
@@ -618,7 +620,7 @@ public class WindowManagerTests
 	}
 
 	[Fact]
-	public void WindowsEventHook_OnWindowMoved_CannotGetNewWindowLocation()
+	public void WindowsEventHook_OnWindowMoved_TryMoveWindowEdgeInDirection_CannotGetNewWindowLocation()
 	{
 		// Given
 		Wrapper wrapper = new();
@@ -648,5 +650,193 @@ public class WindowManagerTests
 
 		// Then
 		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
+	}
+
+	public static IEnumerable<object[]> MoveTooManyEdgesData()
+	{
+		yield return new object[]
+		{
+			new Location<int>(),
+			new Location<int>() { X = 1, Width = 1 }
+		};
+
+		yield return new object[]
+		{
+			new Location<int>(),
+			new Location<int>() { Y = 1, Width = 1 }
+		};
+
+		yield return new object[]
+		{
+			new Location<int>(),
+			new Location<int>()
+			{
+				X = 1,
+				Width = 1,
+				Y = 1,
+				Height = 1
+			}
+		};
+	}
+
+	[MemberData(nameof(MoveTooManyEdgesData))]
+	[Theory]
+	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgeInDirection_MoveTooManyEdges(
+		ILocation<int> originalLocation,
+		ILocation<int> newLocation
+	)
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		Mock<IWorkspace> workspace = new();
+		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+
+		workspace
+			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.Returns(
+				new WindowState()
+				{
+					Location = originalLocation,
+					WindowSize = WindowSize.Normal,
+					Window = new Mock<IWindow>().Object
+				}
+			);
+
+		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(newLocation);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+
+		// Then
+		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
+		workspace.Verify(
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<ILocation<int>>(), It.IsAny<IWindow>()),
+			Times.Never()
+		);
+	}
+
+	public static IEnumerable<object[]> MoveEdgesSuccessData()
+	{
+		// Moeve left edge to the left
+		yield return new object[]
+		{
+			new Location<int>() { X = 4, Width = 4 },
+			new Location<int>() { X = 3, Width = 5 },
+			Direction.Left,
+			new Point<int>() { X = 1, Y = 0 }
+		};
+
+		// Move left edge to the right
+		yield return new object[]
+		{
+			new Location<int>() { X = 4, Width = 4 },
+			new Location<int>() { X = 5, Width = 3 },
+			Direction.Left,
+			new Point<int>() { X = -1, Y = 0 }
+		};
+
+		// Move right edge to the right
+		yield return new object[]
+		{
+			new Location<int>() { X = 4, Width = 4 },
+			new Location<int>() { X = 4, Width = 5 },
+			Direction.Right,
+			new Point<int>() { X = 1, Y = 0 }
+		};
+
+		// Move right edge to the left
+		yield return new object[]
+		{
+			new Location<int>() { X = 4, Width = 4 },
+			new Location<int>() { X = 4, Width = 3 },
+			Direction.Right,
+			new Point<int>() { X = -1, Y = 0 }
+		};
+
+		// Move top edge up
+		yield return new object[]
+		{
+			new Location<int>() { Y = 4, Height = 4 },
+			new Location<int>() { Y = 3, Height = 5 },
+			Direction.Up,
+			new Point<int>() { X = 0, Y = 1 }
+		};
+
+		// Move top edge down
+		yield return new object[]
+		{
+			new Location<int>() { Y = 4, Height = 4 },
+			new Location<int>() { Y = 5, Height = 3 },
+			Direction.Up,
+			new Point<int>() { X = 0, Y = -1 }
+		};
+
+		// Move bottom edge down
+		yield return new object[]
+		{
+			new Location<int>() { Y = 4, Height = 4 },
+			new Location<int>() { Y = 4, Height = 5 },
+			Direction.Down,
+			new Point<int>() { X = 0, Y = 1 }
+		};
+
+		// Move bottom edge up
+		yield return new object[]
+		{
+			new Location<int>() { Y = 4, Height = 4 },
+			new Location<int>() { Y = 4, Height = 3 },
+			Direction.Down,
+			new Point<int>() { X = 0, Y = -1 }
+		};
+	}
+
+	[Theory]
+	[MemberData(nameof(MoveEdgesSuccessData))]
+	public void WindowsEventHook_OnWindowMoveEnd_Success(
+		ILocation<int> originalLocation,
+		ILocation<int> newLocation,
+		Direction direction,
+		IPoint<int> pixelsDelta
+	)
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		Mock<IWorkspace> workspace = new();
+		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+
+		workspace
+			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.Returns(
+				new WindowState()
+				{
+					Location = originalLocation,
+					WindowSize = WindowSize.Normal,
+					Window = new Mock<IWindow>().Object
+				}
+			);
+
+		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(newLocation);
+
+		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+
+		// When
+		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+
+		// Then
+		workspace.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
 	}
 }

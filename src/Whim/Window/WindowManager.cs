@@ -403,7 +403,7 @@ internal class WindowManager : IWindowManager
 			return false;
 		}
 
-		// Find the one edge to move.
+		// Find the one or two edges to move.
 		int leftEdgeDelta = windowState.Location.X - newLocation.X;
 		int topEdgeDelta = windowState.Location.Y - newLocation.Y;
 		int rightEdgeDelta = newLocation.X + newLocation.Width - (windowState.Location.X + windowState.Location.Width);
