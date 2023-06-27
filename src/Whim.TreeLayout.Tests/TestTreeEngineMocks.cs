@@ -132,7 +132,7 @@ internal class TestTreeEngineMocks
 
 		Engine.MoveWindowEdgesInDirection(
 			Direction.Down,
-			new Point<int>() { X = 0, Y = 54 },
+			new Point<double>() { X = 0, Y = 0.05 },
 			RightTopLeftBottomRightTopWindow.Object
 		);
 	}

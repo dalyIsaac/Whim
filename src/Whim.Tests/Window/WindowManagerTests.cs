@@ -718,7 +718,7 @@ public class WindowManagerTests
 		// Then
 		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
 		workspace.Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<ILocation<int>>(), It.IsAny<IWindow>()),
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow>()),
 			Times.Never()
 		);
 	}
@@ -841,7 +841,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		workspace.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
+		wrapper.WorkspaceManager.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
 	}
 
 	[Fact]

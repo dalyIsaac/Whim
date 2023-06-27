@@ -450,7 +450,7 @@ internal class WindowManager : IWindowManager
 			return false;
 		}
 
-		workspace.MoveWindowEdgesInDirection(
+		_context.WorkspaceManager.MoveWindowEdgesInDirection(
 			movedEdge,
 			new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, },
 			window

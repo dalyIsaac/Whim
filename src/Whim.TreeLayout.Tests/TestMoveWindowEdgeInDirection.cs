@@ -10,10 +10,10 @@ public class TestMoveWindowEdgesInDirection
 	{
 		// Given
 		TestTreeEngineMocks testEngine = new();
-		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0 };
 
 		// When
-		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelDeltas, new Mock<IWindow>().Object);
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, new Mock<IWindow>().Object);
 
 		// Then
 		Assert.Equal(0.5, testEngine.LeftNode.GetWeight());
@@ -25,10 +25,10 @@ public class TestMoveWindowEdgesInDirection
 	{
 		// Given
 		TestTreeEngineMocks testEngine = new();
-		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0 };
 
 		// When
-		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelDeltas, testEngine.LeftWindow.Object);
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, testEngine.LeftWindow.Object);
 
 		// Then
 		Assert.Equal(0.5, testEngine.LeftNode.GetWeight());
@@ -45,10 +45,10 @@ public class TestMoveWindowEdgesInDirection
 		TestTree tree = new();
 		TestTreeEngineMocks testEngine = new();
 		testEngine.Engine.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object);
-		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0 };
 
 		// When
-		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelDeltas, testEngine.LeftWindow.Object);
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, testEngine.LeftWindow.Object);
 
 		// Then
 		Assert.Equal(tree.Left.GetWeight(), testEngine.LeftNode.GetWeight());
@@ -64,10 +64,10 @@ public class TestMoveWindowEdgesInDirection
 		// Given
 		TestTreeEngineMocks testEngine = new();
 		testEngine.Engine.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object);
-		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0 };
 
 		// When
-		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Right, pixelDeltas, testEngine.LeftWindow.Object);
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Right, pixelsDeltas, testEngine.LeftWindow.Object);
 
 		// Then
 		Assert.Equal(0.5 + 0.1, testEngine.LeftNode.GetWeight());
@@ -85,12 +85,12 @@ public class TestMoveWindowEdgesInDirection
 		IWindowState[] _ = testEngine.Engine
 			.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object)
 			.ToArray();
-		IPoint<int> pixelDeltas = new Point<int>() { X = 192, Y = 0 };
+		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0 };
 
 		// When
 		testEngine.Engine.MoveWindowEdgesInDirection(
 			Direction.Left,
-			pixelDeltas,
+			pixelsDeltas,
 			testEngine.RightTopLeftBottomLeftWindow.Object
 		);
 
@@ -110,10 +110,10 @@ public class TestMoveWindowEdgesInDirection
 		IWindowState[] _ = testEngine.Engine
 			.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object)
 			.ToArray();
-		IPoint<int> pixelDeltas = new Point<int>() { X = 0, Y = 108 };
+		IPoint<double> pixelsDeltas = new Point<double>() { X = 0, Y = 0.1 };
 
 		// When
-		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Up, pixelDeltas, testEngine.RightBottomWindow.Object);
+		testEngine.Engine.MoveWindowEdgesInDirection(Direction.Up, pixelsDeltas, testEngine.RightBottomWindow.Object);
 
 		// Then
 		Assert.Equal(0.5 + 0.1, testEngine.RightBottomNode.GetWeight());
@@ -129,12 +129,12 @@ public class TestMoveWindowEdgesInDirection
 		// Given
 		TestTreeEngineMocks testEngine = new();
 		testEngine.Engine.DoLayout(new Location<int>() { Height = 1080, Width = 1920 }, new Mock<IMonitor>().Object);
-		IPoint<int> pixelDeltas = new Point<int>() { X = 0, Y = 108 };
+		IPoint<double> pixelsDeltas = new Point<double>() { X = 0, Y = 0.1 };
 
 		// When
 		testEngine.Engine.MoveWindowEdgesInDirection(
 			Direction.Down,
-			pixelDeltas,
+			pixelsDeltas,
 			testEngine.RightTopRight3Window.Object
 		);
 
