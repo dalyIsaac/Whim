@@ -119,21 +119,24 @@ public interface IWorkspace : IDisposable
 
 	/// <summary>
 	/// Change the <paramref name="window"/>'s <paramref name="edges"/> direction by
-	/// the specified <paramref name="pixelDeltas"/>.
+	/// the specified <paramref name="deltas"/>.
 	/// </summary>
 	/// <param name="edges">The edges to change.</param>
-	/// <param name="pixelDeltas">
-	/// The number of pixels to change the edge by. The <paramref name="edges"/> directions are
-	/// associated with the <paramref name="pixelDeltas"/>.
+	/// <param name="deltas">
+	/// The deltas to change the given <paramref name="edges"/> by. When a value is positive, then
+	/// the edge will move in the direction of the <paramref name="edges"/>.
+	/// The <paramref name="deltas"/> have a coordinate space of [0, 1] for both x and y (the unit
+	/// square).
 	/// </param>
 	/// <param name="window">
 	/// The window to change the edge of. If null, the currently focused window is
 	/// used.
 	/// </param>
-	void MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelDeltas, IWindow? window = null);
+	void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null);
 
 	/// <summary>
 	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.
+	/// The point has a coordinate space of [0, 1] for both x and y (the unit square).
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>

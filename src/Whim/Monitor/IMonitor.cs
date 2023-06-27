@@ -65,12 +65,18 @@ public static class MonitorHelpers
 	/// </summary>
 	/// <param name="monitor"></param>
 	/// <param name="point">The point to translate.</param>
+	/// <param name="respectSign">
+	/// Whether to respect the sign. For example, values in [-infinity, 0] will become [-1, 0].
+	/// </param>
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
-	public static IPoint<double> ToUnitSquare(this ILocation<int> monitor, IPoint<int> point)
+	public static IPoint<double> ToUnitSquare(this ILocation<int> monitor, IPoint<int> point, bool respectSign = false)
 	{
-		double x = Math.Abs((double)point.X / monitor.Width);
-		double y = Math.Abs((double)point.Y / monitor.Height);
-		return new Point<double>() { X = x, Y = y };
+		double x = (double)point.X / monitor.Width;
+		double y = (double)point.Y / monitor.Height;
+
+		return respectSign
+			? new Point<double>() { X = x, Y = y }
+			: new Point<double>() { X = Math.Abs(x), Y = Math.Abs(y) };
 	}
 
 	/// <summary>

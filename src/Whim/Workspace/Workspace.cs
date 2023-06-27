@@ -359,13 +359,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelDeltas, IWindow? window = null)
+	public void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
 	{
-		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {pixelDeltas}");
+		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, pixelDeltas, validWindow);
+			ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
 			DoLayout();
 		}
 	}

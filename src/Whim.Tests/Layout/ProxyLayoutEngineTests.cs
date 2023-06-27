@@ -219,17 +219,17 @@ public class ProxyLayoutEngineTests
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(
-			x => x.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<int>>(), It.IsAny<IWindow>())
+			x => x.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow>())
 		);
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		proxyLayoutEngine.MoveWindowEdgesInDirection(Direction.Left, new Point<int>(), new Mock<IWindow>().Object);
+		proxyLayoutEngine.MoveWindowEdgesInDirection(Direction.Left, new Point<double>(), new Mock<IWindow>().Object);
 
 		// Then
 		innerLayoutEngine.Verify(
-			x => x.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<int>>(), It.IsAny<IWindow>()),
+			x => x.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow>()),
 			Times.Once
 		);
 	}

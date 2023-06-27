@@ -638,10 +638,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
+		// Normalize `point` into the unit square.
 		IPoint<int> pointInMonitor = targetMonitor.WorkingArea.ToMonitorCoordinates(point);
 		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(pointInMonitor);
 
-		Logger.Debug($"Normalized location: {normalized}");
+		Logger.Debug($"Normalized point: {normalized}");
 		targetWorkspace.MoveWindowToPoint(window, normalized);
 
 		// If the window is being moved to a different workspace, update the reference in the window map.
@@ -652,6 +653,44 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		// Trigger layouts.
 		window.Focus();
+	}
+
+	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)
+	{
+		window ??= ActiveWorkspace.LastFocusedWindow;
+
+		if (window == null)
+		{
+			Logger.Error("No window was found");
+			return false;
+		}
+
+		Logger.Debug("Moving window {window} in direction {edges} by {pixelsDeltas}");
+
+		// Get the containing monitor.
+		IMonitor? monitor = GetMonitorForWindow(window);
+		if (monitor == null)
+		{
+			Logger.Error($"Could not find a monitor for {window}");
+			return false;
+		}
+
+		// Get the containing workspace.
+		IWorkspace? workspace = GetWorkspaceForMonitor(monitor);
+		if (workspace == null)
+		{
+			Logger.Error($"Monitor {monitor} was not found to correspond to any workspace");
+			return false;
+		}
+
+		Logger.Debug($"Moving window {window} to workspace {workspace}");
+
+		// Normalize `pixelsDeltas` into the unit square.
+		IPoint<double> normalized = monitor.WorkingArea.ToUnitSquare(pixelsDeltas, respectSign: true);
+
+		Logger.Debug($"Normalized point: {normalized}");
+		workspace.MoveWindowEdgesInDirection(edges, normalized, window);
+		return true;
 	}
 
 	#region Phantom Windows
