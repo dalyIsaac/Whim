@@ -1648,18 +1648,19 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
 
-		Wrapper wrapper = new(workspaces);
+		Wrapper wrapper = new(workspaces, monitors);
 
 		Mock<IWindow> window = new();
 		workspaces[1].Setup(w => w.Windows).Returns(new[] { window.Object });
-		workspaces[1].Setup(w => w.LastFocusedWindow).Returns(window.Object);
+		wrapper.RouterManager.Setup(r => r.RouteWindow(window.Object)).Returns(workspaces[1].Object);
 
 		wrapper.WorkspaceManager.Initialize();
 		wrapper.WorkspaceManager.WindowAdded(window.Object);
 
 		// When moving the window edges in a direction
-		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
+		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>(), window.Object);
 
 		// Then nothing happens
 		workspaces[0].Verify(
