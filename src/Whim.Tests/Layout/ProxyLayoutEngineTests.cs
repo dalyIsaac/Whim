@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class ProxyLayoutEngineTests
 {

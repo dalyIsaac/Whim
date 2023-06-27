@@ -667,19 +667,19 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		Logger.Debug("Moving window {window} in direction {edges} by {pixelsDeltas}");
 
-		// Get the containing monitor.
-		IMonitor? monitor = GetMonitorForWindow(window);
-		if (monitor == null)
+		// Get the containing workspace.
+		IWorkspace? workspace = GetWorkspaceForWindow(window);
+		if (workspace == null)
 		{
-			Logger.Error($"Could not find a monitor for {window}");
+			Logger.Error($"Could not find workspace for window {window}");
 			return false;
 		}
 
-		// Get the containing workspace.
-		IWorkspace? workspace = GetWorkspaceForMonitor(monitor);
-		if (workspace == null)
+		// Get the containing monitor.
+		IMonitor? monitor = GetMonitorForWorkspace(workspace);
+		if (monitor == null)
 		{
-			Logger.Error($"Monitor {monitor} was not found to correspond to any workspace");
+			Logger.Error($"Could not find monitor for workspace {workspace}");
 			return false;
 		}
 

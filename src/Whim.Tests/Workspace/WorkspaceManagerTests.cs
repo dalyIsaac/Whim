@@ -1590,4 +1590,115 @@ public class WorkspaceManagerTests
 		// Then the workspace is returned
 		Assert.Equal(workspaces[1].Object, activeWorkspace);
 	}
+
+	[Fact]
+	public void MoveWindowEdgesInDirection_NoWindow()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+
+		Wrapper wrapper = new(workspaces);
+		wrapper.WorkspaceManager.Initialize();
+
+		// When moving the window edges in a direction
+		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
+
+		// Then nothing happens
+		workspaces[0].Verify(
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
+			Times.Never()
+		);
+		workspaces[1].Verify(
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
+			Times.Never()
+		);
+	}
+
+	[Fact]
+	public void MoveWindowEdgesInDirection_NoContainingWorkspace()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+
+		Wrapper wrapper = new(workspaces);
+
+		Mock<IWindow> window = new();
+		workspaces[1].Setup(w => w.Windows).Returns(new[] { window.Object });
+		workspaces[1].Setup(w => w.LastFocusedWindow).Returns(window.Object);
+
+		wrapper.WorkspaceManager.Initialize();
+		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(wrapper.Monitors[1].Object);
+
+		// When moving the window edges in a direction
+		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
+
+		// Then nothing happens
+		workspaces[0].Verify(
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
+			Times.Never()
+		);
+		workspaces[1].Verify(
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
+			Times.Never()
+		);
+	}
+
+	[Fact]
+	public void MoveWindowEdgesInDirection_NoContainingMonitor()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+
+		Wrapper wrapper = new(workspaces);
+
+		Mock<IWindow> window = new();
+		workspaces[1].Setup(w => w.Windows).Returns(new[] { window.Object });
+		workspaces[1].Setup(w => w.LastFocusedWindow).Returns(window.Object);
+
+		wrapper.WorkspaceManager.Initialize();
+		wrapper.WorkspaceManager.WindowAdded(window.Object);
+
+		// When moving the window edges in a direction
+		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
+
+		// Then nothing happens
+		workspaces[0].Verify(
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
+			Times.Never()
+		);
+		workspaces[1].Verify(
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
+			Times.Never()
+		);
+	}
+
+	[Fact]
+	public void MoveWindowEdgesInDirection_Success()
+	{
+		// Given
+		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+
+		Wrapper wrapper = new(workspaces);
+
+		Mock<IWindow> window = new();
+		workspaces[0].Setup(w => w.Windows).Returns(new[] { window.Object });
+		workspaces[0].Setup(w => w.LastFocusedWindow).Returns(window.Object);
+		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(wrapper.Monitors[0].Object);
+
+		wrapper.WorkspaceManager.Initialize();
+		wrapper.WorkspaceManager.WindowAdded(window.Object);
+
+		// When moving the window edges in a direction
+		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
+
+		// Then the window edges are moved
+		workspaces[0].Verify(
+			w => w.MoveWindowEdgesInDirection(Direction.Left, It.IsAny<IPoint<double>>(), window.Object),
+			Times.Once()
+		);
+		workspaces[1].Verify(
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
+			Times.Never()
+		);
+	}
 }
