@@ -8,7 +8,6 @@ on:
       - ".github/workflows/pull_request_labels.yml"
       - ".github/pull_request_template.md"
   pull_request:
-    branches: [main]
     paths-ignore:
       - ".github/ISSUE_TEMPLATE/*"
       - ".github/workflows/pull_request_labels.yml"
