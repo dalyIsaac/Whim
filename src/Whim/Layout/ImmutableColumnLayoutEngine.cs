@@ -46,23 +46,6 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 		_stack = stack;
 	}
 
-	/// <summary>
-	/// Gets the delta to determine whether we want to move towards 0 or not.
-	/// </summary>
-	/// <param name="leftToRight">Whether we are moving left to right or right to left.</param>
-	/// <param name="direction">The window direction to move.</param>
-	private static int GetDelta(bool leftToRight, Direction direction)
-	{
-		if (leftToRight)
-		{
-			return direction == Direction.Left ? -1 : 1;
-		}
-		else
-		{
-			return direction == Direction.Left ? 1 : -1;
-		}
-	}
-
 	/// <inheritdoc/>
 	public IImmutableLayoutEngine Add(IWindow window)
 	{
@@ -72,7 +55,7 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public ImmutableColumnLayoutEngine Remove(IWindow window)
+	public IImmutableLayoutEngine Remove(IWindow window)
 	{
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
@@ -236,4 +219,21 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 
 	/// <inheritdoc/>
 	public IImmutableLayoutEngine HidePhantomWindows() => this;
+
+	/// <summary>
+	/// Gets the delta to determine whether we want to move towards 0 or not.
+	/// </summary>
+	/// <param name="leftToRight">Whether we are moving left to right or right to left.</param>
+	/// <param name="direction">The window direction to move.</param>
+	private static int GetDelta(bool leftToRight, Direction direction)
+	{
+		if (leftToRight)
+		{
+			return direction == Direction.Left ? -1 : 1;
+		}
+		else
+		{
+			return direction == Direction.Left ? 1 : -1;
+		}
+	}
 }

@@ -20,6 +20,22 @@ public interface IImmutableLayoutEngine : IReadOnlyCollection<IWindow>
 	IImmutableLayoutEngine Add(IWindow window);
 
 	/// <summary>
+	/// REmoves a <paramref name="window"/> from the layout engine.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the remove.</returns>
+	IImmutableLayoutEngine Remove(IWindow window);
+
+	/// <summary>
+	/// Determines whether the layout engine contains the <paramref name="window"/>.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns>
+	/// True if the layout engine contains the <paramref name="window"/>, otherwise false.
+	/// </returns>
+	bool Contains(IWindow window);
+
+	/// <summary>
 	/// Performs a layout inside the available <paramref name="location"/>.
 	/// </summary>
 	/// <remarks>
