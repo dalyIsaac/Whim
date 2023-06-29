@@ -25,6 +25,15 @@ public interface IImmutableLayoutEngine
 	IImmutableLayoutEngine Add(IWindow window);
 
 	/// <summary>
+	/// Move the <paramref name="window"/> to the <paramref name="point"/>.
+	/// The point has a coordinate space of [0, 1] for both x and y.
+	/// </summary>
+	/// <param name="window">The window to move.</param>
+	/// <param name="point">The point to move the window to.</param>
+	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the move.</returns>
+	IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point);
+
+	/// <summary>
 	/// REmoves a <paramref name="window"/> from the layout engine.
 	/// </summary>
 	/// <param name="window"></param>
@@ -100,15 +109,6 @@ public interface IImmutableLayoutEngine
 	/// </summary>
 	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the hide.</returns>
 	IImmutableLayoutEngine HidePhantomWindows();
-
-	/// <summary>
-	/// Move the <paramref name="window"/> to the <paramref name="point"/>.
-	/// The point has a coordinate space of [0, 1] for both x and y.
-	/// </summary>
-	/// <param name="window">The window to move.</param>
-	/// <param name="point">The point to move the window to.</param>
-	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the move.</returns>
-	IImmutableLayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point);
 
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type

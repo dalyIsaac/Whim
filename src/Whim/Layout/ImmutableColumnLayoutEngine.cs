@@ -184,12 +184,12 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 		this;
 
 	/// <inheritdoc/>
-	public IImmutableLayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point)
+	public IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");
 
 		// Calculate the index of the window in the stack.
-		int idx = (int)Math.Round(point.X / _stack.Count, MidpointRounding.AwayFromZero);
+		int idx = (int)Math.Round(point.X * _stack.Count, MidpointRounding.AwayFromZero);
 
 		// Bound idx.
 		if (idx < 0)

@@ -74,8 +74,8 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	public virtual IImmutableLayoutEngine HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point) =>
-		InnerLayoutEngine.AddWindowAtPoint(window, point);
+	public virtual IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
+		InnerLayoutEngine.AddAtPoint(window, point);
 
 	/// <summary>
 	/// Checks to see if this <cref name="ILayoutEngine"/>

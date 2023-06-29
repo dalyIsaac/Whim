@@ -901,4 +901,103 @@ public class ImmutableColumnLayoutEngineTests
 		// Then
 		Assert.Same(engine, newEngine);
 	}
+
+	#region AddWindowAtPoint
+	[Fact]
+	public void AddWindowAtPoint_LessThan0()
+	{
+		// Given
+		Mock<IWindow> window = CreateMockWindow();
+
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(new Mock<IWindow>().Object);
+
+		// When
+		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = -0.1 });
+		List<IWindowState> windows = newEngine
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.ToList();
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.Equal(0, windows.FindIndex(w => w.Window == window.Object));
+	}
+
+	[Fact]
+	public void AddWindowAtPoint_GreaterThanAmountOfWindows()
+	{
+		// Given
+		Mock<IWindow> window = CreateMockWindow();
+
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(new Mock<IWindow>().Object);
+
+		// When
+		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 1.1 });
+		List<IWindowState> windows = newEngine
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.ToList();
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.Equal(1, windows.FindIndex(w => w.Window == window.Object));
+	}
+
+	[Fact]
+	public void AddWindowAtPoint_LeftToRight_Middle()
+	{
+		// Given
+		Mock<IWindow> window = CreateMockWindow();
+
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+			.Add(new Mock<IWindow>().Object)
+			.Add(new Mock<IWindow>().Object);
+
+		// When
+		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 0.5 });
+		List<IWindowState> windows = newEngine
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.ToList();
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.Equal(1, windows.FindIndex(w => w.Window == window.Object));
+	}
+
+	[Fact]
+	public void AddWindowAtPoint_RightToLeft_Middle()
+	{
+		// Given
+		Mock<IWindow> window = CreateMockWindow();
+
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+			.Add(new Mock<IWindow>().Object)
+			.Add(new Mock<IWindow>().Object);
+
+		// When
+		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 0.5 });
+		List<IWindowState> windows = newEngine
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.ToList();
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.Equal(1, windows.FindIndex(w => w.Window == window.Object));
+	}
+	#endregion
+
+	[Fact]
+	public void HidePhantomWindows()
+	{
+		// Given
+		Mock<IWindow> window = CreateMockWindow();
+
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+			.Add(window.Object)
+			.Add(new Mock<IWindow>().Object);
+
+		// When
+		IImmutableLayoutEngine newEngine = engine.HidePhantomWindows();
+
+		// Then
+		Assert.Same(engine, newEngine);
+	}
 }
