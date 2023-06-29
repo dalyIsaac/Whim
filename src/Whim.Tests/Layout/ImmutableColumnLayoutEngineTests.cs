@@ -161,6 +161,21 @@ public class ImmutableColumnLayoutEngineTests
 
 	#region DoLayout
 	[Fact]
+	public void DoLayout_Empty()
+	{
+		// Given
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine();
+
+		// When
+		IWindowState[] windowStates = engine
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.ToArray();
+
+		// Then
+		Assert.Empty(windowStates);
+	}
+
+	[Fact]
 	public void DoLayout_LeftToRight_SingleWindow()
 	{
 		// Given

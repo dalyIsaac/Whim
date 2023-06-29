@@ -78,10 +78,10 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 			yield break;
 		}
 
-		int x,
-			y,
-			width,
-			height;
+		int x;
+		int y;
+		int width;
+		int height;
 
 		if (LeftToRight)
 		{
@@ -163,7 +163,7 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 		}
 
 		// Find the index of the window in the stack.
-		int windowIndex = _stack.FindIndex(x => x.Handle == window?.Handle);
+		int windowIndex = _stack.FindIndex(x => x.Handle == window.Handle);
 		if (windowIndex == -1)
 		{
 			Logger.Error($"Window {window} not found in layout engine {Name}");
