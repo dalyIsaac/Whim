@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -59,9 +58,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	public virtual bool Contains(IWindow window) => InnerLayoutEngine.Contains(window);
 
 	/// <inheritdoc/>
-	public virtual IEnumerator<IWindow> GetEnumerator() => InnerLayoutEngine.GetEnumerator();
-
-	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+	public virtual IEnumerator<IWindow> GetWindows() => InnerLayoutEngine.GetWindows();
 
 	/// <inheritdoc/>
 	public virtual IImmutableLayoutEngine MoveWindowEdgesInDirection(

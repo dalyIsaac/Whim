@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -66,12 +65,10 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public IEnumerator<IWindow> GetEnumerator() => _stack.GetEnumerator();
-
-	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+	public IEnumerator<IWindow> GetWindows() => _stack.GetEnumerator();
 
 	/// <inheritdoc/>
-	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
+	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor _)
 	{
 		string direction = LeftToRight ? "left to right" : "right to left";
 		Logger.Debug($"Performing a column layout {direction}");

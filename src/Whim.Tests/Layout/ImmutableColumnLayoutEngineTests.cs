@@ -1,6 +1,5 @@
 using Moq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -144,31 +143,14 @@ public class ImmutableColumnLayoutEngineTests
 	}
 
 	[Fact]
-	public void GetEnumerator_Generic()
+	public void GetWindows()
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window.Object);
 
 		// When
-		IEnumerator<IWindow> enumerator = engine.GetEnumerator();
-
-		// Then
-		Assert.NotNull(enumerator);
-		Assert.True(enumerator.MoveNext());
-		Assert.Same(window.Object, enumerator.Current);
-		Assert.False(enumerator.MoveNext());
-	}
-
-	[Fact]
-	public void GetEnumerator_NonGeneric()
-	{
-		// Given
-		Mock<IWindow> window = CreateMockWindow();
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window.Object);
-
-		// When
-		IEnumerator enumerator = ((IEnumerable)engine).GetEnumerator();
+		IEnumerator<IWindow> enumerator = engine.GetWindows();
 
 		// Then
 		Assert.NotNull(enumerator);

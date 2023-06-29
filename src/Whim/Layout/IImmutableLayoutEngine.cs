@@ -5,12 +5,17 @@ namespace Whim;
 /// <summary>
 /// Layout engines dictate how windows are laid out.
 /// </summary>
-public interface IImmutableLayoutEngine : IReadOnlyCollection<IWindow>
+public interface IImmutableLayoutEngine
 {
 	/// <summary>
 	/// The name of the layout engine.
 	/// </summary>
 	string Name { get; }
+
+	/// <summary>
+	/// The number of windows in the layout engine.
+	/// </summary>
+	int Count { get; }
 
 	/// <summary>
 	/// Adds a <paramref name="window"/> to the layout engine.
@@ -34,6 +39,12 @@ public interface IImmutableLayoutEngine : IReadOnlyCollection<IWindow>
 	/// True if the layout engine contains the <paramref name="window"/>, otherwise false.
 	/// </returns>
 	bool Contains(IWindow window);
+
+	/// <summary>
+	/// Gets an <see cref="IEnumerator{T}"/> of the windows in the layout engine.
+	/// </summary>
+	/// <returns>An <see cref="IEnumerator{T}"/> of the windows in the layout engine.</returns>
+	IEnumerator<IWindow> GetWindows();
 
 	/// <summary>
 	/// Performs a layout inside the available <paramref name="location"/>.
