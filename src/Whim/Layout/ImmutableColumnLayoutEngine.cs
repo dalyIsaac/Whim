@@ -7,7 +7,7 @@ using System.Linq;
 namespace Whim;
 
 /// <summary>
-/// Abstract layout engine with a stack data structure.
+/// Column layout engine with a stack data structure.
 /// </summary>
 public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 {
@@ -17,12 +17,12 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	private readonly ImmutableList<IWindow> _stack;
 
 	/// <inheritdoc/>
-	public string Name { get; }
+	public string Name { get; init; } = "Column";
 
 	/// <summary>
-	/// Indicates the direction of the layout.
+	/// Indicates the direction of the layout. Defaults to <see langword="false"/>.
 	/// </summary>
-	public bool LeftToRight { get; }
+	public bool LeftToRight { get; init; } = true;
 
 	/// <inheritdoc/>
 	public int Count => _stack.Count;
@@ -30,12 +30,8 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	/// <summary>
 	/// Creates a new instance of the <see cref="ImmutableColumnLayoutEngine"/> class.
 	/// </summary>
-	/// <param name="name">The name of the layout engine.</param>
-	/// <param name="leftToRight">Indicates the direction of the layout.</param>
-	public ImmutableColumnLayoutEngine(string name = "Column", bool leftToRight = false)
+	public ImmutableColumnLayoutEngine()
 	{
-		Name = name;
-		LeftToRight = leftToRight;
 		_stack = ImmutableList<IWindow>.Empty;
 	}
 
@@ -50,7 +46,6 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	public IImmutableLayoutEngine Add(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
-
 		return new ImmutableColumnLayoutEngine(this, _stack.Add(window));
 	}
 
