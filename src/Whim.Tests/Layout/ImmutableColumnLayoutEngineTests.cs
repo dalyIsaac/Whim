@@ -880,4 +880,25 @@ public class ImmutableColumnLayoutEngineTests
 		Assert.Equal(0, windows[1].Location.X);
 	}
 	#endregion
+
+	[Fact]
+	public void MoveWindowEdgesInDirection()
+	{
+		// Given
+		Mock<IWindow> window = CreateMockWindow();
+
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+			.Add(window.Object)
+			.Add(new Mock<IWindow>().Object);
+
+		// When
+		IImmutableLayoutEngine newEngine = engine.MoveWindowEdgesInDirection(
+			Direction.Up,
+			new Point<double>() { X = 0.2 },
+			window.Object
+		);
+
+		// Then
+		Assert.Same(engine, newEngine);
+	}
 }
