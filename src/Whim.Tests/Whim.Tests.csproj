@@ -52,4 +52,8 @@
 		<ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+
 </Project>
