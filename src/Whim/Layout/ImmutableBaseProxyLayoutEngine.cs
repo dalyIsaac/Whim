@@ -41,6 +41,10 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	public virtual IImmutableLayoutEngine Add(IWindow window) => InnerLayoutEngine.Add(window);
 
 	/// <inheritdoc/>
+	public virtual IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
+		InnerLayoutEngine.AddAtPoint(window, point);
+
+	/// <inheritdoc/>
 	public virtual IImmutableLayoutEngine Remove(IWindow window) => InnerLayoutEngine.Remove(window);
 
 	/// <inheritdoc/>
@@ -58,9 +62,6 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	public virtual bool Contains(IWindow window) => InnerLayoutEngine.Contains(window);
 
 	/// <inheritdoc/>
-	public virtual IEnumerator<IWindow> GetWindows() => InnerLayoutEngine.GetWindows();
-
-	/// <inheritdoc/>
 	public virtual IImmutableLayoutEngine MoveWindowEdgesInDirection(
 		Direction edge,
 		IPoint<double> deltas,
@@ -72,10 +73,6 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 
 	/// <inheritdoc/>
 	public virtual IImmutableLayoutEngine HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
-
-	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
-		InnerLayoutEngine.AddAtPoint(window, point);
 
 	/// <summary>
 	/// Checks to see if this <cref name="ILayoutEngine"/>

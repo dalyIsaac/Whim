@@ -34,7 +34,7 @@ public interface IImmutableLayoutEngine
 	IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point);
 
 	/// <summary>
-	/// REmoves a <paramref name="window"/> from the layout engine.
+	/// Removes a <paramref name="window"/> from the layout engine.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the remove.</returns>
@@ -48,12 +48,6 @@ public interface IImmutableLayoutEngine
 	/// True if the layout engine contains the <paramref name="window"/>, otherwise false.
 	/// </returns>
 	bool Contains(IWindow window);
-
-	/// <summary>
-	/// Gets an <see cref="IEnumerator{T}"/> of the windows in the layout engine.
-	/// </summary>
-	/// <returns>An <see cref="IEnumerator{T}"/> of the windows in the layout engine.</returns>
-	IEnumerator<IWindow> GetWindows();
 
 	/// <summary>
 	/// Performs a layout inside the available <paramref name="location"/>.

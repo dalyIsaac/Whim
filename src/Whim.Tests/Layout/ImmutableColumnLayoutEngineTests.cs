@@ -142,23 +142,6 @@ public class ImmutableColumnLayoutEngineTests
 		Assert.False(contains);
 	}
 
-	[Fact]
-	public void GetWindows()
-	{
-		// Given
-		Mock<IWindow> window = CreateMockWindow();
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window.Object);
-
-		// When
-		IEnumerator<IWindow> enumerator = engine.GetWindows();
-
-		// Then
-		Assert.NotNull(enumerator);
-		Assert.True(enumerator.MoveNext());
-		Assert.Same(window.Object, enumerator.Current);
-		Assert.False(enumerator.MoveNext());
-	}
-
 	#region DoLayout
 	[Fact]
 	public void DoLayout_Empty()
