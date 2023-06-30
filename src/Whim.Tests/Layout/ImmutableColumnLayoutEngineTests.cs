@@ -912,7 +912,7 @@ public class ImmutableColumnLayoutEngineTests
 		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(new Mock<IWindow>().Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = -0.1 });
+		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = -10 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
@@ -931,7 +931,7 @@ public class ImmutableColumnLayoutEngineTests
 		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(new Mock<IWindow>().Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 1.1 });
+		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 10 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
