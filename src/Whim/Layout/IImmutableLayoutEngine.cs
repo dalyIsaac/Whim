@@ -105,7 +105,7 @@ public interface IImmutableLayoutEngine
 	IImmutableLayoutEngine HidePhantomWindows();
 
 	/// <summary>
-	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type
+	/// Checks to see if this <see cref="IImmutableLayoutEngine"/> or a child layout engine is type
 	/// <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">The type of layout engine to check for.</typeparam>
@@ -113,14 +113,14 @@ public interface IImmutableLayoutEngine
 	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
 	T? GetLayoutEngine<T>()
-		where T : ILayoutEngine
+		where T : IImmutableLayoutEngine
 	{
 		if (this is T layoutEngine)
 		{
 			return layoutEngine;
 		}
 
-		if (this is BaseProxyLayoutEngine proxy)
+		if (this is ImmutableBaseProxyLayoutEngine proxy)
 		{
 			return proxy.GetLayoutEngine<T>();
 		}
@@ -129,21 +129,21 @@ public interface IImmutableLayoutEngine
 	}
 
 	/// <summary>
-	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is
+	/// Checks to see if this <see cref="IImmutableLayoutEngine"/> or a child layout engine is
 	/// <paramref name="layoutEngine"/>.
 	/// </summary>
 	/// <param name="layoutEngine">The layout engine to check for.</param>
 	/// <returns>
 	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
 	/// </returns>
-	bool ContainsEqual(ILayoutEngine layoutEngine)
+	bool ContainsEqual(IImmutableLayoutEngine layoutEngine)
 	{
 		if (this == layoutEngine)
 		{
 			return true;
 		}
 
-		if (this is BaseProxyLayoutEngine proxy)
+		if (this is ImmutableBaseProxyLayoutEngine proxy)
 		{
 			return proxy.ContainsEqual(layoutEngine);
 		}

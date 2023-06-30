@@ -7,7 +7,7 @@ namespace Whim;
 /// The wrapper layout engine provides additional functionality, but still utilises the underlying
 /// layout engine.
 /// </summary>
-public delegate IImmutableLayoutEngine ImmutableProxyLayoutEngine(ILayoutEngine engine);
+public delegate IImmutableLayoutEngine ImmutableProxyLayoutEngine(IImmutableLayoutEngine engine);
 
 /// <summary>
 /// Abstract layout engine, which proxy layout engines should inherit from.
@@ -75,7 +75,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	public virtual IImmutableLayoutEngine HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
 
 	/// <summary>
-	/// Checks to see if this <cref name="ILayoutEngine"/>
+	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">The type of layout engine to check for.</typeparam>
@@ -83,7 +83,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
 	public T? GetLayoutEngine<T>()
-		where T : ILayoutEngine
+		where T : IImmutableLayoutEngine
 	{
 		if (this is T t)
 		{
@@ -99,14 +99,14 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <summary>
-	/// Checks to see if this <cref name="ILayoutEngine"/>
+	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>
 	/// or a child layout engine is equal to <paramref name="layoutEngine"/>.
 	/// </summary>
 	/// <param name="layoutEngine">The layout engine to check for.</param>
 	/// <returns>
 	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
 	/// </returns>
-	public bool ContainsEqual(ILayoutEngine layoutEngine)
+	public bool ContainsEqual(IImmutableLayoutEngine layoutEngine)
 	{
 		if (this == layoutEngine)
 		{

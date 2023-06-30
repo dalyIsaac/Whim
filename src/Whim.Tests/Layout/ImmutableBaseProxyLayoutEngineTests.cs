@@ -16,6 +16,8 @@ public class ImmutableBaseProxyLayoutEngineTests
 			InnerLayoutEngine.DoLayout(location, monitor);
 	}
 
+	internal interface ITestLayoutEngine : IImmutableLayoutEngine { }
+
 	[Fact]
 	public void Name()
 	{
@@ -236,4 +238,96 @@ public class ImmutableBaseProxyLayoutEngineTests
 		Assert.NotSame(proxyLayoutEngine, newEngine);
 		innerLayoutEngine.Verify(x => x.AddAtPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<double>>()), Times.Once);
 	}
+
+	#region GetLayoutEngine
+	[Fact]
+	public void GetLayoutEngine_IsT()
+	{
+		// Given
+		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
+
+		// When
+		ProxyLayoutEngine? newEngine = proxyLayoutEngine.GetLayoutEngine<ProxyLayoutEngine>();
+
+		// Then
+		Assert.Same(proxyLayoutEngine, newEngine);
+	}
+
+	[Fact]
+	public void GetLayoutEngine_IsInner()
+	{
+		// Given
+		Mock<ITestLayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(x => x.GetLayoutEngine<ITestLayoutEngine>()).Returns(innerLayoutEngine.Object);
+		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
+
+		// When
+		ITestLayoutEngine? newEngine = proxyLayoutEngine.GetLayoutEngine<ITestLayoutEngine>();
+
+		// Then
+		Assert.Same(innerLayoutEngine.Object, newEngine);
+		innerLayoutEngine.Verify(x => x.GetLayoutEngine<ITestLayoutEngine>(), Times.Once);
+	}
+
+	[Fact]
+	public void GetLayoutEngine_Null()
+	{
+		// Given
+		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
+
+		// When
+		ITestLayoutEngine? newEngine = proxyLayoutEngine.GetLayoutEngine<ITestLayoutEngine>();
+
+		// Then
+		Assert.Null(newEngine);
+	}
+	#endregion
+
+	#region ContainsEqual
+	[Fact]
+	public void ContainsEqual_IsT()
+	{
+		// Given
+		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
+
+		// When
+		bool contains = proxyLayoutEngine.ContainsEqual(proxyLayoutEngine);
+
+		// Then
+		Assert.True(contains);
+	}
+
+	[Fact]
+	public void ContainsEqual_IsInner()
+	{
+		// Given
+		Mock<ITestLayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(x => x.ContainsEqual(innerLayoutEngine.Object)).Returns(true);
+		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
+
+		// When
+		bool contains = proxyLayoutEngine.ContainsEqual(innerLayoutEngine.Object);
+
+		// Then
+		Assert.True(contains);
+		innerLayoutEngine.Verify(x => x.ContainsEqual(innerLayoutEngine.Object), Times.Once);
+	}
+
+	[Fact]
+	public void ContainsEqual_False()
+	{
+		// Given
+		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
+
+		// When
+		bool contains = proxyLayoutEngine.ContainsEqual(new Mock<IImmutableLayoutEngine>().Object);
+
+		// Then
+		Assert.False(contains);
+	}
+	#endregion
 }
