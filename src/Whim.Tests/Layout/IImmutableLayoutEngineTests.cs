@@ -72,10 +72,11 @@ public class IImmutableLayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		ProxyLayoutEngine proxy = new(engine);
+		IImmutableLayoutEngine proxyInner = new ProxyLayoutEngine(engine);
+		IImmutableLayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
 
 		// When
-		TestLayoutEngine? newEngine = proxy.GetLayoutEngine<TestLayoutEngine>();
+		TestLayoutEngine? newEngine = proxyOuter.GetLayoutEngine<TestLayoutEngine>();
 
 		// Then
 		Assert.Same(engine, newEngine);
@@ -115,10 +116,11 @@ public class IImmutableLayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		ProxyLayoutEngine proxy = new(engine);
+		IImmutableLayoutEngine proxyInner = new ProxyLayoutEngine(engine);
+		IImmutableLayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
 
 		// When
-		bool contains = proxy.ContainsEqual(engine);
+		bool contains = proxyOuter.ContainsEqual(engine);
 
 		// Then
 		Assert.True(contains);

@@ -113,20 +113,7 @@ public interface IImmutableLayoutEngine
 	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
 	T? GetLayoutEngine<T>()
-		where T : IImmutableLayoutEngine
-	{
-		if (this is T layoutEngine)
-		{
-			return layoutEngine;
-		}
-
-		if (this is ImmutableBaseProxyLayoutEngine proxy)
-		{
-			return proxy.GetLayoutEngine<T>();
-		}
-
-		return default;
-	}
+		where T : IImmutableLayoutEngine => this is T layoutEngine ? layoutEngine : default;
 
 	/// <summary>
 	/// Checks to see if this <see cref="IImmutableLayoutEngine"/> or a child layout engine is
@@ -136,18 +123,5 @@ public interface IImmutableLayoutEngine
 	/// <returns>
 	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
 	/// </returns>
-	bool ContainsEqual(IImmutableLayoutEngine layoutEngine)
-	{
-		if (this == layoutEngine)
-		{
-			return true;
-		}
-
-		if (this is ImmutableBaseProxyLayoutEngine proxy)
-		{
-			return proxy.ContainsEqual(layoutEngine);
-		}
-
-		return false;
-	}
+	bool ContainsEqual(IImmutableLayoutEngine layoutEngine) => this == layoutEngine;
 }

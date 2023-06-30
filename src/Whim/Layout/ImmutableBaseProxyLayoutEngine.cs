@@ -90,12 +90,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 			return t;
 		}
 
-		if (InnerLayoutEngine != null)
-		{
-			return InnerLayoutEngine.GetLayoutEngine<T>();
-		}
-
-		return default;
+		return InnerLayoutEngine.GetLayoutEngine<T>();
 	}
 
 	/// <summary>
@@ -113,11 +108,6 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 			return true;
 		}
 
-		if (InnerLayoutEngine != null)
-		{
-			return InnerLayoutEngine.ContainsEqual(layoutEngine);
-		}
-
-		return false;
+		return InnerLayoutEngine.ContainsEqual(layoutEngine);
 	}
 }
