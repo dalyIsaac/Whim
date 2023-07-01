@@ -119,4 +119,36 @@ public class ImmutableGapsLayoutEngineTests
 		// Then
 		windowStates.Should().BeEquivalentTo(expectedWindowStates);
 	}
+
+	[Fact]
+	public void Update_Same()
+	{
+		// Given
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine();
+		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+
+		// When
+		IImmutableLayoutEngine newEngine = gapsLayoutEngine.Remove(new Mock<IWindow>().Object);
+
+		// Then
+		Assert.Same(newEngine, gapsLayoutEngine);
+		Assert.IsType<ImmutableGapsLayoutEngine>(newEngine);
+	}
+
+	[Fact]
+	public void Update_Different()
+	{
+		// Given
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine();
+		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+
+		// When
+		IImmutableLayoutEngine newEngine = gapsLayoutEngine.Add(new Mock<IWindow>().Object);
+
+		// Then
+		Assert.NotSame(newEngine, gapsLayoutEngine);
+		Assert.IsType<ImmutableGapsLayoutEngine>(newEngine);
+	}
 }
