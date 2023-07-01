@@ -74,7 +74,7 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 
 		if (_plugin.FloatingWindows.TryGetValue(window, out IWorkspace? workspace))
 		{
-			workspace?.RemoveWindow(window);
+			workspace.RemoveWindow(window);
 			return UpdateWindowLocation(window, null);
 		}
 
@@ -84,58 +84,35 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	private ImmutableFloatingLayoutEngine UpdateWindowLocation(IWindow window, ILocation<double>? oldLocation)
 	{
 		// Since the window is floating, we update the location, and return.
-		ILocation<double>? location = GetUnitLocation(window);
-		if (location == null)
+		ILocation<int>? newActualLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
+		if (newActualLocation == null)
 		{
 			Logger.Error($"Could not obtain location for floating window {window}");
 			return this;
 		}
 
-		if (location.Equals(oldLocation))
+		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualLocation);
+		ILocation<double> newUnitSquareLocation = newMonitor.WorkingArea.ToUnitSquare(newActualLocation);
+		if (newUnitSquareLocation.Equals(oldLocation))
 		{
 			Logger.Debug($"Location for window {window} has not changed");
 			return this;
 		}
 
-		if (_workspace is null)
-		{
-			// Get the workspace which contains the window layout engine.
-			ILocation<int>? actualLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
-			if (actualLocation == null)
-			{
-				Logger.Error($"Could not obtain location for floating window {window}");
-				return this;
-			}
-
-			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(actualLocation);
-			if (monitor == null)
-			{
-				Logger.Error($"Could not obtain monitor for floating window {window}");
-				return this;
-			}
-
-			_workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
-		}
+		// Get the workspace which contains the window layout engine.
+		_workspace ??= _context.WorkspaceManager.GetWorkspaceForMonitor(newMonitor);
 
 		// Tell the plugin
 		if (_plugin is IInternalFloatingLayoutPlugin internalPlugin && _workspace is not null)
 		{
 			internalPlugin.MutableFloatingWindows[window] = _workspace;
+			return new ImmutableFloatingLayoutEngine(
+				this,
+				_floatingWindowLocations.SetItem(window, newUnitSquareLocation)
+			);
 		}
 
-		return new ImmutableFloatingLayoutEngine(this, _floatingWindowLocations.SetItem(window, location));
-	}
-
-	private ILocation<double>? GetUnitLocation(IWindow window)
-	{
-		ILocation<int>? location = _context.NativeManager.DwmGetWindowLocation(window.Handle);
-		if (location == null)
-		{
-			return null;
-		}
-
-		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(location);
-		return monitor.WorkingArea.ToUnitSquare(location);
+		return this;
 	}
 
 	/// <inheritdoc />
