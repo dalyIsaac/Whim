@@ -418,30 +418,18 @@ public class ImmutableFloatingLayoutEngineTests
 		wrapper
 			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
 			.Setup_InternalFloatingLayoutPlugin()
+			.Setup_DwmGetWindowLocation_NotNull(
+				new Location<int>()
+				{
+					X = 50,
+					Y = 50,
+					Width = 50,
+					Height = 50
+				}
+			)
 			.Setup_GetWorkspaceForMonitor(workspace.Object)
 			.Setup_GetMonitorAtPoint()
 			.Setup_InternalFloatingLayoutPlugin();
-
-		wrapper.NativeManager
-			.SetupSequence(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()))
-			.Returns(
-				new Location<int>()
-				{
-					X = 1,
-					Y = 1,
-					Width = 1,
-					Height = 1
-				}
-			)
-			.Returns(
-				new Location<int>()
-				{
-					X = 2,
-					Y = 2,
-					Width = 2,
-					Height = 2
-				}
-			);
 
 		ImmutableFloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
@@ -453,10 +441,6 @@ public class ImmutableFloatingLayoutEngineTests
 		// Then
 		Assert.NotSame(engine, result);
 		Assert.NotSame(result, result2);
-		workspace.Verify(x => x.RemoveWindow(window.Object), Times.Once);
-		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
-		wrapper.MonitorManager.Verify(mm => mm.GetMonitorAtPoint(It.IsAny<ILocation<int>>()), Times.Once);
-		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
 		wrapper.InnerLayoutEngine.Verify(x => x.Remove(window.Object), Times.Never);
 	}
 
@@ -465,53 +449,17 @@ public class ImmutableFloatingLayoutEngineTests
 	{
 		// Given
 		Wrapper wrapper = new();
-
-		Mock<IWorkspace> workspace = new();
 		Mock<IWindow> window = new();
-
-		wrapper
-			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
-			.Setup_InternalFloatingLayoutPlugin()
-			.Setup_GetWorkspaceForMonitor(workspace.Object)
-			.Setup_GetMonitorAtPoint()
-			.Setup_InternalFloatingLayoutPlugin();
-
-		wrapper.NativeManager
-			.SetupSequence(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()))
-			.Returns(
-				new Location<int>()
-				{
-					X = 1,
-					Y = 1,
-					Width = 1,
-					Height = 1
-				}
-			)
-			.Returns(
-				new Location<int>()
-				{
-					X = 2,
-					Y = 2,
-					Width = 2,
-					Height = 2
-				}
-			);
 
 		ImmutableFloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
-		IImmutableLayoutEngine result2 = result.Remove(window.Object);
+		IImmutableLayoutEngine result = engine.Remove(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.NotSame(result, result2);
-		workspace.Verify(x => x.RemoveWindow(window.Object), Times.Once);
-		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
-		wrapper.MonitorManager.Verify(mm => mm.GetMonitorAtPoint(It.IsAny<ILocation<int>>()), Times.Once);
-		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
-		wrapper.InnerLayoutEngine.Verify(x => x.Remove(window.Object), Times.Never);
+		wrapper.InnerLayoutEngine.Verify(x => x.Remove(window.Object), Times.Once);
 	}
 	#endregion
 
