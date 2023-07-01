@@ -1,16 +1,23 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
-public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayoutPlugin, IDisposable
 {
 	private readonly IContext _context;
 	private bool disposedValue;
 
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
+
+	/// <inheritdoc />
+	public IDictionary<IWindow, IWorkspace> MutableFloatingWindows { get; } = new Dictionary<IWindow, IWorkspace>();
+
+	/// <inheritdoc />
+	public IReadOnlyDictionary<IWindow, IWorkspace> FloatingWindows => MutableFloatingWindows.AsReadOnly();
 
 	/// <summary>
 	/// Creates a new instance of the floating layout plugin.
@@ -108,6 +115,8 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
 		}
 
 		floatingLayoutEngine.ToggleWindowFloating(window);
+
+		// TODO: Use the internal state of the plugin.
 		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
