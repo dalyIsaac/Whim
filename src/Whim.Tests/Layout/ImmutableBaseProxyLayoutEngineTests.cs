@@ -12,6 +12,9 @@ public class ImmutableBaseProxyLayoutEngineTests
 		public ProxyLayoutEngine(IImmutableLayoutEngine innerLayoutEngine)
 			: base(innerLayoutEngine) { }
 
+		protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+			newLayoutEngine == InnerLayoutEngine ? this : new ProxyLayoutEngine(newLayoutEngine);
+
 		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
 			InnerLayoutEngine.DoLayout(location, monitor);
 	}
@@ -64,6 +67,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
+		Assert.IsType<ProxyLayoutEngine>(newEngine);
 		innerLayoutEngine.Verify(x => x.Add(It.IsAny<IWindow>()), Times.Once);
 	}
 
@@ -81,6 +85,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
+		Assert.IsType<ProxyLayoutEngine>(newEngine);
 		innerLayoutEngine.Verify(x => x.Remove(It.IsAny<IWindow>()), Times.Once);
 	}
 
@@ -134,6 +139,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
+		Assert.IsType<ProxyLayoutEngine>(newEngine);
 		innerLayoutEngine.Verify(x => x.SwapWindowInDirection(It.IsAny<Direction>(), It.IsAny<IWindow>()), Times.Once);
 	}
 
@@ -174,6 +180,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
+		Assert.IsType<ProxyLayoutEngine>(newEngine);
 		innerLayoutEngine.Verify(
 			x => x.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow>()),
 			Times.Once
@@ -216,6 +223,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
+		Assert.IsType<ProxyLayoutEngine>(newEngine);
 		innerLayoutEngine.Verify(x => x.HidePhantomWindows(), Times.Once);
 	}
 
@@ -236,6 +244,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
+		Assert.IsType<ProxyLayoutEngine>(newEngine);
 		innerLayoutEngine.Verify(x => x.AddAtPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<double>>()), Times.Once);
 	}
 
@@ -252,6 +261,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 
 		// Then
 		Assert.Same(proxyLayoutEngine, newEngine);
+		Assert.IsType<ProxyLayoutEngine>(newEngine);
 	}
 
 	[Fact]

@@ -21,6 +21,10 @@ public class ImmutableGapsLayoutEngine : ImmutableBaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
+	protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+		newLayoutEngine == InnerLayoutEngine ? this : new ImmutableGapsLayoutEngine(_gapsConfig, newLayoutEngine);
+
+	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
 		double scaleFactor = monitor.ScaleFactor;
