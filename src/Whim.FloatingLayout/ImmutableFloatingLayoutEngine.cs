@@ -116,6 +116,20 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
+	public override IImmutableLayoutEngine Remove(IWindow window)
+	{
+		// If tracked by this layout engine, remove it.
+		// Otherwise, pass to the inner layout engine.
+
+		if (_floatingWindowLocations.ContainsKey(window))
+		{
+			return new ImmutableFloatingLayoutEngine(this, _floatingWindowLocations.Remove(window));
+		}
+
+		return base.Remove(window);
+	}
+
+	/// <inheritdoc />
 	public override IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) => Add(window);
 
 	/// <inheritdoc />
