@@ -77,10 +77,10 @@ public class ImmutableFloatingLayoutEngineTests
 				.Returns(
 					new Location<int>()
 					{
-						X = 1,
-						Y = 1,
-						Width = 1,
-						Height = 1
+						X = 100,
+						Y = 100,
+						Width = 100,
+						Height = 100
 					}
 				);
 
@@ -350,6 +350,58 @@ public class ImmutableFloatingLayoutEngineTests
 		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Never);
 		wrapper.InnerLayoutEngine.Verify(x => x.Add(window.Object), Times.Once);
 	}
-
 	#endregion
+
+	[Fact]
+	public void DoLayout()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		Mock<IWorkspace> workspace = new();
+		Mock<IWindow> window = new();
+		Mock<IWindow> window2 = new();
+
+		wrapper
+			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
+			.Setup_InternalFloatingLayoutPlugin()
+			.Setup_DwmGetWindowLocation_NotNull(
+				new Location<int>()
+				{
+					X = 50,
+					Y = 50,
+					Width = 50,
+					Height = 50
+				}
+			)
+			.Setup_GetMonitorAtPoint()
+			.Setup_GetWorkspaceForMonitor(workspace.Object);
+
+		ImmutableFloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, new ImmutableColumnLayoutEngine());
+
+		// When
+		IImmutableLayoutEngine result = engine.Add(window.Object);
+		IImmutableLayoutEngine result2 = result.Add(window2.Object);
+		IWindowState[] states = result2
+			.DoLayout(new Location<int>() { Width = 100, Height = 100 }, new Mock<IMonitor>().Object)
+			.ToArray();
+
+		// Then
+		Assert.NotSame(engine, result);
+		Assert.NotSame(result, result2);
+		Assert.Equal(2, states.Length);
+
+		Assert.Equal(
+			new Location<int>()
+			{
+				X = 50,
+				Y = 50,
+				Width = 50,
+				Height = 50
+			},
+			states[0].Location
+		);
+		Assert.Equal(new Location<int>() { Width = 100, Height = 100 }, states[1].Location);
+	}
 }
