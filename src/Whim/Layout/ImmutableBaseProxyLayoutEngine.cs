@@ -31,8 +31,10 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	/// <summary>
 	/// Updates the layout engine with the new proxied layout engine.
 	/// </summary>
-	/// <param name="innerLayoutEngine"></param>
-	/// <returns></returns>
+	/// <param name="newLayoutEngine"></param>
+	/// <returns>
+	/// The proxy layout engine with the new proxied layout engine, if the new layout engine is different.
+	/// </returns>
 	/// <example>
 	/// <code>
 	/// public override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
@@ -41,7 +43,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	/// 		: new MyProxyLayoutEngine(newLayoutEngine);
 	/// </code>
 	/// </example>
-	protected abstract IImmutableLayoutEngine Update(IImmutableLayoutEngine innerLayoutEngine);
+	protected abstract IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine);
 
 	/// <summary>
 	/// The name is only really important for the user, so we can use the name of the proxied layout engine.
