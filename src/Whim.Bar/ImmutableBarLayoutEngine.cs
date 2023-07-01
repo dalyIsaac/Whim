@@ -21,6 +21,10 @@ public class ImmutableBarLayoutEngine : ImmutableBaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
+	protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+		newLayoutEngine == InnerLayoutEngine ? this : new ImmutableBarLayoutEngine(_barConfig, newLayoutEngine);
+
+	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
 		double scale = monitor.ScaleFactor / 100.0;

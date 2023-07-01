@@ -29,6 +29,21 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <summary>
+	/// Updates the layout engine with the new proxied layout engine.
+	/// </summary>
+	/// <param name="innerLayoutEngine"></param>
+	/// <returns></returns>
+	/// <example>
+	/// <code>
+	/// public override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+	/// 	newLayoutEngine == InnerLayoutEngine
+	/// 		? this
+	/// 		: new MyProxyLayoutEngine(newLayoutEngine);
+	/// </code>
+	/// </example>
+	protected abstract IImmutableLayoutEngine Update(IImmutableLayoutEngine innerLayoutEngine);
+
+	/// <summary>
 	/// The name is only really important for the user, so we can use the name of the proxied layout engine.
 	/// </summary>
 	/// <inheritdoc/>
@@ -38,14 +53,14 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	public virtual int Count => InnerLayoutEngine.Count;
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine Add(IWindow window) => InnerLayoutEngine.Add(window);
+	public virtual IImmutableLayoutEngine Add(IWindow window) => Update(InnerLayoutEngine.Add(window));
 
 	/// <inheritdoc/>
 	public virtual IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
-		InnerLayoutEngine.AddAtPoint(window, point);
+		Update(InnerLayoutEngine.AddAtPoint(window, point));
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine Remove(IWindow window) => InnerLayoutEngine.Remove(window);
+	public virtual IImmutableLayoutEngine Remove(IWindow window) => Update(InnerLayoutEngine.Remove(window));
 
 	/// <inheritdoc/>
 	public virtual IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
@@ -56,7 +71,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 
 	/// <inheritdoc/>
 	public virtual IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
-		InnerLayoutEngine.SwapWindowInDirection(direction, window);
+		Update(InnerLayoutEngine.SwapWindowInDirection(direction, window));
 
 	/// <inheritdoc/>
 	public virtual bool Contains(IWindow window) => InnerLayoutEngine.Contains(window);
@@ -66,13 +81,13 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 		Direction edge,
 		IPoint<double> deltas,
 		IWindow window
-	) => InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window);
+	) => Update(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
 
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
+	public virtual IImmutableLayoutEngine HidePhantomWindows() => Update(InnerLayoutEngine.HidePhantomWindows());
 
 	/// <summary>
 	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>

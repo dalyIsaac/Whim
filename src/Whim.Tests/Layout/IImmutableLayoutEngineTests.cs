@@ -11,6 +11,9 @@ public class IImmutableLayoutEngineTests
 		public ProxyLayoutEngine(IImmutableLayoutEngine innerLayoutEngine)
 			: base(innerLayoutEngine) { }
 
+		protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+			newLayoutEngine == InnerLayoutEngine ? this : new ProxyLayoutEngine(newLayoutEngine);
+
 		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
 			InnerLayoutEngine.DoLayout(location, monitor);
 	}
