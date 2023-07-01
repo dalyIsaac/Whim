@@ -96,13 +96,6 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 		}
 
 		floatingLayoutEngine.MarkWindowAsDocked(window);
-
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
-		if (window != null)
-		{
-			MutableFloatingWindows.Remove(window);
-		}
-
 		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
 	}
 
