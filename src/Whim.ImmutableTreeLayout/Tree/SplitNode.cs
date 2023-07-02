@@ -299,7 +299,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		ImmutableList<double> weights = EqualWeight ? DistributeWeights() : _weights;
 		weights = weights.SetItem(idx, weights[idx] + delta);
 
-		return new SplitNode(EqualWeight, IsHorizontal, _children, weights);
+		return new SplitNode(false, IsHorizontal, _children, weights);
 	}
 
 	/// <summary>
