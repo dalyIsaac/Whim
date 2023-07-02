@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -162,6 +163,125 @@ public class SplitNodeTests
 		Assert.Equal((0.5, focusedNode), children[0]);
 		Assert.Equal((0.25, newNode), children[1]);
 		Assert.Equal((0.25, otherNode), children[2]);
+	}
+
+	[Fact]
+	public void Add_InvalidDirection()
+	{
+		// Given
+		WindowNode focusedNode = CreateWindowNode();
+		SplitNode splitNode = new(focusedNode, CreateWindowNode(), Direction.Right);
+		WindowNode newNode = CreateWindowNode();
+
+		// When
+		SplitNode result = splitNode.Add(focusedNode, newNode, Direction.Up);
+		(double, Node)[] children = result.ToArray();
+
+		// Then
+		double aThird = 1d / 3;
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(3, result.Count);
+		Assert.Equal((aThird, newNode), children[0]);
+		Assert.Equal((aThird, focusedNode), children[1]);
+	}
+	#endregion
+
+	#region Remove
+	[Fact]
+	public void Remove_CouldNotFindWindow()
+	{
+		// Given
+		WindowNode focusedNode = CreateWindowNode();
+		SplitNode splitNode = new(focusedNode, CreateWindowNode(), Direction.Right);
+		WindowNode otherNode = CreateWindowNode();
+
+		// When
+		SplitNode result = splitNode.Remove(otherNode);
+
+		// Then
+		Assert.Same(splitNode, result);
+		Assert.Equal(2, splitNode.Count);
+	}
+
+	[Fact]
+	public void Remove_EqualWeight()
+	{
+		// Given
+		WindowNode focusedNode = CreateWindowNode();
+		WindowNode otherNode = CreateWindowNode();
+		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
+
+		// When
+		SplitNode result = splitNode.Remove(otherNode);
+		(double, Node)[] children = result.ToArray();
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(1, result.Count);
+		Assert.Equal((1d, focusedNode), children[0]);
+	}
+
+	[Fact]
+	public void Remove_NotEqualWeight()
+	{
+		// Given
+		WindowNode focusedNode = CreateWindowNode();
+		WindowNode otherNode = CreateWindowNode();
+		WindowNode newNode = CreateWindowNode();
+
+		SplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
+			.ToggleEqualWeight()
+			.Add(otherNode, newNode, Direction.Right);
+
+		// When
+		SplitNode result = splitNode.Remove(focusedNode);
+		(double, Node)[] children = result.ToArray();
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(2, result.Count);
+		Assert.Equal((0.25, otherNode), children[0]);
+		Assert.Equal((0.75, newNode), children[1]);
+	}
+	#endregion
+
+	#region Replace
+	[Fact]
+	public void Replace_CouldNotFindOldNode()
+	{
+		// Given
+		WindowNode focusedNode = CreateWindowNode();
+		WindowNode newNode = CreateWindowNode();
+		WindowNode oldNode = CreateWindowNode();
+
+		SplitNode splitNode = new(focusedNode, CreateWindowNode(), Direction.Right);
+
+		// When
+		SplitNode result = splitNode.Replace(oldNode, newNode);
+
+		// Then
+		Assert.Same(splitNode, result);
+	}
+
+	[Fact]
+	public void Replace_Success()
+	{
+		// Given
+		WindowNode focusedNode = CreateWindowNode();
+		WindowNode newNode = CreateWindowNode();
+		WindowNode oldNode = CreateWindowNode();
+
+		SplitNode splitNode = new(focusedNode, oldNode, Direction.Right);
+
+		// When
+		SplitNode result = splitNode.Replace(oldNode, newNode);
+		(double, Node)[] children = result.ToArray();
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(2, result.Count);
+		Assert.Equal((0.5, focusedNode), children[0]);
+		Assert.Equal((0.5, newNode), children[1]);
 	}
 	#endregion
 }
