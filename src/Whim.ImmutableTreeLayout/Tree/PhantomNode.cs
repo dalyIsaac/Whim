@@ -18,7 +18,7 @@ internal class PhantomNode : LeafNode
 	/// <param name="context"></param>
 	/// <param name="windowModel"></param>
 	/// <param name="phantomWindow"></param>
-	protected PhantomNode(IContext context, IWindow windowModel, Microsoft.UI.Xaml.Window? phantomWindow)
+	private PhantomNode(IContext context, IWindow windowModel, Microsoft.UI.Xaml.Window? phantomWindow)
 		: base(windowModel)
 	{
 		_context = context;

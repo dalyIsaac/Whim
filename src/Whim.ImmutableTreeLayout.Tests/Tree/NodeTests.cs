@@ -1,7 +1,7 @@
 using Moq;
 using Xunit;
 
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.ImmutableTreeLayout.Tests;
 
 public class NodeTests
 {

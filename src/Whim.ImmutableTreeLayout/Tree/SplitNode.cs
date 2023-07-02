@@ -78,6 +78,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		_children = children.ToImmutable();
 		_weights = weights.ToImmutable();
 		IsHorizontal = direction.IsHorizontal();
+		EqualWeight = true;
 	}
 
 	/// <summary>
@@ -365,6 +366,17 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		Logger.Verbose($"Flipping {this}");
 
 		return new SplitNode(EqualWeight, !IsHorizontal, _children, _weights);
+	}
+
+	/// <summary>
+	/// Toggles the <see cref="EqualWeight"/> property of this <see cref="SplitNode"/>.
+	/// </summary>
+	/// <returns></returns>
+	public SplitNode ToggleEqualWeight()
+	{
+		Logger.Verbose($"Toggling EqualWeight of {this}");
+
+		return new SplitNode(!EqualWeight, IsHorizontal, _children, _weights);
 	}
 
 	/// <summary>
