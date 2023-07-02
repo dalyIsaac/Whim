@@ -303,6 +303,13 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
+	/// Gets the weight of the node at the given index.
+	/// </summary>
+	/// <param name="idx"></param>
+	/// <returns></returns>
+	private double GetChildWeight(int idx) => EqualWeight ? 1d / _children.Count : _weights[idx];
+
+	/// <summary>
 	/// Get the weight of the given <paramref name="node"/>.
 	/// The <paramref name="node"/> must be a child of this <see cref="SplitNode"/>.
 	/// </summary>
@@ -317,7 +324,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return null;
 		}
 
-		return EqualWeight ? 1d / _children.Count : _weights[idx];
+		return GetChildWeight(idx);
 	}
 
 	/// <summary>
@@ -395,11 +402,19 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		ImmutableList<Node> children = _children.RemoveAt(idx);
 		children = children.InsertRange(idx, child._children);
 
-		double childWeight = GetChildWeight(child) ?? 1d;
+		double childWeight = GetChildWeight(idx);
 		ImmutableList<double> weights = _weights.RemoveAt(idx);
-		weights.InsertRange(idx, child.Select(c => c.Weight * childWeight));
+		if (child.EqualWeight)
+		{
+			double grandchildrenWeight = childWeight / child._children.Count;
+			weights = weights.InsertRange(idx, Enumerable.Repeat(grandchildrenWeight, child._children.Count));
+		}
+		else
+		{
+			weights = weights.InsertRange(idx, child._weights.Select(w => w * childWeight));
+		}
 
-		return new SplitNode(EqualWeight, IsHorizontal, children, weights);
+		return new SplitNode(false, IsHorizontal, children, weights);
 	}
 
 	/// <summary>

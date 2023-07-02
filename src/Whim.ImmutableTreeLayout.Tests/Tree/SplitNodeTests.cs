@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Moq;
+using System.Collections;
 using Xunit;
 
 namespace Whim.ImmutableTreeLayout.Tests;
@@ -400,4 +400,102 @@ public class SplitNodeTests
 		Assert.Equal((0.35, newNode), children[2]);
 	}
 	#endregion
+
+	#region MergeChild
+	[Fact]
+	public void MergeChild_CouldNotFindNode()
+	{
+		// Given
+		WindowNode focusedNode = CreateWindowNode();
+		WindowNode otherNode = CreateWindowNode();
+
+		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
+
+		// When
+		SplitNode result = splitNode.MergeChild(splitNode);
+
+		// Then
+		Assert.Same(splitNode, result);
+	}
+
+	[Fact]
+	public void MergeChild_Success_ChildIsEqualWeight()
+	{
+		// Given
+		WindowNode node1 = CreateWindowNode();
+		WindowNode node2 = CreateWindowNode();
+
+		SplitNode childSplitNode = new(node1, node2, Direction.Down);
+
+		WindowNode node3 = CreateWindowNode();
+		SplitNode splitNode = new(childSplitNode, node3, Direction.Right);
+
+		// When
+		SplitNode result = splitNode.MergeChild(childSplitNode);
+		(double, Node)[] children = result.ToArray();
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(3, result.Count);
+		Assert.False(result.EqualWeight);
+		Assert.Equal((0.25, node1), children[0]);
+		Assert.Equal((0.25, node2), children[1]);
+		Assert.Equal((0.5, node3), children[2]);
+	}
+
+	[Fact]
+	public void MergeChild_Success_ChildIsNotEqualWeight()
+	{
+		// Given
+		WindowNode node1 = CreateWindowNode();
+		WindowNode node2 = CreateWindowNode();
+		WindowNode node3 = CreateWindowNode();
+
+		SplitNode childSplitNode = new SplitNode(node1, node2, Direction.Down)
+			.ToggleEqualWeight()
+			.Add(node2, node3, Direction.Down);
+
+		WindowNode node4 = CreateWindowNode();
+		SplitNode splitNode = new(childSplitNode, node4, Direction.Right);
+
+		// When
+		SplitNode result = splitNode.MergeChild(childSplitNode);
+		(double, Node)[] children = result.ToArray();
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(4, result.Count);
+		Assert.False(result.EqualWeight);
+		Assert.Equal((0.25, node1), children[0]);
+		Assert.Equal((0.125, node2), children[1]);
+		Assert.Equal((0.125, node3), children[2]);
+		Assert.Equal((0.5, node4), children[3]);
+	}
+	#endregion
+
+	[Fact]
+	public void GetEnumerator()
+	{
+		// Given
+		WindowNode node1 = CreateWindowNode();
+		WindowNode node2 = CreateWindowNode();
+
+		SplitNode splitNode = new(node1, node2, Direction.Right);
+
+		// When
+		IEnumerator enumerator = splitNode.GetEnumerator();
+		List<(double, Node)> items = new();
+		while (enumerator.MoveNext())
+		{
+			if (enumerator.Current is (double weight, Node node))
+			{
+				items.Add((weight, node));
+			}
+		}
+
+		// Then
+		Assert.Equal(2, items.Count);
+		Assert.Equal((0.5, node1), items[0]);
+		Assert.Equal((0.5, node2), items[1]);
+	}
 }
