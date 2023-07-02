@@ -220,6 +220,12 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		return new SplitNode(EqualWeight, IsHorizontal, children, _weights);
 	}
 
+	/// <summary>
+	/// Swaps the given <paramref name="a"/> and <paramref name="b"/> in this <see cref="SplitNode"/>.
+	/// </summary>
+	/// <param name="a"></param>
+	/// <param name="b"></param>
+	/// <returns></returns>
 	public SplitNode Swap(Node a, Node b)
 	{
 		Logger.Verbose($"Swapping {a} and {b} in {this}");
@@ -257,22 +263,12 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
-	/// If <see cref="EqualWeight"/> is <see langword="true"/>, then a new <see cref="ImmutableList{T}"/>
-	/// of weights is created where each weight is 1 / <see cref="Count"/>.
-	///
-	/// Otherwise, the current weights are returned.
+	/// Returns a new list of weights that are distributed evenly. Before calling this method,
+	/// we didn't care about the weights and calculated them manually based on the count.
 	/// </summary>
 	/// <returns></returns>
 	private ImmutableList<double> DistributeWeights()
 	{
-		if (!EqualWeight)
-		{
-			return _weights;
-		}
-
-		// Distribute weights, because previously we didn't
-		// care about them and calculated weights based on
-		// the count.
 		double weight = 1d / _children.Count;
 
 		ImmutableList<double>.Builder builder = ImmutableList.CreateBuilder<double>();
@@ -300,7 +296,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return this;
 		}
 
-		ImmutableList<double> weights = DistributeWeights();
+		ImmutableList<double> weights = EqualWeight ? DistributeWeights() : _weights;
 		weights = weights.SetItem(idx, weights[idx] + delta);
 
 		return new SplitNode(EqualWeight, IsHorizontal, _children, weights);
@@ -376,7 +372,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	{
 		Logger.Verbose($"Toggling EqualWeight of {this}");
 
-		return new SplitNode(!EqualWeight, IsHorizontal, _children, _weights);
+		return new SplitNode(!EqualWeight, IsHorizontal, _children, DistributeWeights());
 	}
 
 	/// <summary>
