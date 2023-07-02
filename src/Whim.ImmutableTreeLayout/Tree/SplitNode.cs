@@ -119,7 +119,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return this;
 		}
 
-		int	focusedNodeIdx = idx;
+		int focusedNodeIdx = idx;
 
 		// Find the index of the new node.
 		int delta;
