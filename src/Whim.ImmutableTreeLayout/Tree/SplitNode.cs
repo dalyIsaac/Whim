@@ -16,38 +16,30 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// The weights of the children. If <see cref="EqualWeight"/> is <see langword="true"/>, then
 	/// the weights here are ignored in favour of <code>1d / _children.Count</code>.
 	/// </summary>
-	private readonly ImmutableList<double> _weights;
+	public ImmutableList<double> Weights { get; }
 
 	/// <summary>
 	/// The child nodes of this <see cref="SplitNode"/>. These will likely be either <see cref="SplitNode"/>s,
 	/// or child classes of <see cref="LeafNode"/>.
 	/// </summary>
-	protected readonly ImmutableList<Node> _children;
+	public ImmutableList<Node> Children { get; }
 
 	/// <summary>
 	/// The number of nodes in this <see cref="SplitNode"/>.
 	/// </summary>
-	public int Count => _children.Count;
+	public int Count => Children.Count;
 
 	/// <summary>
-	/// When <see langword="true"/>, the <see cref="_children"/> are split
-	/// within the parent node equally. This overrides the weights in <see cref="_weights"/>.
+	/// When <see langword="true"/>, the <see cref="Children"/> are split
+	/// within the parent node equally. This overrides the weights in <see cref="Weights"/>.
 	/// </summary>
 	public bool EqualWeight { get; }
 
 	/// <summary>
-	/// When <see langword="true"/>, the <see cref="_children"/> are arranged horizontally.
+	/// When <see langword="true"/>, the <see cref="Children"/> are arranged horizontally.
 	/// Otherwise, they are arranged vertically.
 	/// </summary>
 	public bool IsHorizontal { get; }
-
-	/// <summary>
-	/// Gets the weight and node of the child at the given index.
-	/// </summary>
-	/// <param name="index"></param>
-	/// <returns></returns>
-	public (double weight, Node node) this[int index] =>
-		(EqualWeight ? 1d / _weights.Count : _weights[index], _children[index]);
 
 	/// <summary>
 	/// Creates a new <see cref="SplitNode"/> to replace and absorb <paramref name="focusedNode"/>.
@@ -75,8 +67,8 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		weights.Add(half);
 		weights.Add(half);
 
-		_children = children.ToImmutable();
-		_weights = weights.ToImmutable();
+		Children = children.ToImmutable();
+		Weights = weights.ToImmutable();
 		IsHorizontal = direction.IsHorizontal();
 		EqualWeight = true;
 	}
@@ -94,8 +86,8 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		EqualWeight = equalWeight;
 		IsHorizontal = isHorizontal;
 
-		_children = children;
-		_weights = weights;
+		Children = children;
+		Weights = weights;
 	}
 
 	/// <summary>
@@ -113,7 +105,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		Logger.Verbose($"Adding {newNode} to {this}, in direction {direction} in relation to {focusedNode}");
 
 		// Find the index of the focused node.
-		int idx = _children.IndexOf(focusedNode);
+		int idx = Children.IndexOf(focusedNode);
 		if (idx < 0)
 		{
 			Logger.Error($"Could not find {focusedNode} in {this}");
@@ -140,22 +132,22 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 				break;
 		}
 
-		int newNodeIdx = Math.Clamp(focusedNodeIdx + delta, 0, _children.Count);
+		int newNodeIdx = Math.Clamp(focusedNodeIdx + delta, 0, Children.Count);
 
 		// Insert the node.
-		ImmutableList<Node> children = _children.Insert(newNodeIdx, newNode);
+		ImmutableList<Node> children = Children.Insert(newNodeIdx, newNode);
 		ImmutableList<double> weights;
 
-		if (EqualWeight || _weights.Count == 0)
+		if (EqualWeight || Weights.Count == 0)
 		{
 			// Add the weight 1d, since it doesn't matter.
-			weights = _weights.Add(1d);
+			weights = Weights.Add(1d);
 		}
 		else
 		{
 			// Take half of the last window's space.
-			double half = _weights[^1] / 2;
-			weights = _weights.SetItem(_weights.Count - 1, half);
+			double half = Weights[^1] / 2;
+			weights = Weights.SetItem(Weights.Count - 1, half);
 			weights = weights.Add(half);
 		}
 
@@ -173,26 +165,26 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	{
 		Logger.Verbose($"Removing {node} from {this}");
 
-		int idx = _children.IndexOf(node);
+		int idx = Children.IndexOf(node);
 		if (idx < 0)
 		{
 			Logger.Error($"Could not find {node} in {this}");
 			return this;
 		}
 
-		ImmutableList<Node> children = _children.RemoveAt(idx);
+		ImmutableList<Node> children = Children.RemoveAt(idx);
 		ImmutableList<double> weights;
 
 		// Redistribute weights.
 		if (EqualWeight)
 		{
 			// We don't care about the weights, so just remove the weight.
-			weights = _weights.RemoveAt(idx);
+			weights = Weights.RemoveAt(idx);
 		}
 		else
 		{
 			// Give the extra weight to the last child.
-			weights = _weights.SetItem(_weights.Count - 1, _weights[^1] + _weights[idx]);
+			weights = Weights.SetItem(Weights.Count - 1, Weights[^1] + Weights[idx]);
 			weights = weights.RemoveAt(idx);
 		}
 
@@ -200,24 +192,23 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
-	/// Replaces the given <paramref name="oldNode"/> with the given <paramref name="newNode"/>.
+	/// Replaces the node at the given <paramref name="index"/> with the given <paramref name="newNode"/>.
 	/// </summary>
-	/// <param name="oldNode">The node to replace.</param>
-	/// <param name="newNode">The node to replace <paramref name="oldNode"/> with.</param>
+	/// <param name="index">The index of the node to replace.</param>
+	/// <param name="newNode">The node to replace the old node with.</param>
 	/// <returns></returns>
-	public SplitNode Replace(Node oldNode, Node newNode)
+	public SplitNode Replace(int index, Node newNode)
 	{
-		Logger.Verbose($"Replacing {oldNode} with {newNode} in {this}");
+		Logger.Verbose($"Replacing the node at index {index} with {newNode}");
 
-		int idx = _children.IndexOf(oldNode);
-		if (idx < 0)
+		if (index < 0 || index >= Children.Count)
 		{
-			Logger.Error($"Could not find {oldNode} in {this}");
+			Logger.Error($"Index {index} is out of range for {this}");
 			return this;
 		}
 
-		ImmutableList<Node> children = _children.SetItem(idx, newNode);
-		return new SplitNode(EqualWeight, IsHorizontal, children, _weights);
+		ImmutableList<Node> children = Children.SetItem(index, newNode);
+		return new SplitNode(EqualWeight, IsHorizontal, children, Weights);
 	}
 
 	/// <summary>
@@ -233,13 +224,13 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		int aIdx = -1;
 		int bIdx = -1;
 
-		for (int i = 0; i < _children.Count; i++)
+		for (int i = 0; i < Children.Count; i++)
 		{
-			if (_children[i] == a)
+			if (Children[i] == a)
 			{
 				aIdx = i;
 			}
-			else if (_children[i] == b)
+			else if (Children[i] == b)
 			{
 				bIdx = i;
 			}
@@ -256,10 +247,10 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return this;
 		}
 
-		ImmutableList<Node> children = _children.SetItem(aIdx, b);
+		ImmutableList<Node> children = Children.SetItem(aIdx, b);
 		children = children.SetItem(bIdx, a);
 
-		return new SplitNode(EqualWeight, IsHorizontal, children, _weights);
+		return new SplitNode(EqualWeight, IsHorizontal, children, Weights);
 	}
 
 	/// <summary>
@@ -269,10 +260,10 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <returns></returns>
 	private ImmutableList<double> DistributeWeights()
 	{
-		double weight = 1d / _children.Count;
+		double weight = 1d / Children.Count;
 
 		ImmutableList<double>.Builder builder = ImmutableList.CreateBuilder<double>();
-		for (int i = 0; i < _children.Count; i++)
+		for (int i = 0; i < Children.Count; i++)
 		{
 			builder.Add(weight);
 		}
@@ -289,17 +280,17 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <returns></returns>
 	public SplitNode AdjustChildWeight(Node node, double delta)
 	{
-		int idx = _children.IndexOf(node);
+		int idx = Children.IndexOf(node);
 		if (idx < 0)
 		{
 			Logger.Error($"Node {node} not found in {this}");
 			return this;
 		}
 
-		ImmutableList<double> weights = EqualWeight ? DistributeWeights() : _weights;
+		ImmutableList<double> weights = EqualWeight ? DistributeWeights() : Weights;
 		weights = weights.SetItem(idx, weights[idx] + delta);
 
-		return new SplitNode(false, IsHorizontal, _children, weights);
+		return new SplitNode(false, IsHorizontal, Children, weights);
 	}
 
 	/// <summary>
@@ -307,7 +298,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// </summary>
 	/// <param name="idx"></param>
 	/// <returns></returns>
-	private double GetChildWeight(int idx) => EqualWeight ? 1d / _children.Count : _weights[idx];
+	private double GetChildWeight(int idx) => EqualWeight ? 1d / Children.Count : Weights[idx];
 
 	/// <summary>
 	/// Get the weight of the given <paramref name="node"/>.
@@ -317,7 +308,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <returns></returns>
 	public double? GetChildWeight(Node node)
 	{
-		int idx = _children.IndexOf(node);
+		int idx = Children.IndexOf(node);
 		if (idx < 0)
 		{
 			Logger.Error($"Node {node} not found in {this}");
@@ -336,7 +327,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <returns></returns>
 	public (double weight, double precedingWeight)? GetWeightAndPrecedingWeight(Node node)
 	{
-		int idx = _children.IndexOf(node);
+		int idx = Children.IndexOf(node);
 		if (idx < 0)
 		{
 			Logger.Error($"Node {node} not found in {this}");
@@ -348,13 +339,13 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 
 		if (EqualWeight)
 		{
-			weight = 1d / _children.Count;
+			weight = 1d / Children.Count;
 			precedingWeight = idx * weight;
 		}
 		else
 		{
-			weight = _weights[idx];
-			precedingWeight = _weights.Take(idx).Sum();
+			weight = Weights[idx];
+			precedingWeight = Weights.Take(idx).Sum();
 		}
 
 		return (weight, precedingWeight);
@@ -368,7 +359,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	{
 		Logger.Verbose($"Flipping {this}");
 
-		return new SplitNode(EqualWeight, !IsHorizontal, _children, _weights);
+		return new SplitNode(EqualWeight, !IsHorizontal, Children, Weights);
 	}
 
 	/// <summary>
@@ -379,7 +370,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	{
 		Logger.Verbose($"Toggling EqualWeight of {this}");
 
-		return new SplitNode(!EqualWeight, IsHorizontal, _children, DistributeWeights());
+		return new SplitNode(!EqualWeight, IsHorizontal, Children, DistributeWeights());
 	}
 
 	/// <summary>
@@ -392,26 +383,26 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	{
 		Logger.Verbose($"Merging {child} into {this}");
 
-		int idx = _children.IndexOf(child);
+		int idx = Children.IndexOf(child);
 		if (idx < 0)
 		{
 			Logger.Error($"Node {child} not found in {this}");
 			return this;
 		}
 
-		ImmutableList<Node> children = _children.RemoveAt(idx);
-		children = children.InsertRange(idx, child._children);
+		ImmutableList<Node> children = Children.RemoveAt(idx);
+		children = children.InsertRange(idx, child.Children);
 
 		double childWeight = GetChildWeight(idx);
-		ImmutableList<double> weights = _weights.RemoveAt(idx);
+		ImmutableList<double> weights = Weights.RemoveAt(idx);
 		if (child.EqualWeight)
 		{
-			double grandchildrenWeight = childWeight / child._children.Count;
-			weights = weights.InsertRange(idx, Enumerable.Repeat(grandchildrenWeight, child._children.Count));
+			double grandchildrenWeight = childWeight / child.Children.Count;
+			weights = weights.InsertRange(idx, Enumerable.Repeat(grandchildrenWeight, child.Children.Count));
 		}
 		else
 		{
-			weights = weights.InsertRange(idx, child._weights.Select(w => w * childWeight));
+			weights = weights.InsertRange(idx, child.Weights.Select(w => w * childWeight));
 		}
 
 		return new SplitNode(false, IsHorizontal, children, weights);
@@ -425,17 +416,17 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	{
 		if (EqualWeight)
 		{
-			double weight = 1d / _children.Count;
-			foreach (Node child in _children)
+			double weight = 1d / Children.Count;
+			foreach (Node child in Children)
 			{
 				yield return (weight, child);
 			}
 		}
 		else
 		{
-			for (int i = 0; i < _weights.Count; i++)
+			for (int i = 0; i < Weights.Count; i++)
 			{
-				yield return (_weights[i], _children[i]);
+				yield return (Weights[i], Children[i]);
 			}
 		}
 	}

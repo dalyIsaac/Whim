@@ -1,0 +1,197 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
+
+using WindowDict = System.Collections.Immutable.ImmutableDictionary<
+	Whim.IWindow,
+	System.Collections.Immutable.ImmutableArray<int>
+>;
+
+namespace Whim.ImmutableTreeLayout;
+
+/// <summary>
+/// A tree layout engine allows users to create arbitrary window grid layouts.
+/// </summary>
+public class TreeLayoutEngine : IImmutableLayoutEngine
+{
+	private readonly IContext _context;
+	private readonly IImmutableInternalTreePlugin _plugin;
+	private readonly Node? _root;
+
+	/// <summary>
+	/// Map of windows to their paths in the tree.
+	/// </summary>
+	private readonly WindowDict _windows;
+
+	/// <inheritdoc/>
+	public string Name { get; init; } = "Tree";
+
+	/// <inheritdoc/>
+	public int Count => _windows.Count;
+
+	public Direction AddNodeDirection { get; } = Direction.Right;
+
+	private TreeLayoutEngine(TreeLayoutEngine engine, Node root, WindowDict windows)
+	{
+		_context = engine._context;
+		_plugin = engine._plugin;
+		AddNodeDirection = engine.AddNodeDirection;
+		_root = root;
+		_windows = windows;
+	}
+
+	/// <summary>
+	/// Creates a new <see cref="TreeLayoutEngine"/>, replacing the old node from
+	/// <paramref name="oldNodePath"/> with <paramref name="newNode"/>.
+	///
+	/// It rebuilds the tree from the bottom up.
+	/// </summary>
+	/// <param name="oldNodeAncestors"></param>
+	/// <param name="oldNodePath"></param>
+	/// <param name="newNode"></param>
+	/// <returns></returns>
+	private TreeLayoutEngine CreateNewEngine(
+		SplitNode[] oldNodeAncestors,
+		ImmutableArray<int> oldNodePath,
+		Node newNode
+	)
+	{
+		Node current = newNode;
+
+		for (int idx = oldNodePath.Length - 1; idx >= 0; idx--)
+		{
+			SplitNode parent = oldNodeAncestors[idx];
+			SplitNode newParent = parent.Replace(oldNodePath[idx], current);
+
+			current = newParent;
+		}
+
+		return new TreeLayoutEngine(
+			this,
+			current,
+			newNode is LeafNode leafNode ? _windows.SetItem(leafNode.Window, oldNodePath) : _windows
+		);
+	}
+
+	/// <summary>
+	/// Creates a new dictionary. It contains only <code>{ newWindow: [0]; }</code>.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	private static WindowDict CreateRootNodeDict(IWindow window)
+	{
+		WindowDict.Builder dictBuilder = ImmutableDictionary.CreateBuilder<IWindow, ImmutableArray<int>>();
+
+		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
+		pathBuilder.Add(0);
+
+		dictBuilder.Add(window, pathBuilder.ToImmutable());
+		return dictBuilder.ToImmutable();
+	}
+
+	/// <summary>
+	/// Creates a new dictionary with the top-level split node.
+	/// </summary>
+	/// <param n="windowA"></param>
+	/// <param n="windowB"></param>
+	/// <returns></returns>
+	private static WindowDict CreateTopSplitNodeDict(IWindow windowA, IWindow windowB)
+	{
+		WindowDict.Builder dictBuilder = ImmutableDictionary.CreateBuilder<IWindow, ImmutableArray<int>>();
+
+		ImmutableArray<int>.Builder pathA = ImmutableArray.CreateBuilder<int>();
+		pathA.Add(0);
+		pathA.Add(0);
+
+		ImmutableArray<int>.Builder pathB = ImmutableArray.CreateBuilder<int>();
+		pathB.Add(0);
+		pathB.Add(1);
+
+		dictBuilder.Add(windowA, pathA.ToImmutable());
+		dictBuilder.Add(windowB, pathB.ToImmutable());
+
+		return dictBuilder.ToImmutable();
+	}
+
+	/// <inheritdoc/>
+	public IImmutableLayoutEngine Add(IWindow window)
+	{
+		Logger.Debug($"Adding window {window} to layout engine {Name}");
+
+		// Create the new leaf node.
+		LeafNode newLeafNode = _plugin.PhantomWindows.Contains(window)
+			? new PhantomNode(window)
+			: new WindowNode(window);
+
+		switch (_root)
+		{
+			case null:
+				Logger.Debug($"Root is null, creating new window node");
+				return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
+
+			case PhantomNode:
+				Logger.Debug($"Root is phantom node, replacing with new window node");
+				return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
+
+			case WindowNode rootNode:
+				Logger.Debug($"Root is window node, replacing with split node");
+				SplitNode newRoot = new(rootNode, newLeafNode, AddNodeDirection);
+				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(rootNode.Window, window));
+
+			case SplitNode rootNode:
+				Logger.Debug($"Root is split node, adding new leaf node");
+
+				LeafNode? focusedNode;
+				SplitNode[] ancestors;
+				ImmutableArray<int> path;
+
+				// Try get the focused window, and use its parent. Otherwise, use the right-most leaf.
+				if (
+					_context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow is IWindow focusedWindow
+					&& _windows.TryGetValue(focusedWindow, out ImmutableArray<int> focusedWindowPath)
+					&& _root.GetNodeAtPath(focusedWindowPath) is (SplitNode[] pathAncestors, LeafNode leafNode)
+				)
+				{
+					focusedNode = leafNode;
+					ancestors = pathAncestors;
+					path = focusedWindowPath;
+				}
+				else
+				{
+					(ancestors, path, focusedNode) = rootNode.GetRightMostLeaf();
+				}
+
+				// TODO: Test this assumption.
+				// We're assuming that there is a parent node - otherwise we wouldn't have reached this point.
+				SplitNode parentNode = ancestors[^1];
+				SplitNode newParent = parentNode.Add(focusedNode, newLeafNode, AddNodeDirection);
+				return CreateNewEngine(ancestors, path.RemoveAt(path.Length - 1), newParent);
+
+			default:
+				Logger.Error($"Unexpected root node type: {_root.GetType()}");
+				return this;
+		}
+	}
+
+	public IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
+		throw new System.NotImplementedException();
+
+	public bool Contains(IWindow window) => throw new System.NotImplementedException();
+
+	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
+		throw new System.NotImplementedException();
+
+	public void FocusWindowInDirection(Direction direction, IWindow window) =>
+		throw new System.NotImplementedException();
+
+	public IWindow? GetFirstWindow() => throw new System.NotImplementedException();
+
+	public IImmutableLayoutEngine HidePhantomWindows() => throw new System.NotImplementedException();
+
+	public IImmutableLayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
+		throw new System.NotImplementedException();
+
+	public IImmutableLayoutEngine Remove(IWindow window) => throw new System.NotImplementedException();
+
+	public IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
+		throw new System.NotImplementedException();
+}

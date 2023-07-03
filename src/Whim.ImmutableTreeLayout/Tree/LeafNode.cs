@@ -10,9 +10,9 @@ internal abstract class LeafNode : Node
 	/// </summary>
 	public IWindow Window { get; }
 
-	internal LeafNode(IWindow windowModel)
+	internal LeafNode(IWindow window)
 	{
-		Window = windowModel;
+		Window = window;
 	}
 
 	/// <summary>
