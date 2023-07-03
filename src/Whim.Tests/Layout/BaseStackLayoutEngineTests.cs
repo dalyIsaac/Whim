@@ -19,7 +19,7 @@ public class BaseStackLayoutEngineTests
 		public override void FocusWindowInDirection(Direction direction, IWindow window) =>
 			throw new System.NotImplementedException();
 
-		public override void MoveWindowEdgesInDirection(Direction edge, IPoint<int> pointDeltas, IWindow window) =>
+		public override void MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
 			throw new System.NotImplementedException();
 
 		public override void SwapWindowInDirection(Direction direction, IWindow window) =>

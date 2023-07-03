@@ -81,7 +81,7 @@ public abstract class BaseStackLayoutEngine : ILayoutEngine
 	public abstract void SwapWindowInDirection(Direction direction, IWindow window);
 
 	/// <inheritdoc/>
-	public abstract void MoveWindowEdgesInDirection(Direction edge, IPoint<int> pixelDeltas, IWindow window);
+	public abstract void MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window);
 
 	/// <inheritdoc/>
 	public abstract void AddWindowAtPoint(IWindow window, IPoint<double> point);

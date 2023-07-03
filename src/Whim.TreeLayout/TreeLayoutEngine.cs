@@ -406,9 +406,9 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	/// <inheritdoc />
-	public void MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelDeltas, IWindow window)
+	public void MoveWindowEdgesInDirection(Direction edges, IPoint<double> delta, IWindow window)
 	{
-		Logger.Debug($"Moving window {window} edges in direction {edges} by {pixelDeltas} in layout engine {Name}");
+		Logger.Debug($"Moving window {window} edges in direction {edges} by {delta} in layout engine {Name}");
 
 		if (!_windows.TryGetValue(window, out LeafNode? focusedNode))
 		{
@@ -446,8 +446,8 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 
 		// For each adjacent node, move the window edge in the given direction.
 		Node[] focusedNodeLineage = focusedNode.Lineage.ToArray();
-		MoveSingleWindowEdgeInDirection(pixelDeltas.X, true, focusedNodeLineage, xAdjacentNode);
-		MoveSingleWindowEdgeInDirection(pixelDeltas.Y, false, focusedNodeLineage, yAdjacentNode);
+		MoveSingleWindowEdgeInDirection(delta.X, true, focusedNodeLineage, xAdjacentNode);
+		MoveSingleWindowEdgeInDirection(delta.Y, false, focusedNodeLineage, yAdjacentNode);
 	}
 
 	private void MoveSingleWindowEdgeInDirection(
@@ -485,10 +485,8 @@ public partial class TreeLayoutEngine : ITreeLayoutEngine
 		// First, we need to find the location of the parent node.
 		ILocation<double> parentLocation = GetNodeLocation(parentNode);
 
-		// Figure out what the relative delta of pixelDelta is, first given the unit square, then
-		// given the dimensions of the parent node.
-		double unitSquareDelta = delta / (isXAxis ? _location.Width : _location.Height);
-		double relativeDelta = unitSquareDelta / (isXAxis ? parentLocation.Width : parentLocation.Height);
+		// Figure out what the relative delta of pixelsDeltas is given the unit square.
+		double relativeDelta = delta / (isXAxis ? parentLocation.Width : parentLocation.Height);
 
 		// Now we can adjust the weights.
 		int parentDepth = parentNode.Depth;
