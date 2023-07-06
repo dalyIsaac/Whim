@@ -33,7 +33,8 @@ Each plugin needs to be added to the `context` object.
 Whim is heavily inspired by the [workspacer](https://github.com/workspacer/workspacer) project, to which I've contributed significantly in the past. However, there are a few key differences:
 
 - Whim is built using WinUI 3 instead of Windows Forms. This makes it easier to have a more modern UI.
-- Whim stores windows internally in a more flexible way. This allows for more complex window management.
+- Whim has a more powerful command palette, which supports fuzzy search.
+- Whim stores windows internally in a more flexible way. This allows for more complex window management. For more, see [Layouts](#layouts).
 - Whim has a command system with common functionality, which makes it easier to interact with at a higher level.
 - Creating subclasses of internal classes is not encouraged in Whim - instead, plugins should suffice to add new functionality.
 
@@ -47,9 +48,11 @@ I am grateful to the workspacer project for the inspiration and ideas it has pro
 
 ### Layouts
 
-This is one of the key differences between workspacer and Whim. Currently, workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23).
+This is one of the key differences between workspacer and Whim. Currently, workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). Additionally, workspacer has the concept of a "primary area".
 
-In comparison, layout engines in Whim store windows themselves, and do not require [`IEnumerable<IWindow>` to be passed to them](https://github.com/dalyIsaac/Whim/blob/3ba4d42502732826903522d51e51d55fd0edb6d7/src/Whim/Layout/ILayoutEngine.cs#L8). This allows for more complex layouts, and also allows for more complex window management. For example, the `TreeLayoutEngine` uses a n-ary tree structure to store windows, which allows for arbitrary grid layouts.
+In comparison, layout engines in Whim store windows themselves, and do not require [`IEnumerable<IWindow>` to be passed to them](https://github.com/dalyIsaac/Whim/blob/3ba4d42502732826903522d51e51d55fd0edb6d7/src/Whim/Layout/ILayoutEngine.cs#L8). This allows for more complex layouts, and also allows for more complex window management. For example, the `TreeLayoutEngine` uses a n-ary tree structure to store windows, which allows for arbitrary grid layouts. This also lets Whim support functionality which take into account directions, like `FocusWindowInDirection`, `SwapWindowInDirection`, and `MoveWindowEdgesInDirection`. Given this increased flexibility, Whim does does not have a concept of a "primary area".
+
+In [#425](https://github.com/dalyIsaac/Whim/issues/425), layout engines will become immutable. This will allow for more powerful functionality like previewing changes to layouts before they are applied.
 
 ## Contributing
 
