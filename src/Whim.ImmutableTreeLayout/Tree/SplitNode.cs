@@ -100,6 +100,10 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <param name="newNode"></param>
 	/// <param name="direction"></param>
 	/// <returns></returns>
+
+	// TODO: Replace Direction with a boolean for inserting before/after - it's not currently correct
+	// for the direction to be used for this, as Direction.Right could be passed into a vertical
+	// split node.
 	public SplitNode Add(Node focusedNode, Node newNode, Direction direction)
 	{
 		Logger.Verbose($"Adding {newNode} to {this}, in direction {direction} in relation to {focusedNode}");

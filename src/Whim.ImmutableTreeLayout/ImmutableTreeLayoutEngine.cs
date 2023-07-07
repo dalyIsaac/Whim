@@ -45,9 +45,9 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	///
 	/// It rebuilds the tree from the bottom up.
 	/// </summary>
-	/// <param name="oldNodeAncestors"></param>
-	/// <param name="oldNodePath"></param>
-	/// <param name="newNode"></param>
+	/// <param name="oldNodeAncestors">The ancestors of the old node.</param>
+	/// <param name="oldNodePath">The path to the old node.</param>
+	/// <param name="newNode">The new node to replace the old node.</param>
 	/// <returns></returns>
 	private TreeLayoutEngine CreateNewEngine(
 		SplitNode[] oldNodeAncestors,
@@ -172,8 +172,82 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		}
 	}
 
-	public IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
-		throw new System.NotImplementedException();
+	/// <inheritdoc />
+	public IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
+	{
+		Logger.Debug($"Adding window {window} to layout engine {Name}");
+
+		// Create the new leaf node.
+		LeafNode newLeafNode = _plugin.PhantomWindows.Contains(window)
+			? new PhantomNode(window)
+			: new WindowNode(window);
+
+		// Handle the different root cases.
+		if (_root is null)
+		{
+			Logger.Debug($"Root is null, creating new window node");
+			return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
+		}
+
+		if (_root is PhantomNode)
+		{
+			Logger.Debug($"Root is phantom node, replacing with new window node");
+			return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
+		}
+
+		if (_root is WindowNode windowNode)
+		{
+			Logger.Debug($"Root is window node, replacing with split node");
+			Direction newNodeDirection = new Location<double>() { Width = 1, Height = 1 }.GetDirectionToPoint(point);
+
+			if (newNodeDirection.IsPositiveIndex())
+			{
+				SplitNode newRoot = new(windowNode, newLeafNode, newNodeDirection);
+				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(windowNode.Window, window));
+			}
+			else
+			{
+				SplitNode newRoot = new(newLeafNode, windowNode, newNodeDirection);
+				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(window, windowNode.Window));
+			}
+		}
+
+		if (_root is not SplitNode rootNode)
+		{
+			Logger.Error($"Unexpected root node type: {_root.GetType()}");
+			return this;
+		}
+
+		(SplitNode[], ImmutableArray<int>, LeafNode, Direction)? result = rootNode.GetNodeContainingPoint(point);
+		if (result is null)
+		{
+			Logger.Error($"Failed to find node containing point {point}");
+			return this;
+		}
+
+		(SplitNode[] ancestors, ImmutableArray<int> path, LeafNode focusedNode, Direction direction) = result.Value;
+
+		SplitNode parentNode = ancestors[^1];
+		if (parentNode.IsHorizontal == direction.IsHorizontal())
+		{
+			// Add the node to the parent.
+			SplitNode newParent = parentNode.Add(focusedNode, newLeafNode, direction);
+			return CreateNewEngine(
+				oldNodeAncestors: ancestors,
+				oldNodePath: path.RemoveAt(path.Length - 1),
+				newNode: newParent
+			);
+		}
+
+		// Replace the current node with a split node.
+		SplitNode leafNodeReplacement = new(focusedNode, newLeafNode, direction);
+		SplitNode newParentNode = parentNode.Replace(path[^1], leafNodeReplacement);
+		return CreateNewEngine(
+			oldNodeAncestors: ancestors,
+			oldNodePath: path.RemoveAt(path.Length - 1),
+			newNode: newParentNode
+		);
+	}
 
 	public bool Contains(IWindow window) => throw new System.NotImplementedException();
 
