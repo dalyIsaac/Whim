@@ -246,18 +246,19 @@ public class SplitNodeTests
 	#endregion
 
 	#region Replace
-	[Fact]
-	public void Replace_CouldNotFindOldNode()
+	[InlineData(-1)]
+	[InlineData(2)]
+	[Theory]
+	public void Replace_NodeOutOfRange(int index)
 	{
 		// Given
 		WindowNode focusedNode = CreateWindowNode();
 		WindowNode newNode = CreateWindowNode();
-		WindowNode oldNode = CreateWindowNode();
 
 		SplitNode splitNode = new(focusedNode, CreateWindowNode(), Direction.Right);
 
 		// When
-		SplitNode result = splitNode.Replace(oldNode, newNode);
+		SplitNode result = splitNode.Replace(index, newNode);
 
 		// Then
 		Assert.Same(splitNode, result);
@@ -273,8 +274,10 @@ public class SplitNodeTests
 
 		SplitNode splitNode = new(focusedNode, oldNode, Direction.Right);
 
+		int oldNodeIndex = 1;
+
 		// When
-		SplitNode result = splitNode.Replace(oldNode, newNode);
+		SplitNode result = splitNode.Replace(oldNodeIndex, newNode);
 		(double, Node)[] children = result.ToArray();
 
 		// Then
