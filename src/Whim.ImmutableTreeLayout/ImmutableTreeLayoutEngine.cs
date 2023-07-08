@@ -257,8 +257,29 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		return _windows.ContainsKey(window);
 	}
 
-	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
-		throw new System.NotImplementedException();
+	/// <inheritdoc />
+	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
+	{
+		Logger.Debug($"Doing layout for engine {Name}");
+
+		if (_root == null)
+		{
+			yield break;
+		}
+
+		foreach (NodeState? item in _root.GetWindowLocations(location))
+		{
+			if (item.Node is LeafNode leafNode)
+			{
+				yield return new WindowState()
+				{
+					Window = leafNode.Window,
+					Location = item.Location,
+					WindowSize = item.WindowSize
+				};
+			}
+		}
+	}
 
 	public void FocusWindowInDirection(Direction direction, IWindow window) =>
 		throw new System.NotImplementedException();
