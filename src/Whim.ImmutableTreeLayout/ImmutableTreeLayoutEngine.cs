@@ -249,7 +249,13 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		);
 	}
 
-	public bool Contains(IWindow window) => throw new System.NotImplementedException();
+	/// <inheritdoc />
+	public bool Contains(IWindow window)
+	{
+		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
+
+		return _windows.ContainsKey(window);
+	}
 
 	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
 		throw new System.NotImplementedException();
