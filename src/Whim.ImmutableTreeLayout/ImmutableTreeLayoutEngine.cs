@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-
+using System.Linq;
 using WindowDict = System.Collections.Immutable.ImmutableDictionary<
 	Whim.IWindow,
 	System.Collections.Immutable.ImmutableArray<int>
@@ -220,7 +220,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		(SplitNode[], ImmutableArray<int>, LeafNode, Direction)? result = rootNode.GetNodeContainingPoint(point);
+		var result = rootNode.GetNodeContainingPoint(point);
 		if (result is null)
 		{
 			Logger.Error($"Failed to find node containing point {point}");
@@ -328,8 +328,151 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 	public IImmutableLayoutEngine HidePhantomWindows() => throw new System.NotImplementedException();
 
-	public IImmutableLayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
-		throw new System.NotImplementedException();
+	public IImmutableLayoutEngine MoveWindowEdgesInDirection(
+		Direction edges,
+		IPoint<double> deltas,
+		IWindow focusedWindow
+	)
+	{
+		Logger.Debug($"Moving window edges {edges} in direction {deltas} for window {focusedWindow}");
+
+		if (_root is null)
+		{
+			Logger.Error(
+				$"Root is null, cannot move window edges {edges} in direction {deltas} for window {focusedWindow}"
+			);
+			return this;
+		}
+
+		if (_root is not SplitNode rootSplitNode)
+		{
+			Logger.Debug($"Root is not split node, cannot move window edges");
+			return this;
+		}
+
+		if (!_windows.TryGetValue(focusedWindow, out ImmutableArray<int> windowPath))
+		{
+			Logger.Error($"Window {focusedWindow} not found in layout engine {Name}");
+			return this;
+		}
+
+		var focusedWindowResult = rootSplitNode.GetNodeAtPath(windowPath);
+		if (focusedWindowResult is null)
+		{
+			Logger.Error($"Failed to find window {focusedWindow} in layout engine {Name}");
+			return this;
+		}
+
+		(SplitNode[] windowAncestors, _, ILocation<double> windowLocation) = focusedWindowResult.Value;
+
+		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
+		(SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode)? xAdjacentResult = null;
+		(SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode)? yAdjacentResult = null;
+
+		if (edges.HasFlag(Direction.Left))
+		{
+			xAdjacentResult = TreeHelpers.GetAdjacentNode(rootSplitNode, Direction.Left, monitor, windowLocation);
+		}
+		else if (edges.HasFlag(Direction.Right))
+		{
+			xAdjacentResult = TreeHelpers.GetAdjacentNode(rootSplitNode, Direction.Right, monitor, windowLocation);
+		}
+
+		if (edges.HasFlag(Direction.Up))
+		{
+			yAdjacentResult = TreeHelpers.GetAdjacentNode(rootSplitNode, Direction.Up, monitor, windowLocation);
+		}
+		else if (edges.HasFlag(Direction.Down))
+		{
+			yAdjacentResult = TreeHelpers.GetAdjacentNode(rootSplitNode, Direction.Down, monitor, windowLocation);
+		}
+
+		if (xAdjacentResult == null && yAdjacentResult == null)
+		{
+			Logger.Error($"Could not find adjacent node for focused window in layout engine {Name}");
+			return this;
+		}
+
+		// For each adjacent node, move the window edge in the given direction.
+		TreeLayoutEngine newEngine = this;
+
+		if (xAdjacentResult != null)
+		{
+			newEngine = MoveSingleWindowEdgeInDirection(
+				rootSplitNode,
+				deltas.X,
+				true,
+				windowAncestors,
+				windowPath,
+				xAdjacentResult.Value.Ancestors,
+				xAdjacentResult.Value.Path
+			);
+
+			rootSplitNode = (SplitNode)newEngine._root!;
+		}
+
+		if (yAdjacentResult != null)
+		{
+			newEngine = MoveSingleWindowEdgeInDirection(
+				rootSplitNode,
+				deltas.Y,
+				false,
+				windowAncestors,
+				windowPath,
+				yAdjacentResult.Value.Ancestors,
+				yAdjacentResult.Value.Path
+			);
+		}
+
+		return newEngine;
+	}
+
+	private TreeLayoutEngine MoveSingleWindowEdgeInDirection(
+		SplitNode root,
+		double delta,
+		bool isXAxis,
+		SplitNode[] focusedNodeAncestors,
+		ImmutableArray<int> focusedNodePath,
+		SplitNode[] adjacentNodeAncestors,
+		ImmutableArray<int> adjacentNodePath
+	)
+	{
+		// Get the index of the last common ancestor.
+		int parentDepth = TreeHelpers.GetLastCommonAncestorIndex(focusedNodeAncestors, adjacentNodeAncestors);
+
+		if (parentDepth == -1)
+		{
+			Logger.Error($"Failed to find common parent for focused window and adjacent node");
+			return this;
+		}
+
+		// Adjust the weight of the focused node.
+		// First, we need to find the location of the parent node.
+		ImmutableArray<int> parentNodePath = focusedNodePath.Take(parentDepth).ToImmutableArray();
+		var parentResult = root.GetNodeAtPath(parentNodePath);
+		if (parentResult is null)
+		{
+			Logger.Error($"Failed to find parent node for focused window");
+			return this;
+		}
+
+		(SplitNode[] parentAncestors, Node parentNode, ILocation<double> parentLocation) = parentResult.Value;
+		if (parentNode is not SplitNode parentSplitNode)
+		{
+			Logger.Error($"Focused ancestor node is not a split node");
+			return this;
+		}
+
+		// Figure out what the relative delta of pixelsDeltas is given the unit square.
+		double relativeDelta = delta / (isXAxis ? parentLocation.Width : parentLocation.Height);
+
+		// Now we can adjust the weights.
+		SplitNode newParent = parentSplitNode
+			.AdjustChildWeight(focusedNodePath[parentDepth], relativeDelta)
+			.AdjustChildWeight(adjacentNodePath[parentDepth], -relativeDelta);
+
+		return CreateNewEngine(parentAncestors, parentNodePath, newParent);
+	}
 
 	public IImmutableLayoutEngine Remove(IWindow window) => throw new System.NotImplementedException();
 

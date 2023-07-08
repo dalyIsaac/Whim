@@ -21,28 +21,18 @@ internal static class TreeHelpers
 	/// <param name="root">The root node of the tree.</param>
 	/// <param name="path">The path to the node.</param>
 	/// <returns></returns>
-	public static (SplitNode[] SplitNodes, LeafNode LeafNode, ILocation<double> Rectangle)? GetNodeAtPath(
+	public static (SplitNode[] Ancestors, Node Node, ILocation<double> Location)? GetNodeAtPath(
 		this Node root,
-		ImmutableArray<int> path
+		IReadOnlyList<int> path
 	)
 	{
 		Location<double> location = new() { Height = 1, Width = 1 };
-		SplitNode[] splitNodes = new SplitNode[path.Length - 1];
+		SplitNode[] ancestors = new SplitNode[path.Count - 1];
 
 		Node currentNode = root;
-		for (int idx = 0; idx < path.Length; idx++)
+		for (int idx = 0; idx < path.Count; idx++)
 		{
 			int index = path[idx];
-			if (idx == path.Length - 1)
-			{
-				if (currentNode is not LeafNode leafNode)
-				{
-					Logger.Error($"Expected leaf node at index {idx} of path {path}");
-					return null;
-				}
-
-				return (splitNodes, leafNode, location);
-			}
 
 			if (currentNode is not SplitNode splitNode)
 			{
@@ -50,7 +40,7 @@ internal static class TreeHelpers
 				return null;
 			}
 
-			splitNodes[idx] = splitNode;
+			ancestors[idx] = splitNode;
 			currentNode = splitNode.Children[index];
 
 			// Update the weight.
@@ -80,8 +70,7 @@ internal static class TreeHelpers
 			}
 		}
 
-		Logger.Error($"Expected leaf node at end of path {path}");
-		return null;
+		return (ancestors, currentNode, location);
 	}
 
 	/// <summary>
@@ -335,23 +324,63 @@ internal static class TreeHelpers
 		}
 	}
 
+	/// <summary>
+	/// Gets the adjacent node to the node at the given <paramref name="pathToNode"/>, in the given
+	/// <paramref name="direction"/>.
+	/// </summary>
+	/// <param name="rootNode">The root node of the tree.</param>
+	/// <param name="pathToNode">The path to the node, from the root node.</param>
+	/// <param name="direction">The direction to search in.</param>
+	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
+	/// <returns></returns>
 	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
 		Node rootNode,
-		ImmutableArray<int> path,
+		IReadOnlyList<int> pathToNode,
 		Direction direction,
 		IMonitor monitor
 	)
 	{
-		// Get the coordinates of the node.
-		(SplitNode[], LeafNode, ILocation<double>)? result = rootNode.GetNodeAtPath(path);
+		// If the root node is a leaf node, then we can't find an adjacent node.
+		if (rootNode is LeafNode leafNode)
+		{
+			return (Array.Empty<SplitNode>(), ImmutableArray<int>.Empty, leafNode);
+		}
+
+		if (rootNode is not SplitNode splitNode)
+		{
+			Logger.Error($"Unknown node type {rootNode.GetType()}");
+			return null;
+		}
+
+		// Get the coordinates of the node given by the path.
+		var result = rootNode.GetNodeAtPath(pathToNode);
 		if (result is null)
 		{
-			Logger.Error($"Failed to find node at path {path}");
+			Logger.Error($"Failed to find node at path {pathToNode}");
 			return null;
 		}
 
 		(_, _, ILocation<double> nodeLocation) = result.Value;
 
+		return GetAdjacentNode(splitNode, direction, monitor, nodeLocation);
+	}
+
+	/// <summary>
+	/// Gets the adjacent node to the node at the <paramref name="nodeLocation"/>, in the given
+	/// <paramref name="direction"/>.
+	/// </summary>
+	/// <param name="splitNode">The root split node of the tree.</param>
+	/// <param name="direction">The direction to search in.</param>
+	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
+	/// <param name="nodeLocation">The location of the node, in monitor coordinates.</param>
+	/// <returns></returns>
+	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
+		SplitNode splitNode,
+		Direction direction,
+		IMonitor monitor,
+		ILocation<double> nodeLocation
+	)
+	{
 		// Next, we figure out the adjacent point of the nodeLocation.
 		double x = nodeLocation.X;
 		double y = nodeLocation.Y;
@@ -374,17 +403,7 @@ internal static class TreeHelpers
 			y += nodeLocation.Height + (1d / monitor.WorkingArea.Height);
 		}
 
-		if (rootNode is LeafNode leafNode)
-		{
-			return (Array.Empty<SplitNode>(), ImmutableArray<int>.Empty, leafNode);
-		}
-
-		if (rootNode is not SplitNode splitNode)
-		{
-			Logger.Error($"Unknown node type {rootNode.GetType()}");
-			return null;
-		}
-
+		// Get the adjacent node (the node containing the point (x, y)).
 		if (
 			splitNode.GetNodeContainingPoint(new Point<double>() { X = x, Y = y }) is
 
@@ -401,5 +420,24 @@ internal static class TreeHelpers
 
 		Logger.Error($"Failed to find node containing point {x}, {y}");
 		return null;
+	}
+
+	/// <summary>
+	/// Gets the last index for which the two lists have the same value.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="list1"></param>
+	/// <param name="list2"></param>
+	/// <returns>-1 if the lists have no common parent.</returns>
+	public static int GetLastCommonAncestorIndex<T>(IList<T> list1, IList<T> list2)
+	{
+		int idx = Math.Min(list1.Count, list2.Count) - 1;
+
+		while (idx >= 0 && !list1[idx]!.Equals(list2[idx]))
+		{
+			idx--;
+		}
+
+		return idx;
 	}
 }

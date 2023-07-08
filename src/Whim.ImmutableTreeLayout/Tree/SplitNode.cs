@@ -275,24 +275,23 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
-	/// Changes the weight of the given <paramref name="node"/> by <paramref name="delta"/>.
+	/// Changes the weight of the node at the given <paramref name="index"/> by the given <paramref name="delta"/>.
 	///
 	/// This method does not change the weight of the other children.
 	/// </summary>
-	/// <param name="node"></param>
+	/// <param name="index"></param>
 	/// <param name="delta"></param>
 	/// <returns></returns>
-	public SplitNode AdjustChildWeight(Node node, double delta)
+	public SplitNode AdjustChildWeight(int index, double delta)
 	{
-		int idx = Children.IndexOf(node);
-		if (idx < 0)
+		if (index < 0 || index >= Children.Count)
 		{
-			Logger.Error($"Node {node} not found in {this}");
+			Logger.Error($"Index {index} is out of range for {this}");
 			return this;
 		}
 
 		ImmutableList<double> weights = EqualWeight ? DistributeWeights() : Weights;
-		weights = weights.SetItem(idx, weights[idx] + delta);
+		weights = weights.SetItem(index, weights[index] + delta);
 
 		return new SplitNode(false, IsHorizontal, Children, weights);
 	}
