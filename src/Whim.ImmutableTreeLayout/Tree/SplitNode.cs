@@ -323,39 +323,6 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
-	/// Gets the weight of the given <paramref name="node"/>, and the sum of its
-	/// preceding siblings.
-	/// The <paramref name="node"/> must be a child of this <see cref="SplitNode"/>.
-	/// </summary>
-	/// <param name="node"></param>
-	/// <returns></returns>
-	public (double weight, double precedingWeight)? GetWeightAndPrecedingWeight(Node node)
-	{
-		int idx = Children.IndexOf(node);
-		if (idx < 0)
-		{
-			Logger.Error($"Node {node} not found in {this}");
-			return null;
-		}
-
-		double weight;
-		double precedingWeight;
-
-		if (EqualWeight)
-		{
-			weight = 1d / Children.Count;
-			precedingWeight = idx * weight;
-		}
-		else
-		{
-			weight = Weights[idx];
-			precedingWeight = Weights.Take(idx).Sum();
-		}
-
-		return (weight, precedingWeight);
-	}
-
-	/// <summary>
 	/// Flips the orientation of this <see cref="SplitNode"/>.
 	/// </summary>
 	/// <returns></returns>

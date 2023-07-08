@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Whim.ImmutableTreeLayout;
 
@@ -20,8 +21,12 @@ internal static class TreeHelpers
 	/// <param name="root">The root node of the tree.</param>
 	/// <param name="path">The path to the node.</param>
 	/// <returns></returns>
-	public static (SplitNode[] SplitNodes, LeafNode LeafNode)? GetNodeAtPath(this Node root, ImmutableArray<int> path)
+	public static (SplitNode[] SplitNodes, LeafNode LeafNode, ILocation<double> Rectangle)? GetNodeAtPath(
+		this Node root,
+		ImmutableArray<int> path
+	)
 	{
+		Location<double> location = new() { Height = 1, Width = 1 };
 		SplitNode[] splitNodes = new SplitNode[path.Length - 1];
 
 		Node currentNode = root;
@@ -36,7 +41,7 @@ internal static class TreeHelpers
 					return null;
 				}
 
-				return (splitNodes, leafNode);
+				return (splitNodes, leafNode, location);
 			}
 
 			if (currentNode is not SplitNode splitNode)
@@ -47,6 +52,32 @@ internal static class TreeHelpers
 
 			splitNodes[idx] = splitNode;
 			currentNode = splitNode.Children[index];
+
+			// Update the weight.
+			double precedingWeight;
+			double weight;
+
+			if (splitNode.EqualWeight)
+			{
+				weight = 1.0 / splitNode.Children.Count;
+				precedingWeight = weight * index;
+			}
+			else
+			{
+				weight = splitNode.Weights[index];
+				precedingWeight = splitNode.Weights.Take(index).Sum();
+			}
+
+			if (splitNode.IsHorizontal)
+			{
+				location.X += precedingWeight * location.Width;
+				location.Width = weight * location.Width;
+			}
+			else
+			{
+				location.Y += precedingWeight * location.Height;
+				location.Height = weight * location.Height;
+			}
 		}
 
 		Logger.Error($"Expected leaf node at end of path {path}");
@@ -227,9 +258,9 @@ internal static class TreeHelpers
 	/// Gets the <see cref="WindowState"/> for all windows, within the unit square.
 	/// </summary>
 	/// <param name="node">The root node of the tree.</param>
-	/// <param name="location">The location of the root node.</param>
+	/// <param name="location">The location of the root node, in monitor coordinates.</param>
 	/// <returns></returns>
-	internal static IEnumerable<NodeState> GetWindowLocations(this Node node, ILocation<int> location)
+	public static IEnumerable<NodeState> GetWindowLocations(this Node node, ILocation<int> location)
 	{
 		// If the node is a leaf node, then we can return the location, and break.
 		if (node is LeafNode)
@@ -273,5 +304,73 @@ internal static class TreeHelpers
 
 			precedingWeight += weight;
 		}
+	}
+
+	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
+		Node rootNode,
+		ImmutableArray<int> path,
+		Direction direction,
+		IMonitor monitor
+	)
+	{
+		// Get the coordinates of the node.
+		(SplitNode[], LeafNode, ILocation<double>)? result = rootNode.GetNodeAtPath(path);
+		if (result is null)
+		{
+			Logger.Error($"Failed to find node at path {path}");
+			return null;
+		}
+
+		(_, _, ILocation<double> nodeLocation) = result.Value;
+
+		// Next, we figure out the adjacent point of the nodeLocation.
+		double x = nodeLocation.X;
+		double y = nodeLocation.Y;
+
+		if (direction.HasFlag(Direction.Left))
+		{
+			x -= 1d / monitor.WorkingArea.Width;
+		}
+		else if (direction.HasFlag(Direction.Right))
+		{
+			x += nodeLocation.Width + (1d / monitor.WorkingArea.Width);
+		}
+
+		if (direction.HasFlag(Direction.Up))
+		{
+			y -= 1d / monitor.WorkingArea.Height;
+		}
+		else if (direction.HasFlag(Direction.Down))
+		{
+			y += nodeLocation.Height + (1d / monitor.WorkingArea.Height);
+		}
+
+		if (rootNode is LeafNode leafNode)
+		{
+			return (Array.Empty<SplitNode>(), ImmutableArray<int>.Empty, leafNode);
+		}
+
+		if (rootNode is not SplitNode splitNode)
+		{
+			Logger.Error($"Unknown node type {rootNode.GetType()}");
+			return null;
+		}
+
+		if (
+			splitNode.GetNodeContainingPoint(new Point<double>() { X = x, Y = y }) is
+
+			(
+				SplitNode[] adjacentNodeAncestors,
+				ImmutableArray<int> adjacentNodePath,
+				LeafNode adjacentLeafNode,
+				Direction
+			)
+		)
+		{
+			return (adjacentNodeAncestors, adjacentNodePath, adjacentLeafNode);
+		}
+
+		Logger.Error($"Failed to find node containing point {x}, {y}");
+		return null;
 	}
 }

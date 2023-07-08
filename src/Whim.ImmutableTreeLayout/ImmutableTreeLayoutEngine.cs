@@ -148,7 +148,9 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 				if (
 					_context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow is IWindow focusedWindow
 					&& _windows.TryGetValue(focusedWindow, out ImmutableArray<int> focusedWindowPath)
-					&& _root.GetNodeAtPath(focusedWindowPath) is (SplitNode[] pathAncestors, LeafNode leafNode)
+					&& _root.GetNodeAtPath(focusedWindowPath)
+						is
+						(SplitNode[] pathAncestors, LeafNode leafNode, ILocation<double>)
 				)
 				{
 					focusedNode = leafNode;
@@ -241,6 +243,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 		// Replace the current node with a split node.
 		SplitNode leafNodeReplacement = new(focusedNode, newLeafNode, direction);
+		// TODO: Test path empty path?
 		SplitNode newParentNode = parentNode.Replace(path[^1], leafNodeReplacement);
 		return CreateNewEngine(
 			oldNodeAncestors: ancestors,
@@ -281,8 +284,32 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		}
 	}
 
-	public void FocusWindowInDirection(Direction direction, IWindow window) =>
-		throw new System.NotImplementedException();
+	/// <inheritdoc />
+	public void FocusWindowInDirection(Direction direction, IWindow window)
+	{
+		Logger.Debug($"Focusing window {window} in direction {direction}");
+
+		if (_root is null)
+		{
+			Logger.Error($"Root is null, cannot focus window {window}");
+			return;
+		}
+
+		if (!_windows.TryGetValue(window, out ImmutableArray<int> path))
+		{
+			Logger.Error($"Window {window} not found in layout engine {Name}");
+			return;
+		}
+
+		(SplitNode[], ImmutableArray<int>, LeafNode LeafNode)? adjacentNodeResult = TreeHelpers.GetAdjacentNode(
+			_root,
+			path,
+			direction,
+			_context.MonitorManager.ActiveMonitor
+		);
+
+		adjacentNodeResult?.LeafNode?.Focus();
+	}
 
 	public IWindow? GetFirstWindow() => throw new System.NotImplementedException();
 
