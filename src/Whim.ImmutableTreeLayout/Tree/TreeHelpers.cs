@@ -114,6 +114,35 @@ internal static class TreeHelpers
 	}
 
 	/// <summary>
+	/// Gets the left-most child <see cref="LeafNode"/> of the given <see cref="SplitNode"/>.
+	/// </summary>
+	/// <param name="splitNode"></param>
+	/// <returns></returns>
+	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode) GetLeftMostLeaf(
+		this SplitNode splitNode
+	)
+	{
+		List<SplitNode> splitNodes = new();
+		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
+
+		Node currentNode = splitNode;
+		while (currentNode is SplitNode split)
+		{
+			splitNodes.Add(split);
+			pathBuilder.Add(0);
+			currentNode = split.Children[0];
+		}
+
+		if (currentNode is not LeafNode leaf)
+		{
+			Logger.Error($"Expected leaf node at end of path");
+			return default;
+		}
+
+		return (splitNodes.ToArray(), pathBuilder.ToImmutable(), leaf);
+	}
+
+	/// <summary>
 	/// Gets the leaf node containing the given point, or <see langword="null"/> if the point is not
 	/// inside the root location.
 	/// </summary>

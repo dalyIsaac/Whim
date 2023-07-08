@@ -311,7 +311,20 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		adjacentNodeResult?.LeafNode?.Focus();
 	}
 
-	public IWindow? GetFirstWindow() => throw new System.NotImplementedException();
+	/// <inheritdoc />
+	public IWindow? GetFirstWindow()
+	{
+		Logger.Debug($"Getting first window in layout engine {Name}");
+
+		return _root switch
+		{
+			null => null,
+			WindowNode windowNode => windowNode.Window,
+			PhantomNode => null,
+			SplitNode splitNode => splitNode.GetLeftMostLeaf().LeafNode.Window,
+			_ => null
+		};
+	}
 
 	public IImmutableLayoutEngine HidePhantomWindows() => throw new System.NotImplementedException();
 
