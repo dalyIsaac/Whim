@@ -88,13 +88,7 @@ public partial class TreeLayoutEngine
 	/// <returns>Location of the node. Used for recursion.</returns>
 	internal static ILocation<double> GetNodeLocation(Node node, Location<double>? location = null)
 	{
-		location ??= new Location<double>()
-		{
-			X = 0,
-			Y = 0,
-			Width = 1,
-			Height = 1
-		};
+		location ??= Location.UnitSquare<double>();
 
 		if (node.Parent == null)
 		{

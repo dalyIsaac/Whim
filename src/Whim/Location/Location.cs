@@ -3,6 +3,20 @@ using System.Numerics;
 
 namespace Whim;
 
+/// <summary>
+/// Helpers for <see cref="ILocation{T}"/>.
+/// </summary>
+public static class Location
+{
+	/// <summary>
+	/// Creates a new <see cref="Location{T}"/> of the unit square.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <returns></returns>
+	public static Location<T> UnitSquare<T>()
+		where T : INumber<T> => new() { Width = T.One, Height = T.One };
+}
+
 /// <inheritdoc />
 public record Location<T> : ILocation<T>, IEquatable<Location<T>>
 	where T : INumber<T>

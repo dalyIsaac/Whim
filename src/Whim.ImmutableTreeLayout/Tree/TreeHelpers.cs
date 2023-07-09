@@ -26,7 +26,12 @@ internal static class TreeHelpers
 		IReadOnlyList<int> path
 	)
 	{
-		Location<double> location = new() { Height = 1, Width = 1 };
+		Location<double> location = Location.UnitSquare<double>();
+		if (path.Count == 0)
+		{
+			return (Array.Empty<ISplitNode>(), root, location);
+		}
+
 		ISplitNode[] ancestors = new ISplitNode[path.Count - 1];
 
 		INode currentNode = root;

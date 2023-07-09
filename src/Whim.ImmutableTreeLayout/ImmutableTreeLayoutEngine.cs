@@ -282,7 +282,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		if (_root is WindowNode windowNode)
 		{
 			Logger.Debug($"Root is window node, replacing with split node");
-			Direction newNodeDirection = new Location<double>() { Width = 1, Height = 1 }.GetDirectionToPoint(point);
+			Direction newNodeDirection = Location.UnitSquare<double>().GetDirectionToPoint(point);
 
 			if (newNodeDirection.InsertAfter())
 			{

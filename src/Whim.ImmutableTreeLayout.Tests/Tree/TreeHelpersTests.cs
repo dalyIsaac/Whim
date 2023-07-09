@@ -5,8 +5,6 @@ namespace Whim.ImmutableTreeLayout.Tests;
 
 public class TreeHelpersTests
 {
-	private static ILocation<double> UnitSquare => new Location<double>() { Height = 1, Width = 1 };
-
 	[InlineData(Direction.Right, true)]
 	[InlineData(Direction.Down, true)]
 	[InlineData(Direction.Up, false)]
@@ -36,7 +34,7 @@ public class TreeHelpersTests
 		Assert.NotNull(result);
 		Assert.Empty(result.Value.Ancestors);
 		Assert.Equal(root.Object, result.Value.Node);
-		Assert.Equal(UnitSquare, result.Value.Location);
+		Assert.Equal(Location.UnitSquare<double>(), result.Value.Location);
 	}
 
 	[Fact]
