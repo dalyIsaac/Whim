@@ -369,13 +369,13 @@ internal static class TreeHelpers
 	/// Gets the adjacent node to the node at the <paramref name="nodeLocation"/>, in the given
 	/// <paramref name="direction"/>.
 	/// </summary>
-	/// <param name="splitNode">The root split node of the tree.</param>
+	/// <param name="rootSplitNode">The root split node of the tree.</param>
 	/// <param name="direction">The direction to search in.</param>
 	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
 	/// <param name="nodeLocation">The location of the node, in monitor coordinates.</param>
 	/// <returns></returns>
 	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
-		SplitNode splitNode,
+		SplitNode rootSplitNode,
 		Direction direction,
 		IMonitor monitor,
 		ILocation<double> nodeLocation
@@ -405,7 +405,7 @@ internal static class TreeHelpers
 
 		// Get the adjacent node (the node containing the point (x, y)).
 		if (
-			splitNode.GetNodeContainingPoint(new Point<double>() { X = x, Y = y }) is
+			rootSplitNode.GetNodeContainingPoint(new Point<double>() { X = x, Y = y }) is
 
 			(
 				SplitNode[] adjacentNodeAncestors,

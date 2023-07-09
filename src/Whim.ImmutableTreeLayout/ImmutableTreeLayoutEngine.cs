@@ -8,6 +8,14 @@ using WindowDict = System.Collections.Immutable.ImmutableDictionary<
 
 namespace Whim.ImmutableTreeLayout;
 
+internal record NonRootWindowData(
+	SplitNode RootSplitNode,
+	ImmutableArray<int> WindowPath,
+	SplitNode[] WindowAncestors,
+	Node WindowNode,
+	ILocation<double> WindowLocation
+);
+
 /// <summary>
 /// A tree layout engine allows users to create arbitrary window grid layouts.
 /// </summary>
@@ -118,6 +126,47 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		dictBuilder.Add(windowB, pathB.ToImmutable());
 
 		return dictBuilder.ToImmutable();
+	}
+
+	/// <summary>
+	/// Gets the data for a non-root window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	private NonRootWindowData? GetNonRootWindowData(IWindow window)
+	{
+		if (_root is null)
+		{
+			Logger.Error($"Root is null, cannot get window data");
+			return null;
+		}
+
+		if (_root is not SplitNode rootSplitNode)
+		{
+			Logger.Error($"Root is not split node, cannot get window data");
+			return null;
+		}
+
+		if (!_windows.TryGetValue(window, out ImmutableArray<int> windowPath))
+		{
+			Logger.Error($"Window {window} not found in layout engine");
+			return null;
+		}
+
+		var windowResult = rootSplitNode.GetNodeAtPath(windowPath);
+		if (windowResult is null)
+		{
+			Logger.Error($"Window {window} not found in layout engine");
+			return null;
+		}
+
+		return new NonRootWindowData(
+			rootSplitNode,
+			windowPath,
+			windowResult.Value.Ancestors,
+			windowResult.Value.Node,
+			windowResult.Value.Location
+		);
 	}
 
 	/// <inheritdoc/>
@@ -336,6 +385,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 	public IImmutableLayoutEngine HidePhantomWindows() => throw new System.NotImplementedException();
 
+	/// <inheritdoc />
 	public IImmutableLayoutEngine MoveWindowEdgesInDirection(
 		Direction edges,
 		IPoint<double> deltas,
@@ -344,34 +394,12 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	{
 		Logger.Debug($"Moving window edges {edges} in direction {deltas} for window {focusedWindow}");
 
-		if (_root is null)
-		{
-			Logger.Error(
-				$"Root is null, cannot move window edges {edges} in direction {deltas} for window {focusedWindow}"
-			);
-			return this;
-		}
-
-		if (_root is not SplitNode rootSplitNode)
-		{
-			Logger.Debug($"Root is not split node, cannot move window edges");
-			return this;
-		}
-
-		if (!_windows.TryGetValue(focusedWindow, out ImmutableArray<int> windowPath))
+		if (GetNonRootWindowData(focusedWindow) is not NonRootWindowData windowData)
 		{
 			Logger.Error($"Window {focusedWindow} not found in layout engine {Name}");
 			return this;
 		}
-
-		var focusedWindowResult = rootSplitNode.GetNodeAtPath(windowPath);
-		if (focusedWindowResult is null)
-		{
-			Logger.Error($"Failed to find window {focusedWindow} in layout engine {Name}");
-			return this;
-		}
-
-		(SplitNode[] windowAncestors, _, ILocation<double> windowLocation) = focusedWindowResult.Value;
+		var (rootSplitNode, windowPath, windowAncestors, _, windowLocation) = windowData;
 
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		(SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode)? xAdjacentResult = null;
@@ -379,7 +407,12 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 		if (edges.HasFlag(Direction.Left))
 		{
-			xAdjacentResult = TreeHelpers.GetAdjacentNode(rootSplitNode, Direction.Left, monitor, windowLocation);
+			xAdjacentResult = TreeHelpers.GetAdjacentNode(
+				windowData.RootSplitNode,
+				Direction.Left,
+				monitor,
+				windowLocation
+			);
 		}
 		else if (edges.HasFlag(Direction.Right))
 		{
@@ -534,6 +567,45 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		return CreateNewEngine(windowResult.Value.Ancestors, windowPath[..^1], newParentNode);
 	}
 
-	public IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
-		throw new System.NotImplementedException();
+	/// <inheritdoc />
+	public IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
+	{
+		Logger.Debug($"Swapping window {window} in direction {direction} in layout engine {Name}");
+
+		if (GetNonRootWindowData(window) is not NonRootWindowData windowData)
+		{
+			Logger.Error($"Window {window} not found in layout engine {Name}");
+			return this;
+		}
+
+		var adjacentResult = TreeHelpers.GetAdjacentNode(
+			windowData.RootSplitNode,
+			direction,
+			_context.MonitorManager.ActiveMonitor,
+			windowData.WindowLocation
+		);
+		if (adjacentResult is null)
+		{
+			Logger.Error($"Could not find adjacent node for focused window in layout engine {Name}");
+			return this;
+		}
+
+		// Get the parents of each node.
+		SplitNode windowParent = windowData.WindowAncestors[^1];
+		SplitNode adjacentParent = adjacentResult.Value.Ancestors[^1];
+
+		// If the parents are the same, we can just swap the windows.
+		if (windowParent == adjacentParent)
+		{
+			SplitNode newParent = windowParent.Swap(windowData.WindowPath[^1], adjacentResult.Value.Path[^1]);
+			return CreateNewEngine(windowData.WindowAncestors, windowData.WindowPath[..^1], newParent);
+		}
+
+		// If the parents are different, we need to swap the leaf nodes.
+		SplitNode newWindowParent = windowParent.Replace(windowData.WindowPath[^1], adjacentResult.Value.LeafNode);
+		SplitNode newAdjacentParent = adjacentParent.Replace(adjacentResult.Value.Path[^1], windowData.WindowNode);
+
+		return CreateNewEngine(windowData.WindowAncestors, windowData.WindowPath[..^1], newWindowParent)
+			.CreateNewEngine(adjacentResult.Value.Ancestors, adjacentResult.Value.Path[..^1], newAdjacentParent);
+	}
 }

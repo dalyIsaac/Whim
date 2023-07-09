@@ -215,43 +215,27 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
-	/// Swaps the given <paramref name="a"/> and <paramref name="b"/> in this <see cref="SplitNode"/>.
+	/// Swaps the nodes at the given indices.
 	/// </summary>
-	/// <param name="a"></param>
-	/// <param name="b"></param>
+	/// <param name="aIndex"></param>
+	/// <param name="bIndex"></param>
 	/// <returns></returns>
-	public SplitNode Swap(Node a, Node b)
+	public SplitNode Swap(int aIndex, int bIndex)
 	{
-		Logger.Verbose($"Swapping {a} and {b} in {this}");
-
-		int aIdx = -1;
-		int bIdx = -1;
-
-		for (int i = 0; i < Children.Count; i++)
+		if (aIndex < 0 || aIndex >= Children.Count)
 		{
-			if (Children[i] == a)
-			{
-				aIdx = i;
-			}
-			else if (Children[i] == b)
-			{
-				bIdx = i;
-			}
-
-			if (aIdx != -1 && bIdx != -1)
-			{
-				break;
-			}
-		}
-
-		if (aIdx == -1 || bIdx == -1)
-		{
-			Logger.Error($"Failed to swap {a} and {b} in {this}");
+			Logger.Error($"Index {aIndex} is out of range for {this}");
 			return this;
 		}
 
-		ImmutableList<Node> children = Children.SetItem(aIdx, b);
-		children = children.SetItem(bIdx, a);
+		if (bIndex < 0 || bIndex >= Children.Count)
+		{
+			Logger.Error($"Index {bIndex} is out of range for {this}");
+			return this;
+		}
+
+		ImmutableList<Node> children = Children.SetItem(aIndex, Children[bIndex]);
+		children = children.SetItem(bIndex, Children[aIndex]);
 
 		return new SplitNode(EqualWeight, IsHorizontal, children, Weights);
 	}
