@@ -36,7 +36,31 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	/// <inheritdoc/>
 	public int Count => _windows.Count;
 
-	public Direction AddNodeDirection { get; } = Direction.Right;
+	private Direction _addNodeDirection = Direction.Right;
+
+	/// <summary>
+	/// The direction to add new windows to the tree, when there isn't an explicit direction.
+	/// This must be one of the cardinal directions.
+	/// </summary>
+	public Direction AddNodeDirection
+	{
+		get => _addNodeDirection;
+		init
+		{
+			switch (value)
+			{
+				case Direction.Left:
+				case Direction.Right:
+				case Direction.Up:
+				case Direction.Down:
+					break;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(value), value, "Invalid direction.");
+			}
+
+			_addNodeDirection = value;
+		}
+	}
 
 	private TreeLayoutEngine(TreeLayoutEngine engine, INode root, WindowDict windows)
 		: this(engine._context, engine._plugin)
