@@ -10,35 +10,16 @@ namespace Whim.ImmutableTreeLayout;
 /// SplitNodes dictate the layout of the windows. They have a specific direction, and
 /// children.
 /// </summary>
-internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
+internal class SplitNode : ISplitNode
 {
-	/// <summary>
-	/// The weights of the children. If <see cref="EqualWeight"/> is <see langword="true"/>, then
-	/// the weights here are ignored in favour of <code>1d / _children.Count</code>.
-	/// </summary>
 	public ImmutableList<double> Weights { get; }
 
-	/// <summary>
-	/// The child nodes of this <see cref="SplitNode"/>. These will likely be either <see cref="SplitNode"/>s,
-	/// or child classes of <see cref="LeafNode"/>.
-	/// </summary>
 	public ImmutableList<INode> Children { get; }
 
-	/// <summary>
-	/// The number of nodes in this <see cref="SplitNode"/>.
-	/// </summary>
 	public int Count => Children.Count;
 
-	/// <summary>
-	/// When <see langword="true"/>, the <see cref="Children"/> are split
-	/// within the parent node equally. This overrides the weights in <see cref="Weights"/>.
-	/// </summary>
 	public bool EqualWeight { get; }
 
-	/// <summary>
-	/// When <see langword="true"/>, the <see cref="Children"/> are arranged horizontally.
-	/// Otherwise, they are arranged vertically.
-	/// </summary>
 	public bool IsHorizontal { get; }
 
 	/// <summary>
@@ -90,23 +71,9 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		Weights = weights;
 	}
 
-	/// <summary>
-	/// Adds the given <paramref name="newNode"/> to this <see cref="SplitNode"/>, in the given
-	/// <paramref name="direction"/>, in relation to the given <paramref name="focusedNode"/>.
-	/// If <paramref name="focusedNode"/> is <see langword="null"/>, then the new node is added
-	/// to the end of the list.
-	/// </summary>
-	/// <param name="focusedNode"></param>
-	/// <param name="newNode"></param>
-	/// <param name="direction"></param>
-	/// <returns></returns>
-
-	// TODO: Replace Direction with a boolean for inserting before/after - it's not currently correct
-	// for the direction to be used for this, as Direction.Right could be passed into a vertical
-	// split node.
-	public SplitNode Add(INode focusedNode, INode newNode, Direction direction)
+	public SplitNode Add(INode focusedNode, INode newNode, bool insertAfter)
 	{
-		Logger.Verbose($"Adding {newNode} to {this}, in direction {direction} in relation to {focusedNode}");
+		Logger.Verbose($"Adding {newNode} to {this}, {(insertAfter ? "after" : "before")} {focusedNode}");
 
 		// Find the index of the focused node.
 		int idx = Children.IndexOf(focusedNode);
@@ -119,23 +86,7 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		int focusedNodeIdx = idx;
 
 		// Find the index of the new node.
-		int delta;
-		switch (direction)
-		{
-			case Direction.Right:
-			case Direction.Down:
-				delta = 1;
-				break;
-			case Direction.Left:
-			case Direction.Up:
-				delta = 0;
-				break;
-			default:
-				Logger.Error($"{direction} is not a valid direction to add a node in, defaulting to a delta of 1");
-				delta = 1;
-				break;
-		}
-
+		int delta = insertAfter ? 1 : 0;
 		int newNodeIdx = Math.Clamp(focusedNodeIdx + delta, 0, Children.Count);
 
 		// Insert the node.
@@ -158,13 +109,6 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		return new SplitNode(EqualWeight, IsHorizontal, children, weights);
 	}
 
-	/// <summary>
-	/// Removes the node at the given <paramref name="index"/> from this <see cref="SplitNode"/>.
-	/// If this <see cref="SplitNode"/> is not <see cref="EqualWeight"/>, then the weight of the
-	/// last node is increased by the weight of the removed node.
-	/// </summary>
-	/// <param name="index"></param>
-	/// <returns></returns>
 	public SplitNode Remove(int index)
 	{
 		Logger.Verbose($"Removing node at index {index} from {this}");
@@ -194,12 +138,6 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		return new SplitNode(EqualWeight, IsHorizontal, children, weights);
 	}
 
-	/// <summary>
-	/// Replaces the node at the given <paramref name="index"/> with the given <paramref name="newNode"/>.
-	/// </summary>
-	/// <param name="index">The index of the node to replace.</param>
-	/// <param name="newNode">The node to replace the old node with.</param>
-	/// <returns></returns>
 	public SplitNode Replace(int index, INode newNode)
 	{
 		Logger.Verbose($"Replacing the node at index {index} with {newNode}");
@@ -214,12 +152,6 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		return new SplitNode(EqualWeight, IsHorizontal, children, Weights);
 	}
 
-	/// <summary>
-	/// Swaps the nodes at the given indices.
-	/// </summary>
-	/// <param name="aIndex"></param>
-	/// <param name="bIndex"></param>
-	/// <returns></returns>
 	public SplitNode Swap(int aIndex, int bIndex)
 	{
 		if (aIndex < 0 || aIndex >= Children.Count)
@@ -257,14 +189,6 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		return builder.ToImmutable();
 	}
 
-	/// <summary>
-	/// Changes the weight of the node at the given <paramref name="index"/> by the given <paramref name="delta"/>.
-	///
-	/// This method does not change the weight of the other children.
-	/// </summary>
-	/// <param name="index"></param>
-	/// <param name="delta"></param>
-	/// <returns></returns>
 	public SplitNode AdjustChildWeight(int index, double delta)
 	{
 		if (index < 0 || index >= Children.Count)
@@ -286,12 +210,6 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 	/// <returns></returns>
 	private double GetChildWeight(int idx) => EqualWeight ? 1d / Children.Count : Weights[idx];
 
-	/// <summary>
-	/// Get the weight of the given <paramref name="node"/>.
-	/// The <paramref name="node"/> must be a child of this <see cref="SplitNode"/>.
-	/// </summary>
-	/// <param name="node"></param>
-	/// <returns></returns>
 	public double? GetChildWeight(INode node)
 	{
 		int idx = Children.IndexOf(node);
@@ -304,12 +222,6 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		return GetChildWeight(idx);
 	}
 
-
-
-	/// <summary>
-	/// Toggles the <see cref="EqualWeight"/> property of this <see cref="SplitNode"/>.
-	/// </summary>
-	/// <returns></returns>
 	public SplitNode ToggleEqualWeight()
 	{
 		Logger.Verbose($"Toggling EqualWeight of {this}");
@@ -317,12 +229,6 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		return new SplitNode(!EqualWeight, IsHorizontal, Children, DistributeWeights());
 	}
 
-	/// <summary>
-	/// Merge the given <paramref name="child"/> into this <see cref="SplitNode"/>, at its current
-	/// position.
-	/// </summary>
-	/// <param name="child">The child to merge.</param>
-	/// <returns></returns>
 	public SplitNode MergeChild(SplitNode child)
 	{
 		Logger.Verbose($"Merging {child} into {this}");
@@ -352,10 +258,6 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		return new SplitNode(false, IsHorizontal, children, weights);
 	}
 
-	/// <summary>
-	/// Gets the child nodes and their weights.
-	/// </summary>
-	/// <returns></returns>
 	public IEnumerator<(double Weight, INode Node)> GetEnumerator()
 	{
 		if (EqualWeight)
