@@ -32,38 +32,38 @@ internal static class TreeHelpers
 			return (Array.Empty<ISplitNode>(), root, location);
 		}
 
-		ISplitNode[] ancestors = new ISplitNode[path.Count - 1];
+		ISplitNode[] ancestors = new ISplitNode[path.Count];
 
 		INode currentNode = root;
 		for (int idx = 0; idx < path.Count; idx++)
 		{
 			int index = path[idx];
 
-			if (currentNode is not ISplitNode ISplitNode)
+			if (currentNode is not ISplitNode splitNode)
 			{
 				Logger.Error($"Expected split node at index {idx} of path {path}");
 				return null;
 			}
 
-			ancestors[idx] = ISplitNode;
-			currentNode = ISplitNode.Children[index];
+			ancestors[idx] = splitNode;
+			currentNode = splitNode.Children[index];
 
 			// Update the weight.
 			double precedingWeight;
 			double weight;
 
-			if (ISplitNode.EqualWeight)
+			if (splitNode.EqualWeight)
 			{
-				weight = 1.0 / ISplitNode.Children.Count;
+				weight = 1.0 / splitNode.Children.Count;
 				precedingWeight = weight * index;
 			}
 			else
 			{
-				weight = ISplitNode.Weights[index];
-				precedingWeight = ISplitNode.Weights.Take(index).Sum();
+				weight = splitNode.Weights[index];
+				precedingWeight = splitNode.Weights.Take(index).Sum();
 			}
 
-			if (ISplitNode.IsHorizontal)
+			if (splitNode.IsHorizontal)
 			{
 				location.X += precedingWeight * location.Width;
 				location.Width = weight * location.Width;
@@ -110,16 +110,16 @@ internal static class TreeHelpers
 	/// <summary>
 	/// Gets the left-most child <see cref="LeafNode"/> of the given <see cref="ISplitNode"/>.
 	/// </summary>
-	/// <param name="ISplitNode"></param>
+	/// <param name="rootSplitNode"></param>
 	/// <returns></returns>
 	public static (ISplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode) GetLeftMostLeaf(
-		this ISplitNode ISplitNode
+		this ISplitNode rootSplitNode
 	)
 	{
 		List<ISplitNode> splitNodes = new();
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
 
-		INode currentNode = ISplitNode;
+		INode currentNode = rootSplitNode;
 		while (currentNode is ISplitNode split)
 		{
 			splitNodes.Add(split);
@@ -351,7 +351,7 @@ internal static class TreeHelpers
 			return (Array.Empty<ISplitNode>(), ImmutableArray<int>.Empty, leafNode);
 		}
 
-		if (rootNode is not ISplitNode ISplitNode)
+		if (rootNode is not ISplitNode rootSplitNode)
 		{
 			Logger.Error($"Unknown node type {rootNode.GetType()}");
 			return null;
@@ -367,7 +367,7 @@ internal static class TreeHelpers
 
 		(_, _, ILocation<double> nodeLocation) = result.Value;
 
-		return GetAdjacentNode(ISplitNode, direction, monitor, nodeLocation);
+		return GetAdjacentNode(rootSplitNode, direction, monitor, nodeLocation);
 	}
 
 	/// <summary>

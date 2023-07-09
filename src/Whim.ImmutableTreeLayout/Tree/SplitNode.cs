@@ -61,7 +61,7 @@ internal class SplitNode : ISplitNode
 	/// <param name="isHorizontal"></param>
 	/// <param name="children"></param>
 	/// <param name="weights"></param>
-	private SplitNode(bool equalWeight, bool isHorizontal, ImmutableList<INode> children, ImmutableList<double> weights)
+	public SplitNode(bool equalWeight, bool isHorizontal, ImmutableList<INode> children, ImmutableList<double> weights)
 	{
 		EqualWeight = equalWeight;
 		IsHorizontal = isHorizontal;
@@ -200,25 +200,6 @@ internal class SplitNode : ISplitNode
 		weights = weights.SetItem(index, weights[index] + delta);
 
 		return new SplitNode(false, IsHorizontal, Children, weights);
-	}
-
-	/// <summary>
-	/// Gets the weight of the node at the given index.
-	/// </summary>
-	/// <param name="idx"></param>
-	/// <returns></returns>
-	private double GetChildWeight(int idx) => EqualWeight ? 1d / Children.Count : Weights[idx];
-
-	public double? GetChildWeight(INode node)
-	{
-		int idx = Children.IndexOf(node);
-		if (idx < 0)
-		{
-			Logger.Error($"Node {node} not found in {this}");
-			return null;
-		}
-
-		return GetChildWeight(idx);
 	}
 
 	public ISplitNode ToggleEqualWeight()

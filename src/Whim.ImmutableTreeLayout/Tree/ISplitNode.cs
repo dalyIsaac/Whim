@@ -83,14 +83,6 @@ internal interface ISplitNode : INode, IEnumerable<(double Weight, INode Node)>
 	ISplitNode AdjustChildWeight(int index, double delta);
 
 	/// <summary>
-	/// Get the weight of the given <paramref name="node"/>.
-	/// The <paramref name="node"/> must be a child of this <see cref="ISplitNode"/>.
-	/// </summary>
-	/// <param name="node"></param>
-	/// <returns></returns>
-	double? GetChildWeight(INode node);
-
-	/// <summary>
 	/// Toggles the <see cref="EqualWeight"/> property of this <see cref="ISplitNode"/>.
 	/// </summary>
 	/// <returns></returns>

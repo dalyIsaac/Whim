@@ -383,41 +383,7 @@ public class SplitNodeTests
 	}
 	#endregion
 
-	#region
-	[Fact]
-	public void GetChildWeight_CouldNotFindNode()
-	{
-		// Given
-		WindowNode focusedNode = CreateWindowNode();
-		WindowNode otherNode = CreateWindowNode();
 
-		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
-
-		// When
-		double? result = splitNode.GetChildWeight(CreateWindowNode());
-
-		// Then
-		Assert.Null(result);
-	}
-
-	[Fact]
-	public void GetChildWeight_Success()
-	{
-		// Given
-		WindowNode focusedNode = CreateWindowNode();
-		WindowNode otherNode = CreateWindowNode();
-
-		ISplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
-			.ToggleEqualWeight()
-			.Add(otherNode, CreateWindowNode(), insertAfter: true);
-
-		// When
-		double? result = splitNode.GetChildWeight(otherNode);
-
-		// Then
-		Assert.Equal(0.25, result);
-	}
-	#endregion
 
 	[Fact]
 	public void GetEnumerator()
