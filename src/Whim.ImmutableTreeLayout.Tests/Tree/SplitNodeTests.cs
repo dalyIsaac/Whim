@@ -165,7 +165,6 @@ public class SplitNodeTests
 		Assert.Equal((0.25, otherNode), children[2]);
 	}
 
-
 	#endregion
 
 	#region Remove
