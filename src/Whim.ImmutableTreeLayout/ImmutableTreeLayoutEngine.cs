@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -9,9 +10,9 @@ using WindowDict = System.Collections.Immutable.ImmutableDictionary<
 namespace Whim.ImmutableTreeLayout;
 
 internal record NonRootWindowData(
-	SplitNode RootSplitNode,
+	ISplitNode RootSplitNode,
 	ImmutableArray<int> WindowPath,
-	SplitNode[] WindowAncestors,
+	ISplitNode[] WindowAncestors,
 	INode WindowNode,
 	ILocation<double> WindowLocation
 );
@@ -90,7 +91,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	/// <param name="newNode">The new node to replace the old node.</param>
 	/// <returns></returns>
 	private TreeLayoutEngine CreateNewEngine(
-		SplitNode[] oldNodeAncestors,
+		ISplitNode[] oldNodeAncestors,
 		ImmutableArray<int> oldNodePath,
 		INode newNode
 	)
@@ -99,8 +100,8 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 		for (int idx = oldNodePath.Length - 1; idx >= 0; idx--)
 		{
-			SplitNode parent = oldNodeAncestors[idx];
-			SplitNode newParent = parent.Replace(oldNodePath[idx], current);
+			ISplitNode parent = oldNodeAncestors[idx];
+			ISplitNode newParent = parent.Replace(oldNodePath[idx], current);
 
 			current = newParent;
 		}
@@ -165,7 +166,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return null;
 		}
 
-		if (_root is not SplitNode rootSplitNode)
+		if (_root is not ISplitNode rootSplitNode)
 		{
 			Logger.Error($"Root is not split node, cannot get window data");
 			return null;
@@ -215,14 +216,14 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 			case WindowNode rootNode:
 				Logger.Debug($"Root is window node, replacing with split node");
-				SplitNode newRoot = new(rootNode, newLeafNode, AddNodeDirection);
+				ISplitNode newRoot = new SplitNode(rootNode, newLeafNode, AddNodeDirection);
 				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(rootNode.Window, window));
 
-			case SplitNode rootNode:
+			case ISplitNode rootNode:
 				Logger.Debug($"Root is split node, adding new leaf node");
 
 				LeafNode? focusedNode;
-				SplitNode[] ancestors;
+				ISplitNode[] ancestors;
 				ImmutableArray<int> path;
 
 				// Try get the focused window, and use its parent. Otherwise, use the right-most leaf.
@@ -231,7 +232,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 					&& _windows.TryGetValue(focusedWindow, out ImmutableArray<int> focusedWindowPath)
 					&& _root.GetNodeAtPath(focusedWindowPath)
 						is
-						(SplitNode[] pathAncestors, LeafNode leafNode, ILocation<double>)
+						(ISplitNode[] pathAncestors, LeafNode leafNode, ILocation<double>)
 				)
 				{
 					focusedNode = leafNode;
@@ -245,8 +246,8 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 				// TODO: Test this assumption.
 				// We're assuming that there is a parent node - otherwise we wouldn't have reached this point.
-				SplitNode parentNode = ancestors[^1];
-				SplitNode newParent = parentNode.Add(focusedNode, newLeafNode, AddNodeDirection);
+				ISplitNode parentNode = ancestors[^1];
+				ISplitNode newParent = parentNode.Add(focusedNode, newLeafNode, AddNodeDirection.InsertAfter());
 				return CreateNewEngine(ancestors, path.RemoveAt(path.Length - 1), newParent);
 
 			default:
@@ -283,19 +284,19 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			Logger.Debug($"Root is window node, replacing with split node");
 			Direction newNodeDirection = new Location<double>() { Width = 1, Height = 1 }.GetDirectionToPoint(point);
 
-			if (newNodeDirection.IsPositiveIndex())
+			if (newNodeDirection.InsertAfter())
 			{
-				SplitNode newRoot = new(windowNode, newLeafNode, newNodeDirection);
+				ISplitNode newRoot = new SplitNode(windowNode, newLeafNode, newNodeDirection);
 				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(windowNode.Window, window));
 			}
 			else
 			{
-				SplitNode newRoot = new(newLeafNode, windowNode, newNodeDirection);
+				ISplitNode newRoot = new SplitNode(newLeafNode, windowNode, newNodeDirection);
 				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(window, windowNode.Window));
 			}
 		}
 
-		if (_root is not SplitNode rootNode)
+		if (_root is not ISplitNode rootNode)
 		{
 			Logger.Error($"Unexpected root node type: {_root.GetType()}");
 			return this;
@@ -308,13 +309,13 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		(SplitNode[] ancestors, ImmutableArray<int> path, LeafNode focusedNode, Direction direction) = result.Value;
+		(ISplitNode[] ancestors, ImmutableArray<int> path, LeafNode focusedNode, Direction direction) = result.Value;
 
-		SplitNode parentNode = ancestors[^1];
+		ISplitNode parentNode = ancestors[^1];
 		if (parentNode.IsHorizontal == direction.IsHorizontal())
 		{
 			// Add the node to the parent.
-			SplitNode newParent = parentNode.Add(focusedNode, newLeafNode, direction);
+			ISplitNode newParent = parentNode.Add(focusedNode, newLeafNode, direction.InsertAfter());
 			return CreateNewEngine(
 				oldNodeAncestors: ancestors,
 				oldNodePath: path.RemoveAt(path.Length - 1),
@@ -323,9 +324,9 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		}
 
 		// Replace the current node with a split node.
-		SplitNode leafNodeReplacement = new(focusedNode, newLeafNode, direction);
+		ISplitNode leafNodeReplacement = new SplitNode(focusedNode, newLeafNode, direction);
 		// TODO: Test path empty path?
-		SplitNode newParentNode = parentNode.Replace(path[^1], leafNodeReplacement);
+		ISplitNode newParentNode = parentNode.Replace(path[^1], leafNodeReplacement);
 		return CreateNewEngine(
 			oldNodeAncestors: ancestors,
 			oldNodePath: path.RemoveAt(path.Length - 1),
@@ -382,7 +383,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return;
 		}
 
-		(SplitNode[], ImmutableArray<int>, LeafNode LeafNode)? adjacentNodeResult = TreeHelpers.GetAdjacentNode(
+		(ISplitNode[], ImmutableArray<int>, LeafNode LeafNode)? adjacentNodeResult = TreeHelpers.GetAdjacentNode(
 			_root,
 			path,
 			direction,
@@ -402,7 +403,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			null => null,
 			WindowNode windowNode => windowNode.Window,
 			PhantomNode => null,
-			SplitNode splitNode => splitNode.GetLeftMostLeaf().LeafNode.Window,
+			ISplitNode ISplitNode => ISplitNode.GetLeftMostLeaf().LeafNode.Window,
 			_ => null
 		};
 	}
@@ -438,8 +439,8 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		var (rootSplitNode, windowPath, windowAncestors, _, windowLocation) = windowData;
 
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
-		(SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode)? xAdjacentResult = null;
-		(SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode)? yAdjacentResult = null;
+		(ISplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode)? xAdjacentResult = null;
+		(ISplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode)? yAdjacentResult = null;
 
 		if (edges.HasFlag(Direction.Left))
 		{
@@ -485,7 +486,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 				xAdjacentResult.Value.Path
 			);
 
-			rootSplitNode = (SplitNode)newEngine._root!;
+			rootSplitNode = (ISplitNode)newEngine._root!;
 		}
 
 		if (yAdjacentResult != null)
@@ -505,12 +506,12 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	}
 
 	private TreeLayoutEngine MoveSingleWindowEdgeInDirection(
-		SplitNode root,
+		ISplitNode root,
 		double delta,
 		bool isXAxis,
-		SplitNode[] focusedNodeAncestors,
+		ISplitNode[] focusedNodeAncestors,
 		ImmutableArray<int> focusedNodePath,
-		SplitNode[] adjacentNodeAncestors,
+		ISplitNode[] adjacentNodeAncestors,
 		ImmutableArray<int> adjacentNodePath
 	)
 	{
@@ -533,8 +534,8 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		(SplitNode[] parentAncestors, INode parentNode, ILocation<double> parentLocation) = parentResult.Value;
-		if (parentNode is not SplitNode parentSplitNode)
+		(ISplitNode[] parentAncestors, INode parentNode, ILocation<double> parentLocation) = parentResult.Value;
+		if (parentNode is not ISplitNode parentSplitNode)
 		{
 			Logger.Error($"Focused ancestor node is not a split node");
 			return this;
@@ -544,7 +545,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		double relativeDelta = delta / (isXAxis ? parentLocation.Width : parentLocation.Height);
 
 		// Now we can adjust the weights.
-		SplitNode newParent = parentSplitNode
+		ISplitNode newParent = parentSplitNode
 			.AdjustChildWeight(focusedNodePath[parentDepth], relativeDelta)
 			.AdjustChildWeight(adjacentNodePath[parentDepth], -relativeDelta);
 
@@ -588,7 +589,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		SplitNode parentNode = windowResult.Value.Ancestors[^1];
+		ISplitNode parentNode = windowResult.Value.Ancestors[^1];
 
 		// If the parent node has just two children, remove the parent node and replace it with the other child.
 		if (parentNode.Children.Count == 2)
@@ -599,7 +600,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return CreateNewEngine(windowResult.Value.Ancestors, windowPath[..^1], otherChild);
 		}
 
-		SplitNode newParentNode = parentNode.Remove(windowPath[^1]);
+		ISplitNode newParentNode = parentNode.Remove(windowPath[^1]);
 		return CreateNewEngine(windowResult.Value.Ancestors, windowPath[..^1], newParentNode);
 	}
 
@@ -627,19 +628,19 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		}
 
 		// Get the parents of each node.
-		SplitNode windowParent = windowData.WindowAncestors[^1];
-		SplitNode adjacentParent = adjacentResult.Value.Ancestors[^1];
+		ISplitNode windowParent = windowData.WindowAncestors[^1];
+		ISplitNode adjacentParent = adjacentResult.Value.Ancestors[^1];
 
 		// If the parents are the same, we can just swap the windows.
 		if (windowParent == adjacentParent)
 		{
-			SplitNode newParent = windowParent.Swap(windowData.WindowPath[^1], adjacentResult.Value.Path[^1]);
+			ISplitNode newParent = windowParent.Swap(windowData.WindowPath[^1], adjacentResult.Value.Path[^1]);
 			return CreateNewEngine(windowData.WindowAncestors, windowData.WindowPath[..^1], newParent);
 		}
 
 		// If the parents are different, we need to swap the leaf nodes.
-		SplitNode newWindowParent = windowParent.Replace(windowData.WindowPath[^1], adjacentResult.Value.LeafNode);
-		SplitNode newAdjacentParent = adjacentParent.Replace(adjacentResult.Value.Path[^1], windowData.WindowNode);
+		ISplitNode newWindowParent = windowParent.Replace(windowData.WindowPath[^1], adjacentResult.Value.LeafNode);
+		ISplitNode newAdjacentParent = adjacentParent.Replace(adjacentResult.Value.Path[^1], windowData.WindowNode);
 
 		return CreateNewEngine(windowData.WindowAncestors, windowData.WindowPath[..^1], newWindowParent)
 			.CreateNewEngine(adjacentResult.Value.Ancestors, adjacentResult.Value.Path[..^1], newAdjacentParent);

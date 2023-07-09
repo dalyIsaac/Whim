@@ -13,7 +13,7 @@ internal static class TreeHelpers
 	/// Returns <see langword="true"/> if the direction indicates that a
 	/// newly added node would be placed after the currently focused node.
 	/// </summary>
-	public static bool IsPositiveIndex(this Direction direction) => direction is Direction.Right or Direction.Down;
+	public static bool InsertAfter(this Direction direction) => direction is Direction.Right or Direction.Down;
 
 	/// <summary>
 	/// Gets the node at the given path in the tree, and its parent nodes.
@@ -21,44 +21,44 @@ internal static class TreeHelpers
 	/// <param name="root">The root node of the tree.</param>
 	/// <param name="path">The path to the node.</param>
 	/// <returns></returns>
-	public static (SplitNode[] Ancestors, INode Node, ILocation<double> Location)? GetNodeAtPath(
+	public static (ISplitNode[] Ancestors, INode Node, ILocation<double> Location)? GetNodeAtPath(
 		this INode root,
 		IReadOnlyList<int> path
 	)
 	{
 		Location<double> location = new() { Height = 1, Width = 1 };
-		SplitNode[] ancestors = new SplitNode[path.Count - 1];
+		ISplitNode[] ancestors = new ISplitNode[path.Count - 1];
 
 		INode currentNode = root;
 		for (int idx = 0; idx < path.Count; idx++)
 		{
 			int index = path[idx];
 
-			if (currentNode is not SplitNode splitNode)
+			if (currentNode is not ISplitNode ISplitNode)
 			{
 				Logger.Error($"Expected split node at index {idx} of path {path}");
 				return null;
 			}
 
-			ancestors[idx] = splitNode;
-			currentNode = splitNode.Children[index];
+			ancestors[idx] = ISplitNode;
+			currentNode = ISplitNode.Children[index];
 
 			// Update the weight.
 			double precedingWeight;
 			double weight;
 
-			if (splitNode.EqualWeight)
+			if (ISplitNode.EqualWeight)
 			{
-				weight = 1.0 / splitNode.Children.Count;
+				weight = 1.0 / ISplitNode.Children.Count;
 				precedingWeight = weight * index;
 			}
 			else
 			{
-				weight = splitNode.Weights[index];
-				precedingWeight = splitNode.Weights.Take(index).Sum();
+				weight = ISplitNode.Weights[index];
+				precedingWeight = ISplitNode.Weights.Take(index).Sum();
 			}
 
-			if (splitNode.IsHorizontal)
+			if (ISplitNode.IsHorizontal)
 			{
 				location.X += precedingWeight * location.Width;
 				location.Width = weight * location.Width;
@@ -74,19 +74,19 @@ internal static class TreeHelpers
 	}
 
 	/// <summary>
-	/// Gets the right-most child <see cref="LeafNode"/> of the given <see cref="SplitNode"/>.
+	/// Gets the right-most child <see cref="LeafNode"/> of the given <see cref="ISplitNode"/>.
 	/// </summary>
-	/// <param name="splitNode"></param>
+	/// <param name="ISplitNode"></param>
 	/// <returns></returns>
-	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode) GetRightMostLeaf(
-		this SplitNode splitNode
+	public static (ISplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode) GetRightMostLeaf(
+		this ISplitNode ISplitNode
 	)
 	{
-		List<SplitNode> splitNodes = new();
+		List<ISplitNode> splitNodes = new();
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
 
-		INode currentNode = splitNode;
-		while (currentNode is SplitNode split)
+		INode currentNode = ISplitNode;
+		while (currentNode is ISplitNode split)
 		{
 			splitNodes.Add(split);
 			pathBuilder.Add(split.Children.Count - 1);
@@ -103,19 +103,19 @@ internal static class TreeHelpers
 	}
 
 	/// <summary>
-	/// Gets the left-most child <see cref="LeafNode"/> of the given <see cref="SplitNode"/>.
+	/// Gets the left-most child <see cref="LeafNode"/> of the given <see cref="ISplitNode"/>.
 	/// </summary>
-	/// <param name="splitNode"></param>
+	/// <param name="ISplitNode"></param>
 	/// <returns></returns>
-	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode) GetLeftMostLeaf(
-		this SplitNode splitNode
+	public static (ISplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode) GetLeftMostLeaf(
+		this ISplitNode ISplitNode
 	)
 	{
-		List<SplitNode> splitNodes = new();
+		List<ISplitNode> splitNodes = new();
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
 
-		INode currentNode = splitNode;
-		while (currentNode is SplitNode split)
+		INode currentNode = ISplitNode;
+		while (currentNode is ISplitNode split)
 		{
 			splitNodes.Add(split);
 			pathBuilder.Add(0);
@@ -139,11 +139,11 @@ internal static class TreeHelpers
 	/// <param name="searchPoint">The point to search for.</param>
 	/// <returns></returns>
 	public static (
-		SplitNode[] Ancestors,
+		ISplitNode[] Ancestors,
 		ImmutableArray<int> Path,
 		LeafNode LeafNode,
 		Direction Direction
-	)? GetNodeContainingPoint(this SplitNode rootNode, IPoint<double> searchPoint)
+	)? GetNodeContainingPoint(this ISplitNode rootNode, IPoint<double> searchPoint)
 	{
 		ILocation<double> rootRectangle = new Location<double>
 		{
@@ -159,7 +159,7 @@ internal static class TreeHelpers
 			return null;
 		}
 
-		List<SplitNode> splitNodes = new();
+		List<ISplitNode> splitNodes = new();
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
 
 		INode currentNode = rootNode;
@@ -173,7 +173,7 @@ internal static class TreeHelpers
 				Height = rootRectangle.Height
 			};
 
-		while (currentNode is SplitNode split)
+		while (currentNode is ISplitNode split)
 		{
 			foreach ((double weight, INode child) in split)
 			{
@@ -289,7 +289,7 @@ internal static class TreeHelpers
 		}
 
 		// If the node is not a leaf node, it's a split node.
-		SplitNode parent = (SplitNode)node;
+		ISplitNode parent = (ISplitNode)node;
 
 		// Perform an in-order traversal of the tree.
 		double precedingWeight = 0;
@@ -333,7 +333,7 @@ internal static class TreeHelpers
 	/// <param name="direction">The direction to search in.</param>
 	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
 	/// <returns></returns>
-	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
+	public static (ISplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
 		INode rootNode,
 		IReadOnlyList<int> pathToNode,
 		Direction direction,
@@ -343,10 +343,10 @@ internal static class TreeHelpers
 		// If the root node is a leaf node, then we can't find an adjacent node.
 		if (rootNode is LeafNode leafNode)
 		{
-			return (Array.Empty<SplitNode>(), ImmutableArray<int>.Empty, leafNode);
+			return (Array.Empty<ISplitNode>(), ImmutableArray<int>.Empty, leafNode);
 		}
 
-		if (rootNode is not SplitNode splitNode)
+		if (rootNode is not ISplitNode ISplitNode)
 		{
 			Logger.Error($"Unknown node type {rootNode.GetType()}");
 			return null;
@@ -362,7 +362,7 @@ internal static class TreeHelpers
 
 		(_, _, ILocation<double> nodeLocation) = result.Value;
 
-		return GetAdjacentNode(splitNode, direction, monitor, nodeLocation);
+		return GetAdjacentNode(ISplitNode, direction, monitor, nodeLocation);
 	}
 
 	/// <summary>
@@ -374,8 +374,8 @@ internal static class TreeHelpers
 	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
 	/// <param name="nodeLocation">The location of the node, in monitor coordinates.</param>
 	/// <returns></returns>
-	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
-		SplitNode rootSplitNode,
+	public static (ISplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
+		ISplitNode rootSplitNode,
 		Direction direction,
 		IMonitor monitor,
 		ILocation<double> nodeLocation
@@ -408,7 +408,7 @@ internal static class TreeHelpers
 			rootSplitNode.GetNodeContainingPoint(new Point<double>() { X = x, Y = y }) is
 
 			(
-				SplitNode[] adjacentNodeAncestors,
+				ISplitNode[] adjacentNodeAncestors,
 				ImmutableArray<int> adjacentNodePath,
 				LeafNode adjacentLeafNode,
 				Direction

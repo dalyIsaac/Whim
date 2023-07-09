@@ -95,7 +95,7 @@ public class SplitNodeTests
 		WindowNode newNode = CreateWindowNode();
 
 		// When
-		SplitNode result = splitNode.Add(focusedNode, newNode, Direction.Right);
+		ISplitNode result = splitNode.Add(focusedNode, newNode, insertAfter: true);
 
 		// Then
 		Assert.Same(splitNode, result);
@@ -111,7 +111,7 @@ public class SplitNodeTests
 		WindowNode newNode = CreateWindowNode();
 
 		// When
-		SplitNode result = splitNode.Add(focusedNode, newNode, Direction.Left);
+		ISplitNode result = splitNode.Add(focusedNode, newNode, insertAfter: false);
 		(double, INode)[] children = result.ToArray();
 
 		// Then
@@ -131,7 +131,7 @@ public class SplitNodeTests
 		WindowNode newNode = CreateWindowNode();
 
 		// When
-		SplitNode result = splitNode.Add(focusedNode, newNode, Direction.Right);
+		ISplitNode result = splitNode.Add(focusedNode, newNode, insertAfter: true);
 		(double, INode)[] children = result.ToArray();
 
 		// Then
@@ -152,8 +152,8 @@ public class SplitNodeTests
 		WindowNode newNode = CreateWindowNode();
 
 		// When
-		SplitNode result = splitNode.ToggleEqualWeight();
-		SplitNode result2 = result.Add(focusedNode, newNode, Direction.Right);
+		ISplitNode result = splitNode.ToggleEqualWeight();
+		ISplitNode result2 = result.Add(focusedNode, newNode, insertAfter: true);
 		(double, INode)[] children = result2.ToArray();
 
 		// Then
@@ -165,25 +165,7 @@ public class SplitNodeTests
 		Assert.Equal((0.25, otherNode), children[2]);
 	}
 
-	[Fact]
-	public void Add_InvalidDirection()
-	{
-		// Given
-		WindowNode focusedNode = CreateWindowNode();
-		SplitNode splitNode = new(focusedNode, CreateWindowNode(), Direction.Right);
-		WindowNode newNode = CreateWindowNode();
 
-		// When
-		SplitNode result = splitNode.Add(focusedNode, newNode, Direction.RightUp);
-		(double, INode)[] children = result.ToArray();
-
-		// Then
-		double aThird = 1d / 3;
-		Assert.NotSame(splitNode, result);
-		Assert.Equal(3, result.Count);
-		Assert.Equal((aThird, focusedNode), children[0]);
-		Assert.Equal((aThird, newNode), children[1]);
-	}
 	#endregion
 
 	#region Remove
@@ -196,7 +178,7 @@ public class SplitNodeTests
 		SplitNode splitNode = new(CreateWindowNode(), CreateWindowNode(), Direction.Right);
 
 		// When
-		SplitNode result = splitNode.Remove(index);
+		ISplitNode result = splitNode.Remove(index);
 
 		// Then
 		Assert.Same(splitNode, result);
@@ -213,7 +195,7 @@ public class SplitNodeTests
 		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
 
 		// When
-		SplitNode result = splitNode.Remove(index);
+		ISplitNode result = splitNode.Remove(index);
 		(double, INode)[] children = result.ToArray();
 
 		// Then
@@ -231,12 +213,12 @@ public class SplitNodeTests
 		WindowNode otherNode = CreateWindowNode();
 		WindowNode newNode = CreateWindowNode();
 
-		SplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
+		ISplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
 			.ToggleEqualWeight()
-			.Add(otherNode, newNode, Direction.Right);
+			.Add(otherNode, newNode, insertAfter: true);
 
 		// When
-		SplitNode result = splitNode.Remove(index);
+		ISplitNode result = splitNode.Remove(index);
 		(double, INode)[] children = result.ToArray();
 
 		// Then
@@ -260,7 +242,7 @@ public class SplitNodeTests
 		SplitNode splitNode = new(focusedNode, CreateWindowNode(), Direction.Right);
 
 		// When
-		SplitNode result = splitNode.Replace(index, newNode);
+		ISplitNode result = splitNode.Replace(index, newNode);
 
 		// Then
 		Assert.Same(splitNode, result);
@@ -279,7 +261,7 @@ public class SplitNodeTests
 		int oldNodeIndex = 1;
 
 		// When
-		SplitNode result = splitNode.Replace(oldNodeIndex, newNode);
+		ISplitNode result = splitNode.Replace(oldNodeIndex, newNode);
 		(double, INode)[] children = result.ToArray();
 
 		// Then
@@ -305,7 +287,7 @@ public class SplitNodeTests
 		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
 
 		// When
-		SplitNode result = splitNode.Swap(aIndex, bIndex);
+		ISplitNode result = splitNode.Swap(aIndex, bIndex);
 
 		// Then
 		Assert.Same(splitNode, result);
@@ -323,7 +305,7 @@ public class SplitNodeTests
 		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
 
 		// When
-		SplitNode result = splitNode.Swap(aIndex, bIndex);
+		ISplitNode result = splitNode.Swap(aIndex, bIndex);
 		(double, INode)[] children = result.ToArray();
 
 		// Then
@@ -347,7 +329,7 @@ public class SplitNodeTests
 		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
 
 		// When
-		SplitNode result = splitNode.AdjustChildWeight(index, 0.5);
+		ISplitNode result = splitNode.AdjustChildWeight(index, 0.5);
 
 		// Then
 		Assert.Same(splitNode, result);
@@ -364,7 +346,7 @@ public class SplitNodeTests
 		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
 
 		// When
-		SplitNode result = splitNode.AdjustChildWeight(index, 0.1);
+		ISplitNode result = splitNode.AdjustChildWeight(index, 0.1);
 		(double, INode)[] children = result.ToArray();
 
 		// Then
@@ -384,12 +366,12 @@ public class SplitNodeTests
 		WindowNode otherNode = CreateWindowNode();
 		WindowNode newNode = CreateWindowNode();
 
-		SplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
+		ISplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
 			.ToggleEqualWeight()
-			.Add(otherNode, newNode, Direction.Right);
+			.Add(otherNode, newNode, insertAfter: true);
 
 		// When
-		SplitNode result = splitNode.AdjustChildWeight(index, 0.1);
+		ISplitNode result = splitNode.AdjustChildWeight(index, 0.1);
 		(double, INode)[] children = result.ToArray();
 
 		// Then
@@ -426,87 +408,15 @@ public class SplitNodeTests
 		WindowNode focusedNode = CreateWindowNode();
 		WindowNode otherNode = CreateWindowNode();
 
-		SplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
+		ISplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
 			.ToggleEqualWeight()
-			.Add(otherNode, CreateWindowNode(), Direction.Right);
+			.Add(otherNode, CreateWindowNode(), insertAfter: true);
 
 		// When
 		double? result = splitNode.GetChildWeight(otherNode);
 
 		// Then
 		Assert.Equal(0.25, result);
-	}
-	#endregion
-
-	#region MergeChild
-	[Fact]
-	public void MergeChild_CouldNotFindNode()
-	{
-		// Given
-		WindowNode focusedNode = CreateWindowNode();
-		WindowNode otherNode = CreateWindowNode();
-
-		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
-
-		// When
-		SplitNode result = splitNode.MergeChild(splitNode);
-
-		// Then
-		Assert.Same(splitNode, result);
-	}
-
-	[Fact]
-	public void MergeChild_Success_ChildIsEqualWeight()
-	{
-		// Given
-		WindowNode node1 = CreateWindowNode();
-		WindowNode node2 = CreateWindowNode();
-
-		SplitNode childSplitNode = new(node1, node2, Direction.Down);
-
-		WindowNode node3 = CreateWindowNode();
-		SplitNode splitNode = new(childSplitNode, node3, Direction.Right);
-
-		// When
-		SplitNode result = splitNode.MergeChild(childSplitNode);
-		(double, INode)[] children = result.ToArray();
-
-		// Then
-		Assert.NotSame(splitNode, result);
-		Assert.Equal(3, result.Count);
-		Assert.False(result.EqualWeight);
-		Assert.Equal((0.25, node1), children[0]);
-		Assert.Equal((0.25, node2), children[1]);
-		Assert.Equal((0.5, node3), children[2]);
-	}
-
-	[Fact]
-	public void MergeChild_Success_ChildIsNotEqualWeight()
-	{
-		// Given
-		WindowNode node1 = CreateWindowNode();
-		WindowNode node2 = CreateWindowNode();
-		WindowNode node3 = CreateWindowNode();
-
-		SplitNode childSplitNode = new SplitNode(node1, node2, Direction.Down)
-			.ToggleEqualWeight()
-			.Add(node2, node3, Direction.Down);
-
-		WindowNode node4 = CreateWindowNode();
-		SplitNode splitNode = new(childSplitNode, node4, Direction.Right);
-
-		// When
-		SplitNode result = splitNode.MergeChild(childSplitNode);
-		(double, INode)[] children = result.ToArray();
-
-		// Then
-		Assert.NotSame(splitNode, result);
-		Assert.Equal(4, result.Count);
-		Assert.False(result.EqualWeight);
-		Assert.Equal((0.25, node1), children[0]);
-		Assert.Equal((0.125, node2), children[1]);
-		Assert.Equal((0.125, node3), children[2]);
-		Assert.Equal((0.5, node4), children[3]);
 	}
 	#endregion
 

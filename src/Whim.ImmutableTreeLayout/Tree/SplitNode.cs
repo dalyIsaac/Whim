@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace Whim.ImmutableTreeLayout;
 
@@ -33,7 +32,7 @@ internal class SplitNode : ISplitNode
 		ImmutableList<INode>.Builder children = ImmutableList.CreateBuilder<INode>();
 		ImmutableList<double>.Builder weights = ImmutableList.CreateBuilder<double>();
 
-		if (direction.IsPositiveIndex())
+		if (direction.InsertAfter())
 		{
 			children.Add(focusedNode);
 			children.Add(newNode);
@@ -71,7 +70,7 @@ internal class SplitNode : ISplitNode
 		Weights = weights;
 	}
 
-	public SplitNode Add(INode focusedNode, INode newNode, bool insertAfter)
+	public ISplitNode Add(INode focusedNode, INode newNode, bool insertAfter)
 	{
 		Logger.Verbose($"Adding {newNode} to {this}, {(insertAfter ? "after" : "before")} {focusedNode}");
 
@@ -109,7 +108,7 @@ internal class SplitNode : ISplitNode
 		return new SplitNode(EqualWeight, IsHorizontal, children, weights);
 	}
 
-	public SplitNode Remove(int index)
+	public ISplitNode Remove(int index)
 	{
 		Logger.Verbose($"Removing node at index {index} from {this}");
 
@@ -138,7 +137,7 @@ internal class SplitNode : ISplitNode
 		return new SplitNode(EqualWeight, IsHorizontal, children, weights);
 	}
 
-	public SplitNode Replace(int index, INode newNode)
+	public ISplitNode Replace(int index, INode newNode)
 	{
 		Logger.Verbose($"Replacing the node at index {index} with {newNode}");
 
@@ -152,7 +151,7 @@ internal class SplitNode : ISplitNode
 		return new SplitNode(EqualWeight, IsHorizontal, children, Weights);
 	}
 
-	public SplitNode Swap(int aIndex, int bIndex)
+	public ISplitNode Swap(int aIndex, int bIndex)
 	{
 		if (aIndex < 0 || aIndex >= Children.Count)
 		{
@@ -189,7 +188,7 @@ internal class SplitNode : ISplitNode
 		return builder.ToImmutable();
 	}
 
-	public SplitNode AdjustChildWeight(int index, double delta)
+	public ISplitNode AdjustChildWeight(int index, double delta)
 	{
 		if (index < 0 || index >= Children.Count)
 		{
@@ -222,40 +221,11 @@ internal class SplitNode : ISplitNode
 		return GetChildWeight(idx);
 	}
 
-	public SplitNode ToggleEqualWeight()
+	public ISplitNode ToggleEqualWeight()
 	{
 		Logger.Verbose($"Toggling EqualWeight of {this}");
 
 		return new SplitNode(!EqualWeight, IsHorizontal, Children, DistributeWeights());
-	}
-
-	public SplitNode MergeChild(SplitNode child)
-	{
-		Logger.Verbose($"Merging {child} into {this}");
-
-		int idx = Children.IndexOf(child);
-		if (idx < 0)
-		{
-			Logger.Error($"Node {child} not found in {this}");
-			return this;
-		}
-
-		ImmutableList<INode> children = Children.RemoveAt(idx);
-		children = children.InsertRange(idx, child.Children);
-
-		double childWeight = GetChildWeight(idx);
-		ImmutableList<double> weights = Weights.RemoveAt(idx);
-		if (child.EqualWeight)
-		{
-			double grandchildrenWeight = childWeight / child.Children.Count;
-			weights = weights.InsertRange(idx, Enumerable.Repeat(grandchildrenWeight, child.Children.Count));
-		}
-		else
-		{
-			weights = weights.InsertRange(idx, child.Weights.Select(w => w * childWeight));
-		}
-
-		return new SplitNode(false, IsHorizontal, children, weights);
 	}
 
 	public IEnumerator<(double Weight, INode Node)> GetEnumerator()
