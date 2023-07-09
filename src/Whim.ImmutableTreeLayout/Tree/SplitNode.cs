@@ -304,16 +304,7 @@ internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 		return GetChildWeight(idx);
 	}
 
-	/// <summary>
-	/// Flips the orientation of this <see cref="SplitNode"/>.
-	/// </summary>
-	/// <returns></returns>
-	public SplitNode Flip()
-	{
-		Logger.Verbose($"Flipping {this}");
 
-		return new SplitNode(EqualWeight, !IsHorizontal, Children, Weights);
-	}
 
 	/// <summary>
 	/// Toggles the <see cref="EqualWeight"/> property of this <see cref="SplitNode"/>.

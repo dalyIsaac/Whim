@@ -520,7 +520,7 @@ public class SplitNodeTests
 		SplitNode splitNode = new(node1, node2, Direction.Right);
 
 		// When
-		IEnumerator enumerator = splitNode.GetEnumerator();
+		IEnumerator enumerator = (splitNode as IEnumerable).GetEnumerator();
 		List<(double, INode)> items = new();
 		while (enumerator.MoveNext())
 		{

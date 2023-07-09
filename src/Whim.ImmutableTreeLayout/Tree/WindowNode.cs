@@ -17,26 +17,5 @@ internal class WindowNode : LeafNode
 	/// <summary>
 	/// Gets the string representation of the window.
 	/// </summary>
-	public override string? ToString() => Window?.ToString();
-
-	/// <inheritdoc />
-	public override bool Equals(object? obj)
-	{
-		//
-		// See the full list of guidelines at
-		//   http://go.microsoft.com/fwlink/?LinkID=85237
-		// and also the guidance for operator== at
-		//   http://go.microsoft.com/fwlink/?LinkId=85238
-		//
-
-		if (obj == null || GetType() != obj.GetType())
-		{
-			return false;
-		}
-
-		return obj is WindowNode node && node.Window.Equals(Window);
-	}
-
-	/// <inheritdoc />
-	public override int GetHashCode() => Window.GetHashCode();
+	public override string? ToString() => Window.ToString();
 }
