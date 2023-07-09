@@ -98,13 +98,8 @@ internal static class TreeHelpers
 			currentNode = split.Children[^1];
 		}
 
-		if (currentNode is not LeafNode leaf)
-		{
-			Logger.Error($"Expected leaf node at end of path");
-			return default;
-		}
-
-		return (splitNodes.ToArray(), pathBuilder.ToImmutable(), leaf);
+		// NOTE: This assumes that leaf nodes are always at the end of the path.
+		return (splitNodes.ToArray(), pathBuilder.ToImmutable(), (LeafNode)currentNode);
 	}
 
 	/// <summary>
@@ -127,13 +122,8 @@ internal static class TreeHelpers
 			currentNode = split.Children[0];
 		}
 
-		if (currentNode is not LeafNode leaf)
-		{
-			Logger.Error($"Expected leaf node at end of path");
-			return default;
-		}
-
-		return (splitNodes.ToArray(), pathBuilder.ToImmutable(), leaf);
+		// NOTE: This assumes that leaf nodes are always at the end of the path.
+		return (splitNodes.ToArray(), pathBuilder.ToImmutable(), (LeafNode)currentNode);
 	}
 
 	/// <summary>

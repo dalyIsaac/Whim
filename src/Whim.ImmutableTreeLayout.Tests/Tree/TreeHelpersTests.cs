@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -116,4 +117,47 @@ public class TreeHelpersTests
 		Assert.Equal(TestTreeWindowState.RightTopLeftBottomRightBottom, result.Value.Location);
 	}
 	#endregion
+
+
+	[Fact]
+	public void GetRightMostLeaf()
+	{
+		// Given
+		TestTree tree = new();
+
+		// When
+		var result = tree.Root.GetRightMostLeaf();
+
+		// Then
+		var (ancestors, path, leafNode) = result;
+
+		new SplitNode[] { tree.Root, tree.Right }
+			.Should()
+			.BeEquivalentTo(ancestors);
+		new int[] { 1, 1 }
+			.Should()
+			.BeEquivalentTo(path);
+		Assert.Equal(tree.RightBottom, leafNode);
+	}
+
+	[Fact]
+	public void GetLeftMostLeaf()
+	{
+		// Given
+		TestTree tree = new();
+
+		// When
+		var result = tree.Root.GetLeftMostLeaf();
+
+		// Then
+		var (ancestors, path, leafNode) = result;
+
+		new SplitNode[] { tree.Root }
+			.Should()
+			.BeEquivalentTo(ancestors);
+		new int[] { 0 }
+			.Should()
+			.BeEquivalentTo(path);
+		Assert.Equal(tree.Left, leafNode);
+	}
 }
