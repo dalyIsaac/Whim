@@ -99,10 +99,10 @@ public interface IImmutableLayoutEngine
 	IImmutableLayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window);
 
 	/// <summary>
-	/// Hides all phantom windows belonging to the layout engine.
+	/// Hides all phantom windows belonging to the layout engine. This is used by <see cref="Workspace"/>
+	/// when switching to a different layout engine.
 	/// </summary>
-	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the hide.</returns>
-	IImmutableLayoutEngine HidePhantomWindows();
+	void HidePhantomWindows();
 
 	/// <summary>
 	/// Checks to see if this <see cref="IImmutableLayoutEngine"/> or a child layout engine is type

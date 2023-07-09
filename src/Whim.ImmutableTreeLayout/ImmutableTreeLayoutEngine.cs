@@ -383,7 +383,19 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		};
 	}
 
-	public IImmutableLayoutEngine HidePhantomWindows() => throw new System.NotImplementedException();
+	/// <inheritdoc />
+	public void HidePhantomWindows()
+	{
+		Logger.Debug($"Hiding phantom windows in layout engine {Name}");
+
+		foreach (IWindow window in _windows.Keys)
+		{
+			if (_plugin.PhantomWindows.Contains(window))
+			{
+				window.Hide();
+			}
+		}
+	}
 
 	/// <inheritdoc />
 	public IImmutableLayoutEngine MoveWindowEdgesInDirection(
