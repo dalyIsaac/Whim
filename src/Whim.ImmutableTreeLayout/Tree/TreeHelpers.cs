@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Whim.ImmutableTreeLayout;
 
-internal record NodeState(Node Node, ILocation<int> Location, WindowSize WindowSize);
+internal record NodeState(INode Node, ILocation<int> Location, WindowSize WindowSize);
 
 internal static class TreeHelpers
 {
@@ -21,15 +21,15 @@ internal static class TreeHelpers
 	/// <param name="root">The root node of the tree.</param>
 	/// <param name="path">The path to the node.</param>
 	/// <returns></returns>
-	public static (SplitNode[] Ancestors, Node Node, ILocation<double> Location)? GetNodeAtPath(
-		this Node root,
+	public static (SplitNode[] Ancestors, INode Node, ILocation<double> Location)? GetNodeAtPath(
+		this INode root,
 		IReadOnlyList<int> path
 	)
 	{
 		Location<double> location = new() { Height = 1, Width = 1 };
 		SplitNode[] ancestors = new SplitNode[path.Count - 1];
 
-		Node currentNode = root;
+		INode currentNode = root;
 		for (int idx = 0; idx < path.Count; idx++)
 		{
 			int index = path[idx];
@@ -85,7 +85,7 @@ internal static class TreeHelpers
 		List<SplitNode> splitNodes = new();
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
 
-		Node currentNode = splitNode;
+		INode currentNode = splitNode;
 		while (currentNode is SplitNode split)
 		{
 			splitNodes.Add(split);
@@ -114,7 +114,7 @@ internal static class TreeHelpers
 		List<SplitNode> splitNodes = new();
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
 
-		Node currentNode = splitNode;
+		INode currentNode = splitNode;
 		while (currentNode is SplitNode split)
 		{
 			splitNodes.Add(split);
@@ -162,7 +162,7 @@ internal static class TreeHelpers
 		List<SplitNode> splitNodes = new();
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
 
-		Node currentNode = rootNode;
+		INode currentNode = rootNode;
 
 		Location<double> childLocation =
 			new()
@@ -175,7 +175,7 @@ internal static class TreeHelpers
 
 		while (currentNode is SplitNode split)
 		{
-			foreach ((double weight, Node child) in split)
+			foreach ((double weight, INode child) in split)
 			{
 				// Scale the width/height of the child.
 				if (split.IsHorizontal)
@@ -278,7 +278,7 @@ internal static class TreeHelpers
 	/// <param name="node">The root node of the tree.</param>
 	/// <param name="location">The location of the root node, in monitor coordinates.</param>
 	/// <returns></returns>
-	public static IEnumerable<NodeState> GetWindowLocations(this Node node, ILocation<int> location)
+	public static IEnumerable<NodeState> GetWindowLocations(this INode node, ILocation<int> location)
 	{
 		// If the node is a leaf node, then we can return the location, and break.
 		if (node is LeafNode)
@@ -293,7 +293,7 @@ internal static class TreeHelpers
 
 		// Perform an in-order traversal of the tree.
 		double precedingWeight = 0;
-		foreach ((double weight, Node child) in parent)
+		foreach ((double weight, INode child) in parent)
 		{
 			Location<int> childLocation =
 				new()
@@ -334,7 +334,7 @@ internal static class TreeHelpers
 	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
 	/// <returns></returns>
 	public static (SplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode)? GetAdjacentNode(
-		Node rootNode,
+		INode rootNode,
 		IReadOnlyList<int> pathToNode,
 		Direction direction,
 		IMonitor monitor

@@ -10,7 +10,7 @@ namespace Whim.ImmutableTreeLayout;
 /// SplitNodes dictate the layout of the windows. They have a specific direction, and
 /// children.
 /// </summary>
-internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
+internal class SplitNode : INode, IEnumerable<(double Weight, INode Node)>
 {
 	/// <summary>
 	/// The weights of the children. If <see cref="EqualWeight"/> is <see langword="true"/>, then
@@ -22,7 +22,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// The child nodes of this <see cref="SplitNode"/>. These will likely be either <see cref="SplitNode"/>s,
 	/// or child classes of <see cref="LeafNode"/>.
 	/// </summary>
-	public ImmutableList<Node> Children { get; }
+	public ImmutableList<INode> Children { get; }
 
 	/// <summary>
 	/// The number of nodes in this <see cref="SplitNode"/>.
@@ -47,9 +47,9 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <param name="focusedNode">The currently focused node.</param>
 	/// <param name="newNode">The new node to add.</param>
 	/// <param name="direction">The direction to add the split node in.</param>
-	public SplitNode(Node focusedNode, Node newNode, Direction direction)
+	public SplitNode(INode focusedNode, INode newNode, Direction direction)
 	{
-		ImmutableList<Node>.Builder children = ImmutableList.CreateBuilder<Node>();
+		ImmutableList<INode>.Builder children = ImmutableList.CreateBuilder<INode>();
 		ImmutableList<double>.Builder weights = ImmutableList.CreateBuilder<double>();
 
 		if (direction.IsPositiveIndex())
@@ -81,7 +81,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <param name="isHorizontal"></param>
 	/// <param name="children"></param>
 	/// <param name="weights"></param>
-	private SplitNode(bool equalWeight, bool isHorizontal, ImmutableList<Node> children, ImmutableList<double> weights)
+	private SplitNode(bool equalWeight, bool isHorizontal, ImmutableList<INode> children, ImmutableList<double> weights)
 	{
 		EqualWeight = equalWeight;
 		IsHorizontal = isHorizontal;
@@ -104,7 +104,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	// TODO: Replace Direction with a boolean for inserting before/after - it's not currently correct
 	// for the direction to be used for this, as Direction.Right could be passed into a vertical
 	// split node.
-	public SplitNode Add(Node focusedNode, Node newNode, Direction direction)
+	public SplitNode Add(INode focusedNode, INode newNode, Direction direction)
 	{
 		Logger.Verbose($"Adding {newNode} to {this}, in direction {direction} in relation to {focusedNode}");
 
@@ -139,7 +139,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 		int newNodeIdx = Math.Clamp(focusedNodeIdx + delta, 0, Children.Count);
 
 		// Insert the node.
-		ImmutableList<Node> children = Children.Insert(newNodeIdx, newNode);
+		ImmutableList<INode> children = Children.Insert(newNodeIdx, newNode);
 		ImmutableList<double> weights;
 
 		if (EqualWeight || Weights.Count == 0)
@@ -175,7 +175,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return this;
 		}
 
-		ImmutableList<Node> children = Children.RemoveAt(index);
+		ImmutableList<INode> children = Children.RemoveAt(index);
 		ImmutableList<double> weights;
 
 		// Redistribute weights.
@@ -200,7 +200,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// <param name="index">The index of the node to replace.</param>
 	/// <param name="newNode">The node to replace the old node with.</param>
 	/// <returns></returns>
-	public SplitNode Replace(int index, Node newNode)
+	public SplitNode Replace(int index, INode newNode)
 	{
 		Logger.Verbose($"Replacing the node at index {index} with {newNode}");
 
@@ -210,7 +210,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return this;
 		}
 
-		ImmutableList<Node> children = Children.SetItem(index, newNode);
+		ImmutableList<INode> children = Children.SetItem(index, newNode);
 		return new SplitNode(EqualWeight, IsHorizontal, children, Weights);
 	}
 
@@ -234,7 +234,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return this;
 		}
 
-		ImmutableList<Node> children = Children.SetItem(aIndex, Children[bIndex]);
+		ImmutableList<INode> children = Children.SetItem(aIndex, Children[bIndex]);
 		children = children.SetItem(bIndex, Children[aIndex]);
 
 		return new SplitNode(EqualWeight, IsHorizontal, children, Weights);
@@ -292,7 +292,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// </summary>
 	/// <param name="node"></param>
 	/// <returns></returns>
-	public double? GetChildWeight(Node node)
+	public double? GetChildWeight(INode node)
 	{
 		int idx = Children.IndexOf(node);
 		if (idx < 0)
@@ -343,7 +343,7 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 			return this;
 		}
 
-		ImmutableList<Node> children = Children.RemoveAt(idx);
+		ImmutableList<INode> children = Children.RemoveAt(idx);
 		children = children.InsertRange(idx, child.Children);
 
 		double childWeight = GetChildWeight(idx);
@@ -365,12 +365,12 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	/// Gets the child nodes and their weights.
 	/// </summary>
 	/// <returns></returns>
-	public IEnumerator<(double Weight, Node Node)> GetEnumerator()
+	public IEnumerator<(double Weight, INode Node)> GetEnumerator()
 	{
 		if (EqualWeight)
 		{
 			double weight = 1d / Children.Count;
-			foreach (Node child in Children)
+			foreach (INode child in Children)
 			{
 				yield return (weight, child);
 			}

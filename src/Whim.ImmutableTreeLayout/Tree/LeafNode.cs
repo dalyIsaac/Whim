@@ -3,7 +3,7 @@ namespace Whim.ImmutableTreeLayout;
 /// <summary>
 /// A leaf node in a tree.
 /// </summary>
-internal abstract class LeafNode : Node
+internal abstract class LeafNode : INode
 {
 	/// <summary>
 	/// The window contained by the node.

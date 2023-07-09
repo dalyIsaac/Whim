@@ -12,7 +12,7 @@ internal record NonRootWindowData(
 	SplitNode RootSplitNode,
 	ImmutableArray<int> WindowPath,
 	SplitNode[] WindowAncestors,
-	Node WindowNode,
+	INode WindowNode,
 	ILocation<double> WindowLocation
 );
 
@@ -23,7 +23,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 {
 	private readonly IContext _context;
 	private readonly IImmutableInternalTreePlugin _plugin;
-	private readonly Node? _root;
+	private readonly INode? _root;
 
 	/// <summary>
 	/// Map of windows to their paths in the tree.
@@ -38,7 +38,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 	public Direction AddNodeDirection { get; } = Direction.Right;
 
-	private TreeLayoutEngine(TreeLayoutEngine engine, Node root, WindowDict windows)
+	private TreeLayoutEngine(TreeLayoutEngine engine, INode root, WindowDict windows)
 		: this(engine._context, engine._plugin)
 	{
 		Name = engine.Name;
@@ -68,10 +68,10 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	private TreeLayoutEngine CreateNewEngine(
 		SplitNode[] oldNodeAncestors,
 		ImmutableArray<int> oldNodePath,
-		Node newNode
+		INode newNode
 	)
 	{
-		Node current = newNode;
+		INode current = newNode;
 
 		for (int idx = oldNodePath.Length - 1; idx >= 0; idx--)
 		{
@@ -509,7 +509,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		(SplitNode[] parentAncestors, Node parentNode, ILocation<double> parentLocation) = parentResult.Value;
+		(SplitNode[] parentAncestors, INode parentNode, ILocation<double> parentLocation) = parentResult.Value;
 		if (parentNode is not SplitNode parentSplitNode)
 		{
 			Logger.Error($"Focused ancestor node is not a split node");
@@ -569,7 +569,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		// If the parent node has just two children, remove the parent node and replace it with the other child.
 		if (parentNode.Children.Count == 2)
 		{
-			Node otherChild =
+			INode otherChild =
 				parentNode.Children[0] == windowResult.Value.Node ? parentNode.Children[1] : parentNode.Children[0];
 
 			return CreateNewEngine(windowResult.Value.Ancestors, windowPath[..^1], otherChild);
