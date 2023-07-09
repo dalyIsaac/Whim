@@ -31,12 +31,20 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	public Direction AddNodeDirection { get; } = Direction.Right;
 
 	private TreeLayoutEngine(TreeLayoutEngine engine, Node root, WindowDict windows)
+		: this(engine._context, engine._plugin)
 	{
-		_context = engine._context;
-		_plugin = engine._plugin;
+		Name = engine.Name;
 		AddNodeDirection = engine.AddNodeDirection;
 		_root = root;
 		_windows = windows;
+	}
+
+	internal TreeLayoutEngine(IContext context, IImmutableInternalTreePlugin plugin)
+	{
+		_context = context;
+		_plugin = plugin;
+		_root = null;
+		_windows = WindowDict.Empty;
 	}
 
 	/// <summary>
@@ -474,7 +482,57 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		return CreateNewEngine(parentAncestors, parentNodePath, newParent);
 	}
 
-	public IImmutableLayoutEngine Remove(IWindow window) => throw new System.NotImplementedException();
+	/// <inheritdoc />
+	public IImmutableLayoutEngine Remove(IWindow window)
+	{
+		Logger.Debug($"Removing window {window} from layout engine {Name}");
+
+		if (_root is null)
+		{
+			Logger.Error($"Root is null, cannot remove window {window} from layout engine {Name}");
+			return this;
+		}
+
+		if (_root is LeafNode leafNode)
+		{
+			if (leafNode.Window == window)
+			{
+				return new TreeLayoutEngine(_context, _plugin);
+			}
+			else
+			{
+				Logger.Error($"Root is leaf node, but window {window} is not the root");
+				return this;
+			}
+		}
+
+		if (!_windows.TryGetValue(window, out ImmutableArray<int> windowPath))
+		{
+			Logger.Error($"Window {window} not found in layout engine {Name}");
+			return this;
+		}
+
+		var windowResult = _root.GetNodeAtPath(windowPath);
+		if (windowResult is null)
+		{
+			Logger.Error($"Failed to find window {window} in layout engine {Name}");
+			return this;
+		}
+
+		SplitNode parentNode = windowResult.Value.Ancestors[^1];
+
+		// If the parent node has just two children, remove the parent node and replace it with the other child.
+		if (parentNode.Children.Count == 2)
+		{
+			Node otherChild =
+				parentNode.Children[0] == windowResult.Value.Node ? parentNode.Children[1] : parentNode.Children[0];
+
+			return CreateNewEngine(windowResult.Value.Ancestors, windowPath[..^1], otherChild);
+		}
+
+		SplitNode newParentNode = parentNode.Remove(windowPath[^1]);
+		return CreateNewEngine(windowResult.Value.Ancestors, windowPath[..^1], newParentNode);
+	}
 
 	public IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
 		throw new System.NotImplementedException();

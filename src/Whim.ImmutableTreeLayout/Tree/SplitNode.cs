@@ -159,37 +159,36 @@ internal class SplitNode : Node, IEnumerable<(double Weight, Node Node)>
 	}
 
 	/// <summary>
-	/// Removes the given <paramref name="node"/> from this <see cref="SplitNode"/>.
+	/// Removes the node at the given <paramref name="index"/> from this <see cref="SplitNode"/>.
 	/// If this <see cref="SplitNode"/> is not <see cref="EqualWeight"/>, then the weight of the
 	/// last node is increased by the weight of the removed node.
 	/// </summary>
-	/// <param name="node"></param>
+	/// <param name="index"></param>
 	/// <returns></returns>
-	public SplitNode Remove(Node node)
+	public SplitNode Remove(int index)
 	{
-		Logger.Verbose($"Removing {node} from {this}");
+		Logger.Verbose($"Removing node at index {index} from {this}");
 
-		int idx = Children.IndexOf(node);
-		if (idx < 0)
+		if (index < 0 || index >= Children.Count)
 		{
-			Logger.Error($"Could not find {node} in {this}");
+			Logger.Error($"Index {index} is out of range for {this}");
 			return this;
 		}
 
-		ImmutableList<Node> children = Children.RemoveAt(idx);
+		ImmutableList<Node> children = Children.RemoveAt(index);
 		ImmutableList<double> weights;
 
 		// Redistribute weights.
 		if (EqualWeight)
 		{
 			// We don't care about the weights, so just remove the weight.
-			weights = Weights.RemoveAt(idx);
+			weights = Weights.RemoveAt(index);
 		}
 		else
 		{
 			// Give the extra weight to the last child.
-			weights = Weights.SetItem(Weights.Count - 1, Weights[^1] + Weights[idx]);
-			weights = weights.RemoveAt(idx);
+			weights = Weights.SetItem(Weights.Count - 1, Weights[^1] + Weights[index]);
+			weights = weights.RemoveAt(index);
 		}
 
 		return new SplitNode(EqualWeight, IsHorizontal, children, weights);
