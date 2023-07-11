@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Moq;
 using System.Collections.Immutable;
-using Windows.UI.Input.Inking;
 using Xunit;
 
 namespace Whim.ImmutableTreeLayout.Tests;
@@ -131,15 +130,13 @@ public class TreeHelpersTests
 		var result = tree.Root.GetRightMostLeaf();
 
 		// Then
-		var (ancestors, path, leafNode) = result;
-
 		new SplitNode[] { tree.Root, tree.Right }
 			.Should()
-			.BeEquivalentTo(ancestors);
+			.BeEquivalentTo(result.Ancestors);
 		new int[] { 1, 1 }
 			.Should()
-			.BeEquivalentTo(path);
-		Assert.Equal(tree.RightBottom, leafNode);
+			.BeEquivalentTo(result.Path);
+		Assert.Equal(tree.RightBottom, result.LeafNode);
 	}
 
 	[Fact]
@@ -528,7 +525,7 @@ public class TreeHelpersTests
 			.ToArray();
 
 		// When
-		LeafNodeState[] windowLocations = tree.Root.GetWindowLocations(location).ToArray();
+		LeafNodeWindowLocationState[] windowLocations = tree.Root.GetWindowLocations(location).ToArray();
 
 		// Then
 		windowLocations
@@ -536,7 +533,7 @@ public class TreeHelpersTests
 				nodeState =>
 					new WindowState()
 					{
-						Window = nodeState.Node.Window,
+						Window = nodeState.LeafNode.Window,
 						Location = nodeState.Location,
 						WindowSize = nodeState.WindowSize
 					}
