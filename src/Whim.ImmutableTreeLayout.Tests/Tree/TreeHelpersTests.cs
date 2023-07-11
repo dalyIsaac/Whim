@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Moq;
 using System.Collections.Immutable;
+using Windows.UI.Input.Inking;
 using Xunit;
 
 namespace Whim.ImmutableTreeLayout.Tests;
@@ -115,7 +116,7 @@ public class TreeHelpersTests
 		// Then
 		Assert.NotNull(result);
 		Assert.Equal(tree.RightTopLeftBottomRightBottom, result.Value.Node);
-		Assert.Equal(TestTreeWindowState.RightTopLeftBottomRightBottom, result.Value.Location);
+		Assert.Equal(TestTreeWindowStates.RightTopLeftBottomRightBottom, result.Value.Location);
 	}
 	#endregion
 
@@ -280,6 +281,7 @@ public class TreeHelpersTests
 	}
 	#endregion
 
+	#region GetDirectionToPoint
 	public static IEnumerable<object[]> GetDirectionToPoint_UnitSquareData()
 	{
 		// Top left corner boundary
@@ -500,5 +502,46 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.Equal(expected, result);
+	}
+	#endregion
+
+	[Fact]
+	public void GetWindowLocations()
+	{
+		// Given
+		TestTree tree = new();
+		ILocation<int> location = new Location<int>() { Width = 1920, Height = 1080 };
+
+		IWindowState[] expectedStates = TestTreeWindowStates
+			.GetAllWindowStates(
+				location,
+				tree.Left.Window,
+				tree.RightTopLeftTop.Window,
+				tree.RightTopLeftBottomLeft.Window,
+				tree.RightTopLeftBottomRightTop.Window,
+				tree.RightTopLeftBottomRightBottom.Window,
+				tree.RightTopRight1.Window,
+				tree.RightTopRight2.Window,
+				tree.RightTopRight3.Window,
+				tree.RightBottom.Window
+			)
+			.ToArray();
+
+		// When
+		LeafNodeState[] windowLocations = tree.Root.GetWindowLocations(location).ToArray();
+
+		// Then
+		windowLocations
+			.Select(
+				nodeState =>
+					new WindowState()
+					{
+						Window = nodeState.Node.Window,
+						Location = nodeState.Location,
+						WindowSize = nodeState.WindowSize
+					}
+			)
+			.Should()
+			.BeEquivalentTo(expectedStates);
 	}
 }

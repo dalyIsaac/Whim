@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Whim.ImmutableTreeLayout;
 
-internal record NodeState(INode Node, ILocation<int> Location, WindowSize WindowSize);
+internal record LeafNodeState(LeafNode Node, ILocation<int> Location, WindowSize WindowSize);
 
 internal record NodeAtPointData(
 	IReadOnlyList<ISplitNode> Ancestors,
@@ -309,12 +309,12 @@ internal static class TreeHelpers
 	/// <param name="node">The root node of the tree.</param>
 	/// <param name="location">The location of the root node, in monitor coordinates.</param>
 	/// <returns></returns>
-	public static IEnumerable<NodeState> GetWindowLocations(this INode node, ILocation<int> location)
+	public static IEnumerable<LeafNodeState> GetWindowLocations(this INode node, ILocation<int> location)
 	{
 		// If the node is a leaf node, then we can return the location, and break.
-		if (node is LeafNode)
+		if (node is LeafNode leafNode)
 		{
-			yield return new NodeState(node, location, WindowSize.Normal);
+			yield return new LeafNodeState(leafNode, location, WindowSize.Normal);
 			yield break;
 		}
 
@@ -345,7 +345,7 @@ internal static class TreeHelpers
 				childLocation.Height = Convert.ToInt32(weight * location.Height);
 			}
 
-			foreach (NodeState childLocationResult in GetWindowLocations(child, childLocation))
+			foreach (LeafNodeState childLocationResult in GetWindowLocations(child, childLocation))
 			{
 				yield return childLocationResult;
 			}

@@ -3,7 +3,7 @@ namespace Whim.ImmutableTreeLayout.Tests;
 /// <summary>
 /// This contains the window states for <see cref="TestTree"/>.
 /// </summary>
-internal static class TestTreeWindowState
+internal static class TestTreeWindowStates
 {
 	public static ILocation<double> Left = new Location<double>() { Width = 0.5, Height = 1 };
 	public static ILocation<double> RightBottom = new Location<double>()

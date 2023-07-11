@@ -353,7 +353,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			yield break;
 		}
 
-		foreach (NodeState? item in _root.GetWindowLocations(location))
+		foreach (LeafNodeState? item in _root.GetWindowLocations(location))
 		{
 			if (item.Node is LeafNode leafNode)
 			{
