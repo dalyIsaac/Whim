@@ -91,7 +91,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	/// <param name="newNode">The new node to replace the old node.</param>
 	/// <returns></returns>
 	private TreeLayoutEngine CreateNewEngine(
-		ISplitNode[] oldNodeAncestors,
+		IReadOnlyList<ISplitNode> oldNodeAncestors,
 		ImmutableArray<int> oldNodePath,
 		INode newNode
 	)
@@ -309,7 +309,8 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		(ISplitNode[] ancestors, ImmutableArray<int> path, LeafNode focusedNode, Direction direction) = result.Value;
+		(IReadOnlyList<ISplitNode> ancestors, ImmutableArray<int> path, LeafNode focusedNode, Direction direction) =
+			result;
 
 		ISplitNode parentNode = ancestors[^1];
 		if (parentNode.IsHorizontal == direction.IsHorizontal())

@@ -160,4 +160,83 @@ public class TreeHelpersTests
 			.BeEquivalentTo(path);
 		Assert.Equal(tree.Left, leafNode);
 	}
+
+	#region GetNodeContainingPoint
+	[Fact]
+	public void GetNodeContainingPoint_DoesNotContainPoint()
+	{
+		// Given
+		TestTree tree = new();
+		Point<double> point = new() { X = -0.5, Y = 0.5 };
+
+		// When
+		var result = tree.Root.GetNodeContainingPoint(point);
+
+		// Then
+		Assert.Null(result);
+	}
+
+	[Fact]
+	public void GetNodeContainingPoint_Origin()
+	{
+		// Given
+		TestTree tree = new();
+		Point<double> point = new() { X = 0, Y = 0 };
+
+		// When
+		var result = tree.Root.GetNodeContainingPoint(point);
+
+		// Then
+		Assert.NotNull(result);
+		Assert.Equal(tree.Left, result.LeafNode);
+		new SplitNode[] { tree.Root }
+			.Should()
+			.BeEquivalentTo(result.Ancestors);
+		new int[] { 0 }
+			.Should()
+			.BeEquivalentTo(result.Path);
+	}
+
+	[Fact]
+	public void GetNodeContainingPoint_Middle()
+	{
+		// Given
+		TestTree tree = new();
+		Point<double> point = new() { X = 0.5, Y = 0.5 };
+
+		// When
+		var result = tree.Root.GetNodeContainingPoint(point);
+
+		// Then
+		Assert.NotNull(result);
+		Assert.Equal(tree.RightBottom, result.LeafNode);
+		new SplitNode[] { tree.Root, tree.Right }
+			.Should()
+			.BeEquivalentTo(result.Ancestors);
+		new int[] { 1, 1 }
+			.Should()
+			.BeEquivalentTo(result.Path);
+	}
+
+	[Fact]
+	public void GetNodeContainingPoint_RightTopRight3()
+	{
+		// Given
+		TestTree tree = new();
+		Point<double> point = new() { X = 0.8, Y = 0.4 };
+
+		// When
+		var result = tree.Root.GetNodeContainingPoint(point);
+
+		// Then
+		Assert.NotNull(result);
+		Assert.Equal(tree.RightTopRight3, result.LeafNode);
+		new SplitNode[] { tree.Root, tree.Right, tree.RightTop, tree.RightTopRight }
+			.Should()
+			.BeEquivalentTo(result.Ancestors);
+		new int[] { 1, 0, 1, 2 }
+			.Should()
+			.BeEquivalentTo(result.Path);
+	}
+	#endregion
 }

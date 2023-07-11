@@ -7,6 +7,13 @@ namespace Whim.ImmutableTreeLayout;
 
 internal record NodeState(INode Node, ILocation<int> Location, WindowSize WindowSize);
 
+internal record NodeAtPointData(
+	IReadOnlyList<ISplitNode> Ancestors,
+	ImmutableArray<int> Path,
+	LeafNode LeafNode,
+	Direction Direction
+);
+
 internal static class TreeHelpers
 {
 	/// <summary>
@@ -133,75 +140,100 @@ internal static class TreeHelpers
 	/// <param name="rootNode">The root node of the tree.</param>
 	/// <param name="searchPoint">The point to search for.</param>
 	/// <returns></returns>
-	public static (
-		ISplitNode[] Ancestors,
-		ImmutableArray<int> Path,
-		LeafNode LeafNode,
-		Direction Direction
-	)? GetNodeContainingPoint(this ISplitNode rootNode, IPoint<double> searchPoint)
+	public static NodeAtPointData? GetNodeContainingPoint(this INode rootNode, IPoint<double> searchPoint)
 	{
-		ILocation<double> rootRectangle = new Location<double>
-		{
-			X = 0,
-			Y = 0,
-			Width = 1,
-			Height = 1
-		};
+		Logger.Debug($"Searching for point {searchPoint} in node {rootNode}");
 
-		if (!rootRectangle.IsPointInside(searchPoint))
+		InternalNodeAtPointData? internalNodeAtPointData = GetNodeContainingPoint(
+			rootNode,
+			Location.UnitSquare<double>(),
+			searchPoint,
+			0
+		);
+
+		if (internalNodeAtPointData is null)
 		{
-			Logger.Error($"Search point {searchPoint} is not inside root location {rootRectangle}");
 			return null;
 		}
 
-		List<ISplitNode> splitNodes = new();
-		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
+		return new NodeAtPointData(
+			internalNodeAtPointData.Ancestors,
+			internalNodeAtPointData.Path.ToImmutableArray(),
+			internalNodeAtPointData.LeafNode,
+			internalNodeAtPointData.Direction
+		);
+	}
 
-		INode currentNode = rootNode;
+	private record InternalNodeAtPointData(ISplitNode[] Ancestors, int[] Path, LeafNode LeafNode, Direction Direction);
 
-		Location<double> childLocation =
-			new()
-			{
-				X = rootRectangle.X,
-				Y = rootRectangle.Y,
-				Width = rootRectangle.Width,
-				Height = rootRectangle.Height
-			};
-
-		while (currentNode is ISplitNode split)
+	private static InternalNodeAtPointData? GetNodeContainingPoint(
+		INode root,
+		ILocation<double> rootLocation,
+		IPoint<double> searchPoint,
+		int depth
+	)
+	{
+		if (root is LeafNode leaf)
 		{
-			foreach ((double weight, INode child) in split)
-			{
-				// Scale the width/height of the child.
-				if (split.IsHorizontal)
-				{
-					childLocation.Width = rootRectangle.Width * weight;
-				}
-				else
-				{
-					childLocation.Height = rootRectangle.Height * weight;
-				}
+			return new InternalNodeAtPointData(
+				new ISplitNode[depth],
+				new int[depth],
+				leaf,
+				rootLocation.GetDirectionToPoint(searchPoint)
+			);
+		}
 
-				if (childLocation.IsPointInside(searchPoint))
+		if (root is not SplitNode splitNode)
+		{
+			return null;
+		}
+
+		Location<double> childLocation = new(rootLocation);
+		SplitNode parent = splitNode;
+
+		for (int idx = 0; idx < parent.Children.Count; idx++)
+		{
+			(double weight, INode child) = parent[idx];
+
+			// Scale the width/height of the child.
+			if (parent.IsHorizontal)
+			{
+				childLocation.Width = weight * rootLocation.Width;
+			}
+			else
+			{
+				childLocation.Height = weight * rootLocation.Height;
+			}
+
+			if (childLocation.ContainsPoint(searchPoint))
+			{
+				InternalNodeAtPointData? result = GetNodeContainingPoint(
+					root: child,
+					rootLocation: childLocation,
+					searchPoint,
+					depth + 1
+				);
+
+				if (result != null)
 				{
-					splitNodes.Add(split);
-					pathBuilder.Add(split.Children.IndexOf(child));
-					currentNode = child;
-					break;
+					result.Ancestors[depth] = parent;
+					result.Path[depth] = idx;
+					return result;
 				}
+			}
+
+			// Since it wasn't a match, update the position of the child.
+			if (parent.IsHorizontal)
+			{
+				childLocation.X += childLocation.Width;
+			}
+			else
+			{
+				childLocation.Y += childLocation.Height;
 			}
 		}
 
-		if (currentNode is not LeafNode leaf)
-		{
-			Logger.Error($"Expected leaf node at end of path");
-			return default;
-		}
-
-		// Get the direction of the search point relative to the leaf node.
-		Direction direction = rootRectangle.GetDirectionToPoint(searchPoint);
-
-		return (splitNodes.ToArray(), pathBuilder.ToImmutable(), leaf, direction);
+		return null;
 	}
 
 	/// <summary>
