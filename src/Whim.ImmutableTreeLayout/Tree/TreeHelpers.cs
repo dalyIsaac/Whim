@@ -235,6 +235,7 @@ internal static class TreeHelpers
 			}
 		}
 
+		Logger.Error("The split node contains the point, but none of its children do.");
 		return null;
 	}
 

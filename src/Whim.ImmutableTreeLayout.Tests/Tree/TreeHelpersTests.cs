@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Moq;
+using System.Collections.Immutable;
 using Xunit;
 
 namespace Whim.ImmutableTreeLayout.Tests;
@@ -248,6 +249,31 @@ public class TreeHelpersTests
 
 		// When
 		var result = node.Object.GetNodeContainingPoint(point);
+
+		// Then
+		Assert.Null(result);
+	}
+
+	[Fact]
+	public void GetNodeContainingPoint_DoesNotContainPointInChildNode()
+	{
+		// Given
+		SplitNode node =
+			new(
+				equalWeight: false,
+				isHorizontal: true,
+				new INode[]
+				{
+					new WindowNode(new Mock<IWindow>().Object),
+					new WindowNode(new Mock<IWindow>().Object)
+				}.ToImmutableList(),
+				new double[] { 0.5, 0.25 }.ToImmutableList()
+			);
+
+		Point<double> point = new() { X = 0.8, Y = 0.4 };
+
+		// When
+		var result = node.GetNodeContainingPoint(point);
 
 		// Then
 		Assert.Null(result);
