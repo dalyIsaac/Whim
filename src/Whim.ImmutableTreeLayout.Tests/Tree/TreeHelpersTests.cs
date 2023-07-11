@@ -254,7 +254,7 @@ public class TreeHelpersTests
 	}
 	#endregion
 
-	public static IEnumerable<object[]> GetDirectionToPoint_Data()
+	public static IEnumerable<object[]> GetDirectionToPoint_UnitSquareData()
 	{
 		// Top left corner boundary
 		yield return new object[] { Location.UnitSquare<double>(), new Point<double>(), Direction.Up };
@@ -408,8 +408,64 @@ public class TreeHelpersTests
 		};
 	}
 
+	public static IEnumerable<object[]> GetDirectionToPoint_NonUnitSquareData()
+	{
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 2,
+				Height = 2
+			},
+			new Point<double>() { X = 1.5, Y = 1.5 },
+			Direction.Up
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 2,
+				Height = 2
+			},
+			new Point<double>() { X = 1.5, Y = 2 },
+			Direction.Left
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 2,
+				Height = 2
+			},
+			new Point<double>() { X = 2.5, Y = 2.75 },
+			Direction.Down
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 2,
+				Height = 2
+			},
+			new Point<double>() { X = 2.5, Y = 2.5 },
+			Direction.Right
+		};
+	}
+
 	[Theory]
-	[MemberData(nameof(GetDirectionToPoint_Data))]
+	[MemberData(nameof(GetDirectionToPoint_UnitSquareData))]
+	[MemberData(nameof(GetDirectionToPoint_NonUnitSquareData))]
 	public void GetDirectionToPoint(Location<double> location, Point<double> point, Direction expected)
 	{
 		// Given

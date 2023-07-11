@@ -250,9 +250,9 @@ internal static class TreeHelpers
 		// point's actual y position compared to points given by the two diagonals of the rectangle.
 		//
 		// If we move the rectangle back to the origin, then the two diagonals are:
-		// 1. y = x_p * width_r
-		// 2. y = height_r - x_p * width_r
-		// where _p is the point and _r is the rectangle.
+		// 1. y = x_p * (width_r / height_r)
+		// 2. y = height_r - x_p * (width_r / height_r)
+		// where p is the point and r is the rectangle.
 
 		//        (0, 0)            (width, 0)
 		//             *---------------* eq2
@@ -265,13 +265,6 @@ internal static class TreeHelpers
 		//             | *           *
 		// (height, 0) *     bottom    * eq1
 		//
-		double xw = searchPoint.X * rectangle.Width;
-
-		// equation 1
-		double y1 = xw;
-
-		// equation 2
-		double y2 = rectangle.Height - xw;
 
 		// Adjust the point to be relative to the origin.
 		IPoint<double> normPoint = new Point<double>
@@ -280,6 +273,13 @@ internal static class TreeHelpers
 			Y = searchPoint.Y - rectangle.Y
 		};
 
+		// Equations for the diagonals.
+		double grad = rectangle.Width / rectangle.Height;
+
+		double y1 = normPoint.X * grad;
+		double y2 = rectangle.Height - y1;
+
+		// Check if the point is above the diagonals.
 		bool isAboveDiagonal1 = y1 >= normPoint.Y;
 		bool isAboveDiagonal2 = y2 >= normPoint.Y;
 
@@ -314,7 +314,6 @@ internal static class TreeHelpers
 		if (node is LeafNode)
 		{
 			yield return new NodeState(node, location, WindowSize.Normal);
-
 			yield break;
 		}
 
