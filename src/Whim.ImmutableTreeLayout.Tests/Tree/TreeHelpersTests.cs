@@ -239,4 +239,170 @@ public class TreeHelpersTests
 			.BeEquivalentTo(result.Path);
 	}
 	#endregion
+
+	public static IEnumerable<object[]> GetDirectionToPoint_Data()
+	{
+		// Top left corner boundary
+		yield return new object[] { Location.UnitSquare<double>(), new Point<double>(), Direction.Up };
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.1, Y = 0 },
+			Direction.Up
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0, Y = 0.1 },
+			Direction.Left
+		};
+
+		// Top right corner boundary
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 1, Y = 0 },
+			Direction.Up
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.9, Y = 0 },
+			Direction.Up
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 1, Y = 0.1 },
+			Direction.Right
+		};
+
+		// Middle
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.5, Y = 0.5 },
+			Direction.Up
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.5, Y = 0.4 },
+			Direction.Up
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.5, Y = 0.6 },
+			Direction.Down
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.4, Y = 0.5 },
+			Direction.Left
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.6, Y = 0.5 },
+			Direction.Right
+		};
+
+		// Bottom left corner boundary
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0, Y = 1 },
+			Direction.Left
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0, Y = 0.9 },
+			Direction.Left
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.1, Y = 1 },
+			Direction.Down
+		};
+
+		// Bottom right corner boundary
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 1, Y = 1 },
+			Direction.Right
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 1, Y = 0.9 },
+			Direction.Right
+		};
+
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.9, Y = 1 },
+			Direction.Down
+		};
+
+		// Middle of the top triangle
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.5, Y = 0.25 },
+			Direction.Up
+		};
+
+		// Middle of the bottom triangle
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.5, Y = 0.75 },
+			Direction.Down
+		};
+
+		// Middle of the left triangle
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.25, Y = 0.5 },
+			Direction.Left
+		};
+
+		// Middle of the right triangle
+		yield return new object[]
+		{
+			Location.UnitSquare<double>(),
+			new Point<double>() { X = 0.75, Y = 0.5 },
+			Direction.Right
+		};
+	}
+
+	[Theory]
+	[MemberData(nameof(GetDirectionToPoint_Data))]
+	public void GetDirectionToPoint(Location<double> location, Point<double> point, Direction expected)
+	{
+		// Given
+		// When
+		Direction result = location.GetDirectionToPoint(point);
+
+		// Then
+		Assert.Equal(expected, result);
+	}
 }
