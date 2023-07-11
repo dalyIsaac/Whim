@@ -173,6 +173,11 @@ internal static class TreeHelpers
 		int depth
 	)
 	{
+		if (!rootLocation.ContainsPoint(searchPoint))
+		{
+			return null;
+		}
+
 		if (root is LeafNode leaf)
 		{
 			return new InternalNodeAtPointData(
@@ -205,21 +210,18 @@ internal static class TreeHelpers
 				childLocation.Height = weight * rootLocation.Height;
 			}
 
-			if (childLocation.ContainsPoint(searchPoint))
-			{
-				InternalNodeAtPointData? result = GetNodeContainingPoint(
-					root: child,
-					rootLocation: childLocation,
-					searchPoint,
-					depth + 1
-				);
+			InternalNodeAtPointData? result = GetNodeContainingPoint(
+				root: child,
+				rootLocation: childLocation,
+				searchPoint,
+				depth + 1
+			);
 
-				if (result != null)
-				{
-					result.Ancestors[depth] = parent;
-					result.Path[depth] = idx;
-					return result;
-				}
+			if (result != null)
+			{
+				result.Ancestors[depth] = parent;
+				result.Path[depth] = idx;
+				return result;
 			}
 
 			// Since it wasn't a match, update the position of the child.

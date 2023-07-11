@@ -238,6 +238,20 @@ public class TreeHelpersTests
 			.Should()
 			.BeEquivalentTo(result.Path);
 	}
+
+	[Fact]
+	public void GetNodeContainingPoint_InvalidNode()
+	{
+		// Given
+		Mock<INode> node = new();
+		Point<double> point = new() { X = 0.8, Y = 0.4 };
+
+		// When
+		var result = node.Object.GetNodeContainingPoint(point);
+
+		// Then
+		Assert.Null(result);
+	}
 	#endregion
 
 	public static IEnumerable<object[]> GetDirectionToPoint_Data()
