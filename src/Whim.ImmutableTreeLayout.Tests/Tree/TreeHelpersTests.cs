@@ -34,9 +34,9 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.NotNull(result);
-		Assert.Empty(result.Value.Ancestors);
-		Assert.Equal(root.Object, result.Value.Node);
-		Assert.Equal(Location.UnitSquare<double>(), result.Value.Location);
+		Assert.Empty(result.Ancestors);
+		Assert.Equal(root.Object, result.Node);
+		Assert.Equal(Location.UnitSquare<double>(), result.Location);
 	}
 
 	[Fact]
@@ -65,7 +65,7 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.NotNull(result);
-		Assert.Equal(tree.Right, result.Value.Node);
+		Assert.Equal(tree.Right, result.Node);
 		Assert.Equal(
 			new Location<double>()
 			{
@@ -73,7 +73,7 @@ public class TreeHelpersTests
 				Width = 0.5,
 				Height = 1
 			},
-			result.Value.Location
+			result.Location
 		);
 	}
 
@@ -89,7 +89,7 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.NotNull(result);
-		Assert.Equal(tree.RightTop, result.Value.Node);
+		Assert.Equal(tree.RightTop, result.Node);
 		Assert.Equal(
 			new Location<double>()
 			{
@@ -98,7 +98,7 @@ public class TreeHelpersTests
 				Width = 0.5,
 				Height = 0.5
 			},
-			result.Value.Location
+			result.Location
 		);
 	}
 
@@ -114,11 +114,10 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.NotNull(result);
-		Assert.Equal(tree.RightTopLeftBottomRightBottom, result.Value.Node);
-		Assert.Equal(TestTreeWindowStates.RightTopLeftBottomRightBottom, result.Value.Location);
+		Assert.Equal(tree.RightTopLeftBottomRightBottom, result.Node);
+		Assert.Equal(TestTreeWindowStates.RightTopLeftBottomRightBottom, result.Location);
 	}
 	#endregion
-
 
 	[Fact]
 	public void GetRightMostLeaf()
@@ -541,4 +540,285 @@ public class TreeHelpersTests
 			.Should()
 			.BeEquivalentTo(expectedStates);
 	}
+
+	#region GetAdjacentNode
+	[Fact]
+	public void GetAdjacentNode_RootIsLeafNode()
+	{
+		// Given
+		WindowNode root = new(new Mock<IWindow>().Object);
+		IReadOnlyList<int> pathToNode = Array.Empty<int>();
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(root, pathToNode, Direction.Right, monitor.Object);
+
+		// Then
+		Assert.Null(result);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_RootIsNotISplitNode()
+	{
+		// Given
+		Mock<INode> root = new();
+		IReadOnlyList<int> pathToNode = Array.Empty<int>();
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			root.Object,
+			pathToNode,
+			Direction.Right,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Null(result);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_CannotFindNodeAtPath()
+	{
+		// Given
+		TestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 0, 0, 0, 0, 0 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.Right,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Null(result);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_Success_Left()
+	{
+		// Given
+		TestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.Left,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Equal(tree.Left.Window, result!.LeafNode.Window);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_Success_Right()
+	{
+		// Given
+		TestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.Right,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Equal(tree.RightTopLeftBottomRightTop.Window, result!.LeafNode.Window);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_Success_Up()
+	{
+		// Given
+		TestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(tree.Root, pathToNode, Direction.Up, monitor.Object);
+
+		// Then
+		Assert.Equal(tree.RightTopLeftTop.Window, result!.LeafNode.Window);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_Success_Down()
+	{
+		// Given
+		TestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.Down,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Equal(tree.RightBottom.Window, result!.LeafNode.Window);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_Success_RightUp()
+	{
+		// Given
+		SimpleTestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 1, 0 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.RightUp,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Equal(tree.TopRight.Window, result!.LeafNode.Window);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_Success_RightDown()
+	{
+		// Given
+		SimpleTestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 0, 0 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.RightDown,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Equal(tree.BottomRight.Window, result!.LeafNode.Window);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_Success_LeftUp()
+	{
+		// Given
+		SimpleTestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 1, 1 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.LeftUp,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Equal(tree.TopLeft.Window, result!.LeafNode.Window);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_Success_LeftDown()
+	{
+		// Given
+		SimpleTestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 0, 1 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.LeftDown,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Equal(tree.BottomLeft.Window, result!.LeafNode.Window);
+	}
+	#endregion
+
+	#region GetLastCommonAncestor
+	[Fact]
+	public void GetLastCommonAncestor_EmptyList()
+	{
+		// Given
+		IReadOnlyList<int> pathToNode1 = Array.Empty<int>();
+		IReadOnlyList<int> pathToNode2 = Array.Empty<int>();
+
+		// When
+		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
+
+		// Then
+		Assert.Equal(-1, result);
+	}
+
+	[Fact]
+	public void GetLastCommonAncestor_SomeCommonAncestor()
+	{
+		// Given
+		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode2 = new[] { 1, 0, 0, 1, 1 };
+
+		// When
+		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
+
+		// Then
+		Assert.Equal(3, result);
+	}
+
+	[Fact]
+	public void GetLastCommonAncestor_NoCommonAncestor()
+	{
+		// Given
+		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode2 = new[] { 0, 0, 0, 1, 1 };
+
+		// When
+		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
+
+		// Then
+		Assert.Equal(-1, result);
+	}
+
+	[Fact]
+	public void GetLastCommonAncestor_SamePath()
+	{
+		// Given
+		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode2 = new[] { 1, 0, 0, 1, 0 };
+
+		// When
+		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
+
+		// Then
+		Assert.Equal(4, result);
+	}
+	#endregion
 }

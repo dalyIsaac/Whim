@@ -11,9 +11,9 @@ namespace Whim.ImmutableTreeLayout;
 
 internal record NonRootWindowData(
 	ISplitNode RootSplitNode,
-	ImmutableArray<int> WindowPath,
-	ISplitNode[] WindowAncestors,
 	INode WindowNode,
+	IReadOnlyList<ISplitNode> WindowAncestors,
+	ImmutableArray<int> WindowPath,
 	ILocation<double> WindowLocation
 );
 
@@ -187,10 +187,10 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 		return new NonRootWindowData(
 			rootSplitNode,
+			windowResult.Node,
+			windowResult.Ancestors,
 			windowPath,
-			windowResult.Value.Ancestors,
-			windowResult.Value.Node,
-			windowResult.Value.Location
+			windowResult.Location
 		);
 	}
 
@@ -230,13 +230,12 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 				if (
 					_context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow is IWindow focusedWindow
 					&& _windows.TryGetValue(focusedWindow, out ImmutableArray<int> focusedWindowPath)
-					&& _root.GetNodeAtPath(focusedWindowPath)
-						is
-						(ISplitNode[] pathAncestors, LeafNode leafNode, ILocation<double>)
+					&& _root.GetNodeAtPath(focusedWindowPath) is NodeState nodeState
+					&& nodeState.Node is LeafNode focusedLeafNode
 				)
 				{
-					focusedNode = leafNode;
-					ancestors = pathAncestors;
+					focusedNode = focusedLeafNode;
+					ancestors = nodeState.Ancestors;
 					path = focusedWindowPath;
 				}
 				else
@@ -437,7 +436,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			Logger.Error($"Window {focusedWindow} not found in layout engine {Name}");
 			return this;
 		}
-		var (rootSplitNode, windowPath, windowAncestors, _, windowLocation) = windowData;
+		var (rootSplitNode, _, windowAncestors, windowPath, windowLocation) = windowData;
 
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		LeafNodeStateAtPoint? xAdjacentResult = null;
@@ -517,11 +516,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	)
 	{
 		// Get the index of the last common ancestor.
-		int parentDepth = TreeHelpers.GetLastCommonAncestorIndex<ISplitNode>(
-			focusedNodeAncestors,
-			adjacentNodeAncestors
-		);
-
+		int parentDepth = TreeHelpers.GetLastCommonAncestorIndex(focusedNodeAncestors, adjacentNodeAncestors);
 		if (parentDepth == -1)
 		{
 			Logger.Error($"Failed to find common parent for focused window and adjacent node");
@@ -538,22 +533,21 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		(ISplitNode[] parentAncestors, INode parentNode, ILocation<double> parentLocation) = parentResult.Value;
-		if (parentNode is not ISplitNode parentSplitNode)
+		if (parentResult.Node is not ISplitNode parentSplitNode)
 		{
 			Logger.Error($"Focused ancestor node is not a split node");
 			return this;
 		}
 
 		// Figure out what the relative delta of pixelsDeltas is given the unit square.
-		double relativeDelta = delta / (isXAxis ? parentLocation.Width : parentLocation.Height);
+		double relativeDelta = delta / (isXAxis ? parentResult.Location.Width : parentResult.Location.Height);
 
 		// Now we can adjust the weights.
 		ISplitNode newParent = parentSplitNode
 			.AdjustChildWeight(focusedNodePath[parentDepth], relativeDelta)
 			.AdjustChildWeight(adjacentNodePath[parentDepth], -relativeDelta);
 
-		return CreateNewEngine(parentAncestors, parentNodePath, newParent);
+		return CreateNewEngine(parentResult.Ancestors, parentNodePath, newParent);
 	}
 
 	/// <inheritdoc />
@@ -593,19 +587,19 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		ISplitNode parentNode = windowResult.Value.Ancestors[^1];
+		ISplitNode parentNode = windowResult.Ancestors[^1];
 
 		// If the parent node has just two children, remove the parent node and replace it with the other child.
 		if (parentNode.Children.Count == 2)
 		{
 			INode otherChild =
-				parentNode.Children[0] == windowResult.Value.Node ? parentNode.Children[1] : parentNode.Children[0];
+				parentNode.Children[0] == windowResult.Node ? parentNode.Children[1] : parentNode.Children[0];
 
-			return CreateNewEngine(windowResult.Value.Ancestors, windowPath[..^1], otherChild);
+			return CreateNewEngine(windowResult.Ancestors, windowPath[..^1], otherChild);
 		}
 
 		ISplitNode newParentNode = parentNode.Remove(windowPath[^1]);
-		return CreateNewEngine(windowResult.Value.Ancestors, windowPath[..^1], newParentNode);
+		return CreateNewEngine(windowResult.Ancestors, windowPath[..^1], newParentNode);
 	}
 
 	/// <inheritdoc />

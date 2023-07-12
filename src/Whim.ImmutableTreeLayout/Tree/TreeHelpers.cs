@@ -6,15 +6,15 @@ using System.Linq;
 namespace Whim.ImmutableTreeLayout;
 
 /// <summary>
-/// The location and size of the window in a monitor, using the monitor coordinate space.
+/// The state of a node.
 /// </summary>
-/// <param name="LeafNode">The leaf node.</param>
-/// <param name="Location">The location of the window.</param>
-/// <param name="WindowSize">The <see cref="WindowSize"/>.</param>
-internal record LeafNodeWindowLocationState(LeafNode LeafNode, ILocation<int> Location, WindowSize WindowSize);
+/// <param name="Node">The node.</param>
+/// <param name="Ancestors">The ancestors of the node.</param>
+/// <param name="Location">The location of the node.</param>
+internal record NodeState(INode Node, IReadOnlyList<ISplitNode> Ancestors, ILocation<double> Location);
 
 /// <summary>
-/// The state of a node.
+/// The state of a leaf node.
 /// </summary>
 /// <param name="LeafNode">The leaf node.</param>
 /// <param name="Ancestors">The ancestors of the node.</param>
@@ -35,6 +35,14 @@ internal record LeafNodeStateAtPoint(
 	Direction Direction
 );
 
+/// <summary>
+/// The location and size of the window in a monitor, using the monitor coordinate space.
+/// </summary>
+/// <param name="LeafNode">The leaf node.</param>
+/// <param name="Location">The location of the window.</param>
+/// <param name="WindowSize">The <see cref="WindowSize"/>.</param>
+internal record LeafNodeWindowLocationState(LeafNode LeafNode, ILocation<int> Location, WindowSize WindowSize);
+
 internal static class TreeHelpers
 {
 	/// <summary>
@@ -49,15 +57,12 @@ internal static class TreeHelpers
 	/// <param name="root">The root node of the tree.</param>
 	/// <param name="path">The path to the node.</param>
 	/// <returns></returns>
-	public static (ISplitNode[] Ancestors, INode Node, ILocation<double> Location)? GetNodeAtPath(
-		this INode root,
-		IReadOnlyList<int> path
-	)
+	public static NodeState? GetNodeAtPath(this INode root, IReadOnlyList<int> path)
 	{
 		Location<double> location = Location.UnitSquare<double>();
 		if (path.Count == 0)
 		{
-			return (Array.Empty<ISplitNode>(), root, location);
+			return new NodeState(root, Array.Empty<ISplitNode>(), location);
 		}
 
 		ISplitNode[] ancestors = new ISplitNode[path.Count];
@@ -103,7 +108,7 @@ internal static class TreeHelpers
 			}
 		}
 
-		return (ancestors, currentNode, location);
+		return new NodeState(currentNode, ancestors, location);
 	}
 
 	/// <summary>
@@ -409,9 +414,7 @@ internal static class TreeHelpers
 			return null;
 		}
 
-		(_, _, ILocation<double> nodeLocation) = result.Value;
-
-		return GetAdjacentNode(rootSplitNode, direction, monitor, nodeLocation);
+		return GetAdjacentNode(rootSplitNode, direction, monitor, result.Location);
 	}
 
 	/// <summary>
@@ -468,16 +471,26 @@ internal static class TreeHelpers
 	/// <typeparam name="T"></typeparam>
 	/// <param name="list1"></param>
 	/// <param name="list2"></param>
-	/// <returns>-1 if the lists have no common parent.</returns>
+	/// <returns>-1 if the lists are empty, or if they have no common ancestor.</returns>
 	public static int GetLastCommonAncestorIndex<T>(IReadOnlyList<T> list1, IReadOnlyList<T> list2)
 	{
-		int idx = Math.Min(list1.Count, list2.Count) - 1;
-
-		while (idx >= 0 && !list1[idx]!.Equals(list2[idx]))
+		if (list1.Count == 0 || list2.Count == 0)
 		{
-			idx--;
+			return -1;
 		}
 
-		return idx;
+		// Start at the root node, and work our way down.
+		int max = Math.Min(list1.Count, list2.Count);
+		int idx = 0;
+
+		for (; idx < max; idx++)
+		{
+			if (!list1[idx]!.Equals(list2[idx]))
+			{
+				return idx - 1;
+			}
+		}
+
+		return idx - 1;
 	}
 }
