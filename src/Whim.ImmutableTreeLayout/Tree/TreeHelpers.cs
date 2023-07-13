@@ -138,12 +138,10 @@ internal static class TreeHelpers
 	/// </summary>
 	/// <param name="rootSplitNode"></param>
 	/// <returns></returns>
-	public static (ISplitNode[] Ancestors, ImmutableArray<int> Path, LeafNode LeafNode) GetLeftMostLeaf(
-		this ISplitNode rootSplitNode
-	)
+	public static LeafNodeState GetLeftMostLeaf(this ISplitNode rootSplitNode)
 	{
 		List<ISplitNode> splitNodes = new();
-		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
+		List<int> pathBuilder = new();
 
 		INode currentNode = rootSplitNode;
 		while (currentNode is ISplitNode split)
@@ -154,7 +152,7 @@ internal static class TreeHelpers
 		}
 
 		// NOTE: This assumes that leaf nodes are always at the end of the path.
-		return (splitNodes.ToArray(), pathBuilder.ToImmutable(), (LeafNode)currentNode);
+		return new LeafNodeState((LeafNode)currentNode, splitNodes, pathBuilder.ToImmutableArray());
 	}
 
 	/// <summary>
@@ -183,12 +181,17 @@ internal static class TreeHelpers
 		return new LeafNodeStateAtPoint(
 			internalNodeAtPointData.LeafNode,
 			internalNodeAtPointData.Ancestors,
-			internalNodeAtPointData.Path.ToImmutableArray(),
+			internalNodeAtPointData.Path.ToImmutable(),
 			internalNodeAtPointData.Direction
 		);
 	}
 
-	private record InternalLeafNodeAtPoint(ISplitNode[] Ancestors, int[] Path, LeafNode LeafNode, Direction Direction);
+	private record InternalLeafNodeAtPoint(
+		ISplitNode[] Ancestors,
+		ImmutableArray<int>.Builder Path,
+		LeafNode LeafNode,
+		Direction Direction
+	);
 
 	private static InternalLeafNodeAtPoint? GetNodeContainingPoint(
 		INode root,
@@ -206,7 +209,7 @@ internal static class TreeHelpers
 		{
 			return new InternalLeafNodeAtPoint(
 				new ISplitNode[depth],
-				new int[depth],
+				ImmutableArray.CreateBuilder<int>(depth),
 				leaf,
 				rootLocation.GetDirectionToPoint(searchPoint)
 			);
@@ -492,5 +495,67 @@ internal static class TreeHelpers
 		}
 
 		return idx - 1;
+	}
+
+	/// <summary>
+	/// Returns a new <see cref="ImmutableDictionary{TKey, TValue}"/> with the paths updated to reflect
+	/// the new tree.
+	/// </summary>
+	/// <param name="windowPaths">The old window paths.</param>
+	/// <param name="pathToChangedNode">The path to the node that changed.</param>
+	/// <param name="root">The root node of the tree.</param>
+	/// <returns>A new <see cref="ImmutableDictionary{TKey, TValue}"/> with the paths updated.</returns>
+	public static ImmutableDictionary<IWindow, ImmutableArray<int>> CreateUpdatedPaths(
+		ImmutableDictionary<IWindow, ImmutableArray<int>> windowPaths,
+		ImmutableArray<int> pathToChangedNode,
+		ISplitNode root
+	)
+	{
+		List<(INode, ImmutableArray<int>)> stack = new();
+		INode node = root;
+		int level = 0;
+
+		// Skip to the node that changed.
+		while (level < pathToChangedNode.Length)
+		{
+			int index = pathToChangedNode[level];
+
+			if (node is not ISplitNode splitNode)
+			{
+				Logger.Error($"Expected split node at level {level} of path {pathToChangedNode}");
+				return windowPaths;
+			}
+
+			stack.Add((splitNode, pathToChangedNode.Take(level).ToImmutableArray()));
+
+			node = splitNode.Children[index];
+			level++;
+		}
+
+		// Add the root node.
+		stack.Add((node, pathToChangedNode));
+
+		// Iterate over the tree in-order, and create the updated paths.
+		List<KeyValuePair<IWindow, ImmutableArray<int>>> updatedPaths = new();
+		while (stack.Count > 0)
+		{
+			(INode current, ImmutableArray<int> path) = stack[^1];
+			stack.RemoveAt(stack.Count - 1);
+
+			if (current is SplitNode splitNode)
+			{
+				for (int idx = splitNode.Children.Count - 1; idx >= 0; idx--)
+				{
+					stack.Add((splitNode.Children[idx], path.Add(idx)));
+				}
+			}
+			else if (current is LeafNode leafNode)
+			{
+				updatedPaths.Add(new KeyValuePair<IWindow, ImmutableArray<int>>(leafNode.Window, path));
+			}
+		}
+
+		// Return the updated paths.
+		return windowPaths.SetItems(updatedPaths);
 	}
 }

@@ -37,7 +37,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	/// <inheritdoc/>
 	public int Count => _windows.Count;
 
-	private Direction _addNodeDirection = Direction.Right;
+	private readonly Direction _addNodeDirection = Direction.Right;
 
 	/// <summary>
 	/// The direction to add new windows to the tree, when there isn't an explicit direction.
@@ -83,8 +83,6 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	/// <summary>
 	/// Creates a new <see cref="TreeLayoutEngine"/>, replacing the old node from
 	/// <paramref name="oldNodePath"/> with <paramref name="newNode"/>.
-	///
-	/// It rebuilds the tree from the bottom up.
 	/// </summary>
 	/// <param name="oldNodeAncestors">The ancestors of the old node.</param>
 	/// <param name="oldNodePath">The path to the old node.</param>
@@ -96,6 +94,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		INode newNode
 	)
 	{
+		// Rebuild the tree from the bottom up.
 		INode current = newNode;
 
 		for (int idx = oldNodePath.Length - 1; idx >= 0; idx--)
@@ -106,11 +105,9 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			current = newParent;
 		}
 
-		return new TreeLayoutEngine(
-			this,
-			current,
-			newNode is LeafNode leafNode ? _windows.SetItem(leafNode.Window, oldNodePath) : _windows
-		);
+		WindowDict updatedPaths = TreeHelpers.CreateUpdatedPaths(_windows, oldNodePath, (ISplitNode)current);
+
+		return new TreeLayoutEngine(this, current, updatedPaths);
 	}
 
 	/// <summary>

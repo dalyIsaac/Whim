@@ -148,15 +148,13 @@ public class TreeHelpersTests
 		var result = tree.Root.GetLeftMostLeaf();
 
 		// Then
-		var (ancestors, path, leafNode) = result;
-
 		new SplitNode[] { tree.Root }
 			.Should()
-			.BeEquivalentTo(ancestors);
+			.BeEquivalentTo(result.Ancestors);
 		new int[] { 0 }
 			.Should()
-			.BeEquivalentTo(path);
-		Assert.Equal(tree.Left, leafNode);
+			.BeEquivalentTo(result.Path);
+		Assert.Equal(tree.Left, result.LeafNode);
 	}
 
 	#region GetNodeContainingPoint
