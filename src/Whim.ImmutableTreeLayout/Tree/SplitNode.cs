@@ -229,7 +229,4 @@ internal class SplitNode : ISplitNode
 	}
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-	// TODO: test
-	public (double Weight, INode Node) this[int index] => (Weights[index], Children[index]);
 }

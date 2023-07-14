@@ -30,7 +30,7 @@ internal record LeafNodeState(LeafNode LeafNode, IReadOnlyList<ISplitNode> Ances
 /// <param name="Direction">The direction of the node from the point of interest.</param>
 internal record LeafNodeStateAtPoint(
 	LeafNode LeafNode,
-	IReadOnlyList<ISplitNode> Ancestors,
+	ImmutableArray<ISplitNode> Ancestors,
 	ImmutableArray<int> Path,
 	Direction Direction
 );
@@ -164,106 +164,101 @@ internal static class TreeHelpers
 	/// <returns></returns>
 	public static LeafNodeStateAtPoint? GetNodeContainingPoint(this INode rootNode, IPoint<double> searchPoint)
 	{
-		Logger.Debug($"Searching for point {searchPoint} in node {rootNode}");
-
-		InternalLeafNodeAtPoint? internalNodeAtPointData = GetNodeContainingPoint(
-			rootNode,
-			Location.UnitSquare<double>(),
-			searchPoint,
-			0
-		);
-
-		if (internalNodeAtPointData is null)
+		ILocation<double> parentLocation = Location.UnitSquare<double>();
+		if (!parentLocation.ContainsPoint(searchPoint))
 		{
 			return null;
 		}
 
-		return new LeafNodeStateAtPoint(
-			internalNodeAtPointData.LeafNode,
-			internalNodeAtPointData.Ancestors,
-			internalNodeAtPointData.Path.ToImmutable(),
-			internalNodeAtPointData.Direction
-		);
-	}
-
-	private record InternalLeafNodeAtPoint(
-		ISplitNode[] Ancestors,
-		ImmutableArray<int>.Builder Path,
-		LeafNode LeafNode,
-		Direction Direction
-	);
-
-	private static InternalLeafNodeAtPoint? GetNodeContainingPoint(
-		INode root,
-		ILocation<double> rootLocation,
-		IPoint<double> searchPoint,
-		int depth
-	)
-	{
-		if (!rootLocation.ContainsPoint(searchPoint))
+		if (rootNode is LeafNode rootLeafNode)
 		{
-			return null;
-		}
-
-		if (root is LeafNode leaf)
-		{
-			return new InternalLeafNodeAtPoint(
-				new ISplitNode[depth],
-				ImmutableArray.CreateBuilder<int>(depth),
-				leaf,
-				rootLocation.GetDirectionToPoint(searchPoint)
+			return new LeafNodeStateAtPoint(
+				rootLeafNode,
+				ImmutableArray.Create<ISplitNode>(),
+				ImmutableArray.Create<int>(),
+				parentLocation.GetDirectionToPoint(searchPoint)
 			);
 		}
 
-		if (root is not SplitNode splitNode)
+		if (rootNode is not SplitNode rootSplitNode)
 		{
+			Logger.Error($"Unknown node type {rootNode.GetType()}");
 			return null;
 		}
 
-		Location<double> childLocation = new(rootLocation);
-		SplitNode parent = splitNode;
+		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
+		ImmutableArray<ISplitNode>.Builder ancestorsBuilder = ImmutableArray.CreateBuilder<ISplitNode>();
 
-		for (int idx = 0; idx < parent.Children.Count; idx++)
+		ancestorsBuilder.Add(rootSplitNode);
+
+		// Go to the node containing the searchPoint.
+		INode parent = rootSplitNode;
+		while (true)
 		{
-			(double weight, INode child) = parent[idx];
-
-			// Scale the width/height of the child.
-			if (parent.IsHorizontal)
+			if (parent is not ISplitNode parentSplitNode)
 			{
-				childLocation.Width = weight * rootLocation.Width;
-			}
-			else
-			{
-				childLocation.Height = weight * rootLocation.Height;
+				Logger.Error(
+					$"The root node contains the point, but could not find the leaf node containing the point."
+				);
+				return null;
 			}
 
-			InternalLeafNodeAtPoint? result = GetNodeContainingPoint(
-				root: child,
-				rootLocation: childLocation,
-				searchPoint,
-				depth + 1
-			);
+			double deltaX = 0;
+			double deltaY = 0;
+			for (int idx = 0; idx < parentSplitNode.Children.Count; idx++)
+			{
+				double weight = parentSplitNode.Weights[idx];
+				INode child = parentSplitNode.Children[idx];
+				Location<double> childLocation = new(parentLocation);
+				childLocation.X += deltaX;
+				childLocation.Y += deltaY;
 
-			if (result != null)
-			{
-				result.Ancestors[depth] = parent;
-				result.Path[depth] = idx;
-				return result;
-			}
+				// Scale the width/height of the child.
+				if (parentSplitNode.IsHorizontal)
+				{
+					childLocation.Width = weight * parentLocation.Width;
+				}
+				else
+				{
+					childLocation.Height = weight * parentLocation.Height;
+				}
 
-			// Since it wasn't a match, update the position of the child.
-			if (parent.IsHorizontal)
-			{
-				childLocation.X += childLocation.Width;
-			}
-			else
-			{
-				childLocation.Y += childLocation.Height;
+				if (!childLocation.ContainsPoint(searchPoint))
+				{
+					// Since it wasn't a match, update the position of the child.
+					if (parentSplitNode.IsHorizontal)
+					{
+						deltaX += childLocation.Width;
+					}
+					else
+					{
+						deltaY += childLocation.Height;
+					}
+					continue;
+				}
+
+				pathBuilder.Add(idx);
+
+				// We found a split node containing the searchPoint.
+				if (child is ISplitNode splitNode)
+				{
+					ancestorsBuilder.Add(splitNode);
+					parent = splitNode;
+					parentLocation = childLocation;
+					break;
+				}
+
+				if (child is LeafNode leafNode)
+				{
+					return new LeafNodeStateAtPoint(
+						leafNode,
+						ancestorsBuilder.ToImmutable(),
+						pathBuilder.ToImmutable(),
+						childLocation.GetDirectionToPoint(searchPoint)
+					);
+				}
 			}
 		}
-
-		Logger.Error("The split node contains the point, but none of its children do.");
-		return null;
 	}
 
 	/// <summary>

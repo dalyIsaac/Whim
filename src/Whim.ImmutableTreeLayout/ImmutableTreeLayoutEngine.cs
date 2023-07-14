@@ -298,14 +298,14 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return this;
 		}
 
-		var result = rootNode.GetNodeContainingPoint(point);
+		LeafNodeStateAtPoint? result = rootNode.GetNodeContainingPoint(point);
 		if (result is null)
 		{
 			Logger.Error($"Failed to find node containing point {point}");
 			return this;
 		}
 
-		(LeafNode focusedNode, IReadOnlyList<ISplitNode> ancestors, ImmutableArray<int> path, Direction direction) =
+		(LeafNode focusedNode, ImmutableArray<ISplitNode> ancestors, ImmutableArray<int> path, Direction direction) =
 			result;
 
 		ISplitNode parentNode = ancestors[^1];
