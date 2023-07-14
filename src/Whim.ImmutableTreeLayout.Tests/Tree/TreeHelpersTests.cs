@@ -885,5 +885,72 @@ public class TreeHelpersTests
 			.Should()
 			.BeEquivalentTo(result[tree.RightBottom.Window]);
 	}
+
+	[Fact]
+	public void CreateUpdatedPaths_AmendRightTopRight()
+	{
+		// Given
+		TestTree tree = new();
+		ImmutableArray<int> initialPath = ImmutableArray.Create(0);
+		ImmutableArray<int> pathToNode = ImmutableArray.Create(1, 0, 1);
+
+		// When
+		ImmutableDictionary<IWindow, ImmutableArray<int>> originalDict = TreeHelpers.CreateUpdatedPaths(
+			ImmutableDictionary<IWindow, ImmutableArray<int>>.Empty,
+			initialPath,
+			tree.Root
+		);
+
+		ImmutableDictionary<IWindow, ImmutableArray<int>> result = TreeHelpers.CreateUpdatedPaths(
+			originalDict,
+			pathToNode,
+			tree.Root
+		);
+
+		// Then
+		Assert.NotSame(originalDict, result);
+
+		// Equal and NotEqual test references equality.
+		// See https://devblogs.microsoft.com/dotnet/please-welcome-immutablearrayt/
+		Assert.Equal(originalDict[tree.Left.Window], result[tree.Left.Window]);
+		Assert.Equal(originalDict[tree.RightTopLeftTop.Window], result[tree.RightTopLeftTop.Window]);
+		Assert.Equal(originalDict[tree.RightTopLeftBottomLeft.Window], result[tree.RightTopLeftBottomLeft.Window]);
+		Assert.Equal(
+			originalDict[tree.RightTopLeftBottomRightTop.Window],
+			result[tree.RightTopLeftBottomRightTop.Window]
+		);
+		Assert.Equal(
+			originalDict[tree.RightTopLeftBottomRightBottom.Window],
+			result[tree.RightTopLeftBottomRightBottom.Window]
+		);
+		Assert.NotEqual(originalDict[tree.RightTopRight1.Window], result[tree.RightTopRight1.Window]);
+		Assert.NotEqual(originalDict[tree.RightTopRight2.Window], result[tree.RightTopRight2.Window]);
+		Assert.NotEqual(originalDict[tree.RightTopRight3.Window], result[tree.RightTopRight3.Window]);
+	}
+
+	[Fact]
+	public void CreateUpdatedPaths_DidNotFindSplitNode()
+	{
+		// Given
+		TestTree tree = new();
+		ImmutableArray<int> initialPath = ImmutableArray.Create(0);
+		ImmutableArray<int> pathToNode = ImmutableArray.Create(0, 0);
+
+		// When
+		ImmutableDictionary<IWindow, ImmutableArray<int>> originalDict = TreeHelpers.CreateUpdatedPaths(
+			ImmutableDictionary<IWindow, ImmutableArray<int>>.Empty,
+			initialPath,
+			tree.Root
+		);
+
+		ImmutableDictionary<IWindow, ImmutableArray<int>> result = TreeHelpers.CreateUpdatedPaths(
+			originalDict,
+			pathToNode,
+			tree.Root
+		);
+
+		// Then
+		Assert.Same(originalDict, result);
+	}
 	#endregion
 }

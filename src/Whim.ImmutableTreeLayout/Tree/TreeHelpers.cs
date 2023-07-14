@@ -517,29 +517,29 @@ internal static class TreeHelpers
 		ISplitNode root
 	)
 	{
-		List<(INode, ImmutableArray<int>)> stack = new();
-		INode node = root;
-		int level = 0;
-
-		// Skip to the node that changed.
-		while (level < pathToChangedNode.Length)
+		List<(INode, ImmutableArray<int>)> stack = new() { };
+		if (windowPaths.IsEmpty)
 		{
-			int index = pathToChangedNode[level];
-
-			if (node is not ISplitNode splitNode)
-			{
-				Logger.Error($"Expected split node at level {level} of path {pathToChangedNode}");
-				return windowPaths;
-			}
-
-			stack.Add((splitNode, pathToChangedNode.Take(level).ToImmutableArray()));
-
-			node = splitNode.Children[index];
-			level++;
+			stack.Add((root, ImmutableArray<int>.Empty));
 		}
+		else
+		{
+			// Skip to the node that changed when the given windowPaths is empty.
+			// We only want to update the paths for the subtree that changed.
+			INode node = root;
+			for (int level = 0; level < pathToChangedNode.Length; level++)
+			{
+				if (node is not ISplitNode splitNode)
+				{
+					Logger.Error($"Expected split node at level {level} of path {pathToChangedNode}");
+					return windowPaths;
+				}
 
-		// Add the root node.
-		stack.Add((node, pathToChangedNode));
+				int index = pathToChangedNode[level];
+				node = splitNode.Children[index];
+			}
+			stack.Add((node, pathToChangedNode));
+		}
 
 		// Iterate over the tree in-order, and create the updated paths.
 		List<KeyValuePair<IWindow, ImmutableArray<int>>> updatedPaths = new();
@@ -550,6 +550,8 @@ internal static class TreeHelpers
 
 			if (current is SplitNode splitNode)
 			{
+				// Add the children in reverse order, so that they are processed from the stack in the
+				// correct order (left to right).
 				for (int idx = splitNode.Children.Count - 1; idx >= 0; idx--)
 				{
 					stack.Add((splitNode.Children[idx], path.Add(idx)));
