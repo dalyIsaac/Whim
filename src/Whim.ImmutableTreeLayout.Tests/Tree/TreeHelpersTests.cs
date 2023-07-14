@@ -132,6 +132,7 @@ public class TreeHelpersTests
 		new SplitNode[] { tree.Root, tree.Right }
 			.Should()
 			.BeEquivalentTo(result.Ancestors);
+
 		new int[] { 1, 1 }
 			.Should()
 			.BeEquivalentTo(result.Path);
@@ -151,6 +152,7 @@ public class TreeHelpersTests
 		new SplitNode[] { tree.Root }
 			.Should()
 			.BeEquivalentTo(result.Ancestors);
+
 		new int[] { 0 }
 			.Should()
 			.BeEquivalentTo(result.Path);
@@ -188,6 +190,7 @@ public class TreeHelpersTests
 		new SplitNode[] { tree.Root }
 			.Should()
 			.BeEquivalentTo(result.Ancestors);
+
 		new int[] { 0 }
 			.Should()
 			.BeEquivalentTo(result.Path);
@@ -209,6 +212,7 @@ public class TreeHelpersTests
 		new SplitNode[] { tree.Root, tree.Right }
 			.Should()
 			.BeEquivalentTo(result.Ancestors);
+
 		new int[] { 1, 1 }
 			.Should()
 			.BeEquivalentTo(result.Path);
@@ -230,6 +234,7 @@ public class TreeHelpersTests
 		new SplitNode[] { tree.Root, tree.Right, tree.RightTop, tree.RightTopRight }
 			.Should()
 			.BeEquivalentTo(result.Ancestors);
+
 		new int[] { 1, 0, 1, 2 }
 			.Should()
 			.BeEquivalentTo(result.Path);
@@ -847,28 +852,36 @@ public class TreeHelpersTests
 		new int[] { 0 }
 			.Should()
 			.BeEquivalentTo(result[tree.Left.Window]);
-		new int[] { 1, 0, 0 }
+
+		new int[] { 1, 0, 0, 0 }
 			.Should()
 			.BeEquivalentTo(result[tree.RightTopLeftTop.Window]);
-		new int[] { 1, 0, 1, 0 }
+
+		new int[] { 1, 0, 0, 1, 0 }
 			.Should()
 			.BeEquivalentTo(result[tree.RightTopLeftBottomLeft.Window]);
-		new int[] { 1, 0, 1, 1, 0 }
+
+		new int[] { 1, 0, 0, 1, 1, 0 }
 			.Should()
 			.BeEquivalentTo(result[tree.RightTopLeftBottomRightTop.Window]);
-		new int[] { 1, 0, 1, 1, 1, 0 }
+
+		new int[] { 1, 0, 0, 1, 1, 1 }
 			.Should()
 			.BeEquivalentTo(result[tree.RightTopLeftBottomRightBottom.Window]);
-		new int[] { 1, 0, 1, 1, 1, 1 }
-			.Should()
-			.BeEquivalentTo(result[tree.RightTopRight1.Window]);
+
 		new int[] { 1, 0, 1, 0 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopRight2.Window]);
+			.BeEquivalentTo(result[tree.RightTopRight1.Window]);
+
 		new int[] { 1, 0, 1, 1 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopRight3.Window]);
+			.BeEquivalentTo(result[tree.RightTopRight2.Window]);
+
 		new int[] { 1, 0, 1, 2 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightTopRight3.Window]);
+
+		new int[] { 1, 1 }
 			.Should()
 			.BeEquivalentTo(result[tree.RightBottom.Window]);
 	}
