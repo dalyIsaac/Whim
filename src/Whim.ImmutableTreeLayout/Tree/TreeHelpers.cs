@@ -203,6 +203,8 @@ internal static class TreeHelpers
 				return null;
 			}
 
+			bool foundChild = false;
+
 			double deltaX = 0;
 			double deltaY = 0;
 			for (int idx = 0; idx < parentSplitNode.Children.Count; idx++)
@@ -242,6 +244,7 @@ internal static class TreeHelpers
 				// We found a split node containing the searchPoint.
 				if (child is ISplitNode splitNode)
 				{
+					foundChild = true;
 					ancestorsBuilder.Add(splitNode);
 					parent = splitNode;
 					parentLocation = childLocation;
@@ -257,6 +260,14 @@ internal static class TreeHelpers
 						childLocation.GetDirectionToPoint(searchPoint)
 					);
 				}
+			}
+
+			if (!foundChild)
+			{
+				Logger.Error(
+					$"The root node contains the point, but could not find the leaf node containing the point."
+				);
+				return null;
 			}
 		}
 	}

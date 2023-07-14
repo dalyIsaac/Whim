@@ -819,4 +819,58 @@ public class TreeHelpersTests
 		Assert.Equal(4, result);
 	}
 	#endregion
+
+	#region CreateUpdatedPaths
+	[Fact]
+	public void CreateUpdatedPaths_Create()
+	{
+		// Given
+		TestTree tree = new();
+		ImmutableDictionary<IWindow, ImmutableArray<int>> windowPaths = ImmutableDictionary<
+			IWindow,
+			ImmutableArray<int>
+		>.Empty;
+		ImmutableArray<int> pathToNode = ImmutableArray.Create(1, 0, 0, 1, 0);
+
+		// When
+		ImmutableDictionary<IWindow, ImmutableArray<int>> result = TreeHelpers.CreateUpdatedPaths(
+			windowPaths,
+			pathToNode,
+			tree.Root
+		);
+
+		// Then
+		Assert.NotSame(windowPaths, result);
+		Assert.NotEqual(windowPaths, result);
+		Assert.Equal(9, result.Count);
+
+		new int[] { 0 }
+			.Should()
+			.BeEquivalentTo(result[tree.Left.Window]);
+		new int[] { 1, 0, 0 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightTopLeftTop.Window]);
+		new int[] { 1, 0, 1, 0 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightTopLeftBottomLeft.Window]);
+		new int[] { 1, 0, 1, 1, 0 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightTopLeftBottomRightTop.Window]);
+		new int[] { 1, 0, 1, 1, 1, 0 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightTopLeftBottomRightBottom.Window]);
+		new int[] { 1, 0, 1, 1, 1, 1 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightTopRight1.Window]);
+		new int[] { 1, 0, 1, 0 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightTopRight2.Window]);
+		new int[] { 1, 0, 1, 1 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightTopRight3.Window]);
+		new int[] { 1, 0, 1, 2 }
+			.Should()
+			.BeEquivalentTo(result[tree.RightBottom.Window]);
+	}
+	#endregion
 }
