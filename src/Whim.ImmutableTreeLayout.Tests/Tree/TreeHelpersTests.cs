@@ -175,6 +175,37 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
+	public void GetNodeContainingPoint_RootIsLeaf()
+	{
+		// Given
+		WindowNode root = new(new Mock<IWindow>().Object);
+		Point<double> point = new() { X = 0.5, Y = 0.5 };
+
+		// When
+		var result = root.GetNodeContainingPoint(point);
+
+		// Then
+		Assert.NotNull(result);
+		Assert.Equal(root, result.LeafNode);
+		Assert.Empty(result.Ancestors);
+		Assert.Empty(result.Path);
+	}
+
+	[Fact]
+	public void GetNodeContainingPoint_UnknownNodeType()
+	{
+		// Given
+		SplitNode root = new(new Mock<INode>().Object, new Mock<INode>().Object, Direction.Right);
+		Point<double> point = new() { X = 0.5, Y = 0.5 };
+
+		// When
+		var result = root.GetNodeContainingPoint(point);
+
+		// Then
+		Assert.Null(result);
+	}
+
+	[Fact]
 	public void GetNodeContainingPoint_Origin()
 	{
 		// Given
@@ -596,6 +627,27 @@ public class TreeHelpersTests
 			tree.Root,
 			pathToNode,
 			Direction.Right,
+			monitor.Object
+		);
+
+		// Then
+		Assert.Null(result);
+	}
+
+	[Fact]
+	public void GetAdjacentNode_CannotFindAdjacentNode()
+	{
+		// Given
+		TestTree tree = new();
+		IReadOnlyList<int> pathToNode = new[] { 0 };
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
+
+		// When
+		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+			tree.Root,
+			pathToNode,
+			Direction.Left,
 			monitor.Object
 		);
 

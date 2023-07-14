@@ -192,31 +192,23 @@ internal static class TreeHelpers
 		ancestorsBuilder.Add(rootSplitNode);
 
 		// Go to the node containing the searchPoint.
-		INode parent = rootSplitNode;
+		ISplitNode parent = rootSplitNode;
 		while (true)
 		{
-			if (parent is not ISplitNode parentSplitNode)
-			{
-				Logger.Error(
-					$"The root node contains the point, but could not find the leaf node containing the point."
-				);
-				return null;
-			}
-
 			bool foundChild = false;
 
 			double deltaX = 0;
 			double deltaY = 0;
-			for (int idx = 0; idx < parentSplitNode.Children.Count; idx++)
+			for (int idx = 0; idx < parent.Children.Count; idx++)
 			{
-				double weight = parentSplitNode.Weights[idx];
-				INode child = parentSplitNode.Children[idx];
+				double weight = parent.Weights[idx];
+				INode child = parent.Children[idx];
 				Location<double> childLocation = new(parentLocation);
 				childLocation.X += deltaX;
 				childLocation.Y += deltaY;
 
 				// Scale the width/height of the child.
-				if (parentSplitNode.IsHorizontal)
+				if (parent.IsHorizontal)
 				{
 					childLocation.Width = weight * parentLocation.Width;
 				}
@@ -228,7 +220,7 @@ internal static class TreeHelpers
 				if (!childLocation.ContainsPoint(searchPoint))
 				{
 					// Since it wasn't a match, update the position of the child.
-					if (parentSplitNode.IsHorizontal)
+					if (parent.IsHorizontal)
 					{
 						deltaX += childLocation.Width;
 					}
@@ -260,6 +252,9 @@ internal static class TreeHelpers
 						childLocation.GetDirectionToPoint(searchPoint)
 					);
 				}
+
+				Logger.Error($"Unknown node type {child.GetType()}");
+				return null;
 			}
 
 			if (!foundChild)
@@ -318,22 +313,23 @@ internal static class TreeHelpers
 		bool isAboveDiagonal2 = y2 >= normPoint.Y;
 
 		// Depending on which diagonal the point is above, we can determine the direction.
-		if (isAboveDiagonal1 && isAboveDiagonal2)
+		if (isAboveDiagonal1)
 		{
-			return Direction.Up;
-		}
+			if (isAboveDiagonal2)
+			{
+				return Direction.Up;
+			}
 
-		if (isAboveDiagonal1 && !isAboveDiagonal2)
-		{
 			return Direction.Right;
 		}
 
-		if (!isAboveDiagonal1 && !isAboveDiagonal2)
+		// Implicitly below diagonal 1.
+		if (isAboveDiagonal2)
 		{
-			return Direction.Down;
+			return Direction.Left;
 		}
 
-		return Direction.Left;
+		return Direction.Down;
 	}
 
 	/// <summary>
