@@ -303,7 +303,7 @@ internal static class TreeHelpers
 		};
 
 		// Equations for the diagonals.
-		double grad = rectangle.Width / rectangle.Height;
+		double grad = rectangle.Height / rectangle.Width;
 
 		double y1 = normPoint.X * grad;
 		double y2 = rectangle.Height - y1;

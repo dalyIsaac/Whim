@@ -255,13 +255,6 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			? new PhantomNode(window)
 			: new WindowNode(window);
 
-		// Handle the different root cases.
-		if (_root is null)
-		{
-			Logger.Debug($"Root is null, creating new window node");
-			return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
-		}
-
 		if (_root is PhantomNode)
 		{
 			Logger.Debug($"Root is phantom node, replacing with new window node");
@@ -285,12 +278,17 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			}
 		}
 
-		if (_root is not ISplitNode rootNode)
+		if (_root is ISplitNode splitNode)
 		{
-			Logger.Error($"Unexpected root node type: {_root.GetType()}");
-			return this;
+			return AddAtPointSplitNode(point, newLeafNode, splitNode);
 		}
 
+		Logger.Debug($"Root is null, creating new window node");
+		return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
+	}
+
+	private IImmutableLayoutEngine AddAtPointSplitNode(IPoint<double> point, LeafNode newLeafNode, ISplitNode rootNode)
+	{
 		LeafNodeStateAtPoint? result = rootNode.GetNodeContainingPoint(point);
 		if (result is null)
 		{
@@ -315,7 +313,6 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 		// Replace the current node with a split node.
 		ISplitNode leafNodeReplacement = new SplitNode(focusedNode, newLeafNode, direction);
-		// TODO: Test path empty path?
 		ISplitNode newParentNode = parentNode.Replace(path[^1], leafNodeReplacement);
 		return CreateNewEngine(
 			oldNodeAncestors: ancestors,
