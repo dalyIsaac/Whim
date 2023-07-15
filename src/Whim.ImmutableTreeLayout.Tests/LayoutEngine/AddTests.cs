@@ -296,11 +296,13 @@ public class AddTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 
-		Wrapper wrapper = new Wrapper().SetAsLastFocusedWindow(window1.Object);
+		Wrapper wrapper = new();
 
 		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
+
+		wrapper.SetAsLastFocusedWindow(window1.Object);
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 		Mock<IMonitor> monitor = new();

@@ -138,10 +138,8 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 		ImmutableArray<int>.Builder pathA = ImmutableArray.CreateBuilder<int>();
 		pathA.Add(0);
-		pathA.Add(0);
 
 		ImmutableArray<int>.Builder pathB = ImmutableArray.CreateBuilder<int>();
-		pathB.Add(0);
 		pathB.Add(1);
 
 		dictBuilder.Add(windowA, pathA.ToImmutable());
