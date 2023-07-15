@@ -6,39 +6,11 @@ namespace Whim.ImmutableTreeLayout.Tests;
 
 public class AddTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IImmutableInternalTreePlugin> Plugin { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-
-		public Wrapper()
-		{
-			Plugin.Setup(x => x.PhantomWindows).Returns(new HashSet<IWindow>());
-
-			WorkspaceManager.Setup(x => x.ActiveWorkspace).Returns(Workspace.Object);
-			Context.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-		}
-
-		public Wrapper SetAsPhantom(IWindow window)
-		{
-			Plugin.Setup(x => x.PhantomWindows).Returns(new HashSet<IWindow> { window });
-			return this;
-		}
-
-		public Wrapper SetAsLastFocusedWindow(IWindow? window)
-		{
-			Workspace.Setup(x => x.LastFocusedWindow).Returns(window);
-			return this;
-		}
-	}
-
 	[Fact]
 	public void AddWindow_RootIsNull()
 	{
 		// Given
-		Wrapper wrapper = new();
+		LayoutEngineWrapper wrapper = new();
 		Mock<IWindow> window = new();
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
 
@@ -56,7 +28,7 @@ public class AddTests
 	{
 		// Given
 		Mock<IWindow> window = new();
-		Wrapper wrapper = new Wrapper().SetAsPhantom(window.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(window.Object);
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
 
 		// When
@@ -73,7 +45,7 @@ public class AddTests
 	{
 		// Given
 		Mock<IWindow> phantomWindow = new();
-		Wrapper wrapper = new Wrapper().SetAsPhantom(phantomWindow.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(phantomWindow.Object);
 		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
 			phantomWindow.Object
 		);
@@ -96,7 +68,7 @@ public class AddTests
 		// Given
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
-		Wrapper wrapper = new();
+		LayoutEngineWrapper wrapper = new();
 		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
 			window1.Object
 		);
@@ -154,7 +126,7 @@ public class AddTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 
-		Wrapper wrapper = new Wrapper().SetAsLastFocusedWindow(null);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
 		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
@@ -225,7 +197,7 @@ public class AddTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 
-		Wrapper wrapper = new Wrapper().SetAsLastFocusedWindow(window3.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window3.Object);
 
 		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
@@ -296,7 +268,7 @@ public class AddTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 
-		Wrapper wrapper = new();
+		LayoutEngineWrapper wrapper = new();
 
 		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
