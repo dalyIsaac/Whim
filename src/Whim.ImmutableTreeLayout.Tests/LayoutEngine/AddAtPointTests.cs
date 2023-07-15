@@ -28,8 +28,8 @@ public class AddAtPointTests
 	public void AddAtPoint_RootIsNull_AddPhantom()
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
 		Mock<IWindow> window = new();
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(window.Object);
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 

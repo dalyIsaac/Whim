@@ -148,47 +148,6 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		return dictBuilder.ToImmutable();
 	}
 
-	/// <summary>
-	/// Gets the data for a non-root window.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns></returns>
-	private NonRootWindowData? GetNonRootWindowData(IWindow window)
-	{
-		if (_root is null)
-		{
-			Logger.Error($"Root is null, cannot get window data");
-			return null;
-		}
-
-		if (_root is not ISplitNode rootSplitNode)
-		{
-			Logger.Error($"Root is not split node, cannot get window data");
-			return null;
-		}
-
-		if (!_windows.TryGetValue(window, out ImmutableArray<int> windowPath))
-		{
-			Logger.Error($"Window {window} not found in layout engine");
-			return null;
-		}
-
-		var windowResult = rootSplitNode.GetNodeAtPath(windowPath);
-		if (windowResult is null)
-		{
-			Logger.Error($"Window {window} not found in layout engine");
-			return null;
-		}
-
-		return new NonRootWindowData(
-			rootSplitNode,
-			windowResult.Node,
-			windowResult.Ancestors,
-			windowPath,
-			windowResult.Location
-		);
-	}
-
 	/// <inheritdoc/>
 	public IImmutableLayoutEngine Add(IWindow window)
 	{
@@ -407,6 +366,41 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 				window.Hide();
 			}
 		}
+	}
+
+	/// <summary>
+	/// Gets the data for a non-root window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	private NonRootWindowData? GetNonRootWindowData(IWindow window)
+	{
+		if (_root is not ISplitNode rootSplitNode)
+		{
+			Logger.Error($"Root is not split node, cannot get window data");
+			return null;
+		}
+
+		if (!_windows.TryGetValue(window, out ImmutableArray<int> windowPath))
+		{
+			Logger.Error($"Window {window} not found in layout engine");
+			return null;
+		}
+
+		NodeState? windowResult = rootSplitNode.GetNodeAtPath(windowPath);
+		if (windowResult is null)
+		{
+			Logger.Error($"Window {window} not found in layout engine");
+			return null;
+		}
+
+		return new NonRootWindowData(
+			rootSplitNode,
+			windowResult.Node,
+			windowResult.Ancestors,
+			windowPath,
+			windowResult.Location
+		);
 	}
 
 	/// <inheritdoc />
