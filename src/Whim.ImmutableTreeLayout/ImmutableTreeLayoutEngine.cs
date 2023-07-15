@@ -203,10 +203,6 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 		switch (_root)
 		{
-			case null:
-				Logger.Debug($"Root is null, creating new window node");
-				return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
-
 			case PhantomNode:
 				Logger.Debug($"Root is phantom node, replacing with new window node");
 				return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
@@ -240,15 +236,14 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 					(focusedNode, ancestors, path) = rootNode.GetRightMostLeaf();
 				}
 
-				// TODO: Test this assumption.
 				// We're assuming that there is a parent node - otherwise we wouldn't have reached this point.
 				ISplitNode parentNode = ancestors[^1];
 				ISplitNode newParent = parentNode.Add(focusedNode, newLeafNode, AddNodeDirection.InsertAfter());
 				return CreateNewEngine(ancestors, path.RemoveAt(path.Length - 1), newParent);
 
 			default:
-				Logger.Error($"Unexpected root node type: {_root.GetType()}");
-				return this;
+				Logger.Debug($"Root is null, creating new window node");
+				return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
 		}
 	}
 
