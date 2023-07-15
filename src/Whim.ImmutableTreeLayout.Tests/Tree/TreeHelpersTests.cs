@@ -521,9 +521,117 @@ public class TreeHelpersTests
 		};
 	}
 
+	public static IEnumerable<object[]> GetDirectionToPoint_NonSquareData()
+	{
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 2,
+				Height = 1
+			},
+			new Point<double>() { X = 2.0, Y = 1.25 },
+			Direction.Up
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 2,
+				Height = 1
+			},
+			new Point<double>() { X = 1.5, Y = 1.5 },
+			Direction.Left
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 2,
+				Height = 1
+			},
+			new Point<double>() { X = 2.0, Y = 1.75 },
+			Direction.Down
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 2,
+				Height = 1
+			},
+			new Point<double>() { X = 2.5, Y = 1.5 },
+			Direction.Right
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 1,
+				Height = 2
+			},
+			new Point<double>() { X = 1.5, Y = 1.5 },
+			Direction.Up
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 1,
+				Height = 2
+			},
+			new Point<double>() { X = 1.25, Y = 2.5 },
+			Direction.Left
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 1,
+				Height = 2
+			},
+			new Point<double>() { X = 1.25, Y = 2.75 },
+			Direction.Down
+		};
+
+		yield return new object[]
+		{
+			new Location<double>()
+			{
+				X = 1,
+				Y = 1,
+				Width = 1,
+				Height = 2
+			},
+			new Point<double>() { X = 1.75, Y = 2.5 },
+			Direction.Right
+		};
+	}
+
 	[Theory]
 	[MemberData(nameof(GetDirectionToPoint_UnitSquareData))]
 	[MemberData(nameof(GetDirectionToPoint_NonUnitSquareData))]
+	[MemberData(nameof(GetDirectionToPoint_NonSquareData))]
 	public void GetDirectionToPoint(Location<double> location, Point<double> point, Direction expected)
 	{
 		// Given
