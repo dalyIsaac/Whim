@@ -5,7 +5,7 @@ namespace Whim.ImmutableTreeLayout.Tests;
 internal class LayoutEngineWrapper
 {
 	public Mock<IContext> Context { get; } = new();
-	public Mock<IImmutableInternalTreePlugin> Plugin { get; } = new();
+	public Mock<ITreeLayoutPlugin> Plugin { get; } = new();
 	public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 	public Mock<IWorkspace> Workspace { get; } = new();
 	public Mock<IMonitorManager> MonitorManager { get; } = new();

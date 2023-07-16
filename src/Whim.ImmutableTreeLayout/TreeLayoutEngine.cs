@@ -22,7 +22,7 @@ internal record NonRootWindowData(
 public class TreeLayoutEngine : IImmutableLayoutEngine
 {
 	private readonly IContext _context;
-	private readonly IImmutableInternalTreePlugin _plugin;
+	private readonly ITreeLayoutPlugin _plugin;
 	private readonly INode? _root;
 
 	/// <summary>
@@ -62,7 +62,12 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		_windows = windows;
 	}
 
-	internal TreeLayoutEngine(IContext context, IImmutableInternalTreePlugin plugin)
+	/// <summary>
+	/// Creates a new instance of the tree layout engine.
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="plugin"></param>
+	public TreeLayoutEngine(IContext context, ITreeLayoutPlugin plugin)
 	{
 		_context = context;
 		_plugin = plugin;
