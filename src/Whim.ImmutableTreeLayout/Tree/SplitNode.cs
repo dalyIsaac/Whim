@@ -67,7 +67,7 @@ internal class SplitNode : ISplitNode
 		IsHorizontal = isHorizontal;
 
 		Children = children;
-		Weights = weights;
+		Weights = EqualWeight ? DistributeWeights() : weights;
 	}
 
 	public ISplitNode Add(INode focusedNode, INode newNode, bool insertAfter)
@@ -197,7 +197,15 @@ internal class SplitNode : ISplitNode
 		}
 
 		ImmutableList<double> weights = EqualWeight ? DistributeWeights() : Weights;
-		weights = weights.SetItem(index, weights[index] + delta);
+
+		double newWeight = weights[index] + delta;
+		if (newWeight < 0)
+		{
+			Logger.Error($"New weight {newWeight} is less than 0 for {this}");
+			return this;
+		}
+
+		weights = weights.SetItem(index, newWeight);
 
 		return new SplitNode(false, IsHorizontal, Children, weights);
 	}

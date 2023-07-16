@@ -380,14 +380,10 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			return null;
 		}
 
-		if (!_windows.TryGetValue(window, out ImmutableArray<int> windowPath))
-		{
-			Logger.Error($"Window {window} not found in layout engine");
-			return null;
-		}
-
-		NodeState? windowResult = rootSplitNode.GetNodeAtPath(windowPath);
-		if (windowResult is null)
+		if (
+			!_windows.TryGetValue(window, out ImmutableArray<int> windowPath)
+			|| rootSplitNode.GetNodeAtPath(windowPath) is not NodeState windowResult
+		)
 		{
 			Logger.Error($"Window {window} not found in layout engine");
 			return null;
@@ -422,6 +418,13 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		LeafNodeStateAtPoint? xAdjacentResult = null;
 		LeafNodeStateAtPoint? yAdjacentResult = null;
 
+		// We need to adjust the deltas, because MoveSingleWindowEdgeInDirection works by moving the
+		// edge in the direction when the delta is positive.
+		// For example, if we want to move the left edge to the left, we need to have a positive
+		// X value for MoveSingleWindowEdgeInDirection, but a negative X value for the call to
+		// MoveWindowEdgesInDirection.
+		Point<double> directionAdjustedDeltas = new(deltas);
+
 		if (edges.HasFlag(Direction.Left))
 		{
 			xAdjacentResult = TreeHelpers.GetAdjacentNode(
@@ -430,6 +433,8 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 				monitor,
 				windowLocation
 			);
+
+			directionAdjustedDeltas.X = -directionAdjustedDeltas.X;
 		}
 		else if (edges.HasFlag(Direction.Right))
 		{
@@ -439,6 +444,8 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		if (edges.HasFlag(Direction.Up))
 		{
 			yAdjacentResult = TreeHelpers.GetAdjacentNode(rootSplitNode, Direction.Up, monitor, windowLocation);
+
+			directionAdjustedDeltas.Y = -directionAdjustedDeltas.Y;
 		}
 		else if (edges.HasFlag(Direction.Down))
 		{
@@ -458,7 +465,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		{
 			newEngine = MoveSingleWindowEdgeInDirection(
 				rootSplitNode,
-				deltas.X,
+				directionAdjustedDeltas.X,
 				true,
 				windowAncestors,
 				windowPath,
@@ -473,7 +480,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		{
 			newEngine = MoveSingleWindowEdgeInDirection(
 				rootSplitNode,
-				deltas.Y,
+				directionAdjustedDeltas.Y,
 				false,
 				windowAncestors,
 				windowPath,
@@ -506,16 +513,10 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		// Adjust the weight of the focused node.
 		// First, we need to find the location of the parent node.
 		ImmutableArray<int> parentNodePath = focusedNodePath.Take(parentDepth).ToImmutableArray();
-		var parentResult = root.GetNodeAtPath(parentNodePath);
-		if (parentResult is null)
+		NodeState? parentResult = root.GetNodeAtPath(parentNodePath);
+		if (parentResult is null || parentResult.Node is not ISplitNode parentSplitNode)
 		{
 			Logger.Error($"Failed to find parent node for focused window");
-			return this;
-		}
-
-		if (parentResult.Node is not ISplitNode parentSplitNode)
-		{
-			Logger.Error($"Focused ancestor node is not a split node");
 			return this;
 		}
 
@@ -523,9 +524,19 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		double relativeDelta = delta / (isXAxis ? parentResult.Location.Width : parentResult.Location.Height);
 
 		// Now we can adjust the weights.
-		ISplitNode newParent = parentSplitNode
-			.AdjustChildWeight(focusedNodePath[parentDepth], relativeDelta)
-			.AdjustChildWeight(adjacentNodePath[parentDepth], -relativeDelta);
+		ISplitNode focusedNodeParent = parentSplitNode.AdjustChildWeight(focusedNodePath[parentDepth], relativeDelta);
+		if (focusedNodeParent == parentSplitNode)
+		{
+			Logger.Error($"Failed to adjust child weight for focused window");
+			return this;
+		}
+
+		ISplitNode newParent = focusedNodeParent.AdjustChildWeight(adjacentNodePath[parentDepth], -relativeDelta);
+		if (newParent == focusedNodeParent)
+		{
+			Logger.Error($"Failed to adjust child weight for adjacent node");
+			return this;
+		}
 
 		return CreateNewEngine(parentResult.Ancestors, parentNodePath, newParent);
 	}

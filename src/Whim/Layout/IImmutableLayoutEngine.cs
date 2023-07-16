@@ -90,8 +90,7 @@ public interface IImmutableLayoutEngine
 	/// </summary>
 	/// <param name="edges">The edges to change.</param>
 	/// <param name="deltas">
-	/// The deltas to change the given <paramref name="edges"/> by. When a value is positive, then
-	/// the edge will move in the direction of the <paramref name="edges"/>.
+	/// The deltas to change the given <paramref name="edges"/> by.
 	/// The <paramref name="deltas"/> are in the range [0, 1] for both x and y (the unit square).
 	/// </param>
 	/// <param name="window"></param>

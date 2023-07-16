@@ -381,9 +381,24 @@ public class SplitNodeTests
 		Assert.Equal((0.25, otherNode), children[1]);
 		Assert.Equal((0.35, newNode), children[2]);
 	}
+
+	[Fact]
+	public void AdjustChildWeight_PreventNegativeWeights()
+	{
+		// Given
+		int index = 0;
+		WindowNode focusedNode = CreateWindowNode();
+		WindowNode otherNode = CreateWindowNode();
+
+		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
+
+		// When
+		ISplitNode result = splitNode.AdjustChildWeight(index, -1.0);
+
+		// Then
+		Assert.Same(splitNode, result);
+	}
 	#endregion
-
-
 
 	[Fact]
 	public void GetEnumerator()
