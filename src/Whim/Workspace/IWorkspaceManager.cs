@@ -17,7 +17,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <summary>
 	/// Creates the default layout engines to add to a workspace.
 	/// </summary>
-	Func<IList<ILayoutEngine>> CreateLayoutEngines { get; set; }
+	Func<IList<IImmutableLayoutEngine>> CreateLayoutEngines { get; set; }
 
 	/// <summary>
 	/// Initialize the event listeners.
@@ -81,7 +81,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
 	/// use the <see cref="CreateLayoutEngines"/> function.
 	/// </param>
-	void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null);
+	void Add(string? name = null, IEnumerable<IImmutableLayoutEngine>? layoutEngines = null);
 
 	/// <summary>
 	/// Tries to remove the given workspace.
@@ -170,12 +170,12 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// all workspaces.
 	/// </summary>
 	/// <param name="proxyLayoutEngine">The proxy layout engine to add.</param>
-	void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine);
+	void AddProxyLayoutEngine(ImmutableProxyLayoutEngine proxyLayoutEngine);
 
 	/// <summary>
 	/// The proxy layout engines.
 	/// </summary>
-	IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get; }
+	IEnumerable<ImmutableProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.

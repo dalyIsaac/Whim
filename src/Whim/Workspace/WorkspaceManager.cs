@@ -63,8 +63,8 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
 
-	public Func<IList<ILayoutEngine>> CreateLayoutEngines { get; set; } =
-		() => new ILayoutEngine[] { new ColumnLayoutEngine() };
+	public Func<IList<IImmutableLayoutEngine>> CreateLayoutEngines { get; set; } =
+		() => new IImmutableLayoutEngine[] { new ImmutableColumnLayoutEngine() };
 
 	/// <summary>
 	/// The active workspace.
@@ -84,11 +84,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 	}
 
-	private readonly List<ProxyLayoutEngine> _proxyLayoutEngines = new();
+	private readonly List<ImmutableProxyLayoutEngine> _proxyLayoutEngines = new();
 
 	private bool _disposedValue;
 
-	public IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
+	public IEnumerable<ImmutableProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
 
 	public WorkspaceManager(IContext context)
 	{
@@ -141,7 +141,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	#region Workspaces
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
-	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null)
+	public void Add(string? name = null, IEnumerable<IImmutableLayoutEngine>? layoutEngines = null)
 	{
 		Workspace workspace =
 			new(
@@ -486,7 +486,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		LayoutAllActiveWorkspaces();
 	}
 
-	public void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine)
+	public void AddProxyLayoutEngine(ImmutableProxyLayoutEngine proxyLayoutEngine)
 	{
 		Logger.Debug($"Adding proxy layout engine: {proxyLayoutEngine}");
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
