@@ -336,7 +336,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 			_context.MonitorManager.ActiveMonitor
 		);
 
-		adjacentNodeResult?.LeafNode?.Focus();
+		adjacentNodeResult?.LeafNode.Focus();
 	}
 
 	/// <inheritdoc />
