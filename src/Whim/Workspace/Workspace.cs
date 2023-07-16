@@ -34,11 +34,15 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// </summary>
 	public IWindow? LastFocusedWindow { get; private set; }
 
-	private readonly ILayoutEngine[] _layoutEngines;
+	private readonly IImmutableLayoutEngine[] _layoutEngines;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
-	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
+	public IImmutableLayoutEngine ActiveLayoutEngine
+	{
+		private set => _layoutEngines[_activeLayoutEngineIndex] = value;
+		get => _layoutEngines[_activeLayoutEngineIndex];
+	}
 
 	/// <summary>
 	/// All the windows in this workspace which are common to every layout engine.
@@ -59,7 +63,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// The intersection of <see cref="_normalWindows"/> and <see cref="_phantomWindows"/>
 	/// is the empty set.
 	/// </summary>
-	private readonly Dictionary<IWindow, ILayoutEngine> _phantomWindows = new();
+	private readonly Dictionary<IWindow, IImmutableLayoutEngine> _phantomWindows = new();
 
 	/// <summary>
 	/// Map of windows to their current location.
@@ -70,7 +74,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		IContext context,
 		WorkspaceManagerTriggers triggers,
 		string name,
-		IEnumerable<ILayoutEngine> layoutEngines
+		IEnumerable<IImmutableLayoutEngine> layoutEngines
 	)
 	{
 		_context = context;
@@ -96,7 +100,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_initialized = true;
 
 		// Apply the proxy layout engines
-		foreach (ProxyLayoutEngine proxyLayout in _context.WorkspaceManager.ProxyLayoutEngines)
+		foreach (ImmutableProxyLayoutEngine proxyLayout in _context.WorkspaceManager.ProxyLayoutEngines)
 		{
 			for (int i = 0; i < _layoutEngines.Length; i++)
 			{
@@ -110,7 +114,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (
 			_normalWindows.Contains(window)
 			|| (
-				_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
+				_phantomWindows.TryGetValue(window, out IImmutableLayoutEngine? layoutEngine)
 				&& layoutEngine != null
 				&& ActiveLayoutEngine.ContainsEqual(layoutEngine)
 			)
@@ -132,9 +136,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_normalWindows.Remove(window);
 		_minimizedWindows.Add(window);
 
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
+		for (int i = 0; i < _layoutEngines.Length; i++)
 		{
-			layoutEngine.Remove(window);
+			_layoutEngines[i] = _layoutEngines[i].Remove(window);
 		}
 
 		DoLayout();
@@ -202,7 +206,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		int nextIdx = -1;
 		for (int idx = 0; idx < _layoutEngines.Length; idx++)
 		{
-			ILayoutEngine engine = _layoutEngines[idx];
+			IImmutableLayoutEngine engine = _layoutEngines[idx];
 			if (engine.Name == name)
 			{
 				nextIdx = idx;
@@ -242,9 +246,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		_normalWindows.Add(window);
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
+		for (int i = 0; i < _layoutEngines.Length; i++)
 		{
-			layoutEngine.Add(window);
+			_layoutEngines[i] = _layoutEngines[i].Add(window);
 		}
 		DoLayout();
 		window.Focus();
@@ -259,11 +263,16 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			LastFocusedWindow = null;
 		}
 
-		if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
+		if (_phantomWindows.TryGetValue(window, out IImmutableLayoutEngine? phantomLayoutEngine))
 		{
-			bool removePhantomSuccess = phantomLayoutEngine.Remove(window);
+			IImmutableLayoutEngine newEngine = phantomLayoutEngine.Remove(window);
+
+			bool removePhantomSuccess = newEngine == phantomLayoutEngine;
 			if (removePhantomSuccess)
 			{
+				int idx = Array.IndexOf(_layoutEngines, phantomLayoutEngine);
+				_layoutEngines[idx] = newEngine;
+
 				_phantomWindows.Remove(window);
 				DoLayout();
 			}
@@ -280,12 +289,19 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		bool success = true;
 		if (isNormalWindow)
 		{
-			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				if (!layoutEngine.Remove(window))
+				IImmutableLayoutEngine oldEngine = _layoutEngines[idx];
+				IImmutableLayoutEngine newEngine = oldEngine.Remove(window);
+
+				if (newEngine == oldEngine)
 				{
-					Logger.Error($"Window {window} could not be removed from layout engine {layoutEngine}");
+					Logger.Error($"Window {window} could not be removed from layout engine {oldEngine}");
 					success = false;
+				}
+				else
+				{
+					_layoutEngines[idx] = newEngine;
 				}
 			}
 
@@ -354,7 +370,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+			ActiveLayoutEngine = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
 			DoLayout();
 		}
 	}
@@ -365,7 +381,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
+			ActiveLayoutEngine = ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
 			DoLayout();
 		}
 	}
@@ -381,8 +397,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (_normalWindows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
-			ActiveLayoutEngine.Remove(window);
-			ActiveLayoutEngine.AddWindowAtPoint(window, point);
+			ActiveLayoutEngine = ActiveLayoutEngine.Remove(window).AddAtPoint(window, point);
 		}
 		else
 		{
@@ -395,9 +410,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			// The window is new to the workspace, so add it to all layout engines
 			_normalWindows.Add(window);
 
-			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				layoutEngine.AddWindowAtPoint(window, point);
+				_layoutEngines[idx] = _layoutEngines[idx].AddAtPoint(window, point);
 			}
 		}
 
@@ -498,7 +513,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	#region Phantom Windows
-	public void AddPhantomWindow(ILayoutEngine engine, IWindow window)
+	public void AddPhantomWindow(IImmutableLayoutEngine engine, IWindow window)
 	{
 		Logger.Debug($"Adding phantom window {window} in workspace {Name}");
 
@@ -519,7 +534,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		DoLayout();
 	}
 
-	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window)
+	public void RemovePhantomWindow(IImmutableLayoutEngine engine, IWindow window)
 	{
 		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
 
@@ -529,7 +544,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return;
 		}
 
-		if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine))
+		if (!_phantomWindows.TryGetValue(window, out IImmutableLayoutEngine? phantomEngine))
 		{
 			Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
 			return;
@@ -552,7 +567,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_normalWindows.Contains(window)
 		|| _minimizedWindows.Contains(window)
 		|| (
-			_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
+			_phantomWindows.TryGetValue(window, out IImmutableLayoutEngine? phantomEngine)
 			&& ActiveLayoutEngine.ContainsEqual(phantomEngine)
 		);
 
