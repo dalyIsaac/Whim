@@ -24,9 +24,9 @@ internal class LayoutEngineWrapper
 		Context.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
 	}
 
-	public LayoutEngineWrapper SetAsPhantom(IWindow window)
+	public LayoutEngineWrapper SetAsPhantom(params IWindow[] windows)
 	{
-		Plugin.Setup(x => x.PhantomWindows).Returns(new HashSet<IWindow> { window });
+		Plugin.Setup(x => x.PhantomWindows).Returns(new HashSet<IWindow>(windows));
 		return this;
 	}
 
