@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using WindowDict = System.Collections.Immutable.ImmutableDictionary<
+using WindowPathDict = System.Collections.Immutable.ImmutableDictionary<
 	Whim.IWindow,
 	System.Collections.Immutable.ImmutableArray<int>
 >;
@@ -29,7 +28,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	/// <summary>
 	/// Map of windows to their paths in the tree.
 	/// </summary>
-	private readonly WindowDict _windows;
+	private readonly WindowPathDict _windows;
 
 	/// <inheritdoc/>
 	public string Name { get; init; } = "Tree";
@@ -46,24 +45,15 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	public Direction AddNodeDirection
 	{
 		get => _addNodeDirection;
-		init
-		{
-			switch (value)
+		init =>
+			_addNodeDirection = value switch
 			{
-				case Direction.Left:
-				case Direction.Right:
-				case Direction.Up:
-				case Direction.Down:
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(value), value, "Invalid direction.");
-			}
-
-			_addNodeDirection = value;
-		}
+				Direction.Left or Direction.Right or Direction.Up or Direction.Down => value,
+				_ => Direction.Right,
+			};
 	}
 
-	private TreeLayoutEngine(TreeLayoutEngine engine, INode root, WindowDict windows)
+	private TreeLayoutEngine(TreeLayoutEngine engine, INode root, WindowPathDict windows)
 		: this(engine._context, engine._plugin)
 	{
 		Name = engine.Name;
@@ -77,7 +67,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		_context = context;
 		_plugin = plugin;
 		_root = null;
-		_windows = WindowDict.Empty;
+		_windows = WindowPathDict.Empty;
 	}
 
 	/// <summary>
@@ -92,7 +82,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	private TreeLayoutEngine CreateNewEngine(
 		IReadOnlyList<ISplitNode> oldNodeAncestors,
 		ImmutableArray<int> oldNodePath,
-		WindowDict windows,
+		WindowPathDict windows,
 		INode newNode
 	)
 	{
@@ -119,7 +109,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private static WindowDict CreateRootNodeDict(IWindow window) =>
+	private static WindowPathDict CreateRootNodeDict(IWindow window) =>
 		ImmutableDictionary.Create<IWindow, ImmutableArray<int>>().Add(window, ImmutableArray.Create(0));
 
 	/// <summary>
@@ -128,9 +118,9 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	/// <param n="windowA"></param>
 	/// <param n="windowB"></param>
 	/// <returns></returns>
-	private static WindowDict CreateTopSplitNodeDict(IWindow windowA, IWindow windowB)
+	private static WindowPathDict CreateTopSplitNodeDict(IWindow windowA, IWindow windowB)
 	{
-		WindowDict.Builder dictBuilder = ImmutableDictionary.CreateBuilder<IWindow, ImmutableArray<int>>();
+		WindowPathDict.Builder dictBuilder = ImmutableDictionary.CreateBuilder<IWindow, ImmutableArray<int>>();
 
 		ImmutableArray<int>.Builder pathA = ImmutableArray.CreateBuilder<int>();
 		pathA.Add(0);
@@ -578,7 +568,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		}
 
 		ISplitNode parentNode = windowResult.Ancestors[^1];
-		WindowDict windows = _windows.Remove(window);
+		WindowPathDict windows = _windows.Remove(window);
 
 		// If the parent node has more than two children, just remove the window.
 		if (parentNode.Children.Count != 2)
