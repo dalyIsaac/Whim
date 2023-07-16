@@ -19,7 +19,7 @@ public partial class TreeLayoutEngine
 		IPoint<double> searchPoint
 	)
 	{
-		if (root is LeafNode leaf && rootLocation.IsPointInside(searchPoint))
+		if (root is LeafNode leaf && rootLocation.ContainsPoint(searchPoint))
 		{
 			return leaf;
 		}
@@ -52,7 +52,7 @@ public partial class TreeLayoutEngine
 				childLocation.Height = weight * rootLocation.Height;
 			}
 
-			if (childLocation.IsPointInside(searchPoint))
+			if (childLocation.ContainsPoint(searchPoint))
 			{
 				LeafNode? result = GetNodeContainingPoint(
 					root: child,
@@ -88,13 +88,7 @@ public partial class TreeLayoutEngine
 	/// <returns>Location of the node. Used for recursion.</returns>
 	internal static ILocation<double> GetNodeLocation(Node node, Location<double>? location = null)
 	{
-		location ??= new Location<double>()
-		{
-			X = 0,
-			Y = 0,
-			Width = 1,
-			Height = 1
-		};
+		location ??= Location.UnitSquare<double>();
 
 		if (node.Parent == null)
 		{

@@ -207,7 +207,7 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public IImmutableLayoutEngine HidePhantomWindows() => this;
+	public void HidePhantomWindows() { }
 
 	/// <summary>
 	/// Gets the delta to determine whether we want to move towards 0 or not.

@@ -30,5 +30,5 @@ public interface ILocation<T> : IPoint<T>
 	/// <see langword="true"/> if the location given by <paramref name="point"/> is inside this
 	/// <see cref="ILocation{T}"/>'s bounding box; otherwise, <see langword="false"/>.
 	/// </returns>
-	public bool IsPointInside(IPoint<T> point);
+	public bool ContainsPoint(IPoint<T> point);
 }

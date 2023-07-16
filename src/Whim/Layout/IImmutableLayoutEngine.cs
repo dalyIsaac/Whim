@@ -90,8 +90,7 @@ public interface IImmutableLayoutEngine
 	/// </summary>
 	/// <param name="edges">The edges to change.</param>
 	/// <param name="deltas">
-	/// The deltas to change the given <paramref name="edges"/> by. When a value is positive, then
-	/// the edge will move in the direction of the <paramref name="edges"/>.
+	/// The deltas to change the given <paramref name="edges"/> by.
 	/// The <paramref name="deltas"/> are in the range [0, 1] for both x and y (the unit square).
 	/// </param>
 	/// <param name="window"></param>
@@ -99,10 +98,10 @@ public interface IImmutableLayoutEngine
 	IImmutableLayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window);
 
 	/// <summary>
-	/// Hides all phantom windows belonging to the layout engine.
+	/// Hides all phantom windows belonging to the layout engine. This is used by <see cref="Workspace"/>
+	/// when switching to a different layout engine.
 	/// </summary>
-	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the hide.</returns>
-	IImmutableLayoutEngine HidePhantomWindows();
+	void HidePhantomWindows();
 
 	/// <summary>
 	/// Checks to see if this <see cref="IImmutableLayoutEngine"/> or a child layout engine is type

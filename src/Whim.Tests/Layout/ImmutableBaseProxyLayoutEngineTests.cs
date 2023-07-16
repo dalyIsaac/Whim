@@ -219,11 +219,9 @@ public class ImmutableBaseProxyLayoutEngineTests
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = proxyLayoutEngine.HidePhantomWindows();
+		proxyLayoutEngine.HidePhantomWindows();
 
 		// Then
-		Assert.NotSame(proxyLayoutEngine, newEngine);
-		Assert.IsType<ProxyLayoutEngine>(newEngine);
 		innerLayoutEngine.Verify(x => x.HidePhantomWindows(), Times.Once);
 	}
 

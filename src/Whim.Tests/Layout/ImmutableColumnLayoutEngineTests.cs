@@ -978,9 +978,8 @@ public class ImmutableColumnLayoutEngineTests
 			.Add(new Mock<IWindow>().Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = engine.HidePhantomWindows();
+		engine.HidePhantomWindows();
 
-		// Then
-		Assert.Same(engine, newEngine);
+		// Then nothing...?
 	}
 }

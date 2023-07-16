@@ -89,7 +89,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine HidePhantomWindows() => Update(InnerLayoutEngine.HidePhantomWindows());
+	public virtual void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
 
 	/// <summary>
 	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>

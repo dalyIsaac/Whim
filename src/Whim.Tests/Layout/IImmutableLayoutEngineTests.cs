@@ -39,7 +39,7 @@ public class IImmutableLayoutEngineTests
 
 		public IWindow? GetFirstWindow() => throw new System.NotImplementedException();
 
-		public IImmutableLayoutEngine HidePhantomWindows() => throw new System.NotImplementedException();
+		public void HidePhantomWindows() => throw new System.NotImplementedException();
 
 		public IImmutableLayoutEngine MoveWindowEdgesInDirection(
 			Direction edges,
