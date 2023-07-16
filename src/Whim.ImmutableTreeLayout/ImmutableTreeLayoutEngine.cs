@@ -346,7 +346,6 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 
 		return _root switch
 		{
-			null => null,
 			WindowNode windowNode => windowNode.Window,
 			PhantomNode => null,
 			ISplitNode ISplitNode => ISplitNode.GetLeftMostLeaf().LeafNode.Window,
