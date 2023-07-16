@@ -64,6 +64,7 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	public void SplitFocusedWindow()
 		// {
 		// TODO: Add phantom window to _phantomWindows, and use the TreeLayoutEngine.Add method.
+		// TODO: Call AddPhantomWindow and RemovePhantomWindow.
 		=>
 		throw new NotImplementedException();
 
