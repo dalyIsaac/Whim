@@ -1006,4 +1006,28 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Assert.NotSame(engine, result);
 		expectedWindowStates.Should().BeEquivalentTo(windowStates);
 	}
+
+	[Fact]
+	public void MoveWindowEdgesInDirection_InvalidEdge()
+	{
+		// Given
+		Mock<IWindow> window1 = new();
+		Mock<IWindow> window2 = new();
+		Mock<IWindow> window3 = new();
+
+		LayoutEngineWrapper wrapper = new();
+
+		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
+
+		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+			.Add(window1.Object)
+			.Add(window2.Object)
+			.Add(window3.Object);
+
+		// When
+		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection((Direction)128, pixelsDeltas, window2.Object);
+
+		// Then
+		Assert.Same(engine, result);
+	}
 }
