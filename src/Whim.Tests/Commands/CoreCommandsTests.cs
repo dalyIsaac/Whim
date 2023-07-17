@@ -11,7 +11,7 @@ public class CoreCommandsTests
 		public Mock<IContext> Context { get; }
 		public Mock<IWorkspaceManager> WorkspaceManager { get; }
 		public Mock<IWorkspace> Workspace { get; }
-		public Mock<ILayoutEngine> LayoutEngine { get; }
+		public Mock<IImmutableLayoutEngine> LayoutEngine { get; }
 		public Mock<IWindow> Window { get; }
 
 		public MocksWrapper()
@@ -19,7 +19,7 @@ public class CoreCommandsTests
 			Context = new Mock<IContext>();
 			WorkspaceManager = new Mock<IWorkspaceManager>();
 			Workspace = new Mock<IWorkspace>();
-			LayoutEngine = new Mock<ILayoutEngine>();
+			LayoutEngine = new Mock<IImmutableLayoutEngine>();
 			Window = new Mock<IWindow>();
 
 			Workspace.SetupGet(x => x.LastFocusedWindow).Returns(Window.Object);
