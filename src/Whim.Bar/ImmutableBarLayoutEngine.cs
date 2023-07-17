@@ -10,7 +10,7 @@ public class ImmutableBarLayoutEngine : ImmutableBaseProxyLayoutEngine
 	private readonly BarConfig _barConfig;
 
 	/// <summary>
-	/// Creates a new instance of the proxy layout engine <see cref="BarLayoutEngine"/>.
+	/// Creates a new instance of the proxy layout engine <see cref="ImmutableBarLayoutEngine"/>.
 	/// </summary>
 	/// <param name="barConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
