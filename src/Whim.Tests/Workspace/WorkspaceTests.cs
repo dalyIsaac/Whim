@@ -18,7 +18,7 @@ public class WorkspaceTests
 	{
 		public Mock<IContext> Context { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<ILayoutEngine> LayoutEngine { get; } = new();
+		public Mock<IImmutableLayoutEngine> LayoutEngine { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IMonitor> Monitor { get; } = new();
@@ -78,7 +78,12 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When
 		workspace.Name = "Workspace2";
@@ -93,7 +98,12 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When
 		bool result = workspace.TrySetLayoutEngine("Layout2");
@@ -110,7 +120,12 @@ public class WorkspaceTests
 		mocks.WorkspaceManager.Setup(m => m.GetMonitorForWorkspace(It.IsAny<IWorkspace>())).Returns(null as IMonitor);
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When
 		bool result = workspace.TrySetLayoutEngine("Layout");
@@ -125,7 +140,7 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 
-		Mock<ILayoutEngine> layoutEngine2 = new();
+		Mock<IImmutableLayoutEngine> layoutEngine2 = new();
 		layoutEngine2.Setup(e => e.Name).Returns("Layout2");
 
 		Workspace workspace =
@@ -133,7 +148,7 @@ public class WorkspaceTests
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine2.Object }
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine2.Object }
 			);
 
 		// When
@@ -152,7 +167,8 @@ public class WorkspaceTests
 		// When
 		// Then
 		Assert.Throws<ArgumentException>(
-			() => new Workspace(mocks.Context.Object, mocks.Triggers, "Workspace", Array.Empty<ILayoutEngine>())
+			() =>
+				new Workspace(mocks.Context.Object, mocks.Triggers, "Workspace", Array.Empty<IImmutableLayoutEngine>())
 		);
 	}
 
@@ -164,7 +180,12 @@ public class WorkspaceTests
 		mocks.WorkspaceManager.Setup(m => m.GetMonitorForWorkspace(It.IsAny<IWorkspace>())).Returns(null as IMonitor);
 
 		using Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When
 		workspace.DoLayout();
@@ -186,7 +207,7 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 		window.SetupGet(w => w.IsMouseMoving).Returns(isMouseMoving);
 
-		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		layoutEngine
 			.Setup(e => e.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()))
 			.Returns(
@@ -202,7 +223,12 @@ public class WorkspaceTests
 			);
 
 		using Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { layoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { layoutEngine.Object }
+			);
 
 		// When
 		workspace.DoLayout();
@@ -227,7 +253,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		using Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When
 		workspace.AddWindow(window.Object);
@@ -248,22 +279,22 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 
-		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
-		proxyLayoutEngine.Setup(p => p(It.IsAny<ILayoutEngine>())).Returns((ILayoutEngine e) => e);
-		Mock<ProxyLayoutEngine> proxyLayoutEngine2 = new();
+		Mock<ImmutableProxyLayoutEngine> proxyLayoutEngine = new();
+		proxyLayoutEngine.Setup(p => p(It.IsAny<IImmutableLayoutEngine>())).Returns((IImmutableLayoutEngine e) => e);
+		Mock<ImmutableProxyLayoutEngine> proxyLayoutEngine2 = new();
 		mocks.WorkspaceManager
 			.SetupGet(m => m.ProxyLayoutEngines)
-			.Returns(new ProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
+			.Returns(new ImmutableProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
 
-		Mock<ILayoutEngine> layoutEngine = new();
-		Mock<ILayoutEngine> layoutEngine2 = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine2 = new();
 
 		Workspace workspace =
 			new(
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { layoutEngine.Object, layoutEngine2.Object }
+				new IImmutableLayoutEngine[] { layoutEngine.Object, layoutEngine2.Object }
 			);
 
 		// When
@@ -282,22 +313,22 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 
-		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
-		proxyLayoutEngine.Setup(p => p(It.IsAny<ILayoutEngine>())).Returns((ILayoutEngine e) => e);
-		Mock<ProxyLayoutEngine> proxyLayoutEngine2 = new();
+		Mock<ImmutableProxyLayoutEngine> proxyLayoutEngine = new();
+		proxyLayoutEngine.Setup(p => p(It.IsAny<IImmutableLayoutEngine>())).Returns((IImmutableLayoutEngine e) => e);
+		Mock<ImmutableProxyLayoutEngine> proxyLayoutEngine2 = new();
 		mocks.WorkspaceManager
 			.SetupGet(m => m.ProxyLayoutEngines)
-			.Returns(new ProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
+			.Returns(new ImmutableProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
 
-		Mock<ILayoutEngine> layoutEngine = new();
-		Mock<ILayoutEngine> layoutEngine2 = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine2 = new();
 
 		Workspace workspace =
 			new(
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { layoutEngine.Object, layoutEngine2.Object }
+				new IImmutableLayoutEngine[] { layoutEngine.Object, layoutEngine2.Object }
 			);
 
 		workspace.Initialize();
@@ -320,7 +351,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When
 		bool result = workspace.ContainsWindow(window.Object);
@@ -337,7 +373,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 
 		// When
@@ -355,7 +396,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 		workspace.WindowMinimizeStart(window.Object);
 
@@ -373,9 +419,14 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
-		mocks.LayoutEngine.Setup(l => l.ContainsEqual(It.IsAny<ILayoutEngine>())).Returns(true);
+		mocks.LayoutEngine.Setup(l => l.ContainsEqual(It.IsAny<IImmutableLayoutEngine>())).Returns(true);
 
 		// When
 		bool result = workspace.ContainsWindow(window.Object);
@@ -392,7 +443,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 
 		// When
@@ -410,9 +466,14 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
-		mocks.LayoutEngine.Setup(l => l.ContainsEqual(It.IsAny<ILayoutEngine>())).Returns(true);
+		mocks.LayoutEngine.Setup(l => l.ContainsEqual(It.IsAny<IImmutableLayoutEngine>())).Returns(true);
 
 		// When
 		workspace.WindowFocused(window.Object);
@@ -429,7 +490,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When
 		workspace.WindowFocused(window.Object);
@@ -445,7 +511,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		mocks.LayoutEngine.Setup(l => l.GetFirstWindow()).Returns(new Mock<IWindow>().Object);
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When FocusFirstWindow is called
 		workspace.FocusFirstWindow();
@@ -459,13 +530,13 @@ public class WorkspaceTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Workspace workspace =
 			new(
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
 			);
 
 		// When NextLayoutEngine is called
@@ -481,13 +552,13 @@ public class WorkspaceTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Workspace workspace =
 			new(
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
 			);
 
 		// When NextLayoutEngine is called
@@ -504,13 +575,13 @@ public class WorkspaceTests
 	{
 		// Given the last focused window is a phantom window
 		MocksBuilder mocks = new();
-		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Workspace workspace =
 			new(
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
 			);
 
 		Mock<IWindow> phantomWindow = new();
@@ -531,13 +602,13 @@ public class WorkspaceTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Workspace workspace =
 			new(
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
 			);
 
 		// When PreviousLayoutEngine is called
@@ -553,13 +624,13 @@ public class WorkspaceTests
 	{
 		// Given
 		MocksBuilder mocks = new();
-		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Workspace workspace =
 			new(
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
 			);
 
 		// When PreviousLayoutEngine is called
@@ -576,13 +647,13 @@ public class WorkspaceTests
 	{
 		// Given the last focused window is a phantom window
 		MocksBuilder mocks = new();
-		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Workspace workspace =
 			new(
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object, layoutEngine.Object }
 			);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, new Mock<IWindow>().Object);
 
@@ -605,7 +676,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
 		mocks.WorkspaceManager.Invocations.Clear();
@@ -628,7 +704,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When AddWindow is called
 		workspace.AddWindow(window.Object);
@@ -646,7 +727,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When AddWindow is called
 		workspace.AddWindow(window.Object);
@@ -663,7 +749,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When RemoveWindow is called
 		workspace.RemoveWindow(window.Object);
@@ -682,7 +773,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When RemoveWindow is called
 		bool result = workspace.RemoveWindow(window.Object);
@@ -699,12 +795,17 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// Phantom window is added
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
 		mocks.WorkspaceManager.Invocations.Clear();
-		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(false);
+		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(mocks.LayoutEngine.Object);
 
 		// When RemoveWindow is called
 		bool result = workspace.RemoveWindow(window.Object);
@@ -722,12 +823,17 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// Phantom window is added
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
 		mocks.WorkspaceManager.Invocations.Clear();
-		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(true);
+		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(new Mock<IImmutableLayoutEngine>().Object);
 
 		// When RemoveWindow is called
 		bool result = workspace.RemoveWindow(window.Object);
@@ -745,7 +851,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 		mocks.WorkspaceManager.Invocations.Clear();
 
@@ -765,11 +876,16 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 		workspace.WindowFocused(window.Object);
 		mocks.WorkspaceManager.Invocations.Clear();
-		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(true);
+		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(new Mock<IImmutableLayoutEngine>().Object);
 
 		// When RemoveWindow is called
 		bool result = workspace.RemoveWindow(window.Object);
@@ -788,7 +904,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 		window.Setup(w => w.IsMinimized).Returns(true);
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 		workspace.WindowMinimizeStart(window.Object);
 
@@ -811,7 +932,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When FocusWindowInDirection is called
 		workspace.FocusWindowInDirection(Direction.Up, window.Object);
@@ -827,7 +953,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		workspace.AddWindow(window.Object);
 		workspace.WindowMinimizeStart(window.Object);
@@ -846,7 +977,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 
 		// When FocusWindowInDirection is called
@@ -862,7 +998,12 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When SwapWindowInDirection is called
 		workspace.SwapWindowInDirection(Direction.Up, null);
@@ -878,7 +1019,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When SwapWindowInDirection is called
 		workspace.SwapWindowInDirection(Direction.Up, window.Object);
@@ -894,7 +1040,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 
 		// When SwapWindowInDirection is called
@@ -910,7 +1061,12 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		IPoint<double> deltas = new Point<double>() { X = 0.3, Y = 0 };
 
 		// When MoveWindowEdgesInDirection is called
@@ -930,7 +1086,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		IPoint<double> deltas = new Point<double>() { X = 0.3, Y = 0 };
 
 		// When MoveWindowEdgesInDirection is called
@@ -947,7 +1108,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 		IPoint<double> deltas = new Point<double>() { X = 0.3, Y = 0 };
 
@@ -965,7 +1131,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> phantomWindow = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, phantomWindow.Object);
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
@@ -973,7 +1144,7 @@ public class WorkspaceTests
 		workspace.MoveWindowToPoint(phantomWindow.Object, point);
 
 		// Then the layout engine is told to move the window
-		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(phantomWindow.Object, point), Times.Never);
+		mocks.LayoutEngine.Verify(l => l.AddAtPoint(phantomWindow.Object, point), Times.Never);
 		mocks.LayoutEngine.Verify(l => l.Remove(phantomWindow.Object), Times.Never);
 	}
 
@@ -984,14 +1155,19 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
 		// When MoveWindowToPoint is called
 		workspace.MoveWindowToPoint(window.Object, point);
 
 		// Then the layout engine is told to move the window
-		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(window.Object, point), Times.Once);
+		mocks.LayoutEngine.Verify(l => l.AddAtPoint(window.Object, point), Times.Once);
 		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Never);
 	}
 
@@ -1002,7 +1178,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
 		workspace.AddWindow(window.Object);
@@ -1014,7 +1195,7 @@ public class WorkspaceTests
 		workspace.MoveWindowToPoint(window.Object, point);
 
 		// Then the layout engine is told to move the window
-		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(window.Object, point), Times.Once);
+		mocks.LayoutEngine.Verify(l => l.AddAtPoint(window.Object, point), Times.Once);
 		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Never);
 	}
 
@@ -1026,7 +1207,12 @@ public class WorkspaceTests
 		Mock<IWindow> window = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		workspace.AddWindow(window.Object);
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
@@ -1038,7 +1224,7 @@ public class WorkspaceTests
 
 		// Then the layout engine is told to remove and add the window
 		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Once);
-		mocks.LayoutEngine.Verify(l => l.AddWindowAtPoint(window.Object, point), Times.Once);
+		mocks.LayoutEngine.Verify(l => l.AddAtPoint(window.Object, point), Times.Once);
 	}
 
 	[Fact]
@@ -1047,7 +1233,12 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When ToString is called
 		string result = workspace.ToString();
@@ -1066,7 +1257,12 @@ public class WorkspaceTests
 		Mock<IWindow> phantomWindow = new();
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 		workspace.AddWindow(window2.Object);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, phantomWindow.Object);
@@ -1105,7 +1301,12 @@ public class WorkspaceTests
 			);
 
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 
 		// When TryGetWindowLocation is called
@@ -1122,7 +1323,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When
 		workspace.AddWindow(window.Object);
@@ -1145,10 +1351,15 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When AddPhantomWindow is called
-		workspace.AddPhantomWindow(new Mock<ILayoutEngine>().Object, window.Object);
+		workspace.AddPhantomWindow(new Mock<IImmutableLayoutEngine>().Object, window.Object);
 
 		// Then the window is not added
 		mocks.WorkspaceManager.Verify(wm => wm.AddPhantomWindow(workspace, window.Object), Times.Never);
@@ -1161,7 +1372,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
 
 		// When AddPhantomWindow is called
@@ -1178,7 +1394,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When AddPhantomWindow is called
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
@@ -1194,10 +1415,15 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 
 		// When RemovePhantomWindow is called
-		workspace.RemovePhantomWindow(new Mock<ILayoutEngine>().Object, window.Object);
+		workspace.RemovePhantomWindow(new Mock<IImmutableLayoutEngine>().Object, window.Object);
 
 		// Then the window is not removed
 		mocks.WorkspaceManager.Verify(wm => wm.RemovePhantomWindow(window.Object), Times.Never);
@@ -1210,7 +1436,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
 
 		// When RemovePhantomWindow is called
@@ -1226,7 +1457,7 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> altLayoutEngine = new();
+		Mock<IImmutableLayoutEngine> altLayoutEngine = new();
 
 		// Lie to hit the wrong branch in RemovePhantomWindow
 		mocks.LayoutEngine.Setup(e => e.ContainsEqual(altLayoutEngine.Object)).Returns(true);
@@ -1236,7 +1467,7 @@ public class WorkspaceTests
 				mocks.Context.Object,
 				mocks.Triggers,
 				"Workspace",
-				new ILayoutEngine[] { mocks.LayoutEngine.Object, altLayoutEngine.Object }
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object, altLayoutEngine.Object }
 			);
 		workspace.AddPhantomWindow(altLayoutEngine.Object, window.Object);
 		mocks.LayoutEngine.Setup(e => e.ContainsEqual(mocks.LayoutEngine.Object)).Returns(true);
@@ -1255,7 +1486,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
 
 		// When RemovePhantomWindow is called
@@ -1273,7 +1509,12 @@ public class WorkspaceTests
 		mocks.WorkspaceManager.Setup(wm => wm.GetMonitorForWorkspace(It.IsAny<IWorkspace>())).Returns((IMonitor?)null);
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 
 		// When Dispose is called
@@ -1290,7 +1531,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 
 		// When WindowMinimizeStart is called
@@ -1307,7 +1553,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 
 		// When WindowMinimizeStart is called
@@ -1325,7 +1576,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 		workspace.WindowMinimizeStart(window.Object);
 		mocks.LayoutEngine.Invocations.Clear();
@@ -1344,7 +1600,12 @@ public class WorkspaceTests
 		MocksBuilder mocks = new();
 		Mock<IWindow> window = new();
 		Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+			new(
+				mocks.Context.Object,
+				mocks.Triggers,
+				"Workspace",
+				new IImmutableLayoutEngine[] { mocks.LayoutEngine.Object }
+			);
 		workspace.AddWindow(window.Object);
 		mocks.LayoutEngine.Invocations.Clear();
 
