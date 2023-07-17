@@ -53,8 +53,4 @@
 		<EditorConfigFiles Remove="C:\Users\dalyisaac\Repos\Whim\src\Whim.ImmutableTreeLayout\.editorconfig" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Include="C:\Users\dalyisaac\Repos\Whim\src\Whim.ImmutableTreeLayout\.editorconfig" />
-	</ItemGroup>
-
 </Project>
