@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Tests", "src\Whim.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout", "src\Whim.TreeLayout\Whim.TreeLayout.csproj", "{72CEA67D-7305-4246-BBDD-6FE23DC9FF55}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout.Tests", "src\Whim.TreeLayout.Tests\Whim.TreeLayout.Tests.csproj", "{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.FloatingLayout", "src\Whim.FloatingLayout\Whim.FloatingLayout.csproj", "{636EA561-2625-4D2A-9A8A-890E5AEF18B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Runner", "src\Whim.Runner\Whim.Runner.csproj", "{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}"
@@ -117,18 +115,6 @@ Global
 		{72CEA67D-7305-4246-BBDD-6FE23DC9FF55}.Release|arm64.Build.0 = Release|arm64
 		{72CEA67D-7305-4246-BBDD-6FE23DC9FF55}.Release|x64.ActiveCfg = Release|x64
 		{72CEA67D-7305-4246-BBDD-6FE23DC9FF55}.Release|x64.Build.0 = Release|x64
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Debug|arm64.ActiveCfg = Debug|arm64
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Debug|arm64.Build.0 = Debug|arm64
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Debug|x64.ActiveCfg = Debug|x64
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Debug|x64.Build.0 = Debug|x64
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Release|arm64.ActiveCfg = Release|arm64
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Release|arm64.Build.0 = Release|arm64
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Release|x64.ActiveCfg = Release|x64
-		{3C840D70-328F-4BDE-AA2C-22FD05EB5F61}.Release|x64.Build.0 = Release|x64
 		{636EA561-2625-4D2A-9A8A-890E5AEF18B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{636EA561-2625-4D2A-9A8A-890E5AEF18B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{636EA561-2625-4D2A-9A8A-890E5AEF18B9}.Debug|arm64.ActiveCfg = Debug|arm64
