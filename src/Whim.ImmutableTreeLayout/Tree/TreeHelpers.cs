@@ -412,7 +412,7 @@ internal static class TreeHelpers
 		}
 
 		// Get the coordinates of the node given by the path.
-		var result = rootNode.GetNodeAtPath(pathToNode);
+		NodeState? result = rootNode.GetNodeAtPath(pathToNode);
 		if (result is null)
 		{
 			Logger.Error($"Failed to find node at path {pathToNode}");
