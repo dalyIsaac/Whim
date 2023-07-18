@@ -15,13 +15,6 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage(
 	"Naming",
 	"CA1710:Identifiers should have correct suffix",
-	Justification = "IImmutableLayoutEngine's primary purpose is not as a collection",
-	Scope = "type",
-	Target = "~T:Whim.IImmutableLayoutEngine"
-)]
-[assembly: SuppressMessage(
-	"Naming",
-	"CA1710:Identifiers should have correct suffix",
 	Scope = "type",
 	Target = "~T:Whim.ICommandManager"
 )]

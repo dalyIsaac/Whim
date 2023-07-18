@@ -15,10 +15,10 @@ public class ActiveLayoutEngineChangedEventArgs : EventArgs
 	/// <summary>
 	/// The previous active layout engine.
 	/// </summary>
-	public required ILayoutEngine PreviousLayoutEngine { get; init; }
+	public required IImmutableLayoutEngine PreviousLayoutEngine { get; init; }
 
 	/// <summary>
 	/// The new active layout engine.
 	/// </summary>
-	public required ILayoutEngine CurrentLayoutEngine { get; init; }
+	public required IImmutableLayoutEngine CurrentLayoutEngine { get; init; }
 }
