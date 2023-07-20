@@ -279,12 +279,12 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 
-		Mock<ImmutableProxyLayoutEngine> proxyLayoutEngine = new();
+		Mock<CreateImmutableProxyLayoutEngine> proxyLayoutEngine = new();
 		proxyLayoutEngine.Setup(p => p(It.IsAny<IImmutableLayoutEngine>())).Returns((IImmutableLayoutEngine e) => e);
-		Mock<ImmutableProxyLayoutEngine> proxyLayoutEngine2 = new();
+		Mock<CreateImmutableProxyLayoutEngine> proxyLayoutEngine2 = new();
 		mocks.WorkspaceManager
 			.SetupGet(m => m.ProxyLayoutEngines)
-			.Returns(new ImmutableProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
+			.Returns(new CreateImmutableProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
 
 		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Mock<IImmutableLayoutEngine> layoutEngine2 = new();
@@ -313,12 +313,12 @@ public class WorkspaceTests
 		// Given
 		MocksBuilder mocks = new();
 
-		Mock<ImmutableProxyLayoutEngine> proxyLayoutEngine = new();
+		Mock<CreateImmutableProxyLayoutEngine> proxyLayoutEngine = new();
 		proxyLayoutEngine.Setup(p => p(It.IsAny<IImmutableLayoutEngine>())).Returns((IImmutableLayoutEngine e) => e);
-		Mock<ImmutableProxyLayoutEngine> proxyLayoutEngine2 = new();
+		Mock<CreateImmutableProxyLayoutEngine> proxyLayoutEngine2 = new();
 		mocks.WorkspaceManager
 			.SetupGet(m => m.ProxyLayoutEngines)
-			.Returns(new ImmutableProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
+			.Returns(new CreateImmutableProxyLayoutEngine[] { proxyLayoutEngine.Object, proxyLayoutEngine2.Object });
 
 		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Mock<IImmutableLayoutEngine> layoutEngine2 = new();

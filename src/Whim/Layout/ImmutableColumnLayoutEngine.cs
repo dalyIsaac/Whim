@@ -18,6 +18,9 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	/// <inheritdoc/>
 	public string Name { get; init; } = "Column";
 
+	/// <inheritdoc/>
+	public LayoutEngineIdentity Identity { get; }
+
 	/// <summary>
 	/// Indicates the direction of the layout. Defaults to <see langword="false"/>.
 	/// </summary>
@@ -29,14 +32,17 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	/// <summary>
 	/// Creates a new instance of the <see cref="ImmutableColumnLayoutEngine"/> class.
 	/// </summary>
-	public ImmutableColumnLayoutEngine()
+	/// <param name="identity">The identity of the layout engine.</param>
+	public ImmutableColumnLayoutEngine(LayoutEngineIdentity identity)
 	{
+		Identity = identity;
 		_stack = ImmutableList<IWindow>.Empty;
 	}
 
 	private ImmutableColumnLayoutEngine(ImmutableColumnLayoutEngine layoutEngine, ImmutableList<IWindow> stack)
 	{
 		Name = layoutEngine.Name;
+		Identity = layoutEngine.Identity;
 		LeftToRight = layoutEngine.LeftToRight;
 		_stack = stack;
 	}

@@ -7,7 +7,7 @@ namespace Whim;
 /// The wrapper layout engine provides additional functionality, but still utilises the underlying
 /// layout engine.
 /// </summary>
-public delegate IImmutableLayoutEngine ImmutableProxyLayoutEngine(IImmutableLayoutEngine engine);
+public delegate IImmutableLayoutEngine CreateImmutableProxyLayoutEngine(IImmutableLayoutEngine engine);
 
 /// <summary>
 /// Abstract layout engine, which proxy layout engines should inherit from.

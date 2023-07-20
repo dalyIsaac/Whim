@@ -17,7 +17,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <summary>
 	/// Creates the default layout engines to add to a workspace.
 	/// </summary>
-	Func<IList<IImmutableLayoutEngine>> CreateLayoutEngines { get; set; }
+	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; }
 
 	/// <summary>
 	/// Initialize the event listeners.
@@ -170,12 +170,12 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// all workspaces.
 	/// </summary>
 	/// <param name="proxyLayoutEngine">The proxy layout engine to add.</param>
-	void AddProxyLayoutEngine(ImmutableProxyLayoutEngine proxyLayoutEngine);
+	void AddProxyLayoutEngine(CreateImmutableProxyLayoutEngine proxyLayoutEngine);
 
 	/// <summary>
 	/// The proxy layout engines.
 	/// </summary>
-	IEnumerable<ImmutableProxyLayoutEngine> ProxyLayoutEngines { get; }
+	IEnumerable<CreateImmutableProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.

@@ -14,12 +14,6 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	string Name { get; set; }
 
-	/// <summary>
-	/// Initializes the workspace. This includes wrapping its layout engines with
-	/// proxies from <see cref="IWorkspaceManager"/>.
-	/// </summary>
-	void Initialize();
-
 	#region Layout engine
 	/// <summary>
 	/// The active layout engine.

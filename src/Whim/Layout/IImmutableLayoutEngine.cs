@@ -3,6 +3,13 @@ using System.Collections.Generic;
 namespace Whim;
 
 /// <summary>
+/// Creates a <see cref="IImmutableLayoutEngine"/> with the given <paramref name="identity"/>.
+/// </summary>
+/// <param name="identity"></param>
+/// <returns></returns>
+public delegate IImmutableLayoutEngine CreateLeafLayoutEngine(LayoutEngineIdentity identity);
+
+/// <summary>
 /// Layout engines dictate how windows are laid out.
 /// </summary>
 public interface IImmutableLayoutEngine
