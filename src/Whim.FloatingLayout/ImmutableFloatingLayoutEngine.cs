@@ -12,8 +12,6 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	private readonly IFloatingLayoutPlugin _plugin;
 	private readonly ImmutableDictionary<IWindow, ILocation<double>> _floatingWindowLocations;
 
-	private IWorkspace? _workspace;
-
 	/// <summary>
 	/// Creates a new instance of the proxy layout engine <see cref="ImmutableFloatingLayoutEngine"/>.
 	/// </summary>
@@ -63,19 +61,11 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override IImmutableLayoutEngine Add(IWindow window)
 	{
-		// If tracked by this layout engine, update the location.
-		// If tracked by another floating layout engine, remove it from that one and add it to this one.
-		// Otherwise, pass to the inner layout engine.
-
-		if (_floatingWindowLocations.ContainsKey(window))
+		// If the window is already tracked by this layout engine, or is a new floating window,
+		// update the location and return.
+		if (_floatingWindowLocations.ContainsKey(window) || _plugin.FloatingWindows.Contains(window))
 		{
 			return UpdateWindowLocation(window, _floatingWindowLocations[window]);
-		}
-
-		if (_plugin.FloatingWindows.TryGetValue(window, out IWorkspace? workspace))
-		{
-			workspace.RemoveWindow(window);
-			return UpdateWindowLocation(window, null);
 		}
 
 		return base.Add(window);
@@ -99,19 +89,6 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 			return this;
 		}
 
-		// Get the workspace which contains the window layout engine.
-		_workspace ??= _context.WorkspaceManager.GetWorkspaceForMonitor(newMonitor);
-
-		// Tell the plugin
-		if (_plugin is IInternalFloatingLayoutPlugin internalPlugin && _workspace is not null)
-		{
-			internalPlugin.MutableFloatingWindows[window] = _workspace;
-			return new ImmutableFloatingLayoutEngine(
-				this,
-				_floatingWindowLocations.SetItem(window, newUnitSquareLocation)
-			);
-		}
-
 		return this;
 	}
 
@@ -120,9 +97,13 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	{
 		// If tracked by this layout engine, remove it.
 		// Otherwise, pass to the inner layout engine.
-
 		if (_floatingWindowLocations.ContainsKey(window))
 		{
+			if (_plugin is IInternalFloatingLayoutPlugin internalPlugin)
+			{
+				internalPlugin.MutableFloatingWindows.Remove(window);
+			}
+
 			return new ImmutableFloatingLayoutEngine(this, _floatingWindowLocations.Remove(window));
 		}
 

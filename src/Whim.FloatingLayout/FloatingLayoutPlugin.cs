@@ -1,23 +1,21 @@
-using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
-public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayoutPlugin, IDisposable
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayoutPlugin
 {
 	private readonly IContext _context;
-	private bool disposedValue;
 
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
 
 	/// <inheritdoc />
-	public IDictionary<IWindow, IWorkspace> MutableFloatingWindows { get; } = new Dictionary<IWindow, IWorkspace>();
+	public ISet<IWindow> MutableFloatingWindows { get; } = new HashSet<IWindow>();
 
 	/// <inheritdoc />
-	public IReadOnlyDictionary<IWindow, IWorkspace> FloatingWindows => MutableFloatingWindows.AsReadOnly();
+	public IReadOnlySet<IWindow> FloatingWindows => (IReadOnlySet<IWindow>)MutableFloatingWindows;
 
 	/// <summary>
 	/// Creates a new instance of the floating layout plugin.
@@ -31,8 +29,9 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WindowManager.WindowMoved += WindowManager_WindowMoved;
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, layout));
+		_context.WorkspaceManager.AddProxyLayoutEngine(
+			layout => new ImmutableFloatingLayoutEngine(_context, this, layout)
+		);
 	}
 
 	/// <inheritdoc />
@@ -41,63 +40,56 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
 
-	private void WindowManager_WindowMoved(object? sender, WindowEventArgs e)
+	private void UpdateWindow(IWindow? window, bool markAsFloating)
 	{
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(e.Window);
-		if (workspace == null)
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		if (window == null)
 		{
-			Logger.Error($"Could not find workspace for window {e.Window}");
+			Logger.Error("Could not find window");
 			return;
 		}
 
-		ILayoutEngine rootEngine = workspace.ActiveLayoutEngine;
-		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
-		if (floatingLayoutEngine == null)
+		if (_context.WorkspaceManager.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
-			Logger.Debug("Could not find floating layout engine");
+			Logger.Error($"Window {window} is not in a workspace");
 			return;
 		}
 
-		floatingLayoutEngine.UpdateWindowLocation(e.Window);
+		if (workspace.TryGetWindowLocation(window) is not IWindowState windowState)
+		{
+			Logger.Error($"Could not get location for window {window}");
+			return;
+		}
+
+		if (markAsFloating)
+		{
+			Logger.Debug($"Marking window {window} as floating");
+			MutableFloatingWindows.Add(window);
+		}
+		else
+		{
+			Logger.Debug($"Marking window {window} as docked");
+			MutableFloatingWindows.Remove(window);
+		}
+
+		// Convert the location to a unit square location.
+		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(windowState.Location);
+		ILocation<double> unitSquareLocation = monitor.WorkingArea.ToUnitSquare(windowState.Location);
+
+		workspace.MoveWindowToPoint(window, unitSquareLocation);
 	}
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window
 	/// </summary>
 	/// <param name="window"></param>
-	public void MarkWindowAsFloating(IWindow? window = null)
-	{
-		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
-		if (floatingLayoutEngine == null)
-		{
-			Logger.Error("Could not find floating layout engine");
-			return;
-		}
-
-		floatingLayoutEngine.MarkWindowAsFloating(window);
-		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
-	}
+	public void MarkWindowAsFloating(IWindow? window = null) => UpdateWindow(window, true);
 
 	/// <summary>
 	/// Update the floating window location.
 	/// </summary>
 	/// <param name="window"></param>
-	public void MarkWindowAsDocked(IWindow? window = null)
-	{
-		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
-		if (floatingLayoutEngine == null)
-		{
-			Logger.Error("Could not find floating layout engine");
-			return;
-		}
-
-		floatingLayoutEngine.MarkWindowAsDocked(window);
-		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
-	}
+	public void MarkWindowAsDocked(IWindow? window = null) => UpdateWindow(window, false);
 
 	/// <summary>
 	/// Toggle the floating state of the given <paramref name="window"/>.
@@ -105,19 +97,21 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// <param name="window"></param>
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
-		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
-		if (floatingLayoutEngine == null)
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		if (window == null)
 		{
-			Logger.Error("Could not find floating layout engine");
+			Logger.Error("Could not find window");
 			return;
 		}
 
-		floatingLayoutEngine.ToggleWindowFloating(window);
-
-		// TODO: Use the internal state of the plugin.
-		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
+		if (MutableFloatingWindows.Contains(window))
+		{
+			MarkWindowAsDocked(window);
+		}
+		else
+		{
+			MarkWindowAsFloating(window);
+		}
 	}
 
 	/// <inheritdoc />
@@ -125,29 +119,4 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
-
-	/// <inheritdoc />
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				_context.WindowManager.WindowMoved -= WindowManager_WindowMoved;
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			disposedValue = true;
-		}
-	}
-
-	/// <inheritdoc />
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
-	}
 }

@@ -10,7 +10,7 @@ public interface IFloatingLayoutPlugin : IPlugin
 	/// <summary>
 	/// All the floating windows.
 	/// </summary>
-	IReadOnlyDictionary<IWindow, IWorkspace> FloatingWindows { get; }
+	IReadOnlySet<IWindow> FloatingWindows { get; }
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window

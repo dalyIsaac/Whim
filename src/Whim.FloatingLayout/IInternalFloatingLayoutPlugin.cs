@@ -4,5 +4,5 @@ namespace Whim.FloatingLayout;
 
 internal interface IInternalFloatingLayoutPlugin
 {
-	IDictionary<IWindow, IWorkspace> MutableFloatingWindows { get; }
+	ISet<IWindow> MutableFloatingWindows { get; }
 }
