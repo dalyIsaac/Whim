@@ -41,7 +41,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Whim\Whim.csproj" />
     <ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
-    <ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
   </ItemGroup>
 
   <ItemGroup>
