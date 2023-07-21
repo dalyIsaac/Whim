@@ -8,6 +8,7 @@ namespace Whim.Tests;
 
 public class ImmutableColumnLayoutEngineTests
 {
+	private static readonly LayoutEngineIdentity identity = new();
 	private static readonly Random rnd = new();
 
 	private static Mock<IWindow> CreateMockWindow()
@@ -23,7 +24,7 @@ public class ImmutableColumnLayoutEngineTests
 	public void Name_Default()
 	{
 		// Given
-		ImmutableColumnLayoutEngine engine = new();
+		ImmutableColumnLayoutEngine engine = new(identity);
 
 		// When
 		string name = engine.Name;
@@ -36,7 +37,7 @@ public class ImmutableColumnLayoutEngineTests
 	public void Name_Custom()
 	{
 		// Given
-		ImmutableColumnLayoutEngine engine = new() { Name = "Custom" };
+		ImmutableColumnLayoutEngine engine = new(identity) { Name = "Custom" };
 
 		// When
 		string name = engine.Name;
@@ -49,7 +50,7 @@ public class ImmutableColumnLayoutEngineTests
 	public void LeftToRight_Default()
 	{
 		// Given
-		ImmutableColumnLayoutEngine engine = new();
+		ImmutableColumnLayoutEngine engine = new(identity);
 
 		// When
 		bool leftToRight = engine.LeftToRight;
@@ -62,7 +63,7 @@ public class ImmutableColumnLayoutEngineTests
 	public void LeftToRight_Custom()
 	{
 		// Given
-		ImmutableColumnLayoutEngine engine = new() { LeftToRight = false };
+		ImmutableColumnLayoutEngine engine = new(identity) { LeftToRight = false };
 
 		// When
 		bool leftToRight = engine.LeftToRight;
@@ -75,7 +76,7 @@ public class ImmutableColumnLayoutEngineTests
 	public void Add()
 	{
 		// Given
-		ImmutableColumnLayoutEngine engine = new();
+		ImmutableColumnLayoutEngine engine = new(identity);
 
 		// When
 		IImmutableLayoutEngine newLayoutEngine = engine.Add(CreateWindow());
@@ -90,7 +91,7 @@ public class ImmutableColumnLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window.Object);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(window.Object);
 
 		// When
 		IImmutableLayoutEngine newLayoutEngine = engine.Remove(window.Object);
@@ -104,7 +105,7 @@ public class ImmutableColumnLayoutEngineTests
 	public void Remove_NoChanges()
 	{
 		// Given
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(CreateWindow());
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(CreateWindow());
 
 		// When
 		IImmutableLayoutEngine newLayoutEngine = engine.Remove(new Mock<IWindow>().Object);
@@ -119,7 +120,7 @@ public class ImmutableColumnLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window.Object);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(window.Object);
 
 		// When
 		bool contains = engine.Contains(window.Object);
@@ -133,7 +134,7 @@ public class ImmutableColumnLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window.Object);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(window.Object);
 
 		// When
 		bool contains = engine.Contains(new Mock<IWindow>().Object);
@@ -147,7 +148,7 @@ public class ImmutableColumnLayoutEngineTests
 	public void DoLayout_Empty()
 	{
 		// Given
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine();
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity);
 
 		// When
 		IWindowState[] windowStates = engine
@@ -163,7 +164,7 @@ public class ImmutableColumnLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window.Object);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(window.Object);
 
 		// When
 		IWindowState[] windowStates = engine
@@ -197,7 +198,7 @@ public class ImmutableColumnLayoutEngineTests
 		IWindow window2 = CreateWindow();
 		IWindow window3 = CreateWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window).Add(window2).Add(window3);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(window).Add(window2).Add(window3);
 
 		Location<int> location = new() { Width = 1920, Height = 1080 };
 
@@ -261,7 +262,7 @@ public class ImmutableColumnLayoutEngineTests
 	{
 		// Given
 		IWindow window = CreateWindow();
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }.Add(window);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }.Add(window);
 
 		Location<int> location = new() { Width = 1920, Height = 1080 };
 
@@ -295,7 +296,7 @@ public class ImmutableColumnLayoutEngineTests
 		IWindow window2 = CreateWindow();
 		IWindow window3 = CreateWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(window)
 			.Add(window2)
 			.Add(window3);
@@ -362,7 +363,7 @@ public class ImmutableColumnLayoutEngineTests
 	public void GetFirstWindow_Null()
 	{
 		// Given
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine();
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -376,7 +377,7 @@ public class ImmutableColumnLayoutEngineTests
 	{
 		// Given
 		IWindow window = CreateWindow();
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(window);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(window);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -393,7 +394,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -413,7 +414,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 		Mock<IWindow> otherWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -432,7 +433,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -451,7 +452,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -469,7 +470,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -487,7 +488,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -505,7 +506,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -523,7 +524,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -541,7 +542,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -559,7 +560,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -579,7 +580,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -609,7 +610,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 		Mock<IWindow> notFoundWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -638,7 +639,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -667,7 +668,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -696,7 +697,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -725,7 +726,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(leftWindow.Object)
 			.Add(rightWindow.Object);
 
@@ -754,7 +755,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 		Mock<IWindow> leftWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(rightWindow.Object)
 			.Add(leftWindow.Object);
 
@@ -783,7 +784,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 		Mock<IWindow> leftWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(rightWindow.Object)
 			.Add(leftWindow.Object);
 
@@ -812,7 +813,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 		Mock<IWindow> leftWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(rightWindow.Object)
 			.Add(leftWindow.Object);
 
@@ -841,7 +842,7 @@ public class ImmutableColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 		Mock<IWindow> leftWindow = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(rightWindow.Object)
 			.Add(leftWindow.Object);
 
@@ -870,7 +871,7 @@ public class ImmutableColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(window.Object)
 			.Add(new Mock<IWindow>().Object);
 
@@ -892,7 +893,7 @@ public class ImmutableColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(new Mock<IWindow>().Object);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(new Mock<IWindow>().Object);
 
 		// When
 		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = -10 });
@@ -911,7 +912,7 @@ public class ImmutableColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine().Add(new Mock<IWindow>().Object);
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity).Add(new Mock<IWindow>().Object);
 
 		// When
 		IImmutableLayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 10 });
@@ -930,7 +931,7 @@ public class ImmutableColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(new Mock<IWindow>().Object)
 			.Add(new Mock<IWindow>().Object);
 
@@ -951,7 +952,7 @@ public class ImmutableColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine() { LeftToRight = false }
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity) { LeftToRight = false }
 			.Add(new Mock<IWindow>().Object)
 			.Add(new Mock<IWindow>().Object);
 
@@ -973,7 +974,7 @@ public class ImmutableColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine()
+		IImmutableLayoutEngine engine = new ImmutableColumnLayoutEngine(identity)
 			.Add(window.Object)
 			.Add(new Mock<IWindow>().Object);
 
