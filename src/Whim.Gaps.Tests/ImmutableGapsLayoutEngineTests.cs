@@ -6,6 +6,8 @@ namespace Whim.Gaps.Tests;
 
 public class ImmutableGapsLayoutEngineTests
 {
+	private static LayoutEngineIdentity _identity = new();
+
 	public static IEnumerable<object[]> DoLayout_Data()
 	{
 		yield return new object[]
@@ -92,7 +94,7 @@ public class ImmutableGapsLayoutEngineTests
 	public void DoLayout(GapsConfig gapsConfig, int windowsCount, int scale, IWindowState[] expectedWindowStates)
 	{
 		// Given
-		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine();
+		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
 
 		for (int i = 0; i < windowsCount; i++)
 		{
@@ -125,7 +127,7 @@ public class ImmutableGapsLayoutEngineTests
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine();
+		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
 		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
@@ -141,7 +143,7 @@ public class ImmutableGapsLayoutEngineTests
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine();
+		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
 		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When

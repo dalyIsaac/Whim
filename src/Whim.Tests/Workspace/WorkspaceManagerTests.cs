@@ -113,7 +113,7 @@ public class WorkspaceManagerTests
 		);
 
 		// Verify that the workspace was initialized
-		proxyLayoutEngine.Verify(p => p(It.IsAny<ILayoutEngine>()), Times.Once);
+		proxyLayoutEngine.Verify(p => p(It.IsAny<IImmutableLayoutEngine>()), Times.Once);
 	}
 
 	[Fact]
@@ -1218,7 +1218,7 @@ public class WorkspaceManagerTests
 		Mock<IMonitor> monitor = new();
 		Wrapper wrapper = new(workspaces, new Mock<IMonitor>[] { monitor });
 
-		Mock<ILayoutEngine> layoutEngine = new();
+		Mock<IImmutableLayoutEngine> layoutEngine = new();
 		Mock<IWindow> window = new();
 
 		wrapper.WorkspaceManager.Activate(workspaces[0].Object, monitor.Object);
@@ -1356,8 +1356,10 @@ public class WorkspaceManagerTests
 
 		Wrapper wrapper = new(new[] { workspace, workspace2 });
 
-		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
-		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<IImmutableLayoutEngine>().Object });
 		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
@@ -1420,7 +1422,7 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
+		Mock<CreateImmutableProxyLayoutEngine> proxyLayoutEngine = new();
 
 		// When a proxy layout engine is added
 		wrapper.WorkspaceManager.AddProxyLayoutEngine(proxyLayoutEngine.Object);
@@ -1519,8 +1521,10 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
-		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<IImmutableLayoutEngine>().Object });
 		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		// When creating a workspace
@@ -1541,8 +1545,10 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
-		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<IImmutableLayoutEngine>().Object });
 		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		// When
