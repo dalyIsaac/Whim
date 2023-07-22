@@ -21,6 +21,8 @@ internal record WorkspaceManagerTriggers
 /// </summary>
 internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 {
+	private bool _initialized;
+
 	private readonly IContext _context;
 	protected readonly WorkspaceManagerTriggers _triggers;
 
@@ -38,6 +40,12 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	/// All the phantom windows that are currently added.
 	/// </summary>
 	private readonly HashSet<IWindow> _phantomWindows = new();
+
+	/// <summary>
+	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
+	/// The workspaces will have been created prior to <see cref="Initialize"/>.
+	/// </summary>
+	private readonly List<(string Name, IEnumerable<CreateLeafLayoutEngine> LayoutEngines)> _workspacesToCreate = new();
 
 	public IEnumerable<IWindow> PhantomWindows => _phantomWindows;
 
@@ -105,71 +113,85 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	public void Initialize()
 	{
 		Logger.Debug("Initializing workspace manager...");
+		_initialized = true;
 
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
-
-		// Ensure there's at least n workspaces, for n monitors.
-		if (_context.MonitorManager.Length > _workspaces.Count)
-		{
-			throw new InvalidOperationException("There must be at least as many workspaces as monitors.");
-		}
 
 		// Assign workspaces to monitors.
 		int idx = 0;
 		foreach (IMonitor monitor in _context.MonitorManager)
 		{
-			// Get the workspace for this monitor. If the user hasn't provided enough workspaces, create a new one.
-			IWorkspace workspace = idx < _workspaces.Count ? _workspaces[idx] : CreateWorkspace($"Workspace {idx + 1}");
+			// Get the workspace for this monitor. If the user hasn't provided enough workspaces, try create a new one.
+			IWorkspace? workspace =
+				(idx < _workspaces.Count ? _workspaces[idx] : CreateWorkspace($"Workspace {idx + 1}"))
+				?? throw new InvalidOperationException($"Could not create workspace");
 
 			Activate(workspace, monitor);
 			idx++;
+		}
+
+		// Initialize each of the workspaces.
+		foreach (IWorkspace workspace in _workspaces)
+		{
+			workspace.Initialize();
 		}
 	}
 
 	#region Workspaces
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
-	private Workspace CreateWorkspace(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null)
+	private Workspace? CreateWorkspace(
+		string? name = null,
+		IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null
+	)
 	{
-		// Create the layout engines.
-		ILayoutEngine[] engines;
+		CreateLeafLayoutEngine[] engineCreators = createLayoutEngines?.ToArray() ?? CreateLayoutEngines();
 
-		if (layoutEngines is IEnumerable<ILayoutEngine> definedLayoutEngines)
+		if (engineCreators.Length == 0)
 		{
-			engines = definedLayoutEngines.ToArray();
+			Logger.Error("No layout engines were provided");
+			return null;
 		}
-		else
-		{
-			CreateLeafLayoutEngine[] createLayoutEnginesFn = CreateLayoutEngines();
-			engines = new ILayoutEngine[createLayoutEnginesFn.Length];
 
-			for (int i = 0; i < createLayoutEnginesFn.Length; i++)
-			{
-				engines[i] = createLayoutEnginesFn[i](new LayoutEngineIdentity());
-			}
+		// Create the layout engines.
+		ILayoutEngine[] layoutEngines = new ILayoutEngine[engineCreators.Length];
+		for (int i = 0; i < engineCreators.Length; i++)
+		{
+			layoutEngines[i] = engineCreators[i](new LayoutEngineIdentity());
 		}
 
 		// Set up the proxies.
-		for (int engineIdx = 0; engineIdx < engines.Length; engineIdx++)
+		for (int engineIdx = 0; engineIdx < engineCreators.Length; engineIdx++)
 		{
-			ILayoutEngine engine = engines[engineIdx];
+			ILayoutEngine currentEngine = layoutEngines[engineIdx];
 			foreach (CreateProxyLayoutEngine createProxyLayoutEngineFn in _proxyLayoutEngines)
 			{
-				ILayoutEngine proxy = createProxyLayoutEngineFn(engine);
-				engines[engineIdx] = proxy;
-				engine = proxy;
+				ILayoutEngine proxy = createProxyLayoutEngineFn(currentEngine);
+				layoutEngines[engineIdx] = proxy;
+				currentEngine = proxy;
 			}
 		}
 
 		// Create the workspace.
-		Workspace workspace = new(_context, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", engines);
+		Workspace workspace = new(_context, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
 		_workspaces.Add(workspace);
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 		return workspace;
 	}
 
-	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null) =>
-		CreateWorkspace(name, layoutEngines);
+	public void Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null)
+	{
+		if (_initialized)
+		{
+			CreateWorkspace(name, createLayoutEngines);
+		}
+		else
+		{
+			_workspacesToCreate.Add(
+				(name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines ?? CreateLayoutEngines())
+			);
+		}
+	}
 
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
 
@@ -478,12 +500,16 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			// If there's no workspace, create one.
 			if (workspace is null)
 			{
-				// workspace = CreateWorkspace
-				// workspace.Initialize();
-
-				workspace = CreateWorkspace();
-				_workspaces.Add(workspace);
-				WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
+				if (CreateWorkspace() is IWorkspace newWorkspace)
+				{
+					workspace = newWorkspace;
+					_workspaces.Add(workspace);
+					WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
+				}
+				else
+				{
+					return;
+				}
 			}
 
 			// Add the workspace to the map.

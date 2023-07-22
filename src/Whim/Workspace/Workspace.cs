@@ -6,6 +6,7 @@ namespace Whim;
 
 internal class Workspace : IWorkspace, IInternalWorkspace
 {
+	private bool _initialized;
 	private readonly IContext _context;
 	private readonly WorkspaceManagerTriggers _triggers;
 
@@ -85,6 +86,26 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (_layoutEngines.Length == 0)
 		{
 			throw new ArgumentException("At least one layout engine must be provided.");
+		}
+	}
+
+	public void Initialize()
+	{
+		if (_initialized)
+		{
+			Logger.Error($"Workspace {Name} has already been initialized.");
+			return;
+		}
+
+		_initialized = true;
+
+		// Apply the proxy layout engines
+		foreach (CreateProxyLayoutEngine createProxyLayout in _context.WorkspaceManager.ProxyLayoutEngines)
+		{
+			for (int i = 0; i < _layoutEngines.Length; i++)
+			{
+				_layoutEngines[i] = createProxyLayout(_layoutEngines[i]);
+			}
 		}
 	}
 
