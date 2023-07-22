@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Whim.Tests;
 
-public class ImmutableColumnLayoutEngineTests
+public class ColumnLayoutEngineTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
 	private static readonly Random rnd = new();

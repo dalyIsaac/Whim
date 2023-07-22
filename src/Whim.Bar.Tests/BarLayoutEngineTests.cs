@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Whim.Bar.Tests;
 
-public class ImmutableBarLayoutEngineTests
+public class BarLayoutEngineTests
 {
 	[Fact]
 	public void Update_Same()

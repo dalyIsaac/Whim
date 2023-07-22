@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Whim.Gaps.Tests;
 
-public class ImmutableGapsLayoutEngineTests
+public class GapsLayoutEngineTests
 {
 	private static readonly LayoutEngineIdentity _identity = new();
 

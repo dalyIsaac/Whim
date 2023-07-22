@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Whim.Tests;
 
-public class ImmutableBaseProxyLayoutEngineTests
+public class BaseProxyLayoutEngineTests
 {
 	private class ProxyLayoutEngine : BaseProxyLayoutEngine
 	{
