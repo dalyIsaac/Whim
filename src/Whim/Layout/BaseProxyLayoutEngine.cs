@@ -19,6 +19,9 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	/// </summary>
 	protected ILayoutEngine InnerLayoutEngine { get; }
 
+	/// <inheritdoc/>
+	public LayoutEngineIdentity Identity => InnerLayoutEngine.Identity;
+
 	/// <summary>
 	/// Constructs a new proxy layout engine.
 	/// </summary>

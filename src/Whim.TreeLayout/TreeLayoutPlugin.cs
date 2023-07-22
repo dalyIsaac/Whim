@@ -9,6 +9,9 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 {
 	private readonly IContext _context;
 
+	private readonly Dictionary<LayoutEngineIdentity, Direction> _addNodeDirections = new();
+	private const Direction DefaultAddNodeDirection = Direction.Right;
+
 	/// <inheritdoc/>
 	public string Name => "whim.tree_layout";
 
@@ -48,43 +51,58 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 		}
 	}
 
-	// TODO
-	// private TreeLayoutEngine? GetTreeLayoutEngine(IMonitor monitor)
-	// {
-	// 	IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
-	// 	return workspace?.ActiveLayoutEngine.GetLayoutEngine<TreeLayoutEngine>();
-	// }
-
 	/// <inheritdoc />
-	public Direction? GetAddWindowDirection(IMonitor monitor) =>
-		// GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine ? treeLayoutEngine.AddNodeDirection : null;
-		throw new NotImplementedException();
+	public Direction? GetAddWindowDirection(IMonitor monitor)
+	{
+		ILayoutEngine? layoutEngine = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;
+		if (layoutEngine is not ILayoutEngine treeLayoutEngine)
+		{
+			return null;
+		}
+
+		if (!_addNodeDirections.TryGetValue(treeLayoutEngine.Identity, out Direction direction))
+		{
+			// Lazy initialization
+			_addNodeDirections[treeLayoutEngine.Identity] = direction = DefaultAddNodeDirection;
+		}
+
+		return direction;
+	}
 
 	/// <inheritdoc />
 	public void SplitFocusedWindow()
-		// {
-		// TODO: Add phantom window to _phantomWindows, and use the TreeLayoutEngine.Add method.
-		// TODO: Call AddPhantomWindow and RemovePhantomWindow.
-		=>
-		throw new NotImplementedException();
+	{
+		IWorkspace? workspace = _context.WorkspaceManager.ActiveWorkspace;
+
+		PhantomWindow phantomWindow = new(_context);
+		_phantomWindows.Add(phantomWindow.Window);
+
+		_context.WorkspaceManager.AddPhantomWindow(workspace, phantomWindow.Window);
+	}
 
 	/// <inheritdoc />
 	public void SetAddWindowDirection(IMonitor monitor, Direction direction)
 	{
-		throw new NotImplementedException();
-		// if (GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine)
-		// {
-		// 	treeLayoutEngine.AddNodeDirection = direction;
-		// 	AddWindowDirectionChanged?.Invoke(
-		// 		this,
-		// 		new AddWindowDirectionChangedEventArgs()
-		// 		{
-		// 			TreeLayoutEngine = treeLayoutEngine,
-		// 			CurrentDirection = direction,
-		// 			PreviousDirection = treeLayoutEngine.AddNodeDirection
-		// 		}
-		// 	);
-		// }
+		ILayoutEngine? layoutEngine = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;
+		if (layoutEngine is not ILayoutEngine treeLayoutEngine)
+		{
+			return;
+		}
+
+		Direction previousDirection = _addNodeDirections.TryGetValue(treeLayoutEngine.Identity, out Direction previous)
+			? previous
+			: DefaultAddNodeDirection;
+
+		_addNodeDirections[treeLayoutEngine.Identity] = direction;
+		AddWindowDirectionChanged?.Invoke(
+			this,
+			new AddWindowDirectionChangedEventArgs()
+			{
+				CurrentDirection = direction,
+				PreviousDirection = previousDirection,
+				TreeLayoutEngine = treeLayoutEngine
+			}
+		);
 	}
 
 	/// <inheritdoc />

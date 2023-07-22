@@ -25,6 +25,11 @@ public interface ILayoutEngine
 	int Count { get; }
 
 	/// <summary>
+	/// The identity of the layout engine.
+	/// </summary>
+	LayoutEngineIdentity Identity { get; }
+
+	/// <summary>
 	/// Adds a <paramref name="window"/> to the layout engine.
 	/// </summary>
 	/// <param name="window"></param>
@@ -110,6 +115,7 @@ public interface ILayoutEngine
 	/// </summary>
 	void HidePhantomWindows();
 
+	// TODO: Remove
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type
 	/// <typeparamref name="T"/>.

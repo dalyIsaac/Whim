@@ -36,6 +36,9 @@ public class TreeLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public int Count => _windows.Count;
 
+	/// <inheritdoc/>
+	public LayoutEngineIdentity Identity { get; }
+
 	private readonly Direction _addNodeDirection = Direction.Right;
 
 	/// <summary>
@@ -54,7 +57,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	private TreeLayoutEngine(TreeLayoutEngine engine, INode root, WindowPathDict windows)
-		: this(engine._context, engine._plugin)
+		: this(engine._context, engine._plugin, engine.Identity)
 	{
 		Name = engine.Name;
 		AddNodeDirection = engine.AddNodeDirection;
@@ -67,10 +70,12 @@ public class TreeLayoutEngine : ILayoutEngine
 	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
-	public TreeLayoutEngine(IContext context, ITreeLayoutPlugin plugin)
+	/// <param name="identity"></param>
+	public TreeLayoutEngine(IContext context, ITreeLayoutPlugin plugin, LayoutEngineIdentity identity)
 	{
 		_context = context;
 		_plugin = plugin;
+		Identity = identity;
 		_root = null;
 		_windows = WindowPathDict.Empty;
 	}
@@ -550,7 +555,7 @@ public class TreeLayoutEngine : ILayoutEngine
 		{
 			if (leafNode.Window == window)
 			{
-				return new TreeLayoutEngine(_context, _plugin);
+				return new TreeLayoutEngine(_context, _plugin, Identity);
 			}
 			else
 			{
