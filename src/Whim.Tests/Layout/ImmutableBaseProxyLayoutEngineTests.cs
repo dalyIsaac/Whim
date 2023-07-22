@@ -7,7 +7,7 @@ namespace Whim.Tests;
 
 public class ImmutableBaseProxyLayoutEngineTests
 {
-	private class ProxyLayoutEngine : ImmutableBaseProxyLayoutEngine
+	private class ProxyLayoutEngine : BaseProxyLayoutEngine
 	{
 		public ProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 			: base(innerLayoutEngine) { }

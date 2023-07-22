@@ -12,7 +12,7 @@ public delegate ILayoutEngine CreateImmutableProxyLayoutEngine(ILayoutEngine eng
 /// <summary>
 /// Abstract layout engine, which proxy layout engines should inherit from.
 /// </summary>
-public abstract class ImmutableBaseProxyLayoutEngine : ILayoutEngine
+public abstract class BaseProxyLayoutEngine : ILayoutEngine
 {
 	/// <summary>
 	/// The proxied layout engine.
@@ -23,7 +23,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : ILayoutEngine
 	/// Constructs a new proxy layout engine.
 	/// </summary>
 	/// <param name="innerLayoutEngine">The proxied layout engine.</param>
-	protected ImmutableBaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
+	protected BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 	{
 		InnerLayoutEngine = innerLayoutEngine;
 	}

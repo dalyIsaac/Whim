@@ -6,7 +6,7 @@ namespace Whim.FloatingLayout;
 /// <summary>
 /// A proxy layout engine to allow windows to be free-floating.
 /// </summary>
-public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
+public class ImmutableFloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
 	private readonly IFloatingLayoutPlugin _plugin;

@@ -8,7 +8,7 @@ namespace Whim;
 /// <remarks>
 /// This is used to determine if a <see cref="ILayoutEngine"/>  is the same as another
 /// layout engine.
-/// The leaf layout engines will have an identity, and <see cref="ImmutableBaseProxyLayoutEngine"/>
+/// The leaf layout engines will have an identity, and <see cref="BaseProxyLayoutEngine"/>
 /// will proxy the identity of the inner layout engine.
 /// Creating a new layout engine from an operation on an existing layout engine will keep the same
 /// identity.
