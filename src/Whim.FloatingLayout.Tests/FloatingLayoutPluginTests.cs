@@ -14,7 +14,7 @@ public class FloatingLayoutPluginTests
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();
-		public ImmutableFloatingLayoutEngine FloatingLayoutEngine { get; }
+		public FloatingLayoutEngine FloatingLayoutEngine { get; }
 		public FloatingLayoutPlugin Plugin;
 
 		public Wrapper()

@@ -29,9 +29,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WorkspaceManager.AddProxyLayoutEngine(
-			layout => new ImmutableFloatingLayoutEngine(_context, this, layout)
-		);
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, this, layout));
 	}
 
 	/// <inheritdoc />

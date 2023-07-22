@@ -96,7 +96,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Wrapper wrapper = new();
 		wrapper.Setup_FloatingLayoutPlugin_False();
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 		Mock<IWindow> window = new();
 
@@ -120,7 +120,7 @@ public class ImmutableFloatingLayoutEngineTests
 
 		wrapper.Setup_FloatingLayoutPlugin_True(window.Object);
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
@@ -150,7 +150,7 @@ public class ImmutableFloatingLayoutEngineTests
 			.Setup_GetMonitorAtPoint()
 			.Setup_GetWorkspaceForMonitor(workspace.Object);
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
@@ -181,7 +181,7 @@ public class ImmutableFloatingLayoutEngineTests
 			.Setup_GetMonitorAtPoint()
 			.Setup_GetWorkspaceForMonitor(null!);
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
@@ -212,7 +212,7 @@ public class ImmutableFloatingLayoutEngineTests
 			.Setup_GetMonitorAtPoint()
 			.Setup_GetWorkspaceForMonitor(workspace.Object);
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
@@ -251,7 +251,7 @@ public class ImmutableFloatingLayoutEngineTests
 			.Setup_GetMonitorAtPoint()
 			.Setup_GetWorkspaceForMonitor(workspace.Object);
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
@@ -305,7 +305,7 @@ public class ImmutableFloatingLayoutEngineTests
 				}
 			);
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
@@ -329,7 +329,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Wrapper wrapper = new();
 		wrapper.Setup_FloatingLayoutPlugin_False();
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 		Mock<IWindow> window = new();
 
@@ -368,7 +368,7 @@ public class ImmutableFloatingLayoutEngineTests
 			.Setup_GetMonitorAtPoint()
 			.Setup_GetWorkspaceForMonitor(workspace.Object);
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(
 				wrapper.Context.Object,
 				wrapper.FloatingLayoutPlugin.Object,
@@ -426,7 +426,7 @@ public class ImmutableFloatingLayoutEngineTests
 			.Setup_GetMonitorAtPoint()
 			.Setup_InternalFloatingLayoutPlugin();
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
@@ -446,7 +446,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Wrapper wrapper = new();
 		Mock<IWindow> window = new();
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
@@ -471,7 +471,7 @@ public class ImmutableFloatingLayoutEngineTests
 			.Setup(x => x.SwapWindowInDirection(Direction.Left, window.Object))
 			.Returns(wrapper.InnerLayoutEngine.Object);
 
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When

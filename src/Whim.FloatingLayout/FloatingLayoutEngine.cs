@@ -6,19 +6,19 @@ namespace Whim.FloatingLayout;
 /// <summary>
 /// A proxy layout engine to allow windows to be free-floating.
 /// </summary>
-public class ImmutableFloatingLayoutEngine : BaseProxyLayoutEngine
+public class FloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
 	private readonly IFloatingLayoutPlugin _plugin;
 	private readonly ImmutableDictionary<IWindow, ILocation<double>> _floatingWindowLocations;
 
 	/// <summary>
-	/// Creates a new instance of the proxy layout engine <see cref="ImmutableFloatingLayoutEngine"/>.
+	/// Creates a new instance of the proxy layout engine <see cref="FloatingLayoutEngine"/>.
 	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public ImmutableFloatingLayoutEngine(
+	public FloatingLayoutEngine(
 		IContext context,
 		IFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine
@@ -30,7 +30,7 @@ public class ImmutableFloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowLocations = ImmutableDictionary<IWindow, ILocation<double>>.Empty;
 	}
 
-	private ImmutableFloatingLayoutEngine(ImmutableFloatingLayoutEngine oldEngine, ILayoutEngine newInnerLayoutEngine)
+	private FloatingLayoutEngine(FloatingLayoutEngine oldEngine, ILayoutEngine newInnerLayoutEngine)
 		: base(newInnerLayoutEngine)
 	{
 		_context = oldEngine._context;
@@ -38,8 +38,8 @@ public class ImmutableFloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowLocations = oldEngine._floatingWindowLocations;
 	}
 
-	private ImmutableFloatingLayoutEngine(
-		ImmutableFloatingLayoutEngine oldEngine,
+	private FloatingLayoutEngine(
+		FloatingLayoutEngine oldEngine,
 		ImmutableDictionary<IWindow, ILocation<double>> floatingWindowLocations
 	)
 		: base(oldEngine.InnerLayoutEngine)
@@ -53,7 +53,7 @@ public class ImmutableFloatingLayoutEngine : BaseProxyLayoutEngine
 	protected override ILayoutEngine Update(ILayoutEngine newInnerLayoutEngine) =>
 		newInnerLayoutEngine == InnerLayoutEngine
 			? this
-			: new ImmutableFloatingLayoutEngine(this, newInnerLayoutEngine);
+			: new FloatingLayoutEngine(this, newInnerLayoutEngine);
 
 	/// <inheritdoc />
 	public override ILayoutEngine Add(IWindow window)
@@ -68,7 +68,7 @@ public class ImmutableFloatingLayoutEngine : BaseProxyLayoutEngine
 		return base.Add(window);
 	}
 
-	private ImmutableFloatingLayoutEngine UpdateWindowLocation(IWindow window, ILocation<double>? oldLocation)
+	private FloatingLayoutEngine UpdateWindowLocation(IWindow window, ILocation<double>? oldLocation)
 	{
 		// Since the window is floating, we update the location, and return.
 		ILocation<int>? newActualLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
@@ -101,7 +101,7 @@ public class ImmutableFloatingLayoutEngine : BaseProxyLayoutEngine
 				internalPlugin.MutableFloatingWindows.Remove(window);
 			}
 
-			return new ImmutableFloatingLayoutEngine(this, _floatingWindowLocations.Remove(window));
+			return new FloatingLayoutEngine(this, _floatingWindowLocations.Remove(window));
 		}
 
 		return base.Remove(window);

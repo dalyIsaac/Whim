@@ -42,7 +42,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 		Mock<IWindow> window = new();
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
@@ -60,7 +60,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 		Mock<IWindow> window = new();
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
@@ -78,7 +78,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ImmutableFloatingLayoutEngine engine =
+		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		Mock<IWindow> floatingWindow = new();
