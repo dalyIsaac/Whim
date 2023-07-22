@@ -56,10 +56,7 @@ public class FloatingLayoutPluginTests
 		plugin.PreInitialize();
 
 		// Then
-		wrapper.WorkspaceManager.Verify(
-			x => x.AddProxyLayoutEngine(It.IsAny<CreateImmutableProxyLayoutEngine>()),
-			Times.Once
-		);
+		wrapper.WorkspaceManager.Verify(x => x.AddProxyLayoutEngine(It.IsAny<CreateProxyLayoutEngine>()), Times.Once);
 	}
 
 	[Fact]

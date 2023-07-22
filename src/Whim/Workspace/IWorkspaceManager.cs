@@ -170,12 +170,12 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// all workspaces.
 	/// </summary>
 	/// <param name="proxyLayoutEngine">The proxy layout engine to add.</param>
-	void AddProxyLayoutEngine(CreateImmutableProxyLayoutEngine proxyLayoutEngine);
+	void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine);
 
 	/// <summary>
 	/// The proxy layout engines.
 	/// </summary>
-	IEnumerable<CreateImmutableProxyLayoutEngine> ProxyLayoutEngines { get; }
+	IEnumerable<CreateProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.

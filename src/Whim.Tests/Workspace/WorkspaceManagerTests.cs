@@ -1366,7 +1366,7 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		Mock<CreateImmutableProxyLayoutEngine> proxyLayoutEngine = new();
+		Mock<CreateProxyLayoutEngine> proxyLayoutEngine = new();
 
 		// When a proxy layout engine is added
 		wrapper.WorkspaceManager.AddProxyLayoutEngine(proxyLayoutEngine.Object);
