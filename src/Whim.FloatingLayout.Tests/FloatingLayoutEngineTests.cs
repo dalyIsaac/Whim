@@ -12,7 +12,7 @@ public class FloatingLayoutEngineTests
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
-		public Mock<IImmutableLayoutEngine> InnerLayoutEngine { get; } = new();
+		public Mock<ILayoutEngine> InnerLayoutEngine { get; } = new();
 		public Mock<IWindow> Window { get; } = new();
 		public Mock<IMonitor> Monitor { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();

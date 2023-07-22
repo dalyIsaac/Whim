@@ -14,14 +14,14 @@ public class ImmutableGapsLayoutEngine : ImmutableBaseProxyLayoutEngine
 	/// </summary>
 	/// <param name="gapsConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public ImmutableGapsLayoutEngine(GapsConfig gapsConfig, IImmutableLayoutEngine innerLayoutEngine)
+	public ImmutableGapsLayoutEngine(GapsConfig gapsConfig, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_gapsConfig = gapsConfig;
 	}
 
 	/// <inheritdoc />
-	protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+	protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
 		newLayoutEngine == InnerLayoutEngine ? this : new ImmutableGapsLayoutEngine(_gapsConfig, newLayoutEngine);
 
 	/// <inheritdoc />

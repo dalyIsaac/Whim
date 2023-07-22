@@ -129,19 +129,19 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	#region Workspaces
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
-	private Workspace CreateWorkspace(string? name = null, IEnumerable<IImmutableLayoutEngine>? layoutEngines = null)
+	private Workspace CreateWorkspace(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null)
 	{
 		// Create the layout engines.
-		IImmutableLayoutEngine[] engines;
+		ILayoutEngine[] engines;
 
-		if (layoutEngines is IEnumerable<IImmutableLayoutEngine> layoutEnginesEnum)
+		if (layoutEngines is IEnumerable<ILayoutEngine> layoutEnginesEnum)
 		{
 			engines = layoutEnginesEnum.ToArray();
 		}
 		else
 		{
 			CreateLeafLayoutEngine[] createLayoutEnginesFn = CreateLayoutEngines();
-			engines = new IImmutableLayoutEngine[createLayoutEnginesFn.Length];
+			engines = new ILayoutEngine[createLayoutEnginesFn.Length];
 
 			for (int i = 0; i < createLayoutEnginesFn.Length; i++)
 			{
@@ -152,10 +152,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		// Set up the proxies.
 		for (int engineIdx = 0; engineIdx < engines.Length; engineIdx++)
 		{
-			IImmutableLayoutEngine engine = engines[engineIdx];
+			ILayoutEngine engine = engines[engineIdx];
 			foreach (CreateImmutableProxyLayoutEngine createProxyLayoutEngineFn in _proxyLayoutEngines)
 			{
-				IImmutableLayoutEngine proxy = createProxyLayoutEngineFn(engine);
+				ILayoutEngine proxy = createProxyLayoutEngineFn(engine);
 				engines[engineIdx] = proxy;
 				engine = proxy;
 			}
@@ -168,8 +168,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		return workspace;
 	}
 
-	public void Add(string? name = null, IEnumerable<IImmutableLayoutEngine>? layoutEngines = null) =>
-		Add(name, layoutEngines);
+	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null) => Add(name, layoutEngines);
 
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
 

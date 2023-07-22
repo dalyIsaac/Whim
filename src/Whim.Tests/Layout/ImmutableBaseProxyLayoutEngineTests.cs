@@ -9,23 +9,23 @@ public class ImmutableBaseProxyLayoutEngineTests
 {
 	private class ProxyLayoutEngine : ImmutableBaseProxyLayoutEngine
 	{
-		public ProxyLayoutEngine(IImmutableLayoutEngine innerLayoutEngine)
+		public ProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 			: base(innerLayoutEngine) { }
 
-		protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+		protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
 			newLayoutEngine == InnerLayoutEngine ? this : new ProxyLayoutEngine(newLayoutEngine);
 
 		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
 			InnerLayoutEngine.DoLayout(location, monitor);
 	}
 
-	internal interface ITestLayoutEngine : IImmutableLayoutEngine { }
+	internal interface ITestLayoutEngine : ILayoutEngine { }
 
 	[Fact]
 	public void Name()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.Name).Returns("Inner Layout Engine");
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
@@ -41,7 +41,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void Count()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.Count).Returns(42);
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
@@ -57,13 +57,13 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void Add()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.Add(It.IsAny<IWindow>()));
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = proxyLayoutEngine.Add(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = proxyLayoutEngine.Add(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
@@ -75,13 +75,13 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void Remove()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.Remove(It.IsAny<IWindow>()));
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = proxyLayoutEngine.Remove(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = proxyLayoutEngine.Remove(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
@@ -93,7 +93,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void GetFirstWindow()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.GetFirstWindow()).Returns(new Mock<IWindow>().Object);
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
@@ -110,7 +110,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void FocusWindowInDirection()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.FocusWindowInDirection(It.IsAny<Direction>(), It.IsAny<IWindow>()));
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
@@ -126,16 +126,13 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void SwapWindowInDirection()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.SwapWindowInDirection(It.IsAny<Direction>(), It.IsAny<IWindow>()));
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = proxyLayoutEngine.SwapWindowInDirection(
-			Direction.Left,
-			new Mock<IWindow>().Object
-		);
+		ILayoutEngine newEngine = proxyLayoutEngine.SwapWindowInDirection(Direction.Left, new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
@@ -147,7 +144,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void Contains()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.Contains(It.IsAny<IWindow>())).Returns(true);
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
@@ -164,7 +161,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void MoveWindowEdgesInDirection()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(
 			x => x.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow>())
 		);
@@ -172,7 +169,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = proxyLayoutEngine.MoveWindowEdgesInDirection(
+		ILayoutEngine newEngine = proxyLayoutEngine.MoveWindowEdgesInDirection(
 			Direction.Left,
 			new Point<double>(),
 			new Mock<IWindow>().Object
@@ -191,7 +188,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void DoLayout()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine
 			.Setup(x => x.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()))
 			.Returns(Array.Empty<IWindowState>());
@@ -213,7 +210,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void HidePhantomWindows()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.HidePhantomWindows());
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
@@ -229,16 +226,13 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void AddAtPoint()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.AddAtPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<double>>()));
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = proxyLayoutEngine.AddAtPoint(
-			new Mock<IWindow>().Object,
-			new Point<double>()
-		);
+		ILayoutEngine newEngine = proxyLayoutEngine.AddAtPoint(new Mock<IWindow>().Object, new Point<double>());
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
@@ -251,7 +245,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void GetLayoutEngine_IsT()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
@@ -282,7 +276,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void GetLayoutEngine_Null()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
@@ -298,7 +292,7 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void ContainsEqual_IsT()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
@@ -328,11 +322,11 @@ public class ImmutableBaseProxyLayoutEngineTests
 	public void ContainsEqual_False()
 	{
 		// Given
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		bool contains = proxyLayoutEngine.ContainsEqual(new Mock<IImmutableLayoutEngine>().Object);
+		bool contains = proxyLayoutEngine.ContainsEqual(new Mock<ILayoutEngine>().Object);
 
 		// Then
 		Assert.False(contains);

@@ -15,7 +15,7 @@ public class AddTests
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -32,7 +32,7 @@ public class AddTests
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -46,14 +46,14 @@ public class AddTests
 		// Given
 		Mock<IWindow> phantomWindow = new();
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(phantomWindow.Object);
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
 			phantomWindow.Object
 		);
 
 		Mock<IWindow> window = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -69,14 +69,12 @@ public class AddTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
-			window1.Object
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window1.Object);
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 		Mock<IMonitor> monitor = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window2.Object);
+		ILayoutEngine result = engine.Add(window2.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -128,7 +126,7 @@ public class AddTests
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -136,7 +134,7 @@ public class AddTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window3.Object);
+		ILayoutEngine result = engine.Add(window3.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -199,7 +197,7 @@ public class AddTests
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window3.Object);
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -207,7 +205,7 @@ public class AddTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window3.Object);
+		ILayoutEngine result = engine.Add(window3.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -270,7 +268,7 @@ public class AddTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -280,7 +278,7 @@ public class AddTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window3.Object);
+		ILayoutEngine result = engine.Add(window3.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then

@@ -21,7 +21,7 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	public ImmutableFloatingLayoutEngine(
 		IContext context,
 		IFloatingLayoutPlugin plugin,
-		IImmutableLayoutEngine innerLayoutEngine
+		ILayoutEngine innerLayoutEngine
 	)
 		: base(innerLayoutEngine)
 	{
@@ -30,10 +30,7 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 		_floatingWindowLocations = ImmutableDictionary<IWindow, ILocation<double>>.Empty;
 	}
 
-	private ImmutableFloatingLayoutEngine(
-		ImmutableFloatingLayoutEngine oldEngine,
-		IImmutableLayoutEngine newInnerLayoutEngine
-	)
+	private ImmutableFloatingLayoutEngine(ImmutableFloatingLayoutEngine oldEngine, ILayoutEngine newInnerLayoutEngine)
 		: base(newInnerLayoutEngine)
 	{
 		_context = oldEngine._context;
@@ -53,13 +50,13 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newInnerLayoutEngine) =>
+	protected override ILayoutEngine Update(ILayoutEngine newInnerLayoutEngine) =>
 		newInnerLayoutEngine == InnerLayoutEngine
 			? this
 			: new ImmutableFloatingLayoutEngine(this, newInnerLayoutEngine);
 
 	/// <inheritdoc />
-	public override IImmutableLayoutEngine Add(IWindow window)
+	public override ILayoutEngine Add(IWindow window)
 	{
 		// If the window is already tracked by this layout engine, or is a new floating window,
 		// update the location and return.
@@ -93,7 +90,7 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IImmutableLayoutEngine Remove(IWindow window)
+	public override ILayoutEngine Remove(IWindow window)
 	{
 		// If tracked by this layout engine, remove it.
 		// Otherwise, pass to the inner layout engine.
@@ -111,7 +108,7 @@ public class ImmutableFloatingLayoutEngine : ImmutableBaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) => Add(window);
+	public override ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) => Add(window);
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)

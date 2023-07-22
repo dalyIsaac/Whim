@@ -8,25 +8,25 @@ public class IImmutableLayoutEngineTests
 {
 	private class ProxyLayoutEngine : ImmutableBaseProxyLayoutEngine
 	{
-		public ProxyLayoutEngine(IImmutableLayoutEngine innerLayoutEngine)
+		public ProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 			: base(innerLayoutEngine) { }
 
-		protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+		protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
 			newLayoutEngine == InnerLayoutEngine ? this : new ProxyLayoutEngine(newLayoutEngine);
 
 		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
 			InnerLayoutEngine.DoLayout(location, monitor);
 	}
 
-	private class TestLayoutEngine : IImmutableLayoutEngine
+	private class TestLayoutEngine : ILayoutEngine
 	{
 		public string Name => throw new System.NotImplementedException();
 
 		public int Count => throw new System.NotImplementedException();
 
-		public IImmutableLayoutEngine Add(IWindow window) => throw new System.NotImplementedException();
+		public ILayoutEngine Add(IWindow window) => throw new System.NotImplementedException();
 
-		public IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
+		public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
 			throw new System.NotImplementedException();
 
 		public bool Contains(IWindow window) => throw new System.NotImplementedException();
@@ -41,29 +41,26 @@ public class IImmutableLayoutEngineTests
 
 		public void HidePhantomWindows() => throw new System.NotImplementedException();
 
-		public IImmutableLayoutEngine MoveWindowEdgesInDirection(
-			Direction edges,
-			IPoint<double> deltas,
-			IWindow window
-		) => throw new System.NotImplementedException();
+		public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
+			throw new System.NotImplementedException();
 
-		public IImmutableLayoutEngine Remove(IWindow window) => throw new System.NotImplementedException();
+		public ILayoutEngine Remove(IWindow window) => throw new System.NotImplementedException();
 
-		public IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
+		public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
 			throw new System.NotImplementedException();
 	}
 
-	internal interface ITestLayoutEngine : IImmutableLayoutEngine { }
+	internal interface ITestLayoutEngine : ILayoutEngine { }
 
 	#region GetLayoutEngine
 	[Fact]
 	public void GetLayoutEngine_IsT()
 	{
 		// Given
-		IImmutableLayoutEngine engine = new TestLayoutEngine();
+		ILayoutEngine engine = new TestLayoutEngine();
 
 		// When
-		IImmutableLayoutEngine? newEngine = engine.GetLayoutEngine<IImmutableLayoutEngine>();
+		ILayoutEngine? newEngine = engine.GetLayoutEngine<ILayoutEngine>();
 
 		// Then
 		Assert.Same(engine, newEngine);
@@ -75,8 +72,8 @@ public class IImmutableLayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		IImmutableLayoutEngine proxyInner = new ProxyLayoutEngine(engine);
-		IImmutableLayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
+		ILayoutEngine proxyInner = new ProxyLayoutEngine(engine);
+		ILayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
 
 		// When
 		TestLayoutEngine? newEngine = proxyOuter.GetLayoutEngine<TestLayoutEngine>();
@@ -90,10 +87,10 @@ public class IImmutableLayoutEngineTests
 	public void GetLayoutEngine_Null()
 	{
 		// Given
-		IImmutableLayoutEngine engine = new TestLayoutEngine();
+		ILayoutEngine engine = new TestLayoutEngine();
 
 		// When
-		IImmutableLayoutEngine? newEngine = engine.GetLayoutEngine<ITestLayoutEngine>();
+		ILayoutEngine? newEngine = engine.GetLayoutEngine<ITestLayoutEngine>();
 
 		// Then
 		Assert.Null(newEngine);
@@ -105,7 +102,7 @@ public class IImmutableLayoutEngineTests
 	public void ContainsEqual_IsT()
 	{
 		// Given
-		IImmutableLayoutEngine engine = new TestLayoutEngine();
+		ILayoutEngine engine = new TestLayoutEngine();
 
 		// When
 		bool contains = engine.ContainsEqual(engine);
@@ -119,8 +116,8 @@ public class IImmutableLayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		IImmutableLayoutEngine proxyInner = new ProxyLayoutEngine(engine);
-		IImmutableLayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
+		ILayoutEngine proxyInner = new ProxyLayoutEngine(engine);
+		ILayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
 
 		// When
 		bool contains = proxyOuter.ContainsEqual(engine);
@@ -133,10 +130,10 @@ public class IImmutableLayoutEngineTests
 	public void ContainsEqual_Null()
 	{
 		// Given
-		IImmutableLayoutEngine engine = new TestLayoutEngine();
+		ILayoutEngine engine = new TestLayoutEngine();
 
 		// When
-		bool contains = engine.ContainsEqual(new Mock<IImmutableLayoutEngine>().Object);
+		bool contains = engine.ContainsEqual(new Mock<ILayoutEngine>().Object);
 
 		// Then
 		Assert.False(contains);

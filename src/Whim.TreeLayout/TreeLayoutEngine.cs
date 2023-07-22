@@ -19,7 +19,7 @@ internal record NonRootWindowData(
 /// <summary>
 /// A tree layout engine allows users to create arbitrary window grid layouts.
 /// </summary>
-public class TreeLayoutEngine : IImmutableLayoutEngine
+public class TreeLayoutEngine : ILayoutEngine
 {
 	private readonly IContext _context;
 	private readonly ITreeLayoutPlugin _plugin;
@@ -140,7 +140,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public IImmutableLayoutEngine Add(IWindow window)
+	public ILayoutEngine Add(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
@@ -196,7 +196,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
+	public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
@@ -237,7 +237,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 		return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
 	}
 
-	private IImmutableLayoutEngine AddAtPointSplitNode(IPoint<double> point, LeafNode newLeafNode, ISplitNode rootNode)
+	private ILayoutEngine AddAtPointSplitNode(IPoint<double> point, LeafNode newLeafNode, ISplitNode rootNode)
 	{
 		LeafNodeStateAtPoint? result = rootNode.GetNodeContainingPoint(point);
 		if (result is null)
@@ -392,11 +392,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public IImmutableLayoutEngine MoveWindowEdgesInDirection(
-		Direction edges,
-		IPoint<double> deltas,
-		IWindow focusedWindow
-	)
+	public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow focusedWindow)
 	{
 		Logger.Debug($"Moving window edges {edges} in direction {deltas} for window {focusedWindow}");
 
@@ -540,7 +536,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public IImmutableLayoutEngine Remove(IWindow window)
+	public ILayoutEngine Remove(IWindow window)
 	{
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
@@ -595,7 +591,7 @@ public class TreeLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
+	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Swapping window {window} in direction {direction} in layout engine {Name}");
 

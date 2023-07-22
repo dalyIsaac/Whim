@@ -81,7 +81,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
 	/// use the <see cref="CreateLayoutEngines"/> function.
 	/// </param>
-	void Add(string? name = null, IEnumerable<IImmutableLayoutEngine>? layoutEngines = null);
+	void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null);
 
 	/// <summary>
 	/// Tries to remove the given workspace.

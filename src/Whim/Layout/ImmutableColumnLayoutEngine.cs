@@ -8,7 +8,7 @@ namespace Whim;
 /// <summary>
 /// Column layout engine with a stack data structure.
 /// </summary>
-public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
+public class ImmutableColumnLayoutEngine : ILayoutEngine
 {
 	/// <summary>
 	/// The stack of windows in the engine.
@@ -48,14 +48,14 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public IImmutableLayoutEngine Add(IWindow window)
+	public ILayoutEngine Add(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 		return new ImmutableColumnLayoutEngine(this, _stack.Add(window));
 	}
 
 	/// <inheritdoc/>
-	public IImmutableLayoutEngine Remove(IWindow window)
+	public ILayoutEngine Remove(IWindow window)
 	{
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
@@ -156,7 +156,7 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
+	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Swapping window {window} in layout engine {Name} in direction {direction}");
 
@@ -183,11 +183,10 @@ public class ImmutableColumnLayoutEngine : IImmutableLayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public IImmutableLayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
-		this;
+	public ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) => this;
 
 	/// <inheritdoc/>
-	public IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
+	public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");
 

@@ -14,14 +14,14 @@ public class ImmutableBarLayoutEngine : ImmutableBaseProxyLayoutEngine
 	/// </summary>
 	/// <param name="barConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public ImmutableBarLayoutEngine(BarConfig barConfig, IImmutableLayoutEngine innerLayoutEngine)
+	public ImmutableBarLayoutEngine(BarConfig barConfig, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_barConfig = barConfig;
 	}
 
 	/// <inheritdoc />
-	protected override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
+	protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
 		newLayoutEngine == InnerLayoutEngine ? this : new ImmutableBarLayoutEngine(_barConfig, newLayoutEngine);
 
 	/// <inheritdoc />

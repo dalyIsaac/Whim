@@ -16,7 +16,7 @@ public class ImmutableFloatingLayoutEngineTests
 		public Mock<IFloatingLayoutPlugin> FloatingLayoutPlugin { get; } = new();
 		public Mock<IInternalFloatingLayoutPlugin>? InternalFloatingLayoutPlugin { get; private set; }
 
-		public Mock<IImmutableLayoutEngine> InnerLayoutEngine { get; } = new();
+		public Mock<ILayoutEngine> InnerLayoutEngine { get; } = new();
 
 		public Wrapper()
 		{
@@ -101,7 +101,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -124,7 +124,7 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -154,7 +154,7 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -185,7 +185,7 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -216,7 +216,7 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -255,8 +255,8 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
-		IImmutableLayoutEngine result2 = result.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result2 = result.Add(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -309,8 +309,8 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
-		IImmutableLayoutEngine result2 = result.Add(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result2 = result.Add(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -334,7 +334,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.AddAtPoint(window.Object, new Point<double>());
+		ILayoutEngine result = engine.AddAtPoint(window.Object, new Point<double>());
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -376,8 +376,8 @@ public class ImmutableFloatingLayoutEngineTests
 			);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
-		IImmutableLayoutEngine result2 = result.Add(window2.Object);
+		ILayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result2 = result.Add(window2.Object);
 		IWindowState[] states = result2
 			.DoLayout(new Location<int>() { Width = 100, Height = 100 }, new Mock<IMonitor>().Object)
 			.ToArray();
@@ -430,8 +430,8 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Add(window.Object);
-		IImmutableLayoutEngine result2 = result.Remove(window.Object);
+		ILayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result2 = result.Remove(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -450,7 +450,7 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(window.Object);
+		ILayoutEngine result = engine.Remove(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -475,7 +475,7 @@ public class ImmutableFloatingLayoutEngineTests
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window.Object);
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window.Object);
 
 		// Then
 		Assert.Same(engine, result);

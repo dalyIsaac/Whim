@@ -7,23 +7,23 @@ namespace Whim;
 /// The wrapper layout engine provides additional functionality, but still utilises the underlying
 /// layout engine.
 /// </summary>
-public delegate IImmutableLayoutEngine CreateImmutableProxyLayoutEngine(IImmutableLayoutEngine engine);
+public delegate ILayoutEngine CreateImmutableProxyLayoutEngine(ILayoutEngine engine);
 
 /// <summary>
 /// Abstract layout engine, which proxy layout engines should inherit from.
 /// </summary>
-public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
+public abstract class ImmutableBaseProxyLayoutEngine : ILayoutEngine
 {
 	/// <summary>
 	/// The proxied layout engine.
 	/// </summary>
-	protected IImmutableLayoutEngine InnerLayoutEngine { get; }
+	protected ILayoutEngine InnerLayoutEngine { get; }
 
 	/// <summary>
 	/// Constructs a new proxy layout engine.
 	/// </summary>
 	/// <param name="innerLayoutEngine">The proxied layout engine.</param>
-	protected ImmutableBaseProxyLayoutEngine(IImmutableLayoutEngine innerLayoutEngine)
+	protected ImmutableBaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 	{
 		InnerLayoutEngine = innerLayoutEngine;
 	}
@@ -43,7 +43,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	/// 		: new MyProxyLayoutEngine(newLayoutEngine);
 	/// </code>
 	/// </example>
-	protected abstract IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine);
+	protected abstract ILayoutEngine Update(ILayoutEngine newLayoutEngine);
 
 	/// <summary>
 	/// The name is only really important for the user, so we can use the name of the proxied layout engine.
@@ -55,14 +55,14 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	public virtual int Count => InnerLayoutEngine.Count;
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine Add(IWindow window) => Update(InnerLayoutEngine.Add(window));
+	public virtual ILayoutEngine Add(IWindow window) => Update(InnerLayoutEngine.Add(window));
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
+	public virtual ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
 		Update(InnerLayoutEngine.AddAtPoint(window, point));
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine Remove(IWindow window) => Update(InnerLayoutEngine.Remove(window));
+	public virtual ILayoutEngine Remove(IWindow window) => Update(InnerLayoutEngine.Remove(window));
 
 	/// <inheritdoc/>
 	public virtual IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
@@ -72,18 +72,15 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 		InnerLayoutEngine.FocusWindowInDirection(direction, window);
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
+	public virtual ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
 		Update(InnerLayoutEngine.SwapWindowInDirection(direction, window));
 
 	/// <inheritdoc/>
 	public virtual bool Contains(IWindow window) => InnerLayoutEngine.Contains(window);
 
 	/// <inheritdoc/>
-	public virtual IImmutableLayoutEngine MoveWindowEdgesInDirection(
-		Direction edge,
-		IPoint<double> deltas,
-		IWindow window
-	) => Update(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
+	public virtual ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
+		Update(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
 
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
@@ -100,7 +97,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
 	public T? GetLayoutEngine<T>()
-		where T : IImmutableLayoutEngine
+		where T : ILayoutEngine
 	{
 		if (this is T t)
 		{
@@ -118,7 +115,7 @@ public abstract class ImmutableBaseProxyLayoutEngine : IImmutableLayoutEngine
 	/// <returns>
 	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
 	/// </returns>
-	public bool ContainsEqual(IImmutableLayoutEngine layoutEngine)
+	public bool ContainsEqual(ILayoutEngine layoutEngine)
 	{
 		if (this == layoutEngine)
 		{

@@ -19,7 +19,7 @@ public class ImmutableBarLayoutEngineTests
 				Height = 30
 			};
 
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(ile => ile.Remove(It.IsAny<IWindow>())).Returns(innerLayoutEngine.Object);
 
 		Mock<IMonitor> monitor = new();
@@ -30,7 +30,7 @@ public class ImmutableBarLayoutEngineTests
 		ImmutableBarLayoutEngine engine = new(config, innerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = engine.Remove(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = engine.Remove(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.Same(engine, newEngine);
@@ -51,7 +51,7 @@ public class ImmutableBarLayoutEngineTests
 				Height = 30
 			};
 
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 
 		Mock<IMonitor> monitor = new();
 		monitor.SetupGet(m => m.ScaleFactor).Returns(100);
@@ -61,7 +61,7 @@ public class ImmutableBarLayoutEngineTests
 		ImmutableBarLayoutEngine engine = new(config, innerLayoutEngine.Object);
 
 		// When
-		IImmutableLayoutEngine newEngine = engine.Add(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = engine.Add(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
@@ -82,7 +82,7 @@ public class ImmutableBarLayoutEngineTests
 				Height = 30
 			};
 
-		Mock<IImmutableLayoutEngine> innerLayoutEngine = new();
+		Mock<ILayoutEngine> innerLayoutEngine = new();
 		Mock<IMonitor> monitor = new();
 		monitor.SetupGet(m => m.ScaleFactor).Returns(100);
 

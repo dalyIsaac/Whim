@@ -3,16 +3,16 @@ using System.Collections.Generic;
 namespace Whim;
 
 /// <summary>
-/// Creates a <see cref="IImmutableLayoutEngine"/> with the given <paramref name="identity"/>.
+/// Creates a <see cref="ILayoutEngine"/> with the given <paramref name="identity"/>.
 /// </summary>
 /// <param name="identity"></param>
 /// <returns></returns>
-public delegate IImmutableLayoutEngine CreateLeafLayoutEngine(LayoutEngineIdentity identity);
+public delegate ILayoutEngine CreateLeafLayoutEngine(LayoutEngineIdentity identity);
 
 /// <summary>
 /// Layout engines dictate how windows are laid out.
 /// </summary>
-public interface IImmutableLayoutEngine
+public interface ILayoutEngine
 {
 	/// <summary>
 	/// The name of the layout engine.
@@ -28,8 +28,8 @@ public interface IImmutableLayoutEngine
 	/// Adds a <paramref name="window"/> to the layout engine.
 	/// </summary>
 	/// <param name="window"></param>
-	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the add.</returns>
-	IImmutableLayoutEngine Add(IWindow window);
+	/// <returns>The new <see cref="ILayoutEngine"/> after the add.</returns>
+	ILayoutEngine Add(IWindow window);
 
 	/// <summary>
 	/// Move the <paramref name="window"/> to the <paramref name="point"/>.
@@ -37,15 +37,15 @@ public interface IImmutableLayoutEngine
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
-	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the move.</returns>
-	IImmutableLayoutEngine AddAtPoint(IWindow window, IPoint<double> point);
+	/// <returns>The new <see cref="ILayoutEngine"/> after the move.</returns>
+	ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point);
 
 	/// <summary>
 	/// Removes a <paramref name="window"/> from the layout engine.
 	/// </summary>
 	/// <param name="window"></param>
-	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the remove.</returns>
-	IImmutableLayoutEngine Remove(IWindow window);
+	/// <returns>The new <see cref="ILayoutEngine"/> after the remove.</returns>
+	ILayoutEngine Remove(IWindow window);
 
 	/// <summary>
 	/// Determines whether the layout engine contains the <paramref name="window"/>.
@@ -89,8 +89,8 @@ public interface IImmutableLayoutEngine
 	/// </summary>
 	/// <param name="direction">The direction to swap the window in.</param>
 	/// <param name="window">The window to swap.</param>
-	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the swap.</returns>
-	IImmutableLayoutEngine SwapWindowInDirection(Direction direction, IWindow window);
+	/// <returns>The new <see cref="ILayoutEngine"/> after the swap.</returns>
+	ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
 	/// Moves the focused window's edges by the specified <paramref name="deltas"/>.
@@ -101,8 +101,8 @@ public interface IImmutableLayoutEngine
 	/// The <paramref name="deltas"/> are in the range [0, 1] for both x and y (the unit square).
 	/// </param>
 	/// <param name="window"></param>
-	/// <returns>The new <see cref="IImmutableLayoutEngine"/> after the move.</returns>
-	IImmutableLayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window);
+	/// <returns>The new <see cref="ILayoutEngine"/> after the move.</returns>
+	ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window);
 
 	/// <summary>
 	/// Hides all phantom windows belonging to the layout engine. This is used by <see cref="Workspace"/>
@@ -111,7 +111,7 @@ public interface IImmutableLayoutEngine
 	void HidePhantomWindows();
 
 	/// <summary>
-	/// Checks to see if this <see cref="IImmutableLayoutEngine"/> or a child layout engine is type
+	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type
 	/// <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">The type of layout engine to check for.</typeparam>
@@ -119,15 +119,15 @@ public interface IImmutableLayoutEngine
 	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
 	T? GetLayoutEngine<T>()
-		where T : IImmutableLayoutEngine => this is T layoutEngine ? layoutEngine : default;
+		where T : ILayoutEngine => this is T layoutEngine ? layoutEngine : default;
 
 	/// <summary>
-	/// Checks to see if this <see cref="IImmutableLayoutEngine"/> or a child layout engine is
+	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is
 	/// <paramref name="layoutEngine"/>.
 	/// </summary>
 	/// <param name="layoutEngine">The layout engine to check for.</param>
 	/// <returns>
 	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
 	/// </returns>
-	bool ContainsEqual(IImmutableLayoutEngine layoutEngine) => this == layoutEngine;
+	bool ContainsEqual(ILayoutEngine layoutEngine) => this == layoutEngine;
 }

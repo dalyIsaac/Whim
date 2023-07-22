@@ -14,10 +14,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection(
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(
 			Direction.Left,
 			pixelsDeltas,
 			new Mock<IWindow>().Object
@@ -38,12 +38,12 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection(
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(
 			Direction.Left,
 			pixelsDeltas,
 			new Mock<IWindow>().Object
@@ -63,12 +63,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
-			window1.Object
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window1.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, window1.Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, window1.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -86,13 +84,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = -0.4 };
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, window2.Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, window2.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -110,13 +108,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.4 };
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, window2.Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, window2.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -324,7 +322,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);
@@ -332,7 +330,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, window2.Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, window2.Object);
 		IWindowState[] windowStates = result
 			.DoLayout(new Location<int>() { Width = 100, Height = 100 }, monitor.Object)
 			.ToArray();
@@ -529,7 +527,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 		{
 			AddNodeDirection = Direction.Down
 		}
@@ -540,7 +538,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, window2.Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, window2.Object);
 		IWindowState[] windowStates = result
 			.DoLayout(new Location<int>() { Width = 100, Height = 100 }, monitor.Object)
 			.ToArray();
@@ -988,7 +986,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(topLeft.Object)
 			.Add(topRight.Object)
 			.AddAtPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
@@ -997,7 +995,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[window].Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[window].Object);
 		IWindowState[] windowStates = result
 			.DoLayout(new Location<int>() { Width = 100, Height = 100 }, monitor.Object)
 			.ToArray();
@@ -1019,13 +1017,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.MoveWindowEdgesInDirection((Direction)128, pixelsDeltas, window2.Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection((Direction)128, pixelsDeltas, window2.Object);
 
 		// Then
 		Assert.Same(engine, result);

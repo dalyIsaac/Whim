@@ -14,7 +14,7 @@ public class RemoveTests
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(window.Object);
+		ILayoutEngine result = engine.Remove(window.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -26,12 +26,10 @@ public class RemoveTests
 		// Given
 		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
-			window.Object
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(window.Object);
+		ILayoutEngine result = engine.Remove(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -45,14 +43,12 @@ public class RemoveTests
 		// Given
 		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
-			window.Object
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window.Object);
 
 		Mock<IWindow> wrongWindow = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(wrongWindow.Object);
+		ILayoutEngine result = engine.Remove(wrongWindow.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -67,14 +63,14 @@ public class RemoveTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
 		Mock<IWindow> wrongWindow = new();
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(wrongWindow.Object);
+		ILayoutEngine result = engine.Remove(wrongWindow.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -90,12 +86,12 @@ public class RemoveTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(window1.Object);
+		ILayoutEngine result = engine.Remove(window1.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -112,13 +108,13 @@ public class RemoveTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(window3.Object);
+		ILayoutEngine result = engine.Remove(window3.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -136,13 +132,13 @@ public class RemoveTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(window1.Object);
+		ILayoutEngine result = engine.Remove(window1.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -160,13 +156,13 @@ public class RemoveTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.Remove(window2.Object);
+		ILayoutEngine result = engine.Remove(window2.Object);
 
 		// Then
 		Assert.NotSame(engine, result);

@@ -15,7 +15,7 @@ public class SwapWindowInDirectionTests
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
 
 		// When
-		IImmutableLayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window.Object);
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -30,7 +30,7 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -38,7 +38,7 @@ public class SwapWindowInDirectionTests
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		IImmutableLayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window1.Object);
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window1.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -82,7 +82,7 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -90,7 +90,7 @@ public class SwapWindowInDirectionTests
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		IImmutableLayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1.Object);
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -135,7 +135,7 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
@@ -144,7 +144,7 @@ public class SwapWindowInDirectionTests
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		IImmutableLayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1.Object);
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -198,7 +198,7 @@ public class SwapWindowInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(topLeft.Object)
 			.Add(topRight.Object)
 			.AddAtPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
@@ -208,7 +208,7 @@ public class SwapWindowInDirectionTests
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		IImmutableLayoutEngine result = engine.SwapWindowInDirection(Direction.LeftUp, bottomRight.Object);
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.LeftUp, bottomRight.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then

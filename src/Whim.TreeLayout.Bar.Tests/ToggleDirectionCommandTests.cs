@@ -12,7 +12,7 @@ public class ToggleDirectionCommandTests
 		public Mock<IMonitor> Monitor { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<IImmutableLayoutEngine> TreeLayoutEngine { get; } = new();
+		public Mock<ILayoutEngine> TreeLayoutEngine { get; } = new();
 		public TreeLayoutEngineWidgetViewModel ViewModel { get; }
 
 		public MocksBuilder()

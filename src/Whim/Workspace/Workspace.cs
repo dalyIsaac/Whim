@@ -33,11 +33,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// </summary>
 	public IWindow? LastFocusedWindow { get; private set; }
 
-	private readonly IImmutableLayoutEngine[] _layoutEngines;
+	private readonly ILayoutEngine[] _layoutEngines;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
-	public IImmutableLayoutEngine ActiveLayoutEngine
+	public ILayoutEngine ActiveLayoutEngine
 	{
 		private set => _layoutEngines[_activeLayoutEngineIndex] = value;
 		get => _layoutEngines[_activeLayoutEngineIndex];
@@ -62,7 +62,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// The intersection of <see cref="_normalWindows"/> and <see cref="_phantomWindows"/>
 	/// is the empty set.
 	/// </summary>
-	private readonly Dictionary<IWindow, IImmutableLayoutEngine> _phantomWindows = new();
+	private readonly Dictionary<IWindow, ILayoutEngine> _phantomWindows = new();
 
 	/// <summary>
 	/// Map of windows to their current location.
@@ -73,7 +73,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		IContext context,
 		WorkspaceManagerTriggers triggers,
 		string name,
-		IEnumerable<IImmutableLayoutEngine> layoutEngines
+		IEnumerable<ILayoutEngine> layoutEngines
 	)
 	{
 		_context = context;
@@ -93,7 +93,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (
 			_normalWindows.Contains(window)
 			|| (
-				_phantomWindows.TryGetValue(window, out IImmutableLayoutEngine? layoutEngine)
+				_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
 				&& layoutEngine != null
 				&& ActiveLayoutEngine.ContainsEqual(layoutEngine)
 			)
@@ -185,7 +185,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		int nextIdx = -1;
 		for (int idx = 0; idx < _layoutEngines.Length; idx++)
 		{
-			IImmutableLayoutEngine engine = _layoutEngines[idx];
+			ILayoutEngine engine = _layoutEngines[idx];
 			if (engine.Name == name)
 			{
 				nextIdx = idx;
@@ -242,9 +242,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			LastFocusedWindow = null;
 		}
 
-		if (_phantomWindows.TryGetValue(window, out IImmutableLayoutEngine? phantomLayoutEngine))
+		if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
 		{
-			IImmutableLayoutEngine newEngine = phantomLayoutEngine.Remove(window);
+			ILayoutEngine newEngine = phantomLayoutEngine.Remove(window);
 
 			bool removePhantomSuccess = newEngine == phantomLayoutEngine;
 			if (removePhantomSuccess)
@@ -270,8 +270,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				IImmutableLayoutEngine oldEngine = _layoutEngines[idx];
-				IImmutableLayoutEngine newEngine = oldEngine.Remove(window);
+				ILayoutEngine oldEngine = _layoutEngines[idx];
+				ILayoutEngine newEngine = oldEngine.Remove(window);
 
 				if (newEngine == oldEngine)
 				{
@@ -492,7 +492,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	#region Phantom Windows
-	public void AddPhantomWindow(IImmutableLayoutEngine engine, IWindow window)
+	public void AddPhantomWindow(ILayoutEngine engine, IWindow window)
 	{
 		Logger.Debug($"Adding phantom window {window} in workspace {Name}");
 
@@ -513,7 +513,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		DoLayout();
 	}
 
-	public void RemovePhantomWindow(IImmutableLayoutEngine engine, IWindow window)
+	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window)
 	{
 		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
 
@@ -523,7 +523,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return;
 		}
 
-		if (!_phantomWindows.TryGetValue(window, out IImmutableLayoutEngine? phantomEngine))
+		if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine))
 		{
 			Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
 			return;
@@ -546,7 +546,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_normalWindows.Contains(window)
 		|| _minimizedWindows.Contains(window)
 		|| (
-			_phantomWindows.TryGetValue(window, out IImmutableLayoutEngine? phantomEngine)
+			_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
 			&& ActiveLayoutEngine.ContainsEqual(phantomEngine)
 		);
 

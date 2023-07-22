@@ -94,7 +94,7 @@ public class ImmutableGapsLayoutEngineTests
 	public void DoLayout(GapsConfig gapsConfig, int windowsCount, int scale, IWindowState[] expectedWindowStates)
 	{
 		// Given
-		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
+		ILayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
 
 		for (int i = 0; i < windowsCount; i++)
 		{
@@ -127,11 +127,11 @@ public class ImmutableGapsLayoutEngineTests
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
+		ILayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
 		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		IImmutableLayoutEngine newEngine = gapsLayoutEngine.Remove(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = gapsLayoutEngine.Remove(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.Same(newEngine, gapsLayoutEngine);
@@ -143,11 +143,11 @@ public class ImmutableGapsLayoutEngineTests
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		IImmutableLayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
+		ILayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
 		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		IImmutableLayoutEngine newEngine = gapsLayoutEngine.Add(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = gapsLayoutEngine.Add(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(newEngine, gapsLayoutEngine);

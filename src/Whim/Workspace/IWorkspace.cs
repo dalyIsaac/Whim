@@ -18,7 +18,7 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// The active layout engine.
 	/// </summary>
-	IImmutableLayoutEngine ActiveLayoutEngine { get; }
+	ILayoutEngine ActiveLayoutEngine { get; }
 
 	/// <summary>
 	/// Rotate to the next layout engine.
@@ -150,7 +150,7 @@ public interface IWorkspace : IDisposable
 	/// </remarks>
 	/// <param name="engine">The layout engine to add the phantom window to.</param>
 	/// <param name="window">The phantom window to add.</param>
-	void AddPhantomWindow(IImmutableLayoutEngine engine, IWindow window);
+	void AddPhantomWindow(ILayoutEngine engine, IWindow window);
 
 	/// <summary>
 	/// Remove a phantom window. This can only be done by the active layout engine,
@@ -158,6 +158,6 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="engine">The layout engine to remove the phantom window from.</param>
 	/// <param name="window">The phantom window to remove.</param>
-	void RemovePhantomWindow(IImmutableLayoutEngine engine, IWindow window);
+	void RemovePhantomWindow(ILayoutEngine engine, IWindow window);
 	#endregion
 }

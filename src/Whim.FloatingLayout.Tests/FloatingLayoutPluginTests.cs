@@ -27,7 +27,7 @@ public class FloatingLayoutPluginTests
 			NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns((ILocation<int>?)null);
 
 			Plugin = new(Context.Object);
-			FloatingLayoutEngine = new(Context.Object, Plugin, new Mock<IImmutableLayoutEngine>().Object);
+			FloatingLayoutEngine = new(Context.Object, Plugin, new Mock<ILayoutEngine>().Object);
 		}
 	}
 

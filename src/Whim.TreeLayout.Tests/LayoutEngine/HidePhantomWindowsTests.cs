@@ -18,7 +18,7 @@ public class HidePhantomWindowsTests
 			.SetAsLastFocusedWindow(null)
 			.SetAsPhantom(phantomWindow1.Object, phantomWindow2.Object);
 
-		IImmutableLayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(phantomWindow1.Object)
