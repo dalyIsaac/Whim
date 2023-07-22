@@ -168,14 +168,10 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// Adds a proxy layout engine to the workspace manager.
 	/// A proxy layout engine is used by plugins to add layout functionality to
 	/// all workspaces.
+	/// This should be used by <see cref="IPlugin"/>s.
 	/// </summary>
 	/// <param name="proxyLayoutEngine">The proxy layout engine to add.</param>
 	void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine);
-
-	/// <summary>
-	/// The proxy layout engines.
-	/// </summary>
-	IEnumerable<CreateProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.

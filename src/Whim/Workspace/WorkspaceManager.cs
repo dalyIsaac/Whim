@@ -75,8 +75,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	private readonly List<CreateProxyLayoutEngine> _proxyLayoutEngines = new();
 
-	public IEnumerable<CreateProxyLayoutEngine> ProxyLayoutEngines => _proxyLayoutEngines;
-
 	/// <summary>
 	/// The active workspace.
 	/// </summary>
@@ -128,12 +126,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 			Activate(workspace, monitor);
 			idx++;
-		}
-
-		// Initialize each of the workspaces.
-		foreach (IWorkspace workspace in _workspaces)
-		{
-			workspace.Initialize();
 		}
 	}
 
