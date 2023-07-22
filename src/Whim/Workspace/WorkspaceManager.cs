@@ -134,9 +134,9 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		// Create the layout engines.
 		ILayoutEngine[] engines;
 
-		if (layoutEngines is IEnumerable<ILayoutEngine> layoutEnginesEnum)
+		if (layoutEngines is IEnumerable<ILayoutEngine> definedLayoutEngines)
 		{
-			engines = layoutEnginesEnum.ToArray();
+			engines = definedLayoutEngines.ToArray();
 		}
 		else
 		{
@@ -168,7 +168,8 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		return workspace;
 	}
 
-	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null) => Add(name, layoutEngines);
+	public void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null) =>
+		CreateWorkspace(name, layoutEngines);
 
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
 
