@@ -101,7 +101,7 @@ public class GapsLayoutEngineTests
 			innerLayoutEngine = innerLayoutEngine.Add(new Mock<IWindow>().Object);
 		}
 
-		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		Location<int> location =
 			new()
@@ -128,14 +128,14 @@ public class GapsLayoutEngineTests
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
 		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
-		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = gapsLayoutEngine.Remove(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.Same(newEngine, gapsLayoutEngine);
-		Assert.IsType<ImmutableGapsLayoutEngine>(newEngine);
+		Assert.IsType<GapsLayoutEngine>(newEngine);
 	}
 
 	[Fact]
@@ -144,13 +144,13 @@ public class GapsLayoutEngineTests
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
 		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
-		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = gapsLayoutEngine.Add(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(newEngine, gapsLayoutEngine);
-		Assert.IsType<ImmutableGapsLayoutEngine>(newEngine);
+		Assert.IsType<GapsLayoutEngine>(newEngine);
 	}
 }

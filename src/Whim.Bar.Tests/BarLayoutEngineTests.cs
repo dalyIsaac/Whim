@@ -27,14 +27,14 @@ public class BarLayoutEngineTests
 
 		ILocation<int> location = new Location<int>() { Width = 1920, Height = 1080 };
 
-		ImmutableBarLayoutEngine engine = new(config, innerLayoutEngine.Object);
+		BarLayoutEngine engine = new(config, innerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.Remove(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.Same(engine, newEngine);
-		Assert.IsType<ImmutableBarLayoutEngine>(newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Fact]
@@ -58,14 +58,14 @@ public class BarLayoutEngineTests
 
 		ILocation<int> location = new Location<int>() { Width = 1920, Height = 1080 };
 
-		ImmutableBarLayoutEngine engine = new(config, innerLayoutEngine.Object);
+		BarLayoutEngine engine = new(config, innerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.Add(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		Assert.IsType<ImmutableBarLayoutEngine>(newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Fact]
@@ -88,7 +88,7 @@ public class BarLayoutEngineTests
 
 		ILocation<int> location = new Location<int>() { Width = 1920, Height = 1080 };
 
-		ImmutableBarLayoutEngine engine = new(config, innerLayoutEngine.Object);
+		BarLayoutEngine engine = new(config, innerLayoutEngine.Object);
 
 		// When
 		IEnumerable<IWindowState> layout = engine.DoLayout(location, monitor.Object);

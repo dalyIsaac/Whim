@@ -29,7 +29,7 @@ public class GapsPlugin : IGapsPlugin
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new ImmutableGapsLayoutEngine(GapsConfig, layout));
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new GapsLayoutEngine(GapsConfig, layout));
 	}
 
 	/// <inheritdoc />

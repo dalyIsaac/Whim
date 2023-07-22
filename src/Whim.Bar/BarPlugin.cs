@@ -33,7 +33,7 @@ public class BarPlugin : IBarPlugin
 	{
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 		_context.FilterManager.IgnoreTitleMatch("Whim Bar");
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new ImmutableBarLayoutEngine(_barConfig, layout));
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
 	}
 
 	/// <inheritdoc />

@@ -5,16 +5,16 @@ namespace Whim.Gaps;
 /// <summary>
 /// A proxy layout engine to add gaps to the layout.
 /// </summary>
-public class ImmutableGapsLayoutEngine : BaseProxyLayoutEngine
+public class GapsLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly GapsConfig _gapsConfig;
 
 	/// <summary>
-	/// Create a new instance of the proxy layout engine <see cref="ImmutableGapsLayoutEngine"/>.
+	/// Create a new instance of the proxy layout engine <see cref="GapsLayoutEngine"/>.
 	/// </summary>
 	/// <param name="gapsConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public ImmutableGapsLayoutEngine(GapsConfig gapsConfig, ILayoutEngine innerLayoutEngine)
+	public GapsLayoutEngine(GapsConfig gapsConfig, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_gapsConfig = gapsConfig;
@@ -22,7 +22,7 @@ public class ImmutableGapsLayoutEngine : BaseProxyLayoutEngine
 
 	/// <inheritdoc />
 	protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
-		newLayoutEngine == InnerLayoutEngine ? this : new ImmutableGapsLayoutEngine(_gapsConfig, newLayoutEngine);
+		newLayoutEngine == InnerLayoutEngine ? this : new GapsLayoutEngine(_gapsConfig, newLayoutEngine);
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)

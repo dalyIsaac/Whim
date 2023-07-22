@@ -5,16 +5,16 @@ namespace Whim.Bar;
 /// <summary>
 /// A proxy layout engine to reserve space for the bar in each monitor.
 /// </summary>
-public class ImmutableBarLayoutEngine : BaseProxyLayoutEngine
+public class BarLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly BarConfig _barConfig;
 
 	/// <summary>
-	/// Creates a new instance of the proxy layout engine <see cref="ImmutableBarLayoutEngine"/>.
+	/// Creates a new instance of the proxy layout engine <see cref="BarLayoutEngine"/>.
 	/// </summary>
 	/// <param name="barConfig"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public ImmutableBarLayoutEngine(BarConfig barConfig, ILayoutEngine innerLayoutEngine)
+	public BarLayoutEngine(BarConfig barConfig, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_barConfig = barConfig;
@@ -22,7 +22,7 @@ public class ImmutableBarLayoutEngine : BaseProxyLayoutEngine
 
 	/// <inheritdoc />
 	protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
-		newLayoutEngine == InnerLayoutEngine ? this : new ImmutableBarLayoutEngine(_barConfig, newLayoutEngine);
+		newLayoutEngine == InnerLayoutEngine ? this : new BarLayoutEngine(_barConfig, newLayoutEngine);
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
