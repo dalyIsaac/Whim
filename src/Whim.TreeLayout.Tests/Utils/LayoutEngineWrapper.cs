@@ -1,6 +1,6 @@
 using Moq;
 
-namespace Whim.ImmutableTreeLayout.Tests;
+namespace Whim.TreeLayout.Tests;
 
 internal class LayoutEngineWrapper
 {

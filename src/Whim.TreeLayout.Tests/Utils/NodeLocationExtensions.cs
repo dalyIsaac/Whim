@@ -1,4 +1,4 @@
-namespace Whim.ImmutableTreeLayout.Tests;
+namespace Whim.TreeLayout.Tests;
 
 internal static class NodeLocationExtensions
 {

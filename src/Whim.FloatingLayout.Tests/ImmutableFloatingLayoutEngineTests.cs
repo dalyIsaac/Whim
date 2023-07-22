@@ -28,30 +28,21 @@ public class ImmutableFloatingLayoutEngineTests
 		public Wrapper Setup_InternalFloatingLayoutPlugin()
 		{
 			InternalFloatingLayoutPlugin = FloatingLayoutPlugin.As<IInternalFloatingLayoutPlugin>();
-			InternalFloatingLayoutPlugin
-				.Setup(iflp => iflp.MutableFloatingWindows)
-				.Returns(new Dictionary<IWindow, IWorkspace>());
+			InternalFloatingLayoutPlugin.Setup(iflp => iflp.MutableFloatingWindows).Returns(new HashSet<IWindow>());
 
 			return this;
 		}
 
 		public Wrapper Setup_FloatingLayoutPlugin_False()
 		{
-			FloatingLayoutPlugin
-				.Setup(flp => flp.FloatingWindows.TryGetValue(It.IsAny<IWindow>(), out It.Ref<IWorkspace?>.IsAny))
-				.Returns(false);
-
+			FloatingLayoutPlugin.Setup(flp => flp.FloatingWindows.Contains(It.IsAny<IWindow>())).Returns(false);
 			return this;
 		}
 
-		public Wrapper Setup_FloatingLayoutPlugin_True(IWindow window, IWorkspace? workspace)
+		public Wrapper Setup_FloatingLayoutPlugin_True(IWindow window)
 		{
-			FloatingLayoutPlugin.Setup(flp => flp.FloatingWindows.TryGetValue(window, out workspace)).Returns(true);
-
-			InternalFloatingLayoutPlugin
-				?.Setup(iflp => iflp.MutableFloatingWindows.TryGetValue(window, out workspace))
-				.Returns(true);
-
+			FloatingLayoutPlugin.Setup(flp => flp.FloatingWindows.Contains(window)).Returns(true);
+			InternalFloatingLayoutPlugin?.Setup(iflp => iflp.MutableFloatingWindows.Contains(window)).Returns(true);
 			return this;
 		}
 
@@ -127,7 +118,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWorkspace> workspace = new();
 		Mock<IWindow> window = new();
 
-		wrapper.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object);
+		wrapper.Setup_FloatingLayoutPlugin_True(window.Object);
 
 		ImmutableFloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
@@ -154,7 +145,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		wrapper
-			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
+			.Setup_FloatingLayoutPlugin_True(window.Object)
 			.Setup_DwmGetWindowLocation_NotNull(new Location<int>())
 			.Setup_GetMonitorAtPoint()
 			.Setup_GetWorkspaceForMonitor(workspace.Object);
@@ -184,7 +175,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		wrapper
-			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
+			.Setup_FloatingLayoutPlugin_True(window.Object)
 			.Setup_InternalFloatingLayoutPlugin()
 			.Setup_DwmGetWindowLocation_NotNull(new Location<int>())
 			.Setup_GetMonitorAtPoint()
@@ -215,7 +206,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		wrapper
-			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
+			.Setup_FloatingLayoutPlugin_True(window.Object)
 			.Setup_InternalFloatingLayoutPlugin()
 			.Setup_DwmGetWindowLocation_NotNull(new Location<int>())
 			.Setup_GetMonitorAtPoint()
@@ -246,7 +237,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		wrapper
-			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
+			.Setup_FloatingLayoutPlugin_True(window.Object)
 			.Setup_InternalFloatingLayoutPlugin()
 			.Setup_DwmGetWindowLocation_NotNull(
 				new Location<int>()
@@ -287,7 +278,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		wrapper
-			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
+			.Setup_FloatingLayoutPlugin_True(window.Object)
 			.Setup_InternalFloatingLayoutPlugin()
 			.Setup_GetWorkspaceForMonitor(workspace.Object)
 			.Setup_GetMonitorAtPoint()
@@ -363,7 +354,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window2 = new();
 
 		wrapper
-			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
+			.Setup_FloatingLayoutPlugin_True(window.Object)
 			.Setup_InternalFloatingLayoutPlugin()
 			.Setup_DwmGetWindowLocation_NotNull(
 				new Location<int>()
@@ -378,7 +369,11 @@ public class ImmutableFloatingLayoutEngineTests
 			.Setup_GetWorkspaceForMonitor(workspace.Object);
 
 		ImmutableFloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, new ImmutableColumnLayoutEngine());
+			new(
+				wrapper.Context.Object,
+				wrapper.FloatingLayoutPlugin.Object,
+				new ImmutableColumnLayoutEngine(new LayoutEngineIdentity())
+			);
 
 		// When
 		IImmutableLayoutEngine result = engine.Add(window.Object);
@@ -416,7 +411,7 @@ public class ImmutableFloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		wrapper
-			.Setup_FloatingLayoutPlugin_True(window.Object, workspace.Object)
+			.Setup_FloatingLayoutPlugin_True(window.Object)
 			.Setup_InternalFloatingLayoutPlugin()
 			.Setup_DwmGetWindowLocation_NotNull(
 				new Location<int>()

@@ -1,4 +1,4 @@
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <summary>
 /// Base class for a node in a tree.

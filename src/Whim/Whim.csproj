@@ -45,6 +45,8 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Whim.Tests" />
+		<InternalsVisibleTo Include="Whim.Gaps.Tests" />
+		<InternalsVisibleTo Include="Whim.FloatingLayout.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 

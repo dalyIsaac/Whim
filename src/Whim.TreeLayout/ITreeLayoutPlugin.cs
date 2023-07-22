@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <summary>
 /// TreeLayoutPlugin provides commands and functionality for the <see cref="TreeLayoutEngine"/>.

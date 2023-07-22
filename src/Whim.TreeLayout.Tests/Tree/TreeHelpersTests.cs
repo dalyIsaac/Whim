@@ -3,7 +3,7 @@ using Moq;
 using System.Collections.Immutable;
 using Xunit;
 
-namespace Whim.ImmutableTreeLayout.Tests;
+namespace Whim.TreeLayout.Tests;
 
 public class TreeHelpersTests
 {

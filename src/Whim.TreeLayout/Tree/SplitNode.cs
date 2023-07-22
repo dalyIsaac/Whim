@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <summary>
 /// SplitNodes dictate the layout of the windows. They have a specific direction, and

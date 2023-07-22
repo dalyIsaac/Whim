@@ -6,7 +6,7 @@ namespace Whim.Gaps.Tests;
 
 public class ImmutableGapsLayoutEngineTests
 {
-	private static LayoutEngineIdentity _identity = new();
+	private static readonly LayoutEngineIdentity _identity = new();
 
 	public static IEnumerable<object[]> DoLayout_Data()
 	{

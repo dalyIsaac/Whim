@@ -1,4 +1,4 @@
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <summary>
 /// A phantom node represents a phantom window within the layout tree.

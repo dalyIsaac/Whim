@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <inheritdoc/>
 public class TreeLayoutPlugin : ITreeLayoutPlugin

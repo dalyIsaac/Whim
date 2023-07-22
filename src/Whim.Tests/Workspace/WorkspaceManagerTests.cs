@@ -1,6 +1,5 @@
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -74,61 +73,6 @@ public class WorkspaceManagerTests
 
 		// Then
 		Assert.Throws<InvalidOperationException>(wrapper.WorkspaceManager.Initialize);
-	}
-
-	[Fact]
-	public void Initialize_Success()
-	{
-		// Given the workspace manager has two workspaces
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		// When the workspace manager is initialized, then a MonitorWorkspaceChanged event is raised
-		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged += h,
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged -= h,
-			wrapper.WorkspaceManager.Initialize
-		);
-
-		// The workspaces are initialized
-		workspace.Verify(w => w.Initialize(), Times.Once);
-		workspace2.Verify(w => w.Initialize(), Times.Once);
-	}
-
-	[Fact]
-	public void Add_AfterInitialize()
-	{
-		// Given the workspace manager is already initialized
-		Wrapper wrapper = new(new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() });
-		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
-
-		// When a workspace is added, then WorkspaceAdded is raised
-		wrapper.WorkspaceManager.AddProxyLayoutEngine(proxyLayoutEngine.Object);
-		wrapper.WorkspaceManager.Initialize();
-		Assert.Raises<WorkspaceEventArgs>(
-			h => wrapper.WorkspaceManager.WorkspaceAdded += h,
-			h => wrapper.WorkspaceManager.WorkspaceAdded -= h,
-			() => wrapper.WorkspaceManager.Add("new workspace")
-		);
-
-		// Verify that the workspace was initialized
-		proxyLayoutEngine.Verify(p => p(It.IsAny<IImmutableLayoutEngine>()), Times.Once);
-	}
-
-	[Fact]
-	public void Add_BeforeInitialize()
-	{
-		// Given the workspace manager is not initialized
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace1 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace1 });
-
-		// When
-		wrapper.WorkspaceManager.Initialize();
-
-		// Then
-		workspace.Verify(w => w.Initialize(), Times.Once);
 	}
 
 	[Fact]

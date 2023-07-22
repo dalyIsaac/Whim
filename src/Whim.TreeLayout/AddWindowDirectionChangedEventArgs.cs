@@ -1,6 +1,6 @@
 using System;
 
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <summary>
 /// Event arguments for the <see cref="ITreeLayoutPlugin.AddWindowDirectionChanged"/> event.

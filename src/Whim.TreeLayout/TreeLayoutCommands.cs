@@ -1,6 +1,6 @@
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <summary>
 /// The commands for the tree layout plugin.

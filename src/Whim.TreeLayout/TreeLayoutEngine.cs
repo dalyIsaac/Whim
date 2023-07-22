@@ -6,7 +6,7 @@ using WindowPathDict = System.Collections.Immutable.ImmutableDictionary<
 	System.Collections.Immutable.ImmutableArray<int>
 >;
 
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 internal record NonRootWindowData(
 	ISplitNode RootSplitNode,

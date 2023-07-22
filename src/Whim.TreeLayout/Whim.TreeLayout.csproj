@@ -21,7 +21,7 @@
 		<GenerateLibraryLayout>true</GenerateLibraryLayout>
 		<Nullable>enable</Nullable>
 		<Platforms>x64;arm64;Any CPU</Platforms>
-		<RootNamespace>Whim.ImmutableTreeLayout</RootNamespace>
+		<RootNamespace>Whim.TreeLayout</RootNamespace>
 		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
 		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
@@ -35,7 +35,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="Whim.ImmutableTreeLayout.Tests" />
+		<InternalsVisibleTo Include="Whim.TreeLayout.Tests" />
+		<InternalsVisibleTo Include="Whim.TreeLayout.Bar.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 
@@ -50,7 +51,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EditorConfigFiles Remove="C:\Users\dalyisaac\Repos\Whim\src\Whim.ImmutableTreeLayout\.editorconfig" />
+		<EditorConfigFiles Remove="C:\Users\dalyisaac\Repos\Whim\src\Whim.TreeLayout\.editorconfig" />
 	</ItemGroup>
 
 </Project>

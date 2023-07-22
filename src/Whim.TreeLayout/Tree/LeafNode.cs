@@ -1,4 +1,4 @@
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <summary>
 /// A leaf node in a tree.

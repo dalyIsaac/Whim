@@ -1,7 +1,7 @@
 using Moq;
 using System.Collections.Immutable;
 
-namespace Whim.ImmutableTreeLayout.Tests;
+namespace Whim.TreeLayout.Tests;
 
 /// <summary>
 /// Returns all the nodes of the following tree, for tests. The tree exists within the coordinates (0,0) to (1,1).

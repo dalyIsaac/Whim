@@ -1,4 +1,4 @@
-namespace Whim.ImmutableTreeLayout;
+namespace Whim.TreeLayout;
 
 /// <summary>
 /// WindowNodes represent the location of a window within the layout engine.

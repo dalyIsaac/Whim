@@ -1,4 +1,4 @@
-namespace Whim.ImmutableTreeLayout.Tests;
+namespace Whim.TreeLayout.Tests;
 
 /// <summary>
 /// This contains the window states for <see cref="TestTree"/>.

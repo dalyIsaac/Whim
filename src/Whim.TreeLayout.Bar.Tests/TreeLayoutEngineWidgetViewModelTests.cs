@@ -232,8 +232,8 @@ public class TreeLayoutEngineWidgetViewModelTests
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = mocks.Workspace.Object,
-				CurrentLayoutEngine = new Mock<ITreeLayoutEngine>().Object,
-				PreviousLayoutEngine = new Mock<ITreeLayoutEngine>().Object
+				CurrentLayoutEngine = new Mock<IImmutableLayoutEngine>().Object,
+				PreviousLayoutEngine = new Mock<IImmutableLayoutEngine>().Object
 			}
 		);
 
@@ -256,7 +256,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 			x => x.AddWindowDirectionChanged += null,
 			new AddWindowDirectionChangedEventArgs()
 			{
-				TreeLayoutEngine = new Mock<ITreeLayoutEngine>().Object,
+				TreeLayoutEngine = new Mock<IImmutableLayoutEngine>().Object,
 				CurrentDirection = Direction.Down,
 				PreviousDirection = Direction.Right
 			}

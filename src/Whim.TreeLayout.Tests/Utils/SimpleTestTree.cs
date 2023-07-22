@@ -1,7 +1,7 @@
 using Moq;
 using System.Collections.Immutable;
 
-namespace Whim.ImmutableTreeLayout.Tests;
+namespace Whim.TreeLayout.Tests;
 
 /// <summary>
 /// -----------------------------------------------
