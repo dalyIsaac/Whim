@@ -372,7 +372,7 @@ public class ImmutableFloatingLayoutEngineTests
 			new(
 				wrapper.Context.Object,
 				wrapper.FloatingLayoutPlugin.Object,
-				new ImmutableColumnLayoutEngine(new LayoutEngineIdentity())
+				new ColumnLayoutEngine(new LayoutEngineIdentity())
 			);
 
 		// When

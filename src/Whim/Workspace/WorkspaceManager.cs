@@ -63,7 +63,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
-		() => new CreateLeafLayoutEngine[] { (id) => new ImmutableColumnLayoutEngine(id) };
+		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
 
 	private readonly List<CreateImmutableProxyLayoutEngine> _proxyLayoutEngines = new();
 

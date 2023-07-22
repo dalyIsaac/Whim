@@ -94,7 +94,7 @@ public class ImmutableGapsLayoutEngineTests
 	public void DoLayout(GapsConfig gapsConfig, int windowsCount, int scale, IWindowState[] expectedWindowStates)
 	{
 		// Given
-		ILayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
+		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
 
 		for (int i = 0; i < windowsCount; i++)
 		{
@@ -127,7 +127,7 @@ public class ImmutableGapsLayoutEngineTests
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		ILayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
+		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
 		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
@@ -143,7 +143,7 @@ public class ImmutableGapsLayoutEngineTests
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		ILayoutEngine innerLayoutEngine = new ImmutableColumnLayoutEngine(_identity);
+		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
 		ImmutableGapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When

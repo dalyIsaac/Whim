@@ -8,7 +8,7 @@ namespace Whim;
 /// <summary>
 /// Column layout engine with a stack data structure.
 /// </summary>
-public class ImmutableColumnLayoutEngine : ILayoutEngine
+public class ColumnLayoutEngine : ILayoutEngine
 {
 	/// <summary>
 	/// The stack of windows in the engine.
@@ -30,16 +30,16 @@ public class ImmutableColumnLayoutEngine : ILayoutEngine
 	public int Count => _stack.Count;
 
 	/// <summary>
-	/// Creates a new instance of the <see cref="ImmutableColumnLayoutEngine"/> class.
+	/// Creates a new instance of the <see cref="ColumnLayoutEngine"/> class.
 	/// </summary>
 	/// <param name="identity">The identity of the layout engine.</param>
-	public ImmutableColumnLayoutEngine(LayoutEngineIdentity identity)
+	public ColumnLayoutEngine(LayoutEngineIdentity identity)
 	{
 		Identity = identity;
 		_stack = ImmutableList<IWindow>.Empty;
 	}
 
-	private ImmutableColumnLayoutEngine(ImmutableColumnLayoutEngine layoutEngine, ImmutableList<IWindow> stack)
+	private ColumnLayoutEngine(ColumnLayoutEngine layoutEngine, ImmutableList<IWindow> stack)
 	{
 		Name = layoutEngine.Name;
 		Identity = layoutEngine.Identity;
@@ -51,7 +51,7 @@ public class ImmutableColumnLayoutEngine : ILayoutEngine
 	public ILayoutEngine Add(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
-		return new ImmutableColumnLayoutEngine(this, _stack.Add(window));
+		return new ColumnLayoutEngine(this, _stack.Add(window));
 	}
 
 	/// <inheritdoc/>
@@ -60,7 +60,7 @@ public class ImmutableColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
 		ImmutableList<IWindow> newStack = _stack.Remove(window);
-		return newStack == _stack ? this : new ImmutableColumnLayoutEngine(this, newStack);
+		return newStack == _stack ? this : new ColumnLayoutEngine(this, newStack);
 	}
 
 	/// <inheritdoc/>
@@ -179,7 +179,7 @@ public class ImmutableColumnLayoutEngine : ILayoutEngine
 		// Swap window
 		IWindow adjWindow = _stack[adjIndex];
 		ImmutableList<IWindow> newStack = _stack.SetItem(windowIndex, adjWindow).SetItem(adjIndex, window);
-		return new ImmutableColumnLayoutEngine(this, newStack);
+		return new ColumnLayoutEngine(this, newStack);
 	}
 
 	/// <inheritdoc/>
@@ -208,7 +208,7 @@ public class ImmutableColumnLayoutEngine : ILayoutEngine
 			idx = _stack.Count - idx;
 		}
 
-		return new ImmutableColumnLayoutEngine(this, _stack.Insert(idx, window));
+		return new ColumnLayoutEngine(this, _stack.Insert(idx, window));
 	}
 
 	/// <inheritdoc/>
