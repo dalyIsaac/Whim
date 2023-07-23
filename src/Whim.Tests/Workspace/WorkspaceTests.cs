@@ -33,8 +33,26 @@ public class WorkspaceTests
 			Context.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
 			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
 			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
+
 			LayoutEngine.Setup(l => l.ContainsEqual(LayoutEngine.Object)).Returns(true);
 			LayoutEngine.Setup(l => l.Name).Returns("Layout");
+
+			// This isn't strictly correct, but it's good enough for testing
+			LayoutEngine.Setup(l => l.Add(It.IsAny<IWindow>())).Returns(LayoutEngine.Object);
+			LayoutEngine.Setup(l => l.Remove(It.IsAny<IWindow>())).Returns(LayoutEngine.Object);
+			LayoutEngine
+				.Setup(
+					l =>
+						l.MoveWindowEdgesInDirection(
+							It.IsAny<Direction>(),
+							It.IsAny<IPoint<double>>(),
+							It.IsAny<IWindow>()
+						)
+				)
+				.Returns(LayoutEngine.Object);
+			LayoutEngine
+				.Setup(l => l.SwapWindowInDirection(It.IsAny<Direction>(), It.IsAny<IWindow>()))
+				.Returns(LayoutEngine.Object);
 
 			MonitorManager
 				.Setup(m => m.GetEnumerator())
@@ -654,6 +672,10 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 
+		Mock<ILayoutEngine> resultingEngine = new();
+		resultingEngine.Setup(l => l.Name).Returns("Resulting engine");
+		mocks.LayoutEngine.Setup(l => l.Remove(window.Object)).Returns(resultingEngine.Object);
+
 		// Phantom window is added
 		workspace.AddPhantomWindow(mocks.LayoutEngine.Object, window.Object);
 		mocks.WorkspaceManager.Invocations.Clear();
@@ -917,6 +939,11 @@ public class WorkspaceTests
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
+		// Set up AddAtPoint to return a new layout engine.
+		Mock<ILayoutEngine> resultingEngine = new();
+		resultingEngine.Setup(l => l.Name).Returns("Resulting engine");
+		mocks.LayoutEngine.Setup(l => l.AddAtPoint(window.Object, point)).Returns(resultingEngine.Object);
+
 		// When MoveWindowToPoint is called
 		workspace.MoveWindowToPoint(window.Object, point);
 
@@ -934,6 +961,11 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
+
+		// Set up AddAtPoint to return a new layout engine.
+		Mock<ILayoutEngine> resultingEngine = new();
+		resultingEngine.Setup(l => l.Name).Returns("Resulting engine");
+		mocks.LayoutEngine.Setup(l => l.AddAtPoint(window.Object, point)).Returns(resultingEngine.Object);
 
 		workspace.AddWindow(window.Object);
 		workspace.WindowMinimizeStart(window.Object);
@@ -963,12 +995,20 @@ public class WorkspaceTests
 
 		mocks.LayoutEngine.Reset();
 
+		// Set up AddAtPoint to return a new layout engine.
+		Mock<ILayoutEngine> removeResult = new();
+		Mock<ILayoutEngine> addAtPointResult = new();
+
+		mocks.LayoutEngine.Setup(l => l.Remove(It.IsAny<IWindow>())).Returns(removeResult.Object);
+		removeResult.Setup(l => l.AddAtPoint(window.Object, point)).Returns(addAtPointResult.Object);
+		removeResult.Setup(l => l.Name).Returns("Remove result");
+
 		// When MoveWindowToPoint is called
 		workspace.MoveWindowToPoint(window.Object, point);
 
 		// Then the layout engine is told to remove and add the window
 		mocks.LayoutEngine.Verify(l => l.Remove(window.Object), Times.Once);
-		mocks.LayoutEngine.Verify(l => l.AddAtPoint(window.Object, point), Times.Once);
+		removeResult.Verify(l => l.AddAtPoint(window.Object, point), Times.Once);
 	}
 
 	[Fact]

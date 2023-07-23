@@ -246,7 +246,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			ILayoutEngine newEngine = phantomLayoutEngine.Remove(window);
 
-			bool removePhantomSuccess = newEngine == phantomLayoutEngine;
+			bool removePhantomSuccess = newEngine != phantomLayoutEngine;
 			if (removePhantomSuccess)
 			{
 				int idx = Array.IndexOf(_layoutEngines, phantomLayoutEngine);
