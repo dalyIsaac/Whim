@@ -91,13 +91,9 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	{
 		// If tracked by this layout engine, remove it.
 		// Otherwise, pass to the inner layout engine.
-		if (_floatingWindowLocations.ContainsKey(window))
+		if (_floatingWindowLocations.ContainsKey(window) && _plugin is IInternalFloatingLayoutPlugin internalPlugin)
 		{
-			if (_plugin is IInternalFloatingLayoutPlugin internalPlugin)
-			{
-				internalPlugin.MutableFloatingWindows.Remove(window);
-			}
-
+			internalPlugin.MutableFloatingWindows.Remove(window);
 			return new FloatingLayoutEngine(this, _floatingWindowLocations.Remove(window));
 		}
 
