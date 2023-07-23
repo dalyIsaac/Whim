@@ -1070,22 +1070,19 @@ public class TreeHelpersTests
 		// Then
 		Assert.NotSame(originalDict, result);
 
-		// Equal and NotEqual test references equality.
-		// See https://devblogs.microsoft.com/dotnet/please-welcome-immutablearrayt/
-		Assert.Equal(originalDict[tree.Left.Window], result[tree.Left.Window]);
-		Assert.Equal(originalDict[tree.RightTopLeftTop.Window], result[tree.RightTopLeftTop.Window]);
-		Assert.Equal(originalDict[tree.RightTopLeftBottomLeft.Window], result[tree.RightTopLeftBottomLeft.Window]);
-		Assert.Equal(
-			originalDict[tree.RightTopLeftBottomRightTop.Window],
-			result[tree.RightTopLeftBottomRightTop.Window]
+		// Test reference equality.
+		Assert.True(originalDict[tree.Left.Window] == result[tree.Left.Window]);
+		Assert.True(originalDict[tree.RightTopLeftTop.Window] == result[tree.RightTopLeftTop.Window]);
+		Assert.True(originalDict[tree.RightTopLeftBottomLeft.Window] == result[tree.RightTopLeftBottomLeft.Window]);
+		Assert.True(
+			originalDict[tree.RightTopLeftBottomRightTop.Window] == result[tree.RightTopLeftBottomRightTop.Window]
 		);
-		Assert.Equal(
-			originalDict[tree.RightTopLeftBottomRightBottom.Window],
-			result[tree.RightTopLeftBottomRightBottom.Window]
+		Assert.True(
+			originalDict[tree.RightTopLeftBottomRightBottom.Window] == result[tree.RightTopLeftBottomRightBottom.Window]
 		);
-		Assert.NotEqual(originalDict[tree.RightTopRight1.Window], result[tree.RightTopRight1.Window]);
-		Assert.NotEqual(originalDict[tree.RightTopRight2.Window], result[tree.RightTopRight2.Window]);
-		Assert.NotEqual(originalDict[tree.RightTopRight3.Window], result[tree.RightTopRight3.Window]);
+		Assert.False(originalDict[tree.RightTopRight1.Window] == result[tree.RightTopRight1.Window]);
+		Assert.False(originalDict[tree.RightTopRight2.Window] == result[tree.RightTopRight2.Window]);
+		Assert.False(originalDict[tree.RightTopRight3.Window] == result[tree.RightTopRight3.Window]);
 	}
 
 	[Fact]
