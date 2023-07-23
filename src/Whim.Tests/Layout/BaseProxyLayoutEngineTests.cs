@@ -38,6 +38,22 @@ public class BaseProxyLayoutEngineTests
 	}
 
 	[Fact]
+	public void Identity()
+	{
+		// Given
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(x => x.Identity).Returns(new LayoutEngineIdentity());
+
+		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
+
+		// When
+		LayoutEngineIdentity identity = proxyLayoutEngine.Identity;
+
+		// Then
+		Assert.Same(innerLayoutEngine.Object.Identity, identity);
+	}
+
+	[Fact]
 	public void Count()
 	{
 		// Given
