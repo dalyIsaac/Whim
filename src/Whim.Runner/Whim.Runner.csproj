@@ -102,6 +102,7 @@
 		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
 		<ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
 		<ProjectReference Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
