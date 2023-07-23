@@ -51,6 +51,19 @@ public class WorkspaceManagerTests
 			throw new NotImplementedException();
 	}
 
+	private class TestProxyLayoutEngine : BaseProxyLayoutEngine
+	{
+		public TestProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
+			: base(innerLayoutEngine) { }
+
+		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
+		{
+			yield break;
+		}
+
+		protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) => throw new NotImplementedException();
+	}
+
 	private class Wrapper
 	{
 		public Mock<IContext> Context { get; } = new();
@@ -1494,6 +1507,35 @@ public class WorkspaceManagerTests
 		workspace.Verify(w => w.DoLayout(), Times.Once());
 		workspace2.Verify(w => w.DoLayout(), Times.Once());
 		workspace3.Verify(w => w.DoLayout(), Times.Exactly(2));
+	}
+	#endregion
+
+	#region AddProxyLayoutEngine
+	[Fact]
+	public void NoProxyLayoutEngines()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When
+		wrapper.WorkspaceManager.Initialize();
+
+		// Then
+		Assert.IsNotAssignableFrom<BaseProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
+	}
+
+	[Fact]
+	public void AddProxyLayoutEngine()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When
+		wrapper.WorkspaceManager.AddProxyLayoutEngine((engine) => new TestProxyLayoutEngine(engine));
+		wrapper.WorkspaceManager.Initialize();
+
+		// Then
+		Assert.IsType<TestProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
 	}
 	#endregion
 
