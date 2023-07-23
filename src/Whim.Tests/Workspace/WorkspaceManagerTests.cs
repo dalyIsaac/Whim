@@ -65,6 +65,63 @@ public class WorkspaceManagerTests
 		}
 	}
 
+	#region Add
+	[Fact]
+	public void Add_BeforeInitialization()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When a workspace is added before initialization
+		wrapper.WorkspaceManager.Add();
+
+		// Then the workspace is not added
+		Assert.Empty(wrapper.WorkspaceManager);
+	}
+
+	[Fact]
+	public void Add_BeforeInitialization_DefaultName()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When a workspace is added
+		wrapper.WorkspaceManager.Add();
+		wrapper.WorkspaceManager.Initialize();
+
+		// Then the workspace is created with default name.
+		Assert.Equal("Workspace 1", wrapper.WorkspaceManager.Single().Name);
+	}
+
+	[Fact]
+	public void Add_BeforeInitialization_DefaultLayoutEngine()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When a workspace is added
+		wrapper.WorkspaceManager.Add();
+		wrapper.WorkspaceManager.Initialize();
+
+		// Then the workspace is created with default layout engine.
+		Assert.IsType<ColumnLayoutEngine>(wrapper.WorkspaceManager.Single().ActiveLayoutEngine);
+	}
+
+	[Fact]
+	public void Add_ThrowsWhenNoLayoutEngines()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When the workspace manager is initialized after a workspace is added
+		wrapper.WorkspaceManager.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
+		wrapper.WorkspaceManager.Add();
+
+		// Then an exception is thrown
+		Assert.Throws<InvalidOperationException>(wrapper.WorkspaceManager.Initialize);
+	}
+	#endregion
+
 	#region Remove
 	[Fact]
 	public void Remove_Workspace_RequireAtLeastNWorkspace()
