@@ -1449,6 +1449,28 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void WorkspaceManagerTriggers_ActiveLayoutEngineChanged_DoesNotThrowWhenNoListener()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+
+		// Then changing the layout engine should trigger the event
+		try
+		{
+			workspace.NextLayoutEngine();
+		}
+		catch
+		{
+			Assert.True(false);
+		}
+	}
+
+	[Fact]
 	public void WorkspaceManagerTriggers_WorkspaceRenamed()
 	{
 		// Given
@@ -1465,6 +1487,28 @@ public class WorkspaceManagerTests
 			h => wrapper.WorkspaceManager.WorkspaceRenamed -= h,
 			() => workspace.Name = "new name"
 		);
+	}
+
+	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceRenamed_DoesNotThrowWhenNoListener()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+
+		// Then renaming the workspace should trigger the event
+		try
+		{
+			workspace.Name = "new name";
+		}
+		catch
+		{
+			Assert.True(false);
+		}
 	}
 
 	[Fact]
@@ -1494,6 +1538,35 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceLayoutStarted_DoesNotThrowWhenNoListener()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		wrapper.WorkspaceManager.Activate(workspace);
+
+		// Then starting the layout should trigger the event
+		try
+		{
+			workspace.DoLayout();
+		}
+		catch
+		{
+			Assert.True(false);
+		}
+	}
+
+	[Fact]
 	public void WorkspaceManagerTriggers_WorkspaceLayoutCompleted()
 	{
 		// Given
@@ -1517,6 +1590,35 @@ public class WorkspaceManagerTests
 			h => wrapper.WorkspaceManager.WorkspaceLayoutCompleted -= h,
 			workspace.DoLayout
 		);
+	}
+
+	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceLayoutCompleted_DoesNotThrowWhenNoListener()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
+
+		// When
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		wrapper.WorkspaceManager.Activate(workspace);
+
+		// Then completing the layout should trigger the event
+		try
+		{
+			workspace.DoLayout();
+		}
+		catch
+		{
+			Assert.True(false);
+		}
 	}
 	#endregion
 
