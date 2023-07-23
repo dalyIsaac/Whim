@@ -66,16 +66,6 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void Initialize_RequireAtLeastNWorkspace()
-	{
-		// Given
-		Wrapper wrapper = new();
-
-		// Then
-		Assert.Throws<InvalidOperationException>(wrapper.WorkspaceManager.Initialize);
-	}
-
-	[Fact]
 	public void Remove_Workspace_RequireAtLeastNWorkspace()
 	{
 		// Given the workspace manager has two workspaces and there are two monitors
@@ -1415,6 +1405,7 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
 
 		// When creating a workspace
 		wrapper.WorkspaceManager.Add("workspace");
@@ -1433,6 +1424,7 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
 
 		// When creating a workspace
 		wrapper.WorkspaceManager.Add("workspace");
@@ -1451,6 +1443,8 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
 		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
 		CreateLayoutEngines
 			.Setup(c => c())
@@ -1475,6 +1469,8 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
 		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
 		CreateLayoutEngines
 			.Setup(c => c())
