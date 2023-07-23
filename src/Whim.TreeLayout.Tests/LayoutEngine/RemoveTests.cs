@@ -11,7 +11,7 @@ public class RemoveTests
 		// Given
 		LayoutEngineWrapper wrapper = new();
 		Mock<IWindow> window = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
+		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
 
 		// When
 		ILayoutEngine result = engine.Remove(window.Object);
@@ -26,7 +26,11 @@ public class RemoveTests
 		// Given
 		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window.Object);
 
 		// When
 		ILayoutEngine result = engine.Remove(window.Object);
@@ -43,7 +47,11 @@ public class RemoveTests
 		// Given
 		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window.Object);
 
 		Mock<IWindow> wrongWindow = new();
 
@@ -63,7 +71,7 @@ public class RemoveTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -86,7 +94,7 @@ public class RemoveTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -108,7 +116,7 @@ public class RemoveTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
@@ -132,7 +140,7 @@ public class RemoveTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
@@ -156,7 +164,7 @@ public class RemoveTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);

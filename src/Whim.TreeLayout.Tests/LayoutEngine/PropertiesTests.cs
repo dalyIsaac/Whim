@@ -13,7 +13,8 @@ public class PropertiesTests
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object) { AddNodeDirection = direction };
+		TreeLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity) { AddNodeDirection = direction };
 
 		// When
 		Direction result = engine.AddNodeDirection;
@@ -32,7 +33,8 @@ public class PropertiesTests
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object) { AddNodeDirection = direction };
+		TreeLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity) { AddNodeDirection = direction };
 
 		// When
 		Direction result = engine.AddNodeDirection;
@@ -46,7 +48,8 @@ public class PropertiesTests
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object) { Name = "Test" };
+		TreeLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity) { Name = "Test" };
 
 		// When
 		string result = engine.Name;

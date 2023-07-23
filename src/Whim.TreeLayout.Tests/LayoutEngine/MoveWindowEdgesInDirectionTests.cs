@@ -14,7 +14,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(
@@ -38,7 +38,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -63,7 +63,11 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window1.Object);
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, window1.Object);
@@ -84,7 +88,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = -0.4 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);
@@ -108,7 +112,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.4 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);
@@ -322,7 +326,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);
@@ -527,7 +531,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 		{
 			AddNodeDirection = Direction.Down
 		}
@@ -986,7 +990,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(topLeft.Object)
 			.Add(topRight.Object)
 			.AddAtPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
@@ -1017,7 +1021,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);

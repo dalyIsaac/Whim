@@ -12,7 +12,7 @@ public class AddAtPointTests
 		// Given
 		LayoutEngineWrapper wrapper = new();
 		Mock<IWindow> window = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
+		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
@@ -30,7 +30,7 @@ public class AddAtPointTests
 		// Given
 		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(window.Object);
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object);
+		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
@@ -50,9 +50,11 @@ public class AddAtPointTests
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(phantomWindow.Object);
 
 		Mock<IWindow> window = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(
-			phantomWindow.Object
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(phantomWindow.Object);
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
@@ -72,7 +74,11 @@ public class AddAtPointTests
 		Mock<IWindow> window2 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window1.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
@@ -130,7 +136,11 @@ public class AddAtPointTests
 		Mock<IWindow> window2 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window1.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.7 };
 
@@ -188,7 +198,11 @@ public class AddAtPointTests
 		Mock<IWindow> window2 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window1.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.5 };
 
@@ -246,7 +260,11 @@ public class AddAtPointTests
 		Mock<IWindow> window2 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window1.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.3 };
 
@@ -305,7 +323,7 @@ public class AddAtPointTests
 		Mock<IWindow> window3 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -331,7 +349,7 @@ public class AddAtPointTests
 		Mock<IWindow> window3 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 		{
 			AddNodeDirection = Direction.Right
 		}
@@ -408,7 +426,7 @@ public class AddAtPointTests
 		Mock<IWindow> window3 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 		{
 			AddNodeDirection = Direction.Right
 		}

@@ -20,6 +20,7 @@ public class LayoutEngineTests
 
 	private class TestLayoutEngine : ILayoutEngine
 	{
+		public LayoutEngineIdentity Identity => throw new System.NotImplementedException();
 		public string Name => throw new System.NotImplementedException();
 
 		public int Count => throw new System.NotImplementedException();

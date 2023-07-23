@@ -1362,20 +1362,6 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void AddProxyLayoutEngine()
-	{
-		// Given
-		Wrapper wrapper = new();
-		Mock<CreateProxyLayoutEngine> proxyLayoutEngine = new();
-
-		// When a proxy layout engine is added
-		wrapper.WorkspaceManager.AddProxyLayoutEngine(proxyLayoutEngine.Object);
-
-		// Then the proxy layout engine is added to the list
-		Assert.Contains(proxyLayoutEngine.Object, wrapper.WorkspaceManager.ProxyLayoutEngines);
-	}
-
-	[Fact]
 	public void AddPhantomWindow()
 	{
 		// Given

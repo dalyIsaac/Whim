@@ -11,7 +11,7 @@ public class GetFirstWindowTests
 		// Given
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -27,7 +27,11 @@ public class GetFirstWindowTests
 		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window.Object);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -45,7 +49,11 @@ public class GetFirstWindowTests
 			.SetAsLastFocusedWindow(null)
 			.SetAsPhantom(window.Object);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object).Add(window.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).Add(window.Object);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -64,7 +72,7 @@ public class GetFirstWindowTests
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);

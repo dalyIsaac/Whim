@@ -10,6 +10,7 @@ internal class LayoutEngineWrapper
 	public Mock<IWorkspace> Workspace { get; } = new();
 	public Mock<IMonitorManager> MonitorManager { get; } = new();
 	public Mock<IMonitor> Monitor { get; } = new();
+	public LayoutEngineIdentity Identity { get; } = new();
 
 	public LayoutEngineWrapper()
 	{
