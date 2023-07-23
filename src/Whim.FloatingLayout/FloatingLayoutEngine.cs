@@ -18,11 +18,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public FloatingLayoutEngine(
-		IContext context,
-		IFloatingLayoutPlugin plugin,
-		ILayoutEngine innerLayoutEngine
-	)
+	public FloatingLayoutEngine(IContext context, IFloatingLayoutPlugin plugin, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_context = context;
@@ -51,18 +47,19 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 	/// <inheritdoc />
 	protected override ILayoutEngine Update(ILayoutEngine newInnerLayoutEngine) =>
-		newInnerLayoutEngine == InnerLayoutEngine
-			? this
-			: new FloatingLayoutEngine(this, newInnerLayoutEngine);
+		newInnerLayoutEngine == InnerLayoutEngine ? this : new FloatingLayoutEngine(this, newInnerLayoutEngine);
 
 	/// <inheritdoc />
 	public override ILayoutEngine Add(IWindow window)
 	{
 		// If the window is already tracked by this layout engine, or is a new floating window,
 		// update the location and return.
-		if (_floatingWindowLocations.ContainsKey(window) || _plugin.FloatingWindows.Contains(window))
+		if (
+			_floatingWindowLocations.TryGetValue(window, out ILocation<double>? location)
+			|| _plugin.FloatingWindows.Contains(window)
+		)
 		{
-			return UpdateWindowLocation(window, _floatingWindowLocations[window]);
+			return UpdateWindowLocation(window, location);
 		}
 
 		return base.Add(window);
@@ -86,7 +83,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return this;
 		}
 
-		return this;
+		return new FloatingLayoutEngine(this, _floatingWindowLocations.SetItem(window, newUnitSquareLocation));
 	}
 
 	/// <inheritdoc />
