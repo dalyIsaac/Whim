@@ -65,6 +65,7 @@ public class WorkspaceManagerTests
 		}
 	}
 
+	#region Remove
 	[Fact]
 	public void Remove_Workspace_RequireAtLeastNWorkspace()
 	{
@@ -152,7 +153,9 @@ public class WorkspaceManagerTests
 		);
 		Assert.Equal(workspace.Object, result.Arguments.Workspace);
 	}
+	#endregion
 
+	#region TryGet
 	[Fact]
 	public void TryGet_Null()
 	{
@@ -186,7 +189,9 @@ public class WorkspaceManagerTests
 		// When getting a workspace which does exist, then the workspace is returned
 		Assert.Equal(workspace.Object, wrapper.WorkspaceManager["workspace"]);
 	}
+	#endregion
 
+	#region GetEnumerator
 	[Fact]
 	public void GetEnumerator()
 	{
@@ -210,7 +215,9 @@ public class WorkspaceManagerTests
 		// When enumerating the workspaces, then the workspaces are returned
 		Assert.Equal(new[] { workspace.Object, workspace2.Object }, wrapper.WorkspaceManager);
 	}
+	#endregion
 
+	#region Activate
 	[Fact]
 	public void Activate_NoPreviousWorkspace()
 	{
@@ -434,7 +441,9 @@ public class WorkspaceManagerTests
 		workspaces[1].Verify(w => w.DoLayout(), Times.Never);
 		workspaces[1].Verify(w => w.FocusFirstWindow(), Times.Never);
 	}
+	#endregion
 
+	#region GetMonitorForWorkspace
 	[Fact]
 	public void GetMonitorForWorkspace_NoWorkspace()
 	{
@@ -469,6 +478,7 @@ public class WorkspaceManagerTests
 		// Then the monitor is returned
 		Assert.Equal(wrapper.Monitors[0].Object, monitor);
 	}
+	#endregion
 
 	[Fact]
 	public void LayoutAllActiveWorkspaces()
@@ -493,6 +503,7 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.DoLayout(), Times.Once());
 	}
 
+	#region WindowAdded
 	[Fact]
 	public void WindowAdded_NoRouter()
 	{
@@ -599,7 +610,9 @@ public class WorkspaceManagerTests
 		workspace.Verify(w => w.AddWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
 	}
+	#endregion
 
+	#region WindowRemoved
 	[Fact]
 	public void WindowRemoved_NotFound()
 	{
@@ -648,7 +661,9 @@ public class WorkspaceManagerTests
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 	}
+	#endregion
 
+	#region MoveWindowToWorkspace
 	[Fact]
 	public void MoveWindowToWorkspace_NoWindow()
 	{
@@ -789,7 +804,9 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 		window.Verify(w => w.Hide(), Times.Once());
 	}
+	#endregion
 
+	#region MoveWindowToMonitor
 	[Fact]
 	public void MoveWindowToMonitor_NoWindow()
 	{
@@ -913,6 +930,7 @@ public class WorkspaceManagerTests
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 	}
+	#endregion
 
 	[Fact]
 	public void MoveWindowToPreviousMonitor_Success()
@@ -970,6 +988,7 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 	}
 
+	#region MoveWindowToPoint
 	[Fact]
 	public void MoveWindowToPoint_TargetWorkspaceNotFound()
 	{
@@ -1118,7 +1137,9 @@ public class WorkspaceManagerTests
 
 		window.Verify(w => w.Focus(), Times.Once());
 	}
+	#endregion
 
+	#region WindowFocused
 	[Fact]
 	public void WindowFocused()
 	{
@@ -1166,7 +1187,9 @@ public class WorkspaceManagerTests
 		// Then the first workspace is activated
 		workspaces[0].Verify(w => w.DoLayout(), Times.Once());
 	}
+	#endregion
 
+	#region WindowMinimizeStart
 	[Fact]
 	public void WindowMinimizeStart_CouldNotFindWindow()
 	{
@@ -1205,7 +1228,9 @@ public class WorkspaceManagerTests
 		// Then the workspace is notified
 		internalWorkspace.Verify(w => w.WindowMinimizeStart(window.Object), Times.Once());
 	}
+	#endregion
 
+	#region WindowMinimizeEnd
 	[Fact]
 	public void WindowMinimizeEnd()
 	{
@@ -1251,7 +1276,9 @@ public class WorkspaceManagerTests
 		// Then the workspace is not notified
 		internalWorkspace.Verify(w => w.WindowMinimizeEnd(window.Object), Times.Never());
 	}
+	#endregion
 
+	#region MonitorManager_MonitorsChanged
 	[Fact]
 	public void MonitorManager_MonitorsChanged_Removed()
 	{
@@ -1350,6 +1377,7 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.DoLayout(), Times.Once());
 		workspace3.Verify(w => w.DoLayout(), Times.Exactly(2));
 	}
+	#endregion
 
 	[Fact]
 	public void AddPhantomWindow()
@@ -1400,6 +1428,7 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.Dispose(), Times.Once());
 	}
 
+	#region WorkspaceManagerTriggers
 	[Fact]
 	public void WorkspaceManagerTriggers_ActiveLayoutEngineChanged()
 	{
@@ -1489,7 +1518,9 @@ public class WorkspaceManagerTests
 			workspace.DoLayout
 		);
 	}
+	#endregion
 
+	#region ActiveWorkspace
 	[Fact]
 	public void ActiveWorkspace_CannotFindMonitor()
 	{
@@ -1522,7 +1553,9 @@ public class WorkspaceManagerTests
 		// Then the workspace is returned
 		Assert.Equal(workspaces[1].Object, activeWorkspace);
 	}
+	#endregion
 
+	#region MoveWindowEdgesInDirection
 	[Fact]
 	public void MoveWindowEdgesInDirection_NoWindow()
 	{
@@ -1634,4 +1667,5 @@ public class WorkspaceManagerTests
 			Times.Never()
 		);
 	}
+	#endregion
 }
