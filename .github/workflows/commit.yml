@@ -64,9 +64,9 @@ jobs:
 
       - name: Test
         run: |
-          dotnet test Whim.sln -p:CollectCoverage=true -p:CoverletOutputFormat=opencover
+          dotnet test Whim.sln --collect:"XPlat Code Coverage;Format=opencover"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
         with:
-          files: src\\**\\TestResults\\**\\coverage.opencover.xml
+          files: src/**/TestResults/**/coverage.opencover.xml
