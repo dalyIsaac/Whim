@@ -163,7 +163,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 		viewModel.ToggleDirection();
 
 		// Then
-		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, It.IsAny<Direction>()), Times.Never);
+		mocks.Plugin.Verify(x => x.SetAddWindowDirection(mocks.Monitor.Object, Direction.Right), Times.Once);
 	}
 
 	[Fact]

@@ -351,7 +351,7 @@ public class AddTests
 			.Add(window1.Object)
 			.Add(window2.Object);
 
-		wrapper.Plugin.Setup(p => p.GetAddWindowDirection((TreeLayoutEngine)engine)).Returns(Direction.Down);
+		wrapper.SetAddWindowDirection(Direction.Down);
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 		Mock<IMonitor> monitor = new();
@@ -378,7 +378,7 @@ public class AddTests
 							X = 0,
 							Y = 0,
 							Width = 50,
-							Height = 50
+							Height = 100
 						},
 						WindowSize = WindowSize.Normal
 					},
@@ -399,9 +399,9 @@ public class AddTests
 						Window = window3.Object,
 						Location = new Location<int>()
 						{
-							X = 0,
+							X = 50,
 							Y = 50,
-							Width = 100,
+							Width = 50,
 							Height = 50
 						},
 						WindowSize = WindowSize.Normal

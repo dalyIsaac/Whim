@@ -529,7 +529,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 
-		LayoutEngineWrapper wrapper = new();
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAddWindowDirection(Direction.Down);
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.Add(window1.Object)

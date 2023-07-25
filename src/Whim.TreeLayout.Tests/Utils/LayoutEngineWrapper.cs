@@ -23,6 +23,8 @@ internal class LayoutEngineWrapper
 
 		Context.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 		Context.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
+
+		SetAddWindowDirection(Direction.Right);
 	}
 
 	public LayoutEngineWrapper SetAsPhantom(params IWindow[] windows)
@@ -34,6 +36,12 @@ internal class LayoutEngineWrapper
 	public LayoutEngineWrapper SetAsLastFocusedWindow(IWindow? window)
 	{
 		Workspace.Setup(x => x.LastFocusedWindow).Returns(window);
+		return this;
+	}
+
+	public LayoutEngineWrapper SetAddWindowDirection(Direction direction)
+	{
+		Plugin.Setup(x => x.GetAddWindowDirection(It.IsAny<TreeLayoutEngine>())).Returns(direction);
 		return this;
 	}
 }
