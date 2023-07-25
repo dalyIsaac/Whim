@@ -350,9 +350,6 @@ public class AddAtPointTests
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-		{
-			AddNodeDirection = Direction.Right
-		}
 			.Add(window1.Object)
 			.Add(window2.Object);
 
@@ -427,9 +424,6 @@ public class AddAtPointTests
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-		{
-			AddNodeDirection = Direction.Right
-		}
 			.Add(window1.Object)
 			.Add(window2.Object);
 

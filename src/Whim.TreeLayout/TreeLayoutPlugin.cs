@@ -60,10 +60,16 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 			return null;
 		}
 
-		if (!_addNodeDirections.TryGetValue(treeLayoutEngine.Identity, out Direction direction))
+		return GetAddWindowDirection(treeLayoutEngine);
+	}
+
+	/// <inheritdoc />
+	public Direction GetAddWindowDirection(TreeLayoutEngine engine)
+	{
+		if (!_addNodeDirections.TryGetValue(engine.Identity, out Direction direction))
 		{
 			// Lazy initialization
-			_addNodeDirections[treeLayoutEngine.Identity] = direction = DefaultAddNodeDirection;
+			_addNodeDirections[engine.Identity] = direction = DefaultAddNodeDirection;
 		}
 
 		return direction;
@@ -89,18 +95,24 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 			return;
 		}
 
-		Direction previousDirection = _addNodeDirections.TryGetValue(treeLayoutEngine.Identity, out Direction previous)
+		SetAddWindowDirection(treeLayoutEngine, direction);
+	}
+
+	/// <inheritdoc />
+	public void SetAddWindowDirection(TreeLayoutEngine engine, Direction direction)
+	{
+		Direction previousDirection = _addNodeDirections.TryGetValue(engine.Identity, out Direction previous)
 			? previous
 			: DefaultAddNodeDirection;
 
-		_addNodeDirections[treeLayoutEngine.Identity] = direction;
+		_addNodeDirections[engine.Identity] = direction;
 		AddWindowDirectionChanged?.Invoke(
 			this,
 			new AddWindowDirectionChangedEventArgs()
 			{
 				CurrentDirection = direction,
 				PreviousDirection = previousDirection,
-				TreeLayoutEngine = treeLayoutEngine
+				TreeLayoutEngine = engine
 			}
 		);
 	}

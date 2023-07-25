@@ -54,7 +54,7 @@ public class TreeLayoutPluginTests
 
 	#region GetAddWindowDirection
 	[Fact]
-	public void GetAddWindowDirection_NoLayoutEngine()
+	public void GetAddWindowDirection_Monitor_NoLayoutEngine()
 	{
 		// Given
 		Mock<IMonitor> monitor = new();
@@ -69,7 +69,7 @@ public class TreeLayoutPluginTests
 	}
 
 	[Fact]
-	public void GetAddWindowDirection_IsNotTreeLayoutEngine()
+	public void GetAddWindowDirection_Monitor_IsNotTreeLayoutEngine()
 	{
 		// Given
 		Mock<IMonitor> monitor = new();
@@ -89,7 +89,7 @@ public class TreeLayoutPluginTests
 	}
 
 	[Fact]
-	public void GetAddWindowDirection_LayoutEngineIsNew()
+	public void GetAddWindowDirection_Monitor_LazyInit()
 	{
 		// Given
 		Mock<IMonitor> monitor = new();
@@ -111,7 +111,7 @@ public class TreeLayoutPluginTests
 	}
 
 	[Fact]
-	public void GetAddWindowDirection_LayoutEngineIsNotNew()
+	public void GetAddWindowDirection_Monitor_AlreadyInit()
 	{
 		// Given
 		Mock<IMonitor> monitor = new();
@@ -129,6 +129,38 @@ public class TreeLayoutPluginTests
 
 		// When
 		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+
+		// Then
+		Assert.Equal(Direction.Left, direction);
+	}
+
+	[Fact]
+	public void GetAddWindowDirection_Engine_LazyInit()
+	{
+		// Given
+		Mock<IContext> context = new();
+		TreeLayoutPlugin plugin = new(context.Object);
+		TreeLayoutEngine engine = new(context.Object, plugin, new LayoutEngineIdentity());
+
+		// When
+		Direction? direction = plugin.GetAddWindowDirection(engine);
+
+		// Then
+		Assert.Equal(Direction.Right, direction);
+	}
+
+	[Fact]
+	public void GetAddWindowDirection_Engine_AlreadyInit()
+	{
+		// Given
+		Mock<IContext> context = new();
+		TreeLayoutPlugin plugin = new(context.Object);
+		TreeLayoutEngine engine = new(context.Object, plugin, new LayoutEngineIdentity());
+
+		plugin.SetAddWindowDirection(engine, Direction.Left);
+
+		// When
+		Direction? direction = plugin.GetAddWindowDirection(engine);
 
 		// Then
 		Assert.Equal(Direction.Left, direction);

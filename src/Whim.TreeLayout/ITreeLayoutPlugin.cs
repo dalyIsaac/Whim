@@ -19,7 +19,7 @@ public interface ITreeLayoutPlugin : IPlugin
 	/// Event raised when the direction in which to add new windows to the tree layout for a
 	/// monitor changes.
 	/// </summary>
-	public event EventHandler<AddWindowDirectionChangedEventArgs>? AddWindowDirectionChanged;
+	event EventHandler<AddWindowDirectionChangedEventArgs>? AddWindowDirectionChanged;
 
 	/// <summary>
 	/// Set the direction in which to add new windows to the tree layout for the given
@@ -30,7 +30,15 @@ public interface ITreeLayoutPlugin : IPlugin
 	/// </summary>
 	/// <param name="monitor"></param>
 	/// <param name="direction"></param>
-	public void SetAddWindowDirection(IMonitor monitor, Direction direction);
+	void SetAddWindowDirection(IMonitor monitor, Direction direction);
+
+	/// <summary>
+	/// Set the direction in which to add new windows to the tree layout for the given
+	/// layout engine <paramref name="engine"/>.
+	/// </summary>
+	/// <param name="engine"></param>
+	/// <param name="direction"></param>
+	void SetAddWindowDirection(TreeLayoutEngine engine, Direction direction);
 
 	/// <summary>
 	/// Get the current direction for adding new windows to the tree layout for the given
@@ -41,11 +49,19 @@ public interface ITreeLayoutPlugin : IPlugin
 	/// </summary>
 	/// <param name="monitor"></param>
 	/// <returns></returns>
-	public Direction? GetAddWindowDirection(IMonitor monitor);
+	Direction? GetAddWindowDirection(IMonitor monitor);
+
+	/// <summary>
+	/// Get the current direction for adding new windows to the tree layout for the given
+	/// layout engine <paramref name="engine"/>.
+	/// </summary>
+	/// <param name="engine"></param>
+	/// <returns></returns>
+	Direction GetAddWindowDirection(TreeLayoutEngine engine);
 
 	/// <summary>
 	/// Split the focused window in two, with the space in the direction of the tree layout filled
 	/// by a phantom window.
 	/// </summary>
-	public void SplitFocusedWindow();
+	void SplitFocusedWindow();
 }

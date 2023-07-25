@@ -532,9 +532,6 @@ public class MoveSingleWindowEdgeInDirectionTests
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-		{
-			AddNodeDirection = Direction.Down
-		}
 			.Add(window1.Object)
 			.Add(window2.Object)
 			.Add(window3.Object);

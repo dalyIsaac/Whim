@@ -39,28 +39,10 @@ public class TreeLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public LayoutEngineIdentity Identity { get; }
 
-	private readonly Direction _addNodeDirection = Direction.Right;
-
-	/// <summary>
-	/// The direction to add new windows to the tree, when there isn't an explicit direction.
-	/// This must be one of the cardinal directions.
-	/// </summary>
-	public Direction AddNodeDirection
-	{
-		get => _addNodeDirection;
-		init =>
-			_addNodeDirection = value switch
-			{
-				Direction.Left or Direction.Right or Direction.Up or Direction.Down => value,
-				_ => Direction.Right,
-			};
-	}
-
 	private TreeLayoutEngine(TreeLayoutEngine engine, INode root, WindowPathDict windows)
 		: this(engine._context, engine._plugin, engine.Identity)
 	{
 		Name = engine.Name;
-		AddNodeDirection = engine.AddNodeDirection;
 		_root = root;
 		_windows = windows;
 	}
@@ -162,42 +144,59 @@ public class TreeLayoutEngine : ILayoutEngine
 
 			case WindowNode rootNode:
 				Logger.Debug($"Root is window node, replacing with split node");
-				ISplitNode newRoot = new SplitNode(rootNode, newLeafNode, AddNodeDirection);
+				ISplitNode newRoot = new SplitNode(rootNode, newLeafNode, _plugin.GetAddWindowDirection(this));
 				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(rootNode.Window, window));
 
 			case ISplitNode rootNode:
-				Logger.Debug($"Root is split node, adding new leaf node");
-
-				LeafNode? focusedNode;
-				IReadOnlyList<ISplitNode> ancestors;
-				ImmutableArray<int> path;
-
-				// Try get the focused window, and use its parent. Otherwise, use the right-most leaf.
-				if (
-					_context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow is IWindow focusedWindow
-					&& _windows.TryGetValue(focusedWindow, out ImmutableArray<int> focusedWindowPath)
-					&& _root.GetNodeAtPath(focusedWindowPath) is NodeState nodeState
-					&& nodeState.Node is LeafNode focusedLeafNode
-				)
-				{
-					focusedNode = focusedLeafNode;
-					ancestors = nodeState.Ancestors;
-					path = focusedWindowPath;
-				}
-				else
-				{
-					(focusedNode, ancestors, path) = rootNode.GetRightMostLeaf();
-				}
-
-				// We're assuming that there is a parent node - otherwise we wouldn't have reached this point.
-				ISplitNode parentNode = ancestors[^1];
-				ISplitNode newParent = parentNode.Add(focusedNode, newLeafNode, AddNodeDirection.InsertAfter());
-				return CreateNewEngine(ancestors, path.RemoveAt(path.Length - 1), _windows, newParent);
+				return AddToSplitNode(newLeafNode, rootNode);
 
 			default:
 				Logger.Debug($"Root is null, creating new window node");
 				return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
 		}
+	}
+
+	private ILayoutEngine AddToSplitNode(LeafNode newLeafNode, ISplitNode rootNode)
+	{
+		Logger.Debug($"Root is split node, adding new leaf node");
+
+		LeafNode? focusedNode;
+		IReadOnlyList<ISplitNode> ancestors;
+		ImmutableArray<int> path;
+
+		// Try get the focused window, and use its parent. Otherwise, use the right-most leaf.
+		if (
+			_context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow is IWindow focusedWindow
+			&& _windows.TryGetValue(focusedWindow, out ImmutableArray<int> focusedWindowPath)
+			&& rootNode.GetNodeAtPath(focusedWindowPath) is NodeState nodeState
+			&& nodeState.Node is LeafNode focusedLeafNode
+		)
+		{
+			focusedNode = focusedLeafNode;
+			ancestors = nodeState.Ancestors;
+			path = focusedWindowPath;
+		}
+		else
+		{
+			(focusedNode, ancestors, path) = rootNode.GetRightMostLeaf();
+		}
+
+		// We're assuming that there is a parent node - otherwise we wouldn't have reached this point.
+		ISplitNode parentNode = ancestors[^1];
+		ISplitNode newParent;
+
+		Direction addNodeDirection = _plugin.GetAddWindowDirection(this);
+		if (parentNode.IsHorizontal == addNodeDirection.IsHorizontal())
+		{
+			newParent = parentNode.Add(focusedNode, newLeafNode, addNodeDirection.InsertAfter());
+		}
+		else
+		{
+			SplitNode newChild = new(focusedNode, newLeafNode, addNodeDirection);
+			newParent = parentNode.Replace(path[^1], newChild);
+		}
+
+		return CreateNewEngine(ancestors, path.RemoveAt(path.Length - 1), _windows, newParent);
 	}
 
 	/// <inheritdoc />

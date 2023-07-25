@@ -336,4 +336,77 @@ public class AddTests
 				}
 			);
 	}
+
+	[Fact]
+	public void AddWindow_RootIsSplitNode_AddInDifferentDirection()
+	{
+		// Given
+		Mock<IWindow> window1 = new();
+		Mock<IWindow> window2 = new();
+		Mock<IWindow> window3 = new();
+
+		LayoutEngineWrapper wrapper = new();
+
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+			.Add(window1.Object)
+			.Add(window2.Object);
+
+		wrapper.Plugin.Setup(p => p.GetAddWindowDirection((TreeLayoutEngine)engine)).Returns(Direction.Down);
+
+		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		Mock<IMonitor> monitor = new();
+
+		// When
+		ILayoutEngine result = engine.Add(window3.Object);
+		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+
+		// Then
+		Assert.NotSame(engine, result);
+		Assert.True(result.Contains(window3.Object));
+		Assert.Equal(3, result.Count);
+
+		windowStates
+			.Should()
+			.BeEquivalentTo(
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Window = window1.Object,
+						Location = new Location<int>()
+						{
+							X = 0,
+							Y = 0,
+							Width = 50,
+							Height = 50
+						},
+						WindowSize = WindowSize.Normal
+					},
+					new WindowState()
+					{
+						Window = window2.Object,
+						Location = new Location<int>()
+						{
+							X = 50,
+							Y = 0,
+							Width = 50,
+							Height = 50
+						},
+						WindowSize = WindowSize.Normal
+					},
+					new WindowState()
+					{
+						Window = window3.Object,
+						Location = new Location<int>()
+						{
+							X = 0,
+							Y = 50,
+							Width = 100,
+							Height = 50
+						},
+						WindowSize = WindowSize.Normal
+					}
+				}
+			);
+	}
 }
