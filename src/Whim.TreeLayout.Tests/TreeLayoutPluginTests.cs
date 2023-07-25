@@ -58,8 +58,7 @@ public class TreeLayoutPluginTests
 	{
 		// Given
 		Mock<IMonitor> monitor = new();
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new Wrapper().Setup_GetWorkspaceForMonitor(monitor, workspace.Object);
+		Wrapper wrapper = new();
 		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
 
 		// When
@@ -142,8 +141,7 @@ public class TreeLayoutPluginTests
 	{
 		// Given
 		Mock<IMonitor> monitor = new();
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new Wrapper().Setup_GetWorkspaceForMonitor(monitor, workspace.Object);
+		Wrapper wrapper = new();
 		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
 
 		// When
