@@ -422,13 +422,13 @@ internal class WindowManager : IWindowManager
 		if (leftEdgeDelta != 0)
 		{
 			movedEdge |= Direction.Left;
-			movedEdgeDeltaX = leftEdgeDelta;
+			movedEdgeDeltaX = -leftEdgeDelta;
 			movedEdgeCountX++;
 		}
 		if (topEdgeDelta != 0)
 		{
 			movedEdge |= Direction.Up;
-			movedEdgeDeltaY = topEdgeDelta;
+			movedEdgeDeltaY = -topEdgeDelta;
 			movedEdgeCountY++;
 		}
 		if (rightEdgeDelta != 0)
