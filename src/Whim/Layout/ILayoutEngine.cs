@@ -115,7 +115,6 @@ public interface ILayoutEngine
 	/// </summary>
 	void HidePhantomWindows();
 
-	// TODO: Remove
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type
 	/// <typeparamref name="T"/>.
@@ -125,7 +124,20 @@ public interface ILayoutEngine
 	/// The layout engine with type <typeparamref name="T"/>, or null if none is found.
 	/// </returns>
 	T? GetLayoutEngine<T>()
-		where T : ILayoutEngine => this is T layoutEngine ? layoutEngine : default;
+		where T : ILayoutEngine
+	{
+		if (this is T layoutEngine)
+		{
+			return layoutEngine;
+		}
+
+		if (this is BaseProxyLayoutEngine proxy)
+		{
+			return proxy.GetLayoutEngine<T>();
+		}
+
+		return default;
+	}
 
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is
@@ -135,5 +147,18 @@ public interface ILayoutEngine
 	/// <returns>
 	/// <cref name="true"/> if the layout engine is found, <cref name="false"/> otherwise.
 	/// </returns>
-	bool ContainsEqual(ILayoutEngine layoutEngine) => this == layoutEngine;
+	bool ContainsEqual(ILayoutEngine layoutEngine)
+	{
+		if (this == layoutEngine)
+		{
+			return true;
+		}
+
+		if (this is BaseProxyLayoutEngine proxy)
+		{
+			return proxy.ContainsEqual(layoutEngine);
+		}
+
+		return false;
+	}
 }

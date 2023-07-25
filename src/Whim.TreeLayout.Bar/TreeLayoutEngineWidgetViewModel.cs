@@ -102,7 +102,8 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 				break;
 			default:
 				Logger.Error($"We don't support adding windows in {direction}");
-				return;
+				nextDirection = Direction.Right;
+				break;
 		}
 
 		_plugin.SetAddWindowDirection(_monitor, nextDirection);
