@@ -200,10 +200,22 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
+	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
+		TreeLayoutEngine treeLayoutEngine = this;
+
+		if (_windows.ContainsKey(window))
+		{
+			treeLayoutEngine = (TreeLayoutEngine)treeLayoutEngine.Remove(window);
+		}
+
+		return treeLayoutEngine.AddWindowAtPoint(window, point);
+	}
+
+	private ILayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point)
+	{
 		// Create the new leaf node.
 		LeafNode newLeafNode = _plugin.PhantomWindows.Contains(window)
 			? new PhantomNode(window)
