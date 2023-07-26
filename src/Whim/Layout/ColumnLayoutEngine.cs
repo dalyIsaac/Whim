@@ -186,29 +186,30 @@ public class ColumnLayoutEngine : ILayoutEngine
 	public ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) => this;
 
 	/// <inheritdoc/>
-	public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
+	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");
 
+		ImmutableList<IWindow> newStack = _stack.Remove(window);
 		// Calculate the index of the window in the stack.
-		int idx = (int)Math.Round(point.X * _stack.Count, MidpointRounding.AwayFromZero);
+		int idx = (int)Math.Round(point.X * newStack.Count, MidpointRounding.AwayFromZero);
 
 		// Bound idx.
 		if (idx < 0)
 		{
 			idx = 0;
 		}
-		else if (idx > _stack.Count)
+		else if (idx > newStack.Count)
 		{
-			idx = _stack.Count;
+			idx = newStack.Count;
 		}
 
 		if (!LeftToRight)
 		{
-			idx = _stack.Count - idx;
+			idx = newStack.Count - idx;
 		}
 
-		return new ColumnLayoutEngine(this, _stack.Insert(idx, window));
+		return new ColumnLayoutEngine(this, newStack.Insert(idx, window));
 	}
 
 	/// <inheritdoc/>

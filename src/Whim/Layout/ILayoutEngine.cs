@@ -43,7 +43,7 @@ public interface ILayoutEngine
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
 	/// <returns>The new <see cref="ILayoutEngine"/> after the move.</returns>
-	ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point);
+	ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point);
 
 	/// <summary>
 	/// Removes a <paramref name="window"/> from the layout engine.
