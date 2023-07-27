@@ -376,7 +376,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (_normalWindows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
-			ActiveLayoutEngine = ActiveLayoutEngine.Remove(window).AddAtPoint(window, point);
+			ActiveLayoutEngine = ActiveLayoutEngine.MoveWindowToPoint(window, point);
 		}
 		else
 		{
@@ -391,7 +391,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				_layoutEngines[idx] = _layoutEngines[idx].AddAtPoint(window, point);
+				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
 			}
 		}
 

@@ -61,8 +61,8 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	public virtual ILayoutEngine Add(IWindow window) => Update(InnerLayoutEngine.Add(window));
 
 	/// <inheritdoc/>
-	public virtual ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
-		Update(InnerLayoutEngine.AddAtPoint(window, point));
+	public virtual ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) =>
+		Update(InnerLayoutEngine.MoveWindowToPoint(window, point));
 
 	/// <inheritdoc/>
 	public virtual ILayoutEngine Remove(IWindow window) => Update(InnerLayoutEngine.Remove(window));
