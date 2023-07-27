@@ -20,7 +20,7 @@ public class BarLayoutEngineTests
 			};
 
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		innerLayoutEngine.Setup(ile => ile.Remove(It.IsAny<IWindow>())).Returns(innerLayoutEngine.Object);
+		innerLayoutEngine.Setup(ile => ile.RemoveWindow(It.IsAny<IWindow>())).Returns(innerLayoutEngine.Object);
 
 		Mock<IMonitor> monitor = new();
 		monitor.SetupGet(m => m.ScaleFactor).Returns(100);
@@ -30,7 +30,7 @@ public class BarLayoutEngineTests
 		BarLayoutEngine engine = new(config, innerLayoutEngine.Object);
 
 		// When
-		ILayoutEngine newEngine = engine.Remove(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = engine.RemoveWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.Same(engine, newEngine);
@@ -61,7 +61,7 @@ public class BarLayoutEngineTests
 		BarLayoutEngine engine = new(config, innerLayoutEngine.Object);
 
 		// When
-		ILayoutEngine newEngine = engine.Add(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = engine.AddWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(engine, newEngine);

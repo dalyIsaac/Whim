@@ -98,7 +98,7 @@ public class GapsLayoutEngineTests
 
 		for (int i = 0; i < windowsCount; i++)
 		{
-			innerLayoutEngine = innerLayoutEngine.Add(new Mock<IWindow>().Object);
+			innerLayoutEngine = innerLayoutEngine.AddWindow(new Mock<IWindow>().Object);
 		}
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
@@ -131,7 +131,7 @@ public class GapsLayoutEngineTests
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = gapsLayoutEngine.Remove(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = gapsLayoutEngine.RemoveWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.Same(newEngine, gapsLayoutEngine);
@@ -147,7 +147,7 @@ public class GapsLayoutEngineTests
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = gapsLayoutEngine.Add(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = gapsLayoutEngine.AddWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(newEngine, gapsLayoutEngine);

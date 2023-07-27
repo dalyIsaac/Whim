@@ -19,7 +19,7 @@ public class SwapWindowInDirectionTests
 
 		// Then
 		Assert.Same(engine, result);
-		Assert.False(result.Contains(window.Object));
+		Assert.False(result.ContainsWindow(window.Object));
 		Assert.Equal(0, result.Count);
 	}
 
@@ -31,8 +31,8 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
@@ -83,8 +83,8 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
@@ -136,8 +136,8 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object)
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object)
 			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		Mock<IMonitor> monitor = new();
@@ -199,8 +199,8 @@ public class SwapWindowInDirectionTests
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(topLeft.Object)
-			.Add(topRight.Object)
+			.AddWindow(topLeft.Object)
+			.AddWindow(topRight.Object)
 			.AddAtPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
 			.AddAtPoint(bottomRight.Object, new Point<double>() { X = 0.75, Y = 0.9 });
 

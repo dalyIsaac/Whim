@@ -50,7 +50,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		newInnerLayoutEngine == InnerLayoutEngine ? this : new FloatingLayoutEngine(this, newInnerLayoutEngine);
 
 	/// <inheritdoc />
-	public override ILayoutEngine Add(IWindow window)
+	public override ILayoutEngine AddWindow(IWindow window)
 	{
 		// If the window is already tracked by this layout engine, or is a new floating window,
 		// update the location and return.
@@ -62,7 +62,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return UpdateWindowLocation(window, location);
 		}
 
-		return base.Add(window);
+		return base.AddWindow(window);
 	}
 
 	private FloatingLayoutEngine UpdateWindowLocation(IWindow window, ILocation<double>? oldLocation)
@@ -87,7 +87,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override ILayoutEngine Remove(IWindow window)
+	public override ILayoutEngine RemoveWindow(IWindow window)
 	{
 		// If tracked by this layout engine, remove it.
 		// Otherwise, pass to the inner layout engine.
@@ -97,11 +97,11 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return new FloatingLayoutEngine(this, _floatingWindowLocations.Remove(window));
 		}
 
-		return base.Remove(window);
+		return base.RemoveWindow(window);
 	}
 
 	/// <inheritdoc />
-	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) => Add(window);
+	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) => AddWindow(window);
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)

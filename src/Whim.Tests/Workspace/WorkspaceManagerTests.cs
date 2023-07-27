@@ -27,11 +27,11 @@ public class WorkspaceManagerTests
 
 		public LayoutEngineIdentity Identity => throw new NotImplementedException();
 
-		public ILayoutEngine Add(IWindow window) => throw new NotImplementedException();
+		public ILayoutEngine AddWindow(IWindow window) => throw new NotImplementedException();
 
 		public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) => throw new NotImplementedException();
 
-		public bool Contains(IWindow window) => throw new NotImplementedException();
+		public bool ContainsWindow(IWindow window) => throw new NotImplementedException();
 
 		public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
 			throw new NotImplementedException();
@@ -45,7 +45,7 @@ public class WorkspaceManagerTests
 		public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
 			throw new NotImplementedException();
 
-		public ILayoutEngine Remove(IWindow window) => throw new NotImplementedException();
+		public ILayoutEngine RemoveWindow(IWindow window) => throw new NotImplementedException();
 
 		public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
 			throw new NotImplementedException();

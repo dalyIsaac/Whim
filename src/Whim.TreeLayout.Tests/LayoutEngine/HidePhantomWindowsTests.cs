@@ -19,10 +19,10 @@ public class HidePhantomWindowsTests
 			.SetAsPhantom(phantomWindow1.Object, phantomWindow2.Object);
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object)
-			.Add(phantomWindow1.Object)
-			.Add(phantomWindow2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object)
+			.AddWindow(phantomWindow1.Object)
+			.AddWindow(phantomWindow2.Object);
 
 		// When
 		engine.HidePhantomWindows();

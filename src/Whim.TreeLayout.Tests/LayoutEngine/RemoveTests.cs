@@ -14,7 +14,7 @@ public class RemoveTests
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
 
 		// When
-		ILayoutEngine result = engine.Remove(window.Object);
+		ILayoutEngine result = engine.RemoveWindow(window.Object);
 
 		// Then
 		Assert.Same(engine, result);
@@ -30,14 +30,14 @@ public class RemoveTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window.Object);
+		).AddWindow(window.Object);
 
 		// When
-		ILayoutEngine result = engine.Remove(window.Object);
+		ILayoutEngine result = engine.RemoveWindow(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.False(result.Contains(window.Object));
+		Assert.False(result.ContainsWindow(window.Object));
 		Assert.Equal(0, result.Count);
 	}
 
@@ -51,16 +51,16 @@ public class RemoveTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window.Object);
+		).AddWindow(window.Object);
 
 		Mock<IWindow> wrongWindow = new();
 
 		// When
-		ILayoutEngine result = engine.Remove(wrongWindow.Object);
+		ILayoutEngine result = engine.RemoveWindow(wrongWindow.Object);
 
 		// Then
 		Assert.Same(engine, result);
-		Assert.True(result.Contains(window.Object));
+		Assert.True(result.ContainsWindow(window.Object));
 		Assert.Equal(1, result.Count);
 	}
 
@@ -72,18 +72,18 @@ public class RemoveTests
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		Mock<IWindow> wrongWindow = new();
 
 		// When
-		ILayoutEngine result = engine.Remove(wrongWindow.Object);
+		ILayoutEngine result = engine.RemoveWindow(wrongWindow.Object);
 
 		// Then
 		Assert.Same(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
 		Assert.Equal(2, result.Count);
 	}
 
@@ -95,16 +95,16 @@ public class RemoveTests
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		// When
-		ILayoutEngine result = engine.Remove(window1.Object);
+		ILayoutEngine result = engine.RemoveWindow(window1.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.False(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
+		Assert.False(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
 		Assert.Equal(1, result.Count);
 	}
 
@@ -117,18 +117,18 @@ public class RemoveTests
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object)
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object)
 			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		// When
-		ILayoutEngine result = engine.Remove(window3.Object);
+		ILayoutEngine result = engine.RemoveWindow(window3.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
-		Assert.False(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.False(result.ContainsWindow(window3.Object));
 		Assert.Equal(2, result.Count);
 	}
 
@@ -141,18 +141,18 @@ public class RemoveTests
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object)
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object)
 			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		// When
-		ILayoutEngine result = engine.Remove(window1.Object);
+		ILayoutEngine result = engine.RemoveWindow(window1.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.False(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
-		Assert.True(result.Contains(window3.Object));
+		Assert.False(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window3.Object));
 		Assert.Equal(2, result.Count);
 	}
 
@@ -165,18 +165,18 @@ public class RemoveTests
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object)
-			.Add(window3.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object)
+			.AddWindow(window3.Object);
 
 		// When
-		ILayoutEngine result = engine.Remove(window2.Object);
+		ILayoutEngine result = engine.RemoveWindow(window2.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.False(result.Contains(window2.Object));
-		Assert.True(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.False(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window3.Object));
 		Assert.Equal(2, result.Count);
 	}
 }

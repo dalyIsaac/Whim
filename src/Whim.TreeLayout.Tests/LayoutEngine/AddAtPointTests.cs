@@ -20,7 +20,7 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window.Object));
+		Assert.True(result.ContainsWindow(window.Object));
 		Assert.Equal(1, result.Count);
 	}
 
@@ -38,7 +38,7 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window.Object));
+		Assert.True(result.ContainsWindow(window.Object));
 		Assert.Equal(1, result.Count);
 	}
 
@@ -54,7 +54,7 @@ public class AddAtPointTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(phantomWindow.Object);
+		).AddWindow(phantomWindow.Object);
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
@@ -62,7 +62,7 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window.Object));
+		Assert.True(result.ContainsWindow(window.Object));
 		Assert.Equal(1, result.Count);
 	}
 
@@ -78,7 +78,7 @@ public class AddAtPointTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window1.Object);
+		).AddWindow(window1.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
@@ -91,8 +91,8 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -140,7 +140,7 @@ public class AddAtPointTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window1.Object);
+		).AddWindow(window1.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.7 };
 
@@ -153,8 +153,8 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -202,7 +202,7 @@ public class AddAtPointTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window1.Object);
+		).AddWindow(window1.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.5 };
 
@@ -215,8 +215,8 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -264,7 +264,7 @@ public class AddAtPointTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window1.Object);
+		).AddWindow(window1.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.3 };
 
@@ -277,8 +277,8 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -324,8 +324,8 @@ public class AddAtPointTests
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		IPoint<double> point = new Point<double>() { X = 1.7, Y = 0.5 };
 
@@ -334,9 +334,9 @@ public class AddAtPointTests
 
 		// Then
 		Assert.Same(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
-		Assert.False(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.False(result.ContainsWindow(window3.Object));
 		Assert.Equal(2, result.Count);
 	}
 
@@ -350,8 +350,8 @@ public class AddAtPointTests
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
@@ -364,9 +364,9 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
-		Assert.True(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window3.Object));
 		Assert.Equal(3, result.Count);
 
 		windowStates
@@ -424,8 +424,8 @@ public class AddAtPointTests
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		IPoint<double> point = new Point<double>() { X = 0.75, Y = 0.8 };
 
@@ -438,9 +438,9 @@ public class AddAtPointTests
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
-		Assert.True(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window3.Object));
 		Assert.Equal(3, result.Count);
 
 		windowStates

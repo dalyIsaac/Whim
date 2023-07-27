@@ -34,7 +34,7 @@ public interface ILayoutEngine
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns>The new <see cref="ILayoutEngine"/> after the add.</returns>
-	ILayoutEngine Add(IWindow window);
+	ILayoutEngine AddWindow(IWindow window);
 
 	/// <summary>
 	/// Move the <paramref name="window"/> to the <paramref name="point"/>.
@@ -50,7 +50,7 @@ public interface ILayoutEngine
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns>The new <see cref="ILayoutEngine"/> after the remove.</returns>
-	ILayoutEngine Remove(IWindow window);
+	ILayoutEngine RemoveWindow(IWindow window);
 
 	/// <summary>
 	/// Determines whether the layout engine contains the <paramref name="window"/>.
@@ -59,7 +59,7 @@ public interface ILayoutEngine
 	/// <returns>
 	/// True if the layout engine contains the <paramref name="window"/>, otherwise false.
 	/// </returns>
-	bool Contains(IWindow window);
+	bool ContainsWindow(IWindow window);
 
 	/// <summary>
 	/// Performs a layout inside the available <paramref name="location"/>.

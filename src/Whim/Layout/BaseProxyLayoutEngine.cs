@@ -58,14 +58,14 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	public virtual int Count => InnerLayoutEngine.Count;
 
 	/// <inheritdoc/>
-	public virtual ILayoutEngine Add(IWindow window) => Update(InnerLayoutEngine.Add(window));
+	public virtual ILayoutEngine AddWindow(IWindow window) => Update(InnerLayoutEngine.AddWindow(window));
 
 	/// <inheritdoc/>
 	public virtual ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) =>
 		Update(InnerLayoutEngine.MoveWindowToPoint(window, point));
 
 	/// <inheritdoc/>
-	public virtual ILayoutEngine Remove(IWindow window) => Update(InnerLayoutEngine.Remove(window));
+	public virtual ILayoutEngine RemoveWindow(IWindow window) => Update(InnerLayoutEngine.RemoveWindow(window));
 
 	/// <inheritdoc/>
 	public virtual IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
@@ -79,7 +79,7 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 		Update(InnerLayoutEngine.SwapWindowInDirection(direction, window));
 
 	/// <inheritdoc/>
-	public virtual bool Contains(IWindow window) => InnerLayoutEngine.Contains(window);
+	public virtual bool ContainsWindow(IWindow window) => InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc/>
 	public virtual ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>

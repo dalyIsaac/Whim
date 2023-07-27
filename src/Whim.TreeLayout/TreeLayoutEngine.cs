@@ -127,7 +127,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public ILayoutEngine Add(IWindow window)
+	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
@@ -208,7 +208,7 @@ public class TreeLayoutEngine : ILayoutEngine
 
 		if (_windows.ContainsKey(window))
 		{
-			treeLayoutEngine = (TreeLayoutEngine)treeLayoutEngine.Remove(window);
+			treeLayoutEngine = (TreeLayoutEngine)treeLayoutEngine.RemoveWindow(window);
 		}
 
 		return treeLayoutEngine.AddWindowAtPoint(window, point);
@@ -290,7 +290,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public bool Contains(IWindow window)
+	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
 
@@ -552,7 +552,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public ILayoutEngine Remove(IWindow window)
+	public ILayoutEngine RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 

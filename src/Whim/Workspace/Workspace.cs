@@ -117,7 +117,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		for (int i = 0; i < _layoutEngines.Length; i++)
 		{
-			_layoutEngines[i] = _layoutEngines[i].Remove(window);
+			_layoutEngines[i] = _layoutEngines[i].RemoveWindow(window);
 		}
 
 		DoLayout();
@@ -227,7 +227,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_normalWindows.Add(window);
 		for (int i = 0; i < _layoutEngines.Length; i++)
 		{
-			_layoutEngines[i] = _layoutEngines[i].Add(window);
+			_layoutEngines[i] = _layoutEngines[i].AddWindow(window);
 		}
 		DoLayout();
 		window.Focus();
@@ -244,7 +244,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
 		{
-			ILayoutEngine newEngine = phantomLayoutEngine.Remove(window);
+			ILayoutEngine newEngine = phantomLayoutEngine.RemoveWindow(window);
 
 			bool removePhantomSuccess = newEngine != phantomLayoutEngine;
 			if (removePhantomSuccess)
@@ -271,7 +271,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
 				ILayoutEngine oldEngine = _layoutEngines[idx];
-				ILayoutEngine newEngine = oldEngine.Remove(window);
+				ILayoutEngine newEngine = oldEngine.RemoveWindow(window);
 
 				if (newEngine == oldEngine)
 				{

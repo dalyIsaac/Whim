@@ -74,17 +74,17 @@ public class BaseProxyLayoutEngineTests
 	{
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		innerLayoutEngine.Setup(x => x.Add(It.IsAny<IWindow>()));
+		innerLayoutEngine.Setup(x => x.AddWindow(It.IsAny<IWindow>()));
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		ILayoutEngine newEngine = proxyLayoutEngine.Add(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = proxyLayoutEngine.AddWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
 		Assert.IsType<ProxyLayoutEngine>(newEngine);
-		innerLayoutEngine.Verify(x => x.Add(It.IsAny<IWindow>()), Times.Once);
+		innerLayoutEngine.Verify(x => x.AddWindow(It.IsAny<IWindow>()), Times.Once);
 	}
 
 	[Fact]
@@ -92,17 +92,17 @@ public class BaseProxyLayoutEngineTests
 	{
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		innerLayoutEngine.Setup(x => x.Remove(It.IsAny<IWindow>()));
+		innerLayoutEngine.Setup(x => x.RemoveWindow(It.IsAny<IWindow>()));
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		ILayoutEngine newEngine = proxyLayoutEngine.Remove(new Mock<IWindow>().Object);
+		ILayoutEngine newEngine = proxyLayoutEngine.RemoveWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
 		Assert.IsType<ProxyLayoutEngine>(newEngine);
-		innerLayoutEngine.Verify(x => x.Remove(It.IsAny<IWindow>()), Times.Once);
+		innerLayoutEngine.Verify(x => x.RemoveWindow(It.IsAny<IWindow>()), Times.Once);
 	}
 
 	[Fact]
@@ -161,16 +161,16 @@ public class BaseProxyLayoutEngineTests
 	{
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		innerLayoutEngine.Setup(x => x.Contains(It.IsAny<IWindow>())).Returns(true);
+		innerLayoutEngine.Setup(x => x.ContainsWindow(It.IsAny<IWindow>())).Returns(true);
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		bool contains = proxyLayoutEngine.Contains(new Mock<IWindow>().Object);
+		bool contains = proxyLayoutEngine.ContainsWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.True(contains);
-		innerLayoutEngine.Verify(x => x.Contains(It.IsAny<IWindow>()), Times.Once);
+		innerLayoutEngine.Verify(x => x.ContainsWindow(It.IsAny<IWindow>()), Times.Once);
 	}
 
 	[Fact]
