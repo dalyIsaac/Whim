@@ -101,7 +101,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) => Add(window);
+	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) => Add(window);
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
