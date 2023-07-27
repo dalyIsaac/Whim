@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
-public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayoutPlugin
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 {
 	private readonly IContext _context;
 
@@ -12,10 +12,8 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	public string Name => "whim.floating_layout";
 
 	/// <inheritdoc />
-	public ISet<IWindow> MutableFloatingWindows { get; } = new HashSet<IWindow>();
-
-	/// <inheritdoc />
-	public IReadOnlySet<IWindow> FloatingWindows => (IReadOnlySet<IWindow>)MutableFloatingWindows;
+	internal IDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows { get; } =
+		new Dictionary<IWindow, ISet<LayoutEngineIdentity>>();
 
 	/// <summary>
 	/// Creates a new instance of the floating layout plugin.
@@ -30,6 +28,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	public void PreInitialize()
 	{
 		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, this, layout));
+		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
 	}
 
 	/// <inheritdoc />
@@ -38,12 +37,21 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
 
+	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e) => FloatingWindows.Remove(e.Window);
+
 	private void UpdateWindow(IWindow? window, bool markAsFloating)
 	{
 		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+
 		if (window == null)
 		{
 			Logger.Error("Could not find window");
+			return;
+		}
+
+		if (!markAsFloating && !FloatingWindows.ContainsKey(window))
+		{
+			Logger.Debug($"Window {window} is not floating");
 			return;
 		}
 
@@ -59,15 +67,32 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 			return;
 		}
 
+		LayoutEngineIdentity layoutEngineIdentity = workspace.ActiveLayoutEngine.Identity;
+		ISet<LayoutEngineIdentity> layoutEngines = FloatingWindows.TryGetValue(
+			window,
+			out ISet<LayoutEngineIdentity>? existingLayoutEngines
+		)
+			? existingLayoutEngines
+			: new HashSet<LayoutEngineIdentity>();
+
 		if (markAsFloating)
 		{
 			Logger.Debug($"Marking window {window} as floating");
-			MutableFloatingWindows.Add(window);
+
+			layoutEngines.Add(layoutEngineIdentity);
 		}
 		else
 		{
 			Logger.Debug($"Marking window {window} as docked");
-			MutableFloatingWindows.Remove(window);
+			layoutEngines.Remove(layoutEngineIdentity);
+		}
+
+		if (layoutEngines.Count == 0)
+		{
+			FloatingWindows.Remove(window);
+		}
+		{
+			FloatingWindows[window] = layoutEngines;
 		}
 
 		// Convert the location to a unit square location.
@@ -102,7 +127,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 			return;
 		}
 
-		if (MutableFloatingWindows.Contains(window))
+		if (FloatingWindows.ContainsKey(window))
 		{
 			MarkWindowAsDocked(window);
 		}

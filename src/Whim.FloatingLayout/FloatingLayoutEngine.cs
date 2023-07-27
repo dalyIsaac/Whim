@@ -9,7 +9,7 @@ namespace Whim.FloatingLayout;
 public class FloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
-	private readonly IFloatingLayoutPlugin _plugin;
+	private readonly FloatingLayoutPlugin _plugin;
 	private readonly ImmutableDictionary<IWindow, ILocation<double>> _floatingWindowLocations;
 
 	/// <summary>
@@ -18,7 +18,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public FloatingLayoutEngine(IContext context, IFloatingLayoutPlugin plugin, ILayoutEngine innerLayoutEngine)
+	public FloatingLayoutEngine(IContext context, FloatingLayoutPlugin plugin, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_context = context;
@@ -26,19 +26,12 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowLocations = ImmutableDictionary<IWindow, ILocation<double>>.Empty;
 	}
 
-	private FloatingLayoutEngine(FloatingLayoutEngine oldEngine, ILayoutEngine newInnerLayoutEngine)
-		: base(newInnerLayoutEngine)
-	{
-		_context = oldEngine._context;
-		_plugin = oldEngine._plugin;
-		_floatingWindowLocations = oldEngine._floatingWindowLocations;
-	}
-
 	private FloatingLayoutEngine(
 		FloatingLayoutEngine oldEngine,
+		ILayoutEngine newInnerLayoutEngine,
 		ImmutableDictionary<IWindow, ILocation<double>> floatingWindowLocations
 	)
-		: base(oldEngine.InnerLayoutEngine)
+		: base(newInnerLayoutEngine)
 	{
 		_context = oldEngine._context;
 		_plugin = oldEngine._plugin;
@@ -47,26 +40,60 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 
 	/// <inheritdoc />
 	protected override ILayoutEngine Update(ILayoutEngine newInnerLayoutEngine) =>
-		newInnerLayoutEngine == InnerLayoutEngine ? this : new FloatingLayoutEngine(this, newInnerLayoutEngine);
+		newInnerLayoutEngine == InnerLayoutEngine
+			? this
+			: new FloatingLayoutEngine(_context, _plugin, newInnerLayoutEngine);
 
 	/// <inheritdoc />
 	public override ILayoutEngine AddWindow(IWindow window)
 	{
 		// If the window is already tracked by this layout engine, or is a new floating window,
 		// update the location and return.
-		if (
-			_floatingWindowLocations.TryGetValue(window, out ILocation<double>? location)
-			|| _plugin.FloatingWindows.Contains(window)
-		)
+		if (IsWindowFloating(window))
 		{
-			return UpdateWindowLocation(window, location);
+			return UpdateWindowLocation(window);
 		}
 
 		return base.AddWindow(window);
 	}
 
-	private FloatingLayoutEngine UpdateWindowLocation(IWindow window, ILocation<double>? oldLocation)
+	/// <inheritdoc />
+	public override ILayoutEngine RemoveWindow(IWindow window)
 	{
+		// If tracked by this layout engine, remove it.
+		// Otherwise, pass to the inner layout engine.
+		if (_floatingWindowLocations.ContainsKey(window))
+		{
+			_plugin.FloatingWindows.Remove(window);
+			return new FloatingLayoutEngine(this, InnerLayoutEngine, _floatingWindowLocations.Remove(window));
+		}
+
+		return base.RemoveWindow(window);
+	}
+
+	/// <inheritdoc />
+	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
+	{
+		// If the window is floating, update the location and return.
+		if (IsWindowFloating(window))
+		{
+			return UpdateWindowLocation(window);
+		}
+
+		return base.MoveWindowToPoint(window, point);
+	}
+
+	private bool IsWindowFloating(IWindow window) =>
+		_plugin.FloatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines)
+		&& layoutEngines.Contains(InnerLayoutEngine.Identity);
+
+	private FloatingLayoutEngine UpdateWindowLocation(IWindow window)
+	{
+		// Try get the old location.
+		ILocation<double>? oldLocation = _floatingWindowLocations.TryGetValue(window, out ILocation<double>? location)
+			? location
+			: null;
+
 		// Since the window is floating, we update the location, and return.
 		ILocation<int>? newActualLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
 		if (newActualLocation == null)
@@ -83,32 +110,28 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return this;
 		}
 
-		return new FloatingLayoutEngine(this, _floatingWindowLocations.SetItem(window, newUnitSquareLocation));
+		ILayoutEngine innerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
+		return new FloatingLayoutEngine(
+			this,
+			innerLayoutEngine,
+			_floatingWindowLocations.SetItem(window, newUnitSquareLocation)
+		);
 	}
-
-	/// <inheritdoc />
-	public override ILayoutEngine RemoveWindow(IWindow window)
-	{
-		// If tracked by this layout engine, remove it.
-		// Otherwise, pass to the inner layout engine.
-		if (_floatingWindowLocations.ContainsKey(window) && _plugin is IInternalFloatingLayoutPlugin internalPlugin)
-		{
-			internalPlugin.MutableFloatingWindows.Remove(window);
-			return new FloatingLayoutEngine(this, _floatingWindowLocations.Remove(window));
-		}
-
-		return base.RemoveWindow(window);
-	}
-
-	/// <inheritdoc />
-	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) => AddWindow(window);
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
+		List<IWindow> windowsToRemove = new();
+
 		// Iterate over all windows in _windowToLocation.
 		foreach ((IWindow window, ILocation<double> loc) in _floatingWindowLocations)
 		{
+			if (!_plugin.FloatingWindows.ContainsKey(window))
+			{
+				windowsToRemove.Add(window);
+				continue;
+			}
+
 			yield return new WindowState()
 			{
 				Window = window,
@@ -121,6 +144,12 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		foreach (IWindowState windowLocation in InnerLayoutEngine.DoLayout(location, monitor))
 		{
 			yield return windowLocation;
+		}
+
+		// Remove all windows that are no longer floating.
+		foreach (IWindow window in windowsToRemove)
+		{
+			_floatingWindowLocations.Remove(window);
 		}
 	}
 }
