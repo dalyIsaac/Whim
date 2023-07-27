@@ -27,7 +27,7 @@ public class LayoutEngineTests
 
 		public ILayoutEngine AddWindow(IWindow window) => throw new System.NotImplementedException();
 
-		public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
+		public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) =>
 			throw new System.NotImplementedException();
 
 		public bool ContainsWindow(IWindow window) => throw new System.NotImplementedException();

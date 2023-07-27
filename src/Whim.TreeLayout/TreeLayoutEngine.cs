@@ -246,14 +246,14 @@ public class TreeLayoutEngine : ILayoutEngine
 
 		if (_root is ISplitNode splitNode)
 		{
-			return AddAtPointSplitNode(point, newLeafNode, splitNode);
+			return MoveWindowToPointSplitNode(point, newLeafNode, splitNode);
 		}
 
 		Logger.Debug($"Root is null, creating new window node");
 		return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
 	}
 
-	private ILayoutEngine AddAtPointSplitNode(IPoint<double> point, LeafNode newLeafNode, ISplitNode rootNode)
+	private ILayoutEngine MoveWindowToPointSplitNode(IPoint<double> point, LeafNode newLeafNode, ISplitNode rootNode)
 	{
 		LeafNodeStateAtPoint? result = rootNode.GetNodeContainingPoint(point);
 		if (result is null)

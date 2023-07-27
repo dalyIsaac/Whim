@@ -119,7 +119,7 @@ public class RemoveTests
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object)
-			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
+			.MoveWindowToPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		// When
 		ILayoutEngine result = engine.RemoveWindow(window3.Object);
@@ -143,7 +143,7 @@ public class RemoveTests
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object)
-			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
+			.MoveWindowToPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		// When
 		ILayoutEngine result = engine.RemoveWindow(window1.Object);

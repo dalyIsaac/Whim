@@ -896,7 +896,7 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(new Mock<IWindow>().Object);
 
 		// When
-		ILayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = -10 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = -10 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
@@ -915,7 +915,7 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(new Mock<IWindow>().Object);
 
 		// When
-		ILayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 10 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 10 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
@@ -936,7 +936,7 @@ public class ColumnLayoutEngineTests
 			.AddWindow(new Mock<IWindow>().Object);
 
 		// When
-		ILayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 0.5 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 0.5 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
@@ -957,7 +957,7 @@ public class ColumnLayoutEngineTests
 			.AddWindow(new Mock<IWindow>().Object);
 
 		// When
-		ILayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 0.5 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 0.5 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();

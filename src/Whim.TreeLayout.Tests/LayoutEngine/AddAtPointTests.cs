@@ -4,10 +4,10 @@ using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
-public class AddAtPointTests
+public class MoveWindowToPointTests
 {
 	[Fact]
-	public void AddAtPoint_RootIsNull()
+	public void MoveWindowToPoint_RootIsNull()
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
@@ -16,7 +16,7 @@ public class AddAtPointTests
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, point);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -25,7 +25,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsNull_AddPhantom()
+	public void MoveWindowToPoint_RootIsNull_AddPhantom()
 	{
 		// Given
 		Mock<IWindow> window = new();
@@ -34,7 +34,7 @@ public class AddAtPointTests
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, point);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -43,7 +43,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsPhantomNode()
+	public void MoveWindowToPoint_RootIsPhantomNode()
 	{
 		// Given
 		Mock<IWindow> phantomWindow = new();
@@ -58,7 +58,7 @@ public class AddAtPointTests
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, point);
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -67,7 +67,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsWindowNode_Right()
+	public void MoveWindowToPoint_RootIsWindowNode_Right()
 	{
 		// Given
 		Mock<IWindow> window1 = new();
@@ -86,7 +86,7 @@ public class AddAtPointTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window2.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window2.Object, point);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -129,7 +129,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsWindowNode_Down()
+	public void MoveWindowToPoint_RootIsWindowNode_Down()
 	{
 		// Given
 		Mock<IWindow> window1 = new();
@@ -148,7 +148,7 @@ public class AddAtPointTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window2.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window2.Object, point);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -191,7 +191,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsWindowNode_Left()
+	public void MoveWindowToPoint_RootIsWindowNode_Left()
 	{
 		// Given
 		Mock<IWindow> window1 = new();
@@ -210,7 +210,7 @@ public class AddAtPointTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window2.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window2.Object, point);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -253,7 +253,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsWindowNode_Up()
+	public void MoveWindowToPoint_RootIsWindowNode_Up()
 	{
 		// Given
 		Mock<IWindow> window1 = new();
@@ -272,7 +272,7 @@ public class AddAtPointTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window2.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window2.Object, point);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -315,7 +315,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsSplitNode_DoesNotContainPoint()
+	public void MoveWindowToPoint_RootIsSplitNode_DoesNotContainPoint()
 	{
 		// Given
 		Mock<IWindow> window1 = new();
@@ -330,7 +330,7 @@ public class AddAtPointTests
 		IPoint<double> point = new Point<double>() { X = 1.7, Y = 0.5 };
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window3.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window3.Object, point);
 
 		// Then
 		Assert.Same(engine, result);
@@ -341,7 +341,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsSplitNode_AddInDirection()
+	public void MoveWindowToPoint_RootIsSplitNode_AddInDirection()
 	{
 		// Given
 		Mock<IWindow> window1 = new();
@@ -359,7 +359,7 @@ public class AddAtPointTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window3.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window3.Object, point);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
@@ -415,7 +415,7 @@ public class AddAtPointTests
 	}
 
 	[Fact]
-	public void AddAtPoint_RootIsSplitNode_AddInDifferentDirection()
+	public void MoveWindowToPoint_RootIsSplitNode_AddInDifferentDirection()
 	{
 		// Given
 		Mock<IWindow> window1 = new();
@@ -433,7 +433,7 @@ public class AddAtPointTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window3.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window3.Object, point);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then

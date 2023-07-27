@@ -239,21 +239,21 @@ public class BaseProxyLayoutEngineTests
 	}
 
 	[Fact]
-	public void AddAtPoint()
+	public void MoveWindowToPoint()
 	{
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		innerLayoutEngine.Setup(x => x.AddAtPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<double>>()));
+		innerLayoutEngine.Setup(x => x.MoveWindowToPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<double>>()));
 
 		ProxyLayoutEngine proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		ILayoutEngine newEngine = proxyLayoutEngine.AddAtPoint(new Mock<IWindow>().Object, new Point<double>());
+		ILayoutEngine newEngine = proxyLayoutEngine.MoveWindowToPoint(new Mock<IWindow>().Object, new Point<double>());
 
 		// Then
 		Assert.NotSame(proxyLayoutEngine, newEngine);
 		Assert.IsType<ProxyLayoutEngine>(newEngine);
-		innerLayoutEngine.Verify(x => x.AddAtPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<double>>()), Times.Once);
+		innerLayoutEngine.Verify(x => x.MoveWindowToPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<double>>()), Times.Once);
 	}
 
 	#region GetLayoutEngine

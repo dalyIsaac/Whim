@@ -29,7 +29,7 @@ public class WorkspaceManagerTests
 
 		public ILayoutEngine AddWindow(IWindow window) => throw new NotImplementedException();
 
-		public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) => throw new NotImplementedException();
+		public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) => throw new NotImplementedException();
 
 		public bool ContainsWindow(IWindow window) => throw new NotImplementedException();
 

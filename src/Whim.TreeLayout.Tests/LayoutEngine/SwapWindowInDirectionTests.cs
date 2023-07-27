@@ -138,7 +138,7 @@ public class SwapWindowInDirectionTests
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object)
-			.AddAtPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
+			.MoveWindowToPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
@@ -201,8 +201,8 @@ public class SwapWindowInDirectionTests
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.AddWindow(topLeft.Object)
 			.AddWindow(topRight.Object)
-			.AddAtPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
-			.AddAtPoint(bottomRight.Object, new Point<double>() { X = 0.75, Y = 0.9 });
+			.MoveWindowToPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
+			.MoveWindowToPoint(bottomRight.Object, new Point<double>() { X = 0.75, Y = 0.9 });
 
 		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };

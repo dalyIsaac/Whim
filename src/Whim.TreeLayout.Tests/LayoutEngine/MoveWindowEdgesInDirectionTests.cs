@@ -990,8 +990,8 @@ public class MoveSingleWindowEdgeInDirectionTests
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
 			.AddWindow(topLeft.Object)
 			.AddWindow(topRight.Object)
-			.AddAtPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
-			.AddAtPoint(bottomRight.Object, new Point<double>() { X = 0.75, Y = 0.9 });
+			.MoveWindowToPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
+			.MoveWindowToPoint(bottomRight.Object, new Point<double>() { X = 0.75, Y = 0.9 });
 
 		Mock<IMonitor> monitor = new();
 

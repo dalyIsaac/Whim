@@ -167,7 +167,7 @@ public class FloatingLayoutEngineTests
 	}
 
 	[Fact]
-	public void AddAtPoint()
+	public void MoveWindowToPoint()
 	{
 		// Given
 		Wrapper wrapper = new();
@@ -178,7 +178,7 @@ public class FloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 
 		// When
-		ILayoutEngine result = engine.AddAtPoint(window.Object, new Point<double>());
+		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, new Point<double>());
 
 		// Then
 		Assert.NotSame(engine, result);
