@@ -307,17 +307,14 @@ public class TreeLayoutEngine : ILayoutEngine
 			yield break;
 		}
 
-		foreach (LeafNodeWindowLocationState? item in _root.GetWindowLocations(location))
+		foreach (LeafNodeWindowLocationState item in _root.GetWindowLocations(location))
 		{
-			if (item.LeafNode is LeafNode leafNode)
+			yield return new WindowState()
 			{
-				yield return new WindowState()
-				{
-					Window = leafNode.Window,
-					Location = item.Location,
-					WindowSize = item.WindowSize
-				};
-			}
+				Window = item.LeafNode.Window,
+				Location = item.Location,
+				WindowSize = item.WindowSize
+			};
 		}
 	}
 
