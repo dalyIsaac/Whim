@@ -203,7 +203,7 @@ public class FloatingLayoutPluginTests
 
 		// Then
 		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window.Object, plugin.FloatingWindows.First());
+		Assert.Equal(window.Object, plugin.FloatingWindows.Keys.First());
 		wrapper.Workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<IPoint<double>>()), Times.Once);
 	}
 	#endregion
@@ -284,7 +284,7 @@ public class FloatingLayoutPluginTests
 
 		// Then
 		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window.Object, plugin.FloatingWindows.First());
+		Assert.Equal(window.Object, plugin.FloatingWindows.Keys.First());
 	}
 
 	[Fact]

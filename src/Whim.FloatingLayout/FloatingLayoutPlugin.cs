@@ -11,7 +11,11 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
 
-	/// <inheritdoc />
+	/// <summary>
+	/// Mapping of floating windows to the layout engines that they are floating in.
+	/// This is not exposed outside of this namespace to prevent mutation of the dictionary and
+	/// sets.
+	/// </summary>
 	internal IDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows { get; } =
 		new Dictionary<IWindow, ISet<LayoutEngineIdentity>>();
 
