@@ -32,7 +32,7 @@ public class TestProxyLayoutEngine : BaseProxyLayoutEngine
 		throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public override IWindow? GetFirstWindow() => throw new NotImplementedException();
+	public override IWindow? GetFirstWindow() => null;
 
 	/// <inheritdoc/>
 	public override void HidePhantomWindows() => throw new NotImplementedException();
