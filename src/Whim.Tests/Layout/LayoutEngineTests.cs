@@ -1,23 +1,12 @@
 using Moq;
 using System.Collections.Generic;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
 public class LayoutEngineTests
 {
-	private class ProxyLayoutEngine : BaseProxyLayoutEngine
-	{
-		public ProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
-			: base(innerLayoutEngine) { }
-
-		protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
-			newLayoutEngine == InnerLayoutEngine ? this : new ProxyLayoutEngine(newLayoutEngine);
-
-		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
-			InnerLayoutEngine.DoLayout(location, monitor);
-	}
-
 	private class TestLayoutEngine : ILayoutEngine
 	{
 		public LayoutEngineIdentity Identity => throw new System.NotImplementedException();
@@ -73,8 +62,8 @@ public class LayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		ILayoutEngine proxyInner = new ProxyLayoutEngine(engine);
-		ILayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
+		ILayoutEngine proxyInner = new TestProxyLayoutEngine(engine);
+		ILayoutEngine proxyOuter = new TestProxyLayoutEngine(proxyInner);
 
 		// When
 		TestLayoutEngine? newEngine = proxyOuter.GetLayoutEngine<TestLayoutEngine>();
@@ -117,8 +106,8 @@ public class LayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		ILayoutEngine proxyInner = new ProxyLayoutEngine(engine);
-		ILayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
+		ILayoutEngine proxyInner = new TestProxyLayoutEngine(engine);
+		ILayoutEngine proxyOuter = new TestProxyLayoutEngine(proxyInner);
 
 		// When
 		bool contains = proxyOuter.ContainsEqual(engine);

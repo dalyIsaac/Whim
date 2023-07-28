@@ -49,12 +49,6 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	protected override ILayoutEngine Update(ILayoutEngine newInnerLayoutEngine) =>
-		newInnerLayoutEngine == InnerLayoutEngine
-			? this
-			: new FloatingLayoutEngine(_context, _plugin, newInnerLayoutEngine);
-
-	/// <inheritdoc />
 	public override ILayoutEngine AddWindow(IWindow window)
 	{
 		// If the window is already tracked by this layout engine, or is a new floating window,

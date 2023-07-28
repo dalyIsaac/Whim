@@ -20,9 +20,21 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 		_gapsConfig = gapsConfig;
 	}
 
+	private GapsLayoutEngine(GapsLayoutEngine oldEngine, ILayoutEngine innerLayoutEngine)
+		: base(innerLayoutEngine)
+	{
+		_gapsConfig = oldEngine._gapsConfig;
+	}
+
 	/// <inheritdoc />
-	protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
-		newLayoutEngine == InnerLayoutEngine ? this : new GapsLayoutEngine(_gapsConfig, newLayoutEngine);
+	public override int Count => InnerLayoutEngine.Count;
+
+	/// <inheritdoc />
+	public override ILayoutEngine AddWindow(IWindow window) =>
+		new GapsLayoutEngine(this, InnerLayoutEngine.AddWindow(window));
+
+	/// <inheritdoc />
+	public override bool ContainsWindow(IWindow window) => InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
@@ -61,4 +73,30 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 			};
 		}
 	}
+
+	/// <inheritdoc />
+	public override void FocusWindowInDirection(Direction direction, IWindow window) =>
+		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+
+	/// <inheritdoc />
+	public override IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
+
+	/// <inheritdoc />
+	public override void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
+
+	/// <inheritdoc />
+	public override ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
+		new GapsLayoutEngine(this, InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
+
+	/// <inheritdoc />
+	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) =>
+		new GapsLayoutEngine(this, InnerLayoutEngine.MoveWindowToPoint(window, point));
+
+	/// <inheritdoc />
+	public override ILayoutEngine RemoveWindow(IWindow window) =>
+		new GapsLayoutEngine(this, InnerLayoutEngine.RemoveWindow(window));
+
+	/// <inheritdoc />
+	public override ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
+		new GapsLayoutEngine(this, InnerLayoutEngine.SwapWindowInDirection(direction, window));
 }

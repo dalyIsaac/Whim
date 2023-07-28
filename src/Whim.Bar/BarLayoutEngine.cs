@@ -21,8 +21,14 @@ public class BarLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
-		newLayoutEngine == InnerLayoutEngine ? this : new BarLayoutEngine(_barConfig, newLayoutEngine);
+	public override int Count => InnerLayoutEngine.Count;
+
+	/// <inheritdoc />
+	public override ILayoutEngine AddWindow(IWindow window) =>
+		new BarLayoutEngine(_barConfig, InnerLayoutEngine.AddWindow(window));
+
+	/// <inheritdoc />
+	public override bool ContainsWindow(IWindow window) => InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
@@ -40,4 +46,30 @@ public class BarLayoutEngine : BaseProxyLayoutEngine
 			};
 		return InnerLayoutEngine.DoLayout(proxiedLocation, monitor);
 	}
+
+	/// <inheritdoc />
+	public override void FocusWindowInDirection(Direction direction, IWindow window) =>
+		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+
+	/// <inheritdoc />
+	public override IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
+
+	/// <inheritdoc />
+	public override void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
+
+	/// <inheritdoc />
+	public override ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
+		new BarLayoutEngine(_barConfig, InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
+
+	/// <inheritdoc />
+	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) =>
+		new BarLayoutEngine(_barConfig, InnerLayoutEngine.MoveWindowToPoint(window, point));
+
+	/// <inheritdoc />
+	public override ILayoutEngine RemoveWindow(IWindow window) =>
+		new BarLayoutEngine(_barConfig, InnerLayoutEngine.RemoveWindow(window));
+
+	/// <inheritdoc />
+	public override ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
+		new BarLayoutEngine(_barConfig, InnerLayoutEngine.SwapWindowInDirection(direction, window));
 }

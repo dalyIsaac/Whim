@@ -32,23 +32,6 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	public LayoutEngineIdentity Identity => InnerLayoutEngine.Identity;
 
 	/// <summary>
-	/// Updates the layout engine with the new proxied layout engine.
-	/// </summary>
-	/// <param name="newLayoutEngine"></param>
-	/// <returns>
-	/// The proxy layout engine with the new proxied layout engine, if the new layout engine is different.
-	/// </returns>
-	/// <example>
-	/// <code>
-	/// public override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
-	/// 	newLayoutEngine == InnerLayoutEngine
-	/// 		? this
-	/// 		: new MyProxyLayoutEngine(newLayoutEngine);
-	/// </code>
-	/// </example>
-	protected abstract ILayoutEngine Update(ILayoutEngine newLayoutEngine);
-
-	/// <summary>
 	/// The name is only really important for the user, so we can use the name of the proxied layout engine.
 	/// </summary>
 	/// <inheritdoc/>
