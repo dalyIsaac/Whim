@@ -48,6 +48,9 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowLocations = floatingWindowLocations;
 	}
 
+	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine) =>
+		InnerLayoutEngine == newInnerLayoutEngine ? this : new FloatingLayoutEngine(this, newInnerLayoutEngine);
+
 	/// <inheritdoc />
 	public override ILayoutEngine AddWindow(IWindow window)
 	{
@@ -58,7 +61,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return UpdateWindowLocation(window);
 		}
 
-		return new FloatingLayoutEngine(this, InnerLayoutEngine.AddWindow(window));
+		return UpdateInner(InnerLayoutEngine.AddWindow(window));
 	}
 
 	/// <inheritdoc />
@@ -72,7 +75,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return new FloatingLayoutEngine(this, InnerLayoutEngine, _floatingWindowLocations.Remove(window));
 		}
 
-		return new FloatingLayoutEngine(this, InnerLayoutEngine.RemoveWindow(window));
+		return UpdateInner(InnerLayoutEngine.RemoveWindow(window));
 	}
 
 	/// <inheritdoc />
@@ -84,7 +87,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return UpdateWindowLocation(window);
 		}
 
-		return new FloatingLayoutEngine(this, InnerLayoutEngine.MoveWindowToPoint(window, point));
+		return UpdateInner(InnerLayoutEngine.MoveWindowToPoint(window, point));
 	}
 
 	/// <inheritdoc />
