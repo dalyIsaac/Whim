@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Whim.FloatingLayout;
 
@@ -11,6 +12,9 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	private readonly IContext _context;
 	private readonly FloatingLayoutPlugin _plugin;
 	private readonly ImmutableDictionary<IWindow, ILocation<double>> _floatingWindowLocations;
+
+	/// <inheritdoc />
+	public override int Count => InnerLayoutEngine.Count + _floatingWindowLocations.Count;
 
 	/// <summary>
 	/// Creates a new instance of the proxy layout engine <see cref="FloatingLayoutEngine"/>.
@@ -26,15 +30,21 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowLocations = ImmutableDictionary<IWindow, ILocation<double>>.Empty;
 	}
 
+	private FloatingLayoutEngine(FloatingLayoutEngine oldEngine, ILayoutEngine newInnerLayoutEngine)
+		: base(newInnerLayoutEngine)
+	{
+		_context = oldEngine._context;
+		_plugin = oldEngine._plugin;
+		_floatingWindowLocations = oldEngine._floatingWindowLocations;
+	}
+
 	private FloatingLayoutEngine(
 		FloatingLayoutEngine oldEngine,
 		ILayoutEngine newInnerLayoutEngine,
 		ImmutableDictionary<IWindow, ILocation<double>> floatingWindowLocations
 	)
-		: base(newInnerLayoutEngine)
+		: this(oldEngine, newInnerLayoutEngine)
 	{
-		_context = oldEngine._context;
-		_plugin = oldEngine._plugin;
 		_floatingWindowLocations = floatingWindowLocations;
 	}
 
@@ -54,7 +64,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return UpdateWindowLocation(window);
 		}
 
-		return base.AddWindow(window);
+		return new FloatingLayoutEngine(this, InnerLayoutEngine.AddWindow(window));
 	}
 
 	/// <inheritdoc />
@@ -68,7 +78,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return new FloatingLayoutEngine(this, InnerLayoutEngine, _floatingWindowLocations.Remove(window));
 		}
 
-		return base.RemoveWindow(window);
+		return new FloatingLayoutEngine(this, InnerLayoutEngine.RemoveWindow(window));
 	}
 
 	/// <inheritdoc />
@@ -80,8 +90,12 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			return UpdateWindowLocation(window);
 		}
 
-		return base.MoveWindowToPoint(window, point);
+		return new FloatingLayoutEngine(this, InnerLayoutEngine.MoveWindowToPoint(window, point));
 	}
+
+	/// <inheritdoc />
+	public override ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
+		UpdateWindowLocation(window);
 
 	private bool IsWindowFloating(IWindow window) =>
 		_plugin.FloatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines)
@@ -152,4 +166,56 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 			_floatingWindowLocations.Remove(window);
 		}
 	}
+
+	/// <inheritdoc />
+	public override IWindow? GetFirstWindow()
+	{
+		if (InnerLayoutEngine.GetFirstWindow() is IWindow window)
+		{
+			return window;
+		}
+
+		if (_floatingWindowLocations.Count > 0)
+		{
+			return _floatingWindowLocations.Keys.First();
+		}
+
+		return null;
+	}
+
+	/// <inheritdoc />
+	public override void FocusWindowInDirection(Direction direction, IWindow window)
+	{
+		if (IsWindowFloating(window))
+		{
+			// At this stage, we don't have a way to get the window in a child layout engine at
+			// a given point.
+			// As a workaround, we just focus the first window.
+			InnerLayoutEngine.GetFirstWindow()?.Focus();
+			return;
+		}
+
+		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+	}
+
+	/// <inheritdoc />
+	public override ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
+	{
+		if (IsWindowFloating(window))
+		{
+			// At this stage, we don't have a way to get the window in a child layout engine at
+			// a given point.
+			// For now, we do nothing.
+			return this;
+		}
+
+		return InnerLayoutEngine.SwapWindowInDirection(direction, window);
+	}
+
+	/// <inheritdoc />
+	public override bool ContainsWindow(IWindow window) =>
+		_floatingWindowLocations.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
+
+	/// <inheritdoc />
+	public override void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
 }
