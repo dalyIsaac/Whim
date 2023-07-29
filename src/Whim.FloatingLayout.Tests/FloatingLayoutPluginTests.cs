@@ -41,6 +41,11 @@ public class FloatingLayoutPluginTests
 		public Wrapper Setup_TryGetWindowLocation(IWindow window, IWindowState? windowState)
 		{
 			Workspace.Setup(w => w.TryGetWindowLocation(window)).Returns(windowState);
+
+			if (windowState != null)
+			{
+				Workspace.Setup(w => w.ActiveLayoutEngine).Returns(FloatingLayoutEngine);
+			}
 			return this;
 		}
 

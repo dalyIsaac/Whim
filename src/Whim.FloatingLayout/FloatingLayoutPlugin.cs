@@ -95,6 +95,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin
 		{
 			FloatingWindows.Remove(window);
 		}
+		else
 		{
 			FloatingWindows[window] = layoutEngines;
 		}
