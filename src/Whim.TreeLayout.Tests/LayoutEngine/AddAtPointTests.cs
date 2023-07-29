@@ -487,4 +487,51 @@ public class MoveWindowToPointTests
 				}
 			);
 	}
+
+	[Fact]
+	public void MoveWindowToPoint_AlreadyContainsWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(
+			wrapper.Context.Object,
+			wrapper.Plugin.Object,
+			wrapper.Identity
+		).AddWindow(window.Object);
+
+		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
+
+		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		Mock<IMonitor> monitor = new();
+
+		// When
+		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, point);
+		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+
+		// Then
+		Assert.NotSame(engine, result);
+		Assert.True(result.ContainsWindow(window.Object));
+		Assert.Single(windowStates);
+
+		windowStates
+			.Should()
+			.BeEquivalentTo(
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Window = window.Object,
+						Location = new Location<int>()
+						{
+							X = 0,
+							Y = 0,
+							Width = 100,
+							Height = 100
+						},
+						WindowSize = WindowSize.Normal
+					}
+				}
+			);
+	}
 }
