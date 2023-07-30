@@ -53,6 +53,20 @@ public class FloatingLayoutEngineTests
 				);
 			return this;
 		}
+
+		public Wrapper Setup_RemoveWindow(IWindow window, Mock<ILayoutEngine> newInnerLayoutEngine)
+		{
+			InnerLayoutEngine.Setup(ile => ile.RemoveWindow(window)).Returns(newInnerLayoutEngine.Object);
+			newInnerLayoutEngine.Setup(ile => ile.Identity).Returns(InnerLayoutEngine.Object.Identity);
+			return this;
+		}
+
+		public Wrapper Setup_AddWindow(IWindow window, Mock<ILayoutEngine> newInnerLayoutEngine)
+		{
+			InnerLayoutEngine.Setup(ile => ile.AddWindow(window)).Returns(newInnerLayoutEngine.Object);
+			newInnerLayoutEngine.Setup(ile => ile.Identity).Returns(InnerLayoutEngine.Object.Identity);
+			return this;
+		}
 	}
 
 	#region AddWindow
@@ -119,16 +133,11 @@ public class FloatingLayoutEngineTests
 		Mock<IWindow> window = new();
 		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 
-		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
 		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.NativeManager
-			.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()))
-			.Returns(new Location<int>() { Width = 100, Height = 100 });
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.RemoveWindow(window.Object)).Returns(newInnerLayoutEngine.Object);
-		newInnerLayoutEngine.Setup(ile => ile.Identity).Returns(wrapper.InnerLayoutEngine.Object.Identity);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
@@ -136,10 +145,121 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
-		Assert.NotSame(newEngine1, newEngine2);
+		Assert.Same(newEngine1, newEngine2);
 		wrapper.InnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
-		newInnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+		newInnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Never);
 	}
 
+	[Fact]
+	public void AddWindow_FloatingInPlugin_RemoveFromInner()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+
+		Wrapper wrapper = new Wrapper().Setup_AddWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		wrapper.MarkAsFloating(window.Object);
+		ILayoutEngine newEngine2 = newEngine.AddWindow(window.Object);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.NotSame(newEngine, newEngine2);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+		newInnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+	}
+	#endregion
+
+	#region MoveWindowToPoint
+	[Fact]
+	public void MoveWindowToPoint_UseInner()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		ILocation<double> location = new Location<double>();
+
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, location);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowToPoint_FloatingInPlugin_WindowIsNew()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		ILocation<double> location = new Location<double>();
+
+		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, location);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Never);
+	}
+
+	[Fact]
+	public void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_SameLocation()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+		ILocation<double> location = new Location<double>();
+
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window.Object, location);
+
+		// Then
+		Assert.NotSame(engine, newEngine1);
+		Assert.Same(newEngine1, newEngine2);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Never);
+	}
+
+	[Fact]
+	public void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_DifferentLocation()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+		ILocation<double> location = new Location<double>();
+
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
+		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(new Location<int>());
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window.Object, location);
+
+		// Then
+		Assert.NotSame(engine, newEngine1);
+		Assert.NotSame(newEngine1, newEngine2);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Never);
+	}
 	#endregion
 }

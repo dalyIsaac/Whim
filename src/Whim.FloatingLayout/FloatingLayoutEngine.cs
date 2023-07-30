@@ -58,9 +58,8 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 		// update the location and return.
 		if (IsWindowFloating(window))
 		{
-			// return UpdateWindowLocation(window);
-			FloatingLayoutEngine newEngine = UpdateWindowLocation(window);
-			if (newEngine != this)
+			(FloatingLayoutEngine newEngine, bool error) = UpdateWindowLocation(window);
+			if (!error)
 			{
 				return newEngine;
 			}
@@ -89,21 +88,37 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 		// If the window is floating, update the location and return.
 		if (IsWindowFloating(window))
 		{
-			return UpdateWindowLocation(window);
+			(FloatingLayoutEngine newEngine, bool error) = UpdateWindowLocation(window);
+			if (!error)
+			{
+				return newEngine;
+			}
 		}
 
 		return UpdateInner(InnerLayoutEngine.MoveWindowToPoint(window, point));
 	}
 
 	/// <inheritdoc />
-	public override ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
-		UpdateWindowLocation(window);
+	public override ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window)
+	{
+		// If the window is floating, update the location and return.
+		if (IsWindowFloating(window))
+		{
+			(FloatingLayoutEngine newEngine, bool error) = UpdateWindowLocation(window);
+			if (!error)
+			{
+				return newEngine;
+			}
+		}
+
+		return UpdateInner(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
+	}
 
 	private bool IsWindowFloating(IWindow window) =>
 		_plugin.FloatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines)
 		&& layoutEngines.Contains(InnerLayoutEngine.Identity);
 
-	private FloatingLayoutEngine UpdateWindowLocation(IWindow window)
+	private (FloatingLayoutEngine, bool error) UpdateWindowLocation(IWindow window)
 	{
 		// Try get the old location.
 		ILocation<double>? oldLocation = _floatingWindowLocations.TryGetValue(window, out ILocation<double>? location)
@@ -115,7 +130,7 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 		if (newActualLocation == null)
 		{
 			Logger.Error($"Could not obtain location for floating window {window}");
-			return this;
+			return (this, true);
 		}
 
 		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualLocation);
@@ -123,14 +138,17 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 		if (newUnitSquareLocation.Equals(oldLocation))
 		{
 			Logger.Debug($"Location for window {window} has not changed");
-			return this;
+			return (this, false);
 		}
 
 		ILayoutEngine innerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
-		return new FloatingLayoutEngine(
-			this,
-			innerLayoutEngine,
-			_floatingWindowLocations.SetItem(window, newUnitSquareLocation)
+		return (
+			new FloatingLayoutEngine(
+				this,
+				innerLayoutEngine,
+				_floatingWindowLocations.SetItem(window, newUnitSquareLocation)
+			),
+			false
 		);
 	}
 
