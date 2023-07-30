@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Whim.FloatingLayout;
 
 /// <summary>
@@ -7,11 +5,6 @@ namespace Whim.FloatingLayout;
 /// </summary>
 public interface IFloatingLayoutPlugin : IPlugin
 {
-	/// <summary>
-	/// All the floating windows.
-	/// </summary>
-	IReadOnlySet<IWindow> FloatingWindows { get; }
-
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window
 	/// </summary>

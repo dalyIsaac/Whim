@@ -1,7 +1,7 @@
 using System.Linq;
 using Xunit;
 
-namespace Whim.TestUtilities;
+namespace Whim.TestUtils;
 
 /// <summary>
 /// Test utilities for <see cref="_pluginCommands"/>.

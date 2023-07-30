@@ -98,7 +98,7 @@ public class GapsLayoutEngineTests
 
 		for (int i = 0; i < windowsCount; i++)
 		{
-			innerLayoutEngine = innerLayoutEngine.Add(new Mock<IWindow>().Object);
+			innerLayoutEngine = innerLayoutEngine.AddWindow(new Mock<IWindow>().Object);
 		}
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
@@ -123,34 +123,311 @@ public class GapsLayoutEngineTests
 	}
 
 	[Fact]
-	public void Update_Same()
+	public void Count()
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
-		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.Count).Returns(5);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
 
 		// When
-		ILayoutEngine newEngine = gapsLayoutEngine.Remove(new Mock<IWindow>().Object);
 
 		// Then
-		Assert.Same(newEngine, gapsLayoutEngine);
-		Assert.IsType<GapsLayoutEngine>(newEngine);
+		Assert.Equal(5, gapsLayoutEngine.Count);
+		innerLayoutEngine.Verify(ile => ile.Count, Times.Once);
 	}
 
 	[Fact]
-	public void Update_Different()
+	public void ContainsWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.ContainsWindow(It.IsAny<IWindow>())).Returns(true);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		bool containsWindow = gapsLayoutEngine.ContainsWindow(window.Object);
+
+		// Then
+		Assert.True(containsWindow);
+		innerLayoutEngine.Verify(ile => ile.ContainsWindow(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void FocusWindowInDirection()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Direction direction = Direction.Left;
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.FocusWindowInDirection(direction, window.Object));
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		gapsLayoutEngine.FocusWindowInDirection(direction, window.Object);
+
+		// Then
+		innerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void HidePhantomWindows()
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
-		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.HidePhantomWindows());
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
 
 		// When
-		ILayoutEngine newEngine = gapsLayoutEngine.Add(new Mock<IWindow>().Object);
+		gapsLayoutEngine.HidePhantomWindows();
 
 		// Then
-		Assert.NotSame(newEngine, gapsLayoutEngine);
-		Assert.IsType<GapsLayoutEngine>(newEngine);
+		innerLayoutEngine.Verify(ile => ile.HidePhantomWindows(), Times.Once);
+	}
+
+	#region Add
+	[Fact]
+	public void Add_Same()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.AddWindow(window.Object)).Returns(innerLayoutEngine.Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.AddWindow(window.Object);
+
+		// Then
+		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void Add_NotSame()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.AddWindow(window.Object)).Returns(new Mock<ILayoutEngine>().Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.AddWindow(window.Object);
+
+		// Then
+		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+	}
+	#endregion
+
+	#region Remove
+	[Fact]
+	public void Remove_Same()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.RemoveWindow(window.Object)).Returns(innerLayoutEngine.Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.RemoveWindow(window.Object);
+
+		// Then
+		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void Remove_NotSame()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.RemoveWindow(window.Object)).Returns(new Mock<ILayoutEngine>().Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.RemoveWindow(window.Object);
+
+		// Then
+		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+	}
+	#endregion
+
+	#region MoveWindowEdgesInDirection
+	[Fact]
+	public void MoveWindowEdgesInDirection_Same()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Direction direction = Direction.Left;
+		IPoint<double> deltas = new Point<double>();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine
+			.Setup(ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object))
+			.Returns(innerLayoutEngine.Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.MoveWindowEdgesInDirection(direction, deltas, window.Object);
+
+		// Then
+		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowEdgesInDirection_NotSame()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Direction direction = Direction.Left;
+		IPoint<double> deltas = new Point<double>();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine
+			.Setup(ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object))
+			.Returns(new Mock<ILayoutEngine>().Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.MoveWindowEdgesInDirection(direction, deltas, window.Object);
+
+		// Then
+		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object), Times.Once);
+	}
+	#endregion
+
+	#region MoveWindowToPoint
+	[Fact]
+	public void MoveWindowToPoint_Same()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		IPoint<double> point = new Point<double>();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.MoveWindowToPoint(window.Object, point)).Returns(innerLayoutEngine.Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.MoveWindowToPoint(window.Object, point);
+
+		// Then
+		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, point), Times.Once);
+	}
+
+	[Fact]
+	public void MoveWindowToPoint_NotSame()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		IPoint<double> point = new Point<double>();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine
+			.Setup(ile => ile.MoveWindowToPoint(window.Object, point))
+			.Returns(new Mock<ILayoutEngine>().Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.MoveWindowToPoint(window.Object, point);
+
+		// Then
+		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, point), Times.Once);
+	}
+	#endregion
+
+	#region SwapWindowInDirection
+	[Fact]
+	public void SwapWindowInDirection_Same()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Direction direction = Direction.Left;
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine
+			.Setup(ile => ile.SwapWindowInDirection(direction, window.Object))
+			.Returns(innerLayoutEngine.Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.SwapWindowInDirection(direction, window.Object);
+
+		// Then
+		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(direction, window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void SwapWindowInDirection_NotSame()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Direction direction = Direction.Left;
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine
+			.Setup(ile => ile.SwapWindowInDirection(direction, window.Object))
+			.Returns(new Mock<ILayoutEngine>().Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.SwapWindowInDirection(direction, window.Object);
+
+		// Then
+		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(direction, window.Object), Times.Once);
+	}
+	#endregion
+
+	[Fact]
+	public void GetFirstWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.GetFirstWindow()).Returns(window.Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		IWindow? firstWindow = gapsLayoutEngine.GetFirstWindow();
+
+		// Then
+		Assert.Same(window.Object, firstWindow);
+		innerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Once);
 	}
 }

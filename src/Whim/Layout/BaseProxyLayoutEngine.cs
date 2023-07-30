@@ -19,77 +19,56 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	/// </summary>
 	protected ILayoutEngine InnerLayoutEngine { get; }
 
-	/// <inheritdoc/>
-	public LayoutEngineIdentity Identity => InnerLayoutEngine.Identity;
-
 	/// <summary>
-	/// Constructs a new proxy layout engine.
+	/// Creates a new <cref name="BaseProxyLayoutEngine"/> with the given <paramref name="innerLayoutEngine"/>.
 	/// </summary>
-	/// <param name="innerLayoutEngine">The proxied layout engine.</param>
+	/// <param name="innerLayoutEngine"></param>
 	protected BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 	{
 		InnerLayoutEngine = innerLayoutEngine;
 	}
 
-	/// <summary>
-	/// Updates the layout engine with the new proxied layout engine.
-	/// </summary>
-	/// <param name="newLayoutEngine"></param>
-	/// <returns>
-	/// The proxy layout engine with the new proxied layout engine, if the new layout engine is different.
-	/// </returns>
-	/// <example>
-	/// <code>
-	/// public override IImmutableLayoutEngine Update(IImmutableLayoutEngine newLayoutEngine) =>
-	/// 	newLayoutEngine == InnerLayoutEngine
-	/// 		? this
-	/// 		: new MyProxyLayoutEngine(newLayoutEngine);
-	/// </code>
-	/// </example>
-	protected abstract ILayoutEngine Update(ILayoutEngine newLayoutEngine);
+	/// <inheritdoc/>
+	public LayoutEngineIdentity Identity => InnerLayoutEngine.Identity;
 
 	/// <summary>
 	/// The name is only really important for the user, so we can use the name of the proxied layout engine.
 	/// </summary>
 	/// <inheritdoc/>
-	public virtual string Name => InnerLayoutEngine.Name;
+	public string Name => InnerLayoutEngine.Name;
 
 	/// <inheritdoc/>
-	public virtual int Count => InnerLayoutEngine.Count;
+	public abstract int Count { get; }
 
 	/// <inheritdoc/>
-	public virtual ILayoutEngine Add(IWindow window) => Update(InnerLayoutEngine.Add(window));
+	public abstract ILayoutEngine AddWindow(IWindow window);
 
 	/// <inheritdoc/>
-	public virtual ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
-		Update(InnerLayoutEngine.AddAtPoint(window, point));
+	public abstract ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point);
 
 	/// <inheritdoc/>
-	public virtual ILayoutEngine Remove(IWindow window) => Update(InnerLayoutEngine.Remove(window));
+	public abstract ILayoutEngine RemoveWindow(IWindow window);
 
 	/// <inheritdoc/>
-	public virtual IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
+	public abstract IWindow? GetFirstWindow();
 
 	/// <inheritdoc/>
-	public virtual void FocusWindowInDirection(Direction direction, IWindow window) =>
-		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+	public abstract void FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <inheritdoc/>
-	public virtual ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
-		Update(InnerLayoutEngine.SwapWindowInDirection(direction, window));
+	public abstract ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window);
 
 	/// <inheritdoc/>
-	public virtual bool Contains(IWindow window) => InnerLayoutEngine.Contains(window);
+	public abstract bool ContainsWindow(IWindow window);
 
 	/// <inheritdoc/>
-	public virtual ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
-		Update(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
+	public abstract ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window);
 
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
 	/// <inheritdoc/>
-	public virtual void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
+	public abstract void HidePhantomWindows();
 
 	/// <summary>
 	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>

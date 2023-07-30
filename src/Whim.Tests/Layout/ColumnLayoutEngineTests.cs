@@ -79,7 +79,7 @@ public class ColumnLayoutEngineTests
 		ColumnLayoutEngine engine = new(identity);
 
 		// When
-		ILayoutEngine newLayoutEngine = engine.Add(CreateWindow());
+		ILayoutEngine newLayoutEngine = engine.AddWindow(CreateWindow());
 
 		// Then
 		Assert.NotSame(engine, newLayoutEngine);
@@ -91,10 +91,10 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(window.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window.Object);
 
 		// When
-		ILayoutEngine newLayoutEngine = engine.Remove(window.Object);
+		ILayoutEngine newLayoutEngine = engine.RemoveWindow(window.Object);
 
 		// Then
 		Assert.NotSame(engine, newLayoutEngine);
@@ -105,10 +105,10 @@ public class ColumnLayoutEngineTests
 	public void Remove_NoChanges()
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(CreateWindow());
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(CreateWindow());
 
 		// When
-		ILayoutEngine newLayoutEngine = engine.Remove(new Mock<IWindow>().Object);
+		ILayoutEngine newLayoutEngine = engine.RemoveWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.Same(engine, newLayoutEngine);
@@ -120,10 +120,10 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(window.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window.Object);
 
 		// When
-		bool contains = engine.Contains(window.Object);
+		bool contains = engine.ContainsWindow(window.Object);
 
 		// Then
 		Assert.True(contains);
@@ -134,10 +134,10 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(window.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window.Object);
 
 		// When
-		bool contains = engine.Contains(new Mock<IWindow>().Object);
+		bool contains = engine.ContainsWindow(new Mock<IWindow>().Object);
 
 		// Then
 		Assert.False(contains);
@@ -164,7 +164,7 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(window.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window.Object);
 
 		// When
 		IWindowState[] windowStates = engine
@@ -198,7 +198,7 @@ public class ColumnLayoutEngineTests
 		IWindow window2 = CreateWindow();
 		IWindow window3 = CreateWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(window).Add(window2).Add(window3);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window).AddWindow(window2).AddWindow(window3);
 
 		Location<int> location = new() { Width = 1920, Height = 1080 };
 
@@ -262,7 +262,7 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		IWindow window = CreateWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }.Add(window);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }.AddWindow(window);
 
 		Location<int> location = new() { Width = 1920, Height = 1080 };
 
@@ -297,9 +297,9 @@ public class ColumnLayoutEngineTests
 		IWindow window3 = CreateWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(window)
-			.Add(window2)
-			.Add(window3);
+			.AddWindow(window)
+			.AddWindow(window2)
+			.AddWindow(window3);
 
 		Location<int> location = new() { Width = 1920, Height = 1080 };
 
@@ -377,7 +377,7 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		IWindow window = CreateWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(window);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -394,7 +394,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Up, leftWindow.Object);
@@ -412,7 +414,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 		Mock<IWindow> otherWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, otherWindow.Object);
@@ -429,7 +433,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Right, leftWindow.Object);
@@ -446,7 +452,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Right, rightWindow.Object);
@@ -462,7 +470,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, rightWindow.Object);
@@ -478,7 +488,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, leftWindow.Object);
@@ -495,8 +507,8 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(leftWindow.Object)
-			.Add(rightWindow.Object);
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, leftWindow.Object);
@@ -513,8 +525,8 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(leftWindow.Object)
-			.Add(rightWindow.Object);
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, rightWindow.Object);
@@ -531,8 +543,8 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(leftWindow.Object)
-			.Add(rightWindow.Object);
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Right, rightWindow.Object);
@@ -549,8 +561,8 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(leftWindow.Object)
-			.Add(rightWindow.Object);
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Right, leftWindow.Object);
@@ -568,7 +580,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Up, leftWindow.Object);
@@ -596,7 +610,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> rightWindow = CreateMockWindow();
 		Mock<IWindow> notFoundWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, notFoundWindow.Object);
@@ -623,7 +639,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
@@ -650,7 +668,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
@@ -677,7 +697,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
@@ -704,7 +726,9 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 		Mock<IWindow> rightWindow = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(leftWindow.Object).Add(rightWindow.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(leftWindow.Object)
+			.AddWindow(rightWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
@@ -732,8 +756,8 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(rightWindow.Object)
-			.Add(leftWindow.Object);
+			.AddWindow(rightWindow.Object)
+			.AddWindow(leftWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
@@ -761,8 +785,8 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(rightWindow.Object)
-			.Add(leftWindow.Object);
+			.AddWindow(rightWindow.Object)
+			.AddWindow(leftWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
@@ -790,8 +814,8 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(rightWindow.Object)
-			.Add(leftWindow.Object);
+			.AddWindow(rightWindow.Object)
+			.AddWindow(leftWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
@@ -819,8 +843,8 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> leftWindow = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(rightWindow.Object)
-			.Add(leftWindow.Object);
+			.AddWindow(rightWindow.Object)
+			.AddWindow(leftWindow.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
@@ -847,7 +871,9 @@ public class ColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(window.Object).Add(new Mock<IWindow>().Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(window.Object)
+			.AddWindow(new Mock<IWindow>().Object);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(
@@ -867,10 +893,10 @@ public class ColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(new Mock<IWindow>().Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(new Mock<IWindow>().Object);
 
 		// When
-		ILayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = -10 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = -10 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
@@ -886,10 +912,10 @@ public class ColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(new Mock<IWindow>().Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(new Mock<IWindow>().Object);
 
 		// When
-		ILayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 10 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 10 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
@@ -906,11 +932,11 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> window = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.Add(new Mock<IWindow>().Object)
-			.Add(new Mock<IWindow>().Object);
+			.AddWindow(new Mock<IWindow>().Object)
+			.AddWindow(new Mock<IWindow>().Object);
 
 		// When
-		ILayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 0.5 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 0.5 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
@@ -927,11 +953,11 @@ public class ColumnLayoutEngineTests
 		Mock<IWindow> window = CreateMockWindow();
 
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.Add(new Mock<IWindow>().Object)
-			.Add(new Mock<IWindow>().Object);
+			.AddWindow(new Mock<IWindow>().Object)
+			.AddWindow(new Mock<IWindow>().Object);
 
 		// When
-		ILayoutEngine newEngine = engine.AddAtPoint(window.Object, new Point<double>() { X = 0.5 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 0.5 });
 		List<IWindowState> windows = newEngine
 			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
 			.ToList();
@@ -948,7 +974,9 @@ public class ColumnLayoutEngineTests
 		// Given
 		Mock<IWindow> window = CreateMockWindow();
 
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).Add(window.Object).Add(new Mock<IWindow>().Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(window.Object)
+			.AddWindow(new Mock<IWindow>().Object);
 
 		// When
 		engine.HidePhantomWindows();

@@ -127,7 +127,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public ILayoutEngine Add(IWindow window)
+	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
@@ -200,10 +200,22 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point)
+	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
+		TreeLayoutEngine treeLayoutEngine = this;
+
+		if (_windows.ContainsKey(window))
+		{
+			treeLayoutEngine = (TreeLayoutEngine)treeLayoutEngine.RemoveWindow(window);
+		}
+
+		return treeLayoutEngine.AddWindowAtPoint(window, point);
+	}
+
+	private ILayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point)
+	{
 		// Create the new leaf node.
 		LeafNode newLeafNode = _plugin.PhantomWindows.Contains(window)
 			? new PhantomNode(window)
@@ -234,14 +246,14 @@ public class TreeLayoutEngine : ILayoutEngine
 
 		if (_root is ISplitNode splitNode)
 		{
-			return AddAtPointSplitNode(point, newLeafNode, splitNode);
+			return MoveWindowToPointSplitNode(point, newLeafNode, splitNode);
 		}
 
 		Logger.Debug($"Root is null, creating new window node");
 		return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
 	}
 
-	private ILayoutEngine AddAtPointSplitNode(IPoint<double> point, LeafNode newLeafNode, ISplitNode rootNode)
+	private ILayoutEngine MoveWindowToPointSplitNode(IPoint<double> point, LeafNode newLeafNode, ISplitNode rootNode)
 	{
 		LeafNodeStateAtPoint? result = rootNode.GetNodeContainingPoint(point);
 		if (result is null)
@@ -278,7 +290,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public bool Contains(IWindow window)
+	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
 
@@ -295,17 +307,14 @@ public class TreeLayoutEngine : ILayoutEngine
 			yield break;
 		}
 
-		foreach (LeafNodeWindowLocationState? item in _root.GetWindowLocations(location))
+		foreach (LeafNodeWindowLocationState item in _root.GetWindowLocations(location))
 		{
-			if (item.LeafNode is LeafNode leafNode)
+			yield return new WindowState()
 			{
-				yield return new WindowState()
-				{
-					Window = leafNode.Window,
-					Location = item.Location,
-					WindowSize = item.WindowSize
-				};
-			}
+				Window = item.LeafNode.Window,
+				Location = item.Location,
+				WindowSize = item.WindowSize
+			};
 		}
 	}
 
@@ -540,7 +549,7 @@ public class TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public ILayoutEngine Remove(IWindow window)
+	public ILayoutEngine RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 

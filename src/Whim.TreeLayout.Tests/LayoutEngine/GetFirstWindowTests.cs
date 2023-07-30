@@ -31,7 +31,7 @@ public class GetFirstWindowTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window.Object);
+		).AddWindow(window.Object);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -53,7 +53,7 @@ public class GetFirstWindowTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window.Object);
+		).AddWindow(window.Object);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -73,9 +73,9 @@ public class GetFirstWindowTests
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object)
-			.Add(window3.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object)
+			.AddWindow(window3.Object);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();

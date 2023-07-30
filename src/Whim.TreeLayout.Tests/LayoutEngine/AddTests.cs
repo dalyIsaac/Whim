@@ -15,11 +15,11 @@ public class AddTests
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
 
 		// When
-		ILayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.AddWindow(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window.Object));
+		Assert.True(result.ContainsWindow(window.Object));
 		Assert.Equal(1, result.Count);
 	}
 
@@ -32,11 +32,11 @@ public class AddTests
 		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
 
 		// When
-		ILayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.AddWindow(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window.Object));
+		Assert.True(result.ContainsWindow(window.Object));
 		Assert.Equal(1, result.Count);
 	}
 
@@ -50,17 +50,17 @@ public class AddTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(phantomWindow.Object);
+		).AddWindow(phantomWindow.Object);
 
 		Mock<IWindow> window = new();
 
 		// When
-		ILayoutEngine result = engine.Add(window.Object);
+		ILayoutEngine result = engine.AddWindow(window.Object);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.False(result.Contains(phantomWindow.Object));
-		Assert.True(result.Contains(window.Object));
+		Assert.False(result.ContainsWindow(phantomWindow.Object));
+		Assert.True(result.ContainsWindow(window.Object));
 		Assert.Equal(1, result.Count);
 	}
 
@@ -75,18 +75,18 @@ public class AddTests
 			wrapper.Context.Object,
 			wrapper.Plugin.Object,
 			wrapper.Identity
-		).Add(window1.Object);
+		).AddWindow(window1.Object);
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.Add(window2.Object);
+		ILayoutEngine result = engine.AddWindow(window2.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window1.Object));
-		Assert.True(result.Contains(window2.Object));
+		Assert.True(result.ContainsWindow(window1.Object));
+		Assert.True(result.ContainsWindow(window2.Object));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -133,19 +133,19 @@ public class AddTests
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.Add(window3.Object);
+		ILayoutEngine result = engine.AddWindow(window3.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window3.Object));
 		Assert.Equal(3, result.Count);
 
 		windowStates
@@ -204,19 +204,19 @@ public class AddTests
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window3.Object);
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.Add(window3.Object);
+		ILayoutEngine result = engine.AddWindow(window3.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window3.Object));
 		Assert.Equal(3, result.Count);
 
 		windowStates
@@ -275,8 +275,8 @@ public class AddTests
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		wrapper.SetAsLastFocusedWindow(window1.Object);
 
@@ -284,12 +284,12 @@ public class AddTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.Add(window3.Object);
+		ILayoutEngine result = engine.AddWindow(window3.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window3.Object));
 		Assert.Equal(3, result.Count);
 
 		windowStates
@@ -348,8 +348,8 @@ public class AddTests
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.Add(window1.Object)
-			.Add(window2.Object);
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
 
 		wrapper.SetAddWindowDirection(Direction.Down);
 
@@ -357,12 +357,12 @@ public class AddTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.Add(window3.Object);
+		ILayoutEngine result = engine.AddWindow(window3.Object);
 		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.Contains(window3.Object));
+		Assert.True(result.ContainsWindow(window3.Object));
 		Assert.Equal(3, result.Count);
 
 		windowStates

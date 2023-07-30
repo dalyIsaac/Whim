@@ -1,7 +1,7 @@
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
@@ -17,51 +17,6 @@ public class WorkspaceManagerTests
 			: base(context) { }
 
 		public void Add(IWorkspace workspace) => _workspaces.Add(workspace);
-	}
-
-	private class TestLayoutEngine : ILayoutEngine
-	{
-		public string Name => throw new NotImplementedException();
-
-		public int Count => throw new NotImplementedException();
-
-		public LayoutEngineIdentity Identity => throw new NotImplementedException();
-
-		public ILayoutEngine Add(IWindow window) => throw new NotImplementedException();
-
-		public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) => throw new NotImplementedException();
-
-		public bool Contains(IWindow window) => throw new NotImplementedException();
-
-		public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
-			throw new NotImplementedException();
-
-		public void FocusWindowInDirection(Direction direction, IWindow window) => throw new NotImplementedException();
-
-		public IWindow? GetFirstWindow() => throw new NotImplementedException();
-
-		public void HidePhantomWindows() => throw new NotImplementedException();
-
-		public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
-			throw new NotImplementedException();
-
-		public ILayoutEngine Remove(IWindow window) => throw new NotImplementedException();
-
-		public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
-			throw new NotImplementedException();
-	}
-
-	private class TestProxyLayoutEngine : BaseProxyLayoutEngine
-	{
-		public TestProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
-			: base(innerLayoutEngine) { }
-
-		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
-		{
-			yield break;
-		}
-
-		protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) => throw new NotImplementedException();
 	}
 
 	private class Wrapper

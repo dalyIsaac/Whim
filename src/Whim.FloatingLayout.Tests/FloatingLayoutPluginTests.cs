@@ -41,6 +41,11 @@ public class FloatingLayoutPluginTests
 		public Wrapper Setup_TryGetWindowLocation(IWindow window, IWindowState? windowState)
 		{
 			Workspace.Setup(w => w.TryGetWindowLocation(window)).Returns(windowState);
+
+			if (windowState != null)
+			{
+				Workspace.Setup(w => w.ActiveLayoutEngine).Returns(FloatingLayoutEngine);
+			}
 			return this;
 		}
 
@@ -106,6 +111,37 @@ public class FloatingLayoutPluginTests
 
 		// Then
 		wrapper.WorkspaceManager.Verify(x => x.AddProxyLayoutEngine(It.IsAny<CreateProxyLayoutEngine>()), Times.Never);
+	}
+
+	[Fact]
+	public void WindowManager_WindowRemoved()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<IMonitor> monitor = new();
+		Location<int> location = new();
+		WindowState windowState =
+			new()
+			{
+				Window = window.Object,
+				Location = location,
+				WindowSize = WindowSize.Normal
+			};
+
+		Wrapper wrapper = new();
+		wrapper
+			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
+			.Setup_TryGetWindowLocation(window.Object, windowState)
+			.Setup_GetMonitorAtPoint(location, monitor);
+		FloatingLayoutPlugin plugin = wrapper.Plugin;
+
+		// When
+		plugin.PreInitialize();
+		plugin.MarkWindowAsFloating(window.Object);
+		wrapper.WindowManager.Raise(x => x.WindowRemoved += null, new WindowEventArgs() { Window = window.Object });
+
+		// Then nothing
+		Assert.Empty(plugin.FloatingWindows);
 	}
 
 	#region MarkWindowAsFloating
@@ -203,13 +239,30 @@ public class FloatingLayoutPluginTests
 
 		// Then
 		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window.Object, plugin.FloatingWindows.First());
+		Assert.Equal(window.Object, plugin.FloatingWindows.Keys.First());
 		wrapper.Workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<IPoint<double>>()), Times.Once);
 	}
 	#endregion
 
+	#region MarkWindowAsDocked
 	[Fact]
-	public void MarkWindowAsDocked()
+	public void MarkWindowAsDocked_WindowIsNotFloating()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Wrapper wrapper = new();
+		FloatingLayoutPlugin plugin = wrapper.Plugin;
+
+		// When
+		plugin.MarkWindowAsDocked(window.Object);
+
+		// Then
+		Assert.Empty(plugin.FloatingWindows);
+		wrapper.Workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<IPoint<double>>()), Times.Never);
+	}
+
+	[Fact]
+	public void MarkWindowAsDocked_WindowIsFloating()
 	{
 		// Given
 		Mock<IWindow> window = new();
@@ -239,6 +292,7 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 		wrapper.Workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<IPoint<double>>()), Times.Exactly(2));
 	}
+	#endregion
 
 	#region ToggleWindowFloating
 	[Fact]
@@ -284,7 +338,7 @@ public class FloatingLayoutPluginTests
 
 		// Then
 		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window.Object, plugin.FloatingWindows.First());
+		Assert.Equal(window.Object, plugin.FloatingWindows.Keys.First());
 	}
 
 	[Fact]

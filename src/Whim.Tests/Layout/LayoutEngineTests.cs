@@ -1,23 +1,12 @@
 using Moq;
 using System.Collections.Generic;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
 public class LayoutEngineTests
 {
-	private class ProxyLayoutEngine : BaseProxyLayoutEngine
-	{
-		public ProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
-			: base(innerLayoutEngine) { }
-
-		protected override ILayoutEngine Update(ILayoutEngine newLayoutEngine) =>
-			newLayoutEngine == InnerLayoutEngine ? this : new ProxyLayoutEngine(newLayoutEngine);
-
-		public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
-			InnerLayoutEngine.DoLayout(location, monitor);
-	}
-
 	private class TestLayoutEngine : ILayoutEngine
 	{
 		public LayoutEngineIdentity Identity => throw new System.NotImplementedException();
@@ -25,12 +14,12 @@ public class LayoutEngineTests
 
 		public int Count => throw new System.NotImplementedException();
 
-		public ILayoutEngine Add(IWindow window) => throw new System.NotImplementedException();
+		public ILayoutEngine AddWindow(IWindow window) => throw new System.NotImplementedException();
 
-		public ILayoutEngine AddAtPoint(IWindow window, IPoint<double> point) =>
+		public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) =>
 			throw new System.NotImplementedException();
 
-		public bool Contains(IWindow window) => throw new System.NotImplementedException();
+		public bool ContainsWindow(IWindow window) => throw new System.NotImplementedException();
 
 		public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
 			throw new System.NotImplementedException();
@@ -45,7 +34,7 @@ public class LayoutEngineTests
 		public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
 			throw new System.NotImplementedException();
 
-		public ILayoutEngine Remove(IWindow window) => throw new System.NotImplementedException();
+		public ILayoutEngine RemoveWindow(IWindow window) => throw new System.NotImplementedException();
 
 		public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
 			throw new System.NotImplementedException();
@@ -73,8 +62,8 @@ public class LayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		ILayoutEngine proxyInner = new ProxyLayoutEngine(engine);
-		ILayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
+		ILayoutEngine proxyInner = new TestProxyLayoutEngine(engine);
+		ILayoutEngine proxyOuter = new TestProxyLayoutEngine(proxyInner);
 
 		// When
 		TestLayoutEngine? newEngine = proxyOuter.GetLayoutEngine<TestLayoutEngine>();
@@ -117,8 +106,8 @@ public class LayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		ILayoutEngine proxyInner = new ProxyLayoutEngine(engine);
-		ILayoutEngine proxyOuter = new ProxyLayoutEngine(proxyInner);
+		ILayoutEngine proxyInner = new TestProxyLayoutEngine(engine);
+		ILayoutEngine proxyOuter = new TestProxyLayoutEngine(proxyInner);
 
 		// When
 		bool contains = proxyOuter.ContainsEqual(engine);
