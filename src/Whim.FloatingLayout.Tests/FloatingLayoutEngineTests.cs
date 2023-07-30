@@ -555,4 +555,142 @@ public class FloatingLayoutEngineTests
 		Assert.Same(window.Object, firstWindow);
 	}
 	#endregion
+
+	#region FocusWindowInDirection
+	[Fact]
+	public void FocusWindowInDirection_UseInner()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Direction direction = Direction.Left;
+
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		engine.FocusWindowInDirection(direction, window.Object);
+
+		// Then
+		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void FocusWindowInDirection_FloatingWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+		Direction direction = Direction.Left;
+
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		engine.AddWindow(window.Object).FocusWindowInDirection(direction, window.Object);
+
+		// Then
+		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
+	}
+	#endregion
+
+	#region SwapWindowInDirection
+	[Fact]
+	public void SwapWindowInDirection_UseInner()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Direction direction = Direction.Left;
+
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		engine.SwapWindowInDirection(direction, window.Object);
+
+		// Then
+		wrapper.InnerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(direction, window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void SwapWindowInDirection_FloatingWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+		Direction direction = Direction.Left;
+
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		engine.AddWindow(window.Object).SwapWindowInDirection(direction, window.Object);
+
+		// Then
+		wrapper.InnerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(direction, window.Object), Times.Never);
+	}
+	#endregion
+
+	#region ContainsWindow
+	[Fact]
+	public void ContainsWindow_UseInner()
+	{
+		// Given
+		Mock<IWindow> window = new();
+
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		bool containsWindow = engine.ContainsWindow(window.Object);
+
+		// Then
+		Assert.False(containsWindow);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.ContainsWindow(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void ContainsWindow_FloatingWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		bool containsWindow = engine.AddWindow(window.Object).ContainsWindow(window.Object);
+
+		// Then
+		Assert.True(containsWindow);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.ContainsWindow(window.Object), Times.Never);
+	}
+	#endregion
+
+	[Fact]
+	public void HidePhantomWindows()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		engine.HidePhantomWindows();
+
+		// Then
+		wrapper.InnerLayoutEngine.Verify(ile => ile.HidePhantomWindows(), Times.Once);
+	}
 }
