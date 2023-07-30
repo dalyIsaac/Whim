@@ -499,4 +499,60 @@ public class FloatingLayoutEngineTests
 		windowStates.Should().BeEquivalentTo(expected);
 	}
 	#endregion
+
+	#region GetFirstWindow
+	[Fact]
+	public void GetFirstWindow_NoInnerFirstWindow()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		IWindow? firstWindow = engine.GetFirstWindow();
+
+		// Then
+		Assert.Null(firstWindow);
+	}
+
+	[Fact]
+	public void GetFirstWindow_InnerFirstWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		wrapper.InnerLayoutEngine.Setup(ile => ile.GetFirstWindow()).Returns(window.Object);
+
+		// When
+		IWindow? firstWindow = engine.GetFirstWindow();
+
+		// Then
+		Assert.Same(window.Object, firstWindow);
+	}
+
+	[Fact]
+	public void GetFirstWindow_FloatingFirstWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		IWindow? firstWindow = engine.AddWindow(window.Object).GetFirstWindow();
+
+		// Then
+		Assert.Same(window.Object, firstWindow);
+	}
+	#endregion
 }
