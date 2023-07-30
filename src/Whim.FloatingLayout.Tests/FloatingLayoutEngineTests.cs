@@ -12,7 +12,7 @@ public class FloatingLayoutEngineTests
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IInternalFloatingLayoutPlugin> FloatingLayoutPlugin { get; } = new();
+		public Mock<IInternalFloatingLayoutPlugin> Plugin { get; } = new();
 		public Mock<IMonitor> Monitor { get; } = new();
 
 		public Mock<ILayoutEngine> InnerLayoutEngine { get; } = new();
@@ -31,16 +31,14 @@ public class FloatingLayoutEngineTests
 
 			Monitor.SetupGet(m => m.WorkingArea).Returns(new Location<int>() { Width = 1000, Height = 1000 });
 
-			FloatingLayoutPlugin
-				.SetupGet(x => x.FloatingWindows)
-				.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+			Plugin.SetupGet(x => x.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
 
 			InnerLayoutEngine.Setup(ile => ile.Identity).Returns(new LayoutEngineIdentity());
 		}
 
 		public Wrapper MarkAsFloating(IWindow window)
 		{
-			FloatingLayoutPlugin
+			Plugin
 				.SetupGet(x => x.FloatingWindows)
 				.Returns(
 					new Dictionary<IWindow, ISet<LayoutEngineIdentity>>
@@ -78,7 +76,7 @@ public class FloatingLayoutEngineTests
 
 		Wrapper wrapper = new();
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window.Object);
@@ -96,7 +94,7 @@ public class FloatingLayoutEngineTests
 
 		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window.Object);
@@ -114,7 +112,7 @@ public class FloatingLayoutEngineTests
 
 		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns((Location<int>?)null);
 
@@ -137,7 +135,7 @@ public class FloatingLayoutEngineTests
 			.MarkAsFloating(window.Object)
 			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
@@ -159,7 +157,7 @@ public class FloatingLayoutEngineTests
 
 		Wrapper wrapper = new Wrapper().Setup_AddWindow(window.Object, newInnerLayoutEngine);
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window.Object);
@@ -174,6 +172,53 @@ public class FloatingLayoutEngineTests
 	}
 	#endregion
 
+	#region RemoveWindow
+	[Fact]
+	public void RemoveWindow_UseInner()
+	{
+		// Given
+		Mock<IWindow> window = new();
+
+		Wrapper wrapper = new();
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		ILayoutEngine newEngine = engine.RemoveWindow(window.Object);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void RemoveWindow_FloatingInPlugin()
+	{
+		// Given
+		Mock<IWindow> window = new();
+
+		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When
+		wrapper.MarkAsFloating(window.Object);
+
+		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
+
+		wrapper.InnerLayoutEngine.Invocations.Clear();
+		wrapper.Plugin.Invocations.Clear();
+
+		ILayoutEngine newEngine2 = newEngine1.RemoveWindow(window.Object);
+
+		// Then
+		Assert.NotSame(engine, newEngine1);
+		Assert.NotSame(newEngine1, newEngine2);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Never);
+		wrapper.Plugin.VerifyGet(x => x.FloatingWindows, Times.Once);
+	}
+	#endregion
+
 	#region MoveWindowToPoint
 	[Fact]
 	public void MoveWindowToPoint_UseInner()
@@ -184,7 +229,7 @@ public class FloatingLayoutEngineTests
 
 		Wrapper wrapper = new();
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, location);
@@ -203,7 +248,7 @@ public class FloatingLayoutEngineTests
 
 		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, location);
@@ -225,7 +270,7 @@ public class FloatingLayoutEngineTests
 			.MarkAsFloating(window.Object)
 			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
@@ -249,7 +294,7 @@ public class FloatingLayoutEngineTests
 			.MarkAsFloating(window.Object)
 			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
 		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.FloatingLayoutPlugin.Object, wrapper.InnerLayoutEngine.Object);
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
