@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using Windows.Win32.Foundation;
 using Xunit;
@@ -410,6 +411,92 @@ public class FloatingLayoutEngineTests
 			ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object),
 			Times.Never
 		);
+	}
+	#endregion
+
+	#region DoLayout
+	[Fact]
+	public void DoLayout()
+	{
+		// Given the window has been added and the inner layout engine has a layout
+		Mock<IWindow> floatingWindow = new();
+		Mock<IWindow> window1 = new();
+		Mock<IWindow> window2 = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(floatingWindow.Object)
+			.Setup_RemoveWindow(floatingWindow.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		newInnerLayoutEngine
+			.Setup(ile => ile.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()))
+			.Returns(
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Window = window1.Object,
+						Location = new Location<int>(),
+						WindowSize = WindowSize.Normal
+					},
+					new WindowState()
+					{
+						Window = window2.Object,
+						Location = new Location<int>(),
+						WindowSize = WindowSize.Normal
+					}
+				}
+			);
+
+		// When
+		IWindowState[] windowStates = engine
+			.AddWindow(floatingWindow.Object)
+			.DoLayout(
+				new Location<int>()
+				{
+					X = 0,
+					Y = 0,
+					Width = 1000,
+					Height = 1000
+				},
+				wrapper.Monitor.Object
+			)
+			.ToArray();
+
+		// Then
+		Assert.Equal(3, windowStates.Length);
+
+		IWindowState[] expected = new IWindowState[]
+		{
+			new WindowState()
+			{
+				Window = floatingWindow.Object,
+				Location = new Location<int>()
+				{
+					X = 0,
+					Y = 0,
+					Width = 100,
+					Height = 100
+				},
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = window1.Object,
+				Location = new Location<int>(),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = window2.Object,
+				Location = new Location<int>(),
+				WindowSize = WindowSize.Normal
+			}
+		};
+
+		windowStates.Should().BeEquivalentTo(expected);
 	}
 	#endregion
 }

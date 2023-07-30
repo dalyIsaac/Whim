@@ -155,17 +155,9 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
-		List<IWindow> windowsToRemove = new();
-
 		// Iterate over all windows in _windowToLocation.
 		foreach ((IWindow window, ILocation<double> loc) in _floatingWindowLocations)
 		{
-			if (!_plugin.FloatingWindows.ContainsKey(window))
-			{
-				windowsToRemove.Add(window);
-				continue;
-			}
-
 			yield return new WindowState()
 			{
 				Window = window,
@@ -178,12 +170,6 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 		foreach (IWindowState windowLocation in InnerLayoutEngine.DoLayout(location, monitor))
 		{
 			yield return windowLocation;
-		}
-
-		// Remove all windows that are no longer floating.
-		foreach (IWindow window in windowsToRemove)
-		{
-			_floatingWindowLocations.Remove(window);
 		}
 	}
 
