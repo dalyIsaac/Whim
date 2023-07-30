@@ -114,14 +114,8 @@ public class TreeLayoutEngine : ILayoutEngine
 	{
 		WindowPathDict.Builder dictBuilder = ImmutableDictionary.CreateBuilder<IWindow, ImmutableArray<int>>();
 
-		ImmutableArray<int>.Builder pathA = ImmutableArray.CreateBuilder<int>();
-		pathA.Add(0);
-
-		ImmutableArray<int>.Builder pathB = ImmutableArray.CreateBuilder<int>();
-		pathB.Add(1);
-
-		dictBuilder.Add(windowA, pathA.ToImmutable());
-		dictBuilder.Add(windowB, pathB.ToImmutable());
+		dictBuilder.Add(windowA, ImmutableArray.Create(0));
+		dictBuilder.Add(windowB, ImmutableArray.Create(1));
 
 		return dictBuilder.ToImmutable();
 	}
@@ -227,20 +221,20 @@ public class TreeLayoutEngine : ILayoutEngine
 			return new TreeLayoutEngine(this, newLeafNode, CreateRootNodeDict(window));
 		}
 
-		if (_root is WindowNode windowNode)
+		if (_root is WindowNode focusedWindowNode)
 		{
 			Logger.Debug($"Root is window node, replacing with split node");
 			Direction newNodeDirection = Location.UnitSquare<double>().GetDirectionToPoint(point);
 
+			ISplitNode newRoot = new SplitNode(focusedWindowNode, newLeafNode, newNodeDirection);
+
 			if (newNodeDirection.InsertAfter())
 			{
-				ISplitNode newRoot = new SplitNode(windowNode, newLeafNode, newNodeDirection);
-				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(windowNode.Window, window));
+				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(focusedWindowNode.Window, window));
 			}
 			else
 			{
-				ISplitNode newRoot = new SplitNode(newLeafNode, windowNode, newNodeDirection);
-				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(window, windowNode.Window));
+				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(window, focusedWindowNode.Window));
 			}
 		}
 
