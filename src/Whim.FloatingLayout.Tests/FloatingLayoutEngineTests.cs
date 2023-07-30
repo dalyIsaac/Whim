@@ -543,8 +543,8 @@ public class FloatingLayoutEngineTests
 			);
 
 		// When
-		IWindowState[] windowStates = engine
-			.AddWindow(floatingWindow.Object)
+		ILayoutEngine newEngine = engine.AddWindow(floatingWindow.Object);
+		IWindowState[] windowStates = newEngine
 			.DoLayout(
 				new Location<int>()
 				{
@@ -556,6 +556,7 @@ public class FloatingLayoutEngineTests
 				wrapper.Monitor.Object
 			)
 			.ToArray();
+		int count = newEngine.Count;
 
 		// Then
 		Assert.Equal(3, windowStates.Length);
@@ -589,6 +590,8 @@ public class FloatingLayoutEngineTests
 		};
 
 		windowStates.Should().BeEquivalentTo(expected);
+
+		Assert.Equal(3, count);
 	}
 	#endregion
 
