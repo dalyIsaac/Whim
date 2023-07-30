@@ -411,4 +411,23 @@ public class GapsLayoutEngineTests
 		innerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(direction, window.Object), Times.Once);
 	}
 	#endregion
+
+	[Fact]
+	public void GetFirstWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(ile => ile.GetFirstWindow()).Returns(window.Object);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
+
+		// When
+		IWindow? firstWindow = gapsLayoutEngine.GetFirstWindow();
+
+		// Then
+		Assert.Same(window.Object, firstWindow);
+		innerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Once);
+	}
 }
