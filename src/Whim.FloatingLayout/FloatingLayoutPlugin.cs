@@ -4,19 +4,15 @@ using System.Text.Json;
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
-public class FloatingLayoutPlugin : IFloatingLayoutPlugin
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayoutPlugin
 {
 	private readonly IContext _context;
 
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
 
-	/// <summary>
-	/// Mapping of floating windows to the layout engines that they are floating in.
-	/// This is not exposed outside of this namespace to prevent mutation of the dictionary and
-	/// sets.
-	/// </summary>
-	internal IDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows { get; } =
+	/// <inheritdoc/>
+	public IDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows { get; } =
 		new Dictionary<IWindow, ISet<LayoutEngineIdentity>>();
 
 	/// <summary>

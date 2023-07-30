@@ -7,10 +7,10 @@ namespace Whim.FloatingLayout;
 /// <summary>
 /// A proxy layout engine to allow windows to be free-floating.
 /// </summary>
-public class FloatingLayoutEngine : BaseProxyLayoutEngine
+internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
-	private readonly FloatingLayoutPlugin _plugin;
+	private readonly IInternalFloatingLayoutPlugin _plugin;
 	private readonly ImmutableDictionary<IWindow, ILocation<double>> _floatingWindowLocations;
 
 	/// <inheritdoc />
@@ -22,7 +22,7 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public FloatingLayoutEngine(IContext context, FloatingLayoutPlugin plugin, ILayoutEngine innerLayoutEngine)
+	public FloatingLayoutEngine(IContext context, IInternalFloatingLayoutPlugin plugin, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_context = context;
@@ -58,7 +58,12 @@ public class FloatingLayoutEngine : BaseProxyLayoutEngine
 		// update the location and return.
 		if (IsWindowFloating(window))
 		{
-			return UpdateWindowLocation(window);
+			// return UpdateWindowLocation(window);
+			FloatingLayoutEngine newEngine = UpdateWindowLocation(window);
+			if (newEngine != this)
+			{
+				return newEngine;
+			}
 		}
 
 		return UpdateInner(InnerLayoutEngine.AddWindow(window));
