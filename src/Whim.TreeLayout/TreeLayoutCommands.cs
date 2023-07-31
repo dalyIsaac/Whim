@@ -48,11 +48,6 @@ public class TreeLayoutCommands : PluginCommands
 				callback: () =>
 					_treeLayoutPlugin.SetAddWindowDirection(_context.MonitorManager.ActiveMonitor, Direction.Down),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_DOWN)
-			)
-			.Add(
-				identifier: "split_focused_window",
-				title: "Split the focused window",
-				callback: _treeLayoutPlugin.SplitFocusedWindow
 			);
 	}
 }
