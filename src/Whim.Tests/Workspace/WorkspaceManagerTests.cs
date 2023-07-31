@@ -774,31 +774,6 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void MoveWindowToWorkspace_PhantomWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		Mock<IWindow> window = new();
-		// When a phantom window is added
-		wrapper.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
-		workspace.Reset();
-		workspace2.Reset();
-
-		// and moved to a workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace.Object, window.Object);
-
-		// Then the window is not removed or added to any workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
-	}
-
-	[Fact]
 	public void MoveWindowToWorkspace_CannotFindWindow()
 	{
 		// Given
@@ -1096,35 +1071,6 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
 
 		// Then the window is not removed from the old workspace and not added to the new workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
-	}
-
-	[Fact]
-	public void MoveWindowToPoint_PhantomWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
-		workspace.Reset();
-		workspace2.Reset();
-
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(wrapper.Monitors[1].Object);
-
-		// When a phantom is moved
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
-
-		// Then nothing happens
-		wrapper.MonitorManager.Verify(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never());
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 	}
@@ -1493,39 +1439,6 @@ public class WorkspaceManagerTests
 		Assert.IsType<TestProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
 	}
 	#endregion
-
-	[Fact]
-	public void AddPhantomWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new(new[] { workspace });
-
-		// When a phantom window is added
-		wrapper.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
-
-		// Then the phantom window is added to the list
-		Assert.Contains(window.Object, wrapper.WorkspaceManager.PhantomWindows);
-	}
-
-	[Fact]
-	public void RemovePhantomWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new(new[] { workspace });
-
-		wrapper.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
-
-		// When a phantom window is removed
-		wrapper.WorkspaceManager.RemovePhantomWindow(window.Object);
-
-		// Then the phantom window is removed from the list
-		Assert.DoesNotContain(window.Object, wrapper.WorkspaceManager.PhantomWindows);
-		Assert.Null(wrapper.WorkspaceManager.GetMonitorForWindow(window.Object));
-	}
 
 	[Fact]
 	public void DoesDispose()
