@@ -896,19 +896,4 @@ public class FloatingLayoutEngineTests
 		wrapper.InnerLayoutEngine.Verify(ile => ile.ContainsWindow(window.Object), Times.Never);
 	}
 	#endregion
-
-	[Fact]
-	public void HidePhantomWindows()
-	{
-		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		// When
-		engine.HidePhantomWindows();
-
-		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.HidePhantomWindows(), Times.Once);
-	}
 }

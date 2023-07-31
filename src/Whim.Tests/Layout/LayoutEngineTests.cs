@@ -29,8 +29,6 @@ public class LayoutEngineTests
 
 		public IWindow? GetFirstWindow() => throw new System.NotImplementedException();
 
-		public void HidePhantomWindows() => throw new System.NotImplementedException();
-
 		public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
 			throw new System.NotImplementedException();
 

@@ -967,20 +967,4 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(1, windows.FindIndex(w => w.Window == window.Object));
 	}
 	#endregion
-
-	[Fact]
-	public void HidePhantomWindows()
-	{
-		// Given
-		Mock<IWindow> window = CreateMockWindow();
-
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(window.Object)
-			.AddWindow(new Mock<IWindow>().Object);
-
-		// When
-		engine.HidePhantomWindows();
-
-		// Then nothing...?
-	}
 }
