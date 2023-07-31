@@ -25,48 +25,6 @@ public class MoveWindowToPointTests
 	}
 
 	[Fact]
-	public void MoveWindowToPoint_RootIsNull_AddPhantom()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(window.Object);
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
-		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
-
-		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, point);
-
-		// Then
-		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window.Object));
-		Assert.Equal(1, result.Count);
-	}
-
-	[Fact]
-	public void MoveWindowToPoint_RootIsPhantomNode()
-	{
-		// Given
-		Mock<IWindow> phantomWindow = new();
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(phantomWindow.Object);
-
-		Mock<IWindow> window = new();
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(phantomWindow.Object);
-		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
-
-		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, point);
-
-		// Then
-		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window.Object));
-		Assert.Equal(1, result.Count);
-	}
-
-	[Fact]
 	public void MoveWindowToPoint_RootIsWindowNode_Right()
 	{
 		// Given

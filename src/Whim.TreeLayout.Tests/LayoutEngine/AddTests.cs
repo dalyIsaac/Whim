@@ -24,47 +24,6 @@ public class AddTests
 	}
 
 	[Fact]
-	public void AddPhantom_RootIsNull()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(window.Object);
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
-
-		// When
-		ILayoutEngine result = engine.AddWindow(window.Object);
-
-		// Then
-		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window.Object));
-		Assert.Equal(1, result.Count);
-	}
-
-	[Fact]
-	public void AddWindow_RootIsPhantom()
-	{
-		// Given
-		Mock<IWindow> phantomWindow = new();
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsPhantom(phantomWindow.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(phantomWindow.Object);
-
-		Mock<IWindow> window = new();
-
-		// When
-		ILayoutEngine result = engine.AddWindow(window.Object);
-
-		// Then
-		Assert.NotSame(engine, result);
-		Assert.False(result.ContainsWindow(phantomWindow.Object));
-		Assert.True(result.ContainsWindow(window.Object));
-		Assert.Equal(1, result.Count);
-	}
-
-	[Fact]
 	public void AddWindow_RootIsWindow()
 	{
 		// Given

@@ -18,11 +18,6 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	/// <inheritdoc/>
 	public IPluginCommands PluginCommands => new TreeLayoutCommands(_context, this);
 
-	private readonly HashSet<IWindow> _phantomWindows = new();
-
-	/// <inheritdoc/>
-	public IReadOnlySet<IWindow> PhantomWindows => _phantomWindows;
-
 	/// <inheritdoc	/>
 	public event EventHandler<AddWindowDirectionChangedEventArgs>? AddWindowDirectionChanged;
 
@@ -35,21 +30,10 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	}
 
 	/// <inheritdoc	/>
-	public void PreInitialize()
-	{
-		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
-	}
+	public void PreInitialize() { }
 
 	/// <inheritdoc	/>
 	public void PostInitialize() { }
-
-	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e)
-	{
-		if (_phantomWindows.Contains(e.Window))
-		{
-			_phantomWindows.Remove(e.Window);
-		}
-	}
 
 	/// <inheritdoc />
 	public Direction? GetAddWindowDirection(IMonitor monitor)
@@ -73,17 +57,6 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 		}
 
 		return direction;
-	}
-
-	/// <inheritdoc />
-	public void SplitFocusedWindow()
-	{
-		IWorkspace? workspace = _context.WorkspaceManager.ActiveWorkspace;
-
-		PhantomWindow phantomWindow = new(_context);
-		_phantomWindows.Add(phantomWindow.Window);
-
-		_context.WorkspaceManager.AddPhantomWindow(workspace, phantomWindow.Window);
 	}
 
 	/// <inheritdoc />

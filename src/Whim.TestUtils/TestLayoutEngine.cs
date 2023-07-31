@@ -37,9 +37,6 @@ public class TestLayoutEngine : ILayoutEngine
 	public IWindow? GetFirstWindow() => throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public void HidePhantomWindows() => throw new NotImplementedException();
-
-	/// <inheritdoc/>
 	public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
 		throw new NotImplementedException();
 

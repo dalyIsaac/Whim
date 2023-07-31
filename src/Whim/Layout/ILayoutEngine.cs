@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Whim;
 
 /// <summary>
-/// Creates a <see cref="ILayoutEngine"/> with the given <paramref name="identity"/>.
+/// Creates a non-proxy <see cref="ILayoutEngine"/> with the given <paramref name="identity"/>.
 /// </summary>
 /// <param name="identity"></param>
 /// <returns></returns>

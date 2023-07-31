@@ -41,28 +41,6 @@ public class GetFirstWindowTests
 	}
 
 	[Fact]
-	public void GetFirstWindow_RootIsPhantomWindow()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper()
-			.SetAsLastFocusedWindow(null)
-			.SetAsPhantom(window.Object);
-
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(window.Object);
-
-		// When
-		IWindow? result = engine.GetFirstWindow();
-
-		// Then
-		Assert.Null(result);
-	}
-
-	[Fact]
 	public void GetFirstWindow_RootIsSplitNode()
 	{
 		// Given

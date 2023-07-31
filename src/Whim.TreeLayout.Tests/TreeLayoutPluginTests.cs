@@ -268,20 +268,4 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Down, direction);
 	}
 	#endregion
-
-	[Fact]
-	public void WindowManager_WindowRemoved_NoChanges()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new();
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
-		plugin.PreInitialize();
-
-		// When
-		wrapper.WindowManager.Raise(wm => wm.WindowRemoved += null, new WindowEventArgs() { Window = window.Object });
-
-		// Then
-		Assert.Empty(plugin.PhantomWindows);
-	}
 }

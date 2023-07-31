@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Whim.TreeLayout;
 
@@ -10,11 +9,6 @@ namespace Whim.TreeLayout;
 /// </summary>
 public interface ITreeLayoutPlugin : IPlugin
 {
-	/// <summary>
-	/// The set of phantom windows created by the plugin.
-	/// </summary>
-	IReadOnlySet<IWindow> PhantomWindows { get; }
-
 	/// <summary>
 	/// Event raised when the direction in which to add new windows to the tree layout for a
 	/// monitor changes.
@@ -58,10 +52,4 @@ public interface ITreeLayoutPlugin : IPlugin
 	/// <param name="engine"></param>
 	/// <returns></returns>
 	Direction GetAddWindowDirection(TreeLayoutEngine engine);
-
-	/// <summary>
-	/// Split the focused window in two, with the space in the direction of the tree layout filled
-	/// by a phantom window.
-	/// </summary>
-	void SplitFocusedWindow();
 }
