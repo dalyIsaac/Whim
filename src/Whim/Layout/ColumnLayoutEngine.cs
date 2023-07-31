@@ -212,9 +212,6 @@ public class ColumnLayoutEngine : ILayoutEngine
 		return new ColumnLayoutEngine(this, newStack.Insert(idx, window));
 	}
 
-	/// <inheritdoc/>
-	public void HidePhantomWindows() { }
-
 	/// <summary>
 	/// Gets the delta to determine whether we want to move towards 0 or not.
 	/// </summary>

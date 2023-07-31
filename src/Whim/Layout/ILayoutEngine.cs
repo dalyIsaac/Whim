@@ -110,12 +110,6 @@ public interface ILayoutEngine
 	ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window);
 
 	/// <summary>
-	/// Hides all phantom windows belonging to the layout engine. This is used by <see cref="Workspace"/>
-	/// when switching to a different layout engine.
-	/// </summary>
-	void HidePhantomWindows();
-
-	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type
 	/// <typeparamref name="T"/>.
 	/// </summary>

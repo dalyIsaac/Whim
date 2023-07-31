@@ -84,9 +84,6 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 	public override IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
 
 	/// <inheritdoc />
-	public override void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
-
-	/// <inheritdoc />
 	public override ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
 		UpdateInner(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
 

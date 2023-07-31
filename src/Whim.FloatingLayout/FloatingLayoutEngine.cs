@@ -221,7 +221,4 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override bool ContainsWindow(IWindow window) =>
 		_floatingWindowLocations.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
-
-	/// <inheritdoc />
-	public override void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
 }
