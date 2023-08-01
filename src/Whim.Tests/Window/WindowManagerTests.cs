@@ -418,7 +418,7 @@ public class WindowManagerTests
 		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()), Times.Once);
 	}
 
 	[Fact]
@@ -430,8 +430,8 @@ public class WindowManagerTests
 		wrapper.AllowWindowCreation(hwnd);
 
 		wrapper.WorkspaceManager
-			.Setup(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()))
-			.Returns(new Mock<IMonitor>().Object);
+			.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()))
+			.Returns(new Mock<IWorkspace>().Object);
 
 		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
 
