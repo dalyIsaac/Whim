@@ -11,9 +11,10 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
 
+	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = new();
+
 	/// <inheritdoc/>
-	public IDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows { get; } =
-		new Dictionary<IWindow, ISet<LayoutEngineIdentity>>();
+	public IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows => _floatingWindows;
 
 	/// <summary>
 	/// Creates a new instance of the floating layout plugin.
@@ -37,7 +38,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
 
-	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e) => FloatingWindows.Remove(e.Window);
+	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e) => _floatingWindows.Remove(e.Window);
 
 	private void UpdateWindow(IWindow? window, bool markAsFloating)
 	{
@@ -78,7 +79,6 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 		if (markAsFloating)
 		{
 			Logger.Debug($"Marking window {window} as floating");
-
 			layoutEngines.Add(layoutEngineIdentity);
 		}
 		else
@@ -89,11 +89,11 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 
 		if (layoutEngines.Count == 0)
 		{
-			FloatingWindows.Remove(window);
+			_floatingWindows.Remove(window);
 		}
 		else
 		{
-			FloatingWindows[window] = layoutEngines;
+			_floatingWindows[window] = layoutEngines;
 		}
 
 		// Convert the location to a unit square location.
@@ -103,22 +103,28 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 		workspace.MoveWindowToPoint(window, unitSquareLocation);
 	}
 
-	/// <summary>
-	/// Mark the given <paramref name="window"/> as a floating window
-	/// </summary>
-	/// <param name="window"></param>
+	// TODO: Write dedicated tests for this
+	/// <inheritdoc />
+	public void RemoveLayoutEngineFromWindow(IWindow window, LayoutEngineIdentity layoutEngineIdentity)
+	{
+		if (_floatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines))
+		{
+			layoutEngines.Remove(layoutEngineIdentity);
+
+			if (layoutEngines.Count == 0)
+			{
+				_floatingWindows.Remove(window);
+			}
+		}
+	}
+
+	/// <inheritdoc />
 	public void MarkWindowAsFloating(IWindow? window = null) => UpdateWindow(window, true);
 
-	/// <summary>
-	/// Update the floating window location.
-	/// </summary>
-	/// <param name="window"></param>
+	/// <inheritdoc />
 	public void MarkWindowAsDocked(IWindow? window = null) => UpdateWindow(window, false);
 
-	/// <summary>
-	/// Toggle the floating state of the given <paramref name="window"/>.
-	/// </summary>
-	/// <param name="window"></param>
+	/// <inheritdoc />
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
 		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;

@@ -9,5 +9,12 @@ internal interface IInternalFloatingLayoutPlugin
 	/// This is not exposed outside of this namespace to prevent mutation of the dictionary and
 	/// sets.
 	/// </summary>
-	IDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows { get; }
+	IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows { get; }
+
+	/// <summary>
+	/// Removes the given layout engine from the given window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <param name="layoutEngineIdentity"></param>
+	void RemoveLayoutEngineFromWindow(IWindow window, LayoutEngineIdentity layoutEngineIdentity);
 }

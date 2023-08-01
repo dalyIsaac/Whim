@@ -48,8 +48,27 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowLocations = floatingWindowLocations;
 	}
 
-	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine) =>
-		InnerLayoutEngine == newInnerLayoutEngine ? this : new FloatingLayoutEngine(this, newInnerLayoutEngine);
+	/// <summary>
+	/// Returns a new instance of <see cref="FloatingLayoutEngine"/> with the given inner layout engine,
+	/// if the inner layout engine has changed, or the <paramref name="gcWindow"/> was floating.
+	/// </summary>
+	/// <param name="newInnerLayoutEngine">The new inner layout engine.</param>
+	/// <param name="gcWindow">
+	/// The <see cref="IWindow"/> which triggered the update. If a window has triggered an inner
+	/// layout engine update, the window is no longer floating (apart from that one case where we
+	/// couldn't get the window's location).
+	/// </param>
+	/// <returns></returns>
+	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow gcWindow)
+	{
+		ImmutableDictionary<IWindow, ILocation<double>> newFloatingWindowLocations = _floatingWindowLocations.Remove(
+			gcWindow
+		);
+
+		return InnerLayoutEngine == newInnerLayoutEngine && _floatingWindowLocations == newFloatingWindowLocations
+			? this
+			: new FloatingLayoutEngine(this, newInnerLayoutEngine, newFloatingWindowLocations);
+	}
 
 	/// <inheritdoc />
 	public override ILayoutEngine AddWindow(IWindow window)
@@ -65,21 +84,28 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 			}
 		}
 
-		return UpdateInner(InnerLayoutEngine.AddWindow(window));
+		return UpdateInner(InnerLayoutEngine.AddWindow(window), window);
 	}
 
 	/// <inheritdoc />
 	public override ILayoutEngine RemoveWindow(IWindow window)
 	{
+		bool isFloating = IsWindowFloating(window);
+
 		// If tracked by this layout engine, remove it.
 		// Otherwise, pass to the inner layout engine.
 		if (_floatingWindowLocations.ContainsKey(window))
 		{
-			_plugin.FloatingWindows.Remove(window);
-			return new FloatingLayoutEngine(this, InnerLayoutEngine, _floatingWindowLocations.Remove(window));
+			_plugin.RemoveLayoutEngineFromWindow(window, InnerLayoutEngine.Identity);
+
+			// If the window was not supposed to be floating, remove it from the inner layout engine.
+			if (isFloating)
+			{
+				return new FloatingLayoutEngine(this, InnerLayoutEngine, _floatingWindowLocations.Remove(window));
+			}
 		}
 
-		return UpdateInner(InnerLayoutEngine.RemoveWindow(window));
+		return UpdateInner(InnerLayoutEngine.RemoveWindow(window), window);
 	}
 
 	/// <inheritdoc />
@@ -95,7 +121,7 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 			}
 		}
 
-		return UpdateInner(InnerLayoutEngine.MoveWindowToPoint(window, point));
+		return UpdateInner(InnerLayoutEngine.MoveWindowToPoint(window, point), window);
 	}
 
 	/// <inheritdoc />
@@ -111,7 +137,7 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 			}
 		}
 
-		return UpdateInner(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
+		return UpdateInner(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window), window);
 	}
 
 	private bool IsWindowFloating(IWindow window) =>
