@@ -896,4 +896,135 @@ public class FloatingLayoutEngineTests
 		wrapper.InnerLayoutEngine.Verify(ile => ile.ContainsWindow(window.Object), Times.Never);
 	}
 	#endregion
+
+	#region WindowWasFloating_ShouldBeGarbageCollectedByUpdateInner
+	[Fact]
+	public void WindowWasFloating_AddWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+
+		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When the window is floating...
+		wrapper.MarkAsFloating(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+
+		// ...marked as docked...
+		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+
+		// ... and then added
+		ILayoutEngine newEngine2 = newEngine.AddWindow(window.Object);
+
+		// Then AddWindow should be called on the inner layout engine
+		newInnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void WindowWasFloating_MoveWindowToPoint()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+
+		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When the window is floating...
+		wrapper.MarkAsFloating(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+
+		// ...marked as docked...
+		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+
+		// ... and then moved
+		ILayoutEngine newEngine2 = newEngine.MoveWindowToPoint(window.Object, new Location<double>());
+
+		// Then MoveWindowToPoint should be called on the inner layout engine
+		newInnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, new Location<double>()), Times.Once);
+	}
+
+	[Fact]
+	public void WindowWasFloating_RemoveWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+
+		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When the window is floating...
+		wrapper.MarkAsFloating(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+
+		// ...marked as docked...
+		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+
+		// ... and then removed
+		ILayoutEngine newEngine2 = newEngine.RemoveWindow(window.Object);
+
+		// Then RemoveWindow should be called on the inner layout engine
+		newInnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+	}
+
+	[Fact]
+	public void WindowWasFloating_MoveWindowEdgesInDirection()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+		Point<double> deltas = new();
+
+		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When the window is floating...
+		wrapper.MarkAsFloating(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+
+		// ...marked as docked...
+		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+
+		// ... and then the edges are moved
+		ILayoutEngine newEngine2 = newEngine.MoveWindowEdgesInDirection(Direction.Left, deltas, window.Object);
+
+		// Then MoveWindowEdgesInDirection should be called on the inner layout engine
+		newInnerLayoutEngine.Verify(
+			ile => ile.MoveWindowEdgesInDirection(Direction.Left, deltas, window.Object),
+			Times.Once
+		);
+	}
+
+	[Fact]
+	public void WindowWasFloating_SwapWindowInDirection()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+
+		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		// When the window is floating...
+		wrapper.MarkAsFloating(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+
+		// ...marked as docked...
+		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+
+		// ... and then window is swapped in a direction
+		ILayoutEngine newEngine2 = newEngine.SwapWindowInDirection(Direction.Left, window.Object);
+
+		// Then SwapWindowInDirection should be called on the inner layout engine
+		newInnerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(Direction.Left, window.Object), Times.Once);
+	}
+	#endregion
 }
