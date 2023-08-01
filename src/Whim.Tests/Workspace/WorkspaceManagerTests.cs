@@ -1409,6 +1409,38 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.DoLayout(), Times.Once());
 		workspace3.Verify(w => w.DoLayout(), Times.Exactly(2));
 	}
+
+	[Fact]
+	public void MonitorManager_MonitorsChanged_CannotAddWorkspace()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+
+		Mock<IMonitor> monitor1 = new();
+		Mock<IMonitor> monitor2 = new();
+
+		Wrapper wrapper = new(new[] { workspace });
+
+		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
+
+		// Reset the wrapper
+		workspace.Reset();
+		wrapper.WorkspaceManager.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
+
+		// When a monitor is added
+		wrapper.WorkspaceManager.MonitorManager_MonitorsChanged(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				AddedMonitors = new IMonitor[] { monitor1.Object, monitor2.Object },
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = new IMonitor[] { wrapper.Monitors[0].Object }
+			}
+		);
+
+		// Then the workspace is not activated
+		Assert.Equal(1, wrapper.WorkspaceManager.Count());
+	}
 	#endregion
 
 	#region AddProxyLayoutEngine
