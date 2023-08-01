@@ -67,9 +67,6 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
-	/// <inheritdoc/>
-	public abstract void HidePhantomWindows();
-
 	/// <summary>
 	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.

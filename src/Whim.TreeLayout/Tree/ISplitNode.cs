@@ -15,8 +15,8 @@ internal interface ISplitNode : INode, IEnumerable<(double Weight, INode Node)>
 	ImmutableList<double> Weights { get; }
 
 	/// <summary>
-	/// The child nodes of this <see cref="ISplitNode"/>. These will likely be either <see cref="ISplitNode"/>s,
-	/// or child classes of <see cref="LeafNode"/>.
+	/// The child nodes of this <see cref="ISplitNode"/>. These will be <see cref="ISplitNode"/>s
+	/// or <see cref="WindowNode"/>s.
 	/// </summary>
 	ImmutableList<INode> Children { get; }
 

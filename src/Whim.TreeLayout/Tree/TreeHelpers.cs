@@ -14,22 +14,22 @@ namespace Whim.TreeLayout;
 internal record NodeState(INode Node, IReadOnlyList<ISplitNode> Ancestors, ILocation<double> Location);
 
 /// <summary>
-/// The state of a leaf node.
+/// The state of a window node.
 /// </summary>
-/// <param name="LeafNode">The leaf node.</param>
+/// <param name="WindowNode">The window node.</param>
 /// <param name="Ancestors">The ancestors of the node.</param>
 /// <param name="Path">The path to the node in the tree/ancestors.</param>
-internal record LeafNodeState(LeafNode LeafNode, IReadOnlyList<ISplitNode> Ancestors, ImmutableArray<int> Path);
+internal record WindowNodeState(WindowNode WindowNode, IReadOnlyList<ISplitNode> Ancestors, ImmutableArray<int> Path);
 
 /// <summary>
 /// The state of a node at a point.
 /// </summary>
-/// <param name="LeafNode">The leaf node.</param>
+/// <param name="WindowNode">The window node.</param>
 /// <param name="Ancestors">The ancestors of the node.</param>
 /// <param name="Path">The path to the node in the tree/ancestors.</param>
 /// <param name="Direction">The direction of the node from the point of interest.</param>
-internal record LeafNodeStateAtPoint(
-	LeafNode LeafNode,
+internal record WindowNodeStateAtPoint(
+	WindowNode WindowNode,
 	ImmutableArray<ISplitNode> Ancestors,
 	ImmutableArray<int> Path,
 	Direction Direction
@@ -38,10 +38,10 @@ internal record LeafNodeStateAtPoint(
 /// <summary>
 /// The location and size of the window in a monitor, using the monitor coordinate space.
 /// </summary>
-/// <param name="LeafNode">The leaf node.</param>
+/// <param name="WindowNode">The window node.</param>
 /// <param name="Location">The location of the window.</param>
 /// <param name="WindowSize">The <see cref="WindowSize"/>.</param>
-internal record LeafNodeWindowLocationState(LeafNode LeafNode, ILocation<int> Location, WindowSize WindowSize);
+internal record WindowNodeLocationState(WindowNode WindowNode, ILocation<int> Location, WindowSize WindowSize);
 
 internal static class TreeHelpers
 {
@@ -112,11 +112,11 @@ internal static class TreeHelpers
 	}
 
 	/// <summary>
-	/// Gets the right-most child <see cref="LeafNode"/> of the given <see cref="ISplitNode"/>.
+	/// Gets the right-most child <see cref="WindowNode"/> of the given <see cref="ISplitNode"/>.
 	/// </summary>
 	/// <param name="ISplitNode"></param>
 	/// <returns></returns>
-	public static LeafNodeState GetRightMostLeaf(this ISplitNode ISplitNode)
+	public static WindowNodeState GetRightMostWindow(this ISplitNode ISplitNode)
 	{
 		List<ISplitNode> splitNodes = new();
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
@@ -129,16 +129,16 @@ internal static class TreeHelpers
 			currentNode = split.Children[^1];
 		}
 
-		// NOTE: This assumes that leaf nodes are always at the end of the path.
-		return new LeafNodeState((LeafNode)currentNode, splitNodes, pathBuilder.ToImmutable());
+		// NOTE: This assumes that window nodes are always at the end of the path.
+		return new WindowNodeState((WindowNode)currentNode, splitNodes, pathBuilder.ToImmutable());
 	}
 
 	/// <summary>
-	/// Gets the left-most child <see cref="LeafNode"/> of the given <see cref="ISplitNode"/>.
+	/// Gets the left-most child <see cref="WindowNode"/> of the given <see cref="ISplitNode"/>.
 	/// </summary>
 	/// <param name="rootSplitNode"></param>
 	/// <returns></returns>
-	public static LeafNodeState GetLeftMostLeaf(this ISplitNode rootSplitNode)
+	public static WindowNodeState GetLeftMostWindow(this ISplitNode rootSplitNode)
 	{
 		List<ISplitNode> splitNodes = new();
 		List<int> pathBuilder = new();
@@ -151,18 +151,18 @@ internal static class TreeHelpers
 			currentNode = split.Children[0];
 		}
 
-		// NOTE: This assumes that leaf nodes are always at the end of the path.
-		return new LeafNodeState((LeafNode)currentNode, splitNodes, pathBuilder.ToImmutableArray());
+		// NOTE: This assumes that window nodes are always at the end of the path.
+		return new WindowNodeState((WindowNode)currentNode, splitNodes, pathBuilder.ToImmutableArray());
 	}
 
 	/// <summary>
-	/// Gets the leaf node containing the given point, or <see langword="null"/> if the point is not
+	/// Gets the window node containing the given point, or <see langword="null"/> if the point is not
 	/// inside the root location.
 	/// </summary>
 	/// <param name="rootNode">The root node of the tree.</param>
 	/// <param name="searchPoint">The point to search for.</param>
 	/// <returns></returns>
-	public static LeafNodeStateAtPoint? GetNodeContainingPoint(this INode rootNode, IPoint<double> searchPoint)
+	public static WindowNodeStateAtPoint? GetNodeContainingPoint(this INode rootNode, IPoint<double> searchPoint)
 	{
 		ILocation<double> parentLocation = Location.UnitSquare<double>();
 		if (!parentLocation.ContainsPoint(searchPoint))
@@ -170,10 +170,10 @@ internal static class TreeHelpers
 			return null;
 		}
 
-		if (rootNode is LeafNode rootLeafNode)
+		if (rootNode is WindowNode rootWindowNode)
 		{
-			return new LeafNodeStateAtPoint(
-				rootLeafNode,
+			return new WindowNodeStateAtPoint(
+				rootWindowNode,
 				ImmutableArray.Create<ISplitNode>(),
 				ImmutableArray.Create<int>(),
 				parentLocation.GetDirectionToPoint(searchPoint)
@@ -243,10 +243,10 @@ internal static class TreeHelpers
 					break;
 				}
 
-				if (child is LeafNode leafNode)
+				if (child is WindowNode WindowNode)
 				{
-					return new LeafNodeStateAtPoint(
-						leafNode,
+					return new WindowNodeStateAtPoint(
+						WindowNode,
 						ancestorsBuilder.ToImmutable(),
 						pathBuilder.ToImmutable(),
 						childLocation.GetDirectionToPoint(searchPoint)
@@ -260,7 +260,7 @@ internal static class TreeHelpers
 			if (!foundChild)
 			{
 				Logger.Error(
-					$"The root node contains the point, but could not find the leaf node containing the point."
+					$"The root node contains the point, but could not find the window node containing the point."
 				);
 				return null;
 			}
@@ -338,16 +338,16 @@ internal static class TreeHelpers
 	/// <param name="node">The root node of the tree.</param>
 	/// <param name="location">The location of the root node, in monitor coordinates.</param>
 	/// <returns></returns>
-	public static IEnumerable<LeafNodeWindowLocationState> GetWindowLocations(this INode node, ILocation<int> location)
+	public static IEnumerable<WindowNodeLocationState> GetWindowLocations(this INode node, ILocation<int> location)
 	{
-		// If the node is a leaf node, then we can return the location, and break.
-		if (node is LeafNode leafNode)
+		// If the node is a window node, then we can return the location, and break.
+		if (node is WindowNode WindowNode)
 		{
-			yield return new LeafNodeWindowLocationState(leafNode, location, WindowSize.Normal);
+			yield return new WindowNodeLocationState(WindowNode, location, WindowSize.Normal);
 			yield break;
 		}
 
-		// If the node is not a leaf node, it's a split node.
+		// If the node is not a window node, it's a split node.
 		ISplitNode parent = (ISplitNode)node;
 
 		// Perform an in-order traversal of the tree.
@@ -374,7 +374,7 @@ internal static class TreeHelpers
 				childLocation.Height = Convert.ToInt32(weight * location.Height);
 			}
 
-			foreach (LeafNodeWindowLocationState childLocationResult in GetWindowLocations(child, childLocation))
+			foreach (WindowNodeLocationState childLocationResult in GetWindowLocations(child, childLocation))
 			{
 				yield return childLocationResult;
 			}
@@ -392,15 +392,15 @@ internal static class TreeHelpers
 	/// <param name="direction">The direction to search in.</param>
 	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
 	/// <returns></returns>
-	public static LeafNodeStateAtPoint? GetAdjacentNode(
+	public static WindowNodeStateAtPoint? GetAdjacentWindowNode(
 		INode rootNode,
 		IReadOnlyList<int> pathToNode,
 		Direction direction,
 		IMonitor monitor
 	)
 	{
-		// If the root node is a leaf node, then we can't find an adjacent node.
-		if (rootNode is LeafNode)
+		// If the root node is a window node, then we can't find an adjacent node.
+		if (rootNode is WindowNode)
 		{
 			return null;
 		}
@@ -419,7 +419,7 @@ internal static class TreeHelpers
 			return null;
 		}
 
-		return GetAdjacentNode(rootSplitNode, direction, monitor, result.Location);
+		return GetAdjacentWindowNode(rootSplitNode, direction, monitor, result.Location);
 	}
 
 	/// <summary>
@@ -431,7 +431,7 @@ internal static class TreeHelpers
 	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
 	/// <param name="nodeLocation">The location of the node, in monitor coordinates.</param>
 	/// <returns></returns>
-	public static LeafNodeStateAtPoint? GetAdjacentNode(
+	public static WindowNodeStateAtPoint? GetAdjacentWindowNode(
 		ISplitNode rootSplitNode,
 		Direction direction,
 		IMonitor monitor,
@@ -461,7 +461,7 @@ internal static class TreeHelpers
 		}
 
 		// Get the adjacent node (the node containing the point (x, y)).
-		if (rootSplitNode.GetNodeContainingPoint(new Point<double>() { X = x, Y = y }) is LeafNodeStateAtPoint state)
+		if (rootSplitNode.GetNodeContainingPoint(new Point<double>() { X = x, Y = y }) is WindowNodeStateAtPoint state)
 		{
 			return state;
 		}
@@ -553,9 +553,9 @@ internal static class TreeHelpers
 					stack.Add((splitNode.Children[idx], path.Add(idx)));
 				}
 			}
-			else if (current is LeafNode leafNode)
+			else if (current is WindowNode WindowNode)
 			{
-				updatedPaths.Add(new KeyValuePair<IWindow, ImmutableArray<int>>(leafNode.Window, path));
+				updatedPaths.Add(new KeyValuePair<IWindow, ImmutableArray<int>>(WindowNode.Window, path));
 			}
 		}
 

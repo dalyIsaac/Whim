@@ -14,8 +14,6 @@ internal class LayoutEngineWrapper
 
 	public LayoutEngineWrapper()
 	{
-		Plugin.Setup(x => x.PhantomWindows).Returns(new HashSet<IWindow>());
-
 		Monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 100, Height = 100 });
 
 		WorkspaceManager.Setup(x => x.ActiveWorkspace).Returns(Workspace.Object);
@@ -25,12 +23,6 @@ internal class LayoutEngineWrapper
 		Context.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
 
 		SetAddWindowDirection(Direction.Right);
-	}
-
-	public LayoutEngineWrapper SetAsPhantom(params IWindow[] windows)
-	{
-		Plugin.Setup(x => x.PhantomWindows).Returns(new HashSet<IWindow>(windows));
-		return this;
 	}
 
 	public LayoutEngineWrapper SetAsLastFocusedWindow(IWindow? window)

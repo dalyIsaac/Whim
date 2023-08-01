@@ -1,11 +1,7 @@
-using System.Collections.Generic;
-
 namespace Whim;
 
 internal interface IInternalWorkspaceManager
 {
-	IEnumerable<IWindow> PhantomWindows { get; }
-
 	/// <summary>
 	/// Called when a window has been added by the <see cref="IWindowManager"/>.
 	/// </summary>

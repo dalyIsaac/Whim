@@ -177,23 +177,6 @@ public class GapsLayoutEngineTests
 		innerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Once);
 	}
 
-	[Fact]
-	public void HidePhantomWindows()
-	{
-		// Given
-		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		Mock<ILayoutEngine> innerLayoutEngine = new();
-		innerLayoutEngine.Setup(ile => ile.HidePhantomWindows());
-
-		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine.Object);
-
-		// When
-		gapsLayoutEngine.HidePhantomWindows();
-
-		// Then
-		innerLayoutEngine.Verify(ile => ile.HidePhantomWindows(), Times.Once);
-	}
-
 	#region Add
 	[Fact]
 	public void Add_Same()

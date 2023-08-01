@@ -21,7 +21,7 @@ public class RemoveTests
 	}
 
 	[Fact]
-	public void Remove_RootIsLeaf_Success()
+	public void Remove_RootIsWindow_Success()
 	{
 		// Given
 		Mock<IWindow> window = new();
@@ -42,7 +42,7 @@ public class RemoveTests
 	}
 
 	[Fact]
-	public void Remove_RootIsLeaf_WrongWindow()
+	public void Remove_RootIsWindow_WrongWindow()
 	{
 		// Given
 		Mock<IWindow> window = new();

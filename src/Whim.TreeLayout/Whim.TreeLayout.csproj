@@ -29,9 +29,6 @@
 		<Version>0.1.0</Version>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="PhantomWindow.xaml" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230724000" />
@@ -46,12 +43,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="PhantomWindow.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
 	</ItemGroup>
 
 </Project>

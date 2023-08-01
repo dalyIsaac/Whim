@@ -37,17 +37,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 
 	/// <summary>
-	/// All the phantom windows that are currently added.
-	/// </summary>
-	private readonly HashSet<IWindow> _phantomWindows = new();
-
-	/// <summary>
 	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
 	/// The workspaces will have been created prior to <see cref="Initialize"/>.
 	/// </summary>
 	private readonly List<(string Name, IEnumerable<CreateLeafLayoutEngine> LayoutEngines)> _workspacesToCreate = new();
-
-	public IEnumerable<IWindow> PhantomWindows => _phantomWindows;
 
 	/// <summary>
 	/// Maps monitors to their active workspace.
@@ -551,12 +544,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		if (_phantomWindows.Contains(window))
-		{
-			Logger.Error($"Window {window} is a phantom window and cannot be moved");
-			return;
-		}
-
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
 		// Find the current workspace for the window.
@@ -637,13 +624,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	{
 		Logger.Debug($"Moving window {window} to location {point}");
 
-		// Duck out if the window is a phantom window.
-		bool isPhantom = _phantomWindows.Contains(window);
-		if (isPhantom)
-		{
-			Logger.Error($"Window {window} is a phantom window and cannot be moved");
-			return;
-		}
 		// Get the monitor.
 		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);
 
@@ -719,22 +699,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		workspace.MoveWindowEdgesInDirection(edges, normalized, window);
 		return true;
 	}
-
-	#region Phantom Windows
-	public void AddPhantomWindow(IWorkspace workspace, IWindow window)
-	{
-		Logger.Debug($"Adding phantom window {window} to workspace {workspace}");
-		_phantomWindows.Add(window);
-		_windowWorkspaceMap[window] = workspace;
-	}
-
-	public void RemovePhantomWindow(IWindow window)
-	{
-		Logger.Debug($"Removing phantom window {window}");
-		_phantomWindows.Remove(window);
-		_windowWorkspaceMap.Remove(window);
-	}
-	#endregion
 
 	protected void Dispose(bool disposing)
 	{

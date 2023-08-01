@@ -52,6 +52,36 @@ public class TreeLayoutPluginTests
 		Assert.NotEmpty(commands.Commands);
 	}
 
+	[Fact]
+	public void PreInitialize()
+	{
+		// Given
+		Wrapper wrapper = new();
+		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+
+		// When
+		plugin.PreInitialize();
+
+		// Then nothing
+		wrapper.Context.VerifyGet(c => c.WorkspaceManager, Times.Never);
+		wrapper.Context.VerifyGet(c => c.WindowManager, Times.Never);
+	}
+
+	[Fact]
+	public void PostInitialize()
+	{
+		// Given
+		Wrapper wrapper = new();
+		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+
+		// When
+		plugin.PostInitialize();
+
+		// Then nothing
+		wrapper.Context.VerifyGet(c => c.WorkspaceManager, Times.Never);
+		wrapper.Context.VerifyGet(c => c.WindowManager, Times.Never);
+	}
+
 	#region GetAddWindowDirection
 	[Fact]
 	public void GetAddWindowDirection_Monitor_NoLayoutEngine()
@@ -268,20 +298,4 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Down, direction);
 	}
 	#endregion
-
-	[Fact]
-	public void WindowManager_WindowRemoved_NoChanges()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new();
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
-		plugin.PreInitialize();
-
-		// When
-		wrapper.WindowManager.Raise(wm => wm.WindowRemoved += null, new WindowEventArgs() { Window = window.Object });
-
-		// Then
-		Assert.Empty(plugin.PhantomWindows);
-	}
 }

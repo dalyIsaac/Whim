@@ -120,13 +120,13 @@ public class TreeHelpersTests
 	#endregion
 
 	[Fact]
-	public void GetRightMostLeaf()
+	public void GetRightMostWindow()
 	{
 		// Given
 		TestTree tree = new();
 
 		// When
-		var result = tree.Root.GetRightMostLeaf();
+		var result = tree.Root.GetRightMostWindow();
 
 		// Then
 		new SplitNode[] { tree.Root, tree.Right }
@@ -136,17 +136,17 @@ public class TreeHelpersTests
 		new int[] { 1, 1 }
 			.Should()
 			.BeEquivalentTo(result.Path);
-		Assert.Equal(tree.RightBottom, result.LeafNode);
+		Assert.Equal(tree.RightBottom, result.WindowNode);
 	}
 
 	[Fact]
-	public void GetLeftMostLeaf()
+	public void GetLeftMostWindow()
 	{
 		// Given
 		TestTree tree = new();
 
 		// When
-		var result = tree.Root.GetLeftMostLeaf();
+		var result = tree.Root.GetLeftMostWindow();
 
 		// Then
 		new SplitNode[] { tree.Root }
@@ -156,7 +156,7 @@ public class TreeHelpersTests
 		new int[] { 0 }
 			.Should()
 			.BeEquivalentTo(result.Path);
-		Assert.Equal(tree.Left, result.LeafNode);
+		Assert.Equal(tree.Left, result.WindowNode);
 	}
 
 	#region GetNodeContainingPoint
@@ -175,7 +175,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetNodeContainingPoint_RootIsLeaf()
+	public void GetNodeContainingPoint_RootIsWindow()
 	{
 		// Given
 		WindowNode root = new(new Mock<IWindow>().Object);
@@ -186,7 +186,7 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.NotNull(result);
-		Assert.Equal(root, result.LeafNode);
+		Assert.Equal(root, result.WindowNode);
 		Assert.Empty(result.Ancestors);
 		Assert.Empty(result.Path);
 	}
@@ -217,7 +217,7 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.NotNull(result);
-		Assert.Equal(tree.Left, result.LeafNode);
+		Assert.Equal(tree.Left, result.WindowNode);
 		new SplitNode[] { tree.Root }
 			.Should()
 			.BeEquivalentTo(result.Ancestors);
@@ -239,7 +239,7 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.NotNull(result);
-		Assert.Equal(tree.RightBottom, result.LeafNode);
+		Assert.Equal(tree.RightBottom, result.WindowNode);
 		new SplitNode[] { tree.Root, tree.Right }
 			.Should()
 			.BeEquivalentTo(result.Ancestors);
@@ -261,7 +261,7 @@ public class TreeHelpersTests
 
 		// Then
 		Assert.NotNull(result);
-		Assert.Equal(tree.RightTopRight3, result.LeafNode);
+		Assert.Equal(tree.RightTopRight3, result.WindowNode);
 		new SplitNode[] { tree.Root, tree.Right, tree.RightTop, tree.RightTopRight }
 			.Should()
 			.BeEquivalentTo(result.Ancestors);
@@ -666,7 +666,7 @@ public class TreeHelpersTests
 			.ToArray();
 
 		// When
-		LeafNodeWindowLocationState[] windowLocations = tree.Root.GetWindowLocations(location).ToArray();
+		WindowNodeLocationState[] windowLocations = tree.Root.GetWindowLocations(location).ToArray();
 
 		// Then
 		windowLocations
@@ -674,7 +674,7 @@ public class TreeHelpersTests
 				nodeState =>
 					new WindowState()
 					{
-						Window = nodeState.LeafNode.Window,
+						Window = nodeState.WindowNode.Window,
 						Location = nodeState.Location,
 						WindowSize = nodeState.WindowSize
 					}
@@ -685,7 +685,7 @@ public class TreeHelpersTests
 
 	#region GetAdjacentNode
 	[Fact]
-	public void GetAdjacentNode_RootIsLeafNode()
+	public void GetAdjacentNode_RootIsWindowNode()
 	{
 		// Given
 		WindowNode root = new(new Mock<IWindow>().Object);
@@ -694,7 +694,12 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(root, pathToNode, Direction.Right, monitor.Object);
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
+			root,
+			pathToNode,
+			Direction.Right,
+			monitor.Object
+		);
 
 		// Then
 		Assert.Null(result);
@@ -710,7 +715,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			root.Object,
 			pathToNode,
 			Direction.Right,
@@ -731,7 +736,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Right,
@@ -752,7 +757,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Left,
@@ -773,7 +778,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Left,
@@ -781,7 +786,7 @@ public class TreeHelpersTests
 		);
 
 		// Then
-		Assert.Equal(tree.Left.Window, result!.LeafNode.Window);
+		Assert.Equal(tree.Left.Window, result!.WindowNode.Window);
 	}
 
 	[Fact]
@@ -794,7 +799,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Right,
@@ -802,7 +807,7 @@ public class TreeHelpersTests
 		);
 
 		// Then
-		Assert.Equal(tree.RightTopLeftBottomRightTop.Window, result!.LeafNode.Window);
+		Assert.Equal(tree.RightTopLeftBottomRightTop.Window, result!.WindowNode.Window);
 	}
 
 	[Fact]
@@ -815,10 +820,15 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(tree.Root, pathToNode, Direction.Up, monitor.Object);
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
+			tree.Root,
+			pathToNode,
+			Direction.Up,
+			monitor.Object
+		);
 
 		// Then
-		Assert.Equal(tree.RightTopLeftTop.Window, result!.LeafNode.Window);
+		Assert.Equal(tree.RightTopLeftTop.Window, result!.WindowNode.Window);
 	}
 
 	[Fact]
@@ -831,7 +841,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Down,
@@ -839,7 +849,7 @@ public class TreeHelpersTests
 		);
 
 		// Then
-		Assert.Equal(tree.RightBottom.Window, result!.LeafNode.Window);
+		Assert.Equal(tree.RightBottom.Window, result!.WindowNode.Window);
 	}
 
 	[Fact]
@@ -852,7 +862,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.RightUp,
@@ -860,7 +870,7 @@ public class TreeHelpersTests
 		);
 
 		// Then
-		Assert.Equal(tree.TopRight.Window, result!.LeafNode.Window);
+		Assert.Equal(tree.TopRight.Window, result!.WindowNode.Window);
 	}
 
 	[Fact]
@@ -873,7 +883,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.RightDown,
@@ -881,7 +891,7 @@ public class TreeHelpersTests
 		);
 
 		// Then
-		Assert.Equal(tree.BottomRight.Window, result!.LeafNode.Window);
+		Assert.Equal(tree.BottomRight.Window, result!.WindowNode.Window);
 	}
 
 	[Fact]
@@ -894,7 +904,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.LeftUp,
@@ -902,7 +912,7 @@ public class TreeHelpersTests
 		);
 
 		// Then
-		Assert.Equal(tree.TopLeft.Window, result!.LeafNode.Window);
+		Assert.Equal(tree.TopLeft.Window, result!.WindowNode.Window);
 	}
 
 	[Fact]
@@ -915,7 +925,7 @@ public class TreeHelpersTests
 		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		LeafNodeStateAtPoint? result = TreeHelpers.GetAdjacentNode(
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.LeftDown,
@@ -923,7 +933,7 @@ public class TreeHelpersTests
 		);
 
 		// Then
-		Assert.Equal(tree.BottomLeft.Window, result!.LeafNode.Window);
+		Assert.Equal(tree.BottomLeft.Window, result!.WindowNode.Window);
 	}
 	#endregion
 

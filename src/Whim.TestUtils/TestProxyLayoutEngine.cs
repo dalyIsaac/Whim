@@ -35,9 +35,6 @@ public class TestProxyLayoutEngine : BaseProxyLayoutEngine
 	public override IWindow? GetFirstWindow() => null;
 
 	/// <inheritdoc/>
-	public override void HidePhantomWindows() => throw new NotImplementedException();
-
-	/// <inheritdoc/>
 	public override ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
 		throw new NotImplementedException();
 

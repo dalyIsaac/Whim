@@ -120,20 +120,6 @@ public class BarLayoutEngineTests
 	}
 
 	[Fact]
-	public void HidePhantomWindows()
-	{
-		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
-
-		// When
-		engine.HidePhantomWindows();
-
-		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.HidePhantomWindows(), Times.Once);
-	}
-
-	[Fact]
 	public void MoveWindowEdgesInDirection_NotSame()
 	{
 		// Given

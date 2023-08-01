@@ -234,18 +234,4 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <param name="window"></param>
 	/// <returns>Whether the window's edges were moved.</returns>
 	bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null);
-
-	#region Phantom Windows
-	/// <summary>
-	/// Add a phantom window for the given <paramref name="workspace"/>.
-	/// </summary>
-	/// <param name="window">The phantom window to add.</param>
-	/// <param name="workspace">The workspace to add the window for.</param>
-	void AddPhantomWindow(IWorkspace workspace, IWindow window);
-
-	/// <summary>
-	/// Remove the given phantom window.
-	/// </summary>
-	void RemovePhantomWindow(IWindow window);
-	#endregion
 }
