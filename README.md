@@ -30,11 +30,11 @@ Each plugin needs to be added to the `context` object.
 
 ## Inspiration
 
-Whim is heavily inspired by the [workspacer](https://github.com/workspacer/workspacer) project, to which I've contributed significantly in the past. However, there are a few key differences:
+Whim is heavily inspired by the [workspacer](https://github.com/workspacer/workspacer) project, to which I've contributed to in the past. However, there are a few key differences:
 
 - Whim is built using WinUI 3 instead of Windows Forms. This makes it easier to have a more modern UI.
 - Whim has a more powerful command palette, which supports fuzzy search.
-- Whim stores windows internally in a more flexible way. This allows for more complex window management. For more, see [Layouts](#layouts).
+- Whim stores windows internally in a more flexible way. This facilitates more complex window management. For more, see [Layouts](#layouts).
 - Whim has a command system with common functionality, which makes it easier to interact with at a higher level.
 - Creating subclasses of internal classes is not encouraged in Whim - instead, plugins should suffice to add new functionality.
 
@@ -48,11 +48,30 @@ I am grateful to the workspacer project for the inspiration and ideas it has pro
 
 ### Layouts
 
-This is one of the key differences between workspacer and Whim. Currently, workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). Additionally, workspacer has the concept of a "primary area".
+This is one of the key areas where Whim differs from workspacer.
 
-In comparison, layout engines in Whim store windows themselves, and do not require [`IEnumerable<IWindow>` to be passed to them](https://github.com/dalyIsaac/Whim/blob/3ba4d42502732826903522d51e51d55fd0edb6d7/src/Whim/Layout/ILayoutEngine.cs#L8). This allows for more complex layouts, and also allows for more complex window management. For example, the `TreeLayoutEngine` uses a n-ary tree structure to store windows, which allows for arbitrary grid layouts. This also lets Whim support functionality which take into account directions, like `FocusWindowInDirection`, `SwapWindowInDirection`, and `MoveWindowEdgesInDirection`. Given this increased flexibility, Whim does does not have a concept of a "primary area".
+| Concept                                                             | workspacer             | Whim                                                  |
+| ------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------- |
+| [Data structure for storing windows](#ilayoutengine-data-structure) | `IEnumerable<IWindow>` | Any                                                   |
+| [Primary area support](#primary-area-support)                       | Yes                    | Not built in but possible in a custom `ILayoutEngine` |
+| [Directional support](#directional-support)                         | No                     | Yes                                                   |
+| [`ILayoutEngine` mutability](#ilayoutengine-mutability)             | Mutable                | Immutable                                             |
 
-In [#425](https://github.com/dalyIsaac/Whim/issues/425), layout engines will become immutable. This will allow for more powerful functionality like previewing changes to layouts before they are applied.
+#### `ILayoutEngine` data structure
+
+Currently, workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). Relying so heavily on a stack prevents workspacer from supporting more complex window layouts. For example, Whim's [`TreeLayoutEngine`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim.TreeLayout/TreeLayoutEngine.cs) uses a n-ary tree structure to store windows in arbitrary grid layouts.
+
+#### Primary area support
+
+Whim does not have a core concept of a "primary area", as it's an idea which lends itself to a stack-based data structure. However, it is possible to implement this functionality in a custom `ILayoutEngine` and plugin.
+
+#### Directional support
+
+As Whim supports more novel layouts, it also has functionality to account for directions, like `FocusWindowInDirection`, `SwapWindowInDirection`, and `MoveWindowEdgesInDirection`. For example, it's possible to drag a corner of a window diagonally to resize it (provided the underlying `ILayoutEngine` supports it).
+
+#### `ILayoutEngine` mutability
+
+Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support future functionality like previewing changes to layouts before committing them (see [#425](https://github.com/dalyIsaac/Whim/issues/425)). In comparison, workspacer's `ILayoutEngine` implementations are mutable.
 
 ## Contributing
 
