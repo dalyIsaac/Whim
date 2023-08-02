@@ -1439,7 +1439,7 @@ public class WorkspaceManagerTests
 		);
 
 		// Then the workspace is not activated
-		Assert.Equal(1, wrapper.WorkspaceManager.Count());
+		Assert.Single(wrapper.WorkspaceManager);
 	}
 	#endregion
 
@@ -1464,11 +1464,11 @@ public class WorkspaceManagerTests
 		Wrapper wrapper = new();
 
 		// When
-		wrapper.WorkspaceManager.AddProxyLayoutEngine((engine) => new TestProxyLayoutEngine(engine));
+		wrapper.WorkspaceManager.AddProxyLayoutEngine((engine) => new Mock<TestProxyLayoutEngine>(engine).Object);
 		wrapper.WorkspaceManager.Initialize();
 
 		// Then
-		Assert.IsType<TestProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
+		Assert.IsAssignableFrom<TestProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
 	}
 	#endregion
 
