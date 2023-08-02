@@ -732,30 +732,12 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Once);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Never);
+		window.Verify(w => w.Focus(), Times.Never);
 	}
 
 	[Fact]
-	public void FocusWindowInDirection_UseInner_NullInner()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		Direction direction = Direction.Left;
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.FocusWindowInDirection(direction, window.Object));
-
-		// When
-		engine.FocusWindowInDirection(direction, window.Object);
-
-		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Once);
-	}
-
-	[Fact]
-	public void FocusWindowInDirection_FloatingWindow()
+	public void FocusWindowInDirection_FloatingWindow_NullFirstWindow()
 	{
 		// Given
 		Mock<IWindow> window = new();
@@ -773,6 +755,41 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Never);
+
+		newInnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
+		newInnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Once);
+
+		window.Verify(w => w.Focus(), Times.Never);
+	}
+
+	[Fact]
+	public void FocusWindowInDirection_FloatingWindow_DefinedFirstWindow()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+		Direction direction = Direction.Left;
+
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
+		FloatingLayoutEngine engine =
+			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+
+		newInnerLayoutEngine.Setup(ile => ile.GetFirstWindow()).Returns(window.Object);
+
+		// When
+		engine.AddWindow(window.Object).FocusWindowInDirection(direction, window.Object);
+
+		// Then
+		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
+		wrapper.InnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Never);
+
+		newInnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
+		newInnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Once);
+
+		window.Verify(w => w.Focus(), Times.Once);
 	}
 	#endregion
 
