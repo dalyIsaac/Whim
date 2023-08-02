@@ -97,4 +97,20 @@ public class BaseProxyLayoutEngineTests
 		Assert.False(contains);
 	}
 	#endregion
+
+	[Fact]
+	public void Identity()
+	{
+		// Given
+		Mock<ILayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine.Setup(x => x.Identity).Returns(new LayoutEngineIdentity());
+
+		Mock<TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+
+		// When
+		LayoutEngineIdentity proxyIdentity = proxyLayoutEngine.Object.Identity;
+
+		// Then
+		Assert.Equal(innerLayoutEngine.Object.Identity, proxyIdentity);
+	}
 }

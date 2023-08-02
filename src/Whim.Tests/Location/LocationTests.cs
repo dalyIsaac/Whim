@@ -80,4 +80,41 @@ public class LocationTests
 			location3
 		);
 	}
+
+	[Fact]
+	public void GetHashCode_NotEqual()
+	{
+		// Given
+		Location<int> location1 = new() { Width = 10, Height = 10 };
+		Location<int> location2 =
+			new()
+			{
+				X = 5,
+				Y = 5,
+				Width = 5,
+				Height = 5
+			};
+
+		// When
+		int hashCode1 = location1.GetHashCode();
+		int hashCode2 = location2.GetHashCode();
+
+		// Then
+		Assert.NotEqual(hashCode1, hashCode2);
+	}
+
+	[Fact]
+	public void GetHashCode_Equal()
+	{
+		// Given
+		Location<int> location1 = new() { Width = 10, Height = 10 };
+		Location<int> location2 = new() { Width = 10, Height = 10 };
+
+		// When
+		int hashCode1 = location1.GetHashCode();
+		int hashCode2 = location2.GetHashCode();
+
+		// Then
+		Assert.Equal(hashCode1, hashCode2);
+	}
 }

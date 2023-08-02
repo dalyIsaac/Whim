@@ -26,5 +26,5 @@ public sealed class LayoutEngineIdentity
 	public override bool Equals(object? obj) => obj is LayoutEngineIdentity identity && _id == identity._id;
 
 	/// <inheritdoc/>
-	public override int GetHashCode() => HashCode.Combine(_id);
+	public override int GetHashCode() => _id.GetHashCode();
 }
