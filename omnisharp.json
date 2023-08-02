@@ -1,0 +1,13 @@
+{
+  "FileOptions": {
+    "ExcludeSearchPatterns": ["./src/Whim/Template/**/*"]
+  },
+  "RoslynExtensionsOptions": {
+    "EnableAnalyzersSupport": true
+  },
+  "script": {
+    "enabled": true,
+    "defaultTargetFramework": "net7.0-windows10.0.19041.0",
+    "enableScriptNuGetReferences": true
+  }
+}

@@ -1,5 +1,4 @@
 using Moq;
-using System.Collections.Generic;
 using Whim.TestUtils;
 using Xunit;
 
@@ -27,11 +26,11 @@ public class LayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		ILayoutEngine proxyInner = new TestProxyLayoutEngine(engine);
-		ILayoutEngine proxyOuter = new TestProxyLayoutEngine(proxyInner);
+		Mock<TestProxyLayoutEngine> proxyInner = new(engine);
+		Mock<TestProxyLayoutEngine> proxyOuter = new(proxyInner.Object);
 
 		// When
-		TestLayoutEngine? newEngine = proxyOuter.GetLayoutEngine<TestLayoutEngine>();
+		TestLayoutEngine? newEngine = proxyOuter.Object.GetLayoutEngine<TestLayoutEngine>();
 
 		// Then
 		Assert.Same(engine, newEngine);
@@ -71,11 +70,11 @@ public class LayoutEngineTests
 	{
 		// Given
 		TestLayoutEngine engine = new();
-		ILayoutEngine proxyInner = new TestProxyLayoutEngine(engine);
-		ILayoutEngine proxyOuter = new TestProxyLayoutEngine(proxyInner);
+		Mock<TestProxyLayoutEngine> proxyInner = new(engine);
+		Mock<TestProxyLayoutEngine> proxyOuter = new(proxyInner.Object);
 
 		// When
-		bool contains = proxyOuter.ContainsEqual(engine);
+		bool contains = proxyOuter.Object.ContainsEqual(engine);
 
 		// Then
 		Assert.True(contains);
