@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using System.Text.Json;
 using Windows.Win32.Foundation;
@@ -15,7 +16,7 @@ public class FloatingLayoutPluginTests
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();
-		public FloatingLayoutEngine FloatingLayoutEngine { get; }
+		public Mock<ILayoutEngine> LayoutEngine { get; } = new();
 		public FloatingLayoutPlugin Plugin;
 
 		public Wrapper()
@@ -29,7 +30,8 @@ public class FloatingLayoutPluginTests
 			NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns((ILocation<int>?)null);
 
 			Plugin = new(Context.Object);
-			FloatingLayoutEngine = new(Context.Object, Plugin, new Mock<ILayoutEngine>().Object);
+
+			LayoutEngine.SetupGet(le => le.Identity).Returns(new LayoutEngineIdentity());
 		}
 
 		public Wrapper Setup_GetWorkspaceForWindow(IWindow window, IWorkspace workspace)
@@ -44,7 +46,7 @@ public class FloatingLayoutPluginTests
 
 			if (windowState != null)
 			{
-				Workspace.Setup(w => w.ActiveLayoutEngine).Returns(FloatingLayoutEngine);
+				Workspace.Setup(w => w.ActiveLayoutEngine).Returns(LayoutEngine.Object);
 			}
 			return this;
 		}
@@ -402,4 +404,115 @@ public class FloatingLayoutPluginTests
 		// Then nothing
 		Assert.Empty(plugin.FloatingWindows);
 	}
+
+	#region MarkWindowAsDockedInLayoutEngine
+	[Fact]
+	public void MarkWindowAsDockedInLayoutEngine_WindowIsNotFloating()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Wrapper wrapper = new();
+		FloatingLayoutPlugin plugin = wrapper.Plugin;
+
+		Assert.Empty(plugin.FloatingWindows);
+
+		// When
+		plugin.MarkWindowAsDockedInLayoutEngine(window.Object, wrapper.LayoutEngine.Object.Identity);
+
+		// Then
+		Assert.Empty(plugin.FloatingWindows);
+	}
+
+	[Fact]
+	public void MarkWindowAsDockedInLayoutEngine_WindowIsFloating()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<IMonitor> monitor = new();
+
+		Wrapper wrapper = new();
+
+		wrapper
+			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
+			.Setup_TryGetWindowLocation(
+				window.Object,
+				new WindowState()
+				{
+					Location = new Location<int>() { X = 1, Y = 2 },
+					Window = window.Object,
+					WindowSize = WindowSize.Normal
+				}
+			)
+			.Setup_GetMonitorAtPoint(new Location<int>() { X = 1, Y = 2 }, monitor);
+
+		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		plugin.MarkWindowAsFloating(window.Object);
+
+		plugin.FloatingWindows
+			.Should()
+			.BeEquivalentTo(
+				new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
+				{
+					{
+						window.Object,
+						new HashSet<LayoutEngineIdentity>() { wrapper.LayoutEngine.Object.Identity }
+					}
+				}
+			);
+
+		// When
+		plugin.MarkWindowAsDockedInLayoutEngine(window.Object, wrapper.LayoutEngine.Object.Identity);
+
+		// Then
+		Assert.Empty(plugin.FloatingWindows);
+	}
+
+	[Fact]
+	public void MarkWindowAsDocked_WindowIsFloatingInMultipleLayoutEngines()
+	{
+		// Given
+		Mock<IWindow> window = new();
+		Mock<IMonitor> monitor = new();
+
+		Wrapper wrapper = new();
+		Mock<ILayoutEngine> layoutEngine2 = new();
+		layoutEngine2.SetupGet(le => le.Identity).Returns(new LayoutEngineIdentity());
+
+		wrapper
+			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
+			.Setup_TryGetWindowLocation(
+				window.Object,
+				new WindowState()
+				{
+					Location = new Location<int>() { X = 1, Y = 2 },
+					Window = window.Object,
+					WindowSize = WindowSize.Normal
+				}
+			)
+			.Setup_GetMonitorAtPoint(new Location<int>() { X = 1, Y = 2 }, monitor);
+
+		// When
+		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		plugin.MarkWindowAsFloating(window.Object);
+
+		wrapper.Workspace.Setup(w => w.ActiveLayoutEngine).Returns(layoutEngine2.Object);
+		plugin.MarkWindowAsFloating(window.Object);
+
+		plugin.MarkWindowAsDockedInLayoutEngine(window.Object, wrapper.LayoutEngine.Object.Identity);
+
+		// Then
+		plugin.FloatingWindows
+			.Should()
+			.BeEquivalentTo(
+				new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
+				{
+					{
+						window.Object,
+						new HashSet<LayoutEngineIdentity>() { layoutEngine2.Object.Identity }
+					}
+				}
+			);
+	}
+
+	#endregion
 }

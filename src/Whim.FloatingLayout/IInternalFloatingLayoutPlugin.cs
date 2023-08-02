@@ -16,5 +16,5 @@ internal interface IInternalFloatingLayoutPlugin
 	/// </summary>
 	/// <param name="window"></param>
 	/// <param name="layoutEngineIdentity"></param>
-	void RemoveLayoutEngineFromWindow(IWindow window, LayoutEngineIdentity layoutEngineIdentity);
+	void MarkWindowAsDockedInLayoutEngine(IWindow window, LayoutEngineIdentity layoutEngineIdentity);
 }

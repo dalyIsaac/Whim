@@ -239,8 +239,11 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Mock<IWindow> window = new();
+		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 
-		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
+		Wrapper wrapper = new Wrapper()
+			.MarkAsFloating(window.Object)
+			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
 		FloatingLayoutEngine engine =
 			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
 

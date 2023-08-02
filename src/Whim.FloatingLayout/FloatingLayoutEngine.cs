@@ -96,7 +96,7 @@ internal class FloatingLayoutEngine : BaseProxyLayoutEngine
 		// Otherwise, pass to the inner layout engine.
 		if (_floatingWindowLocations.ContainsKey(window))
 		{
-			_plugin.RemoveLayoutEngineFromWindow(window, InnerLayoutEngine.Identity);
+			_plugin.MarkWindowAsDockedInLayoutEngine(window, InnerLayoutEngine.Identity);
 
 			// If the window was not supposed to be floating, remove it from the inner layout engine.
 			if (isFloating)

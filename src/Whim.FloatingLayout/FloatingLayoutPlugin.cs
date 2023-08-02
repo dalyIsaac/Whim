@@ -103,9 +103,8 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 		workspace.MoveWindowToPoint(window, unitSquareLocation);
 	}
 
-	// TODO: Write dedicated tests for this
 	/// <inheritdoc />
-	public void RemoveLayoutEngineFromWindow(IWindow window, LayoutEngineIdentity layoutEngineIdentity)
+	public void MarkWindowAsDockedInLayoutEngine(IWindow window, LayoutEngineIdentity layoutEngineIdentity)
 	{
 		if (_floatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines))
 		{
