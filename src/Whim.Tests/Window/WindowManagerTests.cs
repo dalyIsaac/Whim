@@ -418,7 +418,7 @@ public class WindowManagerTests
 		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()), Times.Once);
 	}
 
 	[Fact]
@@ -430,8 +430,8 @@ public class WindowManagerTests
 		wrapper.AllowWindowCreation(hwnd);
 
 		wrapper.WorkspaceManager
-			.Setup(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()))
-			.Returns(new Mock<IMonitor>().Object);
+			.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()))
+			.Returns(new Mock<IWorkspace>().Object);
 
 		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
 
@@ -718,7 +718,7 @@ public class WindowManagerTests
 		// Then
 		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
 		workspace.Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<ILocation<int>>(), It.IsAny<IWindow>()),
+			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow>()),
 			Times.Never()
 		);
 	}
@@ -731,7 +731,7 @@ public class WindowManagerTests
 			new Location<int>() { X = 4, Width = 4 },
 			new Location<int>() { X = 3, Width = 5 },
 			Direction.Left,
-			new Point<int>() { X = 1, Y = 0 }
+			new Point<int>() { X = -1, Y = 0 }
 		};
 
 		// Move left edge to the right
@@ -740,7 +740,7 @@ public class WindowManagerTests
 			new Location<int>() { X = 4, Width = 4 },
 			new Location<int>() { X = 5, Width = 3 },
 			Direction.Left,
-			new Point<int>() { X = -1, Y = 0 }
+			new Point<int>() { X = 1, Y = 0 }
 		};
 
 		// Move right edge to the right
@@ -767,7 +767,7 @@ public class WindowManagerTests
 			new Location<int>() { Y = 4, Height = 4 },
 			new Location<int>() { Y = 3, Height = 5 },
 			Direction.Up,
-			new Point<int>() { X = 0, Y = 1 }
+			new Point<int>() { X = 0, Y = -1 }
 		};
 
 		// Move top edge down
@@ -776,7 +776,7 @@ public class WindowManagerTests
 			new Location<int>() { Y = 4, Height = 4 },
 			new Location<int>() { Y = 5, Height = 3 },
 			Direction.Up,
-			new Point<int>() { X = 0, Y = -1 }
+			new Point<int>() { X = 0, Y = 1 }
 		};
 
 		// Move bottom edge down
@@ -841,7 +841,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		workspace.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
+		wrapper.WorkspaceManager.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
 	}
 
 	[Fact]

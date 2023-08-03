@@ -294,7 +294,7 @@ internal class WindowManager : IWindowManager
 	internal void OnWindowAdded(IWindow window)
 	{
 		Logger.Debug($"Window added: {window}");
-		(_context.WorkspaceManager as IInternalWorkspaceManager)?.WindowAdded(window);
+		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowAdded(window);
 		WindowAdded?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
@@ -307,8 +307,8 @@ internal class WindowManager : IWindowManager
 	internal void OnWindowFocused(IWindow window)
 	{
 		Logger.Debug($"Window focused: {window}");
-		(_context.MonitorManager as IInternalMonitorManager)?.WindowFocused(window);
-		(_context.WorkspaceManager as IInternalWorkspaceManager)?.WindowFocused(window);
+		((IInternalMonitorManager)_context.MonitorManager).WindowFocused(window);
+		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowFocused(window);
 		WindowFocused?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
@@ -323,9 +323,9 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Window hidden: {window}");
 
-		if (_context.WorkspaceManager.GetMonitorForWindow(window) == null)
+		if (_context.WorkspaceManager.GetWorkspaceForWindow(window) == null)
 		{
-			Logger.Debug($"Window {window} is not on a monitor, ignoring event");
+			Logger.Debug($"Window {window} is not on a workspace, ignoring event");
 			return;
 		}
 
@@ -336,7 +336,7 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Window removed: {window}");
 		_windows.Remove(window.Handle);
-		(_context.WorkspaceManager as IInternalWorkspaceManager)?.WindowRemoved(window);
+		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowRemoved(window);
 		WindowRemoved?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
@@ -422,13 +422,13 @@ internal class WindowManager : IWindowManager
 		if (leftEdgeDelta != 0)
 		{
 			movedEdge |= Direction.Left;
-			movedEdgeDeltaX = leftEdgeDelta;
+			movedEdgeDeltaX = -leftEdgeDelta;
 			movedEdgeCountX++;
 		}
 		if (topEdgeDelta != 0)
 		{
 			movedEdge |= Direction.Up;
-			movedEdgeDeltaY = topEdgeDelta;
+			movedEdgeDeltaY = -topEdgeDelta;
 			movedEdgeCountY++;
 		}
 		if (rightEdgeDelta != 0)
@@ -450,7 +450,7 @@ internal class WindowManager : IWindowManager
 			return false;
 		}
 
-		workspace.MoveWindowEdgesInDirection(
+		_context.WorkspaceManager.MoveWindowEdgesInDirection(
 			movedEdge,
 			new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, },
 			window
@@ -468,14 +468,14 @@ internal class WindowManager : IWindowManager
 	internal void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
-		(_context.WorkspaceManager as IInternalWorkspaceManager)?.WindowMinimizeStart(window);
+		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowMinimizeStart(window);
 		WindowMinimizeStart?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	internal void OnWindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize ended: {window}");
-		(_context.WorkspaceManager as IInternalWorkspaceManager)?.WindowMinimizeEnd(window);
+		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowMinimizeEnd(window);
 		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 }

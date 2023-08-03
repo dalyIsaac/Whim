@@ -27,6 +27,6 @@ public class MenuVariantRowViewModelTests
 
 		// Then
 		Assert.Equal(newModelMock.Object, vm.Model);
-		Assert.Equal(1, vm.FormattedTitle.Segments.Count);
+		Assert.Single(vm.FormattedTitle.Segments);
 	}
 }

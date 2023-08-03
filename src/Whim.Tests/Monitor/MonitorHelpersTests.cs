@@ -9,25 +9,13 @@ public class MonitorHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			},
+			new Location<int>() { Width = 1920, Height = 1080 },
 			new Point<int>() { X = 192, Y = 108 },
 			new Point<double>() { X = 0.1, Y = 0.1 }
 		};
 		yield return new object[]
 		{
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			},
+			new Location<int>() { Width = 1920, Height = 1080 },
 			new Point<int>() { X = 960, Y = 270 },
 			new Point<double>() { X = 0.5, Y = 0.25 }
 		};
@@ -93,17 +81,87 @@ public class MonitorHelpersTests
 		Assert.Equal(expected.Y, actual.Y);
 	}
 
-	public static IEnumerable<object[]> DoubleToUnitSquareData()
+	public static IEnumerable<object[]> IntToUnitSquareRespectSignData()
 	{
+		yield return new object[]
+		{
+			new Location<int>() { Width = 1920, Height = 1080 },
+			new Point<int>() { X = -192, Y = 108 },
+			new Point<double>() { X = -0.1, Y = 0.1 }
+		};
+		yield return new object[]
+		{
+			new Location<int>() { Width = 1920, Height = 1080 },
+			new Point<int>() { X = 960, Y = -270 },
+			new Point<double>() { X = 0.5, Y = -0.25 }
+		};
 		yield return new object[]
 		{
 			new Location<int>()
 			{
-				X = 0,
-				Y = 0,
+				X = 100,
+				Y = 100,
 				Width = 1920,
 				Height = 1080
 			},
+			new Point<int>() { X = -192, Y = -108 },
+			new Point<double>() { X = -0.1, Y = -0.1 }
+		};
+		yield return new object[]
+		{
+			new Location<int>()
+			{
+				X = 100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = -960, Y = 270 },
+			new Point<double>() { X = -0.5, Y = 0.25 }
+		};
+		yield return new object[]
+		{
+			new Location<int>()
+			{
+				X = -100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = 192, Y = -108 },
+			new Point<double>() { X = 0.1, Y = -0.1 }
+		};
+		yield return new object[]
+		{
+			new Location<int>()
+			{
+				X = -100,
+				Y = 100,
+				Width = 1920,
+				Height = 1080
+			},
+			new Point<int>() { X = -960, Y = -270 },
+			new Point<double>() { X = -0.5, Y = -0.25 }
+		};
+	}
+
+	[Theory]
+	[MemberData(nameof(IntToUnitSquareRespectSignData))]
+	public void ToUnitSquarePointRespectSignTheory(ILocation<int> monitor, IPoint<int> point, IPoint<double> expected)
+	{
+		// When
+		IPoint<double> actual = monitor.ToUnitSquare(point, respectSign: true);
+
+		// Then
+		Assert.Equal(expected.X, actual.X);
+		Assert.Equal(expected.Y, actual.Y);
+	}
+
+	public static IEnumerable<object[]> DoubleToUnitSquareData()
+	{
+		yield return new object[]
+		{
+			new Location<int>() { Width = 1920, Height = 1080 },
 			new Location<int>()
 			{
 				X = 192,
@@ -185,13 +243,7 @@ public class MonitorHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			},
+			new Location<int>() { Width = 1920, Height = 1080 },
 			new Location<double>()
 			{
 				X = 0.1,
@@ -249,13 +301,7 @@ public class MonitorHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			},
+			new Location<int>() { Width = 1920, Height = 1080 },
 			new Point<int>() { X = 192, Y = 108 },
 			new Point<int>() { X = 192, Y = 108 }
 		};

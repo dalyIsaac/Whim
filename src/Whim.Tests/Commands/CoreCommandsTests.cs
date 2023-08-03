@@ -1,5 +1,5 @@
 using Moq;
-using Whim.TestUtilities;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
@@ -147,7 +147,7 @@ public class CoreCommandsTests
 		MocksWrapper mocks = new();
 		CoreCommands commands = new(mocks.Context.Object);
 		PluginCommandsTestUtils testUtils = new(commands);
-		IPoint<int> pixelDeltas = new Point<int>()
+		IPoint<int> pixelsDeltas = new Point<int>()
 		{
 			X = x * CoreCommands.MoveWindowEdgeDelta,
 			Y = y * CoreCommands.MoveWindowEdgeDelta
@@ -160,7 +160,7 @@ public class CoreCommandsTests
 
 		// Then
 		mocks.Context.Verify(
-			x => x.WorkspaceManager.ActiveWorkspace.MoveWindowEdgesInDirection(direction, pixelDeltas, null),
+			x => x.WorkspaceManager.MoveWindowEdgesInDirection(direction, pixelsDeltas, null),
 			Times.Once
 		);
 	}

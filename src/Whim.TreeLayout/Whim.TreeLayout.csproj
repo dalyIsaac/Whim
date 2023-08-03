@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
@@ -29,35 +29,20 @@
 		<Version>0.1.0</Version>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="PhantomWindow.xaml" />
-		<None Remove="TreeLayoutEngineWidget.xaml" />
-	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230602002" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230724000" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Whim.TreeLayout.Tests" />
+		<InternalsVisibleTo Include="Whim.TreeLayout.Bar.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="TreeLayoutEngineWidget.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="PhantomWindow.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
 	</ItemGroup>
 
 </Project>

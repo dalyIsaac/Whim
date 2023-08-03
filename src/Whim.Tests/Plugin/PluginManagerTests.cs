@@ -290,7 +290,7 @@ public class PluginManagerTests
 
 		// Then
 		Assert.Equal(expectedMessage, ex.Message);
-		Assert.Equal(1, pluginManager.LoadedPlugins.Count);
+		Assert.Single(pluginManager.LoadedPlugins);
 	}
 
 	[Fact]

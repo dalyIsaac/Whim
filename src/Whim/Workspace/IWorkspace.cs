@@ -14,12 +14,6 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	string Name { get; set; }
 
-	/// <summary>
-	/// Initializes the workspace. This includes wrapping its layout engines with
-	/// proxies from <see cref="IWorkspaceManager"/>.
-	/// </summary>
-	void Initialize();
-
 	#region Layout engine
 	/// <summary>
 	/// The active layout engine.
@@ -119,48 +113,27 @@ public interface IWorkspace : IDisposable
 
 	/// <summary>
 	/// Change the <paramref name="window"/>'s <paramref name="edges"/> direction by
-	/// the specified <paramref name="pixelDeltas"/>.
+	/// the specified <paramref name="deltas"/>.
 	/// </summary>
 	/// <param name="edges">The edges to change.</param>
-	/// <param name="pixelDeltas">
-	/// The number of pixels to change the edge by. The <paramref name="edges"/> directions are
-	/// associated with the <paramref name="pixelDeltas"/>.
+	/// <param name="deltas">
+	/// The deltas to change the given <paramref name="edges"/> by. When a value is positive, then
+	/// the edge will move in the direction of the <paramref name="edges"/>.
+	/// The <paramref name="deltas"/> have a coordinate space of [0, 1] for both x and y (the unit
+	/// square).
 	/// </param>
 	/// <param name="window">
 	/// The window to change the edge of. If null, the currently focused window is
 	/// used.
 	/// </param>
-	void MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelDeltas, IWindow? window = null);
+	void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null);
 
 	/// <summary>
 	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.
+	/// The point has a coordinate space of [0, 1] for both x and y (the unit square).
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
 	void MoveWindowToPoint(IWindow window, IPoint<double> point);
-	#endregion
-
-	#region Phantom Windows
-	/// <summary>
-	/// Add a phantom window. This can only be done by the active layout engine.
-	/// </summary>
-	/// <remarks>
-	/// Phantom windows are placeholder windows that represent a space in the
-	/// current layout engine.
-	///
-	/// They are designed to let a layout engine reserve a space, for a new window,
-	/// or for a window that is being moved around.
-	/// </remarks>
-	/// <param name="engine">The layout engine to add the phantom window to.</param>
-	/// <param name="window">The phantom window to add.</param>
-	void AddPhantomWindow(ILayoutEngine engine, IWindow window);
-
-	/// <summary>
-	/// Remove a phantom window. This can only be done by the active layout engine,
-	/// and the phantom window must have been added to the same layout engine.
-	/// </summary>
-	/// <param name="engine">The layout engine to remove the phantom window from.</param>
-	/// <param name="window">The phantom window to remove.</param>
-	void RemovePhantomWindow(ILayoutEngine engine, IWindow window);
 	#endregion
 }

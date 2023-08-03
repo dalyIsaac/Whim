@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -8,7 +7,7 @@ namespace Whim;
 /// The wrapper layout engine provides additional functionality, but still utilises the underlying
 /// layout engine.
 /// </summary>
-public delegate ILayoutEngine ProxyLayoutEngine(ILayoutEngine engine);
+public delegate ILayoutEngine CreateProxyLayoutEngine(ILayoutEngine engine);
 
 /// <summary>
 /// Abstract layout engine, which proxy layout engines should inherit from.
@@ -21,73 +20,55 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	protected ILayoutEngine InnerLayoutEngine { get; }
 
 	/// <summary>
-	/// Constructs a new proxy layout engine.
+	/// Creates a new <cref name="BaseProxyLayoutEngine"/> with the given <paramref name="innerLayoutEngine"/>.
 	/// </summary>
-	/// <param name="innerLayoutEngine">The proxied layout engine.</param>
+	/// <param name="innerLayoutEngine"></param>
 	protected BaseProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 	{
 		InnerLayoutEngine = innerLayoutEngine;
 	}
 
+	/// <inheritdoc/>
+	public LayoutEngineIdentity Identity => InnerLayoutEngine.Identity;
+
 	/// <summary>
 	/// The name is only really important for the user, so we can use the name of the proxied layout engine.
 	/// </summary>
 	/// <inheritdoc/>
-	public virtual string Name => InnerLayoutEngine.Name;
+	public string Name => InnerLayoutEngine.Name;
 
 	/// <inheritdoc/>
-	public virtual int Count => InnerLayoutEngine.Count;
+	public abstract int Count { get; }
 
 	/// <inheritdoc/>
-	public virtual bool IsReadOnly => InnerLayoutEngine.IsReadOnly;
+	public abstract ILayoutEngine AddWindow(IWindow window);
 
 	/// <inheritdoc/>
-	public virtual void Add(IWindow window) => InnerLayoutEngine.Add(window);
+	public abstract ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point);
 
 	/// <inheritdoc/>
-	public virtual bool Remove(IWindow window) => InnerLayoutEngine.Remove(window);
+	public abstract ILayoutEngine RemoveWindow(IWindow window);
 
 	/// <inheritdoc/>
-	public virtual IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
+	public abstract IWindow? GetFirstWindow();
 
 	/// <inheritdoc/>
-	public virtual void FocusWindowInDirection(Direction direction, IWindow window) =>
-		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+	public abstract void FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <inheritdoc/>
-	public virtual void SwapWindowInDirection(Direction direction, IWindow window) =>
-		InnerLayoutEngine.SwapWindowInDirection(direction, window);
+	public abstract ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window);
 
 	/// <inheritdoc/>
-	public virtual void Clear() => InnerLayoutEngine.Clear();
+	public abstract bool ContainsWindow(IWindow window);
 
 	/// <inheritdoc/>
-	public virtual bool Contains(IWindow window) => InnerLayoutEngine.Contains(window);
-
-	/// <inheritdoc/>
-	public virtual void CopyTo(IWindow[] array, int arrayIndex) => InnerLayoutEngine.CopyTo(array, arrayIndex);
-
-	/// <inheritdoc/>
-	public virtual IEnumerator<IWindow> GetEnumerator() => InnerLayoutEngine.GetEnumerator();
-
-	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-	/// <inheritdoc/>
-	public virtual void MoveWindowEdgesInDirection(Direction edge, IPoint<int> pixelDeltas, IWindow window) =>
-		InnerLayoutEngine.MoveWindowEdgesInDirection(edge, pixelDeltas, window);
+	public abstract ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window);
 
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
 
-	/// <inheritdoc/>
-	public virtual void HidePhantomWindows() => InnerLayoutEngine.HidePhantomWindows();
-
-	/// <inheritdoc/>
-	public virtual void AddWindowAtPoint(IWindow window, IPoint<double> point) =>
-		InnerLayoutEngine.AddWindowAtPoint(window, point);
-
 	/// <summary>
-	/// Checks to see if this <cref name="ILayoutEngine"/>
+	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">The type of layout engine to check for.</typeparam>
@@ -102,16 +83,11 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 			return t;
 		}
 
-		if (InnerLayoutEngine != null)
-		{
-			return InnerLayoutEngine.GetLayoutEngine<T>();
-		}
-
-		return default;
+		return InnerLayoutEngine.GetLayoutEngine<T>();
 	}
 
 	/// <summary>
-	/// Checks to see if this <cref name="ILayoutEngine"/>
+	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>
 	/// or a child layout engine is equal to <paramref name="layoutEngine"/>.
 	/// </summary>
 	/// <param name="layoutEngine">The layout engine to check for.</param>
@@ -125,11 +101,6 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 			return true;
 		}
 
-		if (InnerLayoutEngine != null)
-		{
-			return InnerLayoutEngine.ContainsEqual(layoutEngine);
-		}
-
-		return false;
+		return InnerLayoutEngine.ContainsEqual(layoutEngine);
 	}
 }

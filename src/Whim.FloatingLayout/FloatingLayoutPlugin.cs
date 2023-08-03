@@ -1,16 +1,20 @@
-using System;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
-public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
+public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayoutPlugin
 {
 	private readonly IContext _context;
-	private bool disposedValue;
 
 	/// <inheritdoc />
 	public string Name => "whim.floating_layout";
+
+	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = new();
+
+	/// <inheritdoc/>
+	public IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows => _floatingWindows;
 
 	/// <summary>
 	/// Creates a new instance of the floating layout plugin.
@@ -24,8 +28,8 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WindowManager.WindowMoved += WindowManager_WindowMoved;
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, layout));
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, this, layout));
+		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
 	}
 
 	/// <inheritdoc />
@@ -34,81 +38,109 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
 
-	private void WindowManager_WindowMoved(object? sender, WindowEventArgs e)
+	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e) => _floatingWindows.Remove(e.Window);
+
+	private void UpdateWindow(IWindow? window, bool markAsFloating)
 	{
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(e.Window);
-		if (workspace == null)
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+
+		if (window == null)
 		{
-			Logger.Error($"Could not find workspace for window {e.Window}");
+			Logger.Error("Could not find window");
 			return;
 		}
 
-		ILayoutEngine rootEngine = workspace.ActiveLayoutEngine;
-		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
-		if (floatingLayoutEngine == null)
+		if (!markAsFloating && !FloatingWindows.ContainsKey(window))
 		{
-			Logger.Debug("Could not find floating layout engine");
+			Logger.Debug($"Window {window} is not floating");
 			return;
 		}
 
-		floatingLayoutEngine.UpdateWindowLocation(e.Window);
+		if (_context.WorkspaceManager.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		{
+			Logger.Error($"Window {window} is not in a workspace");
+			return;
+		}
+
+		if (workspace.TryGetWindowLocation(window) is not IWindowState windowState)
+		{
+			Logger.Error($"Could not get location for window {window}");
+			return;
+		}
+
+		LayoutEngineIdentity layoutEngineIdentity = workspace.ActiveLayoutEngine.Identity;
+		ISet<LayoutEngineIdentity> layoutEngines = FloatingWindows.TryGetValue(
+			window,
+			out ISet<LayoutEngineIdentity>? existingLayoutEngines
+		)
+			? existingLayoutEngines
+			: new HashSet<LayoutEngineIdentity>();
+
+		if (markAsFloating)
+		{
+			Logger.Debug($"Marking window {window} as floating");
+			layoutEngines.Add(layoutEngineIdentity);
+		}
+		else
+		{
+			Logger.Debug($"Marking window {window} as docked");
+			layoutEngines.Remove(layoutEngineIdentity);
+		}
+
+		if (layoutEngines.Count == 0)
+		{
+			_floatingWindows.Remove(window);
+		}
+		else
+		{
+			_floatingWindows[window] = layoutEngines;
+		}
+
+		// Convert the location to a unit square location.
+		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(windowState.Location);
+		ILocation<double> unitSquareLocation = monitor.WorkingArea.ToUnitSquare(windowState.Location);
+
+		workspace.MoveWindowToPoint(window, unitSquareLocation);
 	}
 
-	/// <summary>
-	/// Mark the given <paramref name="window"/> as a floating window
-	/// </summary>
-	/// <param name="window"></param>
-	public void MarkWindowAsFloating(IWindow? window = null)
+	/// <inheritdoc />
+	public void MarkWindowAsDockedInLayoutEngine(IWindow window, LayoutEngineIdentity layoutEngineIdentity)
 	{
-		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
-		if (floatingLayoutEngine == null)
+		if (_floatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines))
 		{
-			Logger.Error("Could not find floating layout engine");
-			return;
-		}
+			layoutEngines.Remove(layoutEngineIdentity);
 
-		floatingLayoutEngine.MarkWindowAsFloating(window);
-		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
+			if (layoutEngines.Count == 0)
+			{
+				_floatingWindows.Remove(window);
+			}
+		}
 	}
 
-	/// <summary>
-	/// Update the floating window location.
-	/// </summary>
-	/// <param name="window"></param>
-	public void MarkWindowAsDocked(IWindow? window = null)
-	{
-		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
-		if (floatingLayoutEngine == null)
-		{
-			Logger.Error("Could not find floating layout engine");
-			return;
-		}
+	/// <inheritdoc />
+	public void MarkWindowAsFloating(IWindow? window = null) => UpdateWindow(window, true);
 
-		floatingLayoutEngine.MarkWindowAsDocked(window);
-		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
-	}
+	/// <inheritdoc />
+	public void MarkWindowAsDocked(IWindow? window = null) => UpdateWindow(window, false);
 
-	/// <summary>
-	/// Toggle the floating state of the given <paramref name="window"/>.
-	/// </summary>
-	/// <param name="window"></param>
+	/// <inheritdoc />
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
-		// Get the currently active floating layout engine.
-		ILayoutEngine rootEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine;
-		IFloatingLayoutEngine? floatingLayoutEngine = rootEngine.GetLayoutEngine<IFloatingLayoutEngine>();
-		if (floatingLayoutEngine == null)
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		if (window == null)
 		{
-			Logger.Error("Could not find floating layout engine");
+			Logger.Error("Could not find window");
 			return;
 		}
 
-		floatingLayoutEngine.ToggleWindowFloating(window);
-		_context.WorkspaceManager.ActiveWorkspace.DoLayout();
+		if (FloatingWindows.ContainsKey(window))
+		{
+			MarkWindowAsDocked(window);
+		}
+		else
+		{
+			MarkWindowAsFloating(window);
+		}
 	}
 
 	/// <inheritdoc />
@@ -116,29 +148,4 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IDisposable
 
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
-
-	/// <inheritdoc />
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				_context.WindowManager.WindowMoved -= WindowManager_WindowMoved;
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			disposedValue = true;
-		}
-	}
-
-	/// <inheritdoc />
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
-	}
 }

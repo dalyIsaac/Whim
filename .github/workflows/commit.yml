@@ -8,7 +8,6 @@ on:
       - ".github/workflows/pull_request_labels.yml"
       - ".github/pull_request_template.md"
   pull_request:
-    branches: [main]
     paths-ignore:
       - ".github/ISSUE_TEMPLATE/*"
       - ".github/workflows/pull_request_labels.yml"
@@ -65,9 +64,9 @@ jobs:
 
       - name: Test
         run: |
-          dotnet test Whim.sln -p:CollectCoverage=true -p:CoverletOutputFormat=opencover
+          dotnet test Whim.sln --collect:"XPlat Code Coverage;Format=opencover"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
         with:
-          files: src/**/*.opencover.xml
+          files: src/**/TestResults/**/coverage.opencover.xml

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Whim.TreeLayout;
@@ -8,10 +9,16 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 {
 	private readonly IContext _context;
 
+	private readonly Dictionary<LayoutEngineIdentity, Direction> _addNodeDirections = new();
+	private const Direction DefaultAddNodeDirection = Direction.Right;
+
 	/// <inheritdoc/>
 	public string Name => "whim.tree_layout";
 
 	/// <inheritdoc/>
+	public IPluginCommands PluginCommands => new TreeLayoutCommands(_context, this);
+
+	/// <inheritdoc	/>
 	public event EventHandler<AddWindowDirectionChangedEventArgs>? AddWindowDirectionChanged;
 
 	/// <summary>
@@ -22,51 +29,65 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 		_context = context;
 	}
 
-	/// <inheritdoc />
+	/// <inheritdoc	/>
 	public void PreInitialize() { }
 
-	/// <inheritdoc />
+	/// <inheritdoc	/>
 	public void PostInitialize() { }
 
 	/// <inheritdoc />
-	public IPluginCommands PluginCommands => new TreeLayoutCommands(_context, this);
-
-	private ITreeLayoutEngine? GetTreeLayoutEngine(IMonitor monitor)
+	public Direction? GetAddWindowDirection(IMonitor monitor)
 	{
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
-		return workspace?.ActiveLayoutEngine.GetLayoutEngine<ITreeLayoutEngine>();
+		ILayoutEngine? layoutEngine = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;
+		if (layoutEngine?.GetLayoutEngine<TreeLayoutEngine>() is not TreeLayoutEngine treeLayoutEngine)
+		{
+			return null;
+		}
+
+		return GetAddWindowDirection(treeLayoutEngine);
+	}
+
+	/// <inheritdoc />
+	public Direction GetAddWindowDirection(TreeLayoutEngine engine)
+	{
+		if (!_addNodeDirections.TryGetValue(engine.Identity, out Direction direction))
+		{
+			// Lazy initialization
+			_addNodeDirections[engine.Identity] = direction = DefaultAddNodeDirection;
+		}
+
+		return direction;
 	}
 
 	/// <inheritdoc />
 	public void SetAddWindowDirection(IMonitor monitor, Direction direction)
 	{
-		if (GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine)
+		ILayoutEngine? layoutEngine = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;
+		if (layoutEngine?.GetLayoutEngine<TreeLayoutEngine>() is not TreeLayoutEngine treeLayoutEngine)
 		{
-			treeLayoutEngine.AddNodeDirection = direction;
-			AddWindowDirectionChanged?.Invoke(
-				this,
-				new AddWindowDirectionChangedEventArgs()
-				{
-					TreeLayoutEngine = treeLayoutEngine,
-					CurrentDirection = direction,
-					PreviousDirection = treeLayoutEngine.AddNodeDirection
-				}
-			);
+			return;
 		}
+
+		SetAddWindowDirection(treeLayoutEngine, direction);
 	}
 
 	/// <inheritdoc />
-	public Direction? GetAddWindowDirection(IMonitor monitor) =>
-		GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine ? treeLayoutEngine.AddNodeDirection : null;
-
-	/// <inheritdoc />
-	public void SplitFocusedWindow()
+	public void SetAddWindowDirection(TreeLayoutEngine engine, Direction direction)
 	{
-		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
-		if (GetTreeLayoutEngine(monitor) is TreeLayoutEngine treeLayoutEngine)
-		{
-			treeLayoutEngine.SplitFocusedWindow();
-		}
+		Direction previousDirection = _addNodeDirections.TryGetValue(engine.Identity, out Direction previous)
+			? previous
+			: DefaultAddNodeDirection;
+
+		_addNodeDirections[engine.Identity] = direction;
+		AddWindowDirectionChanged?.Invoke(
+			this,
+			new AddWindowDirectionChangedEventArgs()
+			{
+				CurrentDirection = direction,
+				PreviousDirection = previousDirection,
+				TreeLayoutEngine = engine
+			}
+		);
 	}
 
 	/// <inheritdoc />

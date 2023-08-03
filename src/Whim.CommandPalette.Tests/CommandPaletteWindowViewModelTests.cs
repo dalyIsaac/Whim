@@ -24,17 +24,7 @@ public class CommandPaletteWindowViewModelTests
 			CommandManager.Setup(x => x.GetEnumerator()).Returns(new List<ICommand>().GetEnumerator());
 
 			Mock<IMonitor> monitor = new();
-			monitor
-				.Setup(m => m.WorkingArea)
-				.Returns(
-					new Location<int>()
-					{
-						X = 0,
-						Y = 0,
-						Height = 1080,
-						Width = 1920
-					}
-				);
+			monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Height = 1080, Width = 1920 });
 
 			Mock<IMonitorManager> monitorManager = new();
 			monitorManager.Setup(m => m.ActiveMonitor).Returns(monitor.Object);

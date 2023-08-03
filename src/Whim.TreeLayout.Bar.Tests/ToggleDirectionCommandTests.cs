@@ -12,7 +12,7 @@ public class ToggleDirectionCommandTests
 		public Mock<IMonitor> Monitor { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<ITreeLayoutEngine> TreeLayoutEngine { get; } = new();
+		public Mock<ILayoutEngine> TreeLayoutEngine { get; } = new();
 		public TreeLayoutEngineWidgetViewModel ViewModel { get; }
 
 		public MocksBuilder()
@@ -20,8 +20,6 @@ public class ToggleDirectionCommandTests
 			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
 			WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(Monitor.Object)).Returns(Workspace.Object);
 			Workspace.SetupGet(x => x.ActiveLayoutEngine).Returns(TreeLayoutEngine.Object);
-
-			TreeLayoutEngine.Setup(t => t.GetLayoutEngine<ITreeLayoutEngine>()).Returns(TreeLayoutEngine.Object);
 
 			ViewModel = new TreeLayoutEngineWidgetViewModel(Context.Object, Plugin.Object, Monitor.Object);
 		}

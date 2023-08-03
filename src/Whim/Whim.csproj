@@ -35,7 +35,7 @@
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.162-beta">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230602002" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230724000" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
 		<PackageReference Include="Serilog" Version="3.0.1" />
 		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
@@ -44,12 +44,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="Whim.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+		<InternalsVisibleTo Include="Whim.FloatingLayout.Tests" />
+		<InternalsVisibleTo Include="Whim.Gaps.Tests" />
+		<InternalsVisibleTo Include="Whim.Tests" />
+		<InternalsVisibleTo Include="Whim.TestUtils" />
+		<InternalsVisibleTo Include="Whim.TreeLayout.Tests" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Template\omnisharp.json" />
 		<EmbeddedResource Include="Template\whim.config.csx" />
 	</ItemGroup>
 </Project>

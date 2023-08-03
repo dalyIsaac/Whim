@@ -10,7 +10,7 @@ public class AddWindowDirectionChangedEventArgs : EventArgs
 	/// <summary>
 	/// The tree layout engine for which the direction in which to add new windows has changed.
 	/// </summary>
-	public required ITreeLayoutEngine TreeLayoutEngine { get; init; }
+	public required ILayoutEngine TreeLayoutEngine { get; init; }
 
 	/// <summary>
 	/// The direction in which to add new windows.
