@@ -20,6 +20,24 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 		_gapsConfig = gapsConfig;
 	}
 
+	private GapsLayoutEngine(GapsLayoutEngine oldEngine, ILayoutEngine innerLayoutEngine)
+		: base(innerLayoutEngine)
+	{
+		_gapsConfig = oldEngine._gapsConfig;
+	}
+
+	private GapsLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine) =>
+		InnerLayoutEngine == newInnerLayoutEngine ? this : new GapsLayoutEngine(this, newInnerLayoutEngine);
+
+	/// <inheritdoc />
+	public override int Count => InnerLayoutEngine.Count;
+
+	/// <inheritdoc />
+	public override ILayoutEngine AddWindow(IWindow window) => UpdateInner(InnerLayoutEngine.AddWindow(window));
+
+	/// <inheritdoc />
+	public override bool ContainsWindow(IWindow window) => InnerLayoutEngine.ContainsWindow(window);
+
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
 	{
@@ -57,4 +75,26 @@ public class GapsLayoutEngine : BaseProxyLayoutEngine
 			};
 		}
 	}
+
+	/// <inheritdoc />
+	public override void FocusWindowInDirection(Direction direction, IWindow window) =>
+		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+
+	/// <inheritdoc />
+	public override IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();
+
+	/// <inheritdoc />
+	public override ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window) =>
+		UpdateInner(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window));
+
+	/// <inheritdoc />
+	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) =>
+		UpdateInner(InnerLayoutEngine.MoveWindowToPoint(window, point));
+
+	/// <inheritdoc />
+	public override ILayoutEngine RemoveWindow(IWindow window) => UpdateInner(InnerLayoutEngine.RemoveWindow(window));
+
+	/// <inheritdoc />
+	public override ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
+		UpdateInner(InnerLayoutEngine.SwapWindowInDirection(direction, window));
 }

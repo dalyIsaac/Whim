@@ -1,7 +1,7 @@
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
@@ -66,71 +66,92 @@ public class WorkspaceManagerTests
 		}
 	}
 
+	#region Add
 	[Fact]
-	public void Initialize_RequireAtLeastNWorkspace()
+	public void Add_BeforeInitialization()
 	{
 		// Given
 		Wrapper wrapper = new();
 
-		// Then
+		// When a workspace is added before initialization
+		wrapper.WorkspaceManager.Add();
+
+		// Then the workspace is not added
+		Assert.Empty(wrapper.WorkspaceManager);
+	}
+
+	[Fact]
+	public void Add_BeforeInitialization_DefaultName()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When a workspace is added
+		wrapper.WorkspaceManager.Add();
+		wrapper.WorkspaceManager.Initialize();
+
+		// Then the workspace is created with default name.
+		Assert.Equal("Workspace 1", wrapper.WorkspaceManager.Single().Name);
+	}
+
+	[Fact]
+	public void Add_SpecifyName()
+	{
+		// Given
+		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		// When a workspace is added with a name
+		wrapper.WorkspaceManager.Add("workspace");
+
+		// Then the workspace is created with the specified name.
+		Assert.Equal("workspace", wrapper.WorkspaceManager.Single().Name);
+	}
+
+	[Fact]
+	public void Add_SpecifyLayoutEngine()
+	{
+		// Given
+		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		// When a workspace is added with a layout engine
+		wrapper.WorkspaceManager.Add("workspace", new CreateLeafLayoutEngine[] { (id) => new TestLayoutEngine() });
+
+		// Then the workspace is created with the specified layout engine.
+		Assert.IsType<TestLayoutEngine>(wrapper.WorkspaceManager.Single().ActiveLayoutEngine);
+	}
+
+	[Fact]
+	public void Add_BeforeInitialization_DefaultLayoutEngine()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When a workspace is added
+		wrapper.WorkspaceManager.Add();
+		wrapper.WorkspaceManager.Initialize();
+
+		// Then the workspace is created with default layout engine.
+		Assert.IsType<ColumnLayoutEngine>(wrapper.WorkspaceManager.Single().ActiveLayoutEngine);
+	}
+
+	[Fact]
+	public void Add_ThrowsWhenNoLayoutEngines()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When the workspace manager is initialized after a workspace is added
+		wrapper.WorkspaceManager.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
+		wrapper.WorkspaceManager.Add();
+
+		// Then an exception is thrown
 		Assert.Throws<InvalidOperationException>(wrapper.WorkspaceManager.Initialize);
 	}
+	#endregion
 
-	[Fact]
-	public void Initialize_Success()
-	{
-		// Given the workspace manager has two workspaces
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		// When the workspace manager is initialized, then a MonitorWorkspaceChanged event is raised
-		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged += h,
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged -= h,
-			wrapper.WorkspaceManager.Initialize
-		);
-
-		// The workspaces are initialized
-		workspace.Verify(w => w.Initialize(), Times.Once);
-		workspace2.Verify(w => w.Initialize(), Times.Once);
-	}
-
-	[Fact]
-	public void Add_AfterInitialize()
-	{
-		// Given the workspace manager is already initialized
-		Wrapper wrapper = new(new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() });
-		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
-
-		// When a workspace is added, then WorkspaceAdded is raised
-		wrapper.WorkspaceManager.AddProxyLayoutEngine(proxyLayoutEngine.Object);
-		wrapper.WorkspaceManager.Initialize();
-		Assert.Raises<WorkspaceEventArgs>(
-			h => wrapper.WorkspaceManager.WorkspaceAdded += h,
-			h => wrapper.WorkspaceManager.WorkspaceAdded -= h,
-			() => wrapper.WorkspaceManager.Add("new workspace")
-		);
-
-		// Verify that the workspace was initialized
-		proxyLayoutEngine.Verify(p => p(It.IsAny<ILayoutEngine>()), Times.Once);
-	}
-
-	[Fact]
-	public void Add_BeforeInitialize()
-	{
-		// Given the workspace manager is not initialized
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace1 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace1 });
-
-		// When
-		wrapper.WorkspaceManager.Initialize();
-
-		// Then
-		workspace.Verify(w => w.Initialize(), Times.Once);
-	}
-
+	#region Remove
 	[Fact]
 	public void Remove_Workspace_RequireAtLeastNWorkspace()
 	{
@@ -218,7 +239,9 @@ public class WorkspaceManagerTests
 		);
 		Assert.Equal(workspace.Object, result.Arguments.Workspace);
 	}
+	#endregion
 
+	#region TryGet
 	[Fact]
 	public void TryGet_Null()
 	{
@@ -252,7 +275,9 @@ public class WorkspaceManagerTests
 		// When getting a workspace which does exist, then the workspace is returned
 		Assert.Equal(workspace.Object, wrapper.WorkspaceManager["workspace"]);
 	}
+	#endregion
 
+	#region GetEnumerator
 	[Fact]
 	public void GetEnumerator()
 	{
@@ -276,7 +301,9 @@ public class WorkspaceManagerTests
 		// When enumerating the workspaces, then the workspaces are returned
 		Assert.Equal(new[] { workspace.Object, workspace2.Object }, wrapper.WorkspaceManager);
 	}
+	#endregion
 
+	#region Activate
 	[Fact]
 	public void Activate_NoPreviousWorkspace()
 	{
@@ -500,7 +527,9 @@ public class WorkspaceManagerTests
 		workspaces[1].Verify(w => w.DoLayout(), Times.Never);
 		workspaces[1].Verify(w => w.FocusFirstWindow(), Times.Never);
 	}
+	#endregion
 
+	#region GetMonitorForWorkspace
 	[Fact]
 	public void GetMonitorForWorkspace_NoWorkspace()
 	{
@@ -535,6 +564,7 @@ public class WorkspaceManagerTests
 		// Then the monitor is returned
 		Assert.Equal(wrapper.Monitors[0].Object, monitor);
 	}
+	#endregion
 
 	[Fact]
 	public void LayoutAllActiveWorkspaces()
@@ -559,6 +589,7 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.DoLayout(), Times.Once());
 	}
 
+	#region WindowAdded
 	[Fact]
 	public void WindowAdded_NoRouter()
 	{
@@ -665,7 +696,9 @@ public class WorkspaceManagerTests
 		workspace.Verify(w => w.AddWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
 	}
+	#endregion
 
+	#region WindowRemoved
 	[Fact]
 	public void WindowRemoved_NotFound()
 	{
@@ -714,7 +747,9 @@ public class WorkspaceManagerTests
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 	}
+	#endregion
 
+	#region MoveWindowToWorkspace
 	[Fact]
 	public void MoveWindowToWorkspace_NoWindow()
 	{
@@ -736,31 +771,6 @@ public class WorkspaceManagerTests
 		// Then the window is not added to the workspace
 		workspace.Verify(w => w.RemoveWindow(It.IsAny<IWindow>()), Times.Never());
 		workspace2.Verify(w => w.AddWindow(It.IsAny<IWindow>()), Times.Never());
-	}
-
-	[Fact]
-	public void MoveWindowToWorkspace_PhantomWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		Mock<IWindow> window = new();
-		// When a phantom window is added
-		wrapper.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
-		workspace.Reset();
-		workspace2.Reset();
-
-		// and moved to a workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace.Object, window.Object);
-
-		// Then the window is not removed or added to any workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
 	}
 
 	[Fact]
@@ -855,7 +865,9 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 		window.Verify(w => w.Hide(), Times.Once());
 	}
+	#endregion
 
+	#region MoveWindowToMonitor
 	[Fact]
 	public void MoveWindowToMonitor_NoWindow()
 	{
@@ -979,6 +991,7 @@ public class WorkspaceManagerTests
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 	}
+	#endregion
 
 	[Fact]
 	public void MoveWindowToPreviousMonitor_Success()
@@ -1036,6 +1049,7 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 	}
 
+	#region MoveWindowToPoint
 	[Fact]
 	public void MoveWindowToPoint_TargetWorkspaceNotFound()
 	{
@@ -1057,35 +1071,6 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
 
 		// Then the window is not removed from the old workspace and not added to the new workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
-	}
-
-	[Fact]
-	public void MoveWindowToPoint_PhantomWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
-		workspace.Reset();
-		workspace2.Reset();
-
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(wrapper.Monitors[1].Object);
-
-		// When a phantom is moved
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
-
-		// Then nothing happens
-		wrapper.MonitorManager.Verify(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never());
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 	}
@@ -1184,7 +1169,9 @@ public class WorkspaceManagerTests
 
 		window.Verify(w => w.Focus(), Times.Once());
 	}
+	#endregion
 
+	#region WindowFocused
 	[Fact]
 	public void WindowFocused()
 	{
@@ -1232,7 +1219,9 @@ public class WorkspaceManagerTests
 		// Then the first workspace is activated
 		workspaces[0].Verify(w => w.DoLayout(), Times.Once());
 	}
+	#endregion
 
+	#region WindowMinimizeStart
 	[Fact]
 	public void WindowMinimizeStart_CouldNotFindWindow()
 	{
@@ -1271,7 +1260,9 @@ public class WorkspaceManagerTests
 		// Then the workspace is notified
 		internalWorkspace.Verify(w => w.WindowMinimizeStart(window.Object), Times.Once());
 	}
+	#endregion
 
+	#region WindowMinimizeEnd
 	[Fact]
 	public void WindowMinimizeEnd()
 	{
@@ -1317,7 +1308,9 @@ public class WorkspaceManagerTests
 		// Then the workspace is not notified
 		internalWorkspace.Verify(w => w.WindowMinimizeEnd(window.Object), Times.Never());
 	}
+	#endregion
 
+	#region MonitorManager_MonitorsChanged
 	[Fact]
 	public void MonitorManager_MonitorsChanged_Removed()
 	{
@@ -1356,8 +1349,10 @@ public class WorkspaceManagerTests
 
 		Wrapper wrapper = new(new[] { workspace, workspace2 });
 
-		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
-		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
 		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
@@ -1416,51 +1411,66 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void MonitorManager_MonitorsChanged_CannotAddWorkspace()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+
+		Mock<IMonitor> monitor1 = new();
+		Mock<IMonitor> monitor2 = new();
+
+		Wrapper wrapper = new(new[] { workspace });
+
+		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
+
+		// Reset the wrapper
+		workspace.Reset();
+		wrapper.WorkspaceManager.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
+
+		// When a monitor is added
+		wrapper.WorkspaceManager.MonitorManager_MonitorsChanged(
+			this,
+			new MonitorsChangedEventArgs()
+			{
+				AddedMonitors = new IMonitor[] { monitor1.Object, monitor2.Object },
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = new IMonitor[] { wrapper.Monitors[0].Object }
+			}
+		);
+
+		// Then the workspace is not activated
+		Assert.Single(wrapper.WorkspaceManager);
+	}
+	#endregion
+
+	#region AddProxyLayoutEngine
+	[Fact]
+	public void NoProxyLayoutEngines()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When
+		wrapper.WorkspaceManager.Initialize();
+
+		// Then
+		Assert.IsNotAssignableFrom<BaseProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
+	}
+
+	[Fact]
 	public void AddProxyLayoutEngine()
 	{
 		// Given
 		Wrapper wrapper = new();
-		Mock<ProxyLayoutEngine> proxyLayoutEngine = new();
 
-		// When a proxy layout engine is added
-		wrapper.WorkspaceManager.AddProxyLayoutEngine(proxyLayoutEngine.Object);
+		// When
+		wrapper.WorkspaceManager.AddProxyLayoutEngine((engine) => new Mock<TestProxyLayoutEngine>(engine).Object);
+		wrapper.WorkspaceManager.Initialize();
 
-		// Then the proxy layout engine is added to the list
-		Assert.Contains(proxyLayoutEngine.Object, wrapper.WorkspaceManager.ProxyLayoutEngines);
+		// Then
+		Assert.IsAssignableFrom<TestProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
 	}
-
-	[Fact]
-	public void AddPhantomWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new(new[] { workspace });
-
-		// When a phantom window is added
-		wrapper.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
-
-		// Then the phantom window is added to the list
-		Assert.Contains(window.Object, wrapper.WorkspaceManager.PhantomWindows);
-	}
-
-	[Fact]
-	public void RemovePhantomWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new(new[] { workspace });
-
-		wrapper.WorkspaceManager.AddPhantomWindow(workspace.Object, window.Object);
-
-		// When a phantom window is removed
-		wrapper.WorkspaceManager.RemovePhantomWindow(window.Object);
-
-		// Then the phantom window is removed from the list
-		Assert.DoesNotContain(window.Object, wrapper.WorkspaceManager.PhantomWindows);
-		Assert.Null(wrapper.WorkspaceManager.GetMonitorForWindow(window.Object));
-	}
+	#endregion
 
 	[Fact]
 	public void DoesDispose()
@@ -1478,11 +1488,13 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.Dispose(), Times.Once());
 	}
 
+	#region WorkspaceManagerTriggers
 	[Fact]
 	public void WorkspaceManagerTriggers_ActiveLayoutEngineChanged()
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
 
 		// When creating a workspace
 		wrapper.WorkspaceManager.Add("workspace");
@@ -1497,10 +1509,33 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void WorkspaceManagerTriggers_ActiveLayoutEngineChanged_DoesNotThrowWhenNoListener()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+
+		// Then changing the layout engine should trigger the event
+		try
+		{
+			workspace.NextLayoutEngine();
+		}
+		catch
+		{
+			Assert.True(false);
+		}
+	}
+
+	[Fact]
 	public void WorkspaceManagerTriggers_WorkspaceRenamed()
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
 
 		// When creating a workspace
 		wrapper.WorkspaceManager.Add("workspace");
@@ -1515,12 +1550,38 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceRenamed_DoesNotThrowWhenNoListener()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+
+		// Then renaming the workspace should trigger the event
+		try
+		{
+			workspace.Name = "new name";
+		}
+		catch
+		{
+			Assert.True(false);
+		}
+	}
+
+	[Fact]
 	public void WorkspaceManagerTriggers_WorkspaceLayoutStarted()
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
-		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.Initialize();
+
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
 		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		// When creating a workspace
@@ -1537,12 +1598,45 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceLayoutStarted_DoesNotThrowWhenNoListener()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
+
+		// When creating a workspace
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		wrapper.WorkspaceManager.Activate(workspace);
+
+		// Then starting the layout should trigger the event
+		try
+		{
+			workspace.DoLayout();
+		}
+		catch
+		{
+			Assert.True(false);
+		}
+	}
+
+	[Fact]
 	public void WorkspaceManagerTriggers_WorkspaceLayoutCompleted()
 	{
 		// Given
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		Mock<Func<IList<ILayoutEngine>>> CreateLayoutEngines = new();
-		CreateLayoutEngines.Setup(c => c()).Returns(new ILayoutEngine[] { new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.Initialize();
+
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
 		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
 
 		// When
@@ -1558,6 +1652,37 @@ public class WorkspaceManagerTests
 		);
 	}
 
+	[Fact]
+	public void WorkspaceManagerTriggers_WorkspaceLayoutCompleted_DoesNotThrowWhenNoListener()
+	{
+		// Given
+		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
+		wrapper.WorkspaceManager.Initialize();
+
+		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
+		CreateLayoutEngines
+			.Setup(c => c())
+			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
+		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
+
+		// When
+		wrapper.WorkspaceManager.Add("workspace");
+		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		wrapper.WorkspaceManager.Activate(workspace);
+
+		// Then completing the layout should trigger the event
+		try
+		{
+			workspace.DoLayout();
+		}
+		catch
+		{
+			Assert.True(false);
+		}
+	}
+	#endregion
+
+	#region ActiveWorkspace
 	[Fact]
 	public void ActiveWorkspace_CannotFindMonitor()
 	{
@@ -1590,7 +1715,9 @@ public class WorkspaceManagerTests
 		// Then the workspace is returned
 		Assert.Equal(workspaces[1].Object, activeWorkspace);
 	}
+	#endregion
 
+	#region MoveWindowEdgesInDirection
 	[Fact]
 	public void MoveWindowEdgesInDirection_NoWindow()
 	{
@@ -1702,4 +1829,5 @@ public class WorkspaceManagerTests
 			Times.Never()
 		);
 	}
+	#endregion
 }

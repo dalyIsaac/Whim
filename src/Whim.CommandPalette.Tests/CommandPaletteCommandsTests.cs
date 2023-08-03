@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Moq;
-using Whim.TestUtilities;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;

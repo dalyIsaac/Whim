@@ -109,6 +109,6 @@ public class SelectVariantRowViewModelTests
 
 		// Then
 		Assert.Same(newModelMock.Object, vm.Model);
-		Assert.Equal(1, vm.FormattedTitle.Segments.Count);
+		Assert.Single(vm.FormattedTitle.Segments);
 	}
 }

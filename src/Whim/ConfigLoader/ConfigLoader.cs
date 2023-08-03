@@ -85,11 +85,9 @@ internal class ConfigLoader
 			?? throw new ConfigLoaderException("Could not find assembly for ConfigLoader");
 
 		string template = ReadTemplateConfigFile(assembly);
-		string omnisharpJson = ReadFile(assembly, "omnisharp.json");
 
 		// Save the files.
 		File.WriteAllText(_configFilePath, template);
-		File.WriteAllText(_fileManager.GetWhimFileDir("omnisharp.json"), omnisharpJson);
 	}
 
 	/// <summary>

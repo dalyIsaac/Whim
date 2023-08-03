@@ -6,7 +6,6 @@ namespace Whim;
 
 internal class Workspace : IWorkspace, IInternalWorkspace
 {
-	private bool _initialized;
 	private readonly IContext _context;
 	private readonly WorkspaceManagerTriggers _triggers;
 
@@ -38,12 +37,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
-	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
+	public ILayoutEngine ActiveLayoutEngine
+	{
+		private set => _layoutEngines[_activeLayoutEngineIndex] = value;
+		get => _layoutEngines[_activeLayoutEngineIndex];
+	}
 
 	/// <summary>
-	/// All the windows in this workspace which are common to every layout engine.
-	/// The intersection of <see cref="_normalWindows"/> and <see cref="_phantomWindows"/>
-	/// is the empty set.
+	/// All the windows in this workspace which are <see cref="WindowSize.Normal"/>.
 	/// </summary>
 	private readonly HashSet<IWindow> _normalWindows = new();
 
@@ -53,13 +54,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private readonly HashSet<IWindow> _minimizedWindows = new();
 
 	public IEnumerable<IWindow> Windows => _normalWindows.Concat(_minimizedWindows);
-
-	/// <summary>
-	/// Phantom windows are specific to a single layout engine.
-	/// The intersection of <see cref="_normalWindows"/> and <see cref="_phantomWindows"/>
-	/// is the empty set.
-	/// </summary>
-	private readonly Dictionary<IWindow, ILayoutEngine> _phantomWindows = new();
 
 	/// <summary>
 	/// Map of windows to their current location.
@@ -85,36 +79,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void Initialize()
-	{
-		if (_initialized)
-		{
-			Logger.Error($"Workspace {Name} has already been initialized.");
-			return;
-		}
-
-		_initialized = true;
-
-		// Apply the proxy layout engines
-		foreach (ProxyLayoutEngine proxyLayout in _context.WorkspaceManager.ProxyLayoutEngines)
-		{
-			for (int i = 0; i < _layoutEngines.Length; i++)
-			{
-				_layoutEngines[i] = proxyLayout(_layoutEngines[i]);
-			}
-		}
-	}
-
 	public void WindowFocused(IWindow window)
 	{
-		if (
-			_normalWindows.Contains(window)
-			|| (
-				_phantomWindows.TryGetValue(window, out ILayoutEngine? layoutEngine)
-				&& layoutEngine != null
-				&& ActiveLayoutEngine.ContainsEqual(layoutEngine)
-			)
-		)
+		if (_normalWindows.Contains(window))
 		{
 			LastFocusedWindow = window;
 			Logger.Debug($"Focused window {window} in workspace {Name}");
@@ -132,9 +99,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_normalWindows.Remove(window);
 		_minimizedWindows.Add(window);
 
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
+		for (int i = 0; i < _layoutEngines.Length; i++)
 		{
-			layoutEngine.Remove(window);
+			_layoutEngines[i] = _layoutEngines[i].RemoveWindow(window);
 		}
 
 		DoLayout();
@@ -162,14 +129,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		int prevIdx = _activeLayoutEngineIndex;
 
-		// If the LastFocusedWindow is a phantom window, remove it.
-		// This is because phantom windows belong to a specific layout engine.
-		if (LastFocusedWindow != null && _phantomWindows.ContainsKey(LastFocusedWindow))
-		{
-			LastFocusedWindow = null;
-		}
-
-		_layoutEngines[prevIdx].HidePhantomWindows();
 		_activeLayoutEngineIndex = nextIdx;
 		DoLayout();
 
@@ -229,12 +188,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug($"Adding window {window} to workspace {Name}");
 
-		if (_phantomWindows.ContainsKey(window))
-		{
-			Logger.Verbose($"Phantom window {window} is already in workspace {Name}");
-			return;
-		}
-
 		if (_normalWindows.Contains(window))
 		{
 			Logger.Error($"Window {window} already exists in workspace {Name}");
@@ -242,9 +195,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		_normalWindows.Add(window);
-		foreach (ILayoutEngine layoutEngine in _layoutEngines)
+		for (int i = 0; i < _layoutEngines.Length; i++)
 		{
-			layoutEngine.Add(window);
+			_layoutEngines[i] = _layoutEngines[i].AddWindow(window);
 		}
 		DoLayout();
 		window.Focus();
@@ -259,17 +212,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			LastFocusedWindow = null;
 		}
 
-		if (_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomLayoutEngine))
-		{
-			bool removePhantomSuccess = phantomLayoutEngine.Remove(window);
-			if (removePhantomSuccess)
-			{
-				_phantomWindows.Remove(window);
-				DoLayout();
-			}
-			return removePhantomSuccess;
-		}
-
 		bool isNormalWindow = _normalWindows.Contains(window);
 		if (!isNormalWindow && !_minimizedWindows.Contains(window))
 		{
@@ -280,12 +222,19 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		bool success = true;
 		if (isNormalWindow)
 		{
-			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				if (!layoutEngine.Remove(window))
+				ILayoutEngine oldEngine = _layoutEngines[idx];
+				ILayoutEngine newEngine = oldEngine.RemoveWindow(window);
+
+				if (newEngine == oldEngine)
 				{
-					Logger.Error($"Window {window} could not be removed from layout engine {layoutEngine}");
+					Logger.Error($"Window {window} could not be removed from layout engine {oldEngine}");
 					success = false;
+				}
+				else
+				{
+					_layoutEngines[idx] = newEngine;
 				}
 			}
 
@@ -354,7 +303,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+			ActiveLayoutEngine = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
 			DoLayout();
 		}
 	}
@@ -365,7 +314,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
+			ActiveLayoutEngine = ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
 			DoLayout();
 		}
 	}
@@ -374,15 +323,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
 
-		if (_phantomWindows.ContainsKey(window))
-		{
-			return;
-		}
 		if (_normalWindows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
-			ActiveLayoutEngine.Remove(window);
-			ActiveLayoutEngine.AddWindowAtPoint(window, point);
+			ActiveLayoutEngine = ActiveLayoutEngine.MoveWindowToPoint(window, point);
 		}
 		else
 		{
@@ -395,9 +339,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			// The window is new to the workspace, so add it to all layout engines
 			_normalWindows.Add(window);
 
-			foreach (ILayoutEngine layoutEngine in _layoutEngines)
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				layoutEngine.AddWindowAtPoint(window, point);
+				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
 			}
 		}
 
@@ -411,11 +355,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		Logger.Debug($"Deactivating workspace {Name}");
 
 		foreach (IWindow window in Windows)
-		{
-			window.Hide();
-		}
-
-		foreach (IWindow window in _phantomWindows.Keys)
 		{
 			window.Hide();
 		}
@@ -497,64 +436,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
-	#region Phantom Windows
-	public void AddPhantomWindow(ILayoutEngine engine, IWindow window)
-	{
-		Logger.Debug($"Adding phantom window {window} in workspace {Name}");
-
-		if (!ActiveLayoutEngine.ContainsEqual(engine))
-		{
-			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
-			return;
-		}
-
-		if (_phantomWindows.ContainsKey(window))
-		{
-			Logger.Error($"Phantom window {window} already exists in workspace {Name}");
-			return;
-		}
-
-		_phantomWindows.Add(window, engine);
-		_context.WorkspaceManager.AddPhantomWindow(this, window);
-		DoLayout();
-	}
-
-	public void RemovePhantomWindow(ILayoutEngine engine, IWindow window)
-	{
-		Logger.Debug($"Removing phantom window {window} in workspace {Name}");
-
-		if (!ActiveLayoutEngine.ContainsEqual(engine))
-		{
-			Logger.Error($"Layout engine {engine} is not active in workspace {Name}");
-			return;
-		}
-
-		if (!_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine))
-		{
-			Logger.Error($"Phantom window {window} does not exist in workspace {Name}");
-			return;
-		}
-
-		if (phantomEngine != engine)
-		{
-			Logger.Error($"Phantom window {window} does not belong to layout engine {engine} in workspace {Name}");
-			return;
-		}
-
-		_phantomWindows.Remove(window);
-		_context.WorkspaceManager.RemovePhantomWindow(window);
-
-		DoLayout();
-	}
-	#endregion
-
-	public bool ContainsWindow(IWindow window) =>
-		_normalWindows.Contains(window)
-		|| _minimizedWindows.Contains(window)
-		|| (
-			_phantomWindows.TryGetValue(window, out ILayoutEngine? phantomEngine)
-			&& ActiveLayoutEngine.ContainsEqual(phantomEngine)
-		);
+	public bool ContainsWindow(IWindow window) => _normalWindows.Contains(window) || _minimizedWindows.Contains(window);
 
 	protected virtual void Dispose(bool disposing)
 	{

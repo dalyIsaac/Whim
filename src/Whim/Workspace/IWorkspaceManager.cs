@@ -17,7 +17,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <summary>
 	/// Creates the default layout engines to add to a workspace.
 	/// </summary>
-	Func<IList<ILayoutEngine>> CreateLayoutEngines { get; set; }
+	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; }
 
 	/// <summary>
 	/// Initialize the event listeners.
@@ -81,7 +81,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
 	/// use the <see cref="CreateLayoutEngines"/> function.
 	/// </param>
-	void Add(string? name = null, IEnumerable<ILayoutEngine>? layoutEngines = null);
+	void Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? layoutEngines = null);
 
 	/// <summary>
 	/// Tries to remove the given workspace.
@@ -168,14 +168,10 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// Adds a proxy layout engine to the workspace manager.
 	/// A proxy layout engine is used by plugins to add layout functionality to
 	/// all workspaces.
+	/// This should be used by <see cref="IPlugin"/>s.
 	/// </summary>
 	/// <param name="proxyLayoutEngine">The proxy layout engine to add.</param>
-	void AddProxyLayoutEngine(ProxyLayoutEngine proxyLayoutEngine);
-
-	/// <summary>
-	/// The proxy layout engines.
-	/// </summary>
-	IEnumerable<ProxyLayoutEngine> ProxyLayoutEngines { get; }
+	void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine);
 
 	/// <summary>
 	/// Moves the given <paramref name="window"/> to the given <paramref name="workspace"/>.
@@ -238,18 +234,4 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <param name="window"></param>
 	/// <returns>Whether the window's edges were moved.</returns>
 	bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null);
-
-	#region Phantom Windows
-	/// <summary>
-	/// Add a phantom window for the given <paramref name="workspace"/>.
-	/// </summary>
-	/// <param name="window">The phantom window to add.</param>
-	/// <param name="workspace">The workspace to add the window for.</param>
-	void AddPhantomWindow(IWorkspace workspace, IWindow window);
-
-	/// <summary>
-	/// Remove the given phantom window.
-	/// </summary>
-	void RemovePhantomWindow(IWindow window);
-	#endregion
 }

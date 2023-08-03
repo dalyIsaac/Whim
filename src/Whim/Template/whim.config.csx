@@ -32,18 +32,6 @@ void DoConfig(IContext context)
 {
 	context.Logger.Config = new LoggerConfig();
 
-	context.WorkspaceManager.CreateLayoutEngines = () => new ILayoutEngine[]
-	{
-		new TreeLayoutEngine(context),
-		new ColumnLayoutEngine()
-	};
-
-	// Add workspaces.
-	context.WorkspaceManager.Add("1");
-	context.WorkspaceManager.Add("2");
-	context.WorkspaceManager.Add("3");
-	context.WorkspaceManager.Add("4");
-
 	// Bar plugin.
 	List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
 	List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
@@ -88,9 +76,20 @@ void DoConfig(IContext context)
 	// Tree layout command palette.
 	TreeLayoutCommandPalettePlugin treeLayoutCommandPalettePlugin = new(context, treeLayoutPlugin, commandPalettePlugin);
 	context.PluginManager.AddPlugin(treeLayoutCommandPalettePlugin);
+
+	// Set up workspaces.
+	context.WorkspaceManager.Add("1");
+	context.WorkspaceManager.Add("2");
+	context.WorkspaceManager.Add("3");
+	context.WorkspaceManager.Add("4");
+
+	// Set up layout engines.
+	context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
+	{
+		(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
+		(id) => new ColumnLayoutEngine(id)
+	};
 }
 
-#pragma warning disable CS8974 // Methods should not return 'this'.
 // We return doConfig here so that Whim can call it when it loads.
 return DoConfig;
-#pragma warning restore CS8974 // Methods should not return 'this'.

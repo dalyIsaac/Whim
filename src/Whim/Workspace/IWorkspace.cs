@@ -14,12 +14,6 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	string Name { get; set; }
 
-	/// <summary>
-	/// Initializes the workspace. This includes wrapping its layout engines with
-	/// proxies from <see cref="IWorkspaceManager"/>.
-	/// </summary>
-	void Initialize();
-
 	#region Layout engine
 	/// <summary>
 	/// The active layout engine.
@@ -141,29 +135,5 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
 	void MoveWindowToPoint(IWindow window, IPoint<double> point);
-	#endregion
-
-	#region Phantom Windows
-	/// <summary>
-	/// Add a phantom window. This can only be done by the active layout engine.
-	/// </summary>
-	/// <remarks>
-	/// Phantom windows are placeholder windows that represent a space in the
-	/// current layout engine.
-	///
-	/// They are designed to let a layout engine reserve a space, for a new window,
-	/// or for a window that is being moved around.
-	/// </remarks>
-	/// <param name="engine">The layout engine to add the phantom window to.</param>
-	/// <param name="window">The phantom window to add.</param>
-	void AddPhantomWindow(ILayoutEngine engine, IWindow window);
-
-	/// <summary>
-	/// Remove a phantom window. This can only be done by the active layout engine,
-	/// and the phantom window must have been added to the same layout engine.
-	/// </summary>
-	/// <param name="engine">The layout engine to remove the phantom window from.</param>
-	/// <param name="window">The phantom window to remove.</param>
-	void RemovePhantomWindow(ILayoutEngine engine, IWindow window);
 	#endregion
 }

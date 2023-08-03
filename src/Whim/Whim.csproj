@@ -44,12 +44,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="Whim.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+		<InternalsVisibleTo Include="Whim.FloatingLayout.Tests" />
+		<InternalsVisibleTo Include="Whim.Gaps.Tests" />
+		<InternalsVisibleTo Include="Whim.Tests" />
+		<InternalsVisibleTo Include="Whim.TestUtils" />
+		<InternalsVisibleTo Include="Whim.TreeLayout.Tests" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Template\omnisharp.json" />
 		<EmbeddedResource Include="Template\whim.config.csx" />
 	</ItemGroup>
 </Project>

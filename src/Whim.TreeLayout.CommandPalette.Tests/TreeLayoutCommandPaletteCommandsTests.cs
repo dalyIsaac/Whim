@@ -1,6 +1,6 @@
 using Moq;
 using Whim.CommandPalette;
-using Whim.TestUtilities;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.CommandPalette.Tests;
