@@ -27,6 +27,7 @@ internal class Context : IContext
 	public IPluginManager PluginManager { get; }
 	public IKeybindManager KeybindManager { get; }
 	internal KeybindHook KeybindHook { get; }
+	internal MouseHook MouseHook { get; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
@@ -49,6 +50,7 @@ internal class Context : IContext
 		PluginManager = new PluginManager(this, FileManager, _commandManager);
 		KeybindManager = new KeybindManager(this);
 		KeybindHook = new KeybindHook(this, CoreNativeManager);
+		MouseHook = new MouseHook(coreNativeManager: CoreNativeManager);
 	}
 
 	public void Initialize()
@@ -84,6 +86,7 @@ internal class Context : IContext
 		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
 		KeybindHook.PostInitialize();
+		MouseHook.PostInitialize();
 
 		Logger.Debug("Completed initialization");
 	}
@@ -100,6 +103,7 @@ internal class Context : IContext
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
 		KeybindHook.Dispose();
+		MouseHook.Dispose();
 
 		Logger.Debug("Mostly exited...");
 

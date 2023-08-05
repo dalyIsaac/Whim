@@ -13,7 +13,7 @@ internal class KeybindHook : IDisposable
 {
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
-	private readonly HOOKPROC _keyboardHook;
+	private readonly HOOKPROC _lowLevelKeyboardProc;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
@@ -21,7 +21,7 @@ internal class KeybindHook : IDisposable
 	{
 		_context = context;
 		_coreNativeManager = coreNativeManager;
-		_keyboardHook = KeyboardHook;
+		_lowLevelKeyboardProc = LowLevelKeyboardProc;
 	}
 
 	public void PostInitialize()
@@ -29,20 +29,20 @@ internal class KeybindHook : IDisposable
 		Logger.Debug("Initializing keybind manager...");
 		_unhookKeyboardHook = _coreNativeManager.SetWindowsHookEx(
 			WINDOWS_HOOK_ID.WH_KEYBOARD_LL,
-			_keyboardHook,
+			_lowLevelKeyboardProc,
 			null,
 			0
 		);
 	}
 
 	/// <summary>
-	/// For relevant documentation, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-hookproc
+	/// For relevant documentation, see https://learn.microsoft.com/en-us/windows/win32/winmsg/lowlevelkeyboardproc
 	/// </summary>
 	/// <param name="nCode"></param>
 	/// <param name="wParam"></param>
 	/// <param name="lParam"></param>
 	/// <returns></returns>
-	private LRESULT KeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
+	private LRESULT LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		Logger.Verbose($"{nCode} {wParam.Value} {lParam.Value}");
 		if (nCode != 0 || ((nuint)wParam != PInvoke.WM_KEYDOWN && (nuint)wParam != PInvoke.WM_SYSKEYDOWN))
@@ -154,10 +154,7 @@ internal class KeybindHook : IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				if (_unhookKeyboardHook != null && !_unhookKeyboardHook.IsInvalid)
-				{
-					_unhookKeyboardHook.Dispose();
-				}
+				_unhookKeyboardHook?.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
