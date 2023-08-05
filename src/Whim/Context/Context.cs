@@ -39,18 +39,21 @@ internal class Context : IContext
 	{
 		FileManager = new FileManager();
 		Logger = new Logger();
+
 		NativeManager = new NativeManager(this);
 		CoreNativeManager = new CoreNativeManager(this);
+
+		KeybindHook = new KeybindHook(this, CoreNativeManager);
+		MouseHook = new MouseHook(coreNativeManager: CoreNativeManager);
+
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
-		WindowManager = new WindowManager(this, CoreNativeManager);
+		WindowManager = new WindowManager(this, CoreNativeManager, MouseHook);
 		MonitorManager = new MonitorManager(this, CoreNativeManager);
 		WorkspaceManager = new WorkspaceManager(this);
 		_commandManager = new CommandManager();
 		PluginManager = new PluginManager(this, FileManager, _commandManager);
 		KeybindManager = new KeybindManager(this);
-		KeybindHook = new KeybindHook(this, CoreNativeManager);
-		MouseHook = new MouseHook(coreNativeManager: CoreNativeManager);
 	}
 
 	public void Initialize()

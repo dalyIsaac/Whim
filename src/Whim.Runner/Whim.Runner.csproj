@@ -101,6 +101,7 @@
 		<ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" />
 		<ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
 		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
+		<ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
 		<ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
 		<ProjectReference
 			Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
@@ -172,6 +173,12 @@
 	<Target Name="CopyGapsAfterBuild" AfterTargets="Build;Publish">
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(OutDir)Whim.Gaps.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" SkipUnchangedFiles="true" />
+	</Target>
+
+	<!--Whim.LayoutPreview-->
+	<Target Name="CopyLayoutPreviewAfterBuild" AfterTargets="Build;Publish">
+		<Copy SourceFiles="$(SolutionDir)src\Whim.LayoutPreview\$(OutDir)Whim.LayoutPreview.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.LayoutPreview\" SkipUnchangedFiles="true" />
 	</Target>
 
 	<!--Whim.TreeLayout-->

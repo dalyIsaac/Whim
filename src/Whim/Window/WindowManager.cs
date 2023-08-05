@@ -11,6 +11,7 @@ internal class WindowManager : IWindowManager
 {
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IMouseHook _mouseHook;
 
 	public event EventHandler<WindowEventArgs>? WindowAdded;
 	public event EventHandler<WindowEventArgs>? WindowFocused;
@@ -44,10 +45,11 @@ internal class WindowManager : IWindowManager
 	/// </summary>
 	private bool _disposedValue;
 
-	public WindowManager(IContext context, ICoreNativeManager coreNativeManager)
+	public WindowManager(IContext context, ICoreNativeManager coreNativeManager, IMouseHook mouseHook)
 	{
 		_context = context;
 		_coreNativeManager = coreNativeManager;
+		_mouseHook = mouseHook;
 		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
 	}
 
@@ -100,6 +102,11 @@ internal class WindowManager : IWindowManager
 
 	public void PostInitialize()
 	{
+		Logger.Debug("Post-initializing window manager...");
+
+		_mouseHook.MouseLeftButtonDown += MouseHook_MouseLeftButtonDown;
+
+		// Add all existing windows.
 		foreach (HWND hwnd in _coreNativeManager.GetAllWindows())
 		{
 			AddWindow(hwnd);
@@ -348,6 +355,16 @@ internal class WindowManager : IWindowManager
 		_mouseMoveWindow.IsMouseMoving = true;
 
 		WindowMoveStart?.Invoke(this, new WindowEventArgs() { Window = window });
+	}
+
+	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e)
+	{
+		if (_mouseMoveWindow == null)
+		{
+			return;
+		}
+
+		Logger.Debug($"Mouse left button down: {e.Point}");
 	}
 
 	private void OnWindowMoveEnd(IWindow window)
