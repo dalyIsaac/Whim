@@ -28,6 +28,18 @@ public class LayoutPreviewPlugin : IPlugin
 		_context.WindowManager.WindowMoved += WindowManager_WindowMoved;
 	}
 
+	/// <inheritdoc	/>
+	public void PostInitialize()
+	{
+		new LayoutPreviewWindow(_context).Activate();
+	}
+
+	/// <inheritdoc />
+	public void LoadState(JsonElement state) { }
+
+	/// <inheritdoc />
+	public JsonElement? SaveState() => null;
+
 	private void WindowManager_WindowMoveStart(object? sender, WindowEventArgs e)
 	{
 		// TODO
@@ -37,13 +49,4 @@ public class LayoutPreviewPlugin : IPlugin
 	{
 		// TODO
 	}
-
-	/// <inheritdoc	/>
-	public void PostInitialize() { }
-
-	/// <inheritdoc />
-	public void LoadState(JsonElement state) { }
-
-	/// <inheritdoc />
-	public JsonElement? SaveState() => null;
 }
