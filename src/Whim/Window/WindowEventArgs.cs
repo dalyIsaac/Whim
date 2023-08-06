@@ -11,4 +11,9 @@ public class WindowEventArgs : EventArgs
 	/// The <see cref="IWindow"/> that had something happen to it.
 	/// </summary>
 	public required IWindow Window { get; init; }
+
+	/// <summary>
+	/// Whether or not the window is being dragged.
+	/// </summary>
+	public bool IsDraggingWindow { get; init; }
 }

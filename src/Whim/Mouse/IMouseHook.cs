@@ -14,4 +14,9 @@ internal interface IMouseHook
 	/// Event that is fired when the mouse left button is pressed down.
 	/// </summary>
 	event EventHandler<MouseEventArgs>? MouseLeftButtonDown;
+
+	/// <summary>
+	/// Event that is fired when the mouse left button is released.
+	/// </summary>
+	event EventHandler<MouseEventArgs>? MouseLeftButtonUp;
 }

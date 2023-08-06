@@ -16,6 +16,7 @@ internal class MouseHook : IMouseHook, IDisposable
 	private UnhookWindowsHookExSafeHandle? _unhookMouseHook;
 	private bool disposedValue;
 	public event EventHandler<MouseEventArgs>? MouseLeftButtonDown;
+	public event EventHandler<MouseEventArgs>? MouseLeftButtonUp;
 
 	public MouseHook(ICoreNativeManager coreNativeManager)
 	{
@@ -43,28 +44,33 @@ internal class MouseHook : IMouseHook, IDisposable
 	/// <returns></returns>
 	private LRESULT LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
-		if (wParam == PInvoke.WM_LBUTTONDOWN)
+		switch ((uint)wParam)
 		{
-			OnMouseLeftDown(lParam);
+			case PInvoke.WM_LBUTTONDOWN:
+				OnMouseTriggerEvent(MouseLeftButtonDown, lParam);
+				break;
+			case PInvoke.WM_LBUTTONUP:
+				OnMouseTriggerEvent(MouseLeftButtonUp, lParam);
+				break;
+			default:
+				break;
 		}
 
 		return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 	}
 
-	private void OnMouseLeftDown(LPARAM lParam)
+	private void OnMouseTriggerEvent(EventHandler<MouseEventArgs>? eventHandler, LPARAM lParam)
 	{
-		if (lParam != 0 && MouseLeftButtonDown is EventHandler<MouseEventArgs> leftButtonDown)
+		if (
+			lParam != 0
+			&& eventHandler is EventHandler<MouseEventArgs> handler
+			&& (MSLLHOOKSTRUCT?)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT)) is MSLLHOOKSTRUCT mouseHookStruct
+		)
 		{
-			if (
-				(MSLLHOOKSTRUCT?)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT))
-				is MSLLHOOKSTRUCT mouseHookStruct
-			)
-			{
-				leftButtonDown.Invoke(
-					this,
-					new MouseEventArgs(new Point<int>() { X = mouseHookStruct.pt.X, Y = mouseHookStruct.pt.Y })
-				);
-			}
+			handler.Invoke(
+				this,
+				new MouseEventArgs(new Point<int>() { X = mouseHookStruct.pt.X, Y = mouseHookStruct.pt.Y })
+			);
 		}
 	}
 

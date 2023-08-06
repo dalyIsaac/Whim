@@ -37,7 +37,7 @@ internal class WindowManager : IWindowManager
 	private readonly WINEVENTPROC _hookDelegate;
 
 	private IWindow? _mouseMoveWindow;
-
+	private bool _isDraggingWindow;
 	private readonly object _mouseMoveLock = new();
 
 	/// <summary>
@@ -105,6 +105,7 @@ internal class WindowManager : IWindowManager
 		Logger.Debug("Post-initializing window manager...");
 
 		_mouseHook.MouseLeftButtonDown += MouseHook_MouseLeftButtonDown;
+		_mouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
 
 		// Add all existing windows.
 		foreach (HWND hwnd in _coreNativeManager.GetAllWindows())
@@ -364,7 +365,12 @@ internal class WindowManager : IWindowManager
 			return;
 		}
 
-		Logger.Debug($"Mouse left button down: {e.Point}");
+		_isDraggingWindow = true;
+	}
+
+	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)
+	{
+		_isDraggingWindow = false;
 	}
 
 	private void OnWindowMoveEnd(IWindow window)
@@ -389,7 +395,6 @@ internal class WindowManager : IWindowManager
 			}
 
 			_mouseMoveWindow = null;
-
 			WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window });
 		}
 	}
@@ -479,7 +484,7 @@ internal class WindowManager : IWindowManager
 	private void OnWindowMoved(IWindow window)
 	{
 		Logger.Debug($"Window moved: {window}");
-		WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window });
+		WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window, IsDraggingWindow = _isDraggingWindow });
 	}
 
 	internal void OnWindowMinimizeStart(IWindow window)
