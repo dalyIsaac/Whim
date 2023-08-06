@@ -27,6 +27,7 @@ public class WindowManagerTests
 		public Mock<IInternalWorkspaceManager> InternalWorkspaceManager = new();
 
 		public Mock<ICoreNativeManager> CoreNativeManager = new();
+		public Mock<IMouseHook> MouseHook = new();
 
 		public Mock<INativeManager> NativeManager = new();
 		public Mock<IWindowMessageMonitor> WindowMessageMonitor = new();
@@ -83,7 +84,8 @@ public class WindowManagerTests
 		// Given
 		Wrapper wrapper = new();
 
-		WindowManager windowManager = new(context: wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		Mock<IWindow> window = new();
 
@@ -105,7 +107,8 @@ public class WindowManagerTests
 		// Given
 		Wrapper wrapper = new();
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		Mock<IWindow> window = new();
 
@@ -128,7 +131,8 @@ public class WindowManagerTests
 		// Given
 		Wrapper wrapper = new();
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		Mock<IWindow> window = new();
 
@@ -150,7 +154,8 @@ public class WindowManagerTests
 		// Given
 		Wrapper wrapper = new();
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		Mock<IWindow> window = new();
 
@@ -172,7 +177,8 @@ public class WindowManagerTests
 		// Given
 		Wrapper wrapper = new();
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		Mock<IWindow> window = new();
 
@@ -215,7 +221,8 @@ public class WindowManagerTests
 		Wrapper wrapper = new();
 		InitializeCoreNativeManagerMock(wrapper);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -245,7 +252,8 @@ public class WindowManagerTests
 			)
 			.Returns(new UnhookWinEventSafeHandle());
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		// Then
@@ -260,7 +268,8 @@ public class WindowManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -298,7 +307,8 @@ public class WindowManagerTests
 		wrapper.CoreNativeManager.Setup(cnm => cnm.IsStandardWindow(hwnd)).Returns(isStandardWindow);
 		wrapper.CoreNativeManager.Setup(cnm => cnm.HasNoVisibleOwner(hwnd)).Returns(hasNoVisibleOwner);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -323,7 +333,8 @@ public class WindowManagerTests
 			.Setup(cnm => cnm.GetProcessNameAndPath((int)wrapper.ProcessId))
 			.Throws(new Win32Exception());
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -344,7 +355,8 @@ public class WindowManagerTests
 
 		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(true);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -366,7 +378,8 @@ public class WindowManagerTests
 		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(false);
 		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMinimized(hwnd)).Returns(true);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -388,7 +401,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -411,7 +425,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -433,7 +448,8 @@ public class WindowManagerTests
 			.Setup(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()))
 			.Returns(new Mock<IMonitor>().Object);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -457,7 +473,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -479,7 +496,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -500,7 +518,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -521,7 +540,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -543,7 +563,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -565,7 +586,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		wrapper.AllowWindowCreation(hwnd);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -584,7 +606,8 @@ public class WindowManagerTests
 		wrapper.AllowWindowCreation(hwnd);
 		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns<IWindow>(null);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -607,7 +630,8 @@ public class WindowManagerTests
 		Mock<IWorkspace> workspace = new();
 		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -641,7 +665,8 @@ public class WindowManagerTests
 				}
 			);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -708,7 +733,8 @@ public class WindowManagerTests
 
 		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(newLocation);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -829,7 +855,8 @@ public class WindowManagerTests
 
 		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(newLocation);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -888,7 +915,8 @@ public class WindowManagerTests
 		System.Drawing.Point point = new(10, 10);
 		wrapper.CoreNativeManager.Setup(nm => nm.GetCursorPos(out point)).Returns(true);
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.Initialize();
@@ -913,7 +941,8 @@ public class WindowManagerTests
 			.Setup(cnm => cnm.GetAllWindows())
 			.Returns(new List<HWND>() { new(1), new(2), new(3) });
 
-		WindowManager windowManager = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
 
 		// When
 		windowManager.PostInitialize();

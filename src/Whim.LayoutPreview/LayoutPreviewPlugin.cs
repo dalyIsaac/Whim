@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.Json;
 
 namespace Whim.LayoutPreview;
@@ -6,6 +7,7 @@ namespace Whim.LayoutPreview;
 public class LayoutPreviewPlugin : IPlugin
 {
 	private readonly IContext _context;
+	private LayoutPreviewWindow? _layoutPreviewWindow;
 
 	/// <inheritdoc/>
 	public string Name => "whim.layout_preview";
@@ -26,12 +28,14 @@ public class LayoutPreviewPlugin : IPlugin
 	{
 		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
 		_context.WindowManager.WindowMoved += WindowManager_WindowMoved;
+		_context.WorkspaceManager.WorkspaceLayoutCompleted += WorkspaceManager_WorkspaceLayoutCompleted;
 	}
 
 	/// <inheritdoc	/>
 	public void PostInitialize()
 	{
-		new LayoutPreviewWindow(_context).Activate();
+		_layoutPreviewWindow = new(_context);
+		_layoutPreviewWindow.Activate();
 	}
 
 	/// <inheritdoc />
@@ -48,5 +52,15 @@ public class LayoutPreviewPlugin : IPlugin
 	private void WindowManager_WindowMoved(object? sender, WindowEventArgs e)
 	{
 		// TODO
+	}
+
+	private void WorkspaceManager_WorkspaceLayoutCompleted(object? sender, WorkspaceEventArgs e)
+	{
+		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
+		_layoutPreviewWindow?.Update(
+			_context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine
+				.DoLayout(new Location<int>() { Height = 500, Width = 500 }, monitor)
+				.ToArray()
+		);
 	}
 }
