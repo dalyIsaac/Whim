@@ -28,7 +28,6 @@ public class LayoutPreviewPlugin : IPlugin
 	{
 		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
 		_context.WindowManager.WindowMoved += WindowManager_WindowMoved;
-		_context.WorkspaceManager.WorkspaceLayoutCompleted += WorkspaceManager_WorkspaceLayoutCompleted;
 	}
 
 	/// <inheritdoc	/>
@@ -49,18 +48,25 @@ public class LayoutPreviewPlugin : IPlugin
 		// TODO
 	}
 
-	private void WindowManager_WindowMoved(object? sender, WindowEventArgs e)
+	private void WindowManager_WindowMoved(object? sender, WindowMovedEventArgs e)
 	{
-		// TODO
-	}
+		// TODO: Only run if the window is being dragged.
+		if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint)
+		{
+			return;
+		}
 
-	private void WorkspaceManager_WorkspaceLayoutCompleted(object? sender, WorkspaceEventArgs e)
-	{
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
+		IPoint<int> monitorPoint = monitor.WorkingArea.ToMonitorCoordinates(cursorDraggedPoint);
+		IPoint<double> normalizedPoint = monitor.WorkingArea.ToUnitSquare(monitorPoint);
+
+		ILayoutEngine layoutEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine.MoveWindowToPoint(
+			e.Window,
+			normalizedPoint
+		);
+
 		_layoutPreviewWindow?.Update(
-			_context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine
-				.DoLayout(new Location<int>() { Height = 500, Width = 500 }, monitor)
-				.ToArray()
+			layoutEngine.DoLayout(new Location<int>() { Height = 500, Width = 500 }, monitor).ToArray()
 		);
 	}
 }

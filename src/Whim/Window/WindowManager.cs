@@ -17,7 +17,8 @@ internal class WindowManager : IWindowManager
 	public event EventHandler<WindowEventArgs>? WindowFocused;
 	public event EventHandler<WindowEventArgs>? WindowRemoved;
 	public event EventHandler<WindowEventArgs>? WindowMoveStart;
-	public event EventHandler<WindowEventArgs>? WindowMoved;
+	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
+	public event EventHandler<WindowEventArgs>? WindowMoveEnd;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
 
@@ -36,8 +37,8 @@ internal class WindowManager : IWindowManager
 	/// </summary>
 	private readonly WINEVENTPROC _hookDelegate;
 
-	private IWindow? _mouseMoveWindow;
-	private bool _isDraggingWindow;
+	private bool _isMovingWindow;
+	private bool _isLeftMouseButtonDown;
 	private readonly object _mouseMoveLock = new();
 
 	/// <summary>
@@ -351,27 +352,13 @@ internal class WindowManager : IWindowManager
 	private void OnWindowMoveStart(IWindow window)
 	{
 		Logger.Debug($"Window move started: {window}");
-
-		_mouseMoveWindow = window;
-		_mouseMoveWindow.IsMouseMoving = true;
-
+		_isMovingWindow = true;
 		WindowMoveStart?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
-	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e)
-	{
-		if (_mouseMoveWindow == null)
-		{
-			return;
-		}
+	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = true;
 
-		_isDraggingWindow = true;
-	}
-
-	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)
-	{
-		_isDraggingWindow = false;
-	}
+	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = false;
 
 	private void OnWindowMoveEnd(IWindow window)
 	{
@@ -379,12 +366,10 @@ internal class WindowManager : IWindowManager
 
 		lock (_mouseMoveLock)
 		{
-			if (_mouseMoveWindow == null)
+			if (!_isMovingWindow)
 			{
 				return;
 			}
-
-			_mouseMoveWindow.IsMouseMoving = false;
 
 			if (!TryMoveWindowEdgesInDirection(window))
 			{
@@ -394,9 +379,9 @@ internal class WindowManager : IWindowManager
 				}
 			}
 
-			_mouseMoveWindow = null;
-			WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window });
+			_isMovingWindow = false;
 		}
+		WindowMoveEnd?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
 	/// <summary>
@@ -483,8 +468,24 @@ internal class WindowManager : IWindowManager
 
 	private void OnWindowMoved(IWindow window)
 	{
+		// TODO: This event gets called every time focus changes - should this be whittled down?
 		Logger.Debug($"Window moved: {window}");
-		WindowMoved?.Invoke(this, new WindowEventArgs() { Window = window, IsDraggingWindow = _isDraggingWindow });
+
+		if (!_isMovingWindow)
+		{
+			return;
+		}
+
+		IPoint<int>? cursorPoint = null;
+		if (_isLeftMouseButtonDown)
+		{
+			if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
+			{
+				cursorPoint = new Point<int>() { X = point.X, Y = point.Y };
+			}
+		}
+
+		WindowMoved?.Invoke(this, new WindowMovedEventArgs() { Window = window, CursorDraggedPoint = cursorPoint });
 	}
 
 	internal void OnWindowMinimizeStart(IWindow window)
