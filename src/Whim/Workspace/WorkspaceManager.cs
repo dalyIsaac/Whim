@@ -556,11 +556,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		_windowWorkspaceMap[window] = workspace;
 		currentWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
-
-		if (GetMonitorForWorkspace(workspace) is null)
-		{
-			window.Hide();
-		}
 	}
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)

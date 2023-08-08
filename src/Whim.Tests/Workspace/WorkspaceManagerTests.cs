@@ -830,41 +830,6 @@ public class WorkspaceManagerTests
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
 		window.Verify(w => w.Hide(), Times.Never());
 	}
-
-	[Fact]
-	public void MoveWindowToWorkspace_Success_WindowHidden()
-	{
-		// Given
-		Mock<IWindow> window = new();
-
-		// there are 3 workspaces
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IWorkspace> workspace3 = new();
-
-		// and there are 3 monitors
-		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>(), new Mock<IMonitor>(), new Mock<IMonitor>(), };
-
-		Wrapper wrapper = new(new[] { workspace, workspace2, workspace3 }, monitors);
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[1].Object);
-
-		// and the window is added
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
-		workspace3.Reset();
-		window.Reset();
-
-		// When a window in a workspace is moved to another workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace2.Object, window.Object);
-
-		// Then the window is removed from the first workspace and added to the third
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
-		window.Verify(w => w.Hide(), Times.Once());
-	}
 	#endregion
 
 	#region MoveWindowToMonitor
