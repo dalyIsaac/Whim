@@ -323,9 +323,9 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Window hidden: {window}");
 
-		if (_context.WorkspaceManager.GetWorkspaceForWindow(window) == null)
+		if (_context.WorkspaceManager.GetMonitorForWindow(window) == null)
 		{
-			Logger.Debug($"Window {window} is not on a workspace, ignoring event");
+			Logger.Debug($"Window {window} is not tracked in a monitor, ignoring event");
 			return;
 		}
 

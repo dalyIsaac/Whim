@@ -37,11 +37,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
-	public ILayoutEngine ActiveLayoutEngine
-	{
-		private set => _layoutEngines[_activeLayoutEngineIndex] = value;
-		get => _layoutEngines[_activeLayoutEngineIndex];
-	}
+	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
 
 	/// <summary>
 	/// All the windows in this workspace which are <see cref="WindowSize.Normal"/>.
@@ -303,7 +299,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
 			DoLayout();
 		}
 	}
@@ -314,7 +310,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
-			ActiveLayoutEngine = ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
+			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowEdgesInDirection(
+				edges,
+				deltas,
+				validWindow
+			);
 			DoLayout();
 		}
 	}
@@ -326,7 +326,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (_normalWindows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
-			ActiveLayoutEngine = ActiveLayoutEngine.MoveWindowToPoint(window, point);
+			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowToPoint(window, point);
 		}
 		else
 		{
