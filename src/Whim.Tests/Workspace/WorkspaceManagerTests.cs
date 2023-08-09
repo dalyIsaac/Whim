@@ -95,6 +95,20 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void Add_BeforeInitialization_CustomName()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		// When a workspace is added
+		wrapper.WorkspaceManager.Add("workspace");
+		wrapper.WorkspaceManager.Initialize();
+
+		// Then the workspace is created with default name.
+		Assert.Equal("workspace", wrapper.WorkspaceManager.Single().Name);
+	}
+
+	[Fact]
 	public void Add_SpecifyName()
 	{
 		// Given

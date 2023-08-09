@@ -108,6 +108,12 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
+		// Create the workspaces.
+		foreach ((string name, IEnumerable<CreateLeafLayoutEngine> createLayoutEngines) in _workspacesToCreate)
+		{
+			CreateWorkspace(name, createLayoutEngines);
+		}
+
 		// Assign workspaces to monitors.
 		int idx = 0;
 		foreach (IMonitor monitor in _context.MonitorManager)
