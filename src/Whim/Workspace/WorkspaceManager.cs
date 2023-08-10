@@ -40,7 +40,8 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
 	/// The workspaces will have been created prior to <see cref="Initialize"/>.
 	/// </summary>
-	private readonly List<(string Name, IEnumerable<CreateLeafLayoutEngine> LayoutEngines)> _workspacesToCreate = new();
+	private readonly List<(string Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines)> _workspacesToCreate =
+		new();
 
 	/// <summary>
 	/// Maps monitors to their active workspace.
@@ -109,7 +110,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
 		// Create the workspaces.
-		foreach ((string name, IEnumerable<CreateLeafLayoutEngine> createLayoutEngines) in _workspacesToCreate)
+		foreach ((string name, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines) in _workspacesToCreate)
 		{
 			CreateWorkspace(name, createLayoutEngines);
 		}
@@ -178,9 +179,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 		else
 		{
-			_workspacesToCreate.Add(
-				(name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines ?? CreateLayoutEngines())
-			);
+			_workspacesToCreate.Add((name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines));
 		}
 	}
 
