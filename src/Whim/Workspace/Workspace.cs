@@ -419,6 +419,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 					deltas,
 					validWindow
 				);
+				success = true;
 			}
 		}
 
