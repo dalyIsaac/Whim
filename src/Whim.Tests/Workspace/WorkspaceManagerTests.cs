@@ -1180,7 +1180,10 @@ public class WorkspaceManagerTests
 	public void WindowFocused_ActivateWorkspace()
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+		Mock<IInternalWorkspace> workspace1 = new();
+		Mock<IInternalWorkspace> workspace2 = new();
+		Mock<IWorkspace>[] workspaces = new[] { workspace1.As<IWorkspace>(), workspace2.As<IWorkspace>() };
+
 		Mock<IMonitor> monitor = new();
 		Wrapper wrapper = new(workspaces, new Mock<IMonitor>[] { monitor });
 
