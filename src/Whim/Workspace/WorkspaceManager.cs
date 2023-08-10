@@ -415,10 +415,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		foreach (IWorkspace workspace in _workspaces)
 		{
-			if (workspace is IInternalWorkspace ws)
-			{
-				ws.WindowFocused(window);
-			}
+			((IInternalWorkspace)workspace).WindowFocused(window);
 		}
 
 		_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceFocused);
@@ -438,10 +435,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		if (workspace is IInternalWorkspace ws)
-		{
-			ws.WindowMinimizeStart(window);
-		}
+		((IInternalWorkspace)workspace).WindowMinimizeStart(window);
 	}
 
 	public void WindowMinimizeEnd(IWindow window)
@@ -454,10 +448,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		if (workspace is IInternalWorkspace ws)
-		{
-			ws.WindowMinimizeEnd(window);
-		}
+		((IInternalWorkspace)workspace).WindowMinimizeEnd(window);
 	}
 	#endregion
 
