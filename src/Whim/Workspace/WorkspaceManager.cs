@@ -40,7 +40,8 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
 	/// The workspaces will have been created prior to <see cref="Initialize"/>.
 	/// </summary>
-	private readonly List<(string Name, IEnumerable<CreateLeafLayoutEngine> LayoutEngines)> _workspacesToCreate = new();
+	private readonly List<(string Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines)> _workspacesToCreate =
+		new();
 
 	/// <summary>
 	/// Maps monitors to their active workspace.
@@ -109,7 +110,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
 		// Create the workspaces.
-		foreach ((string name, IEnumerable<CreateLeafLayoutEngine> createLayoutEngines) in _workspacesToCreate)
+		foreach ((string name, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines) in _workspacesToCreate)
 		{
 			CreateWorkspace(name, createLayoutEngines);
 		}
@@ -178,9 +179,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 		else
 		{
-			_workspacesToCreate.Add(
-				(name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines ?? CreateLayoutEngines())
-			);
+			_workspacesToCreate.Add((name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines));
 		}
 	}
 
@@ -416,10 +415,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		foreach (IWorkspace workspace in _workspaces)
 		{
-			if (workspace is IInternalWorkspace ws)
-			{
-				ws.WindowFocused(window);
-			}
+			((IInternalWorkspace)workspace).WindowFocused(window);
 		}
 
 		_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceFocused);
@@ -439,10 +435,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		if (workspace is IInternalWorkspace ws)
-		{
-			ws.WindowMinimizeStart(window);
-		}
+		((IInternalWorkspace)workspace).WindowMinimizeStart(window);
 	}
 
 	public void WindowMinimizeEnd(IWindow window)
@@ -455,10 +448,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		if (workspace is IInternalWorkspace ws)
-		{
-			ws.WindowMinimizeEnd(window);
-		}
+		((IInternalWorkspace)workspace).WindowMinimizeEnd(window);
 	}
 	#endregion
 

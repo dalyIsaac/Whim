@@ -6,6 +6,10 @@ namespace Whim;
 
 internal class Workspace : IWorkspace, IInternalWorkspace
 {
+	/// <summary>
+	/// Lock for mutating the layout engines.
+	/// </summary>
+	private readonly object _workspaceLock = new();
 	private readonly IContext _context;
 	private readonly WorkspaceManagerTriggers _triggers;
 
@@ -28,16 +32,43 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
+	private IWindow? _lastFocusedWindow;
+
 	/// <summary>
 	/// The last focused window in this workspace.
 	/// </summary>
-	public IWindow? LastFocusedWindow { get; private set; }
+	public IWindow? LastFocusedWindow
+	{
+		get
+		{
+			lock (_workspaceLock)
+			{
+				return _lastFocusedWindow;
+			}
+		}
+		private set
+		{
+			lock (_workspaceLock)
+			{
+				_lastFocusedWindow = value;
+			}
+		}
+	}
 
 	private readonly ILayoutEngine[] _layoutEngines;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
-	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
+	public ILayoutEngine ActiveLayoutEngine
+	{
+		get
+		{
+			lock (_workspaceLock)
+			{
+				return _layoutEngines[_activeLayoutEngineIndex];
+			}
+		}
+	}
 
 	/// <summary>
 	/// All the windows in this workspace which are <see cref="WindowSize.Normal"/>.
@@ -49,7 +80,16 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// </summary>
 	private readonly HashSet<IWindow> _minimizedWindows = new();
 
-	public IEnumerable<IWindow> Windows => _normalWindows.Concat(_minimizedWindows);
+	public IEnumerable<IWindow> Windows
+	{
+		get
+		{
+			lock (_workspaceLock)
+			{
+				return _normalWindows.Concat(_minimizedWindows);
+			}
+		}
+	}
 
 	/// <summary>
 	/// Map of windows to their current location.
@@ -77,27 +117,33 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void WindowFocused(IWindow window)
 	{
-		if (_normalWindows.Contains(window))
+		lock (_workspaceLock)
 		{
-			LastFocusedWindow = window;
-			Logger.Debug($"Focused window {window} in workspace {Name}");
+			if (_normalWindows.Contains(window))
+			{
+				LastFocusedWindow = window;
+				Logger.Debug($"Focused window {window} in workspace {Name}");
+			}
 		}
 	}
 
 	public void WindowMinimizeStart(IWindow window)
 	{
-		if (!_normalWindows.Contains(window))
+		lock (_workspaceLock)
 		{
-			Logger.Error($"Window {window} is not a normal window in workspace {Name}");
-			return;
-		}
+			if (!_normalWindows.Contains(window))
+			{
+				Logger.Error($"Window {window} is not a normal window in workspace {Name}");
+				return;
+			}
 
-		_normalWindows.Remove(window);
-		_minimizedWindows.Add(window);
+			_normalWindows.Remove(window);
+			_minimizedWindows.Add(window);
 
-		for (int i = 0; i < _layoutEngines.Length; i++)
-		{
-			_layoutEngines[i] = _layoutEngines[i].RemoveWindow(window);
+			for (int i = 0; i < _layoutEngines.Length; i++)
+			{
+				_layoutEngines[i] = _layoutEngines[i].RemoveWindow(window);
+			}
 		}
 
 		DoLayout();
@@ -105,14 +151,17 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void WindowMinimizeEnd(IWindow window)
 	{
-		if (!_minimizedWindows.Contains(window))
+		lock (_workspaceLock)
 		{
-			Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
-			return;
-		}
+			if (!_minimizedWindows.Contains(window))
+			{
+				Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
+				return;
+			}
 
-		_minimizedWindows.Remove(window);
-		AddWindow(window);
+			_minimizedWindows.Remove(window);
+			AddWindow(window);
+		}
 	}
 
 	public void FocusFirstWindow()
@@ -121,19 +170,27 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
-	private void UpdateLayoutEngine(int nextIdx)
+	private void UpdateLayoutEngine(int delta)
 	{
-		int prevIdx = _activeLayoutEngineIndex;
+		ILayoutEngine prevLayoutEngine;
+		ILayoutEngine nextLayoutEngine;
 
-		_activeLayoutEngineIndex = nextIdx;
+		lock (_workspaceLock)
+		{
+			int prevIdx = _activeLayoutEngineIndex;
+			_activeLayoutEngineIndex = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
+
+			prevLayoutEngine = _layoutEngines[prevIdx];
+			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
+		}
+
 		DoLayout();
-
 		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
-				PreviousLayoutEngine = _layoutEngines[prevIdx],
-				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
+				PreviousLayoutEngine = prevLayoutEngine,
+				CurrentLayoutEngine = nextLayoutEngine
 			}
 		);
 	}
@@ -141,107 +198,136 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public void NextLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine((_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Length));
+		UpdateLayoutEngine(1);
 	}
 
 	public void PreviousLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine((_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Length));
+		UpdateLayoutEngine(-1);
 	}
 
 	public bool TrySetLayoutEngine(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
-		int nextIdx = -1;
-		for (int idx = 0; idx < _layoutEngines.Length; idx++)
+		ILayoutEngine prevLayoutEngine;
+		ILayoutEngine nextLayoutEngine;
+
+		lock (_workspaceLock)
 		{
-			ILayoutEngine engine = _layoutEngines[idx];
-			if (engine.Name == name)
+			int nextIdx = -1;
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				nextIdx = idx;
-				break;
+				ILayoutEngine engine = _layoutEngines[idx];
+				if (engine.Name == name)
+				{
+					nextIdx = idx;
+					break;
+				}
 			}
+
+			if (nextIdx == -1)
+			{
+				Logger.Error($"Layout engine {name} not found for workspace {Name}");
+				return false;
+			}
+			else if (_activeLayoutEngineIndex == nextIdx)
+			{
+				Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
+				return true;
+			}
+
+			int prevIdx = _activeLayoutEngineIndex;
+			_activeLayoutEngineIndex = nextIdx;
+
+			prevLayoutEngine = _layoutEngines[prevIdx];
+			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		if (nextIdx == -1)
-		{
-			Logger.Error($"Layout engine {name} not found for workspace {Name}");
-			return false;
-		}
-		else if (_activeLayoutEngineIndex == nextIdx)
-		{
-			Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
-			return true;
-		}
+		DoLayout();
+		_triggers.ActiveLayoutEngineChanged(
+			new ActiveLayoutEngineChangedEventArgs()
+			{
+				Workspace = this,
+				PreviousLayoutEngine = prevLayoutEngine,
+				CurrentLayoutEngine = nextLayoutEngine
+			}
+		);
 
-		UpdateLayoutEngine(nextIdx);
 		return true;
 	}
 
 	public void AddWindow(IWindow window)
 	{
-		Logger.Debug($"Adding window {window} to workspace {Name}");
-
-		if (_normalWindows.Contains(window))
+		lock (_workspaceLock)
 		{
-			Logger.Error($"Window {window} already exists in workspace {Name}");
-			return;
+			Logger.Debug($"Adding window {window} to workspace {Name}");
+
+			if (_normalWindows.Contains(window))
+			{
+				Logger.Error($"Window {window} already exists in workspace {Name}");
+				return;
+			}
+
+			_normalWindows.Add(window);
+			for (int i = 0; i < _layoutEngines.Length; i++)
+			{
+				_layoutEngines[i] = _layoutEngines[i].AddWindow(window);
+			}
 		}
 
-		_normalWindows.Add(window);
-		for (int i = 0; i < _layoutEngines.Length; i++)
-		{
-			_layoutEngines[i] = _layoutEngines[i].AddWindow(window);
-		}
 		DoLayout();
 		window.Focus();
 	}
 
 	public bool RemoveWindow(IWindow window)
 	{
-		Logger.Debug($"Removing window {window} from workspace {Name}");
-
-		if (LastFocusedWindow == window)
+		bool success;
+		lock (_workspaceLock)
 		{
-			LastFocusedWindow = null;
-		}
+			Logger.Debug($"Removing window {window} from workspace {Name}");
 
-		bool isNormalWindow = _normalWindows.Contains(window);
-		if (!isNormalWindow && !_minimizedWindows.Contains(window))
-		{
-			Logger.Error($"Window {window} already does not exist in workspace {Name}");
-			return false;
-		}
-
-		bool success = true;
-		if (isNormalWindow)
-		{
-			for (int idx = 0; idx < _layoutEngines.Length; idx++)
+			if (LastFocusedWindow == window)
 			{
-				ILayoutEngine oldEngine = _layoutEngines[idx];
-				ILayoutEngine newEngine = oldEngine.RemoveWindow(window);
-
-				if (newEngine == oldEngine)
-				{
-					Logger.Error($"Window {window} could not be removed from layout engine {oldEngine}");
-					success = false;
-				}
-				else
-				{
-					_layoutEngines[idx] = newEngine;
-				}
+				LastFocusedWindow = null;
 			}
 
-			if (success)
+			bool isNormalWindow = _normalWindows.Contains(window);
+			if (!isNormalWindow && !_minimizedWindows.Contains(window))
 			{
-				_normalWindows.Remove(window);
+				Logger.Error($"Window {window} already does not exist in workspace {Name}");
+				return false;
 			}
-		}
-		else
-		{
-			_minimizedWindows.Remove(window);
+
+			success = true;
+			if (isNormalWindow)
+			{
+				for (int idx = 0; idx < _layoutEngines.Length; idx++)
+				{
+					ILayoutEngine oldEngine = _layoutEngines[idx];
+					ILayoutEngine newEngine = oldEngine.RemoveWindow(window);
+
+					if (newEngine == oldEngine)
+					{
+						Logger.Error($"Window {window} could not be removed from layout engine {oldEngine}");
+						success = false;
+					}
+					else
+					{
+						_layoutEngines[idx] = newEngine;
+					}
+				}
+
+				if (success)
+				{
+					_normalWindows.Remove(window);
+				}
+			}
+			else
+			{
+				_minimizedWindows.Remove(window);
+			}
 		}
 
 		if (success)
@@ -287,61 +373,88 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		lock (_workspaceLock)
 		{
-			ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+			if (GetValidVisibleWindow(window) is IWindow validWindow)
+			{
+				ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+			}
 		}
 	}
 
 	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
-		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
+		bool success = false;
 
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		lock (_workspaceLock)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+			Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
+			if (GetValidVisibleWindow(window) is IWindow validWindow)
+			{
+				_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.SwapWindowInDirection(
+					direction,
+					validWindow
+				);
+				success = true;
+			}
+		}
+
+		if (success)
+		{
 			DoLayout();
 		}
 	}
 
 	public void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
 	{
-		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
+		bool success = false;
 
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		lock (_workspaceLock)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowEdgesInDirection(
-				edges,
-				deltas,
-				validWindow
-			);
+			Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
+			if (GetValidVisibleWindow(window) is IWindow validWindow)
+			{
+				_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowEdgesInDirection(
+					edges,
+					deltas,
+					validWindow
+				);
+				success = true;
+			}
+		}
+
+		if (success)
+		{
 			DoLayout();
 		}
 	}
 
 	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
-		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
+		lock (_workspaceLock)
+		{
+			Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
 
-		if (_normalWindows.Contains(window))
-		{
-			// The window is already in the workspace, so move it in just the active layout engine
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowToPoint(window, point);
-		}
-		else
-		{
-			// If the window is minimized, remove it from the minimized list, and treat it as a new window
-			if (_minimizedWindows.Contains(window))
+			if (_normalWindows.Contains(window))
 			{
-				_minimizedWindows.Remove(window);
+				// The window is already in the workspace, so move it in just the active layout engine
+				_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowToPoint(window, point);
 			}
-
-			// The window is new to the workspace, so add it to all layout engines
-			_normalWindows.Add(window);
-
-			for (int idx = 0; idx < _layoutEngines.Length; idx++)
+			else
 			{
-				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
+				// If the window is minimized, remove it from the minimized list, and treat it as a new window
+				if (_minimizedWindows.Contains(window))
+				{
+					_minimizedWindows.Remove(window);
+				}
+
+				// The window is new to the workspace, so add it to all layout engines
+				_normalWindows.Add(window);
+
+				for (int idx = 0; idx < _layoutEngines.Length; idx++)
+				{
+					_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
+				}
 			}
 		}
 
@@ -436,7 +549,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
-	public bool ContainsWindow(IWindow window) => _normalWindows.Contains(window) || _minimizedWindows.Contains(window);
+	public bool ContainsWindow(IWindow window)
+	{
+		lock (_workspaceLock)
+		{
+			return _normalWindows.Contains(window) || _minimizedWindows.Contains(window);
+		}
+	}
 
 	protected virtual void Dispose(bool disposing)
 	{
