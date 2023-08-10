@@ -32,16 +32,43 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
+	private IWindow? _lastFocusedWindow;
+
 	/// <summary>
 	/// The last focused window in this workspace.
 	/// </summary>
-	public IWindow? LastFocusedWindow { get; private set; }
+	public IWindow? LastFocusedWindow
+	{
+		get
+		{
+			lock (_workspaceLock)
+			{
+				return _lastFocusedWindow;
+			}
+		}
+		private set
+		{
+			lock (_workspaceLock)
+			{
+				_lastFocusedWindow = value;
+			}
+		}
+	}
 
 	private readonly ILayoutEngine[] _layoutEngines;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
-	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
+	public ILayoutEngine ActiveLayoutEngine
+	{
+		get
+		{
+			lock (_workspaceLock)
+			{
+				return _layoutEngines[_activeLayoutEngineIndex];
+			}
+		}
+	}
 
 	/// <summary>
 	/// All the windows in this workspace which are <see cref="WindowSize.Normal"/>.
@@ -90,10 +117,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void WindowFocused(IWindow window)
 	{
-		if (_normalWindows.Contains(window))
+		lock (_workspaceLock)
 		{
-			LastFocusedWindow = window;
-			Logger.Debug($"Focused window {window} in workspace {Name}");
+			if (_normalWindows.Contains(window))
+			{
+				LastFocusedWindow = window;
+				Logger.Debug($"Focused window {window} in workspace {Name}");
+			}
 		}
 	}
 
@@ -140,19 +170,27 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
-	private void UpdateLayoutEngine(int nextIdx)
+	private void UpdateLayoutEngine(int delta)
 	{
-		int prevIdx = _activeLayoutEngineIndex;
+		ILayoutEngine prevLayoutEngine;
+		ILayoutEngine nextLayoutEngine;
 
-		_activeLayoutEngineIndex = nextIdx;
+		lock (_workspaceLock)
+		{
+			int prevIdx = _activeLayoutEngineIndex;
+			_activeLayoutEngineIndex = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
+
+			prevLayoutEngine = _layoutEngines[prevIdx];
+			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
+		}
+
 		DoLayout();
-
 		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
-				PreviousLayoutEngine = _layoutEngines[prevIdx],
-				CurrentLayoutEngine = _layoutEngines[_activeLayoutEngineIndex]
+				PreviousLayoutEngine = prevLayoutEngine,
+				CurrentLayoutEngine = nextLayoutEngine
 			}
 		);
 	}
@@ -160,42 +198,63 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public void NextLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine((_activeLayoutEngineIndex + 1).Mod(_layoutEngines.Length));
+		UpdateLayoutEngine(1);
 	}
 
 	public void PreviousLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine((_activeLayoutEngineIndex - 1).Mod(_layoutEngines.Length));
+		UpdateLayoutEngine(-1);
 	}
 
 	public bool TrySetLayoutEngine(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
-		int nextIdx = -1;
-		for (int idx = 0; idx < _layoutEngines.Length; idx++)
+		ILayoutEngine prevLayoutEngine;
+		ILayoutEngine nextLayoutEngine;
+
+		lock (_workspaceLock)
 		{
-			ILayoutEngine engine = _layoutEngines[idx];
-			if (engine.Name == name)
+			int nextIdx = -1;
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				nextIdx = idx;
-				break;
+				ILayoutEngine engine = _layoutEngines[idx];
+				if (engine.Name == name)
+				{
+					nextIdx = idx;
+					break;
+				}
 			}
+
+			if (nextIdx == -1)
+			{
+				Logger.Error($"Layout engine {name} not found for workspace {Name}");
+				return false;
+			}
+			else if (_activeLayoutEngineIndex == nextIdx)
+			{
+				Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
+				return true;
+			}
+
+			int prevIdx = _activeLayoutEngineIndex;
+			_activeLayoutEngineIndex = nextIdx;
+
+			prevLayoutEngine = _layoutEngines[prevIdx];
+			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		if (nextIdx == -1)
-		{
-			Logger.Error($"Layout engine {name} not found for workspace {Name}");
-			return false;
-		}
-		else if (_activeLayoutEngineIndex == nextIdx)
-		{
-			Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
-			return true;
-		}
+		DoLayout();
+		_triggers.ActiveLayoutEngineChanged(
+			new ActiveLayoutEngineChangedEventArgs()
+			{
+				Workspace = this,
+				PreviousLayoutEngine = prevLayoutEngine,
+				CurrentLayoutEngine = nextLayoutEngine
+			}
+		);
 
-		UpdateLayoutEngine(nextIdx);
 		return true;
 	}
 
@@ -314,9 +373,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		lock (_workspaceLock)
 		{
-			ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+			if (GetValidVisibleWindow(window) is IWindow validWindow)
+			{
+				ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+			}
 		}
 	}
 
