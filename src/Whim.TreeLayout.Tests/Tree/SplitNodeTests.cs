@@ -1,5 +1,6 @@
 using Moq;
 using System.Collections;
+using System.Collections.Immutable;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
@@ -185,46 +186,152 @@ public class SplitNodeTests
 	}
 
 	[Fact]
-	public void Remove_EqualWeight()
+	public void Remove_FirstWindow_OneWindowRemaining()
 	{
 		// Given
-		int index = 1;
-		WindowNode focusedNode = CreateWindowNode();
-		WindowNode otherNode = CreateWindowNode();
-		SplitNode splitNode = new(focusedNode, otherNode, Direction.Right);
+		INode node1 = CreateWindowNode();
+		INode node2 = CreateWindowNode();
+
+		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2);
+		ImmutableList<double> weights = ImmutableList.Create(0.75, 0.25);
+		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
 
 		// When
-		ISplitNode result = splitNode.Remove(index);
-		(double, INode)[] children = result.ToArray();
+		ISplitNode result = splitNode.Remove(0);
 
 		// Then
 		Assert.NotSame(splitNode, result);
-		Assert.Equal(1, result.Count);
-		Assert.Equal((1d, focusedNode), children[0]);
+		Assert.Single(result);
+		Assert.Single(result.Children);
+		Assert.Single(result.Weights);
+		Assert.Equal(node2, result.Children[0]);
+		Assert.True(result.EqualWeight);
 	}
 
 	[Fact]
-	public void Remove_NotEqualWeight()
+	public void Remove_LastWindow_OneWindowRemaining()
 	{
 		// Given
-		int index = 0;
-		WindowNode focusedNode = CreateWindowNode();
-		WindowNode otherNode = CreateWindowNode();
-		WindowNode newNode = CreateWindowNode();
+		INode node1 = CreateWindowNode();
+		INode node2 = CreateWindowNode();
 
-		ISplitNode splitNode = new SplitNode(focusedNode, otherNode, Direction.Right)
-			.ToggleEqualWeight()
-			.Add(otherNode, newNode, insertAfter: true);
+		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2);
+		ImmutableList<double> weights = ImmutableList.Create(0.75, 0.25);
+		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
 
 		// When
-		ISplitNode result = splitNode.Remove(index);
-		(double, INode)[] children = result.ToArray();
+		ISplitNode result = splitNode.Remove(1);
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Single(result);
+		Assert.Single(result.Children);
+		Assert.Single(result.Weights);
+		Assert.Equal(node1, result.Children[0]);
+		Assert.Equal(1, result.Weights[0]);
+	}
+
+	[Fact]
+	public void Remove_FirstWindow_TwoWindowsRemaining()
+	{
+		// Given
+		INode node1 = CreateWindowNode();
+		INode node2 = CreateWindowNode();
+		INode node3 = CreateWindowNode();
+
+		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2, node3);
+		ImmutableList<double> weights = ImmutableList.Create(0.5, 0.25, 0.25);
+		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
+
+		// When
+		ISplitNode result = splitNode.Remove(0);
 
 		// Then
 		Assert.NotSame(splitNode, result);
 		Assert.Equal(2, result.Count);
-		Assert.Equal((0.25, otherNode), children[0]);
-		Assert.Equal((0.75, newNode), children[1]);
+		Assert.Equal(2, result.Children.Count);
+		Assert.Equal(2, result.Weights.Count);
+		Assert.Equal(node2, result.Children[0]);
+		Assert.Equal(node3, result.Children[1]);
+		Assert.Equal(0.75, result.Weights[0]);
+		Assert.Equal(0.25, result.Weights[1]);
+	}
+
+	[Fact]
+	public void Remove_LastWindow_TwoWindowsRemaining()
+	{
+		// Given
+		INode node1 = CreateWindowNode();
+		INode node2 = CreateWindowNode();
+		INode node3 = CreateWindowNode();
+
+		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2, node3);
+		ImmutableList<double> weights = ImmutableList.Create(0.25, 0.25, 0.5);
+		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
+
+		// When
+		ISplitNode result = splitNode.Remove(2);
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(2, result.Count);
+		Assert.Equal(2, result.Children.Count);
+		Assert.Equal(2, result.Weights.Count);
+		Assert.Equal(node1, result.Children[0]);
+		Assert.Equal(node2, result.Children[1]);
+		Assert.Equal(0.25, result.Weights[0]);
+		Assert.Equal(0.75, result.Weights[1]);
+	}
+
+	[Fact]
+	public void Remove_MiddleWindow()
+	{
+		// Given
+		INode node1 = CreateWindowNode();
+		INode node2 = CreateWindowNode();
+		INode node3 = CreateWindowNode();
+
+		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2, node3);
+		ImmutableList<double> weights = ImmutableList.Create(0.5, 0.25, 0.25);
+		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
+
+		// When
+		ISplitNode result = splitNode.Remove(1);
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(2, result.Count);
+		Assert.Equal(2, result.Children.Count);
+		Assert.Equal(2, result.Weights.Count);
+		Assert.Equal(node1, result.Children[0]);
+		Assert.Equal(node3, result.Children[1]);
+		Assert.Equal(0.625, result.Weights[0]);
+		Assert.Equal(0.375, result.Weights[1]);
+	}
+
+	[Fact]
+	public void Remove_EqualWeight()
+	{
+		// Given
+		INode node1 = CreateWindowNode();
+		INode node2 = CreateWindowNode();
+		INode node3 = CreateWindowNode();
+
+		ISplitNode splitNode = new SplitNode(node1, node2, Direction.Right).Add(node2, node3, insertAfter: true);
+
+		// When
+		ISplitNode result = splitNode.Remove(1);
+
+		// Then
+		Assert.NotSame(splitNode, result);
+		Assert.Equal(2, result.Count);
+		Assert.Equal(2, result.Children.Count);
+		Assert.Equal(2, result.Weights.Count);
+		Assert.Equal(node1, result.Children[0]);
+		Assert.Equal(node3, result.Children[1]);
+		Assert.Equal(0.5, result.Weights[0]);
+		Assert.Equal(0.5, result.Weights[1]);
+		Assert.True(result.EqualWeight);
 	}
 	#endregion
 

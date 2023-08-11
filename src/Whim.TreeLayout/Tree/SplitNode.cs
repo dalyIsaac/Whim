@@ -118,6 +118,7 @@ internal class SplitNode : ISplitNode
 			return this;
 		}
 
+		bool isEqualWeight = EqualWeight;
 		ImmutableList<INode> children = Children.RemoveAt(index);
 		ImmutableList<double> weights;
 
@@ -127,14 +128,32 @@ internal class SplitNode : ISplitNode
 			// We don't care about the weights, so just remove the weight.
 			weights = Weights.RemoveAt(index);
 		}
+		else if (Children.Count == 2)
+		{
+			weights = Weights;
+			isEqualWeight = true;
+		}
+		else if (index == Children.Count - 1)
+		{
+			// We're removing the last window, so just add the weight to the previous node.
+			weights = Weights.SetItem(index - 1, Weights[index - 1] + Weights[index]);
+		}
+		else if (index == 0)
+		{
+			// We're removing the first window, so just add the weight to the next node.
+			weights = Weights.SetItem(index + 1, Weights[index] + Weights[index + 1]);
+		}
 		else
 		{
-			// Give the extra weight to the last child.
-			weights = Weights.SetItem(Weights.Count - 1, Weights[^1] + Weights[index]);
-			weights = weights.RemoveAt(index);
+			// We're removing a middle window, so add the weight to the previous and next node.
+			double half = Weights[index] / 2;
+			weights = Weights.SetItem(index - 1, Weights[index - 1] + half);
+			weights = weights.SetItem(index + 1, half + Weights[index + 1]);
 		}
 
-		return new SplitNode(EqualWeight, IsHorizontal, children, weights);
+		weights = weights.RemoveAt(index);
+
+		return new SplitNode(isEqualWeight, IsHorizontal, children, weights);
 	}
 
 	public ISplitNode Replace(int index, INode newNode)
