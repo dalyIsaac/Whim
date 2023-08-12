@@ -26,21 +26,16 @@ public sealed partial class LayoutPreviewWindow : Window
 
 	public void Update(IWindowState[] windowStates)
 	{
-		Rectangle[] rectangles = new Rectangle[windowStates.Length];
+		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
 		for (int i = 0; i < windowStates.Length; i++)
 		{
-			rectangles[i] = new Rectangle()
-			{
-				Fill = new SolidColorBrush(Colors.Red),
-				Width = windowStates[i].Location.Width,
-				Height = windowStates[i].Location.Height
-			};
+			items[i] = new LayoutPreviewWindowItem(windowStates[i]);
 
-			Canvas.SetLeft(rectangles[i], windowStates[i].Location.X);
-			Canvas.SetTop(rectangles[i], windowStates[i].Location.Y);
+			Canvas.SetLeft(items[i], windowStates[i].Location.X);
+			Canvas.SetTop(items[i], windowStates[i].Location.Y);
 		}
 
 		LayoutPreviewCanvas.Children.Clear();
-		LayoutPreviewCanvas.Children.AddRange(rectangles);
+		LayoutPreviewCanvas.Children.AddRange(items);
 	}
 }

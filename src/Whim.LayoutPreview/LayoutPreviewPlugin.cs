@@ -45,12 +45,12 @@ public class LayoutPreviewPlugin : IPlugin
 
 	private void WindowManager_WindowMoveStart(object? sender, WindowEventArgs e)
 	{
-		// TODO
+		// TODO: Show window
 	}
 
 	private void WindowManager_WindowMoved(object? sender, WindowMovedEventArgs e)
 	{
-		// TODO: Only run if the window is being dragged.
+		// Only run if the window is being dragged.
 		if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint)
 		{
 			return;

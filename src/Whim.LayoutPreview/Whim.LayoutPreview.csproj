@@ -31,6 +31,7 @@
 
 	<ItemGroup>
 		<None Remove="LayoutPreviewWindow.xaml" />
+		<None Remove="LayoutPreviewWindowItem.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -46,6 +47,12 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="LayoutPreviewWindowItem.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>
