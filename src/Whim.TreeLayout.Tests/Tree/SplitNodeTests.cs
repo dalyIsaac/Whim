@@ -320,7 +320,7 @@ public class SplitNodeTests
 		ISplitNode splitNode = new SplitNode(node1, node2, Direction.Right).Add(node2, node3, insertAfter: true);
 
 		// When
-		ISplitNode result = splitNode.Remove(1);
+		ISplitNode result = splitNode.Remove(2);
 
 		// Then
 		Assert.NotSame(splitNode, result);
@@ -328,7 +328,7 @@ public class SplitNodeTests
 		Assert.Equal(2, result.Children.Count);
 		Assert.Equal(2, result.Weights.Count);
 		Assert.Equal(node1, result.Children[0]);
-		Assert.Equal(node3, result.Children[1]);
+		Assert.Equal(node2, result.Children[1]);
 		Assert.Equal(0.5, result.Weights[0]);
 		Assert.Equal(0.5, result.Weights[1]);
 		Assert.True(result.EqualWeight);
