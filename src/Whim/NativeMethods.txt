@@ -37,6 +37,9 @@ GetWindowLong
 GetWindowRect
 GetWindowText
 GetWindowThreadProcessId
+ICON_BIG
+ICON_SMALL
+ICON_SMALL2
 IsIconic
 IsWindowVisible
 IsZoomed
@@ -52,6 +55,7 @@ OBJECT_IDENTIFIER
 RemoveWindowSubclass
 SC_CLOSE
 SendInput
+SendMessageTimeout
 SendNotifyMessage
 SetForegroundWindow
 SetWindowLong
@@ -69,6 +73,7 @@ WINDOW_STYLE
 WINEVENT_OUTOFCONTEXT
 WINEVENTPROC
 WM_DISPLAYCHANGE
+WM_GETICON
 WM_KEYDOWN
 WM_LBUTTONDOWN
 WM_LBUTTONUP

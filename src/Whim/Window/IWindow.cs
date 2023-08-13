@@ -38,9 +38,14 @@ public interface IWindow
 	public int ProcessId { get; }
 
 	/// <summary>
-	/// The fully qualified path that defines the location of the module.
+	/// The file name of the module.
 	/// </summary>
 	public string ProcessFileName { get; }
+
+	/// <summary>
+	/// The fully qualified path that defines the location of the module.
+	/// </summary>
+	public string? ProcessFilePath { get; }
 
 	/// <summary>
 	/// The name that the system uses to identify the process to the user.

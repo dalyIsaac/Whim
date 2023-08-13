@@ -10,16 +10,24 @@
 	Height="{x:Bind Path=WindowState.Location.Height}"
 	HorizontalContentAlignment="Stretch"
 	VerticalContentAlignment="Stretch"
-	Background="Red"
 	mc:Ignorable="d">
 
-	<RelativePanel Background="Blue">
+	<RelativePanel Background="Red">
 		<StackPanel RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
 			<TextBlock
 				HorizontalTextAlignment="Center"
 				Text="{x:Bind Path=WindowState.Window.Title}"
 				TextWrapping="WrapWholeWords" />
-			<!--  TODO: icon  -->
+
+			<TextBlock
+				HorizontalTextAlignment="Center"
+				Text="{x:Bind Path=WindowState.Window.ProcessFilePath}"
+				TextWrapping="WrapWholeWords" />
+
+			<Image
+				Width="32"
+				Height="32"
+				Source="{x:Bind Path=ImageSource}" />
 		</StackPanel>
 	</RelativePanel>
 

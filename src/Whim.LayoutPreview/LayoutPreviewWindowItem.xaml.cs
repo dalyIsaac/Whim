@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 
 namespace Whim.LayoutPreview;
 
@@ -12,9 +13,12 @@ public sealed partial class LayoutPreviewWindowItem : UserControl
 	/// </summary>
 	public IWindowState WindowState { get; }
 
+	public ImageSource ImageSource { get; }
+
 	internal LayoutPreviewWindowItem(IWindowState windowState)
 	{
 		WindowState = windowState;
-		this.InitializeComponent();
+		ImageSource = IconHelper.GetIcon(windowState.Window);
+		InitializeComponent();
 	}
 }

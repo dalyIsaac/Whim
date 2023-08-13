@@ -52,6 +52,9 @@ internal class Window : IWindow
 	public required string ProcessFileName { get; init; }
 
 	/// <inheritdoc/>
+	public required string? ProcessFilePath { get; init; }
+
+	/// <inheritdoc/>
 	public required string ProcessName { get; init; }
 
 	/// <inheritdoc/>
@@ -192,6 +195,7 @@ internal class Window : IWindow
 			ProcessId = processId,
 			ProcessName = processName,
 			ProcessFileName = processFileName,
+			ProcessFilePath = processPath
 		};
 	}
 
