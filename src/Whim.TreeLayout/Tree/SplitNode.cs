@@ -123,12 +123,7 @@ internal class SplitNode : ISplitNode
 		ImmutableList<double> weights;
 
 		// Redistribute weights.
-		if (EqualWeight)
-		{
-			// We don't care about the weights, so just remove the weight.
-			weights = Weights.RemoveAt(index);
-		}
-		else if (Children.Count == 2)
+		if (Children.Count == 2)
 		{
 			weights = Weights;
 			isEqualWeight = true;
