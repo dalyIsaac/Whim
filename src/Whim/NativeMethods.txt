@@ -23,6 +23,7 @@ EVENT_SYSTEM_MINIMIZESTART
 EVENT_SYSTEM_MOVESIZEEND
 EVENT_SYSTEM_MOVESIZESTART
 GetAncestor
+GetClassLongPtr
 GetClassName
 GetCursorPos
 GetDesktopWindow
@@ -45,6 +46,7 @@ IsWindowVisible
 IsZoomed
 KBDLLHOOKSTRUCT
 keybd_event
+LoadIcon
 MONITORENUMPROC
 MonitorFromPoint
 MONITORINFOEXW
@@ -55,7 +57,7 @@ OBJECT_IDENTIFIER
 RemoveWindowSubclass
 SC_CLOSE
 SendInput
-SendMessageTimeout
+SendMessage
 SendNotifyMessage
 SetForegroundWindow
 SetWindowLong
