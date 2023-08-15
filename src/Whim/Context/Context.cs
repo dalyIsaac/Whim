@@ -40,8 +40,8 @@ internal class Context : IContext
 		FileManager = new FileManager();
 		Logger = new Logger();
 
-		NativeManager = new NativeManager(this);
 		CoreNativeManager = new CoreNativeManager(this);
+		NativeManager = new NativeManager(this, CoreNativeManager);
 
 		KeybindHook = new KeybindHook(this, CoreNativeManager);
 		MouseHook = new MouseHook(coreNativeManager: CoreNativeManager);

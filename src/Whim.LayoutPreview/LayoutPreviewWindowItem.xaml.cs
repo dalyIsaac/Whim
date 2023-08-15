@@ -13,12 +13,15 @@ public sealed partial class LayoutPreviewWindowItem : UserControl
 	/// </summary>
 	public IWindowState WindowState { get; }
 
-	public ImageSource ImageSource { get; }
+	/// <summary>
+	/// The icon for the window.
+	/// </summary>
+	public ImageSource? ImageSource { get; }
 
 	internal LayoutPreviewWindowItem(IWindowState windowState)
 	{
 		WindowState = windowState;
-		ImageSource = IconHelper.GetIcon(windowState.Window);
+		ImageSource = windowState.Window.GetIcon();
 		InitializeComponent();
 	}
 }

@@ -14,58 +14,58 @@ public interface INativeManager
 	/// Quit the window.
 	/// </summary>
 	/// <param name="hwnd"></param>
-	public void QuitWindow(HWND hwnd);
+	void QuitWindow(HWND hwnd);
 
 	/// <summary>
 	/// Force the window to the foreground.
 	/// </summary>
 	/// <param name="hwnd"></param>
-	public void ForceForegroundWindow(HWND hwnd);
+	void ForceForegroundWindow(HWND hwnd);
 
 	/// <summary>
 	/// Hides the window of the associated handle.
 	/// </summary>
 	/// <param name="hwnd"></param>
-	public bool HideWindow(HWND hwnd);
+	bool HideWindow(HWND hwnd);
 
 	/// <summary>
 	/// Activates the window and displays it as a maximized window.
 	/// </summary>
-	public bool ShowWindowMaximized(HWND hwnd);
+	bool ShowWindowMaximized(HWND hwnd);
 
 	/// <summary>
 	/// Activates the window and displays it as a minimized window.
 	/// </summary>
-	public bool ShowWindowMinimized(HWND hwnd);
+	bool ShowWindowMinimized(HWND hwnd);
 
 	/// <summary>
 	/// Minimizes the specified window and activates the next top-level window in the Z order.
 	/// </summary>
-	public bool MinimizeWindow(HWND hwnd);
+	bool MinimizeWindow(HWND hwnd);
 
 	/// <summary>
 	/// Displays a window in its most recent size and position. The window is not activated.
 	/// </summary>
-	public bool ShowWindowNoActivate(HWND hwnd);
+	bool ShowWindowNoActivate(HWND hwnd);
 
 	/// <summary>
 	/// Safe wrapper around <see cref="PInvoke.GetClassName"/>.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public string GetClassName(HWND hwnd);
+	string GetClassName(HWND hwnd);
 
 	/// <summary>
 	/// Hides the caption buttons from the given window.
 	/// </summary>
 	/// <param name="hwnd"></param>
-	public void HideCaptionButtons(HWND hwnd);
+	void HideCaptionButtons(HWND hwnd);
 
 	/// <summary>
 	/// Prevent the window from being activated.
 	/// </summary>
 	/// <param name="hwnd"></param>
-	public void PreventWindowActivation(HWND hwnd);
+	void PreventWindowActivation(HWND hwnd);
 
 	/// <summary>
 	/// Returns the window's offset.<br/>
@@ -74,14 +74,14 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public ILocation<int>? GetWindowOffset(HWND hwnd);
+	ILocation<int>? GetWindowOffset(HWND hwnd);
 
 	/// <summary>
 	/// Returns the window's location from DWM.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	public ILocation<int>? DwmGetWindowLocation(HWND hwnd);
+	ILocation<int>? DwmGetWindowLocation(HWND hwnd);
 
 	/// <summary>
 	/// Sets the preferred window corners for the given <paramref name="hwnd"/>.
@@ -89,7 +89,7 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <param name="preference"></param>
-	public void SetWindowCorners(
+	void SetWindowCorners(
 		HWND hwnd,
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND
 	);
@@ -104,7 +104,7 @@ public interface INativeManager
 	/// </remarks>
 	/// <param name="nNumWindows"></param>
 	/// <returns></returns>
-	public HDWP BeginDeferWindowPos(int nNumWindows);
+	HDWP BeginDeferWindowPos(int nNumWindows);
 
 	/// <summary>
 	/// Updates the specified multiple-window position structure for the specified window.
@@ -123,7 +123,7 @@ public interface INativeManager
 	/// <param name="cy"></param>
 	/// <param name="uFlags"></param>
 	/// <returns></returns>
-	public HDWP DeferWindowPos(
+	HDWP DeferWindowPos(
 		HDWP hWinPosInfo,
 		HWND hWnd,
 		HWND hWndInsertAfter,
@@ -144,5 +144,13 @@ public interface INativeManager
 	/// </remarks>
 	/// <param name="hWinPosInfo"></param>
 	/// <returns></returns>
-	public bool EndDeferWindowPos(HDWP hWinPosInfo);
+	bool EndDeferWindowPos(HDWP hWinPosInfo);
+
+	/// <summary>
+	/// Retrieves the path to the executable file of the UWP app associated with the given <paramref name="window"/>.
+	/// This will only work for UWP apps (see <see cref="IWindow.IsUwp"/>).
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	string? GetUwpAppProcessPath(IWindow window);
 }

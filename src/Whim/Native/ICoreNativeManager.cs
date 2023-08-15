@@ -316,6 +316,13 @@ internal interface ICoreNativeManager
 	IEnumerable<HWND> GetAllWindows();
 
 	/// <summary>
+	/// Enumerates the child windows that belong to the specified <paramref name="hWndParent"/> by passing the handle to each child window, in turn, to an application-defined callback function.
+	/// </summary>
+	/// <param name="hWndParent"></param>
+	/// <returns></returns>
+	IEnumerable<HWND> GetChildWindows(HWND hWndParent);
+
+	/// <summary>
 	/// Returns <see langword="true"/> when the window is a cloaked window.
 	/// For example, and empty <c>ApplicationFrameWindow</c>.
 	/// For more, see https://social.msdn.microsoft.com/Forums/vstudio/en-US/f8341376-6015-4796-8273-31e0be91da62/difference-between-actually-visible-and-not-visiblewhich-are-there-but-we-cant-see-windows-of?forum=vcgeneral
@@ -492,4 +499,43 @@ internal interface ICoreNativeManager
 	/// <param name="processId">The process ID.</param>
 	/// <returns>The process name and process path.</returns>
 	(string processName, string? processPath) GetProcessNameAndPath(int processId);
+
+	/// <summary>Retrieves the specified value from the WNDCLASSEX structure associated with the specified window.</summary>
+	/// <param name="hWnd">
+	/// <para>Type: <b>HWND</b> A handle to the window and, indirectly, the class to which the window belongs.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//winuser/nf-winuser-getclasslongptrw#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="nIndex">Type: <b>int</b></param>
+	/// <returns>
+	/// <para>Type: <b>ULONG_PTR</b> If the function succeeds, the return value is the requested value. If the function fails, the return value is zero. To get extended error information, call <a href="/windows/desktop/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//winuser/nf-winuser-getclasslongptrw">Learn more about this API from docs.microsoft.com</see>.</para>
+	/// </remarks>
+	nuint GetClassLongPtr(HWND hWnd, GET_CLASS_LONG_INDEX nIndex);
+
+	/// <summary>Sends the specified message to a window or windows. The SendMessage function calls the window procedure for the specified window and does not return until the window procedure has processed the message.</summary>
+	/// <param name="hWnd">
+	/// <para>Type: <b>HWND</b> A handle to the window whose window procedure will receive the message. If this parameter is <b>HWND_BROADCAST</b> ((HWND)0xffff), the message is sent to all top-level windows in the system, including disabled or invisible unowned windows, overlapped windows, and pop-up windows; but the message is not sent to child windows. Message sending is subject to UIPI. The thread of a process can send messages only to message queues of threads in processes of lesser or equal integrity level.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//winuser/nf-winuser-sendmessagew#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="Msg">
+	/// <para>Type: <b>UINT</b> The message to be sent. For lists of the system-provided messages, see <a href="https://docs.microsoft.com/windows/desktop/winmsg/about-messages-and-message-queues">System-Defined Messages</a>.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//winuser/nf-winuser-sendmessagew#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="wParam">
+	/// <para>Type: <b>WPARAM</b> Additional message-specific information.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//winuser/nf-winuser-sendmessagew#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <param name="lParam">
+	/// <para>Type: <b>LPARAM</b> Additional message-specific information.</para>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//winuser/nf-winuser-sendmessagew#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <returns>
+	/// <para>Type: <b>LRESULT</b> The return value specifies the result of the message processing; it depends on the message sent.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para><see href="https://docs.microsoft.com/windows/win32/api//winuser/nf-winuser-sendmessagew">Learn more about this API from docs.microsoft.com</see>.</para>
+	/// </remarks>
+	LRESULT SendMessage(HWND hWnd, uint Msg, WPARAM wParam, LPARAM lParam);
 }

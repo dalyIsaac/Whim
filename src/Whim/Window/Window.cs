@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Media.Imaging;
 using System.ComponentModel;
 using System.IO;
 using Windows.Win32.Foundation;
@@ -221,4 +222,7 @@ internal class Window : IWindow
 
 	/// <inheritdoc/>
 	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle.Value}}}";
+
+	/// <inheritdoc/>
+	public BitmapImage? GetIcon() => this.GetIcon(_coreNativeManager, _context.NativeManager);
 }

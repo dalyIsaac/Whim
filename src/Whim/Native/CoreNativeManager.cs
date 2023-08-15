@@ -179,6 +179,24 @@ internal class CoreNativeManager : ICoreNativeManager
 	}
 
 	/// <inheritdoc/>
+	public IEnumerable<HWND> GetChildWindows(HWND hwnd)
+	{
+		List<HWND> windows = new();
+
+		PInvoke.EnumChildWindows(
+			hwnd,
+			(handle, param) =>
+			{
+				windows.Add(handle);
+				return (BOOL)true;
+			},
+			0
+		);
+
+		return windows;
+	}
+
+	/// <inheritdoc/>
 	public bool IsStandardWindow(HWND hwnd)
 	{
 		if (PInvoke.GetAncestor(hwnd, GET_ANCESTOR_FLAGS.GA_ROOT) != hwnd || !PInvoke.IsWindowVisible(hwnd))
@@ -331,4 +349,10 @@ internal class CoreNativeManager : ICoreNativeManager
 		using Process process = Process.GetProcessById(processId);
 		return (process.ProcessName, process.MainModule?.FileName);
 	}
+
+	/// <inheritdoc/>
+	public nuint GetClassLongPtr(HWND hWnd, GET_CLASS_LONG_INDEX nIndex) => PInvoke.GetClassLongPtr(hWnd, nIndex);
+
+	/// <inheritdoc/>
+	public LRESULT SendMessage(HWND hWnd, uint Msg, WPARAM wParam, LPARAM lParam) => PInvoke.SendMessage(hWnd, Msg, wParam, lParam);
 }

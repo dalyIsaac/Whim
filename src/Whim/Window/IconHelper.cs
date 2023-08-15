@@ -1,7 +1,4 @@
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -15,20 +12,25 @@ namespace Whim;
 /// <summary>
 /// Helper class for getting icons for windows.
 /// </summary>
-public static class IconHelper
+internal static class IconHelper
 {
+	private const uint U_TIMEOUT = 50;
+
 	/// <summary>
 	/// Tries to get the icon for a window.
 	/// </summary>
 	/// <param name="window"></param>
+	/// <param name="coreNativeManager"></param>
+	/// <param name="nativeManager"></param>
 	/// <returns></returns>
-	public static ImageSource? GetIcon(IWindow window)
+	public static BitmapImage? GetIcon(
+		this IWindow window,
+		ICoreNativeManager coreNativeManager,
+		INativeManager nativeManager
+	)
 	{
 		Logger.Debug($"Getting icon for window {window}");
-
-		return window.ProcessFileName == "ApplicationFrameHost.exe"
-		? GetUwpAppIcon(window.Handle)
-		: GetWindowIcon(window.Handle);
+		return window.IsUwp ? GetUwpAppIcon(nativeManager, window) : GetWindowIcon(coreNativeManager, window.Handle);
 	}
 
 	/// <summary>
@@ -37,12 +39,13 @@ public static class IconHelper
 	/// <remarks>
 	/// Based on https://stackoverflow.com/questions/32122679/getting-icon-of-modern-windows-app-from-a-desktop-application
 	/// </remarks>
-	/// <param name="hwnd"></param>
+	/// <param name="nativeManager"></param>
+	/// <param name="window"></param>
 	/// <returns></returns>
-	private static ImageSource? GetUwpAppIcon(HWND hwnd)
+	private static BitmapImage? GetUwpAppIcon(INativeManager nativeManager, IWindow window)
 	{
-		Logger.Debug($"Getting UWP icon for HWND {hwnd}");
-		string? exePath = GetUwpAppProcessPath(hwnd);
+		Logger.Debug($"Getting UWP icon for window {window}");
+		string? exePath = nativeManager.GetUwpAppProcessPath(window);
 		if (exePath is null)
 		{
 			Logger.Error("Could not get UWP app process path");
@@ -63,9 +66,8 @@ public static class IconHelper
 			return null;
 		}
 
-		string? pathToLogo;
-
 		// Read the manifest file.
+		string? pathToLogo;
 		using (FileStream fs = File.OpenRead(manifestPath))
 		{
 			XDocument manifest = XDocument.Load(fs);
@@ -90,79 +92,24 @@ public static class IconHelper
 		return ConvertFromStream(fileStream);
 	}
 
-	// TODO: Consider pulling into IWindow (with a flag for IsModernApp)
-	private static string? GetUwpAppProcessPath(HWND hwnd)
-	{
-		uint pid = 0;
-		unsafe
-		{
-			PInvoke.GetWindowThreadProcessId(hwnd, &pid);
-		}
-
-		// now this is a bit tricky. Modern apps are hosted inside ApplicationFrameHost process, so we need to find
-		// child window which does NOT belong to this process. This should be the process we need
-		List<HWND> children = GetChildWindows(hwnd);
-		foreach (HWND childHwnd in children)
-		{
-			uint childPid;
-			unsafe
-			{
-				PInvoke.GetWindowThreadProcessId(childHwnd, &childPid);
-			}
-			if (childPid != pid)
-			{
-				// here we are
-				Process childProc = Process.GetProcessById((int)childPid);
-				return childProc.MainModule?.FileName;
-			}
-		}
-
-		Logger.Error("Cannot find a path to Uwp App executable file for HWND ${hwnd}");
-		return null;
-	}
-
-	private static List<HWND> GetChildWindows(HWND parent)
-	{
-		List<HWND> windows = new();
-
-		PInvoke.EnumChildWindows(
-			parent,
-			(handle, param) =>
-			{
-				windows.Add(handle);
-				return true;
-			},
-			0
-		);
-
-		return windows;
-	}
-
-	private static ImageSource? GetWindowIcon(HWND hwnd)
+	private static BitmapImage? GetWindowIcon(ICoreNativeManager coreNativeManager, HWND hwnd)
 	{
 		Logger.Debug($"Getting window icon for HWND {hwnd}");
-		// TODO: Consider using SendMessageTimeout
-		HICON hIcon = new(PInvoke.SendMessage(hwnd, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0));
+		HICON hIcon =
+			new(coreNativeManager.SendMessage(hwnd, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0));
 
 		if (hIcon == 0)
 		{
-			hIcon = (HICON)(nint)PInvoke.GetClassLongPtr(hwnd, GET_CLASS_LONG_INDEX.GCL_HICON);
+			hIcon = (HICON)(nint)coreNativeManager.GetClassLongPtr(hwnd, GET_CLASS_LONG_INDEX.GCL_HICON);
 		}
 
-		if (hIcon != 0)
-		{
-			return ConvertFromHandle(hIcon);
-		}
-		else
+		if (hIcon == 0)
 		{
 			Logger.Error($"Could not load icon for HWND ${hwnd}");
 			return null;
 		}
-	}
 
-	// TODO: Are the following methods used by GetUwpAppIcon?
-	private static ImageSource? ConvertFromHandle(HICON hIcon)
-	{
+		// Get the icon from the handle.
 		using Icon icon = Icon.FromHandle((nint)hIcon);
 		MemoryStream iconStream = new();
 
@@ -175,7 +122,7 @@ public static class IconHelper
 		return ConvertFromStream(iconStream);
 	}
 
-	private static ImageSource ConvertFromStream(Stream stream)
+	private static BitmapImage ConvertFromStream(Stream stream)
 	{
 		BitmapImage bitmap = new();
 		bitmap.SetSource(stream.AsRandomAccessStream());
