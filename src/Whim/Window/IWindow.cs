@@ -23,6 +23,11 @@ public interface IWindow
 	string WindowClass { get; }
 
 	/// <summary>
+	/// Whether we think that the window is a UWP app.
+	/// </summary>
+	bool IsUwp { get; }
+
+	/// <summary>
 	/// The location of the window.
 	/// </summary>
 	ILocation<int> Location { get; }

@@ -20,6 +20,9 @@ internal class Window : IWindow
 	public string WindowClass => _context.NativeManager.GetClassName(Handle);
 
 	/// <inheritdoc/>
+	public bool IsUwp => ProcessFileName == "ApplicationFrameHost.exe";
+
+	/// <inheritdoc/>
 	public ILocation<int> Location
 	{
 		get
