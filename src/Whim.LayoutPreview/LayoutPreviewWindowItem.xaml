@@ -19,11 +19,6 @@
 				Text="{x:Bind Path=WindowState.Window.Title}"
 				TextWrapping="WrapWholeWords" />
 
-			<TextBlock
-				HorizontalTextAlignment="Center"
-				Text="{x:Bind Path=WindowState.Window.ProcessFilePath}"
-				TextWrapping="WrapWholeWords" />
-
 			<Image
 				Width="32"
 				Height="32"

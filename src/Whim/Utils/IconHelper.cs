@@ -12,88 +12,82 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-// TODO: Reference the stackoverflow answer
-// https://stackoverflow.com/questions/32122679/getting-icon-of-modern-windows-app-from-a-desktop-application
+/// <summary>
+/// Helper class for getting icons for windows.
+/// </summary>
 public static class IconHelper
 {
+	/// <summary>
+	/// Tries to get the icon for a window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
 	public static ImageSource? GetIcon(IWindow window)
 	{
-		if (window.ProcessFilePath is null)
-		{
-			return null;
-		}
+		Logger.Debug($"Getting icon for window {window}");
 
-		if (window.ProcessFileName == "ApplicationFrameHost.exe")
-		{
-			// TODO
-			// Handles applications like Settings and Calculator.
-			return GetUwpAppIcon(window.Handle);
-		}
-
-		return GetWindowIcon(window.Handle);
+		return window.ProcessFileName == "ApplicationFrameHost.exe"
+		? GetUwpAppIcon(window.Handle)
+		: GetWindowIcon(window.Handle);
 	}
 
+	/// <summary>
+	/// Gets the icon for a UWP app by finding the AppxManifest.xml file and reading the logo path.
+	/// </summary>
+	/// <remarks>
+	/// Based on https://stackoverflow.com/questions/32122679/getting-icon-of-modern-windows-app-from-a-desktop-application
+	/// </remarks>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
 	private static ImageSource? GetUwpAppIcon(HWND hwnd)
 	{
-		string? actualExePath = GetUwpAppProcessPath(hwnd);
-		if (actualExePath is null)
+		Logger.Debug($"Getting UWP icon for HWND {hwnd}");
+		string? exePath = GetUwpAppProcessPath(hwnd);
+		if (exePath is null)
 		{
+			Logger.Error("Could not get UWP app process path");
 			return null;
 		}
 
-		string? dir = Path.GetDirectoryName(actualExePath);
-		if (dir is null)
+		string? exeDir = Path.GetDirectoryName(exePath);
+		if (exeDir is null)
 		{
+			Logger.Error("Could not get directory name for UWP app process path");
 			return null;
 		}
 
-		string manifestPath = Path.Combine(dir, "AppxManifest.xml");
+		string manifestPath = Path.Combine(exeDir, "AppxManifest.xml");
 		if (!File.Exists(manifestPath))
 		{
+			Logger.Error($"Could not find AppxManifest.xml at {manifestPath}");
 			return null;
 		}
 
-		string pathToLogo;
+		string? pathToLogo;
 
 		// Read the manifest file.
 		using (FileStream fs = File.OpenRead(manifestPath))
 		{
 			XDocument manifest = XDocument.Load(fs);
 			const string ns = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
-
-			// rude parsing - take more care here
-			// TODO: fix the parsing here to not use !
-			pathToLogo = manifest.Root!.Element(XName.Get("Properties", ns))!.Element(XName.Get("Logo", ns))!.Value;
+			pathToLogo = manifest.Root?.Element(XName.Get("Properties", ns))?.Element(XName.Get("Logo", ns))?.Value;
 		}
 
-		// now here it is tricky again - there are several files that match logo, for example
-		// black, white, contrast white. Here we choose first, but you might do differently
-		string finalLogo = "";
-
-		// search for all files that match file name in Logo element but with any suffix (like "Logo.black.png, Logo.white.png etc)
-		string? logoParent = Path.GetDirectoryName(pathToLogo);
-		if (logoParent is null)
+		if (pathToLogo is null)
 		{
+			Logger.Error("Could not find logo path in AppxManifest.xml");
 			return null;
 		}
 
-		foreach (string logoFile in Directory.GetFiles(Path.Combine(dir, logoParent),
-			Path.GetFileNameWithoutExtension(pathToLogo) + "*" + Path.GetExtension(pathToLogo)))
-		{
-			finalLogo = logoFile;
-			break;
-		}
-
+		string finalLogo = Path.Combine(exeDir, pathToLogo);
 		if (!File.Exists(finalLogo))
 		{
+			Logger.Error($"Could not find logo at {finalLogo}");
 			return null;
 		}
 
 		using FileStream fileStream = File.OpenRead(finalLogo);
-
-		BitmapImage bitmap = new();
-		bitmap.SetSource(fileStream.AsRandomAccessStream());
-		return bitmap;
+		return ConvertFromStream(fileStream);
 	}
 
 	// TODO: Consider pulling into IWindow (with a flag for IsModernApp)
@@ -146,6 +140,7 @@ public static class IconHelper
 
 	private static ImageSource? GetWindowIcon(HWND hwnd)
 	{
+		Logger.Debug($"Getting window icon for HWND {hwnd}");
 		// TODO: Consider using SendMessageTimeout
 		HICON hIcon = new(PInvoke.SendMessage(hwnd, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0));
 
@@ -166,20 +161,9 @@ public static class IconHelper
 	}
 
 	// TODO: Are the following methods used by GetUwpAppIcon?
-	// TODO: Combine with ConvertFromIcon
 	private static ImageSource? ConvertFromHandle(HICON hIcon)
 	{
-		if (hIcon == 0)
-		{
-			return null;
-		}
-
 		using Icon icon = Icon.FromHandle((nint)hIcon);
-		return ConvertFromIcon(icon);
-	}
-
-	private static ImageSource ConvertFromIcon(Icon icon)
-	{
 		MemoryStream iconStream = new();
 
 		using (Bitmap bmp = icon.ToBitmap())
@@ -188,9 +172,13 @@ public static class IconHelper
 		}
 
 		iconStream.Position = 0;
+		return ConvertFromStream(iconStream);
+	}
 
+	private static ImageSource ConvertFromStream(Stream stream)
+	{
 		BitmapImage bitmap = new();
-		bitmap.SetSource(iconStream.AsRandomAccessStream());
+		bitmap.SetSource(stream.AsRandomAccessStream());
 		return bitmap;
 	}
 }
