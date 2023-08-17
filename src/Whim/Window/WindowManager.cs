@@ -16,7 +16,7 @@ internal class WindowManager : IWindowManager
 	public event EventHandler<WindowEventArgs>? WindowAdded;
 	public event EventHandler<WindowEventArgs>? WindowFocused;
 	public event EventHandler<WindowEventArgs>? WindowRemoved;
-	public event EventHandler<WindowEventArgs>? WindowMoveStart;
+	public event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
 	public event EventHandler<WindowEventArgs>? WindowMoveEnd;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
@@ -353,7 +353,17 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Window move started: {window}");
 		_isMovingWindow = true;
-		WindowMoveStart?.Invoke(this, new WindowEventArgs() { Window = window });
+
+		IPoint<int>? cursorPoint = null;
+		if (_isLeftMouseButtonDown)
+		{
+			if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
+			{
+				cursorPoint = new Point<int>() { X = point.X, Y = point.Y };
+			}
+		}
+
+		WindowMoveStart?.Invoke(this, new WindowMovedEventArgs() { Window = window, CursorDraggedPoint = cursorPoint });
 	}
 
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = true;

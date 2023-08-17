@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim.LayoutPreview;
 
@@ -17,8 +18,31 @@ public sealed partial class LayoutPreviewWindow : Window
 	public LayoutPreviewWindow(IContext context)
 	{
 		_context = context;
-		//_window = this.InitializeBorderlessWindow(_context, "Whim.LayoutPreview", "LayoutPreviewWindow");
-		UIElementExtensions.InitializeComponent(this, "Whim.LayoutPreview", "LayoutPreviewWindow");
+		_window = this.InitializeBorderlessWindow(_context, "Whim.LayoutPreview", "LayoutPreviewWindow");
+		this.SetIsShownInSwitchers(false);
+		this.SetSystemBackdrop();
+
+		Title = LayoutPreviewConfig.Title;
+	}
+
+	public void Activate(IWindow movingWindow, IMonitor? monitor)
+	{
+		if (monitor == null)
+		{
+			return;
+		}
+
+		using WindowDeferPosHandle handle = new(_context);
+		handle.DeferWindowPos(
+			new WindowState()
+			{
+				Window = _window,
+				Location = monitor.WorkingArea,
+				WindowSize = WindowSize.Normal
+			},
+			movingWindow.Handle,
+			SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW
+		);
 	}
 
 	public void Update(IWindowState[] windowStates)
@@ -34,5 +58,6 @@ public sealed partial class LayoutPreviewWindow : Window
 
 		LayoutPreviewCanvas.Children.Clear();
 		LayoutPreviewCanvas.Children.AddRange(items);
+		LayoutPreviewCanvas.InvalidateMeasure();
 	}
 }

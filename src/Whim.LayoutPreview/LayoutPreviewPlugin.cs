@@ -27,14 +27,15 @@ public class LayoutPreviewPlugin : IPlugin
 	public void PreInitialize()
 	{
 		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
-		_context.WindowManager.WindowMoved += WindowManager_WindowMoved;
+		_context.WindowManager.WindowMoved += WindowMoved;
+		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
+		_context.FilterManager.IgnoreTitleMatch(LayoutPreviewConfig.Title);
 	}
 
 	/// <inheritdoc	/>
 	public void PostInitialize()
 	{
 		_layoutPreviewWindow = new(_context);
-		_layoutPreviewWindow.Activate();
 	}
 
 	/// <inheritdoc />
@@ -43,18 +44,27 @@ public class LayoutPreviewPlugin : IPlugin
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
 
-	private void WindowManager_WindowMoveStart(object? sender, WindowEventArgs e)
+	private void WindowManager_WindowMoveStart(object? sender, WindowMovedEventArgs e)
 	{
-		// TODO: Show window
+		if (e.CursorDraggedPoint == null || _layoutPreviewWindow == null)
+		{
+			return;
+		}
+
+		_layoutPreviewWindow.Activate(e.Window, _context.MonitorManager.ActiveMonitor);
+		WindowMoved(this, e);
 	}
 
-	private void WindowManager_WindowMoved(object? sender, WindowMovedEventArgs e)
+	private void WindowMoved(object? sender, WindowMovedEventArgs e)
 	{
 		// Only run if the window is being dragged.
 		if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint)
 		{
 			return;
 		}
+
+		// TODO: Remove
+		Logger.Debug(cursorDraggedPoint.ToString());
 
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		IPoint<int> monitorPoint = monitor.WorkingArea.ToMonitorCoordinates(cursorDraggedPoint);
@@ -65,8 +75,13 @@ public class LayoutPreviewPlugin : IPlugin
 			normalizedPoint
 		);
 
-		_layoutPreviewWindow?.Update(
-			layoutEngine.DoLayout(new Location<int>() { Height = 500, Width = 500 }, monitor).ToArray()
-		);
+		Location<int> location = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
+
+		_layoutPreviewWindow?.Update(layoutEngine.DoLayout(location, monitor).ToArray());
+	}
+
+	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e)
+	{
+		_layoutPreviewWindow?.Hide(_context);
 	}
 }

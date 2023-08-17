@@ -47,7 +47,7 @@ public interface IWindowManager : IDisposable
 	/// <summary>
 	/// Event for when a window is being moved or resized.
 	/// </summary>
-	event EventHandler<WindowEventArgs>? WindowMoveStart;
+	event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
 
 	/// <summary>
 	/// Event for when a window has changed location, shape, or size.
