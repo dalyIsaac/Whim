@@ -1,5 +1,7 @@
+using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Windows.UI;
 
 namespace Whim.LayoutPreview;
 
@@ -18,10 +20,20 @@ public sealed partial class LayoutPreviewWindowItem : UserControl
 	/// </summary>
 	public ImageSource? ImageSource { get; }
 
-	internal LayoutPreviewWindowItem(IWindowState windowState)
+	internal LayoutPreviewWindowItem(IContext context, IWindowState windowState)
 	{
 		WindowState = windowState;
 		ImageSource = windowState.Window.GetIcon();
+
 		InitializeComponent();
+
+		Panel.Background = new AcrylicBrush()
+		{
+			Opacity = 0.8,
+			TintLuminosityOpacity = 0.8,
+			TintColor = context.NativeManager.ShouldSystemUseDarkMode()
+			? Color.FromArgb(Colors.Black.A, 33, 33, 33)
+			: Color.FromArgb(Colors.White.A, 253, 253, 253),
+		};
 	}
 }

@@ -12,7 +12,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 namespace Whim;
 
 /// <inheritdoc/>
-public class NativeManager : INativeManager
+public partial class NativeManager : INativeManager
 {
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
@@ -298,4 +298,11 @@ public class NativeManager : INativeManager
 			}
 		).Succeeded;
 	}
+
+	[LibraryImport("UXTheme.dll", EntryPoint = "#138", SetLastError = true)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool _ShouldSystemUseDarkMode();
+
+	/// <inheritdoc/>
+	public bool ShouldSystemUseDarkMode() => _ShouldSystemUseDarkMode();
 }

@@ -166,4 +166,10 @@ public interface INativeManager
 	/// <param name="hwnd"></param>
 	/// <returns>Whether the function succeeded.</returns>
 	bool EnableBlurBehindWindow(HWND hwnd);
+
+	/// <summary>
+	/// Gets whether the system is using dark mode.
+	/// </summary>
+	/// <returns></returns>
+	bool ShouldSystemUseDarkMode();
 }

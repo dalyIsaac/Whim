@@ -69,7 +69,7 @@ public sealed partial class LayoutPreviewWindow : Window
 		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
 		for (int i = 0; i < windowStates.Length; i++)
 		{
-			items[i] = new LayoutPreviewWindowItem(windowStates[i]);
+			items[i] = new LayoutPreviewWindowItem(_context, windowStates[i]);
 
 			Canvas.SetLeft(items[i], windowStates[i].Location.X);
 			Canvas.SetTop(items[i], windowStates[i].Location.Y);

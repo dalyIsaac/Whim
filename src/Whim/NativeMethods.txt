@@ -9,8 +9,8 @@ DefSubclassProc
 DWM_BB_BLURREGION
 DWM_BB_ENABLE
 DWM_WINDOW_CORNER_PREFERENCE
-DwmGetWindowAttribute
 DwmEnableBlurBehindWindow
+DwmGetWindowAttribute
 DwmSetWindowAttribute
 EndDeferWindowPos
 EnumChildWindows
