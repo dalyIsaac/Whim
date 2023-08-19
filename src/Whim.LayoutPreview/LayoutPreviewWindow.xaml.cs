@@ -3,7 +3,6 @@ using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using System;
 using Windows.Win32.UI.WindowsAndMessaging;
 using WinRT;
@@ -19,6 +18,7 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 	private readonly IWindow _window;
 	private readonly ISystemBackdropControllerWithTargets _systemBackdropController;
 	private readonly SystemBackdropConfiguration _systemBackdropConfiguration;
+	private IWindowState[] _prevWindowStates = Array.Empty<IWindowState>();
 	private bool _disposedValue;
 
 	/// <summary>
@@ -107,6 +107,13 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 
 	public void Update(IWindowState[] windowStates)
 	{
+		if (!CheckIsDifferent(windowStates))
+		{
+			return;
+		}
+
+		_prevWindowStates = windowStates;
+
 		LayoutPreviewCanvas.Children.Clear();
 
 		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
@@ -119,6 +126,24 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 		}
 
 		LayoutPreviewCanvas.Children.AddRange(items);
+	}
+
+	private bool CheckIsDifferent(IWindowState[] windowStates)
+	{
+		if (_prevWindowStates.Length != windowStates.Length)
+		{
+			return true;
+		}
+
+		for (int i = 0; i < windowStates.Length; i++)
+		{
+			if (!_prevWindowStates[i].Equals(windowStates[i]))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private void Dispose(bool disposing)

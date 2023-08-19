@@ -7,9 +7,6 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Canvas
-		x:Name="LayoutPreviewCanvas"
-		HorizontalAlignment="Stretch"
-		VerticalAlignment="Center" />
+	<Canvas x:Name="LayoutPreviewCanvas" />
 
 </Window>
