@@ -1,8 +1,12 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Windows.System;
+using Windows.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.System.WinRT;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
@@ -233,5 +237,65 @@ public class NativeManager : INativeManager
 
 		Logger.Error("Cannot find a path to Uwp App executable file for HWND ${hwnd}");
 		return null;
+	}
+
+	private static Compositor? _compositor;
+	private static readonly object _compositorLock = new();
+
+	/// <inheritdoc/>
+	public Compositor Compositor
+	{
+		get
+		{
+			if (_compositor == null)
+			{
+				lock (_compositorLock)
+				{
+					if (_compositor == null)
+					{
+						if (DispatcherQueue.GetForCurrentThread() == null)
+						{
+							InitializeCoreDispatcher();
+						}
+
+						_compositor = new Compositor();
+					}
+				}
+			}
+
+			return _compositor;
+		}
+	}
+
+	private static DispatcherQueueController InitializeCoreDispatcher()
+	{
+		// Ideally this would be replaced by the dispatcher from Microsoft.UI.
+		// However, ICompositionSupportsSystemBackdrop.SystemBackdrop uses Windows.UI.
+		DispatcherQueueOptions options =
+			new()
+			{
+				apartmentType = DISPATCHERQUEUE_THREAD_APARTMENTTYPE.DQTAT_COM_STA,
+				threadType = DISPATCHERQUEUE_THREAD_TYPE.DQTYPE_THREAD_CURRENT,
+				dwSize = (uint)Marshal.SizeOf(typeof(DispatcherQueueOptions))
+			};
+
+		PInvoke.CreateDispatcherQueueController(options, out nint raw);
+
+		return DispatcherQueueController.FromAbi(raw);
+	}
+
+	/// <inheritdoc/>
+	public bool EnableBlurBehindWindow(HWND hwnd)
+	{
+		using DeleteObjectSafeHandle rgn = PInvoke.CreateRectRgn_SafeHandle(-2, -2, -1, -1);
+		return PInvoke.DwmEnableBlurBehindWindow(
+			hwnd,
+			new DWM_BLURBEHIND()
+			{
+				dwFlags = PInvoke.DWM_BB_ENABLE | PInvoke.DWM_BB_BLURREGION,
+				fEnable = true,
+				hRgnBlur = new HRGN(rgn.DangerousGetHandle())
+			}
+		).Succeeded;
 	}
 }

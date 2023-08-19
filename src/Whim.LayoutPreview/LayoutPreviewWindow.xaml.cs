@@ -1,6 +1,4 @@
-using Microsoft.UI;
 using Microsoft.UI.Composition;
-using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -12,14 +10,11 @@ namespace Whim.LayoutPreview;
 /// <summary>
 /// Window showing a preview of the layout.
 /// </summary>
-public sealed partial class LayoutPreviewWindow : Window, IDisposable
+public sealed partial class LayoutPreviewWindow : Window
 {
 	private readonly IContext _context;
 	private readonly IWindow _window;
-	private readonly ISystemBackdropControllerWithTargets _systemBackdropController;
-	private readonly SystemBackdropConfiguration _systemBackdropConfiguration;
 	private IWindowState[] _prevWindowStates = Array.Empty<IWindowState>();
-	private bool _disposedValue;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="LayoutPreviewWindow"/> class.
@@ -32,57 +27,12 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 
 		Title = LayoutPreviewConfig.Title;
 
-		_systemBackdropConfiguration = new SystemBackdropConfiguration() { IsInputActive = true };
-		SetConfigurationSourceTheme();
-
-		// TODO: Play around with this to get as much transparency as possible.
-		if (MicaController.IsSupported())
-		{
-			_systemBackdropController = new MicaController()
-			{
-				Kind = MicaKind.BaseAlt,
-				// LuminosityOpacity = 0.9f,
-				FallbackColor = Colors.Transparent,
-				// TintOpacity = 0.9f,
-			};
-		}
-		else
-		{
-			_systemBackdropController = new DesktopAcrylicController()
-			{
-				TintOpacity = 0.9f,
-				LuminosityOpacity = 0.9f,
-			};
-		}
-
-		((FrameworkElement)Content).ActualThemeChanged += Window_ThemeChanged;
-
-		_systemBackdropController.AddSystemBackdropTarget(this.As<ICompositionSupportsSystemBackdrop>());
-		_systemBackdropController.SetSystemBackdropConfiguration(_systemBackdropConfiguration);
-	}
-
-	private void Window_ThemeChanged(FrameworkElement sender, object args)
-	{
-		if (_systemBackdropConfiguration != null)
-		{
-			SetConfigurationSourceTheme();
-		}
-	}
-
-	private void SetConfigurationSourceTheme()
-	{
-		switch (((FrameworkElement)Content).ActualTheme)
-		{
-			case ElementTheme.Dark:
-				_systemBackdropConfiguration.Theme = SystemBackdropTheme.Dark;
-				break;
-			case ElementTheme.Light:
-				_systemBackdropConfiguration.Theme = SystemBackdropTheme.Light;
-				break;
-			case ElementTheme.Default:
-				_systemBackdropConfiguration.Theme = SystemBackdropTheme.Default;
-				break;
-		}
+		// Make the window transparent.
+		_context.NativeManager.EnableBlurBehindWindow(_window.Handle);
+		ICompositionSupportsSystemBackdrop brushHolder = this.As<ICompositionSupportsSystemBackdrop>();
+		brushHolder.SystemBackdrop = _context.NativeManager.Compositor.CreateColorBrush(
+			Windows.UI.Color.FromArgb(0, 255, 255, 255)
+		);
 	}
 
 	public void Activate(IWindow movingWindow, IMonitor? monitor)
@@ -144,29 +94,5 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 		}
 
 		return false;
-	}
-
-	private void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				_systemBackdropController.Dispose();
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			_disposedValue = true;
-		}
-	}
-
-	/// <inheritdoc/>
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
 	}
 }

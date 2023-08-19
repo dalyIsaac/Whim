@@ -1,3 +1,4 @@
+using Windows.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
@@ -153,4 +154,16 @@ public interface INativeManager
 	/// <param name="window"></param>
 	/// <returns></returns>
 	string? GetUwpAppProcessPath(IWindow window);
+
+	/// <summary>
+	/// The compositor for Whim.
+	/// </summary>
+	Compositor Compositor { get; }
+
+	/// <summary>
+	/// Enables the blur effect for the given <paramref name="hwnd"/>.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns>Whether the function succeeded.</returns>
+	bool EnableBlurBehindWindow(HWND hwnd);
 }
