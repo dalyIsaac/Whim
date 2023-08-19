@@ -1,7 +1,9 @@
 using Microsoft.UI;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Media;
+using WinRT;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -92,8 +94,33 @@ public static class WindowExtensions
 	/// <see cref="DesktopAcrylicBackdrop"/>.
 	/// </summary>
 	/// <param name="window"></param>
-	public static void SetSystemBackdrop(this Microsoft.UI.Xaml.Window window)
+	/// <param name="micaKind">The mica kind to use, if mica is supported</param>
+	public static void SetSystemBackdrop(this Microsoft.UI.Xaml.Window window, MicaKind micaKind = MicaKind.Base)
 	{
-		window.SystemBackdrop = MicaController.IsSupported() ? new MicaBackdrop() : new DesktopAcrylicBackdrop() { };
+		window.SystemBackdrop = MicaController.IsSupported()
+			? new MicaBackdrop() { Kind = micaKind }
+			: new DesktopAcrylicBackdrop();
+	}
+
+	private static Windows.UI.Composition.Compositor? _compositor;
+	private static readonly object _compositorLock = new();
+
+	public static Windows.UI.Composition.Compositor Compositor
+	{
+		get
+		{
+			if (_compositor == null)
+			{
+				lock (_compositorLock)
+				{
+					if (_compositor == null)
+					{
+						_compositor = new Windows.UI.Composition.Compositor();
+					}
+				}
+			}
+
+			return _compositor;
+		}
 	}
 }

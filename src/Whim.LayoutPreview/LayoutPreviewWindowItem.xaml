@@ -12,7 +12,7 @@
 	VerticalContentAlignment="Stretch"
 	mc:Ignorable="d">
 
-	<RelativePanel Background="Red">
+	<RelativePanel Background="{ThemeResource AccentAcrylicInAppFillColorDefaultBrush}">
 		<StackPanel RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
 			<TextBlock
 				HorizontalTextAlignment="Center"
