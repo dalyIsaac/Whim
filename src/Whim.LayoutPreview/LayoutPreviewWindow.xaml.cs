@@ -30,27 +30,14 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 		_transparentWindowController = _context.NativeManager.CreateTransparentWindowController(this);
 	}
 
-	public void Activate(IWindow movingWindow, IMonitor? monitor)
-	{
-		if (monitor == null)
-		{
-			return;
-		}
-
-		using WindowDeferPosHandle handle = new(_context);
-		handle.DeferWindowPos(
-			new WindowState()
-			{
-				Window = _window,
-				Location = monitor.WorkingArea,
-				WindowSize = WindowSize.Normal
-			},
-			movingWindow.Handle,
-			SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW
-		);
-	}
-
-	public void Update(IWindowState[] windowStates, IPoint<int> cursorPoint)
+	/// <summary>
+	/// Update the preview window with the given window states.
+	/// </summary>
+	/// <param name="windowStates">The window states to display.</param>
+	/// <param name="cursorPoint">The cursor's location inside the monitor.</param>
+	/// <param name="movingWindow">The window which is currently being dragged.</param>
+	/// <param name="monitor">The monitor corresponding to the <paramref name="cursorPoint"/>.</param>
+	public void Update(IWindowState[] windowStates, IPoint<int> cursorPoint, IWindow movingWindow, IMonitor monitor)
 	{
 		if (!ShouldContinue(windowStates, cursorPoint))
 		{
@@ -58,8 +45,6 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 		}
 
 		_prevWindowStates = windowStates;
-
-		LayoutPreviewCanvas.Children.Clear();
 
 		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
 		for (int idx = 0; idx < windowStates.Length; idx++)
@@ -76,7 +61,9 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 			Canvas.SetTop(items[idx], windowStates[idx].Location.Y);
 		}
 
+		LayoutPreviewCanvas.Children.Clear();
 		LayoutPreviewCanvas.Children.AddRange(items);
+		Activate(movingWindow, monitor);
 	}
 
 	private bool ShouldContinue(IWindowState[] windowStates, IPoint<int> cursorPoint)
@@ -104,6 +91,21 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 		}
 
 		return false;
+	}
+
+	private void Activate(IWindow movingWindow, IMonitor monitor)
+	{
+		using WindowDeferPosHandle handle = new(_context);
+		handle.DeferWindowPos(
+			new WindowState()
+			{
+				Window = _window,
+				Location = monitor.WorkingArea,
+				WindowSize = WindowSize.Normal
+			},
+			movingWindow.Handle,
+			SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW
+		);
 	}
 
 	private void Dispose(bool disposing)

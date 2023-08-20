@@ -33,10 +33,7 @@ public class LayoutPreviewPlugin : IPlugin
 	}
 
 	/// <inheritdoc	/>
-	public void PostInitialize()
-	{
-		_layoutPreviewWindow = new(_context);
-	}
+	public void PostInitialize() { }
 
 	/// <inheritdoc />
 	public void LoadState(JsonElement state) { }
@@ -46,12 +43,12 @@ public class LayoutPreviewPlugin : IPlugin
 
 	private void WindowManager_WindowMoveStart(object? sender, WindowMovedEventArgs e)
 	{
-		if (e.CursorDraggedPoint == null || _layoutPreviewWindow == null)
+		if (e.CursorDraggedPoint == null)
 		{
 			return;
 		}
 
-		_layoutPreviewWindow.Activate(e.Window, _context.MonitorManager.ActiveMonitor);
+		_layoutPreviewWindow ??= new(_context);
 		WindowMoved(this, e);
 	}
 
@@ -63,18 +60,34 @@ public class LayoutPreviewPlugin : IPlugin
 			return;
 		}
 
-		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
+		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
 		IPoint<int> monitorPoint = monitor.WorkingArea.ToMonitorCoordinates(cursorDraggedPoint);
 		IPoint<double> normalizedPoint = monitor.WorkingArea.ToUnitSquare(monitorPoint);
 
-		ILayoutEngine layoutEngine = _context.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine.MoveWindowToPoint(
-			e.Window,
-			normalizedPoint
-		);
+		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+		if (workspace == null)
+		{
+			return;
+		}
+
+		ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
 
 		Location<int> location = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
 
-		_layoutPreviewWindow?.Update(layoutEngine.DoLayout(location, monitor).ToArray(), cursorDraggedPoint);
+		// Adjust the cursor point so that it's relative to the monitor's location.
+		Point<int> adjustedCursorPoint =
+			new()
+			{
+				X = cursorDraggedPoint.X - monitor.WorkingArea.X,
+				Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y
+			};
+
+		_layoutPreviewWindow?.Update(
+			layoutEngine.DoLayout(location, monitor).ToArray(),
+			adjustedCursorPoint,
+			e.Window,
+			monitor
+		);
 	}
 
 	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e)
