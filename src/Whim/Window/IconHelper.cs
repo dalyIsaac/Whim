@@ -95,8 +95,7 @@ internal static class IconHelper
 	private static BitmapImage? GetWindowIcon(ICoreNativeManager coreNativeManager, HWND hwnd)
 	{
 		Logger.Debug($"Getting window icon for HWND {hwnd}");
-		HICON hIcon =
-			new(coreNativeManager.SendMessage(hwnd, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0));
+		HICON hIcon = new(coreNativeManager.SendMessage(hwnd, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0));
 
 		if (hIcon == 0)
 		{

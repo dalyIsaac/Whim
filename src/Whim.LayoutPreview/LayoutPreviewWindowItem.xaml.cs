@@ -64,12 +64,7 @@ public sealed partial class LayoutPreviewWindowItem : UserControl
 	/// <returns></returns>
 	private static Color GetTextColor(Color backgroundColor)
 	{
-		double[] uiColors = new double[]
-		{
-			backgroundColor.R / 255,
-			backgroundColor.G / 255,
-			backgroundColor.B / 255
-		};
+		double[] uiColors = new double[] { backgroundColor.R / 255, backgroundColor.G / 255, backgroundColor.B / 255 };
 
 		double[] cColors = new double[3];
 		for (int idx = 0; idx < 3; idx++)
