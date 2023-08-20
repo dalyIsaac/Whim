@@ -14,6 +14,7 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 	private readonly IWindow _window;
 	private readonly TransparentWindowController _transparentWindowController;
 	private IWindowState[] _prevWindowStates = Array.Empty<IWindowState>();
+	private int _prevHoveredIndex = -1;
 	private bool _disposedValue;
 
 	/// <summary>
@@ -49,9 +50,9 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 		);
 	}
 
-	public void Update(IWindowState[] windowStates)
+	public void Update(IWindowState[] windowStates, IPoint<int> cursorPoint)
 	{
-		if (!CheckIsDifferent(windowStates))
+		if (!ShouldContinue(windowStates, cursorPoint))
 		{
 			return;
 		}
@@ -61,27 +62,42 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 		LayoutPreviewCanvas.Children.Clear();
 
 		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
-		for (int i = 0; i < windowStates.Length; i++)
+		for (int idx = 0; idx < windowStates.Length; idx++)
 		{
-			items[i] = new LayoutPreviewWindowItem(_context, windowStates[i]);
+			bool isHovered = windowStates[idx].Location.ContainsPoint(cursorPoint);
+			if (isHovered)
+			{
+				_prevHoveredIndex = idx;
+			}
 
-			Canvas.SetLeft(items[i], windowStates[i].Location.X);
-			Canvas.SetTop(items[i], windowStates[i].Location.Y);
+			items[idx] = new LayoutPreviewWindowItem(_context, windowStates[idx], isHovered);
+
+			Canvas.SetLeft(items[idx], windowStates[idx].Location.X);
+			Canvas.SetTop(items[idx], windowStates[idx].Location.Y);
 		}
 
 		LayoutPreviewCanvas.Children.AddRange(items);
 	}
 
-	private bool CheckIsDifferent(IWindowState[] windowStates)
+	private bool ShouldContinue(IWindowState[] windowStates, IPoint<int> cursorPoint)
 	{
 		if (_prevWindowStates.Length != windowStates.Length)
 		{
 			return true;
 		}
 
-		for (int i = 0; i < windowStates.Length; i++)
+		for (int idx = 0; idx < windowStates.Length; idx++)
 		{
-			if (!_prevWindowStates[i].Equals(windowStates[i]))
+			if (!_prevWindowStates[idx].Equals(windowStates[idx]))
+			{
+				return true;
+			}
+		}
+
+		if (_prevHoveredIndex != -1)
+		{
+			IWindowState prevHoveredState = _prevWindowStates[_prevHoveredIndex];
+			if (!prevHoveredState.Location.ContainsPoint(cursorPoint))
 			{
 				return true;
 			}

@@ -14,15 +14,17 @@
 
 	<RelativePanel x:Name="Panel" CornerRadius="4">
 		<StackPanel RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
-			<TextBlock
-				HorizontalTextAlignment="Center"
-				Text="{x:Bind Path=WindowState.Window.Title}"
-				TextWrapping="WrapWholeWords" />
-
 			<Image
 				Width="32"
 				Height="32"
+				Margin="8"
 				Source="{x:Bind Path=ImageSource}" />
+
+			<TextBlock
+				x:Name="Title"
+				HorizontalTextAlignment="Center"
+				Text="{x:Bind Path=WindowState.Window.Title}"
+				TextWrapping="WrapWholeWords" />
 		</StackPanel>
 	</RelativePanel>
 

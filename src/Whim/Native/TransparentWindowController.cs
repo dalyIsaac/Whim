@@ -21,7 +21,11 @@ public class TransparentWindowController : IDisposable
 	private readonly SUBCLASSPROC _subclassProc;
 	private bool _disposedValue;
 
-	internal TransparentWindowController(IContext context, ICoreNativeManager coreNativeManager, Microsoft.UI.Xaml.Window window)
+	internal TransparentWindowController(
+		IContext context,
+		ICoreNativeManager coreNativeManager,
+		Microsoft.UI.Xaml.Window window
+	)
 	{
 		_context = context;
 		_coreNativeManager = coreNativeManager;
@@ -37,6 +41,16 @@ public class TransparentWindowController : IDisposable
 		_coreNativeManager.SetWindowSubclass(_window.GetHandle(), _subclassProc, SUBCLASSID, 0);
 	}
 
+	/// <summary>
+	/// Listening to these messages is necessary to support transparency when Windows has a light theme.
+	/// </summary>
+	/// <param name="hWnd"></param>
+	/// <param name="uMsg"></param>
+	/// <param name="wParam"></param>
+	/// <param name="lParam"></param>
+	/// <param name="uIdSubclass"></param>
+	/// <param name="dwRefData"></param>
+	/// <returns></returns>
 	private LRESULT WindowProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam, nuint uIdSubclass, nuint dwRefData)
 	{
 		if (uMsg == PInvoke.WM_ERASEBKGND)

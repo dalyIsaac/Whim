@@ -63,9 +63,6 @@ public class LayoutPreviewPlugin : IPlugin
 			return;
 		}
 
-		// TODO: Remove
-		Logger.Debug(cursorDraggedPoint.ToString());
-
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		IPoint<int> monitorPoint = monitor.WorkingArea.ToMonitorCoordinates(cursorDraggedPoint);
 		IPoint<double> normalizedPoint = monitor.WorkingArea.ToUnitSquare(monitorPoint);
@@ -77,7 +74,7 @@ public class LayoutPreviewPlugin : IPlugin
 
 		Location<int> location = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
 
-		_layoutPreviewWindow?.Update(layoutEngine.DoLayout(location, monitor).ToArray());
+		_layoutPreviewWindow?.Update(layoutEngine.DoLayout(location, monitor).ToArray(), cursorDraggedPoint);
 	}
 
 	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e)
