@@ -64,7 +64,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	/// <inheritdoc/>
 	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData) =>
-		PInvoke.EnumDisplayMonitors(hdc, lprcClip, lpfnEnum, dwData);
+		PInvoke.EnumDisplayMonitors(new HDC(hdc?.DangerousGetHandle() ?? 0), lprcClip, lpfnEnum, dwData);
 
 	/// <inheritdoc/>
 	public BOOL GetPrimaryDisplayWorkArea(out RECT lpRect)
@@ -354,5 +354,32 @@ internal class CoreNativeManager : ICoreNativeManager
 	public nuint GetClassLongPtr(HWND hWnd, GET_CLASS_LONG_INDEX nIndex) => PInvoke.GetClassLongPtr(hWnd, nIndex);
 
 	/// <inheritdoc/>
-	public LRESULT SendMessage(HWND hWnd, uint Msg, WPARAM wParam, LPARAM lParam) => PInvoke.SendMessage(hWnd, Msg, wParam, lParam);
+	public LRESULT SendMessage(HWND hWnd, uint Msg, WPARAM wParam, LPARAM lParam) =>
+		PInvoke.SendMessage(hWnd, Msg, wParam, lParam);
+
+	/// <inheritdoc/>
+	public BOOL GetClientRect(HWND hWnd, out RECT lpRect) => PInvoke.GetClientRect(hWnd, out lpRect);
+
+	/// <inheritdoc/>
+	public DeleteObjectSafeHandle CreateSolidBrush(COLORREF crColor) => PInvoke.CreateSolidBrush_SafeHandle(crColor);
+
+	/// <inheritdoc/>
+	public bool EnableBlurBehindWindow(HWND hwnd)
+	{
+		using DeleteObjectSafeHandle rgn = PInvoke.CreateRectRgn_SafeHandle(-2, -2, -1, -1);
+		return PInvoke
+			.DwmEnableBlurBehindWindow(
+				hwnd,
+				new DWM_BLURBEHIND()
+				{
+					dwFlags = PInvoke.DWM_BB_ENABLE | PInvoke.DWM_BB_BLURREGION,
+					fEnable = true,
+					hRgnBlur = new HRGN(rgn.DangerousGetHandle())
+				}
+			)
+			.Succeeded;
+	}
+
+	/// <inheritdoc/>
+	public int FillRect(HDC hDC, in RECT lprc, SafeHandle hbr) => PInvoke.FillRect(hDC, lprc, hbr);
 }

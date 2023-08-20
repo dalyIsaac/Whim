@@ -1,20 +1,20 @@
-using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using Windows.Win32.UI.WindowsAndMessaging;
-using WinRT;
 
 namespace Whim.LayoutPreview;
 
 /// <summary>
 /// Window showing a preview of the layout.
 /// </summary>
-public sealed partial class LayoutPreviewWindow : Window
+public sealed partial class LayoutPreviewWindow : Window, IDisposable
 {
 	private readonly IContext _context;
 	private readonly IWindow _window;
+	private readonly TransparentWindowController _transparentWindowController;
 	private IWindowState[] _prevWindowStates = Array.Empty<IWindowState>();
+	private bool _disposedValue;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="LayoutPreviewWindow"/> class.
@@ -26,13 +26,7 @@ public sealed partial class LayoutPreviewWindow : Window
 		this.SetIsShownInSwitchers(false);
 
 		Title = LayoutPreviewConfig.Title;
-
-		// Make the window transparent.
-		_context.NativeManager.EnableBlurBehindWindow(_window.Handle);
-		ICompositionSupportsSystemBackdrop brushHolder = this.As<ICompositionSupportsSystemBackdrop>();
-		brushHolder.SystemBackdrop = _context.NativeManager.Compositor.CreateColorBrush(
-			Windows.UI.Color.FromArgb(0, 255, 255, 255)
-		);
+		_transparentWindowController = _context.NativeManager.CreateTransparentWindowController(this);
 	}
 
 	public void Activate(IWindow movingWindow, IMonitor? monitor)
@@ -94,5 +88,29 @@ public sealed partial class LayoutPreviewWindow : Window
 		}
 
 		return false;
+	}
+
+	private void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_transparentWindowController.Dispose();
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc/>
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

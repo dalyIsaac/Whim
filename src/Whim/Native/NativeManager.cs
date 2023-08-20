@@ -284,25 +284,14 @@ public partial class NativeManager : INativeManager
 		return DispatcherQueueController.FromAbi(raw);
 	}
 
-	/// <inheritdoc/>
-	public bool EnableBlurBehindWindow(HWND hwnd)
-	{
-		using DeleteObjectSafeHandle rgn = PInvoke.CreateRectRgn_SafeHandle(-2, -2, -1, -1);
-		return PInvoke.DwmEnableBlurBehindWindow(
-			hwnd,
-			new DWM_BLURBEHIND()
-			{
-				dwFlags = PInvoke.DWM_BB_ENABLE | PInvoke.DWM_BB_BLURREGION,
-				fEnable = true,
-				hRgnBlur = new HRGN(rgn.DangerousGetHandle())
-			}
-		).Succeeded;
-	}
-
 	[LibraryImport("UXTheme.dll", EntryPoint = "#138", SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	private static partial bool _ShouldSystemUseDarkMode();
 
 	/// <inheritdoc/>
 	public bool ShouldSystemUseDarkMode() => _ShouldSystemUseDarkMode();
+
+	/// <inheritdoc/>
+	public TransparentWindowController CreateTransparentWindowController(Microsoft.UI.Xaml.Window window) =>
+		new(_context, _coreNativeManager, window);
 }

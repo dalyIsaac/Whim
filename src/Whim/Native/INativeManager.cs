@@ -161,15 +161,15 @@ public interface INativeManager
 	Compositor Compositor { get; }
 
 	/// <summary>
-	/// Enables the blur effect for the given <paramref name="hwnd"/>.
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <returns>Whether the function succeeded.</returns>
-	bool EnableBlurBehindWindow(HWND hwnd);
-
-	/// <summary>
 	/// Gets whether the system is using dark mode.
 	/// </summary>
 	/// <returns></returns>
 	bool ShouldSystemUseDarkMode();
+
+	/// <summary>
+	/// Creates a <see cref="TransparentWindowController"/> for the given <paramref name="window"/>.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	TransparentWindowController CreateTransparentWindowController(Microsoft.UI.Xaml.Window window);
 }

@@ -538,4 +538,20 @@ internal interface ICoreNativeManager
 	/// <para><see href="https://docs.microsoft.com/windows/win32/api//winuser/nf-winuser-sendmessagew">Learn more about this API from docs.microsoft.com</see>.</para>
 	/// </remarks>
 	LRESULT SendMessage(HWND hWnd, uint Msg, WPARAM wParam, LPARAM lParam);
+
+	/// <inheritdoc cref="PInvoke.GetClientRect(HWND, RECT*)"/>
+	BOOL GetClientRect(HWND hWnd, out RECT lpRect);
+
+	/// <inheritdoc cref="PInvoke.CreateSolidBrush(COLORREF)"/>
+	DeleteObjectSafeHandle CreateSolidBrush(COLORREF color);
+
+	/// <summary>
+	/// Enables the blur effect for the given <paramref name="hwnd"/>.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns>Whether the function succeeded.</returns>
+	bool EnableBlurBehindWindow(HWND hwnd);
+
+	/// <inheritdoc cref="PInvoke.FillRect(HDC, in RECT, SafeHandle)"/>
+	int FillRect(HDC hDC, in RECT lprc, SafeHandle hbr);
 }
