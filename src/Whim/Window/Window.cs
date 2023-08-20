@@ -71,9 +71,6 @@ internal class Window : IWindow
 	public bool IsMaximized => _coreNativeManager.IsWindowMaximized(Handle);
 
 	/// <inheritdoc/>
-	public bool IsMouseMoving { get; set; }
-
-	/// <inheritdoc/>
 	public void BringToTop()
 	{
 		Logger.Debug(ToString());

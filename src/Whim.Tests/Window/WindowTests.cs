@@ -252,20 +252,6 @@ public class WindowTests
 	}
 
 	[Fact]
-	public void IsMouseMoving()
-	{
-		// Given
-		Wrapper wrapper = new();
-
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
-
-		// Then
-		Assert.False(window.IsMouseMoving);
-		window.IsMouseMoving = true;
-		Assert.True(window.IsMouseMoving);
-	}
-
-	[Fact]
 	public void BringToTop()
 	{
 		// Given

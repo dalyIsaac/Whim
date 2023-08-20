@@ -74,11 +74,6 @@ public interface IWindow
 	bool IsMaximized { get; }
 
 	/// <summary>
-	/// Indicates whether the mouse is moving the window.
-	/// </summary>
-	bool IsMouseMoving { get; set; }
-
-	/// <summary>
 	/// Moves the focus to this window.
 	/// </summary>
 	void Focus();
