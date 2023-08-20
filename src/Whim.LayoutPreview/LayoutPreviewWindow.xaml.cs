@@ -8,8 +8,13 @@ namespace Whim.LayoutPreview;
 /// <summary>
 /// Window showing a preview of the layout.
 /// </summary>
-public sealed partial class LayoutPreviewWindow : Window, IDisposable
+internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 {
+	/// <summary>
+	/// The default title of the window.
+	/// </summary>
+	public static string WindowTitle { get; } = "Whim Layout Preview";
+
 	private readonly IContext _context;
 	private readonly IWindow _window;
 	private readonly TransparentWindowController _transparentWindowController;
@@ -26,7 +31,7 @@ public sealed partial class LayoutPreviewWindow : Window, IDisposable
 		_window = this.InitializeBorderlessWindow(_context, "Whim.LayoutPreview", "LayoutPreviewWindow");
 		this.SetIsShownInSwitchers(false);
 
-		Title = LayoutPreviewConfig.Title;
+		Title = WindowTitle;
 		_transparentWindowController = _context.NativeManager.CreateTransparentWindowController(this);
 	}
 

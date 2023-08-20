@@ -1,13 +1,15 @@
+using System;
 using System.Linq;
 using System.Text.Json;
 
 namespace Whim.LayoutPreview;
 
 /// <inheritdoc/>
-public class LayoutPreviewPlugin : IPlugin
+public class LayoutPreviewPlugin : IPlugin, IDisposable
 {
 	private readonly IContext _context;
 	private LayoutPreviewWindow? _layoutPreviewWindow;
+	private bool _disposedValue;
 
 	/// <inheritdoc/>
 	public string Name => "whim.layout_preview";
@@ -29,7 +31,7 @@ public class LayoutPreviewPlugin : IPlugin
 		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
 		_context.WindowManager.WindowMoved += WindowMoved;
 		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
-		_context.FilterManager.IgnoreTitleMatch(LayoutPreviewConfig.Title);
+		_context.FilterManager.IgnoreTitleMatch(LayoutPreviewWindow.WindowTitle);
 	}
 
 	/// <inheritdoc	/>
@@ -93,5 +95,30 @@ public class LayoutPreviewPlugin : IPlugin
 	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e)
 	{
 		_layoutPreviewWindow?.Hide(_context);
+	}
+
+	/// <inheritdoc />
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_layoutPreviewWindow?.Dispose();
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc />
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }
