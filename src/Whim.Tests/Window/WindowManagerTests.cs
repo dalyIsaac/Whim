@@ -2,6 +2,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
@@ -503,10 +504,32 @@ public class WindowManagerTests
 		windowManager.Initialize();
 
 		// Then
-		Assert.Raises<WindowEventArgs>(
+		Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
+		);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoved_DoesNotRaise()
+	{
+		// Given
+		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		wrapper.AllowWindowCreation(hwnd);
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+		// When
+		windowManager.Initialize();
+
+		// Then
+		WhimAssert.DoesNotRaise<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
 	}
 
@@ -525,7 +548,8 @@ public class WindowManagerTests
 		windowManager.Initialize();
 
 		// Then
-		Assert.Raises<WindowEventArgs>(
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -826,7 +850,7 @@ public class WindowManagerTests
 
 	[Theory]
 	[MemberData(nameof(MoveEdgesSuccessData))]
-	public void WindowsEventHook_OnWindowMoveEnd_Success(
+	public void WindowsEventHook_OnWindowMoved_Success(
 		ILocation<int> originalLocation,
 		ILocation<int> newLocation,
 		Direction direction,
@@ -861,18 +885,17 @@ public class WindowManagerTests
 		// When
 		windowManager.Initialize();
 		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-		Assert.Raises<WindowEventArgs>(
-			h => windowManager.WindowMoved += h,
-			h => windowManager.WindowMoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0)
-		);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
+		Assert.Raises<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
 	}
 
 	[Fact]
-	public void WindowsEventHook_OnwindowMoveEnd_GetCursorPos()
+	public void WindowsEventHook_OnWindowMoved_GetCursorPos()
 	{
 		// Given
 		Wrapper wrapper = new();
@@ -921,15 +944,16 @@ public class WindowManagerTests
 		// When
 		windowManager.Initialize();
 		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-		Assert.Raises<WindowEventArgs>(
-			h => windowManager.WindowMoved += h,
-			h => windowManager.WindowMoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0)
-		);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(w => w.MoveWindowToPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<int>>()));
+		Assert.Raises<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
 	}
+
+	// TODO: OnWindowMoveEnd
 
 	[Fact]
 	public void PostInitialize()

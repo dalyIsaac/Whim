@@ -352,7 +352,10 @@ internal class WindowManager : IWindowManager
 	private void OnWindowMoveStart(IWindow window)
 	{
 		Logger.Debug($"Window move started: {window}");
-		_isMovingWindow = true;
+		lock (_mouseMoveLock)
+		{
+			_isMovingWindow = true;
+		}
 
 		IPoint<int>? cursorPoint = null;
 		if (_isLeftMouseButtonDown)

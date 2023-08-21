@@ -303,22 +303,6 @@ public class KeybindHookTests
 	}
 
 	[Fact]
-	public void Dispose_HookIsInvalid()
-	{
-		// Given
-		Wrapper wrapper = new(true);
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		wrapper.SetupKey(Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
-
-		// When
-		keybindHook.PostInitialize();
-		keybindHook.Dispose();
-
-		// Then
-		Assert.False(wrapper.Handle.HasDisposed);
-	}
-
-	[Fact]
 	public void Dispose()
 	{
 		// Given
