@@ -6,7 +6,9 @@ namespace Whim.TestUtils;
 /// <summary>
 /// Exception thrown when an event is raised when it should not have been.
 /// </summary>
+#pragma warning disable CA1032 // Implement standard exception constructors
 public class DoesNotRaiseException : XunitException
+#pragma warning restore CA1032 // Implement standard exception constructors
 {
 	/// <summary>
 	/// Creates a new instance of the <see cref="DoesNotRaiseException"/> class.

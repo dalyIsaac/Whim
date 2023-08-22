@@ -5,7 +5,6 @@ using Windows.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
-using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.System.WinRT;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -251,6 +250,7 @@ public partial class NativeManager : INativeManager
 			{
 				lock (_compositorLock)
 				{
+#pragma warning disable CA1508 // Avoid dead conditional code, because of the lock.
 					if (_compositor == null)
 					{
 						if (DispatcherQueue.GetForCurrentThread() == null)
@@ -260,6 +260,7 @@ public partial class NativeManager : INativeManager
 
 						_compositor = new Compositor();
 					}
+#pragma warning restore CA1508 // Avoid dead conditional code
 				}
 			}
 

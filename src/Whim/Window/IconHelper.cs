@@ -14,8 +14,6 @@ namespace Whim;
 /// </summary>
 internal static class IconHelper
 {
-	private const uint U_TIMEOUT = 50;
-
 	/// <summary>
 	/// Tries to get the icon for a window.
 	/// </summary>

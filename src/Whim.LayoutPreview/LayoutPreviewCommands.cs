@@ -5,12 +5,10 @@ namespace Whim.LayoutPreview;
 
 internal class LayoutPreviewCommands : IPluginCommands
 {
-	private readonly IContext _context;
 	private readonly IPlugin _plugin;
 
-	public LayoutPreviewCommands(IContext context, IPlugin plugin)
+	public LayoutPreviewCommands(IPlugin plugin)
 	{
-		_context = context;
 		_plugin = plugin;
 	}
 

@@ -953,8 +953,6 @@ public class WindowManagerTests
 		);
 	}
 
-	// TODO: OnWindowMoveEnd
-
 	[Fact]
 	public void PostInitialize()
 	{
