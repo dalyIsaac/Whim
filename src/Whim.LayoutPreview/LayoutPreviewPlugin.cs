@@ -15,7 +15,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	public string Name => "whim.layout_preview";
 
 	/// <inheritdoc/>
-	public IPluginCommands PluginCommands => new LayoutPreviewCommands(_context, this);
+	public IPluginCommands PluginCommands => new LayoutPreviewCommands(this);
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="LayoutPreviewPlugin"/> class.
