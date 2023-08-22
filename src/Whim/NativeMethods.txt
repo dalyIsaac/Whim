@@ -32,7 +32,6 @@ EVENT_SYSTEM_MOVESIZESTART
 FillRect
 GET_CLASS_LONG_INDEX
 GetAncestor
-GetClassLongPtr
 GetClassName
 GetClientRect
 GetCursorPos
