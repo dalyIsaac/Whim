@@ -382,4 +382,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	/// <inheritdoc/>
 	public int FillRect(HDC hDC, in RECT lprc, SafeHandle hbr) => PInvoke.FillRect(hDC, lprc, hbr);
+
+	/// <inheritdoc/>
+	public Icon LoadIconFromHandle(nint hIcon) => Icon.FromHandle(hIcon);
 }

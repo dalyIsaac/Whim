@@ -13,7 +13,7 @@ namespace Whim;
 /// </summary>
 internal class Context : IContext
 {
-	internal IFileManager FileManager { get; }
+	public IFileManager FileManager { get; }
 	public Logger Logger { get; }
 	public INativeManager NativeManager { get; }
 	internal ICoreNativeManager CoreNativeManager { get; }

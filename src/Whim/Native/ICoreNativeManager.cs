@@ -554,4 +554,10 @@ internal interface ICoreNativeManager
 
 	/// <inheritdoc cref="PInvoke.FillRect(HDC, in RECT, SafeHandle)"/>
 	int FillRect(HDC hDC, in RECT lprc, SafeHandle hbr);
+
+	/// <summary>
+	/// Gets the <see cref="Icon"/> for the given <paramref name="hIcon"/>.
+	/// </summary>
+	/// <param name="hIcon"></param>
+	Icon LoadIconFromHandle(nint hIcon);
 }

@@ -18,17 +18,13 @@ internal static class IconHelper
 	/// Tries to get the icon for a window.
 	/// </summary>
 	/// <param name="window"></param>
+	/// <param name="context"></param>
 	/// <param name="coreNativeManager"></param>
-	/// <param name="nativeManager"></param>
 	/// <returns></returns>
-	public static BitmapImage? GetIcon(
-		this IWindow window,
-		ICoreNativeManager coreNativeManager,
-		INativeManager nativeManager
-	)
+	public static BitmapImage? GetIcon(this IWindow window, IContext context, ICoreNativeManager coreNativeManager)
 	{
 		Logger.Debug($"Getting icon for window {window}");
-		return window.IsUwp ? GetUwpAppIcon(nativeManager, window) : GetWindowIcon(coreNativeManager, window.Handle);
+		return window.IsUwp ? GetUwpAppIcon(context, window) : GetWindowIcon(coreNativeManager, window.Handle);
 	}
 
 	/// <summary>
@@ -37,13 +33,13 @@ internal static class IconHelper
 	/// <remarks>
 	/// Based on https://stackoverflow.com/questions/32122679/getting-icon-of-modern-windows-app-from-a-desktop-application
 	/// </remarks>
-	/// <param name="nativeManager"></param>
+	/// <param name="context"></param>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private static BitmapImage? GetUwpAppIcon(INativeManager nativeManager, IWindow window)
+	private static BitmapImage? GetUwpAppIcon(IContext context, IWindow window)
 	{
 		Logger.Debug($"Getting UWP icon for window {window}");
-		string? exePath = nativeManager.GetUwpAppProcessPath(window);
+		string? exePath = context.NativeManager.GetUwpAppProcessPath(window);
 		if (exePath is null)
 		{
 			Logger.Error("Could not get UWP app process path");
@@ -58,7 +54,7 @@ internal static class IconHelper
 		}
 
 		string manifestPath = Path.Combine(exeDir, "AppxManifest.xml");
-		if (!File.Exists(manifestPath))
+		if (!context.FileManager.FileExists(manifestPath))
 		{
 			Logger.Error($"Could not find AppxManifest.xml at {manifestPath}");
 			return null;
@@ -66,7 +62,7 @@ internal static class IconHelper
 
 		// Read the manifest file.
 		string? pathToLogo;
-		using (FileStream fs = File.OpenRead(manifestPath))
+		using (Stream fs = context.FileManager.OpenRead(manifestPath))
 		{
 			XDocument manifest = XDocument.Load(fs);
 			const string ns = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
@@ -80,13 +76,13 @@ internal static class IconHelper
 		}
 
 		string finalLogo = Path.Combine(exeDir, pathToLogo);
-		if (!File.Exists(finalLogo))
+		if (!context.FileManager.FileExists(finalLogo))
 		{
 			Logger.Error($"Could not find logo at {finalLogo}");
 			return null;
 		}
 
-		using FileStream fileStream = File.OpenRead(finalLogo);
+		using Stream fileStream = context.FileManager.OpenRead(finalLogo);
 		return ConvertFromStream(fileStream);
 	}
 
@@ -107,7 +103,7 @@ internal static class IconHelper
 		}
 
 		// Get the icon from the handle.
-		using Icon icon = Icon.FromHandle((nint)hIcon);
+		using Icon icon = coreNativeManager.LoadIconFromHandle((nint)hIcon);
 		MemoryStream iconStream = new();
 
 		using (Bitmap bmp = icon.ToBitmap())

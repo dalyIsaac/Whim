@@ -221,5 +221,5 @@ internal class Window : IWindow
 	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle.Value}}}";
 
 	/// <inheritdoc/>
-	public BitmapImage? GetIcon() => this.GetIcon(_coreNativeManager, _context.NativeManager);
+	public BitmapImage? GetIcon() => this.GetIcon(_context, _coreNativeManager);
 }
