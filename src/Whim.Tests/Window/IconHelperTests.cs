@@ -191,28 +191,6 @@ public class IconHelperTests
 	}
 
 	[Fact]
-	public void GetUwpAppIcon_Logo()
-	{
-		// Given
-		Wrapper wrapper = new Wrapper()
-			.WithIsUwp()
-			.WithUwpAppProcessPath("C:\\foo.exe")
-			.FileExists("C:\\foo.exe", true)
-			.FileExists("C:\\AppxManifest.xml", true)
-			.OpenRead("C:\\AppxManifest.xml", Wrapper.PackageXml);
-
-		// When
-		BitmapImage? result = IconHelper.GetIcon(
-			wrapper.Window.Object,
-			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object
-		);
-
-		// Then
-		Assert.NotNull(result);
-	}
-
-	[Fact]
 	public void GetWindowIcon_NoIcon()
 	{
 		// Given

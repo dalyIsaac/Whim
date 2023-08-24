@@ -17,7 +17,7 @@ public class TransparentWindowController : IDisposable
 
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
-	private readonly Microsoft.UI.Xaml.Window _window;
+	private readonly HWND _hwnd;
 	private readonly SUBCLASSPROC _subclassProc;
 	private bool _disposedValue;
 
@@ -26,19 +26,26 @@ public class TransparentWindowController : IDisposable
 		ICoreNativeManager coreNativeManager,
 		Microsoft.UI.Xaml.Window window
 	)
+		: this(context, coreNativeManager, window.GetHandle(), window.As<ICompositionSupportsSystemBackdrop>()) { }
+
+	internal TransparentWindowController(
+		IContext context,
+		ICoreNativeManager coreNativeManager,
+		HWND hWND,
+		ICompositionSupportsSystemBackdrop brushHolder
+	)
 	{
 		_context = context;
 		_coreNativeManager = coreNativeManager;
-		_window = window;
+		_hwnd = hWND;
 
-		_coreNativeManager.EnableBlurBehindWindow(_window.GetHandle());
-		ICompositionSupportsSystemBackdrop brushHolder = window.As<ICompositionSupportsSystemBackdrop>();
+		_coreNativeManager.EnableBlurBehindWindow(_hwnd);
 		brushHolder.SystemBackdrop = _context.NativeManager.Compositor.CreateColorBrush(
 			Windows.UI.Color.FromArgb(0, 255, 255, 255)
 		);
 
 		_subclassProc = new SUBCLASSPROC(WindowProc);
-		_coreNativeManager.SetWindowSubclass(_window.GetHandle(), _subclassProc, SUBCLASSID, 0);
+		_coreNativeManager.SetWindowSubclass(_hwnd, _subclassProc, SUBCLASSID, 0);
 	}
 
 	/// <summary>
@@ -76,16 +83,10 @@ public class TransparentWindowController : IDisposable
 	{
 		if (!_disposedValue)
 		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-			}
-
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
 			_disposedValue = true;
-
-			_coreNativeManager.RemoveWindowSubclass(_window.GetHandle(), _subclassProc, SUBCLASSID);
+			_coreNativeManager.RemoveWindowSubclass(_hwnd, _subclassProc, SUBCLASSID);
 		}
 	}
 
