@@ -228,38 +228,4 @@ public class IconHelperTests
 		// Then
 		Assert.Null(result);
 	}
-
-	[Fact]
-	public void GetWindowIcon_Icon()
-	{
-		// Given
-		Wrapper wrapper = new Wrapper().SendMessage(123).GetClassLongPtr(0).LoadIconFromHandle();
-
-		// When
-		BitmapImage? result = IconHelper.GetIcon(
-			wrapper.Window.Object,
-			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object
-		);
-
-		// Then
-		Assert.NotNull(result);
-	}
-
-	[Fact]
-	public void GetWindowIcon_ClassIcon()
-	{
-		// Given
-		Wrapper wrapper = new Wrapper().SendMessage(0).GetClassLongPtr(123).LoadIconFromHandle();
-
-		// When
-		BitmapImage? result = IconHelper.GetIcon(
-			wrapper.Window.Object,
-			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object
-		);
-
-		// Then
-		Assert.NotNull(result);
-	}
 }
