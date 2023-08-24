@@ -50,7 +50,10 @@ internal class KeybindHook : IDisposable
 			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 
-		KBDLLHOOKSTRUCT kbdll = _coreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
+		if (_coreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(lParam) is not KBDLLHOOKSTRUCT kbdll)
+		{
+			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		}
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
 
 		// If one of the following keys are pressed, and they're the only key pressed,

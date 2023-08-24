@@ -312,7 +312,7 @@ internal class CoreNativeManager : ICoreNativeManager
 		PInvoke.GetDpiForMonitor(hmonitor, dpiType, out dpiX, out dpiY);
 
 	/// <inheritdoc/>
-	public T PtrToStructure<T>(IntPtr ptr)
+	public T? PtrToStructure<T>(IntPtr ptr)
 		where T : struct => Marshal.PtrToStructure<T>(ptr);
 
 	/// <inheritdoc/>

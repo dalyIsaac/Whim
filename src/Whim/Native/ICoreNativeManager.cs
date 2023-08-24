@@ -449,7 +449,7 @@ internal interface ICoreNativeManager
 	/// <returns>A managed object that contains the data that the ptr parameter points to.</returns>
 	/// <exception cref="ArgumentException">The layout of T is not sequential or explicit.</exception>
 	/// <exception cref="MissingMethodException">The class specified by T does not have an accessible parameterless constructor.</exception>
-	T PtrToStructure<T>(nint ptr)
+	T? PtrToStructure<T>(nint ptr)
 		where T : struct;
 
 	/// <summary>Registers the specified window to receive session change notifications.</summary>

@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -64,7 +63,7 @@ internal class MouseHook : IMouseHook, IDisposable
 		if (
 			lParam != 0
 			&& eventHandler is EventHandler<MouseEventArgs> handler
-			&& (MSLLHOOKSTRUCT?)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT)) is MSLLHOOKSTRUCT mouseHookStruct
+			&& _coreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(lParam) is MSLLHOOKSTRUCT mouseHookStruct
 		)
 		{
 			handler.Invoke(
