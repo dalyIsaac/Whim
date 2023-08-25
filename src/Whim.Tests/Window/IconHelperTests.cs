@@ -50,7 +50,6 @@ public class IconHelperTests
 		public Mock<IFileManager> FileManager { get; } = new();
 		public Mock<IContext> Context { get; } = new();
 		public Mock<IWindow> Window { get; } = new();
-		public Icon Icon { get; } = new("../../../../../Whim.Runner/Assets/Icon.ico");
 
 		public Wrapper()
 		{
@@ -100,12 +99,6 @@ public class IconHelperTests
 			CoreNativeManager
 				.Setup(n => n.GetClassLongPtr(Window.Object.Handle, GET_CLASS_LONG_INDEX.GCL_HICON))
 				.Returns(icon);
-			return this;
-		}
-
-		public Wrapper LoadIconFromHandle()
-		{
-			CoreNativeManager.Setup(n => n.LoadIconFromHandle(It.IsAny<nint>())).Returns(Icon);
 			return this;
 		}
 	}
