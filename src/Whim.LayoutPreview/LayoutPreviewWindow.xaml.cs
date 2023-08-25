@@ -44,7 +44,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 	/// <param name="monitor">The monitor corresponding to the <paramref name="cursorPoint"/>.</param>
 	public void Update(IWindowState[] windowStates, IPoint<int> cursorPoint, IWindow movingWindow, IMonitor monitor)
 	{
-		if (!ShouldContinue(windowStates, cursorPoint))
+		if (!ShouldContinue(_prevWindowStates, _prevHoveredIndex, windowStates, cursorPoint))
 		{
 			return;
 		}
@@ -68,27 +68,32 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 
 		LayoutPreviewCanvas.Children.Clear();
 		LayoutPreviewCanvas.Children.AddRange(items);
-		Activate(movingWindow, monitor);
+		Activate(_context, _window, movingWindow, monitor);
 	}
 
-	private bool ShouldContinue(IWindowState[] windowStates, IPoint<int> cursorPoint)
+	internal static bool ShouldContinue(
+		IWindowState[] prevWindowStates,
+		int prevHoveredIndex,
+		IWindowState[] windowStates,
+		IPoint<int> cursorPoint
+	)
 	{
-		if (_prevWindowStates.Length != windowStates.Length)
+		if (prevWindowStates.Length != windowStates.Length)
 		{
 			return true;
 		}
 
 		for (int idx = 0; idx < windowStates.Length; idx++)
 		{
-			if (!_prevWindowStates[idx].Equals(windowStates[idx]))
+			if (!prevWindowStates[idx].Equals(windowStates[idx]))
 			{
 				return true;
 			}
 		}
 
-		if (_prevHoveredIndex != -1)
+		if (prevHoveredIndex != -1)
 		{
-			IWindowState prevHoveredState = _prevWindowStates[_prevHoveredIndex];
+			IWindowState prevHoveredState = prevWindowStates[prevHoveredIndex];
 			if (!prevHoveredState.Location.ContainsPoint(cursorPoint))
 			{
 				return true;
@@ -98,13 +103,13 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 		return false;
 	}
 
-	private void Activate(IWindow movingWindow, IMonitor monitor)
+	internal static void Activate(IContext context, IWindow layoutWindow, IWindow movingWindow, IMonitor monitor)
 	{
-		using WindowDeferPosHandle handle = new(_context);
+		using WindowDeferPosHandle handle = new(context);
 		handle.DeferWindowPos(
 			new WindowState()
 			{
-				Window = _window,
+				Window = layoutWindow,
 				Location = monitor.WorkingArea,
 				WindowSize = WindowSize.Normal
 			},
