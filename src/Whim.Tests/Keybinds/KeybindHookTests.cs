@@ -117,6 +117,25 @@ public class KeybindHookTests
 		wrapper.CoreNativeManager.Verify(c => c.CallNextHookEx(nCode, 0, 0), Times.Once);
 	}
 
+	[Fact]
+	public void KeyboardHook_NotPtrToStructure()
+	{
+		// Given
+		Wrapper wrapper = new();
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()))
+			.Returns(null as KBDLLHOOKSTRUCT?);
+
+		// When
+		keybindHook.PostInitialize();
+		wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+
+		// Then
+		wrapper.CoreNativeManager.Verify(c => c.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()), Times.Once);
+		wrapper.CoreNativeManager.Verify(c => c.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Once);
+	}
+
 	// WM_KEYDOWN and WM_SYSKEYDOWN
 	[InlineData(0x0099)]
 	[InlineData(0x0101)]

@@ -471,7 +471,9 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>())).Returns(("processName", "app/ApplicationFrameHost.exe"));
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
+			.Returns(("processName", "app/ApplicationFrameHost.exe"));
 
 		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
 
@@ -487,7 +489,9 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>())).Returns(("processName", "processFileName"));
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
+			.Returns(("processName", "processFileName"));
 
 		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
 
