@@ -554,6 +554,7 @@ public class WindowManagerTests
 	}
 	#endregion
 
+	#region OnWindowMoved
 	[Fact]
 	public void WindowsEventHook_OnWindowMoved_DoesNotRaise()
 	{
@@ -573,6 +574,66 @@ public class WindowManagerTests
 			h => windowManager.WindowMoved -= h,
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoved_DoesNotRaise_MouseIsUp()
+	{
+		// Given
+		HWND hwnd = new(1);
+		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+		// When
+		windowManager.Initialize();
+		windowManager.PostInitialize();
+
+		wrapper.Trigger_MouseLeftButtonDown().Trigger_MouseLeftButtonUp();
+
+		// Then
+		WhimAssert.DoesNotRaise<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
+	}
+
+	[Fact]
+	public void WindowsEventHook_OnWindowMoved_GetCursorPos()
+	{
+		// Given
+		HWND hwnd = new(1);
+		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMinimized(hwnd)).Returns(false);
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		windowManager.PostInitialize();
+
+		wrapper.Trigger_MouseLeftButtonDown();
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny))
+			.Callback(
+				(out IPoint<int> point) =>
+				{
+					point = new Point<int>(1, 2);
+				}
+			)
+			.Returns(true);
+
+		// When
+		windowManager.Initialize();
+		var result = Assert.Raises<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Once);
+		Assert.NotNull(result.Arguments.CursorDraggedPoint);
 	}
 
 	[Fact]
@@ -596,6 +657,7 @@ public class WindowManagerTests
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
 	}
+	#endregion
 
 	[Fact]
 	public void WindowsEventHook_OnWindowMinimizeStart()
@@ -1069,7 +1131,7 @@ public class WindowManagerTests
 	}
 
 	[Fact]
-	public void WindowsEventHook_OnWindowMoved_GetCursorPos()
+	public void WindowsEventHook_OnWindowMoveEnd_GetCursorPos()
 	{
 		// Given
 		Wrapper wrapper = new();
