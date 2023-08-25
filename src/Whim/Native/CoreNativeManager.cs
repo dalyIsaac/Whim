@@ -119,7 +119,7 @@ internal class CoreNativeManager : ICoreNativeManager
 	public BOOL SetForegroundWindow(HWND hWnd) => PInvoke.SetForegroundWindow(hWnd);
 
 	/// <inheritdoc />
-	public uint SendInput(Span<INPUT> pInputs, int cbSize) => PInvoke.SendInput(pInputs, cbSize);
+	public uint SendInput(INPUT[] pInputs, int cbSize) => PInvoke.SendInput(pInputs, cbSize);
 
 	/// <inheritdoc/>
 	public BOOL BringWindowToTop(HWND hWnd) => PInvoke.BringWindowToTop(hWnd);

@@ -18,7 +18,7 @@ internal class WindowManager : IWindowManager
 	public event EventHandler<WindowEventArgs>? WindowRemoved;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
-	public event EventHandler<WindowEventArgs>? WindowMoveEnd;
+	public event EventHandler<WindowMovedEventArgs>? WindowMoveEnd;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
 
@@ -374,6 +374,7 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Debug($"Window move ended: {window}");
 
+		IPoint<int>? point = null;
 		lock (_mouseMoveLock)
 		{
 			if (!_isMovingWindow)
@@ -381,14 +382,14 @@ internal class WindowManager : IWindowManager
 				return;
 			}
 
-			if (!TryMoveWindowEdgesInDirection(window) && _coreNativeManager.GetCursorPos(out IPoint<int> point))
+			if (!TryMoveWindowEdgesInDirection(window) && _coreNativeManager.GetCursorPos(out point))
 			{
 				_context.WorkspaceManager.MoveWindowToPoint(window, point);
 			}
 
 			_isMovingWindow = false;
 		}
-		WindowMoveEnd?.Invoke(this, new WindowEventArgs() { Window = window });
+		WindowMoveEnd?.Invoke(this, new WindowMovedEventArgs() { Window = window, CursorDraggedPoint = point });
 	}
 
 	/// <summary>

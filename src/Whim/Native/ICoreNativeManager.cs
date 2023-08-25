@@ -268,7 +268,7 @@ internal interface ICoreNativeManager
 	/// <param name="pInputs"></param>
 	/// <param name="cbSize"></param>
 	/// <returns></returns>
-	uint SendInput(Span<INPUT> pInputs, int cbSize);
+	uint SendInput(INPUT[] pInputs, int cbSize);
 
 	/// <summary>
 	/// Brings the specified window to the top of the Z order. If the window is a top-level window, it is activated. If the window is a child window, the top-level parent window associated with the child window is activated.

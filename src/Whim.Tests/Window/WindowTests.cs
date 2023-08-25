@@ -1,6 +1,8 @@
 using Moq;
+using System;
 using System.ComponentModel;
 using Windows.Win32.Foundation;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;
 
 namespace Whim.Tests;
@@ -11,11 +13,13 @@ public class WindowTests
 	{
 		public Mock<IContext> Context { get; } = new();
 		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
+		public Mock<IWindowManager> WindowManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 
 		public Wrapper()
 		{
 			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
+			Context.Setup(c => c.WindowManager).Returns(WindowManager.Object);
 
 			CoreNativeManager
 				.Setup(cnm => cnm.GetWindowThreadProcessId(It.IsAny<HWND>(), out It.Ref<uint>.IsAny))
@@ -309,12 +313,12 @@ public class WindowTests
 		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
 
 		// When
-		window.Focus();
+		window.FocusForceForeground();
 
 		// Then
 		wrapper.CoreNativeManager.Verify(cnm => cnm.SetForegroundWindow(It.IsAny<HWND>()), Times.Once);
 		// The following code doesn't work because SendInput accepts a Span.
-		// wrapper.CoreNativeManager.Verify(cnm => cnm.SendInput(It.IsAny<INPUT[]>(), It.IsAny<int>()), Times.Once);
+		wrapper.CoreNativeManager.Verify(cnm => cnm.SendInput(It.IsAny<INPUT[]>(), It.IsAny<int>()), Times.Once);
 	}
 
 	[Fact]

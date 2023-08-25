@@ -106,9 +106,8 @@ internal class Window : IWindow
 		unsafe
 		{
 			INPUT input = new() { type = INPUT_TYPE.INPUT_MOUSE };
-			INPUT[] inputs = new[] { input };
 			// Send empty mouse event. This makes this thread the last to send input, and hence allows it to pass foreground permission checks
-			_ = _coreNativeManager.SendInput(inputs, sizeof(INPUT));
+			_ = _coreNativeManager.SendInput(new[] { input }, sizeof(INPUT));
 		}
 
 		_coreNativeManager.SetForegroundWindow(Handle);

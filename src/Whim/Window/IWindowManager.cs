@@ -64,7 +64,7 @@ public interface IWindowManager : IDisposable
 	/// <see cref="Windows.Win32.PInvoke.EVENT_SYSTEM_MOVESIZEEND"/> event.
 	/// See https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants for more information.
 	/// </summary>
-	event EventHandler<WindowEventArgs>? WindowMoveEnd;
+	event EventHandler<WindowMovedEventArgs>? WindowMoveEnd;
 
 	/// <summary>
 	/// Event for when a window has started being minimized.
