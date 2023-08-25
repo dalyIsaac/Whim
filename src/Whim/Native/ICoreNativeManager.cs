@@ -74,7 +74,7 @@ internal interface ICoreNativeManager
 	/// </summary>
 	/// <param name="lpPoint"></param>
 	/// <returns></returns>
-	BOOL GetCursorPos(out System.Drawing.Point lpPoint);
+	BOOL GetCursorPos(out IPoint<int> lpPoint);
 
 	/// <summary>
 	/// Get the coordinates for the left-side of the virtual screen.

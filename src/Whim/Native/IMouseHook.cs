@@ -5,8 +5,15 @@ namespace Whim;
 /// <summary>
 /// Event arguments for mouse events.
 /// </summary>
-/// <param name="Point">The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.</param>
-internal record MouseEventArgs(IPoint<int> Point);
+internal class MouseEventArgs : EventArgs
+{
+	public IPoint<int> Point { get; }
+
+	public MouseEventArgs(IPoint<int> point)
+	{
+		Point = point;
+	}
+}
 
 internal interface IMouseHook
 {

@@ -18,6 +18,17 @@ public record Point<T> : IPoint<T>
 	public Point() { }
 
 	/// <summary>
+	/// Creates a point with the given <paramref name="x"/> and <paramref name="y"/> values.
+	/// </summary>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	public Point(T x, T y)
+	{
+		X = x;
+		Y = y;
+	}
+
+	/// <summary>
 	/// Creates a new copy of <paramref name="point"/>.
 	/// </summary>
 	/// <param name="point"></param>

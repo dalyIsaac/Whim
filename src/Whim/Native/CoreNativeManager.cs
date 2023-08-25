@@ -45,7 +45,12 @@ internal class CoreNativeManager : ICoreNativeManager
 	public short GetKeyState(int nVirtKey) => PInvoke.GetKeyState(nVirtKey);
 
 	/// <inheritdoc/>
-	public BOOL GetCursorPos(out Point lpPoint) => PInvoke.GetCursorPos(out lpPoint);
+	public BOOL GetCursorPos(out IPoint<int> lpPoint)
+	{
+		bool res = PInvoke.GetCursorPos(out Point point);
+		lpPoint = new Point<int>(point.X, point.Y);
+		return res;
+	}
 
 	/// <inheritdoc/>
 	public int GetVirtualScreenLeft() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN);

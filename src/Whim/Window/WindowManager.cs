@@ -358,12 +358,9 @@ internal class WindowManager : IWindowManager
 		}
 
 		IPoint<int>? cursorPoint = null;
-		if (_isLeftMouseButtonDown)
+		if (_isLeftMouseButtonDown && _coreNativeManager.GetCursorPos(out IPoint<int> point))
 		{
-			if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
-			{
-				cursorPoint = new Point<int>() { X = point.X, Y = point.Y };
-			}
+			cursorPoint = point;
 		}
 
 		WindowMoveStart?.Invoke(this, new WindowMovedEventArgs() { Window = window, CursorDraggedPoint = cursorPoint });
@@ -384,12 +381,9 @@ internal class WindowManager : IWindowManager
 				return;
 			}
 
-			if (!TryMoveWindowEdgesInDirection(window))
+			if (!TryMoveWindowEdgesInDirection(window) && _coreNativeManager.GetCursorPos(out IPoint<int> point))
 			{
-				if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
-				{
-					_context.WorkspaceManager.MoveWindowToPoint(window, new Point<int>() { X = point.X, Y = point.Y });
-				}
+				_context.WorkspaceManager.MoveWindowToPoint(window, point);
 			}
 
 			_isMovingWindow = false;
@@ -490,12 +484,9 @@ internal class WindowManager : IWindowManager
 		}
 
 		IPoint<int>? cursorPoint = null;
-		if (_isLeftMouseButtonDown)
+		if (_isLeftMouseButtonDown && _coreNativeManager.GetCursorPos(out IPoint<int> point))
 		{
-			if (_coreNativeManager.GetCursorPos(out System.Drawing.Point point))
-			{
-				cursorPoint = new Point<int>() { X = point.X, Y = point.Y };
-			}
+			cursorPoint = point;
 		}
 
 		WindowMoved?.Invoke(this, new WindowMovedEventArgs() { Window = window, CursorDraggedPoint = cursorPoint });
