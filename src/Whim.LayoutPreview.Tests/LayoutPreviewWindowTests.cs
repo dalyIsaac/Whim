@@ -1,5 +1,4 @@
 using Moq;
-using Windows.Win32.Foundation;
 using Xunit;
 
 namespace Whim.LayoutPreview.Tests;

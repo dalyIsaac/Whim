@@ -665,7 +665,7 @@ public class WindowManagerTests
 	}
 
 	[Fact]
-	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgeInDirection_NoWorkspace()
+	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgesInDirection_NoWorkspace()
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -690,7 +690,7 @@ public class WindowManagerTests
 	}
 
 	[Fact]
-	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgeInDirection_DoesNotContainWindowState()
+	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgesInDirection_DoesNotContainWindowState()
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -724,6 +724,86 @@ public class WindowManagerTests
 		);
 		Assert.Null(result.Arguments.CursorDraggedPoint);
 	}
+
+	// TODO: Remove if coverage isn't necessary
+	//public static IEnumerable<object[]> MoveSameAxisTwice_Data()
+	//{
+	//	yield return new object[]
+	//	{
+	//		new WindowState()
+	//		{
+	//			Location = new Location<int>() { Height = 10, Width = 10 },
+	//			WindowSize = WindowSize.Normal,
+	//			Window = new Mock<IWindow>().Object
+	//		},
+	//		new Location<int>()
+	//		{
+	//			X = 1,
+	//			Height = 10,
+	//			Width = 11
+	//		}
+	//	};
+
+	//	yield return new object[]
+	//	{
+	//		new WindowState()
+	//		{
+	//			Location = new Location<int>() { Height = 10, Width = 10 },
+	//			WindowSize = WindowSize.Normal,
+	//			Window = new Mock<IWindow>().Object
+	//		},
+	//		new Location<int>()
+	//		{
+	//			Y = 1,
+	//			Height = 11,
+	//			Width = 10
+	//		}
+	//	};
+	//}
+
+	//[MemberData(nameof(MoveSameAxisTwice_Data))]
+	//[Theory]
+	//public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgesInDirection_MoveSameAxisTwice(
+	//	IWindowState oldState,
+	//	ILocation<int> newLocation
+	//)
+	//{
+	//	// Given
+	//	HWND hwnd = new(1);
+	//	Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+
+	//	Mock<IWorkspace> workspace = new();
+	//	workspace.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>())).Returns(oldState);
+
+	//	wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+	//	wrapper.CoreNativeManager.Setup(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny)).Returns(true);
+
+	//	wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(hwnd)).Returns(newLocation);
+
+	//	WindowManager windowManager =
+	//		new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+	//	// When
+	//	Assert.Raises<WindowMovedEventArgs>(
+	//		h => windowManager.WindowMoveEnd += h,
+	//		h => windowManager.WindowMoveEnd -= h,
+	//		() =>
+	//		{
+	//			windowManager.Initialize();
+	//			wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+	//			wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+	//		}
+	//	);
+
+	//	// Then
+	//	workspace.Verify(w => w.TryGetWindowLocation(It.IsAny<IWindow>()), Times.Once);
+	//	wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
+	//	wrapper.WorkspaceManager.Verify(
+	//		wm => wm.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<int>>(), It.IsAny<IWindow>()),
+	//		Times.Never
+	//	);
+	//	wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Once);
+	//}
 
 	[Fact]
 	public void WindowsEventHook_OnWindowMoveEnd_MoveWindowToPoint()
@@ -762,7 +842,7 @@ public class WindowManagerTests
 	#endregion
 
 	[Fact]
-	public void WindowsEventHook_OnWindowMoved_TryMoveWindowEdgeInDirection_CannotGetNewWindowLocation()
+	public void WindowsEventHook_OnWindowMoved_TryMoveWindowEdgesInDirection_CannotGetNewWindowLocation()
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -823,7 +903,7 @@ public class WindowManagerTests
 
 	[MemberData(nameof(MoveTooManyEdgesData))]
 	[Theory]
-	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgeInDirection_MoveTooManyEdges(
+	public void WindowsEventHook_OnWindowMoveEnd_TryMoveWindowEdgesInDirection_MoveTooManyEdges(
 		ILocation<int> originalLocation,
 		ILocation<int> newLocation
 	)
@@ -943,7 +1023,7 @@ public class WindowManagerTests
 
 	[Theory]
 	[MemberData(nameof(MoveEdgesSuccessData))]
-	public void WindowsEventHook_OnWindowMoved_Success(
+	public void WindowsEventHook_OnWindowMoveEnd_Success(
 		ILocation<int> originalLocation,
 		ILocation<int> newLocation,
 		Direction direction,
@@ -981,10 +1061,11 @@ public class WindowManagerTests
 
 		// Then
 		Assert.Raises<WindowMovedEventArgs>(
-			h => windowManager.WindowMoved += h,
-			h => windowManager.WindowMoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+			h => windowManager.WindowMoveEnd += h,
+			h => windowManager.WindowMoveEnd -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0)
 		);
+		wrapper.WorkspaceManager.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
 	}
 
 	[Fact]

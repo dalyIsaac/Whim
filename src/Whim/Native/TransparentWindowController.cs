@@ -26,18 +26,11 @@ public class TransparentWindowController : IDisposable
 		ICoreNativeManager coreNativeManager,
 		Microsoft.UI.Xaml.Window window
 	)
-		: this(context, coreNativeManager, window.GetHandle(), window.As<ICompositionSupportsSystemBackdrop>()) { }
-
-	internal TransparentWindowController(
-		IContext context,
-		ICoreNativeManager coreNativeManager,
-		HWND hWND,
-		ICompositionSupportsSystemBackdrop brushHolder
-	)
 	{
 		_context = context;
 		_coreNativeManager = coreNativeManager;
-		_hwnd = hWND;
+		_hwnd = window.GetHandle();
+		ICompositionSupportsSystemBackdrop brushHolder = window.As<ICompositionSupportsSystemBackdrop>();
 
 		_coreNativeManager.EnableBlurBehindWindow(_hwnd);
 		brushHolder.SystemBackdrop = _context.NativeManager.Compositor.CreateColorBrush(

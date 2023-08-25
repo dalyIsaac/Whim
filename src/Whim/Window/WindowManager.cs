@@ -476,7 +476,6 @@ internal class WindowManager : IWindowManager
 
 	private void OnWindowMoved(IWindow window)
 	{
-		// TODO: This event gets called every time focus changes - should this be whittled down?
 		Logger.Debug($"Window moved: {window}");
 
 		if (!_isMovingWindow)
