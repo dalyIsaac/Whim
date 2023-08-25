@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,38 @@ namespace Whim.Tests;
 )]
 public class WindowManagerTests
 {
+	private class FakeSafeHandle : UnhookWinEventSafeHandle
+	{
+		public bool HasDisposed { get; set; }
+
+		private bool _isInvalid;
+		public override bool IsInvalid => _isInvalid;
+
+		public FakeSafeHandle(bool isInvalid, bool isClosed)
+			: base(default, default)
+		{
+			_isInvalid = isInvalid;
+
+			if (isClosed)
+			{
+				Close();
+			}
+		}
+
+		public void MarkAsInvalid() => _isInvalid = true;
+
+		protected override bool ReleaseHandle()
+		{
+			return true;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			HasDisposed = true;
+			base.Dispose(disposing);
+		}
+	}
+
 	private class Wrapper
 	{
 		public Mock<IContext> Context = new();
@@ -34,7 +67,9 @@ public class WindowManagerTests
 		public Mock<IWindowMessageMonitor> WindowMessageMonitor = new();
 		public Mock<IFilterManager> FilterManager = new();
 
-		public WINEVENTPROC? WinEventProc;
+		public List<FakeSafeHandle> Handles = new();
+
+		public WINEVENTPROC? WinEventProc { get; set; }
 
 		private uint _processId = 1;
 		public uint ProcessId => _processId;
@@ -62,8 +97,14 @@ public class WindowManagerTests
 			// Capture the delegate passed to SetWinEventHook
 			CoreNativeManager
 				.Setup(n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()))
-				.Callback<uint, uint, WINEVENTPROC>((_, _, proc) => WinEventProc = proc)
-				.Returns(new UnhookWinEventSafeHandle(1));
+				.Callback<uint, uint, WINEVENTPROC>(
+					(_, _, proc) =>
+					{
+						WinEventProc = proc;
+						Handles.Add(new FakeSafeHandle(false, false));
+					}
+				)
+				.Returns(() => Handles[^1]);
 		}
 
 		public Wrapper AllowWindowCreation(HWND hwnd)
@@ -625,6 +666,7 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
+		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
@@ -632,7 +674,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Once);
+		wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Exactly(2));
 		Assert.NotNull(result.Arguments.CursorDraggedPoint);
 	}
 
@@ -1208,4 +1250,107 @@ public class WindowManagerTests
 		// Then
 		wrapper.CoreNativeManager.Verify(cnm => cnm.IsSplashScreen(It.IsAny<HWND>()), Times.Exactly(3));
 	}
+
+	#region Dispose
+	[Fact]
+	public void Dispose_NotInitialized()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+		// When
+		windowManager.Dispose();
+
+		// Then
+		Assert.Empty(wrapper.Handles);
+	}
+
+	[Fact]
+	public void Dispose_IsClosed()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		wrapper.CoreNativeManager
+			.Setup(n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()))
+			.Callback<uint, uint, WINEVENTPROC>(
+				(_, _, proc) =>
+				{
+					wrapper.WinEventProc = proc;
+					wrapper.Handles.Add(new FakeSafeHandle(false, true));
+				}
+			)
+			.Returns(() => wrapper.Handles[^1]);
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+		windowManager.Initialize();
+
+		wrapper.Handles.ForEach(h => h.HasDisposed = false);
+
+		// When
+		windowManager.Dispose();
+
+		// Then
+		wrapper.Handles.Should().OnlyContain(h => !h.HasDisposed);
+	}
+
+	[Fact]
+	public void Dispose_IsInvalid()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		wrapper.CoreNativeManager
+			.Setup(n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()))
+			.Callback<uint, uint, WINEVENTPROC>(
+				(_, _, proc) =>
+				{
+					wrapper.WinEventProc = proc;
+					wrapper.Handles.Add(new FakeSafeHandle(false, true));
+				}
+			)
+			.Returns(() => wrapper.Handles[^1]);
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+		windowManager.Initialize();
+
+		wrapper.Handles.ForEach(h =>
+		{
+			h.HasDisposed = false;
+			h.MarkAsInvalid();
+		});
+
+		// When
+		windowManager.Dispose();
+
+		// Then
+		wrapper.Handles.Should().OnlyContain(h => !h.HasDisposed);
+	}
+
+	[Fact]
+	public void Dispose_Success()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+		windowManager.Initialize();
+
+		// When
+		windowManager.Dispose();
+		windowManager.Dispose();
+
+		// Then
+		wrapper.Handles.Should().OnlyContain(h => h.HasDisposed);
+	}
+	#endregion
 }
