@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 using Moq;
-using System.Drawing;
 using System.IO;
 using System.Text;
 using Windows.Win32;

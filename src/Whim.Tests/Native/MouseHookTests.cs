@@ -106,36 +106,44 @@ public class MouseHookTests
 	public void OnMouseTriggerEvent_Success_WM_LBUTTONDOWN()
 	{
 		// Given
-		Wrapper wrapper = new Wrapper().PtrToStructure(new MSLLHOOKSTRUCT());
+		System.Drawing.Point point = new(1, 2);
+		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
+		Wrapper wrapper = new Wrapper().PtrToStructure(msllhookstruct);
 		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
 
 		// When
 		mouseHook.PostInitialize();
 
 		// Then
-		Assert.Raises<MouseEventArgs>(
+		var result = Assert.Raises<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,
 			h => mouseHook.MouseLeftButtonDown -= h,
 			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1)
 		);
+		Assert.Equal(point.X, result.Arguments.Point.X);
+		Assert.Equal(point.Y, result.Arguments.Point.Y);
 	}
 
 	[Fact]
 	public void OnMouseTriggerEvent_Success_WM_LBUTTONUP()
 	{
 		// Given
-		Wrapper wrapper = new Wrapper().PtrToStructure(new MSLLHOOKSTRUCT());
+		System.Drawing.Point point = new(1, 2);
+		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
+		Wrapper wrapper = new Wrapper().PtrToStructure(msllhookstruct);
 		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
 
 		// When
 		mouseHook.PostInitialize();
 
 		// Then
-		Assert.Raises<MouseEventArgs>(
+		var result = Assert.Raises<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonUp += h,
 			h => mouseHook.MouseLeftButtonUp -= h,
 			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONUP, 1)
 		);
+		Assert.Equal(point.X, result.Arguments.Point.X);
+		Assert.Equal(point.Y, result.Arguments.Point.Y);
 	}
 
 	[Fact]

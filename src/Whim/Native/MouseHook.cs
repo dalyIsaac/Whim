@@ -66,10 +66,7 @@ internal class MouseHook : IMouseHook, IDisposable
 			&& _coreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(lParam) is MSLLHOOKSTRUCT mouseHookStruct
 		)
 		{
-			handler.Invoke(
-				this,
-				new MouseEventArgs(new Point<int>() { X = mouseHookStruct.pt.X, Y = mouseHookStruct.pt.Y })
-			);
+			handler.Invoke(this, new MouseEventArgs(new Point<int>(mouseHookStruct.pt.X, mouseHookStruct.pt.Y)));
 		}
 	}
 

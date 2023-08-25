@@ -464,4 +464,38 @@ public class WindowTests
 		// Then
 		Assert.Equal(hashCode, 123.GetHashCode());
 	}
+
+	#region IsUwp
+	[Fact]
+	public void IsUwp_True()
+	{
+		// Given
+		Wrapper wrapper = new();
+		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>())).Returns(("processName", "app/ApplicationFrameHost.exe"));
+
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		bool isUwp = window.IsUwp;
+
+		// Then
+		Assert.True(isUwp);
+	}
+
+	[Fact]
+	public void IsUwp_False()
+	{
+		// Given
+		Wrapper wrapper = new();
+		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>())).Returns(("processName", "processFileName"));
+
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		bool isUwp = window.IsUwp;
+
+		// Then
+		Assert.False(isUwp);
+	}
+	#endregion
 }
