@@ -81,19 +81,13 @@ public class WindowManagerTests
 
 		public Wrapper Trigger_MouseLeftButtonDown()
 		{
-			MouseHook.Raise(
-				m => m.MouseLeftButtonDown += null,
-				new MouseEventArgs(new Point<int>() { X = 1, Y = 2 })
-			);
+			MouseHook.Raise(m => m.MouseLeftButtonDown += null, new MouseEventArgs(new Point<int>() { X = 1, Y = 2 }));
 			return this;
 		}
 
 		public Wrapper Trigger_MouseLeftButtonUp()
 		{
-			MouseHook.Raise(
-				m => m.MouseLeftButtonUp += null,
-				new MouseEventArgs(new Point<int>() { X = 1, Y = 2 })
-			);
+			MouseHook.Raise(m => m.MouseLeftButtonUp += null, new MouseEventArgs(new Point<int>() { X = 1, Y = 2 }));
 			return this;
 		}
 	}
