@@ -28,6 +28,7 @@ public sealed partial class LayoutPreviewWindowItem : UserControl
 
 		InitializeComponent();
 
+		// Set the color for this item.
 		Color tintColor;
 		if (isHovered)
 		{
@@ -49,6 +50,10 @@ public sealed partial class LayoutPreviewWindowItem : UserControl
 		};
 	}
 
+	/// <summary>
+	/// Get the current accent color.
+	/// </summary>
+	/// <returns></returns>
 	private static Color GetHoverTintColor()
 	{
 		Color accentColor = new UISettings().GetColorValue(UIColorType.Accent);

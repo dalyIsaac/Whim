@@ -44,11 +44,13 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 	/// <param name="monitor">The monitor corresponding to the <paramref name="cursorPoint"/>.</param>
 	public void Update(IWindowState[] windowStates, IPoint<int> cursorPoint, IWindow movingWindow, IMonitor monitor)
 	{
+		// Only update the rendered window if the window states have changed.
 		if (!ShouldContinue(_prevWindowStates, _prevHoveredIndex, windowStates, cursorPoint))
 		{
 			return;
 		}
 
+		// Update the rendered window.
 		_prevWindowStates = windowStates;
 
 		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
@@ -71,6 +73,14 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 		Activate(_context, _window, movingWindow, monitor);
 	}
 
+	/// <summary>
+	/// Detects whether the new window states are different from the previous window states.
+	/// </summary>
+	/// <param name="prevWindowStates"></param>
+	/// <param name="prevHoveredIndex"></param>
+	/// <param name="windowStates"></param>
+	/// <param name="cursorPoint"></param>
+	/// <returns></returns>
 	internal static bool ShouldContinue(
 		IWindowState[] prevWindowStates,
 		int prevHoveredIndex,
