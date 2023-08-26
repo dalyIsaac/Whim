@@ -7,13 +7,11 @@ namespace Whim;
 /// </summary>
 public interface IFileManager
 {
-	// TODO: make internal only
 	/// <summary>
 	/// The path to the Whim directory.
 	/// </summary>
 	string WhimDir { get; }
 
-	// TODO: make internal only
 	/// <summary>
 	/// The path to the saved state directory.
 	/// </summary>
