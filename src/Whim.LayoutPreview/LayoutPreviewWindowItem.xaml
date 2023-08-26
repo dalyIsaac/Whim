@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+	x:Class="Whim.LayoutPreview.LayoutPreviewWindowItem"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="using:Whim.LayoutPreview"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Width="{x:Bind Path=WindowState.Location.Width}"
+	Height="{x:Bind Path=WindowState.Location.Height}"
+	HorizontalContentAlignment="Stretch"
+	VerticalContentAlignment="Stretch"
+	mc:Ignorable="d">
+
+	<RelativePanel x:Name="Panel" CornerRadius="4">
+		<StackPanel RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
+			<Image
+				Width="32"
+				Height="32"
+				Margin="8"
+				Source="{x:Bind Path=ImageSource}" />
+
+			<TextBlock
+				x:Name="Title"
+				HorizontalTextAlignment="Center"
+				Text="{x:Bind Path=WindowState.Window.Title}"
+				TextWrapping="WrapWholeWords" />
+		</StackPanel>
+	</RelativePanel>
+
+</UserControl>

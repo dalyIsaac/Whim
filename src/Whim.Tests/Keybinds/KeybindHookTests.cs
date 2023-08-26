@@ -117,6 +117,25 @@ public class KeybindHookTests
 		wrapper.CoreNativeManager.Verify(c => c.CallNextHookEx(nCode, 0, 0), Times.Once);
 	}
 
+	[Fact]
+	public void KeyboardHook_NotPtrToStructure()
+	{
+		// Given
+		Wrapper wrapper = new();
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()))
+			.Returns(null as KBDLLHOOKSTRUCT?);
+
+		// When
+		keybindHook.PostInitialize();
+		wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+
+		// Then
+		wrapper.CoreNativeManager.Verify(c => c.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()), Times.Once);
+		wrapper.CoreNativeManager.Verify(c => c.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Once);
+	}
+
 	// WM_KEYDOWN and WM_SYSKEYDOWN
 	[InlineData(0x0099)]
 	[InlineData(0x0101)]
@@ -296,22 +315,6 @@ public class KeybindHookTests
 		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
 
 		// When
-		keybindHook.Dispose();
-
-		// Then
-		Assert.False(wrapper.Handle.HasDisposed);
-	}
-
-	[Fact]
-	public void Dispose_HookIsInvalid()
-	{
-		// Given
-		Wrapper wrapper = new(true);
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		wrapper.SetupKey(Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
-
-		// When
-		keybindHook.PostInitialize();
 		keybindHook.Dispose();
 
 		// Then

@@ -36,5 +36,5 @@ public class LoggerConfig
 	/// <summary>
 	/// The configuration for the debug sink (what Visual Studio connects to).
 	/// </summary>
-	public SinkConfig? DebugSink { get; } = new SinkConfig() { MinLogLevel = LogLevel.Error };
+	public SinkConfig? DebugSink { get; } = new SinkConfig() { MinLogLevel = LogLevel.Verbose };
 }

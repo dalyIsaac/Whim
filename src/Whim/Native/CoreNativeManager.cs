@@ -45,7 +45,12 @@ internal class CoreNativeManager : ICoreNativeManager
 	public short GetKeyState(int nVirtKey) => PInvoke.GetKeyState(nVirtKey);
 
 	/// <inheritdoc/>
-	public BOOL GetCursorPos(out Point lpPoint) => PInvoke.GetCursorPos(out lpPoint);
+	public BOOL GetCursorPos(out IPoint<int> lpPoint)
+	{
+		bool res = PInvoke.GetCursorPos(out Point point);
+		lpPoint = new Point<int>(point.X, point.Y);
+		return res;
+	}
 
 	/// <inheritdoc/>
 	public int GetVirtualScreenLeft() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN);
@@ -64,7 +69,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	/// <inheritdoc/>
 	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData) =>
-		PInvoke.EnumDisplayMonitors(hdc, lprcClip, lpfnEnum, dwData);
+		PInvoke.EnumDisplayMonitors(new HDC(hdc?.DangerousGetHandle() ?? 0), lprcClip, lpfnEnum, dwData);
 
 	/// <inheritdoc/>
 	public BOOL GetPrimaryDisplayWorkArea(out RECT lpRect)
@@ -114,7 +119,7 @@ internal class CoreNativeManager : ICoreNativeManager
 	public BOOL SetForegroundWindow(HWND hWnd) => PInvoke.SetForegroundWindow(hWnd);
 
 	/// <inheritdoc />
-	public uint SendInput(Span<INPUT> pInputs, int cbSize) => PInvoke.SendInput(pInputs, cbSize);
+	public uint SendInput(INPUT[] pInputs, int cbSize) => PInvoke.SendInput(pInputs, cbSize);
 
 	/// <inheritdoc/>
 	public BOOL BringWindowToTop(HWND hWnd) => PInvoke.BringWindowToTop(hWnd);
@@ -167,6 +172,24 @@ internal class CoreNativeManager : ICoreNativeManager
 		List<HWND> windows = new();
 
 		PInvoke.EnumWindows(
+			(handle, param) =>
+			{
+				windows.Add(handle);
+				return (BOOL)true;
+			},
+			0
+		);
+
+		return windows;
+	}
+
+	/// <inheritdoc/>
+	public IEnumerable<HWND> GetChildWindows(HWND hwnd)
+	{
+		List<HWND> windows = new();
+
+		PInvoke.EnumChildWindows(
+			hwnd,
 			(handle, param) =>
 			{
 				windows.Add(handle);
@@ -294,7 +317,7 @@ internal class CoreNativeManager : ICoreNativeManager
 		PInvoke.GetDpiForMonitor(hmonitor, dpiType, out dpiX, out dpiY);
 
 	/// <inheritdoc/>
-	public T PtrToStructure<T>(IntPtr ptr)
+	public T? PtrToStructure<T>(IntPtr ptr)
 		where T : struct => Marshal.PtrToStructure<T>(ptr);
 
 	/// <inheritdoc/>
@@ -331,4 +354,40 @@ internal class CoreNativeManager : ICoreNativeManager
 		using Process process = Process.GetProcessById(processId);
 		return (process.ProcessName, process.MainModule?.FileName);
 	}
+
+	/// <inheritdoc/>
+	public nuint GetClassLongPtr(HWND hWnd, GET_CLASS_LONG_INDEX nIndex) => PInvoke.GetClassLongPtr(hWnd, nIndex);
+
+	/// <inheritdoc/>
+	public LRESULT SendMessage(HWND hWnd, uint Msg, WPARAM wParam, LPARAM lParam) =>
+		PInvoke.SendMessage(hWnd, Msg, wParam, lParam);
+
+	/// <inheritdoc/>
+	public BOOL GetClientRect(HWND hWnd, out RECT lpRect) => PInvoke.GetClientRect(hWnd, out lpRect);
+
+	/// <inheritdoc/>
+	public DeleteObjectSafeHandle CreateSolidBrush(COLORREF crColor) => PInvoke.CreateSolidBrush_SafeHandle(crColor);
+
+	/// <inheritdoc/>
+	public bool EnableBlurBehindWindow(HWND hwnd)
+	{
+		using DeleteObjectSafeHandle rgn = PInvoke.CreateRectRgn_SafeHandle(-2, -2, -1, -1);
+		return PInvoke
+			.DwmEnableBlurBehindWindow(
+				hwnd,
+				new DWM_BLURBEHIND()
+				{
+					dwFlags = PInvoke.DWM_BB_ENABLE | PInvoke.DWM_BB_BLURREGION,
+					fEnable = true,
+					hRgnBlur = new HRGN(rgn.DangerousGetHandle())
+				}
+			)
+			.Succeeded;
+	}
+
+	/// <inheritdoc/>
+	public int FillRect(HDC hDC, in RECT lprc, SafeHandle hbr) => PInvoke.FillRect(hDC, lprc, hbr);
+
+	/// <inheritdoc/>
+	public Icon LoadIconFromHandle(nint hIcon) => Icon.FromHandle(hIcon);
 }

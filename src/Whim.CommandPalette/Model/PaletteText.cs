@@ -15,7 +15,7 @@ public record struct PaletteTextSegment(string Text, bool IsHighlighted)
 	/// <summary>
 	/// Converts the <see cref="PaletteTextSegment"/> to a <see cref="Run"/>.
 	/// </summary>
-	public Run ToRun()
+	public readonly Run ToRun()
 	{
 		string matchText = Text;
 		FontWeight fontWeight = IsHighlighted ? FontWeights.Bold : FontWeights.Normal;

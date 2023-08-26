@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -10,100 +11,111 @@ public interface IWindow
 	/// <summary>
 	/// The handle of the window.
 	/// </summary>
-	public HWND Handle { get; }
+	HWND Handle { get; }
 
 	/// <summary>
 	/// The title of the window.
 	/// </summary>
-	public string Title { get; }
+	string Title { get; }
 
 	/// <summary>
 	/// The name of the class to which the window belongs.
 	/// </summary>
-	public string WindowClass { get; }
+	string WindowClass { get; }
+
+	/// <summary>
+	/// Whether we think that the window is a UWP app.
+	/// </summary>
+	bool IsUwp { get; }
 
 	/// <summary>
 	/// The location of the window.
 	/// </summary>
-	public ILocation<int> Location { get; }
+	ILocation<int> Location { get; }
 
 	/// <summary>
 	/// The center of the window.
 	/// </summary>
-	public IPoint<int> Center { get; }
+	IPoint<int> Center { get; }
 
 	/// <summary>
 	/// The process ID of the window.
 	/// </summary>
-	public int ProcessId { get; }
+	int ProcessId { get; }
+
+	/// <summary>
+	/// The file name of the module.
+	/// </summary>
+	string ProcessFileName { get; }
 
 	/// <summary>
 	/// The fully qualified path that defines the location of the module.
 	/// </summary>
-	public string ProcessFileName { get; }
+	string? ProcessFilePath { get; }
 
 	/// <summary>
 	/// The name that the system uses to identify the process to the user.
 	/// </summary>
-	public string ProcessName { get; }
+	string ProcessName { get; }
 
 	/// <summary>
 	/// Indicates whether the window is focused.
 	/// </summary>
-	public bool IsFocused { get; }
+	bool IsFocused { get; }
 
 	/// <summary>
 	/// Indiciates whether the window is minimized.
 	/// </summary>
-	public bool IsMinimized { get; }
+	bool IsMinimized { get; }
 
 	/// <summary>
 	/// Indicates whether the window is maximised.
 	/// </summary>
-	public bool IsMaximized { get; }
-
-	/// <summary>
-	/// Indicates whether the mouse is moving the window.
-	/// </summary>
-	public bool IsMouseMoving { get; set; }
+	bool IsMaximized { get; }
 
 	/// <summary>
 	/// Moves the focus to this window.
 	/// </summary>
-	public void Focus();
+	void Focus();
 
 	/// <summary>
 	/// Forces the window to the foreground and to be focused.
 	/// </summary>
-	public void FocusForceForeground();
+	void FocusForceForeground();
 
 	/// <summary>
 	/// Hides this window.
 	/// </summary>
-	public void Hide();
+	void Hide();
 
 	/// <summary>
 	/// Displays a window in its most recent size and position. The window is not activated.
 	/// </summary>
-	public void ShowNormal();
+	void ShowNormal();
 
 	/// <summary>
 	/// Activates the window and displays it as a maximized window.
 	/// </summary>
-	public void ShowMaximized();
+	void ShowMaximized();
 
 	/// <summary>
 	/// Activates the window and displays it as a minimized window.
 	/// </summary>
-	public void ShowMinimized();
+	void ShowMinimized();
 
 	/// <summary>
 	/// Brings the window to the top.
 	/// </summary>
-	public void BringToTop();
+	void BringToTop();
 
 	/// <summary>
 	/// Quits the window.
 	/// </summary>
-	public void Close();
+	void Close();
+
+	/// <summary>
+	/// Gets the icon of the window.
+	/// </summary>
+	/// <returns></returns>
+	BitmapImage? GetIcon();
 }

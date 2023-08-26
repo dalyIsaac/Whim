@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Media.Imaging;
 using System.ComponentModel;
 using System.IO;
 using Windows.Win32.Foundation;
@@ -18,6 +19,9 @@ internal class Window : IWindow
 
 	/// <inheritdoc/>
 	public string WindowClass => _context.NativeManager.GetClassName(Handle);
+
+	/// <inheritdoc/>
+	public bool IsUwp => ProcessFileName == "ApplicationFrameHost.exe";
 
 	/// <inheritdoc/>
 	public ILocation<int> Location
@@ -52,6 +56,9 @@ internal class Window : IWindow
 	public required string ProcessFileName { get; init; }
 
 	/// <inheritdoc/>
+	public required string? ProcessFilePath { get; init; }
+
+	/// <inheritdoc/>
 	public required string ProcessName { get; init; }
 
 	/// <inheritdoc/>
@@ -62,9 +69,6 @@ internal class Window : IWindow
 
 	/// <inheritdoc/>
 	public bool IsMaximized => _coreNativeManager.IsWindowMaximized(Handle);
-
-	/// <inheritdoc/>
-	public bool IsMouseMoving { get; set; }
 
 	/// <inheritdoc/>
 	public void BringToTop()
@@ -102,9 +106,8 @@ internal class Window : IWindow
 		unsafe
 		{
 			INPUT input = new() { type = INPUT_TYPE.INPUT_MOUSE };
-			INPUT[] inputs = new[] { input };
 			// Send empty mouse event. This makes this thread the last to send input, and hence allows it to pass foreground permission checks
-			_ = _coreNativeManager.SendInput(inputs, sizeof(INPUT));
+			_ = _coreNativeManager.SendInput(new[] { input }, sizeof(INPUT));
 		}
 
 		_coreNativeManager.SetForegroundWindow(Handle);
@@ -192,6 +195,7 @@ internal class Window : IWindow
 			ProcessId = processId,
 			ProcessName = processName,
 			ProcessFileName = processFileName,
+			ProcessFilePath = processPath
 		};
 	}
 
@@ -214,4 +218,7 @@ internal class Window : IWindow
 
 	/// <inheritdoc/>
 	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle.Value}}}";
+
+	/// <inheritdoc/>
+	public BitmapImage? GetIcon() => this.GetIcon(_context, _coreNativeManager);
 }

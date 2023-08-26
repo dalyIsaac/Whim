@@ -5,6 +5,7 @@
 #r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
 #r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
 #r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
+#r "WHIM_PATH\plugins\Whim.LayoutPreview\Whim.LayoutPreview.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout\Whim.TreeLayout.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.dll"
@@ -17,6 +18,7 @@ using Whim.CommandPalette;
 using Whim.FloatingLayout;
 using Whim.FocusIndicator;
 using Whim.Gaps;
+using Whim.LayoutPreview;
 using Whim.TreeLayout;
 using Whim.TreeLayout.Bar;
 using Whim.TreeLayout.CommandPalette;
@@ -76,6 +78,10 @@ void DoConfig(IContext context)
 	// Tree layout command palette.
 	TreeLayoutCommandPalettePlugin treeLayoutCommandPalettePlugin = new(context, treeLayoutPlugin, commandPalettePlugin);
 	context.PluginManager.AddPlugin(treeLayoutCommandPalettePlugin);
+
+	// Layout preview.
+	LayoutPreviewPlugin layoutPreviewPlugin = new(context);
+	context.PluginManager.AddPlugin(layoutPreviewPlugin);
 
 	// Set up workspaces.
 	context.WorkspaceManager.Add("1");

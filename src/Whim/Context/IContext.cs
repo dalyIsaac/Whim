@@ -16,52 +16,57 @@ public interface IContext
 	/// <summary>
 	/// Whim's <see cref="Logger"/> instances.
 	/// </summary>
-	public Logger Logger { get; }
+	Logger Logger { get; }
 
 	/// <summary>
 	/// Whim's <see cref="IWorkspaceManager"/> instances.
 	/// </summary>
-	public IWorkspaceManager WorkspaceManager { get; }
+	IWorkspaceManager WorkspaceManager { get; }
 
 	/// <summary>
 	/// Whim's <see cref="IWindowManager"/> instances.
 	/// </summary>
-	public IWindowManager WindowManager { get; }
+	IWindowManager WindowManager { get; }
 
 	/// <summary>
 	/// Whim's <see cref="IMonitorManager"/> instances.
 	/// </summary>
-	public IMonitorManager MonitorManager { get; }
+	IMonitorManager MonitorManager { get; }
 
 	/// <summary>
 	/// Whim's <see cref="IRouterManager"/> instances.
 	/// </summary>
-	public IRouterManager RouterManager { get; }
+	IRouterManager RouterManager { get; }
 
 	/// <summary>
 	/// Whim's <see cref="IFilterManager"/> instances.
 	/// </summary>
-	public IFilterManager FilterManager { get; }
+	IFilterManager FilterManager { get; }
 
 	/// <summary>
 	/// Whim's <see cref="ICommand"/>s.
 	/// </summary>
-	public ICommandManager CommandManager { get; }
+	ICommandManager CommandManager { get; }
 
 	/// <summary>
 	/// Whim's keybinds.
 	/// </summary>
-	public IKeybindManager KeybindManager { get; }
+	IKeybindManager KeybindManager { get; }
 
 	/// <summary>
 	/// Whim's <see cref="IPluginManager"/> instances.
 	/// </summary>
-	public IPluginManager PluginManager { get; }
+	IPluginManager PluginManager { get; }
 
 	/// <summary>
 	/// Manager for interacting with native Windows config.
 	/// </summary>
-	public INativeManager NativeManager { get; }
+	INativeManager NativeManager { get; }
+
+	/// <summary>
+	/// Manager to help interacting with the file system.
+	/// </summary>
+	IFileManager FileManager { get; }
 
 	/// <summary>
 	/// This will be called by the Whim Runner.
@@ -70,17 +75,17 @@ public interface IContext
 	/// <exception cref="ConfigLoaderException">
 	/// Thrown if the user's config could not be loaded.
 	/// </exception>
-	public void Initialize();
+	void Initialize();
 
 	/// <summary>
 	/// This event is fired when the context is shutting down.
 	/// </summary>
-	public event EventHandler<ExitEventArgs>? Exiting;
+	event EventHandler<ExitEventArgs>? Exiting;
 
 	/// <summary>
 	/// This event is fired after the context has been shut down.
 	/// </summary>
-	public event EventHandler<ExitEventArgs>? Exited;
+	event EventHandler<ExitEventArgs>? Exited;
 
 	/// <summary>
 	/// This is called to shutdown the context.
@@ -89,5 +94,5 @@ public interface IContext
 	/// The shutdown event arguments. If this is not provided, we assume
 	/// <see cref="ExitReason.User"/>.
 	/// </param>
-	public void Exit(ExitEventArgs? args = null);
+	void Exit(ExitEventArgs? args = null);
 }

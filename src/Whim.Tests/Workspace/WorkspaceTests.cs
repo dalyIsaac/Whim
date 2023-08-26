@@ -193,49 +193,6 @@ public class WorkspaceTests
 		mocks.TriggerWorkspaceLayoutCompleted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Never);
 	}
 
-	[InlineData(true, 0)]
-	[InlineData(false, 1)]
-	[Theory]
-	public void DoLayout(bool isMouseMoving, int showWindowNoActivateTimes)
-	{
-		// Given
-		MocksBuilder mocks = new();
-
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.IsMouseMoving).Returns(isMouseMoving);
-
-		Mock<ILayoutEngine> layoutEngine = new();
-		layoutEngine
-			.Setup(e => e.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()))
-			.Returns(
-				new WindowState[]
-				{
-					new()
-					{
-						Location = new Location<int>(),
-						Window = window.Object,
-						WindowSize = WindowSize.Normal
-					}
-				}
-			);
-
-		using Workspace workspace =
-			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { layoutEngine.Object });
-
-		// When
-		workspace.DoLayout();
-
-		// Then
-		layoutEngine.Verify(e => e.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()), Times.Once);
-		mocks.NativeManager.Verify(
-			n => n.ShowWindowNoActivate(It.IsAny<HWND>()),
-			Times.Exactly(showWindowNoActivateTimes * 2)
-		);
-		mocks.NativeManager.Verify(n => n.EndDeferWindowPos(It.IsAny<HDWP>()), Times.Exactly(2));
-		mocks.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Once);
-		mocks.TriggerWorkspaceLayoutCompleted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Once);
-	}
-
 	[Fact]
 	public void DoLayout_MinimizedWindow()
 	{

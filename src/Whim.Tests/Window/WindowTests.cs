@@ -1,6 +1,7 @@
 using Moq;
 using System.ComponentModel;
 using Windows.Win32.Foundation;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;
 
 namespace Whim.Tests;
@@ -11,11 +12,13 @@ public class WindowTests
 	{
 		public Mock<IContext> Context { get; } = new();
 		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
+		public Mock<IWindowManager> WindowManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 
 		public Wrapper()
 		{
 			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
+			Context.Setup(c => c.WindowManager).Returns(WindowManager.Object);
 
 			CoreNativeManager
 				.Setup(cnm => cnm.GetWindowThreadProcessId(It.IsAny<HWND>(), out It.Ref<uint>.IsAny))
@@ -252,20 +255,6 @@ public class WindowTests
 	}
 
 	[Fact]
-	public void IsMouseMoving()
-	{
-		// Given
-		Wrapper wrapper = new();
-
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
-
-		// Then
-		Assert.False(window.IsMouseMoving);
-		window.IsMouseMoving = true;
-		Assert.True(window.IsMouseMoving);
-	}
-
-	[Fact]
 	public void BringToTop()
 	{
 		// Given
@@ -323,12 +312,12 @@ public class WindowTests
 		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
 
 		// When
-		window.Focus();
+		window.FocusForceForeground();
 
 		// Then
 		wrapper.CoreNativeManager.Verify(cnm => cnm.SetForegroundWindow(It.IsAny<HWND>()), Times.Once);
 		// The following code doesn't work because SendInput accepts a Span.
-		// wrapper.CoreNativeManager.Verify(cnm => cnm.SendInput(It.IsAny<INPUT[]>(), It.IsAny<int>()), Times.Once);
+		wrapper.CoreNativeManager.Verify(cnm => cnm.SendInput(It.IsAny<INPUT[]>(), It.IsAny<int>()), Times.Once);
 	}
 
 	[Fact]
@@ -478,4 +467,42 @@ public class WindowTests
 		// Then
 		Assert.Equal(hashCode, 123.GetHashCode());
 	}
+
+	#region IsUwp
+	[Fact]
+	public void IsUwp_True()
+	{
+		// Given
+		Wrapper wrapper = new();
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
+			.Returns(("processName", "app/ApplicationFrameHost.exe"));
+
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		bool isUwp = window.IsUwp;
+
+		// Then
+		Assert.True(isUwp);
+	}
+
+	[Fact]
+	public void IsUwp_False()
+	{
+		// Given
+		Wrapper wrapper = new();
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
+			.Returns(("processName", "processFileName"));
+
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+
+		// When
+		bool isUwp = window.IsUwp;
+
+		// Then
+		Assert.False(isUwp);
+	}
+	#endregion
 }

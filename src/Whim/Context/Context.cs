@@ -13,7 +13,7 @@ namespace Whim;
 /// </summary>
 internal class Context : IContext
 {
-	internal IFileManager FileManager { get; }
+	public IFileManager FileManager { get; }
 	public Logger Logger { get; }
 	public INativeManager NativeManager { get; }
 	internal ICoreNativeManager CoreNativeManager { get; }
@@ -27,6 +27,7 @@ internal class Context : IContext
 	public IPluginManager PluginManager { get; }
 	public IKeybindManager KeybindManager { get; }
 	internal KeybindHook KeybindHook { get; }
+	internal MouseHook MouseHook { get; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
@@ -38,17 +39,21 @@ internal class Context : IContext
 	{
 		FileManager = new FileManager();
 		Logger = new Logger();
-		NativeManager = new NativeManager(this);
+
 		CoreNativeManager = new CoreNativeManager(this);
+		NativeManager = new NativeManager(this, CoreNativeManager);
+
+		KeybindHook = new KeybindHook(this, CoreNativeManager);
+		MouseHook = new MouseHook(coreNativeManager: CoreNativeManager);
+
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
-		WindowManager = new WindowManager(this, CoreNativeManager);
+		WindowManager = new WindowManager(this, CoreNativeManager, MouseHook);
 		MonitorManager = new MonitorManager(this, CoreNativeManager);
 		WorkspaceManager = new WorkspaceManager(this);
 		_commandManager = new CommandManager();
 		PluginManager = new PluginManager(this, FileManager, _commandManager);
 		KeybindManager = new KeybindManager(this);
-		KeybindHook = new KeybindHook(this, CoreNativeManager);
 	}
 
 	public void Initialize()
@@ -84,6 +89,7 @@ internal class Context : IContext
 		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
 		KeybindHook.PostInitialize();
+		MouseHook.PostInitialize();
 
 		Logger.Debug("Completed initialization");
 	}
@@ -100,6 +106,7 @@ internal class Context : IContext
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
 		KeybindHook.Dispose();
+		MouseHook.Dispose();
 
 		Logger.Debug("Mostly exited...");
 

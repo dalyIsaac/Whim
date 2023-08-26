@@ -518,10 +518,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			foreach (IWindowState loc in locations)
 			{
 				Logger.Verbose($"Setting location of window {loc.Window}");
-				if (loc.Window.IsMouseMoving)
-				{
-					continue;
-				}
 
 				// Adjust the window location to the monitor's coordinates
 				loc.Location = new Location<int>()

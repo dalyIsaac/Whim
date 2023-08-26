@@ -1,23 +1,30 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Windows.System;
+using Windows.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
+using Windows.Win32.System.WinRT;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
 /// <inheritdoc/>
-public class NativeManager : INativeManager
+public partial class NativeManager : INativeManager
 {
 	private readonly IContext _context;
+	private readonly ICoreNativeManager _coreNativeManager;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="NativeManager"/> class.
 	/// </summary>
 	/// <param name="context"></param>
-	public NativeManager(IContext context)
+	/// <param name="coreNativeManager"></param>
+	internal NativeManager(IContext context, ICoreNativeManager coreNativeManager)
 	{
 		_context = context;
+		_coreNativeManager = coreNativeManager;
 	}
 
 	private const int _bufferCapacity = 255;
@@ -201,4 +208,91 @@ public class NativeManager : INativeManager
 
 	/// <inheritdoc />
 	public bool EndDeferWindowPos(HDWP hWinPosInfo) => PInvoke.EndDeferWindowPos(hWinPosInfo);
+
+	/// <inheritdoc />
+	public string? GetUwpAppProcessPath(IWindow window)
+	{
+		if (!window.IsUwp)
+		{
+			Logger.Error("Cannot get UWP app process path for non-UWP window");
+			return null;
+		}
+
+		_coreNativeManager.GetWindowThreadProcessId(window.Handle, out uint pid);
+
+		// UWP apps are hosted inside a ApplicationFrameHost process.
+		// We need to find the child window which does NOT belong to this process.
+		foreach (HWND childHwnd in _coreNativeManager.GetChildWindows(window.Handle))
+		{
+			_coreNativeManager.GetWindowThreadProcessId(childHwnd, out uint childPid);
+
+			if (childPid != pid)
+			{
+				// here we are
+				Process childProc = Process.GetProcessById((int)childPid);
+				return childProc.MainModule?.FileName;
+			}
+		}
+
+		Logger.Error("Cannot find a path to Uwp App executable file for HWND ${hwnd}");
+		return null;
+	}
+
+	private static Compositor? _compositor;
+	private static readonly object _compositorLock = new();
+
+	/// <inheritdoc/>
+	public Compositor Compositor
+	{
+		get
+		{
+			if (_compositor == null)
+			{
+				lock (_compositorLock)
+				{
+#pragma warning disable CA1508 // Avoid dead conditional code, because of the lock.
+					if (_compositor == null)
+					{
+						if (DispatcherQueue.GetForCurrentThread() == null)
+						{
+							InitializeCoreDispatcher();
+						}
+
+						_compositor = new Compositor();
+					}
+#pragma warning restore CA1508 // Avoid dead conditional code
+				}
+			}
+
+			return _compositor;
+		}
+	}
+
+	private static DispatcherQueueController InitializeCoreDispatcher()
+	{
+		// Ideally this would be replaced by the dispatcher from Microsoft.UI.
+		// However, ICompositionSupportsSystemBackdrop.SystemBackdrop uses Windows.UI.
+		DispatcherQueueOptions options =
+			new()
+			{
+				apartmentType = DISPATCHERQUEUE_THREAD_APARTMENTTYPE.DQTAT_COM_STA,
+				threadType = DISPATCHERQUEUE_THREAD_TYPE.DQTYPE_THREAD_CURRENT,
+				dwSize = (uint)Marshal.SizeOf(typeof(DispatcherQueueOptions))
+			};
+
+		PInvoke.CreateDispatcherQueueController(options, out nint raw);
+
+		return DispatcherQueueController.FromAbi(raw);
+	}
+
+	[LibraryImport("UXTheme.dll", EntryPoint = "#138", SetLastError = true)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool _ShouldSystemUseDarkMode();
+
+	/// <inheritdoc/>
+	public bool ShouldSystemUseDarkMode() => _ShouldSystemUseDarkMode();
+
+	/// <inheritdoc/>
+	public TransparentWindowController CreateTransparentWindowController(Microsoft.UI.Xaml.Window window) =>
+		new(_context, _coreNativeManager, window);
 }

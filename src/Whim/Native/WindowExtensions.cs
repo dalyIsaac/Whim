@@ -92,8 +92,11 @@ public static class WindowExtensions
 	/// <see cref="DesktopAcrylicBackdrop"/>.
 	/// </summary>
 	/// <param name="window"></param>
-	public static void SetSystemBackdrop(this Microsoft.UI.Xaml.Window window)
+	/// <param name="micaKind">The mica kind to use, if mica is supported</param>
+	public static void SetSystemBackdrop(this Microsoft.UI.Xaml.Window window, MicaKind micaKind = MicaKind.Base)
 	{
-		window.SystemBackdrop = MicaController.IsSupported() ? new MicaBackdrop() : new DesktopAcrylicBackdrop() { };
+		window.SystemBackdrop = MicaController.IsSupported()
+			? new MicaBackdrop() { Kind = micaKind }
+			: new DesktopAcrylicBackdrop();
 	}
 }
