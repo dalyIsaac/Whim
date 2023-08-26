@@ -10,7 +10,7 @@ namespace Whim.TreeLayout;
 
 internal record NonRootWindowData(
 	ISplitNode RootSplitNode,
-	INode WindowNode,
+	WindowNode WindowNode,
 	IReadOnlyList<ISplitNode> WindowAncestors,
 	ImmutableArray<int> WindowPath,
 	ILocation<double> WindowLocation
@@ -364,7 +364,7 @@ public class TreeLayoutEngine : ILayoutEngine
 
 		return new NonRootWindowData(
 			rootSplitNode,
-			windowResult.Node,
+			(WindowNode)windowResult.Node,
 			windowResult.Ancestors,
 			windowPath,
 			windowResult.Location
@@ -610,10 +610,61 @@ public class TreeLayoutEngine : ILayoutEngine
 		}
 
 		// If the parents are different, we need to swap the window nodes.
-		ISplitNode newWindowParent = windowParent.Replace(windowData.WindowPath[^1], adjacentResult.WindowNode);
-		ISplitNode newAdjacentParent = adjacentParent.Replace(adjacentResult.Path[^1], windowData.WindowNode);
+		return SwapAdjacentNodes(
+			windowData.WindowPath,
+			windowData.WindowAncestors,
+			windowData.WindowNode,
+			adjacentResult.Path,
+			adjacentResult.Ancestors,
+			adjacentResult.WindowNode
+		);
+	}
 
-		return CreateNewEngine(windowData.WindowAncestors, windowData.WindowPath[..^1], _windows, newWindowParent)
-			.CreateNewEngine(adjacentResult.Ancestors, adjacentResult.Path[..^1], _windows, newAdjacentParent);
+	private TreeLayoutEngine SwapAdjacentNodes(
+		ImmutableArray<int> aPath,
+		IReadOnlyList<ISplitNode> aNodeAncestors,
+		WindowNode aNode,
+		ImmutableArray<int> bPath,
+		IReadOnlyList<ISplitNode> bNodeAncestors,
+		WindowNode bNode
+	)
+	{
+		// A's path should be longer than B's path.
+		if (aPath.Length < bPath.Length)
+		{
+			(aPath, aNode, aNodeAncestors, bPath, bNode, _) = (
+				bPath,
+				bNode,
+				bNodeAncestors,
+				aPath,
+				aNode,
+				aNodeAncestors
+			);
+		}
+
+		// Rebuild the tree from the bottom up.
+		INode currentNode = bNode;
+		int parentIdx = 0;
+
+		for (int idx = aPath.Length - 1; idx >= 0; idx--)
+		{
+			ISplitNode parent = aNodeAncestors[idx];
+			ISplitNode newParent = parent.Replace(aPath[idx], currentNode);
+
+			if (idx == bPath.Length - 1)
+			{
+				newParent = newParent.Replace(bPath[idx], aNode);
+				parentIdx = idx;
+			}
+
+			currentNode = newParent;
+		}
+
+		WindowPathDict newWindows = TreeHelpers.CreateUpdatedPaths(
+			_windows,
+			aPath[..parentIdx],
+			(ISplitNode)currentNode
+		);
+		return new TreeLayoutEngine(this, currentNode, newWindows);
 	}
 }
