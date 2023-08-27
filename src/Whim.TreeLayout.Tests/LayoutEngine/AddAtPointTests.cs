@@ -55,7 +55,7 @@ public class MoveWindowToPointTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
@@ -117,7 +117,7 @@ public class MoveWindowToPointTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
@@ -179,15 +179,15 @@ public class MoveWindowToPointTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
 					{
-						Window = window1.Object,
+						Window = window2.Object,
 						Location = new Location<int>()
 						{
-							X = 50,
+							X = 0,
 							Y = 0,
 							Width = 50,
 							Height = 100
@@ -196,10 +196,10 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window1.Object,
 						Location = new Location<int>()
 						{
-							X = 0,
+							X = 50,
 							Y = 0,
 							Width = 50,
 							Height = 100
@@ -241,21 +241,9 @@ public class MoveWindowToPointTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
-					new WindowState()
-					{
-						Window = window1.Object,
-						Location = new Location<int>()
-						{
-							X = 0,
-							Y = 50,
-							Width = 100,
-							Height = 50
-						},
-						WindowSize = WindowSize.Normal
-					},
 					new WindowState()
 					{
 						Window = window2.Object,
@@ -263,6 +251,18 @@ public class MoveWindowToPointTests
 						{
 							X = 0,
 							Y = 0,
+							Width = 100,
+							Height = 50
+						},
+						WindowSize = WindowSize.Normal
+					},
+					new WindowState()
+					{
+						Window = window1.Object,
+						Location = new Location<int>()
+						{
+							X = 0,
+							Y = 50,
 							Width = 100,
 							Height = 50
 						},
@@ -329,7 +329,7 @@ public class MoveWindowToPointTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
@@ -346,7 +346,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window3.Object,
 						Location = new Location<int>()
 						{
 							X = 33,
@@ -358,7 +358,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window3.Object,
+						Window = window2.Object,
 						Location = new Location<int>()
 						{
 							X = 67,
@@ -403,7 +403,7 @@ public class MoveWindowToPointTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
@@ -474,7 +474,7 @@ public class MoveWindowToPointTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
