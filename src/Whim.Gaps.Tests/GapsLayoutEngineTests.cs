@@ -10,16 +10,17 @@ public class GapsLayoutEngineTests
 
 	public static IEnumerable<object[]> DoLayout_Data()
 	{
+		Mock<IWindow> window1 = new();
 		yield return new object[]
 		{
 			new GapsConfig() { OuterGap = 10, InnerGap = 5 },
-			1,
+			new IWindow[] {window1.Object},
 			100,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = window1.Object,
 					Location = new Location<int>()
 					{
 						X = 10 + 5,
@@ -32,16 +33,18 @@ public class GapsLayoutEngineTests
 			}
 		};
 
+		Mock<IWindow> window2 = new();
+		Mock<IWindow> window3 = new();
 		yield return new object[]
 		{
 			new GapsConfig() { OuterGap = 10, InnerGap = 5 },
-			2,
+			new IWindow[] {window2.Object, window3.Object},
 			100,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = window2.Object,
 					Location = new Location<int>()
 					{
 						X = 10 + 5,
@@ -53,7 +56,7 @@ public class GapsLayoutEngineTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = window3.Object,
 					Location = new Location<int>()
 					{
 						X = 960 + 5,
@@ -66,16 +69,17 @@ public class GapsLayoutEngineTests
 			}
 		};
 
+		Mock<IWindow> window4 = new();
 		yield return new object[]
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			1,
+						new IWindow[] {window4.Object},
 			150,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = window4.Object,
 					Location = new Location<int>()
 					{
 						X = 15 + 7,
@@ -91,14 +95,14 @@ public class GapsLayoutEngineTests
 
 	[Theory]
 	[MemberData(nameof(DoLayout_Data))]
-	public void DoLayout(GapsConfig gapsConfig, int windowsCount, int scale, IWindowState[] expectedWindowStates)
+	public void DoLayout(GapsConfig gapsConfig, IWindow[] windows, int scale, IWindowState[] expectedWindowStates)
 	{
 		// Given
 		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
 
-		for (int i = 0; i < windowsCount; i++)
+		foreach (IWindow w in windows)
 		{
-			innerLayoutEngine = innerLayoutEngine.AddWindow(new Mock<IWindow>().Object);
+			innerLayoutEngine = innerLayoutEngine.AddWindow(w);
 		}
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
@@ -119,7 +123,7 @@ public class GapsLayoutEngineTests
 		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(location, monitor.Object).ToArray();
 
 		// Then
-		windowStates.Should().BeEquivalentTo(expectedWindowStates);
+		windowStates.Should().Equal(expectedWindowStates);
 	}
 
 	[Fact]
