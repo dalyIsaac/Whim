@@ -127,15 +127,17 @@ public class MoveSingleWindowEdgeInDirectionTests
 	public static IEnumerable<object[]> MoveWindowEdgesInDirection_Horizontal_Data()
 	{
 		// Move left edge to the left.
+		Mock<IWindow>[] leftEdgeLeftWindows = new Mock<IWindow>[] { new(), new(), new() };
 		yield return new object[]
 		{
 			Direction.Left,
 			new Point<double>() { X = -0.1 },
+			leftEdgeLeftWindows,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = leftEdgeLeftWindows[0].Object,
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -147,7 +149,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = leftEdgeLeftWindows[1].Object,
 					Location = new Location<int>()
 					{
 						X = 23,
@@ -159,7 +161,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = leftEdgeLeftWindows[2].Object,
 					Location = new Location<int>()
 					{
 						X = 67,
@@ -173,15 +175,17 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move left edge to the right.
+		Mock<IWindow>[] leftEdgeRightWindows = new Mock<IWindow>[] { new(), new(), new() };
 		yield return new object[]
 		{
 			Direction.Left,
 			new Point<double>() { X = 0.1 },
+			leftEdgeRightWindows,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = leftEdgeRightWindows[0].Object,
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -193,7 +197,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = leftEdgeRightWindows[1].Object,
 					Location = new Location<int>()
 					{
 						X = 43,
@@ -205,7 +209,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = leftEdgeRightWindows[2].Object,
 					Location = new Location<int>()
 					{
 						X = 67,
@@ -219,15 +223,17 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move right edge to the left.
+		Mock<IWindow>[] rightEdgeLeftWindows = new Mock<IWindow>[] { new(), new(), new() };
 		yield return new object[]
 		{
 			Direction.Right,
 			new Point<double>() { X = -0.1 },
+			rightEdgeLeftWindows,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = rightEdgeLeftWindows[0].Object,
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -239,7 +245,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = rightEdgeLeftWindows[1].Object,
 					Location = new Location<int>()
 					{
 						X = 33,
@@ -251,7 +257,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = rightEdgeLeftWindows[2].Object,
 					Location = new Location<int>()
 					{
 						X = 57,
@@ -265,15 +271,17 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move right edge to the right.
+		Mock<IWindow>[] rightEdgeRightWindows = new Mock<IWindow>[] { new(), new(), new() };
 		yield return new object[]
 		{
 			Direction.Right,
 			new Point<double>() { X = 0.1 },
+			rightEdgeRightWindows,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = rightEdgeRightWindows[0].Object,
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -285,7 +293,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = rightEdgeRightWindows[1].Object,
 					Location = new Location<int>()
 					{
 						X = 33,
@@ -297,7 +305,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = rightEdgeRightWindows[2].Object,
 					Location = new Location<int>()
 					{
 						X = 77,
@@ -316,25 +324,24 @@ public class MoveSingleWindowEdgeInDirectionTests
 	public void MoveWindowEdgesInDirection_Horizontal(
 		Direction edges,
 		IPoint<double> pixelDeltas,
+		Mock<IWindow>[] windows,
 		IWindowState[] expectedWindowStates
 	)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
+		Assert.Equal(3, windows.Length);
 
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object)
-			.AddWindow(window3.Object);
+			.AddWindow(windows[0].Object)
+			.AddWindow(windows[1].Object)
+			.AddWindow(windows[2].Object);
 
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, window2.Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[1].Object);
 		IWindowState[] windowStates = result
 			.DoLayout(new Location<int>() { Width = 100, Height = 100 }, monitor.Object)
 			.ToArray();
@@ -342,21 +349,28 @@ public class MoveSingleWindowEdgeInDirectionTests
 		// Then
 		Assert.NotSame(engine, result);
 
-		expectedWindowStates.Should().BeEquivalentTo(windowStates);
+		expectedWindowStates.Should().Equal(windowStates);
 	}
 
 	public static IEnumerable<object[]> MoveWindowEdgesInDirection_Vertical_Data()
 	{
 		// Move top edge up.
+		IWindow[] topEdgeUpWindows = new[]
+		{
+			new Mock<IWindow>().Object,
+			new Mock<IWindow>().Object,
+			new Mock<IWindow>().Object
+		};
 		yield return new object[]
 		{
 			Direction.Up,
 			new Point<double>() { Y = -0.1 },
+			topEdgeUpWindows,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = topEdgeUpWindows[0],
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -368,7 +382,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = topEdgeUpWindows[1],
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -380,7 +394,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = topEdgeUpWindows[2],
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -394,15 +408,22 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move top edge down.
+		IWindow[] topEdgeDownWindows = new[]
+		{
+			new Mock<IWindow>().Object,
+			new Mock<IWindow>().Object,
+			new Mock<IWindow>().Object
+		};
 		yield return new object[]
 		{
 			Direction.Up,
 			new Point<double>() { Y = 0.1 },
+			topEdgeDownWindows,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = topEdgeDownWindows[0],
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -414,7 +435,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = topEdgeDownWindows[1],
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -426,7 +447,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = topEdgeDownWindows[2],
 					Location = new Location<int>()
 					{
 						X = 0,
@@ -440,21 +461,28 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move bottom edge up.
+		IWindow[] bottomEdgeUpWindows = new[]
+		{
+			new Mock<IWindow>().Object,
+			new Mock<IWindow>().Object,
+			new Mock<IWindow>().Object
+		};
 		yield return new object[]
 		{
 			Direction.Down,
 			new Point<double>() { Y = -0.1 },
+			bottomEdgeUpWindows,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = bottomEdgeUpWindows[0],
 					Location = new Location<int>() { Width = 100, Height = 33 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = bottomEdgeUpWindows[1],
 					Location = new Location<int>()
 					{
 						Y = 33,
@@ -465,7 +493,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = bottomEdgeUpWindows[2],
 					Location = new Location<int>()
 					{
 						Y = 57,
@@ -478,21 +506,28 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move bottom edge down.
+		IWindow[] bottomEdgeDownWindows = new[]
+		{
+			new Mock<IWindow>().Object,
+			new Mock<IWindow>().Object,
+			new Mock<IWindow>().Object
+		};
 		yield return new object[]
 		{
 			Direction.Down,
 			new Point<double>() { Y = 0.1 },
+			bottomEdgeDownWindows,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = bottomEdgeDownWindows[0],
 					Location = new Location<int>() { Width = 100, Height = 33 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = bottomEdgeDownWindows[1],
 					Location = new Location<int>()
 					{
 						Y = 33,
@@ -503,7 +538,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = bottomEdgeDownWindows[2],
 					Location = new Location<int>()
 					{
 						Y = 77,
@@ -521,25 +556,23 @@ public class MoveSingleWindowEdgeInDirectionTests
 	public void MoveWindowEdgesInDirection_Vertical(
 		Direction edges,
 		IPoint<double> pixelDeltas,
+		IWindow[] windows,
 		IWindowState[] expectedWindowStates
 	)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
-
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAddWindowDirection(Direction.Down);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object)
-			.AddWindow(window3.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
+		foreach (IWindow window in windows)
+		{
+			engine = engine.AddWindow(window);
+		}
 
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, window2.Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[1]);
 		IWindowState[] windowStates = result
 			.DoLayout(new Location<int>() { Width = 100, Height = 100 }, monitor.Object)
 			.ToArray();
@@ -547,28 +580,30 @@ public class MoveSingleWindowEdgeInDirectionTests
 		// Then
 		Assert.NotSame(engine, result);
 
-		expectedWindowStates.Should().BeEquivalentTo(windowStates);
+		expectedWindowStates.Should().Equal(windowStates);
 	}
 
 	public static IEnumerable<object[]> MoveWindowEdgesInDirection_Diagonal_Data()
 	{
 		// Move top left window's bottom-right edge up and left.
+		Mock<IWindow>[] windows1 = new Mock<IWindow>[] { new(), new(), new(), new() };
 		yield return new object[]
 		{
 			"topLeft",
 			Direction.RightDown,
 			new Point<double>() { X = -0.1, Y = -0.1 },
+			windows1,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows1[0].Object,
 					Location = new Location<int>() { Width = 40, Height = 40 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows1[1].Object,
 					Location = new Location<int>()
 					{
 						Y = 40,
@@ -579,7 +614,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows1[2].Object,
 					Location = new Location<int>()
 					{
 						X = 40,
@@ -590,7 +625,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows1[3].Object,
 					Location = new Location<int>()
 					{
 						X = 40,
@@ -604,22 +639,24 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move top left window's bottom-right edge down and right.
+		Mock<IWindow>[] windows2 = new Mock<IWindow>[] { new(), new(), new(), new() };
 		yield return new object[]
 		{
 			"topLeft",
 			Direction.RightDown,
 			new Point<double>() { X = 0.1, Y = 0.1 },
+			windows2,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows2[0].Object,
 					Location = new Location<int>() { Width = 60, Height = 60 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows2[1].Object,
 					Location = new Location<int>()
 					{
 						Y = 60,
@@ -630,7 +667,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows2[2].Object,
 					Location = new Location<int>()
 					{
 						X = 60,
@@ -641,7 +678,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows2[3].Object,
 					Location = new Location<int>()
 					{
 						X = 60,
@@ -655,22 +692,24 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move top right window's bottom-left edge up and right.
+		Mock<IWindow>[] windows3 = new Mock<IWindow>[] { new(), new(), new(), new() };
 		yield return new object[]
 		{
 			"topRight",
 			Direction.LeftDown,
 			new Point<double>() { X = 0.1, Y = -0.1 },
+			windows3,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows3[0].Object,
 					Location = new Location<int>() { Width = 60, Height = 50 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows3[1].Object,
 					Location = new Location<int>()
 					{
 						Y = 50,
@@ -681,7 +720,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows3[2].Object,
 					Location = new Location<int>()
 					{
 						X = 60,
@@ -692,7 +731,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows3[3].Object,
 					Location = new Location<int>()
 					{
 						X = 60,
@@ -706,22 +745,24 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move top right window's bottom-left edge down and left.
+		Mock<IWindow>[] windows4 = new Mock<IWindow>[] { new(), new(), new(), new() };
 		yield return new object[]
 		{
 			"topRight",
 			Direction.LeftDown,
 			new Point<double>() { X = -0.1, Y = 0.1 },
+			windows4,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows4[0].Object,
 					Location = new Location<int>() { Width = 40, Height = 50 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows4[1].Object,
 					Location = new Location<int>()
 					{
 						Y = 50,
@@ -732,7 +773,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows4[2].Object,
 					Location = new Location<int>()
 					{
 						X = 40,
@@ -743,7 +784,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows4[3].Object,
 					Location = new Location<int>()
 					{
 						X = 40,
@@ -757,22 +798,24 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move bottom left window's top-right edge up and left.
+		Mock<IWindow>[] windows5 = new Mock<IWindow>[] { new(), new(), new(), new() };
 		yield return new object[]
 		{
 			"bottomLeft",
 			Direction.RightUp,
 			new Point<double>() { X = -0.1, Y = -0.1 },
+			windows5,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows5[0].Object,
 					Location = new Location<int>() { Width = 40, Height = 40 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows5[1].Object,
 					Location = new Location<int>()
 					{
 						Y = 40,
@@ -783,7 +826,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows5[2].Object,
 					Location = new Location<int>()
 					{
 						X = 40,
@@ -794,7 +837,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows5[3].Object,
 					Location = new Location<int>()
 					{
 						X = 40,
@@ -808,22 +851,24 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move bottom left window's top-right edge down and right.
+		Mock<IWindow>[] windows6 = new Mock<IWindow>[] { new(), new(), new(), new() };
 		yield return new object[]
 		{
 			"bottomLeft",
 			Direction.RightUp,
 			new Point<double>() { X = 0.1, Y = 0.1 },
+			windows6,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows6[0].Object,
 					Location = new Location<int>() { Width = 60, Height = 60 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows6[1].Object,
 					Location = new Location<int>()
 					{
 						Y = 60,
@@ -834,7 +879,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows6[2].Object,
 					Location = new Location<int>()
 					{
 						X = 60,
@@ -845,7 +890,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows6[3].Object,
 					Location = new Location<int>()
 					{
 						X = 60,
@@ -859,22 +904,24 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move bottom right window's top-left edge up and right.
+		Mock<IWindow>[] windows7 = new Mock<IWindow>[] { new(), new(), new(), new() };
 		yield return new object[]
 		{
 			"bottomRight",
 			Direction.LeftUp,
 			new Point<double>() { X = 0.1, Y = -0.1 },
+			windows7,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows7[0].Object,
 					Location = new Location<int>() { Width = 60, Height = 50 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows7[1].Object,
 					Location = new Location<int>()
 					{
 						Y = 50,
@@ -885,7 +932,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows7[2].Object,
 					Location = new Location<int>()
 					{
 						X = 60,
@@ -896,7 +943,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows7[3].Object,
 					Location = new Location<int>()
 					{
 						X = 60,
@@ -910,22 +957,24 @@ public class MoveSingleWindowEdgeInDirectionTests
 		};
 
 		// Move bottom right window's top-left edge down and left.
+		Mock<IWindow>[] windows8 = new Mock<IWindow>[] { new(), new(), new(), new() };
 		yield return new object[]
 		{
 			"bottomRight",
 			Direction.LeftUp,
 			new Point<double>() { X = -0.1, Y = 0.1 },
+			windows8,
 			new IWindowState[]
 			{
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows8[0].Object,
 					Location = new Location<int>() { Width = 40, Height = 50 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows8[1].Object,
 					Location = new Location<int>()
 					{
 						Y = 50,
@@ -936,7 +985,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows8[2].Object,
 					Location = new Location<int>()
 					{
 						X = 40,
@@ -947,7 +996,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				},
 				new WindowState()
 				{
-					Window = new Mock<IWindow>().Object,
+					Window = windows8[3].Object,
 					Location = new Location<int>()
 					{
 						X = 40,
@@ -967,16 +1016,14 @@ public class MoveSingleWindowEdgeInDirectionTests
 		string window,
 		Direction edges,
 		IPoint<double> pixelDeltas,
+		Mock<IWindow>[] windows,
 		IWindowState[] expectedWindowStates
 	)
 	{
 		// Given
-		Mock<IWindow> topLeft = new();
-		Mock<IWindow> topRight = new();
-		Mock<IWindow> bottomLeft = new();
-		Mock<IWindow> bottomRight = new();
-
-		Dictionary<string, Mock<IWindow>> windows =
+		Assert.Equal(4, windows.Length);
+		var (topLeft, bottomLeft, topRight, bottomRight) = (windows[0], windows[1], windows[2], windows[3]);
+		Dictionary<string, Mock<IWindow>> windowsDict =
 			new()
 			{
 				{ "topLeft", topLeft },
@@ -996,14 +1043,14 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[window].Object);
+		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windowsDict[window].Object);
 		IWindowState[] windowStates = result
 			.DoLayout(new Location<int>() { Width = 100, Height = 100 }, monitor.Object)
 			.ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		expectedWindowStates.Should().BeEquivalentTo(windowStates);
+		expectedWindowStates.Should().Equal(windowStates);
 	}
 
 	[Fact]
