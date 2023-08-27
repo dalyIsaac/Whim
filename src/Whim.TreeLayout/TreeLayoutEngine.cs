@@ -642,27 +642,44 @@ public class TreeLayoutEngine : ILayoutEngine
 			);
 		}
 
-		// Rebuild the tree from the bottom up.
+		// Rebuild the tree from the bottom up for the new position for B.
 		INode currentNode = bNode;
-		int parentIdx = 0;
+		ISplitNode? commonAncestor = null;
+		int commonAncestorIdx = 0;
 
 		for (int idx = aPath.Length - 1; idx >= 0; idx--)
 		{
 			ISplitNode parent = aNodeAncestors[idx];
 			ISplitNode newParent = parent.Replace(aPath[idx], currentNode);
 
-			if (idx == bPath.Length - 1)
+			if (idx < bPath.Length && bNodeAncestors[idx] == parent)
 			{
-				newParent = newParent.Replace(bPath[idx], aNode);
-				parentIdx = idx;
+				commonAncestor = newParent;
+				commonAncestorIdx = idx;
+				break;
 			}
 
 			currentNode = newParent;
 		}
 
+		if (commonAncestor is null)
+		{
+			Logger.Error($"Failed to find common ancestor for nodes {aNode} and {bNode}");
+			return this;
+		}
+
+		// Rebuild the tree from the bottom up for the new position for A.
+		currentNode = aNode;
+		for (int idx = bPath.Length - 1; idx >= 0; idx--)
+		{
+			ISplitNode parent = idx == commonAncestorIdx ? commonAncestor : bNodeAncestors[idx];
+			ISplitNode newParent = parent.Replace(bPath[idx], currentNode);
+			currentNode = newParent;
+		}
+
 		WindowPathDict newWindows = TreeHelpers.CreateUpdatedPaths(
 			_windows,
-			aPath[..parentIdx],
+			aPath[..commonAncestorIdx],
 			(ISplitNode)currentNode
 		);
 		return new TreeLayoutEngine(this, currentNode, newWindows);

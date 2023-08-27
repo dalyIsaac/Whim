@@ -48,7 +48,7 @@ public class SwapWindowInDirectionTests
 		{
 			new WindowState()
 			{
-				Window = window2.Object,
+				Window = window1.Object,
 				Location = new Location<int>()
 				{
 					X = 0,
@@ -60,7 +60,7 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = window1.Object,
+				Window = window2.Object,
 				Location = new Location<int>()
 				{
 					X = 50,
@@ -72,7 +72,7 @@ public class SwapWindowInDirectionTests
 			}
 		}
 			.Should()
-			.BeEquivalentTo(windowStates);
+			.Equal(windowStates);
 	}
 
 	[Fact]
@@ -124,7 +124,7 @@ public class SwapWindowInDirectionTests
 			}
 		}
 			.Should()
-			.BeEquivalentTo(windowStates);
+			.Equal(windowStates);
 	}
 
 	[Fact]
@@ -184,11 +184,11 @@ public class SwapWindowInDirectionTests
 			}
 		}
 			.Should()
-			.BeEquivalentTo(windowStates);
+			.Equal(windowStates);
 	}
 
 	[Fact]
-	public void SwapWindowInDIrection_Diagonal()
+	public void SwapWindowInDirection_Diagonal()
 	{
 		// Given
 		Mock<IWindow> topLeft = new();
@@ -230,11 +230,11 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = topRight.Object,
+				Window = bottomLeft.Object,
 				Location = new Location<int>()
 				{
-					X = 50,
-					Y = 0,
+					X = 0,
+					Y = 50,
 					Width = 50,
 					Height = 50
 				},
@@ -242,11 +242,11 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = bottomLeft.Object,
+				Window = topRight.Object,
 				Location = new Location<int>()
 				{
-					X = 0,
-					Y = 50,
+					X = 50,
+					Y = 0,
 					Width = 50,
 					Height = 50
 				},
@@ -266,6 +266,6 @@ public class SwapWindowInDirectionTests
 			}
 		}
 			.Should()
-			.BeEquivalentTo(windowStates);
+			.Equal(windowStates);
 	}
 }
