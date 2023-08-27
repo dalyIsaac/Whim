@@ -14,7 +14,7 @@ public class GapsLayoutEngineTests
 		yield return new object[]
 		{
 			new GapsConfig() { OuterGap = 10, InnerGap = 5 },
-			new IWindow[] {window1.Object},
+			new IWindow[] { window1.Object },
 			100,
 			new IWindowState[]
 			{
@@ -38,7 +38,7 @@ public class GapsLayoutEngineTests
 		yield return new object[]
 		{
 			new GapsConfig() { OuterGap = 10, InnerGap = 5 },
-			new IWindow[] {window2.Object, window3.Object},
+			new IWindow[] { window2.Object, window3.Object },
 			100,
 			new IWindowState[]
 			{
@@ -73,7 +73,7 @@ public class GapsLayoutEngineTests
 		yield return new object[]
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-						new IWindow[] {window4.Object},
+			new IWindow[] { window4.Object },
 			150,
 			new IWindowState[]
 			{
