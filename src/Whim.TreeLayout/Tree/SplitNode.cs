@@ -179,8 +179,11 @@ internal class SplitNode : ISplitNode
 			return this;
 		}
 
-		ImmutableList<INode> children = Children.SetItem(aIndex, Children[bIndex]);
-		children = children.SetItem(bIndex, Children[aIndex]);
+		INode aNode = Children[aIndex];
+		INode bNode = Children[bIndex];
+
+		ImmutableList<INode> children = Children.SetItem(aIndex, bNode);
+		children = children.SetItem(bIndex, aNode);
 
 		return new SplitNode(EqualWeight, IsHorizontal, children, Weights);
 	}

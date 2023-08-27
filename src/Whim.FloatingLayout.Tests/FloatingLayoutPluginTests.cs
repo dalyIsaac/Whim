@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Moq;
 using System.Text.Json;
 using Windows.Win32.Foundation;
@@ -56,6 +55,20 @@ public class FloatingLayoutPluginTests
 			monitor.Setup(m => m.WorkingArea).Returns(location);
 			MonitorManager.Setup(mm => mm.GetMonitorAtPoint(location)).Returns(monitor.Object);
 			return this;
+		}
+	}
+
+	private static void AssertFloatingWindowsEqual(
+		IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> expected,
+		IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> actual
+	)
+	{
+		Assert.Equal(expected.Count, actual.Count);
+
+		foreach (KeyValuePair<IWindow, ISet<LayoutEngineIdentity>> expectedWindow in expected)
+		{
+			Assert.Contains(expectedWindow.Key, actual.Keys);
+			Assert.Equal(expectedWindow.Value, actual[expectedWindow.Key]);
 		}
 	}
 
@@ -448,17 +461,16 @@ public class FloatingLayoutPluginTests
 		FloatingLayoutPlugin plugin = wrapper.Plugin;
 		plugin.MarkWindowAsFloating(window.Object);
 
-		plugin.FloatingWindows
-			.Should()
-			.BeEquivalentTo(
-				new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
+		AssertFloatingWindowsEqual(
+			new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
+			{
 				{
-					{
-						window.Object,
-						new HashSet<LayoutEngineIdentity>() { wrapper.LayoutEngine.Object.Identity }
-					}
+					window.Object,
+					new HashSet<LayoutEngineIdentity>() { wrapper.LayoutEngine.Object.Identity }
 				}
-			);
+			},
+			plugin.FloatingWindows
+		);
 
 		// When
 		plugin.MarkWindowAsDockedInLayoutEngine(window.Object, wrapper.LayoutEngine.Object.Identity);
@@ -501,17 +513,16 @@ public class FloatingLayoutPluginTests
 		plugin.MarkWindowAsDockedInLayoutEngine(window.Object, wrapper.LayoutEngine.Object.Identity);
 
 		// Then
-		plugin.FloatingWindows
-			.Should()
-			.BeEquivalentTo(
-				new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
+		AssertFloatingWindowsEqual(
+			new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
+			{
 				{
-					{
-						window.Object,
-						new HashSet<LayoutEngineIdentity>() { layoutEngine2.Object.Identity }
-					}
+					window.Object,
+					new HashSet<LayoutEngineIdentity>() { layoutEngine2.Object.Identity }
 				}
-			);
+			},
+			plugin.FloatingWindows
+		);
 	}
 
 	#endregion

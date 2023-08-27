@@ -131,11 +131,11 @@ public class TreeHelpersTests
 		// Then
 		new SplitNode[] { tree.Root, tree.Right }
 			.Should()
-			.BeEquivalentTo(result.Ancestors);
+			.Equal(result.Ancestors, (a, b) => a.Equals(b));
 
 		new int[] { 1, 1 }
 			.Should()
-			.BeEquivalentTo(result.Path);
+			.Equal(result.Path);
 		Assert.Equal(tree.RightBottom, result.WindowNode);
 	}
 
@@ -151,11 +151,11 @@ public class TreeHelpersTests
 		// Then
 		new SplitNode[] { tree.Root }
 			.Should()
-			.BeEquivalentTo(result.Ancestors);
+			.Equal(result.Ancestors, (a, b) => a.Equals(b));
 
 		new int[] { 0 }
 			.Should()
-			.BeEquivalentTo(result.Path);
+			.Equal(result.Path);
 		Assert.Equal(tree.Left, result.WindowNode);
 	}
 
@@ -220,11 +220,11 @@ public class TreeHelpersTests
 		Assert.Equal(tree.Left, result.WindowNode);
 		new SplitNode[] { tree.Root }
 			.Should()
-			.BeEquivalentTo(result.Ancestors);
+			.Equal(result.Ancestors, (a, b) => a.Equals(b));
 
 		new int[] { 0 }
 			.Should()
-			.BeEquivalentTo(result.Path);
+			.Equal(result.Path);
 	}
 
 	[Fact]
@@ -242,11 +242,11 @@ public class TreeHelpersTests
 		Assert.Equal(tree.RightBottom, result.WindowNode);
 		new SplitNode[] { tree.Root, tree.Right }
 			.Should()
-			.BeEquivalentTo(result.Ancestors);
+			.Equal(result.Ancestors, (a, b) => a.Equals(b));
 
 		new int[] { 1, 1 }
 			.Should()
-			.BeEquivalentTo(result.Path);
+			.Equal(result.Path);
 	}
 
 	[Fact]
@@ -264,11 +264,11 @@ public class TreeHelpersTests
 		Assert.Equal(tree.RightTopRight3, result.WindowNode);
 		new SplitNode[] { tree.Root, tree.Right, tree.RightTop, tree.RightTopRight }
 			.Should()
-			.BeEquivalentTo(result.Ancestors);
+			.Equal(result.Ancestors, (a, b) => a.Equals(b));
 
 		new int[] { 1, 0, 1, 2 }
 			.Should()
-			.BeEquivalentTo(result.Path);
+			.Equal(result.Path);
 	}
 
 	[Fact]
@@ -680,7 +680,7 @@ public class TreeHelpersTests
 					}
 			)
 			.Should()
-			.BeEquivalentTo(expectedStates);
+			.Equal(expectedStates, (a, b) => a.Equals(b));
 	}
 
 	#region GetAdjacentNode
@@ -1021,39 +1021,39 @@ public class TreeHelpersTests
 
 		new int[] { 0 }
 			.Should()
-			.BeEquivalentTo(result[tree.Left.Window]);
+			.Equal(result[tree.Left.Window]);
 
 		new int[] { 1, 0, 0, 0 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopLeftTop.Window]);
+			.Equal(result[tree.RightTopLeftTop.Window]);
 
 		new int[] { 1, 0, 0, 1, 0 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopLeftBottomLeft.Window]);
+			.Equal(result[tree.RightTopLeftBottomLeft.Window]);
 
 		new int[] { 1, 0, 0, 1, 1, 0 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopLeftBottomRightTop.Window]);
+			.Equal(result[tree.RightTopLeftBottomRightTop.Window]);
 
 		new int[] { 1, 0, 0, 1, 1, 1 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopLeftBottomRightBottom.Window]);
+			.Equal(result[tree.RightTopLeftBottomRightBottom.Window]);
 
 		new int[] { 1, 0, 1, 0 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopRight1.Window]);
+			.Equal(result[tree.RightTopRight1.Window]);
 
 		new int[] { 1, 0, 1, 1 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopRight2.Window]);
+			.Equal(result[tree.RightTopRight2.Window]);
 
 		new int[] { 1, 0, 1, 2 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightTopRight3.Window]);
+			.Equal(result[tree.RightTopRight3.Window]);
 
 		new int[] { 1, 1 }
 			.Should()
-			.BeEquivalentTo(result[tree.RightBottom.Window]);
+			.Equal(result[tree.RightBottom.Window]);
 	}
 
 	[Fact]

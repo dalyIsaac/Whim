@@ -346,13 +346,13 @@ public class MonitorManagerTests
 		raisedEvent.Arguments.UnchangedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.BeEquivalentTo(expectedUnchangedRects.Select(r => r.ToLocation()));
+			.Equal(expectedUnchangedRects.Select(r => r.ToLocation()));
 
 		RECT[] expectedAddedRects = new[] { leftBottom };
 		raisedEvent.Arguments.AddedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.BeEquivalentTo(expectedAddedRects.Select(r => r.ToLocation()));
+			.Equal(expectedAddedRects.Select(r => r.ToLocation()));
 	}
 
 	[Fact]
@@ -413,13 +413,13 @@ public class MonitorManagerTests
 		raisedEvent.Arguments.UnchangedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.BeEquivalentTo(expectedUnchangedRects.Select(r => r.ToLocation()));
+			.Equal(expectedUnchangedRects.Select(r => r.ToLocation()));
 
 		RECT[] expectedAddedRects = new[] { right };
 		raisedEvent.Arguments.AddedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.BeEquivalentTo(expectedAddedRects.Select(r => r.ToLocation()));
+			.Equal(expectedAddedRects.Select(r => r.ToLocation()));
 	}
 
 	[Fact]
@@ -469,7 +469,7 @@ public class MonitorManagerTests
 		raisedEvent.Arguments.RemovedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.BeEquivalentTo(expectedRemovedRects.Select(r => r.ToLocation()));
+			.Equal(expectedRemovedRects.Select(r => r.ToLocation()));
 	}
 
 	[Fact]

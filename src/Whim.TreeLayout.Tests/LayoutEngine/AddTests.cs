@@ -50,7 +50,7 @@ public class AddTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
@@ -109,7 +109,7 @@ public class AddTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
@@ -180,7 +180,7 @@ public class AddTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
@@ -253,7 +253,7 @@ public class AddTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
@@ -326,7 +326,7 @@ public class AddTests
 
 		windowStates
 			.Should()
-			.BeEquivalentTo(
+			.Equal(
 				new IWindowState[]
 				{
 					new WindowState()
