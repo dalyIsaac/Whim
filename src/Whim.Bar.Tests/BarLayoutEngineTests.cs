@@ -341,6 +341,6 @@ public class BarLayoutEngineTests
 			ile => ile.DoLayout(expectedGivenLocation, wrapper.Monitor.Object),
 			Times.Once
 		);
-		layout.Should().BeEquivalentTo(expectedWindowStates);
+		layout.Should().Equal(expectedWindowStates);
 	}
 }
