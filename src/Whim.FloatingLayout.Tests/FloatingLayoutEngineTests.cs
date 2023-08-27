@@ -651,7 +651,7 @@ public class FloatingLayoutEngineTests
 			}
 		};
 
-		windowStates.Should().BeEquivalentTo(expected);
+		windowStates.Should().Equal(expected);
 
 		Assert.Equal(3, count);
 	}
