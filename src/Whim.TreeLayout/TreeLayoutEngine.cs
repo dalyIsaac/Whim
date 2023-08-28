@@ -125,6 +125,12 @@ public class TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
+		if (_windows.ContainsKey(window))
+		{
+			Logger.Error($"Window {window} already exists in layout engine {Name}");
+			return this;
+		}
+
 		WindowNode newWindowNode = new(window);
 
 		switch (_root)

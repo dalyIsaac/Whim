@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
-public class AddTests
+public class AddWindowTests
 {
 	[Fact]
 	public void AddWindow_RootIsNull()
@@ -362,6 +362,64 @@ public class AddTests
 							Y = 50,
 							Width = 50,
 							Height = 50
+						},
+						WindowSize = WindowSize.Normal
+					}
+				}
+			);
+	}
+
+	[Fact]
+	public void AddWindow_WindowAlreadyPresent()
+	{
+		// Given
+		Mock<IWindow> window1 = new();
+		Mock<IWindow> window2 = new();
+
+		LayoutEngineWrapper wrapper = new();
+
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+			.AddWindow(window1.Object)
+			.AddWindow(window2.Object);
+
+		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		Mock<IMonitor> monitor = new();
+
+		// When
+		ILayoutEngine result = engine.AddWindow(window2.Object);
+		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+
+		// Then
+		Assert.Same(engine, result);
+		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.Equal(2, result.Count);
+
+		windowStates
+			.Should()
+			.Equal(
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Window = window1.Object,
+						Location = new Location<int>()
+						{
+							X = 0,
+							Y = 0,
+							Width = 50,
+							Height = 100
+						},
+						WindowSize = WindowSize.Normal
+					},
+					new WindowState()
+					{
+						Window = window2.Object,
+						Location = new Location<int>()
+						{
+							X = 50,
+							Y = 0,
+							Width = 50,
+							Height = 100
 						},
 						WindowSize = WindowSize.Normal
 					}

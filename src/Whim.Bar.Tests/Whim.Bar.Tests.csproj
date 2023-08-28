@@ -43,6 +43,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
+		<ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
 	</ItemGroup>
 
 </Project>

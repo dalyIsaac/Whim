@@ -73,7 +73,7 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Fact]
-	public void Add()
+	public void AddWindow()
 	{
 		// Given
 		ColumnLayoutEngine engine = new(identity);
@@ -83,6 +83,21 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newLayoutEngine);
+		Assert.Equal(1, newLayoutEngine.Count);
+	}
+
+	[Fact]
+	public void AddWindow_WindowAlreadyPresent()
+	{
+		// Given
+		IWindow window = CreateWindow();
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
+
+		// When
+		ILayoutEngine newLayoutEngine = engine.AddWindow(window);
+
+		// Then
+		Assert.Same(engine, newLayoutEngine);
 		Assert.Equal(1, newLayoutEngine.Count);
 	}
 

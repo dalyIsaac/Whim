@@ -51,6 +51,13 @@ public class ColumnLayoutEngine : ILayoutEngine
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
+
+		if (_stack.Contains(window))
+		{
+			Logger.Error($"Window {window} already exists in layout engine {Name}");
+			return this;
+		}
+
 		return new ColumnLayoutEngine(this, _stack.Add(window));
 	}
 
