@@ -12,6 +12,15 @@ public delegate ILayoutEngine CreateLeafLayoutEngine(LayoutEngineIdentity identi
 /// <summary>
 /// Layout engines dictate how windows are laid out.
 /// </summary>
+/// <remarks>
+/// Layout engines are immutable. All methods that change the layout engine return a new
+/// layout engine.
+///
+/// Layout engines are also composable, via the <see cref="BaseProxyLayoutEngine"/> class.
+///
+/// Layout engine tests should extend the <c>Whim.TestUtils.LayoutEngineBaseTests</c>
+/// class, to verify they do not break in common scenarios.
+/// </remarks>
 public interface ILayoutEngine
 {
 	/// <summary>

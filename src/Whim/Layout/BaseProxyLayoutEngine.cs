@@ -12,6 +12,15 @@ public delegate ILayoutEngine CreateProxyLayoutEngine(ILayoutEngine engine);
 /// <summary>
 /// Abstract layout engine, which proxy layout engines should inherit from.
 /// </summary>
+/// <remarks>
+/// Proxy layout engines are layout engines that wrap another layout engine.
+///
+/// Proxy layout engines are useful for adding additional functionality to a layout engine.
+/// For example, the <c>Whim.Gaps</c> plugin uses a proxy layout engine to add gaps to a layout engine.
+///
+/// Proxy layout engine tests should extend the <c>Whim.TestUtils.ProxyLayoutEngineBaseTests</c>
+/// class, to verify they do not break in common scenarios.
+/// </remarks>
 public abstract class BaseProxyLayoutEngine : ILayoutEngine
 {
 	/// <summary>
