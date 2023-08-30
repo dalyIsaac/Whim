@@ -107,15 +107,18 @@ public class TreeLayoutEngine : ILayoutEngine
 	/// <summary>
 	/// Creates a new dictionary with the top-level split node.
 	/// </summary>
-	/// <param n="windowA"></param>
-	/// <param n="windowB"></param>
+	/// <param name="splitNode"></param>
 	/// <returns></returns>
-	private static WindowPathDict CreateTopSplitNodeDict(IWindow windowA, IWindow windowB)
+	private static WindowPathDict CreateTopSplitNodeDict(ISplitNode splitNode)
 	{
 		WindowPathDict.Builder dictBuilder = ImmutableDictionary.CreateBuilder<IWindow, ImmutableArray<int>>();
 
-		dictBuilder.Add(windowA, ImmutableArray.Create(0));
-		dictBuilder.Add(windowB, ImmutableArray.Create(1));
+		int idx = 0;
+		foreach (INode child in splitNode.Children)
+		{
+			dictBuilder.Add(((WindowNode)child).Window, ImmutableArray.Create(idx));
+			idx++;
+		}
 
 		return dictBuilder.ToImmutable();
 	}
@@ -138,7 +141,7 @@ public class TreeLayoutEngine : ILayoutEngine
 			case WindowNode rootNode:
 				Logger.Debug($"Root is window node, replacing with split node");
 				ISplitNode newRoot = new SplitNode(rootNode, newWindowNode, _plugin.GetAddWindowDirection(this));
-				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(rootNode.Window, window));
+				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(newRoot));
 
 			case ISplitNode rootNode:
 				return AddToSplitNode(newWindowNode, rootNode);
@@ -197,14 +200,8 @@ public class TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
-		TreeLayoutEngine treeLayoutEngine = this;
-
-		if (_windows.ContainsKey(window))
-		{
-			treeLayoutEngine = (TreeLayoutEngine)treeLayoutEngine.RemoveWindow(window);
-		}
-
-		return treeLayoutEngine.AddWindowAtPoint(window, point);
+		TreeLayoutEngine intermediateTree = (TreeLayoutEngine)RemoveWindow(window);
+		return intermediateTree.AddWindowAtPoint(window, point);
 	}
 
 	private ILayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point)
@@ -217,15 +214,7 @@ public class TreeLayoutEngine : ILayoutEngine
 			Direction newNodeDirection = Location.UnitSquare<double>().GetDirectionToPoint(point);
 
 			ISplitNode newRoot = new SplitNode(focusedWindowNode, newWindowNode, newNodeDirection);
-
-			if (newNodeDirection.InsertAfter())
-			{
-				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(focusedWindowNode.Window, window));
-			}
-			else
-			{
-				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(window, focusedWindowNode.Window));
-			}
+			return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(newRoot));
 		}
 
 		if (_root is ISplitNode splitNode)
