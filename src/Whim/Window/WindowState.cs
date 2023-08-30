@@ -36,5 +36,11 @@ public class WindowState : IWindowState
 	}
 
 	/// <inheritdoc />
+	public static bool operator ==(WindowState? left, WindowState? right) => Equals(left, right);
+
+	/// <inheritdoc />
+	public static bool operator !=(WindowState? left, WindowState? right) => !Equals(left, right);
+
+	/// <inheritdoc />
 	public override int GetHashCode() => HashCode.Combine(Location, WindowSize, Window);
 }
