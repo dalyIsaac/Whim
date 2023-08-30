@@ -23,15 +23,6 @@ namespace Windows.Win32
 
 			/// <inheritdoc/>
 			public static explicit operator HDWP(nint value) => new(value);
-
-			/// <inheritdoc/>
-			public bool Equals(HDWP other) => Value == other.Value;
-
-			/// <inheritdoc/>
-			public override int GetHashCode() => Value.GetHashCode();
-
-			/// <inheritdoc/>
-			public override string ToString() => Value.ToString();
 		}
 	}
 }

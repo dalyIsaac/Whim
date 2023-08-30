@@ -446,9 +446,52 @@ public class WindowTests
 		// Given
 		Wrapper wrapper = new();
 		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window2 = Window.CreateWindow(
+			wrapper.Context.Object,
+			wrapper.CoreNativeManager.Object,
+			new HWND(123)
+		)!;
 
 		// When
-		bool equals = window.Equals(window);
+		bool equals = window.Equals(window2);
+
+		// Then
+		Assert.True(equals);
+	}
+
+	[Fact]
+	public void Equals_Operator_Success()
+	{
+		// Given
+		Wrapper wrapper = new();
+		Window? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
+		Window? window2 = Window.CreateWindow(
+			wrapper.Context.Object,
+			wrapper.CoreNativeManager.Object,
+			new HWND(123)
+		)! as Window;
+
+		// When
+		bool equals = window == window2;
+
+		// Then
+		Assert.True(equals);
+	}
+
+	[Fact]
+	public void NotEquals_Operator_Success()
+	{
+		// Given
+		Wrapper wrapper = new();
+		Window? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
+		Window? window2 = Window.CreateWindow(
+			wrapper.Context.Object,
+			wrapper.CoreNativeManager.Object,
+			new HWND(1234)
+		)! as Window;
+
+		// When
+		bool equals = window != window2;
 
 		// Then
 		Assert.True(equals);
