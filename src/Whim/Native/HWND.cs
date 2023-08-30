@@ -9,7 +9,7 @@ namespace Windows.Win32
 		/// A handle to a window.
 		/// </summary>
 		[DebuggerDisplay("{Value}")]
-		public readonly struct HWND : IEquatable<HWND>
+		public readonly record struct HWND
 		{
 			internal readonly IntPtr Value;
 
@@ -36,16 +36,7 @@ namespace Windows.Win32
 			public static explicit operator HWND(IntPtr value) => new(value);
 
 			/// <inheritdoc/>
-			public static bool operator ==(HWND left, HWND right) => left.Value == right.Value;
-
-			/// <inheritdoc/>
-			public static bool operator !=(HWND left, HWND right) => !(left == right);
-
-			/// <inheritdoc/>
 			public bool Equals(HWND other) => Value == other.Value;
-
-			/// <inheritdoc/>
-			public override bool Equals(object? obj) => obj is HWND other && Equals(other);
 
 			/// <inheritdoc/>
 			public override int GetHashCode() => Value.GetHashCode();
