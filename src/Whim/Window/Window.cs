@@ -210,6 +210,10 @@ internal class Window : IWindow
 		return obj is Window window && window.Handle == Handle;
 	}
 
+	public static bool operator ==(Window? left, Window? right) => Equals(left, right);
+
+	public static bool operator !=(Window? left, Window? right) => !Equals(left, right);
+
 	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
