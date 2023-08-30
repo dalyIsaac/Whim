@@ -5,7 +5,7 @@ namespace Whim.Bar;
 /// <summary>
 /// A proxy layout engine to reserve space for the bar in each monitor.
 /// </summary>
-public class BarLayoutEngine : BaseProxyLayoutEngine
+public record BarLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly BarConfig _barConfig;
 

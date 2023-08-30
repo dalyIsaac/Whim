@@ -21,7 +21,7 @@ public delegate ILayoutEngine CreateProxyLayoutEngine(ILayoutEngine engine);
 /// Proxy layout engine tests should extend the <c>Whim.TestUtils.ProxyLayoutEngineBaseTests</c>
 /// class, to verify they do not break in common scenarios.
 /// </remarks>
-public abstract class BaseProxyLayoutEngine : ILayoutEngine
+public abstract record BaseProxyLayoutEngine : ILayoutEngine
 {
 	/// <summary>
 	/// The proxied layout engine.
@@ -105,7 +105,7 @@ public abstract class BaseProxyLayoutEngine : ILayoutEngine
 	/// </returns>
 	public bool ContainsEqual(ILayoutEngine layoutEngine)
 	{
-		if (this == layoutEngine)
+		if (Equals(layoutEngine))
 		{
 			return true;
 		}

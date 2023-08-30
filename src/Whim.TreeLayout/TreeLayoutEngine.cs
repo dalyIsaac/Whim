@@ -19,7 +19,7 @@ internal record NonRootWindowData(
 /// <summary>
 /// A tree layout engine allows users to create arbitrary window grid layouts.
 /// </summary>
-public class TreeLayoutEngine : ILayoutEngine
+public record TreeLayoutEngine : ILayoutEngine
 {
 	private readonly IContext _context;
 	private readonly ITreeLayoutPlugin _plugin;

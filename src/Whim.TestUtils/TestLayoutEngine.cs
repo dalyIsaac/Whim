@@ -6,7 +6,7 @@ namespace Whim.TestUtils;
 /// <summary>
 /// A test layout engine that does nothing.
 /// </summary>
-public class TestLayoutEngine : ILayoutEngine
+public record TestLayoutEngine : ILayoutEngine
 {
 	/// <inheritdoc/>
 	public string Name => "Test Layout Engine";

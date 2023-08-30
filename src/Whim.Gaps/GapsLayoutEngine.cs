@@ -5,7 +5,7 @@ namespace Whim.Gaps;
 /// <summary>
 /// A proxy layout engine to add gaps to the layout.
 /// </summary>
-public class GapsLayoutEngine : BaseProxyLayoutEngine
+public record GapsLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly GapsConfig _gapsConfig;
 

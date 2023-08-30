@@ -8,7 +8,7 @@ namespace Whim;
 /// <summary>
 /// Column layout engine with a stack data structure.
 /// </summary>
-public class ColumnLayoutEngine : ILayoutEngine
+public record ColumnLayoutEngine : ILayoutEngine
 {
 	/// <summary>
 	/// The stack of windows in the engine.
