@@ -464,12 +464,10 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		Window? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
-		Window? window2 = Window.CreateWindow(
-			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object,
-			new HWND(123)
-		)! as Window;
+		Window? window =
+			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
+		Window? window2 =
+			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
 
 		// When
 		bool equals = window == window2;
@@ -483,12 +481,10 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		Window? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
-		Window? window2 = Window.CreateWindow(
-			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object,
-			new HWND(1234)
-		)! as Window;
+		Window? window =
+			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
+		Window? window2 =
+			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(1234))! as Window;
 
 		// When
 		bool equals = window != window2;
