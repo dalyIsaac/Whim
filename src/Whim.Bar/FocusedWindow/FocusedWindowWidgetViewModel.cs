@@ -81,7 +81,7 @@ internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposabl
 	{
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(e.Window);
 
-		if (monitor == _monitor)
+		if (_monitor.Equals(monitor))
 		{
 			Title = _getTitle(e.Window);
 		}

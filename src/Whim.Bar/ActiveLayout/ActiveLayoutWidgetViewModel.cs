@@ -48,7 +48,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
 	{
-		if (e.Monitor == Monitor)
+		if (e.Monitor.Equals(Monitor))
 		{
 			OnPropertyChanged(nameof(ActiveLayoutEngine));
 		}

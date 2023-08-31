@@ -152,7 +152,7 @@ public interface ILayoutEngine
 	/// </returns>
 	bool ContainsEqual(ILayoutEngine layoutEngine)
 	{
-		if (this == layoutEngine)
+		if (Equals(layoutEngine))
 		{
 			return true;
 		}

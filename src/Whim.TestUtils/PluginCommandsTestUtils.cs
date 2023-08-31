@@ -1,5 +1,4 @@
 using System.Linq;
-using Xunit;
 
 namespace Whim.TestUtils;
 
@@ -27,7 +26,7 @@ public class PluginCommandsTestUtils
 	public ICommand GetCommand(string id)
 	{
 		ICommand? command = _pluginCommands.Commands.FirstOrDefault(c => c.Id == id);
-		Assert.NotNull(command);
+		Xunit.Assert.NotNull(command);
 		return command!;
 	}
 }

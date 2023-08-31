@@ -1,6 +1,5 @@
 using Moq;
 using System.Runtime.InteropServices;
-using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -77,7 +76,7 @@ public class MouseHookTests
 		mouseHook.PostInitialize();
 
 		// Then
-		WhimAssert.DoesNotRaise<MouseEventArgs>(
+		TestUtils.Assert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,
 			h => mouseHook.MouseLeftButtonDown -= h,
 			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 0)
@@ -95,7 +94,7 @@ public class MouseHookTests
 		mouseHook.PostInitialize();
 
 		// Then
-		WhimAssert.DoesNotRaise<MouseEventArgs>(
+		TestUtils.Assert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,
 			h => mouseHook.MouseLeftButtonDown -= h,
 			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1)
@@ -157,13 +156,13 @@ public class MouseHookTests
 		mouseHook.PostInitialize();
 
 		// Then
-		WhimAssert.DoesNotRaise<MouseEventArgs>(
+		TestUtils.Assert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,
 			h => mouseHook.MouseLeftButtonDown -= h,
 			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_KEYDOWN, 1)
 		);
 
-		WhimAssert.DoesNotRaise<MouseEventArgs>(
+		TestUtils.Assert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonUp += h,
 			h => mouseHook.MouseLeftButtonUp -= h,
 			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_KEYDOWN, 1)

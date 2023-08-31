@@ -349,7 +349,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		// Linear search for the monitor that contains the workspace.
 		foreach ((IMonitor m, IWorkspace w) in _monitorWorkspaceMap)
 		{
-			if (w == workspace)
+			if (w.Equals(workspace))
 			{
 				Logger.Debug($"Found monitor {m} for workspace {workspace}");
 				return m;
@@ -573,7 +573,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		if (oldMonitor == monitor)
+		if (oldMonitor.Equals(monitor))
 		{
 			Logger.Error($"Window {window} is already on monitor {monitor}");
 			return;

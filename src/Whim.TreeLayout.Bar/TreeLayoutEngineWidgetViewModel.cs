@@ -55,7 +55,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
 	{
-		if (e.Monitor == _monitor)
+		if (e.Monitor.Equals(_monitor))
 		{
 			OnPropertyChanged(string.Empty);
 		}

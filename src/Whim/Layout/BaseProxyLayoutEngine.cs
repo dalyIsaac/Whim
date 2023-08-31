@@ -105,7 +105,7 @@ public abstract record BaseProxyLayoutEngine : ILayoutEngine
 	/// </returns>
 	public bool ContainsEqual(ILayoutEngine layoutEngine)
 	{
-		if (this == (layoutEngine as BaseProxyLayoutEngine))
+		if (Equals(layoutEngine) || this == (layoutEngine as BaseProxyLayoutEngine))
 		{
 			return true;
 		}

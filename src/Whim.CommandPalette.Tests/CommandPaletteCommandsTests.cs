@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Moq;
-using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
@@ -70,7 +69,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.command_palette.activate_workspace"
 		);
 
@@ -93,7 +92,9 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand("whim.command_palette.toggle");
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.command_palette.toggle"
+		);
 
 		// When
 		command.TryExecute();
@@ -107,7 +108,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.command_palette.rename_workspace"
 		);
 
@@ -129,7 +130,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.command_palette.create_workspace"
 		);
 
@@ -151,7 +152,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.command_palette.move_window_to_workspace"
 		);
 		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
@@ -277,7 +278,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.command_palette.move_multiple_windows_to_workspace"
 		);
 
@@ -305,7 +306,7 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.command_palette.remove_window"
 		);
 

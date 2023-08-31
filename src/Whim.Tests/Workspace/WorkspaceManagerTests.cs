@@ -1,7 +1,6 @@
 using Moq;
 using System;
 using System.Linq;
-using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
@@ -130,10 +129,13 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.Initialize();
 
 		// When a workspace is added with a layout engine
-		wrapper.WorkspaceManager.Add("workspace", new CreateLeafLayoutEngine[] { (id) => new TestLayoutEngine() });
+		wrapper.WorkspaceManager.Add(
+			"workspace",
+			new CreateLeafLayoutEngine[] { (id) => new TestUtils.TestLayoutEngine() }
+		);
 
 		// Then the workspace is created with the specified layout engine.
-		Assert.IsType<TestLayoutEngine>(wrapper.WorkspaceManager.Single().ActiveLayoutEngine);
+		Assert.IsType<TestUtils.TestLayoutEngine>(wrapper.WorkspaceManager.Single().ActiveLayoutEngine);
 	}
 
 	[Fact]
@@ -923,6 +925,36 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void MoveWindowToMonitor_PreviousMonitorIsDifferentButEqual()
+	{
+		// Given there are 2 workspaces, and the window has been added
+		Mock<IWorkspace> workspace = new();
+		Mock<IWorkspace> workspace2 = new();
+
+		Mock<IMonitor> monitor = new();
+		Mock<IMonitor> monitor2 = new();
+		monitor.Setup(m => m.Equals(monitor2.Object)).Returns(true);
+		monitor2.Setup(m => m.Equals(monitor.Object)).Returns(true);
+
+		Wrapper wrapper = new(new[] { workspace, workspace2 }, new[] { monitor, monitor2 });
+
+		wrapper.WorkspaceManager.Activate(workspace.Object, monitor.Object);
+		wrapper.WorkspaceManager.Activate(workspace2.Object, monitor2.Object);
+
+		Mock<IWindow> window = new();
+		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspace.Reset();
+		workspace2.Reset();
+
+		// When a window which is in a workspace is moved to the same monitor
+		wrapper.WorkspaceManager.MoveWindowToMonitor(monitor2.Object, window.Object);
+
+		// Then the window is not added to the workspace
+		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
+		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+	}
+
+	[Fact]
 	public void MoveWindowToMonitor_WorkspaceForMonitorNotFound()
 	{
 		// Given there are 2 workspaces, and the window has been added
@@ -1446,11 +1478,15 @@ public class WorkspaceManagerTests
 		Wrapper wrapper = new();
 
 		// When
-		wrapper.WorkspaceManager.AddProxyLayoutEngine((engine) => new Mock<TestProxyLayoutEngine>(engine).Object);
+		wrapper.WorkspaceManager.AddProxyLayoutEngine(
+			(engine) => new Mock<TestUtils.TestProxyLayoutEngine>(engine).Object
+		);
 		wrapper.WorkspaceManager.Initialize();
 
 		// Then
-		Assert.IsAssignableFrom<TestProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
+		Assert.IsAssignableFrom<TestUtils.TestProxyLayoutEngine>(
+			wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine
+		);
 	}
 	#endregion
 

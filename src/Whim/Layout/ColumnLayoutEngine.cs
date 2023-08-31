@@ -74,7 +74,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
-		return _stack.Any(x => x.Handle == window.Handle);
+		return _stack.Any(x => x.Equals(window));
 	}
 
 	/// <inheritdoc/>
@@ -148,7 +148,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		}
 
 		// Find the index of the window in the stack
-		int windowIndex = _stack.FindIndex(x => x.Handle == window.Handle);
+		int windowIndex = _stack.FindIndex(x => x.Equals(window));
 		if (windowIndex == -1)
 		{
 			Logger.Error($"Window {window} not found in layout engine {Name}");
@@ -173,7 +173,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		}
 
 		// Find the index of the window in the stack.
-		int windowIndex = _stack.FindIndex(x => x.Handle == window.Handle);
+		int windowIndex = _stack.FindIndex(x => x.Equals(window));
 		if (windowIndex == -1)
 		{
 			Logger.Error($"Window {window} not found in layout engine {Name}");

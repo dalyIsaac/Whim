@@ -40,24 +40,24 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
 			IMonitor? monitorForWorkspace = _context.WorkspaceManager.GetMonitorForWorkspace(workspace);
-			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor == monitorForWorkspace));
+			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor.Equals(monitorForWorkspace)));
 		}
 	}
 
 	private void WorkspaceManager_WorkspaceAdded(object? sender, WorkspaceEventArgs args)
 	{
-		if (Workspaces.Any(model => model.Workspace == args.Workspace))
+		if (Workspaces.Any(model => model.Workspace.Equals(args.Workspace)))
 		{
 			return;
 		}
 
 		IMonitor? monitorForWorkspace = _context.WorkspaceManager.GetMonitorForWorkspace(args.Workspace);
-		Workspaces.Add(new WorkspaceModel(_context, this, args.Workspace, Monitor == monitorForWorkspace));
+		Workspaces.Add(new WorkspaceModel(_context, this, args.Workspace, Monitor.Equals(monitorForWorkspace)));
 	}
 
 	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
 	{
-		WorkspaceModel? workspaceModel = Workspaces.FirstOrDefault(model => model.Workspace == args.Workspace);
+		WorkspaceModel? workspaceModel = Workspaces.FirstOrDefault(model => model.Workspace.Equals(args.Workspace));
 		if (workspaceModel == null)
 		{
 			return;
@@ -77,7 +77,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		if (args.PreviousWorkspace != null)
 		{
 			WorkspaceModel? oldWorkspaceModel = Workspaces.FirstOrDefault(
-				model => model.Workspace == args.PreviousWorkspace
+				model => model.Workspace.Equals(args.PreviousWorkspace)
 			);
 			if (oldWorkspaceModel != null)
 			{
@@ -87,7 +87,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 		// Set the new workspace's model to be active on the monitor
 		WorkspaceModel? newWorkspaceModel = Workspaces.FirstOrDefault(
-			model => model.Workspace == args.CurrentWorkspace
+			model => model.Workspace.Equals(args.CurrentWorkspace)
 		);
 		if (newWorkspaceModel != null)
 		{
@@ -97,7 +97,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 	private void WorkspaceManager_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs e)
 	{
-		WorkspaceModel? workspace = Workspaces.FirstOrDefault(m => m.Workspace == e.Workspace);
+		WorkspaceModel? workspace = Workspaces.FirstOrDefault(m => m.Workspace.Equals(e.Workspace));
 		if (workspace == null)
 		{
 			return;

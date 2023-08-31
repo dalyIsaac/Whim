@@ -118,6 +118,13 @@ internal class WindowManager : IWindowManager
 	public IWindow? CreateWindow(HWND hwnd)
 	{
 		Logger.Debug($"Adding window {hwnd}");
+
+		if (_windows.TryGetValue(hwnd, out IWindow? window) && window != null)
+		{
+			Logger.Debug($"Window {hwnd} already exists");
+			return window;
+		}
+
 		return Window.CreateWindow(_context, _coreNativeManager, hwnd);
 	}
 

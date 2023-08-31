@@ -528,7 +528,7 @@ public record TreeLayoutEngine : ILayoutEngine
 
 		if (_root is WindowNode windowNode)
 		{
-			if (windowNode.Window == window)
+			if (windowNode.Window.Equals(window))
 			{
 				return new TreeLayoutEngine(_context, _plugin, Identity);
 			}
