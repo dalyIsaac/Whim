@@ -1,6 +1,5 @@
 using Moq;
 using Whim.CommandPalette;
-using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.CommandPalette.Tests;
@@ -46,7 +45,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.tree_layout.command_palette.set_direction"
 		);
 		wrapper.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(wrapper.Monitor.Object)).Returns(Direction.Left);
@@ -63,7 +62,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.tree_layout.command_palette.set_direction"
 		);
 		wrapper.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(wrapper.Monitor.Object)).Returns((Direction?)null);

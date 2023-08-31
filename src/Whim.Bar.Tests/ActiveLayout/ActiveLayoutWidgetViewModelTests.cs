@@ -69,6 +69,60 @@ public class ActiveLayoutWidgetViewModelTests
 	}
 
 	[Fact]
+	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitorButEquals()
+	{
+		// Given
+		Wrapper wrapper = new();
+		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Equals(wrapper.Monitor.Object)).Returns(true);
+		wrapper.Monitor.Setup(m => m.Equals(monitor.Object)).Returns(true);
+
+		// When
+		// Then
+		Assert.PropertyChanged(
+			viewModel,
+			nameof(viewModel.ActiveLayoutEngine),
+			() =>
+				wrapper.WorkspaceManager.Raise(
+					wm => wm.MonitorWorkspaceChanged += null,
+					new MonitorWorkspaceChangedEventArgs()
+					{
+						Monitor = monitor.Object,
+						CurrentWorkspace = wrapper.Workspace.Object
+					}
+				)
+		);
+	}
+
+	[Fact]
+	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor()
+	{
+		// Given
+		Wrapper wrapper = new();
+		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Equals(wrapper.Monitor.Object)).Returns(false);
+		wrapper.Monitor.Setup(m => m.Equals(monitor.Object)).Returns(false);
+
+		// When
+		// Then
+		TestUtils.Assert.PropertyNotChanged(
+			viewModel,
+			nameof(viewModel.ActiveLayoutEngine),
+			() =>
+				wrapper.WorkspaceManager.Raise(
+					wm => wm.MonitorWorkspaceChanged += null,
+					new MonitorWorkspaceChangedEventArgs()
+					{
+						Monitor = monitor.Object,
+						CurrentWorkspace = wrapper.Workspace.Object
+					}
+				)
+		);
+	}
+
+	[Fact]
 	public void Dispose()
 	{
 		// Given

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Whim;
 
@@ -68,7 +69,7 @@ public static class KeyModifiersExtensions
 	/// <returns></returns>
 	public static IEnumerable<string> GetParts(this KeyModifiers modifiers)
 	{
-		List<string> parts = new();
+		ImmutableArray<string>.Builder parts = ImmutableArray.CreateBuilder<string>();
 
 		if (modifiers.HasFlag(KeyModifiers.LWin))
 		{
@@ -110,6 +111,6 @@ public static class KeyModifiersExtensions
 			parts.Add("RAlt");
 		}
 
-		return parts;
+		return parts.ToImmutable();
 	}
 }

@@ -26,8 +26,8 @@ public abstract class LayoutEngineBaseTests
 		ILayoutEngine result = layoutEngine.AddWindow(window.Object);
 
 		// Then
-		Assert.NotSame(layoutEngine, result);
-		Assert.True(result.ContainsWindow(window.Object));
+		Xunit.Assert.NotSame(layoutEngine, result);
+		Xunit.Assert.True(result.ContainsWindow(window.Object));
 	}
 
 	[Fact]
@@ -41,9 +41,9 @@ public abstract class LayoutEngineBaseTests
 		ILayoutEngine result = layoutEngine.AddWindow(window.Object);
 
 		// Then
-		Assert.Same(layoutEngine, result);
-		Assert.True(result.ContainsWindow(window.Object));
-		Assert.Equal(1, result.Count);
+		Xunit.Assert.Same(layoutEngine, result);
+		Xunit.Assert.True(result.ContainsWindow(window.Object));
+		Xunit.Assert.Equal(1, result.Count);
 	}
 
 	[Fact]
@@ -57,9 +57,9 @@ public abstract class LayoutEngineBaseTests
 		ILayoutEngine result = layoutEngine.RemoveWindow(window.Object);
 
 		// Then
-		Assert.NotSame(layoutEngine, result);
-		Assert.False(result.ContainsWindow(window.Object));
-		Assert.Equal(0, result.Count);
+		Xunit.Assert.NotSame(layoutEngine, result);
+		Xunit.Assert.False(result.ContainsWindow(window.Object));
+		Xunit.Assert.Equal(0, result.Count);
 	}
 
 	[Fact]
@@ -73,9 +73,9 @@ public abstract class LayoutEngineBaseTests
 		ILayoutEngine result = layoutEngine.RemoveWindow(window.Object);
 
 		// Then
-		Assert.Same(layoutEngine, result);
-		Assert.False(result.ContainsWindow(window.Object));
-		Assert.Equal(0, result.Count);
+		Xunit.Assert.Same(layoutEngine, result);
+		Xunit.Assert.False(result.ContainsWindow(window.Object));
+		Xunit.Assert.Equal(0, result.Count);
 	}
 
 	[Fact]
@@ -89,7 +89,7 @@ public abstract class LayoutEngineBaseTests
 		bool result = layoutEngine.ContainsWindow(window.Object);
 
 		// Then
-		Assert.True(result);
+		Xunit.Assert.True(result);
 	}
 
 	[Fact]
@@ -103,7 +103,7 @@ public abstract class LayoutEngineBaseTests
 		bool result = layoutEngine.ContainsWindow(window.Object);
 
 		// Then
-		Assert.False(result);
+		Xunit.Assert.False(result);
 	}
 
 	[Fact]

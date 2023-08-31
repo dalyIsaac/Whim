@@ -13,8 +13,8 @@ public delegate ILayoutEngine CreateLeafLayoutEngine(LayoutEngineIdentity identi
 /// Layout engines dictate how windows are laid out.
 /// </summary>
 /// <remarks>
-/// Layout engines are immutable. All methods that change the layout engine return a new
-/// layout engine.
+/// Layout engines are immutable, and should be implemented as records. All methods that change the
+/// layout engine return a new layout engine.
 ///
 /// Layout engines are also composable, via the <see cref="BaseProxyLayoutEngine"/> class.
 ///
@@ -152,7 +152,7 @@ public interface ILayoutEngine
 	/// </returns>
 	bool ContainsEqual(ILayoutEngine layoutEngine)
 	{
-		if (this == layoutEngine)
+		if (Equals(layoutEngine))
 		{
 			return true;
 		}

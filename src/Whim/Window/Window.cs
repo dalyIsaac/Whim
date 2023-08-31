@@ -207,8 +207,13 @@ internal class Window : IWindow
 			return false;
 		}
 
-		return obj is Window window && window.Handle == Handle;
+		// It won't reach here if the type is different
+		return ((Window)obj).Handle == Handle;
 	}
+
+	public static bool operator ==(Window? left, Window? right) => Equals(left, right);
+
+	public static bool operator !=(Window? left, Window? right) => !Equals(left, right);
 
 	/// <inheritdoc/>
 	public override int GetHashCode()

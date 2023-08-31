@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Represents a single display device.
 /// </summary>
-public interface IMonitor : IEquatable<IMonitor>
+public interface IMonitor
 {
 	/// <summary>
 	/// The name of the monitor.

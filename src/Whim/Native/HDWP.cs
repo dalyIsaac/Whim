@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 
 namespace Windows.Win32
@@ -9,7 +8,7 @@ namespace Windows.Win32
 		/// A handle to a multiple-window position structure.
 		/// </summary>
 		[DebuggerDisplay("{Value}")]
-		public readonly struct HDWP : IEquatable<HDWP>
+		public readonly record struct HDWP
 		{
 			internal readonly nint Value;
 
@@ -24,24 +23,6 @@ namespace Windows.Win32
 
 			/// <inheritdoc/>
 			public static explicit operator HDWP(nint value) => new(value);
-
-			/// <inheritdoc/>
-			public static bool operator ==(HDWP left, HDWP right) => left.Value == right.Value;
-
-			/// <inheritdoc/>
-			public static bool operator !=(HDWP left, HDWP right) => !(left == right);
-
-			/// <inheritdoc/>
-			public bool Equals(HDWP other) => Value == other.Value;
-
-			/// <inheritdoc/>
-			public override bool Equals(object? obj) => obj is HDWP other && Equals(other);
-
-			/// <inheritdoc/>
-			public override int GetHashCode() => Value.GetHashCode();
-
-			/// <inheritdoc/>
-			public override string ToString() => Value.ToString();
 		}
 	}
 }

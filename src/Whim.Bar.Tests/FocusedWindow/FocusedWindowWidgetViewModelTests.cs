@@ -105,4 +105,103 @@ public class FocusedWindowWidgetViewModelTests
 		// Then
 		wrapper.WindowManager.VerifyRemove(wm => wm.WindowFocused -= It.IsAny<EventHandler<WindowEventArgs>>());
 	}
+
+	[Fact]
+	public void WindowManager_WindowFocused_SameMonitor()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FocusedWindowWidgetViewModel viewModel =
+			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+
+		Mock<IWindow> window = new();
+		window.SetupGet(w => w.Title).Returns("title");
+
+		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(wrapper.Monitor.Object);
+
+		// When
+		Assert.PropertyChanged(
+			viewModel,
+			nameof(viewModel.Title),
+			() =>
+				wrapper.WindowManager.Raise(
+					wm => wm.WindowFocused += null,
+					new WindowEventArgs() { Window = window.Object }
+				)
+		);
+
+		// Then
+		Assert.Equal("title", viewModel.Title);
+	}
+
+	[Fact]
+	public void WindowManager_WindowFocused_DifferentMonitorButEqual()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FocusedWindowWidgetViewModel viewModel =
+			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+
+		Mock<IWindow> window = new();
+		window.SetupGet(w => w.Title).Returns("title");
+
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Equals(wrapper.Monitor.Object)).Returns(true);
+		wrapper.Monitor.Setup(m => m.Equals(monitor.Object)).Returns(true);
+
+		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(monitor.Object);
+
+		// When
+		Assert.PropertyChanged(
+			viewModel,
+			nameof(viewModel.Title),
+			() =>
+				wrapper.WindowManager.Raise(
+					wm => wm.WindowFocused += null,
+					new WindowEventArgs() { Window = window.Object }
+				)
+		);
+
+		// Then
+		Assert.Equal("title", viewModel.Title);
+	}
+
+	[Fact]
+	public void WindowManager_WindowFocused_DifferentMonitor()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FocusedWindowWidgetViewModel viewModel =
+			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+
+		Mock<IWindow> window = new();
+		window.SetupGet(w => w.Title).Returns("title");
+
+		Mock<IWindow> otherWindow = new();
+		otherWindow.SetupGet(w => w.Title).Returns("other title");
+
+		Mock<IMonitor> monitor = new();
+		monitor.Setup(m => m.Equals(wrapper.Monitor.Object)).Returns(true);
+		wrapper.Monitor.Setup(m => m.Equals(monitor.Object)).Returns(true);
+
+		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(monitor.Object);
+		wrapper.WorkspaceManager
+			.Setup(wm => wm.GetMonitorForWindow(otherWindow.Object))
+			.Returns(new Mock<IMonitor>().Object);
+
+		// When
+		wrapper.WindowManager.Raise(wm => wm.WindowFocused += null, new WindowEventArgs() { Window = window.Object });
+		Assert.PropertyChanged(
+			viewModel,
+			nameof(viewModel.Title),
+			() =>
+				wrapper.WindowManager.Raise(
+					wm => wm.WindowFocused += null,
+					new WindowEventArgs() { Window = otherWindow.Object }
+				)
+		);
+
+		// Then
+		Assert.Null(viewModel.Title);
+	}
 }

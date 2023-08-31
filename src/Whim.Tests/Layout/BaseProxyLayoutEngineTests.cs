@@ -1,5 +1,4 @@
 using Moq;
-using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
@@ -12,10 +11,11 @@ public class BaseProxyLayoutEngineTests
 	{
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		Mock<TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+		Mock<TestUtils.TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		TestProxyLayoutEngine? newEngine = proxyLayoutEngine.Object.GetLayoutEngine<TestProxyLayoutEngine>();
+		TestUtils.TestProxyLayoutEngine? newEngine =
+			proxyLayoutEngine.Object.GetLayoutEngine<TestUtils.TestProxyLayoutEngine>();
 
 		// Then
 		Assert.Same(proxyLayoutEngine.Object, newEngine);
@@ -25,16 +25,19 @@ public class BaseProxyLayoutEngineTests
 	public void GetLayoutEngine_IsInner()
 	{
 		// Given
-		Mock<ITestLayoutEngine> innerLayoutEngine = new();
-		innerLayoutEngine.Setup(x => x.GetLayoutEngine<ITestLayoutEngine>()).Returns(innerLayoutEngine.Object);
-		Mock<TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+		Mock<TestUtils.ITestLayoutEngine> innerLayoutEngine = new();
+		innerLayoutEngine
+			.Setup(x => x.GetLayoutEngine<TestUtils.ITestLayoutEngine>())
+			.Returns(innerLayoutEngine.Object);
+		Mock<TestUtils.TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		ITestLayoutEngine? newEngine = proxyLayoutEngine.Object.GetLayoutEngine<ITestLayoutEngine>();
+		TestUtils.ITestLayoutEngine? newEngine =
+			proxyLayoutEngine.Object.GetLayoutEngine<TestUtils.ITestLayoutEngine>();
 
 		// Then
 		Assert.Same(innerLayoutEngine.Object, newEngine);
-		innerLayoutEngine.Verify(x => x.GetLayoutEngine<ITestLayoutEngine>(), Times.Once);
+		innerLayoutEngine.Verify(x => x.GetLayoutEngine<TestUtils.ITestLayoutEngine>(), Times.Once);
 	}
 
 	[Fact]
@@ -42,10 +45,11 @@ public class BaseProxyLayoutEngineTests
 	{
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		Mock<TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+		Mock<TestUtils.TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
-		ITestLayoutEngine? newEngine = proxyLayoutEngine.Object.GetLayoutEngine<ITestLayoutEngine>();
+		TestUtils.ITestLayoutEngine? newEngine =
+			proxyLayoutEngine.Object.GetLayoutEngine<TestUtils.ITestLayoutEngine>();
 
 		// Then
 		Assert.Null(newEngine);
@@ -58,7 +62,8 @@ public class BaseProxyLayoutEngineTests
 	{
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		Mock<TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+		Mock<TestUtils.TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+		proxyLayoutEngine.Setup(p => p.Equals(proxyLayoutEngine.Object)).Returns(true);
 
 		// When
 		bool contains = proxyLayoutEngine.Object.ContainsEqual(proxyLayoutEngine.Object);
@@ -71,9 +76,9 @@ public class BaseProxyLayoutEngineTests
 	public void ContainsEqual_IsInner()
 	{
 		// Given
-		Mock<ITestLayoutEngine> innerLayoutEngine = new();
+		Mock<TestUtils.ITestLayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.ContainsEqual(innerLayoutEngine.Object)).Returns(true);
-		Mock<TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+		Mock<TestUtils.TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
 		bool contains = proxyLayoutEngine.Object.ContainsEqual(innerLayoutEngine.Object);
@@ -88,7 +93,7 @@ public class BaseProxyLayoutEngineTests
 	{
 		// Given
 		Mock<ILayoutEngine> innerLayoutEngine = new();
-		Mock<TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+		Mock<TestUtils.TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
 		bool contains = proxyLayoutEngine.Object.ContainsEqual(new Mock<ILayoutEngine>().Object);
@@ -105,7 +110,7 @@ public class BaseProxyLayoutEngineTests
 		Mock<ILayoutEngine> innerLayoutEngine = new();
 		innerLayoutEngine.Setup(x => x.Identity).Returns(new LayoutEngineIdentity());
 
-		Mock<TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
+		Mock<TestUtils.TestProxyLayoutEngine> proxyLayoutEngine = new(innerLayoutEngine.Object);
 
 		// When
 		LayoutEngineIdentity proxyIdentity = proxyLayoutEngine.Object.Identity;

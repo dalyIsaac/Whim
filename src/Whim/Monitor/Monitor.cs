@@ -71,7 +71,12 @@ internal class Monitor : IMonitor
 		ScaleFactor = (int)((double)effectiveDpiX / 96 * 100);
 	}
 
-	public bool Equals(IMonitor? other) => other is Monitor monitor && _hmonitor == monitor._hmonitor;
+	/// <inheritdoc/>
+	public override bool Equals(object? other) => other is Monitor monitor && _hmonitor == monitor._hmonitor;
+
+	public static bool operator ==(Monitor? left, Monitor? right) => Equals(left, right);
+
+	public static bool operator !=(Monitor? left, Monitor? right) => !Equals(left, right);
 
 	public override int GetHashCode() => (int)(nint)_hmonitor;
 

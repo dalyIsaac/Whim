@@ -446,8 +446,12 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_AlreadyContainsWindow()
+	[InlineData(0.25, 0.25)]
+	[InlineData(0.25, 0.75)]
+	[InlineData(0.75, 0.25)]
+	[InlineData(0.75, 0.75)]
+	[Theory]
+	public void MoveWindowToPoint_AlreadyContainsWindow(double x, double y)
 	{
 		// Given
 		Mock<IWindow> window = new();
@@ -458,7 +462,7 @@ public class MoveWindowToPointTests
 			wrapper.Identity
 		).AddWindow(window.Object);
 
-		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
+		IPoint<double> point = new Point<double>() { X = x, Y = y };
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 		Mock<IMonitor> monitor = new();

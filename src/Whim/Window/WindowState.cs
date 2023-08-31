@@ -29,11 +29,17 @@ public class WindowState : IWindowState
 			return false;
 		}
 
-		return obj is WindowState location
-			&& Location.Equals(location.Location)
-			&& WindowSize == location.WindowSize
-			&& Window.Equals(location.Window);
+		return obj is WindowState state
+			&& Location.Equals(state.Location)
+			&& WindowSize == state.WindowSize
+			&& Window.Equals(state.Window);
 	}
+
+	/// <inheritdoc />
+	public static bool operator ==(WindowState? left, WindowState? right) => Equals(left, right);
+
+	/// <inheritdoc />
+	public static bool operator !=(WindowState? left, WindowState? right) => !Equals(left, right);
 
 	/// <inheritdoc />
 	public override int GetHashCode() => HashCode.Combine(Location, WindowSize, Window);

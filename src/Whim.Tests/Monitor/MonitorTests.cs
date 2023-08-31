@@ -203,6 +203,35 @@ public class MonitorTests
 	}
 
 	[Fact]
+	public void Equals_Operator_Success()
+	{
+		// Given
+		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+
+		// When
+		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
+		Monitor monitor2 = new(nativeManagerMock.Object, hmonitor, false);
+
+		// Then
+		Assert.True(monitor == monitor2);
+	}
+
+	[Fact]
+	public void NotEquals_Operator_Success()
+	{
+		// Given
+		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+		HMONITOR hmonitor2 = new(2);
+
+		// When
+		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
+		Monitor monitor2 = new(nativeManagerMock.Object, hmonitor2, false);
+
+		// Then
+		Assert.True(monitor != monitor2);
+	}
+
+	[Fact]
 	public void ToString_Success()
 	{
 		// Given

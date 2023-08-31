@@ -288,7 +288,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			Logger.Debug($"Removing window {window} from workspace {Name}");
 
-			if (LastFocusedWindow == window)
+			if (window.Equals(LastFocusedWindow))
 			{
 				LastFocusedWindow = null;
 			}

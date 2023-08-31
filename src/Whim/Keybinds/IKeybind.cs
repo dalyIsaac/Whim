@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -42,9 +41,4 @@ public interface IKeybind
 	/// See https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 	/// </summary>
 	public VIRTUAL_KEY Key { get; }
-
-	/// <summary>
-	/// All the keys which make up this keybind.
-	/// </summary>
-	public ReadOnlyCollection<string> AllKeys { get; }
 }
