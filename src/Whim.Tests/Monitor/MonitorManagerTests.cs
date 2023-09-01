@@ -16,7 +16,7 @@ namespace Whim.Tests;
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Unnecessary for tests")]
 public class MonitorManagerTests
 {
-	private class MocksBuilder
+	private class Wrapper
 	{
 		private RECT[] _monitorRects;
 
@@ -24,8 +24,9 @@ public class MonitorManagerTests
 		public Mock<IWorkspaceManager> WorkspaceManager { get; }
 		public Mock<ICoreNativeManager> CoreNativeManager { get; }
 		public Mock<IWindowMessageMonitor> WindowMessageMonitor { get; }
+		public Mock<IMouseHook> MouseHook { get; }
 
-		public MocksBuilder()
+		public Wrapper()
 		{
 			Context = new();
 
@@ -54,6 +55,7 @@ public class MonitorManagerTests
 			);
 
 			WindowMessageMonitor = new();
+			MouseHook = new();
 		}
 
 		[MemberNotNull(nameof(_monitorRects))]
@@ -143,14 +145,15 @@ public class MonitorManagerTests
 	public void Create()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 
 		// When
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 
 		// Then
@@ -162,8 +165,8 @@ public class MonitorManagerTests
 	public void Create_NoPrimaryMonitorFound()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
-		mocksBuilder.CoreNativeManager
+		Wrapper wrapper = new();
+		wrapper.CoreNativeManager
 			.Setup(n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY))
 			.Returns(new HMONITOR(0));
 
@@ -172,9 +175,10 @@ public class MonitorManagerTests
 		var result = Assert.Throws<Exception>(
 			() =>
 				new MonitorManager(
-					mocksBuilder.Context.Object,
-					mocksBuilder.CoreNativeManager.Object,
-					mocksBuilder.WindowMessageMonitor.Object
+					wrapper.Context.Object,
+					wrapper.CoreNativeManager.Object,
+					wrapper.MouseHook.Object,
+					wrapper.WindowMessageMonitor.Object
 				)
 		);
 	}
@@ -183,31 +187,32 @@ public class MonitorManagerTests
 	public void Initialize()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 
 		// When
 		monitorManager.Initialize();
 
 		// Then
-		mocksBuilder.WindowMessageMonitor.VerifyAdd(
+		wrapper.WindowMessageMonitor.VerifyAdd(
 			m => m.DisplayChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
-		mocksBuilder.WindowMessageMonitor.VerifyAdd(
+		wrapper.WindowMessageMonitor.VerifyAdd(
 			m => m.WorkAreaChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
-		mocksBuilder.WindowMessageMonitor.VerifyAdd(
+		wrapper.WindowMessageMonitor.VerifyAdd(
 			m => m.DpiChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
-		mocksBuilder.WindowMessageMonitor.VerifyAdd(
+		wrapper.WindowMessageMonitor.VerifyAdd(
 			m => m.SessionChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
@@ -217,52 +222,52 @@ public class MonitorManagerTests
 	public void WindowFocused_NullMonitor()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 
-		mocksBuilder.WorkspaceManager.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns((IMonitor?)null);
-		mocksBuilder.Context.SetupGet(c => c.WorkspaceManager).Returns(mocksBuilder.WorkspaceManager.Object);
+		wrapper.WorkspaceManager.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns((IMonitor?)null);
+		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 
 		// When
 		monitorManager.WindowFocused(new Mock<IWindow>().Object);
 
 		// Then
-		mocksBuilder.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+		wrapper.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
 	}
 
 	[Fact]
 	public void WindowFocused()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 
 		Mock<IMonitor> monitorMock = new();
 		monitorMock.Setup(m => m.Equals(null)).Returns(false);
 		monitorMock.Setup(m => m.Equals(It.IsAny<IMonitor>())).Returns(true);
 
-		mocksBuilder.WorkspaceManager
-			.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>()))
-			.Returns(monitorMock.Object);
-		mocksBuilder.Context.SetupGet(c => c.WorkspaceManager).Returns(mocksBuilder.WorkspaceManager.Object);
+		wrapper.WorkspaceManager.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns(monitorMock.Object);
+		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 
 		// When
 		monitorManager.WindowFocused(new Mock<IWindow>().Object);
 
 		// Then
-		mocksBuilder.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+		wrapper.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
 		Assert.Equal(monitorMock.Object, monitorManager.ActiveMonitor);
 	}
 
@@ -284,14 +289,15 @@ public class MonitorManagerTests
 	public void WindowMessageMonitor_DisplayChanged_AddMonitor_HasMultipleMonitors()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 
 		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -321,13 +327,13 @@ public class MonitorManagerTests
 				bottom = 2160
 			};
 		RECT[] monitorRects = new[] { right, leftTop, leftBottom };
-		mocksBuilder.UpdateGetCurrentMonitors(monitorRects);
+		wrapper.UpdateGetCurrentMonitors(monitorRects);
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
+			() => wrapper.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -359,7 +365,7 @@ public class MonitorManagerTests
 	public void WindowMessageMonitor_DisplayChanged_AddMonitor_HasSingleMonitor()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 
 		// Populate the monitor manager with a single monitor
 		RECT primaryRect =
@@ -370,13 +376,14 @@ public class MonitorManagerTests
 				right = 1920,
 				bottom = 1080
 			};
-		mocksBuilder.UpdateGetCurrentMonitors(new[] { primaryRect });
+		wrapper.UpdateGetCurrentMonitors(new[] { primaryRect });
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -389,13 +396,13 @@ public class MonitorManagerTests
 				right = 3840,
 				bottom = 1080
 			};
-		mocksBuilder.UpdateGetCurrentMonitors(new[] { primaryRect, right });
+		wrapper.UpdateGetCurrentMonitors(new[] { primaryRect, right });
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
+			() => wrapper.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -426,14 +433,15 @@ public class MonitorManagerTests
 	public void WindowMessageMonitor_DisplayChanged_RemoveMonitor_HasMultipleMonitors()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 
 		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -446,13 +454,13 @@ public class MonitorManagerTests
 				right = 1920,
 				bottom = 1080
 			};
-		mocksBuilder.UpdateGetCurrentMonitors(new[] { left });
+		wrapper.UpdateGetCurrentMonitors(new[] { left });
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
+			() => wrapper.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -476,12 +484,13 @@ public class MonitorManagerTests
 	public void WindowMessageMonitor_WorkAreaChanged()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -489,7 +498,7 @@ public class MonitorManagerTests
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.WorkAreaChanged += null, WindowMessageMonitorEventArgs)
+			() => wrapper.WindowMessageMonitor.Raise(m => m.WorkAreaChanged += null, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -500,12 +509,13 @@ public class MonitorManagerTests
 	public void WindowMessageMonitor_DpiChanged()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -513,7 +523,7 @@ public class MonitorManagerTests
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => mocksBuilder.WindowMessageMonitor.Raise(m => m.DpiChanged += null, WindowMessageMonitorEventArgs)
+			() => wrapper.WindowMessageMonitor.Raise(m => m.DpiChanged += null, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -524,38 +534,40 @@ public class MonitorManagerTests
 	public void WindowMessageMonitor_SessionChanged()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
 		// When
-		mocksBuilder.WindowMessageMonitor.Raise(m => m.SessionChanged += null, WindowMessageMonitorEventArgs);
+		wrapper.WindowMessageMonitor.Raise(m => m.SessionChanged += null, WindowMessageMonitorEventArgs);
 
 		// Then
-		mocksBuilder.CoreNativeManager.Verify(cnm => cnm.TryEnqueue(It.IsAny<DispatcherQueueHandler>()), Times.Once);
+		wrapper.CoreNativeManager.Verify(cnm => cnm.TryEnqueue(It.IsAny<DispatcherQueueHandler>()), Times.Once);
 	}
 
 	[Fact]
 	public void GetMonitorAtPoint_Error_ReturnsFirstMonitor()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		Point<int> point = new() { X = 10 * 1000, Y = 10 * 1000 };
 
-		mocksBuilder.CoreNativeManager
+		wrapper.CoreNativeManager
 			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
 			.Returns((HMONITOR)0);
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -570,18 +582,19 @@ public class MonitorManagerTests
 	public void GetMonitorAtPoint_MultipleMonitors_ReturnsCorrectMonitor()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		Point<int> point = new() { X = 1930, Y = 10 };
 
-		mocksBuilder.CoreNativeManager
+		wrapper.CoreNativeManager
 			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
 			.Returns((HMONITOR)1);
 
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -596,12 +609,13 @@ public class MonitorManagerTests
 	public void GetPreviousMonitor_Error_ReturnsFirstMonitor()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -616,12 +630,13 @@ public class MonitorManagerTests
 	public void GetPreviousMonitor_MultipleMonitors_ReturnsCorrectMonitor()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -636,12 +651,13 @@ public class MonitorManagerTests
 	public void GetPreviousMonitor_MultipleMonitors_Mod()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -656,12 +672,13 @@ public class MonitorManagerTests
 	public void GetNextMonitor_Error_ReturnsFirstMonitor()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -676,12 +693,13 @@ public class MonitorManagerTests
 	public void GetNextMonitor_MultipleMonitors_ReturnsCorrectMonitor()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -696,12 +714,13 @@ public class MonitorManagerTests
 	public void GetNextMonitor_MultipleMonitors_Mod()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -716,12 +735,13 @@ public class MonitorManagerTests
 	public void Dispose()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 		monitorManager.Initialize();
 
@@ -729,23 +749,24 @@ public class MonitorManagerTests
 		monitorManager.Dispose();
 
 		// Then
-		mocksBuilder.WindowMessageMonitor.VerifyRemove(
+		wrapper.WindowMessageMonitor.VerifyRemove(
 			wmm => wmm.DisplayChanged -= It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
-		mocksBuilder.WindowMessageMonitor.Verify(wmm => wmm.Dispose(), Times.Once);
+		wrapper.WindowMessageMonitor.Verify(wmm => wmm.Dispose(), Times.Once);
 	}
 
 	[Fact]
 	public void Length()
 	{
 		// Given
-		MocksBuilder mocksBuilder = new();
+		Wrapper wrapper = new();
 		MonitorManager monitorManager =
 			new(
-				mocksBuilder.Context.Object,
-				mocksBuilder.CoreNativeManager.Object,
-				mocksBuilder.WindowMessageMonitor.Object
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
 			);
 
 		// When
@@ -753,5 +774,34 @@ public class MonitorManagerTests
 
 		// Then
 		Assert.Equal(2, length);
+	}
+
+	[Fact]
+	public void MouseHook_MouseLeftButtonUp()
+	{
+		// Given
+		Wrapper wrapper = new();
+		MonitorManager monitorManager =
+			new(
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
+			);
+		monitorManager.Initialize();
+
+		IMonitor monitor = monitorManager.ActiveMonitor;
+		IMonitor? monitor2 = monitorManager.ElementAt(1);
+
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.MonitorFromPoint(It.IsAny<Point>(), It.IsAny<MONITOR_FROM_FLAGS>()))
+			.Returns(((Monitor)monitor2)._hmonitor);
+
+		// When
+		Assert.Equal(monitor, monitorManager.ActiveMonitor);
+		wrapper.MouseHook.Raise(m => m.MouseLeftButtonUp += null, new MouseEventArgs(new Point<int>()));
+
+		// Then
+		Assert.Equal(monitor2, monitorManager.ActiveMonitor);
 	}
 }

@@ -49,7 +49,7 @@ internal class Context : IContext
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, CoreNativeManager, MouseHook);
-		MonitorManager = new MonitorManager(this, CoreNativeManager);
+		MonitorManager = new MonitorManager(this, CoreNativeManager, MouseHook);
 		WorkspaceManager = new WorkspaceManager(this);
 		_commandManager = new CommandManager();
 		PluginManager = new PluginManager(this, FileManager, _commandManager);
