@@ -15,7 +15,7 @@ internal class MouseEventArgs : EventArgs
 	}
 }
 
-internal interface IMouseHook
+internal interface IMouseHook : IDisposable
 {
 	/// <summary>
 	/// Event that is fired when the mouse left button is pressed down.

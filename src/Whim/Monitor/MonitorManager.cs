@@ -16,6 +16,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 {
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IMouseHook _mouseHook;
 	private readonly IWindowMessageMonitor _windowMessageMonitor;
 
 	/// <summary>
@@ -50,11 +51,13 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	public MonitorManager(
 		IContext context,
 		ICoreNativeManager coreNativeManager,
+		IMouseHook mouseHook,
 		IWindowMessageMonitor? windowMessageMonitor = null
 	)
 	{
 		_context = context;
 		_coreNativeManager = coreNativeManager;
+		_mouseHook = mouseHook;
 		_windowMessageMonitor = windowMessageMonitor ?? new WindowMessageMonitor(_context, _coreNativeManager);
 
 		// Get the monitors.
@@ -73,6 +76,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		_windowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_MonitorsChanged;
 		_windowMessageMonitor.DpiChanged += WindowMessageMonitor_MonitorsChanged;
 		_windowMessageMonitor.SessionChanged += WindowMessageMonitor_SessionChanged;
+		_mouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
 	}
 
 	public void WindowFocused(IWindow window)
@@ -150,6 +154,13 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 				AddedMonitors = addedMonitors
 			}
 		);
+	}
+
+	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)
+	{
+		IMonitor monitor = GetMonitorAtPoint(e.Point);
+		Logger.Debug($"Mouse left button up on {monitor}");
+		ActiveMonitor = monitor;
 	}
 
 	private HMONITOR GetPrimaryHMonitor()
@@ -264,6 +275,8 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 				// dispose managed state (managed objects)
 				_windowMessageMonitor.DisplayChanged -= WindowMessageMonitor_MonitorsChanged;
 				_windowMessageMonitor.Dispose();
+				_mouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
+				_mouseHook.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

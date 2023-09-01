@@ -8,7 +8,7 @@ namespace Whim;
 /// <summary>
 /// Responsible is responsible for hooking into windows and handling mouse events.
 /// </summary>
-internal class MouseHook : IMouseHook, IDisposable
+internal class MouseHook : IMouseHook
 {
 	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly HOOKPROC _lowLevelMouseProc;

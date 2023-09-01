@@ -145,6 +145,10 @@ internal class WindowManager : IWindowManager
 
 					hook.Dispose();
 				}
+
+				_mouseHook.MouseLeftButtonDown -= MouseHook_MouseLeftButtonDown;
+				_mouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
+				_mouseHook.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
