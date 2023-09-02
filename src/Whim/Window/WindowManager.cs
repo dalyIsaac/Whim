@@ -374,7 +374,15 @@ internal class WindowManager : IWindowManager
 			cursorPoint = point;
 		}
 
-		WindowMoveStart?.Invoke(this, new WindowMovedEventArgs() { Window = window, CursorDraggedPoint = cursorPoint });
+		WindowMoveStart?.Invoke(
+			this,
+			new WindowMovedEventArgs()
+			{
+				Window = window,
+				CursorDraggedPoint = cursorPoint,
+				MovedEdges = GetMovedEdges(window)?.MovedEdges
+			}
+		);
 	}
 
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = true;
@@ -386,6 +394,7 @@ internal class WindowManager : IWindowManager
 		Logger.Debug($"Window move ended: {window}");
 
 		IPoint<int>? point = null;
+		Direction? movedEdges = null;
 		lock (_mouseMoveLock)
 		{
 			if (!_isMovingWindow)
@@ -393,14 +402,27 @@ internal class WindowManager : IWindowManager
 				return;
 			}
 
-			if (!TryMoveWindowEdgesInDirection(window) && _coreNativeManager.GetCursorPos(out point))
+			if (GetMovedEdges(window) is (Direction MovedEdges, IPoint<int> MovedPoint) moved)
+			{
+				movedEdges = moved.MovedEdges;
+				_context.WorkspaceManager.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
+			}
+			else if (_coreNativeManager.GetCursorPos(out point))
 			{
 				_context.WorkspaceManager.MoveWindowToPoint(window, point);
 			}
 
 			_isMovingWindow = false;
 		}
-		WindowMoveEnd?.Invoke(this, new WindowMovedEventArgs() { Window = window, CursorDraggedPoint = point });
+		WindowMoveEnd?.Invoke(
+			this,
+			new WindowMovedEventArgs()
+			{
+				Window = window,
+				CursorDraggedPoint = point,
+				MovedEdges = movedEdges
+			}
+		);
 	}
 
 	/// <summary>
@@ -408,21 +430,21 @@ internal class WindowManager : IWindowManager
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private bool TryMoveWindowEdgesInDirection(IWindow window)
+	private (Direction MovedEdges, IPoint<int> MovedPoint)? GetMovedEdges(IWindow window)
 	{
 		Logger.Debug("Trying to move window edges in direction of mouse movement");
 		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(window);
 		if (workspace is null)
 		{
 			Logger.Debug($"Could not find workspace for window {window}, failed to move window edges");
-			return false;
+			return null;
 		}
 
 		IWindowState? windowState = workspace.TryGetWindowLocation(window);
 		if (windowState is null)
 		{
 			Logger.Debug($"Could not find window state for window {window}, failed to move window edges");
-			return false;
+			return null;
 		}
 
 		// Get the new window position.
@@ -430,7 +452,7 @@ internal class WindowManager : IWindowManager
 		if (newLocation is null)
 		{
 			Logger.Debug($"Could not get new window location for window {window}, failed to move window edges");
-			return false;
+			return null;
 		}
 
 		// Find the one or two edges to move.
@@ -444,28 +466,28 @@ internal class WindowManager : IWindowManager
 		int movedEdgeCountY = 0;
 		int movedEdgeDeltaX = 0;
 		int movedEdgeDeltaY = 0;
-		Direction movedEdge = Direction.None;
+		Direction movedEdges = Direction.None;
 		if (leftEdgeDelta != 0)
 		{
-			movedEdge |= Direction.Left;
+			movedEdges |= Direction.Left;
 			movedEdgeDeltaX = -leftEdgeDelta;
 			movedEdgeCountX++;
 		}
 		if (topEdgeDelta != 0)
 		{
-			movedEdge |= Direction.Up;
+			movedEdges |= Direction.Up;
 			movedEdgeDeltaY = -topEdgeDelta;
 			movedEdgeCountY++;
 		}
 		if (rightEdgeDelta != 0)
 		{
-			movedEdge |= Direction.Right;
+			movedEdges |= Direction.Right;
 			movedEdgeDeltaX = rightEdgeDelta;
 			movedEdgeCountX++;
 		}
 		if (bottomEdgeDelta != 0)
 		{
-			movedEdge |= Direction.Down;
+			movedEdges |= Direction.Down;
 			movedEdgeDeltaY = bottomEdgeDelta;
 			movedEdgeCountY++;
 		}
@@ -473,16 +495,10 @@ internal class WindowManager : IWindowManager
 		if (movedEdgeCountX > 1 || movedEdgeCountY > 1)
 		{
 			Logger.Debug($"Window {window} moved more than one edge in the same axis, failed to move window edges");
-			return false;
+			return null;
 		}
 
-		_context.WorkspaceManager.MoveWindowEdgesInDirection(
-			movedEdge,
-			new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, },
-			window
-		);
-
-		return true;
+		return (movedEdges, new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, });
 	}
 
 	private void OnWindowMoved(IWindow window)
@@ -500,7 +516,15 @@ internal class WindowManager : IWindowManager
 			cursorPoint = point;
 		}
 
-		WindowMoved?.Invoke(this, new WindowMovedEventArgs() { Window = window, CursorDraggedPoint = cursorPoint });
+		WindowMoved?.Invoke(
+			this,
+			new WindowMovedEventArgs()
+			{
+				Window = window,
+				CursorDraggedPoint = cursorPoint,
+				MovedEdges = GetMovedEdges(window)?.MovedEdges
+			}
+		);
 	}
 
 	internal void OnWindowMinimizeStart(IWindow window)
