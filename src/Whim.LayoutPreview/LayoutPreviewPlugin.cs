@@ -56,7 +56,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 
 	private void WindowMoved(object? sender, WindowMovedEventArgs e)
 	{
-		// Only run if the window is being dragged.
+		// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
 		if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint || e.MovedEdges is not null)
 		{
 			return;

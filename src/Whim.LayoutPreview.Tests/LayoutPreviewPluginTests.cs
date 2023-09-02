@@ -108,7 +108,13 @@ public class LayoutPreviewPluginTests
 		// Given
 		Wrapper wrapper = new();
 		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
-		WindowMovedEventArgs e = new() { Window = new Mock<IWindow>().Object, CursorDraggedPoint = null };
+		WindowMovedEventArgs e =
+			new()
+			{
+				Window = new Mock<IWindow>().Object,
+				CursorDraggedPoint = null,
+				MovedEdges = null
+			};
 
 		// When
 		plugin.PreInitialize();
@@ -125,7 +131,35 @@ public class LayoutPreviewPluginTests
 		// Given
 		Wrapper wrapper = new();
 		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
-		WindowMovedEventArgs e = new() { Window = new Mock<IWindow>().Object, CursorDraggedPoint = null };
+		WindowMovedEventArgs e =
+			new()
+			{
+				Window = new Mock<IWindow>().Object,
+				CursorDraggedPoint = null,
+				MovedEdges = null
+			};
+
+		// When
+		plugin.PreInitialize();
+		wrapper.WindowManager.Raise(x => x.WindowMoved += null, e);
+
+		// Then
+		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never);
+	}
+
+	[Fact]
+	public void WindowMoved_MovingEdges()
+	{
+		// Given
+		Wrapper wrapper = new();
+		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		WindowMovedEventArgs e =
+			new()
+			{
+				Window = new Mock<IWindow>().Object,
+				CursorDraggedPoint = new Location<int>(),
+				MovedEdges = Direction.LeftDown
+			};
 
 		// When
 		plugin.PreInitialize();
@@ -142,7 +176,12 @@ public class LayoutPreviewPluginTests
 		Wrapper wrapper = new();
 		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
 		WindowMovedEventArgs e =
-			new() { Window = new Mock<IWindow>().Object, CursorDraggedPoint = new Location<int>() };
+			new()
+			{
+				Window = new Mock<IWindow>().Object,
+				CursorDraggedPoint = new Location<int>(),
+				MovedEdges = null
+			};
 		wrapper.WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>())).Returns((IWorkspace?)null);
 
 		// When
@@ -162,7 +201,12 @@ public class LayoutPreviewPluginTests
 		Wrapper wrapper = new();
 		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
 		WindowMovedEventArgs e =
-			new() { Window = new Mock<IWindow>().Object, CursorDraggedPoint = new Location<int>() };
+			new()
+			{
+				Window = new Mock<IWindow>().Object,
+				CursorDraggedPoint = new Location<int>(),
+				MovedEdges = null
+			};
 
 		// When
 		plugin.PreInitialize();
@@ -181,7 +225,13 @@ public class LayoutPreviewPluginTests
 		// Given
 		Wrapper wrapper = new();
 		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
-		WindowMovedEventArgs e = new() { Window = new Mock<IWindow>().Object, CursorDraggedPoint = null };
+		WindowMovedEventArgs e =
+			new()
+			{
+				Window = new Mock<IWindow>().Object,
+				CursorDraggedPoint = null,
+				MovedEdges = null
+			};
 
 		// When
 		plugin.PreInitialize();
