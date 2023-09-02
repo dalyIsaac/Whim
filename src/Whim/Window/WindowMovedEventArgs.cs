@@ -11,7 +11,7 @@ public class WindowMovedEventArgs : WindowEventArgs
 	public required IPoint<int>? CursorDraggedPoint { get; init; }
 
 	/// <summary>
-	/// The edges that were moved.
+	/// The edges that were moved, if the window was being resized by dragging the edges.
 	/// </summary>
 	public required Direction? MovedEdges { get; init; }
 }
