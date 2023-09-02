@@ -52,6 +52,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 
 		// Update the rendered window.
 		_prevWindowStates = windowStates;
+		_prevHoveredIndex = -1;
 
 		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
 		for (int idx = 0; idx < windowStates.Length; idx++)
@@ -88,7 +89,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 		IPoint<int> cursorPoint
 	)
 	{
-		if (prevWindowStates.Length != windowStates.Length)
+		if (prevWindowStates.Length != windowStates.Length || prevHoveredIndex == -1)
 		{
 			return true;
 		}
@@ -101,13 +102,10 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 			}
 		}
 
-		if (prevHoveredIndex != -1)
+		IWindowState prevHoveredState = prevWindowStates[prevHoveredIndex];
+		if (!prevHoveredState.Location.ContainsPoint(cursorPoint))
 		{
-			IWindowState prevHoveredState = prevWindowStates[prevHoveredIndex];
-			if (!prevHoveredState.Location.ContainsPoint(cursorPoint))
-			{
-				return true;
-			}
+			return true;
 		}
 
 		return false;
