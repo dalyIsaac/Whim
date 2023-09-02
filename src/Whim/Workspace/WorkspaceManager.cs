@@ -626,13 +626,21 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		Logger.Debug($"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor}");
-		Logger.Debug($"Active workspace is {ActiveWorkspace}");
-
-		// If the window is being moved to a different workspace, remove it from the current workspace.
-		if (targetWorkspace != ActiveWorkspace && !ActiveWorkspace.RemoveWindow(window))
+		// Get the old workspace.
+		IWorkspace? oldWorkspace = GetWorkspaceForWindow(window);
+		if (oldWorkspace == null)
 		{
-			Logger.Error($"Could not remove window {window} from workspace {ActiveWorkspace}");
+			Logger.Error($"Window {window} was not found in any workspace");
+			return;
+		}
+
+		Logger.Debug($"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor}");
+
+		bool isSameWorkspace = targetWorkspace.Equals(oldWorkspace);
+		// If the window is being moved to a different workspace, remove it from the current workspace.
+		if (!isSameWorkspace && !oldWorkspace.RemoveWindow(window))
+		{
+			Logger.Error($"Could not remove window {window} from workspace {oldWorkspace}");
 			return;
 		}
 
@@ -644,7 +652,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		targetWorkspace.MoveWindowToPoint(window, normalized);
 
 		// If the window is being moved to a different workspace, update the reference in the window map.
-		if (targetWorkspace != ActiveWorkspace)
+		if (!isSameWorkspace)
 		{
 			_windowWorkspaceMap[window] = targetWorkspace;
 		}

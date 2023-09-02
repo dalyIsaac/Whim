@@ -1087,6 +1087,30 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
+	public void MoveWindowToPoint_OldWorkspaceNotFound()
+	{
+		// Given
+		Mock<IWorkspace> workspace = new();
+		Wrapper wrapper = new(new[] { workspace });
+
+		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
+
+		Mock<IWindow> window = new();
+		workspace.Reset();
+
+		wrapper.MonitorManager
+			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
+			.Returns(wrapper.Monitors[0].Object);
+
+		// When a window which is in a workspace is moved to a point which doesn't correspond to any workspaces
+		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
+
+		// Then the window is not removed from the old workspace and not added to the new workspace
+		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
+		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
+	}
+
+	[Fact]
 	public void MoveWindowToPoint_CannotRemoveWindow()
 	{
 		// Given
