@@ -64,31 +64,4 @@ public static class DirectionHelpers
 	/// </summary>
 	public static bool IsHorizontal(this Direction direction) =>
 		direction == Direction.Left || direction == Direction.Right;
-
-	/// <summary>
-	/// Returns the number of directions in the given direction.
-	/// </summary>
-	/// <param name="direction"></param>
-	/// <returns></returns>
-	public static int GetDirectionsCount(this Direction direction)
-	{
-		int count = 0;
-		if (direction.HasFlag(Direction.Left))
-		{
-			count++;
-		}
-		if (direction.HasFlag(Direction.Right))
-		{
-			count++;
-		}
-		if (direction.HasFlag(Direction.Up))
-		{
-			count++;
-		}
-		if (direction.HasFlag(Direction.Down))
-		{
-			count++;
-		}
-		return count;
-	}
 }
