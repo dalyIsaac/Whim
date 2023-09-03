@@ -124,11 +124,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				LastFocusedWindow = window;
 				Logger.Debug($"Focused window {window} in workspace {Name}");
 			}
-			else
-			{
-				Logger.Debug($"Window {window} is not a normal window in workspace {Name}");
-				LastFocusedWindow = null;
-			}
 		}
 	}
 
