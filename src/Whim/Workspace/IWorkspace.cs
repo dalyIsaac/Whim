@@ -50,7 +50,9 @@ public interface IWorkspace : IDisposable
 	IEnumerable<IWindow> Windows { get; }
 
 	/// <summary>
-	/// The currently focused window.
+	/// The last focused window. This is still set when the window has lost focus (provided another
+	/// window in the workspace does not have focus). This is useful in cases like when the
+	/// command palette is opened and wants to perform an action on the last focused window.
 	/// </summary>
 	IWindow? LastFocusedWindow { get; }
 
