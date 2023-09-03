@@ -55,12 +55,14 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 		_prevHoveredIndex = -1;
 
 		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
+		bool isFirst = true;
 		for (int idx = 0; idx < windowStates.Length; idx++)
 		{
-			bool isHovered = windowStates[idx].Location.ContainsPoint(cursorPoint);
+			bool isHovered = isFirst && windowStates[idx].Location.ContainsPoint(cursorPoint);
 			if (isHovered)
 			{
 				_prevHoveredIndex = idx;
+				isFirst = false;
 			}
 
 			items[idx] = new LayoutPreviewWindowItem(_context, windowStates[idx], isHovered);
