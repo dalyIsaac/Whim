@@ -109,6 +109,7 @@ public class FocusedWindowWidgetViewModelTests
 		wrapper.WindowManager.VerifyRemove(wm => wm.WindowFocused -= It.IsAny<EventHandler<WindowFocusedEventArgs>>());
 	}
 
+	#region WindowManager_WindowFocused
 	[Fact]
 	public void WindowManager_WindowFocused_SameMonitor()
 	{
@@ -210,4 +211,45 @@ public class FocusedWindowWidgetViewModelTests
 		// Then
 		Assert.Null(viewModel.Title);
 	}
+
+	[Fact]
+	public void WindowManager_WindowFocused_WindowIsNull()
+	{
+		// Given
+		Wrapper wrapper = new();
+		FocusedWindowWidgetViewModel viewModel =
+			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+
+		Mock<IWindow> window = new();
+		window.SetupGet(w => w.Title).Returns("title");
+
+		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(wrapper.Monitor.Object);
+
+		// When
+		Assert.PropertyChanged(
+			viewModel,
+			nameof(viewModel.Title),
+			() =>
+				wrapper.WindowManager.Raise(
+					wm => wm.WindowFocused += null,
+					new WindowFocusedEventArgs() { Window = window.Object }
+				)
+		);
+
+		Assert.Equal("title", viewModel.Title);
+
+		Assert.PropertyChanged(
+			viewModel,
+			nameof(viewModel.Title),
+			() =>
+				wrapper.WindowManager.Raise(
+					wm => wm.WindowFocused += null,
+					new WindowFocusedEventArgs() { Window = null }
+				)
+		);
+
+		// Then
+		Assert.Null(viewModel.Title);
+	}
+	#endregion
 }
