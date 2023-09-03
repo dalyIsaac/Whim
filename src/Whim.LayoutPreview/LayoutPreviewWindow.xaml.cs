@@ -33,6 +33,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 
 		Title = WindowTitle;
 		_transparentWindowController = _context.NativeManager.CreateTransparentWindowController(this);
+		_context.NativeManager.SetWindowExTransparent(_window.Handle);
 	}
 
 	/// <summary>
