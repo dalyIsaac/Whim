@@ -224,8 +224,9 @@ public class MonitorManagerTests
 		// Given
 		Wrapper wrapper = new();
 
-		wrapper.WorkspaceManager.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns((IMonitor?)null);
-		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()))
+			.Returns((HMONITOR)1);
 
 		MonitorManager monitorManager =
 			new(
@@ -239,7 +240,11 @@ public class MonitorManagerTests
 		monitorManager.WindowFocused(new Mock<IWindow>().Object);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+		wrapper.CoreNativeManager.Verify(cnm => cnm.GetForegroundWindow(), Times.Never);
+		wrapper.CoreNativeManager.Verify(
+			cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()),
+			Times.Once
+		);
 	}
 
 	[Fact]
@@ -248,11 +253,6 @@ public class MonitorManagerTests
 		// Given
 		Wrapper wrapper = new();
 
-		Mock<IMonitor> monitorMock = new();
-		monitorMock.Setup(m => m.Equals(null)).Returns(false);
-		monitorMock.Setup(m => m.Equals(It.IsAny<IMonitor>())).Returns(true);
-
-		wrapper.WorkspaceManager.Setup(w => w.GetMonitorForWindow(It.IsAny<IWindow>())).Returns(monitorMock.Object);
 		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
 
 		MonitorManager monitorManager =
@@ -267,8 +267,42 @@ public class MonitorManagerTests
 		monitorManager.WindowFocused(new Mock<IWindow>().Object);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(w => w.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
-		Assert.Equal(monitorMock.Object, monitorManager.ActiveMonitor);
+		wrapper.CoreNativeManager.Verify(cnm => cnm.GetForegroundWindow(), Times.Never);
+		wrapper.CoreNativeManager.Verify(
+			cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()),
+			Times.Once
+		);
+	}
+
+	[Fact]
+	public void WindowFocused_NullWindow()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		wrapper.CoreNativeManager
+			.Setup(cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()))
+			.Returns((HMONITOR)1);
+
+		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
+
+		MonitorManager monitorManager =
+			new(
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.MouseHook.Object,
+				wrapper.WindowMessageMonitor.Object
+			);
+
+		// When
+		monitorManager.WindowFocused(null);
+
+		// Then
+		wrapper.CoreNativeManager.Verify(cnm => cnm.GetForegroundWindow(), Times.Once);
+		wrapper.CoreNativeManager.Verify(
+			cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()),
+			Times.Once
+		);
 	}
 
 	private static WindowMessageMonitorEventArgs WindowMessageMonitorEventArgs =>

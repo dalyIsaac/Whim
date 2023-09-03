@@ -167,7 +167,7 @@ public class WindowManagerTests
 		Mock<IWindow> window = new();
 
 		// When
-		var result = Assert.Raises<WindowEventArgs>(
+		var result = Assert.Raises<WindowFocusedEventArgs>(
 			eh => windowManager.WindowFocused += eh,
 			eh => windowManager.WindowFocused -= eh,
 			() => windowManager.OnWindowFocused(window.Object)
@@ -456,7 +456,36 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		Assert.Raises<WindowEventArgs>(
+		Assert.Raises<WindowFocusedEventArgs>(
+			h => windowManager.WindowFocused += h,
+			h => windowManager.WindowFocused -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.InternalMonitorManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
+		wrapper.InternalWorkspaceManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
+	}
+
+	[InlineData(PInvoke.EVENT_SYSTEM_FOREGROUND)]
+	[InlineData(PInvoke.EVENT_OBJECT_UNCLOAKED)]
+	[Theory]
+	public void WindowsEventHook_OnWindowFocused_IgnoredWindow(uint eventType)
+	{
+		// Given
+		HWND hwnd = new(1);
+		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+
+		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(true);
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+		// When
+		windowManager.Initialize();
+
+		// Then
+		Assert.Raises<WindowFocusedEventArgs>(
 			h => windowManager.WindowFocused += h,
 			h => windowManager.WindowFocused -= h,
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)

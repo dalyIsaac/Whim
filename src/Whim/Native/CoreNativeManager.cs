@@ -25,11 +25,9 @@ internal class CoreNativeManager : ICoreNativeManager
 		_context = context;
 	}
 
-	/// <inheritdoc/>
 	public UnhookWinEventSafeHandle SetWinEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc) =>
 		PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
 
-	/// <inheritdoc/>
 	public UnhookWindowsHookExSafeHandle SetWindowsHookEx(
 		WINDOWS_HOOK_ID idHook,
 		HOOKPROC lpfn,
@@ -37,14 +35,11 @@ internal class CoreNativeManager : ICoreNativeManager
 		uint dwThreadId
 	) => PInvoke.SetWindowsHookEx(idHook, lpfn, hmod, dwThreadId);
 
-	/// <inheritdoc/>
 	public LRESULT CallNextHookEx(int nCode, WPARAM wParam, LPARAM lParam) =>
 		PInvoke.CallNextHookEx(null, nCode, wParam, lParam);
 
-	/// <inheritdoc/>
 	public short GetKeyState(int nVirtKey) => PInvoke.GetKeyState(nVirtKey);
 
-	/// <inheritdoc/>
 	public BOOL GetCursorPos(out IPoint<int> lpPoint)
 	{
 		bool res = PInvoke.GetCursorPos(out Point point);
@@ -52,26 +47,19 @@ internal class CoreNativeManager : ICoreNativeManager
 		return res;
 	}
 
-	/// <inheritdoc/>
 	public int GetVirtualScreenLeft() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN);
 
-	/// <inheritdoc/>
 	public int GetVirtualScreenTop() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_YVIRTUALSCREEN);
 
-	/// <inheritdoc/>
 	public int GetVirtualScreenWidth() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CXVIRTUALSCREEN);
 
-	/// <inheritdoc/>
 	public int GetVirtualScreenHeight() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CYVIRTUALSCREEN);
 
-	/// <inheritdoc/>
 	public bool HasMultipleMonitors() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CMONITORS) != 0;
 
-	/// <inheritdoc/>
 	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData) =>
 		PInvoke.EnumDisplayMonitors(new HDC(hdc?.DangerousGetHandle() ?? 0), lprcClip, lpfnEnum, dwData);
 
-	/// <inheritdoc/>
 	public BOOL GetPrimaryDisplayWorkArea(out RECT lpRect)
 	{
 		RECT rect = default;
@@ -85,10 +73,8 @@ internal class CoreNativeManager : ICoreNativeManager
 		return result;
 	}
 
-	/// <inheritdoc/>
 	public BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFO lpmi) => PInvoke.GetMonitorInfo(hMonitor, ref lpmi);
 
-	/// <inheritdoc/>
 	public BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi)
 	{
 		unsafe
@@ -100,31 +86,23 @@ internal class CoreNativeManager : ICoreNativeManager
 		}
 	}
 
-	/// <inheritdoc/>
 	public HMONITOR MonitorFromPoint(Point pt, MONITOR_FROM_FLAGS dwFlags) => PInvoke.MonitorFromPoint(pt, dwFlags);
 
-	/// <inheritdoc/>
 	public BOOL GetWindowRect(HWND hWnd, out RECT lpRect) => PInvoke.GetWindowRect(hWnd, out lpRect);
 
-	/// <inheritdoc/>
 	public HWND GetForegroundWindow() => PInvoke.GetForegroundWindow();
 
-	/// <inheritdoc/>
 	public BOOL IsWindowMinimized(HWND hWnd) => PInvoke.IsIconic(hWnd);
 
-	/// <inheritdoc/>
 	public BOOL IsWindowMaximized(HWND hWnd) => PInvoke.IsZoomed(hWnd);
 
-	/// <inheritdoc/>
 	public BOOL SetForegroundWindow(HWND hWnd) => PInvoke.SetForegroundWindow(hWnd);
 
 	/// <inheritdoc />
 	public uint SendInput(INPUT[] pInputs, int cbSize) => PInvoke.SendInput(pInputs, cbSize);
 
-	/// <inheritdoc/>
 	public BOOL BringWindowToTop(HWND hWnd) => PInvoke.BringWindowToTop(hWnd);
 
-	/// <inheritdoc/>
 	public uint GetWindowThreadProcessId(HWND hWnd, out uint lpdwProcessId)
 	{
 		uint pid;
@@ -139,7 +117,6 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	private const int _bufferCapacity = 255;
 
-	/// <inheritdoc/>
 	public string GetWindowText(HWND hwnd)
 	{
 		unsafe
@@ -154,7 +131,6 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	private const string _splashClassName = "MsoSplash";
 
-	/// <inheritdoc/>
 	public bool IsSplashScreen(HWND hwnd)
 	{
 		string classname = _context.NativeManager.GetClassName(hwnd);
@@ -166,7 +142,6 @@ internal class CoreNativeManager : ICoreNativeManager
 		return classname == _splashClassName;
 	}
 
-	/// <inheritdoc/>
 	public IEnumerable<HWND> GetAllWindows()
 	{
 		List<HWND> windows = new();
@@ -183,7 +158,6 @@ internal class CoreNativeManager : ICoreNativeManager
 		return windows;
 	}
 
-	/// <inheritdoc/>
 	public IEnumerable<HWND> GetChildWindows(HWND hwnd)
 	{
 		List<HWND> windows = new();
@@ -201,7 +175,6 @@ internal class CoreNativeManager : ICoreNativeManager
 		return windows;
 	}
 
-	/// <inheritdoc/>
 	public bool IsStandardWindow(HWND hwnd)
 	{
 		if (PInvoke.GetAncestor(hwnd, GET_ANCESTOR_FLAGS.GA_ROOT) != hwnd || !PInvoke.IsWindowVisible(hwnd))
@@ -245,7 +218,6 @@ internal class CoreNativeManager : ICoreNativeManager
 	private readonly HashSet<string> _systemClasses =
 		new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
 
-	/// <inheritdoc/>
 	public bool IsSystemWindow(HWND hwnd, string className)
 	{
 		if (hwnd == PInvoke.GetDesktopWindow() || hwnd == PInvoke.GetShellWindow())
@@ -261,7 +233,6 @@ internal class CoreNativeManager : ICoreNativeManager
 		return false;
 	}
 
-	/// <inheritdoc/>
 	public bool HasNoVisibleOwner(HWND hwnd)
 	{
 		HWND owner = PInvoke.GetWindow(hwnd, GET_WINDOW_CMD.GW_OWNER);
@@ -289,7 +260,6 @@ internal class CoreNativeManager : ICoreNativeManager
 		return rect.top == rect.bottom || rect.left == rect.right;
 	}
 
-	/// <inheritdoc/>
 	public bool IsCloakedWindow(HWND hwnd)
 	{
 		unsafe
@@ -300,40 +270,31 @@ internal class CoreNativeManager : ICoreNativeManager
 		}
 	}
 
-	/// <inheritdoc/>
 	public BOOL SetWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass, nuint dwRefData) =>
 		PInvoke.SetWindowSubclass(hWnd, pfnSubclass, uIdSubclass, dwRefData);
 
-	/// <inheritdoc/>
 	public BOOL RemoveWindowSubclass(HWND hWnd, SUBCLASSPROC pfnSubclass, nuint uIdSubclass) =>
 		PInvoke.RemoveWindowSubclass(hWnd, pfnSubclass, uIdSubclass);
 
-	/// <inheritdoc/>
 	public LRESULT DefSubclassProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam) =>
 		PInvoke.DefSubclassProc(hWnd, uMsg, wParam, lParam);
 
-	/// <inheritdoc/>
 	public HRESULT GetDpiForMonitor(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, out uint dpiX, out uint dpiY) =>
 		PInvoke.GetDpiForMonitor(hmonitor, dpiType, out dpiX, out dpiY);
 
-	/// <inheritdoc/>
 	public T? PtrToStructure<T>(IntPtr ptr)
 		where T : struct => Marshal.PtrToStructure<T>(ptr);
 
-	/// <inheritdoc/>
 	public BOOL WTSRegisterSessionNotification(HWND hWnd, uint dwFlags) =>
 		PInvoke.WTSRegisterSessionNotification(hWnd, dwFlags);
 
-	/// <inheritdoc/>
 	public BOOL WTSUnRegisterSessionNotification(HWND hWnd) => PInvoke.WTSUnRegisterSessionNotification(hWnd);
 
-	/// <inheritdoc/>
 	public bool TryEnqueue(DispatcherQueueHandler callback) =>
 		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
 
 	private Microsoft.UI.Xaml.Window? _window;
 
-	/// <inheritdoc/>
 	public HWND WindowMessageMonitorWindowHandle
 	{
 		get
@@ -348,27 +309,21 @@ internal class CoreNativeManager : ICoreNativeManager
 		}
 	}
 
-	/// <inheritdoc/>
 	public (string processName, string? processPath) GetProcessNameAndPath(int processId)
 	{
 		using Process process = Process.GetProcessById(processId);
 		return (process.ProcessName, process.MainModule?.FileName);
 	}
 
-	/// <inheritdoc/>
 	public nuint GetClassLongPtr(HWND hWnd, GET_CLASS_LONG_INDEX nIndex) => PInvoke.GetClassLongPtr(hWnd, nIndex);
 
-	/// <inheritdoc/>
 	public LRESULT SendMessage(HWND hWnd, uint Msg, WPARAM wParam, LPARAM lParam) =>
 		PInvoke.SendMessage(hWnd, Msg, wParam, lParam);
 
-	/// <inheritdoc/>
 	public BOOL GetClientRect(HWND hWnd, out RECT lpRect) => PInvoke.GetClientRect(hWnd, out lpRect);
 
-	/// <inheritdoc/>
 	public DeleteObjectSafeHandle CreateSolidBrush(COLORREF crColor) => PInvoke.CreateSolidBrush_SafeHandle(crColor);
 
-	/// <inheritdoc/>
 	public bool EnableBlurBehindWindow(HWND hwnd)
 	{
 		using DeleteObjectSafeHandle rgn = PInvoke.CreateRectRgn_SafeHandle(-2, -2, -1, -1);
@@ -385,9 +340,10 @@ internal class CoreNativeManager : ICoreNativeManager
 			.Succeeded;
 	}
 
-	/// <inheritdoc/>
 	public int FillRect(HDC hDC, in RECT lprc, SafeHandle hbr) => PInvoke.FillRect(hDC, lprc, hbr);
 
-	/// <inheritdoc/>
 	public Icon LoadIconFromHandle(nint hIcon) => Icon.FromHandle(hIcon);
+
+	public HMONITOR MonitorFromWindow(HWND hwnd, MONITOR_FROM_FLAGS dwFlags) =>
+		PInvoke.MonitorFromWindow(hwnd, dwFlags);
 }

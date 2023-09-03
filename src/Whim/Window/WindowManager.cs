@@ -14,7 +14,7 @@ internal class WindowManager : IWindowManager
 	private readonly IMouseHook _mouseHook;
 
 	public event EventHandler<WindowEventArgs>? WindowAdded;
-	public event EventHandler<WindowEventArgs>? WindowFocused;
+	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
 	public event EventHandler<WindowEventArgs>? WindowRemoved;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
@@ -225,6 +225,16 @@ internal class WindowManager : IWindowManager
 		{
 			Logger.Verbose($"Window {hwnd.Value} is not added, event type 0x{eventType:X4}");
 			window = AddWindow(hwnd);
+
+			if (
+				window == null
+				&& (eventType == PInvoke.EVENT_SYSTEM_FOREGROUND || eventType == PInvoke.EVENT_OBJECT_UNCLOAKED)
+			)
+			{
+				// Even if the window was ignored, we need to fire OnWindowFocused.
+				OnWindowFocused(window);
+				return;
+			}
 			if (window == null)
 			{
 				return;
@@ -289,20 +299,16 @@ internal class WindowManager : IWindowManager
 		}
 
 		IWindow? window = CreateWindow(hwnd);
-
 		if (window == null)
 		{
-			Logger.Debug($"Window {hwnd.Value} could not be created");
 			return null;
 		}
 		else if (_context.FilterManager.ShouldBeIgnored(window))
 		{
-			Logger.Debug($"Window {window} is filtered");
 			return null;
 		}
 		else if (window.IsMinimized)
 		{
-			Logger.Debug($"Window {window} is minimized");
 			return null;
 		}
 
@@ -324,12 +330,12 @@ internal class WindowManager : IWindowManager
 	/// have switched to a different workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void OnWindowFocused(IWindow window)
+	internal void OnWindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Window focused: {window}");
 		((IInternalMonitorManager)_context.MonitorManager).WindowFocused(window);
 		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowFocused(window);
-		WindowFocused?.Invoke(this, new WindowEventArgs() { Window = window });
+		WindowFocused?.Invoke(this, new WindowFocusedEventArgs() { Window = window });
 	}
 
 	/// <summary>

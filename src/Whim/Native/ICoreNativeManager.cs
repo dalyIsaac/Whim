@@ -560,4 +560,7 @@ internal interface ICoreNativeManager
 	/// </summary>
 	/// <param name="hIcon"></param>
 	Icon LoadIconFromHandle(nint hIcon);
+
+	/// <inheritdoc cref="PInvoke.MonitorFromWindow(HWND, MONITOR_FROM_FLAGS)"/>
+	HMONITOR MonitorFromWindow(HWND hwnd, MONITOR_FROM_FLAGS dwFlags);
 }

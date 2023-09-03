@@ -9,7 +9,7 @@ internal interface IInternalWorkspace
 	/// Called when a window is focused, regardless of whether it's in this workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	void WindowFocused(IWindow window);
+	void WindowFocused(IWindow? window);
 
 	/// <summary>
 	/// Called when a window is about to be minimized.

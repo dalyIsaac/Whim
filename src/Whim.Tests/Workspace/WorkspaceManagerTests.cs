@@ -1257,6 +1257,32 @@ public class WorkspaceManagerTests
 		// Then the first workspace is activated
 		workspaces[0].Verify(w => w.DoLayout(), Times.Once());
 	}
+
+	[Fact]
+	public void WindowFocused_WindowIsNull()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		Mock<IWorkspace> workspace = new();
+		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
+
+		Mock<IWorkspace> workspace2 = new();
+		Mock<IInternalWorkspace> internalWorkspace2 = workspace2.As<IInternalWorkspace>();
+
+		wrapper.WorkspaceManager.Add(workspace.Object);
+		wrapper.WorkspaceManager.Add(workspace2.Object);
+
+		// When a window is focused
+		wrapper.WorkspaceManager.WindowFocused(null);
+
+		// Then the window is focused in all workspaces
+		internalWorkspace.Verify(w => w.WindowFocused(null), Times.Once());
+		internalWorkspace2.Verify(w => w.WindowFocused(null), Times.Once());
+
+		workspace.Verify(w => w.DoLayout(), Times.Never());
+		workspace2.Verify(w => w.DoLayout(), Times.Never());
+	}
 	#endregion
 
 	#region WindowMinimizeStart

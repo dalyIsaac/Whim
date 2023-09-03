@@ -77,10 +77,15 @@ internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposabl
 		GC.SuppressFinalize(this);
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowEventArgs e)
+	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
 	{
-		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(e.Window);
+		if (e.Window is null)
+		{
+			Title = null;
+			return;
+		}
 
+		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(e.Window);
 		if (_monitor.Equals(monitor))
 		{
 			Title = _getTitle(e.Window);
