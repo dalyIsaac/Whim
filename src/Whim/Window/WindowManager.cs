@@ -7,18 +7,6 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-internal enum IgnoreWindowReason
-{
-	None = 0,
-	SplashScreen,
-	Cloaked,
-	NotStandard,
-	HasVisibleOwner,
-	CouldNotCreateWindow,
-	Filtered,
-	Minimized,
-}
-
 internal class WindowManager : IWindowManager
 {
 	private readonly IContext _context;
@@ -236,10 +224,10 @@ internal class WindowManager : IWindowManager
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
 			Logger.Verbose($"Window {hwnd.Value} is not added, event type 0x{eventType:X4}");
-			(window, IgnoreWindowReason ignoreWindowReason) = AddWindow(hwnd);
+			window = AddWindow(hwnd);
 
 			if (
-				ignoreWindowReason != IgnoreWindowReason.None
+				window == null
 				&& (eventType == PInvoke.EVENT_SYSTEM_FOREGROUND || eventType == PInvoke.EVENT_OBJECT_UNCLOAKED)
 			)
 			{
@@ -297,43 +285,36 @@ internal class WindowManager : IWindowManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	private (IWindow? Window, IgnoreWindowReason IgnoreWindowReason) AddWindow(HWND hwnd)
+	private IWindow? AddWindow(HWND hwnd)
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
-		if (_coreNativeManager.IsSplashScreen(hwnd))
+		if (
+			_coreNativeManager.IsSplashScreen(hwnd)
+			|| _coreNativeManager.IsCloakedWindow(hwnd)
+			|| !_coreNativeManager.IsStandardWindow(hwnd)
+			|| !_coreNativeManager.HasNoVisibleOwner(hwnd)
+		)
 		{
-			return (null, IgnoreWindowReason.SplashScreen);
-		}
-		else if (_coreNativeManager.IsCloakedWindow(hwnd))
-		{
-			return (null, IgnoreWindowReason.Cloaked);
-		}
-		else if (!_coreNativeManager.IsStandardWindow(hwnd))
-		{
-			return (null, IgnoreWindowReason.NotStandard);
-		}
-		else if (!_coreNativeManager.HasNoVisibleOwner(hwnd))
-		{
-			return (null, IgnoreWindowReason.HasVisibleOwner);
+			return null;
 		}
 
 		IWindow? window = CreateWindow(hwnd);
 		if (window == null)
 		{
-			return (null, IgnoreWindowReason.CouldNotCreateWindow);
+			return null;
 		}
 		else if (_context.FilterManager.ShouldBeIgnored(window))
 		{
-			return (null, IgnoreWindowReason.Filtered);
+			return null;
 		}
 		else if (window.IsMinimized)
 		{
-			return (null, IgnoreWindowReason.Minimized);
+			return null;
 		}
 
 		_windows[hwnd] = window;
 		OnWindowAdded(window);
-		return (window, IgnoreWindowReason.None);
+		return window;
 	}
 
 	internal void OnWindowAdded(IWindow window)
