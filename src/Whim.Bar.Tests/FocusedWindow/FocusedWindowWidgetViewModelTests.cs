@@ -45,7 +45,7 @@ public class FocusedWindowWidgetViewModelTests
 			{
 				wrapper.WindowManager.Raise(
 					wm => wm.WindowFocused += null,
-					new WindowEventArgs() { Window = window.Object }
+					new WindowFocusedEventArgs() { Window = window.Object }
 				);
 			}
 		);
@@ -74,7 +74,7 @@ public class FocusedWindowWidgetViewModelTests
 			.Returns(new Mock<IMonitor>().Object);
 
 		// When
-		wrapper.WindowManager.Raise(wm => wm.WindowFocused += null, new WindowEventArgs() { Window = window.Object });
+		wrapper.WindowManager.Raise(wm => wm.WindowFocused += null, new WindowFocusedEventArgs() { Window = window.Object });
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
@@ -82,7 +82,7 @@ public class FocusedWindowWidgetViewModelTests
 			{
 				wrapper.WindowManager.Raise(
 					wm => wm.WindowFocused += null,
-					new WindowEventArgs() { Window = otherWindow.Object }
+					new WindowFocusedEventArgs() { Window = otherWindow.Object }
 				);
 			}
 		);
@@ -126,7 +126,7 @@ public class FocusedWindowWidgetViewModelTests
 			() =>
 				wrapper.WindowManager.Raise(
 					wm => wm.WindowFocused += null,
-					new WindowEventArgs() { Window = window.Object }
+					new WindowFocusedEventArgs() { Window = window.Object }
 				)
 		);
 
@@ -158,7 +158,7 @@ public class FocusedWindowWidgetViewModelTests
 			() =>
 				wrapper.WindowManager.Raise(
 					wm => wm.WindowFocused += null,
-					new WindowEventArgs() { Window = window.Object }
+					new WindowFocusedEventArgs() { Window = window.Object }
 				)
 		);
 
@@ -190,14 +190,14 @@ public class FocusedWindowWidgetViewModelTests
 			.Returns(new Mock<IMonitor>().Object);
 
 		// When
-		wrapper.WindowManager.Raise(wm => wm.WindowFocused += null, new WindowEventArgs() { Window = window.Object });
+		wrapper.WindowManager.Raise(wm => wm.WindowFocused += null, new WindowFocusedEventArgs() { Window = window.Object });
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
 			() =>
 				wrapper.WindowManager.Raise(
 					wm => wm.WindowFocused += null,
-					new WindowEventArgs() { Window = otherWindow.Object }
+					new WindowFocusedEventArgs() { Window = otherWindow.Object }
 				)
 		);
 
