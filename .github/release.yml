@@ -1,7 +1,7 @@
 changelog:
   exclude:
     labels:
-    - "whim version"
+      - "whim version"
 
     authors:
       - dependabot
@@ -9,41 +9,45 @@ changelog:
   categories:
     - title: Documentation 📄
       labels:
-      - documentation
+        - documentation
 
     - title: Core
       labels:
-      - core
-      - "layout engine"
+        - core
+        - "layout engine"
 
     - title: Runner 🏃🏻
       labels:
-      - "runner 🏃🏻"
+        - "runner 🏃🏻"
 
     - title: Bar
       labels:
-      - bar
+        - bar
 
     - title: Command Palette
       labels:
-      - "command palette"
+        - "command palette"
 
     - title: Floating Layout ☁️
       labels:
-      - "floating layout"
+        - "floating layout"
 
     - title: Focus Indicator 👀
       labels:
-      - "focus indicator"
+        - "focus indicator"
 
     - title: Gaps
       labels:
-      - gaps
+        - gaps
+
+    - title: Layout Preview
+      labels:
+        - "layout preview"
 
     - title: Tree Layout 🌳
       labels:
-      - "tree layout"
+        - "tree layout"
 
     - title: Other Changes 🖋
       labels:
-      - "*"
+        - "*"
