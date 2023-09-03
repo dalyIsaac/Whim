@@ -103,7 +103,7 @@ public class FocusedWindowWidgetViewModelTests
 		viewModel.Dispose();
 
 		// Then
-		wrapper.WindowManager.VerifyRemove(wm => wm.WindowFocused -= It.IsAny<EventHandler<WindowEventArgs>>());
+		wrapper.WindowManager.VerifyRemove(wm => wm.WindowFocused -= It.IsAny<EventHandler<WindowFocusedEventArgs>>());
 	}
 
 	[Fact]

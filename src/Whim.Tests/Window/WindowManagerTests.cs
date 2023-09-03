@@ -167,7 +167,7 @@ public class WindowManagerTests
 		Mock<IWindow> window = new();
 
 		// When
-		var result = Assert.Raises<WindowEventArgs>(
+		var result = Assert.Raises<WindowFocusedEventArgs>(
 			eh => windowManager.WindowFocused += eh,
 			eh => windowManager.WindowFocused -= eh,
 			() => windowManager.OnWindowFocused(window.Object)
@@ -456,7 +456,7 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		Assert.Raises<WindowEventArgs>(
+		Assert.Raises<WindowFocusedEventArgs>(
 			h => windowManager.WindowFocused += h,
 			h => windowManager.WindowFocused -= h,
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)

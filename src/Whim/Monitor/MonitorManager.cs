@@ -85,11 +85,14 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 		HWND hwnd = window?.Handle ?? _coreNativeManager.GetForegroundWindow();
 		HMONITOR hMONITOR = _coreNativeManager.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
-		IMonitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hMONITOR);
 
-		if (monitor != null)
+		foreach (Monitor monitor in _monitors)
 		{
-			ActiveMonitor = monitor;
+			if (monitor._hmonitor == hMONITOR)
+			{
+				ActiveMonitor = monitor;
+				break;
+			}
 		}
 	}
 
