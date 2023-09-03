@@ -74,7 +74,10 @@ public class FocusedWindowWidgetViewModelTests
 			.Returns(new Mock<IMonitor>().Object);
 
 		// When
-		wrapper.WindowManager.Raise(wm => wm.WindowFocused += null, new WindowFocusedEventArgs() { Window = window.Object });
+		wrapper.WindowManager.Raise(
+			wm => wm.WindowFocused += null,
+			new WindowFocusedEventArgs() { Window = window.Object }
+		);
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
@@ -190,7 +193,10 @@ public class FocusedWindowWidgetViewModelTests
 			.Returns(new Mock<IMonitor>().Object);
 
 		// When
-		wrapper.WindowManager.Raise(wm => wm.WindowFocused += null, new WindowFocusedEventArgs() { Window = window.Object });
+		wrapper.WindowManager.Raise(
+			wm => wm.WindowFocused += null,
+			new WindowFocusedEventArgs() { Window = window.Object }
+		);
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
