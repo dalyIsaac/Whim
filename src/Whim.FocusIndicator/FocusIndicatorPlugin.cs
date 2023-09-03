@@ -37,11 +37,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		_context.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 
 		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
-		_context.WindowManager.WindowAdded += WindowManager_EventSink_Show;
-		_context.WindowManager.WindowRemoved += WindowManager_EventSink_Show;
-		_context.WindowManager.WindowMoveStart += WindowManager_EventSink_Hide;
-		_context.WindowManager.WindowMinimizeStart += WindowManager_EventSink_Hide;
-		_context.WindowManager.WindowMinimizeEnd += WindowManager_EventSink_Show;
 	}
 
 	/// <inheritdoc/>
@@ -77,34 +72,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		}
 
 		Show();
-	}
-
-	private void WindowManager_EventSink_Show(object? sender, WindowEventArgs e)
-	{
-		if (!_isEnabled)
-		{
-			Logger.Debug("Focus indicator is disabled");
-			return;
-		}
-
-		if (_context.WorkspaceManager.GetMonitorForWindow(e.Window) == null)
-		{
-			Logger.Debug($"Window {e.Window} is not registered in the workspace manager");
-			return;
-		}
-
-		Show();
-	}
-
-	private void WindowManager_EventSink_Hide(object? sender, WindowEventArgs e)
-	{
-		if (!_isEnabled)
-		{
-			Logger.Debug("Focus indicator is disabled");
-			return;
-		}
-
-		Hide();
 	}
 
 	private void WorkspaceManager_WorkspaceLayoutStarted(object? sender, WorkspaceEventArgs e) => Hide();
@@ -200,11 +167,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			{
 				// dispose managed state (managed objects)
 				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
-				_context.WindowManager.WindowAdded -= WindowManager_EventSink_Show;
-				_context.WindowManager.WindowRemoved -= WindowManager_EventSink_Show;
-				_context.WindowManager.WindowMoveStart -= WindowManager_EventSink_Show;
-				_context.WindowManager.WindowMinimizeStart -= WindowManager_EventSink_Show;
-				_context.WindowManager.WindowMinimizeEnd -= WindowManager_EventSink_Show;
 				_context.WorkspaceManager.WorkspaceLayoutStarted -= WorkspaceManager_WorkspaceLayoutStarted;
 				_context.WorkspaceManager.WorkspaceLayoutCompleted -= WorkspaceManager_WorkspaceLayoutCompleted;
 				_focusIndicatorWindow?.Close();
