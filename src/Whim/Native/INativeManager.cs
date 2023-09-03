@@ -172,4 +172,16 @@ public interface INativeManager
 	/// <param name="window"></param>
 	/// <returns></returns>
 	TransparentWindowController CreateTransparentWindowController(Microsoft.UI.Xaml.Window window);
+
+	/// <summary>
+	/// Sets the given <paramref name="hwnd"/> to be transparent to mouse clicks.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	void SetWindowExTransparent(HWND hwnd);
+
+	/// <summary>
+	/// Removes the transparency from the given <paramref name="hwnd"/>.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	void RemoveWindowExTransparent(HWND hwnd);
 }
