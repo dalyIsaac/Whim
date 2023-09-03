@@ -467,6 +467,35 @@ public class WindowManagerTests
 		wrapper.InternalWorkspaceManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
 	}
 
+	[InlineData(PInvoke.EVENT_SYSTEM_FOREGROUND)]
+	[InlineData(PInvoke.EVENT_OBJECT_UNCLOAKED)]
+	[Theory]
+	public void WindowsEventHook_OnWindowFocused_IgnoredWindow(uint eventType)
+	{
+		// Given
+		HWND hwnd = new(1);
+		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+
+		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(true);
+
+		WindowManager windowManager =
+			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+
+		// When
+		windowManager.Initialize();
+
+		// Then
+		Assert.Raises<WindowFocusedEventArgs>(
+			h => windowManager.WindowFocused += h,
+			h => windowManager.WindowFocused -= h,
+			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		wrapper.InternalMonitorManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
+		wrapper.InternalWorkspaceManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
+	}
+
 	[Fact]
 	public void WindowsEventHook_OnWindowHidden_IgnoreWindow()
 	{

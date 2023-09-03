@@ -271,6 +271,7 @@ public class WorkspaceTests
 		Assert.True(result);
 	}
 
+	#region WindowFocused
 	[Fact]
 	public void WindowFocused_ContainsWindow()
 	{
@@ -305,6 +306,25 @@ public class WorkspaceTests
 		// Then
 		Assert.Null(workspace.LastFocusedWindow);
 	}
+
+	[Fact]
+	public void WindowFocused_WindowIsNull()
+	{
+		// Given the window is null
+		MocksBuilder mocks = new();
+		Mock<IWindow> window = new();
+
+		Workspace workspace =
+			new(mocks.Context.Object, mocks.Triggers, "Workspace", new ILayoutEngine[] { mocks.LayoutEngine.Object });
+
+		// When
+		workspace.WindowFocused(window.Object);
+		workspace.WindowFocused(null);
+
+		// Then
+		Assert.Null(workspace.LastFocusedWindow);
+	}
+	#endregion
 
 	[Fact]
 	public void FocusFirstWindow()
