@@ -7,6 +7,18 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
+internal enum IgnoreWindowReason
+{
+	None = 0,
+	SplashScreen,
+	Cloaked,
+	NotStandard,
+	HasVisibleOwner,
+	CouldNotCreateWindow,
+	Filtered,
+	Minimized,
+}
+
 internal class WindowManager : IWindowManager
 {
 	private readonly IContext _context;
@@ -14,7 +26,7 @@ internal class WindowManager : IWindowManager
 	private readonly IMouseHook _mouseHook;
 
 	public event EventHandler<WindowEventArgs>? WindowAdded;
-	public event EventHandler<WindowEventArgs>? WindowFocused;
+	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
 	public event EventHandler<WindowEventArgs>? WindowRemoved;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
@@ -224,7 +236,17 @@ internal class WindowManager : IWindowManager
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
 			Logger.Verbose($"Window {hwnd.Value} is not added, event type 0x{eventType:X4}");
-			window = AddWindow(hwnd);
+			(window, IgnoreWindowReason ignoreWindowReason) = AddWindow(hwnd);
+
+			if (
+				ignoreWindowReason != IgnoreWindowReason.None
+				&& (eventType == PInvoke.EVENT_SYSTEM_FOREGROUND || eventType == PInvoke.EVENT_OBJECT_UNCLOAKED)
+			)
+			{
+				// Even if the window was ignored, we need to fire OnWindowFocused.
+				OnWindowFocused(window);
+				return;
+			}
 			if (window == null)
 			{
 				return;
@@ -275,40 +297,43 @@ internal class WindowManager : IWindowManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	private IWindow? AddWindow(HWND hwnd)
+	private (IWindow? Window, IgnoreWindowReason IgnoreWindowReason) AddWindow(HWND hwnd)
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
-		if (
-			_coreNativeManager.IsSplashScreen(hwnd)
-			|| _coreNativeManager.IsCloakedWindow(hwnd)
-			|| !_coreNativeManager.IsStandardWindow(hwnd)
-			|| !_coreNativeManager.HasNoVisibleOwner(hwnd)
-		)
+		if (_coreNativeManager.IsSplashScreen(hwnd))
 		{
-			return null;
+			return (null, IgnoreWindowReason.SplashScreen);
+		}
+		else if (_coreNativeManager.IsCloakedWindow(hwnd))
+		{
+			return (null, IgnoreWindowReason.Cloaked);
+		}
+		else if (!_coreNativeManager.IsStandardWindow(hwnd))
+		{
+			return (null, IgnoreWindowReason.NotStandard);
+		}
+		else if (!_coreNativeManager.HasNoVisibleOwner(hwnd))
+		{
+			return (null, IgnoreWindowReason.HasVisibleOwner);
 		}
 
 		IWindow? window = CreateWindow(hwnd);
-
 		if (window == null)
 		{
-			Logger.Debug($"Window {hwnd.Value} could not be created");
-			return null;
+			return (null, IgnoreWindowReason.CouldNotCreateWindow);
 		}
 		else if (_context.FilterManager.ShouldBeIgnored(window))
 		{
-			Logger.Debug($"Window {window} is filtered");
-			return null;
+			return (null, IgnoreWindowReason.Filtered);
 		}
 		else if (window.IsMinimized)
 		{
-			Logger.Debug($"Window {window} is minimized");
-			return null;
+			return (null, IgnoreWindowReason.Minimized);
 		}
 
 		_windows[hwnd] = window;
 		OnWindowAdded(window);
-		return window;
+		return (window, IgnoreWindowReason.None);
 	}
 
 	internal void OnWindowAdded(IWindow window)
@@ -324,12 +349,14 @@ internal class WindowManager : IWindowManager
 	/// have switched to a different workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void OnWindowFocused(IWindow window)
+	internal void OnWindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Window focused: {window}");
+
 		((IInternalMonitorManager)_context.MonitorManager).WindowFocused(window);
 		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowFocused(window);
-		WindowFocused?.Invoke(this, new WindowEventArgs() { Window = window });
+
+		WindowFocused?.Invoke(this, new WindowFocusedEventArgs() { Window = window });
 	}
 
 	/// <summary>

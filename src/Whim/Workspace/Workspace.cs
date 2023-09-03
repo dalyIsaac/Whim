@@ -115,14 +115,19 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void WindowFocused(IWindow window)
+	public void WindowFocused(IWindow? window)
 	{
 		lock (_workspaceLock)
 		{
-			if (_normalWindows.Contains(window))
+			if (window != null && _normalWindows.Contains(window))
 			{
 				LastFocusedWindow = window;
 				Logger.Debug($"Focused window {window} in workspace {Name}");
+			}
+			else
+			{
+				Logger.Debug($"Window {window} is not a normal window in workspace {Name}");
+				LastFocusedWindow = null;
 			}
 		}
 	}

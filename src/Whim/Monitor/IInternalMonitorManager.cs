@@ -6,5 +6,5 @@ internal interface IInternalMonitorManager
 	/// Called when the window has been focused.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void WindowFocused(IWindow window);
+	internal void WindowFocused(IWindow? window);
 }

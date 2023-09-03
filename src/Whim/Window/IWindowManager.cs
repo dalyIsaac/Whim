@@ -37,7 +37,7 @@ public interface IWindowManager : IDisposable
 	/// <summary>
 	/// Event for when a window is focused.
 	/// </summary>
-	event EventHandler<WindowEventArgs>? WindowFocused;
+	event EventHandler<WindowFocusedEventArgs>? WindowFocused;
 
 	/// <summary>
 	/// Event for when a window is removed from Whim.

@@ -79,10 +79,13 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		_mouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
 	}
 
-	public void WindowFocused(IWindow window)
+	public void WindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Focusing on {window}");
-		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWindow(window);
+
+		HWND hwnd = window?.Handle ?? _coreNativeManager.GetForegroundWindow();
+		HMONITOR hMONITOR = _coreNativeManager.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
+		IMonitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hMONITOR);
 
 		if (monitor != null)
 		{

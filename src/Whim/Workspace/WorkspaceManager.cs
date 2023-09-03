@@ -409,13 +409,18 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
 	}
 
-	public void WindowFocused(IWindow window)
+	public void WindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Window focused: {window}");
 
 		foreach (IWorkspace workspace in _workspaces)
 		{
 			((IInternalWorkspace)workspace).WindowFocused(window);
+		}
+
+		if (window is null)
+		{
+			return;
 		}
 
 		_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceFocused);

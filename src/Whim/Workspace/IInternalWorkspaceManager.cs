@@ -18,7 +18,7 @@ internal interface IInternalWorkspaceManager
 	/// Called when a window has been focused by the <see cref="IWindowManager"/>.
 	/// </summary>
 	/// <param name="window">The window that was focused.</param>
-	void WindowFocused(IWindow window);
+	void WindowFocused(IWindow? window);
 
 	/// <summary>
 	/// Called when a window is about to be minimized.

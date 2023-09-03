@@ -36,7 +36,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	{
 		_context.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 
-		_context.WindowManager.WindowFocused += WindowManager_EventSink_Show;
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 		_context.WindowManager.WindowAdded += WindowManager_EventSink_Show;
 		_context.WindowManager.WindowRemoved += WindowManager_EventSink_Show;
 		_context.WindowManager.WindowMoveStart += WindowManager_EventSink_Hide;
@@ -61,6 +61,23 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	}
 
 	private void DispatcherTimer_Tick(object? sender, object e) => Hide();
+
+	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
+	{
+		if (!_isEnabled)
+		{
+			Logger.Debug("Focus indicator is disabled");
+			return;
+		}
+
+		if (e.Window == null)
+		{
+			Hide();
+			return;
+		}
+
+		Show();
+	}
 
 	private void WindowManager_EventSink_Show(object? sender, WindowEventArgs e)
 	{
@@ -182,7 +199,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WindowManager.WindowFocused -= WindowManager_EventSink_Show;
+				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
 				_context.WindowManager.WindowAdded -= WindowManager_EventSink_Show;
 				_context.WindowManager.WindowRemoved -= WindowManager_EventSink_Show;
 				_context.WindowManager.WindowMoveStart -= WindowManager_EventSink_Show;
