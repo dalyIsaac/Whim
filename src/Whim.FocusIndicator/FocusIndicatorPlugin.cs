@@ -36,6 +36,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	{
 		_context.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
 
+		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
 		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
@@ -56,6 +57,8 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	}
 
 	private void DispatcherTimer_Tick(object? sender, object e) => Hide();
+
+	private void WindowManager_WindowMoveStart(object? sender, WindowMovedEventArgs e) => Hide();
 
 	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
 	{
