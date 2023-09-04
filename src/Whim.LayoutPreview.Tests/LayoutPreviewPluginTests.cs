@@ -49,6 +49,20 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Fact]
+	public void PluginCommands()
+	{
+		// Given
+		Wrapper wrapper = new();
+		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+
+		// When
+		IEnumerable<ICommand> commands = plugin.PluginCommands.Commands;
+
+		// Then
+		Assert.Empty(commands);
+	}
+
+	[Fact]
 	public void PreInitialize()
 	{
 		// Given
