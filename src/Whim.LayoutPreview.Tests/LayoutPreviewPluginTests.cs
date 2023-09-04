@@ -35,6 +35,20 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Fact]
+	public void Name()
+	{
+		// Given
+		Wrapper wrapper = new();
+		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+
+		// When
+		string name = plugin.Name;
+
+		// Then
+		Assert.Equal("whim.layout_preview", name);
+	}
+
+	[Fact]
 	public void PreInitialize()
 	{
 		// Given
