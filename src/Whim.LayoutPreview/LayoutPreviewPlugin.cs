@@ -12,7 +12,11 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	private bool _disposedValue;
 
 	private readonly object _previewLock = new();
-	private IWindow? _draggedWindow;
+
+	/// <summary>
+	/// The window that is currently being dragged.
+	/// </summary>
+	public IWindow? DraggedWindow { get; private set; }
 
 	/// <inheritdoc/>
 	public string Name => "whim.layout_preview";
@@ -78,7 +82,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 				return;
 			}
 
-			_draggedWindow = e.Window;
+			DraggedWindow = e.Window;
 			ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
 
 			Location<int> location = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
@@ -104,10 +108,10 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	{
 		lock (_previewLock)
 		{
-			if (_draggedWindow == e.Window)
+			if (DraggedWindow == e.Window)
 			{
 				_layoutPreviewWindow?.Hide(_context);
-				_draggedWindow = null;
+				DraggedWindow = null;
 			}
 		}
 	}
@@ -117,7 +121,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		lock (_previewLock)
 		{
 			_layoutPreviewWindow?.Hide(_context);
-			_draggedWindow = null;
+			DraggedWindow = null;
 		}
 	}
 
