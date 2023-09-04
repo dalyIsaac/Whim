@@ -240,4 +240,20 @@ public class LayoutPreviewPluginTests
 		// Then
 		Assert.True(true);
 	}
+
+	[Fact]
+	public void WindowManager_WindowRemoved()
+	{
+		// Given
+		Wrapper wrapper = new();
+		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		WindowEventArgs e = new() { Window = new Mock<IWindow>().Object };
+
+		// When
+		plugin.PreInitialize();
+		wrapper.WindowManager.Raise(x => x.WindowRemoved += null, e);
+
+		// Then
+		Assert.True(true);
+	}
 }
