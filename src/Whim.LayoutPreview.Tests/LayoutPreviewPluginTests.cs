@@ -35,6 +35,34 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Fact]
+	public void Name()
+	{
+		// Given
+		Wrapper wrapper = new();
+		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+
+		// When
+		string name = plugin.Name;
+
+		// Then
+		Assert.Equal("whim.layout_preview", name);
+	}
+
+	[Fact]
+	public void PluginCommands()
+	{
+		// Given
+		Wrapper wrapper = new();
+		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+
+		// When
+		IEnumerable<ICommand> commands = plugin.PluginCommands.Commands;
+
+		// Then
+		Assert.Empty(commands);
+	}
+
+	[Fact]
 	public void PreInitialize()
 	{
 		// Given
@@ -121,7 +149,7 @@ public class LayoutPreviewPluginTests
 		wrapper.WindowManager.Raise(x => x.WindowMoveStart += null, e);
 
 		// Then
-		Assert.True(true);
+		Assert.Null(plugin.DraggedWindow);
 	}
 
 	#region WindowMoved
@@ -145,6 +173,7 @@ public class LayoutPreviewPluginTests
 
 		// Then
 		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never);
+		Assert.Null(plugin.DraggedWindow);
 	}
 
 	[Fact]
@@ -167,6 +196,7 @@ public class LayoutPreviewPluginTests
 
 		// Then
 		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never);
+		Assert.Null(plugin.DraggedWindow);
 	}
 
 	[Fact]
@@ -192,6 +222,7 @@ public class LayoutPreviewPluginTests
 		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Once);
 		wrapper.WorkspaceManager.Verify(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
 		wrapper.Workspace.Verify(x => x.ActiveLayoutEngine, Times.Never);
+		Assert.Null(plugin.DraggedWindow);
 	}
 
 	[Fact]
@@ -200,10 +231,11 @@ public class LayoutPreviewPluginTests
 		// Given
 		Wrapper wrapper = new();
 		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		Mock<IWindow> window = new();
 		WindowMovedEventArgs e =
 			new()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = window.Object,
 				CursorDraggedPoint = new Location<int>(),
 				MovedEdges = null
 			};
@@ -216,6 +248,7 @@ public class LayoutPreviewPluginTests
 		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Once);
 		wrapper.WorkspaceManager.Verify(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
 		wrapper.Workspace.Verify(x => x.ActiveLayoutEngine, Times.Once);
+		Assert.Equal(window.Object, plugin.DraggedWindow);
 	}
 	#endregion
 
@@ -238,6 +271,61 @@ public class LayoutPreviewPluginTests
 		wrapper.WindowManager.Raise(x => x.WindowMoveEnd += null, e);
 
 		// Then
-		Assert.True(true);
+		Assert.Null(plugin.DraggedWindow);
+	}
+
+	[Fact]
+	public void WindowManager_WindowRemoved_NotHidden()
+	{
+		// Given
+		Wrapper wrapper = new();
+		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+
+		Mock<IWindow> movedWindow = new();
+		WindowMovedEventArgs moveArgs =
+			new()
+			{
+				Window = movedWindow.Object,
+				CursorDraggedPoint = new Location<int>(),
+				MovedEdges = null
+			};
+
+		Mock<IWindow> removedWindow = new();
+		WindowEventArgs removeArgs = new() { Window = removedWindow.Object };
+
+		// When
+		plugin.PreInitialize();
+		wrapper.WindowManager.Raise(x => x.WindowMoved += null, moveArgs);
+		wrapper.WindowManager.Raise(x => x.WindowRemoved += null, removeArgs);
+
+		// Then
+		Assert.Equal(movedWindow.Object, plugin.DraggedWindow);
+	}
+
+	[Fact]
+	public void WindowManager_WindowRemoved_Shown()
+	{
+		// Given
+		Wrapper wrapper = new();
+		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+
+		Mock<IWindow> movedWindow = new();
+		WindowMovedEventArgs moveArgs =
+			new()
+			{
+				Window = movedWindow.Object,
+				CursorDraggedPoint = new Location<int>(),
+				MovedEdges = null
+			};
+
+		WindowEventArgs removeArgs = new() { Window = movedWindow.Object };
+
+		// When
+		plugin.PreInitialize();
+		wrapper.WindowManager.Raise(x => x.WindowMoved += null, moveArgs);
+		wrapper.WindowManager.Raise(x => x.WindowRemoved += null, removeArgs);
+
+		// Then
+		Assert.Null(plugin.DraggedWindow);
 	}
 }
