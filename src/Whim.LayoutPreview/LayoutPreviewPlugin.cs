@@ -11,6 +11,9 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	private LayoutPreviewWindow? _layoutPreviewWindow;
 	private bool _disposedValue;
 
+	private readonly object _previewLock = new();
+	private IWindow? _draggedWindow;
+
 	/// <inheritdoc/>
 	public string Name => "whim.layout_preview";
 
@@ -31,6 +34,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
 		_context.WindowManager.WindowMoved += WindowMoved;
 		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
+		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
 		_context.FilterManager.IgnoreTitleMatch(LayoutPreviewWindow.WindowTitle);
 	}
 
@@ -56,45 +60,65 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 
 	private void WindowMoved(object? sender, WindowMovedEventArgs e)
 	{
-		// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
-		if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint || e.MovedEdges is not null)
+		lock (_previewLock)
 		{
-			return;
-		}
-
-		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
-		IPoint<int> monitorPoint = monitor.WorkingArea.ToMonitorCoordinates(cursorDraggedPoint);
-		IPoint<double> normalizedPoint = monitor.WorkingArea.ToUnitSquare(monitorPoint);
-
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
-		if (workspace == null)
-		{
-			return;
-		}
-
-		ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
-
-		Location<int> location = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
-
-		// Adjust the cursor point so that it's relative to the monitor's location.
-		Point<int> adjustedCursorPoint =
-			new()
+			// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
+			if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint || e.MovedEdges is not null)
 			{
-				X = cursorDraggedPoint.X - monitor.WorkingArea.X,
-				Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y
-			};
+				return;
+			}
 
-		_layoutPreviewWindow?.Update(
-			layoutEngine.DoLayout(location, monitor).ToArray(),
-			adjustedCursorPoint,
-			e.Window,
-			monitor
-		);
+			IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
+			IPoint<int> monitorPoint = monitor.WorkingArea.ToMonitorCoordinates(cursorDraggedPoint);
+			IPoint<double> normalizedPoint = monitor.WorkingArea.ToUnitSquare(monitorPoint);
+
+			IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+			if (workspace == null)
+			{
+				return;
+			}
+
+			_draggedWindow = e.Window;
+			ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
+
+			Location<int> location = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
+
+			// Adjust the cursor point so that it's relative to the monitor's location.
+			Point<int> adjustedCursorPoint =
+				new()
+				{
+					X = cursorDraggedPoint.X - monitor.WorkingArea.X,
+					Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y
+				};
+
+			_layoutPreviewWindow?.Update(
+				layoutEngine.DoLayout(location, monitor).ToArray(),
+				adjustedCursorPoint,
+				e.Window,
+				monitor
+			);
+		}
+	}
+
+	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e)
+	{
+		lock (_previewLock)
+		{
+			if (_draggedWindow == e.Window)
+			{
+				_layoutPreviewWindow?.Hide(_context);
+				_draggedWindow = null;
+			}
+		}
 	}
 
 	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e)
 	{
-		_layoutPreviewWindow?.Hide(_context);
+		lock (_previewLock)
+		{
+			_layoutPreviewWindow?.Hide(_context);
+			_draggedWindow = null;
+		}
 	}
 
 	/// <inheritdoc />
