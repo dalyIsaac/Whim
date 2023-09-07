@@ -51,6 +51,7 @@ ICON_BIG
 ICON_SMALL
 ICON_SMALL2
 IsIconic
+IsWindow
 IsWindowVisible
 IsZoomed
 KBDLLHOOKSTRUCT

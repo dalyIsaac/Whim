@@ -233,6 +233,8 @@ internal class CoreNativeManager : ICoreNativeManager
 		return false;
 	}
 
+	public bool IsWindow(HWND hWnd) => PInvoke.IsWindow(hWnd);
+
 	public bool HasNoVisibleOwner(HWND hwnd)
 	{
 		HWND owner = PInvoke.GetWindow(hwnd, GET_WINDOW_CMD.GW_OWNER);

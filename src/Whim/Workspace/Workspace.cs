@@ -11,6 +11,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// </summary>
 	private readonly object _workspaceLock = new();
 	private readonly IContext _context;
+	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly WorkspaceManagerTriggers _triggers;
 
 	private string _name;
@@ -98,12 +99,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public Workspace(
 		IContext context,
+		ICoreNativeManager coreNativeManager,
 		WorkspaceManagerTriggers triggers,
 		string name,
 		IEnumerable<ILayoutEngine> layoutEngines
 	)
 	{
 		_context = context;
+		_coreNativeManager = coreNativeManager;
 		_triggers = triggers;
 
 		_name = name;
@@ -496,6 +499,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug($"Workspace {Name}");
 
+		if (GarbageCollect())
+		{
+			Logger.Debug($"Garbage collected windows, skipping layout for workspace {Name}");
+			return;
+		}
+
 		// Get the monitor for this workspace
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
 		if (monitor == null)
@@ -551,6 +560,43 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			return _normalWindows.Contains(window) || _minimizedWindows.Contains(window);
 		}
+	}
+
+	private bool GarbageCollect()
+	{
+		IInternalWindowManager windowManager = (IInternalWindowManager)_context.WindowManager;
+
+		List<IWindow> garbageWindows = new();
+		bool garbageCollected = false;
+
+		foreach (IWindow window in Windows)
+		{
+			bool removeWindow = false;
+			if (!_coreNativeManager.IsWindow(window.Handle))
+			{
+				Logger.Debug($"Window {window.Handle} is no longer a window.");
+				removeWindow = true;
+			}
+			else if (!windowManager.Windows.ContainsKey(window.Handle))
+			{
+				Logger.Debug($"Window {window.Handle} is somehow no longer managed.");
+				removeWindow = true;
+			}
+
+			if (removeWindow)
+			{
+				garbageWindows.Add(window);
+				garbageCollected = true;
+			}
+		}
+
+		// Remove the windows by doing a sneaky call.
+		foreach (IWindow window in garbageWindows)
+		{
+			windowManager.OnWindowRemoved(window);
+		}
+
+		return garbageCollected;
 	}
 
 	protected virtual void Dispose(bool disposing)

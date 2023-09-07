@@ -562,6 +562,7 @@ public class WindowManagerTests
 
 		// Then
 		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowRemoved(It.IsAny<IWindow>()), Times.Once);
+		Assert.Empty(windowManager.Windows);
 	}
 
 	#region OnWindowMoveStart

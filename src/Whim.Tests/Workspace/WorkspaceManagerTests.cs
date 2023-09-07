@@ -12,8 +12,8 @@ public class WorkspaceManagerTests
 		// Yes, I know it's bad to have `_triggers` be `internal` in `WorkspaceManager`.
 		public WorkspaceManagerTriggers InternalTriggers => _triggers;
 
-		public WorkspaceManagerTestWrapper(IContext context)
-			: base(context) { }
+		public WorkspaceManagerTestWrapper(IContext context, ICoreNativeManager coreNativeManager)
+			: base(context, coreNativeManager) { }
 
 		public void Add(IWorkspace workspace) => _workspaces.Add(workspace);
 	}
@@ -24,6 +24,7 @@ public class WorkspaceManagerTests
 		public Mock<IMonitorManager> MonitorManager { get; } = new();
 		public Mock<IMonitor>[] Monitors { get; }
 		public Mock<IRouterManager> RouterManager { get; } = new();
+		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public WorkspaceManagerTestWrapper WorkspaceManager { get; }
 
@@ -55,7 +56,7 @@ public class WorkspaceManagerTests
 
 			RouterManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(null as IWorkspace);
 
-			WorkspaceManager = new(Context.Object);
+			WorkspaceManager = new(Context.Object, CoreNativeManager.Object);
 			foreach (Mock<IWorkspace> workspace in workspaces ?? Array.Empty<Mock<IWorkspace>>())
 			{
 				WorkspaceManager.Add(workspace.Object);

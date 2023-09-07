@@ -95,7 +95,7 @@ internal class Window : IWindow
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
-		(_context.WindowManager as WindowManager)?.OnWindowFocused(this);
+		((IInternalWindowManager)_context.WindowManager).OnWindowFocused(this);
 	}
 
 	/// <inheritdoc/>
@@ -114,7 +114,7 @@ internal class Window : IWindow
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
-		(_context.WindowManager as WindowManager)?.OnWindowFocused(this);
+		((IInternalWindowManager)_context.WindowManager).OnWindowFocused(this);
 	}
 
 	/// <inheritdoc/>
