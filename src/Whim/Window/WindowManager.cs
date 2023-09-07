@@ -287,15 +287,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private IWindow? AddWindow(HWND hwnd)
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
-		// if (
-		// 	_coreNativeManager.IsSplashScreen(hwnd)
-		// 	|| _coreNativeManager.IsCloakedWindow(hwnd)
-		// 	|| !_coreNativeManager.IsStandardWindow(hwnd)
-		// 	|| !_coreNativeManager.HasNoVisibleOwner(hwnd)
-		// )
-		// {
-		// 	return null;
-		// }
 
 		if (_coreNativeManager.IsSplashScreen(hwnd))
 		{
