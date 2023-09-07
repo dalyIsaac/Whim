@@ -354,6 +354,9 @@ internal interface ICoreNativeManager
 	/// <returns></returns>
 	bool IsSystemWindow(HWND hwnd, string className);
 
+	/// <inheritdoc cref="PInvoke.IsWindow(HWND)"/>
+	bool IsWindow(HWND hWnd);
+
 	/// <summary>Installs or updates a window subclass callback.</summary>
 	/// <param name="hWnd">
 	/// <para>Type: <b>HWND</b> The handle of the window being subclassed.</para>

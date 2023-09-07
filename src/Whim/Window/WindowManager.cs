@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -7,7 +8,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-internal class WindowManager : IWindowManager
+internal class WindowManager : IWindowManager, IInternalWindowManager
 {
 	private readonly IContext _context;
 	private readonly ICoreNativeManager _coreNativeManager;
@@ -22,10 +23,8 @@ internal class WindowManager : IWindowManager
 	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
 
-	/// <summary>
-	/// Map of <see cref="HWND"/> to <see cref="IWindow"/> for easy <see cref="IWindow"/> lookup.
-	/// </summary>
-	private readonly Dictionary<HWND, IWindow> _windows = new();
+	private readonly ConcurrentDictionary<HWND, IWindow> _windows = new();
+	public IReadOnlyDictionary<HWND, IWindow> Windows => _windows;
 
 	/// <summary>
 	/// All the hooks added with <see cref="ICoreNativeManager.SetWinEventHook"/>.
@@ -117,7 +116,7 @@ internal class WindowManager : IWindowManager
 
 	public IWindow? CreateWindow(HWND hwnd)
 	{
-		Logger.Debug($"Adding window {hwnd}");
+		Logger.Debug($"Adding window {hwnd.Value}");
 
 		if (_windows.TryGetValue(hwnd, out IWindow? window) && window != null)
 		{
@@ -288,13 +287,31 @@ internal class WindowManager : IWindowManager
 	private IWindow? AddWindow(HWND hwnd)
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
-		if (
-			_coreNativeManager.IsSplashScreen(hwnd)
-			|| _coreNativeManager.IsCloakedWindow(hwnd)
-			|| !_coreNativeManager.IsStandardWindow(hwnd)
-			|| !_coreNativeManager.HasNoVisibleOwner(hwnd)
-		)
+		// if (
+		// 	_coreNativeManager.IsSplashScreen(hwnd)
+		// 	|| _coreNativeManager.IsCloakedWindow(hwnd)
+		// 	|| !_coreNativeManager.IsStandardWindow(hwnd)
+		// 	|| !_coreNativeManager.HasNoVisibleOwner(hwnd)
+		// )
+		// {
+		// 	return null;
+		// }
+
+		if (_coreNativeManager.IsSplashScreen(hwnd))
 		{
+			Logger.Verbose($"Window {hwnd.Value} is a splash screen, ignoring");
+			return null;
+		}
+
+		if (_coreNativeManager.IsCloakedWindow(hwnd))
+		{
+			Logger.Verbose($"Window {hwnd.Value} is cloaked, ignoring");
+			return null;
+		}
+
+		if (!_coreNativeManager.IsStandardWindow(hwnd))
+		{
+			Logger.Verbose($"Window {hwnd.Value} is not a standard window, ignoring");
 			return null;
 		}
 
@@ -303,11 +320,11 @@ internal class WindowManager : IWindowManager
 		{
 			return null;
 		}
-		else if (_context.FilterManager.ShouldBeIgnored(window))
+		if (_context.FilterManager.ShouldBeIgnored(window))
 		{
 			return null;
 		}
-		else if (window.IsMinimized)
+		if (window.IsMinimized)
 		{
 			return null;
 		}
@@ -317,7 +334,7 @@ internal class WindowManager : IWindowManager
 		return window;
 	}
 
-	internal void OnWindowAdded(IWindow window)
+	public void OnWindowAdded(IWindow window)
 	{
 		Logger.Debug($"Window added: {window}");
 		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowAdded(window);
@@ -330,7 +347,7 @@ internal class WindowManager : IWindowManager
 	/// have switched to a different workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	internal void OnWindowFocused(IWindow? window)
+	public void OnWindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Window focused: {window}");
 		((IInternalMonitorManager)_context.MonitorManager).WindowFocused(window);
@@ -358,10 +375,10 @@ internal class WindowManager : IWindowManager
 		OnWindowRemoved(window);
 	}
 
-	internal void OnWindowRemoved(IWindow window)
+	public void OnWindowRemoved(IWindow window)
 	{
 		Logger.Debug($"Window removed: {window}");
-		_windows.Remove(window.Handle);
+		_windows.TryRemove(window.Handle, out _);
 		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowRemoved(window);
 		WindowRemoved?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
@@ -533,14 +550,14 @@ internal class WindowManager : IWindowManager
 		);
 	}
 
-	internal void OnWindowMinimizeStart(IWindow window)
+	public void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
 		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowMinimizeStart(window);
 		WindowMinimizeStart?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
 
-	internal void OnWindowMinimizeEnd(IWindow window)
+	public void OnWindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize ended: {window}");
 		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowMinimizeEnd(window);

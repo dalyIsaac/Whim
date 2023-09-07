@@ -50,7 +50,7 @@ internal class Context : IContext
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, CoreNativeManager, MouseHook);
 		MonitorManager = new MonitorManager(this, CoreNativeManager, MouseHook);
-		WorkspaceManager = new WorkspaceManager(this);
+		WorkspaceManager = new WorkspaceManager(this, CoreNativeManager);
 		_commandManager = new CommandManager();
 		PluginManager = new PluginManager(this, FileManager, _commandManager);
 		KeybindManager = new KeybindManager(this);

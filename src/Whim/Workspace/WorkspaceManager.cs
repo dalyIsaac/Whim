@@ -24,6 +24,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	private bool _initialized;
 
 	private readonly IContext _context;
+	private readonly ICoreNativeManager _coreNativeManager;
 	protected readonly WorkspaceManagerTriggers _triggers;
 
 	/// <summary>
@@ -89,9 +90,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	private bool _disposedValue;
 
-	public WorkspaceManager(IContext context)
+	public WorkspaceManager(IContext context, ICoreNativeManager coreNativeManager)
 	{
 		_context = context;
+		_coreNativeManager = coreNativeManager;
 		_triggers = new WorkspaceManagerTriggers()
 		{
 			ActiveLayoutEngineChanged = (ActiveLayoutEngineChangedEventArgs e) =>
@@ -165,7 +167,8 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 
 		// Create the workspace.
-		Workspace workspace = new(_context, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
+		Workspace workspace =
+			new(_context, _coreNativeManager, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
 		_workspaces.Add(workspace);
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 		return workspace;

@@ -11,6 +11,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// </summary>
 	private readonly object _workspaceLock = new();
 	private readonly IContext _context;
+	private readonly ICoreNativeManager _coreNativeManager;
 	private readonly WorkspaceManagerTriggers _triggers;
 
 	private string _name;
@@ -98,12 +99,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public Workspace(
 		IContext context,
+		ICoreNativeManager coreNativeManager,
 		WorkspaceManagerTriggers triggers,
 		string name,
 		IEnumerable<ILayoutEngine> layoutEngines
 	)
 	{
 		_context = context;
+		_coreNativeManager = coreNativeManager;
 		_triggers = triggers;
 
 		_name = name;
@@ -543,6 +546,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		GarbageCollect();
 	}
 
 	public bool ContainsWindow(IWindow window)
@@ -550,6 +554,42 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		lock (_workspaceLock)
 		{
 			return _normalWindows.Contains(window) || _minimizedWindows.Contains(window);
+		}
+	}
+
+	private void GarbageCollect()
+	{
+		IInternalWindowManager windowManager = (IInternalWindowManager)_context.WindowManager;
+
+		List<IWindow> garbageWindows = new();
+
+		foreach (IWindow window in Windows)
+		{
+			bool removeWindow = false;
+			if (!_coreNativeManager.IsWindow(window.Handle))
+			{
+				Logger.Debug($"Window {window.Handle} is no longer a window.");
+				removeWindow = true;
+			}
+			else if (
+				windowManager.Windows.TryGetValue(window.Handle, out IWindow? windowInManager)
+				&& !windowInManager.Equals(window)
+			)
+			{
+				Logger.Debug($"Window {window.Handle} is no longer the same window.");
+				removeWindow = true;
+			}
+
+			if (removeWindow)
+			{
+				garbageWindows.Add(window);
+			}
+		}
+
+		// Remove the windows by doing a sneaky call.
+		foreach (IWindow window in garbageWindows)
+		{
+			windowManager.OnWindowRemoved(window);
 		}
 	}
 

@@ -34,6 +34,9 @@ namespace Windows.Win32
 
 			/// <inheritdoc/>
 			public static explicit operator HWND(IntPtr value) => new(value);
+
+			/// <inheritdoc/>
+			public override string ToString() => Value.ToString();
 		}
 	}
 }
