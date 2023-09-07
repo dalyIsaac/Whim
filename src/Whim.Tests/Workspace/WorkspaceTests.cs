@@ -87,7 +87,7 @@ public class WorkspaceTests
 			};
 		}
 
-		public Wrapper Setup_GarbageCollection()
+		public Wrapper Setup_PassGarbageCollection()
 		{
 			CoreNativeManager.Setup(c => c.IsWindow(It.IsAny<HWND>())).Returns(true);
 
@@ -223,6 +223,7 @@ public class WorkspaceTests
 		);
 	}
 
+	#region DoLayout
 	[Fact]
 	public void DoLayout_CannotFindMonitorForWorkspace()
 	{
@@ -252,7 +253,7 @@ public class WorkspaceTests
 	public void DoLayout_MinimizedWindow()
 	{
 		// Given
-		Wrapper wrapper = new Wrapper().Setup_GarbageCollection();
+		Wrapper wrapper = new Wrapper().Setup_PassGarbageCollection();
 
 		Mock<IWindow> window = new();
 
@@ -277,6 +278,95 @@ public class WorkspaceTests
 		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Once);
 		wrapper.TriggerWorkspaceLayoutCompleted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Once);
 	}
+
+	[Fact]
+	public void DoLayout_GarbageCollect_IsNotAWindow()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		Mock<IWindow> window = new();
+
+		using Workspace workspace =
+			new(
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.Triggers,
+				"Workspace",
+				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
+			);
+
+		wrapper.CoreNativeManager.Setup(c => c.IsWindow(It.IsAny<HWND>())).Returns(false);
+
+		// When
+		workspace.AddWindow(window.Object);
+
+		// Then
+		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
+		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Never);
+	}
+
+	[Fact]
+	public void DoLayout_GarbageCollect_HandleIsNotEqual()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		Mock<IWindow> window = new();
+
+		using Workspace workspace =
+			new(
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.Triggers,
+				"Workspace",
+				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
+			);
+
+		wrapper.CoreNativeManager.Setup(c => c.IsWindow(It.IsAny<HWND>())).Returns(true);
+		wrapper.InternalWindowManager
+			.Setup(wm => wm.Windows.TryGetValue(It.IsAny<HWND>(), out It.Ref<IWindow?>.IsAny))
+			.Callback(
+				(HWND hwnd, out IWindow? w) =>
+				{
+					w = new Mock<IWindow>().Object;
+				}
+			)
+			.Returns(true);
+
+		// When
+		workspace.AddWindow(window.Object);
+
+		// Then
+		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
+		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Never);
+	}
+
+	[Fact]
+	public void DoLayout_GarbageCollect_HandleIsNotManaged()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		Mock<IWindow> window = new();
+
+		using Workspace workspace =
+			new(
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.Triggers,
+				"Workspace",
+				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
+			);
+
+		// When
+		workspace.AddWindow(window.Object);
+
+		// Then
+		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
+		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Never);
+	}
+	#endregion
 
 	[Fact]
 	public void ContainsWindow_False()
@@ -539,7 +629,7 @@ public class WorkspaceTests
 	public void AddWindow_Fails_AlreadyIncludesWindow()
 	{
 		// Given
-		Wrapper wrapper = new Wrapper().Setup_GarbageCollection();
+		Wrapper wrapper = new Wrapper().Setup_PassGarbageCollection();
 		Mock<IWindow> window = new();
 		Workspace workspace =
 			new(
@@ -563,7 +653,7 @@ public class WorkspaceTests
 	public void AddWindow_Success()
 	{
 		// Given
-		Wrapper wrapper = new Wrapper().Setup_GarbageCollection();
+		Wrapper wrapper = new Wrapper().Setup_PassGarbageCollection();
 		Mock<IWindow> window = new();
 		Workspace workspace =
 			new(
@@ -1055,7 +1145,7 @@ public class WorkspaceTests
 	public void TryGetWindowLocation()
 	{
 		// Given
-		Wrapper wrapper = new Wrapper().Setup_GarbageCollection();
+		Wrapper wrapper = new Wrapper().Setup_PassGarbageCollection();
 
 		Mock<IWindow> window = new();
 
