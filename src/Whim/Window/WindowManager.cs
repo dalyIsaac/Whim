@@ -306,6 +306,12 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			return null;
 		}
 
+		if (!_coreNativeManager.HasNoVisibleOwner(hwnd))
+		{
+			Logger.Verbose($"Window {hwnd.Value} has a visible owner, ignoring");
+			return null;
+		}
+
 		IWindow? window = CreateWindow(hwnd);
 		if (window == null)
 		{

@@ -577,12 +577,17 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Window {window.Handle} is no longer a window.");
 				removeWindow = true;
 			}
-			else if (
-				windowManager.Windows.TryGetValue(window.Handle, out IWindow? windowInManager)
-				&& !windowInManager.Equals(window)
-			)
+			else if (windowManager.Windows.TryGetValue(window.Handle, out IWindow? windowInManager))
 			{
-				Logger.Debug($"Window {window.Handle} is no longer the same window.");
+				if (!windowInManager.Equals(window))
+				{
+					Logger.Debug($"Window {window.Handle} is no longer the same window.");
+					removeWindow = true;
+				}
+			}
+			else
+			{
+				Logger.Debug($"Window {window.Handle} is no longer managed.");
 				removeWindow = true;
 			}
 

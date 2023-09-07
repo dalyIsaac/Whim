@@ -17,6 +17,7 @@ public class WorkspaceTests
 	private class Wrapper
 	{
 		public Mock<IContext> Context { get; } = new();
+		public Mock<IInternalWindowManager> InternalWindowManager { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<ILayoutEngine> LayoutEngine { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
@@ -34,6 +35,7 @@ public class WorkspaceTests
 			Context.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
 			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
 			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
+			Context.Setup(c => c.WindowManager).Returns(InternalWindowManager.As<IWindowManager>().Object);
 
 			LayoutEngine.Setup(l => l.ContainsEqual(LayoutEngine.Object)).Returns(true);
 			LayoutEngine.Setup(l => l.Name).Returns("Layout");
@@ -83,6 +85,26 @@ public class WorkspaceTests
 				WorkspaceLayoutStarted = TriggerWorkspaceLayoutStarted.Object,
 				WorkspaceLayoutCompleted = TriggerWorkspaceLayoutCompleted.Object
 			};
+		}
+
+		public Wrapper Setup_GarbageCollection()
+		{
+			CoreNativeManager.Setup(c => c.IsWindow(It.IsAny<HWND>())).Returns(true);
+
+			Mock<IWindow> window = new();
+			window.Setup(w => w.Equals(It.IsAny<IWindow>())).Returns(true);
+
+			InternalWindowManager
+				.Setup(wm => wm.Windows.TryGetValue(It.IsAny<HWND>(), out It.Ref<IWindow?>.IsAny))
+				.Callback(
+					(HWND hwnd, out IWindow? w) =>
+					{
+						w = window.Object;
+					}
+				)
+				.Returns(true);
+
+			return this;
 		}
 	}
 
@@ -230,7 +252,7 @@ public class WorkspaceTests
 	public void DoLayout_MinimizedWindow()
 	{
 		// Given
-		Wrapper wrapper = new();
+		Wrapper wrapper = new Wrapper().Setup_GarbageCollection();
 
 		Mock<IWindow> window = new();
 
@@ -517,7 +539,7 @@ public class WorkspaceTests
 	public void AddWindow_Fails_AlreadyIncludesWindow()
 	{
 		// Given
-		Wrapper wrapper = new();
+		Wrapper wrapper = new Wrapper().Setup_GarbageCollection();
 		Mock<IWindow> window = new();
 		Workspace workspace =
 			new(
@@ -541,7 +563,7 @@ public class WorkspaceTests
 	public void AddWindow_Success()
 	{
 		// Given
-		Wrapper wrapper = new();
+		Wrapper wrapper = new Wrapper().Setup_GarbageCollection();
 		Mock<IWindow> window = new();
 		Workspace workspace =
 			new(
@@ -1033,7 +1055,7 @@ public class WorkspaceTests
 	public void TryGetWindowLocation()
 	{
 		// Given
-		Wrapper wrapper = new();
+		Wrapper wrapper = new Wrapper().Setup_GarbageCollection();
 
 		Mock<IWindow> window = new();
 

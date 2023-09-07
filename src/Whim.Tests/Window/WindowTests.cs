@@ -12,11 +12,14 @@ public class WindowTests
 	{
 		public Mock<IContext> Context { get; } = new();
 		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
-		public Mock<IWindowManager> WindowManager { get; } = new();
+		public Mock<IWindowManager> WindowManager { get; }
+		public Mock<IInternalWindowManager> InternalWindowManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 
 		public Wrapper()
 		{
+			WindowManager = InternalWindowManager.As<IWindowManager>();
+
 			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
 			Context.Setup(c => c.WindowManager).Returns(WindowManager.Object);
 
