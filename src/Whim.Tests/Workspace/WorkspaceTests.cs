@@ -399,8 +399,8 @@ public class WorkspaceTests
 
 		wrapper.CoreNativeManager.Setup(c => c.IsWindow(It.IsAny<HWND>())).Returns(true);
 		wrapper.InternalWindowManager
-		.Setup(wm => wm.Windows.TryGetValue(It.IsAny<HWND>(), out It.Ref<IWindow?>.IsAny))
-		.Returns(false);
+			.Setup(wm => wm.Windows.TryGetValue(It.IsAny<HWND>(), out It.Ref<IWindow?>.IsAny))
+			.Returns(false);
 
 		// When
 		workspace.AddWindow(window.Object);
