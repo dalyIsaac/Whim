@@ -94,15 +94,7 @@ public class WorkspaceTests
 			Mock<IWindow> window = new();
 			window.Setup(w => w.Equals(It.IsAny<IWindow>())).Returns(true);
 
-			InternalWindowManager
-				.Setup(wm => wm.Windows.TryGetValue(It.IsAny<HWND>(), out It.Ref<IWindow?>.IsAny))
-				.Callback(
-					(HWND hwnd, out IWindow? w) =>
-					{
-						w = window.Object;
-					}
-				)
-				.Returns(true);
+			InternalWindowManager.Setup(wm => wm.Windows.ContainsKey(It.IsAny<HWND>())).Returns(true);
 
 			return this;
 		}
@@ -297,80 +289,6 @@ public class WorkspaceTests
 			);
 
 		wrapper.CoreNativeManager.Setup(c => c.IsWindow(It.IsAny<HWND>())).Returns(false);
-
-		// When
-		workspace.AddWindow(window.Object);
-
-		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
-		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Never);
-	}
-
-	[Fact]
-	public void DoLayout_GarbageCollect_HandleIsEqual()
-	{
-		// Given
-		Wrapper wrapper = new();
-
-		Mock<IWindow> window = new();
-		Mock<IWindow> windowInManager = new();
-		windowInManager.Setup(w => w.Equals(It.IsAny<IWindow>())).Returns(true);
-
-		using Workspace workspace =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.Triggers,
-				"Workspace",
-				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
-			);
-
-		wrapper.CoreNativeManager.Setup(c => c.IsWindow(It.IsAny<HWND>())).Returns(true);
-		wrapper.InternalWindowManager
-			.Setup(wm => wm.Windows.TryGetValue(It.IsAny<HWND>(), out It.Ref<IWindow?>.IsAny))
-			.Callback(
-				(HWND hwnd, out IWindow? w) =>
-				{
-					w = windowInManager.Object;
-				}
-			)
-			.Returns(true);
-
-		// When
-		workspace.AddWindow(window.Object);
-
-		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Once);
-		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Once);
-	}
-
-	[Fact]
-	public void DoLayout_GarbageCollect_HandleIsNotEqual()
-	{
-		// Given
-		Wrapper wrapper = new();
-
-		Mock<IWindow> window = new();
-
-		using Workspace workspace =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.Triggers,
-				"Workspace",
-				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
-			);
-
-		wrapper.CoreNativeManager.Setup(c => c.IsWindow(It.IsAny<HWND>())).Returns(true);
-		wrapper.InternalWindowManager
-			.Setup(wm => wm.Windows.TryGetValue(It.IsAny<HWND>(), out It.Ref<IWindow?>.IsAny))
-			.Callback(
-				(HWND hwnd, out IWindow? w) =>
-				{
-					w = new Mock<IWindow>().Object;
-				}
-			)
-			.Returns(true);
 
 		// When
 		workspace.AddWindow(window.Object);
