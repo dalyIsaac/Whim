@@ -499,6 +499,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug($"Workspace {Name}");
 
+		if (GarbageCollect())
+		{
+			Logger.Debug($"Garbage collected windows, skipping layout for workspace {Name}");
+			return;
+		}
+
 		// Get the monitor for this workspace
 		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
 		if (monitor == null)
@@ -546,7 +552,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
-		GarbageCollect();
 	}
 
 	public bool ContainsWindow(IWindow window)
@@ -557,11 +562,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	private void GarbageCollect()
+	private bool GarbageCollect()
 	{
 		IInternalWindowManager windowManager = (IInternalWindowManager)_context.WindowManager;
 
 		List<IWindow> garbageWindows = new();
+		bool garbageCollected = false;
 
 		foreach (IWindow window in Windows)
 		{
@@ -583,6 +589,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			if (removeWindow)
 			{
 				garbageWindows.Add(window);
+				garbageCollected = true;
 			}
 		}
 
@@ -591,6 +598,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			windowManager.OnWindowRemoved(window);
 		}
+
+		return garbageCollected;
 	}
 
 	protected virtual void Dispose(bool disposing)
