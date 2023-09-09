@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -486,6 +487,15 @@ internal interface ICoreNativeManager
 	/// <param name="callback">The task to execute.</param>
 	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
 	bool TryEnqueue(DispatcherQueueHandler callback);
+
+	/// <summary>
+	/// Runs the given <paramref name="task" /> in a <see cref="Task" />.
+	///
+	/// The returned <see cref="DispatcherQueueHandler" /> should be called when the task is complete to run the
+	/// callback on the thread associated with the <see cref="DispatcherQueue" />.
+	/// </summary>
+	/// <param name="task"></param>
+	Task RunTask(Task<DispatcherQueueHandler> task);
 
 	/// <summary>
 	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.

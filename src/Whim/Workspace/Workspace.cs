@@ -1,6 +1,8 @@
+using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Whim;
 
@@ -522,36 +524,47 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			monitor
 		);
 
-		using (WindowDeferPosHandle handle = new(_context))
+		_coreNativeManager.RunTask(SetWindowPosAsync(locations, monitor));
+	}
+
+	private Task<DispatcherQueueHandler> SetWindowPosAsync(IEnumerable<IWindowState> locations, IMonitor monitor)
+	{
+		return Task.Run<DispatcherQueueHandler>(() =>
 		{
-			foreach (IWindowState loc in locations)
+			using (WindowDeferPosHandle handle = new(_context))
 			{
-				Logger.Verbose($"Setting location of window {loc.Window}");
-
-				// Adjust the window location to the monitor's coordinates
-				loc.Location = new Location<int>()
+				foreach (IWindowState loc in locations)
 				{
-					X = loc.Location.X + monitor.WorkingArea.X,
-					Y = loc.Location.Y + monitor.WorkingArea.Y,
-					Width = loc.Location.Width,
-					Height = loc.Location.Height
-				};
+					Logger.Verbose($"Setting location of window {loc.Window}");
 
-				Logger.Verbose($"{loc.Window} at {loc.Location}");
-				handle.DeferWindowPos(loc);
+					// Adjust the window location to the monitor's coordinates
+					loc.Location = new Location<int>()
+					{
+						X = loc.Location.X + monitor.WorkingArea.X,
+						Y = loc.Location.Y + monitor.WorkingArea.Y,
+						Width = loc.Location.Width,
+						Height = loc.Location.Height
+					};
 
-				// Update the window location
-				_windowLocations[loc.Window] = loc;
+					Logger.Verbose($"{loc.Window} at {loc.Location}");
+					handle.DeferWindowPos(loc);
+
+					// Update the window location
+					_windowLocations[loc.Window] = loc;
+				}
+				Logger.Verbose($"Layout for workspace {Name} complete");
 			}
-			Logger.Verbose($"Layout for workspace {Name} complete");
-		}
 
-		foreach (IWindow window in _minimizedWindows)
-		{
-			window.ShowMinimized();
-		}
+			foreach (IWindow window in _minimizedWindows)
+			{
+				window.ShowMinimized();
+			}
 
-		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+			return () =>
+			{
+				_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+			};
+		});
 	}
 
 	public bool ContainsWindow(IWindow window)

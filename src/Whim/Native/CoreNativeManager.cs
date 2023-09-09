@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
@@ -294,6 +295,13 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public bool TryEnqueue(DispatcherQueueHandler callback) =>
 		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
+
+	public async Task RunTask(Task<DispatcherQueueHandler> task)
+	{
+		DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+		DispatcherQueueHandler callback = await task.ConfigureAwait(false);
+		dispatcherQueue.TryEnqueue(callback);
+	}
 
 	private Microsoft.UI.Xaml.Window? _window;
 
