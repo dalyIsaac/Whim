@@ -368,7 +368,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		Logger.Debug("Layout all active workspaces");
 
 		// For each workspace which is active in a monitor, do a layout.
-		foreach (IWorkspace workspace in _monitorWorkspaceMap.Values)
+		foreach (IWorkspace workspace in _monitorWorkspaceMap.Values.ToArray())
 		{
 			workspace.DoLayout();
 		}
