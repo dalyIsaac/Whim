@@ -296,7 +296,7 @@ internal class CoreNativeManager : ICoreNativeManager
 	public bool TryEnqueue(DispatcherQueueHandler callback) =>
 		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
 
-	public async Task RunTask(Task<DispatcherQueueHandler> task)
+	public async Task ExecuteTask(Task<DispatcherQueueHandler> task)
 	{
 		DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 		DispatcherQueueHandler callback = await task.ConfigureAwait(false);

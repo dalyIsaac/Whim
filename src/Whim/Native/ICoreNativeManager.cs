@@ -489,13 +489,11 @@ internal interface ICoreNativeManager
 	bool TryEnqueue(DispatcherQueueHandler callback);
 
 	/// <summary>
-	/// Runs the given <paramref name="task" /> in a <see cref="Task" />.
-	///
-	/// The returned <see cref="DispatcherQueueHandler" /> should be called when the task is complete to run the
-	/// callback on the thread associated with the <see cref="DispatcherQueue" />.
+	/// Executes the given <paramref name="task" />, and runs the returned <see cref="DispatcherQueueHandler" />
+	/// after the <paramref name="task" /> completes on the thread associated with the <see cref="DispatcherQueue" />.
 	/// </summary>
 	/// <param name="task"></param>
-	Task RunTask(Task<DispatcherQueueHandler> task);
+	Task ExecuteTask(Task<DispatcherQueueHandler> task);
 
 	/// <summary>
 	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.

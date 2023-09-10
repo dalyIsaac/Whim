@@ -524,47 +524,47 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			monitor
 		);
 
-		_coreNativeManager.RunTask(SetWindowPosAsync(locations, monitor));
+		// Set the window positions in another thread. Doing this in the same thread can block
+		// the UI thread, which can delay the handling of messages in the window manager - see #446.
+		_coreNativeManager.ExecuteTask(Task.Run(() => SetWindowPos(locations, monitor)));
 	}
 
-	private Task<DispatcherQueueHandler> SetWindowPosAsync(IEnumerable<IWindowState> locations, IMonitor monitor)
+	private DispatcherQueueHandler SetWindowPos(IEnumerable<IWindowState> locations, IMonitor monitor)
 	{
-		return Task.Run<DispatcherQueueHandler>(() =>
+		using (WindowDeferPosHandle handle = new(_context))
 		{
-			using (WindowDeferPosHandle handle = new(_context))
+			foreach (IWindowState loc in locations)
 			{
-				foreach (IWindowState loc in locations)
+				Logger.Verbose($"Setting location of window {loc.Window}");
+
+				// Adjust the window location to the monitor's coordinates
+				loc.Location = new Location<int>()
 				{
-					Logger.Verbose($"Setting location of window {loc.Window}");
+					X = loc.Location.X + monitor.WorkingArea.X,
+					Y = loc.Location.Y + monitor.WorkingArea.Y,
+					Width = loc.Location.Width,
+					Height = loc.Location.Height
+				};
 
-					// Adjust the window location to the monitor's coordinates
-					loc.Location = new Location<int>()
-					{
-						X = loc.Location.X + monitor.WorkingArea.X,
-						Y = loc.Location.Y + monitor.WorkingArea.Y,
-						Width = loc.Location.Width,
-						Height = loc.Location.Height
-					};
+				Logger.Verbose($"{loc.Window} at {loc.Location}");
+				handle.DeferWindowPos(loc);
 
-					Logger.Verbose($"{loc.Window} at {loc.Location}");
-					handle.DeferWindowPos(loc);
-
-					// Update the window location
-					_windowLocations[loc.Window] = loc;
-				}
-				Logger.Verbose($"Layout for workspace {Name} complete");
+				// Update the window location
+				_windowLocations[loc.Window] = loc;
 			}
+			Logger.Verbose($"Layout for workspace {Name} complete");
+		}
 
-			foreach (IWindow window in _minimizedWindows)
-			{
-				window.ShowMinimized();
-			}
+		foreach (IWindow window in _minimizedWindows)
+		{
+			window.ShowMinimized();
+		}
 
-			return () =>
-			{
-				_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
-			};
-		});
+		// Code run on the UI thread after the layout is complete.
+		return () =>
+		{
+			_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		};
 	}
 
 	public bool ContainsWindow(IWindow window)
