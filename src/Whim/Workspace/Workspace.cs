@@ -501,7 +501,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return location;
 	}
 
-	public async void DoLayout()
+	public void DoLayout()
 	{
 		Logger.Debug($"Workspace {Name}");
 
@@ -547,7 +547,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			);
 			_layoutTask = (task, cancellationTokenSource);
 		}
-		await task.ConfigureAwait(false);
 	}
 
 	private DispatcherQueueHandler SetWindowPos(
