@@ -501,7 +501,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return location;
 	}
 
-	public void DoLayout()
+	public async void DoLayout()
 	{
 		Logger.Debug($"Workspace {Name}");
 
@@ -530,6 +530,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		// Set the window positions in another thread. Doing this in the same thread can block
 		// the UI thread, which can delay the handling of messages in the window manager - see #446.
+		Task task;
 		lock (_layoutLock)
 		{
 			if (_layoutTask?.Task.IsCompleted == false)
@@ -540,9 +541,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 			CancellationTokenSource cancellationTokenSource = new();
 			CancellationToken cancellationToken = cancellationTokenSource.Token;
-			Task task = Task.Run(() => SetWindowPos(locations, monitor, cancellationToken), cancellationToken);
+			task = _coreNativeManager.ExecuteTask(
+				() => SetWindowPos(locations, monitor, cancellationToken),
+				cancellationToken
+			);
 			_layoutTask = (task, cancellationTokenSource);
 		}
+		await task.ConfigureAwait(false);
 	}
 
 	private DispatcherQueueHandler SetWindowPos(

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -296,10 +297,10 @@ internal class CoreNativeManager : ICoreNativeManager
 	public bool TryEnqueue(DispatcherQueueHandler callback) =>
 		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
 
-	public async Task ExecuteTask(Task<DispatcherQueueHandler> task)
+	public async Task ExecuteTask(Func<DispatcherQueueHandler> task, CancellationToken cancellationToken)
 	{
 		DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-		DispatcherQueueHandler callback = await task.ConfigureAwait(false);
+		DispatcherQueueHandler callback = await Task.Run(task, cancellationToken).ConfigureAwait(false);
 		dispatcherQueue.TryEnqueue(callback);
 	}
 

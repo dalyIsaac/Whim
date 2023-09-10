@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -493,7 +494,8 @@ internal interface ICoreNativeManager
 	/// after the <paramref name="task" /> completes on the thread associated with the <see cref="DispatcherQueue" />.
 	/// </summary>
 	/// <param name="task"></param>
-	Task ExecuteTask(Task<DispatcherQueueHandler> task);
+	/// <param name="cancellationToken"></param>
+	Task ExecuteTask(Func<DispatcherQueueHandler> task, CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.
