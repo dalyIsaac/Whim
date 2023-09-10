@@ -1,6 +1,8 @@
+using Microsoft.UI.Dispatching;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Xunit;
@@ -85,6 +87,16 @@ public class WorkspaceTests
 				WorkspaceLayoutStarted = TriggerWorkspaceLayoutStarted.Object,
 				WorkspaceLayoutCompleted = TriggerWorkspaceLayoutCompleted.Object
 			};
+
+			CoreNativeManager
+				.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
+				.Callback<Func<DispatcherQueueHandler>, CancellationToken>(
+					(task, _) =>
+					{
+						var result = task();
+						result.Invoke();
+					}
+				);
 		}
 
 		public Wrapper Setup_PassGarbageCollection()
