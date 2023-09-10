@@ -1,5 +1,6 @@
 using Moq;
 using System.Collections.Generic;
+using System.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Xunit;
@@ -215,5 +216,31 @@ public class WindowDeferPosHandleTests
 				),
 			Times.Never
 		);
+	}
+
+	[Fact]
+	public void DeferWindowPos_Cancelled()
+	{
+		// Given
+		MocksBuilder mocks = new();
+
+		using CancellationTokenSource cts = new();
+		cts.Cancel();
+
+		WindowDeferPosHandle handle = new(mocks.Context.Object, cts.Token);
+
+		// When
+		handle.DeferWindowPos(
+			new WindowState()
+			{
+				Location = new Location<int>(),
+				Window = new Mock<IWindow>().Object,
+				WindowSize = WindowSize.Normal
+			}
+		);
+		handle.Dispose();
+
+		// Then
+		mocks.NativeManager.Verify(n => n.BeginDeferWindowPos(It.IsAny<int>()), Times.Never);
 	}
 }

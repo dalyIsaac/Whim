@@ -80,7 +80,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 		if (_cancellationToken?.IsCancellationRequested == true)
 		{
-			Logger.Debug("Cancellation requested, not setting window position");
+			Logger.Debug("Cancellation requested, skipping setting window position");
 			return;
 		}
 
