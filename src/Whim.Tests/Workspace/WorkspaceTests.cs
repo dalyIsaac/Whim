@@ -3,6 +3,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Xunit;
@@ -364,9 +365,13 @@ public class WorkspaceTests
 				new[] { wrapper.LayoutEngine.Object, new Mock<ILayoutEngine>().Object }
 			);
 
-		wrapper.CoreNativeManager.Setup(
-			c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>())
-		);
+		wrapper.CoreNativeManager
+			.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
+			.Returns(() =>
+			{
+				TaskCompletionSource<object> tcs = new();
+				return tcs.Task;
+			});
 
 		// When
 		workspace.AddWindow(window.Object);
