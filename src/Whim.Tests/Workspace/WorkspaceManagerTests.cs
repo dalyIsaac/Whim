@@ -1,6 +1,8 @@
+using Microsoft.UI.Dispatching;
 using Moq;
 using System;
 using System.Linq;
+using System.Threading;
 using Xunit;
 
 namespace Whim.Tests;
@@ -63,6 +65,16 @@ public class WorkspaceManagerTests
 			}
 
 			Context.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager);
+
+			CoreNativeManager
+				.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
+				.Callback<Func<DispatcherQueueHandler>, CancellationToken>(
+					(task, _) =>
+					{
+						var result = task();
+						result.Invoke();
+					}
+				);
 		}
 	}
 

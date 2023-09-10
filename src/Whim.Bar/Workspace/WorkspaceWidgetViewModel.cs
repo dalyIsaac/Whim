@@ -68,30 +68,14 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
 	{
-		if (args.Monitor != Monitor)
+		if (!args.Monitor.Equals(Monitor))
 		{
 			return;
 		}
 
-		// Set the old workspace's model to not be active on the monitor
-		if (args.PreviousWorkspace != null)
+		foreach (WorkspaceModel workspaceModel in Workspaces)
 		{
-			WorkspaceModel? oldWorkspaceModel = Workspaces.FirstOrDefault(
-				model => model.Workspace.Equals(args.PreviousWorkspace)
-			);
-			if (oldWorkspaceModel != null)
-			{
-				oldWorkspaceModel.ActiveOnMonitor = false;
-			}
-		}
-
-		// Set the new workspace's model to be active on the monitor
-		WorkspaceModel? newWorkspaceModel = Workspaces.FirstOrDefault(
-			model => model.Workspace.Equals(args.CurrentWorkspace)
-		);
-		if (newWorkspaceModel != null)
-		{
-			newWorkspaceModel.ActiveOnMonitor = true;
+			workspaceModel.ActiveOnMonitor = workspaceModel.Workspace.Equals(args.CurrentWorkspace);
 		}
 	}
 

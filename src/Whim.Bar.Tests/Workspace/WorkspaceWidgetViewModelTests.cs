@@ -98,6 +98,7 @@ public class WorkspaceWidgetViewModelTests
 		Assert.Equal(wrapper.Workspace.Object, viewModel.Workspaces[0].Workspace);
 	}
 
+	#region WorkspaceManager_MonitorWorkspaceChanged
 	[Fact]
 	public void WorkspaceManager_MonitorWorkspaceChanged_Deactivate()
 	{
@@ -156,6 +157,43 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(existingModel.ActiveOnMonitor);
 		Assert.True(addedWorkspaceModel.ActiveOnMonitor);
 	}
+
+	[Fact]
+	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor()
+	{
+		// Given
+		Wrapper wrapper = new();
+		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+
+		// Add workspace
+		Mock<IWorkspace> addedWorkspace = new();
+		wrapper.WorkspaceManager.Raise(
+			wm => wm.WorkspaceAdded += null,
+			new WorkspaceEventArgs() { Workspace = addedWorkspace.Object }
+		);
+
+		// Verify that the correct workspace is active on the monitor
+		WorkspaceModel existingModel = viewModel.Workspaces[0];
+		WorkspaceModel addedWorkspaceModel = viewModel.Workspaces[1];
+		Assert.True(existingModel.ActiveOnMonitor);
+		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
+
+		// When
+		wrapper.WorkspaceManager.Raise(
+			wm => wm.MonitorWorkspaceChanged += null,
+			new MonitorWorkspaceChangedEventArgs()
+			{
+				Monitor = new Mock<IMonitor>().Object,
+				PreviousWorkspace = existingModel.Workspace,
+				CurrentWorkspace = addedWorkspaceModel.Workspace
+			}
+		);
+
+		// Then
+		Assert.True(existingModel.ActiveOnMonitor);
+		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
+	}
+	#endregion
 
 	[Fact]
 	public void WorkspaceManager_WorkspaceRenamed_ExistingWorkspace()

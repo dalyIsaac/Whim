@@ -1,6 +1,9 @@
+using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Whim;
 
@@ -59,6 +62,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private readonly ILayoutEngine[] _layoutEngines;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
+
+	private readonly object _layoutLock = new();
+	private (Task Task, CancellationTokenSource CancellationTokenSource)? _layoutTask;
 
 	public ILayoutEngine ActiveLayoutEngine
 	{
@@ -522,7 +528,34 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			monitor
 		);
 
-		using (WindowDeferPosHandle handle = new(_context))
+		// Set the window positions in another thread. Doing this in the same thread can block
+		// the UI thread, which can delay the handling of messages in the window manager - see #446.
+		Task task;
+		lock (_layoutLock)
+		{
+			if (_layoutTask?.Task.IsCompleted == false)
+			{
+				Logger.Debug($"Cancelling previous layout task for workspace {Name}");
+				_layoutTask?.CancellationTokenSource.Cancel();
+			}
+
+			CancellationTokenSource cancellationTokenSource = new();
+			CancellationToken cancellationToken = cancellationTokenSource.Token;
+			task = _coreNativeManager.ExecuteTask(
+				() => SetWindowPos(locations, monitor, cancellationToken),
+				cancellationToken
+			);
+			_layoutTask = (task, cancellationTokenSource);
+		}
+	}
+
+	private DispatcherQueueHandler SetWindowPos(
+		IEnumerable<IWindowState> locations,
+		IMonitor monitor,
+		CancellationToken cancellationToken
+	)
+	{
+		using (WindowDeferPosHandle handle = new(_context, cancellationToken))
 		{
 			foreach (IWindowState loc in locations)
 			{
@@ -551,7 +584,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			window.ShowMinimized();
 		}
 
-		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		// Code run on the UI thread after the layout is complete.
+		return () =>
+		{
+			_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		};
 	}
 
 	public bool ContainsWindow(IWindow window)
@@ -608,6 +645,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Disposing workspace {Name}");
 
 				// dispose managed state (managed objects)
+				_layoutTask?.CancellationTokenSource.Cancel();
+				_layoutTask?.Task.Wait();
+				_layoutTask?.CancellationTokenSource.Dispose();
+
 				bool isWorkspaceActive = _context.WorkspaceManager.GetMonitorForWorkspace(this) != null;
 
 				// If the workspace isn't active on the monitor, show all the windows in as minimized.

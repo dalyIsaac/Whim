@@ -17,6 +17,10 @@ internal interface IInternalWorkspaceManager
 	/// <summary>
 	/// Called when a window has been focused by the <see cref="IWindowManager"/>.
 	/// </summary>
+	/// <remarks>
+	/// <paramref name="window"/> can be null, as it will result in <see cref="IWorkspace.LastFocusedWindow"/>
+	/// being set to null.
+	/// </remarks>
 	/// <param name="window">The window that was focused.</param>
 	void WindowFocused(IWindow? window);
 

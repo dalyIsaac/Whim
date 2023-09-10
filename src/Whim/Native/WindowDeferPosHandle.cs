@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -18,6 +19,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 	private readonly IContext _context;
 	private readonly List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> _windowStates =
 		new();
+	private readonly CancellationToken? _cancellationToken;
 
 	/// <summary>
 	/// The default flags to use when setting the window position.
@@ -36,10 +38,15 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// or statement, otherwise <see cref="INativeManager.EndDeferWindowPos"/> won't be called.
 	/// </summary>
 	/// <param name="context"></param>
-	public WindowDeferPosHandle(IContext context)
+	/// <param name="cancellationToken">
+	/// A <see cref="CancellationToken"/> that can be used to cancel the operation, if set before
+	/// <see cref="Dispose"/> is called.
+	/// </param>
+	public WindowDeferPosHandle(IContext context, CancellationToken? cancellationToken = null)
 	{
 		Logger.Debug("Creating new WindowDeferPosHandle");
 		_context = context;
+		_cancellationToken = cancellationToken;
 	}
 
 	/// <summary>
@@ -70,6 +77,12 @@ public sealed class WindowDeferPosHandle : IDisposable
 	public void Dispose()
 	{
 		Logger.Debug("Disposing WindowDeferPosHandle");
+
+		if (_cancellationToken?.IsCancellationRequested == true)
+		{
+			Logger.Debug("Cancellation requested, skipping setting window position");
+			return;
+		}
 
 		// Check to see if any monitors have non-100% scaling.
 		// If so, we need to set the window position twice.

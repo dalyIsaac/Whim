@@ -1,6 +1,9 @@
+using Microsoft.UI.Dispatching;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Xunit;
@@ -85,6 +88,8 @@ public class WorkspaceTests
 				WorkspaceLayoutStarted = TriggerWorkspaceLayoutStarted.Object,
 				WorkspaceLayoutCompleted = TriggerWorkspaceLayoutCompleted.Object
 			};
+
+			Setup_ExecuteTask();
 		}
 
 		public Wrapper Setup_PassGarbageCollection()
@@ -95,6 +100,21 @@ public class WorkspaceTests
 			window.Setup(w => w.Equals(It.IsAny<IWindow>())).Returns(true);
 
 			InternalWindowManager.Setup(wm => wm.Windows.ContainsKey(It.IsAny<HWND>())).Returns(true);
+
+			return this;
+		}
+
+		public Wrapper Setup_ExecuteTask()
+		{
+			CoreNativeManager
+				.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
+				.Callback<Func<DispatcherQueueHandler>, CancellationToken>(
+					(task, _) =>
+					{
+						var result = task();
+						result.Invoke();
+					}
+				);
 
 			return this;
 		}
@@ -326,6 +346,46 @@ public class WorkspaceTests
 		// Then
 		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
 		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Never);
+	}
+
+	[Fact]
+	public void DoLayout_TakeLatestDoLayout()
+	{
+		// Given
+		Wrapper wrapper = new Wrapper().Setup_PassGarbageCollection();
+
+		Mock<IWindow> window = new();
+
+		using Workspace workspace =
+			new(
+				wrapper.Context.Object,
+				wrapper.CoreNativeManager.Object,
+				wrapper.Triggers,
+				"Workspace",
+				new[] { wrapper.LayoutEngine.Object, new Mock<ILayoutEngine>().Object }
+			);
+
+		wrapper.CoreNativeManager
+			.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
+			.Returns(() =>
+			{
+				TaskCompletionSource<object> tcs = new();
+				return tcs.Task;
+			});
+
+		// When
+		workspace.AddWindow(window.Object);
+		wrapper.TriggerWorkspaceLayoutStarted.Invocations.Clear();
+		wrapper.TriggerWorkspaceLayoutCompleted.Invocations.Clear();
+		workspace.DoLayout();
+		wrapper.Setup_ExecuteTask();
+		workspace.DoLayout();
+
+		// Then
+		wrapper.NativeManager.Verify(n => n.ShowWindowNoActivate(It.IsAny<HWND>()), Times.Never);
+		window.Verify(w => w.ShowMinimized(), Times.Never);
+		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Exactly(2));
+		wrapper.TriggerWorkspaceLayoutCompleted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Once);
 	}
 	#endregion
 
