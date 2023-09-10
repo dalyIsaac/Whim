@@ -68,7 +68,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
 	{
-		if (args.Monitor != Monitor)
+		if (!args.Monitor.Equals(Monitor))
 		{
 			return;
 		}
