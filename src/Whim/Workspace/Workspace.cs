@@ -1,9 +1,11 @@
-using Microsoft.UI.Dispatching;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
@@ -63,8 +65,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
+	private readonly ConcurrentQueue<(ILayoutEngine layoutEngine, IMonitor monitor)> _layoutQueue = new();
+	private CancellationTokenSource? _cancellationTokenSource;
 	private readonly object _layoutLock = new();
-	private (Task Task, CancellationTokenSource CancellationTokenSource)? _layoutTask;
 
 	public ILayoutEngine ActiveLayoutEngine
 	{
@@ -520,75 +523,57 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
-		_windowLocations.Clear();
 
-		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
-		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
-			new Location<int>() { Width = monitor.WorkingArea.Width, Height = monitor.WorkingArea.Height },
-			monitor
-		);
-
-		// Set the window positions in another thread. Doing this in the same thread can block
-		// the UI thread, which can delay the handling of messages in the window manager - see #446.
-		Task task;
 		lock (_layoutLock)
 		{
-			if (_layoutTask?.Task.IsCompleted == false)
+			_layoutQueue.Enqueue((ActiveLayoutEngine, monitor));
+			if (_layoutQueue.Count > 1)
 			{
-				Logger.Debug($"Cancelling previous layout task for workspace {Name}");
-				_layoutTask?.CancellationTokenSource.Cancel();
+				// Cancel the previous layout tasks
+				_cancellationTokenSource?.Cancel();
 			}
 
-			CancellationTokenSource cancellationTokenSource = new();
-			CancellationToken cancellationToken = cancellationTokenSource.Token;
-			task = _coreNativeManager.ExecuteTask(
-				() => SetWindowPos(locations, monitor, cancellationToken),
-				cancellationToken
-			);
-			_layoutTask = (task, cancellationTokenSource);
+			// Set the window positions in another thread. Doing this in the same thread can block
+			// the UI thread, which can delay the handling of messages in the window manager - see #446.
+			_cancellationTokenSource ??= new();
 		}
+
+		// Execute the layout task
+		TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+		Task.Run(
+				() => SetWindowPos(engine: ActiveLayoutEngine, monitor, _cancellationTokenSource.Token),
+				_cancellationTokenSource.Token
+			)
+			.ContinueWith(
+				_ =>
+				{
+					// Remove the completed task from the queue
+					_layoutQueue.TryDequeue(out (ILayoutEngine layoutEngine, IMonitor monitor) _);
+
+					// If there are no more tasks in the queue, dispose the cancellation token source
+					lock (_layoutLock)
+					{
+						if (_layoutQueue.IsEmpty)
+						{
+							_cancellationTokenSource?.Dispose();
+							_cancellationTokenSource = null;
+						}
+					}
+				},
+				uiScheduler
+			);
 	}
 
-	private DispatcherQueueHandler SetWindowPos(
-		IEnumerable<IWindowState> locations,
-		IMonitor monitor,
-		CancellationToken cancellationToken
-	)
+	private void SetWindowPos(ILayoutEngine engine, IMonitor monitor, CancellationToken cancellationToken)
 	{
-		using (WindowDeferPosHandle handle = new(_context, cancellationToken))
+		List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> windowStates = new();
+		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
 		{
-			foreach (IWindowState loc in locations)
-			{
-				Logger.Verbose($"Setting location of window {loc.Window}");
-
-				// Adjust the window location to the monitor's coordinates
-				loc.Location = new Location<int>()
-				{
-					X = loc.Location.X + monitor.WorkingArea.X,
-					Y = loc.Location.Y + monitor.WorkingArea.Y,
-					Width = loc.Location.Width,
-					Height = loc.Location.Height
-				};
-
-				Logger.Verbose($"{loc.Window} at {loc.Location}");
-				handle.DeferWindowPos(loc);
-
-				// Update the window location
-				_windowLocations[loc.Window] = loc;
-			}
-			Logger.Verbose($"Layout for workspace {Name} complete");
+			cancellationToken.ThrowIfCancellationRequested();
+			windowStates.Add((loc, (HWND)1, null));
 		}
 
-		foreach (IWindow window in _minimizedWindows)
-		{
-			window.ShowMinimized();
-		}
-
-		// Code run on the UI thread after the layout is complete.
-		return () =>
-		{
-			_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
-		};
+		using WindowDeferPosHandle handle = new(_context, windowStates, cancellationToken);
 	}
 
 	public bool ContainsWindow(IWindow window)
@@ -599,6 +584,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
+	/// <summary>
+	/// Garbage collects windows that are no longer valid.
+	/// </summary>
+	/// <returns></returns>
 	private bool GarbageCollect()
 	{
 		IInternalWindowManager windowManager = (IInternalWindowManager)_context.WindowManager;
@@ -645,9 +634,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Disposing workspace {Name}");
 
 				// dispose managed state (managed objects)
-				_layoutTask?.CancellationTokenSource.Cancel();
-				_layoutTask?.Task.Wait();
-				_layoutTask?.CancellationTokenSource.Dispose();
+				_cancellationTokenSource?.Dispose();
 
 				bool isWorkspaceActive = _context.WorkspaceManager.GetMonitorForWorkspace(this) != null;
 
