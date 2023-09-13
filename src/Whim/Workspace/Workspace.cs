@@ -102,9 +102,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	/// <summary>
-	/// Map of windows to their current location.
+	/// Map of window handles to their current location.
 	/// </summary>
-	private readonly Dictionary<IWindow, IWindowState> _windowLocations = new();
+	private Dictionary<HWND, IWindowState> _windowLocations = new();
 
 	public Workspace(
 		IContext context,
@@ -489,7 +489,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public IWindowState? TryGetWindowLocation(IWindow window)
 	{
-		_windowLocations.TryGetValue(window, out IWindowState? location);
+		_windowLocations.TryGetValue(window.Handle, out IWindowState? location);
 
 		if (location is null && _minimizedWindows.Contains(window))
 		{
@@ -547,7 +547,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				_cancellationTokenSource.Token
 			)
 			.ContinueWith(
-				_ =>
+				t =>
 				{
 					// Remove the completed task from the queue
 					_layoutQueue.TryDequeue(out (ILayoutEngine layoutEngine, IMonitor monitor) _);
@@ -560,23 +560,34 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 							_cancellationTokenSource?.Dispose();
 							_cancellationTokenSource = null;
 						}
+
+						// Add the window locations to the map
+						_windowLocations = t.Result;
 					}
 				},
 				uiScheduler
 			);
 	}
 
-	private void SetWindowPos(ILayoutEngine engine, IMonitor monitor, CancellationToken cancellationToken)
+	private Dictionary<HWND, IWindowState> SetWindowPos(
+		ILayoutEngine engine,
+		IMonitor monitor,
+		CancellationToken cancellationToken
+	)
 	{
 		Logger.Debug($"Setting window positions for workspace {Name}");
 		List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> windowStates = new();
+		Dictionary<HWND, IWindowState> windowLocations = new();
+
 		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 			windowStates.Add((loc, (HWND)1, null));
+			windowLocations.Add(loc.Window.Handle, loc);
 		}
 
 		using WindowDeferPosHandle handle = new(_context, windowStates, cancellationToken);
+		return windowLocations;
 	}
 
 	public bool ContainsWindow(IWindow window)
