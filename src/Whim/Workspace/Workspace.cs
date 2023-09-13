@@ -522,6 +522,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return;
 		}
 
+		Logger.Debug($"Starting layout for workspace {Name}");
 		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
 
 		lock (_layoutLock)
@@ -531,11 +532,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			{
 				// Cancel the previous layout tasks
 				_cancellationTokenSource?.Cancel();
+				Logger.Debug($"Cancelling previous layout tasks for workspace {Name}");
 			}
 
 			// Set the window positions in another thread. Doing this in the same thread can block
 			// the UI thread, which can delay the handling of messages in the window manager - see #446.
-			_cancellationTokenSource ??= new();
+			_cancellationTokenSource = new();
 		}
 
 		// Execute the layout task
@@ -566,6 +568,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	private void SetWindowPos(ILayoutEngine engine, IMonitor monitor, CancellationToken cancellationToken)
 	{
+		Logger.Debug($"Setting window positions for workspace {Name}");
 		List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> windowStates = new();
 		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
 		{
