@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
@@ -59,6 +60,7 @@ public class MonitorManagerTests
 			InternalContext.SetupGet(x => x.CoreNativeManager).Returns(CoreNativeManager.Object);
 			InternalContext.SetupGet(x => x.MouseHook).Returns(MouseHook.Object);
 			InternalContext.SetupGet(x => x.WindowMessageMonitor).Returns(WindowMessageMonitor.Object);
+			InternalContext.SetupGet(x => x.LayoutLock).Returns(new ReaderWriterLockSlim());
 		}
 
 		[MemberNotNull(nameof(_monitorRects))]

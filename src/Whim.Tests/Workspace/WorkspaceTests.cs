@@ -42,6 +42,7 @@ public class WorkspaceTests
 			Context.Setup(c => c.WindowManager).Returns(InternalWindowManager.As<IWindowManager>().Object);
 
 			InternalContext.Setup(ic => ic.CoreNativeManager).Returns(CoreNativeManager.Object);
+			InternalContext.SetupGet(x => x.LayoutLock).Returns(new ReaderWriterLockSlim());
 
 			LayoutEngine.Setup(l => l.ContainsEqual(LayoutEngine.Object)).Returns(true);
 			LayoutEngine.Setup(l => l.Name).Returns("Layout");
