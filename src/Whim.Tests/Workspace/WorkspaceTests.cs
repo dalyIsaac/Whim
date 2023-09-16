@@ -20,6 +20,7 @@ public class WorkspaceTests
 	private class Wrapper
 	{
 		public Mock<IContext> Context { get; } = new();
+		public Mock<IInternalContext> InternalContext { get; } = new();
 		public Mock<IInternalWindowManager> InternalWindowManager { get; } = new();
 		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
 		public Mock<ILayoutEngine> LayoutEngine { get; } = new();
@@ -39,6 +40,8 @@ public class WorkspaceTests
 			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
 			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
 			Context.Setup(c => c.WindowManager).Returns(InternalWindowManager.As<IWindowManager>().Object);
+
+			InternalContext.Setup(ic => ic.CoreNativeManager).Returns(CoreNativeManager.Object);
 
 			LayoutEngine.Setup(l => l.ContainsEqual(LayoutEngine.Object)).Returns(true);
 			LayoutEngine.Setup(l => l.Name).Returns("Layout");
@@ -133,7 +136,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -154,7 +157,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -177,7 +180,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -202,7 +205,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object, layoutEngine2.Object }
@@ -227,7 +230,7 @@ public class WorkspaceTests
 			() =>
 				new Workspace(
 					wrapper.Context.Object,
-					wrapper.CoreNativeManager.Object,
+					wrapper.InternalContext.Object,
 					wrapper.Triggers,
 					"Workspace",
 					Array.Empty<ILayoutEngine>()
@@ -246,7 +249,7 @@ public class WorkspaceTests
 		using Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -272,7 +275,7 @@ public class WorkspaceTests
 		using Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -302,7 +305,7 @@ public class WorkspaceTests
 		using Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -329,7 +332,7 @@ public class WorkspaceTests
 		using Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -359,7 +362,7 @@ public class WorkspaceTests
 		using Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new[] { wrapper.LayoutEngine.Object, new Mock<ILayoutEngine>().Object }
@@ -399,7 +402,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -422,7 +425,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -446,7 +449,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -472,7 +475,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -496,7 +499,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -519,7 +522,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -543,7 +546,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -565,7 +568,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object, layoutEngine.Object }
@@ -587,7 +590,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object, layoutEngine.Object }
@@ -610,7 +613,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object, layoutEngine.Object }
@@ -632,7 +635,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object, layoutEngine.Object }
@@ -655,7 +658,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -679,7 +682,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -702,7 +705,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -727,7 +730,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -753,7 +756,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -782,7 +785,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -811,7 +814,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -833,7 +836,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -858,7 +861,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -880,7 +883,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -902,7 +905,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -924,7 +927,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -946,7 +949,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -972,7 +975,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -998,7 +1001,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1022,7 +1025,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1051,7 +1054,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1086,7 +1089,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1120,7 +1123,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1144,7 +1147,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1187,7 +1190,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1210,7 +1213,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1242,7 +1245,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1265,7 +1268,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1288,7 +1291,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1312,7 +1315,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
@@ -1337,7 +1340,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(
 				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
+				wrapper.InternalContext.Object,
 				wrapper.Triggers,
 				"Workspace",
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }

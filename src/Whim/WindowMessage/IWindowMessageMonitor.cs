@@ -17,7 +17,7 @@ internal interface IWindowMessageMonitor : IDisposable
 	/// <remarks>
 	/// For more, see https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ms695534(v=vs.85)
 	/// </remarks>
-	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
+	event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
 
 	/// <summary>
 	/// This event is raised when the work area has changed for a monitor.
@@ -27,7 +27,7 @@ internal interface IWindowMessageMonitor : IDisposable
 	/// parameter of the <see cref="PInvoke.SystemParametersInfo"/> function. Whim detects this
 	/// message by listening for the <see cref="PInvoke.WM_SETTINGCHANGE"/> message.
 	/// </remarks>
-	public event EventHandler<WindowMessageMonitorEventArgs>? WorkAreaChanged;
+	event EventHandler<WindowMessageMonitorEventArgs>? WorkAreaChanged;
 
 	/// <summary>
 	/// This event is raised when the DPI has changed for a monitor.
@@ -37,7 +37,7 @@ internal interface IWindowMessageMonitor : IDisposable
 	/// parameter of the <see cref="PInvoke.SystemParametersInfo"/> function. Whim detects this
 	/// message by listening for the <see cref="PInvoke.WM_SETTINGCHANGE"/> message.
 	/// </remarks>
-	public event EventHandler<WindowMessageMonitorEventArgs>? DpiChanged;
+	event EventHandler<WindowMessageMonitorEventArgs>? DpiChanged;
 
 	/// <summary>
 	/// This event is raised when the session has changed.
@@ -45,5 +45,11 @@ internal interface IWindowMessageMonitor : IDisposable
 	/// <remarks>
 	/// For more, see https://learn.microsoft.com/en-us/windows/win32/termserv/wm-wtssession-change
 	/// </remarks>
-	public event EventHandler<WindowMessageMonitorEventArgs>? SessionChanged;
+	event EventHandler<WindowMessageMonitorEventArgs>? SessionChanged;
+
+	/// <summary>
+	/// Initialize the <see cref="IWindowMessageMonitor"/> by hiding the window and setting up
+	/// the window procedure.
+	/// </summary>
+	void PreInitialize();
 }

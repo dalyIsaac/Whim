@@ -42,7 +42,7 @@ public class KeybindHookTests
 	private class Wrapper
 	{
 		public Mock<IContext> Context { get; } = new();
-		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
+		public Mock<IInternalContext> InternalContext { get; } = new();
 		public Mock<IKeybindManager> KeybindManager { get; } = new();
 		public HOOKPROC? KeyboardHook { get; private set; }
 		public FakeSafeHandle Handle { get; }
@@ -53,8 +53,16 @@ public class KeybindHookTests
 
 			Context.SetupGet(context => context.KeybindManager).Returns(KeybindManager.Object);
 
-			CoreNativeManager
-				.Setup(cnm => cnm.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, It.IsAny<HOOKPROC>(), null, 0))
+			InternalContext
+				.Setup(
+					cnm =>
+						cnm.CoreNativeManager.SetWindowsHookEx(
+							WINDOWS_HOOK_ID.WH_KEYBOARD_LL,
+							It.IsAny<HOOKPROC>(),
+							null,
+							0
+						)
+				)
 				.Callback(
 					(WINDOWS_HOOK_ID id, HOOKPROC proc, SafeHandle handle, uint dwThreadId) =>
 					{
@@ -63,18 +71,18 @@ public class KeybindHookTests
 				)
 				.Returns(Handle);
 
-			CoreNativeManager.Setup(cnm => cnm.CallNextHookEx(0, 0, 0)).Returns((LRESULT)0);
+			InternalContext.Setup(cnm => cnm.CoreNativeManager.CallNextHookEx(0, 0, 0)).Returns((LRESULT)0);
 		}
 
 		public void SetupKey(VIRTUAL_KEY[] modifiers, VIRTUAL_KEY key, ICommand[] commands)
 		{
 			foreach (VIRTUAL_KEY modifier in modifiers)
 			{
-				CoreNativeManager.Setup(cnm => cnm.GetKeyState((int)modifier)).Returns(-32768);
+				InternalContext.Setup(cnm => cnm.CoreNativeManager.GetKeyState((int)modifier)).Returns(-32768);
 			}
 
-			CoreNativeManager
-				.Setup(coreNativeManager => coreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()))
+			InternalContext
+				.Setup(c => c.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()))
 				.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)key });
 
 			KeybindManager.Setup(keybindManager => keybindManager.GetCommands(It.IsAny<IKeybind>())).Returns(commands);
@@ -85,16 +93,15 @@ public class KeybindHookTests
 	public void PostInitialize()
 	{
 		// Given
-		Mock<IContext> context = new();
-		Mock<ICoreNativeManager> coreNativeManager = new();
-		KeybindHook keybindHook = new(context.Object, coreNativeManager.Object);
+		Wrapper wrapper = new();
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 
 		// When
 		keybindHook.PostInitialize();
 
 		// Then
-		coreNativeManager.Verify(
-			c => c.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, It.IsAny<HOOKPROC>(), null, 0),
+		wrapper.InternalContext.Verify(
+			c => c.CoreNativeManager.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, It.IsAny<HOOKPROC>(), null, 0),
 			Times.Once
 		);
 	}
@@ -106,15 +113,18 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 
 		// When
 		keybindHook.PostInitialize();
 		wrapper.KeyboardHook?.Invoke(nCode, 0, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(c => c.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()), Times.Never);
-		wrapper.CoreNativeManager.Verify(c => c.CallNextHookEx(nCode, 0, 0), Times.Once);
+		wrapper.InternalContext.Verify(
+			c => c.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()),
+			Times.Never
+		);
+		wrapper.InternalContext.Verify(c => c.CoreNativeManager.CallNextHookEx(nCode, 0, 0), Times.Once);
 	}
 
 	[Fact]
@@ -122,9 +132,9 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()))
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		wrapper.InternalContext
+			.Setup(cnm => cnm.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()))
 			.Returns(null as KBDLLHOOKSTRUCT?);
 
 		// When
@@ -132,8 +142,11 @@ public class KeybindHookTests
 		wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(c => c.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()), Times.Once);
-		wrapper.CoreNativeManager.Verify(c => c.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Once);
+		wrapper.InternalContext.Verify(
+			c => c.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()),
+			Times.Once
+		);
+		wrapper.InternalContext.Verify(c => c.CoreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Once);
 	}
 
 	// WM_KEYDOWN and WM_SYSKEYDOWN
@@ -146,18 +159,18 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 
 		// When
 		keybindHook.PostInitialize();
 		wrapper.KeyboardHook?.Invoke(0, wParam, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(c => c.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()), Times.Never);
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, wParam, 0),
-			Times.Once
+		wrapper.InternalContext.Verify(
+			c => c.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()),
+			Times.Never
 		);
+		wrapper.InternalContext.Verify(c => c.CoreNativeManager.CallNextHookEx(0, wParam, 0), Times.Once);
 	}
 
 	public static readonly IEnumerable<object[]> IgnoredKeys = new List<object[]>()
@@ -178,7 +191,7 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 		wrapper.SetupKey(new VIRTUAL_KEY[] { key }, VIRTUAL_KEY.None, Array.Empty<ICommand>());
 
 		// When
@@ -186,10 +199,7 @@ public class KeybindHookTests
 		wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0),
-			Times.Once
-		);
+		wrapper.InternalContext.Verify(c => c.CoreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Once);
 	}
 
 	public static readonly IEnumerable<object[]> KeybindsToExecute = new List<object[]>()
@@ -238,7 +248,7 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 		Mock<ICommand>[] commands = Enumerable.Range(0, 3).Select(_ => new Mock<ICommand>()).ToArray();
 		wrapper.SetupKey(modifiers, key, commands.Select(c => c.Object).ToArray());
 
@@ -247,10 +257,7 @@ public class KeybindHookTests
 		LRESULT? result = wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_SYSKEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0),
-			Times.Never
-		);
+		wrapper.InternalContext.Verify(c => c.CoreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Never);
 		Assert.Equal(1, (nint)result!);
 		wrapper.KeybindManager.Verify(km => km.GetCommands(keybind), Times.Once);
 		foreach (Mock<ICommand> command in commands)
@@ -264,7 +271,7 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 		wrapper.SetupKey(Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
 
 		// When
@@ -272,10 +279,7 @@ public class KeybindHookTests
 		LRESULT? result = wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0),
-			Times.Once
-		);
+		wrapper.InternalContext.Verify(c => c.CoreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Once);
 		Assert.Equal(0, (nint)result!);
 		wrapper.KeybindManager.Verify(
 			km => km.GetCommands(new Keybind(KeyModifiers.None, VIRTUAL_KEY.VK_A)),
@@ -288,7 +292,7 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 		wrapper.SetupKey(new[] { VIRTUAL_KEY.VK_LWIN }, VIRTUAL_KEY.VK_U, Array.Empty<ICommand>());
 
 		// When
@@ -296,10 +300,7 @@ public class KeybindHookTests
 		LRESULT? result = wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0),
-			Times.Once
-		);
+		wrapper.InternalContext.Verify(c => c.CoreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Once);
 		Assert.Equal(0, (nint)result!);
 		wrapper.KeybindManager.Verify(
 			km => km.GetCommands(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_U)),
@@ -312,7 +313,7 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 
 		// When
 		keybindHook.Dispose();
@@ -326,7 +327,7 @@ public class KeybindHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.InternalContext.Object);
 		wrapper.SetupKey(Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
 
 		// When

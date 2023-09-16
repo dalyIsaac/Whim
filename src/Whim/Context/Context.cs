@@ -13,10 +13,10 @@ namespace Whim;
 /// </summary>
 internal class Context : IContext
 {
+	private readonly IInternalContext _internalContext;
 	public IFileManager FileManager { get; }
 	public Logger Logger { get; }
 	public INativeManager NativeManager { get; }
-	internal ICoreNativeManager CoreNativeManager { get; }
 	public IWorkspaceManager WorkspaceManager { get; }
 	public IWindowManager WindowManager { get; }
 	public IMonitorManager MonitorManager { get; }
@@ -26,8 +26,6 @@ internal class Context : IContext
 	public ICommandManager CommandManager => _commandManager;
 	public IPluginManager PluginManager { get; }
 	public IKeybindManager KeybindManager { get; }
-	internal KeybindHook KeybindHook { get; }
-	internal MouseHook MouseHook { get; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
@@ -39,20 +37,17 @@ internal class Context : IContext
 	{
 		FileManager = new FileManager();
 		Logger = new Logger();
+		_internalContext = new InternalContext(this);
 
-		CoreNativeManager = new CoreNativeManager(this);
-		NativeManager = new NativeManager(this, CoreNativeManager);
-
-		KeybindHook = new KeybindHook(this, CoreNativeManager);
-		MouseHook = new MouseHook(coreNativeManager: CoreNativeManager);
+		NativeManager = new NativeManager(this, _internalContext);
 
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
-		WindowManager = new WindowManager(this, CoreNativeManager, MouseHook);
-		MonitorManager = new MonitorManager(this, CoreNativeManager, MouseHook);
-		WorkspaceManager = new WorkspaceManager(this, CoreNativeManager);
+		WindowManager = new WindowManager(this, _internalContext);
+		MonitorManager = new MonitorManager(_internalContext);
+		WorkspaceManager = new WorkspaceManager(this, _internalContext);
 		_commandManager = new CommandManager();
-		PluginManager = new PluginManager(this, FileManager, _commandManager);
+		PluginManager = new PluginManager(this, _commandManager);
 		KeybindManager = new KeybindManager(this);
 	}
 
@@ -80,6 +75,7 @@ internal class Context : IContext
 		Logger.Initialize(FileManager);
 
 		Logger.Debug("Initializing...");
+		_internalContext.PreInitialize();
 		PluginManager.PreInitialize();
 
 		MonitorManager.Initialize();
@@ -88,8 +84,7 @@ internal class Context : IContext
 
 		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
-		KeybindHook.PostInitialize();
-		MouseHook.PostInitialize();
+		_internalContext.PostInitialize();
 
 		Logger.Debug("Completed initialization");
 	}
@@ -105,8 +100,7 @@ internal class Context : IContext
 		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
-		KeybindHook.Dispose();
-		MouseHook.Dispose();
+		_internalContext.Dispose();
 
 		Logger.Debug("Mostly exited...");
 

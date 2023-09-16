@@ -44,7 +44,7 @@ public class IconHelperTests
 			</Package>
 			""";
 
-		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
+		public Mock<IInternalContext> InternalContext { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public Mock<IFileManager> FileManager { get; } = new();
 		public Mock<IContext> Context { get; } = new();
@@ -87,16 +87,18 @@ public class IconHelperTests
 
 		public Wrapper SendMessage(int icon)
 		{
-			CoreNativeManager
-				.Setup(n => n.SendMessage(Window.Object.Handle, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0))
+			InternalContext
+				.Setup(
+					n => n.CoreNativeManager.SendMessage(Window.Object.Handle, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0)
+				)
 				.Returns((LRESULT)icon);
 			return this;
 		}
 
 		public Wrapper GetClassLongPtr(nuint icon)
 		{
-			CoreNativeManager
-				.Setup(n => n.GetClassLongPtr(Window.Object.Handle, GET_CLASS_LONG_INDEX.GCL_HICON))
+			InternalContext
+				.Setup(n => n.CoreNativeManager.GetClassLongPtr(Window.Object.Handle, GET_CLASS_LONG_INDEX.GCL_HICON))
 				.Returns(icon);
 			return this;
 		}
@@ -112,7 +114,7 @@ public class IconHelperTests
 		BitmapImage? result = IconHelper.GetIcon(
 			wrapper.Window.Object,
 			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object
+			wrapper.InternalContext.Object
 		);
 
 		// Then
@@ -129,7 +131,7 @@ public class IconHelperTests
 		BitmapImage? result = IconHelper.GetIcon(
 			wrapper.Window.Object,
 			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object
+			wrapper.InternalContext.Object
 		);
 
 		// Then
@@ -150,7 +152,7 @@ public class IconHelperTests
 		BitmapImage? result = IconHelper.GetIcon(
 			wrapper.Window.Object,
 			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object
+			wrapper.InternalContext.Object
 		);
 
 		// Then
@@ -175,7 +177,7 @@ public class IconHelperTests
 		BitmapImage? result = IconHelper.GetIcon(
 			wrapper.Window.Object,
 			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object
+			wrapper.InternalContext.Object
 		);
 
 		// Then
@@ -192,7 +194,7 @@ public class IconHelperTests
 		BitmapImage? result = IconHelper.GetIcon(
 			wrapper.Window.Object,
 			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object
+			wrapper.InternalContext.Object
 		);
 
 		// Then
