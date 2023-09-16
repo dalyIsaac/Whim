@@ -57,7 +57,9 @@ public class TransparentWindowController : IDisposable
 		{
 			if (_internalContext.CoreNativeManager.GetClientRect(hWnd, out RECT rect))
 			{
-				using DeleteObjectSafeHandle brush = _internalContext.CoreNativeManager.CreateSolidBrush(new COLORREF());
+				using DeleteObjectSafeHandle brush = _internalContext.CoreNativeManager.CreateSolidBrush(
+					new COLORREF()
+				);
 				_internalContext.CoreNativeManager.FillRect(new HDC((nint)wParam.Value), rect, brush);
 				return (LRESULT)1;
 			}

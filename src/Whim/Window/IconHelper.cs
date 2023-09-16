@@ -93,7 +93,8 @@ internal static class IconHelper
 
 		if (hIcon == 0)
 		{
-			hIcon = (HICON)(nint)internalContext.CoreNativeManager.GetClassLongPtr(hwnd, GET_CLASS_LONG_INDEX.GCL_HICON);
+			hIcon = (HICON)
+				(nint)internalContext.CoreNativeManager.GetClassLongPtr(hwnd, GET_CLASS_LONG_INDEX.GCL_HICON);
 		}
 
 		if (hIcon == 0)

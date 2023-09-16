@@ -168,13 +168,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		// Create the workspace.
 		Workspace workspace =
-			new(
-				_context,
-				_internalContext,
-				_triggers,
-				name ?? $"Workspace {_workspaces.Count + 1}",
-				layoutEngines
-			);
+			new(_context, _internalContext, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
 		_workspaces.Add(workspace);
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 		return workspace;
