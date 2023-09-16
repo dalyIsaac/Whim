@@ -88,8 +88,10 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 		foreach (Monitor monitor in _monitors)
 		{
-			if (monitor._hmonitor == hMONITOR)
+			if (monitor._hmonitor.Equals(hMONITOR))
 			{
+				Logger.Debug($"Setting active monitor to {monitor}");
+
 				ActiveMonitor = monitor;
 				break;
 			}

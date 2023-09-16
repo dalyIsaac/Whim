@@ -77,14 +77,12 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	{
 		get
 		{
-			if (_monitorWorkspaceMap.ContainsKey(_context.MonitorManager.ActiveMonitor))
-			{
-				return _monitorWorkspaceMap[_context.MonitorManager.ActiveMonitor];
-			}
-			else
-			{
-				return _workspaces[0];
-			}
+			// TODO: Remove
+			Logger.Debug($"Getting active workspace for monitor {_context.MonitorManager.ActiveMonitor}");
+
+			return _monitorWorkspaceMap.TryGetValue(_context.MonitorManager.ActiveMonitor, out IWorkspace? workspace)
+				? workspace
+				: _workspaces[0];
 		}
 	}
 
@@ -107,9 +105,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	public void Initialize()
 	{
 		Logger.Debug("Initializing workspace manager...");
-		_initialized = true;
-
-		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
 		// Create the workspaces.
 		foreach ((string name, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines) in _workspacesToCreate)
@@ -129,6 +124,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			Activate(workspace, monitor);
 			idx++;
 		}
+
+		_initialized = true;
+		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+
+		Logger.Debug("Workspace manager initialized");
 	}
 
 	#region Workspaces
@@ -260,20 +260,32 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		activeMonitor ??= _context.MonitorManager.ActiveMonitor;
 
 		// Get the old workspace for the event.
-		_monitorWorkspaceMap.TryGetValue(activeMonitor, out IWorkspace? oldWorkspace);
+		IWorkspace? oldWorkspace = GetWorkspaceForMonitor(activeMonitor);
+
+		// TODO: Remove
+		Logger.Debug($"Old workspace: {oldWorkspace}");
 
 		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = _monitorWorkspaceMap.FirstOrDefault(m => m.Value == workspace).Key;
+		IMonitor? loserMonitor = GetMonitorForWorkspace(workspace);
+
+		// TODO: Remove
+		Logger.Debug($"Loser monitor: {loserMonitor}");
 
 		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
+		// TODO: Remove
+		Logger.Debug($"Updating active monitor to {activeMonitor} for workspace {workspace}");
 		_monitorWorkspaceMap[activeMonitor] = workspace;
 
 		// Send out an event about the losing monitor.
-		if (loserMonitor != null && oldWorkspace != null)
+		if (loserMonitor != null && oldWorkspace != null && !loserMonitor.Equals(activeMonitor))
 		{
 			_monitorWorkspaceMap[loserMonitor] = oldWorkspace;
+
+			// TODO: Remove
+			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
+
 			oldWorkspace.DoLayout();
 			MonitorWorkspaceChanged?.Invoke(
 				this,
@@ -291,6 +303,8 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			oldWorkspace?.Deactivate();
 		}
 
+		// TODO: Remove
+		Logger.Debug($"Layouting workspace {workspace} in active monitor {activeMonitor}");
 		// Layout the new workspace.
 		workspace.DoLayout();
 		workspace.FocusFirstWindow();
@@ -427,7 +441,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 
 		_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceFocused);
-		if (workspaceFocused != null && workspaceFocused != ActiveWorkspace)
+
+		// TODO: Remove
+		Logger.Debug($"Focused workspace: {workspaceFocused}");
+		Logger.Debug($"Active workspace: {ActiveWorkspace}");
+		if (workspaceFocused != null && !workspaceFocused.Equals(ActiveWorkspace))
 		{
 			Activate(workspaceFocused);
 		}
