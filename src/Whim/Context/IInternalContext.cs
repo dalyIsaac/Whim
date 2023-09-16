@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace Whim;
 
@@ -11,9 +12,11 @@ internal interface IInternalContext : IDisposable
 
 	IWindowMessageMonitor WindowMessageMonitor { get; }
 
-	internal IKeybindHook KeybindHook { get; }
+	IKeybindHook KeybindHook { get; }
 
-	internal IMouseHook MouseHook { get; }
+	IMouseHook MouseHook { get; }
+
+	ReaderWriterLockSlim LayoutLock { get; }
 
 	void PreInitialize();
 

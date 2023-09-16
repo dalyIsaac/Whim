@@ -575,6 +575,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		CancellationToken cancellationToken
 	)
 	{
+		_internalContext.LayoutLock.EnterReadLock();
 		Logger.Debug($"Setting window positions for workspace {Name}");
 		List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> windowStates = new();
 		Dictionary<HWND, IWindowState> windowLocations = new();
@@ -586,7 +587,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			windowLocations.Add(loc.Window.Handle, loc);
 		}
 
-		using WindowDeferPosHandle handle = new(_context, windowStates, cancellationToken);
+		WindowDeferPosHandle handle = new(_context, windowStates, cancellationToken);
+		handle.Dispose();
+
+		_internalContext.LayoutLock.ExitReadLock();
 		return windowLocations;
 	}
 
