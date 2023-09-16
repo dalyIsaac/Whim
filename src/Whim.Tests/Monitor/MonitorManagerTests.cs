@@ -21,14 +21,16 @@ public class MonitorManagerTests
 		private RECT[] _monitorRects;
 
 		public Mock<IContext> Context { get; }
+		public Mock<IInternalContext> InternalContext { get; }
 		public Mock<IWorkspaceManager> WorkspaceManager { get; }
 		public Mock<ICoreNativeManager> CoreNativeManager { get; }
-		public Mock<IWindowMessageMonitor> WindowMessageMonitor { get; }
-		public Mock<IMouseHook> MouseHook { get; }
+		public Mock<IWindowMessageMonitor> WindowMessageMonitor { get; } = new();
+		public Mock<IMouseHook> MouseHook { get; } = new();
 
 		public Wrapper()
 		{
 			Context = new();
+			InternalContext = new();
 
 			WorkspaceManager = new();
 			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
@@ -54,8 +56,9 @@ public class MonitorManagerTests
 				}
 			);
 
-			WindowMessageMonitor = new();
-			MouseHook = new();
+			InternalContext.SetupGet(x => x.CoreNativeManager).Returns(CoreNativeManager.Object);
+			InternalContext.SetupGet(x => x.MouseHook).Returns(MouseHook.Object);
+			InternalContext.SetupGet(x => x.WindowMessageMonitor).Returns(WindowMessageMonitor.Object);
 		}
 
 		[MemberNotNull(nameof(_monitorRects))]
@@ -148,13 +151,7 @@ public class MonitorManagerTests
 		Wrapper wrapper = new();
 
 		// When
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 
 		// Then
 		Assert.Equal(new HMONITOR(2), (monitorManager.PrimaryMonitor as Monitor)!._hmonitor);
@@ -172,15 +169,7 @@ public class MonitorManagerTests
 
 		// When
 		// Then
-		var result = Assert.Throws<Exception>(
-			() =>
-				new MonitorManager(
-					wrapper.Context.Object,
-					wrapper.CoreNativeManager.Object,
-					wrapper.MouseHook.Object,
-					wrapper.WindowMessageMonitor.Object
-				)
-		);
+		var result = Assert.Throws<Exception>(() => new MonitorManager(wrapper.InternalContext.Object));
 	}
 
 	[Fact]
@@ -188,13 +177,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 
 		// When
 		monitorManager.Initialize();
@@ -228,13 +211,7 @@ public class MonitorManagerTests
 			.Setup(cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()))
 			.Returns((HMONITOR)1);
 
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 
 		// When
 		monitorManager.WindowFocused(new Mock<IWindow>().Object);
@@ -255,13 +232,7 @@ public class MonitorManagerTests
 
 		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
 
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 
 		// When
 		monitorManager.WindowFocused(new Mock<IWindow>().Object);
@@ -286,13 +257,7 @@ public class MonitorManagerTests
 
 		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
 
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 
 		// When
 		monitorManager.WindowFocused(null);
@@ -326,13 +291,7 @@ public class MonitorManagerTests
 		Wrapper wrapper = new();
 
 		// Populate the monitor manager with the default two monitors
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to be given a new monitor
@@ -412,13 +371,7 @@ public class MonitorManagerTests
 			};
 		wrapper.UpdateGetCurrentMonitors(new[] { primaryRect });
 
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to be given a new monitor
@@ -470,13 +423,7 @@ public class MonitorManagerTests
 		Wrapper wrapper = new();
 
 		// Populate the monitor manager with the default two monitors
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to have only one monitor
@@ -519,13 +466,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -544,13 +485,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -569,13 +504,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -596,13 +525,7 @@ public class MonitorManagerTests
 			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
 			.Returns((HMONITOR)0);
 
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -623,13 +546,7 @@ public class MonitorManagerTests
 			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
 			.Returns((HMONITOR)1);
 
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -644,13 +561,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -665,13 +576,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -686,13 +591,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -707,13 +606,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -728,13 +621,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -749,13 +636,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -770,13 +651,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		// When
@@ -787,7 +662,6 @@ public class MonitorManagerTests
 			wmm => wmm.DisplayChanged -= It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
 			Times.Once
 		);
-		wrapper.WindowMessageMonitor.Verify(wmm => wmm.Dispose(), Times.Once);
 	}
 
 	[Fact]
@@ -795,13 +669,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 
 		// When
 		int length = monitorManager.Length;
@@ -815,13 +683,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		MonitorManager monitorManager =
-			new(
-				wrapper.Context.Object,
-				wrapper.CoreNativeManager.Object,
-				wrapper.MouseHook.Object,
-				wrapper.WindowMessageMonitor.Object
-			);
+		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
 		monitorManager.Initialize();
 
 		IMonitor monitor = monitorManager.ActiveMonitor;

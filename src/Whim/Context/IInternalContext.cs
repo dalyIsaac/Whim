@@ -11,9 +11,9 @@ internal interface IInternalContext : IDisposable
 
 	IWindowMessageMonitor WindowMessageMonitor { get; }
 
-	internal KeybindHook KeybindHook { get; }
+	internal IKeybindHook KeybindHook { get; }
 
-	internal MouseHook MouseHook { get; }
+	internal IMouseHook MouseHook { get; }
 
 	void PreInitialize();
 

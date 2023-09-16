@@ -9,7 +9,7 @@ namespace Whim;
 /// <summary>
 /// Responsible is responsible for hooking into windows and handling keybinds.
 /// </summary>
-internal class KeybindHook : IDisposable
+internal class KeybindHook : IKeybindHook
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;

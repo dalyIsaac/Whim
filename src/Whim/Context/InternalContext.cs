@@ -8,9 +8,9 @@ internal class InternalContext : IInternalContext
 
 	public IWindowMessageMonitor WindowMessageMonitor { get; }
 
-	public KeybindHook KeybindHook { get; }
+	public IKeybindHook KeybindHook { get; }
 
-	public MouseHook MouseHook { get; }
+	public IMouseHook MouseHook { get; }
 
 	public InternalContext(IContext context)
 	{

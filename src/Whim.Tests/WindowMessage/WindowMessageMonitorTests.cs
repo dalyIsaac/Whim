@@ -17,6 +17,7 @@ public class WindowMessageMonitorTests
 	private class Wrapper
 	{
 		public Mock<IContext> Context { get; } = new();
+		public Mock<IInternalContext> InternalContext { get; } = new();
 		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
 		public Mock<INativeManager> NativeManager { get; } = new();
 		public SUBCLASSPROC? SubclassProc { get; private set; }
@@ -24,6 +25,7 @@ public class WindowMessageMonitorTests
 		public Wrapper()
 		{
 			Context.SetupGet(x => x.NativeManager).Returns(NativeManager.Object);
+			InternalContext.Setup(ic => ic.CoreNativeManager).Returns(CoreNativeManager.Object);
 
 			CoreNativeManager
 				.Setup(
@@ -49,15 +51,22 @@ public class WindowMessageMonitorTests
 		Wrapper wrapper = new();
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		windowMessageMonitor.PreInitialize();
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			x => x.SetWindowSubclass(It.IsAny<HWND>(), It.IsAny<SUBCLASSPROC>(), It.IsAny<nuint>(), It.IsAny<nuint>()),
+		wrapper.InternalContext.Verify(
+			x =>
+				x.CoreNativeManager.SetWindowSubclass(
+					It.IsAny<HWND>(),
+					It.IsAny<SUBCLASSPROC>(),
+					It.IsAny<nuint>(),
+					It.IsAny<nuint>()
+				),
 			Times.Once
 		);
-		wrapper.CoreNativeManager.Verify(
-			x => x.WTSRegisterSessionNotification(It.IsAny<HWND>(), It.IsAny<uint>()),
+		wrapper.InternalContext.Verify(
+			x => x.CoreNativeManager.WTSRegisterSessionNotification(It.IsAny<HWND>(), It.IsAny<uint>()),
 			Times.Once
 		);
 	}
@@ -69,7 +78,8 @@ public class WindowMessageMonitorTests
 		Wrapper wrapper = new();
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		windowMessageMonitor.PreInitialize();
 
 		// Then
 		Assert.Raises<WindowMessageMonitorEventArgs>(
@@ -86,7 +96,8 @@ public class WindowMessageMonitorTests
 		Wrapper wrapper = new();
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		windowMessageMonitor.PreInitialize();
 
 		// Then
 		Assert.Raises<WindowMessageMonitorEventArgs>(
@@ -103,7 +114,8 @@ public class WindowMessageMonitorTests
 		Wrapper wrapper = new();
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		windowMessageMonitor.PreInitialize();
 
 		// Then
 		Assert.Raises<WindowMessageMonitorEventArgs>(
@@ -128,7 +140,8 @@ public class WindowMessageMonitorTests
 		Wrapper wrapper = new();
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		windowMessageMonitor.PreInitialize();
 
 		// Then
 		Assert.Raises<WindowMessageMonitorEventArgs>(
@@ -153,14 +166,19 @@ public class WindowMessageMonitorTests
 		Wrapper wrapper = new();
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		windowMessageMonitor.PreInitialize();
 		windowMessageMonitor.Dispose();
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			x => x.RemoveWindowSubclass(It.IsAny<HWND>(), It.IsAny<SUBCLASSPROC>(), It.IsAny<nuint>()),
+		wrapper.InternalContext.Verify(
+			x =>
+				x.CoreNativeManager.RemoveWindowSubclass(It.IsAny<HWND>(), It.IsAny<SUBCLASSPROC>(), It.IsAny<nuint>()),
 			Times.Once
 		);
-		wrapper.CoreNativeManager.Verify(x => x.WTSUnRegisterSessionNotification(It.IsAny<HWND>()), Times.Once);
+		wrapper.InternalContext.Verify(
+			x => x.CoreNativeManager.WTSUnRegisterSessionNotification(It.IsAny<HWND>()),
+			Times.Once
+		);
 	}
 }

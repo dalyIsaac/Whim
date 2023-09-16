@@ -34,6 +34,7 @@ public class PluginManagerTests
 		{
 			Context.Setup(cc => cc.CommandManager).Returns(CommandManager);
 			Context.Setup(cc => cc.KeybindManager).Returns(KeybindManager.Object);
+			Context.Setup(cc => cc.FileManager).Returns(FileManager.Object);
 
 			FileManager.Setup(fm => fm.SavedStateDir).Returns("C:\\Users\\test\\.whim\\state");
 			FileManager.Setup(fm => fm.OpenRead(It.IsAny<string>())).Returns(CreateSavedStateStream());
@@ -88,7 +89,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -108,7 +109,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -130,7 +131,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -153,7 +154,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -179,7 +180,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -205,7 +206,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -225,7 +226,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 
 		// When
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
@@ -282,7 +283,7 @@ public class PluginManagerTests
 
 		mocks.Plugin2.Setup(p => p.Name).Returns(name);
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 
 		// When
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
@@ -299,7 +300,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);
@@ -323,7 +324,7 @@ public class PluginManagerTests
 		// Given
 		MocksWrapper mocks = new();
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(mocks.Context.Object, mocks.CommandManager);
 		pluginManager.AddPlugin(mocks.Plugin1.Object);
 		pluginManager.AddPlugin(mocks.Plugin2.Object);
 		pluginManager.AddPlugin(mocks.Plugin3.Object);

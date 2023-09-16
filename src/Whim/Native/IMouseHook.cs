@@ -26,4 +26,9 @@ internal interface IMouseHook : IDisposable
 	/// Event that is fired when the mouse left button is released.
 	/// </summary>
 	event EventHandler<MouseEventArgs>? MouseLeftButtonUp;
+
+	/// <summary>
+	/// Initializes the mouse hook.
+	/// </summary>
+	void PostInitialize();
 }
