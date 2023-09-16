@@ -11,6 +11,7 @@ public class WindowTests
 	private class Wrapper
 	{
 		public Mock<IContext> Context { get; } = new();
+		public Mock<IInternalContext> InternalContext { get; } = new();
 		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
 		public Mock<IWindowManager> WindowManager { get; }
 		public Mock<IInternalWindowManager> InternalWindowManager { get; } = new();
@@ -22,6 +23,8 @@ public class WindowTests
 
 			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
 			Context.Setup(c => c.WindowManager).Returns(WindowManager.Object);
+
+			InternalContext.Setup(ic => ic.CoreNativeManager).Returns(CoreNativeManager.Object);
 
 			CoreNativeManager
 				.Setup(cnm => cnm.GetWindowThreadProcessId(It.IsAny<HWND>(), out It.Ref<uint>.IsAny))
@@ -43,7 +46,7 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		HWND handle = window.Handle;
@@ -59,7 +62,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.CoreNativeManager.Setup(cnm => cnm.GetWindowText(It.IsAny<HWND>())).Returns("title");
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		string title = window.Title;
@@ -75,7 +78,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.NativeManager.Setup(cnm => cnm.GetClassName(It.IsAny<HWND>())).Returns("windowClass");
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		string windowClass = window.WindowClass;
@@ -104,7 +107,7 @@ public class WindowTests
 				}
 			);
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		ILocation<int> location = window.Location;
@@ -136,7 +139,7 @@ public class WindowTests
 				}
 			);
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		IPoint<int> center = window.Center;
@@ -151,7 +154,7 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		int processId = window.ProcessId;
@@ -165,7 +168,7 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		string processFileName = window.ProcessFileName;
@@ -186,7 +189,7 @@ public class WindowTests
 			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
 			.Returns((string.Empty, null));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		string processFileName = window.ProcessFileName;
@@ -200,7 +203,7 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		string processName = window.ProcessName;
@@ -216,7 +219,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.CoreNativeManager.Setup(cnm => cnm.GetForegroundWindow()).Returns(new HWND(123));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool isFocused = window.IsFocused;
@@ -232,7 +235,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMinimized(It.IsAny<HWND>())).Returns(true);
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool isMinimized = window.IsMinimized;
@@ -248,7 +251,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMaximized(It.IsAny<HWND>())).Returns(true);
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool isMaximized = window.IsMaximized;
@@ -264,7 +267,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.CoreNativeManager.Setup(cnm => cnm.BringWindowToTop(It.IsAny<HWND>()));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		window.BringToTop();
@@ -280,7 +283,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.NativeManager.Setup(cnm => cnm.QuitWindow(It.IsAny<HWND>()));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		window.Close();
@@ -296,7 +299,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.CoreNativeManager.Setup(cnm => cnm.SetForegroundWindow(It.IsAny<HWND>()));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		window.Focus();
@@ -312,7 +315,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.CoreNativeManager.Setup(cnm => cnm.SetForegroundWindow(It.IsAny<HWND>()));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		window.FocusForceForeground();
@@ -330,7 +333,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.NativeManager.Setup(cnm => cnm.HideWindow(It.IsAny<HWND>()));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		window.Hide();
@@ -346,7 +349,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.NativeManager.Setup(cnm => cnm.ShowWindowMaximized(It.IsAny<HWND>()));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		window.ShowMaximized();
@@ -362,7 +365,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.NativeManager.Setup(cnm => cnm.ShowWindowMinimized(It.IsAny<HWND>()));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		window.ShowMinimized();
@@ -378,7 +381,7 @@ public class WindowTests
 		Wrapper wrapper = new();
 		wrapper.NativeManager.Setup(cnm => cnm.ShowWindowNoActivate(It.IsAny<HWND>()));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		window.ShowNormal();
@@ -395,7 +398,7 @@ public class WindowTests
 		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>())).Throws(new Win32Exception());
 
 		// When
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123));
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123));
 
 		// Then
 		Assert.Null(window);
@@ -406,7 +409,7 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool equals = window.Equals(null);
@@ -420,7 +423,7 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool equals = window.Equals(new object());
@@ -434,7 +437,7 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool equals = window.Equals(new Mock<IWindow>().Object);
@@ -448,12 +451,8 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
-		IWindow? window2 = Window.CreateWindow(
-			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object,
-			new HWND(123)
-		)!;
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
+		IWindow? window2 = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool equals = window.Equals(window2);
@@ -468,9 +467,9 @@ public class WindowTests
 		// Given
 		Wrapper wrapper = new();
 		Window? window =
-			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
+			Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))! as Window;
 		Window? window2 =
-			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
+			Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))! as Window;
 
 		// When
 		bool equals = window == window2;
@@ -485,9 +484,9 @@ public class WindowTests
 		// Given
 		Wrapper wrapper = new();
 		Window? window =
-			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
+			Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))! as Window;
 		Window? window2 =
-			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(1234))! as Window;
+			Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(1234))! as Window;
 
 		// When
 		bool equals = window != window2;
@@ -501,7 +500,7 @@ public class WindowTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		int hashCode = window.GetHashCode();
@@ -520,7 +519,7 @@ public class WindowTests
 			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
 			.Returns(("processName", "app/ApplicationFrameHost.exe"));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool isUwp = window.IsUwp;
@@ -538,7 +537,7 @@ public class WindowTests
 			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
 			.Returns(("processName", "processFileName"));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.InternalContext.Object, new HWND(123))!;
 
 		// When
 		bool isUwp = window.IsUwp;

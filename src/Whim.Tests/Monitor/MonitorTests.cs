@@ -8,53 +8,56 @@ namespace Whim.Tests;
 
 public class MonitorTests
 {
-	private static (Mock<ICoreNativeManager>, HMONITOR) CreatePrimaryMonitorMocks()
+	private class Wrapper
 	{
-		Mock<ICoreNativeManager> nativeManagerMock = new();
-		nativeManagerMock.Setup(nm => nm.GetVirtualScreenLeft()).Returns(0);
-		nativeManagerMock.Setup(nm => nm.GetVirtualScreenTop()).Returns(0);
-		nativeManagerMock.Setup(nm => nm.GetVirtualScreenWidth()).Returns(1920);
-		nativeManagerMock.Setup(nm => nm.GetVirtualScreenHeight()).Returns(1080);
+		public HMONITOR HMonitor { get; } = new(1);
+		public Mock<IInternalContext> InternalContext { get; } = new();
+		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
 
-		RECT rect =
-			new()
-			{
-				left = 10,
-				top = 10,
-				right = 1910,
-				bottom = 1070
-			};
-		nativeManagerMock.Setup(nm => nm.GetPrimaryDisplayWorkArea(out rect)).Returns((BOOL)true);
+		public Wrapper()
+		{
+			InternalContext.Setup(ic => ic.CoreNativeManager).Returns(CoreNativeManager.Object);
+			CoreNativeManager.Setup(nm => nm.GetVirtualScreenLeft()).Returns(0);
+			CoreNativeManager.Setup(nm => nm.GetVirtualScreenTop()).Returns(0);
+			CoreNativeManager.Setup(nm => nm.GetVirtualScreenWidth()).Returns(1920);
+			CoreNativeManager.Setup(nm => nm.GetVirtualScreenHeight()).Returns(1080);
 
-		uint effectiveDpiX = 144;
-		uint effectiveDpiY = 144;
-		nativeManagerMock
-			.Setup(
-				nm =>
-					nm.GetDpiForMonitor(
-						It.IsAny<HMONITOR>(),
-						It.IsAny<MONITOR_DPI_TYPE>(),
-						out effectiveDpiX,
-						out effectiveDpiY
-					)
-			)
-			.Returns((HRESULT)0);
+			RECT rect =
+				new()
+				{
+					left = 10,
+					top = 10,
+					right = 1910,
+					bottom = 1070
+				};
+			CoreNativeManager.Setup(nm => nm.GetPrimaryDisplayWorkArea(out rect)).Returns((BOOL)true);
 
-		HMONITOR hmonitor = new(1);
-
-		return (nativeManagerMock, hmonitor);
+			uint effectiveDpiX = 144;
+			uint effectiveDpiY = 144;
+			CoreNativeManager
+				.Setup(
+					nm =>
+						nm.GetDpiForMonitor(
+							It.IsAny<HMONITOR>(),
+							It.IsAny<MONITOR_DPI_TYPE>(),
+							out effectiveDpiX,
+							out effectiveDpiY
+						)
+				)
+				.Returns((HRESULT)0);
+		}
 	}
 
 	[Fact]
 	public void CreateMonitor_SingleMonitor()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
-		nativeManagerMock.Setup(nm => nm.HasMultipleMonitors()).Returns(false);
+		Wrapper wrapper = new();
+		wrapper.CoreNativeManager.Setup(nm => nm.HasMultipleMonitors()).Returns(false);
 		bool isPrimaryHMonitor = true;
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, isPrimaryHMonitor);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, isPrimaryHMonitor);
 
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
@@ -77,12 +80,12 @@ public class MonitorTests
 	public void CreateMonitor_IsPrimaryHMonitor()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
-		nativeManagerMock.Setup(nm => nm.HasMultipleMonitors()).Returns(true);
+		Wrapper wrapper = new();
+		wrapper.CoreNativeManager.Setup(nm => nm.HasMultipleMonitors()).Returns(true);
 		bool isPrimaryHMonitor = true;
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, isPrimaryHMonitor);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, isPrimaryHMonitor);
 
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
@@ -105,10 +108,11 @@ public class MonitorTests
 	public void CreateMonitor_MultipleMonitors()
 	{
 		// Given
-		Mock<ICoreNativeManager> nativeManagerMock = new();
-		nativeManagerMock.Setup(nm => nm.HasMultipleMonitors()).Returns(true);
+		Wrapper wrapper = new();
 
-		nativeManagerMock
+		wrapper.CoreNativeManager.Setup(nm => nm.HasMultipleMonitors()).Returns(true);
+
+		wrapper.CoreNativeManager
 			.Setup(nm => nm.GetMonitorInfo(It.IsAny<HMONITOR>(), ref It.Ref<MONITORINFOEXW>.IsAny))
 			.Callback(
 				(HMONITOR hmonitor, ref MONITORINFOEXW infoEx) =>
@@ -123,7 +127,7 @@ public class MonitorTests
 
 		uint effectiveDpiX = 144;
 		uint effectiveDpiY = 144;
-		nativeManagerMock
+		wrapper.CoreNativeManager
 			.Setup(
 				nm =>
 					nm.GetDpiForMonitor(
@@ -139,7 +143,7 @@ public class MonitorTests
 		bool isPrimaryHMonitor = false;
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, isPrimaryHMonitor);
+		Monitor monitor = new(wrapper.InternalContext.Object, hmonitor, isPrimaryHMonitor);
 
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
@@ -162,12 +166,12 @@ public class MonitorTests
 	public void Equals_Failure()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+		Wrapper wrapper = new();
 		HMONITOR hmonitor2 = new(2);
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
-		Monitor monitor2 = new(nativeManagerMock.Object, hmonitor2, false);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor2 = new(wrapper.InternalContext.Object, hmonitor2, false);
 
 		// Then
 		Assert.False(monitor.Equals(monitor2));
@@ -177,10 +181,10 @@ public class MonitorTests
 	public void Equals_Failure_Null()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
 
 		// Then
 #pragma warning disable CA1508 // Avoid dead conditional code
@@ -192,11 +196,11 @@ public class MonitorTests
 	public void Equals_Success()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
-		Monitor monitor2 = new(nativeManagerMock.Object, hmonitor, false);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor2 = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
 
 		// Then
 		Assert.True(monitor.Equals(monitor2));
@@ -206,11 +210,11 @@ public class MonitorTests
 	public void Equals_Operator_Success()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
-		Monitor monitor2 = new(nativeManagerMock.Object, hmonitor, false);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor2 = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
 
 		// Then
 		Assert.True(monitor == monitor2);
@@ -220,12 +224,12 @@ public class MonitorTests
 	public void NotEquals_Operator_Success()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+		Wrapper wrapper = new();
 		HMONITOR hmonitor2 = new(2);
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
-		Monitor monitor2 = new(nativeManagerMock.Object, hmonitor2, false);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor2 = new(wrapper.InternalContext.Object, hmonitor2, false);
 
 		// Then
 		Assert.True(monitor != monitor2);
@@ -235,10 +239,10 @@ public class MonitorTests
 	public void ToString_Success()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, true);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, true);
 
 		// Then
 		Assert.Equal(
@@ -251,11 +255,11 @@ public class MonitorTests
 	public void GetHashCode_Success()
 	{
 		// Given
-		(Mock<ICoreNativeManager> nativeManagerMock, HMONITOR hmonitor) = CreatePrimaryMonitorMocks();
+		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(nativeManagerMock.Object, hmonitor, false);
-		Monitor monitor2 = new(nativeManagerMock.Object, hmonitor, false);
+		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor2 = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
 
 		// Then
 		Assert.Equal(monitor.GetHashCode(), monitor2.GetHashCode());

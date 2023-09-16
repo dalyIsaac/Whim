@@ -22,12 +22,14 @@ public class MouseHookTests
 
 	private class Wrapper
 	{
+		public Mock<IInternalContext> InternalContext { get; } = new();
 		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
 		public HOOKPROC? HookProc { get; private set; }
 		public WindowsHookHandle SafeHandle { get; } = new();
 
 		public Wrapper()
 		{
+			InternalContext.Setup(ic => ic.CoreNativeManager).Returns(CoreNativeManager.Object);
 			CoreNativeManager
 				.Setup(cnm => cnm.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, It.IsAny<HOOKPROC>(), null, 0))
 				.Callback(
@@ -56,7 +58,7 @@ public class MouseHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		using MouseHook mouseHook = new(wrapper.InternalContext.Object);
 
 		// When
 		mouseHook.PostInitialize();
@@ -70,7 +72,7 @@ public class MouseHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		using MouseHook mouseHook = new(wrapper.InternalContext.Object);
 
 		// When
 		mouseHook.PostInitialize();
@@ -88,7 +90,7 @@ public class MouseHookTests
 	{
 		// Given
 		Wrapper wrapper = new Wrapper().PtrToStructure(null);
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		using MouseHook mouseHook = new(wrapper.InternalContext.Object);
 
 		// When
 		mouseHook.PostInitialize();
@@ -108,7 +110,7 @@ public class MouseHookTests
 		System.Drawing.Point point = new(1, 2);
 		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
 		Wrapper wrapper = new Wrapper().PtrToStructure(msllhookstruct);
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		using MouseHook mouseHook = new(wrapper.InternalContext.Object);
 
 		// When
 		mouseHook.PostInitialize();
@@ -130,7 +132,7 @@ public class MouseHookTests
 		System.Drawing.Point point = new(1, 2);
 		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
 		Wrapper wrapper = new Wrapper().PtrToStructure(msllhookstruct);
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		using MouseHook mouseHook = new(wrapper.InternalContext.Object);
 
 		// When
 		mouseHook.PostInitialize();
@@ -150,7 +152,7 @@ public class MouseHookTests
 	{
 		// Given
 		Wrapper wrapper = new Wrapper().PtrToStructure(new MSLLHOOKSTRUCT());
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		using MouseHook mouseHook = new(wrapper.InternalContext.Object);
 
 		// When
 		mouseHook.PostInitialize();
@@ -174,7 +176,7 @@ public class MouseHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		using MouseHook mouseHook = new(wrapper.InternalContext.Object);
 		mouseHook.PostInitialize();
 
 		// When
@@ -189,7 +191,7 @@ public class MouseHookTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		using MouseHook mouseHook = new(wrapper.InternalContext.Object);
 		mouseHook.PostInitialize();
 		mouseHook.Dispose();
 

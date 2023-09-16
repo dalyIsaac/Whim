@@ -16,29 +16,29 @@ public class TransparentWindowController : IDisposable
 	private const int SUBCLASSID = 4562;
 
 	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IInternalContext _internalContext;
 	private readonly HWND _hwnd;
 	private readonly SUBCLASSPROC _subclassProc;
 	private bool _disposedValue;
 
 	internal TransparentWindowController(
 		IContext context,
-		ICoreNativeManager coreNativeManager,
+		IInternalContext internalContext,
 		Microsoft.UI.Xaml.Window window
 	)
 	{
 		_context = context;
-		_coreNativeManager = coreNativeManager;
+		_internalContext = internalContext;
 		_hwnd = window.GetHandle();
 		ICompositionSupportsSystemBackdrop brushHolder = window.As<ICompositionSupportsSystemBackdrop>();
 
-		_coreNativeManager.EnableBlurBehindWindow(_hwnd);
+		_internalContext.CoreNativeManager.EnableBlurBehindWindow(_hwnd);
 		brushHolder.SystemBackdrop = _context.NativeManager.Compositor.CreateColorBrush(
 			Windows.UI.Color.FromArgb(0, 255, 255, 255)
 		);
 
 		_subclassProc = new SUBCLASSPROC(WindowProc);
-		_coreNativeManager.SetWindowSubclass(_hwnd, _subclassProc, SUBCLASSID, 0);
+		_internalContext.CoreNativeManager.SetWindowSubclass(_hwnd, _subclassProc, SUBCLASSID, 0);
 	}
 
 	/// <summary>
@@ -55,20 +55,22 @@ public class TransparentWindowController : IDisposable
 	{
 		if (uMsg == PInvoke.WM_ERASEBKGND)
 		{
-			if (_coreNativeManager.GetClientRect(hWnd, out RECT rect))
+			if (_internalContext.CoreNativeManager.GetClientRect(hWnd, out RECT rect))
 			{
-				using DeleteObjectSafeHandle brush = _coreNativeManager.CreateSolidBrush(new COLORREF());
-				_coreNativeManager.FillRect(new HDC((nint)wParam.Value), rect, brush);
+				using DeleteObjectSafeHandle brush = _internalContext.CoreNativeManager.CreateSolidBrush(
+					new COLORREF()
+				);
+				_internalContext.CoreNativeManager.FillRect(new HDC((nint)wParam.Value), rect, brush);
 				return (LRESULT)1;
 			}
 		}
 		else if (uMsg == PInvoke.WM_DWMCOMPOSITIONCHANGED)
 		{
-			_coreNativeManager.EnableBlurBehindWindow(hWnd);
+			_internalContext.CoreNativeManager.EnableBlurBehindWindow(hWnd);
 			return (LRESULT)0;
 		}
 
-		return _coreNativeManager.DefSubclassProc(hWnd, uMsg, wParam, lParam);
+		return _internalContext.CoreNativeManager.DefSubclassProc(hWnd, uMsg, wParam, lParam);
 	}
 
 	/// <inheritdoc />
@@ -79,7 +81,7 @@ public class TransparentWindowController : IDisposable
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
 			_disposedValue = true;
-			_coreNativeManager.RemoveWindowSubclass(_hwnd, _subclassProc, SUBCLASSID);
+			_internalContext.CoreNativeManager.RemoveWindowSubclass(_hwnd, _subclassProc, SUBCLASSID);
 		}
 	}
 
