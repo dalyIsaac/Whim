@@ -14,7 +14,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// </summary>
 	private readonly object _workspaceLock = new();
 	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IInternalContext _internalContext;
 	private readonly WorkspaceManagerTriggers _triggers;
 
 	private string _name;
@@ -105,14 +105,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public Workspace(
 		IContext context,
-		ICoreNativeManager coreNativeManager,
+		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
 		string name,
 		IEnumerable<ILayoutEngine> layoutEngines
 	)
 	{
 		_context = context;
-		_coreNativeManager = coreNativeManager;
+		_internalContext = internalContext;
 		_triggers = triggers;
 
 		_name = name;
@@ -541,7 +541,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 			CancellationTokenSource cancellationTokenSource = new();
 			CancellationToken cancellationToken = cancellationTokenSource.Token;
-			task = _coreNativeManager.ExecuteTask(
+			task = _internalContext.CoreNativeManager.ExecuteTask(
 				() => SetWindowPos(locations, monitor, cancellationToken),
 				cancellationToken
 			);
@@ -609,7 +609,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		foreach (IWindow window in Windows)
 		{
 			bool removeWindow = false;
-			if (!_coreNativeManager.IsWindow(window.Handle))
+			if (!_internalContext.CoreNativeManager.IsWindow(window.Handle))
 			{
 				Logger.Debug($"Window {window.Handle} is no longer a window.");
 				removeWindow = true;

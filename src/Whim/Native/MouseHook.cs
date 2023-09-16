@@ -10,23 +10,23 @@ namespace Whim;
 /// </summary>
 internal class MouseHook : IMouseHook
 {
-	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IInternalContext _internalContext;
 	private readonly HOOKPROC _lowLevelMouseProc;
 	private UnhookWindowsHookExSafeHandle? _unhookMouseHook;
 	private bool disposedValue;
 	public event EventHandler<MouseEventArgs>? MouseLeftButtonDown;
 	public event EventHandler<MouseEventArgs>? MouseLeftButtonUp;
 
-	public MouseHook(ICoreNativeManager coreNativeManager)
+	public MouseHook(IInternalContext internalContext)
 	{
-		_coreNativeManager = coreNativeManager;
+		_internalContext = internalContext;
 		_lowLevelMouseProc = LowLevelMouseProc;
 	}
 
 	public void PostInitialize()
 	{
 		Logger.Debug("Initializing mouse manager...");
-		_unhookMouseHook = _coreNativeManager.SetWindowsHookEx(
+		_unhookMouseHook = _internalContext.CoreNativeManager.SetWindowsHookEx(
 			WINDOWS_HOOK_ID.WH_MOUSE_LL,
 			_lowLevelMouseProc,
 			null,
@@ -55,7 +55,7 @@ internal class MouseHook : IMouseHook
 				break;
 		}
 
-		return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 	}
 
 	private void OnMouseTriggerEvent(EventHandler<MouseEventArgs>? eventHandler, LPARAM lParam)
@@ -63,7 +63,8 @@ internal class MouseHook : IMouseHook
 		if (
 			lParam != 0
 			&& eventHandler is EventHandler<MouseEventArgs> handler
-			&& _coreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(lParam) is MSLLHOOKSTRUCT mouseHookStruct
+			&& _internalContext.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(lParam)
+				is MSLLHOOKSTRUCT mouseHookStruct
 		)
 		{
 			handler.Invoke(this, new MouseEventArgs(new Point<int>(mouseHookStruct.pt.X, mouseHookStruct.pt.Y)));

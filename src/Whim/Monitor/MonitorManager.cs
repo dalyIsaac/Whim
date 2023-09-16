@@ -14,10 +14,7 @@ namespace Whim;
 /// </summary>
 internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 {
-	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
-	private readonly IMouseHook _mouseHook;
-	private readonly IWindowMessageMonitor _windowMessageMonitor;
+	private readonly IInternalContext _internalContext;
 
 	/// <summary>
 	/// The <see cref="IMonitor"/>s of the computer.
@@ -48,17 +45,10 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	/// <exception cref="Exception">
 	/// When no monitors are found, or there is no primary monitor.
 	/// </exception>
-	public MonitorManager(
-		IContext context,
-		ICoreNativeManager coreNativeManager,
-		IMouseHook mouseHook,
-		IWindowMessageMonitor? windowMessageMonitor = null
-	)
+	/// <param name="internalContext"></param>
+	public MonitorManager(IInternalContext internalContext)
 	{
-		_context = context;
-		_coreNativeManager = coreNativeManager;
-		_mouseHook = mouseHook;
-		_windowMessageMonitor = windowMessageMonitor ?? new WindowMessageMonitor(_context, _coreNativeManager);
+		_internalContext = internalContext;
 
 		// Get the monitors.
 		_monitors = GetCurrentMonitors();
@@ -72,19 +62,22 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void Initialize()
 	{
-		_windowMessageMonitor.DisplayChanged += WindowMessageMonitor_MonitorsChanged;
-		_windowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_MonitorsChanged;
-		_windowMessageMonitor.DpiChanged += WindowMessageMonitor_MonitorsChanged;
-		_windowMessageMonitor.SessionChanged += WindowMessageMonitor_SessionChanged;
-		_mouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
+		_internalContext.WindowMessageMonitor.DisplayChanged += WindowMessageMonitor_MonitorsChanged;
+		_internalContext.WindowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_MonitorsChanged;
+		_internalContext.WindowMessageMonitor.DpiChanged += WindowMessageMonitor_MonitorsChanged;
+		_internalContext.WindowMessageMonitor.SessionChanged += WindowMessageMonitor_SessionChanged;
+		_internalContext.MouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
 	}
 
 	public void WindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Focusing on {window}");
 
-		HWND hwnd = window?.Handle ?? _coreNativeManager.GetForegroundWindow();
-		HMONITOR hMONITOR = _coreNativeManager.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
+		HWND hwnd = window?.Handle ?? _internalContext.CoreNativeManager.GetForegroundWindow();
+		HMONITOR hMONITOR = _internalContext.CoreNativeManager.MonitorFromWindow(
+			hwnd,
+			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
+		);
 
 		foreach (Monitor monitor in _monitors)
 		{
@@ -101,7 +94,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		// If we update monitors too quickly, the reported working area can sometimes be the
 		// monitor's bounds, which is incorrect. So, we wait a bit before updating the monitors.
 		// This gives Windows some to figure out the correct working area.
-		_coreNativeManager.TryEnqueue(async () =>
+		_internalContext.CoreNativeManager.TryEnqueue(async () =>
 		{
 			await Task.Delay(5000).ConfigureAwait(true);
 			WindowMessageMonitor_MonitorsChanged(sender, e);
@@ -171,7 +164,10 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	private HMONITOR GetPrimaryHMonitor()
 	{
-		return _coreNativeManager.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY);
+		return _internalContext.CoreNativeManager.MonitorFromPoint(
+			new Point(0, 0),
+			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY
+		);
 	}
 
 	/// <summary>
@@ -184,12 +180,12 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		List<HMONITOR> hmonitors = new();
 		HMONITOR primaryHMonitor = GetPrimaryHMonitor();
 
-		if (_coreNativeManager.HasMultipleMonitors())
+		if (_internalContext.CoreNativeManager.HasMultipleMonitors())
 		{
 			MonitorEnumCallback closure = new();
 			MONITORENUMPROC proc = new(closure.Callback);
 
-			_coreNativeManager.EnumDisplayMonitors(null, null, proc, (LPARAM)0);
+			_internalContext.CoreNativeManager.EnumDisplayMonitors(null, null, proc, (LPARAM)0);
 
 			hmonitors = closure.Monitors;
 		}
@@ -211,7 +207,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 			if (monitor is null)
 			{
-				monitor = new Monitor(_coreNativeManager, hmonitor, isPrimaryHMonitor);
+				monitor = new Monitor(_internalContext, hmonitor, isPrimaryHMonitor);
 			}
 			else
 			{
@@ -227,7 +223,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
 		Logger.Debug($"Getting monitor at point {point}");
-		HMONITOR hmonitor = _coreNativeManager.MonitorFromPoint(
+		HMONITOR hmonitor = _internalContext.CoreNativeManager.MonitorFromPoint(
 			point.ToSystemPoint(),
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
@@ -279,10 +275,9 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 				Logger.Debug("Disposing monitor manager");
 
 				// dispose managed state (managed objects)
-				_windowMessageMonitor.DisplayChanged -= WindowMessageMonitor_MonitorsChanged;
-				_windowMessageMonitor.Dispose();
-				_mouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
-				_mouseHook.Dispose();
+				_internalContext.WindowMessageMonitor.DisplayChanged -= WindowMessageMonitor_MonitorsChanged;
+				_internalContext.MouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
+				_internalContext.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
