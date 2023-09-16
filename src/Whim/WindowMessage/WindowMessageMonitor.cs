@@ -11,28 +11,15 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	private const int SUBCLASSID = 4561;
 
 	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IInternalContext _internalContext;
 	private readonly SUBCLASSPROC _subclassProc;
 	private bool _disposedValue;
 
-	public WindowMessageMonitor(IContext context, ICoreNativeManager coreNativeManager)
+	public WindowMessageMonitor(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
-		_coreNativeManager = coreNativeManager;
-
-		_context.NativeManager.HideWindow(_coreNativeManager.WindowMessageMonitorWindowHandle);
-
+		_internalContext = internalContext;
 		_subclassProc = new SUBCLASSPROC(WindowProc);
-		_coreNativeManager.SetWindowSubclass(
-			_coreNativeManager.WindowMessageMonitorWindowHandle,
-			_subclassProc,
-			SUBCLASSID,
-			0
-		);
-		_coreNativeManager.WTSRegisterSessionNotification(
-			_coreNativeManager.WindowMessageMonitorWindowHandle,
-			PInvoke.NOTIFY_FOR_ALL_SESSIONS
-		);
 	}
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
@@ -42,6 +29,22 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	public event EventHandler<WindowMessageMonitorEventArgs>? DpiChanged;
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? SessionChanged;
+
+	public void PreInitialize()
+	{
+		_context.NativeManager.HideWindow(_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle);
+
+		_internalContext.CoreNativeManager.SetWindowSubclass(
+			_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
+			_subclassProc,
+			SUBCLASSID,
+			0
+		);
+		_internalContext.CoreNativeManager.WTSRegisterSessionNotification(
+			_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
+			PInvoke.NOTIFY_FOR_ALL_SESSIONS
+		);
+	}
 
 	private LRESULT WindowProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam, nuint uIdSubclass, nuint dwRefData)
 	{
@@ -79,7 +82,7 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 			return new LRESULT(eventArgs.Result);
 		}
 
-		return _coreNativeManager.DefSubclassProc(hWnd, uMsg, wParam, lParam);
+		return _internalContext.CoreNativeManager.DefSubclassProc(hWnd, uMsg, wParam, lParam);
 	}
 
 	private void WindowProcSettingChange(WindowMessageMonitorEventArgs eventArgs)
@@ -110,12 +113,14 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			_coreNativeManager.RemoveWindowSubclass(
-				_coreNativeManager.WindowMessageMonitorWindowHandle,
+			_internalContext.CoreNativeManager.RemoveWindowSubclass(
+				_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
 				_subclassProc,
 				SUBCLASSID
 			);
-			_coreNativeManager.WTSUnRegisterSessionNotification(_coreNativeManager.WindowMessageMonitorWindowHandle);
+			_internalContext.CoreNativeManager.WTSUnRegisterSessionNotification(
+				_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle
+			);
 			_disposedValue = true;
 		}
 	}

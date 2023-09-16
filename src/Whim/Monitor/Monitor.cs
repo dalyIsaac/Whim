@@ -7,12 +7,12 @@ namespace Whim;
 
 internal class Monitor : IMonitor
 {
-	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IInternalContext _internalContext;
 	internal readonly HMONITOR _hmonitor;
 
-	public Monitor(ICoreNativeManager coreNativeManager, HMONITOR monitor, bool isPrimaryHMonitor)
+	public Monitor(IInternalContext internalContext, HMONITOR monitor, bool isPrimaryHMonitor)
 	{
-		_coreNativeManager = coreNativeManager;
+		_internalContext = internalContext;
 		_hmonitor = monitor;
 
 		Update(isPrimaryHMonitor);
@@ -31,28 +31,28 @@ internal class Monitor : IMonitor
 	[MemberNotNull(nameof(Bounds), nameof(IsPrimary), nameof(Name), nameof(WorkingArea), nameof(ScaleFactor))]
 	internal unsafe void Update(bool isPrimaryHMonitor)
 	{
-		if (!_coreNativeManager.HasMultipleMonitors() || isPrimaryHMonitor)
+		if (!_internalContext.CoreNativeManager.HasMultipleMonitors() || isPrimaryHMonitor)
 		{
 			// Single monitor system.
 			Bounds = new Location<int>()
 			{
-				X = _coreNativeManager.GetVirtualScreenLeft(),
-				Y = _coreNativeManager.GetVirtualScreenTop(),
-				Width = _coreNativeManager.GetVirtualScreenWidth(),
-				Height = _coreNativeManager.GetVirtualScreenHeight()
+				X = _internalContext.CoreNativeManager.GetVirtualScreenLeft(),
+				Y = _internalContext.CoreNativeManager.GetVirtualScreenTop(),
+				Width = _internalContext.CoreNativeManager.GetVirtualScreenWidth(),
+				Height = _internalContext.CoreNativeManager.GetVirtualScreenHeight()
 			};
 
 			IsPrimary = true;
 			Name = "DISPLAY";
 
-			_coreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
+			_internalContext.CoreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
 			WorkingArea = rect.ToLocation();
 		}
 		else
 		{
 			// Multiple monitor system.
 			MONITORINFOEXW infoEx = new() { monitorInfo = new MONITORINFO() { cbSize = (uint)sizeof(MONITORINFOEXW) } };
-			_coreNativeManager.GetMonitorInfo(_hmonitor, ref infoEx);
+			_internalContext.CoreNativeManager.GetMonitorInfo(_hmonitor, ref infoEx);
 
 			Bounds = infoEx.monitorInfo.rcMonitor.ToLocation();
 			WorkingArea = infoEx.monitorInfo.rcWork.ToLocation();
@@ -62,7 +62,7 @@ internal class Monitor : IMonitor
 
 		// Get the scale factor.
 		// We assume that monitors have the same DPI in the x and y directions.
-		_coreNativeManager.GetDpiForMonitor(
+		_internalContext.CoreNativeManager.GetDpiForMonitor(
 			_hmonitor,
 			MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI,
 			out uint effectiveDpiX,

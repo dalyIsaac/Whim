@@ -9,7 +9,6 @@ namespace Whim;
 internal partial class PluginManager : IPluginManager
 {
 	private readonly IContext _context;
-	private readonly IFileManager _fileManager;
 	private readonly CommandManager _commandManager;
 	private readonly string _savedStateFilePath;
 	private readonly List<IPlugin> _plugins = new();
@@ -20,12 +19,11 @@ internal partial class PluginManager : IPluginManager
 
 	public IReadOnlyCollection<IPlugin> LoadedPlugins => _plugins.AsReadOnly();
 
-	public PluginManager(IContext context, IFileManager fileManager, CommandManager commandManager)
+	public PluginManager(IContext context, CommandManager commandManager)
 	{
 		_context = context;
-		_fileManager = fileManager;
 		_commandManager = commandManager;
-		_savedStateFilePath = Path.Combine(_fileManager.SavedStateDir, "plugins.json");
+		_savedStateFilePath = Path.Combine(_context.FileManager.SavedStateDir, "plugins.json");
 	}
 
 	public void PreInitialize()
@@ -52,15 +50,15 @@ internal partial class PluginManager : IPluginManager
 
 	private void LoadSavedState()
 	{
-		_fileManager.EnsureDirExists(_fileManager.SavedStateDir);
+		_context.FileManager.EnsureDirExists(_context.FileManager.SavedStateDir);
 
 		// If the saved plugin state file doesn't yet exist, we don't need to load anything.
-		if (!_fileManager.FileExists(_savedStateFilePath))
+		if (!_context.FileManager.FileExists(_savedStateFilePath))
 		{
 			return;
 		}
 
-		using Stream pluginFileStream = _fileManager.OpenRead(_savedStateFilePath);
+		using Stream pluginFileStream = _context.FileManager.OpenRead(_savedStateFilePath);
 
 		PluginManagerSavedState? savedState = null;
 		try
@@ -162,7 +160,7 @@ internal partial class PluginManager : IPluginManager
 			}
 		}
 
-		_fileManager.WriteAllText(_savedStateFilePath, JsonSerializer.Serialize(pluginManagerSavedState));
+		_context.FileManager.WriteAllText(_savedStateFilePath, JsonSerializer.Serialize(pluginManagerSavedState));
 	}
 
 	public void Dispose()

@@ -24,7 +24,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	private bool _initialized;
 
 	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IInternalContext _internalContext;
 	protected readonly WorkspaceManagerTriggers _triggers;
 
 	/// <summary>
@@ -90,10 +90,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	private bool _disposedValue;
 
-	public WorkspaceManager(IContext context, ICoreNativeManager coreNativeManager)
+	public WorkspaceManager(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
-		_coreNativeManager = coreNativeManager;
+		_internalContext = internalContext;
 		_triggers = new WorkspaceManagerTriggers()
 		{
 			ActiveLayoutEngineChanged = (ActiveLayoutEngineChangedEventArgs e) =>
@@ -168,7 +168,13 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		// Create the workspace.
 		Workspace workspace =
-			new(_context, _coreNativeManager, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
+			new(
+				_context,
+				_internalContext,
+				_triggers,
+				name ?? $"Workspace {_workspaces.Count + 1}",
+				layoutEngines
+			);
 		_workspaces.Add(workspace);
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 		return workspace;
@@ -720,6 +726,8 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 				{
 					workspace.Dispose();
 				}
+
+				_internalContext.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

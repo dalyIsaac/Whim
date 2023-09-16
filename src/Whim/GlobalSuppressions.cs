@@ -83,3 +83,4 @@ using System.Diagnostics.CodeAnalysis;
 	Scope = "namespaceanddescendants",
 	Target = "~N:Windows.Win32"
 )]
+[assembly: SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Context isn't supposed to be disposable", Scope = "type", Target = "~T:Whim.Context")]

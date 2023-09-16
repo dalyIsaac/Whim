@@ -19,12 +19,12 @@ internal static class IconHelper
 	/// </summary>
 	/// <param name="window"></param>
 	/// <param name="context"></param>
-	/// <param name="coreNativeManager"></param>
+	/// <param name="internalContext"></param>
 	/// <returns></returns>
-	public static BitmapImage? GetIcon(this IWindow window, IContext context, ICoreNativeManager coreNativeManager)
+	public static BitmapImage? GetIcon(this IWindow window, IContext context, IInternalContext internalContext)
 	{
 		Logger.Debug($"Getting icon for window {window}");
-		return window.IsUwp ? GetUwpAppIcon(context, window) : GetWindowIcon(coreNativeManager, window.Handle);
+		return window.IsUwp ? GetUwpAppIcon(context, window) : GetWindowIcon(internalContext, window.Handle);
 	}
 
 	/// <summary>
@@ -86,14 +86,14 @@ internal static class IconHelper
 		return ConvertFromStream(fileStream);
 	}
 
-	private static BitmapImage? GetWindowIcon(ICoreNativeManager coreNativeManager, HWND hwnd)
+	private static BitmapImage? GetWindowIcon(IInternalContext internalContext, HWND hwnd)
 	{
 		Logger.Debug($"Getting window icon for HWND {hwnd}");
-		HICON hIcon = new(coreNativeManager.SendMessage(hwnd, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0));
+		HICON hIcon = new(internalContext.CoreNativeManager.SendMessage(hwnd, PInvoke.WM_GETICON, PInvoke.ICON_BIG, 0));
 
 		if (hIcon == 0)
 		{
-			hIcon = (HICON)(nint)coreNativeManager.GetClassLongPtr(hwnd, GET_CLASS_LONG_INDEX.GCL_HICON);
+			hIcon = (HICON)(nint)internalContext.CoreNativeManager.GetClassLongPtr(hwnd, GET_CLASS_LONG_INDEX.GCL_HICON);
 		}
 
 		if (hIcon == 0)
@@ -103,7 +103,7 @@ internal static class IconHelper
 		}
 
 		// Get the icon from the handle.
-		using Icon icon = coreNativeManager.LoadIconFromHandle((nint)hIcon);
+		using Icon icon = internalContext.CoreNativeManager.LoadIconFromHandle((nint)hIcon);
 		MemoryStream iconStream = new();
 
 		using (Bitmap bmp = icon.ToBitmap())

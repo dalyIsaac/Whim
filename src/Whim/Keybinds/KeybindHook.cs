@@ -12,22 +12,22 @@ namespace Whim;
 internal class KeybindHook : IDisposable
 {
 	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IInternalContext _internalContext;
 	private readonly HOOKPROC _lowLevelKeyboardProc;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
-	public KeybindHook(IContext context, ICoreNativeManager coreNativeManager)
+	public KeybindHook(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
-		_coreNativeManager = coreNativeManager;
+		_internalContext = internalContext;
 		_lowLevelKeyboardProc = LowLevelKeyboardProc;
 	}
 
 	public void PostInitialize()
 	{
 		Logger.Debug("Initializing keybind manager...");
-		_unhookKeyboardHook = _coreNativeManager.SetWindowsHookEx(
+		_unhookKeyboardHook = _internalContext.CoreNativeManager.SetWindowsHookEx(
 			WINDOWS_HOOK_ID.WH_KEYBOARD_LL,
 			_lowLevelKeyboardProc,
 			null,
@@ -47,12 +47,12 @@ internal class KeybindHook : IDisposable
 		Logger.Verbose($"{nCode} {wParam.Value} {lParam.Value}");
 		if (nCode != 0 || ((nuint)wParam != PInvoke.WM_KEYDOWN && (nuint)wParam != PInvoke.WM_SYSKEYDOWN))
 		{
-			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 
-		if (_coreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(lParam) is not KBDLLHOOKSTRUCT kbdll)
+		if (_internalContext.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(lParam) is not KBDLLHOOKSTRUCT kbdll)
 		{
-			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
 
@@ -68,7 +68,7 @@ internal class KeybindHook : IDisposable
 			case VIRTUAL_KEY.VK_RCONTROL:
 			case VIRTUAL_KEY.VK_LWIN:
 			case VIRTUAL_KEY.VK_RWIN:
-				return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+				return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 			default:
 				break;
 		}
@@ -77,7 +77,7 @@ internal class KeybindHook : IDisposable
 		if (modifiers == KeyModifiers.None)
 		{
 			Logger.Verbose("No modifiers");
-			return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 
 		if (DoKeyboardEvent(new Keybind(modifiers, key)))
@@ -85,10 +85,11 @@ internal class KeybindHook : IDisposable
 			return (LRESULT)1;
 		}
 
-		return _coreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 	}
 
-	private bool IsModifierPressed(VIRTUAL_KEY key) => (_coreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
+	private bool IsModifierPressed(VIRTUAL_KEY key) =>
+		(_internalContext.CoreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
 
 	private KeyModifiers GetModifiersPressed()
 	{

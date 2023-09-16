@@ -14,17 +14,17 @@ namespace Whim;
 public partial class NativeManager : INativeManager
 {
 	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
+	private readonly IInternalContext _internalContext;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="NativeManager"/> class.
 	/// </summary>
 	/// <param name="context"></param>
-	/// <param name="coreNativeManager"></param>
-	internal NativeManager(IContext context, ICoreNativeManager coreNativeManager)
+	/// <param name="internalContext"></param>
+	internal NativeManager(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
-		_coreNativeManager = coreNativeManager;
+		_internalContext = internalContext;
 	}
 
 	private const int _bufferCapacity = 255;
@@ -218,13 +218,13 @@ public partial class NativeManager : INativeManager
 			return null;
 		}
 
-		_coreNativeManager.GetWindowThreadProcessId(window.Handle, out uint pid);
+		_internalContext.CoreNativeManager.GetWindowThreadProcessId(window.Handle, out uint pid);
 
 		// UWP apps are hosted inside a ApplicationFrameHost process.
 		// We need to find the child window which does NOT belong to this process.
-		foreach (HWND childHwnd in _coreNativeManager.GetChildWindows(window.Handle))
+		foreach (HWND childHwnd in _internalContext.CoreNativeManager.GetChildWindows(window.Handle))
 		{
-			_coreNativeManager.GetWindowThreadProcessId(childHwnd, out uint childPid);
+			_internalContext.CoreNativeManager.GetWindowThreadProcessId(childHwnd, out uint childPid);
 
 			if (childPid != pid)
 			{
@@ -294,7 +294,7 @@ public partial class NativeManager : INativeManager
 
 	/// <inheritdoc/>
 	public TransparentWindowController CreateTransparentWindowController(Microsoft.UI.Xaml.Window window) =>
-		new(_context, _coreNativeManager, window);
+		new(_context, _internalContext, window);
 
 	/// <inheritdoc/>
 	public void SetWindowExTransparent(HWND hwnd)
