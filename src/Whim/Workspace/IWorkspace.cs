@@ -40,7 +40,11 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Trigger a layout.
 	/// </summary>
-	void DoLayout();
+	/// <param name="afterLayout">
+	/// An action to perform after the layout has been performed. This will be called before
+	/// <see cref="IWorkspaceManager.WorkspaceLayoutCompleted"/> .
+	/// </param>
+	void DoLayout(Action? afterLayout = null);
 	#endregion
 
 	#region Windows

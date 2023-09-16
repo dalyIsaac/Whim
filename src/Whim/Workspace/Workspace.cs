@@ -196,14 +196,16 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		DoLayout();
-		_triggers.ActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = this,
-				PreviousLayoutEngine = prevLayoutEngine,
-				CurrentLayoutEngine = nextLayoutEngine
-			}
+		DoLayout(
+			() =>
+				_triggers.ActiveLayoutEngineChanged(
+					new ActiveLayoutEngineChangedEventArgs()
+					{
+						Workspace = this,
+						PreviousLayoutEngine = prevLayoutEngine,
+						CurrentLayoutEngine = nextLayoutEngine
+					}
+				)
 		);
 	}
 
@@ -257,14 +259,16 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		DoLayout();
-		_triggers.ActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = this,
-				PreviousLayoutEngine = prevLayoutEngine,
-				CurrentLayoutEngine = nextLayoutEngine
-			}
+		DoLayout(
+			() =>
+				_triggers.ActiveLayoutEngineChanged(
+					new ActiveLayoutEngineChangedEventArgs()
+					{
+						Workspace = this,
+						PreviousLayoutEngine = prevLayoutEngine,
+						CurrentLayoutEngine = nextLayoutEngine
+					}
+				)
 		);
 
 		return true;
@@ -289,8 +293,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		DoLayout();
-		window.Focus();
+		DoLayout(window.Focus);
 	}
 
 	public bool RemoveWindow(IWindow window)
@@ -504,7 +507,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return location;
 	}
 
-	public void DoLayout()
+	public void DoLayout(Action? afterLayout = null)
 	{
 		Logger.Debug($"Workspace {Name}");
 
@@ -564,6 +567,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 						// Add the window locations to the map
 						_windowLocations = t.Result;
 					}
+
+					// Trigger the layout completed event
+					afterLayout?.Invoke();
+					_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 				},
 				uiScheduler
 			);
