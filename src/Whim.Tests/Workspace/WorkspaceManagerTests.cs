@@ -1145,7 +1145,7 @@ public class WorkspaceManagerTests
 		wrapper.MonitorManager
 			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
 			.Returns(wrapper.Monitors[1].Object);
-		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(false);
+		workspace.Setup(w => w.RemoveWindow(window.Object)).ReturnsAsync(false);
 
 		// When a window is moved to a point, but the window cannot be removed from the old workspace
 		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
@@ -1176,7 +1176,7 @@ public class WorkspaceManagerTests
 		wrapper.MonitorManager
 			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
 			.Returns(wrapper.Monitors[1].Object);
-		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
+		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).ReturnsAsync(true);
 
 		// When a window is moved to a point
 		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
@@ -1207,7 +1207,7 @@ public class WorkspaceManagerTests
 		wrapper.MonitorManager
 			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
 			.Returns(wrapper.Monitors[0].Object);
-		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
+		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).ReturnsAsync(true);
 
 		// When a window is moved to a point
 		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
@@ -1581,15 +1581,11 @@ public class WorkspaceManagerTests
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
 		wrapper.WorkspaceManager.Initialize();
 
-		// When creating a workspace
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
-
 		// Then changing the layout engine should trigger the event
 		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
 			h => wrapper.WorkspaceManager.ActiveLayoutEngineChanged += h,
 			h => wrapper.WorkspaceManager.ActiveLayoutEngineChanged -= h,
-			workspace.NextLayoutEngine
+			async () => await wrapper.WorkspaceManager.ActiveWorkspace.NextLayoutEngine()
 		);
 	}
 
