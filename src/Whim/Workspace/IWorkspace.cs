@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Whim;
 
@@ -23,24 +24,28 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Rotate to the next layout engine.
 	/// </summary>
-	void NextLayoutEngine();
+	Task NextLayoutEngine();
 
 	/// <summary>
 	/// Rotate to the previous layout engine.
 	/// </summary>
-	void PreviousLayoutEngine();
+	Task PreviousLayoutEngine();
 
 	/// <summary>
 	/// Tries to set the layout engine to one with the <c>name</c>.
 	/// </summary>
 	/// <param name="name">The name of the layout engine to make active.</param>
 	/// <returns></returns>
-	bool TrySetLayoutEngine(string name);
+	Task<bool> TrySetLayoutEngine(string name);
 
 	/// <summary>
 	/// Trigger a layout.
 	/// </summary>
-	void DoLayout();
+	/// <param name="afterLayout">
+	/// An action to perform after the layout has been performed. This will be called before
+	/// <see cref="IWorkspaceManager.WorkspaceLayoutCompleted"/> .
+	/// </param>
+	Task DoLayout(Action? afterLayout = null);
 	#endregion
 
 	#region Windows
@@ -60,13 +65,13 @@ public interface IWorkspace : IDisposable
 	/// Adds the window to the workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	void AddWindow(IWindow window);
+	Task AddWindow(IWindow window);
 
 	/// <summary>
 	/// Removes the window from the workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	bool RemoveWindow(IWindow window);
+	Task<bool> RemoveWindow(IWindow window);
 
 	/// <summary>
 	/// Returns true when the workspace contains the provided <paramref name="window"/>.
@@ -111,7 +116,7 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The window to swap. If null, the currently focused window is swapped.
 	/// </param>
-	void SwapWindowInDirection(Direction direction, IWindow? window = null);
+	Task SwapWindowInDirection(Direction direction, IWindow? window = null);
 
 	/// <summary>
 	/// Change the <paramref name="window"/>'s <paramref name="edges"/> direction by
@@ -128,7 +133,7 @@ public interface IWorkspace : IDisposable
 	/// The window to change the edge of. If null, the currently focused window is
 	/// used.
 	/// </param>
-	void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null);
+	Task MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null);
 
 	/// <summary>
 	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.
@@ -136,6 +141,6 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
-	void MoveWindowToPoint(IWindow window, IPoint<double> point);
+	Task MoveWindowToPoint(IWindow window, IPoint<double> point);
 	#endregion
 }

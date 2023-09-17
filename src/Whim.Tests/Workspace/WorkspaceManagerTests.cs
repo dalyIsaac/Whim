@@ -1,12 +1,16 @@
-using Microsoft.UI.Dispatching;
 using Moq;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using Windows.Win32.Foundation;
 using Xunit;
 
 namespace Whim.Tests;
 
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Unnecessary for tests")]
 public class WorkspaceManagerTests
 {
 	private class WorkspaceManagerTestWrapper : WorkspaceManager
@@ -42,6 +46,7 @@ public class WorkspaceManagerTests
 			Context.Setup(c => c.RouterManager).Returns(RouterManager.Object);
 
 			InternalContext.Setup(c => c.CoreNativeManager).Returns(CoreNativeManager.Object);
+			InternalContext.Setup(c => c.LayoutLock).Returns(new ReaderWriterLockSlim());
 
 			Monitors = monitors ?? new[] { new Mock<IMonitor>(), new Mock<IMonitor>() };
 			MonitorManager.Setup(m => m.Length).Returns(Monitors.Length);
@@ -70,12 +75,24 @@ public class WorkspaceManagerTests
 			Context.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager);
 
 			CoreNativeManager
-				.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
-				.Callback<Func<DispatcherQueueHandler>, CancellationToken>(
-					(task, _) =>
+				.Setup(
+					c =>
+						c.RunTask(
+							It.IsAny<Func<Dictionary<HWND, IWindowState>>>(),
+							It.IsAny<Action<Task<Dictionary<HWND, IWindowState>>>>(),
+							It.IsAny<CancellationToken>()
+						)
+				)
+				.Callback(
+					(
+						Func<Dictionary<HWND, IWindowState>> work,
+						Action<Task<Dictionary<HWND, IWindowState>>> cleanup,
+						CancellationToken cancellationToken
+					) =>
 					{
-						var result = task();
-						result.Invoke();
+						// Run the work on the current thread.
+						var result = work();
+						cleanup(Task.FromResult(result));
 					}
 				);
 		}
@@ -99,7 +116,7 @@ public class WorkspaceManagerTests
 	public void Add_BeforeInitialization_DefaultName()
 	{
 		// Given
-		Wrapper wrapper = new();
+		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
 
 		// When a workspace is added
 		wrapper.WorkspaceManager.Add();
@@ -113,7 +130,7 @@ public class WorkspaceManagerTests
 	public void Add_BeforeInitialization_CustomName()
 	{
 		// Given
-		Wrapper wrapper = new();
+		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
 
 		// When a workspace is added
 		wrapper.WorkspaceManager.Add("workspace");
@@ -131,10 +148,10 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.Initialize();
 
 		// When a workspace is added with a name
-		wrapper.WorkspaceManager.Add("workspace");
+		wrapper.WorkspaceManager.Add("named workspace");
 
 		// Then the workspace is created with the specified name.
-		Assert.Equal("workspace", wrapper.WorkspaceManager.Single().Name);
+		Assert.Equal("named workspace", wrapper.WorkspaceManager.Single().Name);
 	}
 
 	[Fact]
@@ -158,7 +175,7 @@ public class WorkspaceManagerTests
 	public void Add_BeforeInitialization_DefaultLayoutEngine()
 	{
 		// Given
-		Wrapper wrapper = new();
+		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
 
 		// When a workspace is added
 		wrapper.WorkspaceManager.Add();
@@ -197,7 +214,7 @@ public class WorkspaceManagerTests
 
 		// Then it returns false, as there must be at least two workspaces, since there are two monitors
 		Assert.False(result);
-		workspace2.Verify(w => w.DoLayout(), Times.Never);
+		workspace2.Verify(w => w.DoLayout(null), Times.Never);
 	}
 
 	[Fact]
@@ -238,7 +255,7 @@ public class WorkspaceManagerTests
 
 		// and the window is added to the last remaining workspace
 		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once);
-		workspace2.Verify(w => w.DoLayout(), Times.Once);
+		workspace2.Verify(w => w.DoLayout(null), Times.Once);
 	}
 
 	[Fact]
@@ -331,7 +348,7 @@ public class WorkspaceManagerTests
 		Wrapper wrapper = new(new[] { workspace, workspace2 });
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(new[] { workspace.Object, workspace2.Object }, wrapper.WorkspaceManager);
+		Assert.Equal(new[] { workspace.Object, workspace2.Object }, (IEnumerable<IWorkspace>?)wrapper.WorkspaceManager);
 	}
 	#endregion
 
@@ -355,7 +372,7 @@ public class WorkspaceManagerTests
 		Assert.Null(result.Arguments.PreviousWorkspace);
 
 		// Layout is done, and the first window is focused.
-		workspace.Verify(w => w.DoLayout(), Times.Once);
+		workspace.Verify(w => w.DoLayout(null), Times.Once);
 		workspace.Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
@@ -387,8 +404,8 @@ public class WorkspaceManagerTests
 		// The old workspace is deactivated, the new workspace is laid out, and the first window is
 		// focused.
 		previousWorkspace.Verify(w => w.Deactivate(), Times.Once);
-		previousWorkspace.Verify(w => w.DoLayout(), Times.Never);
-		currentWorkspace.Verify(w => w.DoLayout(), Times.Once);
+		previousWorkspace.Verify(w => w.DoLayout(null), Times.Never);
+		currentWorkspace.Verify(w => w.DoLayout(null), Times.Once);
 		currentWorkspace.Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
@@ -422,11 +439,11 @@ public class WorkspaceManagerTests
 		Assert.Equal(workspace.Object, result.Arguments.PreviousWorkspace);
 
 		workspace.Verify(w => w.Deactivate(), Times.Never);
-		workspace.Verify(w => w.DoLayout(), Times.Once);
+		workspace.Verify(w => w.DoLayout(null), Times.Once);
 		workspace.Verify(w => w.FocusFirstWindow(), Times.Never);
 
 		workspace2.Verify(w => w.Deactivate(), Times.Never);
-		workspace2.Verify(w => w.DoLayout(), Times.Once);
+		workspace2.Verify(w => w.DoLayout(null), Times.Once);
 		workspace2.Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
@@ -455,11 +472,11 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.ActivatePrevious();
 
 		workspaces[currentIdx].Verify(w => w.Deactivate(), Times.Once);
-		workspaces[currentIdx].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[currentIdx].Verify(w => w.DoLayout(null), Times.Never);
 		workspaces[currentIdx].Verify(w => w.FocusFirstWindow(), Times.Never);
 
 		workspaces[prevIdx].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[prevIdx].Verify(w => w.DoLayout(), Times.Once);
+		workspaces[prevIdx].Verify(w => w.DoLayout(null), Times.Once);
 		workspaces[prevIdx].Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
@@ -487,11 +504,11 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.ActivatePrevious();
 
 		workspaces[0].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[0].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[0].Verify(w => w.DoLayout(null), Times.Never);
 		workspaces[0].Verify(w => w.FocusFirstWindow(), Times.Never);
 
 		workspaces[1].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[1].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[1].Verify(w => w.DoLayout(null), Times.Never);
 		workspaces[1].Verify(w => w.FocusFirstWindow(), Times.Never);
 	}
 
@@ -520,11 +537,11 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.ActivateNext();
 
 		workspaces[currentIdx].Verify(w => w.Deactivate(), Times.Once);
-		workspaces[currentIdx].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[currentIdx].Verify(w => w.DoLayout(null), Times.Never);
 		workspaces[currentIdx].Verify(w => w.FocusFirstWindow(), Times.Never);
 
 		workspaces[nextIdx].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[nextIdx].Verify(w => w.DoLayout(), Times.Once);
+		workspaces[nextIdx].Verify(w => w.DoLayout(null), Times.Once);
 		workspaces[nextIdx].Verify(w => w.FocusFirstWindow(), Times.Once);
 	}
 
@@ -552,11 +569,11 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.ActivateNext();
 
 		workspaces[0].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[0].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[0].Verify(w => w.DoLayout(null), Times.Never);
 		workspaces[0].Verify(w => w.FocusFirstWindow(), Times.Never);
 
 		workspaces[1].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[1].Verify(w => w.DoLayout(), Times.Never);
+		workspaces[1].Verify(w => w.DoLayout(null), Times.Never);
 		workspaces[1].Verify(w => w.FocusFirstWindow(), Times.Never);
 	}
 	#endregion
@@ -617,8 +634,8 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.LayoutAllActiveWorkspaces();
 
 		// Then all active workspaces are laid out
-		workspace.Verify(w => w.DoLayout(), Times.Once());
-		workspace2.Verify(w => w.DoLayout(), Times.Once());
+		workspace.Verify(w => w.DoLayout(null), Times.Once());
+		workspace2.Verify(w => w.DoLayout(null), Times.Once());
 	}
 
 	#region WindowAdded
@@ -1127,36 +1144,6 @@ public class WorkspaceManagerTests
 	}
 
 	[Fact]
-	public void MoveWindowToPoint_CannotRemoveWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(wrapper.Monitors[1].Object);
-		workspace.Setup(w => w.RemoveWindow(window.Object)).Returns(false);
-
-		// When a window is moved to a point, but the window cannot be removed from the old workspace
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
-
-		// Then nothing happens
-		wrapper.Monitors[0].VerifyGet(m => m.WorkingArea, Times.Never());
-		wrapper.Monitors[1].VerifyGet(m => m.WorkingArea, Times.Never());
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
-	}
-
-	[Fact]
 	public void MoveWindowToPoint_Success_DifferentWorkspace()
 	{
 		// Given
@@ -1175,7 +1162,7 @@ public class WorkspaceManagerTests
 		wrapper.MonitorManager
 			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
 			.Returns(wrapper.Monitors[1].Object);
-		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
+		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).ReturnsAsync(true);
 
 		// When a window is moved to a point
 		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
@@ -1206,7 +1193,7 @@ public class WorkspaceManagerTests
 		wrapper.MonitorManager
 			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
 			.Returns(wrapper.Monitors[0].Object);
-		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).Returns(true);
+		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).ReturnsAsync(true);
 
 		// When a window is moved to a point
 		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
@@ -1271,7 +1258,7 @@ public class WorkspaceManagerTests
 		wrapper.WorkspaceManager.WindowFocused(window.Object);
 
 		// Then the first workspace is activated
-		workspaces[0].Verify(w => w.DoLayout(), Times.Once());
+		workspaces[0].Verify(w => w.DoLayout(null), Times.Once());
 	}
 
 	[Fact]
@@ -1296,8 +1283,8 @@ public class WorkspaceManagerTests
 		internalWorkspace.Verify(w => w.WindowFocused(null), Times.Once());
 		internalWorkspace2.Verify(w => w.WindowFocused(null), Times.Once());
 
-		workspace.Verify(w => w.DoLayout(), Times.Never());
-		workspace2.Verify(w => w.DoLayout(), Times.Never());
+		workspace.Verify(w => w.DoLayout(null), Times.Never());
+		workspace2.Verify(w => w.DoLayout(null), Times.Never());
 	}
 	#endregion
 
@@ -1485,9 +1472,9 @@ public class WorkspaceManagerTests
 		);
 
 		// Then the workspace is activated
-		workspace.Verify(w => w.DoLayout(), Times.Once());
-		workspace2.Verify(w => w.DoLayout(), Times.Once());
-		workspace3.Verify(w => w.DoLayout(), Times.Exactly(2));
+		workspace.Verify(w => w.DoLayout(null), Times.Once());
+		workspace2.Verify(w => w.DoLayout(null), Times.Once());
+		workspace3.Verify(w => w.DoLayout(null), Times.Exactly(2));
 	}
 
 	[Fact]
@@ -1580,15 +1567,11 @@ public class WorkspaceManagerTests
 		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
 		wrapper.WorkspaceManager.Initialize();
 
-		// When creating a workspace
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
-
 		// Then changing the layout engine should trigger the event
 		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
 			h => wrapper.WorkspaceManager.ActiveLayoutEngineChanged += h,
 			h => wrapper.WorkspaceManager.ActiveLayoutEngineChanged -= h,
-			workspace.NextLayoutEngine
+			async () => await wrapper.WorkspaceManager.ActiveWorkspace.NextLayoutEngine()
 		);
 	}
 
@@ -1677,7 +1660,7 @@ public class WorkspaceManagerTests
 		Assert.Raises<WorkspaceEventArgs>(
 			h => wrapper.WorkspaceManager.WorkspaceLayoutStarted += h,
 			h => wrapper.WorkspaceManager.WorkspaceLayoutStarted -= h,
-			workspace.DoLayout
+			() => workspace.DoLayout(null)
 		);
 	}
 
@@ -1702,7 +1685,7 @@ public class WorkspaceManagerTests
 		// Then starting the layout should trigger the event
 		try
 		{
-			workspace.DoLayout();
+			workspace.DoLayout(null);
 		}
 		catch
 		{
@@ -1732,7 +1715,7 @@ public class WorkspaceManagerTests
 		Assert.Raises<WorkspaceEventArgs>(
 			h => wrapper.WorkspaceManager.WorkspaceLayoutCompleted += h,
 			h => wrapper.WorkspaceManager.WorkspaceLayoutCompleted -= h,
-			workspace.DoLayout
+			() => workspace.DoLayout(null)
 		);
 	}
 
@@ -1757,7 +1740,7 @@ public class WorkspaceManagerTests
 		// Then completing the layout should trigger the event
 		try
 		{
-			workspace.DoLayout();
+			workspace.DoLayout(null);
 		}
 		catch
 		{

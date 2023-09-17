@@ -71,6 +71,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void WindowFocused(IWindow? window)
 	{
+		_internalContext.LayoutLock.EnterWriteLock();
 		Logger.Debug($"Focusing on {window}");
 
 		HWND hwnd = window?.Handle ?? _internalContext.CoreNativeManager.GetForegroundWindow();
@@ -81,12 +82,15 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 		foreach (Monitor monitor in _monitors)
 		{
-			if (monitor._hmonitor == hMONITOR)
+			if (monitor._hmonitor.Equals(hMONITOR))
 			{
+				Logger.Debug($"Setting active monitor to {monitor}");
+
 				ActiveMonitor = monitor;
 				break;
 			}
 		}
+		_internalContext.LayoutLock.ExitWriteLock();
 	}
 
 	private void WindowMessageMonitor_SessionChanged(object? sender, WindowMessageMonitorEventArgs e)

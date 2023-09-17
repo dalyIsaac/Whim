@@ -1,9 +1,11 @@
-using Microsoft.UI.Dispatching;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
@@ -63,8 +65,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
+	private readonly ConcurrentQueue<(ILayoutEngine layoutEngine, IMonitor monitor)> _layoutQueue = new();
+	private CancellationTokenSource? _cancellationTokenSource;
 	private readonly object _layoutLock = new();
-	private (Task Task, CancellationTokenSource CancellationTokenSource)? _layoutTask;
 
 	public ILayoutEngine ActiveLayoutEngine
 	{
@@ -99,9 +102,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	/// <summary>
-	/// Map of windows to their current location.
+	/// Map of window handles to their current location.
 	/// </summary>
-	private readonly Dictionary<IWindow, IWindowState> _windowLocations = new();
+	private Dictionary<HWND, IWindowState> _windowLocations = new();
 
 	public Workspace(
 		IContext context,
@@ -136,14 +139,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void WindowMinimizeStart(IWindow window)
+	public Task WindowMinimizeStart(IWindow window)
 	{
 		lock (_workspaceLock)
 		{
 			if (!_normalWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} is not a normal window in workspace {Name}");
-				return;
+				return Task.CompletedTask;
 			}
 
 			_normalWindows.Remove(window);
@@ -155,22 +158,24 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		DoLayout();
+		return DoLayout();
 	}
 
-	public void WindowMinimizeEnd(IWindow window)
+	public Task WindowMinimizeEnd(IWindow window)
 	{
+		Task result;
 		lock (_workspaceLock)
 		{
 			if (!_minimizedWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
-				return;
+				return Task.CompletedTask;
 			}
 
 			_minimizedWindows.Remove(window);
-			AddWindow(window);
+			result = AddWindow(window);
 		}
+		return result;
 	}
 
 	public void FocusFirstWindow()
@@ -179,7 +184,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
-	private void UpdateLayoutEngine(int delta)
+	private Task UpdateLayoutEngine(int delta)
 	{
 		ILayoutEngine prevLayoutEngine;
 		ILayoutEngine nextLayoutEngine;
@@ -193,30 +198,32 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		DoLayout();
-		_triggers.ActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = this,
-				PreviousLayoutEngine = prevLayoutEngine,
-				CurrentLayoutEngine = nextLayoutEngine
-			}
+		return DoLayout(
+			() =>
+				_triggers.ActiveLayoutEngineChanged(
+					new ActiveLayoutEngineChangedEventArgs()
+					{
+						Workspace = this,
+						PreviousLayoutEngine = prevLayoutEngine,
+						CurrentLayoutEngine = nextLayoutEngine
+					}
+				)
 		);
 	}
 
-	public void NextLayoutEngine()
+	public Task NextLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine(1);
+		return UpdateLayoutEngine(1);
 	}
 
-	public void PreviousLayoutEngine()
+	public Task PreviousLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine(-1);
+		return UpdateLayoutEngine(-1);
 	}
 
-	public bool TrySetLayoutEngine(string name)
+	public Task<bool> TrySetLayoutEngine(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
@@ -239,12 +246,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			if (nextIdx == -1)
 			{
 				Logger.Error($"Layout engine {name} not found for workspace {Name}");
-				return false;
+				return Task.FromResult(false);
 			}
 			else if (_activeLayoutEngineIndex == nextIdx)
 			{
 				Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
-				return true;
+				return Task.FromResult(true);
 			}
 
 			int prevIdx = _activeLayoutEngineIndex;
@@ -254,20 +261,22 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		DoLayout();
-		_triggers.ActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = this,
-				PreviousLayoutEngine = prevLayoutEngine,
-				CurrentLayoutEngine = nextLayoutEngine
-			}
-		);
-
-		return true;
+		TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+		return DoLayout(
+				() =>
+					_triggers.ActiveLayoutEngineChanged(
+						new ActiveLayoutEngineChangedEventArgs()
+						{
+							Workspace = this,
+							PreviousLayoutEngine = prevLayoutEngine,
+							CurrentLayoutEngine = nextLayoutEngine
+						}
+					)
+			)
+			.ContinueWith(_ => true, uiScheduler);
 	}
 
-	public void AddWindow(IWindow window)
+	public Task AddWindow(IWindow window)
 	{
 		lock (_workspaceLock)
 		{
@@ -276,7 +285,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			if (_normalWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} already exists in workspace {Name}");
-				return;
+				return Task.CompletedTask;
 			}
 
 			_normalWindows.Add(window);
@@ -286,11 +295,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		DoLayout();
-		window.Focus();
+		return DoLayout(window.Focus);
 	}
 
-	public bool RemoveWindow(IWindow window)
+	public Task<bool> RemoveWindow(IWindow window)
 	{
 		bool success;
 		lock (_workspaceLock)
@@ -306,7 +314,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			if (!isNormalWindow && !_minimizedWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} already does not exist in workspace {Name}");
-				return false;
+				return Task.FromResult(false);
 			}
 
 			success = true;
@@ -341,10 +349,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (success)
 		{
-			DoLayout();
+			TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+			return DoLayout().ContinueWith(_ => true, uiScheduler);
 		}
 
-		return success;
+		return Task.FromResult(false);
 	}
 
 	/// <summary>
@@ -391,7 +401,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
+	public Task SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
 		bool success = false;
 
@@ -410,11 +420,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (success)
 		{
-			DoLayout();
+			return DoLayout();
 		}
+		return Task.CompletedTask;
 	}
 
-	public void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
+	public Task MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
 	{
 		bool success = false;
 
@@ -434,11 +445,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (success)
 		{
-			DoLayout();
+			return DoLayout();
 		}
+		return Task.CompletedTask;
 	}
 
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
+	public Task MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
 		lock (_workspaceLock)
 		{
@@ -467,7 +479,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		DoLayout();
+		return DoLayout();
 	}
 
 	public override string ToString() => Name;
@@ -486,7 +498,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public IWindowState? TryGetWindowLocation(IWindow window)
 	{
-		_windowLocations.TryGetValue(window, out IWindowState? location);
+		_windowLocations.TryGetValue(window.Handle, out IWindowState? location);
 
 		if (location is null && _minimizedWindows.Contains(window))
 		{
@@ -501,14 +513,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return location;
 	}
 
-	public void DoLayout()
+	public Task DoLayout(Action? afterLayout = null)
 	{
 		Logger.Debug($"Workspace {Name}");
 
 		if (GarbageCollect())
 		{
 			Logger.Debug($"Garbage collected windows, skipping layout for workspace {Name}");
-			return;
+			return Task.CompletedTask;
 		}
 
 		// Get the monitor for this workspace
@@ -516,79 +528,84 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (monitor == null)
 		{
 			Logger.Debug($"No active monitors found for workspace {Name}.");
-			return;
+			return Task.CompletedTask;
 		}
 
+		Logger.Debug($"Starting layout for workspace {Name}");
 		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
-		_windowLocations.Clear();
 
-		Logger.Verbose($"Starting layout for workspace {Name} with layout engine {ActiveLayoutEngine.Name}");
-		IEnumerable<IWindowState> locations = ActiveLayoutEngine.DoLayout(
-			new Location<int>() { Width = monitor.WorkingArea.Width, Height = monitor.WorkingArea.Height },
-			monitor
-		);
-
-		// Set the window positions in another thread. Doing this in the same thread can block
-		// the UI thread, which can delay the handling of messages in the window manager - see #446.
-		Task task;
 		lock (_layoutLock)
 		{
-			if (_layoutTask?.Task.IsCompleted == false)
+			_layoutQueue.Enqueue((ActiveLayoutEngine, monitor));
+			if (_layoutQueue.Count > 1)
 			{
-				Logger.Debug($"Cancelling previous layout task for workspace {Name}");
-				_layoutTask?.CancellationTokenSource.Cancel();
+				// Cancel the previous layout tasks
+				_cancellationTokenSource?.Cancel();
+				Logger.Debug($"Cancelling previous layout tasks for workspace {Name}");
 			}
 
-			CancellationTokenSource cancellationTokenSource = new();
-			CancellationToken cancellationToken = cancellationTokenSource.Token;
-			task = _internalContext.CoreNativeManager.ExecuteTask(
-				() => SetWindowPos(locations, monitor, cancellationToken),
-				cancellationToken
-			);
-			_layoutTask = (task, cancellationTokenSource);
+			// Set the window positions in another thread. Doing this in the same thread can block
+			// the UI thread, which can delay the handling of messages in the window manager - see #446.
+			_cancellationTokenSource = new();
 		}
+
+		// Execute the layout task
+		return _internalContext.CoreNativeManager.RunTask(
+			() => SetWindowPos(engine: ActiveLayoutEngine, monitor, _cancellationTokenSource.Token),
+			t =>
+			{
+				// Remove the completed task from the queue
+				_layoutQueue.TryDequeue(out (ILayoutEngine layoutEngine, IMonitor monitor) _);
+
+				// If there are no more tasks in the queue, dispose the cancellation token source
+				lock (_layoutLock)
+				{
+					if (_layoutQueue.IsEmpty)
+					{
+						_cancellationTokenSource?.Dispose();
+						_cancellationTokenSource = null;
+					}
+
+					// Add the window locations to the map
+					_windowLocations = t.Result;
+				}
+
+				// Trigger the layout completed event
+				afterLayout?.Invoke();
+				_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+			},
+			_cancellationTokenSource.Token
+		);
 	}
 
-	private DispatcherQueueHandler SetWindowPos(
-		IEnumerable<IWindowState> locations,
+	private Dictionary<HWND, IWindowState> SetWindowPos(
+		ILayoutEngine engine,
 		IMonitor monitor,
 		CancellationToken cancellationToken
 	)
 	{
-		using (WindowDeferPosHandle handle = new(_context, cancellationToken))
+		_internalContext.LayoutLock.EnterReadLock();
+		Logger.Debug($"Setting window positions for workspace {Name}");
+		List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> windowStates = new();
+		Dictionary<HWND, IWindowState> windowLocations = new();
+
+		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
 		{
-			foreach (IWindowState loc in locations)
-			{
-				Logger.Verbose($"Setting location of window {loc.Window}");
-
-				// Adjust the window location to the monitor's coordinates
-				loc.Location = new Location<int>()
-				{
-					X = loc.Location.X + monitor.WorkingArea.X,
-					Y = loc.Location.Y + monitor.WorkingArea.Y,
-					Width = loc.Location.Width,
-					Height = loc.Location.Height
-				};
-
-				Logger.Verbose($"{loc.Window} at {loc.Location}");
-				handle.DeferWindowPos(loc);
-
-				// Update the window location
-				_windowLocations[loc.Window] = loc;
-			}
-			Logger.Verbose($"Layout for workspace {Name} complete");
+			cancellationToken.ThrowIfCancellationRequested();
+			windowStates.Add((loc, (HWND)1, null));
+			windowLocations.Add(loc.Window.Handle, loc);
 		}
+
+		WindowDeferPosHandle handle = new(_context, windowStates, cancellationToken);
+		handle.Dispose();
 
 		foreach (IWindow window in _minimizedWindows)
 		{
 			window.ShowMinimized();
 		}
 
-		// Code run on the UI thread after the layout is complete.
-		return () =>
-		{
-			_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
-		};
+		_internalContext.LayoutLock.ExitReadLock();
+		return windowLocations;
 	}
 
 	public bool ContainsWindow(IWindow window)
@@ -599,6 +616,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
+	/// <summary>
+	/// Garbage collects windows that are no longer valid.
+	/// </summary>
+	/// <returns></returns>
 	private bool GarbageCollect()
 	{
 		IInternalWindowManager windowManager = (IInternalWindowManager)_context.WindowManager;
@@ -645,9 +666,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Disposing workspace {Name}");
 
 				// dispose managed state (managed objects)
-				_layoutTask?.CancellationTokenSource.Cancel();
-				_layoutTask?.Task.Wait();
-				_layoutTask?.CancellationTokenSource.Dispose();
+				_cancellationTokenSource?.Dispose();
 
 				bool isWorkspaceActive = _context.WorkspaceManager.GetMonitorForWorkspace(this) != null;
 

@@ -297,11 +297,16 @@ internal class CoreNativeManager : ICoreNativeManager
 	public bool TryEnqueue(DispatcherQueueHandler callback) =>
 		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
 
-	public async Task ExecuteTask(Func<DispatcherQueueHandler> task, CancellationToken cancellationToken)
+	public Task RunTask<TWorkResult>(
+		Func<TWorkResult> work,
+		Action<Task<TWorkResult>> cleanup,
+		CancellationToken cancellationToken
+	)
 	{
-		DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-		DispatcherQueueHandler callback = await Task.Run(task, cancellationToken).ConfigureAwait(false);
-		dispatcherQueue.TryEnqueue(callback);
+		TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+		return Task.Run(work, cancellationToken)
+			.ContinueWith(cleanup, cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, uiScheduler);
 	}
 
 	private Microsoft.UI.Xaml.Window? _window;

@@ -13,3 +13,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0008:Use explicit type")]
 [assembly: SuppressMessage("Style", "IDE0058:Expression value is never used")]
 [assembly: SuppressMessage("Style", "IDE0028:Simplify collection initialization")]
+[assembly: SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task")]
