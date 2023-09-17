@@ -223,7 +223,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return UpdateLayoutEngine(-1);
 	}
 
-	// TODO
 	public Task<bool> TrySetLayoutEngine(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
