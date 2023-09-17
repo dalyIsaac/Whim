@@ -685,14 +685,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		Logger.Debug($"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor}");
 
-		bool isSameWorkspace = targetWorkspace.Equals(oldWorkspace);
-		// If the window is being moved to a different workspace, remove it from the current workspace.
-		if (!isSameWorkspace && !oldWorkspace.RemoveWindow(window))
-		{
-			Logger.Error($"Could not remove window {window} from workspace {oldWorkspace}");
-			return;
-		}
-
 		// Normalize `point` into the unit square.
 		IPoint<int> pointInMonitor = targetMonitor.WorkingArea.ToMonitorCoordinates(point);
 		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(pointInMonitor);
@@ -700,10 +692,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		Logger.Debug($"Normalized point: {normalized}");
 		targetWorkspace.MoveWindowToPoint(window, normalized);
 
-		// If the window is being moved to a different workspace, update the reference in the window map.
-		if (!isSameWorkspace)
+		// If the window is being moved to a different workspace, remove it from the current workspace.
+		if (!targetWorkspace.Equals(oldWorkspace))
 		{
 			_windowWorkspaceMap[window] = targetWorkspace;
+			oldWorkspace.RemoveWindow(window);
 		}
 
 		// Trigger layouts.

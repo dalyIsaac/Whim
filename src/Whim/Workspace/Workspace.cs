@@ -182,7 +182,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
-	private void UpdateLayoutEngine(int delta)
+	private Task UpdateLayoutEngine(int delta)
 	{
 		ILayoutEngine prevLayoutEngine;
 		ILayoutEngine nextLayoutEngine;
@@ -196,7 +196,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		DoLayout(
+		return DoLayout(
 			() =>
 				_triggers.ActiveLayoutEngineChanged(
 					new ActiveLayoutEngineChangedEventArgs()
@@ -209,19 +209,20 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		);
 	}
 
-	public void NextLayoutEngine()
+	public Task NextLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine(1);
+		return UpdateLayoutEngine(1);
 	}
 
-	public void PreviousLayoutEngine()
+	public Task PreviousLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine(-1);
+		return UpdateLayoutEngine(-1);
 	}
 
-	public bool TrySetLayoutEngine(string name)
+	// TODO
+	public Task<bool> TrySetLayoutEngine(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
@@ -244,12 +245,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			if (nextIdx == -1)
 			{
 				Logger.Error($"Layout engine {name} not found for workspace {Name}");
-				return false;
+				return Task.FromResult(false);
 			}
 			else if (_activeLayoutEngineIndex == nextIdx)
 			{
 				Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
-				return true;
+				return Task.FromResult(true);
 			}
 
 			int prevIdx = _activeLayoutEngineIndex;
@@ -259,22 +260,22 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		DoLayout(
-			() =>
-				_triggers.ActiveLayoutEngineChanged(
-					new ActiveLayoutEngineChangedEventArgs()
-					{
-						Workspace = this,
-						PreviousLayoutEngine = prevLayoutEngine,
-						CurrentLayoutEngine = nextLayoutEngine
-					}
-				)
-		);
-
-		return true;
+		TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+		return DoLayout(
+				() =>
+					_triggers.ActiveLayoutEngineChanged(
+						new ActiveLayoutEngineChangedEventArgs()
+						{
+							Workspace = this,
+							PreviousLayoutEngine = prevLayoutEngine,
+							CurrentLayoutEngine = nextLayoutEngine
+						}
+					)
+			)
+			.ContinueWith(_ => true, uiScheduler);
 	}
 
-	public void AddWindow(IWindow window)
+	public Task AddWindow(IWindow window)
 	{
 		lock (_workspaceLock)
 		{
@@ -283,7 +284,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			if (_normalWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} already exists in workspace {Name}");
-				return;
+				return Task.CompletedTask;
 			}
 
 			_normalWindows.Add(window);
@@ -293,10 +294,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		DoLayout(window.Focus);
+		return DoLayout(window.Focus);
 	}
 
-	public bool RemoveWindow(IWindow window)
+	public Task<bool> RemoveWindow(IWindow window)
 	{
 		bool success;
 		lock (_workspaceLock)
@@ -312,7 +313,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			if (!isNormalWindow && !_minimizedWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} already does not exist in workspace {Name}");
-				return false;
+				return Task.FromResult(false);
 			}
 
 			success = true;
@@ -347,10 +348,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (success)
 		{
-			DoLayout();
+			TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+			return DoLayout().ContinueWith(_ => true, uiScheduler);
 		}
 
-		return success;
+		return Task.FromResult(false);
 	}
 
 	/// <summary>
@@ -397,7 +400,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
+	public Task SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
 		bool success = false;
 
@@ -416,11 +419,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (success)
 		{
-			DoLayout();
+			return DoLayout();
 		}
+		return Task.CompletedTask;
 	}
 
-	public void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
+	public Task MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
 	{
 		bool success = false;
 
@@ -440,11 +444,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		if (success)
 		{
-			DoLayout();
+			return DoLayout();
 		}
+		return Task.CompletedTask;
 	}
 
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
+	public Task MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
 		lock (_workspaceLock)
 		{
@@ -473,7 +478,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		DoLayout();
+		return DoLayout();
 	}
 
 	public override string ToString() => Name;
@@ -507,14 +512,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return location;
 	}
 
-	public void DoLayout(Action? afterLayout = null)
+	public Task DoLayout(Action? afterLayout = null)
 	{
 		Logger.Debug($"Workspace {Name}");
 
 		if (GarbageCollect())
 		{
 			Logger.Debug($"Garbage collected windows, skipping layout for workspace {Name}");
-			return;
+			return Task.CompletedTask;
 		}
 
 		// Get the monitor for this workspace
@@ -522,7 +527,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (monitor == null)
 		{
 			Logger.Debug($"No active monitors found for workspace {Name}.");
-			return;
+			return Task.CompletedTask;
 		}
 
 		Logger.Debug($"Starting layout for workspace {Name}");
@@ -545,7 +550,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		// Execute the layout task
 		TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-		Task.Run(
+		return Task.Run(
 				() => SetWindowPos(engine: ActiveLayoutEngine, monitor, _cancellationTokenSource.Token),
 				_cancellationTokenSource.Token
 			)
