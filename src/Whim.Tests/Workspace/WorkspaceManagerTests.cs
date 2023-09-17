@@ -1,8 +1,10 @@
-using Microsoft.UI.Dispatching;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using Windows.Win32.Foundation;
 using Xunit;
 
 namespace Whim.Tests;
@@ -42,7 +44,9 @@ public class WorkspaceManagerTests
 			Context.Setup(c => c.RouterManager).Returns(RouterManager.Object);
 
 			InternalContext.Setup(c => c.CoreNativeManager).Returns(CoreNativeManager.Object);
+#pragma warning disable CA2000 // Dispose objects before losing scope
 			InternalContext.Setup(c => c.LayoutLock).Returns(new ReaderWriterLockSlim());
+#pragma warning restore CA2000 // Dispose objects before losing scope
 
 			Monitors = monitors ?? new[] { new Mock<IMonitor>(), new Mock<IMonitor>() };
 			MonitorManager.Setup(m => m.Length).Returns(Monitors.Length);
@@ -71,12 +75,24 @@ public class WorkspaceManagerTests
 			Context.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager);
 
 			CoreNativeManager
-				.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
-				.Callback<Func<DispatcherQueueHandler>, CancellationToken>(
-					(task, _) =>
+				.Setup(
+					c =>
+						c.RunTask(
+							It.IsAny<Func<Dictionary<HWND, IWindowState>>>(),
+							It.IsAny<Action<Task<Dictionary<HWND, IWindowState>>>>(),
+							It.IsAny<CancellationToken>()
+						)
+				)
+				.Callback(
+					(
+						Func<Dictionary<HWND, IWindowState>> work,
+						Action<Task<Dictionary<HWND, IWindowState>>> cleanup,
+						CancellationToken cancellationToken
+					) =>
 					{
-						var result = task();
-						result.Invoke();
+						// Run the work on the current thread.
+						var result = work();
+						cleanup(Task.FromResult(result));
 					}
 				);
 		}
@@ -1124,36 +1140,6 @@ public class WorkspaceManagerTests
 
 		// Then the window is not removed from the old workspace and not added to the new workspace
 		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
-	}
-
-	[Fact]
-	public void MoveWindowToPoint_CannotRemoveWindow()
-	{
-		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(wrapper.Monitors[1].Object);
-		workspace.Setup(w => w.RemoveWindow(window.Object)).ReturnsAsync(false);
-
-		// When a window is moved to a point, but the window cannot be removed from the old workspace
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
-
-		// Then nothing happens
-		wrapper.Monitors[0].VerifyGet(m => m.WorkingArea, Times.Never());
-		wrapper.Monitors[1].VerifyGet(m => m.WorkingArea, Times.Never());
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
 		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
 	}
 

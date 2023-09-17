@@ -1,4 +1,3 @@
-using Microsoft.UI.Dispatching;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -93,7 +92,7 @@ public class WorkspaceTests
 				WorkspaceLayoutCompleted = TriggerWorkspaceLayoutCompleted.Object
 			};
 
-			Setup_ExecuteTask();
+			Setup_RunTask();
 		}
 
 		public Wrapper Setup_PassGarbageCollection()
@@ -108,15 +107,27 @@ public class WorkspaceTests
 			return this;
 		}
 
-		public Wrapper Setup_ExecuteTask()
+		public Wrapper Setup_RunTask()
 		{
 			CoreNativeManager
-				.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
-				.Callback<Func<DispatcherQueueHandler>, CancellationToken>(
-					(task, _) =>
+				.Setup(
+					c =>
+						c.RunTask(
+							It.IsAny<Func<Dictionary<HWND, IWindowState>>>(),
+							It.IsAny<Action<Task<Dictionary<HWND, IWindowState>>>>(),
+							It.IsAny<CancellationToken>()
+						)
+				)
+				.Callback(
+					(
+						Func<Dictionary<HWND, IWindowState>> work,
+						Action<Task<Dictionary<HWND, IWindowState>>> cleanup,
+						CancellationToken cancellationToken
+					) =>
 					{
-						var result = task();
-						result.Invoke();
+						// Run the work on the current thread.
+						var result = work();
+						cleanup(Task.FromResult(result));
 					}
 				);
 
@@ -286,7 +297,7 @@ public class WorkspaceTests
 		await workspace.AddWindow(window.Object);
 		wrapper.TriggerWorkspaceLayoutStarted.Invocations.Clear();
 		wrapper.TriggerWorkspaceLayoutCompleted.Invocations.Clear();
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 
 		// Then
 		wrapper.NativeManager.Verify(n => n.ShowWindowNoActivate(It.IsAny<HWND>()), Times.Never);
@@ -350,46 +361,6 @@ public class WorkspaceTests
 		// Then
 		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(workspace), Times.Never);
 		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Never);
-	}
-
-	[Fact]
-	public async void DoLayout_TakeLatestDoLayout()
-	{
-		// Given
-		Wrapper wrapper = new Wrapper().Setup_PassGarbageCollection();
-
-		Mock<IWindow> window = new();
-
-		using Workspace workspace =
-			new(
-				wrapper.Context.Object,
-				wrapper.InternalContext.Object,
-				wrapper.Triggers,
-				"Workspace",
-				new[] { wrapper.LayoutEngine.Object, new Mock<ILayoutEngine>().Object }
-			);
-
-		wrapper.CoreNativeManager
-			.Setup(c => c.ExecuteTask(It.IsAny<Func<DispatcherQueueHandler>>(), It.IsAny<CancellationToken>()))
-			.Returns(() =>
-			{
-				TaskCompletionSource<object> tcs = new();
-				return tcs.Task;
-			});
-
-		// When
-		await workspace.AddWindow(window.Object);
-		wrapper.TriggerWorkspaceLayoutStarted.Invocations.Clear();
-		wrapper.TriggerWorkspaceLayoutCompleted.Invocations.Clear();
-		await workspace.DoLayout();
-		wrapper.Setup_ExecuteTask();
-		await workspace.DoLayout();
-
-		// Then
-		wrapper.NativeManager.Verify(n => n.ShowWindowNoActivate(It.IsAny<HWND>()), Times.Never);
-		window.Verify(w => w.ShowMinimized(), Times.Never);
-		wrapper.TriggerWorkspaceLayoutStarted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Exactly(2));
-		wrapper.TriggerWorkspaceLayoutCompleted.Verify(e => e.Invoke(It.IsAny<WorkspaceEventArgs>()), Times.Once);
 	}
 	#endregion
 
@@ -456,7 +427,7 @@ public class WorkspaceTests
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
 			);
 		await workspace.AddWindow(window.Object);
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 
 		// When
 		bool result = workspace.ContainsWindow(window.Object);
@@ -792,7 +763,7 @@ public class WorkspaceTests
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
 			);
 		await workspace.AddWindow(window.Object);
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 
 		wrapper.WorkspaceManager.Invocations.Clear();
 		wrapper.LayoutEngine.Invocations.Clear();
@@ -844,7 +815,7 @@ public class WorkspaceTests
 			);
 
 		await workspace.AddWindow(window.Object);
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 
 		// When FocusWindowInDirection is called
 		workspace.FocusWindowInDirection(Direction.Up, window.Object);
@@ -1068,7 +1039,7 @@ public class WorkspaceTests
 		wrapper.LayoutEngine.Setup(l => l.MoveWindowToPoint(window.Object, point)).Returns(resultingEngine.Object);
 
 		await workspace.AddWindow(window.Object);
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 
 		wrapper.LayoutEngine.Invocations.Clear();
 
@@ -1222,7 +1193,7 @@ public class WorkspaceTests
 
 		// When
 		await workspace.AddWindow(window.Object);
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 		IWindowState windowState = workspace.TryGetWindowLocation(window.Object)!;
 
 		// Then
@@ -1277,7 +1248,7 @@ public class WorkspaceTests
 		await workspace.AddWindow(window.Object);
 
 		// When WindowMinimizeStart is called
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 
 		// Then
 		wrapper.LayoutEngine.Verify(e => e.RemoveWindow(window.Object), Times.Once);
@@ -1300,8 +1271,8 @@ public class WorkspaceTests
 		await workspace.AddWindow(window.Object);
 
 		// When WindowMinimizeStart is called
-		workspace.WindowMinimizeStart(window.Object);
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 
 		// Then the window is only removed the first time
 		wrapper.LayoutEngine.Verify(e => e.RemoveWindow(window.Object), Times.Once);
@@ -1322,11 +1293,11 @@ public class WorkspaceTests
 				new ILayoutEngine[] { wrapper.LayoutEngine.Object }
 			);
 		await workspace.AddWindow(window.Object);
-		workspace.WindowMinimizeStart(window.Object);
+		await workspace.WindowMinimizeStart(window.Object);
 		wrapper.LayoutEngine.Invocations.Clear();
 
 		// When WindowMinimizeEnd is called
-		workspace.WindowMinimizeEnd(window.Object);
+		await workspace.WindowMinimizeEnd(window.Object);
 
 		// Then
 		wrapper.LayoutEngine.Verify(e => e.AddWindow(window.Object), Times.Once);
@@ -1350,7 +1321,7 @@ public class WorkspaceTests
 		wrapper.LayoutEngine.Invocations.Clear();
 
 		// When WindowMinimizeEnd is called
-		workspace.WindowMinimizeEnd(window.Object);
+		await workspace.WindowMinimizeEnd(window.Object);
 
 		// Then
 		wrapper.LayoutEngine.Verify(e => e.AddWindow(window.Object), Times.Never);

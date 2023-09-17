@@ -139,14 +139,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void WindowMinimizeStart(IWindow window)
+	public Task WindowMinimizeStart(IWindow window)
 	{
 		lock (_workspaceLock)
 		{
 			if (!_normalWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} is not a normal window in workspace {Name}");
-				return;
+				return Task.CompletedTask;
 			}
 
 			_normalWindows.Remove(window);
@@ -158,22 +158,24 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		DoLayout();
+		return DoLayout();
 	}
 
-	public void WindowMinimizeEnd(IWindow window)
+	public Task WindowMinimizeEnd(IWindow window)
 	{
+		Task result;
 		lock (_workspaceLock)
 		{
 			if (!_minimizedWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
-				return;
+				return Task.CompletedTask;
 			}
 
 			_minimizedWindows.Remove(window);
-			AddWindow(window);
+			result = AddWindow(window);
 		}
+		return result;
 	}
 
 	public void FocusFirstWindow()
@@ -549,36 +551,32 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		// Execute the layout task
-		TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-		return Task.Run(
-				() => SetWindowPos(engine: ActiveLayoutEngine, monitor, _cancellationTokenSource.Token),
-				_cancellationTokenSource.Token
-			)
-			.ContinueWith(
-				t =>
+		return _internalContext.CoreNativeManager.RunTask(
+			() => SetWindowPos(engine: ActiveLayoutEngine, monitor, _cancellationTokenSource.Token),
+			t =>
+			{
+				// Remove the completed task from the queue
+				_layoutQueue.TryDequeue(out (ILayoutEngine layoutEngine, IMonitor monitor) _);
+
+				// If there are no more tasks in the queue, dispose the cancellation token source
+				lock (_layoutLock)
 				{
-					// Remove the completed task from the queue
-					_layoutQueue.TryDequeue(out (ILayoutEngine layoutEngine, IMonitor monitor) _);
-
-					// If there are no more tasks in the queue, dispose the cancellation token source
-					lock (_layoutLock)
+					if (_layoutQueue.IsEmpty)
 					{
-						if (_layoutQueue.IsEmpty)
-						{
-							_cancellationTokenSource?.Dispose();
-							_cancellationTokenSource = null;
-						}
-
-						// Add the window locations to the map
-						_windowLocations = t.Result;
+						_cancellationTokenSource?.Dispose();
+						_cancellationTokenSource = null;
 					}
 
-					// Trigger the layout completed event
-					afterLayout?.Invoke();
-					_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
-				},
-				uiScheduler
-			);
+					// Add the window locations to the map
+					_windowLocations = t.Result;
+				}
+
+				// Trigger the layout completed event
+				afterLayout?.Invoke();
+				_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+			},
+			_cancellationTokenSource.Token
+		);
 	}
 
 	private Dictionary<HWND, IWindowState> SetWindowPos(
@@ -601,6 +599,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		WindowDeferPosHandle handle = new(_context, windowStates, cancellationToken);
 		handle.Dispose();
+
+		foreach (IWindow window in _minimizedWindows)
+		{
+			window.ShowMinimized();
+		}
 
 		_internalContext.LayoutLock.ExitReadLock();
 		return windowLocations;

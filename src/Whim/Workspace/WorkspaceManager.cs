@@ -711,13 +711,13 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		Logger.Debug(
 			$"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor} at normalized point {normalized}"
 		);
-		targetWorkspace.MoveWindowToPoint(window, normalized);
 
 		// If the window is being moved to a different workspace, remove it from the current workspace.
 		if (!isSameWorkspace)
 		{
-			_windowWorkspaceMap[window] = targetWorkspace;
+			oldWorkspace.RemoveWindow(window);
 		}
+		targetWorkspace.MoveWindowToPoint(window, normalized);
 
 		// Trigger layouts.
 		window.Focus();
