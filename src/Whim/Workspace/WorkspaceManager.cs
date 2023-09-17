@@ -448,7 +448,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 
 		_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceFocused);
-
 		if (workspaceFocused != null && !workspaceFocused.Equals(ActiveWorkspace))
 		{
 			Activate(workspaceFocused);

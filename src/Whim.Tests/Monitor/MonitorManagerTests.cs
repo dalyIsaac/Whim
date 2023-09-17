@@ -60,7 +60,7 @@ public class MonitorManagerTests
 			InternalContext.SetupGet(x => x.CoreNativeManager).Returns(CoreNativeManager.Object);
 			InternalContext.SetupGet(x => x.MouseHook).Returns(MouseHook.Object);
 			InternalContext.SetupGet(x => x.WindowMessageMonitor).Returns(WindowMessageMonitor.Object);
-			InternalContext.SetupGet(x => x.LayoutLock).Returns(new ReaderWriterLockSlim());
+			InternalContext.Setup(c => c.LayoutLock).Returns(new ReaderWriterLockSlim());
 		}
 
 		[MemberNotNull(nameof(_monitorRects))]

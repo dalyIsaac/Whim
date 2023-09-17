@@ -1,6 +1,7 @@
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Xunit;
 
 namespace Whim.Tests;
 
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Unnecessary for tests")]
 public class WorkspaceManagerTests
 {
 	private class WorkspaceManagerTestWrapper : WorkspaceManager
@@ -44,9 +46,7 @@ public class WorkspaceManagerTests
 			Context.Setup(c => c.RouterManager).Returns(RouterManager.Object);
 
 			InternalContext.Setup(c => c.CoreNativeManager).Returns(CoreNativeManager.Object);
-#pragma warning disable CA2000 // Dispose objects before losing scope
 			InternalContext.Setup(c => c.LayoutLock).Returns(new ReaderWriterLockSlim());
-#pragma warning restore CA2000 // Dispose objects before losing scope
 
 			Monitors = monitors ?? new[] { new Mock<IMonitor>(), new Mock<IMonitor>() };
 			MonitorManager.Setup(m => m.Length).Returns(Monitors.Length);

@@ -140,7 +140,6 @@ public sealed class WindowDeferPosHandle : IDisposable
 			{
 				hdwp = DeferWindowPos(hdwp, windowState, hwndInsertAfter, flags, toMinimize, toMaximize, toNormal);
 			}
-
 			EndDeferWindowPos(hdwp, toMinimize, toMaximize, toNormal);
 
 			// Reset the window states.
