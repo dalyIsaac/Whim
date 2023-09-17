@@ -348,7 +348,7 @@ public class WorkspaceManagerTests
 		Wrapper wrapper = new(new[] { workspace, workspace2 });
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(new[] { workspace.Object, workspace2.Object }, wrapper.WorkspaceManager);
+		Assert.Equal(new[] { workspace.Object, workspace2.Object }, (IEnumerable<IWorkspace>?)wrapper.WorkspaceManager);
 	}
 	#endregion
 
