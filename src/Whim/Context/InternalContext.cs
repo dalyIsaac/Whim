@@ -1,3 +1,5 @@
+using System.Threading;
+
 namespace Whim;
 
 internal class InternalContext : IInternalContext
@@ -11,6 +13,8 @@ internal class InternalContext : IInternalContext
 	public IKeybindHook KeybindHook { get; }
 
 	public IMouseHook MouseHook { get; }
+
+	public ReaderWriterLockSlim LayoutLock { get; } = new();
 
 	public InternalContext(IContext context)
 	{

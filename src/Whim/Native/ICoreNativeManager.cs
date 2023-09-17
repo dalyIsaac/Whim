@@ -490,12 +490,21 @@ internal interface ICoreNativeManager
 	bool TryEnqueue(DispatcherQueueHandler callback);
 
 	/// <summary>
-	/// Executes the given <paramref name="task" />, and runs the returned <see cref="DispatcherQueueHandler" />
-	/// after the <paramref name="task" /> completes on the thread associated with the <see cref="DispatcherQueue" />.
+	/// Queues the specified work to run on the thread pool and returns a <see cref="Task{TResult}"/> object that
+	/// represents that work.
+	///
+	/// The cleanup callback is called on the UI thread when the task completes.
 	/// </summary>
-	/// <param name="task"></param>
-	/// <param name="cancellationToken"></param>
-	Task ExecuteTask(Func<DispatcherQueueHandler> task, CancellationToken cancellationToken);
+	/// <typeparam name="TWorkResult">Specifies the type of the result returned by the work callback.</typeparam>
+	/// <param name="work">The work to execute asynchronously.</param>
+	/// <param name="cleanup">The cleanup callback to execute when the task completes.</param>
+	/// <param name="cancellationToken">A cancellation token that can be used to cancel the work.</param>
+	/// <returns>A <see cref="Task{TResult}"/> object that represents the work queued to execute in the thread pool.</returns>
+	Task RunTask<TWorkResult>(
+		Func<TWorkResult> work,
+		Action<Task<TWorkResult>> cleanup,
+		CancellationToken cancellationToken
+	);
 
 	/// <summary>
 	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.
