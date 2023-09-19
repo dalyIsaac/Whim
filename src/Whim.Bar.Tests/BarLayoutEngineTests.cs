@@ -1,24 +1,10 @@
-using AutoFixture.AutoNSubstitute;
-using AutoFixture;
 using AutoFixture.Xunit2;
 using FluentAssertions;
 using NSubstitute;
 using Xunit;
+using Whim.TestUtils;
 
 namespace Whim.Bar.Tests;
-
-// TODO: Move to utils.
-public class AutoSubstituteDataAttribute : AutoDataAttribute
-{
-	public AutoSubstituteDataAttribute()
-		: base(() => new Fixture().Customize(new AutoNSubstituteCustomization())) { }
-}
-
-public class InlineAutoSubstituteDataAttribute : InlineAutoDataAttribute
-{
-	public InlineAutoSubstituteDataAttribute(params object[] arguments)
-		: base(new AutoSubstituteDataAttribute(), arguments) { }
-}
 
 public class BarLayoutEngineTests
 {

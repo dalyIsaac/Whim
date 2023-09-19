@@ -289,7 +289,7 @@ public class WorkspaceWidgetViewModelTests
 		"NS5000:Received check.",
 		Justification = "The analyzer is wrong"
 	)]
-	public void Dispose(IContext context, IMonitor monitor, IWorkspace workspace)
+	public void Dispose(IContext context, IMonitor monitor)
 	{
 		// Given
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);

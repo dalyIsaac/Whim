@@ -3,6 +3,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
@@ -685,7 +686,7 @@ public class WindowManagerTests
 		windowManager.Initialize();
 
 		// Then
-		TestUtils.Assert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -708,7 +709,7 @@ public class WindowManagerTests
 		wrapper.Trigger_MouseLeftButtonDown().Trigger_MouseLeftButtonUp();
 
 		// Then
-		TestUtils.Assert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)

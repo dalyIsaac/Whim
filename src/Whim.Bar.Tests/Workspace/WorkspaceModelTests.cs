@@ -1,3 +1,4 @@
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Bar.Tests;
