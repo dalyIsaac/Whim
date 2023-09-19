@@ -1,4 +1,5 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Bar.Tests;
@@ -6,25 +7,13 @@ namespace Whim.Bar.Tests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ActiveLayoutWidgetViewModelTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
+	private static ActiveLayoutWidgetViewModel CreateSut(IContext context, IMonitor monitor) => new(context, monitor);
 
-		public Wrapper()
-		{
-			Context.SetupGet(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
-		}
-	}
-
-	[Fact]
-	public void WorkspaceManager_ActiveLayoutEngineChanged()
+	[Theory, AutoSubstituteData]
+	public void WorkspaceManager_ActiveLayoutEngineChanged(IContext context, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		ActiveLayoutWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		// When
 		// Then
@@ -32,24 +21,25 @@ public class ActiveLayoutWidgetViewModelTests
 			viewModel,
 			nameof(viewModel.ActiveLayoutEngine),
 			() =>
-				wrapper.WorkspaceManager.Raise(
-					wm => wm.ActiveLayoutEngineChanged += null,
+				context.WorkspaceManager.ActiveLayoutEngineChanged += Raise.Event<
+					EventHandler<ActiveLayoutEngineChangedEventArgs>
+				>(
+					context.WorkspaceManager,
 					new ActiveLayoutEngineChangedEventArgs()
 					{
-						Workspace = wrapper.Workspace.Object,
-						PreviousLayoutEngine = wrapper.Workspace.Object.ActiveLayoutEngine,
-						CurrentLayoutEngine = wrapper.Workspace.Object.ActiveLayoutEngine
+						Workspace = workspace,
+						PreviousLayoutEngine = workspace.ActiveLayoutEngine,
+						CurrentLayoutEngine = workspace.ActiveLayoutEngine
 					}
 				)
 		);
 	}
 
-	[Fact]
-	public void WorkspaceManager_MonitorWorkspaceChanged()
+	[Theory, AutoSubstituteData]
+	public void WorkspaceManager_MonitorWorkspaceChanged(IContext context, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		ActiveLayoutWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		// When
 		// Then
@@ -57,89 +47,35 @@ public class ActiveLayoutWidgetViewModelTests
 			viewModel,
 			nameof(viewModel.ActiveLayoutEngine),
 			() =>
-				wrapper.WorkspaceManager.Raise(
-					wm => wm.MonitorWorkspaceChanged += null,
-					new MonitorWorkspaceChangedEventArgs()
-					{
-						Monitor = wrapper.Monitor.Object,
-						CurrentWorkspace = wrapper.Workspace.Object
-					}
+				context.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<
+					EventHandler<MonitorWorkspaceChangedEventArgs>
+				>(
+					context.WorkspaceManager,
+					new MonitorWorkspaceChangedEventArgs() { Monitor = monitor, CurrentWorkspace = workspace }
 				)
 		);
 	}
 
-	[Fact]
-	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitorButEquals()
+	[Theory, AutoSubstituteData]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage(
+		"Usage",
+		"NS5000:Received check.",
+		Justification = "The analyzer is wrong"
+	)]
+	public void Dispose(IContext context, IMonitor monitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.Equals(wrapper.Monitor.Object)).Returns(true);
-		wrapper.Monitor.Setup(m => m.Equals(monitor.Object)).Returns(true);
-
-		// When
-		// Then
-		Assert.PropertyChanged(
-			viewModel,
-			nameof(viewModel.ActiveLayoutEngine),
-			() =>
-				wrapper.WorkspaceManager.Raise(
-					wm => wm.MonitorWorkspaceChanged += null,
-					new MonitorWorkspaceChangedEventArgs()
-					{
-						Monitor = monitor.Object,
-						CurrentWorkspace = wrapper.Workspace.Object
-					}
-				)
-		);
-	}
-
-	[Fact]
-	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor()
-	{
-		// Given
-		Wrapper wrapper = new();
-		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.Equals(wrapper.Monitor.Object)).Returns(false);
-		wrapper.Monitor.Setup(m => m.Equals(monitor.Object)).Returns(false);
-
-		// When
-		// Then
-		TestUtils.Assert.PropertyNotChanged(
-			viewModel,
-			nameof(viewModel.ActiveLayoutEngine),
-			() =>
-				wrapper.WorkspaceManager.Raise(
-					wm => wm.MonitorWorkspaceChanged += null,
-					new MonitorWorkspaceChangedEventArgs()
-					{
-						Monitor = monitor.Object,
-						CurrentWorkspace = wrapper.Workspace.Object
-					}
-				)
-		);
-	}
-
-	[Fact]
-	public void Dispose()
-	{
-		// Given
-		Wrapper wrapper = new();
-		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		ActiveLayoutWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		// When
 		viewModel.Dispose();
 
 		// Then
-		wrapper.WorkspaceManager.VerifyRemove(
-			wm => wm.ActiveLayoutEngineChanged -= It.IsAny<EventHandler<ActiveLayoutEngineChangedEventArgs>>(),
-			Times.Once
-		);
-		wrapper.WorkspaceManager.VerifyRemove(
-			wm => wm.MonitorWorkspaceChanged -= It.IsAny<EventHandler<MonitorWorkspaceChangedEventArgs>>(),
-			Times.Once
-		);
+		context.WorkspaceManager.Received(1).ActiveLayoutEngineChanged -= Arg.Any<
+			EventHandler<ActiveLayoutEngineChangedEventArgs>
+		>();
+		context.WorkspaceManager.Received(1).MonitorWorkspaceChanged -= Arg.Any<
+			EventHandler<MonitorWorkspaceChangedEventArgs>
+		>();
 	}
 }

@@ -1,61 +1,58 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Bar.Tests;
 
 public class FocusedWindowWidgetTests
 {
-	[Fact]
-	public void GetTitle()
+	[Theory, AutoSubstituteData]
+	public void GetTitle(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("FocusedWindowWidget.test.xaml.cs - Whim - Visual Studio Code");
+		window.Title.Returns("FocusedWindowWidget.test.xaml.cs - Whim - Visual Studio Code");
 
 		// When
-		string title = FocusedWindowWidget.GetTitle(window.Object);
+		string title = FocusedWindowWidget.GetTitle(window);
 
 		// Then
 		Assert.Equal("FocusedWindowWidget.test.xaml.cs - Whim - Visual Studio Code", title);
 	}
 
-	[Fact]
-	public void GetShortTitle()
+	[Theory, AutoSubstituteData]
+	public void GetShortTitle(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("FocusedWindowWidget.test.xaml.cs - Whim - Visual Studio Code");
+		window.Title.Returns("FocusedWindowWidget.test.xaml.cs - Whim - Visual Studio Code");
 
 		// When
-		string title = FocusedWindowWidget.GetShortTitle(window.Object);
+		string title = FocusedWindowWidget.GetShortTitle(window);
 
 		// Then
 		Assert.Equal("FocusedWindowWidget.test.xaml.cs", title);
 	}
 
-	[Fact]
-	public void GetShortTitle_NoParts()
+	[Theory, AutoSubstituteData]
+	public void GetShortTitle_NoParts(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("");
+		window.Title.Returns("");
 
 		// When
-		string title = FocusedWindowWidget.GetShortTitle(window.Object);
+		string title = FocusedWindowWidget.GetShortTitle(window);
 
 		// Then
 		Assert.Equal("", title);
 	}
 
-	[Fact]
-	public void GetProcessName()
+	[Theory, AutoSubstituteData]
+	public void GetProcessName(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.ProcessName).Returns("code");
+		window.ProcessName.Returns("code");
 
 		// When
-		string processName = FocusedWindowWidget.GetProcessName(window.Object);
+		string processName = FocusedWindowWidget.GetProcessName(window);
 
 		// Then
 		Assert.Equal("code", processName);

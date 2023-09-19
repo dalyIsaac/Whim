@@ -1,4 +1,5 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Bar.Tests;
@@ -6,36 +7,18 @@ namespace Whim.Bar.Tests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FocusedWindowWidgetViewModelTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWindowManager> WindowManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
+	private static FocusedWindowWidgetViewModel CreateSut(IContext context, IMonitor monitor) =>
+		new(context, monitor, FocusedWindowWidget.GetTitle);
 
-		public Wrapper()
-		{
-			Context.SetupGet(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
-			Context.SetupGet(c => c.WindowManager).Returns(WindowManager.Object);
-			WorkspaceManager
-				.Setup(wm => wm.GetEnumerator())
-				.Returns(new List<IWorkspace> { Workspace.Object }.GetEnumerator());
-		}
-	}
-
-	[Fact]
-	public void Title_SameMonitor()
+	[Theory, AutoSubstituteData]
+	public void Title_SameMonitor(IContext context, IMonitor monitor, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FocusedWindowWidgetViewModel viewModel =
-			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("title");
+		window.Title.Returns("title");
 
-		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(wrapper.Monitor.Object);
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(
@@ -43,9 +26,9 @@ public class FocusedWindowWidgetViewModelTests
 			nameof(viewModel.Title),
 			() =>
 			{
-				wrapper.WindowManager.Raise(
-					wm => wm.WindowFocused += null,
-					new WindowFocusedEventArgs() { Window = window.Object }
+				context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+					context.WindowManager,
+					new WindowFocusedEventArgs() { Window = window }
 				);
 			}
 		);
@@ -54,38 +37,30 @@ public class FocusedWindowWidgetViewModelTests
 		Assert.Equal("title", viewModel.Title);
 	}
 
-	[Fact]
-	public void Title_DifferentMonitor()
+	[Theory, AutoSubstituteData]
+	public void Title_DifferentMonitor(IContext context, IMonitor monitor, IWindow window, IWindow otherWindow)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FocusedWindowWidgetViewModel viewModel =
-			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("title");
+		window.Title.Returns("title");
+		otherWindow.Title.Returns("other title");
 
-		Mock<IWindow> otherWindow = new();
-		otherWindow.SetupGet(w => w.Title).Returns("other title");
-
-		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(wrapper.Monitor.Object);
-		wrapper.WorkspaceManager
-			.Setup(wm => wm.GetMonitorForWindow(otherWindow.Object))
-			.Returns(new Mock<IMonitor>().Object);
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
-		wrapper.WindowManager.Raise(
-			wm => wm.WindowFocused += null,
-			new WindowFocusedEventArgs() { Window = window.Object }
+		context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+			context.WindowManager,
+			new WindowFocusedEventArgs() { Window = window }
 		);
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
 			() =>
 			{
-				wrapper.WindowManager.Raise(
-					wm => wm.WindowFocused += null,
-					new WindowFocusedEventArgs() { Window = otherWindow.Object }
+				context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+					context.WindowManager,
+					new WindowFocusedEventArgs() { Window = otherWindow }
 				);
 			}
 		);
@@ -94,43 +69,42 @@ public class FocusedWindowWidgetViewModelTests
 		Assert.Null(viewModel.Title);
 	}
 
-	[Fact]
-	public void Dispose()
+	[Theory, AutoSubstituteData]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage(
+		"Usage",
+		"NS5000:Received check.",
+		Justification = "The analyzer is wrong"
+	)]
+	public void Dispose(IContext context, IMonitor monitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FocusedWindowWidgetViewModel viewModel =
-			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		// When
 		viewModel.Dispose();
 
 		// Then
-		wrapper.WindowManager.VerifyRemove(wm => wm.WindowFocused -= It.IsAny<EventHandler<WindowFocusedEventArgs>>());
+		context.WindowManager.Received(1).WindowFocused -= Arg.Any<EventHandler<WindowFocusedEventArgs>>();
 	}
 
 	#region WindowManager_WindowFocused
-	[Fact]
-	public void WindowManager_WindowFocused_SameMonitor()
+	[Theory, AutoSubstituteData]
+	public void WindowManager_WindowFocused_SameMonitor(IContext context, IMonitor monitor, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FocusedWindowWidgetViewModel viewModel =
-			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("title");
-
-		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(wrapper.Monitor.Object);
+		window.Title.Returns("title");
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
 			() =>
-				wrapper.WindowManager.Raise(
-					wm => wm.WindowFocused += null,
-					new WindowFocusedEventArgs() { Window = window.Object }
+				context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+					context.WindowManager,
+					new WindowFocusedEventArgs() { Window = window }
 				)
 		);
 
@@ -138,73 +112,34 @@ public class FocusedWindowWidgetViewModelTests
 		Assert.Equal("title", viewModel.Title);
 	}
 
-	[Fact]
-	public void WindowManager_WindowFocused_DifferentMonitorButEqual()
+	[Theory, AutoSubstituteData]
+	public void WindowManager_WindowFocused_DifferentMonitor(
+		IContext context,
+		IMonitor monitor,
+		IWindow window,
+		IWindow otherWindow
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FocusedWindowWidgetViewModel viewModel =
-			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("title");
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.Equals(wrapper.Monitor.Object)).Returns(true);
-		wrapper.Monitor.Setup(m => m.Equals(monitor.Object)).Returns(true);
-
-		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(monitor.Object);
+		window.Title.Returns("title");
+		otherWindow.Title.Returns("other title");
 
 		// When
-		Assert.PropertyChanged(
-			viewModel,
-			nameof(viewModel.Title),
-			() =>
-				wrapper.WindowManager.Raise(
-					wm => wm.WindowFocused += null,
-					new WindowFocusedEventArgs() { Window = window.Object }
-				)
-		);
-
-		// Then
-		Assert.Equal("title", viewModel.Title);
-	}
-
-	[Fact]
-	public void WindowManager_WindowFocused_DifferentMonitor()
-	{
-		// Given
-		Wrapper wrapper = new();
-		FocusedWindowWidgetViewModel viewModel =
-			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
-
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("title");
-
-		Mock<IWindow> otherWindow = new();
-		otherWindow.SetupGet(w => w.Title).Returns("other title");
-
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.Equals(wrapper.Monitor.Object)).Returns(true);
-		wrapper.Monitor.Setup(m => m.Equals(monitor.Object)).Returns(true);
-
-		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(monitor.Object);
-		wrapper.WorkspaceManager
-			.Setup(wm => wm.GetMonitorForWindow(otherWindow.Object))
-			.Returns(new Mock<IMonitor>().Object);
-
-		// When
-		wrapper.WindowManager.Raise(
-			wm => wm.WindowFocused += null,
-			new WindowFocusedEventArgs() { Window = window.Object }
+		context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+			context.WindowManager,
+			new WindowFocusedEventArgs() { Window = window }
 		);
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
 			() =>
-				wrapper.WindowManager.Raise(
-					wm => wm.WindowFocused += null,
-					new WindowFocusedEventArgs() { Window = otherWindow.Object }
+				context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+					context.WindowManager,
+					new WindowFocusedEventArgs() { Window = otherWindow }
 				)
 		);
 
@@ -212,27 +147,23 @@ public class FocusedWindowWidgetViewModelTests
 		Assert.Null(viewModel.Title);
 	}
 
-	[Fact]
-	public void WindowManager_WindowFocused_WindowIsNull()
+	[Theory, AutoSubstituteData]
+	public void WindowManager_WindowFocused_WindowIsNull(IContext context, IMonitor monitor, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FocusedWindowWidgetViewModel viewModel =
-			new(wrapper.Context.Object, wrapper.Monitor.Object, FocusedWindowWidget.GetTitle);
+		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
-		Mock<IWindow> window = new();
-		window.SetupGet(w => w.Title).Returns("title");
-
-		wrapper.WorkspaceManager.Setup(wm => wm.GetMonitorForWindow(window.Object)).Returns(wrapper.Monitor.Object);
+		window.Title.Returns("title");
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
 			() =>
-				wrapper.WindowManager.Raise(
-					wm => wm.WindowFocused += null,
-					new WindowFocusedEventArgs() { Window = window.Object }
+				context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+					context.WindowManager,
+					new WindowFocusedEventArgs() { Window = window }
 				)
 		);
 
@@ -242,8 +173,8 @@ public class FocusedWindowWidgetViewModelTests
 			viewModel,
 			nameof(viewModel.Title),
 			() =>
-				wrapper.WindowManager.Raise(
-					wm => wm.WindowFocused += null,
+				context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+					context.WindowManager,
 					new WindowFocusedEventArgs() { Window = null }
 				)
 		);

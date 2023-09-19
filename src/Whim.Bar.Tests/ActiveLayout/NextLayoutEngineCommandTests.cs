@@ -1,4 +1,5 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Bar.Tests;
@@ -6,43 +7,29 @@ namespace Whim.Bar.Tests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class NextLayoutEngineCommandTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
+	private static ActiveLayoutWidgetViewModel CreateSut(IContext context, IMonitor monitor) => new(context, monitor);
 
-		public Wrapper()
-		{
-			Context.SetupGet(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
-			WorkspaceManager.Setup(wm => wm.GetWorkspaceForMonitor(It.IsAny<IMonitor>())).Returns(Workspace.Object);
-		}
-	}
-
-	[Fact]
-	public void Execute()
+	[Theory, AutoSubstituteData]
+	public void Execute(IContext context, IMonitor monitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
-		NextLayoutEngineCommand command = new(wrapper.Context.Object, viewModel);
+		ActiveLayoutWidgetViewModel viewModel = CreateSut(context, monitor);
+		NextLayoutEngineCommand command = new(context, viewModel);
 
 		// When
 		command.Execute(null);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
-		wrapper.Workspace.Verify(w => w.NextLayoutEngine(), Times.Once);
+		context.WorkspaceManager.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		context.WorkspaceManager.GetWorkspaceForMonitor(monitor)!.Received(1).NextLayoutEngine();
 	}
 
-	[Fact]
-	public void CanExecute()
+	[Theory, AutoSubstituteData]
+	public void CanExecute(IContext context, IMonitor monitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ActiveLayoutWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
-		NextLayoutEngineCommand command = new(wrapper.Context.Object, viewModel);
+		ActiveLayoutWidgetViewModel viewModel = CreateSut(context, monitor);
+		NextLayoutEngineCommand command = new(context, viewModel);
 
 		// When
 		bool canExecute = command.CanExecute(null);

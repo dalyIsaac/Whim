@@ -1,4 +1,5 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Bar.Tests;
@@ -6,90 +7,75 @@ namespace Whim.Bar.Tests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class SwitchWorkspaceCommandTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
-		public WorkspaceWidgetViewModel ViewModel { get; }
-		public WorkspaceModel Model { get; }
+	private static SwitchWorkspaceCommand CreateSut(
+		IContext context,
+		WorkspaceWidgetViewModel viewModel,
+		WorkspaceModel workspaceModel
+	) => new(context, viewModel, workspaceModel);
 
-		public Wrapper()
-		{
-			Context.SetupGet(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
-			WorkspaceManager
-				.Setup(wm => wm.GetEnumerator())
-				.Returns(new List<IWorkspace> { Workspace.Object }.GetEnumerator());
-			ViewModel = new WorkspaceWidgetViewModel(Context.Object, Monitor.Object);
-			Model = new WorkspaceModel(Context.Object, ViewModel, Workspace.Object, true);
-		}
-	}
-
-	[Fact]
-	public void Workspace_PropertyChanged()
+	[Theory, AutoSubstituteData]
+	internal void Workspace_PropertyChanged(
+		IContext context,
+		WorkspaceWidgetViewModel viewModel,
+		WorkspaceModel workspaceModel
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		SwitchWorkspaceCommand command = new(wrapper.Context.Object, wrapper.ViewModel, wrapper.Model);
+		SwitchWorkspaceCommand command = CreateSut(context, viewModel, workspaceModel);
 
 		// When
 		// Then
 		Assert.Raises<EventArgs>(
 			h => command.CanExecuteChanged += new EventHandler(h),
 			h => command.CanExecuteChanged -= new EventHandler(h),
-			() => wrapper.Model.ActiveOnMonitor = true
+			() => workspaceModel.ActiveOnMonitor = true
 		);
 	}
 
-	[Fact]
-	public void Execute_InvalidObject()
+	[Theory, AutoSubstituteData]
+	internal void Execute_InvalidObject(
+		IContext context,
+		WorkspaceWidgetViewModel viewModel,
+		WorkspaceModel workspaceModel
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		SwitchWorkspaceCommand command = new(wrapper.Context.Object, wrapper.ViewModel, wrapper.Model);
+		SwitchWorkspaceCommand command = CreateSut(context, viewModel, workspaceModel);
 
 		// When
 		command.Execute(null);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(
-			wm => wm.Activate(wrapper.Workspace.Object, wrapper.ViewModel.Monitor),
-			Times.Never
-		);
+		context.WorkspaceManager.Received(0).Activate(workspaceModel.Workspace, viewModel.Monitor);
 	}
 
-	[Fact]
-	public void Execute_ValidObject()
+	[Theory, AutoSubstituteData]
+	internal void Execute_ValidObject(
+		IContext context,
+		WorkspaceWidgetViewModel viewModel,
+		WorkspaceModel workspaceModel
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		SwitchWorkspaceCommand command = new(wrapper.Context.Object, wrapper.ViewModel, wrapper.Model);
+		SwitchWorkspaceCommand command = CreateSut(context, viewModel, workspaceModel);
 
 		// When
-		command.Execute(wrapper.Model);
+		command.Execute(workspaceModel);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(
-			wm => wm.Activate(wrapper.Workspace.Object, wrapper.ViewModel.Monitor),
-			Times.Once
-		);
+		context.WorkspaceManager.Received(1).Activate(workspaceModel.Workspace, viewModel.Monitor);
 	}
 
-	[Fact]
-	public void Dispose()
+	[Theory, AutoSubstituteData]
+	internal void Dispose(IContext context, WorkspaceWidgetViewModel viewModel, WorkspaceModel workspaceModel)
 	{
 		// Given
-		Wrapper wrapper = new();
-		SwitchWorkspaceCommand command = new(wrapper.Context.Object, wrapper.ViewModel, wrapper.Model);
+		SwitchWorkspaceCommand command = CreateSut(context, viewModel, workspaceModel);
 
 		// When
 		command.Dispose();
 
 		// Then
-		wrapper.WorkspaceManager.Verify(
-			wm => wm.Activate(wrapper.Workspace.Object, wrapper.ViewModel.Monitor),
-			Times.Never
-		);
+		context.WorkspaceManager.Received(0).Activate(workspaceModel.Workspace, viewModel.Monitor);
 	}
 }
