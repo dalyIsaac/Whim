@@ -54,37 +54,4 @@ public static class CustomAssert
 			throw new DoesNotRaiseException(typeof(T));
 		}
 	}
-
-	/// <summary>
-	/// Asserts that a property changed event is not raised for a property.
-	/// </summary>
-	/// <param name="item"></param>
-	/// <param name="propertyName"></param>
-	/// <param name="action"></param>
-	/// <exception cref="DoesNotRaiseException"></exception>
-	public static void PropertyNotChanged(INotifyPropertyChanged item, string propertyName, Action action)
-	{
-		bool raised = false;
-		void handler(object? sender, PropertyChangedEventArgs e)
-		{
-			if (e.PropertyName == propertyName)
-			{
-				raised = true;
-			}
-		}
-		item.PropertyChanged += handler;
-		try
-		{
-			action();
-		}
-		finally
-		{
-			item.PropertyChanged -= handler;
-		}
-
-		if (raised)
-		{
-			throw new DoesNotRaiseException(typeof(PropertyChangedEventArgs));
-		}
-	}
 }
