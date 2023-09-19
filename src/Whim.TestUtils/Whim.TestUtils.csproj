@@ -28,6 +28,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AutoFixture" />
+		<PackageReference Include="AutoFixture.AutoNSubstitute" />
+		<PackageReference Include="AutoFixture.Xunit2" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
 		<PackageReference Include="Moq" />
 		<PackageReference Include="xunit" />

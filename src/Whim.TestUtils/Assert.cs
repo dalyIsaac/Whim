@@ -22,7 +22,7 @@ public class DoesNotRaiseException : XunitException
 /// <summary>
 /// Class containing methods with custom assertions.
 /// </summary>
-public static class Assert
+public static class CustomAssert
 {
 	/// <summary>
 	/// Asserts that an event is not raised.
