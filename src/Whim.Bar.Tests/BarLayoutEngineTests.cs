@@ -14,6 +14,12 @@ public class AutoSubstituteDataAttribute : AutoDataAttribute
 		: base(() => new Fixture().Customize(new AutoNSubstituteCustomization())) { }
 }
 
+public class InlineAutoSubstituteDataAttribute : InlineAutoDataAttribute
+{
+	public InlineAutoSubstituteDataAttribute(params object[] arguments)
+		: base(new AutoSubstituteDataAttribute(), arguments) { }
+}
+
 public class BarLayoutEngineTests
 {
 	private static BarLayoutEngine CreateSut(ILayoutEngine innerLayoutEngine) =>

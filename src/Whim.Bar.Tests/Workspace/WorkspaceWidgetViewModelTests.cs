@@ -1,119 +1,139 @@
-using Moq;
+using AutoFixture;
+using AutoFixture.AutoNSubstitute;
+using AutoFixture.Xunit2;
+using NSubstitute;
 using Xunit;
 
 namespace Whim.Bar.Tests;
 
+public class WorkspaceWidgetViewModelDataAttribute : AutoDataAttribute
+{
+	public WorkspaceWidgetViewModelDataAttribute()
+		: base(CreateFixture) { }
+
+	private static IFixture CreateFixture()
+	{
+		IFixture fixture = new Fixture();
+		fixture.Customize(new AutoNSubstituteCustomization());
+		fixture.Customize(new WorkspaceWidgetViewModelCustomization());
+		return fixture;
+	}
+}
+
+public class WorkspaceWidgetViewModelCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IContext context = fixture.Freeze<IContext>();
+
+		// The workspace manager should have a single workspace
+		using IWorkspace workspace = fixture.Create<IWorkspace>();
+		context.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
+
+		fixture.Inject(context);
+	}
+}
+
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceWidgetViewModelTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
-
-		public Wrapper()
-		{
-			Context.SetupGet(c => c.WorkspaceManager).Returns(WorkspaceManager.Object);
-			WorkspaceManager
-				.Setup(wm => wm.GetEnumerator())
-				.Returns(new List<IWorkspace> { Workspace.Object }.GetEnumerator());
-			WorkspaceManager.Setup(wm => wm.GetMonitorForWorkspace(Workspace.Object)).Returns(Monitor.Object);
-		}
-	}
-
-	[Fact]
-	public void WorkspaceManager_WorkspaceAdded_AlreadyExists()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_WorkspaceAdded_AlreadyExists(IContext context, IMonitor monitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		IWorkspace workspace = context.WorkspaceManager.First();
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.WorkspaceAdded += null,
-			new WorkspaceEventArgs() { Workspace = wrapper.Workspace.Object }
+		context.WorkspaceManager.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceEventArgs>>(
+			context.WorkspaceManager,
+			new WorkspaceEventArgs() { Workspace = workspace }
 		);
 
 		// Then
 		Assert.Single(viewModel.Workspaces);
-		Assert.Equal(wrapper.Workspace.Object, viewModel.Workspaces[0].Workspace);
-		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(wrapper.Workspace.Object), Times.Once);
+		Assert.Equal(workspace, viewModel.Workspaces[0].Workspace);
+		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 	}
 
-	[Fact]
-	public void WorkspaceManager_WorkspaceAdded()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_WorkspaceAdded(IContext context, IMonitor monitor, IWorkspace addedWorkspace)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
-		Mock<IWorkspace> addedWorkspace = new();
+		IWorkspace workspace = context.WorkspaceManager.First();
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.WorkspaceAdded += null,
-			new WorkspaceEventArgs() { Workspace = addedWorkspace.Object }
+		context.WorkspaceManager.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceEventArgs>>(
+			context.WorkspaceManager,
+			new WorkspaceEventArgs() { Workspace = addedWorkspace }
 		);
 
 		// Then
 		Assert.Equal(2, viewModel.Workspaces.Count);
-		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(wrapper.Workspace.Object), Times.Once);
-		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWorkspace(addedWorkspace.Object), Times.Once);
+		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
+		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(addedWorkspace);
 	}
 
-	[Fact]
-	public void WorkspaceManager_WorkspaceRemoved()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_WorkspaceRemoved(IContext context, IMonitor monitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		IWorkspace workspace = context.WorkspaceManager.First();
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.WorkspaceRemoved += null,
-			new WorkspaceEventArgs() { Workspace = wrapper.Workspace.Object }
+		context.WorkspaceManager.WorkspaceRemoved += Raise.Event<EventHandler<WorkspaceEventArgs>>(
+			context.WorkspaceManager,
+			new WorkspaceEventArgs() { Workspace = workspace }
 		);
 
 		// Then
 		Assert.Empty(viewModel.Workspaces);
 	}
 
-	[Fact]
-	public void WorkspaceManager_WorkspaceRemoved_DoesNotExist()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_WorkspaceRemoved_DoesNotExist(
+		IContext context,
+		IMonitor monitor,
+		IWorkspace removedWorkspace
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
-		Mock<IWorkspace> removedWorkspace = new();
+		IWorkspace workspace = context.WorkspaceManager.First();
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.WorkspaceRemoved += null,
-			new WorkspaceEventArgs() { Workspace = removedWorkspace.Object }
+		context.WorkspaceManager.WorkspaceRemoved += Raise.Event<EventHandler<WorkspaceEventArgs>>(
+			context.WorkspaceManager,
+			new WorkspaceEventArgs() { Workspace = removedWorkspace }
 		);
 
 		// Then
 		Assert.Single(viewModel.Workspaces);
-		Assert.Equal(wrapper.Workspace.Object, viewModel.Workspaces[0].Workspace);
+		Assert.Equal(workspace, viewModel.Workspaces[0].Workspace);
 	}
 
 	#region WorkspaceManager_MonitorWorkspaceChanged
-	[Fact]
-	public void WorkspaceManager_MonitorWorkspaceChanged_Deactivate()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_MonitorWorkspaceChanged_Deactivate(
+		IContext context,
+		IMonitor monitor,
+		IWorkspace currentWorkspace
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		IWorkspace previousWorkspace = context.WorkspaceManager.First();
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.MonitorWorkspaceChanged += null,
+		context.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
+			context.WorkspaceManager,
 			new MonitorWorkspaceChangedEventArgs()
 			{
-				Monitor = wrapper.Monitor.Object,
-				PreviousWorkspace = wrapper.Workspace.Object,
-				CurrentWorkspace = new Mock<IWorkspace>().Object
+				Monitor = monitor,
+				PreviousWorkspace = previousWorkspace,
+				CurrentWorkspace = currentWorkspace
 			}
 		);
 
@@ -122,18 +142,22 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(model.ActiveOnMonitor);
 	}
 
-	[Fact]
-	public void WorkspaceManager_MonitorWorkspaceChanged_Activate()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_MonitorWorkspaceChanged_Activate(
+		IContext context,
+		IMonitor monitor,
+		IWorkspace addedWorkspace
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		IWorkspace workspace = context.WorkspaceManager.First();
+		context.WorkspaceManager.GetMonitorForWorkspace(workspace).Returns(monitor);
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// Add workspace
-		Mock<IWorkspace> addedWorkspace = new();
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.WorkspaceAdded += null,
-			new WorkspaceEventArgs() { Workspace = addedWorkspace.Object }
+		context.WorkspaceManager.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceEventArgs>>(
+			context.WorkspaceManager,
+			new WorkspaceEventArgs() { Workspace = addedWorkspace }
 		);
 
 		// Verify that the correct workspace is active on the monitor
@@ -143,11 +167,11 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
 
 		// When
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.MonitorWorkspaceChanged += null,
+		context.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
+			context.WorkspaceManager,
 			new MonitorWorkspaceChangedEventArgs()
 			{
-				Monitor = wrapper.Monitor.Object,
+				Monitor = monitor,
 				PreviousWorkspace = existingModel.Workspace,
 				CurrentWorkspace = addedWorkspaceModel.Workspace
 			}
@@ -158,18 +182,23 @@ public class WorkspaceWidgetViewModelTests
 		Assert.True(addedWorkspaceModel.ActiveOnMonitor);
 	}
 
-	[Fact]
-	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor(
+		IContext context,
+		IMonitor monitor,
+		IWorkspace addedWorkspace,
+		IMonitor otherMonitor
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		IWorkspace workspace = context.WorkspaceManager.First();
+		context.WorkspaceManager.GetMonitorForWorkspace(workspace).Returns(monitor);
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// Add workspace
-		Mock<IWorkspace> addedWorkspace = new();
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.WorkspaceAdded += null,
-			new WorkspaceEventArgs() { Workspace = addedWorkspace.Object }
+		context.WorkspaceManager.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceEventArgs>>(
+			context.WorkspaceManager,
+			new WorkspaceEventArgs() { Workspace = addedWorkspace }
 		);
 
 		// Verify that the correct workspace is active on the monitor
@@ -179,11 +208,11 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
 
 		// When
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.MonitorWorkspaceChanged += null,
+		context.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
+			context.WorkspaceManager,
 			new MonitorWorkspaceChangedEventArgs()
 			{
-				Monitor = new Mock<IMonitor>().Object,
+				Monitor = otherMonitor,
 				PreviousWorkspace = existingModel.Workspace,
 				CurrentWorkspace = addedWorkspaceModel.Workspace
 			}
@@ -195,12 +224,12 @@ public class WorkspaceWidgetViewModelTests
 	}
 	#endregion
 
-	[Fact]
-	public void WorkspaceManager_WorkspaceRenamed_ExistingWorkspace()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_WorkspaceRenamed_ExistingWorkspace(IContext context, IMonitor monitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		IWorkspace workspace = context.WorkspaceManager.First();
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
 		// Then
@@ -209,11 +238,11 @@ public class WorkspaceWidgetViewModelTests
 			nameof(WorkspaceModel.Name),
 			() =>
 			{
-				wrapper.WorkspaceManager.Raise(
-					wm => wm.WorkspaceRenamed += null,
+				context.WorkspaceManager.WorkspaceRenamed += Raise.Event<EventHandler<WorkspaceRenamedEventArgs>>(
+					context.WorkspaceManager,
 					new WorkspaceRenamedEventArgs()
 					{
-						Workspace = wrapper.Workspace.Object,
+						Workspace = workspace,
 						PreviousName = "Old Name",
 						CurrentName = "New Name"
 					}
@@ -222,13 +251,15 @@ public class WorkspaceWidgetViewModelTests
 		);
 	}
 
-	[Fact]
-	public void WorkspaceManager_WorkspaceRenamed_NonExistingWorkspace()
+	[Theory, WorkspaceWidgetViewModelData]
+	public void WorkspaceManager_WorkspaceRenamed_NonExistingWorkspace(
+		IContext context,
+		IMonitor monitor,
+		IWorkspace renamedWorkspace
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
-		Mock<IWorkspace> renamedWorkspace = new();
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// Verify that property changed is not raised
 
@@ -238,11 +269,11 @@ public class WorkspaceWidgetViewModelTests
 		// When
 		model.PropertyChanged += (sender, args) => propertyChangedRaised = true;
 
-		wrapper.WorkspaceManager.Raise(
-			wm => wm.WorkspaceRenamed += null,
+		context.WorkspaceManager.WorkspaceRenamed += Raise.Event<EventHandler<WorkspaceRenamedEventArgs>>(
+			context.WorkspaceManager,
 			new WorkspaceRenamedEventArgs()
 			{
-				Workspace = renamedWorkspace.Object,
+				Workspace = renamedWorkspace,
 				PreviousName = "Old Name",
 				CurrentName = "New Name"
 			}
@@ -252,26 +283,26 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(propertyChangedRaised);
 	}
 
-	[Fact]
-	public void Dispose()
+	[Theory, WorkspaceWidgetViewModelData]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage(
+		"Usage",
+		"NS5000:Received check.",
+		Justification = "The analyzer is wrong"
+	)]
+	public void Dispose(IContext context, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WorkspaceWidgetViewModel viewModel = new(wrapper.Context.Object, wrapper.Monitor.Object);
+		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
 		viewModel.Dispose();
 
 		// Then
-		wrapper.WorkspaceManager.VerifyRemove(wm => wm.WorkspaceAdded -= It.IsAny<EventHandler<WorkspaceEventArgs>>());
-		wrapper.WorkspaceManager.VerifyRemove(
-			wm => wm.WorkspaceRemoved -= It.IsAny<EventHandler<WorkspaceEventArgs>>()
-		);
-		wrapper.WorkspaceManager.VerifyRemove(
-			wm => wm.MonitorWorkspaceChanged -= It.IsAny<EventHandler<MonitorWorkspaceChangedEventArgs>>()
-		);
-		wrapper.WorkspaceManager.VerifyRemove(
-			wm => wm.WorkspaceRenamed -= It.IsAny<EventHandler<WorkspaceRenamedEventArgs>>()
-		);
+		context.WorkspaceManager.Received(1).WorkspaceAdded -= Arg.Any<EventHandler<WorkspaceEventArgs>>();
+		context.WorkspaceManager.Received(1).WorkspaceRemoved -= Arg.Any<EventHandler<WorkspaceEventArgs>>();
+		context.WorkspaceManager.Received(1).MonitorWorkspaceChanged -= Arg.Any<
+			EventHandler<MonitorWorkspaceChangedEventArgs>
+		>();
+		context.WorkspaceManager.Received(1).WorkspaceRenamed -= Arg.Any<EventHandler<WorkspaceRenamedEventArgs>>();
 	}
 }
