@@ -16,7 +16,5 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage(
 	"Design",
 	"CA1019:Define accessors for attribute arguments",
-	Justification = "It's fine for InlineData",
-	Scope = "member",
-	Target = "~M:Whim.TestUtils.InlineAutoSubstituteDataAttribute.#ctor(System.Object[])"
+	Justification = "It's fine for InlineData"
 )]
