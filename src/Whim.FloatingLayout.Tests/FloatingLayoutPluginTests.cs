@@ -1,62 +1,42 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using System.Text.Json;
-using Windows.Win32.Foundation;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
+public class FloatingLayoutPluginCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IContext context = fixture.Freeze<IContext>();
+		IWorkspace workspace = fixture.Freeze<IWorkspace>();
+		IMonitor monitor = fixture.Freeze<IMonitor>();
+		ILocation<int> location = new Location<int>() { X = 1, Y = 2 };
+
+		// The workspace will have a null last focused window
+		workspace.LastFocusedWindow.Returns((IWindow?)null);
+
+		// The workspace manager should have a single workspace
+		context.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
+		context.WorkspaceManager.ActiveWorkspace.Returns(workspace);
+
+		// Monitor manager will return the monitor at the point (1, 2)
+		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
+
+		// Each monitor will be at (1, 2)
+		monitor.WorkingArea.Returns(location);
+
+		fixture.Inject(context);
+		fixture.Inject(workspace);
+		fixture.Inject(monitor);
+	}
+}
+
 public class FloatingLayoutPluginTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IWindowManager> WindowManager { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IMonitorManager> MonitorManager { get; } = new();
-		public Mock<INativeManager> NativeManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<ILayoutEngine> LayoutEngine { get; } = new();
-		public FloatingLayoutPlugin Plugin;
-
-		public Wrapper()
-		{
-			Context.SetupGet(x => x.WindowManager).Returns(WindowManager.Object);
-			Context.SetupGet(x => x.MonitorManager).Returns(MonitorManager.Object);
-			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-			Context.SetupGet(x => x.NativeManager).Returns(NativeManager.Object);
-
-			WorkspaceManager.SetupGet(x => x.ActiveWorkspace).Returns(Workspace.Object);
-			NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns((ILocation<int>?)null);
-
-			Plugin = new(Context.Object);
-
-			LayoutEngine.SetupGet(le => le.Identity).Returns(new LayoutEngineIdentity());
-		}
-
-		public Wrapper Setup_GetWorkspaceForWindow(IWindow window, IWorkspace workspace)
-		{
-			WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(window)).Returns(workspace);
-			return this;
-		}
-
-		public Wrapper Setup_TryGetWindowLocation(IWindow window, IWindowState? windowState)
-		{
-			Workspace.Setup(w => w.TryGetWindowLocation(window)).Returns(windowState);
-
-			if (windowState != null)
-			{
-				Workspace.Setup(w => w.ActiveLayoutEngine).Returns(LayoutEngine.Object);
-			}
-			return this;
-		}
-
-		public Wrapper Setup_GetMonitorAtPoint(ILocation<int> location, Mock<IMonitor> monitor)
-		{
-			monitor.Setup(m => m.WorkingArea).Returns(location);
-			MonitorManager.Setup(mm => mm.GetMonitorAtPoint(location)).Returns(monitor.Object);
-			return this;
-		}
-	}
+	private static FloatingLayoutPlugin CreateSut(IContext context) => new(context);
 
 	private static void AssertFloatingWindowsEqual(
 		IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> expected,
@@ -72,12 +52,11 @@ public class FloatingLayoutPluginTests
 		}
 	}
 
-	[Fact]
-	public void Name()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void Name(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		string name = plugin.Name;
@@ -86,12 +65,11 @@ public class FloatingLayoutPluginTests
 		Assert.Equal("whim.floating_layout", name);
 	}
 
-	[Fact]
-	public void PluginCommands()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void PluginCommands(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		IPluginCommands commands = plugin.PluginCommands;
@@ -100,72 +78,71 @@ public class FloatingLayoutPluginTests
 		Assert.NotEmpty(commands.Commands);
 	}
 
-	[Fact]
-	public void PreInitialize()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void PreInitialize(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.PreInitialize();
 
 		// Then
-		wrapper.WorkspaceManager.Verify(x => x.AddProxyLayoutEngine(It.IsAny<CreateProxyLayoutEngine>()), Times.Once);
+		context.WorkspaceManager.Received(1).AddProxyLayoutEngine(Arg.Any<CreateProxyLayoutEngine>());
 	}
 
-	[Fact]
-	public void PostInitialize()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void PostInitialize(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.PostInitialize();
 
 		// Then
-		wrapper.WorkspaceManager.Verify(x => x.AddProxyLayoutEngine(It.IsAny<CreateProxyLayoutEngine>()), Times.Never);
+		context.WorkspaceManager.Received(0).AddProxyLayoutEngine(Arg.Any<CreateProxyLayoutEngine>());
 	}
 
-	[Fact]
-	public void WindowManager_WindowRemoved()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void WindowManager_WindowRemoved(
+		IContext context,
+		IWindow window,
+		IMonitor monitor,
+		IWorkspace activeWorkspace
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<IMonitor> monitor = new();
 		Location<int> location = new();
 		WindowState windowState =
 			new()
 			{
-				Window = window.Object,
+				Window = window,
 				Location = location,
 				WindowSize = WindowSize.Normal
 			};
 
-		Wrapper wrapper = new();
-		wrapper
-			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
-			.Setup_TryGetWindowLocation(window.Object, windowState)
-			.Setup_GetMonitorAtPoint(location, monitor);
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		activeWorkspace.TryGetWindowLocation(window).Returns(windowState);
+		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
+
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.PreInitialize();
-		plugin.MarkWindowAsFloating(window.Object);
-		wrapper.WindowManager.Raise(x => x.WindowRemoved += null, new WindowEventArgs() { Window = window.Object });
+		plugin.MarkWindowAsFloating(window);
+		context.WindowManager.WindowRemoved += Raise.EventWith(new WindowEventArgs() { Window = window });
 
 		// Then nothing
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
 	#region MarkWindowAsFloating
-	[Fact]
-	public void MarkWindowAsFloating_NoWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsFloating_NoWindow(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.MarkWindowAsFloating(null);
@@ -174,31 +151,32 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Fact]
-	public void MarkWindowAsFloating_NoWorkspaceForWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsFloating_NoWorkspaceForWindow(IContext context, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
-
-		Mock<IWindow> window = new();
+		FloatingLayoutPlugin plugin = CreateSut(context);
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
 
 		// When
-		plugin.MarkWindowAsFloating(window.Object);
+		plugin.MarkWindowAsFloating(window);
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Fact]
-	public void MarkWindowAsFloating_NoWorkspaceForWindow_LastFocusedWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsFloating_NoWorkspaceForWindow_LastFocusedWindow(
+		IContext context,
+		IWindow window,
+		IWorkspace activeWorkspace
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.ActiveWorkspace.LastFocusedWindow).Returns(window.Object);
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+		activeWorkspace.LastFocusedWindow.Returns(window);
 
 		// When
 		plugin.MarkWindowAsFloating();
@@ -207,115 +185,99 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Fact]
-	public void MarkWindowAsFloating_NoWindowState()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsFloating_NoWindowState(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new();
-		wrapper
-			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
-			.Setup_TryGetWindowLocation(window.Object, null);
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		activeWorkspace.TryGetWindowLocation(window).Returns((IWindowState?)null);
 
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
-		plugin.MarkWindowAsFloating(window.Object);
+		plugin.MarkWindowAsFloating(window);
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Fact]
-	public void MarkWindowAsFloating()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<IMonitor> monitor = new();
-
-		Wrapper wrapper = new();
-		wrapper
-			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
-			.Setup_TryGetWindowLocation(
-				window.Object,
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		activeWorkspace
+			.TryGetWindowLocation(window)
+			.Returns(
 				new WindowState()
 				{
 					Location = new Location<int>() { X = 1, Y = 2 },
-					Window = window.Object,
+					Window = window,
 					WindowSize = WindowSize.Normal
 				}
-			)
-			.Setup_GetMonitorAtPoint(new Location<int>() { X = 1, Y = 2 }, monitor);
+			);
 
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
-		plugin.MarkWindowAsFloating(window.Object);
+		plugin.MarkWindowAsFloating(window);
 
 		// Then
 		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window.Object, plugin.FloatingWindows.Keys.First());
-		wrapper.Workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<IPoint<double>>()), Times.Once);
+		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
+		activeWorkspace.Received(1).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
 	}
 	#endregion
 
 	#region MarkWindowAsDocked
-	[Fact]
-	public void MarkWindowAsDocked_WindowIsNotFloating()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsDocked_WindowIsNotFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
-		plugin.MarkWindowAsDocked(window.Object);
+		plugin.MarkWindowAsDocked(window);
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
-		wrapper.Workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<IPoint<double>>()), Times.Never);
+		activeWorkspace.Received(0).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
 	}
 
-	[Fact]
-	public void MarkWindowAsDocked_WindowIsFloating()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsDocked_WindowIsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<IMonitor> monitor = new();
-
-		Wrapper wrapper = new();
-		wrapper
-			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
-			.Setup_TryGetWindowLocation(
-				window.Object,
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		activeWorkspace
+			.TryGetWindowLocation(window)
+			.Returns(
 				new WindowState()
 				{
 					Location = new Location<int>() { X = 1, Y = 2 },
-					Window = window.Object,
+					Window = window,
 					WindowSize = WindowSize.Normal
 				}
-			)
-			.Setup_GetMonitorAtPoint(new Location<int>() { X = 1, Y = 2 }, monitor);
+			);
 
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
-		plugin.MarkWindowAsFloating(window.Object);
+		FloatingLayoutPlugin plugin = CreateSut(context);
+		plugin.MarkWindowAsFloating(window);
 
 		// When
-		plugin.MarkWindowAsDocked(window.Object);
+		plugin.MarkWindowAsDocked(window);
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
-		wrapper.Workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<IPoint<double>>()), Times.Exactly(2));
+		activeWorkspace.Received(2).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
 	}
 	#endregion
 
 	#region ToggleWindowFloating
-	[Fact]
-	public void ToggleWindowFloating_NoWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void ToggleWindowFloating_NoWindow(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.ToggleWindowFloating(null);
@@ -324,78 +286,65 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Fact]
-	public void ToggleWindowFloating_ToFloating()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void ToggleWindowFloating_ToFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<IMonitor> monitor = new();
-
-		Wrapper wrapper = new();
-
-		wrapper
-			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
-			.Setup_TryGetWindowLocation(
-				window.Object,
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		activeWorkspace
+			.TryGetWindowLocation(window)
+			.Returns(
 				new WindowState()
 				{
 					Location = new Location<int>() { X = 1, Y = 2 },
-					Window = window.Object,
+					Window = window,
 					WindowSize = WindowSize.Normal
 				}
-			)
-			.Setup_GetMonitorAtPoint(new Location<int>() { X = 1, Y = 2 }, monitor);
+			);
 
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
-		plugin.ToggleWindowFloating(window.Object);
+		plugin.ToggleWindowFloating(window);
 
 		// Then
 		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window.Object, plugin.FloatingWindows.Keys.First());
+		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
 	}
 
-	[Fact]
-	public void ToggleWindowFloating_ToDocked()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void ToggleWindowFloating_ToDocked(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<IMonitor> monitor = new();
-
-		Wrapper wrapper = new();
-
-		wrapper
-			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
-			.Setup_TryGetWindowLocation(
-				window.Object,
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		activeWorkspace
+			.TryGetWindowLocation(window)
+			.Returns(
 				new WindowState()
 				{
 					Location = new Location<int>() { X = 1, Y = 2 },
-					Window = window.Object,
+					Window = window,
 					WindowSize = WindowSize.Normal
 				}
-			)
-			.Setup_GetMonitorAtPoint(new Location<int>() { X = 1, Y = 2 }, monitor);
+			);
 
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
-		plugin.MarkWindowAsFloating(window.Object);
+		plugin.MarkWindowAsFloating(window);
 
 		// When
-		plugin.ToggleWindowFloating(window.Object);
+		plugin.ToggleWindowFloating(window);
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 	}
 	#endregion
 
-	[Fact]
-	public void SaveState()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void SaveState(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		JsonElement? json = plugin.SaveState();
@@ -404,12 +353,11 @@ public class FloatingLayoutPluginTests
 		Assert.Null(json);
 	}
 
-	[Fact]
-	public void LoadState()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void LoadState(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.LoadState(JsonDocument.Parse("{}").RootElement);
@@ -419,106 +367,108 @@ public class FloatingLayoutPluginTests
 	}
 
 	#region MarkWindowAsDockedInLayoutEngine
-	[Fact]
-	public void MarkWindowAsDockedInLayoutEngine_WindowIsNotFloating()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsDockedInLayoutEngine_WindowIsNotFloating(
+		IContext context,
+		IWindow window,
+		IWorkspace activeWorkspace
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Wrapper wrapper = new();
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
+		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
+		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		Assert.Empty(plugin.FloatingWindows);
 
 		// When
-		plugin.MarkWindowAsDockedInLayoutEngine(window.Object, wrapper.LayoutEngine.Object.Identity);
+		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Fact]
-	public void MarkWindowAsDockedInLayoutEngine_WindowIsFloating()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsDockedInLayoutEngine_WindowIsFloating(
+		IContext context,
+		IWindow window,
+		IWorkspace activeWorkspace
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<IMonitor> monitor = new();
-
-		Wrapper wrapper = new();
-
-		wrapper
-			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
-			.Setup_TryGetWindowLocation(
-				window.Object,
+		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		activeWorkspace
+			.TryGetWindowLocation(window)
+			.Returns(
 				new WindowState()
 				{
 					Location = new Location<int>() { X = 1, Y = 2 },
-					Window = window.Object,
+					Window = window,
 					WindowSize = WindowSize.Normal
 				}
-			)
-			.Setup_GetMonitorAtPoint(new Location<int>() { X = 1, Y = 2 }, monitor);
+			);
 
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
-		plugin.MarkWindowAsFloating(window.Object);
+		FloatingLayoutPlugin plugin = CreateSut(context);
+		plugin.MarkWindowAsFloating(window);
 
 		AssertFloatingWindowsEqual(
 			new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
 			{
 				{
-					window.Object,
-					new HashSet<LayoutEngineIdentity>() { wrapper.LayoutEngine.Object.Identity }
+					window,
+					new HashSet<LayoutEngineIdentity>() { layoutEngine.Identity }
 				}
 			},
 			plugin.FloatingWindows
 		);
 
 		// When
-		plugin.MarkWindowAsDockedInLayoutEngine(window.Object, wrapper.LayoutEngine.Object.Identity);
+		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Fact]
-	public void MarkWindowAsDocked_WindowIsFloatingInMultipleLayoutEngines()
+	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	public void MarkWindowAsDocked_WindowIsFloatingInMultipleLayoutEngines(
+		IContext context,
+		IWindow window,
+		ILayoutEngine layoutEngine2,
+		IWorkspace activeWorkspace
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<IMonitor> monitor = new();
+		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
+		layoutEngine2.Identity.Returns(new LayoutEngineIdentity());
 
-		Wrapper wrapper = new();
-		Mock<ILayoutEngine> layoutEngine2 = new();
-		layoutEngine2.SetupGet(le => le.Identity).Returns(new LayoutEngineIdentity());
-
-		wrapper
-			.Setup_GetWorkspaceForWindow(window.Object, wrapper.Workspace.Object)
-			.Setup_TryGetWindowLocation(
-				window.Object,
+		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		activeWorkspace
+			.TryGetWindowLocation(window)
+			.Returns(
 				new WindowState()
 				{
 					Location = new Location<int>() { X = 1, Y = 2 },
-					Window = window.Object,
+					Window = window,
 					WindowSize = WindowSize.Normal
 				}
-			)
-			.Setup_GetMonitorAtPoint(new Location<int>() { X = 1, Y = 2 }, monitor);
+			);
 
 		// When
-		FloatingLayoutPlugin plugin = wrapper.Plugin;
-		plugin.MarkWindowAsFloating(window.Object);
+		FloatingLayoutPlugin plugin = CreateSut(context);
+		plugin.MarkWindowAsFloating(window);
 
-		wrapper.Workspace.Setup(w => w.ActiveLayoutEngine).Returns(layoutEngine2.Object);
-		plugin.MarkWindowAsFloating(window.Object);
+		activeWorkspace.ActiveLayoutEngine.Returns(layoutEngine2);
+		plugin.MarkWindowAsFloating(window);
 
-		plugin.MarkWindowAsDockedInLayoutEngine(window.Object, wrapper.LayoutEngine.Object.Identity);
+		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
 
 		// Then
 		AssertFloatingWindowsEqual(
 			new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
 			{
 				{
-					window.Object,
-					new HashSet<LayoutEngineIdentity>() { layoutEngine2.Object.Identity }
+					window,
+					new HashSet<LayoutEngineIdentity>() { layoutEngine2.Identity }
 				}
 			},
 			plugin.FloatingWindows
