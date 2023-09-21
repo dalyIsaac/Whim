@@ -1,550 +1,621 @@
+using AutoFixture;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
+public class FloatingLayoutEngineCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IContext context = fixture.Freeze<IContext>();
+		IMonitor monitor = fixture.Freeze<IMonitor>();
+
+		context.MonitorManager.GetMonitorAtPoint(Arg.Any<ILocation<int>>()).Returns(monitor);
+		monitor.WorkingArea.Returns(new Location<int>() { Width = 1000, Height = 1000 });
+		context.NativeManager
+			.DwmGetWindowLocation(Arg.Any<HWND>())
+			.Returns(new Location<int>() { Width = 100, Height = 100 });
+
+		fixture.Inject(context);
+		fixture.Inject(monitor);
+	}
+}
+
 public class FloatingLayoutEngineTests
 {
+	private FloatingLayoutEngineTests MarkWindowAsFloating(
+		IInternalFloatingLayoutPlugin plugin,
+		IWindow window,
+		ILayoutEngine innerLayoutEngine
+	)
+	{
+		IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> floatingWindows = new Dictionary<
+			IWindow,
+			ISet<LayoutEngineIdentity>
+		>
+		{
+			{
+				window,
+				new HashSet<LayoutEngineIdentity> { innerLayoutEngine.Identity }
+			}
+		};
+		plugin.FloatingWindows.Returns(floatingWindows);
+		return this;
+	}
+
+	private FloatingLayoutEngineTests Setup_RemoveWindow(
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
+	{
+		innerLayoutEngine.RemoveWindow(window).Returns(newInnerLayoutEngine);
+		newInnerLayoutEngine.Identity.Returns(innerLayoutEngine.Identity);
+		return this;
+	}
+
+	private FloatingLayoutEngineTests Setup_AddWindow(
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
+	{
+		innerLayoutEngine.AddWindow(window).Returns(newInnerLayoutEngine);
+		newInnerLayoutEngine.Identity.Returns(innerLayoutEngine.Identity);
+		return this;
+	}
+
 	#region AddWindow
-	[Fact]
-	public void AddWindow_UseInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void AddWindow_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 
-	[Fact]
-	public void AddWindow_UseInner_SameInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void AddWindow_UseInner_SameInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.AddWindow(window.Object)).Returns(wrapper.InnerLayoutEngine.Object);
+		innerLayoutEngine.AddWindow(window).Returns(innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// Then
 		Assert.Same(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 
-	[Fact]
-	public void AddWindow_FloatingInPlugin_Succeed()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void AddWindow_FloatingInPlugin_Succeed(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-
-		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Never);
+		innerLayoutEngine.Received(0).AddWindow(window);
 	}
 
-	[Fact]
-	public void AddWindow_FloatingInPlugin_FailOnNoLocation()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void AddWindow_FloatingInPlugin_FailOnNoLocation(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns((Location<int>?)null);
+		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
 
 		// When
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 
-	[Fact]
-	public void AddWindow_FloatingInPlugin_FailOnSameLocation()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void AddWindow_FloatingInPlugin_FailOnSameLocation(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
-		ILayoutEngine newEngine2 = newEngine1.AddWindow(window.Object);
+		ILayoutEngine newEngine1 = engine.AddWindow(window);
+		ILayoutEngine newEngine2 = newEngine1.AddWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
-		newInnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Never);
+		innerLayoutEngine.Received(1).RemoveWindow(window);
+		newInnerLayoutEngine.Received(0).AddWindow(window);
 	}
 
-	[Fact]
-	public void AddWindow_FloatingInPlugin_RemoveFromInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void AddWindow_FloatingInPlugin_RemoveFromInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-
-		Wrapper wrapper = new Wrapper().Setup_AddWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
-		wrapper.MarkAsFloating(window.Object);
-		ILayoutEngine newEngine2 = newEngine.AddWindow(window.Object);
+		ILayoutEngine newEngine = engine.AddWindow(window);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		ILayoutEngine newEngine2 = newEngine.AddWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
 		Assert.NotSame(newEngine, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
-		newInnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+		innerLayoutEngine.Received(1).AddWindow(window);
+		newInnerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 	#endregion
 
 	#region RemoveWindow
-	[Fact]
-	public void RemoveWindow_UseInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void RemoveWindow_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.RemoveWindow(window.Object);
+		ILayoutEngine newEngine = engine.RemoveWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+		innerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
-	[Fact]
-	public void RemoveWindow_UseInner_SameInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void RemoveWindow_UseInner_SameInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.RemoveWindow(window.Object))
-			.Returns(wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(window).Returns(innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.RemoveWindow(window.Object);
+		ILayoutEngine newEngine = engine.RemoveWindow(window);
 
 		// Then
 		Assert.Same(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+		innerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
-	[Fact]
-	public void RemoveWindow_FloatingInPlugin()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void RemoveWindow_FloatingInPlugin(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		wrapper.MarkAsFloating(window.Object);
+		ILayoutEngine newEngine1 = engine.AddWindow(window);
+		innerLayoutEngine.ClearReceivedCalls();
+		plugin.ClearReceivedCalls();
 
-		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
-
-		wrapper.InnerLayoutEngine.Invocations.Clear();
-		wrapper.Plugin.Invocations.Clear();
-
-		ILayoutEngine newEngine2 = newEngine1.RemoveWindow(window.Object);
+		ILayoutEngine newEngine2 = newEngine1.RemoveWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.NotSame(newEngine1, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Never);
-		wrapper.Plugin.VerifyGet(x => x.FloatingWindows, Times.Once);
+		innerLayoutEngine.Received(0).RemoveWindow(window);
+		_ = plugin.Received(1).FloatingWindows;
 	}
 	#endregion
 
 	#region MoveWindowToPoint
-	[Fact]
-	public void MoveWindowToPoint_UseInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowToPoint_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		ILocation<double> location = new Location<double>();
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, location);
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, location);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Once);
+		innerLayoutEngine.Received(1).MoveWindowToPoint(window, location);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_UseInner_SameInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowToPoint_UseInner_SameInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		ILocation<double> location = new Location<double>();
 
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.MoveWindowToPoint(window.Object, location))
-			.Returns(wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.MoveWindowToPoint(window, location).Returns(innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, location);
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, location);
 
 		// Then
 		Assert.Same(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Once);
+		innerLayoutEngine.Received(1).MoveWindowToPoint(window, location);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_FloatingInPlugin_WindowIsNew()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNew(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		ILocation<double> location = new Location<double>();
 
-		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, location);
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, location);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Never);
+		innerLayoutEngine.Received(0).MoveWindowToPoint(window, location);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_SameLocation()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_SameLocation(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 		ILocation<double> location = new Location<double>();
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window.Object, location);
+		ILayoutEngine newEngine1 = engine.AddWindow(window);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, location);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Never);
+		innerLayoutEngine.Received(0).MoveWindowToPoint(window, location);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_DifferentLocation()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_DifferentLocation(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 		ILocation<double> location = new Location<double>();
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(new Location<int>());
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window.Object, location);
+		ILayoutEngine newEngine1 = engine.AddWindow(window);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, location);
+
+		// Then
+		Assert.NotSame(engine, newEngine1);
+		Assert.Same(newEngine1, newEngine2);
+		innerLayoutEngine.Received(0).MoveWindowToPoint(window, location);
+	}
+
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowToPoint_FloatingInPlugin_CannotGetDwmLocation(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
+	{
+		// Given
+		ILocation<double> location = new Location<double>();
+
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+
+		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+
+		// When
+		ILayoutEngine newEngine1 = engine.AddWindow(window);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, location);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.NotSame(newEngine1, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Never);
-	}
-
-	[Fact]
-	public void MoveWindowToPoint_FloatingInPlugin_CannotGetDwmLocation()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-		ILocation<double> location = new Location<double>();
-
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_AddWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns((Location<int>?)null);
-
-		// When
-		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window.Object, location);
-
-		// Then
-		Assert.NotSame(engine, newEngine1);
-		Assert.NotSame(newEngine1, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
-		newInnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, location), Times.Once);
+		innerLayoutEngine.Received(1).AddWindow(window);
+		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, location);
 	}
 	#endregion
 
 	#region MoveWindowEdgesInDirection
-	[Fact]
-	public void MoveWindowEdgesInDirection_UseInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowEdgesInDirection_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		Direction direction = Direction.Left;
 		IPoint<double> deltas = new Point<double>();
 
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window.Object);
+		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(
-			ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object),
-			Times.Once
-		);
+		innerLayoutEngine.Received(1).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_UseInner_SameInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowEdgesInDirection_UseInner_SameInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		Direction direction = Direction.Left;
 		IPoint<double> deltas = new Point<double>();
 
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object))
-			.Returns(wrapper.InnerLayoutEngine.Object);
+		innerLayoutEngine.MoveWindowEdgesInDirection(direction, deltas, window).Returns(innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window.Object);
+		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window);
 
 		// Then
 		Assert.Same(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(
-			ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object),
-			Times.Once
-		);
+		innerLayoutEngine.Received(1).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNew()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNew(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		Direction direction = Direction.Left;
 		IPoint<double> deltas = new Point<double>();
 
-		Wrapper wrapper = new Wrapper().MarkAsFloating(window.Object);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window.Object);
+		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		wrapper.InnerLayoutEngine.Verify(
-			ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object),
-			Times.Never
-		);
+		innerLayoutEngine.Received(0).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_SameLocation()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_SameLocation(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 		Direction direction = Direction.Left;
 		IPoint<double> deltas = new Point<double>();
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowEdgesInDirection(direction, deltas, window.Object);
+		ILayoutEngine newEngine1 = engine.AddWindow(window);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowEdgesInDirection(direction, deltas, window);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(
-			ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object),
-			Times.Never
-		);
+		innerLayoutEngine.Received(0).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_DifferentLocation()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_DifferentLocation(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 		Direction direction = Direction.Left;
 		IPoint<double> deltas = new Point<double>();
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(new Location<int>());
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowEdgesInDirection(direction, deltas, window.Object);
+		ILayoutEngine newEngine1 = engine.AddWindow(window);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowEdgesInDirection(direction, deltas, window);
+
+		// Then
+		Assert.NotSame(engine, newEngine1);
+		Assert.Same(newEngine1, newEngine2);
+		innerLayoutEngine.Received(0).MoveWindowEdgesInDirection(direction, deltas, window);
+	}
+
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void MoveWindowEdgesInDirection_FloatingInPlugin_CannotGetDwmLocation(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
+	{
+		// Given
+		Direction direction = Direction.Left;
+		IPoint<double> deltas = new Point<double>();
+
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+
+		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+
+		// When
+		ILayoutEngine newEngine1 = engine.AddWindow(window);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowEdgesInDirection(direction, deltas, window);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.NotSame(newEngine1, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(
-			ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object),
-			Times.Never
-		);
-	}
-
-	[Fact]
-	public void MoveWindowEdgesInDirection_FloatingInPlugin_CannotGetDwmLocation()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-		Direction direction = Direction.Left;
-		IPoint<double> deltas = new Point<double>();
-
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_AddWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns((Location<int>?)null);
-
-		// When
-		ILayoutEngine newEngine1 = engine.AddWindow(window.Object);
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowEdgesInDirection(direction, deltas, window.Object);
-
-		// Then
-		Assert.NotSame(engine, newEngine1);
-		Assert.NotSame(newEngine1, newEngine2);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
-		newInnerLayoutEngine.Verify(
-			ile => ile.MoveWindowEdgesInDirection(direction, deltas, window.Object),
-			Times.Once
-		);
+		innerLayoutEngine.Received(1).AddWindow(window);
+		newInnerLayoutEngine.Received(1).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 	#endregion
 
 	#region DoLayout
-	[Fact]
-	public void DoLayout()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void DoLayout(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		ILayoutEngine newInnerLayoutEngine,
+		IWindow window1,
+		IWindow window2,
+		IWindow floatingWindow,
+		IMonitor monitor
+	)
 	{
 		// Given the window has been added and the inner layout engine has a layout
-		Mock<IWindow> floatingWindow = new();
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+		MarkWindowAsFloating(plugin, floatingWindow, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, floatingWindow, newInnerLayoutEngine);
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(floatingWindow.Object)
-			.Setup_RemoveWindow(floatingWindow.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		newInnerLayoutEngine
-			.Setup(ile => ile.DoLayout(It.IsAny<ILocation<int>>(), It.IsAny<IMonitor>()))
+			.DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>())
 			.Returns(
 				new IWindowState[]
 				{
 					new WindowState()
 					{
-						Window = window1.Object,
+						Window = window1,
 						Location = new Location<int>(),
 						WindowSize = WindowSize.Normal
 					},
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window2,
 						Location = new Location<int>(),
 						WindowSize = WindowSize.Normal
 					}
 				}
 			);
-		newInnerLayoutEngine.Setup(ile => ile.Count).Returns(2);
+		newInnerLayoutEngine.Count.Returns(2);
 
 		// When
-		ILayoutEngine newEngine = engine.AddWindow(floatingWindow.Object);
+		ILayoutEngine newEngine = engine.AddWindow(floatingWindow);
 		IWindowState[] windowStates = newEngine
 			.DoLayout(
 				new Location<int>()
@@ -554,7 +625,7 @@ public class FloatingLayoutEngineTests
 					Width = 1000,
 					Height = 1000
 				},
-				wrapper.Monitor.Object
+				monitor
 			)
 			.ToArray();
 		int count = newEngine.Count;
@@ -566,7 +637,7 @@ public class FloatingLayoutEngineTests
 		{
 			new WindowState()
 			{
-				Window = floatingWindow.Object,
+				Window = floatingWindow,
 				Location = new Location<int>()
 				{
 					X = 0,
@@ -578,13 +649,13 @@ public class FloatingLayoutEngineTests
 			},
 			new WindowState()
 			{
-				Window = window1.Object,
+				Window = window1,
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
-				Window = window2.Object,
+				Window = window2,
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal
 			}
@@ -597,13 +668,16 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region GetFirstWindow
-	[Fact]
-	public void GetFirstWindow_NoInnerFirstWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void GetFirstWindow_NoInnerFirstWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.GetFirstWindow().Returns((IWindow?)null);
 
 		// When
 		IWindow? firstWindow = engine.GetFirstWindow();
@@ -612,378 +686,408 @@ public class FloatingLayoutEngineTests
 		Assert.Null(firstWindow);
 	}
 
-	[Fact]
-	public void GetFirstWindow_InnerFirstWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void GetFirstWindow_InnerFirstWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.GetFirstWindow()).Returns(window.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
 		IWindow? firstWindow = engine.GetFirstWindow();
 
 		// Then
-		Assert.Same(window.Object, firstWindow);
+		Assert.Same(window, firstWindow);
 	}
 
-	[Fact]
-	public void GetFirstWindow_FloatingFirstWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void GetFirstWindow_FloatingFirstWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+
+		newInnerLayoutEngine.GetFirstWindow().Returns((IWindow?)null);
 
 		// When
-		IWindow? firstWindow = engine.AddWindow(window.Object).GetFirstWindow();
+		IWindow? firstWindow = engine.AddWindow(window).GetFirstWindow();
 
 		// Then
-		Assert.Same(window.Object, firstWindow);
+		Assert.Same(window, firstWindow);
 	}
 	#endregion
 
 	#region FocusWindowInDirection
-	[Fact]
-	public void FocusWindowInDirection_UseInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void FocusWindowInDirection_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		Direction direction = Direction.Left;
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.GetFirstWindow()).Returns(window.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
-		engine.FocusWindowInDirection(direction, window.Object);
+		engine.FocusWindowInDirection(direction, window);
 
 		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Once);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Never);
-		window.Verify(w => w.Focus(), Times.Never);
+		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
+		innerLayoutEngine.Received(0).GetFirstWindow();
+		window.Received(0).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_FloatingWindow_NullFirstWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void FocusWindowInDirection_FloatingWindow_NullFirstWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 		Direction direction = Direction.Left;
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		engine.AddWindow(window.Object).FocusWindowInDirection(direction, window.Object);
+		engine.AddWindow(window).FocusWindowInDirection(direction, window);
 
 		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Never);
+		innerLayoutEngine.Received(0).FocusWindowInDirection(direction, window);
+		innerLayoutEngine.Received(0).GetFirstWindow();
 
-		newInnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
-		newInnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Once);
+		newInnerLayoutEngine.Received(0).FocusWindowInDirection(direction, window);
+		newInnerLayoutEngine.Received(1).GetFirstWindow();
 
-		window.Verify(w => w.Focus(), Times.Never);
+		window.Received(0).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_FloatingWindow_DefinedFirstWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void FocusWindowInDirection_FloatingWindow_DefinedFirstWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 		Direction direction = Direction.Left;
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		newInnerLayoutEngine.Setup(ile => ile.GetFirstWindow()).Returns(window.Object);
+		newInnerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
-		engine.AddWindow(window.Object).FocusWindowInDirection(direction, window.Object);
+		engine.AddWindow(window).FocusWindowInDirection(direction, window);
 
 		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Never);
+		innerLayoutEngine.Received(0).FocusWindowInDirection(direction, window);
+		innerLayoutEngine.Received(0).GetFirstWindow();
 
-		newInnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window.Object), Times.Never);
-		newInnerLayoutEngine.Verify(ile => ile.GetFirstWindow(), Times.Once);
+		newInnerLayoutEngine.Received(0).FocusWindowInDirection(direction, window);
+		newInnerLayoutEngine.Received(1).GetFirstWindow();
 
-		window.Verify(w => w.Focus(), Times.Once);
+		window.Received(1).Focus();
 	}
 	#endregion
 
 	#region SwapWindowInDirection
-	[Fact]
-	public void SwapWindowInDirection_UseInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void SwapWindowInDirection_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		Direction direction = Direction.Left;
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		engine.SwapWindowInDirection(direction, window.Object);
+		engine.SwapWindowInDirection(direction, window);
 
 		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(direction, window.Object), Times.Once);
+		innerLayoutEngine.Received(1).SwapWindowInDirection(direction, window);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_UseInner_SameInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void SwapWindowInDirection_UseInner_SameInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		Direction direction = Direction.Left;
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.SwapWindowInDirection(direction, window.Object))
-			.Returns(wrapper.InnerLayoutEngine.Object);
+		innerLayoutEngine.SwapWindowInDirection(direction, window).Returns(innerLayoutEngine);
 
 		// When
-		engine.SwapWindowInDirection(direction, window.Object);
+		engine.SwapWindowInDirection(direction, window);
 
 		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(direction, window.Object), Times.Once);
+		innerLayoutEngine.Received(1).SwapWindowInDirection(direction, window);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_FloatingWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void SwapWindowInDirection_FloatingWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 		Direction direction = Direction.Left;
 
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		engine.AddWindow(window.Object).SwapWindowInDirection(direction, window.Object);
+		engine.AddWindow(window).SwapWindowInDirection(direction, window);
 
 		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(direction, window.Object), Times.Never);
+		innerLayoutEngine.Received(0).SwapWindowInDirection(direction, window);
 	}
 	#endregion
 
 	#region ContainsWindow
-	[Fact]
-	public void ContainsWindow_UseInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void ContainsWindow_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		bool containsWindow = engine.ContainsWindow(window.Object);
+		bool containsWindow = engine.ContainsWindow(window);
 
 		// Then
 		Assert.False(containsWindow);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.ContainsWindow(window.Object), Times.Once);
+		innerLayoutEngine.Received(1).ContainsWindow(window);
 	}
 
-	[Fact]
-	public void ContainsWindow_UseInner_SameInner()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void ContainsWindow_UseInner_SameInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-
-		Wrapper wrapper = new();
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.ContainsWindow(window.Object)).Returns(true);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.ContainsWindow(window).Returns(true);
 
 		// When
-		bool containsWindow = engine.ContainsWindow(window.Object);
+		bool containsWindow = engine.ContainsWindow(window);
 
 		// Then
 		Assert.True(containsWindow);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.ContainsWindow(window.Object), Times.Once);
+		innerLayoutEngine.Received(1).ContainsWindow(window);
 	}
 
-	[Fact]
-	public void ContainsWindow_FloatingWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void ContainsWindow_FloatingWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-
-		Wrapper wrapper = new Wrapper()
-			.MarkAsFloating(window.Object)
-			.Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
+			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		bool containsWindow = engine.AddWindow(window.Object).ContainsWindow(window.Object);
+		bool containsWindow = engine.AddWindow(window).ContainsWindow(window);
 
 		// Then
 		Assert.True(containsWindow);
-		wrapper.InnerLayoutEngine.Verify(ile => ile.ContainsWindow(window.Object), Times.Never);
+		innerLayoutEngine.Received(0).ContainsWindow(window);
 	}
 	#endregion
 
 	#region WindowWasFloating_ShouldBeGarbageCollectedByUpdateInner
-	[Fact]
-	public void WindowWasFloating_AddWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void WindowWasFloating_AddWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-
-		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
-		wrapper.MarkAsFloating(window.Object);
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
 
 		// ... and then added
-		ILayoutEngine newEngine2 = newEngine.AddWindow(window.Object);
+		ILayoutEngine newEngine2 = newEngine.AddWindow(window);
 
 		// Then AddWindow should be called on the inner layout engine
-		newInnerLayoutEngine.Verify(ile => ile.AddWindow(window.Object), Times.Once);
+		Assert.NotSame(engine, newEngine);
+		Assert.NotSame(newEngine, newEngine2);
+		newInnerLayoutEngine.Received(1).AddWindow(window);
 	}
 
-	[Fact]
-	public void WindowWasFloating_MoveWindowToPoint()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void WindowWasFloating_MoveWindowToPoint(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-
-		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
-		wrapper.MarkAsFloating(window.Object);
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
 
 		// ... and then moved
-		ILayoutEngine newEngine2 = newEngine.MoveWindowToPoint(window.Object, new Location<double>());
+		ILayoutEngine newEngine2 = newEngine.MoveWindowToPoint(window, new Location<double>());
 
 		// Then MoveWindowToPoint should be called on the inner layout engine
-		newInnerLayoutEngine.Verify(ile => ile.MoveWindowToPoint(window.Object, new Location<double>()), Times.Once);
+		Assert.NotSame(engine, newEngine);
+		Assert.NotSame(newEngine, newEngine2);
+		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, new Location<double>());
 	}
 
-	[Fact]
-	public void WindowWasFloating_RemoveWindow()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void WindowWasFloating_RemoveWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-
-		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
-		wrapper.MarkAsFloating(window.Object);
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
 
 		// ... and then removed
-		ILayoutEngine newEngine2 = newEngine.RemoveWindow(window.Object);
+		ILayoutEngine newEngine2 = newEngine.RemoveWindow(window);
 
 		// Then RemoveWindow should be called on the inner layout engine
-		newInnerLayoutEngine.Verify(ile => ile.RemoveWindow(window.Object), Times.Once);
+		Assert.NotSame(engine, newEngine);
+		Assert.NotSame(newEngine, newEngine2);
+		newInnerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
-	[Fact]
-	public void WindowWasFloating_MoveWindowEdgesInDirection()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void WindowWasFloating_MoveWindowEdgesInDirection(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
 		Point<double> deltas = new();
 
-		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
-		wrapper.MarkAsFloating(window.Object);
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
 
 		// ... and then the edges are moved
-		ILayoutEngine newEngine2 = newEngine.MoveWindowEdgesInDirection(Direction.Left, deltas, window.Object);
+		ILayoutEngine newEngine2 = newEngine.MoveWindowEdgesInDirection(Direction.Left, deltas, window);
 
 		// Then MoveWindowEdgesInDirection should be called on the inner layout engine
-		newInnerLayoutEngine.Verify(
-			ile => ile.MoveWindowEdgesInDirection(Direction.Left, deltas, window.Object),
-			Times.Once
-		);
+		Assert.NotSame(engine, newEngine);
+		Assert.NotSame(newEngine, newEngine2);
+		newInnerLayoutEngine.Received(1).MoveWindowEdgesInDirection(Direction.Left, deltas, window);
 	}
 
-	[Fact]
-	public void WindowWasFloating_SwapWindowInDirection()
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void WindowWasFloating_SwapWindowInDirection(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		ILayoutEngine newInnerLayoutEngine
+	)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		Mock<ILayoutEngine> newInnerLayoutEngine = new();
-
-		Wrapper wrapper = new Wrapper().Setup_RemoveWindow(window.Object, newInnerLayoutEngine);
-		FloatingLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.InnerLayoutEngine.Object);
+		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
-		wrapper.MarkAsFloating(window.Object);
-		ILayoutEngine newEngine = engine.AddWindow(window.Object);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		wrapper.Plugin.Setup(p => p.FloatingWindows).Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
 
 		// ... and then window is swapped in a direction
-		ILayoutEngine newEngine2 = newEngine.SwapWindowInDirection(Direction.Left, window.Object);
+		ILayoutEngine newEngine2 = newEngine.SwapWindowInDirection(Direction.Left, window);
 
 		// Then SwapWindowInDirection should be called on the inner layout engine
-		newInnerLayoutEngine.Verify(ile => ile.SwapWindowInDirection(Direction.Left, window.Object), Times.Once);
+		Assert.NotSame(engine, newEngine);
+		Assert.NotSame(newEngine, newEngine2);
+		newInnerLayoutEngine.Received(1).SwapWindowInDirection(Direction.Left, window);
 	}
 	#endregion
 }
