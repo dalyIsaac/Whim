@@ -474,6 +474,5 @@ public class FloatingLayoutPluginTests
 			plugin.FloatingWindows
 		);
 	}
-
 	#endregion
 }

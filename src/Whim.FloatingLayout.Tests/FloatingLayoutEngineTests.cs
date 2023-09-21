@@ -233,7 +233,6 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-
 		innerLayoutEngine.RemoveWindow(window).Returns(innerLayoutEngine);
 
 		// When
@@ -259,10 +258,7 @@ public class FloatingLayoutEngineTests
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
-
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
-
 		innerLayoutEngine.ClearReceivedCalls();
 		plugin.ClearReceivedCalls();
 
@@ -287,7 +283,6 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		ILocation<double> location = new Location<double>();
-
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
@@ -310,7 +305,6 @@ public class FloatingLayoutEngineTests
 		ILocation<double> location = new Location<double>();
 
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-
 		innerLayoutEngine.MoveWindowToPoint(window, location).Returns(innerLayoutEngine);
 
 		// When
@@ -702,7 +696,6 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-
 		innerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
@@ -748,9 +741,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Direction direction = Direction.Left;
-
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-
 		innerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
@@ -834,7 +825,6 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Direction direction = Direction.Left;
-
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
@@ -854,7 +844,6 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Direction direction = Direction.Left;
-
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		innerLayoutEngine.SwapWindowInDirection(direction, window).Returns(innerLayoutEngine);
@@ -920,7 +909,6 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-
 		innerLayoutEngine.ContainsWindow(window).Returns(true);
 
 		// When
