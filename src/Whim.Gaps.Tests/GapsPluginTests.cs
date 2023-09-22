@@ -4,7 +4,7 @@ using System.Text.Json;
 using Whim.TestUtils;
 using Xunit;
 
-namespace Whim.Gaps.Test;
+namespace Whim.Gaps.Tests;
 
 public class GapsPluginCustomization : ICustomization
 {
