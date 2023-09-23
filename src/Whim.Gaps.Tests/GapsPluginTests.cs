@@ -1,93 +1,86 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using System.Text.Json;
+using Whim.TestUtils;
 using Xunit;
 
-namespace Whim.Gaps.Test;
+namespace Whim.Gaps.Tests;
+
+public class GapsPluginCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		GapsConfig gapsConfig = fixture.Freeze<GapsConfig>();
+		gapsConfig.InnerGap = 10;
+		gapsConfig.OuterGap = 10;
+
+		fixture.Inject(gapsConfig);
+	}
+}
 
 public class GapsPluginTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; }
-		public Mock<IWorkspaceManager> WorkspaceManager { get; }
-		public GapsConfig GapsConfig { get; }
-
-		public Wrapper()
-		{
-			Context = new();
-			WorkspaceManager = new();
-			GapsConfig = new() { InnerGap = 10, OuterGap = 10 };
-
-			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-		}
-	}
-
-	[Fact]
-	public void UpdateOuterGap_IncreasesOuterGapByDelta()
+	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	public void UpdateOuterGap_IncreasesOuterGapByDelta(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
-		Wrapper wrapper = new();
-		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
+		GapsPlugin plugin = new(context, gapsConfig);
 
 		// When
 		plugin.UpdateOuterGap(10);
 
 		// Then
-		Assert.Equal(20, wrapper.GapsConfig.OuterGap);
-		wrapper.WorkspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+		Assert.Equal(20, gapsConfig.OuterGap);
+		context.WorkspaceManager.Received(1).LayoutAllActiveWorkspaces();
 	}
 
-	[Fact]
-	public void UpdateInnerGap_IncreasesInnerGapByDelta()
+	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	public void UpdateInnerGap_IncreasesInnerGapByDelta(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
-		Wrapper wrapper = new();
-		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
+		GapsPlugin plugin = new(context, gapsConfig);
 
 		// When
 		plugin.UpdateInnerGap(10);
 
 		// Then
-		Assert.Equal(20, wrapper.GapsConfig.InnerGap);
-		wrapper.WorkspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+		Assert.Equal(20, gapsConfig.InnerGap);
+		context.WorkspaceManager.Received(1).LayoutAllActiveWorkspaces();
 	}
 
-	[Fact]
-	public void UpdateOuterGap_WithNegativeDelta_DecreasesOuterGapByDelta()
+	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	public void UpdateOuterGap_WithNegativeDelta_DecreasesOuterGapByDelta(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
-		Wrapper wrapper = new();
-		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
+		GapsPlugin plugin = new(context, gapsConfig);
 
 		// When
 		plugin.UpdateOuterGap(-10);
 
 		// Then
-		Assert.Equal(0, wrapper.GapsConfig.OuterGap);
-		wrapper.WorkspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+		Assert.Equal(0, gapsConfig.OuterGap);
+		context.WorkspaceManager.Received(1).LayoutAllActiveWorkspaces();
 	}
 
-	[Fact]
-	public void UpdateInnerGap_WithNegativeDelta_DecreasesInnerGapByDelta()
+	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	public void UpdateInnerGap_WithNegativeDelta_DecreasesInnerGapByDelta(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
-		Wrapper wrapper = new();
-		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
+		GapsPlugin plugin = new(context, gapsConfig);
 
 		// When
 		plugin.UpdateInnerGap(-10);
 
 		// Then
-		Assert.Equal(0, wrapper.GapsConfig.InnerGap);
-		wrapper.WorkspaceManager.Verify(x => x.LayoutAllActiveWorkspaces(), Times.Once);
+		Assert.Equal(0, gapsConfig.InnerGap);
+		context.WorkspaceManager.Received(1).LayoutAllActiveWorkspaces();
 	}
 
-	[Fact]
-	public void PluginCommands()
+	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	public void PluginCommands(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
-		Wrapper wrapper = new();
-		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
+		GapsPlugin plugin = new(context, gapsConfig);
 
 		// When
 		IPluginCommands pluginCommands = plugin.PluginCommands;
@@ -96,12 +89,11 @@ public class GapsPluginTests
 		Assert.Equal(4, pluginCommands.Commands.Count());
 	}
 
-	[Fact]
-	public void SaveState()
+	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	public void SaveState(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
-		Wrapper wrapper = new();
-		GapsPlugin plugin = new(wrapper.Context.Object, wrapper.GapsConfig);
+		GapsPlugin plugin = new(context, gapsConfig);
 
 		// When
 		JsonElement? state = plugin.SaveState();
