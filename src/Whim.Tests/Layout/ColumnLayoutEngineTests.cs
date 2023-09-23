@@ -1,24 +1,29 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
+public class ColumnLayoutEngineCustomization : ICustomization
+{
+	private static readonly Random rnd = new();
+
+	public void Customize(IFixture fixture)
+	{
+		IWindow window = Substitute.For<IWindow>();
+		window.Handle.Returns(new Windows.Win32.Foundation.HWND(rnd.Next()));
+		fixture.Inject(window);
+	}
+}
+
+
 public class ColumnLayoutEngineTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
-	private static readonly Random rnd = new();
-
-	private static Mock<IWindow> CreateMockWindow()
-	{
-		Mock<IWindow> window = new();
-		window.Setup(w => w.Handle).Returns(new Windows.Win32.Foundation.HWND(rnd.Next()));
-		return window;
-	}
-
-	private static IWindow CreateWindow() => CreateMockWindow().Object;
 
 	[Fact]
 	public void Name_Default()
@@ -72,25 +77,24 @@ public class ColumnLayoutEngineTests
 		Assert.False(leftToRight);
 	}
 
-	[Fact]
-	public void AddWindow()
+	[Theory, AutoSubstituteData]
+	public void AddWindow(IWindow window)
 	{
 		// Given
 		ColumnLayoutEngine engine = new(identity);
 
 		// When
-		ILayoutEngine newLayoutEngine = engine.AddWindow(CreateWindow());
+		ILayoutEngine newLayoutEngine = engine.AddWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newLayoutEngine);
 		Assert.Equal(1, newLayoutEngine.Count);
 	}
 
-	[Fact]
-	public void AddWindow_WindowAlreadyPresent()
+	[Theory, AutoSubstituteData]
+	public void AddWindow_WindowAlreadyPresent(IWindow window)
 	{
 		// Given
-		IWindow window = CreateWindow();
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
@@ -101,58 +105,55 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(1, newLayoutEngine.Count);
 	}
 
-	[Fact]
-	public void Remove()
+	[Theory, AutoSubstituteData]
+	public void Remove(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
-		ILayoutEngine newLayoutEngine = engine.RemoveWindow(window.Object);
+		ILayoutEngine newLayoutEngine = engine.RemoveWindow(window);
 
 		// Then
 		Assert.NotSame(engine, newLayoutEngine);
 		Assert.Equal(0, newLayoutEngine.Count);
 	}
 
-	[Fact]
-	public void Remove_NoChanges()
+	[Theory, AutoSubstituteData]
+	public void Remove_NoChanges(IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(CreateWindow());
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
-		ILayoutEngine newLayoutEngine = engine.RemoveWindow(new Mock<IWindow>().Object);
+		ILayoutEngine newLayoutEngine = engine.RemoveWindow(Substitute.For<IWindow>());
 
 		// Then
 		Assert.Same(engine, newLayoutEngine);
 		Assert.Equal(1, newLayoutEngine.Count);
 	}
 
-	[Fact]
-	public void Contains()
+	[Theory, AutoSubstituteData]
+	public void Contains(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
-		bool contains = engine.ContainsWindow(window.Object);
+		bool contains = engine.ContainsWindow(window);
 
 		// Then
 		Assert.True(contains);
 	}
 
-	[Fact]
-	public void Contains_False()
+	[Theory, AutoSubstituteData]
+	public void Contains_False(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
-		bool contains = engine.ContainsWindow(new Mock<IWindow>().Object);
+		bool contains = engine.ContainsWindow(Substitute.For<IWindow>());
 
 		// Then
 		Assert.False(contains);
@@ -167,23 +168,22 @@ public class ColumnLayoutEngineTests
 
 		// When
 		IWindowState[] windowStates = engine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		// Then
 		Assert.Empty(windowStates);
 	}
 
-	[Fact]
-	public void DoLayout_LeftToRight_SingleWindow()
+	[Theory, AutoSubstituteData]
+	public void DoLayout_LeftToRight_SingleWindow(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window.Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
 		IWindowState[] windowStates = engine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		// Then
@@ -198,27 +198,23 @@ public class ColumnLayoutEngineTests
 					Width = 1920,
 					Height = 1080
 				},
-				Window = window.Object,
+				Window = window,
 				WindowSize = WindowSize.Normal
 			},
 			windowStates[0]
 		);
 	}
 
-	[Fact]
-	public void DoLayout_LeftToRight_MultipleWindows()
+	[Theory, AutoSubstituteData]
+	public void DoLayout_LeftToRight_MultipleWindows(IWindow window, IWindow window2, IWindow window3)
 	{
 		// Given
-		IWindow window = CreateWindow();
-		IWindow window2 = CreateWindow();
-		IWindow window3 = CreateWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window).AddWindow(window2).AddWindow(window3);
 
 		Location<int> location = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
+		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Equal(3, result.Length);
@@ -272,17 +268,16 @@ public class ColumnLayoutEngineTests
 		);
 	}
 
-	[Fact]
-	public void DoLayout_RightToLeft_SingleWindow()
+	[Theory, AutoSubstituteData]
+	public void DoLayout_RightToLeft_SingleWindow(IWindow window)
 	{
 		// Given
-		IWindow window = CreateWindow();
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }.AddWindow(window);
 
 		Location<int> location = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
+		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Single(result);
@@ -303,14 +298,10 @@ public class ColumnLayoutEngineTests
 		);
 	}
 
-	[Fact]
-	public void DoLayout_RightToLeft_MultipleWindows()
+	[Theory, AutoSubstituteData]
+	public void DoLayout_RightToLeft_MultipleWindows(IWindow window, IWindow window2, IWindow window3)
 	{
 		// Given
-		IWindow window = CreateWindow();
-		IWindow window2 = CreateWindow();
-		IWindow window3 = CreateWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
 			.AddWindow(window)
 			.AddWindow(window2)
@@ -319,7 +310,7 @@ public class ColumnLayoutEngineTests
 		Location<int> location = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, new Mock<IMonitor>().Object).ToArray();
+		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Equal(3, result.Length);
@@ -387,11 +378,10 @@ public class ColumnLayoutEngineTests
 		Assert.Null(result);
 	}
 
-	[Fact]
-	public void GetFirstWindow_SingleWindow()
+	[Theory, AutoSubstituteData]
+	public void GetFirstWindow_SingleWindow(IWindow window)
 	{
 		// Given
-		IWindow window = CreateWindow();
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
@@ -402,499 +392,463 @@ public class ColumnLayoutEngineTests
 	}
 
 	#region FocusWindowInDirection
-	[Fact]
-	public void FocusWindowInDirection_IgnoreIllegalDirection()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_IgnoreIllegalDirection(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Up, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Up, leftWindow);
 
 		// Then
-		leftWindow.Verify(w => w.Focus(), Times.Never);
-		rightWindow.Verify(w => w.Focus(), Times.Never);
+		leftWindow.DidNotReceive().Focus();
+		rightWindow.DidNotReceive().Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_WindowNotFound()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_WindowNotFound(IWindow leftWindow, IWindow rightWindow, IWindow otherWindow)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-		Mock<IWindow> otherWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Left, otherWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, otherWindow);
 
 		// Then
-		leftWindow.Verify(w => w.Focus(), Times.Never);
-		rightWindow.Verify(w => w.Focus(), Times.Never);
+		leftWindow.DidNotReceive().Focus();
+		rightWindow.DidNotReceive().Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_LeftToRight_FocusRight()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_LeftToRight_FocusRight(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Right, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Right, leftWindow);
 
 		// Then
-		leftWindow.Verify(w => w.Focus(), Times.Never);
-		rightWindow.Verify(w => w.Focus(), Times.Once);
+		leftWindow.DidNotReceive().Focus();
+		rightWindow.Received(1).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_LeftToRight_FocusRightWrapAround()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_LeftToRight_FocusRightWrapAround(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Right, rightWindow.Object);
+		engine.FocusWindowInDirection(Direction.Right, rightWindow);
 
 		// Then
-		leftWindow.Verify(w => w.Focus(), Times.Once);
+		leftWindow.Received(1).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_LeftToRight_FocusLeft()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_LeftToRight_FocusLeft(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Left, rightWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, rightWindow);
 
 		// Then
-		leftWindow.Verify(w => w.Focus(), Times.Once);
+		leftWindow.Received(1).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_LeftToRight_FocusLeftWrapAround()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_LeftToRight_FocusLeftWrapAround(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Left, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, leftWindow);
 
 		// Then
-		rightWindow.Verify(w => w.Focus(), Times.Once);
+		rightWindow.Received(1).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_RightToLeft_FocusLeft()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_RightToLeft_FocusLeft(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Left, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, leftWindow);
 
 		// Then
-		rightWindow.Verify(w => w.Focus(), Times.Once);
+		rightWindow.Received(1).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_RightToLeft_FocusLeftWrapAround()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_RightToLeft_FocusLeftWrapAround(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Left, rightWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, rightWindow);
 
 		// Then
-		leftWindow.Verify(w => w.Focus(), Times.Once);
+		leftWindow.Received(1).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_RightToLeft_FocusRight()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_RightToLeft_FocusRight(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Right, rightWindow.Object);
+		engine.FocusWindowInDirection(Direction.Right, rightWindow);
 
 		// Then
-		leftWindow.Verify(w => w.Focus(), Times.Once);
+		leftWindow.Received(1).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_RightToLeft_FocusRightWrapAround()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_RightToLeft_FocusRightWrapAround(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Right, leftWindow.Object);
+		engine.FocusWindowInDirection(Direction.Right, leftWindow);
 
 		// Then
-		rightWindow.Verify(w => w.Focus(), Times.Once);
+		rightWindow.Received(1).Focus();
 	}
 	#endregion
 
 	#region SwapWindowInDirection
-	[Fact]
-	public void SwapWindowInDirection_IgnoreIllegalDirection()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_IgnoreIllegalDirection(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Up, leftWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Up, leftWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Same(engine, newEngine);
 		Assert.Equal(2, windows.Length);
 
-		Assert.Equal(leftWindow.Object, windows[0].Window);
+		Assert.Equal(leftWindow, windows[0].Window);
 		Assert.Equal(0, windows[0].Location.X);
 
-		Assert.Equal(rightWindow.Object, windows[1].Window);
+		Assert.Equal(rightWindow, windows[1].Window);
 		Assert.Equal(960, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_WindowNotFound()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_WindowNotFound(IWindow rightWindow, IWindow leftWindow, IWindow notFoundWindow)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-		Mock<IWindow> notFoundWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, notFoundWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, notFoundWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Same(engine, newEngine);
 		Assert.Equal(2, windows.Length);
 
-		Assert.Equal(leftWindow.Object, windows[0].Window);
+		Assert.Equal(leftWindow, windows[0].Window);
 		Assert.Equal(0, windows[0].Location.X);
 
-		Assert.Equal(rightWindow.Object, windows[1].Window);
+		Assert.Equal(rightWindow, windows[1].Window);
 		Assert.Equal(960, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_LeftToRight_SwapRight()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_LeftToRight_SwapRight(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
-		Assert.Equal(rightWindow.Object, windows[0].Window);
+		Assert.Equal(rightWindow, windows[0].Window);
 		Assert.Equal(0, windows[0].Location.X);
 
-		Assert.Equal(leftWindow.Object, windows[1].Window);
+		Assert.Equal(leftWindow, windows[1].Window);
 		Assert.Equal(960, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_LeftToRight_SwapRightWrapAround()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_LeftToRight_SwapRightWrapAround(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
-		Assert.Equal(rightWindow.Object, windows[0].Window);
+		Assert.Equal(rightWindow, windows[0].Window);
 		Assert.Equal(0, windows[0].Location.X);
 
-		Assert.Equal(leftWindow.Object, windows[1].Window);
+		Assert.Equal(leftWindow, windows[1].Window);
 		Assert.Equal(960, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_LeftToRight_SwapLeft()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_LeftToRight_SwapLeft(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
-		Assert.Equal(rightWindow.Object, windows[0].Window);
+		Assert.Equal(rightWindow, windows[0].Window);
 		Assert.Equal(0, windows[0].Location.X);
 
-		Assert.Equal(leftWindow.Object, windows[1].Window);
+		Assert.Equal(leftWindow, windows[1].Window);
 		Assert.Equal(960, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_LeftToRight_SwapLeftWrapAround()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_LeftToRight_SwapLeftWrapAround(
+		IWindow rightWindow, IWindow leftWindow
+	)
 	{
 		// Given
-		Mock<IWindow> leftWindow = CreateMockWindow();
-		Mock<IWindow> rightWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow.Object)
-			.AddWindow(rightWindow.Object);
+			.AddWindow(leftWindow)
+			.AddWindow(rightWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
-		Assert.Equal(rightWindow.Object, windows[0].Window);
+		Assert.Equal(rightWindow, windows[0].Window);
 		Assert.Equal(0, windows[0].Location.X);
 
-		Assert.Equal(leftWindow.Object, windows[1].Window);
+		Assert.Equal(leftWindow, windows[1].Window);
 		Assert.Equal(960, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_RightToLeft_SwapLeft()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_RightToLeft_SwapLeft(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		Mock<IWindow> rightWindow = CreateMockWindow();
-		Mock<IWindow> leftWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(rightWindow.Object)
-			.AddWindow(leftWindow.Object);
+			.AddWindow(rightWindow)
+			.AddWindow(leftWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
-		Assert.Equal(leftWindow.Object, windows[0].Window);
+		Assert.Equal(leftWindow, windows[0].Window);
 		Assert.Equal(960, windows[0].Location.X);
 
-		Assert.Equal(rightWindow.Object, windows[1].Window);
+		Assert.Equal(rightWindow, windows[1].Window);
 		Assert.Equal(0, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_RightToLeft_SwapLeftWrapAround()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_RightToLeft_SwapLeftWrapAround(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		Mock<IWindow> rightWindow = CreateMockWindow();
-		Mock<IWindow> leftWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(rightWindow.Object)
-			.AddWindow(leftWindow.Object);
+			.AddWindow(rightWindow)
+			.AddWindow(leftWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
-		Assert.Equal(leftWindow.Object, windows[0].Window);
+		Assert.Equal(leftWindow, windows[0].Window);
 		Assert.Equal(960, windows[0].Location.X);
 
-		Assert.Equal(rightWindow.Object, windows[1].Window);
+		Assert.Equal(rightWindow, windows[1].Window);
 		Assert.Equal(0, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_RightToLeft_SwapRight()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_RightToLeft_SwapRight(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		Mock<IWindow> rightWindow = CreateMockWindow();
-		Mock<IWindow> leftWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(rightWindow.Object)
-			.AddWindow(leftWindow.Object);
+			.AddWindow(rightWindow)
+			.AddWindow(leftWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
-		Assert.Equal(leftWindow.Object, windows[0].Window);
+		Assert.Equal(leftWindow, windows[0].Window);
 		Assert.Equal(960, windows[0].Location.X);
 
-		Assert.Equal(rightWindow.Object, windows[1].Window);
+		Assert.Equal(rightWindow, windows[1].Window);
 		Assert.Equal(0, windows[1].Location.X);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_RightToLeft_SwapRightWrapAround()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_RightToLeft_SwapRightWrapAround(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		Mock<IWindow> rightWindow = CreateMockWindow();
-		Mock<IWindow> leftWindow = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(rightWindow.Object)
-			.AddWindow(leftWindow.Object);
+			.AddWindow(rightWindow)
+			.AddWindow(leftWindow);
 
 		// When
-		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow.Object);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow);
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
-		Assert.Equal(leftWindow.Object, windows[0].Window);
+		Assert.Equal(leftWindow, windows[0].Window);
 		Assert.Equal(960, windows[0].Location.X);
 
-		Assert.Equal(rightWindow.Object, windows[1].Window);
+		Assert.Equal(rightWindow, windows[1].Window);
 		Assert.Equal(0, windows[1].Location.X);
 	}
 	#endregion
 
-	[Fact]
-	public void MoveWindowEdgesInDirection()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowEdgesInDirection(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(window.Object)
-			.AddWindow(new Mock<IWindow>().Object);
+			.AddWindow(window)
+			.AddWindow(Substitute.For<IWindow>());
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(
 			Direction.Up,
 			new Point<double>() { X = 0.2 },
-			window.Object
+			window
 		);
 
 		// Then
@@ -902,84 +856,76 @@ public class ColumnLayoutEngineTests
 	}
 
 	#region AddWindowAtPoint
-	[Fact]
-	public void AddWindowAtPoint_LessThan0()
+	[Theory, AutoSubstituteData]
+	public void AddWindowAtPoint_LessThan0(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(new Mock<IWindow>().Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(Substitute.For<IWindow>());
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = -10 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = -10 });
 		List<IWindowState> windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToList();
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		Assert.Equal(0, windows.FindIndex(w => w.Window == window.Object));
+		Assert.Equal(0, windows.FindIndex(w => w.Window == window));
 	}
 
-	[Fact]
-	public void AddWindowAtPoint_GreaterThanAmountOfWindows()
+	[Theory, AutoSubstituteData]
+	public void AddWindowAtPoint_GreaterThanAmountOfWindows(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-
-		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(new Mock<IWindow>().Object);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(Substitute.For<IWindow>());
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 10 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 10 });
 		List<IWindowState> windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToList();
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		Assert.Equal(1, windows.FindIndex(w => w.Window == window.Object));
+		Assert.Equal(1, windows.FindIndex(w => w.Window == window));
 	}
 
-	[Fact]
-	public void AddWindowAtPoint_LeftToRight_Middle()
+	[Theory, AutoSubstituteData]
+	public void AddWindowAtPoint_LeftToRight_Middle(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(new Mock<IWindow>().Object)
-			.AddWindow(new Mock<IWindow>().Object);
+			.AddWindow(Substitute.For<IWindow>())
+			.AddWindow(Substitute.For<IWindow>());
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 0.5 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 0.5 });
 		List<IWindowState> windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToList();
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		Assert.Equal(1, windows.FindIndex(w => w.Window == window.Object));
+		Assert.Equal(1, windows.FindIndex(w => w.Window == window));
 	}
 
-	[Fact]
-	public void AddWindowAtPoint_RightToLeft_Middle()
+	[Theory, AutoSubstituteData]
+	public void AddWindowAtPoint_RightToLeft_Middle(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = CreateMockWindow();
-
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
-			.AddWindow(new Mock<IWindow>().Object)
-			.AddWindow(new Mock<IWindow>().Object);
+			.AddWindow(Substitute.For<IWindow>())
+			.AddWindow(Substitute.For<IWindow>());
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window.Object, new Point<double>() { X = 0.5 });
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 0.5 });
 		List<IWindowState> windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, new Mock<IMonitor>().Object)
+			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToList();
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		Assert.Equal(1, windows.FindIndex(w => w.Window == window.Object));
+		Assert.Equal(1, windows.FindIndex(w => w.Window == window));
 	}
 	#endregion
 }
