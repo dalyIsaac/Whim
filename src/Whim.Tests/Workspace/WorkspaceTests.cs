@@ -1,9 +1,7 @@
 using AutoFixture;
 using NSubstitute;
 using System;
-using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
@@ -26,25 +24,7 @@ public class WorkspaceCustomization : ICustomization
 		internalContext.LayoutLock.Returns(layoutLock);
 
 		// Run DoLayout synchronously for tests.
-		internalContext.CoreNativeManager
-			.When(
-				_ =>
-					_.RunTask(
-						Arg.Any<Func<Dictionary<HWND, IWindowState>>>(),
-						Arg.Any<Action<Task<Dictionary<HWND, IWindowState>>>>(),
-						Arg.Any<CancellationToken>()
-					)
-			)
-			.Do(_ =>
-			{
-				var work = _.Arg<Func<Dictionary<HWND, IWindowState>>>();
-				var cleanup = _.Arg<Action<Task<Dictionary<HWND, IWindowState>>>>();
-				var cancellationToken = _.Arg<CancellationToken>();
-
-				// Run the work on the current thread.
-				var result = work();
-				cleanup(Task.FromResult(result));
-			});
+		WorkspaceTestUtils.SetupDoLayout(internalContext);
 
 		// Assume windows are valid windows.
 		internalContext.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
