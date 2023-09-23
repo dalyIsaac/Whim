@@ -622,8 +622,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// <returns></returns>
 	private bool GarbageCollect()
 	{
-		IInternalWindowManager windowManager = (IInternalWindowManager)_context.WindowManager;
-
 		List<IWindow> garbageWindows = new();
 		bool garbageCollected = false;
 
@@ -635,7 +633,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Window {window.Handle} is no longer a window.");
 				removeWindow = true;
 			}
-			else if (!windowManager.Windows.ContainsKey(window.Handle))
+			else if (!_internalContext.WindowManager.Windows.ContainsKey(window.Handle))
 			{
 				Logger.Debug($"Window {window.Handle} is somehow no longer managed.");
 				removeWindow = true;
@@ -651,7 +649,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		// Remove the windows by doing a sneaky call.
 		foreach (IWindow window in garbageWindows)
 		{
-			windowManager.OnWindowRemoved(window);
+			_internalContext.WindowManager.OnWindowRemoved(window);
 		}
 
 		return garbageCollected;

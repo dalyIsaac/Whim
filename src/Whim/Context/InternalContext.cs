@@ -6,9 +6,13 @@ internal class InternalContext : IInternalContext
 {
 	private bool _disposedValue;
 
+	private readonly IContext _context;
+
 	public ICoreNativeManager CoreNativeManager { get; }
 
 	public IWindowMessageMonitor WindowMessageMonitor { get; }
+
+	public IInternalWindowManager WindowManager => (IInternalWindowManager)_context.WindowManager;
 
 	public IKeybindHook KeybindHook { get; }
 
@@ -18,6 +22,7 @@ internal class InternalContext : IInternalContext
 
 	public InternalContext(IContext context)
 	{
+		_context = context;
 		CoreNativeManager = new CoreNativeManager(context);
 		WindowMessageMonitor = new WindowMessageMonitor(context, this);
 		KeybindHook = new KeybindHook(context, this);
