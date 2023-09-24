@@ -20,7 +20,6 @@ public class ColumnLayoutEngineCustomization : ICustomization
 	}
 }
 
-
 public class ColumnLayoutEngineTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
@@ -393,14 +392,10 @@ public class ColumnLayoutEngineTests
 
 	#region FocusWindowInDirection
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_IgnoreIllegalDirection(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_IgnoreIllegalDirection(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Up, leftWindow);
@@ -414,9 +409,7 @@ public class ColumnLayoutEngineTests
 	public void FocusWindowInDirection_WindowNotFound(IWindow leftWindow, IWindow rightWindow, IWindow otherWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, otherWindow);
@@ -427,14 +420,10 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_LeftToRight_FocusRight(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_LeftToRight_FocusRight(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Right, leftWindow);
@@ -445,14 +434,10 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_LeftToRight_FocusRightWrapAround(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_LeftToRight_FocusRightWrapAround(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Right, rightWindow);
@@ -462,14 +447,10 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_LeftToRight_FocusLeft(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_LeftToRight_FocusLeft(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, rightWindow);
@@ -479,14 +460,10 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_LeftToRight_FocusLeftWrapAround(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_LeftToRight_FocusLeftWrapAround(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, leftWindow);
@@ -496,9 +473,7 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_RightToLeft_FocusLeft(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_RightToLeft_FocusLeft(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
@@ -513,9 +488,7 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_RightToLeft_FocusLeftWrapAround(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_RightToLeft_FocusLeftWrapAround(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
@@ -530,9 +503,7 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_RightToLeft_FocusRight(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_RightToLeft_FocusRight(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
@@ -547,9 +518,7 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_RightToLeft_FocusRightWrapAround(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void FocusWindowInDirection_RightToLeft_FocusRightWrapAround(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }
@@ -566,14 +535,10 @@ public class ColumnLayoutEngineTests
 
 	#region SwapWindowInDirection
 	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_IgnoreIllegalDirection(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void SwapWindowInDirection_IgnoreIllegalDirection(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Up, leftWindow);
@@ -597,9 +562,7 @@ public class ColumnLayoutEngineTests
 	public void SwapWindowInDirection_WindowNotFound(IWindow rightWindow, IWindow leftWindow, IWindow notFoundWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, notFoundWindow);
@@ -620,14 +583,10 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_LeftToRight_SwapRight(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void SwapWindowInDirection_LeftToRight_SwapRight(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow);
@@ -648,14 +607,10 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_LeftToRight_SwapRightWrapAround(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void SwapWindowInDirection_LeftToRight_SwapRightWrapAround(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow);
@@ -676,14 +631,10 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_LeftToRight_SwapLeft(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void SwapWindowInDirection_LeftToRight_SwapLeft(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow);
@@ -704,14 +655,10 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_LeftToRight_SwapLeftWrapAround(
-		IWindow rightWindow, IWindow leftWindow
-	)
+	public void SwapWindowInDirection_LeftToRight_SwapLeftWrapAround(IWindow rightWindow, IWindow leftWindow)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(leftWindow)
-			.AddWindow(rightWindow);
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(leftWindow).AddWindow(rightWindow);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow);
@@ -840,9 +787,7 @@ public class ColumnLayoutEngineTests
 	public void MoveWindowEdgesInDirection(IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new ColumnLayoutEngine(identity)
-			.AddWindow(window)
-			.AddWindow(Substitute.For<IWindow>());
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window).AddWindow(Substitute.For<IWindow>());
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(
