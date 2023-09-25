@@ -85,11 +85,15 @@ internal class MonitorManagerCustomization : ICustomization
 		internalCtx.CoreNativeManager.GetVirtualScreenTop().Returns(primaryRect.top);
 		internalCtx.CoreNativeManager.GetVirtualScreenWidth().Returns(primaryRect.right - primaryRect.left);
 		internalCtx.CoreNativeManager.GetVirtualScreenHeight().Returns(primaryRect.bottom - primaryRect.top);
-		internalCtx.CoreNativeManager.GetPrimaryDisplayWorkArea(out RECT _).Returns((callInfo) =>
-		{
-			callInfo[0] = primaryRect;
-			return (BOOL)true;
-		});
+		internalCtx.CoreNativeManager
+			.GetPrimaryDisplayWorkArea(out RECT _)
+			.Returns(
+				(callInfo) =>
+				{
+					callInfo[0] = primaryRect;
+					return (BOOL)true;
+				}
+			);
 
 		// The HMONITORs are non-zero
 		if (monitorRects.Length > 1)
