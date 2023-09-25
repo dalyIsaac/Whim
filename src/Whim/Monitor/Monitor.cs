@@ -48,16 +48,20 @@ internal class Monitor : IMonitor
 			_internalContext.CoreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
 			WorkingArea = rect.ToLocation();
 		}
-		else
+		else if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
-			MONITORINFOEXW infoEx = new() { monitorInfo = new MONITORINFO() { cbSize = (uint)sizeof(MONITORINFOEXW) } };
-			_internalContext.CoreNativeManager.GetMonitorInfo(_hmonitor, ref infoEx);
-
 			Bounds = infoEx.monitorInfo.rcMonitor.ToLocation();
 			WorkingArea = infoEx.monitorInfo.rcWork.ToLocation();
 			IsPrimary = false;
 			Name = infoEx.GetDeviceName();
+		}
+		else
+		{
+			Bounds = new Location<int>();
+			WorkingArea = new Location<int>();
+			IsPrimary = false;
+			Name = "NOT A DISPLAY";
 		}
 
 		// Get the scale factor.

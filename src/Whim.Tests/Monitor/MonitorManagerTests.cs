@@ -1,6 +1,8 @@
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.UI.Dispatching;
-using Moq;
+using NSubstitute;
+using NSubstitute.ClearExtensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -8,268 +10,225 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Unnecessary for tests")]
-public class MonitorManagerTests
+internal class MonitorManagerCustomization : ICustomization
 {
-	private class Wrapper
+	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+	public void Customize(IFixture fixture)
 	{
-		private RECT[] _monitorRects;
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
-		public Mock<IContext> Context { get; }
-		public Mock<IInternalContext> InternalContext { get; }
-		public Mock<IWorkspaceManager> WorkspaceManager { get; }
-		public Mock<ICoreNativeManager> CoreNativeManager { get; }
-		public Mock<IWindowMessageMonitor> WindowMessageMonitor { get; } = new();
-		public Mock<IMouseHook> MouseHook { get; } = new();
+		internalCtx.LayoutLock.Returns(new ReaderWriterLockSlim());
 
-		public Wrapper()
-		{
-			Context = new();
-			InternalContext = new();
-
-			WorkspaceManager = new();
-			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-
-			CoreNativeManager = new();
-			UpdateGetCurrentMonitors(
-				new[]
+		UpdateGetCurrentMonitors(
+			internalCtx,
+			new[]
+			{
+				new RECT()
 				{
-					new RECT()
-					{
-						left = 1920,
-						top = 0,
-						right = 3840,
-						bottom = 1080
-					},
-					new RECT()
-					{
-						left = 0,
-						top = 0,
-						right = 1920,
-						bottom = 1080
-					}
+					left = 1920,
+					top = 0,
+					right = 3840,
+					bottom = 1080
+				},
+				new RECT()
+				{
+					left = 0,
+					top = 0,
+					right = 1920,
+					bottom = 1080
 				}
-			);
+			}
+		);
+	}
 
-			InternalContext.SetupGet(x => x.CoreNativeManager).Returns(CoreNativeManager.Object);
-			InternalContext.SetupGet(x => x.MouseHook).Returns(MouseHook.Object);
-			InternalContext.SetupGet(x => x.WindowMessageMonitor).Returns(WindowMessageMonitor.Object);
-			InternalContext.Setup(c => c.LayoutLock).Returns(new ReaderWriterLockSlim());
-		}
-
-		[MemberNotNull(nameof(_monitorRects))]
-		public void UpdateGetCurrentMonitors(RECT[] monitorRects)
-		{
-			_monitorRects = monitorRects;
-			CoreNativeManager.Setup(m => m.HasMultipleMonitors()).Returns(monitorRects.Length > 1);
-			CoreNativeManager
-				.Setup(
-					m =>
-						m.EnumDisplayMonitors(
-							It.IsAny<SafeHandle>(),
-							It.IsAny<RECT?>(),
-							It.IsAny<MONITORENUMPROC>(),
-							It.IsAny<LPARAM>()
-						)
-				)
-				.Callback<SafeHandle, RECT?, MONITORENUMPROC, LPARAM>(
-					(hdc, rect, callback, param) =>
+	public static void UpdateGetCurrentMonitors(IInternalContext internalCtx, RECT[] monitorRects)
+	{
+		internalCtx.CoreNativeManager.ClearSubstitute();
+		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(monitorRects.Length > 1);
+		internalCtx.CoreNativeManager
+			.EnumDisplayMonitors(Arg.Any<SafeHandle>(), Arg.Any<RECT?>(), Arg.Any<MONITORENUMPROC>(), Arg.Any<LPARAM>())
+			.Returns(
+				(callInfo) =>
+				{
+					unsafe
 					{
-						unsafe
+						fixed (RECT* monitorRectsPtr = monitorRects)
 						{
-							fixed (RECT* monitorRectsPtr = _monitorRects)
+							for (int i = 0; i < monitorRects.Length; i++)
 							{
-								for (int i = 0; i < _monitorRects.Length; i++)
-								{
-									callback.Invoke(new HMONITOR(i + 1), (HDC)0, &monitorRectsPtr[i], (LPARAM)0);
-								}
+								callInfo
+									.ArgAt<MONITORENUMPROC>(2)
+									.Invoke(new HMONITOR(i + 1), (HDC)0, &monitorRectsPtr[i], (LPARAM)0);
 							}
 						}
 					}
-				);
 
-			var potentialPrimaryMonitors = monitorRects.Where(r => r.left == 0 && r.top == 0);
-			if (potentialPrimaryMonitors.Count() != 1)
-			{
-				throw new Exception("No primary monitor found");
-			}
-			RECT primaryRect = potentialPrimaryMonitors.First();
-
-			CoreNativeManager.Setup(c => c.GetVirtualScreenLeft()).Returns(primaryRect.left);
-			CoreNativeManager.Setup(c => c.GetVirtualScreenTop()).Returns(primaryRect.top);
-			CoreNativeManager.Setup(c => c.GetVirtualScreenWidth()).Returns(primaryRect.right - primaryRect.left);
-			CoreNativeManager
-				.Setup(expression: c => c.GetVirtualScreenHeight())
-				.Returns(primaryRect.bottom - primaryRect.top);
-			CoreNativeManager.Setup(c => c.GetPrimaryDisplayWorkArea(out primaryRect));
-
-			// The HMONITORs are non-zero
-			if (_monitorRects.Length > 1)
-			{
-				for (int i = 0; i < _monitorRects.Length; i++)
-				{
-					if (primaryRect.Equals(_monitorRects[i]))
-					{
-						CoreNativeManager
-							.Setup(
-								n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
-							)
-							.Returns(new HMONITOR(i + 1));
-						continue;
-					}
-
-					CoreNativeManager
-						.Setup(m => m.GetMonitorInfo(new HMONITOR(i + 1), ref It.Ref<MONITORINFOEXW>.IsAny))
-						.Callback(
-							(HMONITOR hmonitor, ref MONITORINFOEXW infoEx) =>
-							{
-								infoEx.monitorInfo.rcMonitor = _monitorRects[(int)hmonitor - 1];
-								infoEx.monitorInfo.rcWork = _monitorRects[(int)hmonitor - 1];
-								infoEx.monitorInfo.dwFlags = 0;
-								infoEx.szDevice = $"DISPLAY {i + 1}";
-							}
-						);
+					return (BOOL)true;
 				}
-			}
-			else
+			);
+
+		var potentialPrimaryMonitors = monitorRects.Where(r => r.left == 0 && r.top == 0);
+		if (potentialPrimaryMonitors.Count() != 1)
+		{
+			throw new Exception("No primary monitor found");
+		}
+		RECT primaryRect = potentialPrimaryMonitors.First();
+
+		internalCtx.CoreNativeManager.GetVirtualScreenLeft().Returns(primaryRect.left);
+		internalCtx.CoreNativeManager.GetVirtualScreenTop().Returns(primaryRect.top);
+		internalCtx.CoreNativeManager.GetVirtualScreenWidth().Returns(primaryRect.right - primaryRect.left);
+		internalCtx.CoreNativeManager.GetVirtualScreenHeight().Returns(primaryRect.bottom - primaryRect.top);
+		internalCtx.CoreNativeManager.GetPrimaryDisplayWorkArea(out RECT _).Returns((callInfo) =>
+		{
+			callInfo[0] = primaryRect;
+			return (BOOL)true;
+		});
+
+		// The HMONITORs are non-zero
+		if (monitorRects.Length > 1)
+		{
+			for (int i = 0; i < monitorRects.Length; i++)
 			{
-				CoreNativeManager
-					.Setup(n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY))
-					.Returns(new HMONITOR(1));
+				if (primaryRect.Equals(monitorRects[i]))
+				{
+					internalCtx.CoreNativeManager
+						.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
+						.Returns(new HMONITOR(i + 1));
+					continue;
+				}
+
+				internalCtx.CoreNativeManager
+					.GetMonitorInfoEx(new HMONITOR(i + 1))
+					.Returns(
+						new MONITORINFOEXW()
+						{
+							monitorInfo = new MONITORINFO()
+							{
+								rcMonitor = monitorRects[i],
+								rcWork = monitorRects[i],
+								dwFlags = 0
+							},
+							szDevice = $"DISPLAY {i + 1}"
+						}
+					);
 			}
 		}
+		else
+		{
+			internalCtx.CoreNativeManager
+				.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
+				.Returns(new HMONITOR(1));
+		}
 	}
+}
 
-	[Fact]
-	public void Create()
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Unnecessary for tests")]
+public class MonitorManagerTests
+{
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void Create(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
 		// When
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 
 		// Then
 		Assert.Equal(new HMONITOR(2), (monitorManager.PrimaryMonitor as Monitor)!._hmonitor);
 		Assert.Equal(new HMONITOR(2), (monitorManager.ActiveMonitor as Monitor)!._hmonitor);
 	}
 
-	[Fact]
-	public void Create_NoPrimaryMonitorFound()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void Create_NoPrimaryMonitorFound(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager
-			.Setup(n => n.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY))
+		internalCtx.CoreNativeManager
+			.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
 			.Returns(new HMONITOR(0));
 
 		// When
 		// Then
-		var result = Assert.Throws<Exception>(() => new MonitorManager(wrapper.InternalContext.Object));
+		var result = Assert.Throws<Exception>(() => new MonitorManager(internalCtx));
 	}
 
-	[Fact]
-	public void Initialize()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void Initialize(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 
 		// When
 		monitorManager.Initialize();
 
 		// Then
-		wrapper.WindowMessageMonitor.VerifyAdd(
-			m => m.DisplayChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
-			Times.Once
-		);
-		wrapper.WindowMessageMonitor.VerifyAdd(
-			m => m.WorkAreaChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
-			Times.Once
-		);
-		wrapper.WindowMessageMonitor.VerifyAdd(
-			m => m.DpiChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
-			Times.Once
-		);
-		wrapper.WindowMessageMonitor.VerifyAdd(
-			m => m.SessionChanged += It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
-			Times.Once
-		);
+		internalCtx.WindowMessageMonitor.Received(1).DisplayChanged += Arg.Any<
+			EventHandler<WindowMessageMonitorEventArgs>
+		>();
+		internalCtx.WindowMessageMonitor.Received(1).WorkAreaChanged += Arg.Any<
+			EventHandler<WindowMessageMonitorEventArgs>
+		>();
+		internalCtx.WindowMessageMonitor.Received(1).DpiChanged += Arg.Any<
+			EventHandler<WindowMessageMonitorEventArgs>
+		>();
+		internalCtx.WindowMessageMonitor.Received(1).SessionChanged += Arg.Any<
+			EventHandler<WindowMessageMonitorEventArgs>
+		>();
 	}
 
-	[Fact]
-	public void WindowFocused_NullMonitor()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowFocused_NullMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()))
+		internalCtx.CoreNativeManager
+			.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 
 		// When
-		monitorManager.WindowFocused(new Mock<IWindow>().Object);
+		monitorManager.WindowFocused(Substitute.For<IWindow>());
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetForegroundWindow(), Times.Never);
-		wrapper.CoreNativeManager.Verify(
-			cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
+		internalCtx.CoreNativeManager.Received(1).MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
 	}
 
-	[Fact]
-	public void WindowFocused()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowFocused(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
-
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 
 		// When
-		monitorManager.WindowFocused(new Mock<IWindow>().Object);
+		monitorManager.WindowFocused(Substitute.For<IWindow>());
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetForegroundWindow(), Times.Never);
-		wrapper.CoreNativeManager.Verify(
-			cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
+		internalCtx.CoreNativeManager.Received(1).MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
 	}
 
-	[Fact]
-	public void WindowFocused_NullWindow()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowFocused_NullWindow(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()))
+		internalCtx.CoreNativeManager
+			.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
-		wrapper.Context.SetupGet(c => c.WorkspaceManager).Returns(wrapper.WorkspaceManager.Object);
-
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 
 		// When
 		monitorManager.WindowFocused(null);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetForegroundWindow(), Times.Once);
-		wrapper.CoreNativeManager.Verify(
-			cnm => cnm.MonitorFromWindow(It.IsAny<HWND>(), It.IsAny<MONITOR_FROM_FLAGS>()),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager.Received(1).GetForegroundWindow();
+		internalCtx.CoreNativeManager.Received(1).MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
 	}
 
 	private static WindowMessageMonitorEventArgs WindowMessageMonitorEventArgs =>
@@ -286,14 +245,12 @@ public class MonitorManagerTests
 			Result = IntPtr.Zero
 		};
 
-	[Fact]
-	public void WindowMessageMonitor_DisplayChanged_AddMonitor_HasMultipleMonitors()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasMultipleMonitors(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
 		// Populate the monitor manager with the default two monitors
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to be given a new monitor
@@ -322,13 +279,16 @@ public class MonitorManagerTests
 				bottom = 2160
 			};
 		RECT[] monitorRects = new[] { right, leftTop, leftBottom };
-		wrapper.UpdateGetCurrentMonitors(monitorRects);
+		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, monitorRects);
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => wrapper.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
+			() =>
+				internalCtx.WindowMessageMonitor.DisplayChanged += Raise.Event<
+					EventHandler<WindowMessageMonitorEventArgs>
+				>(internalCtx.WindowMessageMonitor, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -356,12 +316,10 @@ public class MonitorManagerTests
 			.Equal(expectedAddedRects.Select(r => r.ToLocation()));
 	}
 
-	[Fact]
-	public void WindowMessageMonitor_DisplayChanged_AddMonitor_HasSingleMonitor()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasSingleMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
 		// Populate the monitor manager with a single monitor
 		RECT primaryRect =
 			new()
@@ -371,9 +329,9 @@ public class MonitorManagerTests
 				right = 1920,
 				bottom = 1080
 			};
-		wrapper.UpdateGetCurrentMonitors(new[] { primaryRect });
+		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { primaryRect });
 
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to be given a new monitor
@@ -385,13 +343,16 @@ public class MonitorManagerTests
 				right = 3840,
 				bottom = 1080
 			};
-		wrapper.UpdateGetCurrentMonitors(new[] { primaryRect, right });
+		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { primaryRect, right });
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => wrapper.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
+			() =>
+				internalCtx.WindowMessageMonitor.DisplayChanged += Raise.Event<
+					EventHandler<WindowMessageMonitorEventArgs>
+				>(internalCtx.WindowMessageMonitor, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -418,14 +379,12 @@ public class MonitorManagerTests
 			.Equal(expectedAddedRects.Select(r => r.ToLocation()));
 	}
 
-	[Fact]
-	public void WindowMessageMonitor_DisplayChanged_RemoveMonitor_HasMultipleMonitors()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowMessageMonitor_DisplayChanged_RemoveMonitor_HasMultipleMonitors(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
 		// Populate the monitor manager with the default two monitors
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to have only one monitor
@@ -437,13 +396,16 @@ public class MonitorManagerTests
 				right = 1920,
 				bottom = 1080
 			};
-		wrapper.UpdateGetCurrentMonitors(new[] { left });
+		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { left });
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => wrapper.WindowMessageMonitor.Raise(m => m.DisplayChanged += null, WindowMessageMonitorEventArgs)
+			() =>
+				internalCtx.WindowMessageMonitor.DisplayChanged += Raise.Event<
+					EventHandler<WindowMessageMonitorEventArgs>
+				>(internalCtx.WindowMessageMonitor, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
@@ -463,71 +425,77 @@ public class MonitorManagerTests
 			.Equal(expectedRemovedRects.Select(r => r.ToLocation()));
 	}
 
-	[Fact]
-	public void WindowMessageMonitor_WorkAreaChanged()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowMessageMonitor_WorkAreaChanged(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => wrapper.WindowMessageMonitor.Raise(m => m.WorkAreaChanged += null, WindowMessageMonitorEventArgs)
+			() =>
+				internalCtx.WindowMessageMonitor.WorkAreaChanged += Raise.Event<
+					EventHandler<WindowMessageMonitorEventArgs>
+				>(internalCtx.WindowMessageMonitor, WindowMessageMonitorEventArgs)
 		);
 
 		// Then
 		Assert.Equal(raisedEvent.Arguments.UnchangedMonitors, monitorManager.ToList());
 	}
 
-	[Fact]
-	public void WindowMessageMonitor_DpiChanged()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowMessageMonitor_DpiChanged(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
 			h => monitorManager.MonitorsChanged += h,
 			h => monitorManager.MonitorsChanged -= h,
-			() => wrapper.WindowMessageMonitor.Raise(m => m.DpiChanged += null, WindowMessageMonitorEventArgs)
+			() =>
+				internalCtx.WindowMessageMonitor.DpiChanged += Raise.Event<EventHandler<WindowMessageMonitorEventArgs>>(
+					internalCtx.WindowMessageMonitor,
+					WindowMessageMonitorEventArgs
+				)
 		);
 
 		// Then
 		Assert.Equal(raisedEvent.Arguments.UnchangedMonitors, monitorManager.ToList());
 	}
 
-	[Fact]
-	public void WindowMessageMonitor_SessionChanged()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowMessageMonitor_SessionChanged(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
-		wrapper.WindowMessageMonitor.Raise(m => m.SessionChanged += null, WindowMessageMonitorEventArgs);
+		internalCtx.WindowMessageMonitor.SessionChanged += Raise.Event<EventHandler<WindowMessageMonitorEventArgs>>(
+			internalCtx.WindowMessageMonitor,
+			WindowMessageMonitorEventArgs
+		);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.TryEnqueue(It.IsAny<DispatcherQueueHandler>()), Times.Once);
+		internalCtx.CoreNativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 	}
 
-	[Fact]
-	public void GetMonitorAtPoint_Error_ReturnsFirstMonitor()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetMonitorAtPoint_Error_ReturnsFirstMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
 		Point<int> point = new() { X = 10 * 1000, Y = 10 * 1000 };
 
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
+		internalCtx.CoreNativeManager
+			.MonitorFromPoint(point.ToSystemPoint(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)0);
 
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -537,18 +505,17 @@ public class MonitorManagerTests
 		Assert.Equal(monitorManager.First(), monitor);
 	}
 
-	[Fact]
-	public void GetMonitorAtPoint_MultipleMonitors_ReturnsCorrectMonitor()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetMonitorAtPoint_MultipleMonitors_ReturnsCorrectMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
 		Point<int> point = new() { X = 1930, Y = 10 };
 
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.MonitorFromPoint(point.ToSystemPoint(), It.IsAny<MONITOR_FROM_FLAGS>()))
+		internalCtx.CoreNativeManager
+			.MonitorFromPoint(point.ToSystemPoint(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -558,27 +525,25 @@ public class MonitorManagerTests
 		Assert.Equal(monitorManager.ElementAt(1), monitor);
 	}
 
-	[Fact]
-	public void GetPreviousMonitor_Error_ReturnsFirstMonitor()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetPreviousMonitor_Error_ReturnsFirstMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
-		IMonitor monitor = monitorManager.GetPreviousMonitor(new Mock<IMonitor>().Object);
+		IMonitor monitor = monitorManager.GetPreviousMonitor(Substitute.For<IMonitor>());
 
 		// Then
 		Assert.Equal(monitorManager.First(), monitor);
 	}
 
-	[Fact]
-	public void GetPreviousMonitor_MultipleMonitors_ReturnsCorrectMonitor()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetPreviousMonitor_MultipleMonitors_ReturnsCorrectMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -588,12 +553,11 @@ public class MonitorManagerTests
 		Assert.Equal(monitorManager.First(), monitor);
 	}
 
-	[Fact]
-	public void GetPreviousMonitor_MultipleMonitors_Mod()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetPreviousMonitor_MultipleMonitors_Mod(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -603,27 +567,25 @@ public class MonitorManagerTests
 		Assert.Equal(monitorManager.ElementAt(1), monitor);
 	}
 
-	[Fact]
-	public void GetNextMonitor_Error_ReturnsFirstMonitor()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetNextMonitor_Error_ReturnsFirstMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
-		IMonitor monitor = monitorManager.GetNextMonitor(new Mock<IMonitor>().Object);
+		IMonitor monitor = monitorManager.GetNextMonitor(Substitute.For<IMonitor>());
 
 		// Then
 		Assert.Equal(monitorManager.First(), monitor);
 	}
 
-	[Fact]
-	public void GetNextMonitor_MultipleMonitors_ReturnsCorrectMonitor()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetNextMonitor_MultipleMonitors_ReturnsCorrectMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -633,12 +595,11 @@ public class MonitorManagerTests
 		Assert.Equal(monitorManager.ElementAt(1), monitor);
 	}
 
-	[Fact]
-	public void GetNextMonitor_MultipleMonitors_Mod()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetNextMonitor_MultipleMonitors_Mod(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -648,30 +609,36 @@ public class MonitorManagerTests
 		Assert.Equal(monitorManager.First(), monitor);
 	}
 
-	[Fact]
-	public void Dispose()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void Dispose(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		// When
 		monitorManager.Dispose();
 
 		// Then
-		wrapper.WindowMessageMonitor.VerifyRemove(
-			wmm => wmm.DisplayChanged -= It.IsAny<EventHandler<WindowMessageMonitorEventArgs>>(),
-			Times.Once
-		);
+		internalCtx.WindowMessageMonitor.Received(1).DisplayChanged -= Arg.Any<
+			EventHandler<WindowMessageMonitorEventArgs>
+		>();
+		internalCtx.WindowMessageMonitor.Received(1).WorkAreaChanged -= Arg.Any<
+			EventHandler<WindowMessageMonitorEventArgs>
+		>();
+		internalCtx.WindowMessageMonitor.Received(1).DpiChanged -= Arg.Any<
+			EventHandler<WindowMessageMonitorEventArgs>
+		>();
+		internalCtx.WindowMessageMonitor.Received(1).SessionChanged -= Arg.Any<
+			EventHandler<WindowMessageMonitorEventArgs>
+		>();
 	}
 
-	[Fact]
-	public void Length()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void Length(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 
 		// When
 		int length = monitorManager.Length;
@@ -680,24 +647,26 @@ public class MonitorManagerTests
 		Assert.Equal(2, length);
 	}
 
-	[Fact]
-	public void MouseHook_MouseLeftButtonUp()
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void MouseHook_MouseLeftButtonUp(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		MonitorManager monitorManager = new(wrapper.InternalContext.Object);
+		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
 
 		IMonitor monitor = monitorManager.ActiveMonitor;
 		IMonitor? monitor2 = monitorManager.ElementAt(1);
 
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.MonitorFromPoint(It.IsAny<Point>(), It.IsAny<MONITOR_FROM_FLAGS>()))
+		internalCtx.CoreNativeManager
+			.MonitorFromPoint(Arg.Any<Point>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns(((Monitor)monitor2)._hmonitor);
 
 		// When
 		Assert.Equal(monitor, monitorManager.ActiveMonitor);
-		wrapper.MouseHook.Raise(m => m.MouseLeftButtonUp += null, new MouseEventArgs(new Point<int>()));
+		internalCtx.MouseHook.MouseLeftButtonUp += Raise.Event<EventHandler<MouseEventArgs>>(
+			internalCtx.MouseHook,
+			new MouseEventArgs(new Point<int>())
+		);
 
 		// Then
 		Assert.Equal(monitor2, monitorManager.ActiveMonitor);

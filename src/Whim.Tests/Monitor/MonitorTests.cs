@@ -112,18 +112,19 @@ public class MonitorTests
 
 		wrapper.CoreNativeManager.Setup(nm => nm.HasMultipleMonitors()).Returns(true);
 
-		wrapper.CoreNativeManager
-			.Setup(nm => nm.GetMonitorInfo(It.IsAny<HMONITOR>(), ref It.Ref<MONITORINFOEXW>.IsAny))
-			.Callback(
-				(HMONITOR hmonitor, ref MONITORINFOEXW infoEx) =>
-				{
-					infoEx.monitorInfo.rcMonitor = new RECT(0, 0, 1920, 1080);
-					infoEx.monitorInfo.rcWork = new RECT(10, 10, 1910, 1070);
-					infoEx.monitorInfo.dwFlags = 0;
-					infoEx.szDevice = "DISPLAY";
-				}
-			)
-			.Returns((BOOL)true);
+		//wrapper.CoreNativeManager
+		//	.Setup(nm => nm.GetMonitorInfo(It.IsAny<HMONITOR>()))
+		//	.Returns(
+		//		(HMONITOR hmonitor, ref MONITORINFOEXW infoEx) =>
+		//		{
+		//			MONITORINFOEXW infoEx = default;
+		//			infoEx.monitorInfo.rcMonitor = new RECT(0, 0, 1920, 1080);
+		//			infoEx.monitorInfo.rcWork = new RECT(10, 10, 1910, 1070);
+		//			infoEx.monitorInfo.dwFlags = 0;
+		//			infoEx.szDevice = "DISPLAY";
+		//		}
+		//	)
+		//	.Returns((BOOL)true);
 
 		uint effectiveDpiX = 144;
 		uint effectiveDpiY = 144;
