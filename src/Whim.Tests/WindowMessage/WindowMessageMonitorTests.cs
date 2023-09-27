@@ -1,4 +1,5 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Shell;
@@ -14,107 +15,87 @@ namespace Whim.Tests;
 )]
 public class WindowMessageMonitorTests
 {
-	private class Wrapper
+	private class CaptureProc
 	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IInternalContext> InternalContext { get; } = new();
-		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
-		public Mock<INativeManager> NativeManager { get; } = new();
 		public SUBCLASSPROC? SubclassProc { get; private set; }
 
-		public Wrapper()
+		public static CaptureProc Create(IInternalContext internalCtx)
 		{
-			Context.SetupGet(x => x.NativeManager).Returns(NativeManager.Object);
-			InternalContext.Setup(ic => ic.CoreNativeManager).Returns(CoreNativeManager.Object);
-
-			CoreNativeManager
-				.Setup(
-					cnm =>
-						cnm.SetWindowSubclass(
-							It.IsAny<HWND>(),
-							It.IsAny<SUBCLASSPROC>(),
-							It.IsAny<nuint>(),
-							It.IsAny<nuint>()
-						)
-				)
-				.Callback(
-					(HWND hwnd, SUBCLASSPROC subclassProc, nuint subclassId, nuint refData) =>
-						SubclassProc = subclassProc
+			CaptureProc captureProc = new();
+			internalCtx.CoreNativeManager
+				.SetWindowSubclass(Arg.Any<HWND>(), Arg.Any<SUBCLASSPROC>(), 4561, 0)
+				.Returns(
+					(callInfo) =>
+					{
+						captureProc.SubclassProc = callInfo.ArgAt<SUBCLASSPROC>(1);
+						return (BOOL)true;
+					}
 				);
+			return captureProc;
 		}
 	}
 
-	[Fact]
-	public void Constructor()
+	[Theory, AutoSubstituteData]
+	internal void Constructor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		CaptureProc capture = CaptureProc.Create(internalCtx);
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		WindowMessageMonitor windowMessageMonitor = new(ctx, internalCtx);
 		windowMessageMonitor.PreInitialize();
 
 		// Then
-		wrapper.InternalContext.Verify(
-			x =>
-				x.CoreNativeManager.SetWindowSubclass(
-					It.IsAny<HWND>(),
-					It.IsAny<SUBCLASSPROC>(),
-					It.IsAny<nuint>(),
-					It.IsAny<nuint>()
-				),
-			Times.Once
-		);
-		wrapper.InternalContext.Verify(
-			x => x.CoreNativeManager.WTSRegisterSessionNotification(It.IsAny<HWND>(), It.IsAny<uint>()),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager
+			.Received(1)
+			.SetWindowSubclass(Arg.Any<HWND>(), Arg.Any<SUBCLASSPROC>(), Arg.Any<nuint>(), Arg.Any<nuint>());
+		internalCtx.CoreNativeManager.Received(1).WTSRegisterSessionNotification(Arg.Any<HWND>(), Arg.Any<uint>());
 	}
 
-	[Fact]
-	public void WindowProc_WM_DISPLAYCHANGE()
+	[Theory, AutoSubstituteData]
+	internal void WindowProc_WM_DISPLAYCHANGE(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		CaptureProc capture = CaptureProc.Create(internalCtx);
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		WindowMessageMonitor windowMessageMonitor = new(ctx, internalCtx);
 		windowMessageMonitor.PreInitialize();
 
 		// Then
 		Assert.Raises<WindowMessageMonitorEventArgs>(
 			h => windowMessageMonitor.DisplayChanged += h,
 			h => windowMessageMonitor.DisplayChanged -= h,
-			() => wrapper.SubclassProc?.Invoke((HWND)0, PInvoke.WM_DISPLAYCHANGE, (WPARAM)1, (LPARAM)1, 0, 0)
+			() => capture.SubclassProc?.Invoke((HWND)0, PInvoke.WM_DISPLAYCHANGE, (WPARAM)1, (LPARAM)1, 0, 0)
 		);
 	}
 
-	[Fact]
-	public void WindowProc_WM_WTSESSION_CHANGE()
+	[Theory, AutoSubstituteData]
+	internal void WindowProc_WM_WTSESSION_CHANGE(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		CaptureProc capture = CaptureProc.Create(internalCtx);
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		WindowMessageMonitor windowMessageMonitor = new(ctx, internalCtx);
 		windowMessageMonitor.PreInitialize();
 
 		// Then
 		Assert.Raises<WindowMessageMonitorEventArgs>(
 			h => windowMessageMonitor.SessionChanged += h,
 			h => windowMessageMonitor.SessionChanged -= h,
-			() => wrapper.SubclassProc?.Invoke((HWND)0, PInvoke.WM_WTSSESSION_CHANGE, (WPARAM)1, (LPARAM)1, 0, 0)
+			() => capture.SubclassProc?.Invoke((HWND)0, PInvoke.WM_WTSSESSION_CHANGE, (WPARAM)1, (LPARAM)1, 0, 0)
 		);
 	}
 
-	[Fact]
-	public void WindowProc_WM_SETTINGCHANGE_SPI_GETWORKAREA()
+	[Theory, AutoSubstituteData]
+	internal void WindowProc_WM_SETTINGCHANGE_SPI_GETWORKAREA(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		CaptureProc capture = CaptureProc.Create(internalCtx);
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		WindowMessageMonitor windowMessageMonitor = new(ctx, internalCtx);
 		windowMessageMonitor.PreInitialize();
 
 		// Then
@@ -122,7 +103,7 @@ public class WindowMessageMonitorTests
 			h => windowMessageMonitor.WorkAreaChanged += h,
 			h => windowMessageMonitor.WorkAreaChanged -= h,
 			() =>
-				wrapper.SubclassProc?.Invoke(
+				capture.SubclassProc?.Invoke(
 					(HWND)0,
 					PInvoke.WM_SETTINGCHANGE,
 					new WPARAM((nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA),
@@ -133,14 +114,14 @@ public class WindowMessageMonitorTests
 		);
 	}
 
-	[Fact]
-	public void WindowProc_WM_SETTINGCHANGE_SPI_SETLOGICALDPIOVERRIDE()
+	[Theory, AutoSubstituteData]
+	internal void WindowProc_WM_SETTINGCHANGE_SPI_SETLOGICALDPIOVERRIDE(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		CaptureProc capture = CaptureProc.Create(internalCtx);
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		WindowMessageMonitor windowMessageMonitor = new(ctx, internalCtx);
 		windowMessageMonitor.PreInitialize();
 
 		// Then
@@ -148,7 +129,7 @@ public class WindowMessageMonitorTests
 			h => windowMessageMonitor.DpiChanged += h,
 			h => windowMessageMonitor.DpiChanged -= h,
 			() =>
-				wrapper.SubclassProc?.Invoke(
+				capture.SubclassProc?.Invoke(
 					(HWND)0,
 					PInvoke.WM_SETTINGCHANGE,
 					new WPARAM((nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_SETLOGICALDPIOVERRIDE),
@@ -159,26 +140,21 @@ public class WindowMessageMonitorTests
 		);
 	}
 
-	[Fact]
-	public void Dispose()
+	[Theory, AutoSubstituteData]
+	internal void Dispose(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		CaptureProc capture = CaptureProc.Create(internalCtx);
 
 		// When
-		WindowMessageMonitor windowMessageMonitor = new(wrapper.Context.Object, wrapper.InternalContext.Object);
+		WindowMessageMonitor windowMessageMonitor = new(ctx, internalCtx);
 		windowMessageMonitor.PreInitialize();
 		windowMessageMonitor.Dispose();
 
 		// Then
-		wrapper.InternalContext.Verify(
-			x =>
-				x.CoreNativeManager.RemoveWindowSubclass(It.IsAny<HWND>(), It.IsAny<SUBCLASSPROC>(), It.IsAny<nuint>()),
-			Times.Once
-		);
-		wrapper.InternalContext.Verify(
-			x => x.CoreNativeManager.WTSUnRegisterSessionNotification(It.IsAny<HWND>()),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager
+			.Received(1)
+			.RemoveWindowSubclass(Arg.Any<HWND>(), Arg.Any<SUBCLASSPROC>(), Arg.Any<nuint>());
+		internalCtx.CoreNativeManager.Received(1).WTSUnRegisterSessionNotification(Arg.Any<HWND>());
 	}
 }
