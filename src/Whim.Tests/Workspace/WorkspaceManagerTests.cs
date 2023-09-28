@@ -1,6 +1,7 @@
 using AutoFixture;
 using NSubstitute;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -332,7 +333,7 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(workspaces, (IEnumerable<IWorkspace>?)workspaceManager);
+		Assert.Equal(workspaces, (IEnumerable)workspaceManager);
 	}
 	#endregion
 
@@ -766,6 +767,8 @@ public class WorkspaceManagerTests
 		workspaceManager.Activate(workspaces[0], monitors[0]);
 		workspaceManager.Activate(workspaces[1], monitors[1]);
 
+		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
+
 		// Reset the wrapper
 		workspaces[0].ClearReceivedCalls();
 		workspaces[1].ClearReceivedCalls();
@@ -840,6 +843,8 @@ public class WorkspaceManagerTests
 
 		workspaceManager.Activate(workspaces[0], monitors[0]);
 		workspaceManager.Activate(workspaces[1], monitors[1]);
+
+		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
 
 		// Reset the wrapper
 		workspaces[0].ClearReceivedCalls();
@@ -1702,6 +1707,8 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		workspaceManager.Initialize();
+
+		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
