@@ -507,6 +507,8 @@ public class WindowManagerTests
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
+		ctx.WorkspaceManager.GetMonitorForWindow(Arg.Any<IWindow>()).Returns((IMonitor?)null);
+
 		// When
 		windowManager.Initialize();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0);
@@ -991,6 +993,8 @@ public class WindowManagerTests
 				}
 			);
 
+		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
@@ -1242,6 +1246,33 @@ public class WindowManagerTests
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_InvalidEvent(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		WindowManager windowManager = new(ctx, internalCtx);
+
+		// When
+		windowManager.Initialize();
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, 0xBAADF00D, hwnd, 0, 0, 0, 0);
+
+		// Then
+		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.Received(1).WindowAdded(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowRemoved(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowMinimizeStart(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowMinimizeEnd(Arg.Any<IWindow>());
+		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
+		ctx.WorkspaceManager
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<int>>(), Arg.Any<IWindow>());
+		ctx.WorkspaceManager.DidNotReceive().MoveWindowToWorkspace(Arg.Any<IWorkspace>(), Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
