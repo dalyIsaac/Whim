@@ -56,7 +56,6 @@ public class BaseProxyLayoutEngineTests
 	{
 		// Given
 		TestProxyLayoutEngine proxyLayoutEngine = Substitute.For<TestProxyLayoutEngine>(innerLayoutEngine);
-		proxyLayoutEngine.Equals(proxyLayoutEngine).Returns(true);
 
 		// When
 		bool contains = proxyLayoutEngine.ContainsEqual(proxyLayoutEngine);
