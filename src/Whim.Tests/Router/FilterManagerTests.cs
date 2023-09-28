@@ -1,111 +1,97 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
 public class FilterManagerTests
 {
-	private static Mock<IWindow> CreateWindowMock(
-		string? className = null,
-		string? processName = null,
-		string? title = null
-	)
-	{
-		Mock<IWindow>? windowMock = new();
-		windowMock.Setup(w => w.WindowClass).Returns(className ?? "");
-		windowMock.Setup(w => w.ProcessName).Returns(processName ?? "");
-		windowMock.Setup(w => w.Title).Returns(title ?? "");
-		return windowMock;
-	}
-
-	[Fact]
-	public void IgnoreWindowClass()
+	[Theory, AutoSubstituteData]
+	public void IgnoreWindowClass(IWindow window)
 	{
 		FilterManager filterManager = new();
 		filterManager.IgnoreWindowClass("Test");
 
-		Mock<IWindow> window = CreateWindowMock(className: "Test");
+		window.WindowClass.Returns("Test");
 
-		Assert.True(filterManager.ShouldBeIgnored(window.Object));
+		Assert.True(filterManager.ShouldBeIgnored(window));
 	}
 
-	[Fact]
-	public void IgnoreProcessName()
+	[Theory, AutoSubstituteData]
+	public void IgnoreProcessName(IWindow window)
 	{
 		FilterManager filterManager = new();
 		filterManager.IgnoreProcessName("Test");
 
-		Mock<IWindow> window = CreateWindowMock(processName: "Test");
+		window.ProcessName.Returns("Test");
 
-		Assert.True(filterManager.ShouldBeIgnored(window.Object));
+		Assert.True(filterManager.ShouldBeIgnored(window));
 	}
 
-	[Fact]
-	public void IgnoreTitle()
+	[Theory, AutoSubstituteData]
+	public void IgnoreTitle(IWindow window)
 	{
 		FilterManager filterManager = new();
 		filterManager.IgnoreTitle("Test");
 
-		Mock<IWindow> window = CreateWindowMock(title: "Test");
+		window.Title.Returns("Test");
 
-		Assert.True(filterManager.ShouldBeIgnored(window.Object));
+		Assert.True(filterManager.ShouldBeIgnored(window));
 	}
 
-	[Fact]
-	public void IgnoreTitleMatch()
+	[Theory, AutoSubstituteData]
+	public void IgnoreTitleMatch(IWindow window)
 	{
 		FilterManager filterManager = new();
 		filterManager.IgnoreTitleMatch("Test");
 
-		Mock<IWindow> window = CreateWindowMock(title: "Test");
+		window.Title.Returns("Test");
 
-		Assert.True(filterManager.ShouldBeIgnored(window.Object));
+		Assert.True(filterManager.ShouldBeIgnored(window));
 	}
 
-	[Fact]
-	public void ClearKeepDefaults()
+	[Theory, AutoSubstituteData]
+	public void ClearKeepDefaults(IWindow window, IWindow searchUIWindow)
 	{
 		FilterManager filterManager = new();
 		filterManager.IgnoreWindowClass("Test");
 
-		Mock<IWindow> window = CreateWindowMock(className: "Test");
+		window.WindowClass.Returns("Test");
 
 		filterManager.Clear(clearDefaults: true);
 
-		Assert.False(filterManager.ShouldBeIgnored(window.Object));
+		Assert.False(filterManager.ShouldBeIgnored(window));
 
-		Mock<IWindow> searchUIWindow = CreateWindowMock();
-		searchUIWindow.Setup(w => w.ProcessName).Returns("SearchUI.exe");
+		searchUIWindow.ProcessName.Returns("SearchUI.exe");
 
-		Assert.False(filterManager.ShouldBeIgnored(searchUIWindow.Object));
+		Assert.False(filterManager.ShouldBeIgnored(searchUIWindow));
 	}
 
-	[Fact]
-	public void ClearAll()
+	[Theory, AutoSubstituteData]
+	public void ClearAll(IWindow window, IWindow searchUIWindow)
 	{
 		FilterManager filterManager = new();
 		filterManager.IgnoreWindowClass("Test");
 
-		Mock<IWindow> window = CreateWindowMock(className: "Test");
+		window.WindowClass.Returns("Test");
 
 		filterManager.Clear(clearDefaults: false);
 
-		Assert.False(filterManager.ShouldBeIgnored(window.Object));
+		Assert.False(filterManager.ShouldBeIgnored(window));
 
-		Mock<IWindow> searchUIWindow = CreateWindowMock();
-		searchUIWindow.Setup(w => w.ProcessName).Returns("SearchUI.exe");
+		searchUIWindow.ProcessName.Returns("SearchUI.exe");
 
-		Assert.True(filterManager.ShouldBeIgnored(searchUIWindow.Object));
+		Assert.True(filterManager.ShouldBeIgnored(searchUIWindow));
 	}
 
-	[Fact]
-	public void CustomFilter()
+	[Theory, AutoSubstituteData]
+	public void CustomFilter(IWindow window)
 	{
 		FilterManager filterManager = new();
 		filterManager.Add(w => w.WindowClass == "Test");
 
-		Mock<IWindow> window = CreateWindowMock(className: "Test");
+		window.WindowClass.Returns("Test");
 
-		Assert.True(filterManager.ShouldBeIgnored(window.Object));
+		Assert.True(filterManager.ShouldBeIgnored(window));
 	}
 }

@@ -1,169 +1,121 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
+public class RouterManagerCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IContext ctx = fixture.Freeze<IContext>();
+
+		IWorkspace workspace = fixture.Freeze<IWorkspace>();
+		workspace.Name.Returns("Test");
+
+		ctx.WorkspaceManager.TryGet("Test").Returns(workspace);
+
+		IWindow window = fixture.Freeze<IWindow>();
+		window.WindowClass.Returns("Test");
+		window.ProcessName.Returns("Test");
+		window.Title.Returns("Test");
+	}
+}
+
 public class RouterManagerTests
 {
-	private static Mock<IWindow> CreateWindowMock(
-		string? className = null,
-		string? processName = null,
-		string? title = null
-	)
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddWindowClassRouteString(IContext ctx, IWindow window)
 	{
-		Mock<IWindow>? windowMock = new();
-		windowMock.Setup(w => w.WindowClass).Returns(className ?? "");
-		windowMock.Setup(w => w.ProcessName).Returns(processName ?? "");
-		windowMock.Setup(w => w.Title).Returns(title ?? "");
-		return windowMock;
-	}
-
-	private static Mock<IContext> CreateContextMock(string? workspaceName = null, IWorkspace? workspace = null)
-	{
-		Mock<IContext>? contextMock = new();
-
-		if (workspaceName != null)
-		{
-			Mock<IWorkspace> workspaceMock = new();
-			workspaceMock.Setup(w => w.Name).Returns(workspaceName);
-
-			contextMock.Setup(c => c.WorkspaceManager.TryGet(workspaceName)).Returns(workspaceMock.Object);
-		}
-
-		if (workspace != null)
-		{
-			contextMock.Setup(c => c.WorkspaceManager.TryGet(workspace.Name)).Returns(workspace);
-		}
-
-		return contextMock;
-	}
-
-	[Fact]
-	public void AddWindowClassRouteString()
-	{
-		RouterManager routerManager = new(CreateContextMock("Test").Object);
+		RouterManager routerManager = new(ctx);
 		routerManager.AddWindowClassRoute("Test", "Test");
 
-		Mock<IWindow> window = CreateWindowMock(className: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
-	[Fact]
-	public void AddWindowClassRoute()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddWindowClassRoute(IContext ctx, IWindow window, IWorkspace workspace)
 	{
-		Mock<IWorkspace> workspaceMock = new();
-		workspaceMock.Setup(w => w.Name).Returns("Test");
+		RouterManager routerManager = new(ctx);
+		routerManager.AddWindowClassRoute("Test", workspace);
 
-		RouterManager routerManager = new(CreateContextMock(workspace: workspaceMock.Object).Object);
-		routerManager.AddWindowClassRoute("Test", workspaceMock.Object);
-
-		Mock<IWindow> window = CreateWindowMock(className: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
-	[Fact]
-	public void AddProcessNameRouteString()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddProcessNameRouteString(IContext ctx, IWindow window)
 	{
-		RouterManager routerManager = new(CreateContextMock("Test").Object);
+		RouterManager routerManager = new(ctx);
 		routerManager.AddProcessNameRoute("Test", "Test");
 
-		Mock<IWindow> window = CreateWindowMock(processName: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
-	[Fact]
-	public void AddProcessNameRoute()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddProcessNameRoute(IContext ctx, IWindow window, IWorkspace workspace)
 	{
-		Mock<IWorkspace> workspaceMock = new();
-		workspaceMock.Setup(w => w.Name).Returns("Test");
+		RouterManager routerManager = new(ctx);
+		routerManager.AddProcessNameRoute("Test", workspace);
 
-		RouterManager routerManager = new(CreateContextMock(workspace: workspaceMock.Object).Object);
-		routerManager.AddProcessNameRoute("Test", workspaceMock.Object);
-
-		Mock<IWindow> window = CreateWindowMock(processName: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
-	[Fact]
-	public void AddTitleRouteString()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddTitleRouteString(IContext ctx, IWindow window)
 	{
-		RouterManager routerManager = new(CreateContextMock("Test").Object);
+		RouterManager routerManager = new(ctx);
 		routerManager.AddTitleRoute("Test", "Test");
 
-		Mock<IWindow> window = CreateWindowMock(title: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
-	[Fact]
-	public void AddTitleRoute()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddTitleRoute(IContext ctx, IWindow window, IWorkspace workspace)
 	{
-		Mock<IWorkspace> workspaceMock = new();
-		workspaceMock.Setup(w => w.Name).Returns("Test");
+		RouterManager routerManager = new(ctx);
+		routerManager.AddTitleRoute("Test", workspace);
 
-		RouterManager routerManager = new(CreateContextMock(workspace: workspaceMock.Object).Object);
-		routerManager.AddTitleRoute("Test", workspaceMock.Object);
-
-		Mock<IWindow> window = CreateWindowMock(title: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
-	[Fact]
-	public void AddTitleMatchRouteString()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddTitleMatchRouteString(IContext ctx, IWindow window)
 	{
-		RouterManager routerManager = new(CreateContextMock("Test").Object);
+		RouterManager routerManager = new(ctx);
 		routerManager.AddTitleMatchRoute("Test", "Test");
 
-		Mock<IWindow> window = CreateWindowMock(title: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
-	[Fact]
-	public void AddTitleMatchRoute()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddTitleMatchRoute(IContext ctx, IWindow window, IWorkspace workspace)
 	{
-		Mock<IWorkspace> workspaceMock = new();
-		workspaceMock.Setup(w => w.Name).Returns("Test");
+		RouterManager routerManager = new(ctx);
+		routerManager.AddTitleMatchRoute("Test", workspace);
 
-		RouterManager routerManager = new(CreateContextMock(workspace: workspaceMock.Object).Object);
-		routerManager.AddTitleMatchRoute("Test", workspaceMock.Object);
-
-		Mock<IWindow> window = CreateWindowMock(title: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
-	[Fact]
-	public void Clear()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void Clear(IContext ctx, IWindow window)
 	{
-		RouterManager routerManager = new(CreateContextMock("Test").Object);
+		RouterManager routerManager = new(ctx);
 		routerManager.AddWindowClassRoute("Test", "Test");
 
 		routerManager.Clear();
 
-		Mock<IWindow> window = CreateWindowMock(className: "Test");
-
-		Assert.Null(routerManager.RouteWindow(window.Object));
+		Assert.Null(routerManager.RouteWindow(window));
 	}
 
-	[Fact]
-	public void CustomRouter()
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void CustomRouter(IContext ctx, IWindow window, IWorkspace workspace)
 	{
-		Mock<IWorkspace> workspaceMock = new();
-		workspaceMock.Setup(w => w.Name).Returns("Test");
+		RouterManager routerManager = new(ctx);
 
-		RouterManager routerManager = new(CreateContextMock(workspace: workspaceMock.Object).Object);
+		routerManager.Add((w) => w.WindowClass == "Not Test" ? Substitute.For<IWorkspace>() : null);
+		routerManager.Add((w) => w.WindowClass == "Test" ? workspace : null);
 
-		routerManager.Add((w) => w.WindowClass == "Not Test" ? new Mock<IWorkspace>().Object : null);
-		routerManager.Add((w) => w.WindowClass == "Test" ? workspaceMock.Object : null);
-
-		Mock<IWindow> window = CreateWindowMock(className: "Test");
-
-		Assert.Equal("Test", routerManager.RouteWindow(window.Object)?.Name);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 }

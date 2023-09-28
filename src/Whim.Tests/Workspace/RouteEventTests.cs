@@ -1,56 +1,43 @@
-using Moq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
 public class RouteEventTests
 {
-	[Fact]
-	public void WindowAdded()
+	[Theory, AutoSubstituteData]
+	public void WindowAdded(IWindow window, IWorkspace workspace)
 	{
-		// Given
-		Mock<IWindow> window = new();
-		Mock<IWorkspace> workspace = new();
-
 		// When
-		RouteEventArgs args = RouteEventArgs.WindowAdded(window.Object, workspace.Object);
+		RouteEventArgs args = RouteEventArgs.WindowAdded(window, workspace);
 
 		// Then
-		Assert.Equal(window.Object, args.Window);
+		Assert.Equal(window, args.Window);
 		Assert.Null(args.PreviousWorkspace);
-		Assert.Equal(workspace.Object, args.CurrentWorkspace);
+		Assert.Equal(workspace, args.CurrentWorkspace);
 	}
 
-	[Fact]
-	public void WindowRemoved()
+	[Theory, AutoSubstituteData]
+	public void WindowRemoved(IWindow window, IWorkspace workspace)
 	{
-		// Given
-		Mock<IWindow> window = new();
-		Mock<IWorkspace> workspace = new();
-
 		// When
-		RouteEventArgs args = RouteEventArgs.WindowRemoved(window.Object, workspace.Object);
+		RouteEventArgs args = RouteEventArgs.WindowRemoved(window, workspace);
 
 		// Then
-		Assert.Equal(window.Object, args.Window);
-		Assert.Equal(workspace.Object, args.PreviousWorkspace);
+		Assert.Equal(window, args.Window);
+		Assert.Equal(workspace, args.PreviousWorkspace);
 		Assert.Null(args.CurrentWorkspace);
 	}
 
-	[Fact]
-	public void WindowMoved()
+	[Theory, AutoSubstituteData]
+	public void WindowMoved(IWindow window, IWorkspace fromWorkspace, IWorkspace toWorkspace)
 	{
-		// Given
-		Mock<IWindow> window = new();
-		Mock<IWorkspace> fromWorkspace = new();
-		Mock<IWorkspace> toWorkspace = new();
-
 		// When
-		RouteEventArgs args = RouteEventArgs.WindowMoved(window.Object, fromWorkspace.Object, toWorkspace.Object);
+		RouteEventArgs args = RouteEventArgs.WindowMoved(window, fromWorkspace, toWorkspace);
 
 		// Then
-		Assert.Equal(window.Object, args.Window);
-		Assert.Equal(fromWorkspace.Object, args.PreviousWorkspace);
-		Assert.Equal(toWorkspace.Object, args.CurrentWorkspace);
+		Assert.Equal(window, args.Window);
+		Assert.Equal(fromWorkspace, args.PreviousWorkspace);
+		Assert.Equal(toWorkspace, args.CurrentWorkspace);
 	}
 }

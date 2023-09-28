@@ -1,14 +1,41 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Win32.Foundation;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
+
+public class WorkspaceManagerCustomization : ICustomization
+{
+	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+	public void Customize(IFixture fixture)
+	{
+		// By default, create two monitors.
+		IMonitor[] monitors = new[] { Substitute.For<IMonitor>(), Substitute.For<IMonitor>() };
+		fixture.Inject(monitors);
+
+		IContext ctx = fixture.Freeze<IContext>();
+		WorkspaceManagerTests.SetupMonitors(ctx, monitors);
+
+		// Create the lock.
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
+		ReaderWriterLockSlim layoutLock = new();
+		internalCtx.LayoutLock.Returns(layoutLock);
+
+		// Set up DoLayout
+		WorkspaceTestUtils.SetupDoLayout(internalCtx);
+
+		// Don't route things.
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
+	}
+}
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Unnecessary for tests")]
 public class WorkspaceManagerTests
@@ -18,1573 +45,1462 @@ public class WorkspaceManagerTests
 		// Yes, I know it's bad to have `_triggers` be `internal` in `WorkspaceManager`.
 		public WorkspaceManagerTriggers InternalTriggers => _triggers;
 
-		public WorkspaceManagerTestWrapper(IContext context, IInternalContext internalContext)
-			: base(context, internalContext) { }
+		public WorkspaceManagerTestWrapper(IContext ctx, IInternalContext internalCtx)
+			: base(ctx, internalCtx) { }
 
 		public void Add(IWorkspace workspace) => _workspaces.Add(workspace);
 	}
 
-	private class Wrapper
+	/// <summary>
+	/// Set up the monitors for the <see cref="IMonitorManager"/> to have the specified monitors.
+	/// </summary>
+	/// <param name="ctx"></param>
+	/// <param name="monitors"></param>
+	/// <param name="activeMonitorIndex"></param>
+	internal static void SetupMonitors(IContext ctx, IMonitor[] monitors, int activeMonitorIndex = 0)
 	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IMonitorManager> MonitorManager { get; } = new();
-		public Mock<IMonitor>[] Monitors { get; }
-		public Mock<IRouterManager> RouterManager { get; } = new();
-		public Mock<IInternalContext> InternalContext { get; } = new();
-		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
-		public Mock<INativeManager> NativeManager { get; } = new();
-		public WorkspaceManagerTestWrapper WorkspaceManager { get; }
-
-		public Wrapper(
-			Mock<IWorkspace>[]? workspaces = null,
-			Mock<IMonitor>[]? monitors = null,
-			int activeMonitorIndex = 0
-		)
+		ctx.MonitorManager.GetEnumerator().Returns((_) => ((IEnumerable<IMonitor>)monitors).GetEnumerator());
+		ctx.MonitorManager.Length.Returns(monitors.Length);
+		if (monitors.Length > 0)
 		{
-			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
-			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
-			Context.Setup(c => c.RouterManager).Returns(RouterManager.Object);
-
-			InternalContext.Setup(c => c.CoreNativeManager).Returns(CoreNativeManager.Object);
-			InternalContext.Setup(c => c.LayoutLock).Returns(new ReaderWriterLockSlim());
-
-			Monitors = monitors ?? new[] { new Mock<IMonitor>(), new Mock<IMonitor>() };
-			MonitorManager.Setup(m => m.Length).Returns(Monitors.Length);
-			MonitorManager.Setup(m => m.GetEnumerator()).Returns(Monitors.Select(m => m.Object).GetEnumerator());
-
-			if (Monitors.Length > 0)
-			{
-				MonitorManager.Setup(m => m.ActiveMonitor).Returns(Monitors[activeMonitorIndex].Object);
-			}
-
-			// Set up IEquatable for the monitors.
-			foreach (Mock<IMonitor> mon in Monitors)
-			{
-				mon.Setup(m => m.Equals(It.Is((IMonitor m) => mon.Object == m))).Returns(true);
-				mon.Setup(m => m.WorkingArea).Returns(new Location<int>());
-			}
-
-			RouterManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(null as IWorkspace);
-
-			WorkspaceManager = new(Context.Object, InternalContext.Object);
-			foreach (Mock<IWorkspace> workspace in workspaces ?? Array.Empty<Mock<IWorkspace>>())
-			{
-				WorkspaceManager.Add(workspace.Object);
-			}
-
-			Context.Setup(c => c.WorkspaceManager).Returns(WorkspaceManager);
-
-			CoreNativeManager
-				.Setup(
-					c =>
-						c.RunTask(
-							It.IsAny<Func<Dictionary<HWND, IWindowState>>>(),
-							It.IsAny<Action<Task<Dictionary<HWND, IWindowState>>>>(),
-							It.IsAny<CancellationToken>()
-						)
-				)
-				.Callback(
-					(
-						Func<Dictionary<HWND, IWindowState>> work,
-						Action<Task<Dictionary<HWND, IWindowState>>> cleanup,
-						CancellationToken cancellationToken
-					) =>
-					{
-						// Run the work on the current thread.
-						var result = work();
-						cleanup(Task.FromResult(result));
-					}
-				);
+			ctx.MonitorManager.ActiveMonitor.Returns(monitors[activeMonitorIndex]);
 		}
 	}
 
+	private static WorkspaceManagerTestWrapper CreateSut(
+		IContext ctx,
+		IInternalContext internalCtx,
+		params IWorkspace[] workspaces
+	)
+	{
+		WorkspaceManagerTestWrapper sut = new(ctx, internalCtx);
+		foreach (IWorkspace workspace in workspaces)
+		{
+			sut.Add(workspace);
+		}
+		return sut;
+	}
+
+	private static IWorkspace[] CreateWorkspaces(int count)
+	{
+		IWorkspace[] workspaces = new IWorkspace[count];
+		for (int i = 0; i < count; i++)
+		{
+			workspaces[i] = Substitute.For<IWorkspace, IInternalWorkspace>();
+		}
+		return workspaces;
+	}
+
 	#region Add
-	[Fact]
-	public void Add_BeforeInitialization()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_BeforeInitialization(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 
 		// When a workspace is added before initialization
-		wrapper.WorkspaceManager.Add();
+		workspaceManager.Add();
 
 		// Then the workspace is not added
-		Assert.Empty(wrapper.WorkspaceManager);
+		Assert.Empty(workspaceManager);
 	}
 
-	[Fact]
-	public void Add_BeforeInitialization_DefaultName()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_BeforeInitialization_DefaultName(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
 
 		// When a workspace is added
-		wrapper.WorkspaceManager.Add();
-		wrapper.WorkspaceManager.Initialize();
+		workspaceManager.Add();
+		workspaceManager.Initialize();
 
 		// Then the workspace is created with default name.
-		Assert.Equal("Workspace 1", wrapper.WorkspaceManager.Single().Name);
+		Assert.Equal("Workspace 1", workspaceManager.Single().Name);
 	}
 
-	[Fact]
-	public void Add_BeforeInitialization_CustomName()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_BeforeInitialization_CustomName(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
 
 		// When a workspace is added
-		wrapper.WorkspaceManager.Add("workspace");
-		wrapper.WorkspaceManager.Initialize();
+		workspaceManager.Add("workspace");
+		workspaceManager.Initialize();
 
 		// Then the workspace is created with default name.
-		Assert.Equal("workspace", wrapper.WorkspaceManager.Single().Name);
+		Assert.Equal("workspace", workspaceManager.Single().Name);
 	}
 
-	[Fact]
-	public void Add_SpecifyName()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_SpecifyName(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
-		wrapper.WorkspaceManager.Initialize();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, Array.Empty<IMonitor>());
+		workspaceManager.Initialize();
 
 		// When a workspace is added with a name
-		wrapper.WorkspaceManager.Add("named workspace");
+		workspaceManager.Add("named workspace");
 
 		// Then the workspace is created with the specified name.
-		Assert.Equal("named workspace", wrapper.WorkspaceManager.Single().Name);
+		Assert.Equal("named workspace", workspaceManager.Single().Name);
 	}
 
-	[Fact]
-	public void Add_SpecifyLayoutEngine()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_SpecifyLayoutEngine(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
-		wrapper.WorkspaceManager.Initialize();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, Array.Empty<IMonitor>());
+		workspaceManager.Initialize();
 
 		// When a workspace is added with a layout engine
-		wrapper.WorkspaceManager.Add(
-			"workspace",
-			new CreateLeafLayoutEngine[] { (id) => new TestUtils.TestLayoutEngine() }
-		);
+		workspaceManager.Add("workspace", new CreateLeafLayoutEngine[] { (id) => new TestLayoutEngine() });
 
 		// Then the workspace is created with the specified layout engine.
-		Assert.IsType<TestUtils.TestLayoutEngine>(wrapper.WorkspaceManager.Single().ActiveLayoutEngine);
+		Assert.IsType<TestLayoutEngine>(workspaceManager.Single().ActiveLayoutEngine);
 	}
 
-	[Fact]
-	public void Add_BeforeInitialization_DefaultLayoutEngine()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_BeforeInitialization_DefaultLayoutEngine(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new(monitors: Array.Empty<Mock<IMonitor>>());
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
 
 		// When a workspace is added
-		wrapper.WorkspaceManager.Add();
-		wrapper.WorkspaceManager.Initialize();
+		workspaceManager.Add();
+		workspaceManager.Initialize();
 
 		// Then the workspace is created with default layout engine.
-		Assert.IsType<ColumnLayoutEngine>(wrapper.WorkspaceManager.Single().ActiveLayoutEngine);
+		Assert.IsType<ColumnLayoutEngine>(workspaceManager.Single().ActiveLayoutEngine);
 	}
 
-	[Fact]
-	public void Add_ThrowsWhenNoLayoutEngines()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_ThrowsWhenNoLayoutEngines(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 
 		// When the workspace manager is initialized after a workspace is added
-		wrapper.WorkspaceManager.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
-		wrapper.WorkspaceManager.Add();
+		workspaceManager.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
+		workspaceManager.Add();
 
 		// Then an exception is thrown
-		Assert.Throws<InvalidOperationException>(wrapper.WorkspaceManager.Initialize);
+		Assert.Throws<InvalidOperationException>(workspaceManager.Initialize);
 	}
 	#endregion
 
 	#region Remove
-	[Fact]
-	public void Remove_Workspace_RequireAtLeastNWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Remove_Workspace_RequireAtLeastNWorkspace(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the workspace manager has two workspaces and there are two monitors
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When a workspace is removed
-		bool result = wrapper.WorkspaceManager.Remove(workspace.Object);
+		bool result = workspaceManager.Remove(workspaces[0]);
 
 		// Then it returns false, as there must be at least two workspaces, since there are two monitors
 		Assert.False(result);
-		workspace2.Verify(w => w.DoLayout(null), Times.Never);
+		workspaces[1].DidNotReceive().DoLayout(null);
 	}
 
-	[Fact]
-	public void Remove_Workspace_NotFound()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Remove_Workspace_NotFound(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IWorkspace> workspace3 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2, workspace3 });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(
+			ctx,
+			internalCtx,
+			new[] { Substitute.For<IWorkspace>(), Substitute.For<IWorkspace>(), Substitute.For<IWorkspace>() }
+		);
 
 		// When a workspace is removed
-		bool result = wrapper.WorkspaceManager.Remove(new Mock<IWorkspace>().Object);
+		bool result = workspaceManager.Remove(Substitute.For<IWorkspace>());
 
 		// Then it returns false, as the workspace was not found
 		Assert.False(result);
 	}
 
-	[Fact]
-	public void Remove_Workspace_Success()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Remove_Workspace_Success(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IMonitor>[] monitorWrapper = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(new Mock<IWorkspace>[] { workspace, workspace2 }, monitorWrapper);
-
-		Mock<IWindow> window = new();
-		workspace.Setup(w => w.Windows).Returns(new[] { window.Object });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		workspaces[0].Windows.Returns(new[] { window });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When a workspace is removed, it returns true, WorkspaceRemoved is raised
 		var result = Assert.Raises<WorkspaceEventArgs>(
-			h => wrapper.WorkspaceManager.WorkspaceRemoved += h,
-			h => wrapper.WorkspaceManager.WorkspaceRemoved -= h,
-			() => Assert.True(wrapper.WorkspaceManager.Remove(workspace.Object))
+			h => workspaceManager.WorkspaceRemoved += h,
+			h => workspaceManager.WorkspaceRemoved -= h,
+			() => Assert.True(workspaceManager.Remove(workspaces[0]))
 		);
-		Assert.Equal(workspace.Object, result.Arguments.Workspace);
+		Assert.Equal(workspaces[0], result.Arguments.Workspace);
 
 		// and the window is added to the last remaining workspace
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once);
-		workspace2.Verify(w => w.DoLayout(null), Times.Once);
+		workspaces[1].Received(1).AddWindow(window);
+		workspaces[1].Received(1).DoLayout(null);
 	}
 
-	[Fact]
-	public void Remove_String_NotFound()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Remove_String_NotFound(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When a workspace is removed, it returns false, as the workspace was not found
-		Assert.False(wrapper.WorkspaceManager.Remove("not found"));
+		Assert.False(workspaceManager.Remove("not found"));
 	}
 
-	[Fact]
-	public void Remove_String_Success()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Remove_String_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper =
-			new(new Mock<IWorkspace>[] { workspace, new Mock<IWorkspace>() }, new[] { new Mock<IMonitor>() });
-
-		workspace.Setup(w => w.Name).Returns("workspace");
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+		workspaces[0].Name.Returns("workspace");
 
 		// When a workspace is removed, it returns true, and WorkspaceRemoved is raised
 		var result = Assert.Raises<WorkspaceEventArgs>(
-			h => wrapper.WorkspaceManager.WorkspaceRemoved += h,
-			h => wrapper.WorkspaceManager.WorkspaceRemoved -= h,
-			() => wrapper.WorkspaceManager.Remove("workspace")
+			h => workspaceManager.WorkspaceRemoved += h,
+			h => workspaceManager.WorkspaceRemoved -= h,
+			() => workspaceManager.Remove("workspace")
 		);
-		Assert.Equal(workspace.Object, result.Arguments.Workspace);
+		Assert.Equal(workspaces[0], result.Arguments.Workspace);
 	}
 	#endregion
 
 	#region TryGet
-	[Fact]
-	public void TryGet_Null()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void TryGet_Null(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 
 		// When getting a workspace which does not exist, then null is returned
-		Assert.Null(wrapper.WorkspaceManager.TryGet("not found"));
+		Assert.Null(workspaceManager.TryGet("not found"));
 	}
 
-	[Fact]
-	public void TryGet_Success()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void TryGet_Success(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		workspace.Setup(w => w.Name).Returns("workspace");
-		Wrapper wrapper = new(new[] { workspace });
+		workspace.Name.Returns("workspace");
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
 
 		// When getting a workspace which does exist, then the workspace is returned
-		Assert.Equal(workspace.Object, wrapper.WorkspaceManager.TryGet("workspace"));
+		Assert.Equal(workspace, workspaceManager.TryGet("workspace"));
 	}
 
-	[Fact]
-	public void SquareBracket_Get()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void SquareBracket_Get(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		workspace.Setup(w => w.Name).Returns("workspace");
-		Wrapper wrapper = new(new[] { workspace });
+		workspace.Name.Returns("workspace");
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
 
 		// When getting a workspace which does exist, then the workspace is returned
-		Assert.Equal(workspace.Object, wrapper.WorkspaceManager["workspace"]);
+		Assert.Equal(workspace, workspaceManager["workspace"]);
 	}
 	#endregion
 
 	#region GetEnumerator
-	[Fact]
-	public void GetEnumerator()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void GetEnumerator(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(new[] { workspace.Object, workspace2.Object }, wrapper.WorkspaceManager);
+		Assert.Equal(workspaces, workspaceManager);
 	}
 
-	[Fact]
-	public void IEnumerable_GetEnumerator()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void IEnumerable_GetEnumerator(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(new[] { workspace.Object, workspace2.Object }, (IEnumerable<IWorkspace>?)wrapper.WorkspaceManager);
+		Assert.Equal(workspaces, (IEnumerable)workspaceManager);
 	}
 	#endregion
 
 	#region Activate
-	[Fact]
-	public void Activate_NoPreviousWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Activate_NoPreviousWorkspace(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
-		Mock<IMonitor>[] monitorWrapper = new[] { new Mock<IMonitor>() };
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new(new[] { workspace }, monitorWrapper);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspace);
 
 		// When a workspace is activated when there are no other workspaces activated, then it is
 		// focused on the active monitor and raises an event,
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged += h,
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged -= h,
-			() => wrapper.WorkspaceManager.Activate(workspace.Object)
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.Activate(workspace)
 		);
-		Assert.Equal(workspace.Object, result.Arguments.CurrentWorkspace);
+		Assert.Equal(workspace, result.Arguments.CurrentWorkspace);
 		Assert.Null(result.Arguments.PreviousWorkspace);
 
 		// Layout is done, and the first window is focused.
-		workspace.Verify(w => w.DoLayout(null), Times.Once);
-		workspace.Verify(w => w.FocusFirstWindow(), Times.Once);
+		workspace.Received(1).DoLayout(null);
+		workspace.Received(1).FocusFirstWindow();
 	}
 
-	[Fact]
-	public void Activate_WithPreviousWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Activate_WithPreviousWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace previousWorkspace,
+		IWorkspace currentWorkspace
+	)
 	{
 		// Given
-		Mock<IWorkspace> previousWorkspace = new();
-		Mock<IWorkspace> currentWorkspace = new();
-		Mock<IMonitor>[] monitorWrapper = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(new[] { previousWorkspace, currentWorkspace }, monitorWrapper);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, previousWorkspace, currentWorkspace);
 
-		wrapper.WorkspaceManager.Activate(previousWorkspace.Object);
+		workspaceManager.Activate(previousWorkspace);
 
 		// Reset wrapper
-		previousWorkspace.Reset();
-		currentWorkspace.Reset();
+		previousWorkspace.ClearReceivedCalls();
+		currentWorkspace.ClearReceivedCalls();
 
 		// When a workspace is activated when there is another workspace activated, then the old
 		// workspace is deactivated, the new workspace is activated, and an event is raised
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged += h,
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged -= h,
-			() => wrapper.WorkspaceManager.Activate(currentWorkspace.Object)
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.Activate(currentWorkspace)
 		);
-		Assert.Equal(currentWorkspace.Object, result.Arguments.CurrentWorkspace);
-		Assert.Equal(previousWorkspace.Object, result.Arguments.PreviousWorkspace);
+		Assert.Equal(currentWorkspace, result.Arguments.CurrentWorkspace);
+		Assert.Equal(previousWorkspace, result.Arguments.PreviousWorkspace);
 
 		// The old workspace is deactivated, the new workspace is laid out, and the first window is
 		// focused.
-		previousWorkspace.Verify(w => w.Deactivate(), Times.Once);
-		previousWorkspace.Verify(w => w.DoLayout(null), Times.Never);
-		currentWorkspace.Verify(w => w.DoLayout(null), Times.Once);
-		currentWorkspace.Verify(w => w.FocusFirstWindow(), Times.Once);
+		previousWorkspace.Received(1).Deactivate();
+		previousWorkspace.DidNotReceive().DoLayout(null);
+		currentWorkspace.Received(1).DoLayout(null);
+		currentWorkspace.Received(1).FocusFirstWindow();
 	}
 
-	[Fact]
-	public void Activate_MultipleMonitors()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Activate_MultipleMonitors(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given there are two workspaces and monitors
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-		IMonitor monitor = wrapper.Monitors[0].Object;
-		IMonitor monitor2 = wrapper.Monitors[1].Object;
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, monitor);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, monitor2);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a workspace is activated on a monitor which already has a workspace activated, then
 		// an event is raised
 		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged += h,
-			h => wrapper.WorkspaceManager.MonitorWorkspaceChanged -= h,
-			() => wrapper.WorkspaceManager.Activate(workspace2.Object, monitor)
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.Activate(workspaces[1], monitors[0])
 		);
 
-		Assert.Equal(monitor, result.Arguments.Monitor);
-		Assert.Equal(workspace2.Object, result.Arguments.CurrentWorkspace);
-		Assert.Equal(workspace.Object, result.Arguments.PreviousWorkspace);
+		Assert.Equal(monitors[0], result.Arguments.Monitor);
+		Assert.Equal(workspaces[1], result.Arguments.CurrentWorkspace);
+		Assert.Equal(workspaces[0], result.Arguments.PreviousWorkspace);
 
-		workspace.Verify(w => w.Deactivate(), Times.Never);
-		workspace.Verify(w => w.DoLayout(null), Times.Once);
-		workspace.Verify(w => w.FocusFirstWindow(), Times.Never);
+		workspaces[0].DidNotReceive().Deactivate();
+		workspaces[0].Received(1).DoLayout(null);
+		workspaces[0].DidNotReceive().FocusFirstWindow();
 
-		workspace2.Verify(w => w.Deactivate(), Times.Never);
-		workspace2.Verify(w => w.DoLayout(null), Times.Once);
-		workspace2.Verify(w => w.FocusFirstWindow(), Times.Once);
+		workspaces[1].DidNotReceive().Deactivate();
+		workspaces[1].Received(1).DoLayout(null);
+		workspaces[1].Received(1).FocusFirstWindow();
 	}
 
-	[InlineData(0, 2)]
-	[InlineData(2, 1)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, 2)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(2, 1)]
 	[Theory]
-	public void ActivatePrevious(int currentIdx, int prevIdx)
+	internal void ActivatePrevious(int currentIdx, int prevIdx, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[]
-		{
-			new Mock<IWorkspace>(),
-			new Mock<IWorkspace>(),
-			new Mock<IWorkspace>()
-		};
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(workspaces, monitors);
-
-		wrapper.WorkspaceManager.Activate(workspaces[currentIdx].Object);
+		workspaceManager.Activate(workspaces[currentIdx]);
 
 		// Reset wrapper
-		workspaces[currentIdx].Reset();
+		workspaces[currentIdx].ClearReceivedCalls();
 
 		// When the previous workspace is activated, then the previous workspace is activated
-		wrapper.WorkspaceManager.ActivatePrevious();
+		workspaceManager.ActivatePrevious();
 
-		workspaces[currentIdx].Verify(w => w.Deactivate(), Times.Once);
-		workspaces[currentIdx].Verify(w => w.DoLayout(null), Times.Never);
-		workspaces[currentIdx].Verify(w => w.FocusFirstWindow(), Times.Never);
+		workspaces[currentIdx].Received(1).Deactivate();
+		workspaces[currentIdx].DidNotReceive().DoLayout(null);
+		workspaces[currentIdx].DidNotReceive().FocusFirstWindow();
 
-		workspaces[prevIdx].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[prevIdx].Verify(w => w.DoLayout(null), Times.Once);
-		workspaces[prevIdx].Verify(w => w.FocusFirstWindow(), Times.Once);
+		workspaces[prevIdx].DidNotReceive().Deactivate();
+		workspaces[prevIdx].Received(1).DoLayout(null);
+		workspaces[prevIdx].Received(1).FocusFirstWindow();
 	}
 
-	[Fact]
-	public void ActivePrevious_CannotFindActiveMonitor()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActivePrevious_CannotFindActiveMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[]
-		{
-			new Mock<IWorkspace>(),
-			new Mock<IWorkspace>(),
-			new Mock<IWorkspace>()
-		};
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(workspaces, monitors);
-
-		wrapper.WorkspaceManager.Activate(workspaces[0].Object);
+		workspaceManager.Activate(workspaces[0]);
 
 		// Reset wrapper
-		workspaces[0].Reset();
-		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(new Mock<IMonitor>().Object);
+		workspaces[0].ClearReceivedCalls();
+		ctx.MonitorManager.ActiveMonitor.Returns(Substitute.For<IMonitor>());
 
 		// When the previous workspace is activated, then the previous workspace is activated
-		wrapper.WorkspaceManager.ActivatePrevious();
+		workspaceManager.ActivatePrevious();
 
-		workspaces[0].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[0].Verify(w => w.DoLayout(null), Times.Never);
-		workspaces[0].Verify(w => w.FocusFirstWindow(), Times.Never);
+		workspaces[0].DidNotReceive().Deactivate();
+		workspaces[0].DidNotReceive().DoLayout(null);
+		workspaces[0].DidNotReceive().FocusFirstWindow();
 
-		workspaces[1].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[1].Verify(w => w.DoLayout(null), Times.Never);
-		workspaces[1].Verify(w => w.FocusFirstWindow(), Times.Never);
+		workspaces[1].DidNotReceive().Deactivate();
+		workspaces[1].DidNotReceive().DoLayout(null);
+		workspaces[1].DidNotReceive().FocusFirstWindow();
 	}
 
-	[InlineData(0, 1)]
-	[InlineData(2, 0)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, 1)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(2, 0)]
 	[Theory]
-	public void ActivateNext(int currentIdx, int nextIdx)
+	internal void ActivateNext(int currentIdx, int nextIdx, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[]
-		{
-			new Mock<IWorkspace>(),
-			new Mock<IWorkspace>(),
-			new Mock<IWorkspace>()
-		};
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(workspaces, monitors);
-
-		wrapper.WorkspaceManager.Activate(workspaces[currentIdx].Object);
+		workspaceManager.Activate(workspaces[currentIdx]);
 
 		// Reset wrapper
-		workspaces[currentIdx].Reset();
+		workspaces[currentIdx].ClearReceivedCalls();
 
 		// When the next workspace is activated, then the next workspace is activated
-		wrapper.WorkspaceManager.ActivateNext();
+		workspaceManager.ActivateNext();
 
-		workspaces[currentIdx].Verify(w => w.Deactivate(), Times.Once);
-		workspaces[currentIdx].Verify(w => w.DoLayout(null), Times.Never);
-		workspaces[currentIdx].Verify(w => w.FocusFirstWindow(), Times.Never);
+		workspaces[currentIdx].Received(1).Deactivate();
+		workspaces[currentIdx].DidNotReceive().DoLayout(null);
+		workspaces[currentIdx].DidNotReceive().FocusFirstWindow();
 
-		workspaces[nextIdx].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[nextIdx].Verify(w => w.DoLayout(null), Times.Once);
-		workspaces[nextIdx].Verify(w => w.FocusFirstWindow(), Times.Once);
+		workspaces[nextIdx].DidNotReceive().Deactivate();
+		workspaces[nextIdx].Received(1).DoLayout(null);
+		workspaces[nextIdx].Received(1).FocusFirstWindow();
 	}
 
-	[Fact]
-	public void ActivateNext_CannotFindActiveMonitor()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActivateNext_CannotFindActiveMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[]
-		{
-			new Mock<IWorkspace>(),
-			new Mock<IWorkspace>(),
-			new Mock<IWorkspace>()
-		};
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(workspaces, monitors);
-
-		wrapper.WorkspaceManager.Activate(workspaces[0].Object);
+		workspaceManager.Activate(workspaces[0]);
 
 		// Reset wrapper
-		workspaces[0].Reset();
-		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(new Mock<IMonitor>().Object);
+		workspaces[0].ClearReceivedCalls();
+		ctx.MonitorManager.ActiveMonitor.Returns(Substitute.For<IMonitor>());
 
 		// When the next workspace is activated, then the next workspace is activated
-		wrapper.WorkspaceManager.ActivateNext();
+		workspaceManager.ActivateNext();
 
-		workspaces[0].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[0].Verify(w => w.DoLayout(null), Times.Never);
-		workspaces[0].Verify(w => w.FocusFirstWindow(), Times.Never);
+		workspaces[0].DidNotReceive().Deactivate();
+		workspaces[0].DidNotReceive().DoLayout(null);
+		workspaces[0].DidNotReceive().FocusFirstWindow();
 
-		workspaces[1].Verify(w => w.Deactivate(), Times.Never);
-		workspaces[1].Verify(w => w.DoLayout(null), Times.Never);
-		workspaces[1].Verify(w => w.FocusFirstWindow(), Times.Never);
+		workspaces[1].DidNotReceive().Deactivate();
+		workspaces[1].DidNotReceive().DoLayout(null);
+		workspaces[1].DidNotReceive().FocusFirstWindow();
 	}
 	#endregion
 
 	#region GetMonitorForWorkspace
-	[Fact]
-	public void GetMonitorForWorkspace_NoWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void GetMonitorForWorkspace_NoWorkspace(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IMonitor>[] monitorWrapper = new[] { new Mock<IMonitor>() };
-		Wrapper wrapper = new(new[] { workspace }, monitorWrapper);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspace);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object);
+		workspaceManager.Activate(workspace);
 
 		// When we get the monitor for a workspace which isn't in the workspace manager
-		IMonitor? monitor = wrapper.WorkspaceManager.GetMonitorForWorkspace(new Mock<IWorkspace>().Object);
+		IMonitor? monitor = workspaceManager.GetMonitorForWorkspace(Substitute.For<IWorkspace>());
 
 		// Then null is returned
 		Assert.Null(monitor);
 	}
 
-	[Fact]
-	public void GetMonitorForWorkspace_Success()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void GetMonitorForWorkspace_Success(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// When we get the monitor for a workspace which is in the workspace manager
-		IMonitor? monitor = wrapper.WorkspaceManager.GetMonitorForWorkspace(workspace.Object);
+		IMonitor? monitor = workspaceManager.GetMonitorForWorkspace(workspaces[0]);
 
 		// Then the monitor is returned
-		Assert.Equal(wrapper.Monitors[0].Object, monitor);
+		Assert.Equal(monitors[0], monitor);
 	}
 	#endregion
 
-	[Fact]
-	public void LayoutAllActiveWorkspaces()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void LayoutAllActiveWorkspaces(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When we layout all active workspaces
-		wrapper.WorkspaceManager.LayoutAllActiveWorkspaces();
+		workspaceManager.LayoutAllActiveWorkspaces();
 
 		// Then all active workspaces are laid out
-		workspace.Verify(w => w.DoLayout(null), Times.Once());
-		workspace2.Verify(w => w.DoLayout(null), Times.Once());
+		workspaces[0].Received(1).DoLayout(null);
+		workspaces[1].Received(1).DoLayout(null);
 	}
 
 	#region WindowAdded
-	[Fact]
-	public void WindowAdded_NoRouter()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowAdded_NoRouter(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors, IWindow window)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window is added
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspaceManager.WindowAdded(window);
 
 		// Then the window is added to the active workspace
-		workspace.Verify(w => w.AddWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+		workspaces[0].Received(1).AddWindow(window);
+		workspaces[1].DidNotReceive().AddWindow(window);
 	}
 
-	[Fact]
-	public void WindowAdded_NoRouter_GetMonitorAtWindowCenter()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowAdded_NoRouter_GetMonitorAtWindowCenter(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(wrapper.Monitors[0].Object);
+		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[0]);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window is added
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspaceManager.WindowAdded(window);
 
 		// Then the window is added to the active workspace
-		workspace.Verify(w => w.AddWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+		workspaces[0].Received(1).AddWindow(window);
+		workspaces[1].DidNotReceive().AddWindow(window);
 	}
 
-	[Fact]
-	public void WindowAdded_Router()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowAdded_Router(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors, IWindow window)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// There is a router which routes the window to a different workspace
-		Mock<IWindow> window = new();
-		wrapper.RouterManager.Setup(r => r.RouteWindow(window.Object)).Returns(workspace2.Object);
+		ctx.RouterManager.RouteWindow(window).Returns(workspaces[1]);
 
 		// When a window is added
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspaceManager.WindowAdded(window);
 
 		// Then the window is added to the workspace returned by the router
-		workspace.Verify(w => w.AddWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
+		workspaces[0].DidNotReceive().AddWindow(window);
+		workspaces[1].Received(1).AddWindow(window);
 	}
 
-	[Fact]
-	public void WindowAdded_RouterToActive()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowAdded_RouterToActive(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// There is a router which routes the window to the active workspace
-		Mock<IWindow> window = new();
-		wrapper.RouterManager.Setup(r => r.RouteWindow(window.Object)).Returns<IWorkspace?>(null);
-		wrapper.RouterManager.Setup(r => r.RouteToActiveWorkspace).Returns(true);
+		ctx.RouterManager.RouteWindow(window).Returns((IWorkspace?)null);
+		ctx.RouterManager.RouteToActiveWorkspace.Returns(true);
 
 		// When a window is added
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspaceManager.WindowAdded(window);
 
 		// Then the window is added to the active workspace
-		workspace.Verify(w => w.AddWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+		workspaces[0].Received(1).AddWindow(window);
+		workspaces[1].DidNotReceive().AddWindow(window);
 	}
 	#endregion
 
 	#region WindowRemoved
-	[Fact]
-	public void WindowRemoved_NotFound()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowRemoved_NotFound(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window is removed
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowRemoved(window.Object);
+		workspaceManager.WindowRemoved(window);
 
 		// Then the window is removed from all workspaces
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.RemoveWindow(window.Object), Times.Never());
+		workspaces[0].DidNotReceive().RemoveWindow(window);
+		workspaces[1].DidNotReceive().RemoveWindow(window);
 	}
 
-	[Fact]
-	public void WindowRemoved_Found()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowRemoved_Found(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors, IWindow window)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspaceManager.WindowAdded(window);
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window which is in a workspace is removed
-		wrapper.WorkspaceManager.WindowRemoved(window.Object);
+		workspaceManager.WindowRemoved(window);
 
 		// Then the window is removed from the workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.RemoveWindow(window.Object), Times.Never());
+		workspaces[0].Received(1).RemoveWindow(window);
+		workspaces[1].DidNotReceive().RemoveWindow(window);
 	}
 	#endregion
 
 	#region MoveWindowToWorkspace
-	[Fact]
-	public void MoveWindowToWorkspace_NoWindow()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToWorkspace_NoWindow(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
+
+		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window which is not in a workspace is moved to a workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace.Object);
+		workspaceManager.MoveWindowToWorkspace(workspaces[0]);
 
 		// Then the window is not added to the workspace
-		workspace.Verify(w => w.RemoveWindow(It.IsAny<IWindow>()), Times.Never());
-		workspace2.Verify(w => w.AddWindow(It.IsAny<IWindow>()), Times.Never());
+		workspaces[0].DidNotReceive().RemoveWindow(Arg.Any<IWindow>());
+		workspaces[1].DidNotReceive().AddWindow(Arg.Any<IWindow>());
 	}
 
-	[Fact]
-	public void MoveWindowToWorkspace_CannotFindWindow()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToWorkspace_CannotFindWindow(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
-		// Given
-		Mock<IWindow> window = new();
-
-		// there are 3 workspaces
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IWorkspace> workspace3 = new();
-
-		Wrapper wrapper = new(new[] { workspace, workspace2, workspace3 });
+		// Given there are 3 workspaces
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
-		workspace3.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
+		workspaces[2].ClearReceivedCalls();
 
 		// When a window not in any workspace is moved to a workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace.Object, window.Object);
+		workspaceManager.MoveWindowToWorkspace(workspaces[0], window);
 
 		// Then the window is not removed or added to any workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+		workspaces[0].DidNotReceive().RemoveWindow(window);
+		workspaces[1].DidNotReceive().AddWindow(window);
 	}
 
-	[Fact]
-	public void MoveWindowToWorkspace_Success_WindowNotHidden()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToWorkspace_Success_WindowNotHidden(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
-		// Given
-		Mock<IWindow> window = new();
+		// Given there are 3 workspaces
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		// there are 3 workspaces
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IWorkspace> workspace3 = new();
-
-		Wrapper wrapper = new(new[] { workspace, workspace2, workspace3 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// and the window is added
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
-		workspace3.Reset();
-		window.Reset();
+		workspaceManager.WindowAdded(window);
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
+		workspaces[2].ClearReceivedCalls();
+		window.ClearReceivedCalls();
 
 		// When a window in a workspace is moved to another workspace
-		wrapper.WorkspaceManager.MoveWindowToWorkspace(workspace2.Object, window.Object);
+		workspaceManager.MoveWindowToWorkspace(workspaces[1], window);
 
 		// Then the window is removed from the first workspace and added to the second
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
-		window.Verify(w => w.Hide(), Times.Never());
+		workspaces[0].Received(1).RemoveWindow(window);
+		workspaces[1].Received(1).AddWindow(window);
+		window.DidNotReceive().Hide();
 	}
 	#endregion
 
 	#region MoveWindowToMonitor
-	[Fact]
-	public void MoveWindowToMonitor_NoWindow()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToMonitor_NoWindow(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given there are 2 workspaces
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When there is no focused window
-		wrapper.WorkspaceManager.MoveWindowToMonitor(wrapper.Monitors[0].Object);
+		workspaceManager.MoveWindowToMonitor(monitors[0]);
 
 		// Then the window is not added to the workspace
-		workspace.Verify(w => w.RemoveWindow(It.IsAny<IWindow>()), Times.Never());
-		workspace2.Verify(w => w.AddWindow(It.IsAny<IWindow>()), Times.Never());
+		workspaces[0].DidNotReceive().RemoveWindow(Arg.Any<IWindow>());
+		workspaces[1].DidNotReceive().AddWindow(Arg.Any<IWindow>());
 	}
 
-	[Fact]
-	public void MoveWindowToMonitor_NoPreviousMonitor()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToMonitor_NoPreviousMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given there are 2 workspaces
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
-
-		Mock<IWindow> window = new();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window which is not in a workspace is moved to a monitor
-		wrapper.WorkspaceManager.MoveWindowToMonitor(wrapper.Monitors[0].Object, window.Object);
+		workspaceManager.MoveWindowToMonitor(monitors[0], window);
 
 		// Then the window is not added to the workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+		workspaces[0].DidNotReceive().RemoveWindow(window);
+		workspaces[1].DidNotReceive().AddWindow(window);
 	}
 
-	[Fact]
-	public void MoveWindowToMonitor_PreviousMonitorIsNewMonitor()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToMonitor_PreviousMonitorIsNewMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given there are 2 workspaces, and the window has been added
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
+		workspaceManager.WindowAdded(window);
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window which is in a workspace is moved to the same monitor
-		wrapper.WorkspaceManager.MoveWindowToMonitor(wrapper.Monitors[0].Object, window.Object);
+		workspaceManager.MoveWindowToMonitor(monitors[0], window);
 
 		// Then the window is not added to the workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+		workspaces[0].DidNotReceive().RemoveWindow(window);
+		workspaces[1].DidNotReceive().AddWindow(window);
 	}
 
-	[Fact]
-	public void MoveWindowToMonitor_PreviousMonitorIsDifferentButEqual()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToMonitor_WorkspaceForMonitorNotFound(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given there are 2 workspaces, and the window has been added
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Mock<IMonitor> monitor = new();
-		Mock<IMonitor> monitor2 = new();
-		monitor.Setup(m => m.Equals(monitor2.Object)).Returns(true);
-		monitor2.Setup(m => m.Equals(monitor.Object)).Returns(true);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
-		Wrapper wrapper = new(new[] { workspace, workspace2 }, new[] { monitor, monitor2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, monitor.Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, monitor2.Object);
-
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
-
-		// When a window which is in a workspace is moved to the same monitor
-		wrapper.WorkspaceManager.MoveWindowToMonitor(monitor2.Object, window.Object);
-
-		// Then the window is not added to the workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
-	}
-
-	[Fact]
-	public void MoveWindowToMonitor_WorkspaceForMonitorNotFound()
-	{
-		// Given there are 2 workspaces, and the window has been added
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
-
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
+		workspaceManager.WindowAdded(window);
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window which is in a workspace is moved to a monitor which isn't registered
-		wrapper.WorkspaceManager.MoveWindowToMonitor(new Mock<IMonitor>().Object, window.Object);
+		workspaceManager.MoveWindowToMonitor(Substitute.For<IMonitor>(), window);
 
 		// Then the window is not added to the workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Never());
+		workspaces[0].DidNotReceive().RemoveWindow(window);
+		workspaces[1].DidNotReceive().AddWindow(window);
 	}
 
-	[Fact]
-	public void MoveWindowToMonitor_Success()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToMonitor_Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
+		workspaceManager.WindowAdded(window);
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window which is in a workspace is moved to a monitor
-		wrapper.WorkspaceManager.MoveWindowToMonitor(wrapper.Monitors[1].Object, window.Object);
+		workspaceManager.MoveWindowToMonitor(monitors[1], window);
 
 		// Then the window is removed from the old workspace and added to the new workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
+		workspaces[0].Received(1).RemoveWindow(window);
+		workspaces[1].Received(1).AddWindow(window);
 	}
 	#endregion
 
-	[Fact]
-	public void MoveWindowToPreviousMonitor_Success()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToPreviousMonitor_Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
+		IWorkspace[] workspaces = CreateWorkspaces(2);
 
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-		wrapper.MonitorManager
-			.Setup(m => m.GetPreviousMonitor(wrapper.Monitors[0].Object))
-			.Returns(wrapper.Monitors[1].Object);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+		ctx.MonitorManager.GetPreviousMonitor(monitors[0]).Returns(monitors[1]);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
+		workspaceManager.WindowAdded(window);
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window which is in a workspace is moved to the previous monitor
-		wrapper.WorkspaceManager.MoveWindowToPreviousMonitor(window.Object);
+		workspaceManager.MoveWindowToPreviousMonitor(window);
 
 		// Then the window is removed from the old workspace and added to the new workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
+		workspaces[0].Received(1).RemoveWindow(window);
+		workspaces[1].Received(1).AddWindow(window);
 	}
 
-	[Fact]
-	public void MoveWindowToNextMonitor_Success()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToNextMonitor_Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
+		IWorkspace[] workspaces = CreateWorkspaces(2);
 
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
-		wrapper.MonitorManager
-			.Setup(m => m.GetNextMonitor(wrapper.Monitors[0].Object))
-			.Returns(wrapper.Monitors[1].Object);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+		ctx.MonitorManager.GetNextMonitor(monitors[0]).Returns(monitors[1]);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-		workspace2.Reset();
+		workspaceManager.WindowAdded(window);
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
 
 		// When a window which is in a workspace is moved to the next monitor
-		wrapper.WorkspaceManager.MoveWindowToNextMonitor(window.Object);
+		workspaceManager.MoveWindowToNextMonitor(window);
 
 		// Then the window is removed from the old workspace and added to the new workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		workspace2.Verify(w => w.AddWindow(window.Object), Times.Once());
+		workspaces[0].Received(1).RemoveWindow(window);
+		workspaces[1].Received(1).AddWindow(window);
 	}
 
 	#region MoveWindowToPoint
-	[Fact]
-	public void MoveWindowToPoint_TargetWorkspaceNotFound()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToPoint_TargetWorkspaceNotFound(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWorkspace workspace,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new(new[] { workspace });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
+		workspaceManager.Activate(workspace, monitors[0]);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		workspace.Reset();
-
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(new Mock<IMonitor>().Object);
+		workspaceManager.WindowAdded(window);
+		workspace.ClearReceivedCalls();
 
 		// When a window which is in a workspace is moved to a point which doesn't correspond to any workspaces
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
+		workspaceManager.MoveWindowToPoint(window, new Point<int>());
 
 		// Then the window is not removed from the old workspace and not added to the new workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
+		workspace.DidNotReceive().RemoveWindow(window);
+		workspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_OldWorkspaceNotFound()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToPoint_OldWorkspaceNotFound(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWorkspace workspace,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new(new[] { workspace });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
+		workspaceManager.Activate(workspace, monitors[0]);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-
-		Mock<IWindow> window = new();
-		workspace.Reset();
-
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(wrapper.Monitors[0].Object);
+		workspace.ClearReceivedCalls();
+		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[0]);
 
 		// When a window which is in a workspace is moved to a point which doesn't correspond to any workspaces
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
+		workspaceManager.MoveWindowToPoint(window, new Point<int>());
 
 		// Then the window is not removed from the old workspace and not added to the new workspace
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		workspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
+		workspace.DidNotReceive().RemoveWindow(window);
+		workspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_Success_DifferentWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToPoint_Success_DifferentWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWorkspace activeWorkspace,
+		IWorkspace targetWorkspace,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> activeWorkspace = new();
-		Mock<IWorkspace> targetWorkspace = new();
-		Wrapper wrapper = new(new[] { activeWorkspace, targetWorkspace });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(
+			ctx,
+			internalCtx,
+			new[] { activeWorkspace, targetWorkspace }
+		);
 
-		wrapper.WorkspaceManager.Activate(activeWorkspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(targetWorkspace.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(activeWorkspace, monitors[0]);
+		workspaceManager.Activate(targetWorkspace, monitors[1]);
 
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		activeWorkspace.Reset();
-		targetWorkspace.Reset();
+		workspaceManager.WindowAdded(window);
+		activeWorkspace.ClearReceivedCalls();
+		targetWorkspace.ClearReceivedCalls();
 
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(wrapper.Monitors[1].Object);
-		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).ReturnsAsync(true);
+		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[1]);
+		activeWorkspace.RemoveWindow(window).Returns(Task.FromResult(true));
 
 		// When a window is moved to a point
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
+		workspaceManager.MoveWindowToPoint(window, new Point<int>());
 
 		// Then the window is removed from the old workspace and added to the new workspace
-		activeWorkspace.Verify(w => w.RemoveWindow(window.Object), Times.Once());
-		activeWorkspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
+		activeWorkspace.Received(1).RemoveWindow(window);
+		activeWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
 
-		Assert.Equal(targetWorkspace.Object, wrapper.WorkspaceManager.GetWorkspaceForWindow(window.Object));
+		Assert.Equal(targetWorkspace, workspaceManager.GetWorkspaceForWindow(window));
 
-		window.Verify(w => w.Focus(), Times.Once());
+		window.Received(1).Focus();
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_Success_SameWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToPoint_Success_SameWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWorkspace activeWorkspace,
+		IWorkspace anotherWorkspace,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> activeWorkspace = new();
-		Mock<IWorkspace> anotherWorkspace = new();
-		Wrapper wrapper = new(new[] { activeWorkspace, anotherWorkspace });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(
+			ctx,
+			internalCtx,
+			new[] { activeWorkspace, anotherWorkspace }
+		);
 
-		wrapper.WorkspaceManager.Activate(activeWorkspace.Object, wrapper.Monitors[0].Object);
+		workspaceManager.Activate(activeWorkspace, monitors[0]);
 
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		activeWorkspace.Reset();
+		workspaceManager.WindowAdded(window);
+		activeWorkspace.ClearReceivedCalls();
 
-		wrapper.MonitorManager
-			.Setup(m => m.GetMonitorAtPoint(It.IsAny<IPoint<int>>()))
-			.Returns(wrapper.Monitors[0].Object);
-		activeWorkspace.Setup(w => w.RemoveWindow(window.Object)).ReturnsAsync(true);
+		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[0]);
+		activeWorkspace.RemoveWindow(window).Returns(Task.FromResult(true));
 
 		// When a window is moved to a point
-		wrapper.WorkspaceManager.MoveWindowToPoint(window.Object, new Point<int>());
+		workspaceManager.MoveWindowToPoint(window, new Point<int>());
 
 		// Then the window is removed from the old workspace and added to the new workspace
-		activeWorkspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
-		activeWorkspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Once());
-		anotherWorkspace.Verify(w => w.MoveWindowToPoint(window.Object, It.IsAny<Point<double>>()), Times.Never());
+		activeWorkspace.DidNotReceive().RemoveWindow(window);
+		activeWorkspace.Received(1).MoveWindowToPoint(window, Arg.Any<Point<double>>());
+		anotherWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
 
-		Assert.Equal(activeWorkspace.Object, wrapper.WorkspaceManager.GetWorkspaceForWindow(window.Object));
+		Assert.Equal(activeWorkspace, workspaceManager.GetWorkspaceForWindow(window));
 
-		window.Verify(w => w.Focus(), Times.Once());
+		window.Received(1).Focus();
 	}
 	#endregion
 
 	#region WindowFocused
-	[Fact]
-	public void WindowFocused()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowFocused(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		Mock<IWorkspace> workspace = new();
-		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
-
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IInternalWorkspace> internalWorkspace2 = workspace2.As<IInternalWorkspace>();
-
-		wrapper.WorkspaceManager.Add(workspace.Object);
-		wrapper.WorkspaceManager.Add(workspace2.Object);
-
-		Mock<IWindow> window = new();
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When a window is focused
-		wrapper.WorkspaceManager.WindowFocused(window.Object);
+		workspaceManager.WindowFocused(window);
 
 		// Then the window is focused in all workspaces
-		internalWorkspace.Verify(w => w.WindowFocused(window.Object), Times.Once());
-		internalWorkspace2.Verify(w => w.WindowFocused(window.Object), Times.Once());
+		((IInternalWorkspace)workspaces[0])
+			.Received(1)
+			.WindowFocused(window);
+		((IInternalWorkspace)workspaces[1]).Received(1).WindowFocused(window);
 	}
 
-	[Fact]
-	public void WindowFocused_ActivateWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowFocused_ActivateWorkspace(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Mock<IInternalWorkspace> workspace1 = new();
-		Mock<IInternalWorkspace> workspace2 = new();
-		Mock<IWorkspace>[] workspaces = new[] { workspace1.As<IWorkspace>(), workspace2.As<IWorkspace>() };
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		IMonitor monitor = ctx.MonitorManager.ActiveMonitor;
+		SetupMonitors(ctx, new[] { monitor });
 
-		Mock<IMonitor> monitor = new();
-		Wrapper wrapper = new(workspaces, new Mock<IMonitor>[] { monitor });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Mock<ILayoutEngine> layoutEngine = new();
-		Mock<IWindow> window = new();
-
-		wrapper.WorkspaceManager.Activate(workspaces[0].Object, monitor.Object);
-		workspaces[0].Reset();
+		workspaceManager.Activate(workspaces[0], monitor);
+		workspaces[0].ClearReceivedCalls();
 
 		// When a window is added to the first workspace, the second workspace is activated, and the window is focused
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
-		wrapper.WorkspaceManager.Activate(workspaces[1].Object, monitor.Object);
-		wrapper.WorkspaceManager.WindowFocused(window.Object);
+		workspaceManager.WindowAdded(window);
+		workspaceManager.Activate(workspaces[1], monitor);
+		workspaceManager.WindowFocused(window);
 
 		// Then the first workspace is activated
-		workspaces[0].Verify(w => w.DoLayout(null), Times.Once());
+		workspaces[0].Received(1).DoLayout(null);
 	}
 
-	[Fact]
-	public void WindowFocused_WindowIsNull()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowFocused_WindowIsNull(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		Mock<IWorkspace> workspace = new();
-		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
-
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IInternalWorkspace> internalWorkspace2 = workspace2.As<IInternalWorkspace>();
-
-		wrapper.WorkspaceManager.Add(workspace.Object);
-		wrapper.WorkspaceManager.Add(workspace2.Object);
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When a window is focused
-		wrapper.WorkspaceManager.WindowFocused(null);
+		workspaceManager.WindowFocused(null);
 
 		// Then the window is focused in all workspaces
-		internalWorkspace.Verify(w => w.WindowFocused(null), Times.Once());
-		internalWorkspace2.Verify(w => w.WindowFocused(null), Times.Once());
+		((IInternalWorkspace)workspaces[0])
+			.Received(1)
+			.WindowFocused(null);
+		((IInternalWorkspace)workspaces[1]).Received(1).WindowFocused(null);
 
-		workspace.Verify(w => w.DoLayout(null), Times.Never());
-		workspace2.Verify(w => w.DoLayout(null), Times.Never());
+		workspaces[0].DidNotReceive().DoLayout(null);
+		workspaces[1].DidNotReceive().DoLayout(null);
 	}
 	#endregion
 
 	#region WindowMinimizeStart
-	[Fact]
-	public void WindowMinimizeStart_CouldNotFindWindow()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowMinimizeStart_CouldNotFindWindow(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace workspace,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new(new[] { workspace });
-		Mock<IWindow> window = new();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
 
 		// When a window is minimized, but the window is not found in any workspace
-		wrapper.WorkspaceManager.WindowMinimizeStart(window.Object);
+		workspaceManager.WindowMinimizeStart(window);
 
 		// Then nothing happens
-		workspace.Verify(w => w.RemoveWindow(window.Object), Times.Never());
+		workspace.DidNotReceive().RemoveWindow(window);
 	}
 
-	[Fact]
-	public void WindowMinimizeStart()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowMinimizeStart(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
-
-		Wrapper wrapper = new(new[] { workspace });
-
-		Mock<IRouterManager> routerManager = new();
-		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
-		wrapper.Context.Setup(c => c.RouterManager).Returns(routerManager.Object);
+		IWorkspace workspace = Substitute.For<IWorkspace, IInternalWorkspace>();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		// A window is added to the workspace
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspaceManager.WindowAdded(window);
 
 		// When a window is minimized
-		wrapper.WorkspaceManager.WindowMinimizeStart(window.Object);
+		workspaceManager.WindowMinimizeStart(window);
 
 		// Then the workspace is notified
-		internalWorkspace.Verify(w => w.WindowMinimizeStart(window.Object), Times.Once());
+		((IInternalWorkspace)workspace)
+			.Received(1)
+			.WindowMinimizeStart(window);
 	}
 	#endregion
 
 	#region WindowMinimizeEnd
-	[Fact]
-	public void WindowMinimizeEnd()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowMinimizeEnd(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
-
-		Wrapper wrapper = new(new[] { workspace });
-
-		Mock<IRouterManager> routerManager = new();
-		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
-		wrapper.Context.Setup(c => c.RouterManager).Returns(routerManager.Object);
+		IWorkspace workspace = Substitute.For<IWorkspace, IInternalWorkspace>();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		// A window is added to the workspace
-		Mock<IWindow> window = new();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspaceManager.WindowAdded(window);
 
 		// When a window is restored
-		wrapper.WorkspaceManager.WindowMinimizeEnd(window.Object);
+		workspaceManager.WindowMinimizeEnd(window);
 
 		// Then the window is routed to the workspace
-		internalWorkspace.Verify(w => w.WindowMinimizeEnd(window.Object), Times.Once());
+		((IInternalWorkspace)workspace)
+			.Received(1)
+			.WindowMinimizeEnd(window);
 	}
 
-	[Fact]
-	public void WindowMinizeEnd_Fail()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowMinizeEnd_Fail(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IInternalWorkspace> internalWorkspace = workspace.As<IInternalWorkspace>();
-
-		Wrapper wrapper = new(new[] { workspace });
-
-		Mock<IRouterManager> routerManager = new();
-		routerManager.Setup(r => r.RouteWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
-		wrapper.Context.Setup(c => c.RouterManager).Returns(routerManager.Object);
-
-		Mock<IWindow> window = new();
+		IWorkspace workspace = Substitute.For<IWorkspace, IInternalWorkspace>();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		// When a window which isn't tracked is restored
-		wrapper.WorkspaceManager.WindowMinimizeEnd(window.Object);
+		workspaceManager.WindowMinimizeEnd(window);
 
 		// Then the workspace is not notified
-		internalWorkspace.Verify(w => w.WindowMinimizeEnd(window.Object), Times.Never());
+		((IInternalWorkspace)workspace)
+			.DidNotReceive()
+			.WindowMinimizeEnd(window);
 	}
 	#endregion
 
 	#region MonitorManager_MonitorsChanged
-	[Fact]
-	public void MonitorManager_MonitorsChanged_Removed()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MonitorManager_MonitorsChanged_Removed(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
+		IWorkspace[] workspaces = CreateWorkspaces(2);
 
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// When a monitor is removed, and a monitor not tracked in the WorkspaceManager is removed
-		wrapper.WorkspaceManager.MonitorManager_MonitorsChanged(
+		workspaceManager.MonitorManager_MonitorsChanged(
 			this,
 			new MonitorsChangedEventArgs()
 			{
 				AddedMonitors = Array.Empty<IMonitor>(),
-				RemovedMonitors = new IMonitor[] { wrapper.Monitors[0].Object, new Mock<IMonitor>().Object },
-				UnchangedMonitors = new IMonitor[] { wrapper.Monitors[1].Object }
+				RemovedMonitors = new IMonitor[] { monitors[0], Substitute.For<IMonitor>() },
+				UnchangedMonitors = new IMonitor[] { monitors[1] }
 			}
 		);
 
 		// Then the workspace is deactivated
-		workspace.Verify(w => w.Deactivate(), Times.Once());
+		workspaces[0].Received(1).Deactivate();
 	}
 
-	[Fact]
-	public void MonitorManager_MonitorsChanged_Added_CreateWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MonitorManager_MonitorsChanged_Added_CreateWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>());
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		int calls = 0;
+		CreateLeafLayoutEngine[] createLayoutEngines()
+		{
+			calls++;
+			return new CreateLeafLayoutEngine[] { (identity) => Substitute.For<ILayoutEngine>() };
+		}
+		workspaceManager.CreateLayoutEngines = createLayoutEngines;
 
-		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
-		CreateLayoutEngines
-			.Setup(c => c())
-			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
-		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// When a monitor is added
-		wrapper.WorkspaceManager.MonitorManager_MonitorsChanged(
+		workspaceManager.MonitorManager_MonitorsChanged(
 			this,
 			new MonitorsChangedEventArgs()
 			{
-				AddedMonitors = new IMonitor[] { monitor.Object },
+				AddedMonitors = new IMonitor[] { Substitute.For<IMonitor>() },
 				RemovedMonitors = Array.Empty<IMonitor>(),
-				UnchangedMonitors = new IMonitor[] { wrapper.Monitors[0].Object, wrapper.Monitors[1].Object }
+				UnchangedMonitors = new IMonitor[] { monitors[0], monitors[1] }
 			}
 		);
 
 		// Then a new workspace is created
-		CreateLayoutEngines.Verify(f => f(), Times.Once());
+		Assert.Equal(1, calls);
 	}
 
-	[Fact]
-	public void MonitorManager_MonitorsChanged_Added_UseExistingWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MonitorManager_MonitorsChanged_Added_UseExistingWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Mock<IWorkspace> workspace3 = new();
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Mock<IMonitor> monitor = new();
-
-		Wrapper wrapper = new(new[] { workspace, workspace2, workspace3 });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
-		wrapper.WorkspaceManager.Activate(workspace2.Object, wrapper.Monitors[1].Object);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		workspace2.Reset();
-		workspace3.Reset();
+		workspaces[0].ClearReceivedCalls();
+		workspaces[1].ClearReceivedCalls();
+		workspaces[2].ClearReceivedCalls();
 
 		// When a monitor is added
-		wrapper.WorkspaceManager.MonitorManager_MonitorsChanged(
+		workspaceManager.MonitorManager_MonitorsChanged(
 			this,
 			new MonitorsChangedEventArgs()
 			{
-				AddedMonitors = new IMonitor[] { monitor.Object },
+				AddedMonitors = new IMonitor[] { Substitute.For<IMonitor>() },
 				RemovedMonitors = Array.Empty<IMonitor>(),
-				UnchangedMonitors = new IMonitor[] { wrapper.Monitors[0].Object, wrapper.Monitors[1].Object }
+				UnchangedMonitors = new IMonitor[] { monitors[0], monitors[1] }
 			}
 		);
 
 		// Then the workspace is activated
-		workspace.Verify(w => w.DoLayout(null), Times.Once());
-		workspace2.Verify(w => w.DoLayout(null), Times.Once());
-		workspace3.Verify(w => w.DoLayout(null), Times.Exactly(2));
+		workspaces[0].Received(1).DoLayout(null);
+		workspaces[1].Received(1).DoLayout(null);
+		workspaces[2].Received(2).DoLayout(null);
 	}
 
-	[Fact]
-	public void MonitorManager_MonitorsChanged_CannotAddWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MonitorManager_MonitorsChanged_CannotAddWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWorkspace workspace
+	)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-
-		Mock<IMonitor> monitor1 = new();
-		Mock<IMonitor> monitor2 = new();
-
-		Wrapper wrapper = new(new[] { workspace });
-
-		wrapper.WorkspaceManager.Activate(workspace.Object, wrapper.Monitors[0].Object);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
+		workspaceManager.Activate(workspace, monitors[0]);
 
 		// Reset the wrapper
-		workspace.Reset();
-		wrapper.WorkspaceManager.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
+		workspace.ClearReceivedCalls();
+		workspaceManager.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
 
 		// When a monitor is added
-		wrapper.WorkspaceManager.MonitorManager_MonitorsChanged(
+		workspaceManager.MonitorManager_MonitorsChanged(
 			this,
 			new MonitorsChangedEventArgs()
 			{
-				AddedMonitors = new IMonitor[] { monitor1.Object, monitor2.Object },
+				AddedMonitors = new IMonitor[] { monitors[0], monitors[1] },
 				RemovedMonitors = Array.Empty<IMonitor>(),
-				UnchangedMonitors = new IMonitor[] { wrapper.Monitors[0].Object }
+				UnchangedMonitors = new IMonitor[] { monitors[0] }
 			}
 		);
 
 		// Then the workspace is not activated
-		Assert.Single(wrapper.WorkspaceManager);
+		Assert.Single(workspaceManager);
 	}
 	#endregion
 
 	#region AddProxyLayoutEngine
-	[Fact]
-	public void NoProxyLayoutEngines()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void NoProxyLayoutEngines(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 
 		// When
-		wrapper.WorkspaceManager.Initialize();
+		workspaceManager.Initialize();
 
 		// Then
-		Assert.IsNotAssignableFrom<BaseProxyLayoutEngine>(wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine);
+		Assert.IsNotAssignableFrom<BaseProxyLayoutEngine>(workspaceManager.ActiveWorkspace.ActiveLayoutEngine);
 	}
 
-	[Fact]
-	public void AddProxyLayoutEngine()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void AddProxyLayoutEngine(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 
 		// When
-		wrapper.WorkspaceManager.AddProxyLayoutEngine(
-			(engine) => new Mock<TestUtils.TestProxyLayoutEngine>(engine).Object
-		);
-		wrapper.WorkspaceManager.Initialize();
+		workspaceManager.AddProxyLayoutEngine((engine) => Substitute.For<TestProxyLayoutEngine>(engine));
+		workspaceManager.Initialize();
 
 		// Then
-		Assert.IsAssignableFrom<TestUtils.TestProxyLayoutEngine>(
-			wrapper.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine
-		);
+		Assert.IsAssignableFrom<TestProxyLayoutEngine>(workspaceManager.ActiveWorkspace.ActiveLayoutEngine);
 	}
 	#endregion
 
-	[Fact]
-	public void DoesDispose()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void DoesDispose(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace> workspace = new();
-		Mock<IWorkspace> workspace2 = new();
-		Wrapper wrapper = new(new[] { workspace, workspace2 });
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When the workspace manager is disposed
-		wrapper.WorkspaceManager.Dispose();
+		workspaceManager.Dispose();
 
 		// Then the workspaces are disposed
-		workspace.Verify(w => w.Dispose(), Times.Once());
-		workspace2.Verify(w => w.Dispose(), Times.Once());
+		workspaces[0].Received(1).Dispose();
+		workspaces[1].Received(1).Dispose();
 	}
 
 	#region WorkspaceManagerTriggers
-	[Fact]
-	public void WorkspaceManagerTriggers_ActiveLayoutEngineChanged()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WorkspaceManagerTriggers_ActiveLayoutEngineChanged(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		wrapper.WorkspaceManager.Initialize();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		workspaceManager.Initialize();
 
 		// Then changing the layout engine should trigger the event
 		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
-			h => wrapper.WorkspaceManager.ActiveLayoutEngineChanged += h,
-			h => wrapper.WorkspaceManager.ActiveLayoutEngineChanged -= h,
-			async () => await wrapper.WorkspaceManager.ActiveWorkspace.NextLayoutEngine()
+			h => workspaceManager.ActiveLayoutEngineChanged += h,
+			h => workspaceManager.ActiveLayoutEngineChanged -= h,
+			async () => await workspaceManager.ActiveWorkspace.NextLayoutEngine()
 		);
 	}
 
-	[Fact]
-	public void WorkspaceManagerTriggers_ActiveLayoutEngineChanged_DoesNotThrowWhenNoListener()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WorkspaceManagerTriggers_ActiveLayoutEngineChanged_DoesNotThrowWhenNoListener(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given
-		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		wrapper.WorkspaceManager.Initialize();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		workspaceManager.Initialize();
 
 		// When creating a workspace
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		workspaceManager.Add("workspace");
+		IWorkspace workspace = workspaceManager["workspace"]!;
 
 		// Then changing the layout engine should trigger the event
 		try
@@ -1597,35 +1513,38 @@ public class WorkspaceManagerTests
 		}
 	}
 
-	[Fact]
-	public void WorkspaceManagerTriggers_WorkspaceRenamed()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WorkspaceManagerTriggers_WorkspaceRenamed(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		wrapper.WorkspaceManager.Initialize();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		workspaceManager.Initialize();
 
 		// When creating a workspace
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		workspaceManager.Add("workspace");
+		IWorkspace workspace = workspaceManager["workspace"]!;
 
 		// Then renaming the workspace should trigger the event
 		Assert.Raises<WorkspaceRenamedEventArgs>(
-			h => wrapper.WorkspaceManager.WorkspaceRenamed += h,
-			h => wrapper.WorkspaceManager.WorkspaceRenamed -= h,
+			h => workspaceManager.WorkspaceRenamed += h,
+			h => workspaceManager.WorkspaceRenamed -= h,
 			() => workspace.Name = "new name"
 		);
 	}
 
-	[Fact]
-	public void WorkspaceManagerTriggers_WorkspaceRenamed_DoesNotThrowWhenNoListener()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WorkspaceManagerTriggers_WorkspaceRenamed_DoesNotThrowWhenNoListener(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given
-		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		wrapper.WorkspaceManager.Initialize();
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		workspaceManager.Initialize();
 
 		// When creating a workspace
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
+		workspaceManager.Add("workspace");
+		IWorkspace workspace = workspaceManager["workspace"]!;
 
 		// Then renaming the workspace should trigger the event
 		try
@@ -1638,49 +1557,47 @@ public class WorkspaceManagerTests
 		}
 	}
 
-	[Fact]
-	public void WorkspaceManagerTriggers_WorkspaceLayoutStarted()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WorkspaceManagerTriggers_WorkspaceLayoutStarted(
+		IContext ctx,
+		IInternalContext internalCtx,
+		Func<CreateLeafLayoutEngine[]> createLayoutEngines
+	)
 	{
 		// Given
-		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		wrapper.WorkspaceManager.Initialize();
-
-		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
-		CreateLayoutEngines
-			.Setup(c => c())
-			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
-		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		workspaceManager.Initialize();
+		workspaceManager.CreateLayoutEngines = createLayoutEngines;
 
 		// When creating a workspace
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
-		wrapper.WorkspaceManager.Activate(workspace);
+		workspaceManager.Add("workspace");
+		IWorkspace workspace = workspaceManager["workspace"]!;
+		workspaceManager.Activate(workspace);
 
 		// Then starting the layout should trigger the event
 		Assert.Raises<WorkspaceEventArgs>(
-			h => wrapper.WorkspaceManager.WorkspaceLayoutStarted += h,
-			h => wrapper.WorkspaceManager.WorkspaceLayoutStarted -= h,
+			h => workspaceManager.WorkspaceLayoutStarted += h,
+			h => workspaceManager.WorkspaceLayoutStarted -= h,
 			() => workspace.DoLayout(null)
 		);
 	}
 
-	[Fact]
-	public void WorkspaceManagerTriggers_WorkspaceLayoutStarted_DoesNotThrowWhenNoListener()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WorkspaceManagerTriggers_WorkspaceLayoutStarted_DoesNotThrowWhenNoListener(
+		IContext ctx,
+		IInternalContext internalCtx,
+		Func<CreateLeafLayoutEngine[]> createLayoutEngines
+	)
 	{
 		// Given
-		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		wrapper.WorkspaceManager.Initialize();
-
-		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
-		CreateLayoutEngines
-			.Setup(c => c())
-			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
-		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		workspaceManager.Initialize();
+		workspaceManager.CreateLayoutEngines = createLayoutEngines;
 
 		// When creating a workspace
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
-		wrapper.WorkspaceManager.Activate(workspace);
+		workspaceManager.Add("workspace");
+		IWorkspace workspace = workspaceManager["workspace"]!;
+		workspaceManager.Activate(workspace);
 
 		// Then starting the layout should trigger the event
 		try
@@ -1693,49 +1610,47 @@ public class WorkspaceManagerTests
 		}
 	}
 
-	[Fact]
-	public void WorkspaceManagerTriggers_WorkspaceLayoutCompleted()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WorkspaceManagerTriggers_WorkspaceLayoutCompleted(
+		IContext ctx,
+		IInternalContext internalCtx,
+		Func<CreateLeafLayoutEngine[]> createLayoutEngines
+	)
 	{
 		// Given
-		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		wrapper.WorkspaceManager.Initialize();
-
-		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
-		CreateLayoutEngines
-			.Setup(c => c())
-			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
-		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		workspaceManager.Initialize();
+		workspaceManager.CreateLayoutEngines = createLayoutEngines;
 
 		// When
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
-		wrapper.WorkspaceManager.Activate(workspace);
+		workspaceManager.Add("workspace");
+		IWorkspace workspace = workspaceManager["workspace"]!;
+		workspaceManager.Activate(workspace);
 
 		// Then completing the layout should trigger the event
 		Assert.Raises<WorkspaceEventArgs>(
-			h => wrapper.WorkspaceManager.WorkspaceLayoutCompleted += h,
-			h => wrapper.WorkspaceManager.WorkspaceLayoutCompleted -= h,
+			h => workspaceManager.WorkspaceLayoutCompleted += h,
+			h => workspaceManager.WorkspaceLayoutCompleted -= h,
 			() => workspace.DoLayout(null)
 		);
 	}
 
-	[Fact]
-	public void WorkspaceManagerTriggers_WorkspaceLayoutCompleted_DoesNotThrowWhenNoListener()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WorkspaceManagerTriggers_WorkspaceLayoutCompleted_DoesNotThrowWhenNoListener(
+		IContext ctx,
+		IInternalContext internalCtx,
+		Func<CreateLeafLayoutEngine[]> createLayoutEngines
+	)
 	{
 		// Given
-		Wrapper wrapper = new(Array.Empty<Mock<IWorkspace>>());
-		wrapper.WorkspaceManager.Initialize();
-
-		Mock<Func<CreateLeafLayoutEngine[]>> CreateLayoutEngines = new();
-		CreateLayoutEngines
-			.Setup(c => c())
-			.Returns(new CreateLeafLayoutEngine[] { (identity) => new Mock<ILayoutEngine>().Object });
-		wrapper.WorkspaceManager.CreateLayoutEngines = CreateLayoutEngines.Object;
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		workspaceManager.Initialize();
+		workspaceManager.CreateLayoutEngines = createLayoutEngines;
 
 		// When
-		wrapper.WorkspaceManager.Add("workspace");
-		IWorkspace workspace = wrapper.WorkspaceManager["workspace"]!;
-		wrapper.WorkspaceManager.Activate(workspace);
+		workspaceManager.Add("workspace");
+		IWorkspace workspace = workspaceManager["workspace"]!;
+		workspaceManager.Activate(workspace);
 
 		// Then completing the layout should trigger the event
 		try
@@ -1750,151 +1665,150 @@ public class WorkspaceManagerTests
 	#endregion
 
 	#region ActiveWorkspace
-	[Fact]
-	public void ActiveWorkspace_CannotFindMonitor()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActiveWorkspace_CannotFindMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
-		Wrapper wrapper = new(workspaces);
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(new Mock<IMonitor>().Object);
+		ctx.MonitorManager.ActiveMonitor.Returns(Substitute.For<IMonitor>());
 
 		// When the active monitor can't be found inside the WorkspaceManager
-		IWorkspace activeWorkspace = wrapper.WorkspaceManager.ActiveWorkspace;
+		IWorkspace activeWorkspace = workspaceManager.ActiveWorkspace;
 
 		// Then the first workspace is returned
-		Assert.Equal(workspaces[0].Object, activeWorkspace);
+		Assert.Equal(workspaces[0], activeWorkspace);
 	}
 
-	[Fact]
-	public void ActiveWorkspace_CanFindMonitor()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActiveWorkspace_CanFindMonitor(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
-		Wrapper wrapper = new(workspaces);
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		wrapper.WorkspaceManager.Initialize();
-		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(wrapper.Monitors[1].Object);
+		workspaceManager.Initialize();
+		ctx.MonitorManager.ActiveMonitor.Returns(monitors[1]);
 
 		// When the active monitor can be found inside the WorkspaceManager
-		IWorkspace activeWorkspace = wrapper.WorkspaceManager.ActiveWorkspace;
+		IWorkspace activeWorkspace = workspaceManager.ActiveWorkspace;
 
 		// Then the workspace is returned
-		Assert.Equal(workspaces[1].Object, activeWorkspace);
+		Assert.Equal(workspaces[1], activeWorkspace);
 	}
 	#endregion
 
 	#region MoveWindowEdgesInDirection
-	[Fact]
-	public void MoveWindowEdgesInDirection_NoWindow()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowEdgesInDirection_NoWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+		workspaceManager.Initialize();
 
-		Wrapper wrapper = new(workspaces);
-		wrapper.WorkspaceManager.Initialize();
+		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
 
 		// When moving the window edges in a direction
-		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
+		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then nothing happens
-		workspaces[0].Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
-			Times.Never()
-		);
-		workspaces[1].Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
-			Times.Never()
-		);
+		workspaces[0]
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		workspaces[1]
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_NoContainingWorkspace()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowEdgesInDirection_NoContainingWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Wrapper wrapper = new(workspaces);
+		workspaces[1].Windows.Returns(new[] { window });
+		workspaces[1].LastFocusedWindow.Returns(window);
 
-		Mock<IWindow> window = new();
-		workspaces[1].Setup(w => w.Windows).Returns(new[] { window.Object });
-		workspaces[1].Setup(w => w.LastFocusedWindow).Returns(window.Object);
-
-		wrapper.WorkspaceManager.Initialize();
-		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(wrapper.Monitors[1].Object);
+		workspaceManager.Initialize();
+		ctx.MonitorManager.ActiveMonitor.Returns(monitors[1]);
 
 		// When moving the window edges in a direction
-		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
+		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then nothing happens
-		workspaces[0].Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
-			Times.Never()
-		);
-		workspaces[1].Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
-			Times.Never()
-		);
+		workspaces[0]
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		workspaces[1]
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_NoContainingMonitor()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowEdgesInDirection_NoContainingMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
-		Mock<IMonitor>[] monitors = new[] { new Mock<IMonitor>() };
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
 
-		Wrapper wrapper = new(workspaces, monitors);
+		workspaces[1].Windows.Returns(new[] { window });
+		ctx.RouterManager.RouteWindow(window).Returns(workspaces[1]);
 
-		Mock<IWindow> window = new();
-		workspaces[1].Setup(w => w.Windows).Returns(new[] { window.Object });
-		wrapper.RouterManager.Setup(r => r.RouteWindow(window.Object)).Returns(workspaces[1].Object);
-
-		wrapper.WorkspaceManager.Initialize();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+		workspaceManager.Initialize();
+		workspaceManager.WindowAdded(window);
 
 		// When moving the window edges in a direction
-		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>(), window.Object);
+		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>(), window);
 
 		// Then nothing happens
-		workspaces[0].Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
-			Times.Never()
-		);
-		workspaces[1].Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
-			Times.Never()
-		);
+		workspaces[0]
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		workspaces[1]
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_Success()
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowEdgesInDirection_Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
 	{
 		// Given
-		Mock<IWorkspace>[] workspaces = new[] { new Mock<IWorkspace>(), new Mock<IWorkspace>() };
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		Wrapper wrapper = new(workspaces);
+		workspaces[0].Windows.Returns(new[] { window });
+		workspaces[0].LastFocusedWindow.Returns(window);
+		ctx.MonitorManager.ActiveMonitor.Returns(monitors[0]);
 
-		Mock<IWindow> window = new();
-		workspaces[0].Setup(w => w.Windows).Returns(new[] { window.Object });
-		workspaces[0].Setup(w => w.LastFocusedWindow).Returns(window.Object);
-		wrapper.MonitorManager.Setup(m => m.ActiveMonitor).Returns(wrapper.Monitors[0].Object);
-
-		wrapper.WorkspaceManager.Initialize();
-		wrapper.WorkspaceManager.WindowAdded(window.Object);
+		workspaceManager.Initialize();
+		workspaceManager.WindowAdded(window);
 
 		// When moving the window edges in a direction
-		wrapper.WorkspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
+		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then the window edges are moved
-		workspaces[0].Verify(
-			w => w.MoveWindowEdgesInDirection(Direction.Left, It.IsAny<IPoint<double>>(), window.Object),
-			Times.Once()
-		);
-		workspaces[1].Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow?>()),
-			Times.Never()
-		);
+		workspaces[0].Received(1).MoveWindowEdgesInDirection(Direction.Left, Arg.Any<IPoint<double>>(), window);
+		workspaces[1]
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
 	}
 	#endregion
 }

@@ -169,9 +169,8 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getmonitorinfoa
 	/// </remarks>
 	/// <param name="hMonitor"></param>
-	/// <param name="lpmi"></param>
 	/// <returns></returns>
-	BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFO lpmi);
+	MONITORINFO? GetMonitorInfo(HMONITOR hMonitor);
 
 	/// <summary>
 	/// Retrieve information about a display monitor.
@@ -182,9 +181,8 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getmonitorinfoa
 	/// </remarks>
 	/// <param name="hMonitor"></param>
-	/// <param name="lpmi"></param>
 	/// <returns></returns>
-	BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi);
+	MONITORINFOEXW? GetMonitorInfoEx(HMONITOR hMonitor);
 
 	/// <summary>
 	/// Retrieve a handle to the display monitor that contains a specified point.

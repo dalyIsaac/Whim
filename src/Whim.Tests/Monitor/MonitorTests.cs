@@ -1,4 +1,6 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
+using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.HiDpi;
@@ -6,58 +8,61 @@ using Xunit;
 
 namespace Whim.Tests;
 
+internal class MonitorCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
+
+		internalCtx.CoreNativeManager.GetVirtualScreenLeft().Returns(0);
+		internalCtx.CoreNativeManager.GetVirtualScreenTop().Returns(0);
+		internalCtx.CoreNativeManager.GetVirtualScreenWidth().Returns(1920);
+		internalCtx.CoreNativeManager.GetVirtualScreenHeight().Returns(1080);
+
+		internalCtx.CoreNativeManager
+			.GetPrimaryDisplayWorkArea(out RECT _)
+			.Returns(
+				(callInfo) =>
+				{
+					callInfo[0] = new RECT()
+					{
+						left = 10,
+						top = 10,
+						right = 1910,
+						bottom = 1070
+					};
+					return (BOOL)true;
+				}
+			);
+
+		uint effectiveDpiX = 144;
+		uint effectiveDpiY = 144;
+		internalCtx.CoreNativeManager
+			.GetDpiForMonitor(Arg.Any<HMONITOR>(), Arg.Any<MONITOR_DPI_TYPE>(), out uint _, out uint _)
+			.Returns(
+				(callInfo) =>
+				{
+					callInfo[2] = effectiveDpiX;
+					callInfo[3] = effectiveDpiY;
+					return (HRESULT)0;
+				}
+			);
+
+		fixture.Inject(new HMONITOR(1));
+	}
+}
+
 public class MonitorTests
 {
-	private class Wrapper
-	{
-		public HMONITOR HMonitor { get; } = new(1);
-		public Mock<IInternalContext> InternalContext { get; } = new();
-		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
-
-		public Wrapper()
-		{
-			InternalContext.Setup(ic => ic.CoreNativeManager).Returns(CoreNativeManager.Object);
-			CoreNativeManager.Setup(nm => nm.GetVirtualScreenLeft()).Returns(0);
-			CoreNativeManager.Setup(nm => nm.GetVirtualScreenTop()).Returns(0);
-			CoreNativeManager.Setup(nm => nm.GetVirtualScreenWidth()).Returns(1920);
-			CoreNativeManager.Setup(nm => nm.GetVirtualScreenHeight()).Returns(1080);
-
-			RECT rect =
-				new()
-				{
-					left = 10,
-					top = 10,
-					right = 1910,
-					bottom = 1070
-				};
-			CoreNativeManager.Setup(nm => nm.GetPrimaryDisplayWorkArea(out rect)).Returns((BOOL)true);
-
-			uint effectiveDpiX = 144;
-			uint effectiveDpiY = 144;
-			CoreNativeManager
-				.Setup(
-					nm =>
-						nm.GetDpiForMonitor(
-							It.IsAny<HMONITOR>(),
-							It.IsAny<MONITOR_DPI_TYPE>(),
-							out effectiveDpiX,
-							out effectiveDpiY
-						)
-				)
-				.Returns((HRESULT)0);
-		}
-	}
-
-	[Fact]
-	public void CreateMonitor_SingleMonitor()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void CreateMonitor_SingleMonitor(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(nm => nm.HasMultipleMonitors()).Returns(false);
+		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(false);
 		bool isPrimaryHMonitor = true;
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, isPrimaryHMonitor);
+		Monitor monitor = new(internalCtx, hmonitor, isPrimaryHMonitor);
 
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
@@ -76,16 +81,15 @@ public class MonitorTests
 		Assert.Equal(150, monitor.ScaleFactor);
 	}
 
-	[Fact]
-	public void CreateMonitor_IsPrimaryHMonitor()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void CreateMonitor_IsPrimaryHMonitor(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(nm => nm.HasMultipleMonitors()).Returns(true);
+		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(true);
 		bool isPrimaryHMonitor = true;
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, isPrimaryHMonitor);
+		Monitor monitor = new(internalCtx, hmonitor, isPrimaryHMonitor);
 
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
@@ -104,46 +108,44 @@ public class MonitorTests
 		Assert.Equal(150, monitor.ScaleFactor);
 	}
 
-	[Fact]
-	public void CreateMonitor_MultipleMonitors()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void CreateMonitor_MultipleMonitors(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
 
-		wrapper.CoreNativeManager.Setup(nm => nm.HasMultipleMonitors()).Returns(true);
+		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(true);
 
-		wrapper.CoreNativeManager
-			.Setup(nm => nm.GetMonitorInfo(It.IsAny<HMONITOR>(), ref It.Ref<MONITORINFOEXW>.IsAny))
-			.Callback(
-				(HMONITOR hmonitor, ref MONITORINFOEXW infoEx) =>
+		internalCtx.CoreNativeManager
+			.GetMonitorInfoEx(Arg.Any<HMONITOR>())
+			.Returns(
+				(_) =>
 				{
+					MONITORINFOEXW infoEx = default;
 					infoEx.monitorInfo.rcMonitor = new RECT(0, 0, 1920, 1080);
 					infoEx.monitorInfo.rcWork = new RECT(10, 10, 1910, 1070);
 					infoEx.monitorInfo.dwFlags = 0;
 					infoEx.szDevice = "DISPLAY";
+					return infoEx;
 				}
-			)
-			.Returns((BOOL)true);
+			);
 
 		uint effectiveDpiX = 144;
 		uint effectiveDpiY = 144;
-		wrapper.CoreNativeManager
-			.Setup(
-				nm =>
-					nm.GetDpiForMonitor(
-						It.IsAny<HMONITOR>(),
-						It.IsAny<MONITOR_DPI_TYPE>(),
-						out effectiveDpiX,
-						out effectiveDpiY
-					)
-			)
-			.Returns((HRESULT)0);
+		internalCtx.CoreNativeManager
+			.GetDpiForMonitor(Arg.Any<HMONITOR>(), Arg.Any<MONITOR_DPI_TYPE>(), out uint _, out uint _)
+			.Returns(
+				(callInfo) =>
+				{
+					callInfo[2] = effectiveDpiX;
+					callInfo[3] = effectiveDpiY;
+					return (HRESULT)0;
+				}
+			);
 
-		HMONITOR hmonitor = new(1);
 		bool isPrimaryHMonitor = false;
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, hmonitor, isPrimaryHMonitor);
+		Monitor monitor = new(internalCtx, hmonitor, isPrimaryHMonitor);
 
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
@@ -162,29 +164,27 @@ public class MonitorTests
 		Assert.Equal(150, monitor.ScaleFactor);
 	}
 
-	[Fact]
-	public void Equals_Failure()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void Equals_Failure(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
 		HMONITOR hmonitor2 = new(2);
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
-		Monitor monitor2 = new(wrapper.InternalContext.Object, hmonitor2, false);
+		Monitor monitor = new(internalCtx, hmonitor, false);
+		Monitor monitor2 = new(internalCtx, hmonitor2, false);
 
 		// Then
 		Assert.False(monitor.Equals(monitor2));
 	}
 
-	[Fact]
-	public void Equals_Failure_Null()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void Equals_Failure_Null(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor = new(internalCtx, hmonitor, false);
 
 		// Then
 #pragma warning disable CA1508 // Avoid dead conditional code
@@ -192,57 +192,53 @@ public class MonitorTests
 #pragma warning restore CA1508 // Avoid dead conditional code
 	}
 
-	[Fact]
-	public void Equals_Success()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void Equals_Success(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
-		Monitor monitor2 = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor = new(internalCtx, hmonitor, false);
+		Monitor monitor2 = new(internalCtx, hmonitor, false);
 
 		// Then
 		Assert.True(monitor.Equals(monitor2));
 	}
 
-	[Fact]
-	public void Equals_Operator_Success()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void Equals_Operator_Success(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
-		Monitor monitor2 = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor = new(internalCtx, hmonitor, false);
+		Monitor monitor2 = new(internalCtx, hmonitor, false);
 
 		// Then
 		Assert.True(monitor == monitor2);
 	}
 
-	[Fact]
-	public void NotEquals_Operator_Success()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void NotEquals_Operator_Success(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
 		HMONITOR hmonitor2 = new(2);
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
-		Monitor monitor2 = new(wrapper.InternalContext.Object, hmonitor2, false);
+		Monitor monitor = new(internalCtx, hmonitor, false);
+		Monitor monitor2 = new(internalCtx, hmonitor2, false);
 
 		// Then
 		Assert.True(monitor != monitor2);
 	}
 
-	[Fact]
-	public void ToString_Success()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void ToString_Success(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, true);
+		Monitor monitor = new(internalCtx, hmonitor, true);
 
 		// Then
 		Assert.Equal(
@@ -251,15 +247,14 @@ public class MonitorTests
 		);
 	}
 
-	[Fact]
-	public void GetHashCode_Success()
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void GetHashCode_Success(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-		Wrapper wrapper = new();
 
 		// When
-		Monitor monitor = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
-		Monitor monitor2 = new(wrapper.InternalContext.Object, wrapper.HMonitor, false);
+		Monitor monitor = new(internalCtx, hmonitor, false);
+		Monitor monitor2 = new(internalCtx, hmonitor, false);
 
 		// Then
 		Assert.Equal(monitor.GetHashCode(), monitor2.GetHashCode());

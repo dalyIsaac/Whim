@@ -1,4 +1,5 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
@@ -6,44 +7,37 @@ namespace Whim.Tests;
 public class LayoutEngineTests
 {
 	#region GetLayoutEngine
-	[Fact]
-	public void GetLayoutEngine_IsT()
+	[Theory, AutoSubstituteData]
+	public void GetLayoutEngine_IsT(TestLayoutEngine engine)
 	{
-		// Given
-		ILayoutEngine engine = new TestUtils.TestLayoutEngine();
-
 		// When
-		ILayoutEngine? newEngine = engine.GetLayoutEngine<ILayoutEngine>();
+		ILayoutEngine? newEngine = ((ILayoutEngine)engine).GetLayoutEngine<ILayoutEngine>();
 
 		// Then
 		Assert.Same(engine, newEngine);
 		Assert.NotNull(newEngine);
 	}
 
-	[Fact]
-	public void GetLayoutEngine_IsProxy()
+	[Theory, AutoSubstituteData]
+	public void GetLayoutEngine_IsProxy(TestLayoutEngine engine)
 	{
 		// Given
-		TestUtils.TestLayoutEngine engine = new();
-		Mock<TestUtils.TestProxyLayoutEngine> proxyInner = new(engine);
-		Mock<TestUtils.TestProxyLayoutEngine> proxyOuter = new(proxyInner.Object);
+		TestProxyLayoutEngine proxyInner = Substitute.For<TestProxyLayoutEngine>(engine);
+		TestProxyLayoutEngine proxyOuter = Substitute.For<TestProxyLayoutEngine>(proxyInner);
 
 		// When
-		TestUtils.TestLayoutEngine? newEngine = proxyOuter.Object.GetLayoutEngine<TestUtils.TestLayoutEngine>();
+		TestLayoutEngine? newEngine = proxyOuter.GetLayoutEngine<TestLayoutEngine>();
 
 		// Then
 		Assert.Same(engine, newEngine);
 		Assert.NotNull(newEngine);
 	}
 
-	[Fact]
-	public void GetLayoutEngine_Null()
+	[Theory, AutoSubstituteData]
+	public void GetLayoutEngine_Null(TestLayoutEngine engine)
 	{
-		// Given
-		ILayoutEngine engine = new TestUtils.TestLayoutEngine();
-
 		// When
-		ILayoutEngine? newEngine = engine.GetLayoutEngine<TestUtils.ITestLayoutEngine>();
+		ILayoutEngine? newEngine = ((ILayoutEngine)engine).GetLayoutEngine<ITestLayoutEngine>();
 
 		// Then
 		Assert.Null(newEngine);
@@ -51,42 +45,35 @@ public class LayoutEngineTests
 	#endregion
 
 	#region
-	[Fact]
-	public void ContainsEqual_IsT()
+	[Theory, AutoSubstituteData]
+	public void ContainsEqual_IsT(TestLayoutEngine engine)
 	{
-		// Given
-		ILayoutEngine engine = new TestUtils.TestLayoutEngine();
-
 		// When
-		bool contains = engine.ContainsEqual(engine);
+		bool contains = ((ILayoutEngine)engine).ContainsEqual(engine);
 
 		// Then
 		Assert.True(contains);
 	}
 
-	[Fact]
-	public void ContainsEqual_IsProxy()
+	[Theory, AutoSubstituteData]
+	public void ContainsEqual_IsProxy(TestLayoutEngine engine)
 	{
 		// Given
-		TestUtils.TestLayoutEngine engine = new();
-		Mock<TestUtils.TestProxyLayoutEngine> proxyInner = new(engine);
-		Mock<TestUtils.TestProxyLayoutEngine> proxyOuter = new(proxyInner.Object);
+		TestProxyLayoutEngine proxyInner = Substitute.For<TestProxyLayoutEngine>(engine);
+		TestProxyLayoutEngine proxyOuter = Substitute.For<TestProxyLayoutEngine>(proxyInner);
 
 		// When
-		bool contains = proxyOuter.Object.ContainsEqual(engine);
+		bool contains = proxyOuter.ContainsEqual(engine);
 
 		// Then
 		Assert.True(contains);
 	}
 
-	[Fact]
-	public void ContainsEqual_Null()
+	[Theory, AutoSubstituteData]
+	public void ContainsEqual_Null(TestLayoutEngine engine)
 	{
-		// Given
-		ILayoutEngine engine = new TestUtils.TestLayoutEngine();
-
 		// When
-		bool contains = engine.ContainsEqual(new Mock<ILayoutEngine>().Object);
+		bool contains = ((ILayoutEngine)engine).ContainsEqual(Substitute.For<ILayoutEngine>());
 
 		// Then
 		Assert.False(contains);

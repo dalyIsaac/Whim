@@ -280,6 +280,9 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 				// dispose managed state (managed objects)
 				_internalContext.WindowMessageMonitor.DisplayChanged -= WindowMessageMonitor_MonitorsChanged;
+				_internalContext.WindowMessageMonitor.WorkAreaChanged -= WindowMessageMonitor_MonitorsChanged;
+				_internalContext.WindowMessageMonitor.DpiChanged -= WindowMessageMonitor_MonitorsChanged;
+				_internalContext.WindowMessageMonitor.SessionChanged -= WindowMessageMonitor_SessionChanged;
 				_internalContext.MouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
 				_internalContext.Dispose();
 			}

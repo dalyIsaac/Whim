@@ -1,4 +1,5 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;
 
@@ -6,27 +7,14 @@ namespace Whim.Tests;
 
 public class KeybindManagerTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<ICommandManager> CommandManager { get; } = new();
-
-		public Wrapper()
-		{
-			Context.SetupGet(context => context.CommandManager).Returns(CommandManager.Object);
-		}
-	}
-
-	[Fact]
-	public void Add_DoesNotContainKeybind()
+	[Theory, AutoSubstituteData]
+	public void Add_DoesNotContainKeybind(IContext context, ICommand command)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
-		ICommand command = new Mock<ICommand>().Object;
 
-		wrapper.CommandManager.Setup(commandManager => commandManager.TryGetCommand("command")).Returns(command);
+		context.CommandManager.TryGetCommand("command").Returns(command);
 
 		// When
 		keybindManager.Add("command", keybind);
@@ -37,18 +25,15 @@ public class KeybindManagerTests
 		Assert.Equal(command, allCommands[0]);
 	}
 
-	[Fact]
-	public void Add_ContainsKeybind()
+	[Theory, AutoSubstituteData]
+	public void Add_ContainsKeybind(IContext context, ICommand command, ICommand command2)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
-		ICommand command = new Mock<ICommand>().Object;
-		ICommand command2 = new Mock<ICommand>().Object;
 
-		wrapper.CommandManager.Setup(commandManager => commandManager.TryGetCommand("command")).Returns(command);
-		wrapper.CommandManager.Setup(commandManager => commandManager.TryGetCommand("command2")).Returns(command2);
+		context.CommandManager.TryGetCommand("command").Returns(command);
+		context.CommandManager.TryGetCommand("command2").Returns(command2);
 
 		// When
 		keybindManager.Add("command", keybind);
@@ -61,12 +46,11 @@ public class KeybindManagerTests
 		Assert.Equal(command2, allCommands[1]);
 	}
 
-	[Fact]
-	public void GetCommands_DoesNotContainKeybind()
+	[Theory, AutoSubstituteData]
+	public void GetCommands_DoesNotContainKeybind(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
 
 		// When
@@ -76,16 +60,14 @@ public class KeybindManagerTests
 		Assert.Empty(allCommands);
 	}
 
-	[Fact]
-	public void GetCommands_DoesNotContainCommand()
+	[Theory, AutoSubstituteData]
+	public void GetCommands_DoesNotContainCommand(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
-		ICommand command = new Mock<ICommand>().Object;
 
-		wrapper.CommandManager.Setup(commandManager => commandManager.TryGetCommand("command")).Returns(command);
+		context.CommandManager.TryGetCommand("command2").Returns((ICommand?)null);
 
 		// When
 		keybindManager.Add("command2", keybind);
@@ -95,18 +77,15 @@ public class KeybindManagerTests
 		Assert.Empty(allCommands);
 	}
 
-	[Fact]
-	public void GetCommands_Success()
+	[Theory, AutoSubstituteData]
+	public void GetCommands_Success(IContext context, ICommand command, ICommand command2)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
-		ICommand command = new Mock<ICommand>().Object;
-		ICommand command2 = new Mock<ICommand>().Object;
 
-		wrapper.CommandManager.Setup(commandManager => commandManager.TryGetCommand("command")).Returns(command);
-		wrapper.CommandManager.Setup(commandManager => commandManager.TryGetCommand("command2")).Returns(command2);
+		context.CommandManager.TryGetCommand("command").Returns(command);
+		context.CommandManager.TryGetCommand("command2").Returns(command2);
 
 		// When
 		keybindManager.Add("command", keybind);
@@ -119,12 +98,11 @@ public class KeybindManagerTests
 		Assert.Equal(command2, allCommands[1]);
 	}
 
-	[Fact]
-	public void TryGet_DoesNotContainCommand()
+	[Theory, AutoSubstituteData]
+	public void TryGet_DoesNotContainCommand(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 
 		// When
 		IKeybind? keybind = keybindManager.TryGetKeybind("command");
@@ -133,12 +111,11 @@ public class KeybindManagerTests
 		Assert.Null(keybind);
 	}
 
-	[Fact]
-	public void TryGet_ContainsCommand()
+	[Theory, AutoSubstituteData]
+	public void TryGet_ContainsCommand(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
 
 		// When
@@ -149,12 +126,11 @@ public class KeybindManagerTests
 		Assert.Equal(keybind, result);
 	}
 
-	[Fact]
-	public void Remove_DoesNotContainCommand()
+	[Theory, AutoSubstituteData]
+	public void Remove_DoesNotContainCommand(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 
 		// When
 		bool result = keybindManager.Remove("command");
@@ -163,12 +139,11 @@ public class KeybindManagerTests
 		Assert.False(result);
 	}
 
-	[Fact]
-	public void Remove_ContainsCommand()
+	[Theory, AutoSubstituteData]
+	public void Remove_ContainsCommand(IContext context)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IKeybindManager keybindManager = new KeybindManager(wrapper.Context.Object);
+		IKeybindManager keybindManager = new KeybindManager(context);
 		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
 
 		// When
