@@ -1,36 +1,39 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
+using Whim.TestUtils;
 using Windows.System;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
-public class FreeTextVariantViewModelTests
+public class FreeTextVariantViewModelCustomization : ICustomization
 {
-	private class MocksBuilder
+	public void Customize(IFixture fixture)
 	{
-		public Mock<FreeTextVariantCallback> Callback { get; } = new();
-		public FreeTextVariantConfig Config { get; }
-		public Mock<ICommandPaletteWindowViewModel> WindowViewModel { get; } = new();
+		ICommandPaletteWindowViewModel windowViewModel = fixture.Freeze<ICommandPaletteWindowViewModel>();
+		windowViewModel.Text = "Hello, world!";
 
-		public MocksBuilder()
-		{
-			Config = new FreeTextVariantConfig()
+		FreeTextVariantCallback callback = Substitute.For<FreeTextVariantCallback>();
+		fixture.Inject(callback);
+
+		FreeTextVariantConfig config =
+			new()
 			{
 				InitialText = "Hello, world!",
-				Callback = Callback.Object,
+				Callback = callback,
 				Prompt = "Hello, world!"
 			};
-
-			WindowViewModel.Setup(wvm => wvm.Text).Returns("Hello, world!");
-		}
+		fixture.Inject(config);
 	}
+}
 
-	[Fact]
-	public void NotFreeTextVariantConfig()
+public class FreeTextVariantViewModelTests
+{
+	[Theory, AutoSubstituteData<FreeTextVariantViewModelCustomization>]
+	internal void NotFreeTextVariantConfig(ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+		FreeTextVariantViewModel vm = new(windowViewModel);
 
 		// When
 		vm.Activate(new UnknownConfig());
@@ -40,12 +43,11 @@ public class FreeTextVariantViewModelTests
 		Assert.Null(vm.ConfirmButtonText);
 	}
 
-	[Fact]
-	public void PromptDefaultsToEmptyString()
+	[Theory, AutoSubstituteData<FreeTextVariantViewModelCustomization>]
+	internal void PromptDefaultsToEmptyString(ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+		FreeTextVariantViewModel vm = new(windowViewModel);
 
 		// When
 		string prompt = vm.Prompt;
@@ -54,67 +56,78 @@ public class FreeTextVariantViewModelTests
 		Assert.Equal("", prompt);
 	}
 
-	[Fact]
-	public void OnKeyDown_Enter()
+	[Theory, AutoSubstituteData<FreeTextVariantViewModelCustomization>]
+	internal void OnKeyDown_Enter(
+		ICommandPaletteWindowViewModel windowViewModel,
+		FreeTextVariantConfig config,
+		FreeTextVariantCallback callback
+	)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+		FreeTextVariantViewModel vm = new(windowViewModel);
 
-		vm.Activate(mocks.Config);
+		vm.Activate(config);
 
 		// When
 		vm.OnKeyDown(VirtualKey.Enter);
 
 		// Then
-		mocks.Callback.Verify(c => c("Hello, world!"), Times.Once);
-		mocks.WindowViewModel.Verify(w => w.RequestHide(), Times.Once);
+		callback.Received(1).Invoke("Hello, world!");
+		windowViewModel.Received(1).RequestHide();
 	}
 
-	[Fact]
-	public void OnKeyDown_Enter_NoActivationConfig()
+	[Theory, AutoSubstituteData<FreeTextVariantViewModelCustomization>]
+	internal void OnKeyDown_Enter_NoActivationConfig(
+		ICommandPaletteWindowViewModel windowViewModel,
+		FreeTextVariantCallback callback
+	)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+		FreeTextVariantViewModel vm = new(windowViewModel);
 
 		// When
 		vm.OnKeyDown(VirtualKey.Enter);
 
 		// Then
-		mocks.Callback.Verify(c => c("Hello, world!"), Times.Never);
+		callback.DidNotReceive().Invoke("Hello, world!");
 	}
 
-	[Fact]
-	public void OnKeyDown_NotEnter()
+	[Theory, AutoSubstituteData<FreeTextVariantViewModelCustomization>]
+	internal void OnKeyDown_NotEnter(
+		ICommandPaletteWindowViewModel windowViewModel,
+		FreeTextVariantConfig config,
+		FreeTextVariantCallback callback
+	)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+		FreeTextVariantViewModel vm = new(windowViewModel);
 
-		vm.Activate(mocks.Config);
+		vm.Activate(config);
 
 		// When
 		vm.OnKeyDown(VirtualKey.Escape);
 
 		// Then
-		mocks.Callback.Verify(c => c("Hello, world!"), Times.Never);
+		callback.DidNotReceive().Invoke("Hello, world!");
 	}
 
-	[Fact]
-	public void Confirm()
+	[Theory, AutoSubstituteData<FreeTextVariantViewModelCustomization>]
+	internal void Confirm(
+		ICommandPaletteWindowViewModel windowViewModel,
+		FreeTextVariantConfig config,
+		FreeTextVariantCallback callback
+	)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		FreeTextVariantViewModel vm = new(mocks.WindowViewModel.Object);
+		FreeTextVariantViewModel vm = new(windowViewModel);
 
-		vm.Activate(mocks.Config);
+		vm.Activate(config);
 
 		// When
 		vm.Confirm();
 
 		// Then
-		mocks.Callback.Verify(c => c("Hello, world!"), Times.Once);
-		mocks.WindowViewModel.Verify(w => w.RequestHide(), Times.Once);
+		callback.Received(1).Invoke("Hello, world!");
+		windowViewModel.Received(1).RequestHide();
 	}
 }
