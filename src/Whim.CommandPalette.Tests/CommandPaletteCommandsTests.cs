@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
@@ -8,60 +8,44 @@ public class CommandPaletteCommandsTests
 {
 	private class Wrapper
 	{
-		public Mock<IContext> Context { get; }
-		public Mock<IWorkspaceManager> WorkspaceManager { get; }
-		public Mock<IWorkspace> Workspace { get; }
-		public Mock<IWorkspace> OtherWorkspace { get; }
-		public Mock<ICommandPalettePlugin> Plugin { get; }
-		public Mock<IWindow>[] Windows { get; }
-		public IWindow[] WindowsArray => Windows.Select(w => w.Object).ToArray();
+		public IContext Context { get; }
+		public IWorkspace Workspace { get; }
+		public IWorkspace OtherWorkspace { get; }
+		public ICommandPalettePlugin Plugin { get; }
+		public IWindow[] Windows { get; }
 		public CommandPaletteCommands Commands { get; }
 
 		public Wrapper()
 		{
-			Context = new();
-			WorkspaceManager = new();
-			Workspace = new();
-			Workspace.SetupGet(w => w.Name).Returns("Workspace");
-			OtherWorkspace = new();
-			OtherWorkspace.SetupGet(w => w.Name).Returns("Other workspace");
+			Context = Substitute.For<IContext>();
 
-			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-			WorkspaceManager.SetupGet(w => w.ActiveWorkspace).Returns(Workspace.Object);
-			WorkspaceManager
-				.Setup(w => w.GetEnumerator())
-				.Returns(new List<IWorkspace>() { Workspace.Object, OtherWorkspace.Object }.GetEnumerator());
+			Workspace = Substitute.For<IWorkspace>();
+			Workspace.Name.Returns("Workspace");
 
-			Plugin = new();
-			Plugin.SetupGet(p => p.Name).Returns("whim.command_palette");
+			OtherWorkspace = Substitute.For<IWorkspace>();
+			OtherWorkspace.Name.Returns("Other workspace");
 
-			Windows = new Mock<IWindow>[3];
-			Windows[0] = new();
-			Windows[0].SetupGet(w => w.Title).Returns("Window 0");
-			Windows[1] = new();
-			Windows[1].SetupGet(w => w.Title).Returns("Window 1");
-			Windows[2] = new();
-			Windows[2].SetupGet(w => w.Title).Returns("Window 2");
+			Context.WorkspaceManager.ActiveWorkspace.Returns(Workspace);
+			Context.WorkspaceManager
+				.GetEnumerator()
+				.Returns((_) => new List<IWorkspace>() { Workspace, OtherWorkspace }.GetEnumerator());
 
-			Workspace.SetupGet(w => w.Windows).Returns(new List<IWindow>() { Windows[0].Object, Windows[1].Object });
-			OtherWorkspace.SetupGet(w => w.Windows).Returns(new List<IWindow>() { Windows[2].Object });
+			Plugin = Substitute.For<ICommandPalettePlugin>();
+			Plugin.Name.Returns("whim.command_palette");
 
-			Commands = new(Context.Object, Plugin.Object);
+			Windows = new IWindow[3];
+			Windows[0] = Substitute.For<IWindow>();
+			Windows[0].Title.Returns("Window 0");
+			Windows[1] = Substitute.For<IWindow>();
+			Windows[1].Title.Returns("Window 1");
+			Windows[2] = Substitute.For<IWindow>();
+			Windows[2].Title.Returns("Window 2");
+
+			Workspace.Windows.Returns((_) => new List<IWindow>() { Windows[0], Windows[1] });
+			OtherWorkspace.Windows.Returns((_) => new List<IWindow>() { Windows[2] });
+
+			Commands = new(Context, Plugin);
 		}
-	}
-
-	private static List<FreeTextVariantConfig> VerifyFreeTextActivated(Mock<ICommandPalettePlugin> plugin)
-	{
-		List<FreeTextVariantConfig> configs = new();
-		plugin.Setup(p => p.Activate(Capture.In(configs)));
-		return configs;
-	}
-
-	private static List<MenuVariantConfig> VerifyMenuActivated(Mock<ICommandPalettePlugin> plugin)
-	{
-		List<MenuVariantConfig> configs = new();
-		plugin.Setup(p => p.Activate(Capture.In(configs)));
-		return configs;
 	}
 
 	[Fact]
@@ -73,18 +57,20 @@ public class CommandPaletteCommandsTests
 			"whim.command_palette.activate_workspace"
 		);
 
-		List<MenuVariantConfig> configs = VerifyMenuActivated(wrapper.Plugin);
+		MenuVariantConfig? config = null;
+		wrapper.Plugin.Activate(Arg.Do<MenuVariantConfig>(c => config = c));
+
 		command.TryExecute();
 
 		// Verify that the plugin was activated.
-		wrapper.Plugin.Verify(p => p.Activate(It.IsAny<MenuVariantConfig>()), Times.Once);
+		wrapper.Plugin.Received(1).Activate(Arg.Any<MenuVariantConfig>());
 
 		// Call the callback.
-		ICommand activeWorkspaceCommand = configs[0].Commands.First();
+		ICommand activeWorkspaceCommand = config!.Commands.First();
 		activeWorkspaceCommand.TryExecute();
 
 		// Verify that the workspace was activated.
-		wrapper.WorkspaceManager.Verify(w => w.Activate(wrapper.OtherWorkspace.Object, null), Times.Once);
+		wrapper.Context.WorkspaceManager.Received(1).Activate(wrapper.OtherWorkspace, null);
 	}
 
 	[Fact]
@@ -100,7 +86,7 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(p => p.Toggle(), Times.Once);
+		wrapper.Plugin.Received(1).Toggle();
 	}
 
 	[Fact]
@@ -112,17 +98,19 @@ public class CommandPaletteCommandsTests
 			"whim.command_palette.rename_workspace"
 		);
 
-		List<FreeTextVariantConfig> configs = VerifyFreeTextActivated(wrapper.Plugin);
+		FreeTextVariantConfig? config = null;
+		wrapper.Plugin.Activate(Arg.Do<FreeTextVariantConfig>(c => config = c));
+
 		command.TryExecute();
 
 		// Verify that the plugin was activated
-		wrapper.Plugin.Verify(p => p.Activate(It.IsAny<FreeTextVariantConfig>()), Times.Once);
+		wrapper.Plugin.Received(1).Activate(Arg.Any<FreeTextVariantConfig>());
 
 		// Call the callback
-		configs[0].Callback("New workspace name");
+		config!.Callback("New workspace name");
 
 		// Verify that the workspace was renamed
-		wrapper.WorkspaceManager.VerifySet(w => w.ActiveWorkspace.Name = "New workspace name", Times.Once);
+		wrapper.Context.WorkspaceManager.ActiveWorkspace.Received(1).Name = "New workspace name";
 	}
 
 	[Fact]
@@ -134,17 +122,19 @@ public class CommandPaletteCommandsTests
 			"whim.command_palette.create_workspace"
 		);
 
-		List<FreeTextVariantConfig> configs = VerifyFreeTextActivated(wrapper.Plugin);
+		FreeTextVariantConfig? config = null;
+		wrapper.Plugin.Activate(Arg.Do<FreeTextVariantConfig>(c => config = c));
+
 		command.TryExecute();
 
 		// Verify that the plugin was activated.
-		wrapper.Plugin.Verify(x => x.Activate(It.IsAny<FreeTextVariantConfig>()), Times.Once);
+		wrapper.Plugin.Activate(Arg.Any<FreeTextVariantConfig>());
 
 		// Call the callback.
-		configs[0].Callback("New workspace name");
+		config!.Callback("New workspace name");
 
 		// Verify that the workspace was created.
-		wrapper.Context.Verify(x => x.WorkspaceManager.Add("New workspace name", null), Times.Once);
+		wrapper.Context.WorkspaceManager.Received(1).Add("New workspace name", null);
 	}
 
 	[Fact]
@@ -155,16 +145,12 @@ public class CommandPaletteCommandsTests
 		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
 			"whim.command_palette.move_window_to_workspace"
 		);
-		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
-
-		List<FreeTextVariantConfig> freeTextConfigs = VerifyFreeTextActivated(wrapper.Plugin);
-		List<MenuVariantConfig> menuConfigs = VerifyMenuActivated(wrapper.Plugin);
 
 		// When
 		command.TryExecute();
 
 		// Verify that the plugin was menu activated.
-		wrapper.Plugin.Verify(x => x.Activate(It.IsAny<MenuVariantConfig>()), Times.Once);
+		wrapper.Plugin.Received(1).Activate(Arg.Any<MenuVariantConfig>());
 	}
 
 	[Fact]
@@ -172,14 +158,14 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
 		// When
-		ICommand command = commands.MoveWindowToWorkspaceCommandCreator(wrapper.Workspace.Object);
+		ICommand command = commands.MoveWindowToWorkspaceCommandCreator(wrapper.Workspace);
 		command.TryExecute();
 
 		// Verify that MoveWindowToWorkspace was called with the workspace.
-		wrapper.WorkspaceManager.Verify(x => x.MoveWindowToWorkspace(wrapper.Workspace.Object, null), Times.Once);
+		wrapper.Context.WorkspaceManager.Received(1).MoveWindowToWorkspace(wrapper.Workspace, null);
 	}
 
 	[Fact]
@@ -189,7 +175,7 @@ public class CommandPaletteCommandsTests
 		Wrapper wrapper = new();
 
 		// When
-		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 		SelectOption[] options = commands.CreateMoveWindowsToWorkspaceOptions();
 
 		// Then
@@ -208,22 +194,13 @@ public class CommandPaletteCommandsTests
 		Wrapper wrapper = new();
 
 		// When
-		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
-		ICommand command = commands.MoveMultipleWindowsToWorkspaceCreator(
-			wrapper.WindowsArray,
-			wrapper.Workspace.Object
-		);
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
+		ICommand command = commands.MoveMultipleWindowsToWorkspaceCreator(wrapper.Windows, wrapper.Workspace);
 
 		// Then
 		command.TryExecute();
-		wrapper.WorkspaceManager.Verify(
-			x => x.MoveWindowToWorkspace(wrapper.Workspace.Object, wrapper.Windows[0].Object),
-			Times.Once
-		);
-		wrapper.WorkspaceManager.Verify(
-			x => x.MoveWindowToWorkspace(wrapper.Workspace.Object, wrapper.Windows[1].Object),
-			Times.Once
-		);
+		wrapper.Context.WorkspaceManager.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[0]);
+		wrapper.Context.WorkspaceManager.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[1]);
 	}
 
 	[Fact]
@@ -255,22 +232,20 @@ public class CommandPaletteCommandsTests
 			};
 
 		// When
-		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 		commands.MoveMultipleWindowsToWorkspaceCallback(options);
 
 		// Then
 		string[] expectedWorkspaces = new string[] { "Workspace", "Other workspace" };
-		wrapper.Plugin.Verify(
-			x =>
-				x.Activate(
-					It.Is<MenuVariantConfig>(
-						c =>
-							c.Hint == "Select workspace"
-							&& c.Commands.Select(c => c.Title).SequenceEqual(expectedWorkspaces)
-					)
-				),
-			Times.Once
-		);
+		wrapper.Plugin
+			.Received(1)
+			.Activate(
+				Arg.Is<MenuVariantConfig>(
+					c =>
+						c.Hint == "Select workspace"
+						&& c.Commands.Select(c => c.Title).SequenceEqual(expectedWorkspaces)
+				)
+			);
 	}
 
 	[Fact]
@@ -286,19 +261,17 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(
-			x =>
-				x.Activate(
-					It.Is<SelectVariantConfig>(
-						c =>
-							c.Hint == "Select windows"
-							&& c.Options
-								.Select(y => y.Title)
-								.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
-					)
-				),
-			Times.Once
-		);
+		wrapper.Plugin
+			.Received(1)
+			.Activate(
+				Arg.Is<SelectVariantConfig>(
+					c =>
+						c.Hint == "Select windows"
+						&& c.Options
+							.Select(y => y.Title)
+							.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
+				)
+			);
 	}
 
 	[Fact]
@@ -314,20 +287,18 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(
-			x =>
-				x.Activate(
-					It.Is<MenuVariantConfig>(
-						c =>
-							c.Hint == "Select window"
-							&& c.ConfirmButtonText == "Remove"
-							&& c.Commands
-								.Select(c => c.Title)
-								.SequenceEqual(new string[] { "Remove \"Window 0\"", "Remove \"Window 1\"" })
-					)
-				),
-			Times.Once
-		);
+		wrapper.Plugin
+			.Received(1)
+			.Activate(
+				Arg.Is<MenuVariantConfig>(
+					c =>
+						c.Hint == "Select window"
+						&& c.ConfirmButtonText == "Remove"
+						&& c.Commands
+							.Select(c => c.Title)
+							.SequenceEqual(new string[] { "Remove \"Window 0\"", "Remove \"Window 1\"" })
+				)
+			);
 	}
 
 	[Fact]
@@ -335,13 +306,13 @@ public class CommandPaletteCommandsTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteCommands commands = new(wrapper.Context.Object, wrapper.Plugin.Object);
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
 		// When
-		ICommand command = commands.RemoveWindowCommandCreator(wrapper.Windows[0].Object);
+		ICommand command = commands.RemoveWindowCommandCreator(wrapper.Windows[0]);
 		command.TryExecute();
 
 		// Then
-		wrapper.Workspace.Verify(x => x.RemoveWindow(wrapper.Windows[0].Object), Times.Once);
+		wrapper.Workspace.Received(1).RemoveWindow(wrapper.Windows[0]);
 	}
 }
