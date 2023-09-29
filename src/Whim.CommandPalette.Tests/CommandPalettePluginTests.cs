@@ -1,28 +1,23 @@
-#pragma warning disable CA2000 // Dispose objects before losing scope
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
 public class CommandPalettePluginTests
 {
-	[Fact]
-	public void PreInitialize_ShouldIgnoreTitleMatch()
+	[Theory, AutoSubstituteData]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+	public void PreInitialize_ShouldIgnoreTitleMatch(IContext ctx)
 	{
 		// Given
-		Mock<IFilterManager> filterManagerMock = new();
-		Mock<IContext> contextMock = new();
-		contextMock.Setup(x => x.FilterManager).Returns(filterManagerMock.Object);
-
-		CommandPaletteConfig commandPaletteConfig = new(contextMock.Object);
-		CommandPalettePlugin commandPalettePlugin = new(contextMock.Object, commandPaletteConfig);
+		CommandPaletteConfig commandPaletteConfig = new(ctx);
+		CommandPalettePlugin commandPalettePlugin = new(ctx, commandPaletteConfig);
 
 		// When
 		commandPalettePlugin.PreInitialize();
 
 		// Then
-		contextMock.Verify(x => x.FilterManager.IgnoreTitleMatch(CommandPaletteConfig.Title), Times.Once);
+		ctx.FilterManager.Received(1).IgnoreTitleMatch(CommandPaletteConfig.Title);
 	}
 }
-
-#pragma warning restore CA2000 // Dispose objects before losing scope

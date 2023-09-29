@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
@@ -11,11 +11,11 @@ public class MatcherResultTests
 		// Given
 		string text = "normal highlighted normal";
 		FilterTextMatch[] matches = new[] { new FilterTextMatch(7, 18), };
-		Mock<IVariantRowModel<int>> modelMock = new();
-		modelMock.Setup(m => m.Title).Returns(text);
+		IVariantRowModel<int> modelMock = Substitute.For<IVariantRowModel<int>>();
+		modelMock.Title.Returns(text);
 
 		// When
-		MatcherResult<int> matcherResult = new(modelMock.Object, matches, 0);
+		MatcherResult<int> matcherResult = new(modelMock, matches, 0);
 
 		// Then
 		Assert.Equal(3, matcherResult.FormattedTitle.Segments.Count);
