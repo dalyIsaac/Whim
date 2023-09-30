@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <UserControl
 	x:Class="Whim.LayoutPreview.LayoutPreviewWindowItem"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -11,11 +11,11 @@
 	HorizontalContentAlignment="Stretch"
 	VerticalContentAlignment="Stretch"
 	mc:Ignorable="d">
-	
+
 	<UserControl.Resources>
 		<local:NonNegativeValueConverter x:Key="NonNegativeValueConverter" />
 	</UserControl.Resources>
-	
+
 	<RelativePanel x:Name="Panel" CornerRadius="4">
 		<StackPanel RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
 			<Image
