@@ -17,7 +17,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 
 	public IVariantControl? ActiveVariant { get; private set; }
 
-	public CommandPalettePlugin Plugin { get; }
+	public ICommandPalettePlugin Plugin { get; }
 
 	public int MaxHeight { get; set; }
 
