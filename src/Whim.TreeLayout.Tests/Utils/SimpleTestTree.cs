@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using System.Collections.Immutable;
 
 namespace Whim.TreeLayout.Tests;
@@ -38,11 +38,11 @@ internal class SimpleTestTree
 
 	public SimpleTestTree()
 	{
-		BottomRight = new WindowNode(new Mock<IWindow>().Object);
-		BottomLeft = new WindowNode(new Mock<IWindow>().Object);
+		BottomRight = new WindowNode(Substitute.For<IWindow>());
+		BottomLeft = new WindowNode(Substitute.For<IWindow>());
 
-		TopRight = new WindowNode(new Mock<IWindow>().Object);
-		TopLeft = new WindowNode(new Mock<IWindow>().Object);
+		TopRight = new WindowNode(Substitute.For<IWindow>());
+		TopLeft = new WindowNode(Substitute.For<IWindow>());
 
 		Bottom = new SplitNode(
 			equalWeight: true,
