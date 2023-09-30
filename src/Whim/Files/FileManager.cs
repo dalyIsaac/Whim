@@ -30,7 +30,18 @@ internal class FileManager : IFileManager
 
 	/// <inheritdoc />
 	public Stream OpenRead(string filePath) => File.OpenRead(filePath);
+	
+	/// <inheritdoc />
+	public string ReadAllText(string filePath) => File.ReadAllText(filePath);
 
 	/// <inheritdoc />
-	public void WriteAllText(string filePath, string contents) => File.WriteAllText(filePath, contents);
+	public void WriteAllText(string filePath, string contents)
+	{
+		string? parentPath = Path.GetDirectoryName(filePath);
+		if (parentPath != null)
+		{
+			EnsureDirExists(parentPath);
+		}
+		File.WriteAllText(filePath, contents);
+	}
 }

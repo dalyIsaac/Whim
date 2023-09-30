@@ -45,6 +45,13 @@ public interface IFileManager
 	Stream OpenRead(string filePath);
 
 	/// <summary>
+	/// Opens a text file, reads all the text in the file, and then closes the file.
+	/// </summary>
+	/// <param name="filePath">The file path.</param>
+	/// <returns>A string containing all the text in the file.</returns>
+	string ReadAllText(string filePath);
+
+	/// <summary>
 	/// WRites the given <paramref name="contents"/> to the given <paramref name="filePath"/>.
 	/// </summary>
 	/// <param name="filePath">The file path.</param>
