@@ -58,7 +58,9 @@ public static class WindowExtensions
 		}
 		catch (NotImplementedException)
 		{
-			Logger.Error($"{nameof(AppWindow.IsShownInSwitchers)} isn't implemented, ignoring attempt to set it to: {show}");
+			Logger.Error(
+				$"{nameof(AppWindow.IsShownInSwitchers)} isn't implemented, ignoring attempt to set it to: {show}"
+			);
 		}
 	}
 
