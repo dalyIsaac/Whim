@@ -170,18 +170,6 @@ internal interface ICoreNativeManager
 	/// </remarks>
 	/// <param name="hMonitor"></param>
 	/// <returns></returns>
-	MONITORINFO? GetMonitorInfo(HMONITOR hMonitor);
-
-	/// <summary>
-	/// Retrieve information about a display monitor.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetMonitorInfo(HMONITOR, ref MONITORINFO)"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getmonitorinfoa
-	/// </remarks>
-	/// <param name="hMonitor"></param>
-	/// <returns></returns>
 	MONITORINFOEXW? GetMonitorInfoEx(HMONITOR hMonitor);
 
 	/// <summary>
