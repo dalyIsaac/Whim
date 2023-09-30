@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace Whim;
@@ -27,11 +28,31 @@ public record Location<T> : ILocation<T>, IEquatable<Location<T>>
 	/// <inheritdoc />
 	public T Y { get; set; } = T.Zero;
 
-	/// <inheritdoc />
-	public T Width { get; set; } = T.Zero;
+	private T _width = T.Zero;
 
 	/// <inheritdoc />
-	public T Height { get; set; } = T.Zero;
+	public T Width
+	{
+		get => _width;
+		set
+		{
+			Debug.Assert(value >= T.Zero);
+			_width = value;
+		}
+	}
+
+	private T _height = T.Zero;
+
+	/// <inheritdoc />
+	public T Height
+	{
+		get => _height;
+		set
+		{
+			Debug.Assert(value >= T.Zero);
+			_height = value;
+		}
+	}
 
 	/// <summary>
 	/// Creates a new <see cref="Location{T}"/> with zero values.

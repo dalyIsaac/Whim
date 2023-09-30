@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim.Gaps;
@@ -68,8 +69,8 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 				{
 					X = loc.Location.X + innerGap,
 					Y = loc.Location.Y + innerGap,
-					Width = loc.Location.Width - doubleInnerGap,
-					Height = loc.Location.Height - doubleInnerGap
+					Width = Math.Max(0, loc.Location.Width - doubleInnerGap),
+					Height = Math.Max(0, loc.Location.Height - doubleInnerGap)
 				},
 				WindowSize = loc.WindowSize
 			};
