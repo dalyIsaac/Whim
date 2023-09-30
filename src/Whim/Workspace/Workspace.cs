@@ -517,6 +517,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug($"Workspace {Name}");
 
+		if (_disposedValue)
+		{
+			Logger.Debug($"Workspace {Name} is disposed, skipping layout");
+			return Task.CompletedTask;
+		}
+
 		if (GarbageCollect())
 		{
 			Logger.Debug($"Garbage collected windows, skipping layout for workspace {Name}");
@@ -562,7 +568,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				{
 					if (_layoutQueue.IsEmpty)
 					{
-						_cancellationTokenSource?.Dispose();
 						_cancellationTokenSource = null;
 					}
 
