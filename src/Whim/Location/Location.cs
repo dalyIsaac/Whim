@@ -36,7 +36,7 @@ public record Location<T> : ILocation<T>, IEquatable<Location<T>>
 		get => _width;
 		set
 		{
-			Debug.Assert(value >= T.Zero);
+			Debug.Assert(!T.IsNaN(value) && value >= T.Zero);
 			_width = value;
 		}
 	}
@@ -49,7 +49,7 @@ public record Location<T> : ILocation<T>, IEquatable<Location<T>>
 		get => _height;
 		set
 		{
-			Debug.Assert(value >= T.Zero);
+			Debug.Assert(!T.IsNaN(value) && value >= T.Zero);
 			_height = value;
 		}
 	}

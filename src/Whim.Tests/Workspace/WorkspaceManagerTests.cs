@@ -18,7 +18,12 @@ public class WorkspaceManagerCustomization : ICustomization
 	public void Customize(IFixture fixture)
 	{
 		// By default, create two monitors.
-		IMonitor[] monitors = new[] { Substitute.For<IMonitor>(), Substitute.For<IMonitor>() };
+		IMonitor monitor1 = Substitute.For<IMonitor>();
+		monitor1.WorkingArea.Returns(new Location<int>() { X = 0, Y = 0, Width = 1920, Height = 1080 });
+		IMonitor monitor2 = Substitute.For<IMonitor>();
+		monitor2.WorkingArea.Returns(new Location<int>() { X = 1920, Y = 360, Width = 1080, Height = 720 });
+		
+		IMonitor[] monitors = new[] { monitor1, monitor2 };
 		fixture.Inject(monitors);
 
 		IContext ctx = fixture.Freeze<IContext>();
