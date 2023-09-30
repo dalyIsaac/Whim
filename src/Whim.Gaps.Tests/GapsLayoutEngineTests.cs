@@ -127,6 +127,288 @@ public class GapsLayoutEngineTests
 		windowStates.Should().Equal(expectedWindowStates);
 	}
 
+	public static IEnumerable<object[]> DoLayout_OutOfBoundsData()
+	{
+		// A window whose width returned by the layout engine as less than zero should not have the
+		// gap applied in the x direction
+		IWindow window1 = Substitute.For<IWindow>();
+		yield return new object[]
+		{
+			new GapsConfig { OuterGap = 10, InnerGap = 5 },
+			window1,
+			new Location<int>()
+			{
+				X = 5,
+				Y = 5,
+				Width = -100,
+				Height = 1080
+			},
+			new IWindowState[]
+			{
+				new WindowState()
+				{
+					Window = window1,
+					Location = new Location<int>()
+					{
+						X = 5,
+						Y = 5,
+						Width = 0,
+						Height = 1080
+					},
+					WindowSize = WindowSize.Normal
+				}
+			}
+		};
+
+		// A window whose width returned by the layout engine as zero should not have the gap applied
+		// in the x direction
+		IWindow window2 = Substitute.For<IWindow>();
+		yield return new object[]
+		{
+			new GapsConfig { OuterGap = 10, InnerGap = 5 },
+			window2,
+			new Location<int>()
+			{
+				X = 5,
+				Y = 5,
+				Width = 0,
+				Height = 1080
+			},
+			new IWindowState[]
+			{
+				new WindowState()
+				{
+					Window = window2,
+					Location = new Location<int>()
+					{
+						X = 5,
+						Y = 5,
+						Width = 0,
+						Height = 1080
+					},
+					WindowSize = WindowSize.Normal
+				}
+			}
+		};
+
+		// A window whose width is less than the gap should not have the gap applied in the x direction
+		IWindow window3 = Substitute.For<IWindow>();
+		yield return new object[]
+		{
+			new GapsConfig { OuterGap = 10, InnerGap = 5 },
+			window3,
+			new Location<int>()
+			{
+				X = 5,
+				Y = 5,
+				Width = 5,
+				Height = 1080
+			},
+			new IWindowState[]
+			{
+				new WindowState()
+				{
+					Window = window3,
+					Location = new Location<int>()
+					{
+						X = 5,
+						Y = 5,
+						Width = 5,
+						Height = 1080
+					},
+					WindowSize = WindowSize.Normal
+				}
+			}
+		};
+
+		// A window whose height returned by the layout engine as less than zero should not have the
+		// gap applied in the y direction
+		IWindow window4 = Substitute.For<IWindow>();
+		yield return new object[]
+		{
+			new GapsConfig { OuterGap = 10, InnerGap = 5 },
+			window4,
+			new Location<int>()
+			{
+				X = 5,
+				Y = 5,
+				Width = 1920,
+				Height = -100
+			},
+			new IWindowState[]
+			{
+				new WindowState()
+				{
+					Window = window4,
+					Location = new Location<int>()
+					{
+						X = 5,
+						Y = 5,
+						Width = 1920,
+						Height = 0
+					},
+					WindowSize = WindowSize.Normal
+				}
+			}
+		};
+
+		// A window whose height returned by the layout engine as zero should not have the gap applied
+		// in the y direction
+		IWindow window5 = Substitute.For<IWindow>();
+		yield return new object[]
+		{
+			new GapsConfig { OuterGap = 10, InnerGap = 5 },
+			window5,
+			new Location<int>()
+			{
+				X = 5,
+				Y = 5,
+				Width = 1920,
+				Height = 0
+			},
+			new IWindowState[]
+			{
+				new WindowState()
+				{
+					Window = window5,
+					Location = new Location<int>()
+					{
+						X = 5,
+						Y = 5,
+						Width = 1920,
+						Height = 0
+					},
+					WindowSize = WindowSize.Normal
+				}
+			}
+		};
+
+		// A window whose height is less than the gap should not have the gap applied in the y direction
+		IWindow window6 = Substitute.For<IWindow>();
+		yield return new object[]
+		{
+			new GapsConfig { OuterGap = 10, InnerGap = 5 },
+			window6,
+			new Location<int>()
+			{
+				X = 5,
+				Y = 5,
+				Width = 1920,
+				Height = 5
+			},
+			new IWindowState[]
+			{
+				new WindowState()
+				{
+					Window = window6,
+					Location = new Location<int>()
+					{
+						X = 5,
+						Y = 5,
+						Width = 1920,
+						Height = 5
+					},
+					WindowSize = WindowSize.Normal
+				}
+			}
+		};
+
+		// A window whose width and height are less than the gap should not have the gap applied in
+		// either direction
+		IWindow window7 = Substitute.For<IWindow>();
+		yield return new object[]
+		{
+			new GapsConfig { OuterGap = 10, InnerGap = 5 },
+			window7,
+			new Location<int>()
+			{
+				X = 5,
+				Y = 5,
+				Width = 5,
+				Height = 5
+			},
+			new IWindowState[]
+			{
+				new WindowState()
+				{
+					Window = window7,
+					Location = new Location<int>()
+					{
+						X = 5,
+						Y = 5,
+						Width = 5,
+						Height = 5
+					},
+					WindowSize = WindowSize.Normal
+				}
+			}
+		};
+
+		// A window whose width and height are zero should not have the gap applied in either direction
+		IWindow window8 = Substitute.For<IWindow>();
+		yield return new object[]
+		{
+			new GapsConfig { OuterGap = 10, InnerGap = 5 },
+			window8,
+			new Location<int>()
+			{
+				X = 5,
+				Y = 5,
+				Width = 0,
+				Height = 0
+			},
+			new IWindowState[]
+			{
+				new WindowState()
+				{
+					Window = window8,
+					Location = new Location<int>()
+					{
+						X = 5,
+						Y = 5,
+						Width = 0,
+						Height = 0
+					},
+					WindowSize = WindowSize.Normal
+				}
+			}
+		};
+	}
+
+	[Theory]
+	[MemberData(nameof(DoLayout_OutOfBoundsData))]
+	public void DoLayout_OutOfBounds(
+		GapsConfig gapsConfig,
+		IWindow window,
+		Location<int> location,
+		IWindowState[] expectedWindowStates
+	)
+	{
+		// Given
+		ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
+		innerLayoutEngine
+			.DoLayout(location, Arg.Any<IMonitor>())
+			.Returns(
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Window = window,
+						Location = location,
+						WindowSize = WindowSize.Normal
+					}
+				}
+			);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+
+		// When
+		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+
+		// Then
+		windowStates.Should().Equal(expectedWindowStates);
+	}
+
 	[Theory, AutoSubstituteData]
 	public void Count(ILayoutEngine innerLayoutEngine)
 	{
