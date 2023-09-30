@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
@@ -7,10 +7,10 @@ public class MatcherResultComparerTests
 {
 	private static MatcherResult<MenuVariantRowModelData> CreateMatcherItem(string title, uint score = 0)
 	{
-		Mock<ICommand> command = new();
-		command.SetupGet(c => c.Title).Returns(title);
+		ICommand command = Substitute.For<ICommand>();
+		command.Title.Returns(title);
 		return new MatcherResult<MenuVariantRowModelData>(
-			new MenuVariantRowModel(command.Object, null),
+			new MenuVariantRowModel(command, null),
 			Array.Empty<FilterTextMatch>(),
 			score
 		);
