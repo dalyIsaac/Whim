@@ -6,12 +6,16 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:local="using:Whim.LayoutPreview"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	Width="{x:Bind Path=WindowState.Location.Width}"
-	Height="{x:Bind Path=WindowState.Location.Height}"
+	Width="{x:Bind Path=WindowState.Location.Width, Converter={StaticResource NonNegativeValueConverter}}"
+	Height="{x:Bind Path=WindowState.Location.Height, Converter={StaticResource NonNegativeValueConverter}}"
 	HorizontalContentAlignment="Stretch"
 	VerticalContentAlignment="Stretch"
 	mc:Ignorable="d">
-
+	
+	<UserControl.Resources>
+		<local:NonNegativeValueConverter x:Key="NonNegativeValueConverter" />
+	</UserControl.Resources>
+	
 	<RelativePanel x:Name="Panel" CornerRadius="4">
 		<StackPanel RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
 			<Image
