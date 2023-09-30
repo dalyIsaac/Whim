@@ -1,25 +1,22 @@
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
 public class SelectVariantRowViewModelTests
 {
-	private static Mock<IVariantRowModel<SelectOption>> CreateModelMock(bool isSelected, bool IsEnabled)
+	private static IVariantRowModel<SelectOption> CreateModelMock(bool isSelected, bool IsEnabled)
 	{
-		Mock<IVariantRowModel<SelectOption>> modelMock = new();
-
-		SelectOption data =
-			new()
+		IVariantRowModel<SelectOption> modelMock = Substitute.For<IVariantRowModel<SelectOption>>();
+		modelMock.Data.Returns(
+			new SelectOption()
 			{
 				Id = "id",
 				Title = "title",
 				IsSelected = isSelected,
 				IsEnabled = IsEnabled
-			};
-
-		modelMock.Setup(m => m.Data).Returns(data);
-
+			}
+		);
 		return modelMock;
 	}
 
@@ -27,8 +24,8 @@ public class SelectVariantRowViewModelTests
 	public void IsSelected_WhenSetToTrue_SetsIsSelectedOnModel()
 	{
 		// Given
-		Mock<IVariantRowModel<SelectOption>> modelMock = CreateModelMock(false, false);
-		MatcherResult<SelectOption> matcherResult = new(modelMock.Object, Array.Empty<FilterTextMatch>(), 0);
+		IVariantRowModel<SelectOption> modelMock = CreateModelMock(false, false);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
 
 		SelectVariantRowViewModel vm = new(matcherResult);
 
@@ -36,15 +33,15 @@ public class SelectVariantRowViewModelTests
 		Assert.PropertyChanged(vm, nameof(vm.IsSelected), () => vm.IsSelected = true);
 
 		// Then
-		Assert.True(modelMock.Object.Data.IsSelected);
+		Assert.True(modelMock.Data.IsSelected);
 	}
 
 	[Fact]
 	public void IsSelected_WhenSetToFalse_SetsIsSelectedOnModel()
 	{
 		// Given
-		Mock<IVariantRowModel<SelectOption>> modelMock = CreateModelMock(true, false);
-		MatcherResult<SelectOption> matcherResult = new(modelMock.Object, Array.Empty<FilterTextMatch>(), 0);
+		IVariantRowModel<SelectOption> modelMock = CreateModelMock(true, false);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
 
 		SelectVariantRowViewModel vm = new(matcherResult);
 
@@ -52,15 +49,15 @@ public class SelectVariantRowViewModelTests
 		Assert.PropertyChanged(vm, nameof(vm.IsSelected), () => vm.IsSelected = false);
 
 		// Then
-		Assert.False(modelMock.Object.Data.IsSelected);
+		Assert.False(modelMock.Data.IsSelected);
 	}
 
 	[Fact]
 	public void IsEnabled_WhenSetToTrue_SetsIsEnabledOnModel()
 	{
 		// Given
-		Mock<IVariantRowModel<SelectOption>> modelMock = CreateModelMock(false, false);
-		MatcherResult<SelectOption> matcherResult = new(modelMock.Object, Array.Empty<FilterTextMatch>(), 0);
+		IVariantRowModel<SelectOption> modelMock = CreateModelMock(false, false);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
 
 		SelectVariantRowViewModel vm = new(matcherResult);
 
@@ -68,15 +65,15 @@ public class SelectVariantRowViewModelTests
 		Assert.PropertyChanged(vm, nameof(vm.IsEnabled), () => vm.IsEnabled = true);
 
 		// Then
-		Assert.True(modelMock.Object.Data.IsEnabled);
+		Assert.True(modelMock.Data.IsEnabled);
 	}
 
 	[Fact]
 	public void IsEnabled_WhenSetToFalse_SetsIsEnabledOnModel()
 	{
 		// Given
-		Mock<IVariantRowModel<SelectOption>> modelMock = CreateModelMock(false, true);
-		MatcherResult<SelectOption> matcherResult = new(modelMock.Object, Array.Empty<FilterTextMatch>(), 0);
+		IVariantRowModel<SelectOption> modelMock = CreateModelMock(false, true);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
 
 		SelectVariantRowViewModel vm = new(matcherResult);
 
@@ -84,7 +81,7 @@ public class SelectVariantRowViewModelTests
 		Assert.PropertyChanged(vm, nameof(vm.IsEnabled), () => vm.IsEnabled = false);
 
 		// Then
-		Assert.False(modelMock.Object.Data.IsEnabled);
+		Assert.False(modelMock.Data.IsEnabled);
 	}
 
 	[Fact]
@@ -92,23 +89,23 @@ public class SelectVariantRowViewModelTests
 	{
 		// Given
 		// Old
-		Mock<IVariantRowModel<SelectOption>> modelMock = CreateModelMock(false, true);
+		IVariantRowModel<SelectOption> modelMock = CreateModelMock(false, true);
 
-		MatcherResult<SelectOption> matcherResult = new(modelMock.Object, Array.Empty<FilterTextMatch>(), 0);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
 		SelectVariantRowViewModel vm = new(matcherResult);
 
 		// New
-		Mock<IVariantRowModel<SelectOption>> newModelMock = CreateModelMock(true, false);
-		newModelMock.Setup(m => m.Title).Returns("Test");
+		IVariantRowModel<SelectOption> newModelMock = CreateModelMock(true, false);
+		newModelMock.Title.Returns("Test");
 
 		FilterTextMatch[] matches = new FilterTextMatch[] { new(0, 4) };
-		MatcherResult<SelectOption> newMatcherResult = new(newModelMock.Object, matches, 0);
+		MatcherResult<SelectOption> newMatcherResult = new(newModelMock, matches, 0);
 
 		// When
 		Assert.PropertyChanged(vm, string.Empty, () => vm.Update(newMatcherResult));
 
 		// Then
-		Assert.Same(newModelMock.Object, vm.Model);
+		Assert.Same(newModelMock, vm.Model);
 		Assert.Single(vm.FormattedTitle.Segments);
 	}
 }

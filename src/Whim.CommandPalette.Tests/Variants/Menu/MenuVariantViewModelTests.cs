@@ -1,58 +1,49 @@
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.UI.Xaml;
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Windows.System;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
+public class MenuVariantViewModelCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		ICommandPaletteWindowViewModel windowViewModel = fixture.Freeze<ICommandPaletteWindowViewModel>();
+		windowViewModel.IsConfigActive(Arg.Any<BaseVariantConfig>()).Returns(true);
+		windowViewModel.Text.Returns("ti");
+	}
+}
+
 public class MenuVariantViewModelTests
 {
-	private class MocksBuilder
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<ICommandManager> CommandManager { get; } = new();
-		public Mock<IKeybindManager> KeybindManager { get; } = new();
-		public Mock<ICommandPaletteWindowViewModel> WindowViewModel { get; } = new();
-
-		public MocksBuilder()
-		{
-			Context.Setup(c => c.CommandManager).Returns(CommandManager.Object);
-			Context.Setup(c => c.KeybindManager).Returns(KeybindManager.Object);
-
-			CommandManager.Setup(cm => cm.GetEnumerator()).Returns(new List<ICommand>().GetEnumerator());
-
-			WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(true);
-			WindowViewModel.Setup(wvm => wvm.Text).Returns("ti");
-		}
-	}
-
 	private static IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel> MenuRowFactory(
 		MatcherResult<MenuVariantRowModelData> item
 	) => new MenuRowStub() { ViewModel = new MenuVariantRowViewModel(item) };
 
-	[Fact]
-	public void Constructor()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void Constructor(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		mocks.CommandManager
-			.Setup(cm => cm.GetEnumerator())
+		ctx.CommandManager
+			.GetEnumerator()
 			.Returns(new List<ICommand>() { new Command("id", "title", () => { }) }.GetEnumerator());
 
 		// When
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		// Then
 		Assert.Single(vm._allItems);
 	}
 
-	[Fact]
-	public void Activate_NotMenuVariantConfig()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void Activate_NotMenuVariantConfig(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		// When
 		vm.Activate(new UnknownConfig());
@@ -62,20 +53,19 @@ public class MenuVariantViewModelTests
 		Assert.Null(vm.ConfirmButtonText);
 	}
 
-	[Fact]
-	public void Activate_MenuVariantConfig()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void Activate_MenuVariantConfig(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
 		IEnumerable<ICommand> items = new List<ICommand>()
 		{
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
 			new Command("id3", "title3", () => { })
 		};
-		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		// When
 		vm.Activate(new MenuVariantConfig() { Commands = items, ConfirmButtonText = "Execute" });
@@ -85,22 +75,26 @@ public class MenuVariantViewModelTests
 		Assert.Equal("Execute", vm.ConfirmButtonText);
 	}
 
+	[InlineAutoSubstituteData<MenuVariantViewModelCustomization>(VirtualKey.Up, 2)]
+	[InlineAutoSubstituteData<MenuVariantViewModelCustomization>(VirtualKey.Down, 1)]
 	[Theory]
-	[InlineData(VirtualKey.Up, 2)]
-	[InlineData(VirtualKey.Down, 1)]
-	public void OnKeyDown_VerticalArrow(VirtualKey key, int expectedIndex)
+	internal void OnKeyDown_VerticalArrow(
+		VirtualKey key,
+		int expectedIndex,
+		IContext ctx,
+		ICommandPaletteWindowViewModel windowViewModel
+	)
 	{
 		// Given
-		MocksBuilder mocks = new();
 		IEnumerable<ICommand> items = new List<ICommand>()
 		{
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
 			new Command("id3", "title3", () => { })
 		};
-		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
@@ -114,20 +108,19 @@ public class MenuVariantViewModelTests
 		Assert.Equal(expectedIndex, vm.SelectedIndex);
 	}
 
-	[Fact]
-	public void OnKeyDown_UnhandledKeys()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void OnKeyDown_UnhandledKeys(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
 		IEnumerable<ICommand> items = new List<ICommand>()
 		{
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
 			new Command("id3", "title3", () => { })
 		};
-		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
@@ -137,11 +130,10 @@ public class MenuVariantViewModelTests
 		Assert.Equal(0, vm.SelectedIndex);
 	}
 
-	[Fact]
-	public void OnKeyDown_Enter()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void OnKeyDown_Enter(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
 		bool called = false;
 		IEnumerable<ICommand> items = new List<ICommand>()
 		{
@@ -154,9 +146,9 @@ public class MenuVariantViewModelTests
 				}
 			)
 		};
-		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
+		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
@@ -167,12 +159,11 @@ public class MenuVariantViewModelTests
 		Assert.True(called);
 	}
 
-	[Fact]
-	public void PopulateItems_CannotExecute()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void PopulateItems_CannotExecute(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		// When
 		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }, () => false) });
@@ -181,12 +172,11 @@ public class MenuVariantViewModelTests
 		Assert.Empty(vm._allItems);
 	}
 
-	[Fact]
-	public void PopulateItems_AddNew()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void PopulateItems_AddNew(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		// When
 		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
@@ -195,12 +185,11 @@ public class MenuVariantViewModelTests
 		Assert.Single(vm._allItems);
 	}
 
-	[Fact]
-	public void PopulateItems_UpdateExisting()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void PopulateItems_UpdateExisting(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
 
@@ -212,12 +201,11 @@ public class MenuVariantViewModelTests
 		Assert.Equal("new title", vm._allItems[0].Data.Command.Title);
 	}
 
-	[Fact]
-	public void PopulateItems_RemoveExtra()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void PopulateItems_RemoveExtra(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
 
@@ -228,12 +216,11 @@ public class MenuVariantViewModelTests
 		Assert.Empty(vm._allItems);
 	}
 
-	[Fact]
-	public void PopulateItems_SkipEqualCommand()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void PopulateItems_SkipEqualCommand(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		Command command = new("id", "title", () => { });
 		vm.PopulateItems(new List<ICommand>() { command });
@@ -246,11 +233,10 @@ public class MenuVariantViewModelTests
 		Assert.Equal(command, vm._allItems[0].Data.Command);
 	}
 
-	[Fact]
-	public void ExecuteCommand()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void ExecuteCommand(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
 		bool called = false;
 		IEnumerable<ICommand> items = new List<ICommand>()
 		{
@@ -263,10 +249,9 @@ public class MenuVariantViewModelTests
 				}
 			)
 		};
+		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
-		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
-
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
@@ -274,54 +259,53 @@ public class MenuVariantViewModelTests
 
 		// Then
 		Assert.True(called);
-		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide());
+		windowViewModel.Received(1).RequestHide();
 	}
 
-	[Fact]
-	public void ExecuteCommand_ReuseShouldNotHide()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void ExecuteCommand_ReuseShouldNotHide(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		mocks.WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
-
 		string callbackText = string.Empty;
 		IEnumerable<ICommand> items = new List<ICommand>() { new Command("id", "title", () => { }) };
+		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
-		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
-
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
-		vm.Activate(new MenuVariantConfig() { Commands = items });
-		mocks.WindowViewModel.Setup(wvm => wvm.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(false);
-
-		// When
-		vm.ExecuteCommand();
-
-		// Then
-		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
-	}
-
-	[Fact]
-	public void ExecuteCommand_NotActivated()
-	{
-		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
+		MenuVariantConfig activationConfig = new() { Commands = items };
+		vm.Activate(activationConfig);
+		windowViewModel.IsConfigActive(activationConfig).Returns(false);
 
 		// When
 		vm.ExecuteCommand();
 
 		// Then
-		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
+		windowViewModel.DidNotReceive().RequestHide();
 	}
 
-	[InlineData(-1)]
-	[InlineData(1)]
-	[Theory]
-	public void ExecuteCommand_InvalidSelectedIndex(int index)
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void ExecuteCommand_NotActivated(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
+
+		// When
+		vm.ExecuteCommand();
+
+		// Then
+		windowViewModel.DidNotReceive().RequestHide();
+	}
+
+	[InlineAutoSubstituteData(-1)]
+	[InlineAutoSubstituteData(1)]
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void ExecuteCommand_InvalidSelectedIndex(
+		int index,
+		IContext ctx,
+		ICommandPaletteWindowViewModel windowViewModel
+	)
+	{
+		// Given
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		vm.Activate(
 			new MenuVariantConfig() { Commands = new List<ICommand>() { new Command("id", "title", () => { }) } }
 		);
@@ -331,14 +315,13 @@ public class MenuVariantViewModelTests
 		vm.ExecuteCommand();
 
 		// Then
-		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide(), Times.Never);
+		windowViewModel.DidNotReceive().RequestHide();
 	}
 
-	[Fact]
-	public void Confirm()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void Confirm(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
 		bool called = false;
 		IEnumerable<ICommand> items = new List<ICommand>()
 		{
@@ -351,10 +334,9 @@ public class MenuVariantViewModelTests
 				}
 			)
 		};
+		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
-		mocks.CommandManager.Setup(cm => cm.GetEnumerator()).Returns(items.GetEnumerator());
-
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		vm.Activate(new MenuVariantConfig() { Commands = items });
 
 		// When
@@ -362,15 +344,14 @@ public class MenuVariantViewModelTests
 
 		// Then
 		Assert.True(called);
-		mocks.WindowViewModel.Verify(wvm => wvm.RequestHide());
+		windowViewModel.Received(1).RequestHide();
 	}
 
-	[Fact]
-	public void Update_NoMatches()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void Update_NoMatches(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<ICommand>() });
 
@@ -382,12 +363,11 @@ public class MenuVariantViewModelTests
 		Assert.Equal(Visibility.Collapsed, vm.ListViewItemsVisibility);
 	}
 
-	[Fact]
-	public void Update_NotActivated()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void Update_NotActivated(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		// When
 		vm.Update();
@@ -406,23 +386,20 @@ public class MenuVariantViewModelTests
 			items.Add(new(new MenuVariantRowModel(new Command($"id{i}", $"title{i}", () => { }), null), segments, 0));
 		}
 
-		Mock<IMatcher<MenuVariantRowModelData>> matcher = new();
+		IMatcher<MenuVariantRowModelData> matcher = Substitute.For<IMatcher<MenuVariantRowModelData>>();
 		matcher
-			.Setup(
-				m => m.Match(It.IsAny<string>(), It.IsAny<IReadOnlyList<IVariantRowModel<MenuVariantRowModelData>>>())
-			)
+			.Match(Arg.Any<string>(), Arg.Any<IReadOnlyList<IVariantRowModel<MenuVariantRowModelData>>>())
 			.Returns(items);
 
-		MenuVariantConfig config = new() { Matcher = matcher.Object, Commands = Array.Empty<ICommand>() };
+		MenuVariantConfig config = new() { Matcher = matcher, Commands = Array.Empty<ICommand>() };
 		return config;
 	}
 
-	[Fact]
-	public void Update_SomeMatches()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void Update_SomeMatches(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		vm.Activate(CreateMenuActivationConfig(3));
 
 		// When
@@ -434,12 +411,11 @@ public class MenuVariantViewModelTests
 		Assert.Equal(3, vm.MenuRows.Count);
 	}
 
-	[Fact]
-	public void Update_RemoveUnused()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void Update_RemoveUnused(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		vm.Activate(CreateMenuActivationConfig(3));
 		vm.Activate(CreateMenuActivationConfig(2));
@@ -458,12 +434,11 @@ public class MenuVariantViewModelTests
 		Assert.True(vm.MenuRows[1] is MenuRowStub stub2 && stub2.IsUpdated);
 	}
 
-	[Fact]
-	public void LoadMenuMatches_AddRows()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void LoadMenuMatches_AddRows(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		string query = "ti";
 		MenuVariantConfig config = CreateMenuActivationConfig(2);
 
@@ -476,12 +451,11 @@ public class MenuVariantViewModelTests
 		Assert.Equal("title1", vm.MenuRows[1].ViewModel.Model.Title);
 	}
 
-	[Fact]
-	public void LoadMenuMatches_UpdateRows()
+	[Theory, AutoSubstituteData<MenuVariantViewModelCustomization>]
+	internal void LoadMenuMatches_UpdateRows(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		MenuVariantViewModel vm = new(mocks.Context.Object, mocks.WindowViewModel.Object, MenuRowFactory);
+		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 		string query = "ti";
 
 		vm.LoadMenuMatches(query, CreateMenuActivationConfig(2));

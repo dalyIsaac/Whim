@@ -1,91 +1,89 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
 
 public class ExecuteCommandTests
 {
-	[Fact]
-	public void CanExecute_WhenActiveVariantIsNull_ReturnsFalse()
+	[Theory, AutoSubstituteData]
+	internal void CanExecute_WhenActiveVariantIsNull_ReturnsFalse(ICommandPaletteWindowViewModel viewModelMock)
 	{
 		// Given
-		Mock<ICommandPaletteWindowViewModel> viewModelMock = new();
-		viewModelMock.Setup(x => x.ActiveVariant).Returns((IVariantControl?)null);
+		viewModelMock.ActiveVariant.Returns((IVariantControl?)null);
 
 		// When
-		ConfirmCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock);
 
 		// Then
 		Assert.False(command.CanExecute(null));
 	}
 
-	[Fact]
-	public void CanExecute_WhenActiveVariantIsNotNull_ReturnsTrue()
+	[Theory, AutoSubstituteData]
+	internal void CanExecute_WhenActiveVariantIsNotNull_ReturnsTrue(ICommandPaletteWindowViewModel viewModelMock)
 	{
 		// Given
-		Mock<ICommandPaletteWindowViewModel> viewModelMock = new();
-		viewModelMock.Setup(x => x.ActiveVariant).Returns(new Mock<IVariantControl>().Object);
+		viewModelMock.ActiveVariant.Returns(Substitute.For<IVariantControl>());
 
 		// When
-		ConfirmCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock);
 
 		// Then
 		Assert.True(command.CanExecute(null));
 	}
 
-	[Fact]
-	public void Execute_WhenActiveVariantIsNull_ReturnsEarly()
+	[Theory, AutoSubstituteData]
+	internal void Execute_WhenActiveVariantIsNull_ReturnsEarly(ICommandPaletteWindowViewModel viewModelMock)
 	{
 		// Given
-		Mock<ICommandPaletteWindowViewModel> viewModelMock = new();
-		viewModelMock.Setup(x => x.ActiveVariant).Returns((IVariantControl?)null);
+		viewModelMock.ActiveVariant.Returns((IVariantControl?)null);
 
 		// When
-		ConfirmCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock);
 		command.Execute(null);
 
 		// Then
-		viewModelMock.Verify(x => x.RequestHide(), Times.Never);
+		viewModelMock.DidNotReceive().RequestHide();
 	}
 
-	[Fact]
-	public void Execute_DoesNotHide()
+	[Theory, AutoSubstituteData]
+	internal void Execute_DoesNotHide(
+		ICommandPaletteWindowViewModel viewModelMock,
+		IVariantControl variantMock,
+		IVariantViewModel variantViewModelMock
+	)
 	{
 		// Given
-		Mock<ICommandPaletteWindowViewModel> viewModelMock = new();
-		Mock<IVariantControl> variantMock = new();
-		Mock<IVariantViewModel> variantViewModelMock = new();
-
-		variantMock.Setup(x => x.ViewModel).Returns(variantViewModelMock.Object);
-		viewModelMock.Setup(x => x.ActiveVariant).Returns(variantMock.Object);
-		viewModelMock.Setup(x => x.ActivationConfig).Returns(new Mock<BaseVariantConfig>().Object);
+		variantMock.ViewModel.Returns(variantViewModelMock);
+		viewModelMock.ActiveVariant.Returns(variantMock);
+		viewModelMock.ActivationConfig.Returns(Substitute.For<BaseVariantConfig>());
 
 		// When
-		ConfirmCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock);
 		command.Execute(null);
 
 		// Then
-		viewModelMock.Verify(x => x.RequestHide(), Times.Never);
+		viewModelMock.DidNotReceive().RequestHide();
 	}
 
-	[Fact]
-	public void Execute_Hides()
+	[Theory, AutoSubstituteData]
+	internal void Execute_Hides(
+		ICommandPaletteWindowViewModel viewModelMock,
+		IVariantControl variantMock,
+		IVariantViewModel variantViewModelMock
+	)
 	{
 		// Given
-		Mock<ICommandPaletteWindowViewModel> viewModelMock = new();
-		Mock<IVariantControl> variantMock = new();
-		Mock<IVariantViewModel> variantViewModelMock = new();
-
-		variantMock.Setup(x => x.ViewModel).Returns(variantViewModelMock.Object);
-		viewModelMock.Setup(x => x.ActiveVariant).Returns(variantMock.Object);
-		viewModelMock.Setup(x => x.ActivationConfig).Returns(new Mock<BaseVariantConfig>().Object);
-		viewModelMock.Setup(x => x.IsConfigActive(It.IsAny<BaseVariantConfig>())).Returns(true);
+		variantMock.ViewModel.Returns(variantViewModelMock);
+		viewModelMock.ActiveVariant.Returns(variantMock);
+		viewModelMock.ActivationConfig.Returns(Substitute.For<BaseVariantConfig>());
+		viewModelMock.IsConfigActive(Arg.Any<BaseVariantConfig>()).Returns(true);
 
 		// When
-		ConfirmCommand command = new(viewModelMock.Object);
+		ConfirmCommand command = new(viewModelMock);
 		command.Execute(null);
 
 		// Then
-		viewModelMock.Verify(x => x.RequestHide(), Times.Once);
+		viewModelMock.Received(1).RequestHide();
 	}
 }
