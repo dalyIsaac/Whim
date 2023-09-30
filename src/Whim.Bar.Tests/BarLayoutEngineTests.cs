@@ -289,4 +289,19 @@ public class BarLayoutEngineTests
 		innerLayoutEngine.Received(1).DoLayout(expectedGivenLocation, monitor);
 		layout.Should().Equal(expectedWindowStates);
 	}
+
+	[Theory]
+	[InlineAutoSubstituteData(0)]
+	[InlineAutoSubstituteData(-30)]
+	public void DoLayout_HeightMustBeNonNegative(int height, ILayoutEngine innerLayoutEngine, IMonitor monitor)
+	{
+		// Given
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
+
+		// When
+		engine.DoLayout(new Location<int>() { Width = 100, Height = height }, monitor);
+
+		// Then
+		innerLayoutEngine.Received(1).DoLayout(Arg.Is<Location<int>>(l => l.Height == 0), monitor);
+	}
 }
