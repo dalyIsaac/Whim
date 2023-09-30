@@ -12,8 +12,17 @@ public class FloatingLayoutPluginCustomization : ICustomization
 	{
 		IContext context = fixture.Freeze<IContext>();
 		IWorkspace workspace = fixture.Freeze<IWorkspace>();
+
 		IMonitor monitor = fixture.Freeze<IMonitor>();
-		ILocation<int> location = new Location<int>() { X = 1, Y = 2,  Width = 2, Height = 2};
+		monitor.WorkingArea.Returns(
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 3,
+				Height = 3
+			}
+		);
 
 		// The workspace will have a null last focused window
 		workspace.LastFocusedWindow.Returns((IWindow?)null);
@@ -22,11 +31,8 @@ public class FloatingLayoutPluginCustomization : ICustomization
 		context.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
 		context.WorkspaceManager.ActiveWorkspace.Returns(workspace);
 
-		// Monitor manager will return the monitor at the point (1, 2)
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
-
-		// Each monitor will be at (1, 2)
-		monitor.WorkingArea.Returns(location);
+		// Monitor manager will return the monitor at the point (1, 2).
+		context.MonitorManager.GetMonitorAtPoint(Arg.Is<IPoint<int>>(p => p.X == 1 && p.Y == 2)).Returns(monitor);
 
 		fixture.Inject(context);
 		fixture.Inject(workspace);
@@ -202,25 +208,21 @@ public class FloatingLayoutPluginTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
-	public void MarkWindowAsFloating(IContext context, IWindow window, IWorkspace activeWorkspace, IMonitor monitor)
+	public void MarkWindowAsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		Location<int> location = new Location<int>() { X = 1, Y = 2 };
 		activeWorkspace
 			.TryGetWindowLocation(window)
 			.Returns(
 				new WindowState()
 				{
-					Location = location,
+					Location = new Location<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
 			);
-		Location<int> monitorWorkingArea = new() { X = 0, Y = 0, Width = 3, Height = 3 };
-		monitor.WorkingArea.Returns(monitorWorkingArea);
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
-		
+
 		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
@@ -249,25 +251,21 @@ public class FloatingLayoutPluginTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
-	public void MarkWindowAsDocked_WindowIsFloating(IContext context, IWindow window, IWorkspace activeWorkspace, IMonitor monitor)
+	public void MarkWindowAsDocked_WindowIsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		Location<int> location = new() { X = 1, Y = 2 };
 		activeWorkspace
 			.TryGetWindowLocation(window)
 			.Returns(
 				new WindowState()
 				{
-					Location = location,
+					Location = new Location<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
 			);
-		Location<int> monitorWorkingArea = new() { X = 0, Y = 0, Width = 3, Height = 3 };
-		monitor.WorkingArea.Returns(monitorWorkingArea);
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
-		
+
 		FloatingLayoutPlugin plugin = CreateSut(context);
 		plugin.MarkWindowAsFloating(window);
 
@@ -295,25 +293,21 @@ public class FloatingLayoutPluginTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
-	public void ToggleWindowFloating_ToFloating(IContext context, IWindow window, IWorkspace activeWorkspace, IMonitor monitor)
+	public void ToggleWindowFloating_ToFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		Location<int> location = new Location<int>() { X = 1, Y = 2 };
 		activeWorkspace
 			.TryGetWindowLocation(window)
 			.Returns(
 				new WindowState()
 				{
-					Location = location,
+					Location = new Location<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
 			);
-		Location<int> monitorWorkingArea = new() { X = 0, Y = 0, Width = 3, Height = 3 };
-		monitor.WorkingArea.Returns(monitorWorkingArea);
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
-		
+
 		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
@@ -325,25 +319,21 @@ public class FloatingLayoutPluginTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
-	public void ToggleWindowFloating_ToDocked(IContext context, IWindow window, IWorkspace activeWorkspace, IMonitor monitor)
+	public void ToggleWindowFloating_ToDocked(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		Location<int> location = new() { X = 1, Y = 2 };
 		activeWorkspace
 			.TryGetWindowLocation(window)
 			.Returns(
 				new WindowState()
 				{
-					Location = location,
+					Location = new Location<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
 			);
-		Location<int> monitorWorkingArea = new() { X = 0, Y = 0, Width = 3, Height = 3 };
-		monitor.WorkingArea.Returns(monitorWorkingArea);
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
-		
+
 		FloatingLayoutPlugin plugin = CreateSut(context);
 
 		plugin.MarkWindowAsFloating(window);
@@ -407,27 +397,22 @@ public class FloatingLayoutPluginTests
 	public void MarkWindowAsDockedInLayoutEngine_WindowIsFloating(
 		IContext context,
 		IWindow window,
-		IWorkspace activeWorkspace,
-		IMonitor monitor
+		IWorkspace activeWorkspace
 	)
 	{
 		// Given
 		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		Location<int> location = new() { X = 1, Y = 2 };
 		activeWorkspace
 			.TryGetWindowLocation(window)
 			.Returns(
 				new WindowState()
 				{
-					Location = location,
+					Location = new Location<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
 			);
-		Location<int> monitorWorkingArea = new() { X = 0, Y = 0, Width = 3, Height = 3 };
-		monitor.WorkingArea.Returns(monitorWorkingArea);
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
 
 		FloatingLayoutPlugin plugin = CreateSut(context);
 		plugin.MarkWindowAsFloating(window);
@@ -455,8 +440,7 @@ public class FloatingLayoutPluginTests
 		IContext context,
 		IWindow window,
 		ILayoutEngine layoutEngine2,
-		IWorkspace activeWorkspace,
-		IMonitor monitor
+		IWorkspace activeWorkspace
 	)
 	{
 		// Given
@@ -464,20 +448,16 @@ public class FloatingLayoutPluginTests
 		layoutEngine2.Identity.Returns(new LayoutEngineIdentity());
 
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		Location<int> location = new() { X = 1, Y = 2 };
 		activeWorkspace
 			.TryGetWindowLocation(window)
 			.Returns(
 				new WindowState()
 				{
-					Location = location,
+					Location = new Location<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
 			);
-		Location<int> monitorWorkingArea = new() { X = 0, Y = 0, Width = 3, Height = 3 };
-		monitor.WorkingArea.Returns(monitorWorkingArea);
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
 
 		// When
 		FloatingLayoutPlugin plugin = CreateSut(context);
