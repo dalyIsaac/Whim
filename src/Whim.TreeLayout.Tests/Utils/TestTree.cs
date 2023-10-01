@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using System.Collections.Immutable;
 
 namespace Whim.TreeLayout.Tests;
@@ -69,21 +69,21 @@ internal class TestTree
 
 	public TestTree()
 	{
-		Mock<IWindow> leftWindow = new();
-		Mock<IWindow> rightTopLeftTopWindow = new();
-		Mock<IWindow> rightTopLeftBottomLeftWindow = new();
-		Mock<IWindow> rightTopLeftBottomRightTopWindow = new();
-		Mock<IWindow> rightTopLeftBottomRightBottomWindow = new();
-		Mock<IWindow> rightTopRight1Window = new();
-		Mock<IWindow> rightTopRight2Window = new();
-		Mock<IWindow> rightTopRight3Window = new();
-		Mock<IWindow> rightBottomWindow = new();
+		IWindow leftWindow = Substitute.For<IWindow>();
+		IWindow rightTopLeftTopWindow = Substitute.For<IWindow>();
+		IWindow rightTopLeftBottomLeftWindow = Substitute.For<IWindow>();
+		IWindow rightTopLeftBottomRightTopWindow = Substitute.For<IWindow>();
+		IWindow rightTopLeftBottomRightBottomWindow = Substitute.For<IWindow>();
+		IWindow rightTopRight1Window = Substitute.For<IWindow>();
+		IWindow rightTopRight2Window = Substitute.For<IWindow>();
+		IWindow rightTopRight3Window = Substitute.For<IWindow>();
+		IWindow rightBottomWindow = Substitute.For<IWindow>();
 
-		RightTopRight3 = new WindowNode(rightTopRight3Window.Object);
+		RightTopRight3 = new WindowNode(rightTopRight3Window);
 
-		RightTopRight2 = new WindowNode(rightTopRight2Window.Object);
+		RightTopRight2 = new WindowNode(rightTopRight2Window);
 
-		RightTopRight1 = new WindowNode(rightTopRight1Window.Object);
+		RightTopRight1 = new WindowNode(rightTopRight1Window);
 
 		RightTopRight = new SplitNode(
 			equalWeight: true,
@@ -92,9 +92,9 @@ internal class TestTree
 			new double[] { 1d / 3, 1d / 3, 1d / 3 }.ToImmutableList()
 		);
 
-		RightTopLeftBottomRightBottom = new WindowNode(rightTopLeftBottomRightBottomWindow.Object);
+		RightTopLeftBottomRightBottom = new WindowNode(rightTopLeftBottomRightBottomWindow);
 
-		RightTopLeftBottomRightTop = new WindowNode(rightTopLeftBottomRightTopWindow.Object);
+		RightTopLeftBottomRightTop = new WindowNode(rightTopLeftBottomRightTopWindow);
 
 		RightTopLeftBottomRight = new SplitNode(
 			equalWeight: false,
@@ -103,7 +103,7 @@ internal class TestTree
 			new double[] { 0.7, 0.3 }.ToImmutableList()
 		);
 
-		RightTopLeftBottomLeft = new WindowNode(rightTopLeftBottomLeftWindow.Object);
+		RightTopLeftBottomLeft = new WindowNode(rightTopLeftBottomLeftWindow);
 
 		RightTopLeftBottom = new SplitNode(
 			equalWeight: true,
@@ -112,9 +112,9 @@ internal class TestTree
 			new double[] { 0.5, 0.5 }.ToImmutableList()
 		);
 
-		RightTopLeftTop = new WindowNode(rightTopLeftTopWindow.Object);
+		RightTopLeftTop = new WindowNode(rightTopLeftTopWindow);
 
-		RightBottom = new WindowNode(rightBottomWindow.Object);
+		RightBottom = new WindowNode(rightBottomWindow);
 
 		RightTopLeft = new SplitNode(
 			equalWeight: true,
@@ -137,7 +137,7 @@ internal class TestTree
 			new double[] { 0.5, 0.5 }.ToImmutableList()
 		);
 
-		Left = new WindowNode(leftWindow.Object);
+		Left = new WindowNode(leftWindow);
 
 		Root = new SplitNode(
 			equalWeight: true,
