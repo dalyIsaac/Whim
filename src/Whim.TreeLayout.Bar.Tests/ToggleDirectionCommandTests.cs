@@ -1,36 +1,36 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Bar.Tests;
 
+public class ToggleDirectionCommandCustomization : ICustomization
+{
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+	public void Customize(IFixture fixture)
+	{
+		IContext ctx = fixture.Freeze<IContext>();
+		IMonitor monitor = fixture.Freeze<IMonitor>();
+		IWorkspace workspace = fixture.Freeze<IWorkspace>();
+		ILayoutEngine treeLayoutEngine = fixture.Freeze<ILayoutEngine>();
+		ITreeLayoutPlugin plugin = fixture.Freeze<ITreeLayoutPlugin>();
+
+		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
+		fixture.Inject(viewModel);
+
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
+	}
+}
+
 public class ToggleDirectionCommandTests
 {
-	private class MocksBuilder
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<ITreeLayoutPlugin> Plugin { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<ILayoutEngine> TreeLayoutEngine { get; } = new();
-		public TreeLayoutEngineWidgetViewModel ViewModel { get; }
-
-		public MocksBuilder()
-		{
-			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-			WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(Monitor.Object)).Returns(Workspace.Object);
-			Workspace.SetupGet(x => x.ActiveLayoutEngine).Returns(TreeLayoutEngine.Object);
-
-			ViewModel = new TreeLayoutEngineWidgetViewModel(Context.Object, Plugin.Object, Monitor.Object);
-		}
-	}
-
-	[Fact]
-	public void CanExecute_ShouldReturnTrue()
+	[Theory, AutoSubstituteData<ToggleDirectionCommandCustomization>]
+	public void CanExecute_ShouldReturnTrue(TreeLayoutEngineWidgetViewModel viewModel)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		ToggleDirectionCommand command = new(mocks.ViewModel);
+		ToggleDirectionCommand command = new(viewModel);
 
 		// When
 		bool actual = command.CanExecute(null);
@@ -39,18 +39,21 @@ public class ToggleDirectionCommandTests
 		Assert.True(actual);
 	}
 
-	[Fact]
-	public void Execute_ShouldToggleDirection()
+	[Theory, AutoSubstituteData<ToggleDirectionCommandCustomization>]
+	public void Execute_ShouldToggleDirection(
+		ITreeLayoutPlugin plugin,
+		TreeLayoutEngineWidgetViewModel viewModel,
+		IMonitor monitor
+	)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		mocks.Plugin.Setup(p => p.GetAddWindowDirection(mocks.Monitor.Object)).Returns(Direction.Up);
-		ToggleDirectionCommand command = new(mocks.ViewModel);
+		plugin.GetAddWindowDirection(monitor).Returns(Direction.Up);
+		ToggleDirectionCommand command = new(viewModel);
 
 		// When
 		command.Execute(null);
 
 		// Then
-		mocks.Plugin.Verify(p => p.SetAddWindowDirection(mocks.Monitor.Object, Direction.Right));
+		plugin.Received(1).SetAddWindowDirection(monitor, Direction.Right);
 	}
 }
