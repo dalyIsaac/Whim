@@ -18,15 +18,6 @@ internal class ConfigLoader
 	private readonly IFileManager _fileManager;
 	private readonly string _configFilePath;
 
-	private bool DoesConfigExist() => File.Exists(_configFilePath);
-
-	/// <summary>
-	/// Loads the Whim config from the Whim config file, if it exists.
-	/// Otherwise, it will create a new Whim config file.
-	/// </summary>
-	/// <returns>The Whim config.</returns>
-	private string LoadRawConfig() => File.ReadAllText(_configFilePath);
-
 	public ConfigLoader(IFileManager fileManager)
 	{
 		_fileManager = fileManager;
@@ -87,7 +78,7 @@ internal class ConfigLoader
 		string template = ReadTemplateConfigFile(assembly);
 
 		// Save the files.
-		File.WriteAllText(_configFilePath, template);
+		_fileManager.WriteAllText(_configFilePath, template);
 	}
 
 	/// <summary>
@@ -101,13 +92,12 @@ internal class ConfigLoader
 		_fileManager.EnsureDirExists(_fileManager.WhimDir);
 
 		// Acquire the Whim config.
-		bool configExists = DoesConfigExist();
-		if (!configExists)
+		if (!_fileManager.FileExists(_configFilePath))
 		{
 			CreateConfig();
 		}
 
-		string rawConfig = LoadRawConfig();
+		string rawConfig = _fileManager.ReadAllText(_configFilePath);
 
 		// Evaluate the Whim config.
 		ScriptOptions options = ScriptOptions.Default;

@@ -2,6 +2,7 @@ using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Media;
+using System;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -51,7 +52,16 @@ public static class WindowExtensions
 	/// <param name="show"></param>
 	public static void SetIsShownInSwitchers(this Microsoft.UI.Xaml.Window window, bool show)
 	{
-		window.GetAppWindow().IsShownInSwitchers = show;
+		try
+		{
+			window.GetAppWindow().IsShownInSwitchers = show;
+		}
+		catch (NotImplementedException)
+		{
+			Logger.Error(
+				$"{nameof(AppWindow.IsShownInSwitchers)} isn't implemented, ignoring attempt to set it to: {show}"
+			);
+		}
 	}
 
 	/// <summary>
