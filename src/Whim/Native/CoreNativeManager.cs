@@ -75,21 +75,13 @@ internal class CoreNativeManager : ICoreNativeManager
 		return result;
 	}
 
-	public MONITORINFO? GetMonitorInfo(HMONITOR hMonitor)
-	{
-		MONITORINFO lpmi = default;
-		bool result = PInvoke.GetMonitorInfo(hMonitor, ref lpmi);
-		return result ? lpmi : null;
-	}
-
 	public MONITORINFOEXW? GetMonitorInfoEx(HMONITOR hMonitor)
 	{
 		unsafe
 		{
-			MONITORINFOEXW lpmi = default;
-
-			bool result = PInvoke.GetMonitorInfo(hMonitor, (MONITORINFO*)&lpmi);
-			return result ? lpmi : null;
+			MONITORINFOEXW infoEx = new() { monitorInfo = new MONITORINFO() { cbSize = (uint)sizeof(MONITORINFOEXW) } };
+			MONITORINFOEXW* infoExPtr = &infoEx;
+			return PInvoke.GetMonitorInfo(hMonitor, (MONITORINFO*)infoExPtr) ? infoEx : null;
 		}
 	}
 
