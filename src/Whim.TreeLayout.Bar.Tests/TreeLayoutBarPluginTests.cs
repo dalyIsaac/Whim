@@ -1,24 +1,17 @@
-using Moq;
 using System.Text.Json;
 using Whim.Bar;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Bar.Tests;
 
 public class TreeLayoutBarPluginTests
 {
-	private class MocksBuilder
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<ITreeLayoutPlugin> TreeLayoutPlugin { get; } = new();
-	}
-
-	[Fact]
-	public void Name()
+	[Theory, AutoSubstituteData]
+	public void Name(ITreeLayoutPlugin treeLayoutPlugin)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutBarPlugin plugin = new(mocks.TreeLayoutPlugin.Object);
+		TreeLayoutBarPlugin plugin = new(treeLayoutPlugin);
 
 		// When
 		string name = plugin.Name;
@@ -27,24 +20,22 @@ public class TreeLayoutBarPluginTests
 		Assert.Equal("whim.tree_layout.bar", name);
 	}
 
-	[Fact]
-	public void Commands()
+	[Theory, AutoSubstituteData]
+	public void Commands(ITreeLayoutPlugin treeLayoutPlugin)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutBarPlugin plugin = new(mocks.TreeLayoutPlugin.Object);
+		TreeLayoutBarPlugin plugin = new(treeLayoutPlugin);
 
 		// Then
 		Assert.Empty(plugin.PluginCommands.Commands);
 		Assert.Empty(plugin.PluginCommands.Keybinds);
 	}
 
-	[Fact]
-	public void CreateComponent()
+	[Theory, AutoSubstituteData]
+	public void CreateComponent(ITreeLayoutPlugin treeLayoutPlugin)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutBarPlugin plugin = new(mocks.TreeLayoutPlugin.Object);
+		TreeLayoutBarPlugin plugin = new(treeLayoutPlugin);
 
 		// When
 		BarComponent component = plugin.CreateComponent();
@@ -53,12 +44,11 @@ public class TreeLayoutBarPluginTests
 		Assert.NotNull(component);
 	}
 
-	[Fact]
-	public void SaveState()
+	[Theory, AutoSubstituteData]
+	public void SaveState(ITreeLayoutPlugin treeLayoutPlugin)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutBarPlugin plugin = new(mocks.TreeLayoutPlugin.Object);
+		TreeLayoutBarPlugin plugin = new(treeLayoutPlugin);
 
 		// When
 		JsonElement? state = plugin.SaveState();
