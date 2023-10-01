@@ -1,4 +1,3 @@
-using Moq;
 using System;
 using Xunit;
 
@@ -15,201 +14,183 @@ public abstract class LayoutEngineBaseTests
 	/// </summary>
 	public abstract Func<ILayoutEngine> CreateLayoutEngine { get; }
 
-	[Fact]
-	public void AddWindow_NewWindow()
+	[Theory, AutoSubstituteData]
+	public void AddWindow_NewWindow(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		ILayoutEngine layoutEngine = CreateLayoutEngine();
 
 		// When
-		ILayoutEngine result = layoutEngine.AddWindow(window.Object);
+		ILayoutEngine result = layoutEngine.AddWindow(window);
 
 		// Then
 		Xunit.Assert.NotSame(layoutEngine, result);
-		Xunit.Assert.True(result.ContainsWindow(window.Object));
+		Xunit.Assert.True(result.ContainsWindow(window));
 	}
 
-	[Fact]
-	public void AddWindow_WindowAlreadyIncluded()
+	[Theory, AutoSubstituteData]
+	public void AddWindow_WindowAlreadyIncluded(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window);
 
 		// When
-		ILayoutEngine result = layoutEngine.AddWindow(window.Object);
+		ILayoutEngine result = layoutEngine.AddWindow(window);
 
 		// Then
 		Xunit.Assert.Same(layoutEngine, result);
-		Xunit.Assert.True(result.ContainsWindow(window.Object));
+		Xunit.Assert.True(result.ContainsWindow(window));
 		Xunit.Assert.Equal(1, result.Count);
 	}
 
-	[Fact]
-	public void RemoveWindow_WindowIsPresent()
+	[Theory, AutoSubstituteData]
+	public void RemoveWindow_WindowIsPresent(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window);
 
 		// When
-		ILayoutEngine result = layoutEngine.RemoveWindow(window.Object);
+		ILayoutEngine result = layoutEngine.RemoveWindow(window);
 
 		// Then
 		Xunit.Assert.NotSame(layoutEngine, result);
-		Xunit.Assert.False(result.ContainsWindow(window.Object));
+		Xunit.Assert.False(result.ContainsWindow(window));
 		Xunit.Assert.Equal(0, result.Count);
 	}
 
-	[Fact]
-	public void RemoveWindow_WindowIsNotPresent()
+	[Theory, AutoSubstituteData]
+	public void RemoveWindow_WindowIsNotPresent(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		ILayoutEngine layoutEngine = CreateLayoutEngine();
 
 		// When
-		ILayoutEngine result = layoutEngine.RemoveWindow(window.Object);
+		ILayoutEngine result = layoutEngine.RemoveWindow(window);
 
 		// Then
 		Xunit.Assert.Same(layoutEngine, result);
-		Xunit.Assert.False(result.ContainsWindow(window.Object));
+		Xunit.Assert.False(result.ContainsWindow(window));
 		Xunit.Assert.Equal(0, result.Count);
 	}
 
-	[Fact]
-	public void ContainsWindow_WindowIsPresent()
+	[Theory, AutoSubstituteData]
+	public void ContainsWindow_WindowIsPresent(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window);
 
 		// When
-		bool result = layoutEngine.ContainsWindow(window.Object);
+		bool result = layoutEngine.ContainsWindow(window);
 
 		// Then
 		Xunit.Assert.True(result);
 	}
 
-	[Fact]
-	public void ContainsWindow_WindowIsNotPresent()
+	[Theory, AutoSubstituteData]
+	public void ContainsWindow_WindowIsNotPresent(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		ILayoutEngine layoutEngine = CreateLayoutEngine();
 
 		// When
-		bool result = layoutEngine.ContainsWindow(window.Object);
+		bool result = layoutEngine.ContainsWindow(window);
 
 		// Then
 		Xunit.Assert.False(result);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_WindowIsPresent()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_WindowIsPresent(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1.Object).AddWindow(window2.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1).AddWindow(window2);
 
 		// When
-		layoutEngine.SwapWindowInDirection(Direction.Right, window1.Object);
+		layoutEngine.SwapWindowInDirection(Direction.Right, window1);
 
 		// Then it shouldn't throw.
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_WindowIsNotPresent()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_WindowIsNotPresent(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1);
 
 		// When
-		layoutEngine.SwapWindowInDirection(Direction.Right, window2.Object);
+		layoutEngine.SwapWindowInDirection(Direction.Right, window2);
 
 		// Then it shouldn't throw.
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_WindowIsPresent()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_WindowIsPresent(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1.Object).AddWindow(window2.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1).AddWindow(window2);
 
 		// When
-		layoutEngine.FocusWindowInDirection(Direction.Right, window1.Object);
+		layoutEngine.FocusWindowInDirection(Direction.Right, window1);
 
 		// Then it shouldn't throw.
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_WindowIsNotPresent()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_WindowIsNotPresent(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1);
 
 		// When
-		layoutEngine.FocusWindowInDirection(Direction.Right, window2.Object);
+		layoutEngine.FocusWindowInDirection(Direction.Right, window2);
 
 		// Then it shouldn't throw.
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_WindowIsPresent()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_WindowIsPresent(IWindow window1)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1);
 
 		// When
-		layoutEngine.MoveWindowToPoint(window1.Object, new Point<double>(1, 1));
+		layoutEngine.MoveWindowToPoint(window1, new Point<double>(1, 1));
 
 		// Then it shouldn't throw.
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_WindowIsNotPresent()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_WindowIsNotPresent(IWindow window1)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
 		ILayoutEngine layoutEngine = CreateLayoutEngine();
 
 		// When
-		layoutEngine.MoveWindowToPoint(window1.Object, new Point<double>(1, 1));
+		layoutEngine.MoveWindowToPoint(window1, new Point<double>(1, 1));
 
 		// Then it shouldn't throw.
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_WindowIsPresent()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowEdgesInDirection_WindowIsPresent(IWindow window1)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1.Object);
+		ILayoutEngine layoutEngine = CreateLayoutEngine().AddWindow(window1);
 
 		// When
-		layoutEngine.MoveWindowEdgesInDirection(Direction.LeftDown, new Point<double>(1, 1), window1.Object);
+		layoutEngine.MoveWindowEdgesInDirection(Direction.LeftDown, new Point<double>(1, 1), window1);
 
 		// Then it shouldn't throw.
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_WindowIsNotPresent()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowEdgesInDirection_WindowIsNotPresent(IWindow window1)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
 		ILayoutEngine layoutEngine = CreateLayoutEngine();
 
 		// When
-		layoutEngine.MoveWindowEdgesInDirection(Direction.LeftDown, new Point<double>(1, 1), window1.Object);
+		layoutEngine.MoveWindowEdgesInDirection(Direction.LeftDown, new Point<double>(1, 1), window1);
 
 		// Then it shouldn't throw.
 	}
