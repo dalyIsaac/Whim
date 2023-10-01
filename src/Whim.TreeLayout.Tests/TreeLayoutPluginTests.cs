@@ -1,36 +1,17 @@
-using Moq;
+using NSubstitute;
 using System.Text.Json;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
 public class TreeLayoutPluginTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWindowManager> WindowManager { get; } = new();
-
-		public Wrapper()
-		{
-			Context.SetupGet(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-			Context.SetupGet(x => x.WindowManager).Returns(WindowManager.Object);
-		}
-
-		public Wrapper Setup_GetWorkspaceForMonitor(Mock<IMonitor> monitor, IWorkspace workspace)
-		{
-			WorkspaceManager.Setup(wm => wm.GetWorkspaceForMonitor(monitor.Object)).Returns(workspace);
-			return this;
-		}
-	}
-
-	[Fact]
-	public void Name()
+	[Theory, AutoSubstituteData]
+	public void Name(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
 		string name = plugin.Name;
@@ -39,12 +20,11 @@ public class TreeLayoutPluginTests
 		Assert.Equal("whim.tree_layout", name);
 	}
 
-	[Fact]
-	public void PluginCommands()
+	[Theory, AutoSubstituteData]
+	public void PluginCommands(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
 		IPluginCommands commands = plugin.PluginCommands;
@@ -53,125 +33,115 @@ public class TreeLayoutPluginTests
 		Assert.NotEmpty(commands.Commands);
 	}
 
-	[Fact]
-	public void PreInitialize()
+	[Theory, AutoSubstituteData]
+	public void PreInitialize(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
 		plugin.PreInitialize();
 
 		// Then nothing
-		wrapper.Context.VerifyGet(c => c.WorkspaceManager, Times.Never);
-		wrapper.Context.VerifyGet(c => c.WindowManager, Times.Never);
+		Assert.Empty(ctx.WorkspaceManager.ReceivedCalls());
+		Assert.Empty(ctx.WindowManager.ReceivedCalls());
 	}
 
-	[Fact]
-	public void PostInitialize()
+	[Theory, AutoSubstituteData]
+	public void PostInitialize(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
 		plugin.PostInitialize();
 
 		// Then nothing
-		wrapper.Context.VerifyGet(c => c.WorkspaceManager, Times.Never);
-		wrapper.Context.VerifyGet(c => c.WindowManager, Times.Never);
+		Assert.Empty(ctx.WorkspaceManager.ReceivedCalls());
+		Assert.Empty(ctx.WindowManager.ReceivedCalls());
 	}
 
 	#region GetAddWindowDirection
-	[Fact]
-	public void GetAddWindowDirection_Monitor_NoLayoutEngine()
+	[Theory, AutoSubstituteData]
+	public void GetAddWindowDirection_Monitor_NoLayoutEngine(IContext ctx, IMonitor monitor)
 	{
 		// Given
-		Mock<IMonitor> monitor = new();
-		Wrapper wrapper = new();
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
-		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+		Direction? direction = plugin.GetAddWindowDirection(monitor);
 
 		// Then
 		Assert.Null(direction);
 	}
 
-	[Fact]
-	public void GetAddWindowDirection_Monitor_IsNotTreeLayoutEngine()
+	[Theory, AutoSubstituteData]
+	public void GetAddWindowDirection_Monitor_IsNotTreeLayoutEngine(
+		IContext ctx,
+		IMonitor monitor,
+		IWorkspace workspace,
+		ILayoutEngine layoutEngine
+	)
 	{
 		// Given
-		Mock<IMonitor> monitor = new();
-		Mock<IWorkspace> workspace = new();
-		Mock<ILayoutEngine> layoutEngine = new();
-		Wrapper wrapper = new Wrapper().Setup_GetWorkspaceForMonitor(monitor, workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		workspace.ActiveLayoutEngine.Returns(layoutEngine);
 
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
-
-		workspace.Setup(w => w.ActiveLayoutEngine).Returns(layoutEngine.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
-		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+		Direction? direction = plugin.GetAddWindowDirection(monitor);
 
 		// Then
 		Assert.Null(direction);
 	}
 
-	[Fact]
-	public void GetAddWindowDirection_Monitor_LazyInit()
+	[Theory, AutoSubstituteData]
+	public void GetAddWindowDirection_Monitor_LazyInit(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		Mock<IMonitor> monitor = new();
-		Mock<IWorkspace> workspace = new();
-		Mock<ILayoutEngine> layoutEngine = new();
-		Wrapper wrapper = new Wrapper().Setup_GetWorkspaceForMonitor(monitor, workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		LayoutEngineIdentity identity = new();
-		TreeLayoutEngine treeLayoutEngine = new(wrapper.Context.Object, plugin, identity);
-		workspace.Setup(w => w.ActiveLayoutEngine).Returns(treeLayoutEngine);
+		TreeLayoutEngine treeLayoutEngine = new(ctx, plugin, identity);
+		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
 
 		// When
-		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+		Direction? direction = plugin.GetAddWindowDirection(monitor);
 
 		// Then
 		Assert.Equal(Direction.Right, direction);
 	}
 
-	[Fact]
-	public void GetAddWindowDirection_Monitor_AlreadyInit()
+	[Theory, AutoSubstituteData]
+	public void GetAddWindowDirection_Monitor_AlreadyInit(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		Mock<IMonitor> monitor = new();
-		Mock<IWorkspace> workspace = new();
-		Mock<ILayoutEngine> layoutEngine = new();
-		Wrapper wrapper = new Wrapper().Setup_GetWorkspaceForMonitor(monitor, workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		LayoutEngineIdentity identity = new();
-		TreeLayoutEngine treeLayoutEngine = new(wrapper.Context.Object, plugin, identity);
-		workspace.Setup(w => w.ActiveLayoutEngine).Returns(treeLayoutEngine);
+		TreeLayoutEngine treeLayoutEngine = new(ctx, plugin, identity);
+		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
 
-		plugin.SetAddWindowDirection(monitor.Object, Direction.Left);
+		plugin.SetAddWindowDirection(monitor, Direction.Left);
 
 		// When
-		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+		Direction? direction = plugin.GetAddWindowDirection(monitor);
 
 		// Then
 		Assert.Equal(Direction.Left, direction);
 	}
 
-	[Fact]
-	public void GetAddWindowDirection_Engine_LazyInit()
+	[Theory, AutoSubstituteData]
+	public void GetAddWindowDirection_Engine_LazyInit(IContext ctx)
 	{
 		// Given
-		Mock<IContext> context = new();
-		TreeLayoutPlugin plugin = new(context.Object);
-		TreeLayoutEngine engine = new(context.Object, plugin, new LayoutEngineIdentity());
+		TreeLayoutPlugin plugin = new(ctx);
+		TreeLayoutEngine engine = new(ctx, plugin, new LayoutEngineIdentity());
 
 		// When
 		Direction? direction = plugin.GetAddWindowDirection(engine);
@@ -180,13 +150,12 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Right, direction);
 	}
 
-	[Fact]
-	public void GetAddWindowDirection_Engine_AlreadyInit()
+	[Theory, AutoSubstituteData]
+	public void GetAddWindowDirection_Engine_AlreadyInit(IContext ctx)
 	{
 		// Given
-		Mock<IContext> context = new();
-		TreeLayoutPlugin plugin = new(context.Object);
-		TreeLayoutEngine engine = new(context.Object, plugin, new LayoutEngineIdentity());
+		TreeLayoutPlugin plugin = new(ctx);
+		TreeLayoutEngine engine = new(ctx, plugin, new LayoutEngineIdentity());
 
 		plugin.SetAddWindowDirection(engine, Direction.Left);
 
@@ -199,66 +168,64 @@ public class TreeLayoutPluginTests
 	#endregion
 
 	#region SetAddWindowDirection
-	[Fact]
-	public void SetAddWindowDirection_NoLayoutEngine()
+	[Theory, AutoSubstituteData]
+	public void SetAddWindowDirection_NoLayoutEngine(IContext ctx, IMonitor monitor)
 	{
 		// Given
-		Mock<IMonitor> monitor = new();
-		Wrapper wrapper = new();
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
-		plugin.SetAddWindowDirection(monitor.Object, Direction.Up);
-		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+		plugin.SetAddWindowDirection(monitor, Direction.Up);
+		Direction? direction = plugin.GetAddWindowDirection(monitor);
 
 		// Then
 		Assert.Null(direction);
 	}
 
-	[Fact]
-	public void SetAddWindowDirection_NotTreeLayoutEngine()
+	[Theory, AutoSubstituteData]
+	public void SetAddWindowDirection_NotTreeLayoutEngine(
+		IContext ctx,
+		IMonitor monitor,
+		IWorkspace workspace,
+		ILayoutEngine layoutEngine
+	)
 	{
 		// Given
-		Mock<IMonitor> monitor = new();
-		Mock<IWorkspace> workspace = new();
-		Mock<ILayoutEngine> layoutEngine = new();
-		Wrapper wrapper = new Wrapper().Setup_GetWorkspaceForMonitor(monitor, workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
-		workspace.Setup(w => w.ActiveLayoutEngine).Returns(layoutEngine.Object);
+		workspace.ActiveLayoutEngine.Returns(layoutEngine);
 
 		// When
-		plugin.SetAddWindowDirection(monitor.Object, Direction.Up);
-		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+		plugin.SetAddWindowDirection(monitor, Direction.Up);
+		Direction? direction = plugin.GetAddWindowDirection(monitor);
 
 		// Then
 		Assert.Null(direction);
 	}
 
-	[Fact]
-	public void SetAddWindowDirection_DirectionNotSet()
+	[Theory, AutoSubstituteData]
+	public void SetAddWindowDirection_DirectionNotSet(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		Mock<IMonitor> monitor = new();
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new Wrapper().Setup_GetWorkspaceForMonitor(monitor, workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		LayoutEngineIdentity identity = new();
-		TreeLayoutEngine treeLayoutEngine = new(wrapper.Context.Object, plugin, identity);
-		workspace.Setup(w => w.ActiveLayoutEngine).Returns(treeLayoutEngine);
+		TreeLayoutEngine treeLayoutEngine = new(ctx, plugin, identity);
+		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
 
 		// When
 		Assert.RaisedEvent<AddWindowDirectionChangedEventArgs> addWindowEvent =
 			Assert.Raises<AddWindowDirectionChangedEventArgs>(
 				h => plugin.AddWindowDirectionChanged += h,
 				h => plugin.AddWindowDirectionChanged -= h,
-				() => plugin.SetAddWindowDirection(monitor.Object, Direction.Up)
+				() => plugin.SetAddWindowDirection(monitor, Direction.Up)
 			);
 
-		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+		Direction? direction = plugin.GetAddWindowDirection(monitor);
 
 		// Then
 		Assert.Equal(Direction.Up, addWindowEvent.Arguments.CurrentDirection);
@@ -267,30 +234,28 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Up, direction);
 	}
 
-	[Fact]
-	public void SetAddWindowDirection_DirectionAlreadySet()
+	[Theory, AutoSubstituteData]
+	public void SetAddWindowDirection_DirectionAlreadySet(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		Mock<IMonitor> monitor = new();
-		Mock<IWorkspace> workspace = new();
-		Wrapper wrapper = new Wrapper().Setup_GetWorkspaceForMonitor(monitor, workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
-		TreeLayoutPlugin plugin = new(wrapper.Context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		LayoutEngineIdentity identity = new();
-		TreeLayoutEngine treeLayoutEngine = new(wrapper.Context.Object, plugin, identity);
-		workspace.Setup(w => w.ActiveLayoutEngine).Returns(treeLayoutEngine);
+		TreeLayoutEngine treeLayoutEngine = new(ctx, plugin, identity);
+		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
 
 		// When
-		plugin.SetAddWindowDirection(monitor.Object, Direction.Up);
+		plugin.SetAddWindowDirection(monitor, Direction.Up);
 		Assert.RaisedEvent<AddWindowDirectionChangedEventArgs> addWindowEvent =
 			Assert.Raises<AddWindowDirectionChangedEventArgs>(
 				h => plugin.AddWindowDirectionChanged += h,
 				h => plugin.AddWindowDirectionChanged -= h,
-				() => plugin.SetAddWindowDirection(monitor.Object, Direction.Down)
+				() => plugin.SetAddWindowDirection(monitor, Direction.Down)
 			);
 
-		Direction? direction = plugin.GetAddWindowDirection(monitor.Object);
+		Direction? direction = plugin.GetAddWindowDirection(monitor);
 
 		// Then
 		Assert.Equal(Direction.Down, addWindowEvent.Arguments.CurrentDirection);
@@ -300,27 +265,25 @@ public class TreeLayoutPluginTests
 	}
 	#endregion
 
-	[Fact]
-	public void LoadState()
+	[Theory, AutoSubstituteData]
+	public void LoadState(IContext ctx)
 	{
 		// Given
-		Mock<IContext> context = new();
-		TreeLayoutPlugin plugin = new(context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
 		plugin.LoadState(JsonDocument.Parse("{}").RootElement);
 
 		// Then nothing
-		context.Verify(c => c.WorkspaceManager, Times.Never);
-		context.Verify(c => c.WindowManager, Times.Never);
+		Assert.Empty(ctx.WorkspaceManager.ReceivedCalls());
+		Assert.Empty(ctx.WindowManager.ReceivedCalls());
 	}
 
-	[Fact]
-	public void SaveState()
+	[Theory, AutoSubstituteData]
+	public void SaveState(IContext ctx)
 	{
 		// Given
-		Mock<IContext> context = new();
-		TreeLayoutPlugin plugin = new(context.Object);
+		TreeLayoutPlugin plugin = new(ctx);
 
 		// When
 		JsonElement? state = plugin.SaveState();

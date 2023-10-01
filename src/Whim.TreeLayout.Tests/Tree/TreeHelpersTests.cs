@@ -1,18 +1,29 @@
+using AutoFixture;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using System.Collections.Immutable;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
+public class TreeHelpersCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IMonitor monitor = fixture.Freeze<IMonitor>();
+		monitor.WorkingArea.Returns(new Location<int>() { Width = 1920, Height = 1080 });
+	}
+}
+
 public class TreeHelpersTests
 {
-	[InlineData(Direction.Right, true)]
-	[InlineData(Direction.Down, true)]
-	[InlineData(Direction.Up, false)]
-	[InlineData(Direction.Left, false)]
+	[InlineAutoSubstituteData<TreeHelpersCustomization>(Direction.Right, true)]
+	[InlineAutoSubstituteData<TreeHelpersCustomization>(Direction.Down, true)]
+	[InlineAutoSubstituteData<TreeHelpersCustomization>(Direction.Up, false)]
+	[InlineAutoSubstituteData<TreeHelpersCustomization>(Direction.Left, false)]
 	[Theory]
-	public void InsertAfter_ReturnsExpected(Direction direction, bool expected)
+	internal void InsertAfter_ReturnsExpected(Direction direction, bool expected)
 	{
 		// Given
 		// When
@@ -23,38 +34,34 @@ public class TreeHelpersTests
 	}
 
 	#region GetNodeAtPath
-	[Fact]
-	public void GetNodeAtPath_WithEmptyPath_ReturnsRoot()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetNodeAtPath_WithEmptyPath_ReturnsRoot(INode root)
 	{
-		// Given
-		Mock<INode> root = new();
-
 		// When
-		var result = root.Object.GetNodeAtPath(Array.Empty<int>());
+		var result = root.GetNodeAtPath(Array.Empty<int>());
 
 		// Then
 		Assert.NotNull(result);
 		Assert.Empty(result.Ancestors);
-		Assert.Equal(root.Object, result.Node);
+		Assert.Equal(root, result.Node);
 		Assert.Equal(Location.UnitSquare<double>(), result.Location);
 	}
 
-	[Fact]
-	public void GetNodeAtPath_CurrentNodeIsNotSplitNode()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetNodeAtPath_CurrentNodeIsNotSplitNode(INode root)
 	{
 		// Given
-		Mock<INode> root = new();
 		int[] path = { 0 };
 
 		// When
-		var result = root.Object.GetNodeAtPath(path);
+		var result = root.GetNodeAtPath(path);
 
 		// Then
 		Assert.Null(result);
 	}
 
 	[Fact]
-	public void GetNodeAtPath_EqualWeight_Horizontal()
+	internal void GetNodeAtPath_EqualWeight_Horizontal()
 	{
 		// Given
 		TestTree tree = new();
@@ -78,7 +85,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetNodeAtPath_EqualWeight_Vertical()
+	internal void GetNodeAtPath_EqualWeight_Vertical()
 	{
 		// Given
 		TestTree tree = new();
@@ -103,7 +110,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetNodeAtPath_Unequal()
+	internal void GetNodeAtPath_Unequal()
 	{
 		// Given
 		TestTree tree = new();
@@ -120,7 +127,7 @@ public class TreeHelpersTests
 	#endregion
 
 	[Fact]
-	public void GetRightMostWindow()
+	internal void GetRightMostWindow()
 	{
 		// Given
 		TestTree tree = new();
@@ -140,7 +147,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetLeftMostWindow()
+	internal void GetLeftMostWindow()
 	{
 		// Given
 		TestTree tree = new();
@@ -161,7 +168,7 @@ public class TreeHelpersTests
 
 	#region GetNodeContainingPoint
 	[Fact]
-	public void GetNodeContainingPoint_DoesNotContainPoint()
+	internal void GetNodeContainingPoint_DoesNotContainPoint()
 	{
 		// Given
 		TestTree tree = new();
@@ -175,10 +182,10 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetNodeContainingPoint_RootIsWindow()
+	internal void GetNodeContainingPoint_RootIsWindow()
 	{
 		// Given
-		WindowNode root = new(new Mock<IWindow>().Object);
+		WindowNode root = new(Substitute.For<IWindow>());
 		Point<double> point = new() { X = 0.5, Y = 0.5 };
 
 		// When
@@ -192,10 +199,10 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetNodeContainingPoint_UnknownNodeType()
+	internal void GetNodeContainingPoint_UnknownNodeType()
 	{
 		// Given
-		SplitNode root = new(new Mock<INode>().Object, new Mock<INode>().Object, Direction.Right);
+		SplitNode root = new(Substitute.For<INode>(), Substitute.For<INode>(), Direction.Right);
 		Point<double> point = new() { X = 0.5, Y = 0.5 };
 
 		// When
@@ -206,7 +213,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetNodeContainingPoint_Origin()
+	internal void GetNodeContainingPoint_Origin()
 	{
 		// Given
 		TestTree tree = new();
@@ -228,7 +235,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetNodeContainingPoint_Middle()
+	internal void GetNodeContainingPoint_Middle()
 	{
 		// Given
 		TestTree tree = new();
@@ -250,7 +257,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetNodeContainingPoint_RightTopRight3()
+	internal void GetNodeContainingPoint_RightTopRight3()
 	{
 		// Given
 		TestTree tree = new();
@@ -271,22 +278,21 @@ public class TreeHelpersTests
 			.Equal(result.Path);
 	}
 
-	[Fact]
-	public void GetNodeContainingPoint_InvalidNode()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetNodeContainingPoint_InvalidNode(INode node)
 	{
 		// Given
-		Mock<INode> node = new();
 		Point<double> point = new() { X = 0.8, Y = 0.4 };
 
 		// When
-		var result = node.Object.GetNodeContainingPoint(point);
+		var result = node.GetNodeContainingPoint(point);
 
 		// Then
 		Assert.Null(result);
 	}
 
 	[Fact]
-	public void GetNodeContainingPoint_DoesNotContainPointInChildNode()
+	internal void GetNodeContainingPoint_DoesNotContainPointInChildNode()
 	{
 		// Given
 		SplitNode node =
@@ -295,8 +301,8 @@ public class TreeHelpersTests
 				isHorizontal: true,
 				new INode[]
 				{
-					new WindowNode(new Mock<IWindow>().Object),
-					new WindowNode(new Mock<IWindow>().Object)
+					new WindowNode(Substitute.For<IWindow>()),
+					new WindowNode(Substitute.For<IWindow>())
 				}.ToImmutableList(),
 				new double[] { 0.5, 0.25 }.ToImmutableList()
 			);
@@ -632,7 +638,7 @@ public class TreeHelpersTests
 	[MemberData(nameof(GetDirectionToPoint_UnitSquareData))]
 	[MemberData(nameof(GetDirectionToPoint_NonUnitSquareData))]
 	[MemberData(nameof(GetDirectionToPoint_NonSquareData))]
-	public void GetDirectionToPoint(Location<double> location, Point<double> point, Direction expected)
+	internal void GetDirectionToPoint(Location<double> location, Point<double> point, Direction expected)
 	{
 		// Given
 		// When
@@ -644,7 +650,7 @@ public class TreeHelpersTests
 	#endregion
 
 	[Fact]
-	public void GetWindowLocations()
+	internal void GetWindowLocations()
 	{
 		// Given
 		TestTree tree = new();
@@ -684,252 +690,217 @@ public class TreeHelpersTests
 	}
 
 	#region GetAdjacentNode
-	[Fact]
-	public void GetAdjacentNode_RootIsWindowNode()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_RootIsWindowNode(IWindow window, IMonitor monitor)
 	{
 		// Given
-		WindowNode root = new(new Mock<IWindow>().Object);
+		WindowNode root = new(window);
 		IReadOnlyList<int> pathToNode = Array.Empty<int>();
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
-			root,
-			pathToNode,
-			Direction.Right,
-			monitor.Object
-		);
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(root, pathToNode, Direction.Right, monitor);
 
 		// Then
 		Assert.Null(result);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_RootIsNotISplitNode()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_RootIsNotISplitNode(INode root, IMonitor monitor)
 	{
 		// Given
-		Mock<INode> root = new();
 		IReadOnlyList<int> pathToNode = Array.Empty<int>();
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
-		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
-			root.Object,
-			pathToNode,
-			Direction.Right,
-			monitor.Object
-		);
+		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(root, pathToNode, Direction.Right, monitor);
 
 		// Then
 		Assert.Null(result);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_CannotFindNodeAtPath()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_CannotFindNodeAtPath(IMonitor monitor)
 	{
 		// Given
 		TestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 0, 0, 0, 0, 0 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Right,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Null(result);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_CannotFindAdjacentNode()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_CannotFindAdjacentNode(IMonitor monitor)
 	{
 		// Given
 		TestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 0 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Left,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Null(result);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_Success_Left()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_Success_Left(IMonitor monitor)
 	{
 		// Given
 		TestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Left,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Equal(tree.Left.Window, result!.WindowNode.Window);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_Success_Right()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_Success_Right(IMonitor monitor)
 	{
 		// Given
 		TestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Right,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Equal(tree.RightTopLeftBottomRightTop.Window, result!.WindowNode.Window);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_Success_Up()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_Success_Up(IMonitor monitor)
 	{
 		// Given
 		TestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Up,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Equal(tree.RightTopLeftTop.Window, result!.WindowNode.Window);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_Success_Down()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_Success_Down(IMonitor monitor)
 	{
 		// Given
 		TestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.Down,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Equal(tree.RightBottom.Window, result!.WindowNode.Window);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_Success_RightUp()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_Success_RightUp(IMonitor monitor)
 	{
 		// Given
 		SimpleTestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 1, 0 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.RightUp,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Equal(tree.TopRight.Window, result!.WindowNode.Window);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_Success_RightDown()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_Success_RightDown(IMonitor monitor)
 	{
 		// Given
 		SimpleTestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 0, 0 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.RightDown,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Equal(tree.BottomRight.Window, result!.WindowNode.Window);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_Success_LeftUp()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_Success_LeftUp(IMonitor monitor)
 	{
 		// Given
 		SimpleTestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 1, 1 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.LeftUp,
-			monitor.Object
+			monitor
 		);
 
 		// Then
 		Assert.Equal(tree.TopLeft.Window, result!.WindowNode.Window);
 	}
 
-	[Fact]
-	public void GetAdjacentNode_Success_LeftDown()
+	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
+	internal void GetAdjacentNode_Success_LeftDown(IMonitor monitor)
 	{
 		// Given
 		SimpleTestTree tree = new();
 		IReadOnlyList<int> pathToNode = new[] { 0, 1 };
-		Mock<IMonitor> monitor = new();
-		monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 1920, Height = 1080 });
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
 			tree.Root,
 			pathToNode,
 			Direction.LeftDown,
-			monitor.Object
+			monitor
 		);
 
 		// Then
@@ -939,7 +910,7 @@ public class TreeHelpersTests
 
 	#region GetLastCommonAncestor
 	[Fact]
-	public void GetLastCommonAncestor_EmptyList()
+	internal void GetLastCommonAncestor_EmptyList()
 	{
 		// Given
 		IReadOnlyList<int> pathToNode1 = Array.Empty<int>();
@@ -953,7 +924,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetLastCommonAncestor_SomeCommonAncestor()
+	internal void GetLastCommonAncestor_SomeCommonAncestor()
 	{
 		// Given
 		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
@@ -967,7 +938,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetLastCommonAncestor_NoCommonAncestor()
+	internal void GetLastCommonAncestor_NoCommonAncestor()
 	{
 		// Given
 		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
@@ -981,7 +952,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void GetLastCommonAncestor_SamePath()
+	internal void GetLastCommonAncestor_SamePath()
 	{
 		// Given
 		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
@@ -997,7 +968,7 @@ public class TreeHelpersTests
 
 	#region CreateUpdatedPaths
 	[Fact]
-	public void CreateUpdatedPaths_Create()
+	internal void CreateUpdatedPaths_Create()
 	{
 		// Given
 		TestTree tree = new();
@@ -1057,7 +1028,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void CreateUpdatedPaths_AmendRightTopRight()
+	internal void CreateUpdatedPaths_AmendRightTopRight()
 	{
 		// Given
 		TestTree tree = new();
@@ -1096,7 +1067,7 @@ public class TreeHelpersTests
 	}
 
 	[Fact]
-	public void CreateUpdatedPaths_DidNotFindSplitNode()
+	internal void CreateUpdatedPaths_DidNotFindSplitNode()
 	{
 		// Given
 		TestTree tree = new();

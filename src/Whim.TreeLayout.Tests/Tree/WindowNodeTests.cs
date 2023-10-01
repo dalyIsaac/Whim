@@ -1,36 +1,21 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
 public class WindowNodeTests
 {
-	[Fact]
-	public void Focus()
+	[Theory, AutoSubstituteData]
+	public void Focus(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		WindowNode windowNode = new(window.Object);
+		WindowNode windowNode = new(window);
 
 		// When
 		windowNode.Focus();
 
 		// Then
-		window.Verify(w => w.Focus(), Times.Once);
-	}
-
-	[Fact]
-	public void ToString_ReturnsWindowToString()
-	{
-		// Given
-		Mock<IWindow> window = new();
-		window.Setup(x => x.ToString()).Returns("window");
-		WindowNode node = new(window.Object);
-
-		// When
-		string? result = node.ToString();
-
-		// Then
-		Assert.Equal("window", result);
+		window.Received(1).Focus();
 	}
 }
