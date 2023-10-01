@@ -1,54 +1,49 @@
 using FluentAssertions;
-using Moq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
 public class MoveWindowToPointTests
 {
-	[Fact]
-	public void MoveWindowToPoint_RootIsNull()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_RootIsNull(IWindow window)
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		Mock<IWindow> window = new();
 		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window, point);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window.Object));
+		Assert.True(result.ContainsWindow(window));
 		Assert.Equal(1, result.Count);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_RootIsWindowNode_Right()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_RootIsWindowNode_Right(IWindow window1, IWindow window2, IMonitor monitor)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1.Object
+			window1
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
-		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window2.Object, point);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -58,7 +53,7 @@ public class MoveWindowToPointTests
 				{
 					new WindowState()
 					{
-						Window = window1.Object,
+						Window = window1,
 						Location = new Location<int>()
 						{
 							X = 0,
@@ -70,7 +65,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window2,
 						Location = new Location<int>()
 						{
 							X = 50,
@@ -84,31 +79,26 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_RootIsWindowNode_Down()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_RootIsWindowNode_Down(IWindow window1, IWindow window2, IMonitor monitor)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1.Object
+			window1
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.7 };
-
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
-		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window2.Object, point);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -118,7 +108,7 @@ public class MoveWindowToPointTests
 				{
 					new WindowState()
 					{
-						Window = window1.Object,
+						Window = window1,
 						Location = new Location<int>()
 						{
 							X = 0,
@@ -130,7 +120,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window2,
 						Location = new Location<int>()
 						{
 							X = 0,
@@ -144,31 +134,26 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_RootIsWindowNode_Left()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_RootIsWindowNode_Left(IWindow window1, IWindow window2, IMonitor monitor)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1.Object
+			window1
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.5 };
-
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
-		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window2.Object, point);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -178,7 +163,7 @@ public class MoveWindowToPointTests
 				{
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window2,
 						Location = new Location<int>()
 						{
 							X = 0,
@@ -190,7 +175,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window1.Object,
+						Window = window1,
 						Location = new Location<int>()
 						{
 							X = 50,
@@ -204,31 +189,26 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_RootIsWindowNode_Up()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_RootIsWindowNode_Up(IWindow window1, IWindow window2, IMonitor monitor)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1.Object
+			window1
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.3 };
-
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
-		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window2.Object, point);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
 		Assert.Equal(2, result.Count);
 
 		windowStates
@@ -238,7 +218,7 @@ public class MoveWindowToPointTests
 				{
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window2,
 						Location = new Location<int>()
 						{
 							X = 0,
@@ -250,7 +230,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window1.Object,
+						Window = window1,
 						Location = new Location<int>()
 						{
 							X = 0,
@@ -264,59 +244,55 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_RootIsSplitNode_DoesNotContainPoint()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_RootIsSplitNode_DoesNotContainPoint(IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
-
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
+			.AddWindow(window1)
+			.AddWindow(window2);
 
 		IPoint<double> point = new Point<double>() { X = 1.7, Y = 0.5 };
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window3.Object, point);
+		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
 
 		// Then
 		Assert.Same(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
-		Assert.False(result.ContainsWindow(window3.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
+		Assert.False(result.ContainsWindow(window3));
 		Assert.Equal(2, result.Count);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_RootIsSplitNode_AddInDirection()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_RootIsSplitNode_AddInDirection(
+		IWindow window1,
+		IWindow window2,
+		IWindow window3,
+		IMonitor monitor
+	)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
-
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
+			.AddWindow(window1)
+			.AddWindow(window2);
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
-		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window3.Object, point);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
-		Assert.True(result.ContainsWindow(window3.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
+		Assert.True(result.ContainsWindow(window3));
 		Assert.Equal(3, result.Count);
 
 		windowStates
@@ -326,7 +302,7 @@ public class MoveWindowToPointTests
 				{
 					new WindowState()
 					{
-						Window = window1.Object,
+						Window = window1,
 						Location = new Location<int>()
 						{
 							X = 0,
@@ -338,7 +314,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window3.Object,
+						Window = window3,
 						Location = new Location<int>()
 						{
 							X = 33,
@@ -350,7 +326,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window2,
 						Location = new Location<int>()
 						{
 							X = 67,
@@ -364,33 +340,33 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_RootIsSplitNode_AddInDifferentDirection()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_RootIsSplitNode_AddInDifferentDirection(
+		IWindow window1,
+		IWindow window2,
+		IWindow window3,
+		IMonitor monitor
+	)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
-
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
+			.AddWindow(window1)
+			.AddWindow(window2);
 
 		IPoint<double> point = new Point<double>() { X = 0.75, Y = 0.8 };
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
-		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window3.Object, point);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
-		Assert.True(result.ContainsWindow(window3.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
+		Assert.True(result.ContainsWindow(window3));
 		Assert.Equal(3, result.Count);
 
 		windowStates
@@ -400,7 +376,7 @@ public class MoveWindowToPointTests
 				{
 					new WindowState()
 					{
-						Window = window1.Object,
+						Window = window1,
 						Location = new Location<int>()
 						{
 							X = 0,
@@ -412,7 +388,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window2.Object,
+						Window = window2,
 						Location = new Location<int>()
 						{
 							X = 50,
@@ -424,7 +400,7 @@ public class MoveWindowToPointTests
 					},
 					new WindowState()
 					{
-						Window = window3.Object,
+						Window = window3,
 						Location = new Location<int>()
 						{
 							X = 50,
@@ -438,32 +414,30 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[InlineData(0.25, 0.25)]
-	[InlineData(0.25, 0.75)]
-	[InlineData(0.75, 0.25)]
-	[InlineData(0.75, 0.75)]
+	[InlineAutoSubstituteData(0.25, 0.25)]
+	[InlineAutoSubstituteData(0.25, 0.75)]
+	[InlineAutoSubstituteData(0.75, 0.25)]
+	[InlineAutoSubstituteData(0.75, 0.75)]
 	[Theory]
-	public void MoveWindowToPoint_AlreadyContainsWindow(double x, double y)
+	public void MoveWindowToPoint_AlreadyContainsWindow(double x, double y, IWindow window, IMonitor monitor)
 	{
 		// Given
-		Mock<IWindow> window = new();
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window.Object);
+		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window);
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window.Object
+			window
 		);
 
 		IPoint<double> point = new Point<double>() { X = x, Y = y };
 
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
-		Mock<IMonitor> monitor = new();
 
 		// When
-		ILayoutEngine result = engine.MoveWindowToPoint(window.Object, point);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.MoveWindowToPoint(window, point);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window.Object));
+		Assert.True(result.ContainsWindow(window));
 		Assert.Single(windowStates);
 
 		windowStates
@@ -473,7 +447,7 @@ public class MoveWindowToPointTests
 				{
 					new WindowState()
 					{
-						Window = window.Object,
+						Window = window,
 						Location = new Location<int>()
 						{
 							X = 0,

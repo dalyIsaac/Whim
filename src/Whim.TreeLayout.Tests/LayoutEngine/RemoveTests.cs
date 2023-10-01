@@ -1,178 +1,162 @@
-using Moq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
 public class RemoveTests
 {
-	[Fact]
-	public void Remove_RootIsNull()
+	[Theory, AutoSubstituteData]
+	public void Remove_RootIsNull(IWindow window)
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		Mock<IWindow> window = new();
 		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
 		// When
-		ILayoutEngine result = engine.RemoveWindow(window.Object);
+		ILayoutEngine result = engine.RemoveWindow(window);
 
 		// Then
 		Assert.Same(engine, result);
 	}
 
-	[Fact]
-	public void Remove_RootIsWindow_Success()
+	[Theory, AutoSubstituteData]
+	public void Remove_RootIsWindow_Success(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window.Object
+			window
 		);
 
 		// When
-		ILayoutEngine result = engine.RemoveWindow(window.Object);
+		ILayoutEngine result = engine.RemoveWindow(window);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.False(result.ContainsWindow(window.Object));
+		Assert.False(result.ContainsWindow(window));
 		Assert.Equal(0, result.Count);
 	}
 
-	[Fact]
-	public void Remove_RootIsWindow_WrongWindow()
+	[Theory, AutoSubstituteData]
+	public void Remove_RootIsWindow_WrongWindow(IWindow window, IWindow wrongWindow)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window.Object
+			window
 		);
 
-		Mock<IWindow> wrongWindow = new();
-
 		// When
-		ILayoutEngine result = engine.RemoveWindow(wrongWindow.Object);
+		ILayoutEngine result = engine.RemoveWindow(wrongWindow);
 
 		// Then
 		Assert.Same(engine, result);
-		Assert.True(result.ContainsWindow(window.Object));
+		Assert.True(result.ContainsWindow(window));
 		Assert.Equal(1, result.Count);
 	}
 
-	[Fact]
-	public void Remove_RootIsSplitNode_CannotFindWindow()
+	[Theory, AutoSubstituteData]
+	public void Remove_RootIsSplitNode_CannotFindWindow(IWindow window1, IWindow window2, IWindow wrongWindow)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
-
-		Mock<IWindow> wrongWindow = new();
+			.AddWindow(window1)
+			.AddWindow(window2);
 
 		// When
-		ILayoutEngine result = engine.RemoveWindow(wrongWindow.Object);
+		ILayoutEngine result = engine.RemoveWindow(wrongWindow);
 
 		// Then
 		Assert.Same(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
 		Assert.Equal(2, result.Count);
 	}
 
-	[Fact]
-	public void Remove_RootIsSplitNode_ReplaceRoot()
+	[Theory, AutoSubstituteData]
+	public void Remove_RootIsSplitNode_ReplaceRoot(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
+			.AddWindow(window1)
+			.AddWindow(window2);
 
 		// When
-		ILayoutEngine result = engine.RemoveWindow(window1.Object);
+		ILayoutEngine result = engine.RemoveWindow(window1);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.False(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
+		Assert.False(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
 		Assert.Equal(1, result.Count);
 	}
 
-	[Fact]
-	public void Remove_RootIsSplitNode_ReplaceChildSplitNodeWithWindow()
+	[Theory, AutoSubstituteData]
+	public void Remove_RootIsSplitNode_ReplaceChildSplitNodeWithWindow(
+		IWindow window1,
+		IWindow window2,
+		IWindow window3
+	)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object)
-			.MoveWindowToPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
+			.AddWindow(window1)
+			.AddWindow(window2)
+			.MoveWindowToPoint(window3, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		// When
-		ILayoutEngine result = engine.RemoveWindow(window3.Object);
+		ILayoutEngine result = engine.RemoveWindow(window3);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
-		Assert.False(result.ContainsWindow(window3.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
+		Assert.False(result.ContainsWindow(window3));
 		Assert.Equal(2, result.Count);
 	}
 
-	[Fact]
-	public void Remove_RootIsSplitNode_ReplaceRootWithSplitNode()
+	[Theory, AutoSubstituteData]
+	public void Remove_RootIsSplitNode_ReplaceRootWithSplitNode(IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object)
-			.MoveWindowToPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
+			.AddWindow(window1)
+			.AddWindow(window2)
+			.MoveWindowToPoint(window3, new Point<double>() { X = 0.75, Y = 0.75 });
 
 		// When
-		ILayoutEngine result = engine.RemoveWindow(window1.Object);
+		ILayoutEngine result = engine.RemoveWindow(window1);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.False(result.ContainsWindow(window1.Object));
-		Assert.True(result.ContainsWindow(window2.Object));
-		Assert.True(result.ContainsWindow(window3.Object));
+		Assert.False(result.ContainsWindow(window1));
+		Assert.True(result.ContainsWindow(window2));
+		Assert.True(result.ContainsWindow(window3));
 		Assert.Equal(2, result.Count);
 	}
 
-	[Fact]
-	public void Remove_RootIsSplitNode_KeepRoot()
+	[Theory, AutoSubstituteData]
+	public void Remove_RootIsSplitNode_KeepRoot(IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object)
-			.AddWindow(window3.Object);
+			.AddWindow(window1)
+			.AddWindow(window2)
+			.AddWindow(window3);
 
 		// When
-		ILayoutEngine result = engine.RemoveWindow(window2.Object);
+		ILayoutEngine result = engine.RemoveWindow(window2);
 
 		// Then
 		Assert.NotSame(engine, result);
-		Assert.True(result.ContainsWindow(window1.Object));
-		Assert.False(result.ContainsWindow(window2.Object));
-		Assert.True(result.ContainsWindow(window3.Object));
+		Assert.True(result.ContainsWindow(window1));
+		Assert.False(result.ContainsWindow(window2));
+		Assert.True(result.ContainsWindow(window3));
 		Assert.Equal(2, result.Count);
 	}
 }

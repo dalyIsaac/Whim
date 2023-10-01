@@ -1,45 +1,41 @@
 using FluentAssertions;
-using Moq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
 public class SwapWindowInDirectionTests
 {
-	[Fact]
-	public void SwapWindowInDirection_RootIsNull()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_RootIsNull(IWindow window)
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		Mock<IWindow> window = new();
 		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
 		// When
-		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window.Object);
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window);
 
 		// Then
 		Assert.Same(engine, result);
-		Assert.False(result.ContainsWindow(window.Object));
+		Assert.False(result.ContainsWindow(window));
 		Assert.Equal(0, result.Count);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_NoAdjacentNodeInDirection()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_NoAdjacentNodeInDirection(IWindow window1, IWindow window2, IMonitor monitor)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
+			.AddWindow(window1)
+			.AddWindow(window2);
 
-		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window1.Object);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window1);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.Same(engine, result);
@@ -48,7 +44,7 @@ public class SwapWindowInDirectionTests
 		{
 			new WindowState()
 			{
-				Window = window1.Object,
+				Window = window1,
 				Location = new Location<int>()
 				{
 					X = 0,
@@ -60,7 +56,7 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = window2.Object,
+				Window = window2,
 				Location = new Location<int>()
 				{
 					X = 50,
@@ -75,23 +71,20 @@ public class SwapWindowInDirectionTests
 			.Equal(windowStates);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_SameParent()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_SameParent(IWindow window1, IWindow window2, IMonitor monitor)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
+			.AddWindow(window1)
+			.AddWindow(window2);
 
-		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1.Object);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -100,7 +93,7 @@ public class SwapWindowInDirectionTests
 		{
 			new WindowState()
 			{
-				Window = window2.Object,
+				Window = window2,
 				Location = new Location<int>()
 				{
 					X = 0,
@@ -112,7 +105,7 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = window1.Object,
+				Window = window1,
 				Location = new Location<int>()
 				{
 					X = 50,
@@ -127,25 +120,26 @@ public class SwapWindowInDirectionTests
 			.Equal(windowStates);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_DifferentParents()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_DifferentParents(
+		IWindow window1,
+		IWindow window2,
+		IWindow window3,
+		IMonitor monitor
+	)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object)
-			.MoveWindowToPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
+			.AddWindow(window1)
+			.AddWindow(window2)
+			.MoveWindowToPoint(window3, new Point<double>() { X = 0.75, Y = 0.75 });
 
-		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1.Object);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -154,13 +148,13 @@ public class SwapWindowInDirectionTests
 		{
 			new WindowState()
 			{
-				Window = window2.Object,
+				Window = window2,
 				Location = new Location<int>() { Width = 50, Height = 100 },
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
-				Window = window1.Object,
+				Window = window1,
 				Location = new Location<int>()
 				{
 					X = 50,
@@ -172,7 +166,7 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = window3.Object,
+				Window = window3,
 				Location = new Location<int>()
 				{
 					X = 50,
@@ -187,29 +181,29 @@ public class SwapWindowInDirectionTests
 			.Equal(windowStates);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_Diagonal()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_Diagonal(
+		IWindow topLeft,
+		IWindow topRight,
+		IWindow bottomLeft,
+		IWindow bottomRight,
+		IMonitor monitor
+	)
 	{
 		// Given
-		Mock<IWindow> topLeft = new();
-		Mock<IWindow> topRight = new();
-		Mock<IWindow> bottomLeft = new();
-		Mock<IWindow> bottomRight = new();
-
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(topLeft.Object)
-			.AddWindow(topRight.Object)
-			.MoveWindowToPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })
-			.MoveWindowToPoint(bottomRight.Object, new Point<double>() { X = 0.75, Y = 0.9 });
+			.AddWindow(topLeft)
+			.AddWindow(topRight)
+			.MoveWindowToPoint(bottomLeft, new Point<double>() { X = 0.25, Y = 0.9 })
+			.MoveWindowToPoint(bottomRight, new Point<double>() { X = 0.75, Y = 0.9 });
 
-		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		ILayoutEngine result = engine.SwapWindowInDirection(Direction.LeftUp, bottomRight.Object);
-		IWindowState[] windowStates = result.DoLayout(location, monitor.Object).ToArray();
+		ILayoutEngine result = engine.SwapWindowInDirection(Direction.LeftUp, bottomRight);
+		IWindowState[] windowStates = result.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -218,7 +212,7 @@ public class SwapWindowInDirectionTests
 		{
 			new WindowState()
 			{
-				Window = bottomRight.Object,
+				Window = bottomRight,
 				Location = new Location<int>()
 				{
 					X = 0,
@@ -230,7 +224,7 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = bottomLeft.Object,
+				Window = bottomLeft,
 				Location = new Location<int>()
 				{
 					X = 0,
@@ -242,7 +236,7 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = topRight.Object,
+				Window = topRight,
 				Location = new Location<int>()
 				{
 					X = 50,
@@ -254,7 +248,7 @@ public class SwapWindowInDirectionTests
 			},
 			new WindowState()
 			{
-				Window = topLeft.Object,
+				Window = topLeft,
 				Location = new Location<int>()
 				{
 					X = 50,

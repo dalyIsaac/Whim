@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using System.Collections;
 using System.Collections.Immutable;
 using Xunit;
@@ -9,7 +9,7 @@ public class SplitNodeTests
 {
 	private static WindowNode CreateWindowNode()
 	{
-		return new(new Mock<IWindow>().Object);
+		return new(Substitute.For<IWindow>());
 	}
 
 	#region Ctor
