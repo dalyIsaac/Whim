@@ -1,55 +1,42 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using System.Text.Json;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.LayoutPreview.Tests;
 
+public class LayoutPreviewPluginCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IContext ctx = fixture.Freeze<IContext>();
+
+		IWorkspace workspace = fixture.Freeze<IWorkspace>();
+
+		IMonitor monitor = fixture.Freeze<IMonitor>();
+		monitor.WorkingArea.Returns(
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 1920,
+				Height = 1080
+			}
+		);
+
+		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitor);
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
+	}
+}
+
 public class LayoutPreviewPluginTests
 {
-	private class Wrapper
-	{
-		public Mock<IWindowManager> WindowManager { get; } = new();
-		public Mock<IFilterManager> FilterManager { get; } = new();
-		public Mock<IMonitorManager> MonitorManager { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
-		public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-		public Mock<IWorkspace> Workspace { get; } = new();
-		public Mock<ILayoutEngine> LayoutEngine { get; } = new();
-		public Mock<IContext> Context { get; } = new();
-
-		public Wrapper()
-		{
-			Context.Setup(x => x.WindowManager).Returns(WindowManager.Object);
-			Context.Setup(x => x.FilterManager).Returns(FilterManager.Object);
-			Context.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
-			Context.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-
-			MonitorManager.Setup(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(Monitor.Object);
-
-			Monitor
-				.Setup(x => x.WorkingArea)
-				.Returns(
-					new Location<int>()
-					{
-						X = 0,
-						Y = 0,
-						Width = 1920,
-						Height = 1080
-					}
-				);
-
-			WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(Monitor.Object)).Returns(Workspace.Object);
-
-			Workspace.Setup(x => x.ActiveLayoutEngine).Returns(LayoutEngine.Object);
-		}
-	}
-
-	[Fact]
-	public void Name()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void Name(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 
 		// When
 		string name = plugin.Name;
@@ -58,12 +45,11 @@ public class LayoutPreviewPluginTests
 		Assert.Equal("whim.layout_preview", name);
 	}
 
-	[Fact]
-	public void PluginCommands()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void PluginCommands(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 
 		// When
 		IEnumerable<ICommand> commands = plugin.PluginCommands.Commands;
@@ -72,38 +58,27 @@ public class LayoutPreviewPluginTests
 		Assert.Empty(commands);
 	}
 
-	[Fact]
-	public void PreInitialize()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void PreInitialize(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 
 		// When
 		plugin.PreInitialize();
 
 		// Then
-		wrapper.WindowManager.VerifyAdd(
-			x => x.WindowMoveStart += It.IsAny<EventHandler<WindowMovedEventArgs>>(),
-			Times.Once
-		);
-		wrapper.WindowManager.VerifyAdd(
-			x => x.WindowMoved += It.IsAny<EventHandler<WindowMovedEventArgs>>(),
-			Times.Once
-		);
-		wrapper.WindowManager.VerifyAdd(
-			x => x.WindowMoveEnd += It.IsAny<EventHandler<WindowMovedEventArgs>>(),
-			Times.Once
-		);
-		wrapper.FilterManager.Verify(x => x.IgnoreTitleMatch(LayoutPreviewWindow.WindowTitle), Times.Once);
+		ctx.WindowManager.Received(1).WindowMoveStart += Arg.Any<EventHandler<WindowMovedEventArgs>>();
+		ctx.WindowManager.Received(1).WindowMoved += Arg.Any<EventHandler<WindowMovedEventArgs>>();
+		ctx.WindowManager.Received(1).WindowMoveEnd += Arg.Any<EventHandler<WindowMovedEventArgs>>();
+		ctx.FilterManager.Received(1).IgnoreTitleMatch(LayoutPreviewWindow.WindowTitle);
 	}
 
-	[Fact]
-	public void PostInitialize()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void PostInitialize(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 
 		// When
 		plugin.PostInitialize();
@@ -112,12 +87,11 @@ public class LayoutPreviewPluginTests
 		Assert.True(true);
 	}
 
-	[Fact]
-	public void LoadState()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void LoadState(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 
 		// When
 		plugin.LoadState(default);
@@ -126,12 +100,11 @@ public class LayoutPreviewPluginTests
 		Assert.True(true);
 	}
 
-	[Fact]
-	public void SaveState()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void SaveState(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 
 		// When
 		JsonElement? state = plugin.SaveState();
@@ -140,200 +113,192 @@ public class LayoutPreviewPluginTests
 		Assert.Null(state);
 	}
 
-	[Fact]
-	public void WindowMoveStart_NotDragged()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void WindowMoveStart_NotDragged(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e =
 			new()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = null,
 				MovedEdges = null
 			};
 
 		// When
 		plugin.PreInitialize();
-		wrapper.WindowManager.Raise(x => x.WindowMoveStart += null, e);
+		ctx.WindowManager.WindowMoveStart += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
 	}
 
 	#region WindowMoved
-	[Fact]
-	public void WindowMoved_NotDragged()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void WindowMoved_NotDragged(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e =
 			new()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = null,
 				MovedEdges = null
 			};
 
 		// When
 		plugin.PreInitialize();
-		wrapper.WindowManager.Raise(x => x.WindowMoved += null, e);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
 
 		// Then
-		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never);
+		ctx.MonitorManager.DidNotReceive().GetMonitorAtPoint(Arg.Any<IPoint<int>>());
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Fact]
-	public void WindowMoved_MovingEdges()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void WindowMoved_MovingEdges(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e =
 			new()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = new Location<int>(),
 				MovedEdges = Direction.LeftDown
 			};
 
 		// When
 		plugin.PreInitialize();
-		wrapper.WindowManager.Raise(x => x.WindowMoved += null, e);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
 
 		// Then
-		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Never);
+		ctx.MonitorManager.DidNotReceive().GetMonitorAtPoint(Arg.Any<IPoint<int>>());
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Fact]
-	public void WindowMoved_Dragged_CannotFindWorkspace()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void WindowMoved_Dragged_CannotFindWorkspace(IContext ctx, IWorkspace workspace)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e =
 			new()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = new Location<int>(),
 				MovedEdges = null
 			};
-		wrapper.WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>())).Returns((IWorkspace?)null);
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
+
+		workspace.ActiveLayoutEngine.ClearReceivedCalls();
 
 		// When
 		plugin.PreInitialize();
-		wrapper.WindowManager.Raise(x => x.WindowMoved += null, e);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
 
 		// Then
-		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Once);
-		wrapper.WorkspaceManager.Verify(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
-		wrapper.Workspace.Verify(x => x.ActiveLayoutEngine, Times.Never);
+		ctx.MonitorManager.Received(1).GetMonitorAtPoint(Arg.Any<IPoint<int>>());
+		ctx.WorkspaceManager.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		Assert.Empty(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Fact]
-	public void WindowMoved_Dragged_Success()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void WindowMoved_Dragged_Success(IContext ctx, IWindow window, IWorkspace workspace)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
-		Mock<IWindow> window = new();
+		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e =
 			new()
 			{
-				Window = window.Object,
+				Window = window,
 				CursorDraggedPoint = new Location<int>(),
 				MovedEdges = null
 			};
 
+		workspace.ActiveLayoutEngine.ClearReceivedCalls();
+
 		// When
 		plugin.PreInitialize();
-		wrapper.WindowManager.Raise(x => x.WindowMoved += null, e);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
 
 		// Then
-		wrapper.MonitorManager.Verify(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>()), Times.Once);
-		wrapper.WorkspaceManager.Verify(x => x.GetWorkspaceForMonitor(It.IsAny<IMonitor>()), Times.Once);
-		wrapper.Workspace.Verify(x => x.ActiveLayoutEngine, Times.Once);
-		Assert.Equal(window.Object, plugin.DraggedWindow);
+		ctx.MonitorManager.Received(1).GetMonitorAtPoint(Arg.Any<IPoint<int>>());
+		ctx.WorkspaceManager.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		Assert.Single(workspace.ActiveLayoutEngine.ReceivedCalls());
+		Assert.Equal(window, plugin.DraggedWindow);
 	}
 	#endregion
 
-	[Fact]
-	public void WindowMoveEnd()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void WindowMoveEnd(IContext ctx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e =
 			new()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = null,
 				MovedEdges = null
 			};
 
 		// When
 		plugin.PreInitialize();
-		wrapper.WindowManager.Raise(x => x.WindowMoveEnd += null, e);
+		ctx.WindowManager.WindowMoveEnd += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Fact]
-	public void WindowManager_WindowRemoved_NotHidden()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void WindowManager_WindowRemoved_NotHidden(IContext ctx, IWindow movedWindow, IWindow removedWindow)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 
-		Mock<IWindow> movedWindow = new();
 		WindowMovedEventArgs moveArgs =
 			new()
 			{
-				Window = movedWindow.Object,
+				Window = movedWindow,
 				CursorDraggedPoint = new Location<int>(),
 				MovedEdges = null
 			};
 
-		Mock<IWindow> removedWindow = new();
-		WindowEventArgs removeArgs = new() { Window = removedWindow.Object };
+		WindowEventArgs removeArgs = new() { Window = removedWindow };
 
 		// When
 		plugin.PreInitialize();
-		wrapper.WindowManager.Raise(x => x.WindowMoved += null, moveArgs);
-		wrapper.WindowManager.Raise(x => x.WindowRemoved += null, removeArgs);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
+		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(ctx.WindowManager, removeArgs);
 
 		// Then
-		Assert.Equal(movedWindow.Object, plugin.DraggedWindow);
+		Assert.Equal(movedWindow, plugin.DraggedWindow);
 	}
 
-	[Fact]
-	public void WindowManager_WindowRemoved_Shown()
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	public void WindowManager_WindowRemoved_Shown(IContext ctx, IWindow movedWindow)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using LayoutPreviewPlugin plugin = new(wrapper.Context.Object);
+		using LayoutPreviewPlugin plugin = new(ctx);
 
-		Mock<IWindow> movedWindow = new();
 		WindowMovedEventArgs moveArgs =
 			new()
 			{
-				Window = movedWindow.Object,
+				Window = movedWindow,
 				CursorDraggedPoint = new Location<int>(),
 				MovedEdges = null
 			};
 
-		WindowEventArgs removeArgs = new() { Window = movedWindow.Object };
+		WindowEventArgs removeArgs = new() { Window = movedWindow };
 
 		// When
 		plugin.PreInitialize();
-		wrapper.WindowManager.Raise(x => x.WindowMoved += null, moveArgs);
-		wrapper.WindowManager.Raise(x => x.WindowRemoved += null, removeArgs);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
+		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(ctx.WindowManager, removeArgs);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
