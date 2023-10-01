@@ -184,4 +184,11 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	void RemoveWindowExTransparent(HWND hwnd);
+
+	/// <summary>
+	/// Sets the given <paramref name="hwnd"/> to be a toolwindow.
+	/// A tool window does not appear in the taskbar or in the dialog that appears when the user presses ALT+TAB.
+	/// </summary>
+	/// <param name="hwnd"></param>
+	void SetExToolWindow(HWND hwnd);
 }

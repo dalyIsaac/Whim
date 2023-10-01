@@ -317,4 +317,15 @@ public partial class NativeManager : INativeManager
 			exStyle & ~(int)WINDOW_EX_STYLE.WS_EX_LAYERED
 		);
 	}
+
+	/// <inheritdoc/>
+	public void SetExToolWindow(HWND hwnd)
+	{
+		int exStyle = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+		_ = PInvoke.SetWindowLong(
+			hwnd,
+			WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE,
+			exStyle | (int)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW
+		);
+	}
 }
