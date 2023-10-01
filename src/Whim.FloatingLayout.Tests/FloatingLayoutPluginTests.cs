@@ -12,8 +12,17 @@ public class FloatingLayoutPluginCustomization : ICustomization
 	{
 		IContext context = fixture.Freeze<IContext>();
 		IWorkspace workspace = fixture.Freeze<IWorkspace>();
+
 		IMonitor monitor = fixture.Freeze<IMonitor>();
-		ILocation<int> location = new Location<int>() { X = 1, Y = 2 };
+		monitor.WorkingArea.Returns(
+			new Location<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 3,
+				Height = 3
+			}
+		);
 
 		// The workspace will have a null last focused window
 		workspace.LastFocusedWindow.Returns((IWindow?)null);
@@ -22,11 +31,8 @@ public class FloatingLayoutPluginCustomization : ICustomization
 		context.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
 		context.WorkspaceManager.ActiveWorkspace.Returns(workspace);
 
-		// Monitor manager will return the monitor at the point (1, 2)
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
-
-		// Each monitor will be at (1, 2)
-		monitor.WorkingArea.Returns(location);
+		// Monitor manager will return the monitor at the point (1, 2).
+		context.MonitorManager.GetMonitorAtPoint(Arg.Is<IPoint<int>>(p => p.X == 1 && p.Y == 2)).Returns(monitor);
 
 		fixture.Inject(context);
 		fixture.Inject(workspace);

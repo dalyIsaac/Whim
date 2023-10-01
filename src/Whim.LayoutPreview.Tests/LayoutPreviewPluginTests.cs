@@ -26,7 +26,17 @@ public class LayoutPreviewPluginTests
 
 			MonitorManager.Setup(x => x.GetMonitorAtPoint(It.IsAny<IPoint<int>>())).Returns(Monitor.Object);
 
-			Monitor.Setup(x => x.WorkingArea).Returns(new Location<int>());
+			Monitor
+				.Setup(x => x.WorkingArea)
+				.Returns(
+					new Location<int>()
+					{
+						X = 0,
+						Y = 0,
+						Width = 1920,
+						Height = 1080
+					}
+				);
 
 			WorkspaceManager.Setup(x => x.GetWorkspaceForMonitor(Monitor.Object)).Returns(Workspace.Object);
 
