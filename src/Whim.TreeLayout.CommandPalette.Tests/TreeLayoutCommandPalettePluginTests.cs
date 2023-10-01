@@ -1,27 +1,21 @@
-using Moq;
 using System.Text.Json;
 using Whim.CommandPalette;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.CommandPalette.Tests;
 
 public class TreeLayoutCommandPalettePluginTests
 {
-	private class MocksBuilder
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IPlugin> TreeLayoutCommandPalettePlugin { get; } = new();
-		public Mock<ITreeLayoutPlugin> TreeLayoutPlugin { get; } = new();
-		public Mock<ICommandPalettePlugin> CommandPalettePlugin { get; } = new();
-	}
-
-	[Fact]
-	public void Commands()
+	[Theory, AutoSubstituteData]
+	public void Commands(
+		IContext context,
+		ITreeLayoutPlugin treeLayoutPlugin,
+		ICommandPalettePlugin commandPalettePlugin
+	)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutCommandPalettePlugin plugin =
-			new(mocks.Context.Object, mocks.TreeLayoutPlugin.Object, mocks.CommandPalettePlugin.Object);
+		TreeLayoutCommandPalettePlugin plugin = new(context, treeLayoutPlugin, commandPalettePlugin);
 
 		// Then
 		Assert.NotEmpty(plugin.PluginCommands.Commands);
@@ -29,13 +23,15 @@ public class TreeLayoutCommandPalettePluginTests
 		Assert.Equal("Set tree layout direction", plugin.PluginCommands.Commands.First().Title);
 	}
 
-	[Fact]
-	public void SaveState()
+	[Theory, AutoSubstituteData]
+	public void SaveState(
+		IContext context,
+		ITreeLayoutPlugin treeLayoutPlugin,
+		ICommandPalettePlugin commandPalettePlugin
+	)
 	{
 		// Given
-		MocksBuilder mocks = new();
-		TreeLayoutCommandPalettePlugin plugin =
-			new(mocks.Context.Object, mocks.TreeLayoutPlugin.Object, mocks.CommandPalettePlugin.Object);
+		TreeLayoutCommandPalettePlugin plugin = new(context, treeLayoutPlugin, commandPalettePlugin);
 
 		// When
 		JsonElement? state = plugin.SaveState();
