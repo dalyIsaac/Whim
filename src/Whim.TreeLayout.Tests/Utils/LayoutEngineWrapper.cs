@@ -1,39 +1,34 @@
-using Moq;
+using NSubstitute;
 
 namespace Whim.TreeLayout.Tests;
 
 internal class LayoutEngineWrapper
 {
-	public Mock<IContext> Context { get; } = new();
-	public Mock<ITreeLayoutPlugin> Plugin { get; } = new();
-	public Mock<IWorkspaceManager> WorkspaceManager { get; } = new();
-	public Mock<IWorkspace> Workspace { get; } = new();
-	public Mock<IMonitorManager> MonitorManager { get; } = new();
-	public Mock<IMonitor> Monitor { get; } = new();
+	public IContext Context { get; } = Substitute.For<IContext>();
+	public ITreeLayoutPlugin Plugin { get; } = Substitute.For<ITreeLayoutPlugin>();
+	public IWorkspace Workspace { get; } = Substitute.For<IWorkspace>();
+	public IMonitor Monitor { get; } = Substitute.For<IMonitor>();
 	public LayoutEngineIdentity Identity { get; } = new();
 
 	public LayoutEngineWrapper()
 	{
-		Monitor.Setup(m => m.WorkingArea).Returns(new Location<int>() { Width = 100, Height = 100 });
+		Monitor.WorkingArea.Returns(new Location<int>() { Width = 100, Height = 100 });
 
-		WorkspaceManager.Setup(x => x.ActiveWorkspace).Returns(Workspace.Object);
-		MonitorManager.Setup(x => x.ActiveMonitor).Returns(Monitor.Object);
-
-		Context.Setup(x => x.WorkspaceManager).Returns(WorkspaceManager.Object);
-		Context.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
+		Context.WorkspaceManager.ActiveWorkspace.Returns(Workspace);
+		Context.MonitorManager.ActiveMonitor.Returns(Monitor);
 
 		SetAddWindowDirection(Direction.Right);
 	}
 
 	public LayoutEngineWrapper SetAsLastFocusedWindow(IWindow? window)
 	{
-		Workspace.Setup(x => x.LastFocusedWindow).Returns(window);
+		Workspace.LastFocusedWindow.Returns(window);
 		return this;
 	}
 
 	public LayoutEngineWrapper SetAddWindowDirection(Direction direction)
 	{
-		Plugin.Setup(x => x.GetAddWindowDirection(It.IsAny<TreeLayoutEngine>())).Returns(direction);
+		Plugin.GetAddWindowDirection(Arg.Any<TreeLayoutEngine>()).Returns(direction);
 		return this;
 	}
 }

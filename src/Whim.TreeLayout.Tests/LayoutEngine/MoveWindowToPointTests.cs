@@ -12,7 +12,7 @@ public class MoveWindowToPointTests
 		// Given
 		LayoutEngineWrapper wrapper = new();
 		Mock<IWindow> window = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
+		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
@@ -32,11 +32,9 @@ public class MoveWindowToPointTests
 		Mock<IWindow> window2 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
+			window1.Object
+		);
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
@@ -94,11 +92,9 @@ public class MoveWindowToPointTests
 		Mock<IWindow> window2 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
+			window1.Object
+		);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.7 };
 
@@ -156,11 +152,9 @@ public class MoveWindowToPointTests
 		Mock<IWindow> window2 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
+			window1.Object
+		);
 
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.5 };
 
@@ -218,11 +212,9 @@ public class MoveWindowToPointTests
 		Mock<IWindow> window2 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
+			window1.Object
+		);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.3 };
 
@@ -281,7 +273,7 @@ public class MoveWindowToPointTests
 		Mock<IWindow> window3 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object);
 
@@ -307,7 +299,7 @@ public class MoveWindowToPointTests
 		Mock<IWindow> window3 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object);
 
@@ -381,7 +373,7 @@ public class MoveWindowToPointTests
 		Mock<IWindow> window3 = new();
 
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object);
 
@@ -456,11 +448,9 @@ public class MoveWindowToPointTests
 		// Given
 		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window.Object);
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(window.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
+			window.Object
+		);
 
 		IPoint<double> point = new Point<double>() { X = x, Y = y };
 

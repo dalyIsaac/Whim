@@ -12,7 +12,7 @@ public class FocusWindowInDirectionTests
 		Mock<IWindow> focusWindow = new();
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, focusWindow.Object);
@@ -30,11 +30,9 @@ public class FocusWindowInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context.Object,
-			wrapper.Plugin.Object,
-			wrapper.Identity
-		).AddWindow(window1.Object);
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
+			window1.Object
+		);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, focusWindow.Object);
@@ -53,7 +51,7 @@ public class FocusWindowInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object);
 
@@ -74,7 +72,7 @@ public class FocusWindowInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object);
 

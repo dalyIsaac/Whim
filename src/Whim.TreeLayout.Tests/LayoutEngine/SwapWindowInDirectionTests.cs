@@ -12,7 +12,7 @@ public class SwapWindowInDirectionTests
 		// Given
 		LayoutEngineWrapper wrapper = new();
 		Mock<IWindow> window = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
+		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window.Object);
@@ -30,7 +30,7 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object);
 
@@ -82,7 +82,7 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window1 = new();
 		Mock<IWindow> window2 = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object);
 
@@ -135,7 +135,7 @@ public class SwapWindowInDirectionTests
 		Mock<IWindow> window2 = new();
 		Mock<IWindow> window3 = new();
 		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(window1.Object)
 			.AddWindow(window2.Object)
 			.MoveWindowToPoint(window3.Object, new Point<double>() { X = 0.75, Y = 0.75 });
@@ -198,7 +198,7 @@ public class SwapWindowInDirectionTests
 
 		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
 			.AddWindow(topLeft.Object)
 			.AddWindow(topRight.Object)
 			.MoveWindowToPoint(bottomLeft.Object, new Point<double>() { X = 0.25, Y = 0.9 })

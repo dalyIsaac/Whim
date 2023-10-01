@@ -10,7 +10,7 @@ public class DoLayoutTests
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
+		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
 		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };

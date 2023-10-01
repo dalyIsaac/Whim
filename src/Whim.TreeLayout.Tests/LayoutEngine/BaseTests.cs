@@ -8,6 +8,6 @@ public class BaseTests : LayoutEngineBaseTests
 		() =>
 		{
 			LayoutEngineWrapper wrapper = new();
-			return new TreeLayoutEngine(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
+			return new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 		};
 }
