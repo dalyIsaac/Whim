@@ -1,86 +1,77 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
 public class FocusWindowInDirectionTests
 {
-	[Fact]
-	public void FocusWindowInDirection_RootIsNull()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_RootIsNull(IWindow focusWindow)
 	{
 		// Given
-		Mock<IWindow> focusWindow = new();
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Left, focusWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, focusWindow);
 
 		// Then
-		focusWindow.Verify(x => x.Focus(), Times.Never);
+		focusWindow.DidNotReceive().Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_CannotFindWindow()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_CannotFindWindow(IWindow window1, IWindow focusWindow)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> focusWindow = new();
-
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1.Object
+			window1
 		);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Left, focusWindow.Object);
+		engine.FocusWindowInDirection(Direction.Left, focusWindow);
 
 		// Then
-		window1.Verify(x => x.Focus(), Times.Never);
-		focusWindow.Verify(x => x.Focus(), Times.Never);
+		window1.DidNotReceive().Focus();
+		focusWindow.DidNotReceive().Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_CannotFindWindowInDirection()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_CannotFindWindowInDirection(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
+			.AddWindow(window1)
+			.AddWindow(window2);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Left, window1.Object);
+		engine.FocusWindowInDirection(Direction.Left, window1);
 
 		// Then
-		window1.Verify(x => x.Focus(), Times.Never);
-		window2.Verify(x => x.Focus(), Times.Never);
+		window1.DidNotReceive().Focus();
+		window2.DidNotReceive().Focus();
 	}
 
-	[Fact]
-	public void FocusWindowInDirection_FocusRight()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_FocusRight(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-
 		LayoutEngineWrapper wrapper = new();
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object);
+			.AddWindow(window1)
+			.AddWindow(window2);
 
 		// When
-		engine.FocusWindowInDirection(Direction.Right, window1.Object);
+		engine.FocusWindowInDirection(Direction.Right, window1);
 
 		// Then
-		window1.Verify(x => x.Focus(), Times.Never);
-		window2.Verify(x => x.Focus(), Times.Once);
+		window1.DidNotReceive().Focus();
+		window2.Received().Focus();
 	}
 }

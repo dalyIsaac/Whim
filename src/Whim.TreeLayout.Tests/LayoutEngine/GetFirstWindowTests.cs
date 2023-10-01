@@ -1,4 +1,4 @@
-using Moq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
@@ -20,43 +20,38 @@ public class GetFirstWindowTests
 		Assert.Null(result);
 	}
 
-	[Fact]
-	public void GetFirstWindow_RootIsWindow()
+	[Theory, AutoSubstituteData]
+	public void GetFirstWindow_RootIsWindow(IWindow window)
 	{
 		// Given
-		Mock<IWindow> window = new();
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window.Object
+			window
 		);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
 
 		// Then
-		Assert.Same(window.Object, result);
+		Assert.Same(window, result);
 	}
 
-	[Fact]
-	public void GetFirstWindow_RootIsSplitNode()
+	[Theory, AutoSubstituteData]
+	public void GetFirstWindow_RootIsSplitNode(IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
-		Mock<IWindow> window1 = new();
-		Mock<IWindow> window2 = new();
-		Mock<IWindow> window3 = new();
-
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
 
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1.Object)
-			.AddWindow(window2.Object)
-			.AddWindow(window3.Object);
+			.AddWindow(window1)
+			.AddWindow(window2)
+			.AddWindow(window3);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
 
 		// Then
-		Assert.Same(window1.Object, result);
+		Assert.Same(window1, result);
 	}
 }
