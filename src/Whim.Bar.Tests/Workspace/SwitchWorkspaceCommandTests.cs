@@ -46,7 +46,7 @@ public class SwitchWorkspaceCommandTests
 		command.Execute(null);
 
 		// Then
-		context.WorkspaceManager.Received(0).Activate(workspaceModel.Workspace, viewModel.Monitor);
+		context.WorkspaceManager.DidNotReceive().Activate(workspaceModel.Workspace, viewModel.Monitor);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -76,6 +76,6 @@ public class SwitchWorkspaceCommandTests
 		command.Dispose();
 
 		// Then
-		context.WorkspaceManager.Received(0).Activate(workspaceModel.Workspace, viewModel.Monitor);
+		context.WorkspaceManager.DidNotReceive().Activate(workspaceModel.Workspace, viewModel.Monitor);
 	}
 }

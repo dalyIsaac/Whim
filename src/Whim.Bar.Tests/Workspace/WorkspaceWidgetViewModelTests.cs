@@ -1,24 +1,9 @@
 using AutoFixture;
-using AutoFixture.AutoNSubstitute;
-using AutoFixture.Xunit2;
 using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Bar.Tests;
-
-public class WorkspaceWidgetViewModelDataAttribute : AutoDataAttribute
-{
-	public WorkspaceWidgetViewModelDataAttribute()
-		: base(CreateFixture) { }
-
-	private static IFixture CreateFixture()
-	{
-		IFixture fixture = new Fixture();
-		fixture.Customize(new AutoNSubstituteCustomization());
-		fixture.Customize(new WorkspaceWidgetViewModelCustomization());
-		return fixture;
-	}
-}
 
 public class WorkspaceWidgetViewModelCustomization : ICustomization
 {
@@ -37,7 +22,7 @@ public class WorkspaceWidgetViewModelCustomization : ICustomization
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceWidgetViewModelTests
 {
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_WorkspaceAdded_AlreadyExists(IContext context, IMonitor monitor)
 	{
 		// Given
@@ -56,7 +41,7 @@ public class WorkspaceWidgetViewModelTests
 		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 	}
 
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_WorkspaceAdded(IContext context, IMonitor monitor, IWorkspace addedWorkspace)
 	{
 		// Given
@@ -75,7 +60,7 @@ public class WorkspaceWidgetViewModelTests
 		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(addedWorkspace);
 	}
 
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_WorkspaceRemoved(IContext context, IMonitor monitor)
 	{
 		// Given
@@ -92,7 +77,7 @@ public class WorkspaceWidgetViewModelTests
 		Assert.Empty(viewModel.Workspaces);
 	}
 
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_WorkspaceRemoved_DoesNotExist(
 		IContext context,
 		IMonitor monitor,
@@ -115,7 +100,7 @@ public class WorkspaceWidgetViewModelTests
 	}
 
 	#region WorkspaceManager_MonitorWorkspaceChanged
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_MonitorWorkspaceChanged_Deactivate(
 		IContext context,
 		IMonitor monitor,
@@ -142,7 +127,7 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(model.ActiveOnMonitor);
 	}
 
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_MonitorWorkspaceChanged_Activate(
 		IContext context,
 		IMonitor monitor,
@@ -182,7 +167,7 @@ public class WorkspaceWidgetViewModelTests
 		Assert.True(addedWorkspaceModel.ActiveOnMonitor);
 	}
 
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor(
 		IContext context,
 		IMonitor monitor,
@@ -224,7 +209,7 @@ public class WorkspaceWidgetViewModelTests
 	}
 	#endregion
 
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_WorkspaceRenamed_ExistingWorkspace(IContext context, IMonitor monitor)
 	{
 		// Given
@@ -251,7 +236,7 @@ public class WorkspaceWidgetViewModelTests
 		);
 	}
 
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_WorkspaceRenamed_NonExistingWorkspace(
 		IContext context,
 		IMonitor monitor,
@@ -283,7 +268,7 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(propertyChangedRaised);
 	}
 
-	[Theory, WorkspaceWidgetViewModelData]
+	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	[System.Diagnostics.CodeAnalysis.SuppressMessage(
 		"Usage",
 		"NS5000:Received check.",

@@ -1,25 +1,9 @@
 using AutoFixture;
-using AutoFixture.AutoNSubstitute;
-using AutoFixture.Xunit2;
 using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
-
-public class FloatingLayoutCommandsDataAttribute : AutoDataAttribute
-{
-	public FloatingLayoutCommandsDataAttribute()
-		: base(CreateFixture) { }
-
-	private static IFixture CreateFixture()
-	{
-		IFixture fixture = new Fixture();
-		fixture.Customize(new AutoNSubstituteCustomization());
-		fixture.Customize(new FloatingLayoutCommandsCustomization());
-		return fixture;
-	}
-}
 
 public class FloatingLayoutCommandsCustomization : ICustomization
 {
@@ -36,7 +20,7 @@ public class FloatingLayoutCommandsTests
 	private static ICommand CreateSut(IFloatingLayoutPlugin plugin, string id) =>
 		new PluginCommandsTestUtils(new FloatingLayoutCommands(plugin)).GetCommand(id);
 
-	[Theory, FloatingLayoutCommandsData]
+	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
 	public void ToggleWindowFloatingCommand(IFloatingLayoutPlugin plugin)
 	{
 		// Given
@@ -49,7 +33,7 @@ public class FloatingLayoutCommandsTests
 		plugin.Received(1).ToggleWindowFloating(null);
 	}
 
-	[Theory, FloatingLayoutCommandsData]
+	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
 	public void MarkWindowAsFloatingCommand(IFloatingLayoutPlugin plugin)
 	{
 		// Given
@@ -62,7 +46,7 @@ public class FloatingLayoutCommandsTests
 		plugin.Received(1).MarkWindowAsFloating(null);
 	}
 
-	[Theory, FloatingLayoutCommandsData]
+	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
 	public void MarkWindowAsDockedCommand(IFloatingLayoutPlugin plugin)
 	{
 		// Given

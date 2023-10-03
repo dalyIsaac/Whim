@@ -36,7 +36,6 @@
 		</PackageReference>
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
-		<PackageReference Include="Moq" />
 		<PackageReference Include="NSubstitute" />
 		<PackageReference Include="NSubstitute.Analyzers.CSharp" />
 		<PackageReference Include="xunit" />
