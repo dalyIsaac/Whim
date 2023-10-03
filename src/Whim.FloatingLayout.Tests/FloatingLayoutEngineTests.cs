@@ -127,7 +127,7 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		innerLayoutEngine.Received(0).AddWindow(window);
+		innerLayoutEngine.DidNotReceive().AddWindow(window);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -174,7 +174,7 @@ public class FloatingLayoutEngineTests
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
 		innerLayoutEngine.Received(1).RemoveWindow(window);
-		newInnerLayoutEngine.Received(0).AddWindow(window);
+		newInnerLayoutEngine.DidNotReceive().AddWindow(window);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -267,7 +267,7 @@ public class FloatingLayoutEngineTests
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.NotSame(newEngine1, newEngine2);
-		innerLayoutEngine.Received(0).RemoveWindow(window);
+		innerLayoutEngine.DidNotReceive().RemoveWindow(window);
 		_ = plugin.Received(1).FloatingWindows;
 	}
 	#endregion
@@ -334,7 +334,7 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		innerLayoutEngine.Received(0).MoveWindowToPoint(window, location);
+		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, location);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -360,7 +360,7 @@ public class FloatingLayoutEngineTests
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		innerLayoutEngine.Received(0).MoveWindowToPoint(window, location);
+		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, location);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -386,7 +386,7 @@ public class FloatingLayoutEngineTests
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		innerLayoutEngine.Received(0).MoveWindowToPoint(window, location);
+		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, location);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -486,7 +486,7 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		innerLayoutEngine.Received(0).MoveWindowEdgesInDirection(direction, deltas, window);
+		innerLayoutEngine.DidNotReceive().MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -513,7 +513,7 @@ public class FloatingLayoutEngineTests
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		innerLayoutEngine.Received(0).MoveWindowEdgesInDirection(direction, deltas, window);
+		innerLayoutEngine.DidNotReceive().MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -540,7 +540,7 @@ public class FloatingLayoutEngineTests
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		innerLayoutEngine.Received(0).MoveWindowEdgesInDirection(direction, deltas, window);
+		innerLayoutEngine.DidNotReceive().MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -749,8 +749,8 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
-		innerLayoutEngine.Received(0).GetFirstWindow();
-		window.Received(0).Focus();
+		innerLayoutEngine.DidNotReceive().GetFirstWindow();
+		window.DidNotReceive().Focus();
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -773,13 +773,13 @@ public class FloatingLayoutEngineTests
 		engine.AddWindow(window).FocusWindowInDirection(direction, window);
 
 		// Then
-		innerLayoutEngine.Received(0).FocusWindowInDirection(direction, window);
-		innerLayoutEngine.Received(0).GetFirstWindow();
+		innerLayoutEngine.DidNotReceive().FocusWindowInDirection(direction, window);
+		innerLayoutEngine.DidNotReceive().GetFirstWindow();
 
-		newInnerLayoutEngine.Received(0).FocusWindowInDirection(direction, window);
+		newInnerLayoutEngine.DidNotReceive().FocusWindowInDirection(direction, window);
 		newInnerLayoutEngine.Received(1).GetFirstWindow();
 
-		window.Received(0).Focus();
+		window.DidNotReceive().Focus();
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -804,10 +804,10 @@ public class FloatingLayoutEngineTests
 		engine.AddWindow(window).FocusWindowInDirection(direction, window);
 
 		// Then
-		innerLayoutEngine.Received(0).FocusWindowInDirection(direction, window);
-		innerLayoutEngine.Received(0).GetFirstWindow();
+		innerLayoutEngine.DidNotReceive().FocusWindowInDirection(direction, window);
+		innerLayoutEngine.DidNotReceive().GetFirstWindow();
 
-		newInnerLayoutEngine.Received(0).FocusWindowInDirection(direction, window);
+		newInnerLayoutEngine.DidNotReceive().FocusWindowInDirection(direction, window);
 		newInnerLayoutEngine.Received(1).GetFirstWindow();
 
 		window.Received(1).Focus();
@@ -875,7 +875,7 @@ public class FloatingLayoutEngineTests
 		engine.AddWindow(window).SwapWindowInDirection(direction, window);
 
 		// Then
-		innerLayoutEngine.Received(0).SwapWindowInDirection(direction, window);
+		innerLayoutEngine.DidNotReceive().SwapWindowInDirection(direction, window);
 	}
 	#endregion
 
@@ -938,7 +938,7 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		Assert.True(containsWindow);
-		innerLayoutEngine.Received(0).ContainsWindow(window);
+		innerLayoutEngine.DidNotReceive().ContainsWindow(window);
 	}
 	#endregion
 

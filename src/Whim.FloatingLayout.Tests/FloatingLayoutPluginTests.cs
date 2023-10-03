@@ -107,7 +107,7 @@ public class FloatingLayoutPluginTests
 		plugin.PostInitialize();
 
 		// Then
-		context.WorkspaceManager.Received(0).AddProxyLayoutEngine(Arg.Any<CreateProxyLayoutEngine>());
+		context.WorkspaceManager.DidNotReceive().AddProxyLayoutEngine(Arg.Any<CreateProxyLayoutEngine>());
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
@@ -247,7 +247,7 @@ public class FloatingLayoutPluginTests
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
-		activeWorkspace.Received(0).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
+		activeWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
