@@ -32,7 +32,8 @@
 		<PackageReference Include="AutoFixture.AutoNSubstitute" />
 		<PackageReference Include="AutoFixture.Xunit2" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
-		<PackageReference Include="Moq" />
+		<PackageReference Include="NSubstitute" />
+		<PackageReference Include="NSubstitute.Analyzers.CSharp" />
 		<PackageReference Include="xunit" />
 	</ItemGroup>
 
