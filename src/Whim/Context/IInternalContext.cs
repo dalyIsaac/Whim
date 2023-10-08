@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 
 namespace Whim;
 
@@ -17,13 +16,6 @@ internal interface IInternalContext : IDisposable
 	IKeybindHook KeybindHook { get; }
 
 	IMouseHook MouseHook { get; }
-
-	/// <summary>
-	/// This lock is used to prevent <see cref="IWindowManager"/> events from modifying the
-	/// <see cref="MonitorManager"/> and <see cref="WorkspaceManager"/> while a
-	/// <see cref="Workspace.DoLayout"/> layout is occurring.
-	/// </summary>
-	ReaderWriterLockSlim LayoutLock { get; }
 
 	void PreInitialize();
 

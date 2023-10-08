@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -474,23 +472,6 @@ internal interface ICoreNativeManager
 	/// <param name="callback">The task to execute.</param>
 	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
 	bool TryEnqueue(DispatcherQueueHandler callback);
-
-	/// <summary>
-	/// Queues the specified work to run on the thread pool and returns a <see cref="Task{TResult}"/> object that
-	/// represents that work.
-	///
-	/// The cleanup callback is called on the UI thread when the task completes.
-	/// </summary>
-	/// <typeparam name="TWorkResult">Specifies the type of the result returned by the work callback.</typeparam>
-	/// <param name="work">The work to execute asynchronously.</param>
-	/// <param name="cleanup">The cleanup callback to execute when the task completes.</param>
-	/// <param name="cancellationToken">A cancellation token that can be used to cancel the work.</param>
-	/// <returns>A <see cref="Task{TResult}"/> object that represents the work queued to execute in the thread pool.</returns>
-	Task RunTask<TWorkResult>(
-		Func<TWorkResult> work,
-		Action<Task<TWorkResult>> cleanup,
-		CancellationToken cancellationToken
-	);
 
 	/// <summary>
 	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.

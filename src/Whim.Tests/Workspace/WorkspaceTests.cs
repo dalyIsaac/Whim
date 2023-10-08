@@ -1,7 +1,6 @@
 using AutoFixture;
 using NSubstitute;
 using System;
-using System.Threading;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
@@ -10,21 +9,9 @@ namespace Whim.Tests;
 
 public class WorkspaceCustomization : ICustomization
 {
-	[System.Diagnostics.CodeAnalysis.SuppressMessage(
-		"Reliability",
-		"CA2000:Dispose objects before losing scope",
-		Justification = "Unnecessary for tests"
-	)]
 	public void Customize(IFixture fixture)
 	{
 		IInternalContext internalContext = fixture.Freeze<IInternalContext>();
-
-		// Mock the readonly property LayoutLock in InternalContext.
-		ReaderWriterLockSlim layoutLock = new();
-		internalContext.LayoutLock.Returns(layoutLock);
-
-		// Run DoLayout synchronously for tests.
-		WorkspaceTestUtils.SetupDoLayout(internalContext);
 
 		// Assume windows are valid windows.
 		internalContext.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
@@ -77,7 +64,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void TrySetLayoutEngine_CannotFindEngine(
+	internal void TrySetLayoutEngine_CannotFindEngine(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -89,14 +76,14 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When
-		bool result = await workspace.TrySetLayoutEngine("Layout2");
+		bool result = workspace.TrySetLayoutEngine("Layout2");
 
 		// Then
 		Assert.False(result);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void TrySetLayoutEngine_AlreadyActive(
+	internal void TrySetLayoutEngine_AlreadyActive(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -111,14 +98,14 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When
-		bool result = await workspace.TrySetLayoutEngine("Layout");
+		bool result = workspace.TrySetLayoutEngine("Layout");
 
 		// Then
 		Assert.True(result);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void TrySetLayoutEngine_Success(
+	internal void TrySetLayoutEngine_Success(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -133,7 +120,7 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine2 });
 
 		// When
-		bool result = await workspace.TrySetLayoutEngine("Layout2");
+		bool result = workspace.TrySetLayoutEngine("Layout2");
 
 		// Then
 		Assert.True(result);
@@ -153,7 +140,7 @@ public class WorkspaceTests
 
 	#region DoLayout
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void DoLayout_CannotFindMonitorForWorkspace(
+	internal void DoLayout_CannotFindMonitorForWorkspace(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -167,7 +154,7 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When
-		await workspace.DoLayout();
+		workspace.DoLayout();
 
 		// Then
 		layoutEngine.DidNotReceive().DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>());
@@ -176,7 +163,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void DoLayout_MinimizedWindow(
+	internal void DoLayout_MinimizedWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -190,10 +177,10 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 		triggers.WorkspaceLayoutStarted.ClearReceivedCalls();
 		triggers.WorkspaceLayoutCompleted.ClearReceivedCalls();
-		await workspace.WindowMinimizeStart(window);
+		workspace.WindowMinimizeStart(window);
 
 		// Then
 		context.NativeManager.DidNotReceive().ShowWindowNoActivate(Arg.Any<HWND>());
@@ -203,7 +190,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void DoLayout_GarbageCollect_IsNotAWindow(
+	internal void DoLayout_GarbageCollect_IsNotAWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -218,7 +205,7 @@ public class WorkspaceTests
 		internalContext.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(false);
 
 		// When
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// Then the window should have been removed, and the layout didn't start
 		internalContext.WindowManager.Received(1).OnWindowRemoved(window);
@@ -227,7 +214,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void DoLayout_GarbageCollect_HandleIsNotManaged(
+	internal void DoLayout_GarbageCollect_HandleIsNotManaged(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -243,7 +230,7 @@ public class WorkspaceTests
 		internalContext.WindowManager.Windows.ContainsKey(Arg.Any<HWND>()).Returns(false);
 
 		// When
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// Then the window should have been removed, and the layout didn't start
 		internalContext.WindowManager.Received(1).OnWindowRemoved(window);
@@ -273,7 +260,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void ContainsWindow_True_NormalWindow(
+	internal void ContainsWindow_True_NormalWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -284,7 +271,7 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// When
 		bool result = workspace.ContainsWindow(window);
@@ -294,7 +281,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void ContainsWindow_True_MinimizedWindow(
+	internal void ContainsWindow_True_MinimizedWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -305,8 +292,8 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
-		await workspace.WindowMinimizeStart(window);
+		workspace.AddWindow(window);
+		workspace.WindowMinimizeStart(window);
 
 		// When
 		bool result = workspace.ContainsWindow(window);
@@ -317,7 +304,7 @@ public class WorkspaceTests
 
 	#region WindowFocused
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void WindowFocused_ContainsWindow(
+	internal void WindowFocused_ContainsWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -328,7 +315,7 @@ public class WorkspaceTests
 		// Given the window is in the workspace
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// When
 		workspace.WindowFocused(window);
@@ -399,7 +386,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void NextLayoutEngine(
+	internal void NextLayoutEngine(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -412,14 +399,14 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine2 });
 
 		// When NextLayoutEngine is called
-		await workspace.NextLayoutEngine();
+		workspace.NextLayoutEngine();
 
 		// Then the active layout engine is set to the next one
 		Assert.True(Object.ReferenceEquals(layoutEngine2, workspace.ActiveLayoutEngine));
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void NextLayoutEngine_LastEngine(
+	internal void NextLayoutEngine_LastEngine(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -432,15 +419,15 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine2 });
 
 		// When NextLayoutEngine is called
-		await workspace.NextLayoutEngine();
-		await workspace.NextLayoutEngine();
+		workspace.NextLayoutEngine();
+		workspace.NextLayoutEngine();
 
 		// Then the active layout engine is set to the first one
 		Assert.True(Object.ReferenceEquals(layoutEngine, workspace.ActiveLayoutEngine));
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void PreviousLayoutEngine(
+	internal void PreviousLayoutEngine(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -453,14 +440,14 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine2 });
 
 		// When PreviousLayoutEngine is called
-		await workspace.PreviousLayoutEngine();
+		workspace.PreviousLayoutEngine();
 
 		// Then the active layout engine is set to the previous one
 		Assert.True(Object.ReferenceEquals(layoutEngine2, workspace.ActiveLayoutEngine));
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void PreviousLayoutEngine_FirstEngine(
+	internal void PreviousLayoutEngine_FirstEngine(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -473,15 +460,15 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine2 });
 
 		// When PreviousLayoutEngine is called
-		await workspace.PreviousLayoutEngine();
-		await workspace.PreviousLayoutEngine();
+		workspace.PreviousLayoutEngine();
+		workspace.PreviousLayoutEngine();
 
 		// Then the active layout engine is set to the last one
 		Assert.True(Object.ReferenceEquals(layoutEngine, workspace.ActiveLayoutEngine));
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void AddWindow_Fails_AlreadyIncludesWindow(
+	internal void AddWindow_Fails_AlreadyIncludesWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -494,8 +481,8 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When AddWindow is called
-		await workspace.AddWindow(window);
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// Then the window is added to the layout engine
 		layoutEngine.Received(1).AddWindow(window);
@@ -503,7 +490,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void AddWindow_Success(
+	internal void AddWindow_Success(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -516,7 +503,7 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When AddWindow is called
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// Then the window is added to the layout engine
 		layoutEngine.Received(1).AddWindow(window);
@@ -524,7 +511,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void RemoveWindow_Fails_AlreadyRemoved(
+	internal void RemoveWindow_Fails_AlreadyRemoved(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -537,8 +524,8 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When RemoveWindow is called
-		await workspace.RemoveWindow(window);
-		bool result = await workspace.RemoveWindow(window);
+		workspace.RemoveWindow(window);
+		bool result = workspace.RemoveWindow(window);
 
 		// Then the window is removed from the layout engine
 		Assert.False(result);
@@ -547,7 +534,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void RemoveWindow_Fails_DidNotRemoveFromLayoutEngine(
+	internal void RemoveWindow_Fails_DidNotRemoveFromLayoutEngine(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -558,7 +545,7 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		internalContext.CoreNativeManager.ClearReceivedCalls();
 
@@ -566,7 +553,7 @@ public class WorkspaceTests
 		givenEngine.RemoveWindow(window).Returns(givenEngine);
 
 		// When RemoveWindow is called
-		bool result = await workspace.RemoveWindow(window);
+		bool result = workspace.RemoveWindow(window);
 
 		// Then the window is removed from the layout engine
 		Assert.False(result);
@@ -575,7 +562,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void RemoveWindow_Success(
+	internal void RemoveWindow_Success(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -586,7 +573,7 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 		workspace.WindowFocused(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
@@ -594,7 +581,7 @@ public class WorkspaceTests
 		internalContext.CoreNativeManager.ClearReceivedCalls();
 
 		// When RemoveWindow is called
-		bool result = await workspace.RemoveWindow(window);
+		bool result = workspace.RemoveWindow(window);
 
 		// Then the window is removed from the layout engine
 		Assert.True(result);
@@ -603,7 +590,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void RemoveWindow_MinimizedWindow(
+	internal void RemoveWindow_MinimizedWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -615,14 +602,14 @@ public class WorkspaceTests
 		window.IsMinimized.Returns(true);
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
-		await workspace.WindowMinimizeStart(window);
+		workspace.AddWindow(window);
+		workspace.WindowMinimizeStart(window);
 
 		context.WorkspaceManager.ClearReceivedCalls();
 		internalContext.CoreNativeManager.ClearReceivedCalls();
 
 		// When RemoveWindow is called
-		bool result = await workspace.RemoveWindow(window);
+		bool result = workspace.RemoveWindow(window);
 
 		// Then the window is not removed from the layout engine
 		Assert.True(result);
@@ -651,7 +638,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void FocusWindowInDirection_Fails_WindowIsMinimized(
+	internal void FocusWindowInDirection_Fails_WindowIsMinimized(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -662,8 +649,8 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
-		await workspace.WindowMinimizeStart(window);
+		workspace.AddWindow(window);
+		workspace.WindowMinimizeStart(window);
 
 		// When FocusWindowInDirection is called
 		workspace.FocusWindowInDirection(Direction.Up, window);
@@ -673,7 +660,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void FocusWindowInDirection_Success(
+	internal void FocusWindowInDirection_Success(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -684,7 +671,7 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// When FocusWindowInDirection is called
 		workspace.FocusWindowInDirection(Direction.Up, window);
@@ -694,7 +681,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void SwapWindowInDirection_Fails_WindowIsNull(
+	internal void SwapWindowInDirection_Fails_WindowIsNull(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -706,14 +693,14 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When SwapWindowInDirection is called
-		await workspace.SwapWindowInDirection(Direction.Up, null);
+		workspace.SwapWindowInDirection(Direction.Up, null);
 
 		// Then the layout engine is not told to swap the window
 		layoutEngine.DidNotReceive().SwapWindowInDirection(Direction.Up, Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void SwapWindowInDirection_Fails_DoesNotContainWindow(
+	internal void SwapWindowInDirection_Fails_DoesNotContainWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -726,14 +713,14 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When SwapWindowInDirection is called
-		await workspace.SwapWindowInDirection(Direction.Up, window);
+		workspace.SwapWindowInDirection(Direction.Up, window);
 
 		// Then the layout engine is not told to swap the window
 		layoutEngine.DidNotReceive().SwapWindowInDirection(Direction.Up, window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void SwapWindowInDirection_Success(
+	internal void SwapWindowInDirection_Success(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -744,19 +731,19 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When SwapWindowInDirection is called
-		await workspace.SwapWindowInDirection(Direction.Up, window);
+		workspace.SwapWindowInDirection(Direction.Up, window);
 
 		// Then the layout engine is told to swap the window
 		givenEngine.Received(1).SwapWindowInDirection(Direction.Up, window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void MoveWindowEdgesInDirection_Fails_WindowIsNull(
+	internal void MoveWindowEdgesInDirection_Fails_WindowIsNull(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -769,14 +756,14 @@ public class WorkspaceTests
 		IPoint<double> deltas = new Point<double>() { X = 0.3, Y = 0 };
 
 		// When MoveWindowEdgesInDirection is called
-		await workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, null);
+		workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, null);
 
 		// Then the layout engine is not told to move the window
 		layoutEngine.DidNotReceive().MoveWindowEdgesInDirection(Direction.Up, deltas, Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void MoveWindowEdgesInDirection_Fails_DoesNotContainWindow(
+	internal void MoveWindowEdgesInDirection_Fails_DoesNotContainWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -790,14 +777,14 @@ public class WorkspaceTests
 		IPoint<double> deltas = new Point<double>() { X = 0.3, Y = 0 };
 
 		// When MoveWindowEdgesInDirection is called
-		await workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window);
+		workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window);
 
 		// Then the layout engine is not told to move the window
 		layoutEngine.DidNotReceive().MoveWindowEdgesInDirection(Direction.Up, deltas, window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void MoveWindowEdgesInDirection_Success(
+	internal void MoveWindowEdgesInDirection_Success(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -808,19 +795,19 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 		IPoint<double> deltas = new Point<double>() { X = 0.3, Y = 0 };
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowEdgesInDirection is called
-		await workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window);
+		workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window);
 
 		// Then the layout engine is told to move the window
 		givenEngine.Received(1).MoveWindowEdgesInDirection(Direction.Up, deltas, window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void MoveWindowToPoint_Success_AddWindow(
+	internal void MoveWindowToPoint_Success_AddWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -834,7 +821,7 @@ public class WorkspaceTests
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
 		// When MoveWindowToPoint is called
-		await workspace.MoveWindowToPoint(window, point);
+		workspace.MoveWindowToPoint(window, point);
 
 		// Then the layout engine is told to move the window
 		layoutEngine.Received(1).MoveWindowToPoint(window, point);
@@ -842,7 +829,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void MoveWindowToPoint_Success_WindowIsMinimized(
+	internal void MoveWindowToPoint_Success_WindowIsMinimized(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -855,13 +842,13 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
-		await workspace.AddWindow(window);
-		await workspace.WindowMinimizeStart(window);
+		workspace.AddWindow(window);
+		workspace.WindowMinimizeStart(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowToPoint is called
-		await workspace.MoveWindowToPoint(window, point);
+		workspace.MoveWindowToPoint(window, point);
 
 		// Then the layout engine is told to move the window
 		givenEngine.Received(1).MoveWindowToPoint(window, point);
@@ -869,7 +856,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void MoveWindowToPoint_Success_WindowAlreadyExists(
+	internal void MoveWindowToPoint_Success_WindowAlreadyExists(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -880,13 +867,13 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowToPoint is called
-		await workspace.MoveWindowToPoint(window, point);
+		workspace.MoveWindowToPoint(window, point);
 
 		// Then the layout engine is told to remove and add the window
 		givenEngine.Received(1).MoveWindowToPoint(window, point);
@@ -912,7 +899,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void Deactivate(
+	internal void Deactivate(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -924,8 +911,8 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
-		await workspace.AddWindow(window2);
+		workspace.AddWindow(window);
+		workspace.AddWindow(window2);
 		internalContext.CoreNativeManager.ClearReceivedCalls();
 
 		// When Deactivate is called
@@ -938,7 +925,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void TryGetWindowLocation(
+	internal void TryGetWindowLocation(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -965,7 +952,7 @@ public class WorkspaceTests
 
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// When TryGetWindowLocation is called
 		IWindowState? result = workspace.TryGetWindowLocation(window);
@@ -975,7 +962,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void TryGetWindowLocation_MinimizedWindow(
+	internal void TryGetWindowLocation_MinimizedWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -988,8 +975,8 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		// When
-		await workspace.AddWindow(window);
-		await workspace.WindowMinimizeStart(window);
+		workspace.AddWindow(window);
+		workspace.WindowMinimizeStart(window);
 		IWindowState windowState = workspace.TryGetWindowLocation(window)!;
 
 		// Then
@@ -1002,7 +989,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void Dispose(
+	internal void Dispose(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -1015,7 +1002,7 @@ public class WorkspaceTests
 
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		// When Dispose is called
 		workspace.Dispose();
@@ -1025,7 +1012,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void WindowMinimizeStart(
+	internal void WindowMinimizeStart(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -1036,19 +1023,19 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When WindowMinimizeStart is called
-		await workspace.WindowMinimizeStart(window);
+		workspace.WindowMinimizeStart(window);
 
 		// Then
 		givenEngine.Received(1).RemoveWindow(window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void WindowMinimizeStart_Twice(
+	internal void WindowMinimizeStart_Twice(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -1059,20 +1046,20 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		workspace.ActiveLayoutEngine.RemoveWindow(window).Returns(workspace.ActiveLayoutEngine);
 
 		// When WindowMinimizeStart is called
-		await workspace.WindowMinimizeStart(window);
-		await workspace.WindowMinimizeStart(window);
+		workspace.WindowMinimizeStart(window);
+		workspace.WindowMinimizeStart(window);
 
 		// Then the window is only removed the first time
 		workspace.ActiveLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void WindowMinimizeEnd(
+	internal void WindowMinimizeEnd(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -1083,20 +1070,20 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
-		await workspace.WindowMinimizeStart(window);
+		workspace.AddWindow(window);
+		workspace.WindowMinimizeStart(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When WindowMinimizeEnd is called
-		await workspace.WindowMinimizeEnd(window);
+		workspace.WindowMinimizeEnd(window);
 
 		// Then
 		givenEngine.Received(1).AddWindow(window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal async void WindowMinimizeEnd_NotMinimized(
+	internal void WindowMinimizeEnd_NotMinimized(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -1107,12 +1094,12 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		await workspace.AddWindow(window);
+		workspace.AddWindow(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When WindowMinimizeEnd is called
-		await workspace.WindowMinimizeEnd(window);
+		workspace.WindowMinimizeEnd(window);
 
 		// Then
 		givenEngine.DidNotReceive().AddWindow(window);

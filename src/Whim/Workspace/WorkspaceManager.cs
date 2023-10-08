@@ -208,7 +208,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return false;
 		}
 
-		_internalContext.LayoutLock.EnterWriteLock();
 		// Remap windows to the first workspace which isn't active.
 		IWorkspace workspaceToActivate = _workspaces[^1];
 		foreach (IWorkspace w in _workspaces)
@@ -224,7 +223,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		{
 			_windowWorkspaceMap[window] = workspaceToActivate;
 		}
-		_internalContext.LayoutLock.ExitWriteLock();
 
 		foreach (IWindow window in workspace.Windows)
 		{
@@ -261,7 +259,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	public void Activate(IWorkspace workspace, IMonitor? activeMonitor = null)
 	{
-		_internalContext.LayoutLock.EnterWriteLock();
 		Logger.Debug($"Activating workspace {workspace}");
 
 		activeMonitor ??= _context.MonitorManager.ActiveMonitor;
@@ -283,7 +280,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			_monitorWorkspaceMap[loserMonitor] = oldWorkspace;
 			layoutOldWorkspace = (oldWorkspace, loserMonitor);
 		}
-		_internalContext.LayoutLock.ExitWriteLock();
 
 		if (layoutOldWorkspace is (IWorkspace, IMonitor) oldWorkspaceValue)
 		{
@@ -392,7 +388,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	#region Windows
 	public void WindowAdded(IWindow window)
 	{
-		_internalContext.LayoutLock.EnterWriteLock();
 		Logger.Debug($"Adding window {window}");
 		IWorkspace? workspace = _context.RouterManager.RouteWindow(window);
 
@@ -407,7 +402,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		workspace ??= ActiveWorkspace;
 
 		_windowWorkspaceMap[window] = workspace;
-		_internalContext.LayoutLock.ExitWriteLock();
 
 		workspace.AddWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
@@ -416,18 +410,16 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	public void WindowRemoved(IWindow window)
 	{
-		_internalContext.LayoutLock.EnterWriteLock();
 		Logger.Debug($"Window removed: {window}");
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-			_internalContext.LayoutLock.ExitWriteLock();
+
 			return;
 		}
 
 		_windowWorkspaceMap.Remove(window);
-		_internalContext.LayoutLock.ExitWriteLock();
 
 		workspace.RemoveWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
@@ -456,32 +448,28 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	public void WindowMinimizeStart(IWindow window)
 	{
-		_internalContext.LayoutLock.EnterWriteLock();
 		Logger.Debug($"Window minimize start: {window}");
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-			_internalContext.LayoutLock.ExitWriteLock();
+
 			return;
 		}
-		_internalContext.LayoutLock.ExitWriteLock();
 
 		((IInternalWorkspace)workspace).WindowMinimizeStart(window);
 	}
 
 	public void WindowMinimizeEnd(IWindow window)
 	{
-		_internalContext.LayoutLock.EnterWriteLock();
 		Logger.Debug($"Window minimize end: {window}");
 
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-			_internalContext.LayoutLock.ExitWriteLock();
+
 			return;
 		}
-		_internalContext.LayoutLock.ExitWriteLock();
 
 		((IInternalWorkspace)workspace).WindowMinimizeEnd(window);
 	}
@@ -566,14 +554,13 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
 	{
-		_internalContext.LayoutLock.EnterWriteLock();
 		window ??= ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
 		if (window == null)
 		{
 			Logger.Error("No window was found");
-			_internalContext.LayoutLock.ExitWriteLock();
+
 			return;
 		}
 
@@ -583,12 +570,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? currentWorkspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-			_internalContext.LayoutLock.ExitWriteLock();
+
 			return;
 		}
 
 		_windowWorkspaceMap[window] = workspace;
-		_internalContext.LayoutLock.ExitWriteLock();
 
 		currentWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
@@ -653,7 +639,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point)
 	{
-		_internalContext.LayoutLock.EnterWriteLock();
 		Logger.Debug($"Moving window {window} to location {point}");
 
 		// Get the monitor.
@@ -664,7 +649,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		if (targetWorkspace == null)
 		{
 			Logger.Error($"Monitor {targetMonitor} was not found to correspond to any workspace");
-			_internalContext.LayoutLock.ExitWriteLock();
+
 			return;
 		}
 
@@ -673,7 +658,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		if (oldWorkspace == null)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-			_internalContext.LayoutLock.ExitWriteLock();
+
 			return;
 		}
 
@@ -682,7 +667,6 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		{
 			_windowWorkspaceMap[window] = targetWorkspace;
 		}
-		_internalContext.LayoutLock.ExitWriteLock();
 
 		// Normalize `point` into the unit square.
 		IPoint<int> pointInMonitor = targetMonitor.WorkingArea.ToMonitorCoordinates(point);

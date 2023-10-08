@@ -5,8 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Whim.TestUtils;
 using Xunit;
 
@@ -44,14 +42,6 @@ public class WorkspaceManagerCustomization : ICustomization
 
 		IContext ctx = fixture.Freeze<IContext>();
 		WorkspaceManagerTests.SetupMonitors(ctx, monitors);
-
-		// Create the lock.
-		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-		ReaderWriterLockSlim layoutLock = new();
-		internalCtx.LayoutLock.Returns(layoutLock);
-
-		// Set up DoLayout
-		WorkspaceTestUtils.SetupDoLayout(internalCtx);
 
 		// Don't route things.
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
@@ -229,7 +219,7 @@ public class WorkspaceManagerTests
 
 		// Then it returns false, as there must be at least two workspaces, since there are two monitors
 		Assert.False(result);
-		workspaces[1].DidNotReceive().DoLayout(null);
+		workspaces[1].DidNotReceive().DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -268,7 +258,7 @@ public class WorkspaceManagerTests
 
 		// and the window is added to the last remaining workspace
 		workspaces[1].Received(1).AddWindow(window);
-		workspaces[1].Received(1).DoLayout(null);
+		workspaces[1].Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -343,7 +333,16 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(workspaces, workspaceManager);
+		IEnumerator<IWorkspace> enumerator = workspaceManager.GetEnumerator();
+		List<IWorkspace> enumeratedWorkspaces = new();
+
+		while (enumerator.MoveNext())
+		{
+			enumeratedWorkspaces.Add(enumerator.Current);
+		}
+
+		// Then
+		Assert.Equal(workspaces, enumeratedWorkspaces);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -354,7 +353,16 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(workspaces, (IEnumerable)workspaceManager);
+		IEnumerator enumerator = ((IEnumerable)workspaceManager).GetEnumerator();
+		List<IWorkspace> enumeratedWorkspaces = new();
+
+		while (enumerator.MoveNext())
+		{
+			enumeratedWorkspaces.Add((IWorkspace)enumerator.Current);
+		}
+
+		// Then
+		Assert.Equal(workspaces, enumeratedWorkspaces);
 	}
 	#endregion
 
@@ -377,7 +385,7 @@ public class WorkspaceManagerTests
 		Assert.Null(result.Arguments.PreviousWorkspace);
 
 		// Layout is done, and the first window is focused.
-		workspace.Received(1).DoLayout(null);
+		workspace.Received(1).DoLayout();
 		workspace.Received(1).FocusFirstWindow();
 	}
 
@@ -412,8 +420,8 @@ public class WorkspaceManagerTests
 		// The old workspace is deactivated, the new workspace is laid out, and the first window is
 		// focused.
 		previousWorkspace.Received(1).Deactivate();
-		previousWorkspace.DidNotReceive().DoLayout(null);
-		currentWorkspace.Received(1).DoLayout(null);
+		previousWorkspace.DidNotReceive().DoLayout();
+		currentWorkspace.Received(1).DoLayout();
 		currentWorkspace.Received(1).FocusFirstWindow();
 	}
 
@@ -444,11 +452,11 @@ public class WorkspaceManagerTests
 		Assert.Equal(workspaces[0], result.Arguments.PreviousWorkspace);
 
 		workspaces[0].DidNotReceive().Deactivate();
-		workspaces[0].Received(1).DoLayout(null);
+		workspaces[0].Received(1).DoLayout();
 		workspaces[0].DidNotReceive().FocusFirstWindow();
 
 		workspaces[1].DidNotReceive().Deactivate();
-		workspaces[1].Received(1).DoLayout(null);
+		workspaces[1].Received(1).DoLayout();
 		workspaces[1].Received(1).FocusFirstWindow();
 	}
 
@@ -471,11 +479,11 @@ public class WorkspaceManagerTests
 		workspaceManager.ActivatePrevious();
 
 		workspaces[currentIdx].Received(1).Deactivate();
-		workspaces[currentIdx].DidNotReceive().DoLayout(null);
+		workspaces[currentIdx].DidNotReceive().DoLayout();
 		workspaces[currentIdx].DidNotReceive().FocusFirstWindow();
 
 		workspaces[prevIdx].DidNotReceive().Deactivate();
-		workspaces[prevIdx].Received(1).DoLayout(null);
+		workspaces[prevIdx].Received(1).DoLayout();
 		workspaces[prevIdx].Received(1).FocusFirstWindow();
 	}
 
@@ -497,11 +505,11 @@ public class WorkspaceManagerTests
 		workspaceManager.ActivatePrevious();
 
 		workspaces[0].DidNotReceive().Deactivate();
-		workspaces[0].DidNotReceive().DoLayout(null);
+		workspaces[0].DidNotReceive().DoLayout();
 		workspaces[0].DidNotReceive().FocusFirstWindow();
 
 		workspaces[1].DidNotReceive().Deactivate();
-		workspaces[1].DidNotReceive().DoLayout(null);
+		workspaces[1].DidNotReceive().DoLayout();
 		workspaces[1].DidNotReceive().FocusFirstWindow();
 	}
 
@@ -524,11 +532,11 @@ public class WorkspaceManagerTests
 		workspaceManager.ActivateNext();
 
 		workspaces[currentIdx].Received(1).Deactivate();
-		workspaces[currentIdx].DidNotReceive().DoLayout(null);
+		workspaces[currentIdx].DidNotReceive().DoLayout();
 		workspaces[currentIdx].DidNotReceive().FocusFirstWindow();
 
 		workspaces[nextIdx].DidNotReceive().Deactivate();
-		workspaces[nextIdx].Received(1).DoLayout(null);
+		workspaces[nextIdx].Received(1).DoLayout();
 		workspaces[nextIdx].Received(1).FocusFirstWindow();
 	}
 
@@ -550,11 +558,11 @@ public class WorkspaceManagerTests
 		workspaceManager.ActivateNext();
 
 		workspaces[0].DidNotReceive().Deactivate();
-		workspaces[0].DidNotReceive().DoLayout(null);
+		workspaces[0].DidNotReceive().DoLayout();
 		workspaces[0].DidNotReceive().FocusFirstWindow();
 
 		workspaces[1].DidNotReceive().Deactivate();
-		workspaces[1].DidNotReceive().DoLayout(null);
+		workspaces[1].DidNotReceive().DoLayout();
 		workspaces[1].DidNotReceive().FocusFirstWindow();
 	}
 	#endregion
@@ -612,8 +620,8 @@ public class WorkspaceManagerTests
 		workspaceManager.LayoutAllActiveWorkspaces();
 
 		// Then all active workspaces are laid out
-		workspaces[0].Received(1).DoLayout(null);
-		workspaces[1].Received(1).DoLayout(null);
+		workspaces[0].Received(1).DoLayout();
+		workspaces[1].Received(1).DoLayout();
 	}
 
 	#region WindowAdded
@@ -1120,7 +1128,7 @@ public class WorkspaceManagerTests
 		targetWorkspace.ClearReceivedCalls();
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[1]);
-		activeWorkspace.RemoveWindow(window).Returns(Task.FromResult(true));
+		activeWorkspace.RemoveWindow(window).Returns(true);
 
 		// When a window is moved to a point
 		workspaceManager.MoveWindowToPoint(window, new Point<int>());
@@ -1157,7 +1165,7 @@ public class WorkspaceManagerTests
 		activeWorkspace.ClearReceivedCalls();
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[0]);
-		activeWorkspace.RemoveWindow(window).Returns(Task.FromResult(true));
+		activeWorkspace.RemoveWindow(window).Returns(true);
 
 		// When a window is moved to a point
 		workspaceManager.MoveWindowToPoint(window, new Point<int>());
@@ -1210,7 +1218,7 @@ public class WorkspaceManagerTests
 		workspaceManager.WindowFocused(window);
 
 		// Then the first workspace is activated
-		workspaces[0].Received(1).DoLayout(null);
+		workspaces[0].Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1229,8 +1237,8 @@ public class WorkspaceManagerTests
 			.WindowFocused(null);
 		((IInternalWorkspace)workspaces[1]).Received(1).WindowFocused(null);
 
-		workspaces[0].DidNotReceive().DoLayout(null);
-		workspaces[1].DidNotReceive().DoLayout(null);
+		workspaces[0].DidNotReceive().DoLayout();
+		workspaces[1].DidNotReceive().DoLayout();
 	}
 	#endregion
 
@@ -1412,9 +1420,9 @@ public class WorkspaceManagerTests
 		);
 
 		// Then the workspace is activated
-		workspaces[0].Received(1).DoLayout(null);
-		workspaces[1].Received(1).DoLayout(null);
-		workspaces[2].Received(2).DoLayout(null);
+		workspaces[0].Received(1).DoLayout();
+		workspaces[1].Received(1).DoLayout();
+		workspaces[2].Received(2).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1505,7 +1513,7 @@ public class WorkspaceManagerTests
 		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
 			h => workspaceManager.ActiveLayoutEngineChanged += h,
 			h => workspaceManager.ActiveLayoutEngineChanged -= h,
-			async () => await workspaceManager.ActiveWorkspace.NextLayoutEngine()
+			workspaceManager.ActiveWorkspace.NextLayoutEngine
 		);
 	}
 
@@ -1599,7 +1607,7 @@ public class WorkspaceManagerTests
 		Assert.Raises<WorkspaceEventArgs>(
 			h => workspaceManager.WorkspaceLayoutStarted += h,
 			h => workspaceManager.WorkspaceLayoutStarted -= h,
-			() => workspace.DoLayout(null)
+			workspace.DoLayout
 		);
 	}
 
@@ -1623,7 +1631,7 @@ public class WorkspaceManagerTests
 		// Then starting the layout should trigger the event
 		try
 		{
-			workspace.DoLayout(null);
+			workspace.DoLayout();
 		}
 		catch
 		{
@@ -1652,7 +1660,7 @@ public class WorkspaceManagerTests
 		Assert.Raises<WorkspaceEventArgs>(
 			h => workspaceManager.WorkspaceLayoutCompleted += h,
 			h => workspaceManager.WorkspaceLayoutCompleted -= h,
-			() => workspace.DoLayout(null)
+			workspace.DoLayout
 		);
 	}
 
@@ -1676,7 +1684,7 @@ public class WorkspaceManagerTests
 		// Then completing the layout should trigger the event
 		try
 		{
-			workspace.DoLayout(null);
+			workspace.DoLayout();
 		}
 		catch
 		{

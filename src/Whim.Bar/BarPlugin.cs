@@ -53,7 +53,8 @@ public class BarPlugin : IBarPlugin
 		// Remove the removed monitors
 		foreach (IMonitor monitor in e.RemovedMonitors)
 		{
-			_monitorBarMap[monitor]?.Close();
+			_monitorBarMap.TryGetValue(monitor, out BarWindow? value);
+			value?.Close();
 			_monitorBarMap.Remove(monitor);
 		}
 

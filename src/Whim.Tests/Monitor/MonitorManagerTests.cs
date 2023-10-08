@@ -4,12 +4,12 @@ using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -19,13 +19,9 @@ namespace Whim.Tests;
 
 internal class MonitorManagerCustomization : ICustomization
 {
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	public void Customize(IFixture fixture)
 	{
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-
-		internalCtx.LayoutLock.Returns(new ReaderWriterLockSlim());
-
 		UpdateGetCurrentMonitors(
 			internalCtx,
 			new[]
@@ -162,6 +158,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	[SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void Initialize(IInternalContext internalCtx)
 	{
 		// Given
@@ -614,6 +611,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	[SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void Dispose(IInternalContext internalCtx)
 	{
 		// Given
@@ -675,4 +673,44 @@ public class MonitorManagerTests
 		// Then
 		Assert.Equal(monitor2, monitorManager.ActiveMonitor);
 	}
+
+	#region GetEnumerator
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetEnumerator(IInternalContext internalCtx)
+	{
+		// Given
+		MonitorManager monitorManager = new(internalCtx);
+
+		// When
+		IEnumerator<IMonitor> enumerator = monitorManager.GetEnumerator();
+		List<IMonitor> monitors = new();
+
+		while (enumerator.MoveNext())
+		{
+			monitors.Add(enumerator.Current);
+		}
+
+		// Then
+		Assert.Equal(monitorManager.ToList(), monitors);
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetEnumerator_Explicit(IInternalContext internalCtx)
+	{
+		// Given
+		MonitorManager monitorManager = new(internalCtx);
+
+		// When
+		IEnumerator enumerator = ((IEnumerable)monitorManager).GetEnumerator();
+		List<IMonitor> monitors = new();
+
+		while (enumerator.MoveNext())
+		{
+			monitors.Add((IMonitor)enumerator.Current);
+		}
+
+		// Then
+		Assert.Equal(monitorManager.ToList(), monitors);
+	}
+	#endregion
 }

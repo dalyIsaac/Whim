@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
@@ -293,18 +291,6 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public bool TryEnqueue(DispatcherQueueHandler callback) =>
 		DispatcherQueue.GetForCurrentThread().TryEnqueue(callback);
-
-	public Task RunTask<TWorkResult>(
-		Func<TWorkResult> work,
-		Action<Task<TWorkResult>> cleanup,
-		CancellationToken cancellationToken
-	)
-	{
-		TaskScheduler uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-
-		return Task.Run(work, cancellationToken)
-			.ContinueWith(cleanup, cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, uiScheduler);
-	}
 
 	private Microsoft.UI.Xaml.Window? _window;
 
