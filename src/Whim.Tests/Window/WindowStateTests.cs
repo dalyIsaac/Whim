@@ -1,12 +1,12 @@
-using Moq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
 public class WindowStateTests
 {
-	[Fact]
-	public void Equals_NotWindowState()
+	[Theory, AutoSubstituteData]
+	public void Equals_NotWindowState(IWindow window)
 	{
 		// Given
 		WindowState windowState =
@@ -14,7 +14,7 @@ public class WindowStateTests
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = new Mock<IWindow>().Object
+				Window = window
 			};
 
 		// When
@@ -24,24 +24,23 @@ public class WindowStateTests
 		Assert.False(result);
 	}
 
-	[Fact]
-	public void Equals_DifferentLocation()
+	[Theory, AutoSubstituteData]
+	public void Equals_DifferentLocation(IWindow window)
 	{
 		// Given
-		Mock<IWindow> windowMock = new();
 		WindowState windowState1 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock.Object
+				Window = window
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Location = new Location<int>() { X = 1, Y = 1 },
 				WindowSize = WindowSize.Normal,
-				Window = windowMock.Object
+				Window = window
 			};
 
 		// When
@@ -51,24 +50,23 @@ public class WindowStateTests
 		Assert.False(result);
 	}
 
-	[Fact]
-	public void Equals_DifferentWindowSize()
+	[Theory, AutoSubstituteData]
+	public void Equals_DifferentWindowSize(IWindow window)
 	{
 		// Given
-		Mock<IWindow> windowMock = new();
 		WindowState windowState1 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock.Object
+				Window = window
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Maximized,
-				Window = windowMock.Object
+				Window = window
 			};
 
 		// When
@@ -78,25 +76,23 @@ public class WindowStateTests
 		Assert.False(result);
 	}
 
-	[Fact]
-	public void Equals_DifferentWindow()
+	[Theory, AutoSubstituteData]
+	public void Equals_DifferentWindow(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> windowMock1 = new();
-		Mock<IWindow> windowMock2 = new();
 		WindowState windowState1 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock1.Object
+				Window = window1
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock2.Object
+				Window = window2
 			};
 
 		// When
@@ -106,24 +102,23 @@ public class WindowStateTests
 		Assert.False(result);
 	}
 
-	[Fact]
-	public void Equals_Success()
+	[Theory, AutoSubstituteData]
+	public void Equals_Success(IWindow window)
 	{
 		// Given
-		Mock<IWindow> windowMock = new();
 		WindowState windowState1 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock.Object
+				Window = window
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock.Object
+				Window = window
 			};
 
 		// When
@@ -133,24 +128,23 @@ public class WindowStateTests
 		Assert.True(result);
 	}
 
-	[Fact]
-	public void Equals_Operator_Success()
+	[Theory, AutoSubstituteData]
+	public void Equals_Operator_Success(IWindow window)
 	{
 		// Given
-		Mock<IWindow> windowMock = new();
 		WindowState windowState1 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock.Object
+				Window = window
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock.Object
+				Window = window
 			};
 
 		// When
@@ -160,25 +154,23 @@ public class WindowStateTests
 		Assert.True(result);
 	}
 
-	[Fact]
-	public void NotEquals_Operator_Success()
+	[Theory, AutoSubstituteData]
+	public void NotEquals_Operator_Success(IWindow window1, IWindow window2)
 	{
 		// Given
-		Mock<IWindow> windowMock1 = new();
-		Mock<IWindow> windowMock2 = new();
 		WindowState windowState1 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock1.Object
+				Window = window1
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = windowMock2.Object
+				Window = window2
 			};
 
 		// When

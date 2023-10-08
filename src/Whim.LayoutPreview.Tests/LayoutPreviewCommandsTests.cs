@@ -1,17 +1,17 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.LayoutPreview.Tests;
 
 public class LayoutPreviewCommandsTests
 {
-	[Fact]
-	public void Name()
+	[Theory, AutoSubstituteData]
+	public void Name(IPlugin plugin)
 	{
 		// Given
-		Mock<IPlugin> plugin = new();
-		plugin.SetupGet(p => p.Name).Returns("whim.layout_preview");
-		LayoutPreviewCommands layoutPreviewCommands = new(plugin.Object);
+		plugin.Name.Returns("whim.layout_preview");
+		LayoutPreviewCommands layoutPreviewCommands = new(plugin);
 
 		// When
 		string name = layoutPreviewCommands.PluginName;
@@ -20,12 +20,11 @@ public class LayoutPreviewCommandsTests
 		Assert.Equal("whim.layout_preview", name);
 	}
 
-	[Fact]
-	public void Commands()
+	[Theory, AutoSubstituteData]
+	public void Commands(IPlugin plugin)
 	{
 		// Given
-		Mock<IPlugin> plugin = new();
-		LayoutPreviewCommands layoutPreviewCommands = new(plugin.Object);
+		LayoutPreviewCommands layoutPreviewCommands = new(plugin);
 
 		// When
 		IEnumerable<ICommand> commands = layoutPreviewCommands.Commands;
@@ -34,12 +33,11 @@ public class LayoutPreviewCommandsTests
 		Assert.Empty(commands);
 	}
 
-	[Fact]
-	public void Keybinds()
+	[Theory, AutoSubstituteData]
+	public void Keybinds(IPlugin plugin)
 	{
 		// Given
-		Mock<IPlugin> plugin = new();
-		LayoutPreviewCommands layoutPreviewCommands = new(plugin.Object);
+		LayoutPreviewCommands layoutPreviewCommands = new(plugin);
 
 		// When
 		IEnumerable<(string commandId, IKeybind keybind)> keybinds = layoutPreviewCommands.Keybinds;

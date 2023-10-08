@@ -1,41 +1,32 @@
+using AutoFixture.Xunit2;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
+using Whim.TestUtils;
 
 namespace Whim.Bar.Tests;
 
 public class BarLayoutEngineTests
 {
-	private class Wrapper
-	{
-		public Mock<ILayoutEngine> InnerLayoutEngine { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
-		public ILocation<int> Location { get; } = new Location<int>() { Width = 100, Height = 100 };
-		public BarConfig BarConfig { get; }
-
-		public Wrapper()
-		{
-			BarConfig = new(
+	private static BarLayoutEngine CreateSut(ILayoutEngine innerLayoutEngine) =>
+		new(
+			new BarConfig(
 				leftComponents: new List<BarComponent>(),
 				centerComponents: new List<BarComponent>(),
 				rightComponents: new List<BarComponent>()
 			)
 			{
 				Height = 30
-			};
+			},
+			innerLayoutEngine
+		);
 
-			Monitor.SetupGet(m => m.ScaleFactor).Returns(100);
-		}
-	}
-
-	[Fact]
-	public void Count()
+	[Theory, AutoSubstituteData]
+	public void Count(ILayoutEngine innerLayoutEngine)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
-
-		wrapper.InnerLayoutEngine.SetupGet(ile => ile.Count).Returns(5);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
+		innerLayoutEngine.Count.Returns(5);
 
 		// When
 		int count = engine.Count;
@@ -44,18 +35,14 @@ public class BarLayoutEngineTests
 		Assert.Equal(5, count);
 	}
 
-	[Fact]
-	public void AddWindow()
+	[Theory, AutoSubstituteData]
+	public void AddWindow(ILayoutEngine innerLayoutEngine, ILayoutEngine addWindowResult, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-
-		Mock<ILayoutEngine> addWindowResult = new();
-		wrapper.InnerLayoutEngine.Setup(ile => ile.AddWindow(window)).Returns(addWindowResult.Object);
-		addWindowResult.Setup(ile => ile.AddWindow(window)).Returns(addWindowResult.Object);
+		innerLayoutEngine.AddWindow(window).Returns(addWindowResult);
+		addWindowResult.AddWindow(window).Returns(addWindowResult);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window);
@@ -66,16 +53,13 @@ public class BarLayoutEngineTests
 		Assert.Same(newEngine, newEngine2);
 	}
 
-	[Fact]
-	public void ContainsWindow()
+	[Theory, AutoSubstituteData]
+	public void ContainsWindow(ILayoutEngine innerLayoutEngine, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.ContainsWindow(window)).Returns(true);
+		innerLayoutEngine.ContainsWindow(window).Returns(true);
 
 		// When
 		bool contains = engine.ContainsWindow(window);
@@ -84,33 +68,26 @@ public class BarLayoutEngineTests
 		Assert.True(contains);
 	}
 
-	[Fact]
-	public void FocusWindowInDirection()
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection(ILayoutEngine innerLayoutEngine, IWindow window, [Frozen] Direction direction)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
-
-		IWindow window = new Mock<IWindow>().Object;
-		Direction direction = Direction.Left;
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
 		// When
 		engine.FocusWindowInDirection(direction, window);
 
 		// Then
-		wrapper.InnerLayoutEngine.Verify(ile => ile.FocusWindowInDirection(direction, window), Times.Once);
+		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
 	}
 
-	[Fact]
-	public void GetFirstWindow()
+	[Theory, AutoSubstituteData]
+	public void GetFirstWindow(ILayoutEngine innerLayoutEngine, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.GetFirstWindow()).Returns(window);
+		innerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
 		IWindow? firstWindow = engine.GetFirstWindow();
@@ -119,21 +96,19 @@ public class BarLayoutEngineTests
 		Assert.Same(window, firstWindow);
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_NotSame()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowEdgesInDirection_NotSame(
+		ILayoutEngine innerLayoutEngine,
+		ILayoutEngine moveWindowEdgesResult,
+		IWindow window,
+		Direction direction,
+		Point<double> deltas
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-		Direction direction = Direction.Left;
-		IPoint<double> deltas = new Point<double>();
-
-		Mock<ILayoutEngine> moveWindowEdgesInDirectionResult = new();
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.MoveWindowEdgesInDirection(direction, deltas, window))
-			.Returns(moveWindowEdgesInDirectionResult.Object);
+		innerLayoutEngine.MoveWindowEdgesInDirection(direction, deltas, window).Returns(moveWindowEdgesResult);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window);
@@ -142,20 +117,18 @@ public class BarLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_Same()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowEdgesInDirection_Same(
+		ILayoutEngine innerLayoutEngine,
+		IWindow window,
+		Direction direction,
+		Point<double> deltas
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-		Direction direction = Direction.Left;
-		IPoint<double> deltas = new Point<double>();
-
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.MoveWindowEdgesInDirection(direction, deltas, window))
-			.Returns(wrapper.InnerLayoutEngine.Object);
+		innerLayoutEngine.MoveWindowEdgesInDirection(direction, deltas, window).Returns(innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window);
@@ -164,20 +137,18 @@ public class BarLayoutEngineTests
 		Assert.Same(engine, newEngine);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_NotSame()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_NotSame(
+		ILayoutEngine innerLayoutEngine,
+		ILayoutEngine moveWindowToPointResult,
+		IWindow window,
+		Point<double> point
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-		IPoint<double> point = new Point<double>();
-
-		Mock<ILayoutEngine> moveWindowToPointResult = new();
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.MoveWindowToPoint(window, point))
-			.Returns(moveWindowToPointResult.Object);
+		innerLayoutEngine.MoveWindowToPoint(window, point).Returns(moveWindowToPointResult);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, point);
@@ -186,19 +157,13 @@ public class BarLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 	}
 
-	[Fact]
-	public void MoveWindowToPoint_Same()
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_Same(ILayoutEngine innerLayoutEngine, IWindow window, Point<double> point)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-		IPoint<double> point = new Point<double>();
-
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.MoveWindowToPoint(window, point))
-			.Returns(wrapper.InnerLayoutEngine.Object);
+		innerLayoutEngine.MoveWindowToPoint(window, point).Returns(innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, point);
@@ -207,17 +172,13 @@ public class BarLayoutEngineTests
 		Assert.Same(engine, newEngine);
 	}
 
-	[Fact]
-	public void RemoveWindow_NotSame()
+	[Theory, AutoSubstituteData]
+	public void RemoveWindow_NotSame(ILayoutEngine innerLayoutEngine, ILayoutEngine removeWindowResult, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-
-		Mock<ILayoutEngine> removeWindowResult = new();
-		wrapper.InnerLayoutEngine.Setup(ile => ile.RemoveWindow(window)).Returns(removeWindowResult.Object);
+		innerLayoutEngine.RemoveWindow(window).Returns(removeWindowResult);
 
 		// When
 		ILayoutEngine newEngine = engine.RemoveWindow(window);
@@ -226,16 +187,13 @@ public class BarLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 	}
 
-	[Fact]
-	public void RemoveWindow_Same()
+	[Theory, AutoSubstituteData]
+	public void RemoveWindow_Same(ILayoutEngine innerLayoutEngine, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindow window = new Mock<IWindow>().Object;
-
-		wrapper.InnerLayoutEngine.Setup(ile => ile.RemoveWindow(window)).Returns(wrapper.InnerLayoutEngine.Object);
+		innerLayoutEngine.RemoveWindow(window).Returns(innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.RemoveWindow(window);
@@ -244,19 +202,18 @@ public class BarLayoutEngineTests
 		Assert.Same(engine, newEngine);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_NotSame()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_NotSame(
+		ILayoutEngine innerLayoutEngine,
+		ILayoutEngine swapWindowInDirectionResult,
+		IWindow window,
+		Direction direction
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
-		IWindow window = new Mock<IWindow>().Object;
-		Direction direction = Direction.Left;
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		Mock<ILayoutEngine> swapWindowInDirectionResult = new();
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.SwapWindowInDirection(direction, window))
-			.Returns(swapWindowInDirectionResult.Object);
+		innerLayoutEngine.SwapWindowInDirection(direction, window).Returns(swapWindowInDirectionResult);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(direction, window);
@@ -265,18 +222,13 @@ public class BarLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 	}
 
-	[Fact]
-	public void SwapWindowInDirection_Same()
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_Same(ILayoutEngine innerLayoutEngine, IWindow window, Direction direction)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
-		IWindow window = new Mock<IWindow>().Object;
-		Direction direction = Direction.Left;
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.SwapWindowInDirection(direction, window))
-			.Returns(wrapper.InnerLayoutEngine.Object);
+		innerLayoutEngine.SwapWindowInDirection(direction, window).Returns(innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(direction, window);
@@ -285,14 +237,12 @@ public class BarLayoutEngineTests
 		Assert.Same(engine, newEngine);
 	}
 
-	[Fact]
-	public void DoLayout()
+	[Theory, AutoSubstituteData]
+	public void DoLayout(ILayoutEngine innerLayoutEngine, IWindow window1, IWindow window2, IMonitor monitor)
 	{
 		// Given
-		Wrapper wrapper = new();
-		BarLayoutEngine engine = new(wrapper.BarConfig, wrapper.InnerLayoutEngine.Object);
-		IWindow window1 = new Mock<IWindow>().Object;
-		IWindow window2 = new Mock<IWindow>().Object;
+		monitor.ScaleFactor.Returns(100);
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
 		IWindowState[] expectedWindowStates = new[]
 		{
@@ -321,26 +271,37 @@ public class BarLayoutEngineTests
 			}
 		};
 
-		ILocation<int> expectedGivenLocation = new Location<int>()
-		{
-			Y = 30,
-			Width = 100,
-			Height = 70
-		};
+		Location<int> expectedGivenLocation =
+			new()
+			{
+				Y = 30,
+				Width = 100,
+				Height = 70
+			};
 
-		wrapper.InnerLayoutEngine
-			.Setup(ile => ile.DoLayout(expectedGivenLocation, wrapper.Monitor.Object))
-			.Returns(expectedWindowStates);
+		innerLayoutEngine.DoLayout(expectedGivenLocation, monitor).Returns(expectedWindowStates);
 
 		// When
-		IWindowState[] layout = engine.DoLayout(wrapper.Location, wrapper.Monitor.Object).ToArray();
+		IWindowState[] layout = engine.DoLayout(new Location<int>() { Width = 100, Height = 100 }, monitor).ToArray();
 
 		// Then
 		Assert.Equal(2, layout.Length);
-		wrapper.InnerLayoutEngine.Verify(
-			ile => ile.DoLayout(expectedGivenLocation, wrapper.Monitor.Object),
-			Times.Once
-		);
+		innerLayoutEngine.Received(1).DoLayout(expectedGivenLocation, monitor);
 		layout.Should().Equal(expectedWindowStates);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData(0)]
+	[InlineAutoSubstituteData(-30)]
+	public void DoLayout_HeightMustBeNonNegative(int height, ILayoutEngine innerLayoutEngine, IMonitor monitor)
+	{
+		// Given
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
+
+		// When
+		engine.DoLayout(new Location<int>() { Width = 100, Height = height }, monitor);
+
+		// Then
+		innerLayoutEngine.Received(1).DoLayout(Arg.Is<Location<int>>(l => l.Height == 0), monitor);
 	}
 }

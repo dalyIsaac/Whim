@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
@@ -8,20 +8,16 @@ public class TreeLayoutCommandsTests
 {
 	private class Wrapper
 	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IMonitorManager> MonitorManager { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
-		public Mock<ITreeLayoutPlugin> Plugin { get; } = new();
+		public IContext Context { get; } = Substitute.For<IContext>();
+		public IMonitor Monitor { get; } = Substitute.For<IMonitor>();
+		public ITreeLayoutPlugin Plugin { get; } = Substitute.For<ITreeLayoutPlugin>();
 		public TreeLayoutCommands Commands { get; }
 
 		public Wrapper()
 		{
-			Context.Setup(x => x.MonitorManager).Returns(MonitorManager.Object);
-			MonitorManager.Setup(x => x.ActiveMonitor).Returns(Monitor.Object);
-
-			Plugin.Setup(t => t.Name).Returns("whim.tree_layout");
-
-			Commands = new TreeLayoutCommands(Context.Object, Plugin.Object);
+			Context.MonitorManager.ActiveMonitor.Returns(Monitor);
+			Plugin.Name.Returns("whim.tree_layout");
+			Commands = new TreeLayoutCommands(Context, Plugin);
 		}
 	}
 
@@ -40,6 +36,6 @@ public class TreeLayoutCommandsTests
 		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(x => x.SetAddWindowDirection(wrapper.Monitor.Object, direction));
+		wrapper.Plugin.Received().SetAddWindowDirection(wrapper.Monitor, direction);
 	}
 }

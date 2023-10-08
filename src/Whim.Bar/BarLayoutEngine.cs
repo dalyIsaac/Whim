@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim.Bar;
@@ -44,7 +45,7 @@ public record BarLayoutEngine : BaseProxyLayoutEngine
 				X = location.X,
 				Y = location.Y + height,
 				Width = location.Width,
-				Height = location.Height - height
+				Height = Math.Max(0, location.Height - height)
 			};
 		return InnerLayoutEngine.DoLayout(proxiedLocation, monitor);
 	}

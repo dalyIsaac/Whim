@@ -9,8 +9,7 @@ public class PropertiesTests
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine =
-			new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity) { Name = "Test" };
+		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity) { Name = "Test" };
 
 		// When
 		string result = engine.Name;

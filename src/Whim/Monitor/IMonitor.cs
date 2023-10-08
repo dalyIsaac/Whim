@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace Whim;
 
@@ -71,6 +72,8 @@ public static class MonitorHelpers
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
 	public static IPoint<double> ToUnitSquare(this ILocation<int> monitor, IPoint<int> point, bool respectSign = false)
 	{
+		Debug.Assert(monitor.Width != 0);
+		Debug.Assert(monitor.Height != 0);
 		double x = (double)point.X / monitor.Width;
 		double y = (double)point.Y / monitor.Height;
 
@@ -88,6 +91,8 @@ public static class MonitorHelpers
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
 	public static ILocation<double> ToUnitSquare(this ILocation<int> monitor, ILocation<int> location)
 	{
+		Debug.Assert(monitor.Width != 0);
+		Debug.Assert(monitor.Height != 0);
 		double x = Math.Abs((double)location.X / monitor.Width);
 		double y = Math.Abs((double)location.Y / monitor.Height);
 		double width = Math.Abs((double)location.Width / monitor.Width);

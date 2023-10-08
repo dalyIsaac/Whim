@@ -1,59 +1,57 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Gaps.Tests;
 
+public class GapsCommandsCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IGapsPlugin plugin = fixture.Create<IGapsPlugin>();
+		plugin.Name.Returns("whim.gaps");
+		plugin.GapsConfig.Returns(new GapsConfig());
+		fixture.Inject(plugin);
+	}
+}
+
 public class GapsCommandsTests
 {
-	private class Wrapper
-	{
-		public Mock<IGapsPlugin> Plugin { get; }
-		public GapsConfig Config { get; }
-		public ICommand Command { get; }
+	private static ICommand CreateSut(IGapsPlugin plugin, string id) =>
+		new PluginCommandsTestUtils(new GapsCommands(plugin)).GetCommand(id);
 
-		public Wrapper(string commandId)
-		{
-			Plugin = new();
-			Config = new();
-
-			Plugin.SetupGet(p => p.Name).Returns("whim.gaps");
-			Plugin.SetupGet(p => p.GapsConfig).Returns(Config);
-
-			GapsCommands gapsCommands = new(Plugin.Object);
-			Command = new PluginCommandsTestUtils(gapsCommands).GetCommand(commandId);
-		}
-	}
-
-	[InlineData("whim.gaps.outer.increase", 1)]
-	[InlineData("whim.gaps.outer.decrease", -1)]
+	[InlineAutoSubstituteData<GapsCommandsCustomization>("whim.gaps.outer.increase", 1)]
+	[InlineAutoSubstituteData<GapsCommandsCustomization>("whim.gaps.outer.decrease", -1)]
 	[Theory]
-	public void OuterGapCommands(string commandId, int mul)
+	public void OuterGapCommands(string commandId, int mul, IGapsPlugin plugin)
 	{
 		// Given
-		Wrapper wrapper = new(commandId);
-		int expectedDelta = wrapper.Config.DefaultOuterDelta * mul;
+		ICommand command = CreateSut(plugin, commandId);
+		int expectedDelta = plugin.GapsConfig.DefaultOuterDelta * mul;
 
 		// When
-		wrapper.Command.TryExecute();
+		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(p => p.UpdateOuterGap(expectedDelta), Times.Once);
+		plugin.Received(1).UpdateOuterGap(expectedDelta);
+		plugin.Received(1).UpdateOuterGap(expectedDelta);
 	}
 
-	[InlineData("whim.gaps.inner.increase", 1)]
-	[InlineData("whim.gaps.inner.decrease", -1)]
+	[InlineAutoSubstituteData<GapsCommandsCustomization>("whim.gaps.inner.increase", 1)]
+	[InlineAutoSubstituteData<GapsCommandsCustomization>("whim.gaps.inner.decrease", -1)]
 	[Theory]
-	public void InnerGapCommands(string commandId, int mul)
+	public void InnerGapCommands(string commandId, int mul, IGapsPlugin plugin)
 	{
 		// Given
-		Wrapper wrapper = new(commandId);
-		int expectedDelta = wrapper.Config.DefaultInnerDelta * mul;
+		ICommand command = CreateSut(plugin, commandId);
+		int expectedDelta = plugin.GapsConfig.DefaultInnerDelta * mul;
 
 		// When
-		wrapper.Command.TryExecute();
+		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(p => p.UpdateInnerGap(expectedDelta), Times.Once);
+		plugin.Received(1).UpdateInnerGap(expectedDelta);
+		plugin.Received(1).UpdateInnerGap(expectedDelta);
 	}
 }

@@ -1,4 +1,3 @@
-using Moq;
 using Xunit;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -6,10 +5,21 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System;
+using AutoFixture;
+using NSubstitute;
+using Whim.TestUtils;
 
 namespace Whim.Tests;
+
+public class KeybindHookCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
+		internalCtx.CoreNativeManager.CallNextHookEx(0, 0, 0).Returns((LRESULT)0);
+	}
+}
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class KeybindHookTests
@@ -39,157 +49,145 @@ public class KeybindHookTests
 		}
 	}
 
-	private class Wrapper
+	private class CaptureKeybindHook
 	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
-		public Mock<IKeybindManager> KeybindManager { get; } = new();
 		public HOOKPROC? KeyboardHook { get; private set; }
-		public FakeSafeHandle Handle { get; }
+		public FakeSafeHandle? Handle { get; private set; }
 
-		public Wrapper(bool isHandleInvalid = false)
+		public static CaptureKeybindHook Create(IInternalContext internalCtx)
 		{
-			Handle = new FakeSafeHandle(isHandleInvalid);
-
-			Context.SetupGet(context => context.KeybindManager).Returns(KeybindManager.Object);
-
-			CoreNativeManager
-				.Setup(cnm => cnm.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, It.IsAny<HOOKPROC>(), null, 0))
-				.Callback(
-					(WINDOWS_HOOK_ID id, HOOKPROC proc, SafeHandle handle, uint dwThreadId) =>
+			CaptureKeybindHook captureKeybindHook = new();
+			internalCtx.CoreNativeManager
+				.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0)
+				.Returns(
+					(callInfo) =>
 					{
-						KeyboardHook = proc;
+						captureKeybindHook.KeyboardHook = callInfo.ArgAt<HOOKPROC>(1);
+						captureKeybindHook.Handle = new FakeSafeHandle(false);
+						return captureKeybindHook.Handle;
 					}
-				)
-				.Returns(Handle);
+				);
 
-			CoreNativeManager.Setup(cnm => cnm.CallNextHookEx(0, 0, 0)).Returns((LRESULT)0);
+			return captureKeybindHook;
 		}
+	}
 
-		public void SetupKey(VIRTUAL_KEY[] modifiers, VIRTUAL_KEY key, ICommand[] commands)
+	private static void SetupKey(
+		IContext ctx,
+		IInternalContext internalCtx,
+		VIRTUAL_KEY[] modifiers,
+		VIRTUAL_KEY key,
+		ICommand[] commands
+	)
+	{
+		foreach (VIRTUAL_KEY modifier in modifiers)
 		{
-			foreach (VIRTUAL_KEY modifier in modifiers)
-			{
-				CoreNativeManager.Setup(cnm => cnm.GetKeyState((int)modifier)).Returns(-32768);
-			}
-
-			CoreNativeManager
-				.Setup(coreNativeManager => coreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()))
-				.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)key });
-
-			KeybindManager.Setup(keybindManager => keybindManager.GetCommands(It.IsAny<IKeybind>())).Returns(commands);
+			internalCtx.CoreNativeManager.GetKeyState((int)modifier).Returns((short)-32768);
 		}
+
+		internalCtx.CoreNativeManager
+			.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+			.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)key });
+
+		ctx.KeybindManager.GetCommands(Arg.Any<IKeybind>()).Returns(commands);
 	}
 
-	[Fact]
-	public void PostInitialize()
+	[Theory, AutoSubstituteData<KeybindHookCustomization>]
+	internal void PostInitialize(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Mock<IContext> context = new();
-		Mock<ICoreNativeManager> coreNativeManager = new();
-		KeybindHook keybindHook = new(context.Object, coreNativeManager.Object);
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
 
 		// When
 		keybindHook.PostInitialize();
 
 		// Then
-		coreNativeManager.Verify(
-			c => c.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, It.IsAny<HOOKPROC>(), null, 0),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager
+			.Received(1)
+			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0);
 	}
 
-	[InlineData(1)]
-	[InlineData(-1)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(1)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(-1)]
 	[Theory]
-	public void KeyboardHook_InvalidNCode(int nCode)
+	internal void KeyboardHook_InvalidNCode(int nCode, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
 
 		// When
 		keybindHook.PostInitialize();
-		wrapper.KeyboardHook?.Invoke(nCode, 0, 0);
+		capture.KeyboardHook?.Invoke(nCode, 0, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(c => c.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()), Times.Never);
-		wrapper.CoreNativeManager.Verify(c => c.CallNextHookEx(nCode, 0, 0), Times.Once);
+		internalCtx.CoreNativeManager.DidNotReceive().PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
+		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(nCode, 0, 0);
 	}
 
-	[Fact]
-	public void KeyboardHook_NotPtrToStructure()
+	[Theory, AutoSubstituteData<KeybindHookCustomization>]
+	internal void KeyboardHook_NotPtrToStructure(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()))
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
+		internalCtx.CoreNativeManager
+			.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
 			.Returns(null as KBDLLHOOKSTRUCT?);
 
 		// When
 		keybindHook.PostInitialize();
-		wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+		capture.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(c => c.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()), Times.Once);
-		wrapper.CoreNativeManager.Verify(c => c.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0), Times.Once);
+		internalCtx.CoreNativeManager.Received(1).PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
+		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 	}
 
 	// WM_KEYDOWN and WM_SYSKEYDOWN
-	[InlineData(0x0099)]
-	[InlineData(0x0101)]
-	[InlineData(0x0103)]
-	[InlineData(0x0105)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(0x0099)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(0x0101)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(0x0103)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(0x0105)]
 	[Theory]
-	public void KeyboardHook_ValidNCodeButInvalidWParam(uint wParam)
+	internal void KeyboardHook_ValidNCodeButInvalidWParam(uint wParam, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
 
 		// When
 		keybindHook.PostInitialize();
-		wrapper.KeyboardHook?.Invoke(0, wParam, 0);
+		capture.KeyboardHook?.Invoke(0, wParam, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(c => c.PtrToStructure<KBDLLHOOKSTRUCT>(It.IsAny<nint>()), Times.Never);
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, wParam, 0),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager.DidNotReceive().PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
+		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, wParam, 0);
 	}
 
-	public static readonly IEnumerable<object[]> IgnoredKeys = new List<object[]>()
-	{
-		new object[] { VIRTUAL_KEY.VK_LSHIFT },
-		new object[] { VIRTUAL_KEY.VK_RSHIFT },
-		new object[] { VIRTUAL_KEY.VK_LMENU },
-		new object[] { VIRTUAL_KEY.VK_RMENU },
-		new object[] { VIRTUAL_KEY.VK_LCONTROL },
-		new object[] { VIRTUAL_KEY.VK_RCONTROL },
-		new object[] { VIRTUAL_KEY.VK_LWIN },
-		new object[] { VIRTUAL_KEY.VK_RWIN }
-	};
-
-	[MemberData(nameof(IgnoredKeys))]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LSHIFT)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RSHIFT)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LMENU)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RMENU)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LCONTROL)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RCONTROL)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LWIN)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RWIN)]
 	[Theory]
-	public void KeyboardHook_IgnoredKey(VIRTUAL_KEY key)
+	internal void KeyboardHook_IgnoredKey(VIRTUAL_KEY key, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		wrapper.SetupKey(new VIRTUAL_KEY[] { key }, VIRTUAL_KEY.None, Array.Empty<ICommand>());
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
+		SetupKey(ctx, internalCtx, new VIRTUAL_KEY[] { key }, VIRTUAL_KEY.None, Array.Empty<ICommand>());
 
 		// When
 		keybindHook.PostInitialize();
-		wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+		capture.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 	}
 
 	public static readonly IEnumerable<object[]> KeybindsToExecute = new List<object[]>()
@@ -234,106 +232,94 @@ public class KeybindHookTests
 
 	[MemberData(nameof(KeybindsToExecute))]
 	[Theory]
-	public void KeyboardHook_ValidKeybind(VIRTUAL_KEY[] modifiers, VIRTUAL_KEY key, Keybind keybind)
+	internal void KeyboardHook_ValidKeybind(VIRTUAL_KEY[] modifiers, VIRTUAL_KEY key, Keybind keybind)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		Mock<ICommand>[] commands = Enumerable.Range(0, 3).Select(_ => new Mock<ICommand>()).ToArray();
-		wrapper.SetupKey(modifiers, key, commands.Select(c => c.Object).ToArray());
+		IContext ctx = Substitute.For<IContext>();
+		IInternalContext internalCtx = Substitute.For<IInternalContext>();
+
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
+		ICommand[] commands = Enumerable.Range(0, 3).Select(_ => Substitute.For<ICommand>()).ToArray();
+		SetupKey(ctx, internalCtx, modifiers, key, commands.Select(c => c).ToArray());
 
 		// When
 		keybindHook.PostInitialize();
-		LRESULT? result = wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_SYSKEYDOWN, 0);
+		LRESULT? result = capture.KeyboardHook?.Invoke(0, PInvoke.WM_SYSKEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0),
-			Times.Never
-		);
+		internalCtx.CoreNativeManager.DidNotReceive().CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 		Assert.Equal(1, (nint)result!);
-		wrapper.KeybindManager.Verify(km => km.GetCommands(keybind), Times.Once);
-		foreach (Mock<ICommand> command in commands)
+		ctx.KeybindManager.Received(1).GetCommands(keybind);
+		foreach (ICommand command in commands)
 		{
-			command.Verify(c => c.TryExecute(), Times.Once);
+			command.Received(1).TryExecute();
 		}
 	}
 
-	[Fact]
-	public void KeyboardHook_NoModifiers()
+	[Theory, AutoSubstituteData<KeybindHookCustomization>]
+	internal void KeyboardHook_NoModifiers(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		wrapper.SetupKey(Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
+		SetupKey(ctx, internalCtx, Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
 
 		// When
 		keybindHook.PostInitialize();
-		LRESULT? result = wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+		LRESULT? result = capture.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 		Assert.Equal(0, (nint)result!);
-		wrapper.KeybindManager.Verify(
-			km => km.GetCommands(new Keybind(KeyModifiers.None, VIRTUAL_KEY.VK_A)),
-			Times.Never
-		);
+		ctx.KeybindManager.DidNotReceive().GetCommands(new Keybind(KeyModifiers.None, VIRTUAL_KEY.VK_A));
 	}
 
-	[Fact]
-	public void KeyboardHook_NoCommands()
+	[Theory, AutoSubstituteData<KeybindHookCustomization>]
+	internal void KeyboardHook_NoCommands(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		wrapper.SetupKey(new[] { VIRTUAL_KEY.VK_LWIN }, VIRTUAL_KEY.VK_U, Array.Empty<ICommand>());
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
+		SetupKey(ctx, internalCtx, new[] { VIRTUAL_KEY.VK_LWIN }, VIRTUAL_KEY.VK_U, Array.Empty<ICommand>());
 
 		// When
 		keybindHook.PostInitialize();
-		LRESULT? result = wrapper.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+		LRESULT? result = capture.KeyboardHook?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			coreNativeManager => coreNativeManager.CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0),
-			Times.Once
-		);
+		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 		Assert.Equal(0, (nint)result!);
-		wrapper.KeybindManager.Verify(
-			km => km.GetCommands(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_U)),
-			Times.Once
-		);
+		ctx.KeybindManager.Received(1).GetCommands(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_U));
 	}
 
-	[Fact]
-	public void Dispose_HookIsNull()
+	[Theory, AutoSubstituteData<KeybindHookCustomization>]
+	internal void Dispose_HookIsNull(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
 
 		// When
 		keybindHook.Dispose();
 
 		// Then
-		Assert.False(wrapper.Handle.HasDisposed);
+		Assert.Null(capture.Handle);
 	}
 
-	[Fact]
-	public void Dispose()
+	[Theory, AutoSubstituteData<KeybindHookCustomization>]
+	internal void Dispose(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		KeybindHook keybindHook = new(wrapper.Context.Object, wrapper.CoreNativeManager.Object);
-		wrapper.SetupKey(Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
+		SetupKey(ctx, internalCtx, Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
 
 		// When
 		keybindHook.PostInitialize();
 		keybindHook.Dispose();
 
 		// Then
-		Assert.True(wrapper.Handle.HasDisposed);
+		Assert.True(capture.Handle?.HasDisposed);
 	}
 }

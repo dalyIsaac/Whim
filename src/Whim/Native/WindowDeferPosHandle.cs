@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -17,14 +18,14 @@ namespace Whim;
 public sealed class WindowDeferPosHandle : IDisposable
 {
 	private readonly IContext _context;
+	private readonly CancellationToken? _cancellationToken;
 	private readonly List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> _windowStates =
 		new();
-	private readonly CancellationToken? _cancellationToken;
 
 	/// <summary>
 	/// The default flags to use when setting the window position.
 	/// </summary>
-	public const SET_WINDOW_POS_FLAGS DefaultFlags =
+	private const SET_WINDOW_POS_FLAGS DefaultFlags =
 		SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
 		| SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
 		| SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
@@ -34,19 +35,41 @@ public sealed class WindowDeferPosHandle : IDisposable
 	/// <summary>
 	/// Create a new <see cref="WindowDeferPosHandle"/> to set the position of multiple windows at once.
 	///
-	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block
-	/// or statement, otherwise <see cref="INativeManager.EndDeferWindowPos"/> won't be called.
+	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block,
+	/// a <c>using</c> statement, or by calling <see cref="Dispose"/> manually, otherwise
+	/// <see cref="INativeManager.EndDeferWindowPos"/> won't be called.
 	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="cancellationToken">
-	/// A <see cref="CancellationToken"/> that can be used to cancel the operation, if set before
-	/// <see cref="Dispose"/> is called.
+	/// A <see cref="CancellationToken"/> that can be used to lay out the windows.
 	/// </param>
 	public WindowDeferPosHandle(IContext context, CancellationToken? cancellationToken = null)
 	{
 		Logger.Debug("Creating new WindowDeferPosHandle");
 		_context = context;
 		_cancellationToken = cancellationToken;
+	}
+
+	/// <summary>
+	/// Create a new <see cref="WindowDeferPosHandle"/> to set the position of multiple windows at once.
+	///
+	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block,
+	/// a <c>using</c> statement, or by calling <see cref="Dispose"/> manually, otherwise
+	/// <see cref="INativeManager.EndDeferWindowPos"/> won't be called.
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="windowStates"></param>
+	/// <param name="cancellationToken">
+	/// A <see cref="CancellationToken"/> that can be used to lay out the windows.
+	/// </param>
+	public WindowDeferPosHandle(
+		IContext context,
+		IEnumerable<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> windowStates,
+		CancellationToken? cancellationToken = null
+	)
+		: this(context, cancellationToken)
+	{
+		_windowStates.AddRange(windowStates);
 	}
 
 	/// <summary>
@@ -98,117 +121,117 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 		Logger.Debug($"Setting window position {numPasses} times");
 
-		int count = _windowStates.Count;
+		List<IWindow> toMinimize = new();
+		List<IWindow> toMaximize = new();
+		List<IWindow> toNormal = new();
+
 		for (int i = 0; i < numPasses; i++)
 		{
-			using InternalWindowDeferPosHandle handle = new(_context, count);
-			for (int j = 0; j < count; j++)
+			Logger.Debug($"Setting window position, pass {i + 1} of {numPasses}");
+			if (_cancellationToken?.IsCancellationRequested == true)
 			{
-				(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags) = _windowStates[j];
-				handle.DeferWindowPos(windowState, hwndInsertAfter, flags);
-			}
-		}
-
-		Logger.Debug("Finished setting window position");
-	}
-
-	private sealed class InternalWindowDeferPosHandle : IDisposable
-	{
-		private readonly IContext _context;
-		private HDWP _hWinPosInfo;
-		private readonly List<IWindow> _toMinimize;
-		private readonly List<IWindow> _toMaximize;
-		private readonly List<IWindow> _toNormal;
-
-		/// <summary>
-		/// Create a new <see cref="InternalWindowDeferPosHandle"/> for <paramref name="count"/> windows.
-		/// This is to be used when setting the position of multiple windows at once.
-		///
-		/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block
-		/// or statement, otherwise <see cref="INativeManager.EndDeferWindowPos"/> won't be called.
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="count"></param>
-		public InternalWindowDeferPosHandle(IContext context, int count)
-		{
-			Logger.Debug("Creating new InternalWindowDeferPosHandle");
-			_context = context;
-			_hWinPosInfo = context.NativeManager.BeginDeferWindowPos(count);
-
-			_toMinimize = new List<IWindow>();
-			_toMaximize = new List<IWindow>();
-			_toNormal = new List<IWindow>();
-		}
-
-		public void DeferWindowPos(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)
-		{
-			IWindow window = windowState.Window;
-
-			ILocation<int>? offset = _context.NativeManager.GetWindowOffset(window.Handle);
-			if (offset is null)
-			{
+				Logger.Debug("Cancellation requested, skipping setting window position");
 				return;
 			}
 
-			ILocation<int> location = windowState.Location.Add(offset);
-
-			WindowSize windowSize = windowState.WindowSize;
-
-			SET_WINDOW_POS_FLAGS uFlags = flags ?? DefaultFlags;
-
-			if (windowSize == WindowSize.Maximized)
+			// We don't cancel from here on out, as we're dealing with native code.
+			HDWP hdwp = _context.NativeManager.BeginDeferWindowPos(_windowStates.Count);
+			foreach ((IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags) in _windowStates)
 			{
-				_toMaximize.Add(window);
-				uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+				hdwp = DeferWindowPos(hdwp, windowState, hwndInsertAfter, flags, toMinimize, toMaximize, toNormal);
 			}
-			else if (windowSize == WindowSize.Minimized)
-			{
-				_toMinimize.Add(window);
-				uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
-			}
-			else
-			{
-				_toNormal.Add(window);
-			}
+			EndDeferWindowPos(hdwp, toMinimize, toMaximize, toNormal);
 
-			_hWinPosInfo = _context.NativeManager.DeferWindowPos(
-				_hWinPosInfo,
-				window.Handle,
-				hwndInsertAfter,
-				location.X,
-				location.Y,
-				location.Width,
-				location.Height,
-				uFlags
-			);
+			// Reset the window states.
+			if (i < numPasses - 1)
+			{
+				toMaximize.Clear();
+				toMinimize.Clear();
+				toNormal.Clear();
+			}
 		}
+		Logger.Debug("Finished setting window position");
+	}
 
-		public void Dispose()
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private HDWP DeferWindowPos(
+		HDWP hdwp,
+		IWindowState windowState,
+		HWND hwndInsertAfter,
+		SET_WINDOW_POS_FLAGS? flags,
+		List<IWindow> toMinimize,
+		List<IWindow> toMaximize,
+		List<IWindow> toNormal
+	)
+	{
+		IWindow window = windowState.Window;
+
+		ILocation<int>? offset = _context.NativeManager.GetWindowOffset(window.Handle);
+		if (offset is null)
 		{
-			Logger.Debug("Disposing InternalWindowDeferPosHandle");
-			foreach (IWindow w in _toMinimize)
-			{
-				if (!w.IsMinimized)
-				{
-					_context.NativeManager.MinimizeWindow(w.Handle);
-				}
-			}
-
-			foreach (IWindow w in _toMaximize)
-			{
-				if (!w.IsMaximized)
-				{
-					_context.NativeManager.ShowWindowMaximized(w.Handle);
-				}
-			}
-
-			foreach (IWindow w in _toNormal)
-			{
-				_context.NativeManager.ShowWindowNoActivate(w.Handle);
-			}
-
-			_context.NativeManager.EndDeferWindowPos(_hWinPosInfo);
-			Logger.Debug("Disposed InternalWindowDeferPosHandle");
+			return hdwp;
 		}
+
+		ILocation<int> location = windowState.Location.Add(offset);
+		WindowSize windowSize = windowState.WindowSize;
+		SET_WINDOW_POS_FLAGS uFlags = flags ?? DefaultFlags;
+
+		if (windowSize == WindowSize.Maximized)
+		{
+			toMaximize.Add(window);
+			uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+		}
+		else if (windowSize == WindowSize.Minimized)
+		{
+			toMinimize.Add(window);
+			uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+		}
+		else
+		{
+			toNormal.Add(window);
+		}
+
+		return _context.NativeManager.DeferWindowPos(
+			hdwp,
+			window.Handle,
+			hwndInsertAfter,
+			location.X,
+			location.Y,
+			location.Width,
+			location.Height,
+			uFlags
+		);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private void EndDeferWindowPos(
+		HDWP hDWP,
+		List<IWindow> toMinimize,
+		List<IWindow> toMaximize,
+		List<IWindow> toNormal
+	)
+	{
+		foreach (IWindow w in toMinimize)
+		{
+			if (!w.IsMinimized)
+			{
+				_context.NativeManager.MinimizeWindow(w.Handle);
+			}
+		}
+
+		foreach (IWindow w in toMaximize)
+		{
+			if (!w.IsMaximized)
+			{
+				_context.NativeManager.ShowWindowMaximized(w.Handle);
+			}
+		}
+
+		foreach (IWindow w in toNormal)
+		{
+			_context.NativeManager.ShowWindowNoActivate(w.Handle);
+		}
+
+		_context.NativeManager.EndDeferWindowPos(hDWP);
 	}
 }

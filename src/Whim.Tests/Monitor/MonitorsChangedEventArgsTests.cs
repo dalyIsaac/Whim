@@ -1,6 +1,6 @@
-using Moq;
 using System;
 using System.Collections.Generic;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
@@ -27,15 +27,15 @@ public class MonitorsChangedEventArgsTests
 		Assert.Same(currentMonitors1, currentMonitors2);
 	}
 
-	[Fact]
-	public void CurrentMonitors_Concat()
+	[Theory, AutoSubstituteData]
+	public void CurrentMonitors_Concat(
+		IMonitor unchangedMonitor1,
+		IMonitor unchangedMonitor2,
+		IMonitor addedMonitor1,
+		IMonitor addedMonitor2
+	)
 	{
 		// Given
-		IMonitor unchangedMonitor1 = Mock.Of<IMonitor>();
-		IMonitor unchangedMonitor2 = Mock.Of<IMonitor>();
-		IMonitor addedMonitor1 = Mock.Of<IMonitor>();
-		IMonitor addedMonitor2 = Mock.Of<IMonitor>();
-
 		MonitorsChangedEventArgs args =
 			new()
 			{
@@ -57,14 +57,16 @@ public class MonitorsChangedEventArgsTests
 		);
 	}
 
-	[Fact]
-	public void PreviousMonitors_Concat()
+	[Theory, AutoSubstituteData]
+	public void PreviousMonitors_Concat(
+		IMonitor unchangedMonitor1,
+		IMonitor unchangedMonitor2,
+		IMonitor removedMonitor1,
+		IMonitor removedMonitor2
+	)
 	{
 		// Given
-		IMonitor unchangedMonitor1 = Mock.Of<IMonitor>();
-		IMonitor unchangedMonitor2 = Mock.Of<IMonitor>();
-		IMonitor removedMonitor1 = Mock.Of<IMonitor>();
-		IMonitor removedMonitor2 = Mock.Of<IMonitor>();
+
 
 		MonitorsChangedEventArgs args =
 			new()

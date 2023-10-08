@@ -1,62 +1,61 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
+public class FloatingLayoutCommandsCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IFloatingLayoutPlugin plugin = fixture.Freeze<IFloatingLayoutPlugin>();
+		plugin.Name.Returns("whim.floating_layout");
+		fixture.Inject(plugin);
+	}
+}
+
 public class FloatingLayoutCommandsTests
 {
-	private class Wrapper
-	{
-		public Mock<IFloatingLayoutPlugin> Plugin { get; }
-		public ICommand Command { get; }
+	private static ICommand CreateSut(IFloatingLayoutPlugin plugin, string id) =>
+		new PluginCommandsTestUtils(new FloatingLayoutCommands(plugin)).GetCommand(id);
 
-		public Wrapper(string id)
-		{
-			Plugin = new();
-			Plugin.SetupGet(p => p.Name).Returns("whim.floating_layout");
-
-			FloatingLayoutCommands commands = new(Plugin.Object);
-			Command = new PluginCommandsTestUtils(commands).GetCommand(id);
-		}
-	}
-
-	[Fact]
-	public void ToggleWindowFloatingCommand()
+	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
+	public void ToggleWindowFloatingCommand(IFloatingLayoutPlugin plugin)
 	{
 		// Given
-		Wrapper wrapper = new("whim.floating_layout.toggle_window_floating");
+		ICommand command = CreateSut(plugin, "whim.floating_layout.toggle_window_floating");
 
 		// When
-		wrapper.Command.TryExecute();
+		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(p => p.ToggleWindowFloating(null), Times.Once);
+		plugin.Received(1).ToggleWindowFloating(null);
 	}
 
-	[Fact]
-	public void MarkWindowAsFloatingCommand()
+	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
+	public void MarkWindowAsFloatingCommand(IFloatingLayoutPlugin plugin)
 	{
 		// Given
-		Wrapper wrapper = new("whim.floating_layout.mark_window_as_floating");
+		ICommand command = CreateSut(plugin, "whim.floating_layout.mark_window_as_floating");
 
 		// When
-		wrapper.Command.TryExecute();
+		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(p => p.MarkWindowAsFloating(null), Times.Once);
+		plugin.Received(1).MarkWindowAsFloating(null);
 	}
 
-	[Fact]
-	public void MarkWindowAsDockedCommand()
+	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
+	public void MarkWindowAsDockedCommand(IFloatingLayoutPlugin plugin)
 	{
 		// Given
-		Wrapper wrapper = new("whim.floating_layout.mark_window_as_docked");
+		ICommand command = CreateSut(plugin, "whim.floating_layout.mark_window_as_docked");
 
 		// When
-		wrapper.Command.TryExecute();
+		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Verify(p => p.MarkWindowAsDocked(null), Times.Once);
+		plugin.Received(1).MarkWindowAsDocked(null);
 	}
 }

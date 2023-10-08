@@ -14,3 +14,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0042:Variable declaration can be deconstructed")]
 [assembly: SuppressMessage("Style", "IDE0058:Expression value is never used")]
 [assembly: SuppressMessage("Style", "IDE0022:Use expression body for methods")]
+[assembly: SuppressMessage("Performance", "CA1813:Avoid unsealed attributes")]

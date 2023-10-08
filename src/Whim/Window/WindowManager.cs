@@ -11,8 +11,7 @@ namespace Whim;
 internal class WindowManager : IWindowManager, IInternalWindowManager
 {
 	private readonly IContext _context;
-	private readonly ICoreNativeManager _coreNativeManager;
-	private readonly IMouseHook _mouseHook;
+	private readonly IInternalContext _internalContext;
 
 	public event EventHandler<WindowEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
@@ -45,11 +44,10 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// </summary>
 	private bool _disposedValue;
 
-	public WindowManager(IContext context, ICoreNativeManager coreNativeManager, IMouseHook mouseHook)
+	public WindowManager(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
-		_coreNativeManager = coreNativeManager;
-		_mouseHook = mouseHook;
+		_internalContext = internalContext;
 		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
 	}
 
@@ -58,32 +56,32 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		Logger.Debug("Initializing window manager...");
 
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
-		_addedHooks[0] = _coreNativeManager.SetWinEventHook(
+		_addedHooks[0] = _internalContext.CoreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_OBJECT_DESTROY,
 			PInvoke.EVENT_OBJECT_HIDE,
 			_hookDelegate
 		);
-		_addedHooks[1] = _coreNativeManager.SetWinEventHook(
+		_addedHooks[1] = _internalContext.CoreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_OBJECT_CLOAKED,
 			PInvoke.EVENT_OBJECT_UNCLOAKED,
 			_hookDelegate
 		);
-		_addedHooks[2] = _coreNativeManager.SetWinEventHook(
+		_addedHooks[2] = _internalContext.CoreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_SYSTEM_MOVESIZESTART,
 			PInvoke.EVENT_SYSTEM_MOVESIZEEND,
 			_hookDelegate
 		);
-		_addedHooks[3] = _coreNativeManager.SetWinEventHook(
+		_addedHooks[3] = _internalContext.CoreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_SYSTEM_FOREGROUND,
 			PInvoke.EVENT_SYSTEM_FOREGROUND,
 			_hookDelegate
 		);
-		_addedHooks[4] = _coreNativeManager.SetWinEventHook(
+		_addedHooks[4] = _internalContext.CoreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
 			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
 			_hookDelegate
 		);
-		_addedHooks[5] = _coreNativeManager.SetWinEventHook(
+		_addedHooks[5] = _internalContext.CoreNativeManager.SetWinEventHook(
 			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
 			PInvoke.EVENT_SYSTEM_MINIMIZEEND,
 			_hookDelegate
@@ -104,11 +102,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		Logger.Debug("Post-initializing window manager...");
 
-		_mouseHook.MouseLeftButtonDown += MouseHook_MouseLeftButtonDown;
-		_mouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
+		_internalContext.MouseHook.MouseLeftButtonDown += MouseHook_MouseLeftButtonDown;
+		_internalContext.MouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
 
 		// Add all existing windows.
-		foreach (HWND hwnd in _coreNativeManager.GetAllWindows())
+		foreach (HWND hwnd in _internalContext.CoreNativeManager.GetAllWindows())
 		{
 			AddWindow(hwnd);
 		}
@@ -124,7 +122,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			return window;
 		}
 
-		return Window.CreateWindow(_context, _coreNativeManager, hwnd);
+		return Window.CreateWindow(_context, _internalContext, hwnd);
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -145,9 +143,9 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 					hook.Dispose();
 				}
 
-				_mouseHook.MouseLeftButtonDown -= MouseHook_MouseLeftButtonDown;
-				_mouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
-				_mouseHook.Dispose();
+				_internalContext.MouseHook.MouseLeftButtonDown -= MouseHook_MouseLeftButtonDown;
+				_internalContext.MouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
+				_internalContext.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
@@ -288,25 +286,25 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		Logger.Debug($"Adding window {hwnd.Value}");
 
-		if (_coreNativeManager.IsSplashScreen(hwnd))
+		if (_internalContext.CoreNativeManager.IsSplashScreen(hwnd))
 		{
 			Logger.Verbose($"Window {hwnd.Value} is a splash screen, ignoring");
 			return null;
 		}
 
-		if (_coreNativeManager.IsCloakedWindow(hwnd))
+		if (_internalContext.CoreNativeManager.IsCloakedWindow(hwnd))
 		{
 			Logger.Verbose($"Window {hwnd.Value} is cloaked, ignoring");
 			return null;
 		}
 
-		if (!_coreNativeManager.IsStandardWindow(hwnd))
+		if (!_internalContext.CoreNativeManager.IsStandardWindow(hwnd))
 		{
 			Logger.Verbose($"Window {hwnd.Value} is not a standard window, ignoring");
 			return null;
 		}
 
-		if (!_coreNativeManager.HasNoVisibleOwner(hwnd))
+		if (!_internalContext.CoreNativeManager.HasNoVisibleOwner(hwnd))
 		{
 			Logger.Verbose($"Window {hwnd.Value} has a visible owner, ignoring");
 			return null;
@@ -389,7 +387,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		IPoint<int>? cursorPoint = null;
-		if (_isLeftMouseButtonDown && _coreNativeManager.GetCursorPos(out IPoint<int> point))
+		if (_isLeftMouseButtonDown && _internalContext.CoreNativeManager.GetCursorPos(out IPoint<int> point))
 		{
 			cursorPoint = point;
 		}
@@ -427,7 +425,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				movedEdges = moved.MovedEdges;
 				_context.WorkspaceManager.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
 			}
-			else if (_coreNativeManager.GetCursorPos(out point))
+			else if (_internalContext.CoreNativeManager.GetCursorPos(out point))
 			{
 				_context.WorkspaceManager.MoveWindowToPoint(window, point);
 			}
@@ -531,7 +529,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		IPoint<int>? cursorPoint = null;
-		if (_isLeftMouseButtonDown && _coreNativeManager.GetCursorPos(out IPoint<int> point))
+		if (_isLeftMouseButtonDown && _internalContext.CoreNativeManager.GetCursorPos(out IPoint<int> point))
 		{
 			cursorPoint = point;
 		}

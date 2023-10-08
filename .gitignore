@@ -354,3 +354,6 @@ MigrationBackup/
 
 # Installer
 bin/whim-install.exe
+
+# Rider
+.idea/

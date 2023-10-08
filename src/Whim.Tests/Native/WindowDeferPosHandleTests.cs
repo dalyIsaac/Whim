@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using System.Collections.Generic;
 using System.Threading;
 using Windows.Win32.Foundation;
@@ -19,24 +19,14 @@ public record struct DeferWindowPosTestData(
 
 public class WindowDeferPosHandleTests
 {
-	private class MocksBuilder
+	private static IContext Setup()
 	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<INativeManager> NativeManager { get; } = new();
-		public Mock<IMonitorManager> MonitorManager { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
-		public Mock<IMonitor> Monitor2 { get; } = new();
-
-		public MocksBuilder()
-		{
-			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
-			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
-
-			NativeManager.Setup(n => n.BeginDeferWindowPos(It.IsAny<int>())).Returns((HDWP)1);
-			MonitorManager
-				.Setup(m => m.GetEnumerator())
-				.Returns(new List<IMonitor>() { Monitor.Object, Monitor2.Object }.GetEnumerator());
-		}
+		IContext ctx = Substitute.For<IContext>();
+		ctx.NativeManager.BeginDeferWindowPos(Arg.Any<int>()).Returns((HDWP)1);
+		ctx.MonitorManager
+			.GetEnumerator()
+			.Returns((_) => new List<IMonitor>() { Substitute.For<IMonitor>() }.GetEnumerator());
+		return ctx;
 	}
 
 	private const SET_WINDOW_POS_FLAGS COMMON_FLAGS =
@@ -54,7 +44,7 @@ public class WindowDeferPosHandleTests
 				new WindowState()
 				{
 					Location = new Location<int>(),
-					Window = new Mock<IWindow>().Object,
+					Window = Substitute.For<IWindow>(),
 					WindowSize = WindowSize.Normal
 				},
 				null,
@@ -72,7 +62,7 @@ public class WindowDeferPosHandleTests
 				new WindowState()
 				{
 					Location = new Location<int>(),
-					Window = new Mock<IWindow>().Object,
+					Window = Substitute.For<IWindow>(),
 					WindowSize = WindowSize.Minimized
 				},
 				(HWND)1,
@@ -90,7 +80,7 @@ public class WindowDeferPosHandleTests
 				new WindowState()
 				{
 					Location = new Location<int>(),
-					Window = new Mock<IWindow>().Object,
+					Window = Substitute.For<IWindow>(),
 					WindowSize = WindowSize.Maximized
 				},
 				(HWND)3,
@@ -108,7 +98,7 @@ public class WindowDeferPosHandleTests
 				new WindowState()
 				{
 					Location = new Location<int>(),
-					Window = new Mock<IWindow>().Object,
+					Window = Substitute.For<IWindow>(),
 					WindowSize = WindowSize.Normal
 				},
 				(HWND)4,
@@ -126,121 +116,105 @@ public class WindowDeferPosHandleTests
 	public void DeferWindowPos(DeferWindowPosTestData data)
 	{
 		// Given
-		MocksBuilder mocks = new();
+		IContext ctx = Setup();
 
-		mocks.NativeManager.Setup(n => n.BeginDeferWindowPos(It.IsAny<int>())).Returns((HDWP)1);
-		mocks.NativeManager
-			.Setup(
-				n =>
-					n.DeferWindowPos(
-						It.IsAny<HDWP>(),
-						It.IsAny<HWND>(),
-						It.IsAny<HWND>(),
-						It.IsAny<int>(),
-						It.IsAny<int>(),
-						It.IsAny<int>(),
-						It.IsAny<int>(),
-						It.IsAny<SET_WINDOW_POS_FLAGS>()
-					)
+		ctx.NativeManager.BeginDeferWindowPos(Arg.Any<int>()).Returns((HDWP)1);
+		ctx.NativeManager
+			.DeferWindowPos(
+				Arg.Any<HDWP>(),
+				Arg.Any<HWND>(),
+				Arg.Any<HWND>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<SET_WINDOW_POS_FLAGS>()
 			)
 			.Returns((HDWP)2);
-		mocks.NativeManager.Setup(n => n.GetWindowOffset(It.IsAny<HWND>())).Returns(new Location<int>());
+		ctx.NativeManager.GetWindowOffset(Arg.Any<HWND>()).Returns(new Location<int>());
 
-		WindowDeferPosHandle handle = new(mocks.Context.Object);
+		WindowDeferPosHandle handle = new(ctx);
 
 		// When
 		handle.DeferWindowPos(data.WindowState, data.HwndInsertAfter, data.Flags);
 		handle.Dispose();
 
 		// Then
-		mocks.NativeManager.Verify(
-			n =>
-				n.DeferWindowPos(
-					(HDWP)1,
-					data.WindowState.Window.Handle,
-					data.HwndInsertAfter ?? (HWND)1,
-					data.WindowState.Location.X,
-					data.WindowState.Location.Y,
-					data.WindowState.Location.Width,
-					data.WindowState.Location.Height,
-					data.ExpectedFlags
-				),
-			Times.Exactly(2)
-		);
-		mocks.NativeManager.Verify(n => n.EndDeferWindowPos(It.IsAny<HDWP>()), Times.Exactly(2));
-		mocks.NativeManager.Verify(
-			n => n.ShowWindowNoActivate(It.IsAny<HWND>()),
-			Times.Exactly(data.ExpectedNormalCallCount * 2)
-		);
-		mocks.NativeManager.Verify(
-			n => n.MinimizeWindow(It.IsAny<HWND>()),
-			Times.Exactly(data.ExpectedMinimizedCallCount * 2)
-		);
-		mocks.NativeManager.Verify(
-			n => n.ShowWindowMaximized(It.IsAny<HWND>()),
-			Times.Exactly(data.ExpectedMaximizedCallCount * 2)
-		);
+		ctx.NativeManager
+			.Received(2)
+			.DeferWindowPos(
+				(HDWP)1,
+				data.WindowState.Window.Handle,
+				data.HwndInsertAfter ?? (HWND)1,
+				data.WindowState.Location.X,
+				data.WindowState.Location.Y,
+				data.WindowState.Location.Width,
+				data.WindowState.Location.Height,
+				data.ExpectedFlags
+			);
+		ctx.NativeManager.Received(2).EndDeferWindowPos(Arg.Any<HDWP>());
+		ctx.NativeManager.Received(data.ExpectedNormalCallCount * 2).ShowWindowNoActivate(Arg.Any<HWND>());
+		ctx.NativeManager.Received(data.ExpectedMinimizedCallCount * 2).MinimizeWindow(Arg.Any<HWND>());
+		ctx.NativeManager.Received(data.ExpectedMaximizedCallCount * 2).ShowWindowMaximized(Arg.Any<HWND>());
 	}
 
 	[Fact]
 	public void DeferWindowPos_NoWindowOffset()
 	{
 		// Given
-		MocksBuilder mocks = new();
-		mocks.NativeManager.Setup(n => n.GetWindowOffset(It.IsAny<HWND>())).Returns((Location<int>?)null);
+		IContext ctx = Setup();
+		ctx.NativeManager.GetWindowOffset(Arg.Any<HWND>()).Returns((Location<int>?)null);
 
-		using WindowDeferPosHandle handle = new(mocks.Context.Object);
+		using WindowDeferPosHandle handle = new(ctx);
 
 		// When
 		handle.DeferWindowPos(
 			new WindowState()
 			{
 				Location = new Location<int>(),
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				WindowSize = WindowSize.Normal
 			}
 		);
 
 		// Then
-		mocks.NativeManager.Verify(
-			n =>
-				n.DeferWindowPos(
-					It.IsAny<HDWP>(),
-					It.IsAny<HWND>(),
-					It.IsAny<HWND>(),
-					It.IsAny<int>(),
-					It.IsAny<int>(),
-					It.IsAny<int>(),
-					It.IsAny<int>(),
-					It.IsAny<SET_WINDOW_POS_FLAGS>()
-				),
-			Times.Never
-		);
+		ctx.NativeManager
+			.DidNotReceive()
+			.DeferWindowPos(
+				Arg.Any<HDWP>(),
+				Arg.Any<HWND>(),
+				Arg.Any<HWND>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<SET_WINDOW_POS_FLAGS>()
+			);
 	}
 
 	[Fact]
 	public void DeferWindowPos_Cancelled()
 	{
 		// Given
-		MocksBuilder mocks = new();
+		IContext ctx = Setup();
 
 		using CancellationTokenSource cts = new();
 		cts.Cancel();
 
-		WindowDeferPosHandle handle = new(mocks.Context.Object, cts.Token);
+		WindowDeferPosHandle handle = new(ctx, cts.Token);
 
 		// When
 		handle.DeferWindowPos(
 			new WindowState()
 			{
 				Location = new Location<int>(),
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				WindowSize = WindowSize.Normal
 			}
 		);
 		handle.Dispose();
 
 		// Then
-		mocks.NativeManager.Verify(n => n.BeginDeferWindowPos(It.IsAny<int>()), Times.Never);
+		ctx.NativeManager.DidNotReceive().BeginDeferWindowPos(Arg.Any<int>());
 	}
 }

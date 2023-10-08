@@ -1,4 +1,5 @@
-using Moq;
+using NSubstitute;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.LayoutPreview.Tests;
@@ -35,13 +36,13 @@ public class LayoutPreviewWindowTests
 		{
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal
 			},
@@ -52,7 +53,7 @@ public class LayoutPreviewWindowTests
 			prevWindowStates[0],
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Maximized
 			},
@@ -80,13 +81,13 @@ public class LayoutPreviewWindowTests
 		{
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = location,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal
 			},
@@ -96,13 +97,13 @@ public class LayoutPreviewWindowTests
 		{
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = location,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal
 			},
@@ -130,13 +131,13 @@ public class LayoutPreviewWindowTests
 		{
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = location,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
-				Window = new Mock<IWindow>().Object,
+				Window = Substitute.For<IWindow>(),
 				Location = new Location<int>(),
 				WindowSize = WindowSize.Normal
 			},
@@ -157,33 +158,13 @@ public class LayoutPreviewWindowTests
 	}
 	#endregion
 
-	[Fact]
-	public void Activate()
+	[Theory, AutoSubstituteData]
+	public void Activate(IContext ctx, IWindow layoutWindow, IWindow movingWindow, IMonitor monitor)
 	{
-		// Given
-		Mock<INativeManager> nativeManagerMock = new();
-		Mock<IMonitorManager> monitorManagerMock = new();
-		Mock<IContext> contextMock = new();
-		Mock<IWindow> layoutWindowMock = new();
-		Mock<IWindow> movingWindowMock = new();
-		Mock<IMonitor> monitorMock = new();
-
-		contextMock.SetupGet(context => context.NativeManager).Returns(nativeManagerMock.Object);
-		contextMock.SetupGet(context => context.MonitorManager).Returns(monitorManagerMock.Object);
-
-		monitorManagerMock
-			.Setup(mm => mm.GetEnumerator())
-			.Returns(new List<IMonitor>() { monitorMock.Object }.GetEnumerator());
-
 		// When
-		LayoutPreviewWindow.Activate(
-			contextMock.Object,
-			layoutWindowMock.Object,
-			movingWindowMock.Object,
-			monitorMock.Object
-		);
+		LayoutPreviewWindow.Activate(ctx, layoutWindow, movingWindow, monitor);
 
 		// Then
-		nativeManagerMock.Verify(nativeManager => nativeManager.BeginDeferWindowPos(1), Times.Exactly(2));
+		ctx.NativeManager.Received(1).BeginDeferWindowPos(1);
 	}
 }

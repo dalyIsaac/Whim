@@ -1,49 +1,60 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using System.ComponentModel;
+using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;
 
 namespace Whim.Tests;
 
+internal class WindowCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IContext ctx = fixture.Freeze<IContext>();
+		IWindowManager windowManager = Substitute.For<IWindowManager, IInternalWindowManager>();
+		ctx.WindowManager.Returns(windowManager);
+
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
+
+		internalCtx.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>()).Returns(("processName", "processFileName"));
+
+		internalCtx.CoreNativeManager
+			.GetWindowThreadProcessId(Arg.Any<HWND>(), out uint _)
+			.Returns(
+				(x) =>
+				{
+					x[1] = (uint)456;
+					return (uint)1;
+				}
+			);
+
+		internalCtx.CoreNativeManager
+			.GetWindowRect(Arg.Any<HWND>(), out RECT _)
+			.Returns(
+				(x) =>
+				{
+					x[1] = new RECT()
+					{
+						left = 0,
+						top = 0,
+						right = 100,
+						bottom = 200
+					};
+					return (BOOL)1;
+				}
+			);
+	}
+}
+
 public class WindowTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
-		public Mock<IWindowManager> WindowManager { get; }
-		public Mock<IInternalWindowManager> InternalWindowManager { get; } = new();
-		public Mock<INativeManager> NativeManager { get; } = new();
-
-		public Wrapper()
-		{
-			WindowManager = InternalWindowManager.As<IWindowManager>();
-
-			Context.Setup(c => c.NativeManager).Returns(NativeManager.Object);
-			Context.Setup(c => c.WindowManager).Returns(WindowManager.Object);
-
-			CoreNativeManager
-				.Setup(cnm => cnm.GetWindowThreadProcessId(It.IsAny<HWND>(), out It.Ref<uint>.IsAny))
-				.Callback(
-					(HWND hwnd, out uint processId) =>
-					{
-						processId = 456;
-					}
-				);
-
-			CoreNativeManager
-				.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
-				.Returns(("processName", "processFileName"));
-		}
-	}
-
-	[Fact]
-	public void Handle()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Handle(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		HWND handle = window.Handle;
@@ -52,14 +63,13 @@ public class WindowTests
 		Assert.Equal(123, handle.Value);
 	}
 
-	[Fact]
-	public void Title()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Title(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetWindowText(It.IsAny<HWND>())).Returns("title");
+		internalCtx.CoreNativeManager.GetWindowText(Arg.Any<HWND>()).Returns("title");
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		string title = window.Title;
@@ -68,14 +78,13 @@ public class WindowTests
 		Assert.Equal("title", title);
 	}
 
-	[Fact]
-	public void WindowClass()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void WindowClass(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.NativeManager.Setup(cnm => cnm.GetClassName(It.IsAny<HWND>())).Returns("windowClass");
+		ctx.NativeManager.GetClassName(Arg.Any<HWND>()).Returns("windowClass");
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		string windowClass = window.WindowClass;
@@ -84,27 +93,11 @@ public class WindowTests
 		Assert.Equal("windowClass", windowClass);
 	}
 
-	[Fact]
-	public void Location()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Location(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetWindowRect(It.IsAny<HWND>(), out It.Ref<RECT>.IsAny))
-			.Callback(
-				(HWND hwnd, out RECT rect) =>
-				{
-					rect = new RECT()
-					{
-						left = 0,
-						top = 0,
-						right = 100,
-						bottom = 200
-					};
-				}
-			);
-
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		ILocation<int> location = window.Location;
@@ -116,27 +109,11 @@ public class WindowTests
 		Assert.Equal(200, location.Height);
 	}
 
-	[Fact]
-	public void Center()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Center(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetWindowRect(It.IsAny<HWND>(), out It.Ref<RECT>.IsAny))
-			.Callback(
-				(HWND hwnd, out RECT rect) =>
-				{
-					rect = new RECT()
-					{
-						left = 0,
-						top = 0,
-						right = 100,
-						bottom = 200
-					};
-				}
-			);
-
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		IPoint<int> center = window.Center;
@@ -146,12 +123,11 @@ public class WindowTests
 		Assert.Equal(100, center.Y);
 	}
 
-	[Fact]
-	public void ProcessId()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void ProcessId(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		int processId = window.ProcessId;
@@ -160,12 +136,11 @@ public class WindowTests
 		Assert.Equal(456, processId);
 	}
 
-	[Fact]
-	public void ProcessFileName()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void ProcessFileName(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		string processFileName = window.ProcessFileName;
@@ -174,19 +149,16 @@ public class WindowTests
 		Assert.Equal("processFileName", processFileName);
 	}
 
-	[Fact]
-	public void ProcessFileName_NA()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void ProcessFileName_NA(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
 
 		// This is actually wrong - the error is thrown by Path.GetFileName.
 		// However, I can't be bothered to mock that out.
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
-			.Returns((string.Empty, null));
+		internalCtx.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>()).Returns((string.Empty, null));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		string processFileName = window.ProcessFileName;
@@ -195,12 +167,11 @@ public class WindowTests
 		Assert.Equal("--NA--", processFileName);
 	}
 
-	[Fact]
-	public void ProcessName()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void ProcessName(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		string processName = window.ProcessName;
@@ -209,14 +180,13 @@ public class WindowTests
 		Assert.Equal("processName", processName);
 	}
 
-	[Fact]
-	public void IsFocused()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void IsFocused(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetForegroundWindow()).Returns(new HWND(123));
+		internalCtx.CoreNativeManager.GetForegroundWindow().Returns(new HWND(123));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		bool isFocused = window.IsFocused;
@@ -225,14 +195,13 @@ public class WindowTests
 		Assert.True(isFocused);
 	}
 
-	[Fact]
-	public void IsMinimized()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void IsMinimized(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMinimized(It.IsAny<HWND>())).Returns(true);
+		internalCtx.CoreNativeManager.IsWindowMinimized(Arg.Any<HWND>()).Returns((BOOL)true);
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		bool isMinimized = window.IsMinimized;
@@ -241,14 +210,13 @@ public class WindowTests
 		Assert.True(isMinimized);
 	}
 
-	[Fact]
-	public void IsMaximized()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void IsMaximized(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMaximized(It.IsAny<HWND>())).Returns(true);
+		internalCtx.CoreNativeManager.IsWindowMaximized(Arg.Any<HWND>()).Returns((BOOL)true);
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		bool isMaximized = window.IsMaximized;
@@ -257,156 +225,148 @@ public class WindowTests
 		Assert.True(isMaximized);
 	}
 
-	[Fact]
-	public void BringToTop()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void BringToTop(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.BringWindowToTop(It.IsAny<HWND>()));
+		internalCtx.CoreNativeManager.BringWindowToTop(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		window.BringToTop();
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.BringWindowToTop(It.IsAny<HWND>()), Times.Once);
+		internalCtx.CoreNativeManager.Received(1).BringWindowToTop(Arg.Any<HWND>());
 	}
 
-	[Fact]
-	public void Close()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Close(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.NativeManager.Setup(cnm => cnm.QuitWindow(It.IsAny<HWND>()));
+		ctx.NativeManager.QuitWindow(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		window.Close();
 
 		// Then
-		wrapper.NativeManager.Verify(cnm => cnm.QuitWindow(It.IsAny<HWND>()), Times.Once);
+		ctx.NativeManager.Received(1).QuitWindow(Arg.Any<HWND>());
 	}
 
-	[Fact]
-	public void Focus()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Focus(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.SetForegroundWindow(It.IsAny<HWND>()));
+		internalCtx.CoreNativeManager.SetForegroundWindow(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		window.Focus();
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.SetForegroundWindow(It.IsAny<HWND>()), Times.Once);
+		internalCtx.CoreNativeManager.Received(1).SetForegroundWindow(Arg.Any<HWND>());
 	}
 
-	[Fact]
-	public void FocusForceForeground()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void FocusForceForeground(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.SetForegroundWindow(It.IsAny<HWND>()));
+		internalCtx.CoreNativeManager.SetForegroundWindow(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		window.FocusForceForeground();
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.SetForegroundWindow(It.IsAny<HWND>()), Times.Once);
+		internalCtx.CoreNativeManager.Received(1).SetForegroundWindow(Arg.Any<HWND>());
 		// The following code doesn't work because SendInput accepts a Span.
-		wrapper.CoreNativeManager.Verify(cnm => cnm.SendInput(It.IsAny<INPUT[]>(), It.IsAny<int>()), Times.Once);
+		internalCtx.CoreNativeManager.Received(1).SendInput(Arg.Any<INPUT[]>(), Arg.Any<int>());
 	}
 
-	[Fact]
-	public void Hide()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Hide(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.NativeManager.Setup(cnm => cnm.HideWindow(It.IsAny<HWND>()));
+		ctx.NativeManager.HideWindow(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		window.Hide();
 
 		// Then
-		wrapper.NativeManager.Verify(cnm => cnm.HideWindow(It.IsAny<HWND>()), Times.Once);
+		ctx.NativeManager.Received(1).HideWindow(Arg.Any<HWND>());
 	}
 
-	[Fact]
-	public void ShowMaximized()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void ShowMaximized(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.NativeManager.Setup(cnm => cnm.ShowWindowMaximized(It.IsAny<HWND>()));
+		ctx.NativeManager.ShowWindowMaximized(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		window.ShowMaximized();
 
 		// Then
-		wrapper.NativeManager.Verify(cnm => cnm.ShowWindowMaximized(It.IsAny<HWND>()), Times.Once);
+		ctx.NativeManager.Received(1).ShowWindowMaximized(Arg.Any<HWND>());
 	}
 
-	[Fact]
-	public void ShowMinimized()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void ShowMinimized(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.NativeManager.Setup(cnm => cnm.ShowWindowMinimized(It.IsAny<HWND>()));
+		ctx.NativeManager.ShowWindowMinimized(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		window.ShowMinimized();
 
 		// Then
-		wrapper.NativeManager.Verify(cnm => cnm.ShowWindowMinimized(It.IsAny<HWND>()), Times.Once);
+		ctx.NativeManager.Received(1).ShowWindowMinimized(Arg.Any<HWND>());
 	}
 
-	[Fact]
-	public void ShowNormal()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void ShowNormal(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.NativeManager.Setup(cnm => cnm.ShowWindowNoActivate(It.IsAny<HWND>()));
+		ctx.NativeManager.ShowWindowNoActivate(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		window.ShowNormal();
 
 		// Then
-		wrapper.NativeManager.Verify(cnm => cnm.ShowWindowNoActivate(It.IsAny<HWND>()), Times.Once);
+		ctx.NativeManager.Received(1).ShowWindowNoActivate(Arg.Any<HWND>());
 	}
 
-	[Fact]
-	public void CreateWindow_Null()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void CreateWindow_Null(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>())).Throws(new Win32Exception());
+		internalCtx.CoreNativeManager
+			.When(x => x.GetProcessNameAndPath(Arg.Any<int>()))
+			.Do(x => throw new Win32Exception());
 
 		// When
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123));
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123));
 
 		// Then
 		Assert.Null(window);
 	}
 
-	[Fact]
-	public void Equals_Null()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Equals_Null(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		bool equals = window.Equals(null);
@@ -415,12 +375,11 @@ public class WindowTests
 		Assert.False(equals);
 	}
 
-	[Fact]
-	public void Equals_WrongType()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Equals_WrongType(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		bool equals = window.Equals(new object());
@@ -429,31 +388,25 @@ public class WindowTests
 		Assert.False(equals);
 	}
 
-	[Fact]
-	public void Equals_NotWindow()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Equals_NotWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
-		bool equals = window.Equals(new Mock<IWindow>().Object);
+		bool equals = window.Equals(Substitute.For<IWindow>());
 
 		// Then
 		Assert.False(equals);
 	}
 
-	[Fact]
-	public void Equals_Success()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Equals_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
-		IWindow? window2 = Window.CreateWindow(
-			wrapper.Context.Object,
-			wrapper.CoreNativeManager.Object,
-			new HWND(123)
-		)!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
+		IWindow? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		bool equals = window.Equals(window2);
@@ -462,15 +415,12 @@ public class WindowTests
 		Assert.True(equals);
 	}
 
-	[Fact]
-	public void Equals_Operator_Success()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Equals_Operator_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		Window? window =
-			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
-		Window? window2 =
-			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
+		Window? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))! as Window;
+		Window? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(123))! as Window;
 
 		// When
 		bool equals = window == window2;
@@ -479,15 +429,12 @@ public class WindowTests
 		Assert.True(equals);
 	}
 
-	[Fact]
-	public void NotEquals_Operator_Success()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void NotEquals_Operator_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		Window? window =
-			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))! as Window;
-		Window? window2 =
-			Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(1234))! as Window;
+		Window? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))! as Window;
+		Window? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(1234))! as Window;
 
 		// When
 		bool equals = window != window2;
@@ -496,12 +443,11 @@ public class WindowTests
 		Assert.True(equals);
 	}
 
-	[Fact]
-	public void GetHashCode_Success()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void GetHashCode_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		IWindow? window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		int hashCode = window.GetHashCode();
@@ -511,16 +457,15 @@ public class WindowTests
 	}
 
 	#region IsUwp
-	[Fact]
-	public void IsUwp_True()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void IsUwp_True(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
+		internalCtx.CoreNativeManager
+			.GetProcessNameAndPath(Arg.Any<int>())
 			.Returns(("processName", "app/ApplicationFrameHost.exe"));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		bool isUwp = window.IsUwp;
@@ -529,16 +474,15 @@ public class WindowTests
 		Assert.True(isUwp);
 	}
 
-	[Fact]
-	public void IsUwp_False()
+	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void IsUwp_False(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetProcessNameAndPath(It.IsAny<int>()))
+		internalCtx.CoreNativeManager
+			.GetProcessNameAndPath(Arg.Any<int>())
 			.Returns(("processName", "processFileName"));
 
-		IWindow window = Window.CreateWindow(wrapper.Context.Object, wrapper.CoreNativeManager.Object, new HWND(123))!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
 		bool isUwp = window.IsUwp;

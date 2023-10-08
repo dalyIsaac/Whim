@@ -1,5 +1,5 @@
-using Moq;
-using System.Runtime.InteropServices;
+using NSubstitute;
+using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -20,95 +20,89 @@ public class MouseHookTests
 		}
 	}
 
-	private class Wrapper
+	private class CaptureMouseHook
 	{
-		public Mock<ICoreNativeManager> CoreNativeManager { get; } = new();
-		public HOOKPROC? HookProc { get; private set; }
-		public WindowsHookHandle SafeHandle { get; } = new();
+		public HOOKPROC? MouseHook { get; private set; }
+		public WindowsHookHandle? Handle { get; private set; }
 
-		public Wrapper()
+		public static CaptureMouseHook Create(IInternalContext internalCtx)
 		{
-			CoreNativeManager
-				.Setup(cnm => cnm.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, It.IsAny<HOOKPROC>(), null, 0))
-				.Callback(
-					(WINDOWS_HOOK_ID id, HOOKPROC proc, SafeHandle handle, uint dwThreadId) =>
+			CaptureMouseHook captureMouseHook = new();
+			internalCtx.CoreNativeManager
+				.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, Arg.Any<HOOKPROC>(), null, 0)
+				.Returns(
+					(callInfo) =>
 					{
-						HookProc = proc;
+						captureMouseHook.MouseHook = callInfo.ArgAt<HOOKPROC>(1);
+						captureMouseHook.Handle ??= new WindowsHookHandle();
+						return captureMouseHook.Handle;
 					}
-				)
-				.Returns(SafeHandle);
+				);
 
-			CoreNativeManager.Setup(cnm => cnm.CallNextHookEx(It.IsAny<int>(), It.IsAny<WPARAM>(), It.IsAny<LPARAM>()));
-		}
-
-		public Wrapper PtrToStructure(MSLLHOOKSTRUCT? msllhookstruct)
-		{
-			CoreNativeManager
-				.Setup(cnm => cnm.PtrToStructure<MSLLHOOKSTRUCT>(It.IsAny<nint>()))
-				.Returns(msllhookstruct);
-
-			return this;
+			return captureMouseHook;
 		}
 	}
 
-	[Fact]
-	public void PostInitialize()
+	[Theory, AutoSubstituteData]
+	internal void PostInitialize(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
+		using MouseHook mouseHook = new(internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
 
 		// Then
-		Assert.NotNull(wrapper.HookProc);
+		Assert.NotNull(capture.MouseHook);
 	}
 
-	[Fact]
-	public void OnMouseTriggerEvent_LParamIsZero()
+	[Theory, AutoSubstituteData]
+	internal void OnMouseTriggerEvent_LParamIsZero(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
+		using MouseHook mouseHook = new(internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
 
 		// Then
-		TestUtils.Assert.DoesNotRaise<MouseEventArgs>(
+		CustomAssert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,
 			h => mouseHook.MouseLeftButtonDown -= h,
-			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 0)
+			() => capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 0)
 		);
 	}
 
-	[Fact]
-	public void OnMouseTriggerEvent_NotMSLLHOOKSTRUCT()
+	[Theory, AutoSubstituteData]
+	internal void OnMouseTriggerEvent_NotMSLLHOOKSTRUCT(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new Wrapper().PtrToStructure(null);
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
+		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns((MSLLHOOKSTRUCT?)null);
+		using MouseHook mouseHook = new(internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
 
 		// Then
-		TestUtils.Assert.DoesNotRaise<MouseEventArgs>(
+		CustomAssert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,
 			h => mouseHook.MouseLeftButtonDown -= h,
-			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1)
+			() => capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1)
 		);
 	}
 
-	[Fact]
-	public void OnMouseTriggerEvent_Success_WM_LBUTTONDOWN()
+	[Theory, AutoSubstituteData]
+	internal void OnMouseTriggerEvent_Success_WM_LBUTTONDOWN(IInternalContext internalCtx)
 	{
 		// Given
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
 		System.Drawing.Point point = new(1, 2);
 		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
-		Wrapper wrapper = new Wrapper().PtrToStructure(msllhookstruct);
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns(msllhookstruct);
+		using MouseHook mouseHook = new(internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
@@ -117,20 +111,21 @@ public class MouseHookTests
 		var result = Assert.Raises<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,
 			h => mouseHook.MouseLeftButtonDown -= h,
-			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1)
+			() => capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1)
 		);
 		Assert.Equal(point.X, result.Arguments.Point.X);
 		Assert.Equal(point.Y, result.Arguments.Point.Y);
 	}
 
-	[Fact]
-	public void OnMouseTriggerEvent_Success_WM_LBUTTONUP()
+	[Theory, AutoSubstituteData]
+	internal void OnMouseTriggerEvent_Success_WM_LBUTTONUP(IInternalContext internalCtx)
 	{
 		// Given
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
 		System.Drawing.Point point = new(1, 2);
 		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
-		Wrapper wrapper = new Wrapper().PtrToStructure(msllhookstruct);
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns(msllhookstruct);
+		using MouseHook mouseHook = new(internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
@@ -139,57 +134,58 @@ public class MouseHookTests
 		var result = Assert.Raises<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonUp += h,
 			h => mouseHook.MouseLeftButtonUp -= h,
-			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONUP, 1)
+			() => capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONUP, 1)
 		);
 		Assert.Equal(point.X, result.Arguments.Point.X);
 		Assert.Equal(point.Y, result.Arguments.Point.Y);
 	}
 
-	[Fact]
-	public void OtherKey()
+	[Theory, AutoSubstituteData]
+	internal void OtherKey(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new Wrapper().PtrToStructure(new MSLLHOOKSTRUCT());
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
+		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns(new MSLLHOOKSTRUCT());
+		using MouseHook mouseHook = new(internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
 
 		// Then
-		TestUtils.Assert.DoesNotRaise<MouseEventArgs>(
+		CustomAssert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,
 			h => mouseHook.MouseLeftButtonDown -= h,
-			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_KEYDOWN, 1)
+			() => capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_KEYDOWN, 1)
 		);
 
-		TestUtils.Assert.DoesNotRaise<MouseEventArgs>(
+		CustomAssert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonUp += h,
 			h => mouseHook.MouseLeftButtonUp -= h,
-			() => wrapper.HookProc!.Invoke(0, (WPARAM)PInvoke.WM_KEYDOWN, 1)
+			() => capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_KEYDOWN, 1)
 		);
 	}
 
-	[Fact]
-	public void Dispose()
+	[Theory, AutoSubstituteData]
+	internal void Dispose(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
+		using MouseHook mouseHook = new(internalCtx);
 		mouseHook.PostInitialize();
 
 		// When
 		mouseHook.Dispose();
 
 		// Then
-		Assert.Equal(1, wrapper.SafeHandle.Calls);
+		Assert.Equal(1, capture.Handle?.Calls);
 	}
 
-	[Fact]
-	public void AlreadyDisposed()
+	[Theory, AutoSubstituteData]
+	internal void AlreadyDisposed(IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		using MouseHook mouseHook = new(wrapper.CoreNativeManager.Object);
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
+		using MouseHook mouseHook = new(internalCtx);
 		mouseHook.PostInitialize();
 		mouseHook.Dispose();
 
@@ -197,6 +193,6 @@ public class MouseHookTests
 		mouseHook.Dispose();
 
 		// Then
-		Assert.Equal(1, wrapper.SafeHandle.Calls);
+		Assert.Equal(1, capture.Handle?.Calls);
 	}
 }

@@ -1,125 +1,123 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using Whim.CommandPalette;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.CommandPalette.Tests;
 
+public class TreeLayoutCommandPaletteCommandsCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IContext ctx = fixture.Freeze<IContext>();
+		IMonitor monitor = fixture.Freeze<IMonitor>();
+
+		ctx.MonitorManager.ActiveMonitor.Returns(monitor);
+
+		IPlugin treeLayoutCommandPalettePlugin = fixture.Freeze<IPlugin>();
+		treeLayoutCommandPalettePlugin.Name.Returns("whim.tree_layout.command_palette");
+
+		ITreeLayoutPlugin treeLayoutPlugin = fixture.Freeze<ITreeLayoutPlugin>();
+		ICommandPalettePlugin commandPalettePlugin = fixture.Freeze<ICommandPalettePlugin>();
+
+		TreeLayoutCommandPalettePluginCommands commands =
+			new(ctx, treeLayoutCommandPalettePlugin, treeLayoutPlugin, commandPalettePlugin);
+		fixture.Inject(commands);
+	}
+}
+
 public class TreeLayoutCommandPaletteCommandsTests
 {
-	private class Wrapper
-	{
-		public Mock<IContext> Context { get; } = new();
-		public Mock<IPlugin> TreeLayoutCommandPalettePlugin { get; } = new();
-		public Mock<ITreeLayoutPlugin> TreeLayoutPlugin { get; } = new();
-		public Mock<ICommandPalettePlugin> CommandPalettePlugin { get; } = new();
-		public Mock<IMonitorManager> MonitorManager { get; } = new();
-		public Mock<IMonitor> Monitor { get; } = new();
-		public TreeLayoutCommandPalettePluginCommands Commands { get; }
-
-		public Wrapper()
-		{
-			Context.Setup(c => c.MonitorManager).Returns(MonitorManager.Object);
-			MonitorManager.Setup(m => m.ActiveMonitor).Returns(Monitor.Object);
-
-			TreeLayoutCommandPalettePlugin.Setup(t => t.Name).Returns("whim.tree_layout.command_palette");
-
-			TreeLayoutCommandPalettePluginCommands commands =
-				new(
-					Context.Object,
-					TreeLayoutCommandPalettePlugin.Object,
-					TreeLayoutPlugin.Object,
-					CommandPalettePlugin.Object
-				);
-
-			Commands = new(
-				Context.Object,
-				TreeLayoutCommandPalettePlugin.Object,
-				TreeLayoutPlugin.Object,
-				CommandPalettePlugin.Object
-			);
-		}
-	}
-
-	[Fact]
-	public void SetDirectionCommand_Activates()
+	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
+	public void SetDirectionCommand_Activates(
+		ICommandPalettePlugin commandPalettePlugin,
+		TreeLayoutCommandPalettePluginCommands commands,
+		ITreeLayoutPlugin treeLayoutPlugin,
+		IMonitor monitor
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new PluginCommandsTestUtils(commands).GetCommand(
 			"whim.tree_layout.command_palette.set_direction"
 		);
-		wrapper.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(wrapper.Monitor.Object)).Returns(Direction.Left);
+		treeLayoutPlugin.GetAddWindowDirection(monitor).Returns(Direction.Left);
 
 		// When
 		command.TryExecute();
 
 		// Then
-		wrapper.CommandPalettePlugin.Verify(c => c.Activate(It.IsAny<MenuVariantConfig>()), Times.Once);
+		commandPalettePlugin.Received(1).Activate(Arg.Any<MenuVariantConfig>());
 	}
 
-	[Fact]
-	public void SetDirectionCommand_Activates_Fails()
+	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
+	public void SetDirectionCommand_Activates_Fails(
+		ICommandPalettePlugin commandPalettePlugin,
+		TreeLayoutCommandPalettePluginCommands commands,
+		ITreeLayoutPlugin treeLayoutPlugin,
+		IMonitor monitor
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		ICommand command = new TestUtils.PluginCommandsTestUtils(commands).GetCommand(
 			"whim.tree_layout.command_palette.set_direction"
 		);
-		wrapper.TreeLayoutPlugin.Setup(t => t.GetAddWindowDirection(wrapper.Monitor.Object)).Returns((Direction?)null);
+		treeLayoutPlugin.GetAddWindowDirection(monitor).Returns((Direction?)null);
 
 		// When
 		command.TryExecute();
 
 		// Then
-		wrapper.CommandPalettePlugin.Verify(c => c.Activate(It.IsAny<MenuVariantConfig>()), Times.Never);
+		commandPalettePlugin.DidNotReceive().Activate(Arg.Any<MenuVariantConfig>());
 	}
 
-	[Fact]
-	public void CreateSetDirectionCommandItems()
+	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
+	public void CreateSetDirectionCommandItems(TreeLayoutCommandPalettePluginCommands commands)
 	{
-		// Given
-		Wrapper wrapper = new();
-
 		// When
-		ICommand[] commandItems = wrapper.Commands.CreateSetDirectionCommands();
+		ICommand[] commandItems = commands.CreateSetDirectionCommands();
 
 		// Then
 		Assert.Equal(4, commandItems.Length);
 	}
 
-	[InlineData("Left", Direction.Left)]
-	[InlineData("Right", Direction.Right)]
-	[InlineData("Up", Direction.Up)]
-	[InlineData("Down", Direction.Down)]
+	[InlineAutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>("Left", Direction.Left)]
+	[InlineAutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>("Right", Direction.Right)]
+	[InlineAutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>("Up", Direction.Up)]
+	[InlineAutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>("Down", Direction.Down)]
 	[Theory]
-	public void SetDirection(string direction, Direction expectedDirection)
+	public void SetDirection(
+		string direction,
+		Direction expectedDirection,
+		TreeLayoutCommandPalettePluginCommands commands,
+		ITreeLayoutPlugin treeLayoutPlugin,
+		IMonitor monitor
+	)
 	{
-		// Given
-		Wrapper wrapper = new();
-
 		// When
-		wrapper.Commands.SetDirection(direction);
+		commands.SetDirection(direction);
 
 		// Then
-		wrapper.TreeLayoutPlugin.Verify(
-			t => t.SetAddWindowDirection(wrapper.Monitor.Object, expectedDirection),
-			Times.Once
-		);
+		treeLayoutPlugin.Received(1).SetAddWindowDirection(monitor, expectedDirection);
 	}
 
-	[Fact]
-	public void SetDirectionCommand_FailsWhenNoActiveTreeLayoutEngine()
+	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
+	public void SetDirectionCommand_FailsWhenNoActiveTreeLayoutEngine(
+		TreeLayoutCommandPalettePluginCommands commands,
+		ITreeLayoutPlugin treeLayoutPlugin,
+		IMonitor monitor,
+		IWorkspaceManager workspaceManager,
+		IWorkspace workspace
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
+		workspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		workspace.ActiveLayoutEngine.Returns((ILayoutEngine?)null);
 
 		// When
-		wrapper.Commands.SetDirection("welp");
+		commands.SetDirection("welp");
 
 		// Then
-		wrapper.TreeLayoutPlugin.Verify(
-			t => t.SetAddWindowDirection(It.IsAny<IMonitor>(), It.IsAny<Direction>()),
-			Times.Never
-		);
+		treeLayoutPlugin.DidNotReceive().SetAddWindowDirection(Arg.Any<IMonitor>(), Arg.Any<Direction>());
 	}
 }

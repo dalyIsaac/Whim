@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -169,22 +167,8 @@ internal interface ICoreNativeManager
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getmonitorinfoa
 	/// </remarks>
 	/// <param name="hMonitor"></param>
-	/// <param name="lpmi"></param>
 	/// <returns></returns>
-	BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFO lpmi);
-
-	/// <summary>
-	/// Retrieve information about a display monitor.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetMonitorInfo(HMONITOR, ref MONITORINFO)"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getmonitorinfoa
-	/// </remarks>
-	/// <param name="hMonitor"></param>
-	/// <param name="lpmi"></param>
-	/// <returns></returns>
-	BOOL GetMonitorInfo(HMONITOR hMonitor, ref MONITORINFOEXW lpmi);
+	MONITORINFOEXW? GetMonitorInfoEx(HMONITOR hMonitor);
 
 	/// <summary>
 	/// Retrieve a handle to the display monitor that contains a specified point.
@@ -488,14 +472,6 @@ internal interface ICoreNativeManager
 	/// <param name="callback">The task to execute.</param>
 	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
 	bool TryEnqueue(DispatcherQueueHandler callback);
-
-	/// <summary>
-	/// Executes the given <paramref name="task" />, and runs the returned <see cref="DispatcherQueueHandler" />
-	/// after the <paramref name="task" /> completes on the thread associated with the <see cref="DispatcherQueue" />.
-	/// </summary>
-	/// <param name="task"></param>
-	/// <param name="cancellationToken"></param>
-	Task ExecuteTask(Func<DispatcherQueueHandler> task, CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.

@@ -66,6 +66,7 @@ public interface IWorkspace : IDisposable
 	/// Removes the window from the workspace.
 	/// </summary>
 	/// <param name="window"></param>
+	/// <returns>True when the window was removed.</returns>
 	bool RemoveWindow(IWindow window);
 
 	/// <summary>

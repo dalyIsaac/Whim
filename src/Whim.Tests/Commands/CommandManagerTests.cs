@@ -1,45 +1,53 @@
-using Moq;
+using AutoFixture;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
+public class CommandManagerCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		ICommand command = fixture.Freeze<ICommand>();
+		command.Id.Returns("command");
+		fixture.Inject(command);
+	}
+}
+
 public class CommandManagerTests
 {
-	[Fact]
-	public void AddPluginCommand_Success()
+	[Theory, AutoSubstituteData<CommandManagerCustomization>]
+	public void AddPluginCommand_Success(ICommand command)
 	{
 		// Given
-		Mock<ICommand> command = new();
-		command.SetupGet(c => c.Id).Returns("command");
 		CommandManager commandManager = new();
 
 		// When
-		commandManager.AddPluginCommand(command.Object);
+		commandManager.AddPluginCommand(command);
 
 		// Then
-		Assert.Contains(command.Object, commandManager);
-		Assert.Equal(command.Object, commandManager.TryGetCommand(command.Object.Id));
+		Assert.Contains(command, commandManager);
+		Assert.Equal(command, commandManager.TryGetCommand(command.Id));
 		Assert.Single(commandManager);
 	}
 
-	[Fact]
-	public void AddPluginCommand_AlreadyContainsCommand()
+	[Theory, AutoSubstituteData<CommandManagerCustomization>]
+	public void AddPluginCommand_AlreadyContainsCommand(ICommand command)
 	{
 		// Given
-		Mock<ICommand> command = new();
-		command.SetupGet(c => c.Id).Returns("command");
 		CommandManager commandManager = new();
 
 		// When
-		commandManager.AddPluginCommand(command.Object);
-		Assert.Throws<InvalidOperationException>(() => commandManager.AddPluginCommand(command.Object));
+		commandManager.AddPluginCommand(command);
+		Assert.Throws<InvalidOperationException>(() => commandManager.AddPluginCommand(command));
 
 		// Then
-		Assert.Contains(command.Object, commandManager);
-		Assert.Equal(command.Object, commandManager.TryGetCommand(command.Object.Id));
+		Assert.Contains(command, commandManager);
+		Assert.Equal(command, commandManager.TryGetCommand(command.Id));
 		Assert.Single(commandManager);
 	}
 
@@ -59,20 +67,18 @@ public class CommandManagerTests
 		Assert.Equal("title", command.Title);
 	}
 
-	[Fact]
-	public void GetEnumerator()
+	[Theory, AutoSubstituteData<CommandManagerCustomization>]
+	public void GetEnumerator(ICommand command)
 	{
 		// Given
-		Mock<ICommand> command = new();
-		command.SetupGet(c => c.Id).Returns("command");
 		CommandManager commandManager = new();
 
 		// When
-		commandManager.AddPluginCommand(command.Object);
+		commandManager.AddPluginCommand(command);
 
 		// Then
 		List<ICommand> allCommands = commandManager.ToList();
 		Assert.Single(allCommands);
-		Assert.Equal(command.Object, allCommands[0]);
+		Assert.Equal(command, allCommands[0]);
 	}
 }

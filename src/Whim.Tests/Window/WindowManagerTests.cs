@@ -1,14 +1,85 @@
+using AutoFixture;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
 using Xunit;
 
 namespace Whim.Tests;
+
+internal class WindowManagerCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		IWorkspaceManager workspaceManager = Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>();
+		IMonitorManager monitorManager = Substitute.For<IMonitorManager, IInternalMonitorManager>();
+
+		IContext context = fixture.Freeze<IContext>();
+		context.WorkspaceManager.Returns(workspaceManager);
+		context.MonitorManager.Returns(monitorManager);
+	}
+}
+
+internal class WindowManagerFakeSafeHandle : UnhookWinEventSafeHandle
+{
+	public bool HasDisposed { get; set; }
+
+	private bool _isInvalid;
+	public override bool IsInvalid => _isInvalid;
+
+	public WindowManagerFakeSafeHandle(bool isInvalid, bool isClosed)
+		: base(default, default)
+	{
+		_isInvalid = isInvalid;
+
+		if (isClosed)
+		{
+			Close();
+		}
+	}
+
+	public void MarkAsInvalid() => _isInvalid = true;
+
+	protected override bool ReleaseHandle()
+	{
+		return true;
+	}
+
+	protected override void Dispose(bool disposing)
+	{
+		HasDisposed = true;
+		base.Dispose(disposing);
+	}
+}
+
+internal class CaptureWinEventProc
+{
+	public WINEVENTPROC? WinEventProc { get; private set; }
+	public List<WindowManagerFakeSafeHandle> Handles { get; } = new();
+
+	public static CaptureWinEventProc Create(
+		IInternalContext internalCtx,
+		bool isInvalid = false,
+		bool isClosed = false
+	)
+	{
+		CaptureWinEventProc capture = new();
+		internalCtx.CoreNativeManager
+			.SetWinEventHook(Arg.Any<uint>(), Arg.Any<uint>(), Arg.Any<WINEVENTPROC>())
+			.Returns(callInfo =>
+			{
+				capture.WinEventProc = callInfo.ArgAt<WINEVENTPROC>(2);
+				capture.Handles.Add(new WindowManagerFakeSafeHandle(isInvalid, isClosed));
+				return capture.Handles[^1];
+			});
+		return capture;
+	}
+}
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
 	"Reliability",
@@ -17,238 +88,156 @@ namespace Whim.Tests;
 )]
 public class WindowManagerTests
 {
-	private class FakeSafeHandle : UnhookWinEventSafeHandle
+	private static readonly uint _processId = 1;
+
+	private static void AllowWindowCreation(IContext ctx, IInternalContext internalCtx, HWND hwnd)
 	{
-		public bool HasDisposed { get; set; }
+		internalCtx.CoreNativeManager.IsSplashScreen(hwnd).Returns(false);
+		internalCtx.CoreNativeManager.IsCloakedWindow(hwnd).Returns(false);
+		internalCtx.CoreNativeManager.IsStandardWindow(hwnd).Returns(true);
+		internalCtx.CoreNativeManager.HasNoVisibleOwner(hwnd).Returns(true);
 
-		private bool _isInvalid;
-		public override bool IsInvalid => _isInvalid;
-
-		public FakeSafeHandle(bool isInvalid, bool isClosed)
-			: base(default, default)
-		{
-			_isInvalid = isInvalid;
-
-			if (isClosed)
+		ctx.NativeManager.GetClassName(hwnd).Returns("WindowClass");
+		internalCtx.CoreNativeManager
+			.GetWindowThreadProcessId(hwnd, out _)
+			.Returns(callInfo =>
 			{
-				Close();
-			}
-		}
-
-		public void MarkAsInvalid() => _isInvalid = true;
-
-		protected override bool ReleaseHandle()
-		{
-			return true;
-		}
-
-		protected override void Dispose(bool disposing)
-		{
-			HasDisposed = true;
-			base.Dispose(disposing);
-		}
+				callInfo[1] = _processId;
+				return (uint)1;
+			});
+		internalCtx.CoreNativeManager.GetProcessNameAndPath((int)_processId).Returns(("name", "path"));
 	}
 
-	private class Wrapper
+	private WindowManagerTests Trigger_MouseLeftButtonDown(IInternalContext internalCtx)
 	{
-		public Mock<IContext> Context = new();
-
-		public Mock<IMonitorManager> MonitorManager;
-		public Mock<IInternalMonitorManager> InternalMonitorManager;
-
-		public Mock<IWorkspaceManager> WorkspaceManager;
-		public Mock<IInternalWorkspaceManager> InternalWorkspaceManager = new();
-
-		public Mock<ICoreNativeManager> CoreNativeManager = new();
-		public Mock<IMouseHook> MouseHook = new();
-
-		public Mock<INativeManager> NativeManager = new();
-		public Mock<IWindowMessageMonitor> WindowMessageMonitor = new();
-		public Mock<IFilterManager> FilterManager = new();
-
-		public List<FakeSafeHandle> Handles = new();
-
-		public WINEVENTPROC? WinEventProc { get; set; }
-
-		private uint _processId = 1;
-		public uint ProcessId => _processId;
-
-		public Wrapper()
-		{
-			InternalMonitorManager = new();
-			InternalMonitorManager.Setup(m => m.WindowFocused(It.IsAny<IWindow>()));
-
-			MonitorManager = InternalMonitorManager.As<IMonitorManager>();
-
-			InternalWorkspaceManager.Setup(expression: m => m.WindowAdded(It.IsAny<IWindow>()));
-			InternalWorkspaceManager.Setup(m => m.WindowFocused(It.IsAny<IWindow>()));
-			InternalWorkspaceManager.Setup(m => m.WindowRemoved(It.IsAny<IWindow>()));
-			InternalWorkspaceManager.Setup(m => m.WindowMinimizeStart(It.IsAny<IWindow>()));
-			InternalWorkspaceManager.Setup(m => m.WindowMinimizeEnd(It.IsAny<IWindow>()));
-
-			WorkspaceManager = InternalWorkspaceManager.As<IWorkspaceManager>();
-
-			Context.SetupGet(m => m.WorkspaceManager).Returns(WorkspaceManager.Object);
-			Context.SetupGet(m => m.MonitorManager).Returns(MonitorManager.Object);
-			Context.SetupGet(m => m.FilterManager).Returns(FilterManager.Object);
-			Context.SetupGet(m => m.NativeManager).Returns(NativeManager.Object);
-
-			// Capture the delegate passed to SetWinEventHook
-			CoreNativeManager
-				.Setup(n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()))
-				.Callback<uint, uint, WINEVENTPROC>(
-					(_, _, proc) =>
-					{
-						WinEventProc = proc;
-						Handles.Add(new FakeSafeHandle(false, false));
-					}
-				)
-				.Returns(() => Handles[^1]);
-		}
-
-		public Wrapper AllowWindowCreation(HWND hwnd)
-		{
-			CoreNativeManager.Setup(cnm => cnm.IsSplashScreen(hwnd)).Returns(false);
-			CoreNativeManager.Setup(cnm => cnm.IsCloakedWindow(hwnd)).Returns(false);
-			CoreNativeManager.Setup(cnm => cnm.IsStandardWindow(hwnd)).Returns(true);
-			CoreNativeManager.Setup(cnm => cnm.HasNoVisibleOwner(hwnd)).Returns(true);
-			NativeManager.Setup(nm => nm.GetClassName(It.IsAny<HWND>())).Returns("WindowClass");
-
-			CoreNativeManager.Setup(cnm => cnm.GetWindowThreadProcessId(hwnd, out _processId));
-			CoreNativeManager.Setup(cnm => cnm.GetProcessNameAndPath((int)ProcessId)).Returns(("name", "path"));
-			return this;
-		}
-
-		public Wrapper Trigger_MouseLeftButtonDown()
-		{
-			MouseHook.Raise(m => m.MouseLeftButtonDown += null, new MouseEventArgs(new Point<int>() { X = 1, Y = 2 }));
-			return this;
-		}
-
-		public Wrapper Trigger_MouseLeftButtonUp()
-		{
-			MouseHook.Raise(m => m.MouseLeftButtonUp += null, new MouseEventArgs(new Point<int>() { X = 1, Y = 2 }));
-			return this;
-		}
+		internalCtx.MouseHook.MouseLeftButtonDown += Raise.Event<EventHandler<MouseEventArgs>>(
+			new MouseEventArgs(new Point<int>() { X = 1, Y = 2 })
+		);
+		return this;
 	}
 
-	[Fact]
-	public void OnWindowAdded()
+	private WindowManagerTests Trigger_MouseLeftButtonUp(IInternalContext internalCtx)
+	{
+		internalCtx.MouseHook.MouseLeftButtonUp += Raise.Event<EventHandler<MouseEventArgs>>(
+			new MouseEventArgs(new Point<int>() { X = 1, Y = 2 })
+		);
+		return this;
+	}
+
+	private WindowManagerTests Setup_GetCursorPos(IInternalContext internalCtx)
+	{
+		internalCtx.CoreNativeManager
+			.GetCursorPos(out _)
+			.Returns(callInfo =>
+			{
+				callInfo[0] = new Point<int>(1, 2);
+				return (BOOL)true;
+			});
+		return this;
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void OnWindowAdded(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
-
-		Mock<IWindow> window = new();
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		var result = Assert.Raises<WindowEventArgs>(
 			eh => windowManager.WindowAdded += eh,
 			eh => windowManager.WindowAdded -= eh,
-			() => windowManager.OnWindowAdded(window.Object)
+			() => windowManager.OnWindowAdded(window)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowAdded(window.Object), Times.Once);
-		Assert.Equal(window.Object, result.Arguments.Window);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowAdded(window);
+		Assert.Equal(window, result.Arguments.Window);
 	}
 
-	[Fact]
-	public void OnWindowFocused()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void OnWindowFocused(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
-
-		Mock<IWindow> window = new();
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		var result = Assert.Raises<WindowFocusedEventArgs>(
 			eh => windowManager.WindowFocused += eh,
 			eh => windowManager.WindowFocused -= eh,
-			() => windowManager.OnWindowFocused(window.Object)
+			() => windowManager.OnWindowFocused(window)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowFocused(window.Object), Times.Once);
-		wrapper.InternalMonitorManager.Verify(m => m.WindowFocused(window.Object), Times.Once);
-		Assert.Equal(window.Object, result.Arguments.Window);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowFocused(window);
+		((IInternalMonitorManager)ctx.MonitorManager).Received(1).WindowFocused(window);
+		Assert.Equal(window, result.Arguments.Window);
 	}
 
-	[Fact]
-	public void OnWindowRemoved()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void OnWindowRemoved(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
-
-		Mock<IWindow> window = new();
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		var result = Assert.Raises<WindowEventArgs>(
 			eh => windowManager.WindowRemoved += eh,
 			eh => windowManager.WindowRemoved -= eh,
-			() => windowManager.OnWindowRemoved(window.Object)
+			() => windowManager.OnWindowRemoved(window)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowRemoved(window.Object), Times.Once);
-		Assert.Equal(window.Object, result.Arguments.Window);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowRemoved(window);
+		Assert.Equal(window, result.Arguments.Window);
 	}
 
-	[Fact]
-	public void OnWindowMinimizeStart()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void OnWindowMinimizeStart(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
-
-		Mock<IWindow> window = new();
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		var result = Assert.Raises<WindowEventArgs>(
 			eh => windowManager.WindowMinimizeStart += eh,
 			eh => windowManager.WindowMinimizeStart -= eh,
-			() => windowManager.OnWindowMinimizeStart(window.Object)
+			() => windowManager.OnWindowMinimizeStart(window)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowMinimizeStart(window.Object), Times.Once);
-		Assert.Equal(window.Object, result.Arguments.Window);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowMinimizeStart(window);
+		Assert.Equal(window, result.Arguments.Window);
 	}
 
-	[Fact]
-	public void OnWindowMinimizeEnd()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void OnWindowMinimizeEnd(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
-
-		Mock<IWindow> window = new();
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		var result = Assert.Raises<WindowEventArgs>(
 			eh => windowManager.WindowMinimizeEnd += eh,
 			eh => windowManager.WindowMinimizeEnd -= eh,
-			() => windowManager.OnWindowMinimizeEnd(window.Object)
+			() => windowManager.OnWindowMinimizeEnd(window)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowMinimizeEnd(window.Object), Times.Once);
-		Assert.Equal(window.Object, result.Arguments.Window);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowMinimizeEnd(window);
+		Assert.Equal(window, result.Arguments.Window);
 	}
 
-	private static void InitializeCoreNativeManagerMock(Wrapper wrapper)
+	private static void InitializeCoreNativeManagerMock(IInternalContext internalCtx)
 	{
 		(uint, uint)[] events = new[]
 		{
@@ -262,72 +251,71 @@ public class WindowManagerTests
 
 		foreach (var (eventMin, eventMax) in events)
 		{
-			wrapper.CoreNativeManager
-				.Setup(n => n.SetWinEventHook(eventMin, eventMax, It.IsAny<WINEVENTPROC>()))
+			internalCtx.CoreNativeManager
+				.SetWinEventHook(eventMin, eventMax, Arg.Any<WINEVENTPROC>())
 				.Returns(new UnhookWinEventSafeHandle(1));
 		}
 	}
 
-	[Fact]
-	public void Initialize()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void Initialize(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		InitializeCoreNativeManagerMock(wrapper);
+		InitializeCoreNativeManagerMock(internalCtx);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()),
-			Times.Exactly(6)
-		);
+		internalCtx.CoreNativeManager
+			.Received(6)
+			.SetWinEventHook(Arg.Any<uint>(), Arg.Any<uint>(), Arg.Any<WINEVENTPROC>());
 	}
 
-	[Fact]
-	public void Initialize_Fail()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void Initialize_Fail(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-		InitializeCoreNativeManagerMock(wrapper);
+		InitializeCoreNativeManagerMock(internalCtx);
 
-		wrapper.CoreNativeManager
-			.Setup(
-				n =>
-					n.SetWinEventHook(
-						PInvoke.EVENT_SYSTEM_MINIMIZESTART,
-						PInvoke.EVENT_SYSTEM_MINIMIZEEND,
-						It.IsAny<WINEVENTPROC>()
-					)
+		internalCtx.CoreNativeManager
+			.SetWinEventHook(
+				PInvoke.EVENT_SYSTEM_MINIMIZESTART,
+				PInvoke.EVENT_SYSTEM_MINIMIZEEND,
+				Arg.Any<WINEVENTPROC>()
 			)
 			.Returns(new UnhookWinEventSafeHandle());
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		// Then
 		Assert.Throws<InvalidOperationException>(windowManager.Initialize);
 	}
 
-	[InlineData(PInvoke.CHILDID_SELF + 1, 0, 0)]
-	[InlineData(PInvoke.CHILDID_SELF, 1, 0)]
-	[InlineData(PInvoke.CHILDID_SELF, 0, null)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.CHILDID_SELF + 1, 0, 0)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.CHILDID_SELF, 1, 0)]
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.CHILDID_SELF, 0, null)]
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 	[Theory]
-	public void WindowsEventHook_IsEventWindowValid_False(int idObject, int idChild, int? hwndValue)
+	internal void WindowsEventHook_IsEventWindowValid_False(
+		int idObject,
+		int idChild,
+		int? hwndValue,
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke(
+		capture.WinEventProc!.Invoke(
 			(HWINEVENTHOOK)0,
 			PInvoke.EVENT_OBJECT_SHOW,
 			hwndValue == null ? HWND.Null : (HWND)hwndValue,
@@ -338,148 +326,159 @@ public class WindowManagerTests
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowAdded(It.IsAny<IWindow>()), Times.Never);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.DidNotReceive()
+			.WindowAdded(Arg.Any<IWindow>());
 	}
 
-	[InlineData(true, false, true, true)]
-	[InlineData(false, true, true, true)]
-	[InlineData(false, false, false, true)]
-	[InlineData(false, false, true, false)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(true, false, true, true)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(false, true, true, true)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(false, false, false, true)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(false, false, true, false)]
 	[Theory]
-	public void WindowsEventHook_AddWindow_Fail(
+	internal void WindowsEventHook_AddWindow_Fail(
 		bool isSplashScreen,
 		bool isCloakedWindow,
 		bool isStandardWindow,
-		bool hasNoVisibleOwner
+		bool hasNoVisibleOwner,
+		IContext ctx,
+		IInternalContext internalCtx
 	)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new();
-		wrapper.CoreNativeManager.Setup(cnm => cnm.IsSplashScreen(hwnd)).Returns(isSplashScreen);
-		wrapper.CoreNativeManager.Setup(cnm => cnm.IsCloakedWindow(hwnd)).Returns(isCloakedWindow);
-		wrapper.CoreNativeManager.Setup(cnm => cnm.IsStandardWindow(hwnd)).Returns(isStandardWindow);
-		wrapper.CoreNativeManager.Setup(cnm => cnm.HasNoVisibleOwner(hwnd)).Returns(hasNoVisibleOwner);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		internalCtx.CoreNativeManager.IsSplashScreen(hwnd).Returns(isSplashScreen);
+		internalCtx.CoreNativeManager.IsCloakedWindow(hwnd).Returns(isCloakedWindow);
+		internalCtx.CoreNativeManager.IsStandardWindow(hwnd).Returns(isStandardWindow);
+		internalCtx.CoreNativeManager.HasNoVisibleOwner(hwnd).Returns(hasNoVisibleOwner);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(
-			cnm => cnm.GetWindowThreadProcessId(hwnd, out It.Ref<uint>.IsAny),
-			Times.Never
-		);
+		internalCtx.CoreNativeManager.DidNotReceive().GetWindowThreadProcessId(hwnd, out _);
 	}
 
-	[Fact]
-	public void WindowsEventHook_CreateWindow_Null()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_CreateWindow_Null(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetProcessNameAndPath((int)wrapper.ProcessId))
-			.Throws(new Win32Exception());
+		internalCtx.CoreNativeManager
+			.When(cnm => cnm.GetProcessNameAndPath((int)_processId))
+			.Do(_ => throw new Win32Exception());
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowAdded(It.IsAny<IWindow>()), Times.Never);
-		wrapper.FilterManager.Verify(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>()), Times.Never);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.DidNotReceive()
+			.WindowAdded(Arg.Any<IWindow>());
+		ctx.FilterManager.DidNotReceive().ShouldBeIgnored(Arg.Any<IWindow>());
 	}
 
-	[Fact]
-	public void WindowsEventHook_IgnoreWindow()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_IgnoreWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(true);
+		ctx.FilterManager.ShouldBeIgnored(Arg.Any<IWindow>()).Returns(true);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowAdded(It.IsAny<IWindow>()), Times.Never);
-		wrapper.FilterManager.Verify(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>()), Times.Once);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.DidNotReceive()
+			.WindowAdded(Arg.Any<IWindow>());
+		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
 	}
 
-	[Fact]
-	public void WindowsEventHook_WindowIsMinimized()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_WindowIsMinimized(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(false);
-		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMinimized(hwnd)).Returns(true);
+		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowAdded(It.IsAny<IWindow>()), Times.Never);
-		wrapper.FilterManager.Verify(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>()), Times.Once);
-		wrapper.InternalWorkspaceManager.Verify(iwm => iwm.WindowAdded(It.IsAny<IWindow>()), Times.Never);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.DidNotReceive()
+			.WindowAdded(Arg.Any<IWindow>());
+		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
+		((IInternalWorkspaceManager)ctx.WorkspaceManager).DidNotReceive().WindowAdded(Arg.Any<IWindow>());
 	}
 
-	[InlineData(PInvoke.EVENT_SYSTEM_FOREGROUND)]
-	[InlineData(PInvoke.EVENT_OBJECT_UNCLOAKED)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_UNCLOAKED)]
 	[Theory]
-	public void WindowsEventHook_OnWindowFocused(uint eventType)
+	internal void WindowsEventHook_OnWindowFocused(uint eventType, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
 		Assert.Raises<WindowFocusedEventArgs>(
 			h => windowManager.WindowFocused += h,
 			h => windowManager.WindowFocused -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.InternalMonitorManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
+		((IInternalMonitorManager)ctx.MonitorManager)
+			.Received(1)
+			.WindowFocused(Arg.Any<IWindow>());
+		((IInternalWorkspaceManager)ctx.WorkspaceManager).Received(1).WindowFocused(Arg.Any<IWindow>());
 	}
 
-	[InlineData(PInvoke.EVENT_SYSTEM_FOREGROUND)]
-	[InlineData(PInvoke.EVENT_OBJECT_UNCLOAKED)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_UNCLOAKED)]
 	[Theory]
-	public void WindowsEventHook_OnWindowFocused_IgnoredWindow(uint eventType)
+	internal void WindowsEventHook_OnWindowFocused_IgnoredWindow(
+		uint eventType,
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		wrapper.FilterManager.Setup(fm => fm.ShouldBeIgnored(It.IsAny<IWindow>())).Returns(true);
+		ctx.FilterManager.ShouldBeIgnored(Arg.Any<IWindow>()).Returns(true);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
@@ -488,93 +487,108 @@ public class WindowManagerTests
 		Assert.Raises<WindowFocusedEventArgs>(
 			h => windowManager.WindowFocused += h,
 			h => windowManager.WindowFocused -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.InternalMonitorManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
-		wrapper.InternalWorkspaceManager.Verify(m => m.WindowFocused(It.IsAny<IWindow>()), Times.Once);
+		((IInternalMonitorManager)ctx.MonitorManager)
+			.Received(1)
+			.WindowFocused(Arg.Any<IWindow>());
+		((IInternalWorkspaceManager)ctx.WorkspaceManager).Received(1).WindowFocused(Arg.Any<IWindow>());
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowHidden_IgnoreWindow()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowHidden_IgnoreWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
+
+		ctx.WorkspaceManager.GetMonitorForWindow(Arg.Any<IWindow>()).Returns((IMonitor?)null);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()), Times.Once);
+		ctx.WorkspaceManager.Received(1).GetMonitorForWindow(Arg.Any<IWindow>());
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowHidden()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowHidden(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		wrapper.WorkspaceManager
-			.Setup(wm => wm.GetMonitorForWindow(It.IsAny<IWindow>()))
-			.Returns(new Mock<IMonitor>().Object);
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowRemoved += h,
 			h => windowManager.WindowRemoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowRemoved(It.IsAny<IWindow>()), Times.Once);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowRemoved(Arg.Any<IWindow>());
 	}
 
-	[InlineData(PInvoke.EVENT_OBJECT_DESTROY)]
-	[InlineData(PInvoke.EVENT_OBJECT_CLOAKED)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_DESTROY)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_CLOAKED)]
 	[Theory]
-	public void WindowsEventHook_OnWindowRemoved(uint eventType)
+	internal void WindowsEventHook_OnWindowRemoved(uint eventType, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowRemoved += h,
 			h => windowManager.WindowRemoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, eventType, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowRemoved(It.IsAny<IWindow>()), Times.Once);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowRemoved(Arg.Any<IWindow>());
 		Assert.Empty(windowManager.Windows);
 	}
 
 	#region OnWindowMoveStart
-	[Fact]
-	public void WindowsEventHook_OnWindowMoveStart()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoveStart(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+		internalCtx.CoreNativeManager
+			.GetCursorPos(out _)
+			.Returns(
+				(callInfo) =>
+				{
+					callInfo[0] = null;
+					return (BOOL)false;
+				}
+			);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		workspace.TryGetWindowLocation(Arg.Any<IWindow>()).Returns((IWindowState?)null);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
@@ -583,44 +597,35 @@ public class WindowManagerTests
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
 		);
 		Assert.Null(result.Arguments.CursorDraggedPoint);
 		Assert.Null(result.Arguments.MovedEdges);
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoveStart_GetCursorPos()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoveStart_GetCursorPos(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 		windowManager.PostInitialize();
 
-		wrapper.Trigger_MouseLeftButtonDown();
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny))
-			.Callback(
-				(out IPoint<int> point) =>
-				{
-					point = new Point<int>(1, 2);
-				}
-			)
-			.Returns(true);
+		Trigger_MouseLeftButtonDown(internalCtx).Setup_GetCursorPos(internalCtx);
 
 		// When
 		windowManager.Initialize();
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Once);
+		internalCtx.CoreNativeManager.Received(1).GetCursorPos(out IPoint<int> _);
 		Assert.NotNull(result.Arguments.CursorDraggedPoint);
 	}
 
@@ -628,7 +633,7 @@ public class WindowManagerTests
 	[MemberData(nameof(MoveEdgesSuccessData))]
 #pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameter
-	public void WindowsEventHook_OnWindowMoveStart_MovedEdges(
+	internal void WindowsEventHook_OnWindowMoveStart_MovedEdges(
 		ILocation<int> originalLocation,
 		ILocation<int> newLocation,
 		Direction _direction,
@@ -638,173 +643,159 @@ public class WindowManagerTests
 #pragma warning restore IDE0060 // Remove unused parameter
 	{
 		// Given
-		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		IContext ctx = Substitute.For<IContext>();
+		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>());
+		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
+		IInternalContext internalCtx = Substitute.For<IInternalContext>();
+		IWorkspace workspace = Substitute.For<IWorkspace>();
 
-		Mock<IWorkspace> workspace = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.TryGetWindowLocation(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
 					Location = originalLocation,
 					WindowSize = WindowSize.Normal,
-					Window = new Mock<IWindow>().Object
+					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns(newLocation);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 		windowManager.PostInitialize();
 
-		wrapper.Trigger_MouseLeftButtonDown();
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny))
-			.Callback(
-				(out IPoint<int> point) =>
-				{
-					point = new Point<int>(1, 2);
-				}
-			)
-			.Returns(true);
+		Trigger_MouseLeftButtonDown(internalCtx).Setup_GetCursorPos(internalCtx);
 
 		// When
 		windowManager.Initialize();
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Once);
+		internalCtx.CoreNativeManager.Received(1).GetCursorPos(out IPoint<int> _);
 		Assert.NotNull(result.Arguments.CursorDraggedPoint);
 		Assert.NotNull(result.Arguments.MovedEdges);
 	}
 	#endregion
 
 	#region OnWindowMoved
-	[Fact]
-	public void WindowsEventHook_OnWindowMoved_DoesNotRaise()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
 
 		// Then
-		TestUtils.Assert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoved_DoesNotRaise_MouseIsUp()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise_MouseIsUp(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
 		windowManager.PostInitialize();
 
-		wrapper.Trigger_MouseLeftButtonDown().Trigger_MouseLeftButtonUp();
+		Trigger_MouseLeftButtonDown(internalCtx).Trigger_MouseLeftButtonUp(internalCtx);
 
 		// Then
-		TestUtils.Assert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoved_GetCursorPos()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoved_GetCursorPos(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
-		wrapper.CoreNativeManager.Setup(cnm => cnm.IsWindowMinimized(hwnd)).Returns(false);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)false);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 		windowManager.PostInitialize();
 
-		wrapper.Trigger_MouseLeftButtonDown();
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny))
-			.Callback(
-				(out IPoint<int> point) =>
-				{
-					point = new Point<int>(1, 2);
-				}
-			)
-			.Returns(true);
+		Trigger_MouseLeftButtonDown(internalCtx).Setup_GetCursorPos(internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Exactly(2));
+		internalCtx.CoreNativeManager.Received(2).GetCursorPos(out IPoint<int> _);
 		Assert.NotNull(result.Arguments.CursorDraggedPoint);
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoved()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoved(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		ILocation<int> originalLocation = new Location<int>() { X = 4, Width = 4 };
 		ILocation<int> newLocation = new Location<int>() { X = 3, Width = 5 };
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		Mock<IWorkspace> workspace = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.TryGetWindowLocation(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
 					Location = originalLocation,
 					WindowSize = WindowSize.Normal,
-					Window = new Mock<IWindow>().Object
+					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns(newLocation);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
@@ -813,110 +804,112 @@ public class WindowManagerTests
 	}
 	#endregion
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMinimizeStart()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMinimizeStart(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowMinimizeStart += h,
 			h => windowManager.WindowMinimizeStart -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MINIMIZESTART, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MINIMIZESTART, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowMinimizeStart(It.IsAny<IWindow>()), Times.Once);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowMinimizeStart(Arg.Any<IWindow>());
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMinimizeEnd()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMinimizeEnd(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowMinimizeEnd += h,
 			h => windowManager.WindowMinimizeEnd -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MINIMIZEEND, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MINIMIZEEND, hwnd, 0, 0, 0, 0)
 		);
 
 		// Then
-		wrapper.InternalWorkspaceManager.Verify(wm => wm.WindowMinimizeEnd(It.IsAny<IWindow>()), Times.Once);
+		((IInternalWorkspaceManager)ctx.WorkspaceManager)
+			.Received(1)
+			.WindowMinimizeEnd(Arg.Any<IWindow>());
 	}
 
 	#region OnWindowMoveEnd
-	[Fact]
-	public void WindowsEventHook_OnWindowMoveEnd_WindowNotMoving()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoveEnd_WindowNotMoving(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()), Times.Never);
-		wrapper.WorkspaceManager.Verify(
-			wm => wm.MoveWindowToPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<int>>()),
-			Times.Never
-		);
+		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_NoWorkspace()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_NoWorkspace(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns<IWindow>(null);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.WorkspaceManager.Verify(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>()), Times.Once);
-		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Never);
-		wrapper.WorkspaceManager.Verify(
-			wm => wm.MoveWindowToPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<int>>()),
-			Times.Never
-		);
+		ctx.WorkspaceManager.Received(1).GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.NativeManager.DidNotReceive().DwmGetWindowLocation(Arg.Any<HWND>());
+		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_DoesNotContainWindowState()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_DoesNotContainWindowState(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace workspace
+	)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		Mock<IWorkspace> workspace = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		workspace.TryGetWindowLocation(Arg.Any<IWindow>()).Returns((IWindowState?)null);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
@@ -925,35 +918,36 @@ public class WindowManagerTests
 			h => windowManager.WindowMoveEnd -= h,
 			() =>
 			{
-				wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-				wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 			}
 		);
 
 		// Then
-		workspace.Verify(w => w.TryGetWindowLocation(It.IsAny<IWindow>()), Times.Once);
-		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Never);
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Once);
-		wrapper.WorkspaceManager.Verify(
-			wm => wm.MoveWindowToPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<int>>()),
-			Times.Never
-		);
+		workspace.Received(1).TryGetWindowLocation(Arg.Any<IWindow>());
+		ctx.NativeManager.DidNotReceive().DwmGetWindowLocation(Arg.Any<HWND>());
+		internalCtx.CoreNativeManager.Received(1).GetCursorPos(out IPoint<int> _);
+		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 		Assert.Null(result.Arguments.CursorDraggedPoint);
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoveEnd_MoveWindowToPoint()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoveEnd_MoveWindowToPoint(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace workspace
+	)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		Mock<IWorkspace> workspace = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
-		wrapper.CoreNativeManager.Setup(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny)).Returns(true);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		workspace.TryGetWindowLocation(Arg.Any<IWindow>()).Returns((IWindowState?)null);
+		internalCtx.CoreNativeManager.GetCursorPos(out IPoint<int> _).Returns((BOOL)true);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		Assert.Raises<WindowMovedEventArgs>(
@@ -962,129 +956,116 @@ public class WindowManagerTests
 			() =>
 			{
 				windowManager.Initialize();
-				wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-				wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 			}
 		);
 
 		// Then
-		workspace.Verify(w => w.TryGetWindowLocation(It.IsAny<IWindow>()), Times.Once);
-		wrapper.CoreNativeManager.Verify(cnm => cnm.GetCursorPos(out It.Ref<IPoint<int>>.IsAny), Times.Once);
-		wrapper.WorkspaceManager.Verify(
-			wm => wm.MoveWindowToPoint(It.IsAny<IWindow>(), It.IsAny<IPoint<int>>()),
-			Times.Once
-		);
+		workspace.Received(1).TryGetWindowLocation(Arg.Any<IWindow>());
+		internalCtx.CoreNativeManager.Received(1).GetCursorPos(out IPoint<int> _);
+		ctx.WorkspaceManager.Received(1).MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 	}
 	#endregion
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoved_GetMovedEdges_CannotGetNewWindowLocation()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoved_GetMovedEdges_CannotGetNewWindowLocation(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace workspace
+	)
 	{
 		// Given
 		HWND hwnd = new(1);
-		Wrapper wrapper = new Wrapper().AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		Mock<IWorkspace> workspace = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.TryGetWindowLocation(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
 					Location = new Location<int>(),
 					WindowSize = WindowSize.Normal,
-					Window = new Mock<IWindow>().Object
+					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
+		ctx.NativeManager.Received(1).DwmGetWindowLocation(Arg.Any<HWND>());
 	}
 
-	public static IEnumerable<object[]> MoveTooManyEdgesData()
-	{
-		yield return new object[]
-		{
-			new Location<int>(),
-			new Location<int>() { X = 1, Width = 1 }
-		};
-
-		yield return new object[]
-		{
-			new Location<int>(),
-			new Location<int>() { Y = 1, Width = 1 }
-		};
-
-		yield return new object[]
-		{
-			new Location<int>(),
-			new Location<int>()
-			{
-				X = 1,
-				Width = 1,
-				Y = 1,
-				Height = 1
-			}
-		};
-	}
-
-	[MemberData(nameof(MoveTooManyEdgesData))]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(1, 0, 1, 0)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(0, 1, 1, 0)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(1, 1, 1, 1)]
 	[Theory]
-	public void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_MoveTooManyEdges(
-		ILocation<int> originalLocation,
-		ILocation<int> newLocation
+	internal void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_MoveTooManyEdges(
+		int newX,
+		int newY,
+		int newWidth,
+		int newHeight,
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace workspace
 	)
 	{
 		// Given
-		Wrapper wrapper = new();
-
+		Location<int> originalLocation = new();
+		Location<int> newLocation =
+			new()
+			{
+				X = newX,
+				Y = newY,
+				Width = newWidth,
+				Height = newHeight
+			};
 		HWND hwnd = new(1);
-		wrapper.AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		Mock<IWorkspace> workspace = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.TryGetWindowLocation(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
 					Location = originalLocation,
 					WindowSize = WindowSize.Normal,
-					Window = new Mock<IWindow>().Object
+					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns(newLocation);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		wrapper.NativeManager.Verify(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()), Times.Once);
-		workspace.Verify(
-			w => w.MoveWindowEdgesInDirection(It.IsAny<Direction>(), It.IsAny<IPoint<double>>(), It.IsAny<IWindow>()),
-			Times.Never()
-		);
+		ctx.NativeManager.Received(1).DwmGetWindowLocation(Arg.Any<HWND>());
+		workspace
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow>());
 	}
 
 	public static IEnumerable<object[]> MoveEdgesSuccessData()
 	{
-		// Moeve left edge to the left
+		// Move left edge to the left
 		yield return new object[]
 		{
 			new Location<int>() { X = 4, Width = 4 },
@@ -1159,7 +1140,7 @@ public class WindowManagerTests
 
 	[Theory]
 	[MemberData(nameof(MoveEdgesSuccessData))]
-	public void WindowsEventHook_OnWindowMoveEnd_Success(
+	internal void WindowsEventHook_OnWindowMoveEnd_Success(
 		ILocation<int> originalLocation,
 		ILocation<int> newLocation,
 		Direction direction,
@@ -1167,57 +1148,62 @@ public class WindowManagerTests
 	)
 	{
 		// Given
-		Wrapper wrapper = new();
+		IContext ctx = Substitute.For<IContext>();
+		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>());
+		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
+		IInternalContext internalCtx = Substitute.For<IInternalContext>();
+		IWorkspace workspace = Substitute.For<IWorkspace>();
 
 		HWND hwnd = new(1);
-		wrapper.AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		Mock<IWorkspace> workspace = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.TryGetWindowLocation(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
 					Location = originalLocation,
 					WindowSize = WindowSize.Normal,
-					Window = new Mock<IWindow>().Object
+					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		wrapper.NativeManager.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>())).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns(newLocation);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 
 		// Then
 		Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoveEnd += h,
 			h => windowManager.WindowMoveEnd -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0)
 		);
-		wrapper.WorkspaceManager.Verify(w => w.MoveWindowEdgesInDirection(direction, pixelsDelta, It.IsAny<IWindow>()));
+		ctx.WorkspaceManager.Received().MoveWindowEdgesInDirection(direction, pixelsDelta, Arg.Any<IWindow>());
 	}
 
-	[Fact]
-	public void WindowsEventHook_OnWindowMoveEnd_GetCursorPos()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoveEnd_GetCursorPos(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace workspace
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-
 		HWND hwnd = new(1);
-		wrapper.AllowWindowCreation(hwnd);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		Mock<IWorkspace> workspace = new();
-		wrapper.WorkspaceManager.Setup(wm => wm.GetWorkspaceForWindow(It.IsAny<IWindow>())).Returns(workspace.Object);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.Setup(w => w.TryGetWindowLocation(It.IsAny<IWindow>()))
+			.TryGetWindowLocation(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
@@ -1229,12 +1215,12 @@ public class WindowManagerTests
 						Height = 4
 					},
 					WindowSize = WindowSize.Normal,
-					Window = new Mock<IWindow>().Object
+					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		wrapper.NativeManager
-			.Setup(nm => nm.DwmGetWindowLocation(It.IsAny<HWND>()))
+		ctx.NativeManager
+			.DwmGetWindowLocation(Arg.Any<HWND>())
 			.Returns(
 				new Location<int>()
 				{
@@ -1246,114 +1232,107 @@ public class WindowManagerTests
 			);
 
 		IPoint<int> point = new Point<int>(10, 10);
-		wrapper.CoreNativeManager.Setup(nm => nm.GetCursorPos(out point)).Returns(true);
+		internalCtx.CoreNativeManager.GetCursorPos(out point).Returns((BOOL)true);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Initialize();
-		wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 
 		// Then
 		Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
-			() => wrapper.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
 	}
 
-	[Fact]
-	public void PostInitialize()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_InvalidEvent(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		wrapper.CoreNativeManager
-			.Setup(cnm => cnm.GetAllWindows())
-			.Returns(new List<HWND>() { new(1), new(2), new(3) });
+		WindowManager windowManager = new(ctx, internalCtx);
 
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		// When
+		windowManager.Initialize();
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, 0xBAADF00D, hwnd, 0, 0, 0, 0);
+
+		// Then
+		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.Received(1).WindowAdded(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowRemoved(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowMinimizeStart(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowMinimizeEnd(Arg.Any<IWindow>());
+		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
+		ctx.WorkspaceManager
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<int>>(), Arg.Any<IWindow>());
+		ctx.WorkspaceManager.DidNotReceive().MoveWindowToWorkspace(Arg.Any<IWorkspace>(), Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void PostInitialize(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		internalCtx.CoreNativeManager.GetAllWindows().Returns(new List<HWND>() { new(1), new(2), new(3) });
+
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.PostInitialize();
 
 		// Then
-		wrapper.CoreNativeManager.Verify(cnm => cnm.IsSplashScreen(It.IsAny<HWND>()), Times.Exactly(3));
+		internalCtx.CoreNativeManager.Received(3).IsSplashScreen(Arg.Any<HWND>());
 	}
 
 	#region Dispose
-	[Fact]
-	public void Dispose_NotInitialized()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void Dispose_NotInitialized(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
 		windowManager.Dispose();
 
 		// Then
-		Assert.Empty(wrapper.Handles);
+		Assert.Empty(capture.Handles);
 	}
 
-	[Fact]
-	public void Dispose_IsClosed()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void Dispose_IsClosed(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		wrapper.CoreNativeManager
-			.Setup(n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()))
-			.Callback<uint, uint, WINEVENTPROC>(
-				(_, _, proc) =>
-				{
-					wrapper.WinEventProc = proc;
-					wrapper.Handles.Add(new FakeSafeHandle(false, true));
-				}
-			)
-			.Returns(() => wrapper.Handles[^1]);
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx, false, true);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		windowManager.Initialize();
 
-		wrapper.Handles.ForEach(h => h.HasDisposed = false);
+		capture.Handles.ForEach(h => h.HasDisposed = false);
 
 		// When
 		windowManager.Dispose();
 
 		// Then
-		wrapper.Handles.Should().OnlyContain(h => !h.HasDisposed);
+		capture.Handles.Should().OnlyContain(h => !h.HasDisposed);
 	}
 
-	[Fact]
-	public void Dispose_IsInvalid()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void Dispose_IsInvalid(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		wrapper.CoreNativeManager
-			.Setup(n => n.SetWinEventHook(It.IsAny<uint>(), It.IsAny<uint>(), It.IsAny<WINEVENTPROC>()))
-			.Callback<uint, uint, WINEVENTPROC>(
-				(_, _, proc) =>
-				{
-					wrapper.WinEventProc = proc;
-					wrapper.Handles.Add(new FakeSafeHandle(false, true));
-				}
-			)
-			.Returns(() => wrapper.Handles[^1]);
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx, false, true);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		windowManager.Initialize();
 
-		wrapper.Handles.ForEach(h =>
+		capture.Handles.ForEach(h =>
 		{
 			h.HasDisposed = false;
 			h.MarkAsInvalid();
@@ -1363,17 +1342,15 @@ public class WindowManagerTests
 		windowManager.Dispose();
 
 		// Then
-		wrapper.Handles.Should().OnlyContain(h => !h.HasDisposed);
+		capture.Handles.Should().OnlyContain(h => !h.HasDisposed);
 	}
 
-	[Fact]
-	public void Dispose_Success()
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void Dispose_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Wrapper wrapper = new();
-
-		WindowManager windowManager =
-			new(wrapper.Context.Object, wrapper.CoreNativeManager.Object, wrapper.MouseHook.Object);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		WindowManager windowManager = new(ctx, internalCtx);
 
 		windowManager.Initialize();
 
@@ -1382,7 +1359,7 @@ public class WindowManagerTests
 		windowManager.Dispose();
 
 		// Then
-		wrapper.Handles.Should().OnlyContain(h => h.HasDisposed);
+		capture.Handles.Should().OnlyContain(h => h.HasDisposed);
 	}
 	#endregion
 }

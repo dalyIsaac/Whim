@@ -1,22 +1,21 @@
-using Moq;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
 public class DoLayoutTests
 {
-	[Fact]
-	public void DoLayout_RootIsNull()
+	[Theory, AutoSubstituteData]
+	public void DoLayout_RootIsNull(IMonitor monitor)
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context.Object, wrapper.Plugin.Object, wrapper.Identity);
+		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
-		Mock<IMonitor> monitor = new();
 		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
 
 		// When
-		IWindowState[] windowStates = engine.DoLayout(location, monitor.Object).ToArray();
+		IWindowState[] windowStates = engine.DoLayout(location, monitor).ToArray();
 
 		// Then
 		Assert.Empty(windowStates);

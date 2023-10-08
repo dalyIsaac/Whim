@@ -1,4 +1,3 @@
-using Moq;
 using System;
 using Xunit;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -6,8 +5,37 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
+using NSubstitute;
+using Whim.TestUtils;
 
 namespace Whim.Tests;
+
+public class PluginManagerCustomization : ICustomization
+{
+	public const string SavedStateDir = "C:\\Users\\test\\.whim\\state";
+
+	public void Customize(IFixture fixture)
+	{
+		IContext ctx = fixture.Freeze<IContext>();
+
+		ctx.FileManager.SavedStateDir.Returns(SavedStateDir);
+		ctx.FileManager.OpenRead(Arg.Any<string>()).Returns(CreateSavedStateStream());
+	}
+
+	private static MemoryStream CreateSavedStateStream()
+	{
+		PluginManagerSavedState savedState = new();
+		savedState.Plugins.Add("whim.plugin1", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
+		savedState.Plugins.Add("whim.plugin2", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
+
+		MemoryStream stream = new();
+		stream.Write(JsonSerializer.SerializeToUtf8Bytes(savedState));
+		stream.Position = 0;
+
+		return stream;
+	}
+}
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
 	"Reliability",
@@ -16,293 +44,261 @@ namespace Whim.Tests;
 )]
 public class PluginManagerTests
 {
-	private class MocksWrapper
+	private static (IPlugin, IPlugin, IPlugin) CreatePlugins()
 	{
-		public Mock<IContext> Context { get; } = new();
-		public CommandManager CommandManager { get; } = new();
-		public Mock<IKeybindManager> KeybindManager { get; } = new();
-		public Mock<IFileManager> FileManager { get; } = new();
-		public Mock<IPlugin> Plugin1 { get; } = new();
-		public Mock<IPlugin> Plugin2 { get; } = new();
-		public Mock<IPlugin> Plugin3 { get; } = new();
-		public PluginCommands PluginCommands1 { get; } = new("whim.plugin1");
-		public PluginCommands PluginCommands2 { get; } = new("whim.plugin2");
-		public PluginCommands PluginCommands3 { get; } = new("whim.plugin3");
-		public string WrittenTextContents { get; private set; } = string.Empty;
+		PluginCommands pluginCommands1 = new("whim.plugin1");
+		PluginCommands pluginCommands2 = new("whim.plugin2");
+		PluginCommands pluginCommands3 = new("whim.plugin3");
 
-		public MocksWrapper()
-		{
-			Context.Setup(cc => cc.CommandManager).Returns(CommandManager);
-			Context.Setup(cc => cc.KeybindManager).Returns(KeybindManager.Object);
+		pluginCommands1.Add("command1", "Command 1", () => { });
+		pluginCommands2
+			.Add("command2", "Command 2", () => { }, keybind: new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A))
+			.Add("command22", "Command 2.2", () => { });
+		pluginCommands3.Add(
+			"command3",
+			"Command 3",
+			() => { },
+			keybind: new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)
+		);
 
-			FileManager.Setup(fm => fm.SavedStateDir).Returns("C:\\Users\\test\\.whim\\state");
-			FileManager.Setup(fm => fm.OpenRead(It.IsAny<string>())).Returns(CreateSavedStateStream());
-			FileManager
-				.Setup(fm => fm.WriteAllText(It.IsAny<string>(), It.IsAny<string>()))
-				.Callback<string, string>((filePath, contents) => WrittenTextContents = contents);
+		IPlugin plugin1 = Substitute.For<IPlugin, IDisposable>();
+		IPlugin plugin2 = Substitute.For<IPlugin, IDisposable>();
+		IPlugin plugin3 = Substitute.For<IPlugin>();
 
-			Plugin1.Setup(p => p.Name).Returns("whim.plugin1");
-			Plugin2.Setup(p => p.Name).Returns("whim.plugin2");
-			Plugin3.Setup(p => p.Name).Returns("whim.plugin3");
+		plugin1.Name.Returns("whim.plugin1");
+		plugin2.Name.Returns("whim.plugin2");
+		plugin3.Name.Returns("whim.plugin3");
 
-			Plugin1.Setup(p => p.PluginCommands).Returns(PluginCommands1);
-			Plugin2.Setup(p => p.PluginCommands).Returns(PluginCommands2);
-			Plugin3.Setup(p => p.PluginCommands).Returns(PluginCommands3);
+		plugin1.PluginCommands.Returns(pluginCommands1);
+		plugin2.PluginCommands.Returns(pluginCommands2);
+		plugin3.PluginCommands.Returns(pluginCommands3);
 
-			JsonElement savedPluginState = JsonSerializer.SerializeToElement(new Dictionary<string, object>());
-			Plugin1.Setup(p => p.SaveState()).Returns(savedPluginState);
-			Plugin2.Setup(p => p.SaveState()).Returns(savedPluginState);
+		JsonElement savedPluginState = JsonSerializer.SerializeToElement(new Dictionary<string, object>());
+		plugin1.SaveState().Returns(savedPluginState);
+		plugin2.SaveState().Returns(savedPluginState);
 
-			Plugin1.As<IDisposable>();
-			Plugin2.As<IDisposable>();
-
-			PluginCommands1.Add("command1", "Command 1", () => { });
-			PluginCommands2
-				.Add("command2", "Command 2", () => { }, keybind: new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A))
-				.Add("command22", "Command 2.2", () => { });
-			PluginCommands3.Add(
-				"command3",
-				"Command 3",
-				() => { },
-				keybind: new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)
-			);
-		}
-
-		private static MemoryStream CreateSavedStateStream()
-		{
-			PluginManagerSavedState savedState = new();
-			savedState.Plugins.Add("whim.plugin1", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
-			savedState.Plugins.Add("whim.plugin2", JsonSerializer.SerializeToElement(new Dictionary<string, object>()));
-
-			MemoryStream stream = new();
-			stream.Write(JsonSerializer.SerializeToUtf8Bytes(savedState));
-			stream.Position = 0;
-
-			return stream;
-		}
+		return (plugin1, plugin2, plugin3);
 	}
 
-	[Fact]
-	public void PreInitialize()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void PreInitialize(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
-
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		PluginManager pluginManager = new(ctx, commandManager);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
 		// When
 		pluginManager.PreInitialize();
 
 		// Then
-		mocks.Plugin1.Verify(p => p.PreInitialize(), Times.Once);
-		mocks.Plugin2.Verify(p => p.PreInitialize(), Times.Once);
-		mocks.Plugin3.Verify(p => p.PreInitialize(), Times.Once);
+		plugin1.Received(1).PreInitialize();
+		plugin2.Received(1).PreInitialize();
+		plugin3.Received(1).PreInitialize();
 	}
 
-	[Fact]
-	public void PostInitialize_FileDoesNotExist()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void PostInitialize_FileDoesNotExist(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		PluginManager pluginManager = new(ctx, commandManager);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
-
-		mocks.FileManager.Setup(fm => fm.FileExists(It.IsAny<string>())).Returns(false);
+		ctx.FileManager.FileExists(Arg.Any<string>()).Returns(false);
 
 		// When
 		pluginManager.PostInitialize();
 
 		// Then
-		mocks.FileManager.Verify(fm => fm.EnsureDirExists(mocks.FileManager.Object.SavedStateDir), Times.Once);
-		mocks.FileManager.Verify(fm => fm.OpenRead(It.IsAny<string>()), Times.Never);
-		mocks.Plugin1.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Never);
+		ctx.FileManager.Received(1).EnsureDirExists(PluginManagerCustomization.SavedStateDir);
+		ctx.FileManager.DidNotReceive().OpenRead(Arg.Any<string>());
+		plugin1.DidNotReceive().LoadState(Arg.Any<JsonElement>());
 	}
 
-	[Fact]
-	public void PostInitialize_SavedStateIsEmpty()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void PostInitialize_SavedStateIsEmpty(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		PluginManager pluginManager = new(ctx, commandManager);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
-
-		mocks.FileManager.Setup(fm => fm.FileExists(It.IsAny<string>())).Returns(true);
-		mocks.FileManager.Setup(fm => fm.OpenRead(It.IsAny<string>())).Returns(new MemoryStream());
+		ctx.FileManager.FileExists(Arg.Any<string>()).Returns(true);
+		ctx.FileManager.OpenRead(Arg.Any<string>()).Returns(new MemoryStream());
 
 		// When
 		pluginManager.PostInitialize();
 
 		// Then
-		mocks.FileManager.Verify(fm => fm.EnsureDirExists(mocks.FileManager.Object.SavedStateDir), Times.Once);
-		mocks.FileManager.Verify(fm => fm.OpenRead(It.IsAny<string>()), Times.Once);
-		mocks.Plugin1.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Never);
+		ctx.FileManager.Received(1).EnsureDirExists(PluginManagerCustomization.SavedStateDir);
+		ctx.FileManager.Received(1).OpenRead(Arg.Any<string>());
+		plugin1.DidNotReceive().LoadState(Arg.Any<JsonElement>());
 	}
 
-	[Fact]
-	public void PostInitialize_SavedStateIsNull()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void PostInitialize_SavedStateIsNull(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
-
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		PluginManager pluginManager = new(ctx, commandManager);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
 		MemoryStream stream = new();
 		stream.Write(System.Text.Encoding.ASCII.GetBytes("null"));
 
-		mocks.FileManager.Setup(fm => fm.FileExists(It.IsAny<string>())).Returns(true);
-		mocks.FileManager.Setup(fm => fm.OpenRead(It.IsAny<string>())).Returns(new MemoryStream());
+		ctx.FileManager.FileExists(Arg.Any<string>()).Returns(true);
+		ctx.FileManager.OpenRead(Arg.Any<string>()).Returns(new MemoryStream());
 
 		// When
 		pluginManager.PostInitialize();
 
 		// Then
-		mocks.FileManager.Verify(fm => fm.EnsureDirExists(mocks.FileManager.Object.SavedStateDir), Times.Once);
-		mocks.FileManager.Verify(fm => fm.OpenRead(It.IsAny<string>()), Times.Once);
-		mocks.Plugin1.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Never);
+		ctx.FileManager.Received(1).EnsureDirExists(PluginManagerCustomization.SavedStateDir);
+		ctx.FileManager.Received(1).OpenRead(Arg.Any<string>());
+		plugin1.DidNotReceive().LoadState(Arg.Any<JsonElement>());
 	}
 
-	[Fact]
-	public void PostInitialize_SavedStateFileExists()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void PostInitialize_SavedStateFileExists(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		PluginManager pluginManager = new(ctx, commandManager);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
-
-		mocks.FileManager.Setup(fm => fm.FileExists(It.IsAny<string>())).Returns(true);
+		ctx.FileManager.FileExists(Arg.Any<string>()).Returns(true);
 
 		// When
 		pluginManager.PostInitialize();
 
 		// Then
-		mocks.Plugin1.Verify(p => p.PostInitialize(), Times.Once);
-		mocks.Plugin2.Verify(p => p.PostInitialize(), Times.Once);
-		mocks.Plugin3.Verify(p => p.PostInitialize(), Times.Once);
-		mocks.FileManager.Verify(fm => fm.EnsureDirExists(mocks.FileManager.Object.SavedStateDir), Times.Once);
-		mocks.FileManager.Verify(fm => fm.OpenRead(It.IsAny<string>()), Times.Once);
-		mocks.Plugin1.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Once);
-		mocks.Plugin2.Verify(p => p.LoadState(It.IsAny<JsonElement>()), Times.Once);
+		plugin1.Received(1).PostInitialize();
+		plugin2.Received(1).PostInitialize();
+		plugin3.Received(1).PostInitialize();
+		ctx.FileManager.Received(1).EnsureDirExists(PluginManagerCustomization.SavedStateDir);
+		ctx.FileManager.Received(1).OpenRead(Arg.Any<string>());
+		plugin1.Received(1).LoadState(Arg.Any<JsonElement>());
+		plugin2.Received(1).LoadState(Arg.Any<JsonElement>());
 	}
 
-	[Fact]
-	public void PostInitialize_Success()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void PostInitialize_Success(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
-
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		PluginManager pluginManager = new(ctx, commandManager);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
 		// When
 		pluginManager.PostInitialize();
 
 		// Then
-		mocks.Plugin1.Verify(p => p.PostInitialize(), Times.Once);
-		mocks.Plugin2.Verify(p => p.PostInitialize(), Times.Once);
-		mocks.Plugin3.Verify(p => p.PostInitialize(), Times.Once);
+		plugin1.Received(1).PostInitialize();
+		plugin2.Received(1).PostInitialize();
+		plugin3.Received(1).PostInitialize();
 	}
 
-	[Fact]
-	public void AddPlugin()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void AddPlugin(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
-
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		PluginManager pluginManager = new(ctx, commandManager);
 
 		// When
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
 		// Then
 		Assert.Equal(3, pluginManager.LoadedPlugins.Count);
 
 		// I want to verify that the command passed into Add is equivalent to the one created in the mocks
-		Assert.Equal(4, mocks.CommandManager.Count);
-		List<ICommand> commands = mocks.CommandManager.ToList();
+		Assert.Equal(4, commandManager.Count);
+		List<ICommand> commands = commandManager.ToList();
 		Assert.Equal("whim.plugin1.command1", commands[0].Id);
 		Assert.Equal("whim.plugin2.command2", commands[1].Id);
 		Assert.Equal("whim.plugin2.command22", commands[2].Id);
 		Assert.Equal("whim.plugin3.command3", commands[3].Id);
 
-		mocks.KeybindManager.Verify(km => km.Add(It.IsAny<string>(), It.IsAny<Keybind>()), Times.Exactly(2));
-		mocks.KeybindManager.Verify(
-			km => km.Add("whim.plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A)),
-			Times.Once
-		);
-		mocks.KeybindManager.Verify(
-			km => km.Add("whim.plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B)),
-			Times.Once
-		);
+		ctx.KeybindManager.Received(2).Add(Arg.Any<string>(), Arg.Any<Keybind>());
+		ctx.KeybindManager
+			.Received(1)
+			.Add("whim.plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A));
+		ctx.KeybindManager.Received(1).Add("whim.plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B));
 	}
 
-	[InlineData("whim.plugin1", "Plugin with name 'whim.plugin1' already exists.")]
-	[InlineData("whim.custom", "Name 'whim.custom' is reserved for user-defined commands.")]
-	[InlineData("whim", "Name 'whim' is reserved for internal use.")]
-	[InlineData("", "Plugin name cannot be empty.")]
-	[InlineData(
+	[InlineAutoSubstituteData<PluginManagerCustomization>(
+		"whim.plugin1",
+		"Plugin with name 'whim.plugin1' already exists."
+	)]
+	[InlineAutoSubstituteData<PluginManagerCustomization>(
+		"whim.custom",
+		"Name 'whim.custom' is reserved for user-defined commands."
+	)]
+	[InlineAutoSubstituteData<PluginManagerCustomization>("whim", "Name 'whim' is reserved for internal use.")]
+	[InlineAutoSubstituteData<PluginManagerCustomization>("", "Plugin name cannot be empty.")]
+	[InlineAutoSubstituteData<PluginManagerCustomization>(
 		"Hello world",
 		"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
 	)]
-	[InlineData(
+	[InlineAutoSubstituteData<PluginManagerCustomization>(
 		"whim.name.",
 		"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
 	)]
-	[InlineData(
+	[InlineAutoSubstituteData<PluginManagerCustomization>(
 		"whim.name..",
 		"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
 	)]
-	[InlineData(
+	[InlineAutoSubstituteData<PluginManagerCustomization>(
 		"whim..name",
 		"Plugin name must be in the format [first](.[second])*. For more, see the regex in PluginManager.cs."
 	)]
 	[Theory]
-	public void AddPlugin_InvalidName(string name, string expectedMessage)
+	internal void AddPlugin_InvalidName(
+		string name,
+		string expectedMessage,
+		IContext ctx,
+		CommandManager commandManager
+	)
 	{
 		// Given
-		MocksWrapper mocks = new();
+		(IPlugin plugin1, IPlugin plugin2, _) = CreatePlugins();
+		plugin2.Name.Returns(name);
 
-		mocks.Plugin2.Setup(p => p.Name).Returns(name);
-
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
+		PluginManager pluginManager = new(ctx, commandManager);
 
 		// When
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		Exception ex = Assert.Throws<InvalidOperationException>(() => pluginManager.AddPlugin(mocks.Plugin2.Object));
+		pluginManager.AddPlugin(plugin1);
+		Exception ex = Assert.Throws<InvalidOperationException>(() => pluginManager.AddPlugin(plugin2));
 
 		// Then
 		Assert.Equal(expectedMessage, ex.Message);
 		Assert.Single(pluginManager.LoadedPlugins);
 	}
 
-	[Fact]
-	public void Contains()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void Contains(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
-
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		PluginManager pluginManager = new(ctx, commandManager);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
 		// When
 		bool contains1 = pluginManager.Contains("whim.plugin1");
@@ -317,28 +313,34 @@ public class PluginManagerTests
 		Assert.False(contains4);
 	}
 
-	[Fact]
-	public void Dispose()
+	[Theory, AutoSubstituteData<PluginManagerCustomization>]
+	internal void Dispose(IContext ctx, CommandManager commandManager)
 	{
 		// Given
-		MocksWrapper mocks = new();
+		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
+		string writtenTextContents = "";
+		ctx.FileManager
+			.WhenForAnyArgs(fm => fm.WriteAllText(Arg.Any<string>(), Arg.Any<string>()))
+			.Do(call =>
+			{
+				writtenTextContents = call.ArgAt<string>(1);
+			});
 
-		PluginManager pluginManager = new(mocks.Context.Object, mocks.FileManager.Object, mocks.CommandManager);
-		pluginManager.AddPlugin(mocks.Plugin1.Object);
-		pluginManager.AddPlugin(mocks.Plugin2.Object);
-		pluginManager.AddPlugin(mocks.Plugin3.Object);
+		PluginManager pluginManager = new(ctx, commandManager);
+		pluginManager.AddPlugin(plugin1);
+		pluginManager.AddPlugin(plugin2);
+		pluginManager.AddPlugin(plugin3);
 
 		// When
 		pluginManager.Dispose();
 
 		// Then
-		mocks.FileManager.Verify(
-			fm => fm.WriteAllText($"{mocks.FileManager.Object.SavedStateDir}\\plugins.json", It.IsAny<string>()),
-			Times.Once
-		);
-		Assert.Equal("""{"Plugins":{"whim.plugin1":{},"whim.plugin2":{}}}""", mocks.WrittenTextContents);
+		ctx.FileManager
+			.Received(1)
+			.WriteAllText($"{PluginManagerCustomization.SavedStateDir}\\plugins.json", Arg.Any<string>());
+		Assert.Equal("""{"Plugins":{"whim.plugin1":{},"whim.plugin2":{}}}""", writtenTextContents);
 
-		mocks.Plugin1.As<IDisposable>().Verify(p => p.Dispose(), Times.Once);
-		mocks.Plugin2.As<IDisposable>().Verify(p => p.Dispose(), Times.Once);
+		((IDisposable)plugin1).Received(1).Dispose();
+		((IDisposable)plugin2).Received(1).Dispose();
 	}
 }
