@@ -14,6 +14,7 @@ public class BarPluginTests
 		BarPlugin barPlugin = new(context, barConfig);
 
 		// When MonitorManager_MonitorsChanged is called with a removed monitor which is not in the map
+		barPlugin.PreInitialize();
 		context.MonitorManager.MonitorsChanged += Raise.EventWith(
 			new MonitorsChangedEventArgs()
 			{
