@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Whim;
 
 /// <summary>
@@ -17,11 +15,11 @@ internal interface IInternalWorkspace
 	/// Called when a window is about to be minimized.
 	/// </summary>
 	/// <param name="window"></param>
-	Task WindowMinimizeStart(IWindow window);
+	void WindowMinimizeStart(IWindow window);
 
 	/// <summary>
 	/// Called when a window is about to be unminimized.
 	/// </summary>
 	/// <param name="window"></param>
-	Task WindowMinimizeEnd(IWindow window);
+	void WindowMinimizeEnd(IWindow window);
 }

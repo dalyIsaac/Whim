@@ -9,7 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -19,13 +18,9 @@ namespace Whim.Tests;
 
 internal class MonitorManagerCustomization : ICustomization
 {
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	public void Customize(IFixture fixture)
 	{
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-
-		internalCtx.LayoutLock.Returns(new ReaderWriterLockSlim());
-
 		UpdateGetCurrentMonitors(
 			internalCtx,
 			new[]
@@ -162,6 +157,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	[SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void Initialize(IInternalContext internalCtx)
 	{
 		// Given
@@ -614,6 +610,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	[SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void Dispose(IInternalContext internalCtx)
 	{
 		// Given
