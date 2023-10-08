@@ -4,6 +4,7 @@ using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -672,4 +673,44 @@ public class MonitorManagerTests
 		// Then
 		Assert.Equal(monitor2, monitorManager.ActiveMonitor);
 	}
+
+	#region GetEnumerator
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetEnumerator(IInternalContext internalCtx)
+	{
+		// Given
+		MonitorManager monitorManager = new(internalCtx);
+
+		// When
+		IEnumerator<IMonitor> enumerator = monitorManager.GetEnumerator();
+		List<IMonitor> monitors = new();
+
+		while (enumerator.MoveNext())
+		{
+			monitors.Add(enumerator.Current);
+		}
+
+		// Then
+		Assert.Equal(monitorManager.ToList(), monitors);
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetEnumerator_Explicit(IInternalContext internalCtx)
+	{
+		// Given
+		MonitorManager monitorManager = new(internalCtx);
+
+		// When
+		IEnumerator enumerator = ((IEnumerable)monitorManager).GetEnumerator();
+		List<IMonitor> monitors = new();
+
+		while (enumerator.MoveNext())
+		{
+			monitors.Add((IMonitor)enumerator.Current);
+		}
+
+		// Then
+		Assert.Equal(monitorManager.ToList(), monitors);
+	}
+	#endregion
 }

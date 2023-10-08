@@ -333,7 +333,16 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(workspaces, workspaceManager);
+		IEnumerator<IWorkspace> enumerator = workspaceManager.GetEnumerator();
+		List<IWorkspace> enumeratedWorkspaces = new();
+
+		while (enumerator.MoveNext())
+		{
+			enumeratedWorkspaces.Add(enumerator.Current);
+		}
+
+		// Then
+		Assert.Equal(workspaces, enumeratedWorkspaces);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -344,7 +353,16 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
-		Assert.Equal(workspaces, (IEnumerable)workspaceManager);
+		IEnumerator enumerator = ((IEnumerable)workspaceManager).GetEnumerator();
+		List<IWorkspace> enumeratedWorkspaces = new();
+
+		while (enumerator.MoveNext())
+		{
+			enumeratedWorkspaces.Add((IWorkspace)enumerator.Current);
+		}
+
+		// Then
+		Assert.Equal(workspaces, enumeratedWorkspaces);
 	}
 	#endregion
 
