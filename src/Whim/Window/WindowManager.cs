@@ -44,6 +44,8 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// </summary>
 	private bool _disposedValue;
 
+	public int EntriesCount { get; private set; }
+
 	public WindowManager(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
@@ -229,14 +231,19 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			)
 			{
 				// Even if the window was ignored, we need to fire OnWindowFocused.
+				EntriesCount++;
 				OnWindowFocused(window);
+				EntriesCount--;
 				return;
 			}
+
 			if (window == null)
 			{
 				return;
 			}
 		}
+
+		EntriesCount++;
 
 		Logger.Verbose($"Windows event 0x{eventType:X4} for {window}");
 		switch (eventType)
@@ -274,6 +281,8 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				Logger.Error($"Unhandled event 0x{eventType:X4}");
 				break;
 		}
+
+		EntriesCount--;
 	}
 
 	/// <summary>

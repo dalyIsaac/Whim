@@ -112,6 +112,13 @@ public sealed class WindowDeferPosHandle : IDisposable
 			}
 		}
 
+		IInternalWindowManager internalWindowManager = (IInternalWindowManager)_context.WindowManager;
+		if (internalWindowManager.EntriesCount > 1)
+		{
+			Logger.Debug("Whim has reentered, deferring setting window positions");
+			return;
+		}
+
 		Logger.Debug($"Setting window position {numPasses} times");
 		if (_windowStates.Count == 1)
 		{
