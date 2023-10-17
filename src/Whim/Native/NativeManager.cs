@@ -192,11 +192,7 @@ public partial class NativeManager : INativeManager
 	}
 
 	/// <inheritdoc />
-	public HDWP BeginDeferWindowPos(int nNumWindows) => PInvoke.BeginDeferWindowPos(nNumWindows);
-
-	/// <inheritdoc />
-	public HDWP DeferWindowPos(
-		HDWP hWinPosInfo,
+	public bool SetWindowPos(
 		HWND hWnd,
 		HWND hWndInsertAfter,
 		int x,
@@ -204,10 +200,7 @@ public partial class NativeManager : INativeManager
 		int cx,
 		int cy,
 		SET_WINDOW_POS_FLAGS uFlags
-	) => PInvoke.DeferWindowPos(hWinPosInfo, hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
-
-	/// <inheritdoc />
-	public bool EndDeferWindowPos(HDWP hWinPosInfo) => PInvoke.EndDeferWindowPos(hWinPosInfo);
+	) => PInvoke.SetWindowPos(hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
 
 	/// <inheritdoc />
 	public string? GetUwpAppProcessPath(IWindow window)

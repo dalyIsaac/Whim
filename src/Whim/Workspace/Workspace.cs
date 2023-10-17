@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Win32.Foundation;
-using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
@@ -534,12 +533,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private Dictionary<HWND, IWindowState> SetWindowPos(ILayoutEngine engine, IMonitor monitor)
 	{
 		Logger.Debug($"Setting window positions for workspace {Name}");
-		List<(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags)> windowStates = new();
+		List<WindowPosState> windowStates = new();
 		Dictionary<HWND, IWindowState> windowLocations = new();
 
 		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
 		{
-			windowStates.Add((loc, (HWND)1, null));
+			windowStates.Add(new (loc, (HWND)1, null));
 			windowLocations.Add(loc.Window.Handle, loc);
 		}
 

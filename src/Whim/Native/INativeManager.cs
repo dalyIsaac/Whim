@@ -95,57 +95,8 @@ public interface INativeManager
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND
 	);
 
-	/// <summary>
-	/// Allocates memory for a multiple-window position structure and returns the handle to the structure.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.BeginDeferWindowPos(int)"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-begindeferwindowpos
-	/// </remarks>
-	/// <param name="nNumWindows"></param>
-	/// <returns></returns>
-	HDWP BeginDeferWindowPos(int nNumWindows);
-
-	/// <summary>
-	/// Updates the specified multiple-window position structure for the specified window.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.DeferWindowPos(HDWP, HWND, HWND, int, int, int, int, SET_WINDOW_POS_FLAGS)"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-deferwindowpos
-	/// </remarks>
-	/// <param name="hWinPosInfo"></param>
-	/// <param name="hWnd"></param>
-	/// <param name="hWndInsertAfter"></param>
-	/// <param name="x"></param>
-	/// <param name="y"></param>
-	/// <param name="cx"></param>
-	/// <param name="cy"></param>
-	/// <param name="uFlags"></param>
-	/// <returns></returns>
-	HDWP DeferWindowPos(
-		HDWP hWinPosInfo,
-		HWND hWnd,
-		HWND hWndInsertAfter,
-		int x,
-		int y,
-		int cx,
-		int cy,
-		SET_WINDOW_POS_FLAGS uFlags
-	);
-
-	/// <summary>
-	/// Simultaneously updates the position, size, shape, content, and translucency of the specified windows in a single-refreshing cycle.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.EndDeferWindowPos(HDWP)"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-enddeferwindowpos
-	/// </remarks>
-	/// <param name="hWinPosInfo"></param>
-	/// <returns></returns>
-	bool EndDeferWindowPos(HDWP hWinPosInfo);
+	/// <inheritdoc cref="PInvoke.SetWindowPos(HWND, HWND, int, int, int, int, SET_WINDOW_POS_FLAGS)"/>
+	bool SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, SET_WINDOW_POS_FLAGS uFlags);
 
 	/// <summary>
 	/// Retrieves the path to the executable file of the UWP app associated with the given <paramref name="window"/>.
