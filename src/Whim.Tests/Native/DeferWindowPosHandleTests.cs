@@ -1,6 +1,5 @@
 using NSubstitute;
 using System.Collections.Generic;
-using System.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Xunit;
@@ -17,16 +16,20 @@ public record struct DeferWindowPosTestData(
 	int ExpectedMaximizedCallCount
 );
 
-public class WindowDeferPosHandleTests
+public class DeferWindowPosHandleTests
 {
-	private static IContext Setup()
+	private class Wrapper
 	{
-		IContext ctx = Substitute.For<IContext>();
-		ctx.NativeManager.BeginDeferWindowPos(Arg.Any<int>()).Returns((HDWP)1);
-		ctx.MonitorManager
-			.GetEnumerator()
-			.Returns((_) => new List<IMonitor>() { Substitute.For<IMonitor>() }.GetEnumerator());
-		return ctx;
+		public IContext Context { get; } = Substitute.For<IContext>();
+
+		public IInternalContext InternalContext { get; } = Substitute.For<IInternalContext>();
+
+		public Wrapper()
+		{
+			Context.MonitorManager
+				.GetEnumerator()
+				.Returns((_) => new List<IMonitor>() { Substitute.For<IMonitor>() }.GetEnumerator());
+		}
 	}
 
 	private const SET_WINDOW_POS_FLAGS COMMON_FLAGS =
@@ -116,34 +119,21 @@ public class WindowDeferPosHandleTests
 	public void DeferWindowPos(DeferWindowPosTestData data)
 	{
 		// Given
-		IContext ctx = Setup();
+		Wrapper wrapper = new();
 
-		ctx.NativeManager.BeginDeferWindowPos(Arg.Any<int>()).Returns((HDWP)1);
-		ctx.NativeManager
-			.DeferWindowPos(
-				Arg.Any<HDWP>(),
-				Arg.Any<HWND>(),
-				Arg.Any<HWND>(),
-				Arg.Any<int>(),
-				Arg.Any<int>(),
-				Arg.Any<int>(),
-				Arg.Any<int>(),
-				Arg.Any<SET_WINDOW_POS_FLAGS>()
-			)
-			.Returns((HDWP)2);
-		ctx.NativeManager.GetWindowOffset(Arg.Any<HWND>()).Returns(new Location<int>());
+		wrapper.Context.NativeManager.GetWindowOffset(Arg.Any<HWND>()).Returns(new Location<int>());
+		wrapper.InternalContext.DeferWindowPosManager.CanDoLayout().Returns(true);
 
-		DeferWindowPosHandle handle = new(ctx);
+		DeferWindowPosHandle handle = new(wrapper.Context, wrapper.InternalContext);
 
 		// When
 		handle.DeferWindowPos(data.WindowState, data.HwndInsertAfter, data.Flags);
 		handle.Dispose();
 
 		// Then
-		ctx.NativeManager
+		wrapper.InternalContext.CoreNativeManager
 			.Received(2)
-			.DeferWindowPos(
-				(HDWP)1,
+			.SetWindowPos(
 				data.WindowState.Window.Handle,
 				data.HwndInsertAfter ?? (HWND)1,
 				data.WindowState.Location.X,
@@ -152,20 +142,22 @@ public class WindowDeferPosHandleTests
 				data.WindowState.Location.Height,
 				data.ExpectedFlags
 			);
-		ctx.NativeManager.Received(2).EndDeferWindowPos(Arg.Any<HDWP>());
-		ctx.NativeManager.Received(data.ExpectedNormalCallCount * 2).ShowWindowNoActivate(Arg.Any<HWND>());
-		ctx.NativeManager.Received(data.ExpectedMinimizedCallCount * 2).MinimizeWindow(Arg.Any<HWND>());
-		ctx.NativeManager.Received(data.ExpectedMaximizedCallCount * 2).ShowWindowMaximized(Arg.Any<HWND>());
+
+		wrapper.Context.NativeManager.Received(data.ExpectedNormalCallCount * 2).ShowWindowNoActivate(Arg.Any<HWND>());
+		wrapper.Context.NativeManager.Received(data.ExpectedMinimizedCallCount * 2).MinimizeWindow(Arg.Any<HWND>());
+		wrapper.Context.NativeManager
+			.Received(data.ExpectedMaximizedCallCount * 2)
+			.ShowWindowMaximized(Arg.Any<HWND>());
 	}
 
 	[Fact]
 	public void DeferWindowPos_NoWindowOffset()
 	{
 		// Given
-		IContext ctx = Setup();
-		ctx.NativeManager.GetWindowOffset(Arg.Any<HWND>()).Returns((Location<int>?)null);
+		Wrapper wrapper = new();
+		wrapper.Context.NativeManager.GetWindowOffset(Arg.Any<HWND>()).Returns((Location<int>?)null);
 
-		using DeferWindowPosHandle handle = new(ctx);
+		using DeferWindowPosHandle handle = new(wrapper.Context, wrapper.InternalContext);
 
 		// When
 		handle.DeferWindowPos(
@@ -178,10 +170,9 @@ public class WindowDeferPosHandleTests
 		);
 
 		// Then
-		ctx.NativeManager
+		wrapper.InternalContext.CoreNativeManager
 			.DidNotReceive()
-			.DeferWindowPos(
-				Arg.Any<HDWP>(),
+			.SetWindowPos(
 				Arg.Any<HWND>(),
 				Arg.Any<HWND>(),
 				Arg.Any<int>(),
@@ -191,30 +182,4 @@ public class WindowDeferPosHandleTests
 				Arg.Any<SET_WINDOW_POS_FLAGS>()
 			);
 	}
-
-	// [Fact]
-	// public void DeferWindowPos_Cancelled()
-	// {
-	// 	// Given
-	// 	IContext ctx = Setup();
-
-	// 	using CancellationTokenSource cts = new();
-	// 	cts.Cancel();
-
-	// 	WindowDeferPosHandle handle = new(ctx, cts.Token);
-
-	// 	// When
-	// 	handle.DeferWindowPos(
-	// 		new WindowState()
-	// 		{
-	// 			Location = new Location<int>(),
-	// 			Window = Substitute.For<IWindow>(),
-	// 			WindowSize = WindowSize.Normal
-	// 		}
-	// 	);
-	// 	handle.Dispose();
-
-	// 	// Then
-	// 	ctx.NativeManager.DidNotReceive().BeginDeferWindowPos(Arg.Any<int>());
-	// }
 }

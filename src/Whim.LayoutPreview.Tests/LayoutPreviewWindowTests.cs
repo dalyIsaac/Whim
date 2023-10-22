@@ -1,8 +1,19 @@
+using AutoFixture;
 using NSubstitute;
+using System.Diagnostics.CodeAnalysis;
 using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.LayoutPreview.Tests;
+
+public class LayoutPreviewWindowCustomization : ICustomization
+{
+	public void Customize(IFixture fixture)
+	{
+		fixture.Freeze<IContext>();
+		fixture.Freeze<IInternalContext>();
+	}
+}
 
 public class LayoutPreviewWindowTests
 {
@@ -158,13 +169,24 @@ public class LayoutPreviewWindowTests
 	}
 	#endregion
 
-	[Theory, AutoSubstituteData]
-	public void Activate(IContext ctx, IWindow layoutWindow, IWindow movingWindow, IMonitor monitor)
+	[Theory, AutoSubstituteData<LayoutPreviewWindowCustomization>]
+	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+	internal void Activate(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWindow layoutWindow,
+		IWindow movingWindow,
+		IMonitor monitor
+	)
 	{
+		// Given
+		ctx.NativeManager.DeferWindowPos().Returns(new DeferWindowPosHandle(ctx, internalCtx));
+		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
+
 		// When
 		LayoutPreviewWindow.Activate(ctx, layoutWindow, movingWindow, monitor);
 
 		// Then
-		ctx.NativeManager.Received(1).BeginDeferWindowPos(1);
+		ctx.NativeManager.Received(1).DeferWindowPos();
 	}
 }

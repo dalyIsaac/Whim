@@ -163,33 +163,6 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void DoLayout_MinimizedWindow(
-		IContext context,
-		IInternalContext internalContext,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given
-
-		using Workspace workspace =
-			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-
-		// When
-		workspace.AddWindow(window);
-		triggers.WorkspaceLayoutStarted.ClearReceivedCalls();
-		triggers.WorkspaceLayoutCompleted.ClearReceivedCalls();
-		workspace.WindowMinimizeStart(window);
-
-		// Then
-		context.NativeManager.DidNotReceive().ShowWindowNoActivate(Arg.Any<HWND>());
-		window.Received(1).ShowMinimized();
-		triggers.WorkspaceLayoutStarted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());
-		triggers.WorkspaceLayoutCompleted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void DoLayout_GarbageCollect_IsNotAWindow(
 		IContext context,
 		IInternalContext internalContext,
