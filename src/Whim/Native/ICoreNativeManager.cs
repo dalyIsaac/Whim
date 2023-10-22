@@ -552,4 +552,7 @@ internal interface ICoreNativeManager
 
 	/// <inheritdoc cref="PInvoke.MonitorFromWindow(HWND, MONITOR_FROM_FLAGS)"/>
 	HMONITOR MonitorFromWindow(HWND hwnd, MONITOR_FROM_FLAGS dwFlags);
+
+	/// <inheritdoc cref="PInvoke.SetWindowPos(HWND, HWND, int, int, int, int, SET_WINDOW_POS_FLAGS)"/>
+	bool SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, SET_WINDOW_POS_FLAGS uFlags);
 }

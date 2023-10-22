@@ -538,17 +538,26 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
 		{
-			windowStates.Add(new (loc, (HWND)1, null));
+			windowStates.Add(new(loc, (HWND)1, null));
 			windowLocations.Add(loc.Window.Handle, loc);
 		}
 
-		WindowDeferPosHandle handle = new(_context, windowStates);
-		handle.Dispose();
-
+		ILocation<int> minimizedLocation = new Location<int>();
 		foreach (IWindow window in _minimizedWindows)
 		{
-			window.ShowMinimized();
+			windowStates.Add(
+				new(
+					new WindowState()
+					{
+						Location = minimizedLocation,
+						WindowSize = WindowSize.Minimized,
+						Window = window
+					}
+				)
+			);
 		}
+
+		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);
 
 		return windowLocations;
 	}

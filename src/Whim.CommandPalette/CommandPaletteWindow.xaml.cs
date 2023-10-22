@@ -139,7 +139,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		WindowContainer.MaxHeight = height;
 
-		using WindowDeferPosHandle handle = new(_context);
+		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos();
 		handle.DeferWindowPos(
 			new WindowState()
 			{

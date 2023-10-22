@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using Windows.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
-using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
@@ -95,8 +95,18 @@ public interface INativeManager
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND
 	);
 
-	/// <inheritdoc cref="PInvoke.SetWindowPos(HWND, HWND, int, int, int, int, SET_WINDOW_POS_FLAGS)"/>
-	bool SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, SET_WINDOW_POS_FLAGS uFlags);
+	/// <summary>
+	/// Creates a handle which will facilitates setting the position of multiple windows at once.
+	/// </summary>
+	/// <returns></returns>
+	DeferWindowPosHandle DeferWindowPos();
+
+	/// <summary>
+	/// Creates a handle which will facilitates setting the position of multiple windows at once.
+	/// </summary>
+	/// <param name="windowStates">The initial window states to set.</param>
+	/// <returns></returns>
+	DeferWindowPosHandle DeferWindowPos(IEnumerable<WindowPosState> windowStates);
 
 	/// <summary>
 	/// Retrieves the path to the executable file of the UWP app associated with the given <paramref name="window"/>.

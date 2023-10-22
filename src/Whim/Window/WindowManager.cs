@@ -44,8 +44,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// </summary>
 	private bool _disposedValue;
 
-	public int EntriesCount { get; private set; }
-
 	public WindowManager(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
@@ -204,7 +202,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// <param name="idChild"></param>
 	/// <param name="idEventThread"></param>
 	/// <param name="dwmsEventTime"></param>
-	private void WindowsEventHook(
+	internal void WindowsEventHook(
 		HWINEVENTHOOK hWinEventHook,
 		uint eventType,
 		HWND hwnd,
@@ -231,9 +229,9 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			)
 			{
 				// Even if the window was ignored, we need to fire OnWindowFocused.
-				EntriesCount++;
 				OnWindowFocused(window);
-				EntriesCount--;
+
+				_internalContext.DeferWindowPosManager.RecoverLayout();
 				return;
 			}
 
@@ -242,8 +240,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				return;
 			}
 		}
-
-		EntriesCount++;
 
 		Logger.Verbose($"Windows event 0x{eventType:X4} for {window}");
 		switch (eventType)
@@ -282,7 +278,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				break;
 		}
 
-		EntriesCount--;
+		_internalContext.DeferWindowPosManager.RecoverLayout();
 	}
 
 	/// <summary>

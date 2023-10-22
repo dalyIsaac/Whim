@@ -44,7 +44,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		// Prevent the window from being activated.
 		_context.NativeManager.PreventWindowActivation(_window.Handle);
 
-		using WindowDeferPosHandle windowDeferPos = new(_context);
+		using DeferWindowPosHandle windowDeferPos = _context.NativeManager.DeferWindowPos();
 
 		// Layout the focus indicator window.
 		windowDeferPos.DeferWindowPos(

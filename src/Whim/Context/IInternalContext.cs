@@ -17,6 +17,8 @@ internal interface IInternalContext : IDisposable
 
 	IMouseHook MouseHook { get; }
 
+	IDeferWindowPosManager DeferWindowPosManager { get; }
+
 	void PreInitialize();
 
 	void PostInitialize();

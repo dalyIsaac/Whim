@@ -7,15 +7,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 namespace Whim;
 
 /// <summary>
-/// The positioning state of a window.
-/// </summary>
-/// <param name="WindowState"></param>
-/// <param name="HwndInsertAfter"></param>
-/// <param name="Flags"></param>
-public record WindowPosState(IWindowState WindowState, HWND HwndInsertAfter, SET_WINDOW_POS_FLAGS? Flags);
-
-/// <summary>
-/// Sets the position of multiple windows at once, using <see cref="INativeManager.SetWindowPos"/>.
+/// Sets the position of multiple windows at once, using <see cref="ICoreNativeManager.SetWindowPos"/>.
 /// <br/>
 /// This internally calls <see cref="Windows.Win32.PInvoke.SetWindowPos"/> to set the position of the window.
 /// Each call occurs in parallel.
@@ -23,9 +15,11 @@ public record WindowPosState(IWindowState WindowState, HWND HwndInsertAfter, SET
 /// When the system has non-100% scaled monitors, for some reason we need to set the window
 /// position twice, otherwise windows will have incorrect dimensions.
 /// </summary>
-public sealed class WindowDeferPosHandle : IDisposable
+public sealed class DeferWindowPosHandle : IDisposable
 {
 	private readonly IContext _context;
+	private readonly IInternalContext _internalContext;
+
 	private readonly List<WindowPosState> _windowStates = new();
 
 	/// <summary>
@@ -39,28 +33,35 @@ public sealed class WindowDeferPosHandle : IDisposable
 		| SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
 
 	/// <summary>
-	/// Create a new <see cref="WindowDeferPosHandle"/> to set the position of multiple windows at once.
+	/// Create a new <see cref="DeferWindowPosHandle"/> to set the position of multiple windows at once.
 	///
-	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block,
-	/// otherwise <see cref="INativeManager.SetWindowPos"/> will not be called.
+	/// <see cref="DeferWindowPosHandle"/> must be used in conjunction with a <c>using</c> block,
+	/// otherwise <see cref="ICoreNativeManager.SetWindowPos"/> will not be called.
 	/// </summary>
 	/// <param name="context"></param>
-	public WindowDeferPosHandle(IContext context)
+	/// <param name="internalContext"></param>
+	internal DeferWindowPosHandle(IContext context, IInternalContext internalContext)
 	{
 		Logger.Debug("Creating new WindowDeferPosHandle");
 		_context = context;
+		_internalContext = internalContext;
 	}
 
 	/// <summary>
-	/// Create a new <see cref="WindowDeferPosHandle"/> to set the position of multiple windows at once.
+	/// Create a new <see cref="DeferWindowPosHandle"/> to set the position of multiple windows at once.
 	///
-	/// <see cref="WindowDeferPosHandle"/> must be used in conjunction with a <c>using</c> block,
-	/// otherwise <see cref="INativeManager.SetWindowPos"/> will not be called.
+	/// <see cref="DeferWindowPosHandle"/> must be used in conjunction with a <c>using</c> block,
+	/// otherwise <see cref="ICoreNativeManager.SetWindowPos"/> will not be called.
 	/// </summary>
 	/// <param name="context"></param>
+	/// <param name="internalContext"></param>
 	/// <param name="windowStates"></param>
-	public WindowDeferPosHandle(IContext context, IEnumerable<WindowPosState> windowStates)
-		: this(context)
+	internal DeferWindowPosHandle(
+		IContext context,
+		IInternalContext internalContext,
+		IEnumerable<WindowPosState> windowStates
+	)
+		: this(context, internalContext)
 	{
 		_windowStates.AddRange(windowStates);
 	}
@@ -112,10 +113,9 @@ public sealed class WindowDeferPosHandle : IDisposable
 			}
 		}
 
-		IInternalWindowManager internalWindowManager = (IInternalWindowManager)_context.WindowManager;
-		if (internalWindowManager.EntriesCount > 1)
+		if (!_internalContext.DeferWindowPosManager.CanDoLayout())
 		{
-			Logger.Debug("Whim has reentered, deferring setting window positions");
+			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates);
 			return;
 		}
 
@@ -141,8 +141,7 @@ public sealed class WindowDeferPosHandle : IDisposable
 
 	private void SetWindowPos(WindowPosState source)
 	{
-		(IWindowState windowState, HWND hwndInsertAfter, SET_WINDOW_POS_FLAGS? flags) = source;
-		IWindow window = windowState.Window;
+		IWindow window = source.WindowState.Window;
 
 		ILocation<int>? offset = _context.NativeManager.GetWindowOffset(window.Handle);
 		if (offset is null)
@@ -150,9 +149,9 @@ public sealed class WindowDeferPosHandle : IDisposable
 			return;
 		}
 
-		ILocation<int> location = windowState.Location.Add(offset);
-		WindowSize windowSize = windowState.WindowSize;
-		SET_WINDOW_POS_FLAGS uFlags = flags ?? DefaultFlags;
+		ILocation<int> location = source.WindowState.Location.Add(offset);
+		WindowSize windowSize = source.WindowState.WindowSize;
+		SET_WINDOW_POS_FLAGS uFlags = source.Flags ?? DefaultFlags;
 
 		if (windowSize == WindowSize.Maximized)
 		{
@@ -169,9 +168,9 @@ public sealed class WindowDeferPosHandle : IDisposable
 			_context.NativeManager.ShowWindowNoActivate(window.Handle);
 		}
 
-		_context.NativeManager.SetWindowPos(
+		_internalContext.CoreNativeManager.SetWindowPos(
 			window.Handle,
-			hwndInsertAfter,
+			source.HwndInsertAfter,
 			location.X,
 			location.Y,
 			location.Width,

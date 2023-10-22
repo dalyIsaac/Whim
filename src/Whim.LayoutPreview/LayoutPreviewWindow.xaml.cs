@@ -116,7 +116,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 
 	internal static void Activate(IContext context, IWindow layoutWindow, IWindow movingWindow, IMonitor monitor)
 	{
-		using WindowDeferPosHandle handle = new(context);
+		using DeferWindowPosHandle handle = context.NativeManager.DeferWindowPos();
 		handle.DeferWindowPos(
 			new WindowState()
 			{
