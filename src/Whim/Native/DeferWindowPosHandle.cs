@@ -131,13 +131,11 @@ public sealed class DeferWindowPosHandle : IDisposable
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				Parallel.ForEach(_windowStates, (Action<WindowPosState, ParallelLoopState, long>)SetWindowPos);
+				Parallel.ForEach(_windowStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
 			}
 		}
 		Logger.Debug("Finished setting window position");
 	}
-
-	private void SetWindowPos(WindowPosState source, ParallelLoopState state, long arg3) => SetWindowPos(source);
 
 	private void SetWindowPos(WindowPosState source)
 	{

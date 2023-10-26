@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Whim;
 
@@ -9,6 +10,8 @@ internal class DeferWindowPosManager : IDeferWindowPosManager
 	private readonly IInternalContext _internalContext;
 
 	private readonly Dictionary<IWindow, WindowPosState> _deferredWindowStates = new();
+
+	public ParallelOptions ParallelOptions { get; } = new();
 
 	public DeferWindowPosManager(IContext context, IInternalContext internalContext)
 	{

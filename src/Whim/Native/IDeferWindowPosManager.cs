@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -60,4 +61,9 @@ internal interface IDeferWindowPosManager
 	/// after the last call to <see cref="RecoverLayout"/>.
 	/// </summary>
 	void RecoverLayout();
+
+	/// <summary>
+	/// The <see cref="ParallelOptions"/> to use when performing layout.
+	/// </summary>
+	ParallelOptions ParallelOptions { get; }
 }
