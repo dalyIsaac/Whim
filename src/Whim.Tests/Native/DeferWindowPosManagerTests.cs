@@ -29,12 +29,18 @@ public class DeferWindowPosManagerCustomization : ICustomization
 
 public class DeferWindowPosManagerTests
 {
+	private static DeferWindowPosManager CreateSut(IContext ctx, IInternalContext internalCtx)
+	{
+		DeferWindowPosManager manager = new(ctx, internalCtx);
+		internalCtx.DeferWindowPosManager.Returns(manager);
+		return manager;
+	}
+
 	[Theory, AutoSubstituteData]
 	internal void RecoverLayout_NoDeferredWindows(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given no windows are provided
-		DeferWindowPosManager manager = new(ctx, internalCtx);
-
+		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		// When RecoverLayout is called
 		manager.RecoverLayout();
 
@@ -51,7 +57,7 @@ public class DeferWindowPosManagerTests
 	)
 	{
 		// Given a window is provided, and a workspace is found for it
-		DeferWindowPosManager manager = new(ctx, internalCtx);
+		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState });
 
 		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns(workspace);
@@ -74,7 +80,7 @@ public class DeferWindowPosManagerTests
 	)
 	{
 		// Given two windows are provided for the same workspace
-		DeferWindowPosManager manager = new(ctx, internalCtx);
+		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState1, windowPosState2 });
 
 		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState1.WindowState.Window).Returns(workspace);
@@ -97,7 +103,7 @@ public class DeferWindowPosManagerTests
 	{
 		// Given a window is provided, no workspace is found for the window, and the window is
 		// ignored by the FilterManager
-		DeferWindowPosManager manager = new(ctx, internalCtx);
+		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState });
 
 		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns((IWorkspace?)null);
@@ -119,7 +125,7 @@ public class DeferWindowPosManagerTests
 	{
 		// Given a window is provided, no workspace is found for the window, and the window is
 		// not ignored by the FilterManager
-		DeferWindowPosManager manager = new(ctx, internalCtx);
+		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState });
 
 		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns((IWorkspace?)null);

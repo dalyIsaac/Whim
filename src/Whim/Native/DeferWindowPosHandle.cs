@@ -101,6 +101,12 @@ public sealed class DeferWindowPosHandle : IDisposable
 			return;
 		}
 
+		if (!_internalContext.DeferWindowPosManager.CanDoLayout())
+		{
+			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates);
+			return;
+		}
+
 		// Check to see if any monitors have non-100% scaling.
 		// If so, we need to set the window position twice.
 		int numPasses = 1;
@@ -111,12 +117,6 @@ public sealed class DeferWindowPosHandle : IDisposable
 				numPasses = 2;
 				break;
 			}
-		}
-
-		if (!_internalContext.DeferWindowPosManager.CanDoLayout())
-		{
-			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates);
-			return;
 		}
 
 		Logger.Debug($"Setting window position {numPasses} times");
