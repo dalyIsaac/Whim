@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Windows.System;
@@ -192,22 +193,11 @@ public partial class NativeManager : INativeManager
 	}
 
 	/// <inheritdoc />
-	public HDWP BeginDeferWindowPos(int nNumWindows) => PInvoke.BeginDeferWindowPos(nNumWindows);
+	public DeferWindowPosHandle DeferWindowPos() => new(_context, _internalContext);
 
 	/// <inheritdoc />
-	public HDWP DeferWindowPos(
-		HDWP hWinPosInfo,
-		HWND hWnd,
-		HWND hWndInsertAfter,
-		int x,
-		int y,
-		int cx,
-		int cy,
-		SET_WINDOW_POS_FLAGS uFlags
-	) => PInvoke.DeferWindowPos(hWinPosInfo, hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
-
-	/// <inheritdoc />
-	public bool EndDeferWindowPos(HDWP hWinPosInfo) => PInvoke.EndDeferWindowPos(hWinPosInfo);
+	public DeferWindowPosHandle DeferWindowPos(IEnumerable<WindowPosState> windowStates) =>
+		new(_context, _internalContext, windowStates);
 
 	/// <inheritdoc />
 	public string? GetUwpAppProcessPath(IWindow window)

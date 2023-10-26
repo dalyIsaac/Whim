@@ -202,7 +202,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// <param name="idChild"></param>
 	/// <param name="idEventThread"></param>
 	/// <param name="dwmsEventTime"></param>
-	private void WindowsEventHook(
+	internal void WindowsEventHook(
 		HWINEVENTHOOK hWinEventHook,
 		uint eventType,
 		HWND hwnd,
@@ -230,8 +230,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			{
 				// Even if the window was ignored, we need to fire OnWindowFocused.
 				OnWindowFocused(window);
+
+				_internalContext.DeferWindowPosManager.RecoverLayout();
 				return;
 			}
+
 			if (window == null)
 			{
 				return;
@@ -274,6 +277,8 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				Logger.Error($"Unhandled event 0x{eventType:X4}");
 				break;
 		}
+
+		_internalContext.DeferWindowPosManager.RecoverLayout();
 	}
 
 	/// <summary>

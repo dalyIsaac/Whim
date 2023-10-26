@@ -345,4 +345,14 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public HMONITOR MonitorFromWindow(HWND hwnd, MONITOR_FROM_FLAGS dwFlags) =>
 		PInvoke.MonitorFromWindow(hwnd, dwFlags);
+
+	public bool SetWindowPos(
+		HWND hWnd,
+		HWND hWndInsertAfter,
+		int x,
+		int y,
+		int cx,
+		int cy,
+		SET_WINDOW_POS_FLAGS uFlags
+	) => PInvoke.SetWindowPos(hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
 }

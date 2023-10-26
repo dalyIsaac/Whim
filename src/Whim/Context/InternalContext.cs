@@ -16,6 +16,8 @@ internal class InternalContext : IInternalContext
 
 	public IMouseHook MouseHook { get; }
 
+	public IDeferWindowPosManager DeferWindowPosManager { get; }
+
 	public InternalContext(IContext context)
 	{
 		_context = context;
@@ -23,6 +25,7 @@ internal class InternalContext : IInternalContext
 		WindowMessageMonitor = new WindowMessageMonitor(context, this);
 		KeybindHook = new KeybindHook(context, this);
 		MouseHook = new MouseHook(this);
+		DeferWindowPosManager = new DeferWindowPosManager(context, this);
 	}
 
 	public void PreInitialize()
