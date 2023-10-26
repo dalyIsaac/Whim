@@ -222,4 +222,24 @@ public class DeferWindowPosHandleTests
 
 		AssertSetWindowPos(internalCtx, windowPosState, expectedFlags: expectedFlags);
 	}
+
+	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
+	internal void DeferWindowPos_DefaultToHwnd1(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WindowPosState windowPosState
+	)
+	{
+		// Given no HWND is provided
+		using DeferWindowPosHandle handle = new(ctx, internalCtx);
+		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
+
+		handle.DeferWindowPos(windowPosState.WindowState, null, null);
+
+		// When disposing
+		handle.Dispose();
+
+		// Then the window is laid out with HWND 1
+		AssertSetWindowPos(internalCtx, windowPosState, expectedFlags: COMMON_FLAGS);
+	}
 }
