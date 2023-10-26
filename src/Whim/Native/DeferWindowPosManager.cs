@@ -80,6 +80,8 @@ internal class DeferWindowPosManager : IDeferWindowPosManager
 			else if (_context.FilterManager.ShouldBeIgnored(windowState.WindowState.Window))
 			{
 				// We don't store the window in the window manager, but we do still set its position.
+				// We only set the positions of windows which aren't tracked by Whim - the other windows
+				// will be set out by their respective workspaces.
 				deferredWindowStates.Add(windowState);
 			}
 		}
