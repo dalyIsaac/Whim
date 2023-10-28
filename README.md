@@ -90,6 +90,8 @@ dotnet tool run dotnet-csharpier .
 dotnet tool run xstyler --recursive --d . --config ./.xamlstylerrc
 ```
 
+Tests have not been written for all of Whim's code, but they are encouraged. Tests have not been written for UI code-behind files, as I committed to xUnit before I realized that Windows App SDK isn't easily compatible with xUnit. I'm open to suggestions on how to test UI code-behind files.
+
 ### Visual Studio
 
 Visual Studio 2022 is the easiest way to get started with working on Whim. Check the following:
@@ -112,3 +114,7 @@ The Whim repository includes a `.vscode` directory with a [`launch.json`](.vscod
 Tasks to build, test, and format XAML can be found in [`tasks.json`](.vscode/tasks.json).
 
 To see the recommended extensions, open the Command Palette and run `Extensions: Show Recommended Extensions`.
+
+## Discord
+
+A Discord server has been set up at <https://discord.gg/gEFq9wr7jb>.
