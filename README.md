@@ -1,12 +1,12 @@
 # Whim
 
-Whim is a pluggable and modern window manager for Windows 10 and 11, built using WinUI 3 and .NET. It is currently in active development, but feel free to try it out and report any issues you find. Breaking API changes are possible.
+Whim is a pluggable and modern window manager for Windows 10 and 11, built using WinUI 3 and .NET. It is currently in active development.
 
 ![Whim demo](docs/assets/readme-demo.gif)
 
 ## Installation
 
-Alpha builds are available on the [releases page](https://github.com/dalyIsaac/Whim/releases). Download the latest installer and run it to install Whim.
+Alpha builds are available on the [releases page](https://github.com/dalyIsaac/Whim/releases).
 
 ## Customization
 
@@ -39,6 +39,8 @@ Whim is heavily inspired by the [workspacer](https://github.com/workspacer/works
 - Creating subclasses of internal classes is not encouraged in Whim - instead, plugins should suffice to add new functionality.
 
 Whim was not built to be a drop-in replacement for workspacer, but it does have a similar feel and many of the same features. It is not a fork of workspacer, and is built from the ground up.
+
+It should be noted that [workspacer is no longer in active development](https://github.com/workspacer/workspacer/discussions/485).
 
 I am grateful to the workspacer project for the inspiration and ideas it has provided.
 
@@ -75,6 +77,44 @@ Implementations of Whim's `ILayoutEngine` should be immutable. This was done to 
 
 ## Contributing
 
-Please file an issue if you find any bugs or have any feature requests. Pull requests are welcome, but please file an issue first to discuss the change you'd like to make.
+Please file an issue if you find any bugs or have any feature requests. Pull requests are welcome.
 
 Work is currently being tracked in the [project board](https://github.com/users/dalyIsaac/projects/2/views/7).
+
+Before making a pull request, please install the tools specified in [`.config/dotnet-tools.json`](.config/dotnet-tools.json):
+
+```shell
+dotnet tool restore
+# To run the formatters:
+dotnet tool run dotnet-csharpier .
+dotnet tool run xstyler --recursive --d . --config ./.xamlstylerrc
+```
+
+Tests have not been written for all of Whim's code, but they are encouraged. Tests have not been written for UI code-behind files, as I committed to xUnit before I realized that Windows App SDK isn't easily compatible with xUnit. I'm open to suggestions on how to test UI code-behind files.
+
+### Visual Studio
+
+Visual Studio 2022 is the easiest way to get started with working on Whim. Check the following:
+
+- The `.NET Desktop Development` workload is installed (see the Visual Studio Installer).
+- The **Configuration Manager** is set to `Debug` and your target architecture (e.g. `x64`).
+- Each project's platform matches the current target architecture.
+- `Whim.Runner` is set as the startup project.
+- The **green Start arrow** is labeled `Whim.Runner (Unpackaged)`.
+
+**Recommended Extensions:**
+
+- [CSharpier](https://marketplace.visualstudio.com/items?itemName=csharpier.CSharpier)
+- [XAML Styler for Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=TeamXavalon.XAMLStyler2022)
+
+### Visual Studio Code
+
+The Whim repository includes a `.vscode` directory with a [`launch.json`](.vscode/launch.json) file. This file contains a `Launch Whim.Runner` configuration which can be used to debug Whim in Visual Studio Code. Unfortunately tests do not appear in Visual Studio Code's Test Explorer.
+
+Tasks to build, test, and format XAML can be found in [`tasks.json`](.vscode/tasks.json).
+
+To see the recommended extensions, open the Command Palette and run `Extensions: Show Recommended Extensions`.
+
+## Discord
+
+A Discord server has been set up at <https://discord.gg/gEFq9wr7jb>.

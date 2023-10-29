@@ -7,11 +7,13 @@ on:
       - ".github/ISSUE_TEMPLATE/*"
       - ".github/workflows/pull_request_labels.yml"
       - ".github/pull_request_template.md"
+      - "README.md"
   pull_request:
     paths-ignore:
       - ".github/ISSUE_TEMPLATE/*"
       - ".github/workflows/pull_request_labels.yml"
       - ".github/pull_request_template.md"
+      - "README.md"
 
 jobs:
   commit:
