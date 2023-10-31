@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Xunit.Sdk;
 
 namespace Whim.TestUtils;
@@ -51,6 +52,40 @@ public static class CustomAssert
 		if (raised)
 		{
 			throw new DoesNotRaiseException(typeof(T));
+		}
+	}
+
+	/// <summary>
+	/// Asserts that <see cref="INotifyPropertyChanged.PropertyChanged"/> is not raised.
+	/// </summary>
+	/// <param name="attach">The method to attach the event handler.</param>
+	/// <param name="detach">The method to detach the event handler.</param>
+	/// <param name="action">The action to perform.</param>
+	/// <exception cref="DoesNotRaiseException">Thrown when the event is raised.</exception>
+	public static void DoesNotPropertyChange(
+		Action<PropertyChangedEventHandler> attach,
+		Action<PropertyChangedEventHandler> detach,
+		Action action
+	)
+	{
+		bool raised = false;
+		void handler(object? sender, PropertyChangedEventArgs e)
+		{
+			raised = true;
+		}
+		attach(handler);
+		try
+		{
+			action();
+		}
+		finally
+		{
+			detach(handler);
+		}
+
+		if (raised)
+		{
+			throw new DoesNotRaiseException(typeof(PropertyChangedEventArgs));
 		}
 	}
 }

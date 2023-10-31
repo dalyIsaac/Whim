@@ -308,10 +308,18 @@ internal class CoreNativeManager : ICoreNativeManager
 		}
 	}
 
-	public (string processName, string? processPath) GetProcessNameAndPath(int processId)
+	public (string ProcessName, string? ProcessPath)? GetProcessNameAndPath(int processId)
 	{
-		using Process process = Process.GetProcessById(processId);
-		return (process.ProcessName, process.MainModule?.FileName);
+		try
+		{
+			using Process process = Process.GetProcessById(processId);
+			return (process.ProcessName, process.MainModule?.FileName);
+		}
+		catch (ArgumentException ex)
+		{
+			Logger.Error($"Could not get process with id {processId}: {ex.Message}");
+			return null;
+		}
 	}
 
 	public nuint GetClassLongPtr(HWND hWnd, GET_CLASS_LONG_INDEX nIndex) => PInvoke.GetClassLongPtr(hWnd, nIndex);

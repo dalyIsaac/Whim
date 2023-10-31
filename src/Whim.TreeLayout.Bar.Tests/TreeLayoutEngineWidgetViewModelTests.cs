@@ -207,18 +207,22 @@ public class TreeLayoutEngineWidgetViewModelTests
 		// Given
 		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
 
-		// When
-		ctx.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
-			new MonitorWorkspaceChangedEventArgs()
-			{
-				Monitor = Substitute.For<IMonitor>(),
-				CurrentWorkspace = Substitute.For<IWorkspace>(),
-				PreviousWorkspace = Substitute.For<IWorkspace>()
-			}
+		// Then should not have PropertyChanged event raised
+		CustomAssert.DoesNotPropertyChange(
+			h => viewModel.PropertyChanged += h,
+			h => viewModel.PropertyChanged -= h,
+			() =>
+				ctx.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<
+					EventHandler<MonitorWorkspaceChangedEventArgs>
+				>(
+					new MonitorWorkspaceChangedEventArgs()
+					{
+						Monitor = Substitute.For<IMonitor>(),
+						CurrentWorkspace = Substitute.For<IWorkspace>(),
+						PreviousWorkspace = Substitute.For<IWorkspace>()
+					}
+				)
 		);
-
-		// Then should not have called anything
-		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForMonitor(Arg.Any<IMonitor>());
 	}
 
 	[Theory, AutoSubstituteData<TreeLayoutEngineWidgetViewModelCustomization>]

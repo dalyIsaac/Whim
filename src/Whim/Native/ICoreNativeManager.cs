@@ -487,7 +487,7 @@ internal interface ICoreNativeManager
 	/// </summary>
 	/// <param name="processId">The process ID.</param>
 	/// <returns>The process name and process path.</returns>
-	(string processName, string? processPath) GetProcessNameAndPath(int processId);
+	(string ProcessName, string? ProcessPath)? GetProcessNameAndPath(int processId);
 
 	/// <summary>Retrieves the specified value from the WNDCLASSEX structure associated with the specified window.</summary>
 	/// <param name="hWnd">

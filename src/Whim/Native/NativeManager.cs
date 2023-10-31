@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Windows.System;
 using Windows.UI.Composition;
@@ -218,9 +217,7 @@ public partial class NativeManager : INativeManager
 
 			if (childPid != pid)
 			{
-				// here we are
-				Process childProc = Process.GetProcessById((int)childPid);
-				return childProc.MainModule?.FileName;
+				return _internalContext.CoreNativeManager.GetProcessNameAndPath((int)childPid)?.ProcessPath;
 			}
 		}
 

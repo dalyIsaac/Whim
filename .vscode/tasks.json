@@ -5,7 +5,7 @@
       "label": "build",
       "command": "dotnet",
       "type": "process",
-      "args": ["build", "Whim.sln"],
+      "args": ["build", "Whim.sln", "-p:Platform=x64"],
       "problemMatcher": "$msCompile"
     },
     {

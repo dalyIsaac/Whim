@@ -143,7 +143,7 @@ public class WindowTests
 		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
-		string processFileName = window.ProcessFileName;
+		string? processFileName = window.ProcessFileName;
 
 		// Then
 		Assert.Equal("processFileName", processFileName);
@@ -161,10 +161,10 @@ public class WindowTests
 		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
-		string processFileName = window.ProcessFileName;
+		string? processFileName = window.ProcessFileName;
 
 		// Then
-		Assert.Equal("--NA--", processFileName);
+		Assert.Null(processFileName);
 	}
 
 	[Theory, AutoSubstituteData<WindowCustomization>]
@@ -174,7 +174,7 @@ public class WindowTests
 		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
-		string processName = window.ProcessName;
+		string? processName = window.ProcessName;
 
 		// Then
 		Assert.Equal("processName", processName);

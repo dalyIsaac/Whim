@@ -46,7 +46,7 @@ public interface IWindow
 	/// <summary>
 	/// The file name of the module.
 	/// </summary>
-	string ProcessFileName { get; }
+	string? ProcessFileName { get; }
 
 	/// <summary>
 	/// The fully qualified path that defines the location of the module.
@@ -56,7 +56,7 @@ public interface IWindow
 	/// <summary>
 	/// The name that the system uses to identify the process to the user.
 	/// </summary>
-	string ProcessName { get; }
+	string? ProcessName { get; }
 
 	/// <summary>
 	/// Indicates whether the window is focused.

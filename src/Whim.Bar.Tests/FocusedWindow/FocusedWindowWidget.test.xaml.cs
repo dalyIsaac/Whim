@@ -52,7 +52,7 @@ public class FocusedWindowWidgetTests
 		window.ProcessName.Returns("code");
 
 		// When
-		string processName = FocusedWindowWidget.GetProcessName(window);
+		string? processName = FocusedWindowWidget.GetProcessName(window);
 
 		// Then
 		Assert.Equal("code", processName);

@@ -43,7 +43,7 @@ internal class FilterManager : IFilterManager
 	public bool ShouldBeIgnored(IWindow window)
 	{
 		return _ignoreWindowClasses.Contains(window.WindowClass.ToLower())
-			|| _ignoreProcessNames.Contains(window.ProcessName.ToLower())
+			|| (window.ProcessName is string processName && _ignoreProcessNames.Contains(processName.ToLower()))
 			|| _ignoreTitles.Contains(window.Title.ToLower())
 			|| _filters.Any(f => f(window));
 	}
