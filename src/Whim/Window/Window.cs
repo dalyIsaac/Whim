@@ -11,19 +11,14 @@ internal class Window : IWindow
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	/// <inheritdoc/>
 	public required HWND Handle { get; init; }
 
-	/// <inheritdoc/>
 	public string Title => _internalContext.CoreNativeManager.GetWindowText(Handle);
 
-	/// <inheritdoc/>
 	public string WindowClass => _context.NativeManager.GetClassName(Handle);
 
-	/// <inheritdoc/>
 	public bool IsUwp => ProcessFileName == "ApplicationFrameHost.exe";
 
-	/// <inheritdoc/>
 	public ILocation<int> Location
 	{
 		get
@@ -39,7 +34,6 @@ internal class Window : IWindow
 		}
 	}
 
-	/// <inheritdoc/>
 	public IPoint<int> Center
 	{
 		get
@@ -49,42 +43,32 @@ internal class Window : IWindow
 		}
 	}
 
-	/// <inheritdoc/>
 	public required int ProcessId { get; init; }
 
-	/// <inheritdoc/>
-	public required string ProcessFileName { get; init; }
+	public required string? ProcessFileName { get; init; }
 
-	/// <inheritdoc/>
 	public required string? ProcessFilePath { get; init; }
 
-	/// <inheritdoc/>
-	public required string ProcessName { get; init; }
+	public required string? ProcessName { get; init; }
 
-	/// <inheritdoc/>
 	public bool IsFocused => _internalContext.CoreNativeManager.GetForegroundWindow() == Handle;
 
-	/// <inheritdoc/>
 	public bool IsMinimized => _internalContext.CoreNativeManager.IsWindowMinimized(Handle);
 
-	/// <inheritdoc/>
 	public bool IsMaximized => _internalContext.CoreNativeManager.IsWindowMaximized(Handle);
 
-	/// <inheritdoc/>
 	public void BringToTop()
 	{
 		Logger.Debug(ToString());
 		_internalContext.CoreNativeManager.BringWindowToTop(Handle);
 	}
 
-	/// <inheritdoc/>
 	public void Close()
 	{
 		Logger.Debug(ToString());
 		_context.NativeManager.QuitWindow(Handle);
 	}
 
-	/// <inheritdoc/>
 	public void Focus()
 	{
 		Logger.Debug(ToString());
@@ -98,7 +82,6 @@ internal class Window : IWindow
 		((IInternalWindowManager)_context.WindowManager).OnWindowFocused(this);
 	}
 
-	/// <inheritdoc/>
 	public void FocusForceForeground()
 	{
 		Logger.Debug(ToString());
@@ -117,28 +100,24 @@ internal class Window : IWindow
 		((IInternalWindowManager)_context.WindowManager).OnWindowFocused(this);
 	}
 
-	/// <inheritdoc/>
 	public void Hide()
 	{
 		Logger.Debug(ToString());
 		_context.NativeManager.HideWindow(Handle);
 	}
 
-	/// <inheritdoc/>
 	public void ShowMaximized()
 	{
 		Logger.Debug(ToString());
 		_context.NativeManager.ShowWindowMaximized(Handle);
 	}
 
-	/// <inheritdoc/>
 	public void ShowMinimized()
 	{
 		Logger.Debug(ToString());
 		_context.NativeManager.ShowWindowMinimized(Handle);
 	}
 
-	/// <inheritdoc/>
 	public void ShowNormal()
 	{
 		Logger.Debug(ToString());
@@ -169,14 +148,19 @@ internal class Window : IWindow
 	{
 		_ = internalContext.CoreNativeManager.GetWindowThreadProcessId(hwnd, out uint pid);
 		int processId = (int)pid;
-		string processName;
+		string? processName;
 		string? processPath;
-		string processFileName;
+		string? processFileName;
 
 		try
 		{
-			(processName, processPath) = internalContext.CoreNativeManager.GetProcessNameAndPath(processId);
-			processFileName = Path.GetFileName(processPath) ?? "--NA--";
+			(string ProcessName, string? ProcessPath)? result = internalContext.CoreNativeManager.GetProcessNameAndPath(
+				processId
+			);
+			processName = result?.ProcessName;
+			processPath = result?.ProcessPath;
+
+			processFileName = Path.GetFileName(processPath);
 		}
 		catch (Win32Exception ex)
 		{
@@ -199,7 +183,6 @@ internal class Window : IWindow
 		};
 	}
 
-	/// <inheritdoc/>
 	public override bool Equals(object? obj)
 	{
 		if (obj == null || GetType() != obj.GetType())
@@ -215,15 +198,12 @@ internal class Window : IWindow
 
 	public static bool operator !=(Window? left, Window? right) => !Equals(left, right);
 
-	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
 		return Handle.GetHashCode();
 	}
 
-	/// <inheritdoc/>
 	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle.Value}}}";
 
-	/// <inheritdoc/>
 	public BitmapImage? GetIcon() => this.GetIcon(_context, _internalContext);
 }

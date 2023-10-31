@@ -33,7 +33,7 @@ internal class RouterManager : IRouterManager
 		Logger.Debug($"Routing process name: {processName} to workspace {workspaceName}");
 		Add(window =>
 		{
-			if (window.ProcessName.ToLower() == processName)
+			if (window.ProcessName?.ToLower() == processName)
 			{
 				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
@@ -48,7 +48,7 @@ internal class RouterManager : IRouterManager
 		Logger.Debug($"Routing process name: {processName} to workspace {workspace}");
 		Add(window =>
 		{
-			if (window.ProcessName.ToLower() == processName)
+			if (window.ProcessName?.ToLower() == processName)
 			{
 				return workspace;
 			}

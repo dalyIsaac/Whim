@@ -1,5 +1,6 @@
 using AutoFixture;
 using NSubstitute;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Whim.TestUtils;
 using Xunit;
@@ -59,6 +60,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[SuppressMessage("Usage", "NS5000:Received check.")]
 	public void PreInitialize(IContext ctx)
 	{
 		// Given

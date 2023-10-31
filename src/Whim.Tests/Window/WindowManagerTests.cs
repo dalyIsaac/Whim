@@ -88,7 +88,7 @@ internal class CaptureWinEventProc
 )]
 public class WindowManagerTests
 {
-	private static readonly uint _processId = 1;
+	private const uint _processId = 1;
 
 	private static void AllowWindowCreation(IContext ctx, IInternalContext internalCtx, HWND hwnd)
 	{
