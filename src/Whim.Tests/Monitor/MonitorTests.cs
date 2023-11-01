@@ -112,7 +112,6 @@ public class MonitorTests
 	internal void CreateMonitor_MultipleMonitors(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-
 		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(true);
 
 		internalCtx.CoreNativeManager
@@ -162,6 +161,24 @@ public class MonitorTests
 			monitor.WorkingArea
 		);
 		Assert.Equal(150, monitor.ScaleFactor);
+	}
+
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void CreateMonitor_CreationFailed(IInternalContext internalCtx, HMONITOR hmonitor)
+	{
+		// Given
+		bool isPrimaryHMonitor = false;
+		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(true);
+		internalCtx.CoreNativeManager.GetMonitorInfoEx(Arg.Any<HMONITOR>()).Returns((_) => null);
+
+		// When
+		Monitor monitor = new(internalCtx, hmonitor, isPrimaryHMonitor);
+
+		// Then
+		Assert.Equal("NOT A DISPLAY", monitor.Name);
+		Assert.False(monitor.IsPrimary);
+		Assert.Equal(new Location<int>(), monitor.Bounds);
+		Assert.Equal(new Location<int>(), monitor.WorkingArea);
 	}
 
 	[Theory, AutoSubstituteData<MonitorCustomization>]
