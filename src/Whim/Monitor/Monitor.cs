@@ -22,45 +22,29 @@ internal class Monitor : IMonitor
 
 	public bool IsPrimary { get; private set; }
 
-	public ILocation<int> Bounds { get; private set; }
+	// Bounds and WorkingArea are lazily evaluated because sometimes they return incorrect values
+	// inside RDP sessions, during display changes. This is a workaround for that.
+	public ILocation<int> Bounds => GetBounds();
 
-	public ILocation<int> WorkingArea { get; private set; }
+	public ILocation<int> WorkingArea => GetWorkingArea();
 
 	public int ScaleFactor { get; private set; }
 
-	[MemberNotNull(nameof(Bounds), nameof(IsPrimary), nameof(Name), nameof(WorkingArea), nameof(ScaleFactor))]
+	[MemberNotNull(nameof(IsPrimary), nameof(Name), nameof(ScaleFactor))]
 	internal unsafe void Update(bool isPrimaryHMonitor)
 	{
-		if (!_internalContext.CoreNativeManager.HasMultipleMonitors() || isPrimaryHMonitor)
+		IsPrimary = !_internalContext.CoreNativeManager.HasMultipleMonitors() || isPrimaryHMonitor;
+		if (IsPrimary)
 		{
-			// Single monitor system.
-			Bounds = new Location<int>()
-			{
-				X = _internalContext.CoreNativeManager.GetVirtualScreenLeft(),
-				Y = _internalContext.CoreNativeManager.GetVirtualScreenTop(),
-				Width = _internalContext.CoreNativeManager.GetVirtualScreenWidth(),
-				Height = _internalContext.CoreNativeManager.GetVirtualScreenHeight()
-			};
-
-			IsPrimary = true;
 			Name = "DISPLAY";
-
-			_internalContext.CoreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
-			WorkingArea = rect.ToLocation();
 		}
 		else if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
-			Bounds = infoEx.monitorInfo.rcMonitor.ToLocation();
-			WorkingArea = infoEx.monitorInfo.rcWork.ToLocation();
-			IsPrimary = false;
 			Name = infoEx.GetDeviceName();
 		}
 		else
 		{
-			Bounds = new Location<int>();
-			WorkingArea = new Location<int>();
-			IsPrimary = false;
 			Name = "NOT A DISPLAY";
 		}
 
@@ -73,6 +57,47 @@ internal class Monitor : IMonitor
 			out uint _
 		);
 		ScaleFactor = (int)((double)effectiveDpiX / 96 * 100);
+	}
+
+	private ILocation<int> GetBounds()
+	{
+		if (IsPrimary)
+		{
+			return new Location<int>()
+			{
+				X = _internalContext.CoreNativeManager.GetVirtualScreenLeft(),
+				Y = _internalContext.CoreNativeManager.GetVirtualScreenTop(),
+				Width = _internalContext.CoreNativeManager.GetVirtualScreenWidth(),
+				Height = _internalContext.CoreNativeManager.GetVirtualScreenHeight()
+			};
+		}
+		else if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
+		{
+			// Multiple monitor system.
+			return infoEx.monitorInfo.rcMonitor.ToLocation();
+		}
+		else
+		{
+			return new Location<int>();
+		}
+	}
+
+	private ILocation<int> GetWorkingArea()
+	{
+		if (IsPrimary)
+		{
+			_internalContext.CoreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
+			return rect.ToLocation();
+		}
+		else if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
+		{
+			// Multiple monitor system.
+			return infoEx.monitorInfo.rcWork.ToLocation();
+		}
+		else
+		{
+			return new Location<int>();
+		}
 	}
 
 	/// <inheritdoc/>
