@@ -45,6 +45,7 @@ internal class Monitor : IMonitor
 		}
 		else
 		{
+			Logger.Error($"Failed to get name for monitor {_hmonitor}");
 			Name = "NOT A DISPLAY";
 		}
 
@@ -78,6 +79,7 @@ internal class Monitor : IMonitor
 		}
 		else
 		{
+			Logger.Error($"Failed to get bounds for monitor {_hmonitor}");
 			return new Location<int>();
 		}
 	}
@@ -96,6 +98,7 @@ internal class Monitor : IMonitor
 		}
 		else
 		{
+			Logger.Error($"Failed to get working area for monitor {_hmonitor}");
 			return new Location<int>();
 		}
 	}
