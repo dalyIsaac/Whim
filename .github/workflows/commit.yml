@@ -32,8 +32,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: ${{ runner.os }}-nuget-
+          key: ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
+          restore-keys: |
+            ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
+            ${{ matrix.platform }}-nuget-
 
       - name: Restore dependencies
         run: |
