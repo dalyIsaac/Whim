@@ -31,7 +31,7 @@ jobs:
       - name: Cache NuGet packages
         uses: actions/cache@v2
         with:
-          path: ${{ github.workspace }}/.nuget/packages
+          path: $HOME/.nuget/packages
           key: ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
           restore-keys: |
             ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
