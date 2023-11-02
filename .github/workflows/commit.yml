@@ -28,6 +28,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
       - name: Restore dependencies
         run: |
           dotnet restore Whim.sln -p:Configuration=$env:Configuration
