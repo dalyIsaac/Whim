@@ -31,7 +31,7 @@ jobs:
       - name: Cache NuGet packages
         uses: actions/cache@v2
         with:
-          path: $HOME/.nuget/packages
+          path: ~/.nuget/packages
           key: ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
           restore-keys: |
             ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
@@ -39,13 +39,18 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          dotnet restore Whim.sln -p:Configuration=$env:Configuration -v:d
+          dotnet restore Whim.sln -p:Configuration=$env:Configuration
         env:
           Configuration: ${{ matrix.configuration }}
 
       - name: Install dotnet tools
         run: |
-          dotnet tool restore -v:d
+          dotnet tool restore
+
+      # TODO: Remove
+      - name: Check dependencies
+        run: |
+          ls ~/.nuget/packages
 
       # - name: Check C# formatting
       #   run: |
