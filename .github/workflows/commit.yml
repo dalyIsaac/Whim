@@ -39,7 +39,7 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          dotnet restore Whim.sln -p:Configuration=$env:Configuration
+          dotnet restore Whim.sln -p:Configuration=$env:Configuration --packages=${{ github.workspace }}/.nuget/packages
         env:
           Configuration: ${{ matrix.configuration }}
 
