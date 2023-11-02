@@ -47,42 +47,37 @@ jobs:
         run: |
           dotnet tool restore
 
-      # TODO: Remove
-      - name: Check dependencies
+      - name: Check C# formatting
         run: |
-          ls ~/.nuget/packages
+          dotnet tool run dotnet-csharpier . --check
 
-      # - name: Check C# formatting
-      #   run: |
-      #     dotnet tool run dotnet-csharpier . --check
+      - name: Check XAML formatting
+        run: |
+          dotnet tool run xstyler --recursive --d . --passive --config ./.xamlstylerrc
 
-      # - name: Check XAML formatting
-      #   run: |
-      #     dotnet tool run xstyler --recursive --d . --passive --config ./.xamlstylerrc
+      #   - name: Check analyzers
+      #     run: |
+      #       dotnet format analyzers Whim.sln --verify-no-changes --no-restore
 
-      # #   - name: Check analyzers
-      # #     run: |
-      # #       dotnet format analyzers Whim.sln --verify-no-changes --no-restore
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
 
-      # - name: Add msbuild to PATH
-      #   uses: microsoft/setup-msbuild@v1.1
+      - name: Build
+        run: |
+          msbuild Whim.sln `
+            -p:Configuration=$env:Configuration `
+            -p:Platform=$env:Platform `
+            -p:BuildInParallel=true `
+            -maxCpuCount
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
 
-      # - name: Build
-      #   run: |
-      #     msbuild Whim.sln `
-      #       -p:Configuration=$env:Configuration `
-      #       -p:Platform=$env:Platform `
-      #       -p:BuildInParallel=true `
-      #       -maxCpuCount
-      #   env:
-      #     Configuration: ${{ matrix.configuration }}
-      #     Platform: ${{ matrix.platform }}
+      - name: Test
+        run: |
+          dotnet test Whim.sln --collect:"XPlat Code Coverage;Format=opencover"
 
-      # - name: Test
-      #   run: |
-      #     dotnet test Whim.sln --collect:"XPlat Code Coverage;Format=opencover"
-
-      # - name: Upload coverage to Codecov
-      #   uses: codecov/codecov-action@v3.1.0
-      #   with:
-      #     files: src/**/TestResults/**/coverage.opencover.xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          files: src/**/TestResults/**/coverage.opencover.xml
