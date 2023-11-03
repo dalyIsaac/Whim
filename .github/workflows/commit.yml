@@ -17,7 +17,7 @@ on:
 
 env:
   # We install the packages to the D:\ drive to avoid the slow IO on the C:\ drive.
-  # Based on https://github.com/actions/setup-dotnet/issues/260
+  # Based on https://github.com/actions/setup-dotnet/issues/260#issuecomment-1790162905
   NUGET_PACKAGES: D:\a\.nuget\packages
 
 jobs:
