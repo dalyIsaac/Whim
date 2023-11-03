@@ -15,6 +15,9 @@ on:
       - ".github/pull_request_template.md"
       - "README.md"
 
+env:
+  NUGET_PACKAGES: D:\a\.nuget\packages
+
 jobs:
   commit:
     strategy:
@@ -31,7 +34,7 @@ jobs:
       - name: Cache NuGet packages
         uses: actions/cache@v2
         with:
-          path: ~/.nuget/packages
+          path: ${{ env.NUGET_PACKAGES }}
           key: ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
           restore-keys: |
             ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
