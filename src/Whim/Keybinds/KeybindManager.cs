@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Whim;
 
@@ -9,16 +10,42 @@ internal class KeybindManager : IKeybindManager
 	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = new();
 	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = new();
 
-	public bool UnifyKeyModifiers { get; set; } = true;
-
 	public KeybindManager(IContext context)
 	{
 		_context = context;
 	}
 
+	private bool _uniqueKeyModifiers = true;
+	public bool UnifyKeyModifiers
+	{
+		get => _uniqueKeyModifiers;
+		set
+		{
+			if (value && _uniqueKeyModifiers == false)
+			{
+				UnifyKeybinds();
+			}
+
+			_uniqueKeyModifiers = value;
+		}
+	}
+
+	private void UnifyKeybinds()
+	{
+		KeyValuePair<string, IKeybind>[] keybinds = _commandsKeybindsMap.ToArray();
+		_commandsKeybindsMap.Clear();
+		_keybindsCommandsMap.Clear();
+
+		foreach (KeyValuePair<string, IKeybind> keybind in keybinds)
+		{
+			Add(keybind.Key, keybind.Value);
+		}
+	}
+
 	public void Add(string commandId, IKeybind keybind)
 	{
 		Logger.Debug($"Adding keybind '{keybind}' for command '{commandId}'");
+		keybind = UnifyKeyModifiers ? keybind.UnifyModifiers() : keybind;
 
 		if (!_keybindsCommandsMap.ContainsKey(keybind))
 		{
