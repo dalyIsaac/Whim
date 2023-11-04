@@ -232,4 +232,47 @@ public class KeybindManagerTests
 		Assert.Single(allCommands);
 		Assert.Same(command, allCommands[0]);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void GetCommands_NotUnified_FailedLookup(IContext context)
+	{
+		// Given
+		IKeybindManager keybindManager = new KeybindManager(context) { UnifyKeyModifiers = false };
+		IKeybind keybind = new Keybind(KeyModifiers.RWin | KeyModifiers.RControl, VIRTUAL_KEY.VK_A);
+
+		// When
+		keybindManager.Add("command", keybind);
+		ICommand[] allCommands = keybindManager.GetCommands(
+			new Keybind(KeyModifiers.LWin | KeyModifiers.LControl, VIRTUAL_KEY.VK_A)
+		);
+
+		// Then
+		Assert.Empty(allCommands);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData(KeyModifiers.LWin | KeyModifiers.LControl, VIRTUAL_KEY.VK_A)]
+	[InlineAutoSubstituteData(KeyModifiers.RWin | KeyModifiers.RControl, VIRTUAL_KEY.VK_A)]
+	[InlineAutoSubstituteData(KeyModifiers.LWin | KeyModifiers.RControl, VIRTUAL_KEY.VK_A)]
+	public void GetCommands_NotUnified_Success(
+		KeyModifiers modifiers,
+		VIRTUAL_KEY key,
+		IContext context,
+		ICommand command
+	)
+	{
+		// Given
+		IKeybindManager keybindManager = new KeybindManager(context) { UnifyKeyModifiers = false };
+		IKeybind keybind = new Keybind(modifiers, key);
+
+		context.CommandManager.TryGetCommand("command").Returns(command);
+
+		// When
+		keybindManager.Add("command", keybind);
+		ICommand[] allCommands = keybindManager.GetCommands(keybind);
+
+		// Then
+		Assert.Single(allCommands);
+		Assert.Same(command, allCommands[0]);
+	}
 }
