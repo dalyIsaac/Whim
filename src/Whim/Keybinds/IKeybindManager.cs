@@ -6,6 +6,12 @@ namespace Whim;
 public interface IKeybindManager
 {
 	/// <summary>
+	/// Whether to treat key modifiers like `LWin` and `RWin` as the same.
+	/// For key modifiers which have a left and right variant, this will treat them as the same.
+	/// </summary>
+	bool UnifyKeyModifiers { get; set; }
+
+	/// <summary>
 	/// Adds a keybind.
 	/// </summary>
 	/// <remarks>

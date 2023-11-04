@@ -9,6 +9,8 @@ internal class KeybindManager : IKeybindManager
 	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = new();
 	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = new();
 
+	public bool UnifyKeyModifiers { get; set; } = true;
+
 	public KeybindManager(IContext context)
 	{
 		_context = context;
