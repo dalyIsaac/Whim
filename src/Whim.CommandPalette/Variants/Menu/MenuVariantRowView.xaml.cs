@@ -12,10 +12,13 @@ internal sealed partial class MenuVariantRowView
 {
 	public static double MenuRowHeight => 36;
 
+	private readonly IContext _context;
+
 	public MenuVariantRowViewModel ViewModel { get; }
 
-	public MenuVariantRowView(MatcherResult<MenuVariantRowModelData> matcherResult)
+	public MenuVariantRowView(IContext context, MatcherResult<MenuVariantRowModelData> matcherResult)
 	{
+		_context = context;
 		ViewModel = new MenuVariantRowViewModel(matcherResult);
 		UIElementExtensions.InitializeComponent(this, "Whim.CommandPalette", "Variants/Menu/MenuVariantRowView");
 	}
@@ -40,7 +43,7 @@ internal sealed partial class MenuVariantRowView
 
 		if (ViewModel.Model.Data.Keybind is not null)
 		{
-			CommandKeybind.Text = ViewModel.Model.Data.Keybind.ToString();
+			CommandKeybind.Text = ViewModel.Model.Data.Keybind.ToString(_context.KeybindManager.UnifyKeyModifiers);
 			CommandKeybindBorder.Visibility = Visibility.Visible;
 		}
 		else
