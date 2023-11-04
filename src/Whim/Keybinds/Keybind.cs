@@ -24,21 +24,19 @@ public readonly record struct Keybind : IKeybind
 	}
 
 	/// <inheritdoc />
-	public override string ToString()
-	{
-		StringBuilder sb = new();
-		sb.AppendJoin(" + ", Modifiers.GetParts(false));
-		sb.Append(" + ");
-		sb.Append(Key.GetKeyString());
-		return sb.ToString();
-	}
+	public override string ToString() => ToString(false);
 
 	/// <inheritdoc />
 	public string ToString(bool unifyKeyModifiers)
 	{
 		StringBuilder sb = new();
 		sb.AppendJoin(" + ", Modifiers.GetParts(unifyKeyModifiers));
-		sb.Append(" + ");
+
+		if (sb.Length > 0)
+		{
+			sb.Append(" + ");
+		}
+
 		sb.Append(Key.GetKeyString());
 		return sb.ToString();
 	}

@@ -23,6 +23,7 @@ internal class KeybindManager : IKeybindManager
 		{
 			if (value && _uniqueKeyModifiers == false)
 			{
+				_uniqueKeyModifiers = true;
 				UnifyKeybinds();
 			}
 
