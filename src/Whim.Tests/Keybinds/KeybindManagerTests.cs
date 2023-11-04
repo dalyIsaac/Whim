@@ -210,4 +210,26 @@ public class KeybindManagerTests
 		Assert.NotNull(result);
 		Assert.Equal(new Keybind(KeyModifiers.LWin | KeyModifiers.LControl, VIRTUAL_KEY.VK_A), result);
 	}
+
+	[Theory]
+	[InlineAutoSubstituteData(KeyModifiers.LWin | KeyModifiers.LControl, VIRTUAL_KEY.VK_A)]
+	[InlineAutoSubstituteData(KeyModifiers.RWin | KeyModifiers.RControl, VIRTUAL_KEY.VK_A)]
+	[InlineAutoSubstituteData(KeyModifiers.LWin | KeyModifiers.RControl, VIRTUAL_KEY.VK_A)]
+	[InlineAutoSubstituteData(KeyModifiers.RWin | KeyModifiers.LControl, VIRTUAL_KEY.VK_A)]
+	public void GetCommands_Unified(KeyModifiers modifiers, VIRTUAL_KEY key, IContext context, ICommand command)
+	{
+		// Given
+		IKeybindManager keybindManager = new KeybindManager(context);
+		IKeybind keybind = new Keybind(KeyModifiers.RWin | KeyModifiers.RControl, VIRTUAL_KEY.VK_A);
+
+		context.CommandManager.TryGetCommand("command").Returns(command);
+
+		// When
+		keybindManager.Add("command", keybind);
+		ICommand[] allCommands = keybindManager.GetCommands(new Keybind(modifiers, key));
+
+		// Then
+		Assert.Single(allCommands);
+		Assert.Same(command, allCommands[0]);
+	}
 }
