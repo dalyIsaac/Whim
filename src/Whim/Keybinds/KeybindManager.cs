@@ -32,6 +32,7 @@ internal class KeybindManager : IKeybindManager
 	public ICommand[] GetCommands(IKeybind keybind)
 	{
 		Logger.Debug($"Getting commands for keybind '{keybind}'");
+		keybind = UnifyKeyModifiers ? keybind.UnifyModifiers() : keybind;
 
 		if (_keybindsCommandsMap.TryGetValue(keybind, out List<string>? commandIds))
 		{

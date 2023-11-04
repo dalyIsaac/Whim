@@ -137,4 +137,44 @@ public static class KeyModifiersExtensions
 		}
 		return parts.ToImmutable();
 	}
+
+	/// <summary>
+	/// Returns a new <see cref="IKeybind"/>, with the right modifiers replaced with left
+	/// modifiers.
+	/// </summary>
+	/// <param name="keybind"></param>
+	/// <returns></returns>
+	public static IKeybind UnifyModifiers(this IKeybind keybind) => new Keybind(keybind.Modifiers.Unify(), keybind.Key);
+
+	/// <summary>
+	/// Returns a new <see cref="KeyModifiers"/>, with the right modifiers replaced with left
+	/// modifiers.
+	/// </summary>
+	/// <param name="modifiers"></param>
+	/// <returns></returns>
+	public static KeyModifiers Unify(this KeyModifiers modifiers)
+	{
+		KeyModifiers newModifiers = modifiers;
+		if (modifiers.HasFlag(KeyModifiers.RWin))
+		{
+			newModifiers &= ~KeyModifiers.RWin;
+			newModifiers |= KeyModifiers.LWin;
+		}
+		if (modifiers.HasFlag(KeyModifiers.RControl))
+		{
+			newModifiers &= ~KeyModifiers.RControl;
+			newModifiers |= KeyModifiers.LControl;
+		}
+		if (modifiers.HasFlag(KeyModifiers.RShift))
+		{
+			newModifiers &= ~KeyModifiers.RShift;
+			newModifiers |= KeyModifiers.LShift;
+		}
+		if (modifiers.HasFlag(KeyModifiers.RAlt))
+		{
+			newModifiers &= ~KeyModifiers.RAlt;
+			newModifiers |= KeyModifiers.LAlt;
+		}
+		return newModifiers;
+	}
 }
