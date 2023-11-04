@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Text;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -13,11 +13,6 @@ public readonly record struct Keybind : IKeybind
 	public VIRTUAL_KEY Key { get; }
 
 	/// <summary>
-	/// Saved representation of the keybind as a string.
-	/// </summary>
-	private readonly string _allKeysStr;
-
-	/// <summary>
 	/// Creates a new keybind.
 	/// </summary>
 	/// <param name="modifiers">The modifiers for the keybind.</param>
@@ -26,14 +21,23 @@ public readonly record struct Keybind : IKeybind
 	{
 		Modifiers = modifiers;
 		Key = key;
-
-		ImmutableArray<string>.Builder allKeys = ImmutableArray.CreateBuilder<string>();
-		allKeys.AddRange(Modifiers.GetParts());
-		allKeys.Add(Key.GetKeyString());
-
-		_allKeysStr = string.Join(" + ", allKeys.ToImmutable());
 	}
 
 	/// <inheritdoc />
-	public override string ToString() => _allKeysStr;
+	public override string ToString() => ToString(false);
+
+	/// <inheritdoc />
+	public string ToString(bool unifyKeyModifiers)
+	{
+		StringBuilder sb = new();
+		sb.AppendJoin(" + ", Modifiers.GetParts(unifyKeyModifiers));
+
+		if (sb.Length > 0)
+		{
+			sb.Append(" + ");
+		}
+
+		sb.Append(Key.GetKeyString());
+		return sb.ToString();
+	}
 }
