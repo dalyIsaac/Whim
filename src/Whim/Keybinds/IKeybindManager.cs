@@ -8,6 +8,7 @@ public interface IKeybindManager
 	/// <summary>
 	/// Whether to treat key modifiers like `LWin` and `RWin` as the same.
 	/// For key modifiers which have a left and right variant, this will treat them as the same.
+	/// Defaults to <c>true</c>.
 	/// </summary>
 	/// <remarks>
 	/// When this is set to <c>true</c>, all of the existing keybinds will be re-added in a unified
