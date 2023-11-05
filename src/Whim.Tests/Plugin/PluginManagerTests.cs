@@ -238,7 +238,9 @@ public class PluginManagerTests
 		ctx.KeybindManager
 			.Received(1)
 			.SetKeybind("whim.plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A));
-		ctx.KeybindManager.Received(1).SetKeybind("whim.plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B));
+		ctx.KeybindManager
+			.Received(1)
+			.SetKeybind("whim.plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B));
 	}
 
 	[InlineAutoSubstituteData<PluginManagerCustomization>(
