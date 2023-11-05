@@ -56,6 +56,10 @@ context.KeybindManager.SetKeybind("whim.command_palette.toggle", new Keybind(IKe
 context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace);
 ```
 
+> [!WARNING]
+> When overridding keybinds for plugins, make sure to set the keybind **after** calling `context.PluginManager.AddPlugin(plugin);`
+> This is because `PluginManager` will set the default keybinds for a plugin when it is added, overriding custom keybinds set before the plugin is added.
+
 ## Inspiration
 
 Whim is heavily inspired by the [workspacer](https://github.com/workspacer/workspacer) project, to which I've contributed to in the past. However, there are a few key differences:
