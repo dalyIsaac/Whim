@@ -63,7 +63,7 @@ internal class Context : IContext
 
 		foreach ((string name, IKeybind keybind) in coreCommands.Keybinds)
 		{
-			KeybindManager.Add(name, keybind);
+			KeybindManager.SetKeybind(name, keybind);
 		}
 
 		// Load the user's config.

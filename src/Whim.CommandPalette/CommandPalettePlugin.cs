@@ -12,7 +12,7 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	private bool _disposedValue;
 
 	/// <inheritdoc />
-	public string Name => "whim.commmand_palette";
+	public string Name => "whim.command_palette";
 
 	/// <summary>
 	/// The configuration for the command palette plugin.
