@@ -57,8 +57,9 @@ context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace);
 ```
 
 > [!WARNING]
-> When overridding keybinds for plugins, make sure to set the keybind **after** calling `context.PluginManager.AddPlugin(plugin);`
-> This is because `PluginManager` will set the default keybinds for a plugin when it is added, overriding custom keybinds set before the plugin is added.
+> When overridding keybinds for plugins, make sure to set the keybind **after** calling `context.PluginManager.AddPlugin(plugin)`.
+>
+> Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
 
 ## Inspiration
 
