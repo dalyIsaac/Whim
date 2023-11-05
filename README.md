@@ -28,6 +28,34 @@ context.PluginManager.AddPlugin(barPlugin);
 
 Each plugin needs to be added to the `context` object.
 
+### Commands
+
+Whim stores commands ([`ICommand`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Commands/ICommand.cs)), which are objects with a unique identifier, title, and executable action. Commands expose easy access to functionality from Whim's core, and loaded plugins.
+
+Command identifiers namespaced to the plugin which defines them. For example, the `whim.core` namespace is reserved for core commands, and `whim.gaps` is used by the `GapsPlugin` to define commands. Identifiers are based on the [`Name`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Plugin/IPlugin.cs) property of the plugin - for example, [`GapsPlugin.Name`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim.Gaps/GapsPlugin.cs).
+
+Each plugin can provide commands through the `PluginCommands` property of the [`IPlugin`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Plugin/IPlugin.cs) interface.
+
+Custom commands can be created using the `whim.custom` namespace.
+
+### Keybinds
+
+Commands can be bound to keybinds ([`IKeybind`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Keybinds/IKeybind.cs)).
+
+**Each command is bound to a single keybind.**
+
+**Each keybind can trigger multiple commands.**
+
+Keybinds can be overridden and removed in the config. For example:
+
+```csharp
+// Override the default keybind for showing/hiding the command palette.
+context.KeybindManager.SetKeybind("whim.command_palette.toggle", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_P));
+
+// Remove the default keybind for closing the current workspace.
+context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace);
+```
+
 ## Inspiration
 
 Whim is heavily inspired by the [workspacer](https://github.com/workspacer/workspacer) project, to which I've contributed to in the past. However, there are a few key differences:
