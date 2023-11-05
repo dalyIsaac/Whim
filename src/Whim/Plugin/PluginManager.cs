@@ -114,7 +114,7 @@ internal partial class PluginManager : IPluginManager
 
 		foreach ((string commandId, IKeybind keybind) in plugin.PluginCommands.Keybinds)
 		{
-			_context.KeybindManager.Add(commandId, keybind);
+			_context.KeybindManager.SetKeybind(commandId, keybind);
 		}
 
 		return plugin;
