@@ -77,50 +77,6 @@ internal interface ICoreNativeManager
 	BOOL GetCursorPos(out IPoint<int> lpPoint);
 
 	/// <summary>
-	/// Get the coordinates for the left-side of the virtual screen.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX)"/> with <see cref="SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-	/// </remarks>
-	/// <returns></returns>
-	int GetVirtualScreenLeft();
-
-	/// <summary>
-	/// Get the coordinates for the top-side of the virtual screen.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX)"/> with <see cref="SYSTEM_METRICS_INDEX.SM_YVIRTUALSCREEN"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-	/// </remarks>
-	/// <returns></returns>
-	int GetVirtualScreenTop();
-
-	/// <summary>
-	/// Get the width of the virtual screen.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX)"/> with <see cref="SYSTEM_METRICS_INDEX.SM_CXVIRTUALSCREEN"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-	/// </remarks>
-	/// <returns></returns>
-	int GetVirtualScreenWidth();
-
-	/// <summary>
-	/// Get the height of the virtual screen.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX)"/> with <see cref="SYSTEM_METRICS_INDEX.SM_CYVIRTUALSCREEN"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-	/// </remarks>
-	/// <returns></returns>
-	int GetVirtualScreenHeight();
-
-	/// <summary>
 	/// Whether the desktop has multiple monitors.
 	/// </summary>
 	/// <remarks>
@@ -550,8 +506,8 @@ internal interface ICoreNativeManager
 	/// <param name="hIcon"></param>
 	Icon LoadIconFromHandle(nint hIcon);
 
-	/// <inheritdoc cref="PInvoke.MonitorFromWindow(HWND, MONITOR_FROM_FLAGS)"/>
-	HMONITOR MonitorFromWindow(HWND hwnd, MONITOR_FROM_FLAGS dwFlags);
+	/// <inheritdoc cref="PInvoke.MonitorFromRect(in RECT, MONITOR_FROM_FLAGS)"/>
+	HMONITOR MonitorFromRect(in RECT lprc, MONITOR_FROM_FLAGS dwFlags);
 
 	/// <inheritdoc cref="PInvoke.SetWindowPos(HWND, HWND, int, int, int, int, SET_WINDOW_POS_FLAGS)"/>
 	bool SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, SET_WINDOW_POS_FLAGS uFlags);

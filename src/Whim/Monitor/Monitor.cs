@@ -62,17 +62,7 @@ internal class Monitor : IMonitor
 
 	private ILocation<int> GetBounds()
 	{
-		if (IsPrimary)
-		{
-			return new Location<int>()
-			{
-				X = _internalContext.CoreNativeManager.GetVirtualScreenLeft(),
-				Y = _internalContext.CoreNativeManager.GetVirtualScreenTop(),
-				Width = _internalContext.CoreNativeManager.GetVirtualScreenWidth(),
-				Height = _internalContext.CoreNativeManager.GetVirtualScreenHeight()
-			};
-		}
-		else if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
+		if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
 			return infoEx.monitorInfo.rcMonitor.ToLocation();

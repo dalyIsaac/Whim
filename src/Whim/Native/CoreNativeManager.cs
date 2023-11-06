@@ -47,14 +47,6 @@ internal class CoreNativeManager : ICoreNativeManager
 		return res;
 	}
 
-	public int GetVirtualScreenLeft() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN);
-
-	public int GetVirtualScreenTop() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_YVIRTUALSCREEN);
-
-	public int GetVirtualScreenWidth() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CXVIRTUALSCREEN);
-
-	public int GetVirtualScreenHeight() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CYVIRTUALSCREEN);
-
 	public bool HasMultipleMonitors() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CMONITORS) != 0;
 
 	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData) =>
@@ -351,8 +343,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public Icon LoadIconFromHandle(nint hIcon) => Icon.FromHandle(hIcon);
 
-	public HMONITOR MonitorFromWindow(HWND hwnd, MONITOR_FROM_FLAGS dwFlags) =>
-		PInvoke.MonitorFromWindow(hwnd, dwFlags);
+	public HMONITOR MonitorFromRect(in RECT lprc, MONITOR_FROM_FLAGS dwFlags) => PInvoke.MonitorFromRect(lprc, dwFlags);
 
 	public bool SetWindowPos(
 		HWND hWnd,
