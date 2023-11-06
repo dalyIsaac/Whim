@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.HiDpi;
 
@@ -33,7 +32,7 @@ internal class Monitor : IMonitor
 	[MemberNotNull(nameof(IsPrimary), nameof(Name), nameof(ScaleFactor))]
 	internal unsafe void Update(bool isPrimaryHMonitor)
 	{
-		IsPrimary = !_internalContext.CoreNativeManager.HasMultipleMonitors() || isPrimaryHMonitor;
+		IsPrimary = isPrimaryHMonitor || _internalContext.CoreNativeManager.HasMultipleMonitors() == false;
 		if (IsPrimary)
 		{
 			Name = "DISPLAY";
@@ -62,17 +61,7 @@ internal class Monitor : IMonitor
 
 	private ILocation<int> GetBounds()
 	{
-		if (IsPrimary)
-		{
-			return new Location<int>()
-			{
-				X = _internalContext.CoreNativeManager.GetVirtualScreenLeft(),
-				Y = _internalContext.CoreNativeManager.GetVirtualScreenTop(),
-				Width = _internalContext.CoreNativeManager.GetVirtualScreenWidth(),
-				Height = _internalContext.CoreNativeManager.GetVirtualScreenHeight()
-			};
-		}
-		else if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
+		if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
 			return infoEx.monitorInfo.rcMonitor.ToLocation();
@@ -86,12 +75,7 @@ internal class Monitor : IMonitor
 
 	private ILocation<int> GetWorkingArea()
 	{
-		if (IsPrimary)
-		{
-			_internalContext.CoreNativeManager.GetPrimaryDisplayWorkArea(out RECT rect);
-			return rect.ToLocation();
-		}
-		else if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
+		if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
 			return infoEx.monitorInfo.rcWork.ToLocation();

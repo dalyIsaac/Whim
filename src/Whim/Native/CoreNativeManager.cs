@@ -47,31 +47,10 @@ internal class CoreNativeManager : ICoreNativeManager
 		return res;
 	}
 
-	public int GetVirtualScreenLeft() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN);
-
-	public int GetVirtualScreenTop() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_YVIRTUALSCREEN);
-
-	public int GetVirtualScreenWidth() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CXVIRTUALSCREEN);
-
-	public int GetVirtualScreenHeight() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CYVIRTUALSCREEN);
-
 	public bool HasMultipleMonitors() => PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CMONITORS) != 0;
 
 	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData) =>
 		PInvoke.EnumDisplayMonitors(new HDC(hdc?.DangerousGetHandle() ?? 0), lprcClip, lpfnEnum, dwData);
-
-	public BOOL GetPrimaryDisplayWorkArea(out RECT lpRect)
-	{
-		RECT rect = default;
-		BOOL result;
-		unsafe
-		{
-			result = PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA, 0, &rect, 0);
-		}
-
-		lpRect = rect;
-		return result;
-	}
 
 	public MONITORINFOEXW? GetMonitorInfoEx(HMONITOR hMonitor)
 	{

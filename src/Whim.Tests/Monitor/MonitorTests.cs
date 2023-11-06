@@ -14,24 +14,17 @@ internal class MonitorCustomization : ICustomization
 	{
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
-		internalCtx.CoreNativeManager.GetVirtualScreenLeft().Returns(0);
-		internalCtx.CoreNativeManager.GetVirtualScreenTop().Returns(0);
-		internalCtx.CoreNativeManager.GetVirtualScreenWidth().Returns(1920);
-		internalCtx.CoreNativeManager.GetVirtualScreenHeight().Returns(1080);
-
 		internalCtx.CoreNativeManager
-			.GetPrimaryDisplayWorkArea(out RECT _)
+			.GetMonitorInfoEx(Arg.Any<HMONITOR>())
 			.Returns(
-				(callInfo) =>
+				(_) =>
 				{
-					callInfo[0] = new RECT()
-					{
-						left = 10,
-						top = 10,
-						right = 1910,
-						bottom = 1070
-					};
-					return (BOOL)true;
+					MONITORINFOEXW infoEx = default;
+					infoEx.monitorInfo.rcMonitor = new RECT(0, 0, 1920, 1080);
+					infoEx.monitorInfo.rcWork = new RECT(10, 10, 1910, 1070);
+					infoEx.monitorInfo.dwFlags = 0;
+					infoEx.szDevice = "DISPLAY";
+					return infoEx;
 				}
 			);
 
@@ -113,20 +106,6 @@ public class MonitorTests
 	{
 		// Given
 		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(true);
-
-		internalCtx.CoreNativeManager
-			.GetMonitorInfoEx(Arg.Any<HMONITOR>())
-			.Returns(
-				(_) =>
-				{
-					MONITORINFOEXW infoEx = default;
-					infoEx.monitorInfo.rcMonitor = new RECT(0, 0, 1920, 1080);
-					infoEx.monitorInfo.rcWork = new RECT(10, 10, 1910, 1070);
-					infoEx.monitorInfo.dwFlags = 0;
-					infoEx.szDevice = "DISPLAY";
-					return infoEx;
-				}
-			);
 
 		uint effectiveDpiX = 144;
 		uint effectiveDpiY = 144;
