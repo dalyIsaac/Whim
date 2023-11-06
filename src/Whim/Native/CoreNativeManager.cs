@@ -52,19 +52,6 @@ internal class CoreNativeManager : ICoreNativeManager
 	public BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData) =>
 		PInvoke.EnumDisplayMonitors(new HDC(hdc?.DangerousGetHandle() ?? 0), lprcClip, lpfnEnum, dwData);
 
-	public BOOL GetPrimaryDisplayWorkArea(out RECT lpRect)
-	{
-		RECT rect = default;
-		BOOL result;
-		unsafe
-		{
-			result = PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA, 0, &rect, 0);
-		}
-
-		lpRect = rect;
-		return result;
-	}
-
 	public MONITORINFOEXW? GetMonitorInfoEx(HMONITOR hMonitor)
 	{
 		unsafe
@@ -343,7 +330,8 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public Icon LoadIconFromHandle(nint hIcon) => Icon.FromHandle(hIcon);
 
-	public HMONITOR MonitorFromRect(in RECT lprc, MONITOR_FROM_FLAGS dwFlags) => PInvoke.MonitorFromRect(lprc, dwFlags);
+	public HMONITOR MonitorFromWindow(HWND hwnd, MONITOR_FROM_FLAGS dwFlags) =>
+		PInvoke.MonitorFromWindow(hwnd, dwFlags);
 
 	public bool SetWindowPos(
 		HWND hWnd,

@@ -103,18 +103,6 @@ internal interface ICoreNativeManager
 	BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData);
 
 	/// <summary>
-	/// Retrieves the size of the work area on the primary display monitor.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION, uint, void*, SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS)"/> with <see cref="SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-systemparametersinfoa
-	/// </remarks>
-	/// <param name="workArea"></param>
-	/// <returns></returns>
-	BOOL GetPrimaryDisplayWorkArea(out RECT workArea);
-
-	/// <summary>
 	/// Retrieve information about a display monitor.
 	/// </summary>
 	/// <remarks>
@@ -506,8 +494,8 @@ internal interface ICoreNativeManager
 	/// <param name="hIcon"></param>
 	Icon LoadIconFromHandle(nint hIcon);
 
-	/// <inheritdoc cref="PInvoke.MonitorFromRect(in RECT, MONITOR_FROM_FLAGS)"/>
-	HMONITOR MonitorFromRect(in RECT lprc, MONITOR_FROM_FLAGS dwFlags);
+	/// <inheritdoc cref="PInvoke.MonitorFromWindow(HWND, MONITOR_FROM_FLAGS)"/>
+	HMONITOR MonitorFromWindow(HWND hwnd, MONITOR_FROM_FLAGS dwFlags);
 
 	/// <inheritdoc cref="PInvoke.SetWindowPos(HWND, HWND, int, int, int, int, SET_WINDOW_POS_FLAGS)"/>
 	bool SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, SET_WINDOW_POS_FLAGS uFlags);
