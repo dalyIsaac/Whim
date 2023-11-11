@@ -1,6 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1275,10 +1276,13 @@ public class WindowManagerTests
 		ctx.WorkspaceManager.DidNotReceive().MoveWindowToWorkspace(Arg.Any<IWorkspace>(), Arg.Any<IWindow>());
 	}
 
-	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void PostInitialize(IContext ctx, IInternalContext internalCtx)
+	[Theory]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(false)]
+	[InlineAutoSubstituteData<WindowManagerCustomization>(true)]
+	internal void PostInitialize(bool routeToActiveWorkspace, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
+		ctx.RouterManager.RouteToActiveWorkspace.Returns(routeToActiveWorkspace);
 		internalCtx.CoreNativeManager.GetAllWindows().Returns(new List<HWND>() { new(1), new(2), new(3) });
 
 		WindowManager windowManager = new(ctx, internalCtx);
@@ -1286,8 +1290,10 @@ public class WindowManagerTests
 		// When
 		windowManager.PostInitialize();
 
-		// Then
+		// Then RouteToActiveWorkspace was get and set
 		internalCtx.CoreNativeManager.Received(3).IsSplashScreen(Arg.Any<HWND>());
+		_ = ctx.RouterManager.Received(1).RouteToActiveWorkspace;
+		ctx.RouterManager.Received().RouteToActiveWorkspace = routeToActiveWorkspace;
 	}
 
 	#region Dispose

@@ -105,11 +105,18 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		_internalContext.MouseHook.MouseLeftButtonDown += MouseHook_MouseLeftButtonDown;
 		_internalContext.MouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
 
+		// Don't route to the active workspace while we're adding all the windows.
+		bool routeToActiveWorkspace = _context.RouterManager.RouteToActiveWorkspace;
+		_context.RouterManager.RouteToActiveWorkspace = false;
+
 		// Add all existing windows.
 		foreach (HWND hwnd in _internalContext.CoreNativeManager.GetAllWindows())
 		{
 			AddWindow(hwnd);
 		}
+
+		// Restore the route to active workspace setting.
+		_context.RouterManager.RouteToActiveWorkspace = routeToActiveWorkspace;
 	}
 
 	public IWindow? CreateWindow(HWND hwnd)
