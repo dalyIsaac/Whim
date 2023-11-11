@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Whim.TestUtils;
 using Xunit;
+using static Xunit.Assert;
 
 namespace Whim.Tests;
 
@@ -655,15 +656,18 @@ public class WorkspaceManagerTests
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window is added
-		workspaceManager.WindowAdded(window);
+		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+			h => workspaceManager.WindowRouted += h,
+			h => workspaceManager.WindowRouted -= h,
+			() => workspaceManager.WindowAdded(window)
+		);
 
 		// Then the window is added to the active workspace
-		workspaces[0].Received(1).AddWindow(window);
-		workspaces[1].DidNotReceive().AddWindow(window);
+		Assert_WindowAddedToWorkspace1(workspaces, window, routeEvent);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void WindowAdded_NoRouter_GetMonitorAtWindowCenter(
+	internal void WindowAdded_RouterReturnsInvalidWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IMonitor[] monitors,
@@ -674,17 +678,52 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[0]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// There is a router which routes the window to a different workspace
+		ctx.RouterManager.RouteWindow(window).Returns((IWorkspace?)null);
+
+		// When a window is added
+		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+			h => workspaceManager.WindowRouted += h,
+			h => workspaceManager.WindowRouted -= h,
+			() => workspaceManager.WindowAdded(window)
+		);
+
+		// Then the window is added to the active workspace
+		Assert_WindowAddedToWorkspace1(workspaces, window, routeEvent);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowAdded_NoRouter_GetMonitorAtWindowCenter(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window,
+		IWorkspace imposterWorkspace
+	)
+	{
+		// Given
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		ctx.RouterManager.RouteWindow(window).Returns(imposterWorkspace);
+		ctx.MonitorManager.GetMonitorAtPoint(point: Arg.Any<IPoint<int>>()).Returns(monitors[0]);
 
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window is added
-		workspaceManager.WindowAdded(window);
+		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+			h => workspaceManager.WindowRouted += h,
+			h => workspaceManager.WindowRouted -= h,
+			() => workspaceManager.WindowAdded(window)
+		);
 
 		// Then the window is added to the active workspace
-		workspaces[0].Received(1).AddWindow(window);
-		workspaces[1].DidNotReceive().AddWindow(window);
+		Assert_WindowAddedToWorkspace1(workspaces, window, routeEvent);
+		imposterWorkspace.DidNotReceive().AddWindow(window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -701,7 +740,11 @@ public class WorkspaceManagerTests
 		ctx.RouterManager.RouteWindow(window).Returns(workspaces[1]);
 
 		// When a window is added
-		workspaceManager.WindowAdded(window);
+		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+			h => workspaceManager.WindowRouted += h,
+			h => workspaceManager.WindowRouted -= h,
+			() => workspaceManager.WindowAdded(window)
+		);
 
 		// Then the window is added to the workspace returned by the router
 		workspaces[0].DidNotReceive().AddWindow(window);
@@ -728,11 +771,27 @@ public class WorkspaceManagerTests
 		ctx.RouterManager.RouteToActiveWorkspace.Returns(true);
 
 		// When a window is added
-		workspaceManager.WindowAdded(window);
+		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+			h => workspaceManager.WindowRouted += h,
+			h => workspaceManager.WindowRouted -= h,
+			() => workspaceManager.WindowAdded(window)
+		);
 
 		// Then the window is added to the active workspace
+		Assert_WindowAddedToWorkspace1(workspaces, window, routeEvent);
+	}
+
+	private static void Assert_WindowAddedToWorkspace1(
+		IWorkspace[] workspaces,
+		IWindow window,
+		RaisedEvent<RouteEventArgs> routeEvent
+	)
+	{
 		workspaces[0].Received(1).AddWindow(window);
 		workspaces[1].DidNotReceive().AddWindow(window);
+
+		Assert.Equal(workspaces[0], routeEvent.Arguments.CurrentWorkspace);
+		Assert.Equal(window, routeEvent.Arguments.Window);
 	}
 	#endregion
 
@@ -1076,13 +1135,13 @@ public class WorkspaceManagerTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		IMonitor[] monitors,
-		IWorkspace activeWorkspace,
-		IWorkspace targetWorkspace,
 		IWindow window
 	)
 	{
 		// Given
-		IWorkspace[] workspaces = new[] { activeWorkspace, targetWorkspace };
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		IWorkspace activeWorkspace = workspaces[0];
+		IWorkspace targetWorkspace = workspaces[1];
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
