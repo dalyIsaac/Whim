@@ -115,6 +115,18 @@ public class WorkspaceManagerTests
 		}
 	}
 
+	private static void ActivateWorkspacesOnMonitors(
+		WorkspaceManagerTestWrapper workspaceManager,
+		IWorkspace[] workspaces,
+		IMonitor[] monitors
+	)
+	{
+		for (int i = 0; i < workspaces.Length; i++)
+		{
+			workspaceManager.Activate(workspaces[i], monitors[i]);
+		}
+	}
+
 	#region Add
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void Add_BeforeInitialization(IContext ctx, IInternalContext internalCtx)
@@ -445,8 +457,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		// Reset wrapper
 		ClearWorkspaceReceivedCalls(workspaces);
@@ -621,10 +632,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
-
-		// Reset the wrapper
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When we layout all active workspaces
@@ -643,10 +651,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
-
-		// Reset the wrapper
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window is added
@@ -671,10 +676,7 @@ public class WorkspaceManagerTests
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[0]);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
-
-		// Reset the wrapper
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window is added
@@ -692,10 +694,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
-
-		// Reset the wrapper
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// There is a router which routes the window to a different workspace
@@ -721,10 +720,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
-
-		// Reset the wrapper
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// There is a router which routes the window to the active workspace
@@ -753,10 +749,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
-
-		// Reset the wrapper
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window is removed
@@ -774,11 +767,9 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaceManager.WindowAdded(window);
-		// Reset the wrapper
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window which is in a workspace is removed
@@ -798,12 +789,9 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
-
-		// Reset the wrapper
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window which is not in a workspace is moved to a workspace
@@ -820,8 +808,6 @@ public class WorkspaceManagerTests
 		// Given there are 3 workspaces
 		IWorkspace[] workspaces = CreateWorkspaces(3);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
-
-		// Reset the wrapper
 		ClearWorkspaceReceivedCalls(workspaces);
 		workspaces[2].ClearReceivedCalls();
 
@@ -872,12 +858,9 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
-
-		// Reset the wrapper
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When there is no focused window
@@ -900,10 +883,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
-
-		// Reset the wrapper
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window which is not in a workspace is moved to a monitor
@@ -926,8 +906,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaceManager.WindowAdded(window);
 		ClearWorkspaceReceivedCalls(workspaces);
@@ -952,8 +931,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaceManager.WindowAdded(window);
 		ClearWorkspaceReceivedCalls(workspaces);
@@ -978,8 +956,7 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaceManager.WindowAdded(window);
 		ClearWorkspaceReceivedCalls(workspaces);
@@ -1003,12 +980,10 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		IWorkspace[] workspaces = CreateWorkspaces(2);
-
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		ctx.MonitorManager.GetPreviousMonitor(monitors[0]).Returns(monitors[1]);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaceManager.WindowAdded(window);
 		ClearWorkspaceReceivedCalls(workspaces);
@@ -1031,12 +1006,10 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		IWorkspace[] workspaces = CreateWorkspaces(2);
-
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		ctx.MonitorManager.GetNextMonitor(monitors[0]).Returns(monitors[1]);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaceManager.WindowAdded(window);
 		ClearWorkspaceReceivedCalls(workspaces);
@@ -1109,18 +1082,12 @@ public class WorkspaceManagerTests
 	)
 	{
 		// Given
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(
-			ctx,
-			internalCtx,
-			new[] { activeWorkspace, targetWorkspace }
-		);
-
-		workspaceManager.Activate(activeWorkspace, monitors[0]);
-		workspaceManager.Activate(targetWorkspace, monitors[1]);
+		IWorkspace[] workspaces = new[] { activeWorkspace, targetWorkspace };
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		workspaceManager.WindowAdded(window);
-		activeWorkspace.ClearReceivedCalls();
-		targetWorkspace.ClearReceivedCalls();
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[1]);
 		activeWorkspace.RemoveWindow(window).Returns(true);
@@ -1198,7 +1165,6 @@ public class WorkspaceManagerTests
 	{
 		// Given the window is defined, but not in any workspace
 		IWorkspace[] workspaces = CreateWorkspaces(2);
-
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When WindowFocused is called
@@ -1215,7 +1181,6 @@ public class WorkspaceManagerTests
 		ctx.MonitorManager.GetEnumerator().Returns(Array.Empty<IMonitor>().AsEnumerable().GetEnumerator());
 		IWorkspace[] workspaces = CreateWorkspaces(2);
 		IInternalWorkspace[] internalWorkspaces = workspaces.Cast<IInternalWorkspace>().ToArray();
-
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		workspaceManager.WindowAdded(window);
 
@@ -1237,7 +1202,6 @@ public class WorkspaceManagerTests
 	{
 		// Given the window is defined, in a workspace, and the workspace is shown
 		IWorkspace[] workspaces = CreateWorkspaces(2);
-
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		workspaceManager.WindowAdded(window);
 		workspaceManager.WindowFocused(window);
@@ -1351,11 +1315,9 @@ public class WorkspaceManagerTests
 	{
 		// Given
 		IWorkspace[] workspaces = CreateWorkspaces(2);
-
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		// When a monitor is removed, and a monitor not tracked in the WorkspaceManager is removed
 		workspaceManager.MonitorManager_MonitorsChanged(
@@ -1391,8 +1353,7 @@ public class WorkspaceManagerTests
 		}
 		workspaceManager.CreateLayoutEngines = createLayoutEngines;
 
-		workspaceManager.Activate(workspaces[0], monitors[0]);
-		workspaceManager.Activate(workspaces[1], monitors[1]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
 		// When a monitor is added
 		workspaceManager.MonitorManager_MonitorsChanged(
@@ -1422,8 +1383,6 @@ public class WorkspaceManagerTests
 
 		workspaceManager.Activate(workspaces[0], monitors[0]);
 		workspaceManager.Activate(workspaces[1], monitors[1]);
-
-		// Reset the wrapper
 		ClearWorkspaceReceivedCalls(workspaces);
 		workspaces[2].ClearReceivedCalls();
 
@@ -1813,7 +1772,6 @@ public class WorkspaceManagerTests
 
 		workspaces[1].Windows.Returns(new[] { window });
 		ctx.RouterManager.RouteWindow(window).Returns(workspaces[1]);
-
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		workspaceManager.Initialize();
 		workspaceManager.WindowAdded(window);
