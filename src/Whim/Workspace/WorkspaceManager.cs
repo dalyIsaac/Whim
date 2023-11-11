@@ -439,10 +439,17 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceFocused);
-		if (workspaceFocused != null && !workspaceFocused.Equals(ActiveWorkspace))
+		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceForWindow))
 		{
-			Activate(workspaceFocused);
+			Logger.Debug($"Window {window} was not found in any workspace");
+			return;
+		}
+
+		if (!_monitorWorkspaceMap.ContainsValue(workspaceForWindow))
+		{
+			Logger.Debug($"Window {window} is not in an active workspace");
+			Activate(workspaceForWindow);
+			return;
 		}
 	}
 
