@@ -36,7 +36,52 @@ Command identifiers namespaced to the plugin which defines them. For example, th
 
 Each plugin can provide commands through the `PluginCommands` property of the [`IPlugin`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Plugin/IPlugin.cs) interface.
 
-Custom commands can be created using the `whim.custom` namespace.
+Custom commands are automatically added to the `whim.custom` namespace. For example, the following creates 10 commands to bind <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>1</kbd> through <kbd>0</kbd> to the workspaces at the indices `0` through `9`.
+
+```csharp
+// Add this at the top
+using System.Linq;
+
+void DoConfig(IContext context)
+{
+    // ...
+
+    for (int idx = 1; idx <= 10; idx++)
+    {
+        // Create a command to activate the workspace at the given index.
+        ActivateWorkspaceAtIndex activateWorkspaceAtIndex = new(idx);
+        context.CommandManager.Add(
+            // Automatically namespaced to `whim.custom`.
+            identifier: $"activate_workspace_index_{idx}",
+            title: $"Activate workspace at index {idx}",
+            callback: () => activateWorkspaceAtIndex.Execute(context)
+        );
+
+        // Create keybindings to call the command at the given index.
+        context.KeybindManager.Add(
+            commandId: $"whim.custom.activate_workspace_index_{idx}",
+            keybind: new Keybind(KeyModifiers.LAlt | KeyModifiers.LShift,
+            key: GetVirtualKeyForInt(idx))
+        );
+    }
+
+    // ...
+}
+
+// This record is necessary, otherwise the index captured is the last one (11)
+// The index here is 1-based.
+record ActivateWorkspaceAtIndex(int Index)
+{
+    public void Execute(IContext context)
+    {
+        IWorkspace[] workspaces = context.WorkspaceManager.ToArray();
+        if (Index <= workspaces.Length)
+        {
+            context.WorkspaceManager.Activate(workspaces[Index - 1]);
+        }
+    }
+}
+```
 
 ### Keybinds
 
@@ -53,7 +98,7 @@ Keybinds can be overridden and removed in the config. For example:
 context.KeybindManager.SetKeybind("whim.command_palette.toggle", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_P));
 
 // Remove the default keybind for closing the current workspace.
-context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace);
+context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace");
 ```
 
 > [!WARNING]
@@ -61,7 +106,37 @@ context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace);
 >
 > Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
 
-## Inspiration
+### Routing
+
+[`IRouterManager`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Router/IRouterManager.cs) is used by Whim to route windows to specific workspaces. For example, to route Discord to a workspace "Chat", you can do the following:
+
+```csharp
+context.RouterManager.Add((window) =>
+{
+    if (window.ProcessFileName == "Discord.exe")
+    {
+        return context.WorkspaceManager.TryGet("Chat");
+    }
+
+    // Continue routing.
+    return null;
+});
+```
+
+### Filtering
+
+[`IFilterManager`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Router/IFilterManager.cs) tells Whim to ignore windows based on `Filter` delegates. A common use case is for plugins to filter out windows they manage themselves and want Whim to not lay out. For example, the bars and command palette are filtered out.
+
+```csharp
+// Called by the bar plugin.
+context.FilterManager.IgnoreTitleMatch("Whim Bar");
+```
+
+## Architecture
+
+> In progress...
+
+### Inspiration
 
 Whim is heavily inspired by the [workspacer](https://github.com/workspacer/workspacer) project, to which I've contributed to in the past. However, there are a few key differences:
 
@@ -76,10 +151,6 @@ Whim was not built to be a drop-in replacement for workspacer, but it does have 
 It should be noted that [workspacer is no longer in active development](https://github.com/workspacer/workspacer/discussions/485).
 
 I am grateful to the workspacer project for the inspiration and ideas it has provided.
-
-## Architecture
-
-> In progress...
 
 ### Layouts
 
