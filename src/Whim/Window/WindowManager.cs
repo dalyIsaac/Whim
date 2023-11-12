@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
@@ -43,6 +44,14 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// Indicates whether values have been disposed.
 	/// </summary>
 	private bool _disposedValue;
+
+	public HashSet<string> LocationRestoringProcessFileNames { get; } = new() { "firefox.exe" };
+
+	/// <summary>
+	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringProcessFileNames"/>.
+	/// We maintain a set of the windows that have been handled so that we don't enter an infinite loop of location change events.
+	/// </summary>
+	private readonly HashSet<IWindow> _handledLocationRestoringWindows = new();
 
 	public WindowManager(IContext context, IInternalContext internalContext)
 	{
@@ -386,6 +395,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		Logger.Debug($"Window removed: {window}");
 		_windows.TryRemove(window.Handle, out _);
+		_handledLocationRestoringWindows.Remove(window);
 		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowRemoved(window);
 		WindowRemoved?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
@@ -537,7 +547,29 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		if (!_isMovingWindow)
 		{
-			return;
+			if (
+				window.ProcessFileName != null
+				&& !_handledLocationRestoringWindows.Contains(window)
+				&& LocationRestoringProcessFileNames.Contains(window.ProcessFileName)
+			)
+			{
+				// The window's application tried to restore its position.
+				// Wait, then restore the position.
+				_internalContext.CoreNativeManager.TryEnqueue(async () =>
+				{
+					await Task.Delay(2000).ConfigureAwait(true);
+					if (_context.WorkspaceManager.GetWorkspaceForWindow(window) is IWorkspace workspace)
+					{
+						_handledLocationRestoringWindows.Add(window);
+						workspace.DoLayout();
+					}
+				});
+			}
+			else
+			{
+				// Ignore the window moving event.
+				return;
+			}
 		}
 
 		IPoint<int>? cursorPoint = null;
