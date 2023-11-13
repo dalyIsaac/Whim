@@ -76,6 +76,7 @@ internal class Context : IContext
 
 		Logger.Debug("Initializing...");
 		_internalContext.PreInitialize();
+		WindowManager.PreInitialize();
 		PluginManager.PreInitialize();
 
 		MonitorManager.Initialize();

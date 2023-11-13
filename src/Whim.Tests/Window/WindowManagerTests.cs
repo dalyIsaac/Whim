@@ -108,7 +108,9 @@ public class WindowManagerTests
 				callInfo[1] = _processId;
 				return (uint)1;
 			});
-		internalCtx.CoreNativeManager.GetProcessNameAndPath((int)_processId).Returns(("name", "path"));
+		internalCtx.CoreNativeManager
+			.GetProcessNameAndPath((int)_processId)
+			.Returns(("firefox.exe", "C:\\Program Files\\Firefox Developer Edition\\firefox.exe"));
 	}
 
 	private WindowManagerTests Trigger_MouseLeftButtonDown(IInternalContext internalCtx)
@@ -748,15 +750,9 @@ public class WindowManagerTests
 		);
 	}
 
-	private static IWorkspace Setup_LocationRestoring_Success(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WindowManager windowManager,
-		HWND hwnd
-	)
+	private static IWorkspace Setup_LocationRestoring_Success(IContext ctx, IInternalContext internalCtx, HWND hwnd)
 	{
 		IWindow window = Window.CreateWindow(ctx, internalCtx, hwnd)!;
-		windowManager.LocationRestoringProcessFileNames.Add("path");
 
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
@@ -775,16 +771,17 @@ public class WindowManagerTests
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
 	internal async void WindowsEventHook_OnWindowMoved_Raises_CannotFindWorkspaceForWindow(
-	IContext ctx,
-	IInternalContext internalCtx
-)
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given the window is registered as restoring, but no workspace is found for it
 		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
 			ctx,
 			internalCtx
 		);
-		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, windowManager, hwnd);
+		windowManager.PreInitialize();
+		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
 
 		// When the window is moved
@@ -810,7 +807,8 @@ public class WindowManagerTests
 			ctx,
 			internalCtx
 		);
-		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, windowManager, hwnd);
+		windowManager.PreInitialize();
+		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved
 		// Then an event is raised, and the workspace is asked to do a layout
@@ -838,7 +836,8 @@ public class WindowManagerTests
 			ctx,
 			internalCtx
 		);
-		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, windowManager, hwnd);
+		windowManager.PreInitialize();
+		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved for the second time
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
@@ -859,7 +858,8 @@ public class WindowManagerTests
 			ctx,
 			internalCtx
 		);
-		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, windowManager, hwnd);
+		windowManager.PreInitialize();
+		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved and then removed
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);

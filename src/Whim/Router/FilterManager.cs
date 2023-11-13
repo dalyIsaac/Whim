@@ -19,6 +19,7 @@ internal class FilterManager : IFilterManager
 
 	public FilterManager()
 	{
+		// TODO: Move this somewhere else?
 		IFilterManager.AddDefaultFilters(this);
 	}
 

@@ -45,10 +45,10 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// </summary>
 	private bool _disposedValue;
 
-	public HashSet<string> LocationRestoringProcessFileNames { get; } = new() { "firefox.exe" };
+	public IFilterManager LocationRestoringFilterManager { get; } = new FilterManager();
 
 	/// <summary>
-	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringProcessFileNames"/>.
+	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringFilterManager"/>.
 	/// We maintain a set of the windows that have been handled so that we don't enter an infinite loop of location change events.
 	/// </summary>
 	private readonly HashSet<IWindow> _handledLocationRestoringWindows = new();
@@ -58,6 +58,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		_context = context;
 		_internalContext = internalContext;
 		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
+	}
+
+	public void PreInitialize()
+	{
+		LocationRestoringFilterManager.IgnoreProcessName("firefox.exe");
 	}
 
 	public void Initialize()
@@ -550,7 +555,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			if (
 				window.ProcessFileName != null
 				&& !_handledLocationRestoringWindows.Contains(window)
-				&& LocationRestoringProcessFileNames.Contains(window.ProcessFileName)
+				&& LocationRestoringFilterManager.ShouldBeIgnored(window)
 			)
 			{
 				// The window's application tried to restore its position.

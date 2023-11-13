@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -10,10 +9,14 @@ namespace Whim;
 public interface IWindowManager : IDisposable
 {
 	/// <summary>
-	/// <see cref="IWindow.ProcessFileName"/>s of processes that will try restore window locations
-	/// after their windows are created.
+	/// Filters for windows that will try restore window locations after their windows are created.
 	/// </summary>
-	HashSet<string> LocationRestoringProcessFileNames { get; }
+	IFilterManager LocationRestoringFilterManager { get; }
+
+	/// <summary>
+	/// Populate the <see cref="LocationRestoringFilterManager"/> with default filters.
+	/// </summary>
+	void PreInitialize();
 
 	/// <summary>
 	/// Initialize the windows event hooks.
