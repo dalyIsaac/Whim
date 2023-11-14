@@ -66,6 +66,8 @@ internal class Context : IContext
 			KeybindManager.SetKeybind(name, keybind);
 		}
 
+		FilteredWindows.LoadWindowsIgnoredByWhim(FilterManager);
+
 		// Load the user's config.
 		ConfigLoader configLoader = new(FileManager);
 		DoConfig doConfig = configLoader.LoadConfig();

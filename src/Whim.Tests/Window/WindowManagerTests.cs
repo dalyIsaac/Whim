@@ -1,10 +1,12 @@
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -106,7 +108,9 @@ public class WindowManagerTests
 				callInfo[1] = _processId;
 				return (uint)1;
 			});
-		internalCtx.CoreNativeManager.GetProcessNameAndPath((int)_processId).Returns(("name", "path"));
+		internalCtx.CoreNativeManager
+			.GetProcessNameAndPath((int)_processId)
+			.Returns(("chrome.exe", "C:\\Program Files\\Google Chrome\\chrome.exe"));
 	}
 
 	private WindowManagerTests Trigger_MouseLeftButtonDown(IInternalContext internalCtx)
@@ -690,6 +694,188 @@ public class WindowManagerTests
 	#endregion
 
 	#region OnWindowMoved
+	private static (CaptureWinEventProc, WindowManager, HWND) Setup_LocationRestoring(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+		WindowManager windowManager = new(ctx, internalCtx);
+		windowManager.Initialize();
+		return (capture, windowManager, hwnd);
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise_ProcessFileNameIsNull(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given the window has no process file name
+		internalCtx.CoreNativeManager.GetProcessNameAndPath((int)_processId).Returns(("", null));
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
+			ctx,
+			internalCtx
+		);
+
+		// When the window is moved
+		// Then no event is raised
+		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise_WindowDoesNotRestore(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given the window is not registered as restoring
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
+			ctx,
+			internalCtx
+		);
+
+		// When the window is moved
+		// Then no event is raised
+		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
+	}
+
+	private static IWorkspace Setup_LocationRestoring_Success(IContext ctx, IInternalContext internalCtx, HWND hwnd)
+	{
+		IWindow window = Window.CreateWindow(ctx, internalCtx, hwnd)!;
+
+		IWorkspace workspace = Substitute.For<IWorkspace>();
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+
+		internalCtx.CoreNativeManager
+			.When(cnm => cnm.TryEnqueue(Arg.Any<DispatcherQueueHandler>()))
+			.Do(callInfo =>
+			{
+				var handler = callInfo.ArgAt<DispatcherQueueHandler>(0);
+				handler.Invoke();
+			});
+
+		internalCtx.CoreNativeManager
+			.GetProcessNameAndPath((int)_processId)
+			.Returns(("firefox.exe", "C:\\Program Files\\Mozilla Firefox\\firefox.exe"));
+
+		return workspace;
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal async void WindowsEventHook_OnWindowMoved_Raises_CannotFindWorkspaceForWindow(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given the window is registered as restoring, but no workspace is found for it
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
+			ctx,
+			internalCtx
+		);
+		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
+
+		// When the window is moved
+		// Then an event is raised, but the workspace is not asked to do a layout
+		var result = Assert.Raises<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
+		await Task.Delay(2200);
+
+		Assert.Null(result.Arguments.CursorDraggedPoint);
+		Assert.Null(result.Arguments.MovedEdges);
+		Assert.NotNull(result.Arguments.Window);
+		workspace.DidNotReceive().DoLayout();
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal async void WindowsEventHook_OnWindowMoved_Raises_DoLayout(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given the window is registered as restoring, and a workspace is found for it
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
+			ctx,
+			internalCtx
+		);
+		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
+
+		// When the window is moved
+		// Then an event is raised, and the workspace is asked to do a layout
+		var result = Assert.Raises<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
+		await Task.Delay(2200);
+
+		Assert.Null(result.Arguments.CursorDraggedPoint);
+		Assert.Equal(result.Arguments.MovedEdges, Direction.None);
+		Assert.NotNull(result.Arguments.Window);
+		workspace.Received(1).DoLayout();
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal async void WindowsEventHook_OnWindowMoved_DoesNotRaise_WindowAlreadyHandled(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given the window is registered as restoring, a workspace is found for it, and the window is already handled
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
+			ctx,
+			internalCtx
+		);
+		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
+
+		// When the window is moved for the second time
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
+		await Task.Delay(2200).ConfigureAwait(true);
+
+		// Then no event is raised
+		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
+			h => windowManager.WindowMoved += h,
+			h => windowManager.WindowMoved -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
+		);
+		await Task.Delay(2200).ConfigureAwait(true);
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal async void WindowsEventHook_OnWindowMoved_WindowGetsRemoved(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given the window has been been handled, but is removed
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
+			ctx,
+			internalCtx
+		);
+		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
+
+		// When the window is moved and then removed
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
+		await Task.Delay(2200).ConfigureAwait(true);
+
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_DESTROY, hwnd, 0, 0, 0, 0);
+		await Task.Delay(2200).ConfigureAwait(true);
+
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
+		await Task.Delay(2200).ConfigureAwait(true);
+
+		// Then the workspace is asked to do two layouts
+		workspace.Received(2).DoLayout();
+	}
+
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
 	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise(IContext ctx, IInternalContext internalCtx)
 	{
@@ -714,20 +900,20 @@ public class WindowManagerTests
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
 	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise_MouseIsUp(IContext ctx, IInternalContext internalCtx)
 	{
-		// Given
+		// Given the window has not had OnWindowMoveStart called
 		HWND hwnd = new(1);
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
-		// When
+		// When the window is moved
 		windowManager.Initialize();
 		windowManager.PostInitialize();
 
 		Trigger_MouseLeftButtonDown(internalCtx).Trigger_MouseLeftButtonUp(internalCtx);
 
-		// Then
+		// Then no event is raised
 		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
