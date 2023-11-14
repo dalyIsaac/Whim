@@ -132,6 +132,16 @@ context.RouterManager.Add((window) =>
 context.FilterManager.IgnoreTitleMatch("Whim Bar");
 ```
 
+## Window manager
+
+The [`IWindowManager`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Window/IWindowManager.cs) is used by Whim to manage [`IWindow`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Window/IWindow.cs)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
+
+For example, the most commonly subscribed event is the `WindowFocused` event, used by the `Whim.FocusIndicator` and `Whim.Bar` plugins.
+
+The `IWindowManager` also exposes an `IFilterManager` called `LocationRestoringFilterManager`. Some applications like to restore their window positions when they start (e.g., Firefox, JetBrains Gateway). As a window manager, this is undesirable. `LocationRestoringFilterManager` listens to `WindowMoved` events for these windows and will force their parent `IWorkspace` to do a layout two seconds after their first `WindowMoved` event, attempting to restore the window to its correct position.
+
+If this doesn't work, dragging a window's edge will force a layout, which should fix the window's position. This is an area which could use further improvement.
+
 ## Architecture
 
 > In progress...
