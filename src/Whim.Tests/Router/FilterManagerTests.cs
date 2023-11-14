@@ -71,9 +71,9 @@ public class FilterManagerTests
 		// When the filter manager is cleared
 		filterManager.Clear();
 
-		// Then the window should be ignored
+		// Then the window should be ignored, but not the search UI window
 		Assert.False(filterManager.ShouldBeIgnored(window));
-	}ShouldIgnore
+	}
 
 	[Theory, AutoSubstituteData]
 	public void CustomFilter(IWindow window)
@@ -84,7 +84,6 @@ public class FilterManagerTests
 
 		window.WindowClass.Returns("Test");
 
-		Assert.True(filterManager.CheckWindow(window));
+		Assert.True(filterManager.ShouldBeIgnored(window));
 	}
 }
-ShouldIgnoreShouldIgnoreShouldIgnore

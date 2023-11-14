@@ -827,7 +827,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise_WindowAlreadyHandled(
+	internal async void WindowsEventHook_OnWindowMoved_DoesNotRaise_WindowAlreadyHandled(
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -841,6 +841,7 @@ public class WindowManagerTests
 
 		// When the window is moved for the second time
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
+		await Task.Delay(2200).ConfigureAwait(true);
 
 		// Then no event is raised
 		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
@@ -848,6 +849,7 @@ public class WindowManagerTests
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
+		await Task.Delay(2200).ConfigureAwait(true);
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
