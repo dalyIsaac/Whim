@@ -18,5 +18,5 @@ public static class FilteredWindows
 	/// </summary>
 	/// <param name="filterManager"></param>
 	public static void LoadLocationRestoringWindows(IFilterManager filterManager) =>
-		filterManager.IgnoreProcessName("firefox.exe");
+		filterManager.IgnoreProcessName("firefox.exe").IgnoreProcessName("gateway64.exe");
 }
