@@ -58,11 +58,8 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		_context = context;
 		_internalContext = internalContext;
 		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
-	}
 
-	public void PreInitialize()
-	{
-		LocationRestoringFilterManager.IgnoreProcessName("firefox.exe");
+		FilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
 	}
 
 	public void Initialize()

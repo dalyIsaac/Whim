@@ -19,8 +19,7 @@ public interface IFilterManager
 	/// <summary>
 	/// Clears all the filters.
 	/// </summary>
-	/// <param name="clearDefaults">Indicates whether the default filters should be retained.</param>
-	public void Clear(bool clearDefaults = false);
+	public void Clear();
 
 	/// <summary>
 	/// Indicates whether the window should be ignored.
@@ -55,13 +54,4 @@ public interface IFilterManager
 	/// </summary>
 	/// <param name="match"></param>
 	public IFilterManager IgnoreTitleMatch(string match);
-
-	/// <summary>
-	/// Populates the provided <see cref="IFilterManager"/> with the default
-	/// filters.
-	/// </summary>
-	public static void AddDefaultFilters(IFilterManager router)
-	{
-		router.IgnoreProcessName("SearchUI.exe");
-	}
 }

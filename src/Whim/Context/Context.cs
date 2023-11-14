@@ -66,6 +66,8 @@ internal class Context : IContext
 			KeybindManager.SetKeybind(name, keybind);
 		}
 
+		FilteredWindows.LoadWindowsIgnoredByWhim(FilterManager);
+
 		// Load the user's config.
 		ConfigLoader configLoader = new(FileManager);
 		DoConfig doConfig = configLoader.LoadConfig();
@@ -76,7 +78,6 @@ internal class Context : IContext
 
 		Logger.Debug("Initializing...");
 		_internalContext.PreInitialize();
-		WindowManager.PreInitialize();
 		PluginManager.PreInitialize();
 
 		MonitorManager.Initialize();

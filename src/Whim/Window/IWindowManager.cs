@@ -14,11 +14,6 @@ public interface IWindowManager : IDisposable
 	IFilterManager LocationRestoringFilterManager { get; }
 
 	/// <summary>
-	/// Populate the <see cref="LocationRestoringFilterManager"/> with default filters.
-	/// </summary>
-	void PreInitialize();
-
-	/// <summary>
 	/// Initialize the windows event hooks.
 	/// </summary>
 	/// <returns></returns>

@@ -17,28 +17,18 @@ internal class FilterManager : IFilterManager
 	/// </summary>
 	private readonly List<Filter> _filters = new();
 
-	public FilterManager()
-	{
-		// TODO: Move this somewhere else?
-		IFilterManager.AddDefaultFilters(this);
-	}
-
 	public void Add(Filter filter)
 	{
 		_filters.Add(filter);
 	}
 
-	public void Clear(bool clearDefaults = false)
+	public void Clear()
 	{
-		Logger.Debug($"Clearing filters. Defaults being cleared: {clearDefaults}");
+		Logger.Debug($"Clearing filters");
 		_ignoreWindowClasses.Clear();
 		_ignoreProcessNames.Clear();
 		_ignoreTitles.Clear();
 		_filters.Clear();
-		if (!clearDefaults)
-		{
-			IFilterManager.AddDefaultFilters(this);
-		}
 	}
 
 	public bool ShouldBeIgnored(IWindow window)

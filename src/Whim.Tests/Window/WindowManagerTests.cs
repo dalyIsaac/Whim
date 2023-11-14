@@ -110,7 +110,7 @@ public class WindowManagerTests
 			});
 		internalCtx.CoreNativeManager
 			.GetProcessNameAndPath((int)_processId)
-			.Returns(("firefox.exe", "C:\\Program Files\\Firefox Developer Edition\\firefox.exe"));
+			.Returns(("chrome.exe", "C:\\Program Files\\Google Chrome\\chrome.exe"));
 	}
 
 	private WindowManagerTests Trigger_MouseLeftButtonDown(IInternalContext internalCtx)
@@ -757,7 +757,6 @@ public class WindowManagerTests
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
-		// Set up TryEnqueue
 		internalCtx.CoreNativeManager
 			.When(cnm => cnm.TryEnqueue(Arg.Any<DispatcherQueueHandler>()))
 			.Do(callInfo =>
@@ -765,6 +764,10 @@ public class WindowManagerTests
 				var handler = callInfo.ArgAt<DispatcherQueueHandler>(0);
 				handler.Invoke();
 			});
+
+		internalCtx.CoreNativeManager
+			.GetProcessNameAndPath((int)_processId)
+			.Returns(("firefox.exe", "C:\\Program Files\\Mozilla Firefox\\firefox.exe"));
 
 		return workspace;
 	}
@@ -780,7 +783,6 @@ public class WindowManagerTests
 			ctx,
 			internalCtx
 		);
-		windowManager.PreInitialize();
 		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
 
@@ -807,7 +809,6 @@ public class WindowManagerTests
 			ctx,
 			internalCtx
 		);
-		windowManager.PreInitialize();
 		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved
@@ -836,7 +837,6 @@ public class WindowManagerTests
 			ctx,
 			internalCtx
 		);
-		windowManager.PreInitialize();
 		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved for the second time
@@ -858,7 +858,6 @@ public class WindowManagerTests
 			ctx,
 			internalCtx
 		);
-		windowManager.PreInitialize();
 		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved and then removed
