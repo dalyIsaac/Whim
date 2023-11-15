@@ -4,6 +4,9 @@ Whim is a pluggable and modern window manager for Windows 10 and 11, built using
 
 ![Whim demo](docs/assets/readme-demo.gif)
 
+> [!NOTE]
+> Documentation is lacking in some areas, and is a work in progress. If you have any questions, feel free to ask in the [Discord server](https://discord.gg/gEFq9wr7jb), or raise an issue on GitHub.
+
 ## Installation
 
 Alpha builds are available on the [releases page](https://github.com/dalyIsaac/Whim/releases).
@@ -238,7 +241,7 @@ context.RouterManager.Add((window) =>
 context.FilterManager.IgnoreTitleMatch("Whim Bar");
 ```
 
-## Window manager
+## Window Manager
 
 The [`IWindowManager`](src/Whim/Window/IWindowManager.cs) is used by Whim to manage [`IWindow`](src/Whim/Window/IWindow.cs)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
 
@@ -249,8 +252,6 @@ The `IWindowManager` also exposes an `IFilterManager` called `LocationRestoringF
 If this doesn't work, dragging a window's edge will force a layout, which should fix the window's position. This is an area which could use further improvement.
 
 ## Architecture
-
-> In progress...
 
 ### Inspiration
 
@@ -279,19 +280,19 @@ This is one of the key areas where Whim differs from workspacer.
 | [Directional support](#directional-support)                         | No                     | Yes                                                   |
 | [`ILayoutEngine` mutability](#ilayoutengine-mutability)             | Mutable                | Immutable                                             |
 
-#### `ILayoutEngine` data structure
+#### `ILayoutEngine` Data Structure
 
 Currently, workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). Relying so heavily on a stack prevents workspacer from supporting more complex window layouts. For example, Whim's [`TreeLayoutEngine`](src/Whim.TreeLayout/TreeLayoutEngine.cs) uses a n-ary tree structure to store windows in arbitrary grid layouts.
 
-#### Primary area support
+#### Primary Area Support
 
 Whim does not have a core concept of a "primary area", as it's an idea which lends itself to a stack-based data structure. However, it is possible to implement this functionality in a custom `ILayoutEngine` and plugin.
 
-#### Directional support
+#### Directional Support
 
 As Whim supports more novel layouts, it also has functionality to account for directions, like `FocusWindowInDirection`, `SwapWindowInDirection`, and `MoveWindowEdgesInDirection`. For example, it's possible to drag a corner of a window diagonally to resize it (provided the underlying `ILayoutEngine` supports it).
 
-#### `ILayoutEngine` mutability
+#### `ILayoutEngine` Mutability
 
 Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support future functionality like previewing changes to layouts before committing them (see [#425](https://github.com/dalyIsaac/Whim/issues/425)). In comparison, workspacer's `ILayoutEngine` implementations are mutable.
 
@@ -361,7 +362,3 @@ The Whim repository includes a `.vscode` directory with a [`launch.json`](.vscod
 Tasks to build, test, and format XAML can be found in [`tasks.json`](.vscode/tasks.json).
 
 To see the recommended extensions, open the Command Palette and run `Extensions: Show Recommended Extensions`.
-
-## Discord
-
-A Discord server has been set up at <https://discord.gg/gEFq9wr7jb>.
