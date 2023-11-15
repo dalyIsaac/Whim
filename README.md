@@ -14,7 +14,7 @@ When you run Whim for the first time, it will create a `.whim` directory in your
 
 This directory will contain a `whim.config.csx` file which you can edit to customize Whim. This file is a C# script file, and is reloaded every time Whim starts. To have the best development experience, you should have dotnet tooling installed (Visual Studio Code will prompt you when you open `.whim`).
 
-The config contains a pre-filled example which you can use as a starting point. You can also find the config [here](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Template/whim.config.csx).
+The config contains a pre-filled example which you can use as a starting point. You can also find the config [here](src/Whim/Template/whim.config.csx).
 
 ### Plugins
 
@@ -30,11 +30,11 @@ Each plugin needs to be added to the `context` object.
 
 ### Commands
 
-Whim stores commands ([`ICommand`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Commands/ICommand.cs)), which are objects with a unique identifier, title, and executable action. Commands expose easy access to functionality from Whim's core, and loaded plugins.
+Whim stores commands ([`ICommand`](src/Whim/Commands/ICommand.cs)), which are objects with a unique identifier, title, and executable action. Commands expose easy access to functionality from Whim's core, and loaded plugins.
 
-Command identifiers namespaced to the plugin which defines them. For example, the `whim.core` namespace is reserved for core commands, and `whim.gaps` is used by the `GapsPlugin` to define commands. Identifiers are based on the [`Name`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Plugin/IPlugin.cs) property of the plugin - for example, [`GapsPlugin.Name`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim.Gaps/GapsPlugin.cs).
+Command identifiers namespaced to the plugin which defines them. For example, the `whim.core` namespace is reserved for core commands, and `whim.gaps` is used by the `GapsPlugin` to define commands. Identifiers are based on the [`Name`](src/Whim/Plugin/IPlugin.cs) property of the plugin - for example, [`GapsPlugin.Name`](src/Whim.Gaps/GapsPlugin.cs).
 
-Each plugin can provide commands through the `PluginCommands` property of the [`IPlugin`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Plugin/IPlugin.cs) interface.
+Each plugin can provide commands through the `PluginCommands` property of the [`IPlugin`](src/Whim/Plugin/IPlugin.cs) interface.
 
 Custom commands are automatically added to the `whim.custom` namespace. For example, the following creates 10 commands to bind <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>1</kbd> through <kbd>0</kbd> to the workspaces at the indices `0` through `9`.
 
@@ -101,7 +101,7 @@ record ActivateWorkspaceAtIndex(int Index)
 
 ### Keybinds
 
-Commands can be bound to keybinds ([`IKeybind`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Keybinds/IKeybind.cs)).
+Commands can be bound to keybinds ([`IKeybind`](src/Whim/Keybinds/IKeybind.cs)).
 
 **Each command is bound to a single keybind.**
 
@@ -122,9 +122,97 @@ context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace");
 >
 > Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
 
+#### Default Keybindings
+
+##### Core Commands
+
+These are the commands and associated keybindings provided by Whim's core. See [`CoreCommands.cs`](src/Whim/Commands/CoreCommands.cs).
+
+| Identifier                                  | Title                                             | Keybind                                              |
+| ------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------- |
+| `whim.core.activate_previous_workspace`     | Activate the previous workspace                   | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>LEFT</kbd>   |
+| `whim.core.activate_next_workspace`         | Activate the next workspace                       | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>RIGHT</kbd>  |
+| `whim.core.focus_window_in_direction.left`  | Focus the window in the left direction            | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>LEFT</kbd>    |
+| `whim.core.focus_window_in_direction.right` | Focus the window in the right direction           | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>RIGHT</kbd>   |
+| `whim.core.focus_window_in_direction.up`    | Focus the window in the up direction              | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>UP</kbd>      |
+| `whim.core.focus_window_in_direction.down`  | Focus the window in the down direction            | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>DOWN</kbd>    |
+| `whim.core.swap_window_in_direction.left`   | Swap the window with the window to the left       | <kbd>Win</kbd> + <kbd>LEFT</kbd>                     |
+| `whim.core.swap_window_in_direction.right`  | Swap the window with the window to the right      | <kbd>Win</kbd> + <kbd>RIGHT</kbd>                    |
+| `whim.core.swap_window_in_direction.up`     | Swap the window with the window to the up         | <kbd>Win</kbd> + <kbd>UP</kbd>                       |
+| `whim.core.swap_window_in_direction.down`   | Swap the window with the window to the down       | <kbd>Win</kbd> + <kbd>DOWN</kbd>                     |
+| `whim.core.move_window_left_edge_left`      | Move the current window's left edge to the left   | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>H</kbd>      |
+| `whim.core.move_window_left_edge_right`     | Move the current window's left edge to the right  | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>J</kbd>      |
+| `whim.core.move_window_right_edge_left`     | Move the current window's right edge to the left  | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd>      |
+| `whim.core.move_window_right_edge_right`    | Move the current window's right edge to the right | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>L</kbd>      |
+| `whim.core.move_window_top_edge_up`         | Move the current window's top edge up             | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>U</kbd>      |
+| `whim.core.move_window_top_edge_down`       | Move the current window's top edge down           | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>      |
+| `whim.core.move_window_bottom_edge_up`      | Move the current window's bottom edge up          | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>O</kbd>      |
+| `whim.core.move_window_bottom_edge_down`    | Move the current window's bottom edge down        | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>P</kbd>      |
+| `whim.core.move_window_to_previous_monitor` | Move the window to the previous monitor           | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>LEFT</kbd>  |
+| `whim.core.move_window_to_next_monitor`     | Move the window to the next monitor               | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>RIGHT</kbd> |
+| `whim.core.close_current_workspace`         | Close the current workspace                       | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>W</kbd>      |
+| `whim.core.exit_whim`                       | Exit Whim                                         | No default keybind                                   |
+
+##### Command Palette Plugin Commands
+
+See [`CommandPaletteCommands.cs`](src/Whim.CommandPalette/CommandPaletteCommands.cs).
+
+| Identifier                                                | Title                              | Keybind                                          |
+| --------------------------------------------------------- | ---------------------------------- | ------------------------------------------------ |
+| `whim.command_palette.toggle`                             | Toggle command palette             | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> |
+| `whim.command_palette.activate_workspace`                 | Activate workspace                 | No default keybind                               |
+| `whim.command_palette.rename_workspace`                   | Rename workspace                   | No default keybind                               |
+| `whim.command_palette.create_workspace`                   | Create workspace                   | No default keybind                               |
+| `whim.command_palette.move_window_to_workspace`           | Move window to workspace           | No default keybind                               |
+| `whim.command_palette.move_multiple_windows_to_workspace` | Move multiple windows to workspace | No default keybind                               |
+| `whim.command_palette.remove_window`                      | Select window to remove from Whim  | No default keybind                               |
+
+##### Floating Layout Plugin Commands
+
+See [`FloatingLayoutCommands.cs`](src/Whim.FloatingLayout/FloatingLayoutCommands.cs).
+
+| Identifier                                     | Title                   | Keybind                                          |
+| ---------------------------------------------- | ----------------------- | ------------------------------------------------ |
+| `whim.floating_layout.toggle_window_floating`  | Toggle window floating  | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd> |
+| `whim.floating_layout.mark_window_as_floating` | Mark window as floating | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> |
+| `whim.floating_layout.mark_window_as_docked`   | Mark window as docked   | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> |
+
+##### Focus Indicator Plugin Commands
+
+See [`FocusIndicatorCommands.cs`](src/Whim.FocusIndicator/FocusIndicatorCommands.cs).
+
+| Identifier                            | Title                                         | Keybind            |
+| ------------------------------------- | --------------------------------------------- | ------------------ |
+| `whim.focus_indicator.show`           | Show focus indicator                          | No default keybind |
+| `whim.focus_indicator.toggle`         | Toggle focus indicator                        | No default keybind |
+| `whim.focus_indicator.toggle_fade`    | Toggle whether the focus indicator fades      | No default keybind |
+| `whim.focus_indicator.toggle_enabled` | Toggle whether the focus indicator is enabled | No default keybind |
+
+##### Gaps Plugin Commands
+
+See [`GapsCommands.cs`](src/Whim.Gaps/GapsCommands.cs).
+
+| Identifier                 | Title              | Keybind                                                            |
+| -------------------------- | ------------------ | ------------------------------------------------------------------ |
+| `whim.gaps.outer.increase` | Increase outer gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> |
+| `whim.gaps.outer.decrease` | Decrease outer gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd> |
+| `whim.gaps.inner.increase` | Increase inner gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> |
+| `whim.gaps.inner.decrease` | Decrease inner gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd> |
+
+##### Tree Layout Plugin Commands
+
+See [`TreeLayoutCommands.cs`](src/Whim.TreeLayout/TreeLayoutCommands.cs).
+
+| Identifier                                  | Title                                          | Keybind                                                                |
+| ------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------- |
+| `whim.tree_layout.add_tree_direction_left`  | Add windows to the left of the current window  | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>LEFT</kbd>  |
+| `whim.tree_layout.add_tree_direction_right` | Add windows to the right of the current window | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>RIGHT</kbd> |
+| `whim.tree_layout.add_tree_direction_up`    | Add windows above the current window           | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>UP</kbd>    |
+| `whim.tree_layout.add_tree_direction_down`  | Add windows below the current window           | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>DOWN</kbd>  |
+
 ### Routing
 
-[`IRouterManager`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Router/IRouterManager.cs) is used by Whim to route windows to specific workspaces. For example, to route Discord to a workspace "Chat", you can do the following:
+[`IRouterManager`](src/Whim/Router/IRouterManager.cs) is used by Whim to route windows to specific workspaces. For example, to route Discord to a workspace "Chat", you can do the following:
 
 ```csharp
 context.RouterManager.Add((window) =>
@@ -141,7 +229,7 @@ context.RouterManager.Add((window) =>
 
 ### Filtering
 
-[`IFilterManager`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Router/IFilterManager.cs) tells Whim to ignore windows based on `Filter` delegates. A common use case is for plugins to filter out windows they manage themselves and want Whim to not lay out. For example, the bars and command palette are filtered out.
+[`IFilterManager`](src/Whim/Router/IFilterManager.cs) tells Whim to ignore windows based on `Filter` delegates. A common use case is for plugins to filter out windows they manage themselves and want Whim to not lay out. For example, the bars and command palette are filtered out.
 
 ```csharp
 // Called by the bar plugin.
@@ -150,7 +238,7 @@ context.FilterManager.IgnoreTitleMatch("Whim Bar");
 
 ## Window manager
 
-The [`IWindowManager`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Window/IWindowManager.cs) is used by Whim to manage [`IWindow`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Window/IWindow.cs)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
+The [`IWindowManager`](src/Whim/Window/IWindowManager.cs) is used by Whim to manage [`IWindow`](src/Whim/Window/IWindow.cs)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
 
 For example, the `WindowFocused` event is used by the `Whim.FocusIndicator` and `Whim.Bar` plugins to update their indications of the currently focused window.
 
@@ -191,7 +279,7 @@ This is one of the key areas where Whim differs from workspacer.
 
 #### `ILayoutEngine` data structure
 
-Currently, workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). Relying so heavily on a stack prevents workspacer from supporting more complex window layouts. For example, Whim's [`TreeLayoutEngine`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim.TreeLayout/TreeLayoutEngine.cs) uses a n-ary tree structure to store windows in arbitrary grid layouts.
+Currently, workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). Relying so heavily on a stack prevents workspacer from supporting more complex window layouts. For example, Whim's [`TreeLayoutEngine`](src/Whim.TreeLayout/TreeLayoutEngine.cs) uses a n-ary tree structure to store windows in arbitrary grid layouts.
 
 #### Primary area support
 
