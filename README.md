@@ -81,6 +81,22 @@ record ActivateWorkspaceAtIndex(int Index)
         }
     }
 }
+
+/// <summary>
+/// Convert the given integer to a <see cref="VIRTUAL_KEY"/>.
+/// This converts the integer 0 - 9 to <see cref="VIRTUAL_KEY.VK_1"/> - <see cref="VIRTUAL_KEY.VK_0"/>.
+/// </summary>
+/// <param name="idx">The integer to convert, 0 - 9.</param>
+/// <returns>The <see cref="VIRTUAL_KEY"/> corresponding to the given integer</returns>
+ VIRTUAL_KEY GetVirtualKeyForInt(int idx)
+ {
+    if (idx == 10)
+    {
+        return VIRTUAL_KEY.VK_0;
+    }
+
+    return (VIRTUAL_KEY)((int)VIRTUAL_KEY.VK_1 + (idx - 1));
+ }
 ```
 
 ### Keybinds
