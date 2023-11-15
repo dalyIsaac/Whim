@@ -124,6 +124,8 @@ context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace");
 
 #### Default Keybindings
 
+Keybindings can also be seen in the command palette, when it is activated (<kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> by default).
+
 ##### Core Commands
 
 These are the commands and associated keybindings provided by Whim's core. See [`CoreCommands.cs`](src/Whim/Commands/CoreCommands.cs).
