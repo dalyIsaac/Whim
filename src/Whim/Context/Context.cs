@@ -16,7 +16,7 @@ internal class Context : IContext
 	private readonly IInternalContext _internalContext;
 	public IFileManager FileManager { get; }
 	public Logger Logger { get; }
-	public ExceptionHandling ExceptionHandling { get; set; } = ExceptionHandling.Log;
+	public UncaughtExceptionHandling UncaughtExceptionHandling { get; set; } = UncaughtExceptionHandling.Log;
 	public INativeManager NativeManager { get; }
 	public IWorkspaceManager WorkspaceManager { get; }
 	public IWindowManager WindowManager { get; }
@@ -91,6 +91,26 @@ internal class Context : IContext
 		_internalContext.PostInitialize();
 
 		Logger.Debug("Completed initialization");
+	}
+
+	public void HandleUncaughtException(string procName, Exception exception)
+	{
+		Logger.Fatal($"Unhandled exception in {procName}: {exception}");
+
+		switch (UncaughtExceptionHandling)
+		{
+			case UncaughtExceptionHandling.Notify:
+				// TODO
+				throw new NotImplementedException();
+
+			case UncaughtExceptionHandling.Shutdown:
+				Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = exception.ToString() });
+				break;
+
+			case UncaughtExceptionHandling.Log:
+			default:
+				break;
+		}
 	}
 
 	public void Exit(ExitEventArgs? args = null)

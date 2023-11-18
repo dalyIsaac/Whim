@@ -10,6 +10,7 @@ namespace Whim;
 /// </summary>
 internal class MouseHook : IMouseHook
 {
+	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 	private readonly HOOKPROC _lowLevelMouseProc;
 	private UnhookWindowsHookExSafeHandle? _unhookMouseHook;
@@ -17,8 +18,9 @@ internal class MouseHook : IMouseHook
 	public event EventHandler<MouseEventArgs>? MouseLeftButtonDown;
 	public event EventHandler<MouseEventArgs>? MouseLeftButtonUp;
 
-	public MouseHook(IInternalContext internalContext)
+	public MouseHook(IContext context, IInternalContext internalContext)
 	{
+		_context = context;
 		_internalContext = internalContext;
 		_lowLevelMouseProc = LowLevelMouseProcWrapper;
 	}
@@ -39,7 +41,7 @@ internal class MouseHook : IMouseHook
 		}
 		catch (Exception e)
 		{
-			Logger.Fatal($"Error in LowLevelMouseProc: {e}");
+			_context.HandleUncaughtException(nameof(LowLevelMouseProc), e);
 			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 	}

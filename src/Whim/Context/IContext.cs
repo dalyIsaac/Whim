@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Ways to handle uncaught exceptions.
 /// </summary>
-public enum ExceptionHandling
+public enum UncaughtExceptionHandling
 {
 	/// <summary>
 	/// Log the error and continue.
@@ -40,9 +40,9 @@ public interface IContext
 	Logger Logger { get; }
 
 	/// <summary>
-	/// How to handle uncaught exceptions. Defaults to <see cref="ExceptionHandling.Log"/>.
+	/// How to handle uncaught exceptions. Defaults to <see cref="UncaughtExceptionHandling.Log"/>.
 	/// </summary>
-	ExceptionHandling ExceptionHandling { get; set; }
+	UncaughtExceptionHandling UncaughtExceptionHandling { get; set; }
 
 	/// <summary>
 	/// Whim's <see cref="IWorkspaceManager"/> instances.
@@ -102,6 +102,13 @@ public interface IContext
 	/// Thrown if the user's config could not be loaded.
 	/// </exception>
 	void Initialize();
+
+	/// <summary>
+	/// Handles an uncaught exception, according to <see cref="UncaughtExceptionHandling"/>.
+	/// </summary>
+	/// <param name="procName"></param>
+	/// <param name="exception"></param>
+	void HandleUncaughtException(string procName, Exception exception);
 
 	/// <summary>
 	/// This event is fired when the context is shutting down.
