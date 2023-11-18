@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -11,7 +12,6 @@ namespace Whim;
 internal class MouseHook : IMouseHook
 {
 	private readonly IInternalContext _internalContext;
-	private readonly HOOKPROC _lowLevelMouseProc;
 	private UnhookWindowsHookExSafeHandle? _unhookMouseHook;
 	private bool disposedValue;
 	public event EventHandler<MouseEventArgs>? MouseLeftButtonDown;
@@ -20,7 +20,6 @@ internal class MouseHook : IMouseHook
 	public MouseHook(IInternalContext internalContext)
 	{
 		_internalContext = internalContext;
-		_lowLevelMouseProc = LowLevelMouseProc;
 	}
 
 	public void PostInitialize()
@@ -28,7 +27,20 @@ internal class MouseHook : IMouseHook
 		Logger.Debug("Initializing mouse manager...");
 		_unhookMouseHook = _internalContext
 			.CoreNativeManager
-			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, _lowLevelMouseProc, null, 0);
+			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, LowLevelMouseProcWrapper, null, 0);
+	}
+
+	private LRESULT LowLevelMouseProcWrapper(int nCode, WPARAM wParam, LPARAM lParam)
+	{
+		try
+		{
+			return LowLevelMouseProc(nCode, wParam, lParam);
+		}
+		catch (Exception e)
+		{
+			Logger.Error($"Error in LowLevelMouseProc: {e}");
+			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		}
 	}
 
 	/// <summary>
@@ -38,6 +50,7 @@ internal class MouseHook : IMouseHook
 	/// <param name="wParam"></param>
 	/// <param name="lParam"></param>
 	/// <returns></returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private LRESULT LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		switch ((uint)wParam)

@@ -13,7 +13,6 @@ internal class KeybindHook : IKeybindHook
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
-	private readonly HOOKPROC _lowLevelKeyboardProc;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
@@ -21,7 +20,6 @@ internal class KeybindHook : IKeybindHook
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_lowLevelKeyboardProc = LowLevelKeyboardProc;
 	}
 
 	public void PostInitialize()
@@ -29,7 +27,20 @@ internal class KeybindHook : IKeybindHook
 		Logger.Debug("Initializing keybind manager...");
 		_unhookKeyboardHook = _internalContext
 			.CoreNativeManager
-			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _lowLevelKeyboardProc, null, 0);
+			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, LowLevelKeyboardProcWrapper, null, 0);
+	}
+
+	private LRESULT LowLevelKeyboardProcWrapper(int nCode, WPARAM wParam, LPARAM lParam)
+	{
+		try
+		{
+			return LowLevelKeyboardProc(nCode, wParam, lParam);
+		}
+		catch (Exception e)
+		{
+			Logger.Error($"Error in LowLevelKeyboardProc: {e}");
+			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		}
 	}
 
 	/// <summary>

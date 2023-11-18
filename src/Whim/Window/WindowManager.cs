@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -32,11 +33,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// </summary>
 	private readonly UnhookWinEventSafeHandle[] _addedHooks = new UnhookWinEventSafeHandle[6];
 
-	/// <summary>
-	/// The delegate for handling all events triggered by <see cref="ICoreNativeManager.SetWinEventHook"/>.
-	/// </summary>
-	private readonly WINEVENTPROC _hookDelegate;
-
 	private bool _isMovingWindow;
 	private bool _isLeftMouseButtonDown;
 	private readonly object _mouseMoveLock = new();
@@ -58,7 +54,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
 
 		FilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
 	}
@@ -70,22 +65,26 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
 		_addedHooks[0] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_HIDE, _hookDelegate);
+			.SetWinEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_HIDE, WinEventProcWrapper);
 		_addedHooks[1] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);
+			.SetWinEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, WinEventProcWrapper);
 		_addedHooks[2] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
+			.SetWinEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, WinEventProcWrapper);
 		_addedHooks[3] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
+			.SetWinEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, WinEventProcWrapper);
 		_addedHooks[4] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, _hookDelegate);
+			.SetWinEventHook(
+				PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
+				PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
+				WinEventProcWrapper
+			);
 		_addedHooks[5] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, _hookDelegate);
+			.SetWinEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, WinEventProcWrapper);
 
 		// If any of the above hooks are invalid, we dispose the WindowManager instance and return false.
 		for (int i = 0; i < _addedHooks.Length; i++)
@@ -197,19 +196,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		// The handle is not null.
 		&& hwnd != null;
 
-	/// <summary>
-	/// Event hook for <see cref="ICoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>. <br />
-	///
-	/// For more, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
-	/// </summary>
-	/// <param name="hWinEventHook"></param>
-	/// <param name="eventType"></param>
-	/// <param name="hwnd"></param>
-	/// <param name="idObject"></param>
-	/// <param name="idChild"></param>
-	/// <param name="idEventThread"></param>
-	/// <param name="dwmsEventTime"></param>
-	internal void WindowsEventHook(
+	internal void WinEventProcWrapper(
 		HWINEVENTHOOK hWinEventHook,
 		uint eventType,
 		HWND hwnd,
@@ -217,6 +204,39 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		int idChild,
 		uint idEventThread,
 		uint dwmsEventTime
+	)
+	{
+		try
+		{
+			WinEventProc(hWinEventHook, eventType, hwnd, idObject, idChild, idEventThread, dwmsEventTime);
+		}
+		catch (Exception e)
+		{
+			Logger.Error($"Caught error in WinEventProc: {e}");
+		}
+	}
+
+	/// <summary>
+	/// Event hook for <see cref="ICoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>. <br />
+	///
+	/// For more, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
+	/// </summary>
+	/// <param name="_hWinEventHook"></param>
+	/// <param name="eventType"></param>
+	/// <param name="hwnd"></param>
+	/// <param name="idObject"></param>
+	/// <param name="idChild"></param>
+	/// <param name="_idEventThread"></param>
+	/// <param name="_dwmsEventTime"></param>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private void WinEventProc(
+		HWINEVENTHOOK _hWinEventHook,
+		uint eventType,
+		HWND hwnd,
+		int idObject,
+		int idChild,
+		uint _idEventThread,
+		uint _dwmsEventTime
 	)
 	{
 		if (!IsEventWindowValid(idObject, idChild, hwnd))
