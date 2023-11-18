@@ -14,5 +14,5 @@ internal interface IInternalWindowManager
 	/// <summary>
 	/// Map of <see cref="HWND"/> to <see cref="IWindow"/> for easy <see cref="IWindow"/> lookup.
 	/// </summary>
-	IReadOnlyDictionary<HWND, IWindow> Windows { get; }
+	IReadOnlyDictionary<HWND, IWindow> HandleWindowMap { get; }
 }

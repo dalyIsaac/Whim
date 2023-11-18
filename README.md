@@ -39,67 +39,39 @@ Command identifiers namespaced to the plugin which defines them. For example, th
 
 Each plugin can provide commands through the `PluginCommands` property of the [`IPlugin`](src/Whim/Plugin/IPlugin.cs) interface.
 
-Custom commands are automatically added to the `whim.custom` namespace. For example, the following creates 10 commands to bind <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>1</kbd> through <kbd>0</kbd> to the workspaces at the indices `0` through `9`.
+Custom commands are automatically added to the `whim.custom` namespace. For example, the following command minimizes Discord:
 
 ```csharp
-// Add this at the top
+// Add to the top.
 using System.Linq;
 
-void DoConfig(IContext context)
+void DoConfig(IConfig context)
 {
     // ...
 
-    for (int idx = 1; idx <= 10; idx++)
-    {
-        // Create a command to activate the workspace at the given index.
-        ActivateWorkspaceAtIndex activateWorkspaceAtIndex = new(idx);
-        context.CommandManager.Add(
-            // Automatically namespaced to `whim.custom`.
-            identifier: $"activate_workspace_index_{idx}",
-            title: $"Activate workspace at index {idx}",
-            callback: () => activateWorkspaceAtIndex.Execute(context)
-        );
-
-        // Create keybindings to call the command at the given index.
-        context.KeybindManager.Add(
-            commandId: $"whim.custom.activate_workspace_index_{idx}",
-            keybind: new Keybind(KeyModifiers.LAlt | KeyModifiers.LShift,
-            key: GetVirtualKeyForInt(idx))
-        );
-    }
-
-    // ...
-}
-
-// This record is necessary, otherwise the index captured is the last one (11)
-// The index here is 1-based.
-record ActivateWorkspaceAtIndex(int Index)
-{
-    public void Execute(IContext context)
-    {
-        IWorkspace[] workspaces = context.WorkspaceManager.ToArray();
-        if (Index <= workspaces.Length)
+    // Create the command.
+    context.CommandManager.Add(
+        // Automatically namespaced to `whim.custom`.
+        identifier: "minimize_discord",
+        title: "Minimize Discord",
+        callback: () =>
         {
-            context.WorkspaceManager.Activate(workspaces[Index - 1]);
+            // Get the first window with the process name "Discord.exe".
+            IWindow window = context.WindowManager.FirstOrDefault(w => w.ProcessFileName == "Discord.exe");
+            if (window != null)
+            {
+                // Minimize the window.
+                window.ShowMinimized();
+                context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Focus();
+            }
         }
-    }
+    );
+
+    // Create an associated keybind.
+    context.KeybindManager.SetKeybind("whim.custom.minimize_discord", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_D));
+
+    // ...
 }
-
-/// <summary>
-/// Convert the given integer to a <see cref="VIRTUAL_KEY"/>.
-/// This converts the integer 0 - 9 to <see cref="VIRTUAL_KEY.VK_1"/> - <see cref="VIRTUAL_KEY.VK_0"/>.
-/// </summary>
-/// <param name="idx">The integer to convert, 0 - 9.</param>
-/// <returns>The <see cref="VIRTUAL_KEY"/> corresponding to the given integer</returns>
- VIRTUAL_KEY GetVirtualKeyForInt(int idx)
- {
-    if (idx == 10)
-    {
-        return VIRTUAL_KEY.VK_0;
-    }
-
-    return (VIRTUAL_KEY)((int)VIRTUAL_KEY.VK_1 + (idx - 1));
- }
 ```
 
 ### Keybinds
@@ -133,32 +105,33 @@ Keybindings can also be seen in the command palette, when it is activated (<kbd>
 
 These are the commands and associated keybindings provided by Whim's core. See [`CoreCommands.cs`](src/Whim/Commands/CoreCommands.cs).
 
-| Identifier                                  | Title                                             | Keybind                                              |
-| ------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------- |
-| `whim.core.activate_previous_workspace`     | Activate the previous workspace                   | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>LEFT</kbd>   |
-| `whim.core.activate_next_workspace`         | Activate the next workspace                       | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>RIGHT</kbd>  |
-| `whim.core.focus_window_in_direction.left`  | Focus the window in the left direction            | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>LEFT</kbd>    |
-| `whim.core.focus_window_in_direction.right` | Focus the window in the right direction           | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>RIGHT</kbd>   |
-| `whim.core.focus_window_in_direction.up`    | Focus the window in the up direction              | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>UP</kbd>      |
-| `whim.core.focus_window_in_direction.down`  | Focus the window in the down direction            | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>DOWN</kbd>    |
-| `whim.core.swap_window_in_direction.left`   | Swap the window with the window to the left       | <kbd>Win</kbd> + <kbd>LEFT</kbd>                     |
-| `whim.core.swap_window_in_direction.right`  | Swap the window with the window to the right      | <kbd>Win</kbd> + <kbd>RIGHT</kbd>                    |
-| `whim.core.swap_window_in_direction.up`     | Swap the window with the window to the up         | <kbd>Win</kbd> + <kbd>UP</kbd>                       |
-| `whim.core.swap_window_in_direction.down`   | Swap the window with the window to the down       | <kbd>Win</kbd> + <kbd>DOWN</kbd>                     |
-| `whim.core.move_window_left_edge_left`      | Move the current window's left edge to the left   | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>H</kbd>      |
-| `whim.core.move_window_left_edge_right`     | Move the current window's left edge to the right  | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>J</kbd>      |
-| `whim.core.move_window_right_edge_left`     | Move the current window's right edge to the left  | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd>      |
-| `whim.core.move_window_right_edge_right`    | Move the current window's right edge to the right | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>L</kbd>      |
-| `whim.core.move_window_top_edge_up`         | Move the current window's top edge up             | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>U</kbd>      |
-| `whim.core.move_window_top_edge_down`       | Move the current window's top edge down           | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>      |
-| `whim.core.move_window_bottom_edge_up`      | Move the current window's bottom edge up          | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>O</kbd>      |
-| `whim.core.move_window_bottom_edge_down`    | Move the current window's bottom edge down        | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>P</kbd>      |
-| `whim.core.move_window_to_previous_monitor` | Move the window to the previous monitor           | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>LEFT</kbd>  |
-| `whim.core.move_window_to_next_monitor`     | Move the window to the next monitor               | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>RIGHT</kbd> |
-| `whim.core.focus_previous_monitor`          | Focus the previous monitor                        | No default keybind                                   |
-| `whim.core.focus_next_monitor`              | Focus the next monitor                            | No default keybind                                   |
-| `whim.core.close_current_workspace`         | Close the current workspace                       | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>W</kbd>      |
-| `whim.core.exit_whim`                       | Exit Whim                                         | No default keybind                                   |
+| Identifier                                  | Title                                                            | Keybind                                              |
+| ------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------- |
+| `whim.core.activate_previous_workspace`     | Activate the previous workspace                                  | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>LEFT</kbd>   |
+| `whim.core.activate_next_workspace`         | Activate the next workspace                                      | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>RIGHT</kbd>  |
+| `whim.core.focus_window_in_direction.left`  | Focus the window in the left direction                           | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>LEFT</kbd>    |
+| `whim.core.focus_window_in_direction.right` | Focus the window in the right direction                          | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>RIGHT</kbd>   |
+| `whim.core.focus_window_in_direction.up`    | Focus the window in the up direction                             | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>UP</kbd>      |
+| `whim.core.focus_window_in_direction.down`  | Focus the window in the down direction                           | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>DOWN</kbd>    |
+| `whim.core.swap_window_in_direction.left`   | Swap the window with the window to the left                      | <kbd>Win</kbd> + <kbd>LEFT</kbd>                     |
+| `whim.core.swap_window_in_direction.right`  | Swap the window with the window to the right                     | <kbd>Win</kbd> + <kbd>RIGHT</kbd>                    |
+| `whim.core.swap_window_in_direction.up`     | Swap the window with the window to the up                        | <kbd>Win</kbd> + <kbd>UP</kbd>                       |
+| `whim.core.swap_window_in_direction.down`   | Swap the window with the window to the down                      | <kbd>Win</kbd> + <kbd>DOWN</kbd>                     |
+| `whim.core.move_window_left_edge_left`      | Move the current window's left edge to the left                  | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>H</kbd>      |
+| `whim.core.move_window_left_edge_right`     | Move the current window's left edge to the right                 | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>J</kbd>      |
+| `whim.core.move_window_right_edge_left`     | Move the current window's right edge to the left                 | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd>      |
+| `whim.core.move_window_right_edge_right`    | Move the current window's right edge to the right                | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>L</kbd>      |
+| `whim.core.move_window_top_edge_up`         | Move the current window's top edge up                            | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>U</kbd>      |
+| `whim.core.move_window_top_edge_down`       | Move the current window's top edge down                          | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>      |
+| `whim.core.move_window_bottom_edge_up`      | Move the current window's bottom edge up                         | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>O</kbd>      |
+| `whim.core.move_window_bottom_edge_down`    | Move the current window's bottom edge down                       | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>P</kbd>      |
+| `whim.core.move_window_to_previous_monitor` | Move the window to the previous monitor                          | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>LEFT</kbd>  |
+| `whim.core.move_window_to_next_monitor`     | Move the window to the next monitor                              | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>RIGHT</kbd> |
+| `whim.core.focus_previous_monitor`          | Focus the previous monitor                                       | No default keybind                                   |
+| `whim.core.focus_next_monitor`              | Focus the next monitor                                           | No default keybind                                   |
+| `whim.core.close_current_workspace`         | Close the current workspace                                      | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>W</kbd>      |
+| `whim.core.exit_whim`                       | Exit Whim                                                        | No default keybind                                   |
+| `whim.core.activate_workspace_{idx}`        | Activate workspace `{idx}` (where `idx` is an int 1, 2, ...9, 0) | <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>{idx}</kbd> |
 
 ##### Command Palette Plugin Commands
 

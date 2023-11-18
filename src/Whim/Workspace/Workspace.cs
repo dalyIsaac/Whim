@@ -587,7 +587,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Window {window.Handle} is no longer a window.");
 				removeWindow = true;
 			}
-			else if (!_internalContext.WindowManager.Windows.ContainsKey(window.Handle))
+			else if (!_internalContext.WindowManager.HandleWindowMap.ContainsKey(window.Handle))
 			{
 				Logger.Debug($"Window {window.Handle} is somehow no longer managed.");
 				removeWindow = true;
