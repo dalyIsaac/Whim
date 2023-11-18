@@ -1,10 +1,10 @@
+using System;
+using System.Linq;
+using System.Reflection;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Kernel;
 using AutoFixture.Xunit2;
-using System;
-using System.Linq;
-using System.Reflection;
 using Xunit;
 
 namespace Whim.TestUtils;

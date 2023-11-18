@@ -1,5 +1,5 @@
-using NSubstitute;
 using System;
+using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Xunit;

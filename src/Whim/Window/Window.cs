@@ -1,6 +1,6 @@
-using Microsoft.UI.Xaml.Media.Imaging;
 using System.ComponentModel;
 using System.IO;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
@@ -154,9 +154,9 @@ internal class Window : IWindow
 
 		try
 		{
-			(string ProcessName, string? ProcessPath)? result = internalContext.CoreNativeManager.GetProcessNameAndPath(
-				processId
-			);
+			(string ProcessName, string? ProcessPath)? result = internalContext
+				.CoreNativeManager
+				.GetProcessNameAndPath(processId);
 			processName = result?.ProcessName;
 			processPath = result?.ProcessPath;
 

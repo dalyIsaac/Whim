@@ -1,5 +1,5 @@
-using NSubstitute;
 using System.Collections.Immutable;
+using NSubstitute;
 
 namespace Whim.TreeLayout.Tests;
 

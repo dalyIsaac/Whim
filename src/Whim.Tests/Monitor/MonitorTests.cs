@@ -14,7 +14,8 @@ internal class MonitorCustomization : ICustomization
 	{
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetMonitorInfoEx(Arg.Any<HMONITOR>())
 			.Returns(
 				(_) =>
@@ -30,7 +31,8 @@ internal class MonitorCustomization : ICustomization
 
 		uint effectiveDpiX = 144;
 		uint effectiveDpiY = 144;
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetDpiForMonitor(Arg.Any<HMONITOR>(), Arg.Any<MONITOR_DPI_TYPE>(), out uint _, out uint _)
 			.Returns(
 				(callInfo) =>
@@ -109,7 +111,8 @@ public class MonitorTests
 
 		uint effectiveDpiX = 144;
 		uint effectiveDpiY = 144;
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetDpiForMonitor(Arg.Any<HMONITOR>(), Arg.Any<MONITOR_DPI_TYPE>(), out uint _, out uint _)
 			.Returns(
 				(callInfo) =>

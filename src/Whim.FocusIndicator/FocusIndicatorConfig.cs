@@ -1,7 +1,7 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Xaml.Media;
-using System;
+﻿using System;
 using System.ComponentModel;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
 namespace Whim.FocusIndicator;

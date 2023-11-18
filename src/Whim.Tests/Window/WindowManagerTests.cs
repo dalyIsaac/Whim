@@ -1,14 +1,18 @@
+using System;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -78,7 +82,8 @@ internal class CaptureWinEventProc
 	)
 	{
 		CaptureWinEventProc capture = new();
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.SetWinEventHook(Arg.Any<uint>(), Arg.Any<uint>(), Arg.Any<WINEVENTPROC>())
 			.Returns(callInfo =>
 			{
@@ -107,14 +112,16 @@ public class WindowManagerTests
 		internalCtx.CoreNativeManager.HasNoVisibleOwner(hwnd).Returns(true);
 
 		ctx.NativeManager.GetClassName(hwnd).Returns("WindowClass");
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetWindowThreadProcessId(hwnd, out _)
 			.Returns(callInfo =>
 			{
 				callInfo[1] = _processId;
 				return (uint)1;
 			});
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetProcessNameAndPath((int)_processId)
 			.Returns(("chrome.exe", "C:\\Program Files\\Google Chrome\\chrome.exe"));
 	}
@@ -137,7 +144,8 @@ public class WindowManagerTests
 
 	private WindowManagerTests Setup_GetCursorPos(IInternalContext internalCtx)
 	{
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetCursorPos(out _)
 			.Returns(callInfo =>
 			{
@@ -262,7 +270,8 @@ public class WindowManagerTests
 
 		foreach (var (eventMin, eventMax) in events)
 		{
-			internalCtx.CoreNativeManager
+			internalCtx
+				.CoreNativeManager
 				.SetWinEventHook(eventMin, eventMax, Arg.Any<WINEVENTPROC>())
 				.Returns(new UnhookWinEventSafeHandle(1));
 		}
@@ -280,7 +289,8 @@ public class WindowManagerTests
 		windowManager.Initialize();
 
 		// Then
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.Received(6)
 			.SetWinEventHook(Arg.Any<uint>(), Arg.Any<uint>(), Arg.Any<WINEVENTPROC>());
 	}
@@ -291,7 +301,8 @@ public class WindowManagerTests
 		// Given
 		InitializeCoreNativeManagerMock(internalCtx);
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.SetWinEventHook(
 				PInvoke.EVENT_SYSTEM_MINIMIZESTART,
 				PInvoke.EVENT_SYSTEM_MINIMIZEEND,
@@ -326,15 +337,17 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		capture.WinEventProc!.Invoke(
-			(HWINEVENTHOOK)0,
-			PInvoke.EVENT_OBJECT_SHOW,
-			hwndValue == null ? HWND.Null : (HWND)hwndValue,
-			idObject,
-			idChild,
-			0,
-			0
-		);
+		capture
+			.WinEventProc!
+			.Invoke(
+				(HWINEVENTHOOK)0,
+				PInvoke.EVENT_OBJECT_SHOW,
+				hwndValue == null ? HWND.Null : (HWND)hwndValue,
+				idObject,
+				idChild,
+				0,
+				0
+			);
 
 		// Then
 		((IInternalWorkspaceManager)ctx.WorkspaceManager)
@@ -382,7 +395,8 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.When(cnm => cnm.GetProcessNameAndPath((int)_processId))
 			.Do(_ => throw new Win32Exception());
 
@@ -587,7 +601,8 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetCursorPos(out _)
 			.Returns(
 				(callInfo) =>
@@ -763,7 +778,8 @@ public class WindowManagerTests
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.When(cnm => cnm.TryEnqueue(Arg.Any<DispatcherQueueHandler>()))
 			.Do(callInfo =>
 			{
@@ -771,7 +787,8 @@ public class WindowManagerTests
 				handler.Invoke();
 			});
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetProcessNameAndPath((int)_processId)
 			.Returns(("firefox.exe", "C:\\Program Files\\Mozilla Firefox\\firefox.exe"));
 
@@ -1530,11 +1547,13 @@ public class WindowManagerTests
 
 		windowManager.Initialize();
 
-		capture.Handles.ForEach(h =>
-		{
-			h.HasDisposed = false;
-			h.MarkAsInvalid();
-		});
+		capture
+			.Handles
+			.ForEach(h =>
+			{
+				h.HasDisposed = false;
+				h.MarkAsInvalid();
+			});
 
 		// When
 		windowManager.Dispose();

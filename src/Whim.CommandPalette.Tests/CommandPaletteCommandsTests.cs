@@ -26,7 +26,8 @@ public class CommandPaletteCommandsTests
 			OtherWorkspace.Name.Returns("Other workspace");
 
 			Context.WorkspaceManager.ActiveWorkspace.Returns(Workspace);
-			Context.WorkspaceManager
+			Context
+				.WorkspaceManager
 				.GetEnumerator()
 				.Returns((_) => new List<IWorkspace>() { Workspace, OtherWorkspace }.GetEnumerator());
 
@@ -237,7 +238,8 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		string[] expectedWorkspaces = new string[] { "Workspace", "Other workspace" };
-		wrapper.Plugin
+		wrapper
+			.Plugin
 			.Received(1)
 			.Activate(
 				Arg.Is<MenuVariantConfig>(
@@ -261,7 +263,8 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Then
-		wrapper.Plugin
+		wrapper
+			.Plugin
 			.Received(1)
 			.Activate(
 				Arg.Is<SelectVariantConfig>(
@@ -287,7 +290,8 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Then
-		wrapper.Plugin
+		wrapper
+			.Plugin
 			.Received(1)
 			.Activate(
 				Arg.Is<MenuVariantConfig>(

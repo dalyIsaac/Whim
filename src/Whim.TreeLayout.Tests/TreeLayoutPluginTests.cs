@@ -1,5 +1,5 @@
-using NSubstitute;
 using System.Text.Json;
+using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 

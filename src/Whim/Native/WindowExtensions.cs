@@ -1,8 +1,8 @@
+using System;
 using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Media;
-using System;
 using Windows.Win32.Foundation;
 
 namespace Whim;

@@ -1,6 +1,7 @@
+using System.Collections.Generic;
+using System.Collections.Generic;
 using AutoFixture;
 using NSubstitute;
-using System.Collections.Generic;
 using Whim.TestUtils;
 using Xunit;
 

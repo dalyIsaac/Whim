@@ -14,7 +14,8 @@ public class BaseFloatingLayoutEngineTests : ProxyLayoutEngineBaseTests
 			IInternalFloatingLayoutPlugin plugin = Substitute.For<IInternalFloatingLayoutPlugin>();
 			ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
 
-			context.NativeManager
+			context
+				.NativeManager
 				.DwmGetWindowLocation(Arg.Any<HWND>())
 				.Returns(new Location<int>() { Width = 100, Height = 100 });
 			context.MonitorManager.GetMonitorAtPoint(Arg.Any<ILocation<int>>()).Returns(monitor);

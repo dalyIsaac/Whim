@@ -1,8 +1,8 @@
-using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Microsoft.UI.Xaml;
 using Windows.System;
 
 namespace Whim.CommandPalette;

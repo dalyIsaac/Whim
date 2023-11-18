@@ -1,8 +1,3 @@
-using AutoFixture;
-using FluentAssertions;
-using Microsoft.UI.Dispatching;
-using NSubstitute;
-using NSubstitute.ClearExtensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using AutoFixture;
+using FluentAssertions;
+using Microsoft.UI.Dispatching;
+using NSubstitute;
+using NSubstitute.ClearExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -67,12 +67,14 @@ internal class MonitorManagerCustomization : ICustomization
 		{
 			if (primaryRect.Equals(rect))
 			{
-				internalCtx.CoreNativeManager
+				internalCtx
+					.CoreNativeManager
 					.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
 					.Returns(hMonitor);
 			}
 
-			internalCtx.CoreNativeManager
+			internalCtx
+				.CoreNativeManager
 				.GetMonitorInfoEx(hMonitor)
 				.Returns(
 					new MONITORINFOEXW()
@@ -93,7 +95,8 @@ internal class MonitorManagerCustomization : ICustomization
 	public static void UpdateMultipleMonitors(IInternalContext internalCtx, (RECT Rect, HMONITOR HMonitor)[] monitors)
 	{
 		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(monitors.Length > 1);
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.EnumDisplayMonitors(Arg.Any<SafeHandle>(), Arg.Any<RECT?>(), Arg.Any<MONITORENUMPROC>(), Arg.Any<LPARAM>())
 			.Returns(
 				(callInfo) =>
@@ -131,7 +134,8 @@ public class MonitorManagerTests
 	internal void Create_NoPrimaryMonitorFound(IInternalContext internalCtx)
 	{
 		// Given
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
 			.Returns(new HMONITOR(0));
 
@@ -169,7 +173,8 @@ public class MonitorManagerTests
 	internal void WindowFocused_NullMonitor(IInternalContext internalCtx)
 	{
 		// Given
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
@@ -201,7 +206,8 @@ public class MonitorManagerTests
 	internal void WindowFocused_NullWindow(IInternalContext internalCtx)
 	{
 		// Given
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
@@ -290,13 +296,17 @@ public class MonitorManagerTests
 		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
 
 		RECT[] expectedUnchangedRects = new[] { leftTop, right };
-		raisedEvent.Arguments.UnchangedMonitors
+		raisedEvent
+			.Arguments
+			.UnchangedMonitors
 			.Select(m => m.Bounds)
 			.Should()
 			.Equal(expectedUnchangedRects.Select(r => r.ToLocation()));
 
 		RECT[] expectedAddedRects = new[] { leftBottom };
-		raisedEvent.Arguments.AddedMonitors
+		raisedEvent
+			.Arguments
+			.AddedMonitors
 			.Select(m => m.Bounds)
 			.Should()
 			.Equal(expectedAddedRects.Select(r => r.ToLocation()));
@@ -356,13 +366,17 @@ public class MonitorManagerTests
 		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
 
 		RECT[] expectedUnchangedRects = new[] { primaryRect };
-		raisedEvent.Arguments.UnchangedMonitors
+		raisedEvent
+			.Arguments
+			.UnchangedMonitors
 			.Select(m => m.Bounds)
 			.Should()
 			.Equal(expectedUnchangedRects.Select(r => r.ToLocation()));
 
 		RECT[] expectedAddedRects = new[] { right };
-		raisedEvent.Arguments.AddedMonitors
+		raisedEvent
+			.Arguments
+			.AddedMonitors
 			.Select(m => m.Bounds)
 			.Should()
 			.Equal(expectedAddedRects.Select(r => r.ToLocation()));
@@ -417,7 +431,9 @@ public class MonitorManagerTests
 				bottom = 1080
 			}
 		};
-		raisedEvent.Arguments.RemovedMonitors
+		raisedEvent
+			.Arguments
+			.RemovedMonitors
 			.Select(m => m.Bounds)
 			.Should()
 			.Equal(expectedRemovedRects.Select(r => r.ToLocation()));
@@ -489,7 +505,8 @@ public class MonitorManagerTests
 		// Given
 		Point<int> point = new() { X = 10 * 1000, Y = 10 * 1000 };
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.MonitorFromPoint(point.ToSystemPoint(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)0);
 
@@ -509,7 +526,8 @@ public class MonitorManagerTests
 		// Given
 		Point<int> point = new() { X = 1930, Y = 10 };
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.MonitorFromPoint(point.ToSystemPoint(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
@@ -656,7 +674,8 @@ public class MonitorManagerTests
 		IMonitor monitor = monitorManager.ActiveMonitor;
 		IMonitor? monitor2 = monitorManager.ElementAt(1);
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.MonitorFromPoint(Arg.Any<Point>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns(((Monitor)monitor2)._hmonitor);
 

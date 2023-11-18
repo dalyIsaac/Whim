@@ -78,10 +78,9 @@ public class BarPlugin : IBarPlugin
 		{
 			barWindow.UpdateLocation();
 			deferPosHandle.DeferWindowPos(barWindow.WindowState);
-			_context.NativeManager.SetWindowCorners(
-				barWindow.WindowState.Window.Handle,
-				DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND
-			);
+			_context
+				.NativeManager
+				.SetWindowCorners(barWindow.WindowState.Window.Handle, DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND);
 		}
 	}
 

@@ -1,6 +1,6 @@
+using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim.LayoutPreview;

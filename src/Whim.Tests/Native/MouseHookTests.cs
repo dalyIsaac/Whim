@@ -28,7 +28,8 @@ public class MouseHookTests
 		public static CaptureMouseHook Create(IInternalContext internalCtx)
 		{
 			CaptureMouseHook captureMouseHook = new();
-			internalCtx.CoreNativeManager
+			internalCtx
+				.CoreNativeManager
 				.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, Arg.Any<HOOKPROC>(), null, 0)
 				.Returns(
 					(callInfo) =>

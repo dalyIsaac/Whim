@@ -1,6 +1,6 @@
+using System.Text.Json;
 using AutoFixture;
 using NSubstitute;
-using System.Text.Json;
 using Whim.TestUtils;
 using Xunit;
 

@@ -96,9 +96,11 @@ public class CommandPaletteCommands : PluginCommands
 						new MenuVariantConfig()
 						{
 							Hint = "Select window",
-							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(
-								w => RemoveWindowCommandCreator(w)
-							),
+							Commands = _context
+								.WorkspaceManager
+								.ActiveWorkspace
+								.Windows
+								.Select(w => RemoveWindowCommandCreator(w)),
 							ConfirmButtonText = "Remove"
 						}
 					)
@@ -139,7 +141,8 @@ public class CommandPaletteCommands : PluginCommands
 	public SelectOption[] CreateMoveWindowsToWorkspaceOptions()
 	{
 		// All the windows in all the workspaces.
-		IEnumerable<IWindow> windows = _context.WorkspaceManager
+		IEnumerable<IWindow> windows = _context
+			.WorkspaceManager
 			.Select(w => w.Windows)
 			.SelectMany(w => w)
 			.OrderBy(w => w.Title);

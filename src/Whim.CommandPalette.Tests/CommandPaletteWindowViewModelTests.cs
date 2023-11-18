@@ -120,15 +120,17 @@ public class CommandPaletteWindowViewModelTests
 			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
 
 		IMonitor monitor = Substitute.For<IMonitor>();
-		monitor.WorkingArea.Returns(
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Height = 100,
-				Width = 100
-			}
-		);
+		monitor
+			.WorkingArea
+			.Returns(
+				new Location<int>()
+				{
+					X = 0,
+					Y = 0,
+					Height = 100,
+					Width = 100
+				}
+			);
 
 		MenuVariantConfig config =
 			new()
