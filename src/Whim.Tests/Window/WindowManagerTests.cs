@@ -4,8 +4,10 @@ using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Whim.TestUtils;
 using Windows.Win32;
@@ -60,6 +62,10 @@ internal class WindowManagerFakeSafeHandle : UnhookWinEventSafeHandle
 	}
 }
 
+/// <summary>
+/// Captures the <see cref="WINEVENTPROC"/> passed to <see cref="CoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>,
+/// and stores the <see cref="WindowManagerFakeSafeHandle"/> returned by <see cref="CoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>.
+/// </summary>
 internal class CaptureWinEventProc
 {
 	public WINEVENTPROC? WinEventProc { get; private set; }
@@ -1552,6 +1558,52 @@ public class WindowManagerTests
 
 		// Then
 		capture.Handles.Should().OnlyContain(h => h.HasDisposed);
+	}
+	#endregion
+
+
+	#region GetEnumerator
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void GetEnumerator(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		WindowManager windowManager = new(ctx, internalCtx);
+		windowManager.Initialize();
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+
+		// When
+		IWindow[] windows = windowManager.ToArray();
+
+		// Then
+		Assert.Single(windows);
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void IEnumerable_GetEnumerator(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		WindowManager windowManager = new(ctx, internalCtx);
+		windowManager.Initialize();
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+
+		// When
+		IEnumerator enumerator = ((IEnumerable)windowManager).GetEnumerator();
+		List<IWindow> windows = new();
+		while (enumerator.MoveNext())
+		{
+			windows.Add((IWindow)enumerator.Current);
+		}
+
+		// Then
+		Assert.Single(windows);
 	}
 	#endregion
 }
