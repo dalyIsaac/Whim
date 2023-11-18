@@ -17,7 +17,7 @@ public class WorkspaceCustomization : ICustomization
 		internalContext.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
 
 		// Assume windows are managed.
-		internalContext.WindowManager.Windows.ContainsKey(Arg.Any<HWND>()).Returns(true);
+		internalContext.WindowManager.HandleWindowMap.ContainsKey(Arg.Any<HWND>()).Returns(true);
 
 		// Set up the triggers.
 		WorkspaceManagerTriggers triggers =
@@ -200,7 +200,7 @@ public class WorkspaceTests
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		internalContext.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
-		internalContext.WindowManager.Windows.ContainsKey(Arg.Any<HWND>()).Returns(false);
+		internalContext.WindowManager.HandleWindowMap.ContainsKey(Arg.Any<HWND>()).Returns(false);
 
 		// When
 		workspace.AddWindow(window);

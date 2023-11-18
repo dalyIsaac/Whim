@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
@@ -243,5 +244,81 @@ public class CoreCommandsTests
 
 		// Then
 		context.Received(1).Exit(null);
+	}
+
+	private static List<IWorkspace> CreateWorkspaces(int count)
+	{
+		List<IWorkspace> workspaces = new();
+		for (int idx = 0; idx < count; idx++)
+		{
+			workspaces.Add(Substitute.For<IWorkspace>());
+		}
+		return workspaces;
+	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void ActivateWorkspaceAtIndex_IndexDoesNotExist(IContext context)
+	{
+		// Given
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+		List<IWorkspace> workspaces = CreateWorkspaces(2);
+		context.WorkspaceManager.GetEnumerator().Returns(workspaces.GetEnumerator());
+
+		int index = 3;
+
+		ICommand command = testUtils.GetCommand($"whim.core.activate_workspace_{index}");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		context.WorkspaceManager.DidNotReceive().Activate(Arg.Any<IWorkspace>());
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData<CoreCommandsCustomization>(1)]
+	[InlineAutoSubstituteData<CoreCommandsCustomization>(2)]
+	[InlineAutoSubstituteData<CoreCommandsCustomization>(10)]
+	public void ActivateWorkspaceAtIndex(int index, IContext context)
+	{
+		// Given
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+		List<IWorkspace> workspaces = CreateWorkspaces(10);
+		context.WorkspaceManager.GetEnumerator().Returns(workspaces.GetEnumerator());
+
+		ICommand command = testUtils.GetCommand($"whim.core.activate_workspace_{index}");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		context.WorkspaceManager.Received(1).Activate(workspaces[index - 1]);
+	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void ActivateWorkspaceAtIndex_VerifyKeybinds(IContext context)
+	{
+		// Given
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		// When
+		IKeybind[] keybinds = new IKeybind[10];
+		for (int idx = 0; idx < 10; idx++)
+		{
+			keybinds[idx] = testUtils.GetKeybind($"whim.core.activate_workspace_{idx + 1}");
+		}
+
+		// Then
+		for (int idx = 0; idx < 9; idx++)
+		{
+			Assert.Equal(KeyModifiers.LAlt | KeyModifiers.LShift, keybinds[idx].Modifiers);
+			Assert.Equal("VK_" + (idx + 1), keybinds[idx].Key.ToString());
+		}
+
+		Assert.Equal(KeyModifiers.LAlt | KeyModifiers.LShift, keybinds[9].Modifiers);
+		Assert.Equal("VK_0", keybinds[9].Key.ToString());
 	}
 }
