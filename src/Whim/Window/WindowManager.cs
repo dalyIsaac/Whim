@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
 
 	private readonly ConcurrentDictionary<HWND, IWindow> _windows = new();
-	public IReadOnlyDictionary<HWND, IWindow> Windows => _windows;
+	public IReadOnlyDictionary<HWND, IWindow> HandleWindowMap => _windows;
 
 	/// <summary>
 	/// All the hooks added with <see cref="ICoreNativeManager.SetWinEventHook"/>.
@@ -604,4 +605,8 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		((IInternalWorkspaceManager)_context.WorkspaceManager).WindowMinimizeEnd(window);
 		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs() { Window = window });
 	}
+
+	public IEnumerator<IWindow> GetEnumerator() => _windows.Values.GetEnumerator();
+
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

@@ -570,7 +570,7 @@ public class WindowManagerTests
 		((IInternalWorkspaceManager)ctx.WorkspaceManager)
 			.Received(1)
 			.WindowRemoved(Arg.Any<IWindow>());
-		Assert.Empty(windowManager.Windows);
+		Assert.Empty(windowManager.HandleWindowMap);
 	}
 
 	#region OnWindowMoveStart
