@@ -32,6 +32,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// </summary>
 	private readonly UnhookWinEventSafeHandle[] _addedHooks = new UnhookWinEventSafeHandle[6];
 
+	/// <summary>
+	/// The delegate for handling all events triggered by <see cref="ICoreNativeManager.SetWinEventHook"/>.
+	/// </summary>
+	private readonly WINEVENTPROC _hookDelegate;
+
 	private bool _isMovingWindow;
 	private bool _isLeftMouseButtonDown;
 	private readonly object _mouseMoveLock = new();
@@ -53,6 +58,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		_context = context;
 		_internalContext = internalContext;
+		_hookDelegate = new WINEVENTPROC(WinEventProcWrapper);
 
 		FilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
 	}
@@ -64,26 +70,22 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
 		_addedHooks[0] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_HIDE, WinEventProcWrapper);
+			.SetWinEventHook(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_HIDE, _hookDelegate);
 		_addedHooks[1] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, WinEventProcWrapper);
+			.SetWinEventHook(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED, _hookDelegate);
 		_addedHooks[2] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, WinEventProcWrapper);
+			.SetWinEventHook(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND, _hookDelegate);
 		_addedHooks[3] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, WinEventProcWrapper);
+			.SetWinEventHook(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND, _hookDelegate);
 		_addedHooks[4] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(
-				PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
-				PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
-				WinEventProcWrapper
-			);
+			.SetWinEventHook(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, _hookDelegate);
 		_addedHooks[5] = _internalContext
 			.CoreNativeManager
-			.SetWinEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, WinEventProcWrapper);
+			.SetWinEventHook(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND, _hookDelegate);
 
 		// If any of the above hooks are invalid, we dispose the WindowManager instance and return false.
 		for (int i = 0; i < _addedHooks.Length; i++)

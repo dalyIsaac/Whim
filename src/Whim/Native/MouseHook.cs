@@ -11,6 +11,7 @@ namespace Whim;
 internal class MouseHook : IMouseHook
 {
 	private readonly IInternalContext _internalContext;
+	private readonly HOOKPROC _lowLevelMouseProc;
 	private UnhookWindowsHookExSafeHandle? _unhookMouseHook;
 	private bool disposedValue;
 	public event EventHandler<MouseEventArgs>? MouseLeftButtonDown;
@@ -19,6 +20,7 @@ internal class MouseHook : IMouseHook
 	public MouseHook(IInternalContext internalContext)
 	{
 		_internalContext = internalContext;
+		_lowLevelMouseProc = LowLevelMouseProcWrapper;
 	}
 
 	public void PostInitialize()
@@ -26,7 +28,7 @@ internal class MouseHook : IMouseHook
 		Logger.Debug("Initializing mouse manager...");
 		_unhookMouseHook = _internalContext
 			.CoreNativeManager
-			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, LowLevelMouseProcWrapper, null, 0);
+			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, _lowLevelMouseProc, null, 0);
 	}
 
 	private LRESULT LowLevelMouseProcWrapper(int nCode, WPARAM wParam, LPARAM lParam)
