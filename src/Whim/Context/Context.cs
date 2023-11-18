@@ -103,7 +103,11 @@ internal class Context : IContext
 				// TODO
 				throw new NotImplementedException();
 
-			case UncaughtExceptionHandling.Shutdown:
+			case UncaughtExceptionHandling.ShutdownSilently:
+				Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = exception.ToString() });
+				break;
+
+			case UncaughtExceptionHandling.ShutdownWithMessage:
 				Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = exception.ToString() });
 				break;
 

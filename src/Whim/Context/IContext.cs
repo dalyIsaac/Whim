@@ -18,9 +18,14 @@ public enum UncaughtExceptionHandling
 	Notify,
 
 	/// <summary>
+	/// Shutdown silently.
+	/// </summary>
+	ShutdownSilently,
+
+	/// <summary>
 	/// Shutdown and show the user an error message.
 	/// </summary>
-	Shutdown,
+	ShutdownWithMessage
 }
 
 /// <summary>
