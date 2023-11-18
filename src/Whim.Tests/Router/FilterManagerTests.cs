@@ -59,39 +59,20 @@ public class FilterManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void ClearKeepDefaults(IWindow window, IWindow searchUIWindow)
+	public void Clear(IWindow window)
 	{
 		// Given
 		FilterManager filterManager = new();
+		FilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
 		filterManager.IgnoreWindowClass("Test");
 
 		window.WindowClass.Returns("Test");
-		searchUIWindow.ProcessName.Returns("SearchUI.exe");
 
-		// When the filter manager is cleared, and the defaults are cleared
-		filterManager.Clear(clearDefaults: true);
-
-		// Then neither window should be ignored
-		Assert.False(filterManager.ShouldBeIgnored(window));
-		Assert.False(filterManager.ShouldBeIgnored(searchUIWindow));
-	}
-
-	[Theory, AutoSubstituteData]
-	public void ClearAll(IWindow window, IWindow searchUIWindow)
-	{
-		// Given
-		FilterManager filterManager = new();
-		filterManager.IgnoreWindowClass("Test");
-
-		window.WindowClass.Returns("Test");
-		searchUIWindow.ProcessName.Returns("SearchUI.exe");
-
-		// When the filter manager is cleared, and the defaults are kept
-		filterManager.Clear(clearDefaults: false);
+		// When the filter manager is cleared
+		filterManager.Clear();
 
 		// Then the window should be ignored, but not the search UI window
 		Assert.False(filterManager.ShouldBeIgnored(window));
-		Assert.True(filterManager.ShouldBeIgnored(searchUIWindow));
 	}
 
 	[Theory, AutoSubstituteData]

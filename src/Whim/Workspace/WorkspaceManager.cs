@@ -391,7 +391,14 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		Logger.Debug($"Adding window {window}");
 		IWorkspace? workspace = _context.RouterManager.RouteWindow(window);
 
-		if (!_context.RouterManager.RouteToActiveWorkspace && workspace == null)
+		// Check the workspace exists.
+		if (workspace != null && !_workspaces.Contains(workspace))
+		{
+			Logger.Error($"Workspace {workspace} was not found");
+			workspace = null;
+		}
+
+		if (workspace == null && !_context.RouterManager.RouteToActiveWorkspace)
 		{
 			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(window.Center);
 			if (monitor is not null)

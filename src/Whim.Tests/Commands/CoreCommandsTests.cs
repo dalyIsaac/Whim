@@ -194,6 +194,25 @@ public class CoreCommandsTests
 		context.WorkspaceManager.Received(1).MoveWindowToNextMonitor(null);
 	}
 
+	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_previous_monitor")]
+	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_next_monitor")]
+	[Theory]
+	public void FocusMonitor(string commandName, IContext context, IWorkspace workspace)
+	{
+		// Given
+		workspace.LastFocusedWindow.Returns((IWindow?)null);
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand(commandName);
+
+		// When
+		command.TryExecute();
+
+		// Then
+		workspace.LastFocusedWindow?.DidNotReceive().Focus();
+	}
+
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
 	public void CloseCurrentWorkspace(IContext context, IWorkspace workspace)
 	{
