@@ -1,7 +1,7 @@
-using Serilog;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Serilog;
 
 namespace Whim;
 

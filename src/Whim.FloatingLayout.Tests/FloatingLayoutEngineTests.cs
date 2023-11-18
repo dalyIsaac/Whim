@@ -16,7 +16,8 @@ public class FloatingLayoutEngineCustomization : ICustomization
 
 		context.MonitorManager.GetMonitorAtPoint(Arg.Any<ILocation<int>>()).Returns(monitor);
 		monitor.WorkingArea.Returns(new Location<int>() { Width = 1000, Height = 1000 });
-		context.NativeManager
+		context
+			.NativeManager
 			.DwmGetWindowLocation(Arg.Any<HWND>())
 			.Returns(new Location<int>() { Width = 100, Height = 100 });
 

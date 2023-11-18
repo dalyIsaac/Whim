@@ -1,5 +1,5 @@
-using Microsoft.UI.Xaml.Controls;
 using System;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Whim.CommandPalette;
 

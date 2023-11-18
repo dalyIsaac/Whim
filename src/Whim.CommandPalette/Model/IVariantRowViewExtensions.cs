@@ -1,5 +1,5 @@
-using Microsoft.UI.Xaml.Documents;
 using System.Collections.Generic;
+using Microsoft.UI.Xaml.Documents;
 
 namespace Whim.CommandPalette;
 

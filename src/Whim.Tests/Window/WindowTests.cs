@@ -1,6 +1,6 @@
+using System.ComponentModel;
 using AutoFixture;
 using NSubstitute;
-using System.ComponentModel;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -20,7 +20,8 @@ internal class WindowCustomization : ICustomization
 
 		internalCtx.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>()).Returns(("processName", "processFileName"));
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetWindowThreadProcessId(Arg.Any<HWND>(), out uint _)
 			.Returns(
 				(x) =>
@@ -30,7 +31,8 @@ internal class WindowCustomization : ICustomization
 				}
 			);
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetWindowRect(Arg.Any<HWND>(), out RECT _)
 			.Returns(
 				(x) =>
@@ -351,7 +353,8 @@ public class WindowTests
 	internal void CreateWindow_Null(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.When(x => x.GetProcessNameAndPath(Arg.Any<int>()))
 			.Do(x => throw new Win32Exception());
 
@@ -461,7 +464,8 @@ public class WindowTests
 	internal void IsUwp_True(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetProcessNameAndPath(Arg.Any<int>())
 			.Returns(("processName", "app/ApplicationFrameHost.exe"));
 
@@ -478,7 +482,8 @@ public class WindowTests
 	internal void IsUwp_False(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.GetProcessNameAndPath(Arg.Any<int>())
 			.Returns(("processName", "processFileName"));
 

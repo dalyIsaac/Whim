@@ -1,6 +1,6 @@
-using NSubstitute;
 using System.Collections;
 using System.Collections.Immutable;
+using NSubstitute;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;

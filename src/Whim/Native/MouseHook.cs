@@ -26,12 +26,9 @@ internal class MouseHook : IMouseHook
 	public void PostInitialize()
 	{
 		Logger.Debug("Initializing mouse manager...");
-		_unhookMouseHook = _internalContext.CoreNativeManager.SetWindowsHookEx(
-			WINDOWS_HOOK_ID.WH_MOUSE_LL,
-			_lowLevelMouseProc,
-			null,
-			0
-		);
+		_unhookMouseHook = _internalContext
+			.CoreNativeManager
+			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, _lowLevelMouseProc, null, 0);
 	}
 
 	/// <summary>

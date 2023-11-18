@@ -27,12 +27,9 @@ internal class KeybindHook : IKeybindHook
 	public void PostInitialize()
 	{
 		Logger.Debug("Initializing keybind manager...");
-		_unhookKeyboardHook = _internalContext.CoreNativeManager.SetWindowsHookEx(
-			WINDOWS_HOOK_ID.WH_KEYBOARD_LL,
-			_lowLevelKeyboardProc,
-			null,
-			0
-		);
+		_unhookKeyboardHook = _internalContext
+			.CoreNativeManager
+			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _lowLevelKeyboardProc, null, 0);
 	}
 
 	/// <summary>

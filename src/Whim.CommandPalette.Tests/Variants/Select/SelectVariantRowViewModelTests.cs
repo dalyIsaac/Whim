@@ -8,15 +8,17 @@ public class SelectVariantRowViewModelTests
 	private static IVariantRowModel<SelectOption> CreateModelMock(bool isSelected, bool IsEnabled)
 	{
 		IVariantRowModel<SelectOption> modelMock = Substitute.For<IVariantRowModel<SelectOption>>();
-		modelMock.Data.Returns(
-			new SelectOption()
-			{
-				Id = "id",
-				Title = "title",
-				IsSelected = isSelected,
-				IsEnabled = IsEnabled
-			}
-		);
+		modelMock
+			.Data
+			.Returns(
+				new SelectOption()
+				{
+					Id = "id",
+					Title = "title",
+					IsSelected = isSelected,
+					IsEnabled = IsEnabled
+				}
+			);
 		return modelMock;
 	}
 

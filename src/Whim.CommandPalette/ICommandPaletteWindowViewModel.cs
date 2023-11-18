@@ -1,6 +1,6 @@
-using Microsoft.UI.Xaml;
 using System;
 using System.ComponentModel;
+using Microsoft.UI.Xaml;
 using Windows.System;
 
 namespace Whim.CommandPalette;

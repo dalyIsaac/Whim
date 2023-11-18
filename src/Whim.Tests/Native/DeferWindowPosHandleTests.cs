@@ -1,7 +1,7 @@
-using AutoFixture;
-using NSubstitute;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoFixture;
+using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -57,7 +57,8 @@ public class DeferWindowPosHandleTests
 		int expectedCallCount = 1
 	)
 	{
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.Received(expectedCallCount)
 			.SetWindowPos(
 				windowPosState.WindowState.Window.Handle,
@@ -93,9 +94,9 @@ public class DeferWindowPosHandleTests
 		handle.Dispose();
 
 		// Then the layout is deferred
-		internalCtx.DeferWindowPosManager.DeferLayout(
-			Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState)
-		);
+		internalCtx
+			.DeferWindowPosManager
+			.DeferLayout(Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState));
 	}
 
 	[Theory]
@@ -173,7 +174,8 @@ public class DeferWindowPosHandleTests
 		handle.Dispose();
 
 		// Then the window is not laid out
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.DidNotReceive()
 			.SetWindowPos(
 				Arg.Any<HWND>(),

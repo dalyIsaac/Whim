@@ -1,8 +1,8 @@
 using AutoFixture.Xunit2;
 using FluentAssertions;
 using NSubstitute;
-using Xunit;
 using Whim.TestUtils;
+using Xunit;
 
 namespace Whim.Bar.Tests;
 

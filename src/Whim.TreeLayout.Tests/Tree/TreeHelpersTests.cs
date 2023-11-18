@@ -1,7 +1,7 @@
+using System.Collections.Immutable;
 using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
-using System.Collections.Immutable;
 using Whim.TestUtils;
 using Xunit;
 

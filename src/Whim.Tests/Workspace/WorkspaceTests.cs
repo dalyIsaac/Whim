@@ -1,6 +1,6 @@
+using System;
 using AutoFixture;
 using NSubstitute;
-using System;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;

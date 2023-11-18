@@ -1,6 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using NSubstitute;
-using System.Diagnostics.CodeAnalysis;
 using Whim.TestUtils;
 using Xunit;
 

@@ -1,5 +1,5 @@
-﻿using Microsoft.UI.Dispatching;
-using System.Threading;
+﻿using System.Threading;
+using Microsoft.UI.Dispatching;
 
 namespace Whim.Runner;
 
@@ -52,14 +52,18 @@ public static partial class Program
 		{
 			System.Diagnostics.Debug.WriteLine("Starting!!!");
 			// Start the application and the message loop.
-			global::Microsoft.UI.Xaml.Application.Start(
-				(p) =>
-				{
-					DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
-					SynchronizationContext.SetSynchronizationContext(context);
-					_ = new App();
-				}
-			);
+			global::Microsoft
+				.UI
+				.Xaml
+				.Application
+				.Start(
+					(p) =>
+					{
+						DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
+						SynchronizationContext.SetSynchronizationContext(context);
+						_ = new App();
+					}
+				);
 		}
 	}
 }

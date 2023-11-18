@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Documents;
-using System.Collections.Generic;
 using Windows.UI.Text;
 
 namespace Whim.CommandPalette;

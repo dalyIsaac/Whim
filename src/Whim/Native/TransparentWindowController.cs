@@ -1,5 +1,5 @@
-using Microsoft.UI.Composition;
 using System;
+using Microsoft.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -33,9 +33,10 @@ public class TransparentWindowController : IDisposable
 		ICompositionSupportsSystemBackdrop brushHolder = window.As<ICompositionSupportsSystemBackdrop>();
 
 		_internalContext.CoreNativeManager.EnableBlurBehindWindow(_hwnd);
-		brushHolder.SystemBackdrop = _context.NativeManager.Compositor.CreateColorBrush(
-			Windows.UI.Color.FromArgb(0, 255, 255, 255)
-		);
+		brushHolder.SystemBackdrop = _context
+			.NativeManager
+			.Compositor
+			.CreateColorBrush(Windows.UI.Color.FromArgb(0, 255, 255, 255));
 
 		_subclassProc = new SUBCLASSPROC(WindowProc);
 		_internalContext.CoreNativeManager.SetWindowSubclass(_hwnd, _subclassProc, SUBCLASSID, 0);
@@ -57,9 +58,9 @@ public class TransparentWindowController : IDisposable
 		{
 			if (_internalContext.CoreNativeManager.GetClientRect(hWnd, out RECT rect))
 			{
-				using DeleteObjectSafeHandle brush = _internalContext.CoreNativeManager.CreateSolidBrush(
-					new COLORREF()
-				);
+				using DeleteObjectSafeHandle brush = _internalContext
+					.CoreNativeManager
+					.CreateSolidBrush(new COLORREF());
 				_internalContext.CoreNativeManager.FillRect(new HDC((nint)wParam.Value), rect, brush);
 				return (LRESULT)1;
 			}

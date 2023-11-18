@@ -1,5 +1,5 @@
-using AutoFixture.AutoNSubstitute;
 using AutoFixture;
+using AutoFixture.AutoNSubstitute;
 using AutoFixture.Xunit2;
 
 namespace Whim.TestUtils;

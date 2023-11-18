@@ -1,6 +1,6 @@
+using System.Threading.Tasks;
 using AutoFixture;
 using NSubstitute;
-using System.Threading.Tasks;
 using Whim.TestUtils;
 using Xunit;
 

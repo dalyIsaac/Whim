@@ -1,7 +1,7 @@
-using AutoFixture;
-using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using AutoFixture;
+using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
@@ -16,15 +16,17 @@ public class LayoutPreviewPluginCustomization : ICustomization
 		IWorkspace workspace = fixture.Freeze<IWorkspace>();
 
 		IMonitor monitor = fixture.Freeze<IMonitor>();
-		monitor.WorkingArea.Returns(
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080
-			}
-		);
+		monitor
+			.WorkingArea
+			.Returns(
+				new Location<int>()
+				{
+					X = 0,
+					Y = 0,
+					Width = 1920,
+					Height = 1080
+				}
+			);
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitor);
 		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);

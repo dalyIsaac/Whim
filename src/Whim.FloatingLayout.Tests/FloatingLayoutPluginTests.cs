@@ -1,6 +1,6 @@
+using System.Text.Json;
 using AutoFixture;
 using NSubstitute;
-using System.Text.Json;
 using Whim.TestUtils;
 using Xunit;
 
@@ -14,15 +14,17 @@ public class FloatingLayoutPluginCustomization : ICustomization
 		IWorkspace workspace = fixture.Freeze<IWorkspace>();
 
 		IMonitor monitor = fixture.Freeze<IMonitor>();
-		monitor.WorkingArea.Returns(
-			new Location<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = 3,
-				Height = 3
-			}
-		);
+		monitor
+			.WorkingArea
+			.Returns(
+				new Location<int>()
+				{
+					X = 0,
+					Y = 0,
+					Width = 3,
+					Height = 3
+				}
+			);
 
 		// The workspace will have a null last focused window
 		workspace.LastFocusedWindow.Returns((IWindow?)null);

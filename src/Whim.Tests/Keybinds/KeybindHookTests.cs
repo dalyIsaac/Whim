@@ -1,14 +1,14 @@
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoFixture;
+using NSubstitute;
+using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using AutoFixture;
-using NSubstitute;
-using Whim.TestUtils;
+using Xunit;
 
 namespace Whim.Tests;
 
@@ -57,7 +57,8 @@ public class KeybindHookTests
 		public static CaptureKeybindHook Create(IInternalContext internalCtx)
 		{
 			CaptureKeybindHook captureKeybindHook = new();
-			internalCtx.CoreNativeManager
+			internalCtx
+				.CoreNativeManager
 				.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0)
 				.Returns(
 					(callInfo) =>
@@ -85,7 +86,8 @@ public class KeybindHookTests
 			internalCtx.CoreNativeManager.GetKeyState((int)modifier).Returns((short)-32768);
 		}
 
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
 			.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)key });
 
@@ -103,7 +105,8 @@ public class KeybindHookTests
 		keybindHook.PostInitialize();
 
 		// Then
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.Received(1)
 			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0);
 	}
@@ -132,7 +135,8 @@ public class KeybindHookTests
 		// Given
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
-		internalCtx.CoreNativeManager
+		internalCtx
+			.CoreNativeManager
 			.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
 			.Returns(null as KBDLLHOOKSTRUCT?);
 
