@@ -38,7 +38,7 @@ internal class MouseHook : IMouseHook
 		}
 		catch (Exception e)
 		{
-			Logger.Error($"Error in LowLevelMouseProc: {e}");
+			Logger.Fatal($"Error in LowLevelMouseProc: {e}");
 			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 	}

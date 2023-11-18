@@ -38,7 +38,7 @@ internal class KeybindHook : IKeybindHook
 		}
 		catch (Exception e)
 		{
-			Logger.Error($"Error in LowLevelKeyboardProc: {e}");
+			Logger.Fatal($"Error in LowLevelKeyboardProc: {e}");
 			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
 	}

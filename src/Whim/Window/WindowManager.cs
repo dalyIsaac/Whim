@@ -212,7 +212,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 		catch (Exception e)
 		{
-			Logger.Error($"Caught error in WinEventProc: {e}");
+			Logger.Fatal($"Caught error in WinEventProc: {e}");
 		}
 	}
 
