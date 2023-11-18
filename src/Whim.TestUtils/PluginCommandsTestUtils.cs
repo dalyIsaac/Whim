@@ -30,4 +30,16 @@ public class PluginCommandsTestUtils
 		Assert.NotNull(command);
 		return command!;
 	}
+
+	/// <summary>
+	/// Get the keybind with the given identifier.
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns></returns>
+	public IKeybind GetKeybind(string id)
+	{
+		IKeybind? keybind = _pluginCommands.Keybinds.FirstOrDefault(c => c.commandId == id).keybind;
+		Assert.NotNull(keybind);
+		return keybind!;
+	}
 }
