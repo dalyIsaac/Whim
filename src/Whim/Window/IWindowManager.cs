@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -6,8 +7,13 @@ namespace Whim;
 /// <summary>
 /// The manager for <see cref="IWindow"/>s.
 /// </summary>
-public interface IWindowManager : IDisposable
+public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 {
+	/// <summary>
+	/// Filters for windows that will try restore window locations after their windows are created.
+	/// </summary>
+	IFilterManager LocationRestoringFilterManager { get; }
+
 	/// <summary>
 	/// Initialize the windows event hooks.
 	/// </summary>

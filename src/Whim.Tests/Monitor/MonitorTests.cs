@@ -14,24 +14,17 @@ internal class MonitorCustomization : ICustomization
 	{
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
-		internalCtx.CoreNativeManager.GetVirtualScreenLeft().Returns(0);
-		internalCtx.CoreNativeManager.GetVirtualScreenTop().Returns(0);
-		internalCtx.CoreNativeManager.GetVirtualScreenWidth().Returns(1920);
-		internalCtx.CoreNativeManager.GetVirtualScreenHeight().Returns(1080);
-
 		internalCtx.CoreNativeManager
-			.GetPrimaryDisplayWorkArea(out RECT _)
+			.GetMonitorInfoEx(Arg.Any<HMONITOR>())
 			.Returns(
-				(callInfo) =>
+				(_) =>
 				{
-					callInfo[0] = new RECT()
-					{
-						left = 10,
-						top = 10,
-						right = 1910,
-						bottom = 1070
-					};
-					return (BOOL)true;
+					MONITORINFOEXW infoEx = default;
+					infoEx.monitorInfo.rcMonitor = new RECT(0, 0, 1920, 1080);
+					infoEx.monitorInfo.rcWork = new RECT(10, 10, 1910, 1070);
+					infoEx.monitorInfo.dwFlags = 0;
+					infoEx.szDevice = "DISPLAY";
+					return infoEx;
 				}
 			);
 
@@ -112,22 +105,7 @@ public class MonitorTests
 	internal void CreateMonitor_MultipleMonitors(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
-
 		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(true);
-
-		internalCtx.CoreNativeManager
-			.GetMonitorInfoEx(Arg.Any<HMONITOR>())
-			.Returns(
-				(_) =>
-				{
-					MONITORINFOEXW infoEx = default;
-					infoEx.monitorInfo.rcMonitor = new RECT(0, 0, 1920, 1080);
-					infoEx.monitorInfo.rcWork = new RECT(10, 10, 1910, 1070);
-					infoEx.monitorInfo.dwFlags = 0;
-					infoEx.szDevice = "DISPLAY";
-					return infoEx;
-				}
-			);
 
 		uint effectiveDpiX = 144;
 		uint effectiveDpiY = 144;
@@ -162,6 +140,24 @@ public class MonitorTests
 			monitor.WorkingArea
 		);
 		Assert.Equal(150, monitor.ScaleFactor);
+	}
+
+	[Theory, AutoSubstituteData<MonitorCustomization>]
+	internal void CreateMonitor_CreationFailed(IInternalContext internalCtx, HMONITOR hmonitor)
+	{
+		// Given
+		bool isPrimaryHMonitor = false;
+		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(true);
+		internalCtx.CoreNativeManager.GetMonitorInfoEx(Arg.Any<HMONITOR>()).Returns((_) => null);
+
+		// When
+		Monitor monitor = new(internalCtx, hmonitor, isPrimaryHMonitor);
+
+		// Then
+		Assert.Equal("NOT A DISPLAY", monitor.Name);
+		Assert.False(monitor.IsPrimary);
+		Assert.Equal(new Location<int>(), monitor.Bounds);
+		Assert.Equal(new Location<int>(), monitor.WorkingArea);
 	}
 
 	[Theory, AutoSubstituteData<MonitorCustomization>]

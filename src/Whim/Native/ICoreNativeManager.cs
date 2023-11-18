@@ -77,50 +77,6 @@ internal interface ICoreNativeManager
 	BOOL GetCursorPos(out IPoint<int> lpPoint);
 
 	/// <summary>
-	/// Get the coordinates for the left-side of the virtual screen.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX)"/> with <see cref="SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-	/// </remarks>
-	/// <returns></returns>
-	int GetVirtualScreenLeft();
-
-	/// <summary>
-	/// Get the coordinates for the top-side of the virtual screen.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX)"/> with <see cref="SYSTEM_METRICS_INDEX.SM_YVIRTUALSCREEN"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-	/// </remarks>
-	/// <returns></returns>
-	int GetVirtualScreenTop();
-
-	/// <summary>
-	/// Get the width of the virtual screen.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX)"/> with <see cref="SYSTEM_METRICS_INDEX.SM_CXVIRTUALSCREEN"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-	/// </remarks>
-	/// <returns></returns>
-	int GetVirtualScreenWidth();
-
-	/// <summary>
-	/// Get the height of the virtual screen.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX)"/> with <see cref="SYSTEM_METRICS_INDEX.SM_CYVIRTUALSCREEN"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-	/// </remarks>
-	/// <returns></returns>
-	int GetVirtualScreenHeight();
-
-	/// <summary>
 	/// Whether the desktop has multiple monitors.
 	/// </summary>
 	/// <remarks>
@@ -145,18 +101,6 @@ internal interface ICoreNativeManager
 	/// <param name="dwData"></param>
 	/// <returns></returns>
 	BOOL EnumDisplayMonitors(SafeHandle? hdc, RECT? lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData);
-
-	/// <summary>
-	/// Retrieves the size of the work area on the primary display monitor.
-	/// </summary>
-	/// <remarks>
-	/// This uses <see cref="PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION, uint, void*, SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS)"/> with <see cref="SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-systemparametersinfoa
-	/// </remarks>
-	/// <param name="workArea"></param>
-	/// <returns></returns>
-	BOOL GetPrimaryDisplayWorkArea(out RECT workArea);
 
 	/// <summary>
 	/// Retrieve information about a display monitor.

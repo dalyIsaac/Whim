@@ -63,8 +63,10 @@ internal class Context : IContext
 
 		foreach ((string name, IKeybind keybind) in coreCommands.Keybinds)
 		{
-			KeybindManager.Add(name, keybind);
+			KeybindManager.SetKeybind(name, keybind);
 		}
+
+		FilteredWindows.LoadWindowsIgnoredByWhim(FilterManager);
 
 		// Load the user's config.
 		ConfigLoader configLoader = new(FileManager);

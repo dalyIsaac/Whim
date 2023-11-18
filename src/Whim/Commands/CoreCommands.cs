@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -170,12 +171,45 @@ internal class CoreCommands : PluginCommands
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
+				identifier: "focus_previous_monitor",
+				title: "Focus the previous monitor",
+				callback: () =>
+				{
+					IMonitor active = _context.MonitorManager.ActiveMonitor;
+					IMonitor previous = _context.MonitorManager.GetPreviousMonitor(active);
+					IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(previous);
+					workspace?.LastFocusedWindow?.Focus();
+				}
+			)
+			.Add(
+				identifier: "focus_next_monitor",
+				title: "Focus the next monitor",
+				callback: () =>
+				{
+					IMonitor active = _context.MonitorManager.ActiveMonitor;
+					IMonitor next = _context.MonitorManager.GetNextMonitor(active);
+					IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(next);
+					workspace?.LastFocusedWindow?.Focus();
+				}
+			)
+			.Add(
 				identifier: "close_current_workspace",
 				title: "Close the current workspace",
 				callback: () => _context.WorkspaceManager.Remove(_context.WorkspaceManager.ActiveWorkspace),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_W)
 			)
 			.Add(identifier: "exit_whim", title: "Exit Whim", callback: () => _context.Exit());
+
+		for (int idx = 1; idx <= 10; idx++)
+		{
+			ActivateWorkspaceAtIndex activateWorkspaceAtIndex = new(idx);
+			_ = Add(
+				identifier: $"activate_workspace_{idx}",
+				title: $"Activate workspace {idx}",
+				callback: () => activateWorkspaceAtIndex.Execute(context),
+				keybind: new Keybind(KeyModifiers.LAlt | KeyModifiers.LShift, key: GetVirtualKeyForInt(idx))
+			);
+		}
 	}
 
 	/// <summary>
@@ -201,4 +235,34 @@ internal class CoreCommands : PluginCommands
 		{
 			_context.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
 		};
+
+	// This record is necessary, otherwise the index captured is the last one (11)
+	// The index here is 1-based.
+	private record ActivateWorkspaceAtIndex(int Index)
+	{
+		public void Execute(IContext context)
+		{
+			IWorkspace[] workspaces = context.WorkspaceManager.ToArray();
+			if (Index <= workspaces.Length)
+			{
+				context.WorkspaceManager.Activate(workspaces[Index - 1]);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Convert the given integer to a <see cref="VIRTUAL_KEY"/>.
+	/// This converts the integer 0 - 9 to <see cref="VIRTUAL_KEY.VK_1"/> - <see cref="VIRTUAL_KEY.VK_0"/>.
+	/// </summary>
+	/// <param name="idx">The integer to convert, 0 - 9.</param>
+	/// <returns>The <see cref="VIRTUAL_KEY"/> corresponding to the given integer</returns>
+	private static VIRTUAL_KEY GetVirtualKeyForInt(int idx)
+	{
+		if (idx == 10)
+		{
+			return VIRTUAL_KEY.VK_0;
+		}
+
+		return (VIRTUAL_KEY)((int)VIRTUAL_KEY.VK_1 + (idx - 1));
+	}
 }

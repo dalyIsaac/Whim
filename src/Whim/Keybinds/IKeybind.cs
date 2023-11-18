@@ -35,10 +35,20 @@ public interface IKeybind
 	/// <summary>
 	/// Modifiers like Alt, Ctrl, and Win.
 	/// </summary>
-	public KeyModifiers Modifiers { get; }
+	KeyModifiers Modifiers { get; }
 
 	/// <summary>
 	/// See https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 	/// </summary>
-	public VIRTUAL_KEY Key { get; }
+	VIRTUAL_KEY Key { get; }
+
+	/// <summary>
+	/// Returns a string representation of the keybind.
+	/// </summary>
+	/// <param name="unifyKeyModifiers">
+	/// Whether to treat key modifiers like `LWin` and `RWin` as the same.
+	/// See <see cref="IKeybindManager.UnifyKeyModifiers"/>.
+	/// </param>
+	/// <returns></returns>
+	string ToString(bool unifyKeyModifiers);
 }

@@ -391,7 +391,14 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		Logger.Debug($"Adding window {window}");
 		IWorkspace? workspace = _context.RouterManager.RouteWindow(window);
 
-		if (!_context.RouterManager.RouteToActiveWorkspace && workspace == null)
+		// Check the workspace exists.
+		if (workspace != null && !_workspaces.Contains(workspace))
+		{
+			Logger.Error($"Workspace {workspace} was not found");
+			workspace = null;
+		}
+
+		if (workspace == null && !_context.RouterManager.RouteToActiveWorkspace)
 		{
 			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(window.Center);
 			if (monitor is not null)
@@ -439,10 +446,17 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceFocused);
-		if (workspaceFocused != null && !workspaceFocused.Equals(ActiveWorkspace))
+		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspaceForWindow))
 		{
-			Activate(workspaceFocused);
+			Logger.Debug($"Window {window} was not found in any workspace");
+			return;
+		}
+
+		if (!_monitorWorkspaceMap.ContainsValue(workspaceForWindow))
+		{
+			Logger.Debug($"Window {window} is not in an active workspace");
+			Activate(workspaceForWindow);
+			return;
 		}
 	}
 

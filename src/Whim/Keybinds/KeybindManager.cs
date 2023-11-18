@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Whim;
 
@@ -14,9 +15,57 @@ internal class KeybindManager : IKeybindManager
 		_context = context;
 	}
 
+	private bool _uniqueKeyModifiers = true;
+	public bool UnifyKeyModifiers
+	{
+		get => _uniqueKeyModifiers;
+		set
+		{
+			if (value && _uniqueKeyModifiers == false)
+			{
+				_uniqueKeyModifiers = true;
+				UnifyKeybinds();
+			}
+
+			_uniqueKeyModifiers = value;
+		}
+	}
+
+	private void UnifyKeybinds()
+	{
+		KeyValuePair<string, IKeybind>[] keybinds = _commandsKeybindsMap.ToArray();
+		_commandsKeybindsMap.Clear();
+		_keybindsCommandsMap.Clear();
+
+		foreach (KeyValuePair<string, IKeybind> keybind in keybinds)
+		{
+			SetKeybind(keybind.Key, keybind.Value);
+		}
+	}
+
+	[Obsolete("Method is deprecated, please use SetKeybind(string, IKeybind) instead.")]
 	public void Add(string commandId, IKeybind keybind)
 	{
+		Logger.Warning("Method is deprecated, please use SetKeybind(string, IKeybind) instead.");
 		Logger.Debug($"Adding keybind '{keybind}' for command '{commandId}'");
+
+		if (_commandsKeybindsMap.ContainsKey(commandId))
+		{
+			throw new ArgumentException($"Command '{commandId}' already has a keybind");
+		}
+
+		SetKeybind(commandId, keybind);
+	}
+
+	public void SetKeybind(string commandId, IKeybind keybind)
+	{
+		Logger.Debug($"Setting keybind '{keybind}' for command '{commandId}'");
+		keybind = UnifyKeyModifiers ? keybind.UnifyModifiers() : keybind;
+
+		if (_commandsKeybindsMap.TryGetValue(commandId, out IKeybind? existingKeybind))
+		{
+			_keybindsCommandsMap[existingKeybind].Remove(commandId);
+		}
 
 		if (!_keybindsCommandsMap.ContainsKey(keybind))
 		{
@@ -24,12 +73,13 @@ internal class KeybindManager : IKeybindManager
 		}
 
 		_keybindsCommandsMap[keybind].Add(commandId);
-		_commandsKeybindsMap.Add(commandId, keybind);
+		_commandsKeybindsMap[commandId] = keybind;
 	}
 
 	public ICommand[] GetCommands(IKeybind keybind)
 	{
 		Logger.Debug($"Getting commands for keybind '{keybind}'");
+		keybind = UnifyKeyModifiers ? keybind.UnifyModifiers() : keybind;
 
 		if (_keybindsCommandsMap.TryGetValue(keybind, out List<string>? commandIds))
 		{

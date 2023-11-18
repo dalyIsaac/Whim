@@ -1,3 +1,5 @@
+using System;
+
 namespace Whim;
 
 /// <summary>
@@ -6,6 +8,18 @@ namespace Whim;
 public interface IKeybindManager
 {
 	/// <summary>
+	/// Whether to treat key modifiers like `LWin` and `RWin` as the same.
+	/// For key modifiers which have a left and right variant, this will treat them as the same.
+	/// Defaults to <c>true</c>.
+	/// </summary>
+	/// <remarks>
+	/// When this is set to <c>true</c>, all of the existing keybinds will be re-added in a unified
+	/// form.
+	/// All new keybinds will also be unified.
+	/// </remarks>
+	bool UnifyKeyModifiers { get; set; }
+
+	/// <summary>
 	/// Adds a keybind.
 	/// </summary>
 	/// <remarks>
@@ -13,7 +27,21 @@ public interface IKeybindManager
 	/// </remarks>
 	/// <param name="commandId">The identifier of the command to bind to.</param>
 	/// <param name="keybind">The keybind to add.</param>
+	/// <exception cref="ArgumentException">Thrown if the command identifier is already bound to a keybind.</exception>
+	[Obsolete("Method is deprecated, please use SetKeybind(string, IKeybind) instead.")]
 	void Add(string commandId, IKeybind keybind);
+
+	/// <summary>
+	/// Sets a keybind.
+	/// If a keybind already exists for the given command, it will be overwritten.
+	/// </summary>
+	/// <remarks>
+	/// Keybinds can have multiple commands bound to them.
+	/// Commands can have a single keybind.
+	/// </remarks>
+	/// <param name="commandId">The identifier of the command to bind to.</param>
+	/// <param name="keybind">The keybind to set.</param>
+	void SetKeybind(string commandId, IKeybind keybind);
 
 	/// <summary>
 	/// Removes a keybind.

@@ -26,106 +26,89 @@ internal class MonitorManagerCustomization : ICustomization
 			internalCtx,
 			new[]
 			{
-				new RECT()
-				{
-					left = 1920,
-					top = 0,
-					right = 3840,
-					bottom = 1080
-				},
-				new RECT()
-				{
-					left = 0,
-					top = 0,
-					right = 1920,
-					bottom = 1080
-				}
+				(
+					new RECT()
+					{
+						left = 1920,
+						top = 0,
+						right = 3840,
+						bottom = 1080
+					},
+					(HMONITOR)1
+				),
+				(
+					new RECT()
+					{
+						left = 0,
+						top = 0,
+						right = 1920,
+						bottom = 1080
+					},
+					(HMONITOR)2
+				)
 			}
 		);
 	}
 
-	public static void UpdateGetCurrentMonitors(IInternalContext internalCtx, RECT[] monitorRects)
+	public static void UpdateGetCurrentMonitors(IInternalContext internalCtx, (RECT Rect, HMONITOR HMonitor)[] monitors)
 	{
 		internalCtx.CoreNativeManager.ClearSubstitute();
-		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(monitorRects.Length > 1);
-		internalCtx.CoreNativeManager
-			.EnumDisplayMonitors(Arg.Any<SafeHandle>(), Arg.Any<RECT?>(), Arg.Any<MONITORENUMPROC>(), Arg.Any<LPARAM>())
-			.Returns(
-				(callInfo) =>
-				{
-					unsafe
-					{
-						fixed (RECT* monitorRectsPtr = monitorRects)
-						{
-							for (int i = 0; i < monitorRects.Length; i++)
-							{
-								callInfo
-									.ArgAt<MONITORENUMPROC>(2)
-									.Invoke(new HMONITOR(i + 1), (HDC)0, &monitorRectsPtr[i], (LPARAM)0);
-							}
-						}
-					}
+		UpdateMultipleMonitors(internalCtx, monitors);
 
-					return (BOOL)true;
-				}
-			);
-
-		var potentialPrimaryMonitors = monitorRects.Where(r => r.left == 0 && r.top == 0);
+		var potentialPrimaryMonitors = monitors.Select(m => m.Rect).Where(r => r.left == 0 && r.top == 0);
 		if (potentialPrimaryMonitors.Count() != 1)
 		{
 			throw new Exception("No primary monitor found");
 		}
 		RECT primaryRect = potentialPrimaryMonitors.First();
 
-		internalCtx.CoreNativeManager.GetVirtualScreenLeft().Returns(primaryRect.left);
-		internalCtx.CoreNativeManager.GetVirtualScreenTop().Returns(primaryRect.top);
-		internalCtx.CoreNativeManager.GetVirtualScreenWidth().Returns(primaryRect.right - primaryRect.left);
-		internalCtx.CoreNativeManager.GetVirtualScreenHeight().Returns(primaryRect.bottom - primaryRect.top);
+		// The HMONITORs are non-zero
+		foreach ((RECT rect, HMONITOR hMonitor) in monitors)
+		{
+			if (primaryRect.Equals(rect))
+			{
+				internalCtx.CoreNativeManager
+					.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
+					.Returns(hMonitor);
+			}
+
+			internalCtx.CoreNativeManager
+				.GetMonitorInfoEx(hMonitor)
+				.Returns(
+					new MONITORINFOEXW()
+					{
+						monitorInfo = new MONITORINFO()
+						{
+							cbSize = (uint)Marshal.SizeOf<MONITORINFO>(),
+							rcMonitor = rect,
+							rcWork = rect,
+							dwFlags = 0
+						},
+						szDevice = $"DISPLAY {(int)hMonitor}"
+					}
+				);
+		}
+	}
+
+	public static void UpdateMultipleMonitors(IInternalContext internalCtx, (RECT Rect, HMONITOR HMonitor)[] monitors)
+	{
+		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(monitors.Length > 1);
 		internalCtx.CoreNativeManager
-			.GetPrimaryDisplayWorkArea(out RECT _)
+			.EnumDisplayMonitors(Arg.Any<SafeHandle>(), Arg.Any<RECT?>(), Arg.Any<MONITORENUMPROC>(), Arg.Any<LPARAM>())
 			.Returns(
 				(callInfo) =>
 				{
-					callInfo[0] = primaryRect;
+					foreach ((RECT rect, HMONITOR hMonitor) in monitors)
+					{
+						unsafe
+						{
+							callInfo.ArgAt<MONITORENUMPROC>(2).Invoke(hMonitor, (HDC)0, &rect, (LPARAM)0);
+						}
+					}
+
 					return (BOOL)true;
 				}
 			);
-
-		// The HMONITORs are non-zero
-		if (monitorRects.Length > 1)
-		{
-			for (int i = 0; i < monitorRects.Length; i++)
-			{
-				if (primaryRect.Equals(monitorRects[i]))
-				{
-					internalCtx.CoreNativeManager
-						.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
-						.Returns(new HMONITOR(i + 1));
-					continue;
-				}
-
-				internalCtx.CoreNativeManager
-					.GetMonitorInfoEx(new HMONITOR(i + 1))
-					.Returns(
-						new MONITORINFOEXW()
-						{
-							monitorInfo = new MONITORINFO()
-							{
-								rcMonitor = monitorRects[i],
-								rcWork = monitorRects[i],
-								dwFlags = 0
-							},
-							szDevice = $"DISPLAY {i + 1}"
-						}
-					);
-			}
-		}
-		else
-		{
-			internalCtx.CoreNativeManager
-				.MonitorFromPoint(new Point(0, 0), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY)
-				.Returns(new HMONITOR(1));
-		}
 	}
 }
 
@@ -279,8 +262,10 @@ public class MonitorManagerTests
 				right = 1920,
 				bottom = 2160
 			};
-		RECT[] monitorRects = new[] { right, leftTop, leftBottom };
-		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, monitorRects);
+		MonitorManagerCustomization.UpdateGetCurrentMonitors(
+			internalCtx,
+			new[] { (right, (HMONITOR)1), (leftTop, (HMONITOR)2), (leftBottom, (HMONITOR)3) }
+		);
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
@@ -330,7 +315,7 @@ public class MonitorManagerTests
 				right = 1920,
 				bottom = 1080
 			};
-		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { primaryRect });
+		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { (primaryRect, (HMONITOR)1) });
 
 		MonitorManager monitorManager = new(internalCtx);
 		monitorManager.Initialize();
@@ -344,7 +329,10 @@ public class MonitorManagerTests
 				right = 3840,
 				bottom = 1080
 			};
-		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { primaryRect, right });
+		MonitorManagerCustomization.UpdateGetCurrentMonitors(
+			internalCtx,
+			new[] { (primaryRect, (HMONITOR)1), (right, (HMONITOR)2) }
+		);
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
@@ -397,7 +385,7 @@ public class MonitorManagerTests
 				right = 1920,
 				bottom = 1080
 			};
-		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { left });
+		MonitorManagerCustomization.UpdateMultipleMonitors(internalCtx, new[] { (left, (HMONITOR)2) });
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
@@ -419,7 +407,16 @@ public class MonitorManagerTests
 		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
 		Assert.Single(raisedEvent.Arguments.RemovedMonitors);
 
-		RECT[] expectedRemovedRects = new[] { left };
+		RECT[] expectedRemovedRects = new[]
+		{
+			new RECT()
+			{
+				left = 1920,
+				top = 0,
+				right = 3840,
+				bottom = 1080
+			}
+		};
 		raisedEvent.Arguments.RemovedMonitors
 			.Select(m => m.Bounds)
 			.Should()
