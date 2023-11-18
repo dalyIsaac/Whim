@@ -13,6 +13,7 @@ internal class Monitor : IMonitor
 	{
 		_internalContext = internalContext;
 		_hmonitor = monitor;
+		Logger.Fatal($"Updating monitor {_hmonitor}");
 
 		Update(isPrimaryHMonitor);
 	}
@@ -50,9 +51,12 @@ internal class Monitor : IMonitor
 
 		// Get the scale factor.
 		// We assume that monitors have the same DPI in the x and y directions.
-		_internalContext
-			.CoreNativeManager
-			.GetDpiForMonitor(_hmonitor, MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI, out uint effectiveDpiX, out uint _);
+		_internalContext.CoreNativeManager.GetDpiForMonitor(
+			_hmonitor,
+			MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI,
+			out uint effectiveDpiX,
+			out uint _
+		);
 		ScaleFactor = (int)((double)effectiveDpiX / 96 * 100);
 	}
 

@@ -41,6 +41,9 @@ internal class Context : IContext
 
 		NativeManager = new NativeManager(this, _internalContext);
 
+		// Initialize just the logger.
+		Logger.Initialize(FileManager);
+
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, _internalContext);
@@ -74,8 +77,6 @@ internal class Context : IContext
 		doConfig(this);
 
 		// Initialize the managers.
-		Logger.Initialize(FileManager);
-
 		Logger.Debug("Initializing...");
 		_internalContext.PreInitialize();
 		PluginManager.PreInitialize();
