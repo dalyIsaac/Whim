@@ -3,6 +3,27 @@ using System;
 namespace Whim;
 
 /// <summary>
+/// Ways to handle uncaught exceptions.
+/// </summary>
+public enum ExceptionHandling
+{
+	/// <summary>
+	/// Log the error and continue.
+	/// </summary>
+	Log,
+
+	/// <summary>
+	/// Send a notification to the user and continue.
+	/// </summary>
+	Notify,
+
+	/// <summary>
+	/// Shutdown and show the user an error message.
+	/// </summary>
+	Shutdown,
+}
+
+/// <summary>
 /// This is the core of Whim. <br/>
 ///
 /// <c>IContext</c> consists of managers which contain and control Whim's state, and thus
@@ -17,6 +38,11 @@ public interface IContext
 	/// Whim's <see cref="Logger"/> instances.
 	/// </summary>
 	Logger Logger { get; }
+
+	/// <summary>
+	/// How to handle uncaught exceptions. Defaults to <see cref="ExceptionHandling.Log"/>.
+	/// </summary>
+	ExceptionHandling ExceptionHandling { get; set; }
 
 	/// <summary>
 	/// Whim's <see cref="IWorkspaceManager"/> instances.

@@ -16,6 +16,7 @@ internal class Context : IContext
 	private readonly IInternalContext _internalContext;
 	public IFileManager FileManager { get; }
 	public Logger Logger { get; }
+	public ExceptionHandling ExceptionHandling { get; set; } = ExceptionHandling.Log;
 	public INativeManager NativeManager { get; }
 	public IWorkspaceManager WorkspaceManager { get; }
 	public IWindowManager WindowManager { get; }
