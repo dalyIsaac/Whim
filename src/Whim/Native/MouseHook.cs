@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -50,7 +49,6 @@ internal class MouseHook : IMouseHook
 	/// <param name="wParam"></param>
 	/// <param name="lParam"></param>
 	/// <returns></returns>
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private LRESULT LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		switch ((uint)wParam)

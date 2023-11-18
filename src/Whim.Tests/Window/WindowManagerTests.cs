@@ -1617,4 +1617,27 @@ public class WindowManagerTests
 		Assert.Single(windows);
 	}
 	#endregion
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void HandleException(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given an exception is thrown
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		WindowManager windowManager = new(ctx, internalCtx);
+		windowManager.Initialize();
+
+		// When
+		internalCtx
+			.CoreNativeManager
+			.WhenForAnyArgs(x => x.GetWindowThreadProcessId(hwnd, out uint _))
+			.Do(x => throw new Exception());
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		IWindow[] windows = windowManager.ToArray();
+
+		// Then
+		Assert.Empty(windows);
+	}
 }

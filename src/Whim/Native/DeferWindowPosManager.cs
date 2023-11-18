@@ -38,7 +38,7 @@ internal class DeferWindowPosManager : IDeferWindowPosManager
 		for (int i = 0; i < stackTrace.FrameCount; i++)
 		{
 			StackFrame? frame = stackTrace.GetFrame(i);
-			if (frame?.GetMethod() == typeof(WindowManager).GetMethod(nameof(WindowManager.WindowsEventHook)))
+			if (frame?.GetMethod() == typeof(WindowManager).GetMethod(nameof(WindowManager.WinEventProcWrapper)))
 			{
 				entryCount++;
 

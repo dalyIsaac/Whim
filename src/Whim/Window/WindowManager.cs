@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -228,7 +227,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// <param name="idChild"></param>
 	/// <param name="_idEventThread"></param>
 	/// <param name="_dwmsEventTime"></param>
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void WinEventProc(
 		HWINEVENTHOOK _hWinEventHook,
 		uint eventType,

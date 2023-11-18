@@ -167,6 +167,29 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
+	internal void HandleException(IInternalContext internalCtx)
+	{
+		// Given
+		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
+		System.Drawing.Point point = new(1, 2);
+		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
+		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns(msllhookstruct);
+		using MouseHook mouseHook = new(internalCtx);
+
+		mouseHook.PostInitialize();
+
+		// When
+		internalCtx
+			.CoreNativeManager
+			.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>())
+			.Returns(_ => throw new System.Exception("Test exception"));
+		capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1);
+
+		// The
+		Assert.Equal(0, capture.Handle?.Calls);
+	}
+
+	[Theory, AutoSubstituteData]
 	internal void Dispose(IInternalContext internalCtx)
 	{
 		// Given
