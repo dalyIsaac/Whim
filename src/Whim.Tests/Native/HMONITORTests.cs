@@ -37,6 +37,20 @@ public class HMONITORTests
 		Assert.Equal(expected, result);
 	}
 
+	[Fact]
+	public void Equals_Method_Object()
+	{
+		// Given
+		HMONITOR hmonitor = new(1);
+		object obj = "1";
+
+		// When
+		bool result = hmonitor.Equals(obj);
+
+		// Then
+		Assert.False(result);
+	}
+
 	[Theory]
 	[InlineData(1, 1, false)]
 	[InlineData(1, 2, true)]
@@ -64,5 +78,18 @@ public class HMONITORTests
 
 		// Then
 		Assert.Equal("0x00012345", result);
+	}
+
+	[Fact]
+	public void Test_GetHashCode()
+	{
+		// Given
+		HMONITOR hmonitor = new(1);
+
+		// When
+		int result = hmonitor.GetHashCode();
+
+		// Then
+		Assert.Equal(1, result);
 	}
 }

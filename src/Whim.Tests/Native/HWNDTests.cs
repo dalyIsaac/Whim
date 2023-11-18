@@ -1,3 +1,4 @@
+using System;
 using Windows.Win32.Foundation;
 using Xunit;
 
@@ -49,6 +50,20 @@ public class HWNDTests
 		Assert.Equal(expected, result);
 	}
 
+	[Fact]
+	public void Equals_Method_Object()
+	{
+		// Given
+		HWND hwnd = new(1);
+		object obj = "1";
+
+		// When
+		bool result = hwnd.Equals(obj);
+
+		// Then
+		Assert.False(result);
+	}
+
 	[Theory]
 	[InlineData(1, 1, true)]
 	[InlineData(1, 2, false)]
@@ -86,6 +101,19 @@ public class HWNDTests
 	{
 		// Given
 		HWND hwnd = new(0x12345);
+
+		// When
+		string result = hwnd.ToString();
+
+		// Then
+		Assert.Equal("0x00012345", result);
+	}
+
+	[Fact]
+	public void CreateFromIntPtr()
+	{
+		// Given
+		HWND hwnd = (HWND)new IntPtr(0x12345);
 
 		// When
 		string result = hwnd.ToString();
