@@ -1,12 +1,8 @@
 using System;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
@@ -323,7 +319,7 @@ public class WindowManagerTests
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.CHILDID_SELF, 0, null)]
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 	[Theory]
-	internal void WindowsEventHook_IsEventWindowValid_False(
+	internal void WinEventProc_IsEventWindowValid_False(
 		int idObject,
 		int idChild,
 		int? hwndValue,
@@ -360,7 +356,7 @@ public class WindowManagerTests
 	[InlineAutoSubstituteData<WindowManagerCustomization>(false, false, false, true)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(false, false, true, false)]
 	[Theory]
-	internal void WindowsEventHook_AddWindow_Fail(
+	internal void WinEventProc_AddWindow_Fail(
 		bool isSplashScreen,
 		bool isCloakedWindow,
 		bool isStandardWindow,
@@ -388,7 +384,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_CreateWindow_Null(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_CreateWindow_Null(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -414,7 +410,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_IgnoreWindow(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_IgnoreWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -437,7 +433,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_WindowIsMinimized(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_WindowIsMinimized(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -463,7 +459,7 @@ public class WindowManagerTests
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_UNCLOAKED)]
 	[Theory]
-	internal void WindowsEventHook_OnWindowFocused(uint eventType, IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowFocused(uint eventType, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -490,11 +486,7 @@ public class WindowManagerTests
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_UNCLOAKED)]
 	[Theory]
-	internal void WindowsEventHook_OnWindowFocused_IgnoredWindow(
-		uint eventType,
-		IContext ctx,
-		IInternalContext internalCtx
-	)
+	internal void WinEventProc_OnWindowFocused_IgnoredWindow(uint eventType, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -523,7 +515,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowHidden_IgnoreWindow(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowHidden_IgnoreWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -543,7 +535,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowHidden(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowHidden(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -569,7 +561,7 @@ public class WindowManagerTests
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_DESTROY)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_CLOAKED)]
 	[Theory]
-	internal void WindowsEventHook_OnWindowRemoved(uint eventType, IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowRemoved(uint eventType, IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -595,7 +587,7 @@ public class WindowManagerTests
 
 	#region OnWindowMoveStart
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoveStart(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
+	internal void WinEventProc_OnWindowMoveStart(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -630,7 +622,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoveStart_GetCursorPos(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMoveStart_GetCursorPos(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -659,7 +651,7 @@ public class WindowManagerTests
 	[MemberData(nameof(MoveEdgesSuccessData))]
 #pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameter
-	internal void WindowsEventHook_OnWindowMoveStart_MovedEdges(
+	internal void WinEventProc_OnWindowMoveStart_MovedEdges(
 		ILocation<int> originalLocation,
 		ILocation<int> newLocation,
 		Direction _direction,
@@ -729,7 +721,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise_ProcessFileNameIsNull(
+	internal void WinEventProc_OnWindowMoved_DoesNotRaise_ProcessFileNameIsNull(
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -751,7 +743,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise_WindowDoesNotRestore(
+	internal void WinEventProc_OnWindowMoved_DoesNotRaise_WindowDoesNotRestore(
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -796,7 +788,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal async void WindowsEventHook_OnWindowMoved_Raises_CannotFindWorkspaceForWindow(
+	internal async void WinEventProc_OnWindowMoved_Raises_CannotFindWorkspaceForWindow(
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -825,7 +817,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal async void WindowsEventHook_OnWindowMoved_Raises_DoLayout(IContext ctx, IInternalContext internalCtx)
+	internal async void WinEventProc_OnWindowMoved_Raises_DoLayout(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the window is registered as restoring, and a workspace is found for it
 		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
@@ -850,7 +842,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal async void WindowsEventHook_OnWindowMoved_DoesNotRaise_WindowAlreadyHandled(
+	internal async void WinEventProc_OnWindowMoved_DoesNotRaise_WindowAlreadyHandled(
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -876,7 +868,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal async void WindowsEventHook_OnWindowMoved_WindowGetsRemoved(IContext ctx, IInternalContext internalCtx)
+	internal async void WinEventProc_OnWindowMoved_WindowGetsRemoved(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the window has been been handled, but is removed
 		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
@@ -900,7 +892,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMoved_DoesNotRaise(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -921,7 +913,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoved_DoesNotRaise_MouseIsUp(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMoved_DoesNotRaise_MouseIsUp(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the window has not had OnWindowMoveStart called
 		HWND hwnd = new(1);
@@ -945,7 +937,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoved_GetCursorPos(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMoved_GetCursorPos(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -973,7 +965,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoved(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
+	internal void WinEventProc_OnWindowMoved(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
@@ -1015,7 +1007,7 @@ public class WindowManagerTests
 	#endregion
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMinimizeStart(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMinimizeStart(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -1039,7 +1031,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMinimizeEnd(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMinimizeEnd(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -1064,7 +1056,7 @@ public class WindowManagerTests
 
 	#region OnWindowMoveEnd
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoveEnd_WindowNotMoving(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMoveEnd_WindowNotMoving(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -1083,7 +1075,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_NoWorkspace(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMoveEnd_GetMovedEdges_NoWorkspace(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -1105,7 +1097,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_DoesNotContainWindowState(
+	internal void WinEventProc_OnWindowMoveEnd_GetMovedEdges_DoesNotContainWindowState(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IWorkspace workspace
@@ -1142,7 +1134,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoveEnd_MoveWindowToPoint(
+	internal void WinEventProc_OnWindowMoveEnd_MoveWindowToPoint(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IWorkspace workspace
@@ -1179,7 +1171,7 @@ public class WindowManagerTests
 	#endregion
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoved_GetMovedEdges_CannotGetNewWindowLocation(
+	internal void WinEventProc_OnWindowMoved_GetMovedEdges_CannotGetNewWindowLocation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IWorkspace workspace
@@ -1220,7 +1212,7 @@ public class WindowManagerTests
 	[InlineAutoSubstituteData<WindowManagerCustomization>(0, 1, 1, 0)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(1, 1, 1, 1)]
 	[Theory]
-	internal void WindowsEventHook_OnWindowMoveEnd_GetMovedEdges_MoveTooManyEdges(
+	internal void WinEventProc_OnWindowMoveEnd_GetMovedEdges_MoveTooManyEdges(
 		int newX,
 		int newY,
 		int newWidth,
@@ -1350,7 +1342,7 @@ public class WindowManagerTests
 
 	[Theory]
 	[MemberData(nameof(MoveEdgesSuccessData))]
-	internal void WindowsEventHook_OnWindowMoveEnd_Success(
+	internal void WinEventProc_OnWindowMoveEnd_Success(
 		ILocation<int> originalLocation,
 		ILocation<int> newLocation,
 		Direction direction,
@@ -1399,7 +1391,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_OnWindowMoveEnd_GetCursorPos(
+	internal void WinEventProc_OnWindowMoveEnd_GetCursorPos(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IWorkspace workspace
@@ -1459,7 +1451,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WindowsEventHook_InvalidEvent(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_InvalidEvent(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
