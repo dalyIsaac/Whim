@@ -13,6 +13,7 @@ internal class Monitor : IMonitor
 	{
 		_internalContext = internalContext;
 		_hmonitor = monitor;
+		Logger.Fatal($"Updating monitor {_hmonitor}");
 
 		Update(isPrimaryHMonitor);
 	}

@@ -9,34 +9,39 @@ namespace Windows.Win32
 		/// A handle to a window.
 		/// </summary>
 		[DebuggerDisplay("{Value}")]
-		public readonly record struct HWND
+		public readonly struct HWND : IEquatable<HWND>
 		{
 			internal readonly IntPtr Value;
 
-			/// <summary>
-			/// Creates a new <see cref="HWND"/> from a <see cref="IntPtr"/>.
-			/// </summary>
-			/// <param name="value"></param>
-			public HWND(IntPtr value) => Value = value;
+			internal HWND(IntPtr value) => Value = value;
 
-			/// <summary>
-			/// Creates a <see langword="null"/> value.
-			/// </summary>
-			public static HWND Null => default;
+			internal static HWND Null => default;
 
-			/// <summary>
-			/// Whether this <see cref="HWND"/> has a <see langword="null"/> value.
-			/// </summary>
-			public bool IsNull => Value == default;
+			internal bool IsNull => Value == default;
 
-			/// <inheritdoc/>
+			/// <inheritdoc />
 			public static implicit operator IntPtr(HWND value) => value.Value;
 
-			/// <inheritdoc/>
+			/// <inheritdoc />
 			public static explicit operator HWND(IntPtr value) => new(value);
 
-			/// <inheritdoc/>
-			public override string ToString() => Value.ToString();
+			/// <inheritdoc />
+			public static bool operator ==(HWND left, HWND right) => left.Value == right.Value;
+
+			/// <inheritdoc />
+			public static bool operator !=(HWND left, HWND right) => !(left == right);
+
+			/// <inheritdoc />
+			public bool Equals(HWND other) => Value == other.Value;
+
+			/// <inheritdoc />
+			public override bool Equals(object? obj) => obj is HWND other && Equals(other);
+
+			/// <inheritdoc />
+			public override int GetHashCode() => Value.GetHashCode();
+
+			/// <inheritdoc />
+			public override string ToString() => $"0x{Value:X8}";
 		}
 	}
 }
