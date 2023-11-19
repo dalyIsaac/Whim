@@ -89,7 +89,18 @@ public interface IWorkspace : IDisposable
 	/// If the window is not in the workspace, or the workspace is not focused,
 	/// <c>null</c> is returned.
 	/// </returns>
+	[Obsolete("Use TryGetWindowState instead.")]
 	IWindowState? TryGetWindowLocation(IWindow window);
+
+	/// <summary>
+	/// Gets the current state (as of the last <see cref="DoLayout"/>) of the window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns>
+	/// If the window is not in the workspace, or the workspace is not active,
+	/// <c>null</c> is returned.
+	/// </returns>
+	IWindowState? TryGetWindowState(IWindow window);
 
 	/// <summary>
 	/// Focuses on the first window in the workspace.

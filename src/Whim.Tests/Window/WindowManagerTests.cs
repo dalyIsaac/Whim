@@ -604,7 +604,7 @@ public class WindowManagerTests
 				}
 			);
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
-		workspace.TryGetWindowLocation(Arg.Any<IWindow>()).Returns((IWindowState?)null);
+		workspace.TryGetWindowState(Arg.Any<IWindow>()).Returns((IWindowState?)null);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -674,7 +674,7 @@ public class WindowManagerTests
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.TryGetWindowLocation(Arg.Any<IWindow>())
+			.TryGetWindowState(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
@@ -977,7 +977,7 @@ public class WindowManagerTests
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.TryGetWindowLocation(Arg.Any<IWindow>())
+			.TryGetWindowState(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
@@ -1109,7 +1109,7 @@ public class WindowManagerTests
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
-		workspace.TryGetWindowLocation(Arg.Any<IWindow>()).Returns((IWindowState?)null);
+		workspace.TryGetWindowState(Arg.Any<IWindow>()).Returns((IWindowState?)null);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1126,7 +1126,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		workspace.Received(1).TryGetWindowLocation(Arg.Any<IWindow>());
+		workspace.Received(1).TryGetWindowState(Arg.Any<IWindow>());
 		ctx.NativeManager.DidNotReceive().DwmGetWindowLocation(Arg.Any<HWND>());
 		internalCtx.CoreNativeManager.Received(1).GetCursorPos(out IPoint<int> _);
 		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
@@ -1146,7 +1146,7 @@ public class WindowManagerTests
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
-		workspace.TryGetWindowLocation(Arg.Any<IWindow>()).Returns((IWindowState?)null);
+		workspace.TryGetWindowState(Arg.Any<IWindow>()).Returns((IWindowState?)null);
 		internalCtx.CoreNativeManager.GetCursorPos(out IPoint<int> _).Returns((BOOL)true);
 
 		WindowManager windowManager = new(ctx, internalCtx);
@@ -1164,7 +1164,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		workspace.Received(1).TryGetWindowLocation(Arg.Any<IWindow>());
+		workspace.Received(1).TryGetWindowState(Arg.Any<IWindow>());
 		internalCtx.CoreNativeManager.Received(1).GetCursorPos(out IPoint<int> _);
 		ctx.WorkspaceManager.Received(1).MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 	}
@@ -1185,7 +1185,7 @@ public class WindowManagerTests
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.TryGetWindowLocation(Arg.Any<IWindow>())
+			.TryGetWindowState(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
@@ -1239,7 +1239,7 @@ public class WindowManagerTests
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.TryGetWindowLocation(Arg.Any<IWindow>())
+			.TryGetWindowState(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
@@ -1363,7 +1363,7 @@ public class WindowManagerTests
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.TryGetWindowLocation(Arg.Any<IWindow>())
+			.TryGetWindowState(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
@@ -1405,7 +1405,7 @@ public class WindowManagerTests
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
-			.TryGetWindowLocation(Arg.Any<IWindow>())
+			.TryGetWindowState(Arg.Any<IWindow>())
 			.Returns(
 				new WindowState()
 				{
