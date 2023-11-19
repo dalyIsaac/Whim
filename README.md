@@ -337,3 +337,9 @@ The Whim repository includes a `.vscode` directory with a [`launch.json`](.vscod
 Tasks to build, test, and format XAML can be found in [`tasks.json`](.vscode/tasks.json).
 
 To see the recommended extensions, open the Command Palette and run `Extensions: Show Recommended Extensions`.
+
+### Unhandled Exception Handling
+
+`IContext` has an `UncaughtExceptionHandling` property to specify how to handle uncaught exceptions. When developing, it's recommended to set this to `UncaughtExceptionHandling.Shutdown` to shutdown Whim when an uncaught exception occurs. This will make it easier to debug the exception.
+
+All uncaught exceptions will be logged as `Fatal`.
