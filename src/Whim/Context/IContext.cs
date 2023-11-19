@@ -100,6 +100,8 @@ public interface IContext
 
 	/// <summary>
 	/// Handles an uncaught exception, according to <see cref="UncaughtExceptionHandling"/>.
+	/// Place this in a <c>catch</c> block where re-entry can occur - for example, in a
+	/// Win32 hook.
 	/// </summary>
 	/// <param name="procName"></param>
 	/// <param name="exception"></param>
