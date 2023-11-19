@@ -330,6 +330,10 @@ Visual Studio 2022 is the easiest way to get started with working on Whim. Check
 - [CSharpier](https://marketplace.visualstudio.com/items?itemName=csharpier.CSharpier)
 - [XAML Styler for Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=TeamXavalon.XAMLStyler2022)
 
+> [!WARNING]
+>
+> Windows App SDK 1.4 introduced a bug which causes Visual Studio to crash Whim when debugging. Make sure to apply the workaround from <https://github.com/microsoft/microsoft-ui-xaml/issues/9008#issuecomment-1773734685/>.
+
 ### Visual Studio Code
 
 The Whim repository includes a `.vscode` directory with a [`launch.json`](.vscode/launch.json) file. This file contains a `Launch Whim.Runner` configuration which can be used to debug Whim in Visual Studio Code. Unfortunately tests do not appear in Visual Studio Code's Test Explorer.

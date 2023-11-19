@@ -3,9 +3,6 @@ changelog:
     labels:
       - "whim version"
 
-    authors:
-      - dependabot
-
   categories:
     - title: Documentation 📄
       labels:
