@@ -51,14 +51,16 @@ public class CommandManagerTests
 		Assert.Single(commandManager);
 	}
 
-	[Fact]
-	public void Add()
+	[Theory]
+	[InlineData("command")]
+	[InlineData("whim.custom.command")]
+	public void Add(string identifier)
 	{
 		// Given
 		CommandManager commandManager = new();
 
 		// When
-		commandManager.Add("command", "title", () => { });
+		commandManager.Add(identifier, "title", () => { });
 
 		// Then
 		ICommand? command = commandManager.TryGetCommand("whim.custom.command");

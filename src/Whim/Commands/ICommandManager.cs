@@ -9,9 +9,14 @@ namespace Whim;
 public interface ICommandManager : IEnumerable<ICommand>
 {
 	/// <summary>
+	/// The prefix for all custom commands.
+	/// </summary>
+	const string CustomCommandPrefix = "whim.custom";
+
+	/// <summary>
 	/// Gets the number of commands in the manager.
 	/// </summary>
-	public int Count { get; }
+	int Count { get; }
 
 	/// <summary>
 	/// Adds a new user-defined command to the manager.
@@ -31,12 +36,12 @@ public interface ICommandManager : IEnumerable<ICommand>
 	/// executed.
 	/// If this is null, the command will always be accessible.
 	/// </param>
-	public void Add(string identifier, string title, Action callback, Func<bool>? condition = null);
+	void Add(string identifier, string title, Action callback, Func<bool>? condition = null);
 
 	/// <summary>
 	/// Tries to get the command with the given identifier.
 	/// </summary>
 	/// <param name="commandId">The identifier of the command to get</param>
 	/// <returns>The command with the given identifier, or null if not found.</returns>
-	public ICommand? TryGetCommand(string commandId);
+	ICommand? TryGetCommand(string commandId);
 }
