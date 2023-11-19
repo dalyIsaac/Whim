@@ -5,7 +5,7 @@ namespace Whim.Runner;
 /// <summary>
 /// Exposes the exception encountered during startup to the user.
 /// </summary>
-public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
+public sealed partial class ExceptionWindow : Microsoft.UI.Xaml.Window
 {
 	private readonly App _app;
 
@@ -19,7 +19,7 @@ public sealed partial class StartupExceptionWindow : Microsoft.UI.Xaml.Window
 	/// </summary>
 	/// <param name="app"></param>
 	/// <param name="exitEventArgs"></param>
-	public StartupExceptionWindow(App app, ExitEventArgs exitEventArgs)
+	public ExceptionWindow(App app, ExitEventArgs exitEventArgs)
 	{
 		InitializeComponent();
 		_app = app;

@@ -66,7 +66,7 @@ public partial class App : Application
 		}
 		else
 		{
-			new StartupExceptionWindow(this, e).Activate();
+			new ExceptionWindow(this, e).Activate();
 		}
 	}
 
@@ -74,6 +74,8 @@ public partial class App : Application
 	{
 		Logger.Error(e.Exception.ToString());
 		e.Handled = true;
+
+		_context?.HandleUncaughtException("App", e.Exception);
 
 #if DEBUG
 		_context?.Exit();

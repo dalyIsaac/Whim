@@ -24,7 +24,7 @@ internal class InternalContext : IInternalContext
 		CoreNativeManager = new CoreNativeManager(context);
 		WindowMessageMonitor = new WindowMessageMonitor(context, this);
 		KeybindHook = new KeybindHook(context, this);
-		MouseHook = new MouseHook(this);
+		MouseHook = new MouseHook(context, this);
 		DeferWindowPosManager = new DeferWindowPosManager(context, this);
 	}
 

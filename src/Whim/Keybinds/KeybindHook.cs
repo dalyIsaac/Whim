@@ -21,7 +21,7 @@ internal class KeybindHook : IKeybindHook
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_lowLevelKeyboardProc = LowLevelKeyboardProc;
+		_lowLevelKeyboardProc = LowLevelKeyboardProcWrapper;
 	}
 
 	public void PostInitialize()
@@ -30,6 +30,19 @@ internal class KeybindHook : IKeybindHook
 		_unhookKeyboardHook = _internalContext
 			.CoreNativeManager
 			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, _lowLevelKeyboardProc, null, 0);
+	}
+
+	private LRESULT LowLevelKeyboardProcWrapper(int nCode, WPARAM wParam, LPARAM lParam)
+	{
+		try
+		{
+			return LowLevelKeyboardProc(nCode, wParam, lParam);
+		}
+		catch (Exception e)
+		{
+			_context.HandleUncaughtException(nameof(LowLevelKeyboardProc), e);
+			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		}
 	}
 
 	/// <summary>

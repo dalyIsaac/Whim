@@ -262,3 +262,6 @@ dotnet_diagnostic.IDE0045.severity = silent
 
 # IDE0055: Fix formatting
 dotnet_diagnostic.IDE0055.severity = none
+
+# IDE0060: Remove unused parameters
+dotnet_diagnostic.IDE0060.severity = none

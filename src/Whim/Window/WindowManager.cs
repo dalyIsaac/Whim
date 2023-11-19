@@ -58,7 +58,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_hookDelegate = new WINEVENTPROC(WindowsEventHook);
+		_hookDelegate = new WINEVENTPROC(WinEventProcWrapper);
 
 		FilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
 	}
@@ -197,19 +197,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		// The handle is not null.
 		&& hwnd != null;
 
-	/// <summary>
-	/// Event hook for <see cref="ICoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>. <br />
-	///
-	/// For more, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
-	/// </summary>
-	/// <param name="hWinEventHook"></param>
-	/// <param name="eventType"></param>
-	/// <param name="hwnd"></param>
-	/// <param name="idObject"></param>
-	/// <param name="idChild"></param>
-	/// <param name="idEventThread"></param>
-	/// <param name="dwmsEventTime"></param>
-	internal void WindowsEventHook(
+	internal void WinEventProcWrapper(
 		HWINEVENTHOOK hWinEventHook,
 		uint eventType,
 		HWND hwnd,
@@ -217,6 +205,38 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		int idChild,
 		uint idEventThread,
 		uint dwmsEventTime
+	)
+	{
+		try
+		{
+			WinEventProc(hWinEventHook, eventType, hwnd, idObject, idChild, idEventThread, dwmsEventTime);
+		}
+		catch (Exception e)
+		{
+			_context.HandleUncaughtException(nameof(WinEventProc), e);
+		}
+	}
+
+	/// <summary>
+	/// Event hook for <see cref="ICoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>. <br />
+	///
+	/// For more, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
+	/// </summary>
+	/// <param name="_hWinEventHook"></param>
+	/// <param name="eventType"></param>
+	/// <param name="hwnd"></param>
+	/// <param name="idObject"></param>
+	/// <param name="idChild"></param>
+	/// <param name="_idEventThread"></param>
+	/// <param name="_dwmsEventTime"></param>
+	private void WinEventProc(
+		HWINEVENTHOOK _hWinEventHook,
+		uint eventType,
+		HWND hwnd,
+		int idObject,
+		int idChild,
+		uint _idEventThread,
+		uint _dwmsEventTime
 	)
 	{
 		if (!IsEventWindowValid(idObject, idChild, hwnd))
