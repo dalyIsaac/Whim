@@ -183,7 +183,11 @@ public class MouseHookTests
 			.CoreNativeManager
 			.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>())
 			.Returns(_ => throw new System.Exception("Test exception"));
-		capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1);
+		CustomAssert.DoesNotRaise<MouseEventArgs>(
+			h => mouseHook.MouseLeftButtonDown += h,
+			h => mouseHook.MouseLeftButtonDown -= h,
+			() => capture.MouseHook!.Invoke(0, (WPARAM)PInvoke.WM_LBUTTONDOWN, 1)
+		);
 
 		// The
 		Assert.Equal(0, capture.Handle?.Calls);
