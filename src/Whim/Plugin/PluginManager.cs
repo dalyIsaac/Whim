@@ -90,8 +90,10 @@ internal partial class PluginManager : IPluginManager
 	{
 		switch (plugin.Name)
 		{
-			case "whim.custom":
-				throw new InvalidOperationException("Name 'whim.custom' is reserved for user-defined commands.");
+			case ICommandManager.CustomCommandPrefix:
+				throw new InvalidOperationException(
+					$"Name '{ICommandManager.CustomCommandPrefix}' is reserved for user-defined commands."
+				);
 			case "whim":
 				throw new InvalidOperationException("Name 'whim' is reserved for internal use.");
 			case string name when Contains(name):
