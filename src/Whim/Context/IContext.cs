@@ -13,11 +13,6 @@ public enum UncaughtExceptionHandling
 	Log,
 
 	/// <summary>
-	/// Send a notification to the user and continue.
-	/// </summary>
-	Notify,
-
-	/// <summary>
 	/// Shutdown and show the user an error message.
 	/// </summary>
 	Shutdown

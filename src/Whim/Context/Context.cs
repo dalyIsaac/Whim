@@ -99,10 +99,6 @@ internal class Context : IContext
 
 		switch (UncaughtExceptionHandling)
 		{
-			case UncaughtExceptionHandling.Notify:
-				// TODO
-				throw new NotImplementedException();
-
 			case UncaughtExceptionHandling.Shutdown:
 				Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = exception.ToString() });
 				break;
