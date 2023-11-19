@@ -45,11 +45,11 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void PostInitialize(IInternalContext internalCtx)
+	internal void PostInitialize(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
@@ -59,11 +59,11 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMouseTriggerEvent_LParamIsZero(IInternalContext internalCtx)
+	internal void OnMouseTriggerEvent_LParamIsZero(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
@@ -77,12 +77,12 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMouseTriggerEvent_NotMSLLHOOKSTRUCT(IInternalContext internalCtx)
+	internal void OnMouseTriggerEvent_NotMSLLHOOKSTRUCT(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
 		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns((MSLLHOOKSTRUCT?)null);
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
@@ -96,14 +96,14 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMouseTriggerEvent_Success_WM_LBUTTONDOWN(IInternalContext internalCtx)
+	internal void OnMouseTriggerEvent_Success_WM_LBUTTONDOWN(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
 		System.Drawing.Point point = new(1, 2);
 		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
 		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns(msllhookstruct);
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
@@ -119,14 +119,14 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMouseTriggerEvent_Success_WM_LBUTTONUP(IInternalContext internalCtx)
+	internal void OnMouseTriggerEvent_Success_WM_LBUTTONUP(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
 		System.Drawing.Point point = new(1, 2);
 		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
 		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns(msllhookstruct);
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
@@ -142,12 +142,12 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OtherKey(IInternalContext internalCtx)
+	internal void OtherKey(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
 		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns(new MSLLHOOKSTRUCT());
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 
 		// When
 		mouseHook.PostInitialize();
@@ -167,14 +167,14 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void HandleException(IInternalContext internalCtx)
+	internal void HandleException(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
 		System.Drawing.Point point = new(1, 2);
 		MSLLHOOKSTRUCT msllhookstruct = new() { pt = point };
 		internalCtx.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>()).Returns(msllhookstruct);
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 
 		mouseHook.PostInitialize();
 
@@ -190,11 +190,11 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void Dispose(IInternalContext internalCtx)
+	internal void Dispose(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 		mouseHook.PostInitialize();
 
 		// When
@@ -205,11 +205,11 @@ public class MouseHookTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void AlreadyDisposed(IInternalContext internalCtx)
+	internal void AlreadyDisposed(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureMouseHook capture = CaptureMouseHook.Create(internalCtx);
-		using MouseHook mouseHook = new(internalCtx);
+		using MouseHook mouseHook = new(ctx, internalCtx);
 		mouseHook.PostInitialize();
 		mouseHook.Dispose();
 
