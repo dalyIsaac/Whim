@@ -898,7 +898,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void TryGetWindowLocation(
+	internal void TryGetWindowState(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -908,34 +908,34 @@ public class WorkspaceTests
 	)
 	{
 		// Given
+		IWindowState expectedWindowState = new WindowState()
+		{
+			Location = new Location<int>(),
+			Window = window,
+			WindowSize = WindowSize.Normal
+		};
 		layoutEngine.AddWindow(window).Returns(resultingEngine);
 		resultingEngine
 			.DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>())
-			.Returns(
-				new WindowState[]
-				{
-					new()
-					{
-						Location = new Location<int>(),
-						Window = window,
-						WindowSize = WindowSize.Normal
-					}
-				}
-			);
+			.Returns(new IWindowState[] { expectedWindowState });
 
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		workspace.AddWindow(window);
 
-		// When TryGetWindowLocation is called
-		IWindowState? result = workspace.TryGetWindowLocation(window);
+		// When TryGetWindowState is called
+		IWindowState? result = workspace.TryGetWindowState(window);
+		IWindowState? result2 = workspace.TryGetWindowLocation(window);
 
 		// Then the result is as expected
 		Assert.NotNull(result);
+		Assert.Equal(expectedWindowState, result);
+
+		Assert.Equal(result, result2);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void TryGetWindowLocation_MinimizedWindow(
+	internal void TryGetWindowState_MinimizedWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -950,7 +950,7 @@ public class WorkspaceTests
 		// When
 		workspace.AddWindow(window);
 		workspace.WindowMinimizeStart(window);
-		IWindowState windowState = workspace.TryGetWindowLocation(window)!;
+		IWindowState windowState = workspace.TryGetWindowState(window)!;
 
 		// Then
 		Assert.Equal(window, windowState.Window);

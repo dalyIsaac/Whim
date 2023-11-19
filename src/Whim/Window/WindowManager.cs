@@ -491,7 +491,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			return null;
 		}
 
-		IWindowState? windowState = workspace.TryGetWindowLocation(window);
+		IWindowState? windowState = workspace.TryGetWindowState(window);
 		if (windowState is null)
 		{
 			Logger.Debug($"Could not find window state for window {window}, failed to move window edges");

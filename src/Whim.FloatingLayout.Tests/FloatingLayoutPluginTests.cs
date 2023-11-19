@@ -131,7 +131,7 @@ public class FloatingLayoutPluginTests
 			};
 
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace.TryGetWindowLocation(window).Returns(windowState);
+		activeWorkspace.TryGetWindowState(window).Returns(windowState);
 		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
 
 		FloatingLayoutPlugin plugin = CreateSut(context);
@@ -198,7 +198,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace.TryGetWindowLocation(window).Returns((IWindowState?)null);
+		activeWorkspace.TryGetWindowState(window).Returns((IWindowState?)null);
 
 		FloatingLayoutPlugin plugin = CreateSut(context);
 
@@ -215,7 +215,7 @@ public class FloatingLayoutPluginTests
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
-			.TryGetWindowLocation(window)
+			.TryGetWindowState(window)
 			.Returns(
 				new WindowState()
 				{
@@ -258,7 +258,7 @@ public class FloatingLayoutPluginTests
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
-			.TryGetWindowLocation(window)
+			.TryGetWindowState(window)
 			.Returns(
 				new WindowState()
 				{
@@ -300,7 +300,7 @@ public class FloatingLayoutPluginTests
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
-			.TryGetWindowLocation(window)
+			.TryGetWindowState(window)
 			.Returns(
 				new WindowState()
 				{
@@ -326,7 +326,7 @@ public class FloatingLayoutPluginTests
 		// Given
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
-			.TryGetWindowLocation(window)
+			.TryGetWindowState(window)
 			.Returns(
 				new WindowState()
 				{
@@ -406,7 +406,7 @@ public class FloatingLayoutPluginTests
 		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
-			.TryGetWindowLocation(window)
+			.TryGetWindowState(window)
 			.Returns(
 				new WindowState()
 				{
@@ -451,7 +451,7 @@ public class FloatingLayoutPluginTests
 
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
-			.TryGetWindowLocation(window)
+			.TryGetWindowState(window)
 			.Returns(
 				new WindowState()
 				{

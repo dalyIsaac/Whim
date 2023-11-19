@@ -481,7 +481,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_windowLocations.Clear();
 	}
 
-	public IWindowState? TryGetWindowLocation(IWindow window)
+	public IWindowState? TryGetWindowLocation(IWindow window) => TryGetWindowState(window);
+
+	public IWindowState? TryGetWindowState(IWindow window)
 	{
 		_windowLocations.TryGetValue(window.Handle, out IWindowState? location);
 

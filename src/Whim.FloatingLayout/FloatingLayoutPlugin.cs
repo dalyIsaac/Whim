@@ -62,7 +62,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 			return;
 		}
 
-		if (workspace.TryGetWindowLocation(window) is not IWindowState windowState)
+		if (workspace.TryGetWindowState(window) is not IWindowState windowState)
 		{
 			Logger.Error($"Could not get location for window {window}");
 			return;
