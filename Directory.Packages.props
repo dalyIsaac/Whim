@@ -28,6 +28,6 @@
 		<PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.16" />
 		<PackageVersion Include="xunit" Version="2.6.1" />
 		<PackageVersion Include="xunit.analyzers" Version="1.4.0" />
-		<PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
+		<PackageVersion Include="xunit.runner.visualstudio" Version="2.5.4" />
 	</ItemGroup>
 </Project>
