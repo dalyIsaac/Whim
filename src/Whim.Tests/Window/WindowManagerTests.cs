@@ -649,7 +649,6 @@ public class WindowManagerTests
 
 	[Theory]
 	[MemberData(nameof(MoveEdgesSuccessData))]
-#pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameter
 	internal void WinEventProc_OnWindowMoveStart_MovedEdges(
 		ILocation<int> originalLocation,
@@ -658,7 +657,6 @@ public class WindowManagerTests
 		IPoint<int> _pixelsDelta
 	)
 #pragma warning restore xUnit1026 // Theory methods should use all of their parameters
-#pragma warning restore IDE0060 // Remove unused parameter
 	{
 		// Given
 		IContext ctx = Substitute.For<IContext>();
