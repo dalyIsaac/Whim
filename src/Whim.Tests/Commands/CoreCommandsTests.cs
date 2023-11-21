@@ -195,6 +195,42 @@ public class CoreCommandsTests
 		context.WorkspaceManager.Received(1).MoveWindowToNextMonitor(null);
 	}
 
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void MaximizeWindow(IContext context, IWindow window)
+	{
+		// Given
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+
+		ICommand command = testUtils.GetCommand("whim.core.maximize_window");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		window.Received(1).ShowMaximized();
+	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void MinimizeWindow(IContext context, IWindow window)
+	{
+		// Given
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+
+		ICommand command = testUtils.GetCommand("whim.core.minimize_window");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		window.Received(1).ShowMinimized();
+	}
+
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_previous_monitor")]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_next_monitor")]
 	[Theory]
