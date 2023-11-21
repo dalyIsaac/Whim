@@ -67,12 +67,13 @@ internal class KeybindManager : IKeybindManager
 			_keybindsCommandsMap[existingKeybind].Remove(commandId);
 		}
 
-		if (!_keybindsCommandsMap.ContainsKey(keybind))
+		if (!_keybindsCommandsMap.TryGetValue(keybind, out List<string>? value))
 		{
-			_keybindsCommandsMap.Add(keybind, new List<string>());
+			value = new List<string>();
+			_keybindsCommandsMap.Add(keybind, value);
 		}
 
-		_keybindsCommandsMap[keybind].Add(commandId);
+		value.Add(commandId);
 		_commandsKeybindsMap[commandId] = keybind;
 	}
 
