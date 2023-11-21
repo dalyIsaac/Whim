@@ -175,6 +175,16 @@ internal class CoreCommands : PluginCommands
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
+				identifier: "maximize_window",
+				title: "Maximize the current window",
+				callback: () => _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.ShowMaximized()
+			)
+			.Add(
+				identifier: "minimize_window",
+				title: "Minimize the current window",
+				callback: () => _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.ShowMinimized()
+			)
+			.Add(
 				identifier: "focus_previous_monitor",
 				title: "Focus the previous monitor",
 				callback: () =>
