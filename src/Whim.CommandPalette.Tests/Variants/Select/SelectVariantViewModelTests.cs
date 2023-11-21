@@ -195,7 +195,7 @@ public class SelectVariantViewModelTests
 					IsSelected = false,
 					IsEnabled = false,
 				},
-				new SelectOption()
+				new()
 				{
 					Id = "id3",
 					Title = "title3",
@@ -434,21 +434,21 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.PopulateItems(
 			new List<SelectOption>
 			{
-				new SelectOption()
+				new()
 				{
 					Id = "4",
 					Title = "title4",
 					IsSelected = true,
 					IsEnabled = false
 				},
-				new SelectOption()
+				new()
 				{
 					Id = "5",
 					Title = "title5",
 					IsSelected = false,
 					IsEnabled = false
 				},
-				new SelectOption()
+				new()
 				{
 					Id = "6",
 					Title = "title6",
@@ -479,7 +479,7 @@ public class SelectVariantViewModelTests
 			new List<SelectOption>
 			{
 				options[0],
-				new SelectOption()
+				new()
 				{
 					Id = "5",
 					Title = "title5",
