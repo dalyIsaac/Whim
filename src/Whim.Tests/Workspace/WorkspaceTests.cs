@@ -359,6 +359,49 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void FocusLastFocusedWindow_NoLastFocusedWindow(
+		IContext context,
+		IInternalContext internalContext,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine
+	)
+	{
+		// Given
+		Workspace workspace =
+			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+
+		// When FocusLastFocusedWindow is called
+		workspace.FocusLastFocusedWindow();
+
+		// Then the LayoutEngine's GetFirstWindow method is called
+		layoutEngine.Received(1).GetFirstWindow();
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void FocusLastFocusedWindow_LastFocusedWindow(
+		IContext context,
+		IInternalContext internalContext,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		IWindow window
+	)
+	{
+		// Given the window is in the workspace
+		Workspace workspace =
+			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		workspace.AddWindow(window);
+
+		window.ClearReceivedCalls();
+
+		// When FocusLastFocusedWindow is called
+		workspace.FocusLastFocusedWindow();
+
+		// Then the LayoutEngine's GetFirstWindow method is called
+		layoutEngine.DidNotReceive().GetFirstWindow();
+		window.Received(1).Focus();
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void NextLayoutEngine(
 		IContext context,
 		IInternalContext internalContext,
@@ -460,6 +503,7 @@ public class WorkspaceTests
 		// Then the window is added to the layout engine
 		layoutEngine.Received(1).AddWindow(window);
 		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
+		window.Received(2).Focus();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -481,6 +525,31 @@ public class WorkspaceTests
 		// Then the window is added to the layout engine
 		layoutEngine.Received(1).AddWindow(window);
 		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
+		window.Received(1).Focus();
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void AddWindow_Success_WindowWasMinimized(
+		IContext context,
+		IInternalContext internalContext,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		IWindow window
+	)
+	{
+		// Given the window has already been added but was since minimized
+		Workspace workspace =
+			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		workspace.AddWindow(window);
+		workspace.WindowMinimizeStart(window);
+
+		// When AddWindow is called
+		workspace.AddWindow(window);
+
+		// Then the window is added to the layout engine
+		layoutEngine.Received(1).AddWindow(window);
+		context.WorkspaceManager.Received(3).GetMonitorForWorkspace(workspace);
+		window.Received(2).Focus();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]

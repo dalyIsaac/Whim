@@ -298,9 +298,7 @@ public class CommandPaletteCommandsTests
 					c =>
 						c.Hint == "Select window"
 						&& c.ConfirmButtonText == "Remove"
-						&& c.Commands
-							.Select(c => c.Title)
-							.SequenceEqual(new string[] { "Remove \"Window 0\"", "Remove \"Window 1\"" })
+						&& c.Commands.Select(c => c.Title).SequenceEqual(new string[] { "Window 0", "Window 1" })
 				)
 			);
 	}
@@ -318,5 +316,71 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		wrapper.Workspace.Received(1).RemoveWindow(wrapper.Windows[0]);
+	}
+
+	[Fact]
+	public void FindFocusWindow()
+	{
+		// Given
+		Wrapper wrapper = new();
+		ICommand command = new TestUtils.PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+			"whim.command_palette.find_focus_window"
+		);
+
+		// When
+		command.TryExecute();
+
+		// Then
+		wrapper
+			.Plugin
+			.Received(1)
+			.Activate(
+				Arg.Is<MenuVariantConfig>(
+					c =>
+						c.Hint == "Find window"
+						&& c.ConfirmButtonText == "Focus"
+						&& c.Commands
+							.Select(c => c.Title)
+							.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
+				)
+			);
+	}
+
+	[Fact]
+	public void FocusWindowCommandCreator()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		IWindow window = wrapper.Windows[0];
+		wrapper.Context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
+
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
+
+		// When
+		ICommand command = commands.FocusWindowCommandCreator(window);
+		command.TryExecute();
+
+		// Then
+		wrapper.Workspace.Received(1).AddWindow(window);
+	}
+
+	[Fact]
+	public void FocusWindowCommandCreator_CannotFindWorkspace()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		IWindow window = wrapper.Windows[0];
+		wrapper.Context.WorkspaceManager.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
+
+		// When
+		ICommand command = commands.FocusWindowCommandCreator(window);
+		command.TryExecute();
+
+		// Then
+		wrapper.Workspace.DidNotReceive().AddWindow(window);
 	}
 }

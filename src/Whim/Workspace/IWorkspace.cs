@@ -105,7 +105,14 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Focuses on the first window in the workspace.
 	/// </summary>
+	[Obsolete("Use FocusLastFocusedWindow instead.")]
 	void FocusFirstWindow();
+
+	/// <summary>
+	/// Focuses on the last window in the workspace. If <see cref="LastFocusedWindow"/> is null,
+	/// then we try focus the first window.
+	/// </summary>
+	void FocusLastFocusedWindow();
 
 	/// <summary>
 	/// Focuses the <paramref name="window"/> in the <paramref name="direction"/>.
