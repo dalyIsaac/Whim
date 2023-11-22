@@ -270,7 +270,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			if (_normalWindows.Contains(window))
 			{
 				Logger.Error($"Window {window} already exists in workspace {Name}");
+				window.Focus();
 				return;
+			}
+
+			if (_minimizedWindows.Contains(window))
+			{
+				Logger.Debug($"Window {window} is minimized in workspace {Name}, unminimizing");
+				_minimizedWindows.Remove(window);
 			}
 
 			_normalWindows.Add(window);
