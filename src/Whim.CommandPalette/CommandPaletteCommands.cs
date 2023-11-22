@@ -104,6 +104,22 @@ public class CommandPaletteCommands : PluginCommands
 							ConfirmButtonText = "Remove"
 						}
 					)
+			)
+			.Add(
+				identifier: "find_focus_window",
+				title: "Find and focus window",
+				callback: () =>
+					_commandPalettePlugin.Activate(
+						new MenuVariantConfig()
+						{
+							Hint = "Find window",
+							ConfirmButtonText = "Focus",
+							Commands = _context
+								.WorkspaceManager
+								.SelectMany(w => w.Windows)
+								.Select(w => FocusWindowCommandCreator(w))
+						}
+					)
 			);
 	}
 
@@ -223,7 +239,30 @@ public class CommandPaletteCommands : PluginCommands
 	internal ICommand RemoveWindowCommandCreator(IWindow window) =>
 		new Command(
 			identifier: $"{PluginName}.remove_window.{window.Title}",
-			title: $"Remove \"{window.Title}\"",
+			title: window.Title,
 			callback: () => _context.WorkspaceManager.ActiveWorkspace.RemoveWindow(window)
+		);
+
+	/// <summary>
+	/// Focus window command creator.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	internal ICommand FocusWindowCommandCreator(IWindow window) =>
+		new Command(
+			identifier: $"{PluginName}.focus_window.{window.Title}",
+			title: window.Title,
+			callback: () =>
+			{
+				IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(window);
+				if (workspace == null)
+				{
+					return;
+				}
+
+				// A bit of a dirty hack to focus the window. If the window is minimised, it will
+				// now be shown. It will then be focused.
+				workspace.AddWindow(window);
+			}
 		);
 }
