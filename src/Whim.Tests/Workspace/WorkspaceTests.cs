@@ -359,6 +359,49 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void FocusLastFocusedWindow_NoLastFocusedWindow(
+		IContext context,
+		IInternalContext internalContext,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine
+	)
+	{
+		// Given
+		Workspace workspace =
+			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+
+		// When FocusLastFocusedWindow is called
+		workspace.FocusLastFocusedWindow();
+
+		// Then the LayoutEngine's GetFirstWindow method is called
+		layoutEngine.Received(1).GetFirstWindow();
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void FocusLastFocusedWindow_LastFocusedWindow(
+		IContext context,
+		IInternalContext internalContext,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		IWindow window
+	)
+	{
+		// Given the window is in the workspace
+		Workspace workspace =
+			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		workspace.AddWindow(window);
+
+		window.ClearReceivedCalls();
+
+		// When FocusLastFocusedWindow is called
+		workspace.FocusLastFocusedWindow();
+
+		// Then the LayoutEngine's GetFirstWindow method is called
+		layoutEngine.DidNotReceive().GetFirstWindow();
+		window.Received(1).Focus();
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void NextLayoutEngine(
 		IContext context,
 		IInternalContext internalContext,

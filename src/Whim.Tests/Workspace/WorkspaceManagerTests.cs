@@ -416,7 +416,7 @@ public class WorkspaceManagerTests
 
 		// Layout is done, and the first window is focused.
 		workspace.Received(1).DoLayout();
-		workspace.Received(1).FocusFirstWindow();
+		workspace.Received(1).FocusLastFocusedWindow();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -452,7 +452,7 @@ public class WorkspaceManagerTests
 		previousWorkspace.Received(1).Deactivate();
 		previousWorkspace.DidNotReceive().DoLayout();
 		currentWorkspace.Received(1).DoLayout();
-		currentWorkspace.Received(1).FocusFirstWindow();
+		currentWorkspace.Received(1).FocusLastFocusedWindow();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -481,11 +481,11 @@ public class WorkspaceManagerTests
 
 		workspaces[0].DidNotReceive().Deactivate();
 		workspaces[0].Received(1).DoLayout();
-		workspaces[0].DidNotReceive().FocusFirstWindow();
+		workspaces[0].DidNotReceive().FocusLastFocusedWindow();
 
 		workspaces[1].DidNotReceive().Deactivate();
 		workspaces[1].Received(1).DoLayout();
-		workspaces[1].Received(1).FocusFirstWindow();
+		workspaces[1].Received(1).FocusLastFocusedWindow();
 	}
 
 	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, 2)]
@@ -508,11 +508,11 @@ public class WorkspaceManagerTests
 
 		workspaces[currentIdx].Received(1).Deactivate();
 		workspaces[currentIdx].DidNotReceive().DoLayout();
-		workspaces[currentIdx].DidNotReceive().FocusFirstWindow();
+		workspaces[currentIdx].DidNotReceive().FocusLastFocusedWindow();
 
 		workspaces[prevIdx].DidNotReceive().Deactivate();
 		workspaces[prevIdx].Received(1).DoLayout();
-		workspaces[prevIdx].Received(1).FocusFirstWindow();
+		workspaces[prevIdx].Received(1).FocusLastFocusedWindow();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -534,11 +534,11 @@ public class WorkspaceManagerTests
 
 		workspaces[0].DidNotReceive().Deactivate();
 		workspaces[0].DidNotReceive().DoLayout();
-		workspaces[0].DidNotReceive().FocusFirstWindow();
+		workspaces[0].DidNotReceive().FocusLastFocusedWindow();
 
 		workspaces[1].DidNotReceive().Deactivate();
 		workspaces[1].DidNotReceive().DoLayout();
-		workspaces[1].DidNotReceive().FocusFirstWindow();
+		workspaces[1].DidNotReceive().FocusLastFocusedWindow();
 	}
 
 	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, 1)]
@@ -561,11 +561,11 @@ public class WorkspaceManagerTests
 
 		workspaces[currentIdx].Received(1).Deactivate();
 		workspaces[currentIdx].DidNotReceive().DoLayout();
-		workspaces[currentIdx].DidNotReceive().FocusFirstWindow();
+		workspaces[currentIdx].DidNotReceive().FocusLastFocusedWindow();
 
 		workspaces[nextIdx].DidNotReceive().Deactivate();
 		workspaces[nextIdx].Received(1).DoLayout();
-		workspaces[nextIdx].Received(1).FocusFirstWindow();
+		workspaces[nextIdx].Received(1).FocusLastFocusedWindow();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -587,11 +587,11 @@ public class WorkspaceManagerTests
 
 		workspaces[0].DidNotReceive().Deactivate();
 		workspaces[0].DidNotReceive().DoLayout();
-		workspaces[0].DidNotReceive().FocusFirstWindow();
+		workspaces[0].DidNotReceive().FocusLastFocusedWindow();
 
 		workspaces[1].DidNotReceive().Deactivate();
 		workspaces[1].DidNotReceive().DoLayout();
-		workspaces[1].DidNotReceive().FocusFirstWindow();
+		workspaces[1].DidNotReceive().FocusLastFocusedWindow();
 	}
 	#endregion
 

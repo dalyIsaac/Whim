@@ -174,6 +174,20 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
+	public void FocusLastFocusedWindow()
+	{
+		Logger.Debug($"Focusing last focused window in workspace {Name}");
+		if (LastFocusedWindow != null)
+		{
+			LastFocusedWindow.Focus();
+		}
+		else
+		{
+			Logger.Debug($"No last focused window in workspace {Name}, focusing first window");
+			ActiveLayoutEngine.GetFirstWindow()?.Focus();
+		}
+	}
+
 	private void UpdateLayoutEngine(int delta)
 	{
 		ILayoutEngine prevLayoutEngine;
@@ -289,6 +303,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		DoLayout();
 		window.Focus();
+		LastFocusedWindow = window;
 	}
 
 	public bool RemoveWindow(IWindow window)

@@ -303,7 +303,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		// Layout the new workspace.
 		workspace.DoLayout();
-		workspace.FocusFirstWindow();
+		workspace.FocusLastFocusedWindow();
 		MonitorWorkspaceChanged?.Invoke(
 			this,
 			new MonitorWorkspaceChangedEventArgs()
