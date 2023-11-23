@@ -7,11 +7,11 @@ namespace Whim.Tests;
 public class FilterManagerTests
 {
 	[Theory, AutoSubstituteData]
-	public void IgnoreWindowClass(IWindow window)
+	public void AddWindowClassFilter(IWindow window)
 	{
 		// Given
 		FilterManager filterManager = new();
-		filterManager.IgnoreWindowClass("Test");
+		filterManager.AddWindowClassFilter("Test");
 
 		window.WindowClass.Returns("Test");
 
@@ -20,11 +20,11 @@ public class FilterManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void IgnoreProcessName(IWindow window)
+	public void AddProcessNameFilter(IWindow window)
 	{
 		// Given
 		FilterManager filterManager = new();
-		filterManager.IgnoreProcessName("Test");
+		filterManager.AddProcessNameFilter("Test");
 
 		window.ProcessName.Returns("Test");
 
@@ -33,11 +33,11 @@ public class FilterManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void IgnoreTitle(IWindow window)
+	public void AddTitleFilter(IWindow window)
 	{
 		// Given
 		FilterManager filterManager = new();
-		filterManager.IgnoreTitle("Test");
+		filterManager.AddTitleFilter("Test");
 
 		window.Title.Returns("Test");
 
@@ -46,11 +46,11 @@ public class FilterManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void IgnoreTitleMatch(IWindow window)
+	public void AddTitleMatchFilter(IWindow window)
 	{
 		// Given
 		FilterManager filterManager = new();
-		filterManager.IgnoreTitleMatch("Test");
+		filterManager.AddTitleMatchFilter("Test");
 
 		window.Title.Returns("Test");
 
@@ -64,7 +64,7 @@ public class FilterManagerTests
 		// Given
 		FilterManager filterManager = new();
 		FilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
-		filterManager.IgnoreWindowClass("Test");
+		filterManager.AddWindowClassFilter("Test");
 
 		window.WindowClass.Returns("Test");
 

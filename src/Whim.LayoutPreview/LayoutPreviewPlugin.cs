@@ -39,7 +39,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		_context.WindowManager.WindowMoved += WindowMoved;
 		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
 		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
-		_context.FilterManager.IgnoreTitleMatch(LayoutPreviewWindow.WindowTitle);
+		_context.FilterManager.AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
 	/// <inheritdoc	/>

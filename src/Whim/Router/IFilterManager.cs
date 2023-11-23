@@ -1,3 +1,5 @@
+using System;
+
 namespace Whim;
 
 /// <summary>
@@ -14,12 +16,12 @@ public interface IFilterManager
 	/// Add a filter.
 	/// </summary>
 	/// <param name="filter"></param>
-	public void Add(Filter filter);
+	void Add(Filter filter);
 
 	/// <summary>
 	/// Clears all the filters.
 	/// </summary>
-	public void Clear();
+	void Clear();
 
 	/// <summary>
 	/// Indicates whether the window should be ignored.
@@ -29,29 +31,61 @@ public interface IFilterManager
 	/// <see langword="true"/> when the window should be ignored, otherwise
 	/// <see langword="false"/>.
 	/// </returns>
-	public bool ShouldBeIgnored(IWindow window);
+	bool ShouldBeIgnored(IWindow window);
 
 	/// <summary>
 	/// Ignores the window class. Case insensitive.
 	/// </summary>
 	/// <param name="windowClass"></param>
-	public IFilterManager IgnoreWindowClass(string windowClass);
+	[Obsolete("Use AddWindowClassFilter instead")]
+	IFilterManager IgnoreWindowClass(string windowClass);
 
 	/// <summary>
 	/// Ignores the process name. Case insensitive.
 	/// </summary>
 	/// <param name="processName"></param>
-	public IFilterManager IgnoreProcessName(string processName);
+	[Obsolete("Use AddProcessNameFilter instead")]
+	IFilterManager IgnoreProcessName(string processName);
 
 	/// <summary>
 	/// Ignores the title. Case insensitive.
 	/// </summary>
 	/// <param name="title"></param>
-	public IFilterManager IgnoreTitle(string title);
+	[Obsolete("Use AddTitleFilter instead")]
+	IFilterManager IgnoreTitle(string title);
 
 	/// <summary>
 	/// Filter the title according to the regex pattern.
 	/// </summary>
 	/// <param name="match"></param>
-	public IFilterManager IgnoreTitleMatch(string match);
+	[Obsolete("Use AddTitleMatchFilter instead")]
+	IFilterManager IgnoreTitleMatch(string match);
+
+	/// <summary>
+	/// Ignores the window class. Case insensitive.
+	/// </summary>
+	/// <param name="windowClass"></param>
+	/// <returns></returns>
+	IFilterManager AddWindowClassFilter(string windowClass);
+
+	/// <summary>
+	/// Ignores the process name. Case insensitive.
+	/// </summary>
+	/// <param name="processName"></param>
+	/// <returns></returns>
+	IFilterManager AddProcessNameFilter(string processName);
+
+	/// <summary>
+	/// Ignores the title. Case insensitive.
+	/// </summary>
+	/// <param name="title"></param>
+	/// <returns></returns>
+	IFilterManager AddTitleFilter(string title);
+
+	/// <summary>
+	/// Filter the title according to the regex pattern.
+	/// </summary>
+	/// <param name="match"></param>
+	/// <returns></returns>
+	IFilterManager AddTitleMatchFilter(string match);
 }

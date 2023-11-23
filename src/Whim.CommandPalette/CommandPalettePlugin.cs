@@ -38,7 +38,7 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	/// <inheritdoc/>
 	public void PreInitialize()
 	{
-		_context.FilterManager.IgnoreTitleMatch(CommandPaletteConfig.Title);
+		_context.FilterManager.AddTitleMatchFilter(CommandPaletteConfig.Title);
 	}
 
 	/// <inheritdoc/>

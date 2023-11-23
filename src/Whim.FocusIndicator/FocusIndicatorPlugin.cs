@@ -34,7 +34,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	/// <inheritdoc/>
 	public void PreInitialize()
 	{
-		_context.FilterManager.IgnoreTitleMatch(FocusIndicatorConfig.Title);
+		_context.FilterManager.AddTitleMatchFilter(FocusIndicatorConfig.Title);
 
 		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
 		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;

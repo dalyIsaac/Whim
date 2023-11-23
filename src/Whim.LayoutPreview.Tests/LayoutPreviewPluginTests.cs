@@ -75,7 +75,7 @@ public class LayoutPreviewPluginTests
 		ctx.WindowManager.Received(1).WindowMoveStart += Arg.Any<EventHandler<WindowMovedEventArgs>>();
 		ctx.WindowManager.Received(1).WindowMoved += Arg.Any<EventHandler<WindowMovedEventArgs>>();
 		ctx.WindowManager.Received(1).WindowMoveEnd += Arg.Any<EventHandler<WindowMovedEventArgs>>();
-		ctx.FilterManager.Received(1).IgnoreTitleMatch(LayoutPreviewWindow.WindowTitle);
+		ctx.FilterManager.Received(1).AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
