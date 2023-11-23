@@ -213,14 +213,19 @@ public class CoreCommandsTests
 		window.Received(1).ShowMaximized();
 	}
 
+	#region MinimizeWindow
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	public void MinimizeWindow(IContext context, IWindow window)
+	public void MinimizeWindow(IContext context, IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
 		CoreCommands commands = new(context);
 		PluginCommandsTestUtils testUtils = new(commands);
 
-		context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		window3.IsMinimized.Returns(false);
+
+		IWorkspace activeWorkspace = context.WorkspaceManager.ActiveWorkspace;
+		activeWorkspace.LastFocusedWindow.Returns(window1);
+		activeWorkspace.Windows.GetEnumerator().Returns(new List<IWindow>() { window2, window3 }.GetEnumerator());
 
 		ICommand command = testUtils.GetCommand("whim.core.minimize_window");
 
@@ -228,8 +233,53 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		window.Received(1).ShowMinimized();
+		window1.Received(1).ShowMinimized();
+		window3.Received(1).Focus();
 	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void MinimizeWindow_NoLastFocusedWindow(IContext context, IWindow window1, IWindow window2)
+	{
+		// Given
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		window2.IsMinimized.Returns(false);
+
+		IWorkspace activeWorkspace = context.WorkspaceManager.ActiveWorkspace;
+		activeWorkspace.LastFocusedWindow.Returns((IWindow?)null);
+		activeWorkspace.Windows.GetEnumerator().Returns(new List<IWindow>() { window1, window2 }.GetEnumerator());
+
+		ICommand command = testUtils.GetCommand("whim.core.minimize_window");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		window2.Received(1).Focus();
+	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void MinimizeWindow_FocusFirstWindow(IContext context, IWindow window1, IWindow window2, IWindow window3)
+	{
+		// Given
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		IWorkspace activeWorkspace = context.WorkspaceManager.ActiveWorkspace;
+		activeWorkspace.LastFocusedWindow.Returns(window1);
+		activeWorkspace.Windows.GetEnumerator().Returns(new List<IWindow>() { window2, window3 }.GetEnumerator());
+
+		ICommand command = testUtils.GetCommand("whim.core.minimize_window");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		window1.Received(1).ShowMinimized();
+		window2.Received(1).Focus();
+	}
+	#endregion
 
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_previous_monitor")]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_next_monitor")]

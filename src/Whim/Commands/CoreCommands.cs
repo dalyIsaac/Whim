@@ -182,7 +182,21 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "minimize_window",
 				title: "Minimize the current window",
-				callback: () => _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.ShowMinimized()
+				callback: () =>
+				{
+					IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
+					workspace.LastFocusedWindow?.ShowMinimized();
+
+					// Find the first non-minimized window and focus it
+					foreach (IWindow window in workspace.Windows)
+					{
+						if (!window.IsMinimized)
+						{
+							window.Focus();
+							break;
+						}
+					}
+				}
 			)
 			.Add(
 				identifier: "focus_previous_monitor",
