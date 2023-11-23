@@ -18,6 +18,6 @@ public class CommandPalettePluginTests
 		commandPalettePlugin.PreInitialize();
 
 		// Then
-		ctx.FilterManager.Received(1).IgnoreTitleMatch(CommandPaletteConfig.Title);
+		ctx.FilterManager.Received(1).AddTitleMatchFilter(CommandPaletteConfig.Title);
 	}
 }

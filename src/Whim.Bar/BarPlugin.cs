@@ -32,7 +32,7 @@ public class BarPlugin : IBarPlugin
 	public void PreInitialize()
 	{
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
-		_context.FilterManager.IgnoreTitleMatch("Whim Bar");
+		_context.FilterManager.AddTitleMatchFilter("Whim Bar");
 		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
 	}
 

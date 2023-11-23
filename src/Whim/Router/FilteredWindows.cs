@@ -10,7 +10,7 @@ public static class FilteredWindows
 	/// </summary>
 	/// <param name="filterManager"></param>
 	public static void LoadWindowsIgnoredByWhim(IFilterManager filterManager) =>
-		filterManager.IgnoreProcessName("SearchUI.exe");
+		filterManager.AddProcessNameFilter("SearchUI.exe");
 
 	/// <summary>
 	/// Load the windows which try to set their own locations when the start up.
@@ -18,5 +18,5 @@ public static class FilteredWindows
 	/// </summary>
 	/// <param name="filterManager"></param>
 	public static void LoadLocationRestoringWindows(IFilterManager filterManager) =>
-		filterManager.IgnoreProcessName("firefox.exe").IgnoreProcessName("gateway64.exe");
+		filterManager.AddProcessNameFilter("firefox.exe").AddProcessNameFilter("gateway64.exe");
 }

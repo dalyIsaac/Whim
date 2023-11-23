@@ -213,7 +213,7 @@ context.RouterManager.Add((window) =>
 
 ```csharp
 // Called by the bar plugin.
-context.FilterManager.IgnoreTitleMatch("Whim Bar");
+context.FilterManager.AddTitleMatchFilter("Whim Bar");
 ```
 
 ## Window Manager
