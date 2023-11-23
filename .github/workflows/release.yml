@@ -52,6 +52,10 @@ jobs:
     concurrency: ci-${{ github.ref }}
     needs:
       - create-release
+    env:
+      # We install the packages to the D:\ drive to avoid the slow IO on the C:\ drive.
+      # Based on https://github.com/actions/setup-dotnet/issues/260#issuecomment-1790162905
+      NUGET_PACKAGES: D:\a\.nuget\packages
 
     strategy:
       matrix:
@@ -60,7 +64,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
+          restore-keys: |
+            ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
+            ${{ matrix.platform }}-nuget-
 
       - name: Get variables
         shell: pwsh
