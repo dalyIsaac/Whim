@@ -214,13 +214,17 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	public void MinimizeWindow(IContext context, IWindow window)
+	public void MinimizeWindow(IContext context, IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
 		CoreCommands commands = new(context);
 		PluginCommandsTestUtils testUtils = new(commands);
 
-		context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		window3.IsMinimized.Returns(false);
+
+		IWorkspace activeWorkspace = context.WorkspaceManager.ActiveWorkspace;
+		activeWorkspace.LastFocusedWindow.Returns(window1);
+		activeWorkspace.Windows.GetEnumerator().Returns(new List<IWindow>() { window2, window3 }.GetEnumerator());
 
 		ICommand command = testUtils.GetCommand("whim.core.minimize_window");
 
@@ -228,7 +232,8 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		window.Received(1).ShowMinimized();
+		window1.Received(1).ShowMinimized();
+		window3.Received(1).Focus();
 	}
 
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_previous_monitor")]
