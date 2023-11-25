@@ -13,7 +13,7 @@ Alpha builds are available on the [releases page](https://github.com/dalyIsaac/W
 
 ## Customization
 
-When you run Whim for the first time, it will create a `.whim` directory in your user profile - for example, `C:\Users\Isaac\.whim`.
+When you run Whim for the first time, it will create a `.whim` directory in your user profile - for example, `C:\Users\Isaac\.whim`. This can be configured with the CLI option `--dir`.
 
 This directory will contain a `whim.config.csx` file which you can edit to customize Whim. This file is a C# script file, and is reloaded every time Whim starts. To have the best development experience, you should have dotnet tooling installed (Visual Studio Code will prompt you when you open `.whim`).
 
@@ -216,7 +216,7 @@ context.RouterManager.Add((window) =>
 context.FilterManager.AddTitleMatchFilter("Whim Bar");
 ```
 
-## Window Manager
+### Window Manager
 
 The [`IWindowManager`](src/Whim/Window/IWindowManager.cs) is used by Whim to manage [`IWindow`](src/Whim/Window/IWindow.cs)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
 
