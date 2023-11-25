@@ -39,6 +39,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		_context.WindowManager.WindowMoved += WindowMoved;
 		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
 		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 		_context.FilterManager.AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
@@ -113,6 +114,15 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 				_layoutPreviewWindow?.Hide(_context);
 				DraggedWindow = null;
 			}
+		}
+	}
+
+	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
+	{
+		lock (_previewLock)
+		{
+			_layoutPreviewWindow?.Hide(_context);
+			DraggedWindow = null;
 		}
 	}
 
