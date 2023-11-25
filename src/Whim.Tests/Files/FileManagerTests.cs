@@ -10,7 +10,7 @@ public class FileManagerTests
 	public void WhimDir()
 	{
 		// Given
-		IFileManager fileManager = new FileManager();
+		IFileManager fileManager = new FileManager(Array.Empty<string>());
 
 		// When
 		string whimDir = fileManager.WhimDir;
@@ -20,10 +20,58 @@ public class FileManagerTests
 	}
 
 	[Fact]
+	public void WhimDir_WithDirArg()
+	{
+		// Given
+		string dirArg = "--dir";
+		string whimDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "test");
+		string[] args = { dirArg, whimDir };
+		IFileManager fileManager = new FileManager(args);
+
+		// When
+		string whimDirFromArgs = fileManager.WhimDir;
+
+		// Then
+		Assert.Equal(whimDir, whimDirFromArgs);
+	}
+
+	[Fact]
+	public void WhimDir_WithDirArg_WithExtraArg()
+	{
+		// Given
+		string dirArg = "--dir";
+		string whimDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "test");
+		string[] args = { dirArg, whimDir, "--extra" };
+		IFileManager fileManager = new FileManager(args);
+
+		// When
+		string whimDirFromArgs = fileManager.WhimDir;
+
+		// Then
+		Assert.Equal(whimDir, whimDirFromArgs);
+	}
+
+	[Fact]
+	public void WhimDir_WithDirArg_Equals()
+	{
+		// Given
+		string dirArg = "--dir";
+		string whimDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "test");
+		string[] args = { dirArg + "=" + whimDir };
+		IFileManager fileManager = new FileManager(args);
+
+		// When
+		string whimDirFromArgs = fileManager.WhimDir;
+
+		// Then
+		Assert.Equal(whimDir, whimDirFromArgs);
+	}
+
+	[Fact]
 	public void SavedStateDir()
 	{
 		// Given
-		IFileManager fileManager = new FileManager();
+		IFileManager fileManager = new FileManager(Array.Empty<string>());
 
 		// When
 		string savedStateDir = fileManager.SavedStateDir;
@@ -39,7 +87,7 @@ public class FileManagerTests
 	public void GetWhimFileDir()
 	{
 		// Given
-		IFileManager fileManager = new FileManager();
+		IFileManager fileManager = new FileManager(Array.Empty<string>());
 
 		// When
 		string whimFileDir = fileManager.GetWhimFileDir("test");
@@ -55,7 +103,7 @@ public class FileManagerTests
 	public void GetWhimFileDir_WithSubDir()
 	{
 		// Given
-		IFileManager fileManager = new FileManager();
+		IFileManager fileManager = new FileManager(Array.Empty<string>());
 
 		// When
 		string whimFileDir = fileManager.GetWhimFileDir(Path.Combine("test", "subdir"));

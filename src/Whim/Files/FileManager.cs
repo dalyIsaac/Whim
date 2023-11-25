@@ -13,9 +13,8 @@ internal class FileManager : IFileManager
 	/// <inheritdoc />
 	public string SavedStateDir => Path.Combine(WhimDir, "state");
 
-	public FileManager()
+	public FileManager(string[] args)
 	{
-		string[] args = Environment.GetCommandLineArgs();
 		string? dir = GetDirFromArgs(args);
 		if (dir != null)
 		{
