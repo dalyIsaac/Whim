@@ -36,7 +36,9 @@ internal class Context : IContext
 	/// </summary>
 	public Context()
 	{
-		FileManager = new FileManager();
+		string[] args = Environment.GetCommandLineArgs();
+
+		FileManager = new FileManager(args);
 		Logger = new Logger();
 		_internalContext = new InternalContext(this);
 

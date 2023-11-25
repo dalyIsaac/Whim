@@ -13,6 +13,50 @@ internal class FileManager : IFileManager
 	/// <inheritdoc />
 	public string SavedStateDir => Path.Combine(WhimDir, "state");
 
+	public FileManager(string[] args)
+	{
+		string? dir = GetDirFromArgs(args);
+		if (dir != null)
+		{
+			WhimDir = dir;
+		}
+	}
+
+	private static string? GetDirFromArgs(string[] args)
+	{
+		const string dirArg = "--dir";
+		for (int i = 0; i < args.Length; i++)
+		{
+			string arg = args[i];
+			if (!arg.StartsWith(dirArg))
+			{
+				continue;
+			}
+
+			if (arg.Length > dirArg.Length + 1)
+			{
+				return arg[(dirArg.Length + 1)..];
+			}
+
+			for (int j = i + 1; j < args.Length; j++)
+			{
+				string nextArg = args[j];
+				if (string.IsNullOrEmpty(nextArg))
+				{
+					continue;
+				}
+				if (nextArg.StartsWith("--"))
+				{
+					return null;
+				}
+
+				return nextArg;
+			}
+		}
+
+		return null;
+	}
+
 	/// <inheritdoc />
 	public void EnsureDirExists(string dir)
 	{
