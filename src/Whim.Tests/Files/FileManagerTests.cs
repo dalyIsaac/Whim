@@ -6,6 +6,9 @@ namespace Whim.Tests;
 
 public class FileManagerTests
 {
+	private static readonly string ExpectedWhimDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim");
+	private static readonly string ExpectedAltWhimDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "test");
+
 	[Fact]
 	public void WhimDir()
 	{
@@ -16,7 +19,7 @@ public class FileManagerTests
 		string whimDir = fileManager.WhimDir;
 
 		// Then
-		Assert.Equal(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim"), whimDir);
+		Assert.Equal(ExpectedWhimDir, whimDir);
 	}
 
 	[Fact]
@@ -24,15 +27,14 @@ public class FileManagerTests
 	{
 		// Given
 		string dirArg = "--dir";
-		string whimDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "test");
-		string[] args = { dirArg, whimDir };
+		string[] args = { dirArg, ExpectedAltWhimDir };
 		IFileManager fileManager = new FileManager(args);
 
 		// When
 		string whimDirFromArgs = fileManager.WhimDir;
 
 		// Then
-		Assert.Equal(whimDir, whimDirFromArgs);
+		Assert.Equal(ExpectedAltWhimDir, whimDirFromArgs);
 	}
 
 	[Fact]
@@ -40,15 +42,14 @@ public class FileManagerTests
 	{
 		// Given
 		string dirArg = "--dir";
-		string whimDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "test");
-		string[] args = { dirArg, whimDir, "--extra" };
+		string[] args = { dirArg, ExpectedAltWhimDir, "--extra" };
 		IFileManager fileManager = new FileManager(args);
 
 		// When
 		string whimDirFromArgs = fileManager.WhimDir;
 
 		// Then
-		Assert.Equal(whimDir, whimDirFromArgs);
+		Assert.Equal(ExpectedAltWhimDir, whimDirFromArgs);
 	}
 
 	[Fact]
@@ -56,15 +57,14 @@ public class FileManagerTests
 	{
 		// Given
 		string dirArg = "--dir";
-		string whimDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "test");
-		string[] args = { dirArg + "=" + whimDir };
+		string[] args = { dirArg + "=" + ExpectedAltWhimDir };
 		IFileManager fileManager = new FileManager(args);
 
 		// When
 		string whimDirFromArgs = fileManager.WhimDir;
 
 		// Then
-		Assert.Equal(whimDir, whimDirFromArgs);
+		Assert.Equal(ExpectedAltWhimDir, whimDirFromArgs);
 	}
 
 	[Fact]
@@ -77,10 +77,7 @@ public class FileManagerTests
 		string savedStateDir = fileManager.SavedStateDir;
 
 		// Then
-		Assert.Equal(
-			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim", "state"),
-			savedStateDir
-		);
+		Assert.Equal(Path.Combine(ExpectedWhimDir, "state"), savedStateDir);
 	}
 
 	[Fact]
@@ -93,10 +90,7 @@ public class FileManagerTests
 		string whimFileDir = fileManager.GetWhimFileDir("test");
 
 		// Then
-		Assert.Equal(
-			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim", "test"),
-			whimFileDir
-		);
+		Assert.Equal(Path.Combine(ExpectedWhimDir, "test"), whimFileDir);
 	}
 
 	[Fact]
@@ -109,9 +103,6 @@ public class FileManagerTests
 		string whimFileDir = fileManager.GetWhimFileDir(Path.Combine("test", "subdir"));
 
 		// Then
-		Assert.Equal(
-			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim", "test", "subdir"),
-			whimFileDir
-		);
+		Assert.Equal(Path.Combine(ExpectedWhimDir, "test", "subdir"), whimFileDir);
 	}
 }
