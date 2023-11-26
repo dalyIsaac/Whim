@@ -94,55 +94,55 @@ internal static class TestTreeWindowStates
 			new WindowState()
 			{
 				Window = leftWindow,
-				Location = Left.Scale(screen),
+				Rectangle = Left.Scale(screen),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = rightTopLeftTopWindow,
-				Location = RightTopLeftTop.Scale(screen),
+				Rectangle = RightTopLeftTop.Scale(screen),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = rightTopLeftBottomLeftWindow,
-				Location = RightTopLeftBottomLeft.Scale(screen),
+				Rectangle = RightTopLeftBottomLeft.Scale(screen),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = rightTopLeftBottomRightTopWindow,
-				Location = RightTopLeftBottomRightTop.Scale(screen),
+				Rectangle = RightTopLeftBottomRightTop.Scale(screen),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = rightTopLeftBottomRightBottomWindow,
-				Location = RightTopLeftBottomRightBottom.Scale(screen),
+				Rectangle = RightTopLeftBottomRightBottom.Scale(screen),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = rightTopRight1Window,
-				Location = RightTopRight1.Scale(screen),
+				Rectangle = RightTopRight1.Scale(screen),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = rightTopRight2Window,
-				Location = RightTopRight2.Scale(screen),
+				Rectangle = RightTopRight2.Scale(screen),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = rightTopRight3Window,
-				Location = RightTopRight3.Scale(screen),
+				Rectangle = RightTopRight3.Scale(screen),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = rightBottomWindow,
-				Location = RightBottom.Scale(screen),
+				Rectangle = RightBottom.Scale(screen),
 				WindowSize = WindowSize.Normal
 			}
 		};

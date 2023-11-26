@@ -45,7 +45,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -57,7 +57,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 0,
@@ -94,7 +94,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -106,7 +106,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 0,
@@ -149,13 +149,13 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Rectangle<int>() { Width = 50, Height = 100 },
+				Rectangle = new Rectangle<int>() { Width = 50, Height = 100 },
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 0,
@@ -167,7 +167,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window3,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 50,
@@ -213,7 +213,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = bottomRight,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -225,7 +225,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = bottomLeft,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 50,
@@ -237,7 +237,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = topRight,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 0,
@@ -249,7 +249,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = topLeft,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 50,

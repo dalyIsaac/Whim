@@ -48,13 +48,13 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 		};
@@ -65,7 +65,7 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Maximized
 			},
 		};
@@ -93,13 +93,13 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = location,
+				Rectangle = location,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 		};
@@ -109,13 +109,13 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = location,
+				Rectangle = location,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 		};
@@ -143,13 +143,13 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = location,
+				Rectangle = location,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 		};

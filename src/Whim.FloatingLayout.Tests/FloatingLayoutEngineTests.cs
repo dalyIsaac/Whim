@@ -602,13 +602,13 @@ public class FloatingLayoutEngineTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Rectangle<int>(),
+						Rectangle = new Rectangle<int>(),
 						WindowSize = WindowSize.Normal
 					},
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Rectangle<int>(),
+						Rectangle = new Rectangle<int>(),
 						WindowSize = WindowSize.Normal
 					}
 				}
@@ -639,7 +639,7 @@ public class FloatingLayoutEngineTests
 			new WindowState()
 			{
 				Window = floatingWindow,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -651,13 +651,13 @@ public class FloatingLayoutEngineTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			}
 		};

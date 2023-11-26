@@ -187,7 +187,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 			yield return new WindowState()
 			{
 				Window = window,
-				Location = location.ToMonitor(loc),
+				Rectangle = location.ToMonitor(loc),
 				WindowSize = WindowSize.Normal
 			};
 		}

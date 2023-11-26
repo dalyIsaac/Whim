@@ -30,7 +30,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 	public void Activate(IWindowState windowState)
 	{
 		Logger.Debug("Activating focus indicator window");
-		IRectangle<int> focusedWindowLocation = windowState.Location;
+		IRectangle<int> focusedWindowLocation = windowState.Rectangle;
 		int borderSize = FocusIndicatorConfig.BorderSize;
 
 		IRectangle<int> borderLocation = new Rectangle<int>()
@@ -51,7 +51,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 			new WindowState()
 			{
 				Window = _window,
-				Location = borderLocation,
+				Rectangle = borderLocation,
 				WindowSize = WindowSize.Normal
 			},
 			windowState.Window.Handle,

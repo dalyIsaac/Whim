@@ -29,7 +29,7 @@ public class DeferWindowPosHandleCustomization : ICustomization
 			return new WindowPosState(
 				new WindowState()
 				{
-					Location = new Rectangle<int>(),
+					Rectangle = new Rectangle<int>(),
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -63,10 +63,10 @@ public class DeferWindowPosHandleTests
 			.SetWindowPos(
 				windowPosState.WindowState.Window.Handle,
 				windowPosState.HwndInsertAfter,
-				windowPosState.WindowState.Location.X,
-				windowPosState.WindowState.Location.Y,
-				windowPosState.WindowState.Location.Width,
-				windowPosState.WindowState.Location.Height,
+				windowPosState.WindowState.Rectangle.X,
+				windowPosState.WindowState.Rectangle.Y,
+				windowPosState.WindowState.Rectangle.Width,
+				windowPosState.WindowState.Rectangle.Height,
 				expectedFlags
 			);
 	}

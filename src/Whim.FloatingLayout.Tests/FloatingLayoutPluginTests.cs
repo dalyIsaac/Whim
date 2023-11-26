@@ -126,7 +126,7 @@ public class FloatingLayoutPluginTests
 			new()
 			{
 				Window = window,
-				Location = location,
+				Rectangle = location,
 				WindowSize = WindowSize.Normal
 			};
 
@@ -219,7 +219,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Rectangle<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -262,7 +262,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Rectangle<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -304,7 +304,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Rectangle<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -330,7 +330,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Rectangle<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -410,7 +410,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Rectangle<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -455,7 +455,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Rectangle<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}

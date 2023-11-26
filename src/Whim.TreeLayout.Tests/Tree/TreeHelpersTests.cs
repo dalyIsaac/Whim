@@ -681,7 +681,7 @@ public class TreeHelpersTests
 					new WindowState()
 					{
 						Window = nodeState.WindowNode.Window,
-						Location = nodeState.Location,
+						Rectangle = nodeState.Location,
 						WindowSize = nodeState.WindowSize
 					}
 			)

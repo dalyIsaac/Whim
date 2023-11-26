@@ -249,7 +249,7 @@ public class BarLayoutEngineTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					Y = 30,
 					Width = 50,
@@ -260,7 +260,7 @@ public class BarLayoutEngineTests
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 30,

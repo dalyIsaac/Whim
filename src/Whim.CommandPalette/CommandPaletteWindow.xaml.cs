@@ -144,7 +144,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			new WindowState()
 			{
 				Window = _window,
-				Location = windowLocation,
+				Rectangle = windowLocation,
 				WindowSize = WindowSize.Normal
 			},
 			_window.Handle

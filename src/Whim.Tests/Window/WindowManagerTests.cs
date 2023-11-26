@@ -676,7 +676,7 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Location = originalLocation,
+					Rectangle = originalLocation,
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
@@ -979,7 +979,7 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Location = originalLocation,
+					Rectangle = originalLocation,
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
@@ -1187,7 +1187,7 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Rectangle<int>(),
+					Rectangle = new Rectangle<int>(),
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
@@ -1241,7 +1241,7 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Location = originalLocation,
+					Rectangle = originalLocation,
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
@@ -1365,7 +1365,7 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Location = originalLocation,
+					Rectangle = originalLocation,
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
@@ -1407,7 +1407,7 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 4,
 						Y = 4,

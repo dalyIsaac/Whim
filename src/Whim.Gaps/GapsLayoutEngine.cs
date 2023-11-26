@@ -62,28 +62,28 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 
 		foreach (IWindowState loc in InnerLayoutEngine.DoLayout(proxiedLocation, monitor))
 		{
-			int x = loc.Location.X + innerGap;
-			int y = loc.Location.Y + innerGap;
-			int width = loc.Location.Width - doubleInnerGap;
-			int height = loc.Location.Height - doubleInnerGap;
+			int x = loc.Rectangle.X + innerGap;
+			int y = loc.Rectangle.Y + innerGap;
+			int width = loc.Rectangle.Width - doubleInnerGap;
+			int height = loc.Rectangle.Height - doubleInnerGap;
 
 			// Get the location of the window with the gaps applied. If the window is too small in
 			// a given dimension, then we don't apply the gap in that dimension.
 			if (width <= 0)
 			{
-				x = loc.Location.X;
-				width = Math.Max(0, loc.Location.Width);
+				x = loc.Rectangle.X;
+				width = Math.Max(0, loc.Rectangle.Width);
 			}
 			if (height <= 0)
 			{
-				y = loc.Location.Y;
-				height = Math.Max(0, loc.Location.Height);
+				y = loc.Rectangle.Y;
+				height = Math.Max(0, loc.Rectangle.Height);
 			}
 
 			yield return new WindowState()
 			{
 				Window = loc.Window,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = x,
 					Y = y,

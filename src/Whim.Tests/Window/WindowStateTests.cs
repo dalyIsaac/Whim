@@ -12,7 +12,7 @@ public class WindowStateTests
 		WindowState windowState =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window
 			};
@@ -31,14 +31,14 @@ public class WindowStateTests
 		WindowState windowState1 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window
 			};
 		WindowState windowState2 =
 			new()
 			{
-				Location = new Rectangle<int>() { X = 1, Y = 1 },
+				Rectangle = new Rectangle<int>() { X = 1, Y = 1 },
 				WindowSize = WindowSize.Normal,
 				Window = window
 			};
@@ -57,14 +57,14 @@ public class WindowStateTests
 		WindowState windowState1 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window
 			};
 		WindowState windowState2 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Maximized,
 				Window = window
 			};
@@ -83,14 +83,14 @@ public class WindowStateTests
 		WindowState windowState1 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window1
 			};
 		WindowState windowState2 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window2
 			};
@@ -109,14 +109,14 @@ public class WindowStateTests
 		WindowState windowState1 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window
 			};
 		WindowState windowState2 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window
 			};
@@ -135,14 +135,14 @@ public class WindowStateTests
 		WindowState windowState1 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window
 			};
 		WindowState windowState2 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window
 			};
@@ -161,14 +161,14 @@ public class WindowStateTests
 		WindowState windowState1 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window1
 			};
 		WindowState windowState2 =
 			new()
 			{
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
 				Window = window2
 			};

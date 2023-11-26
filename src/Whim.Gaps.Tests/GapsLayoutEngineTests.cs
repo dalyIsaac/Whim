@@ -22,7 +22,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window1,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 10 + 5,
 						Y = 10 + 5,
@@ -46,7 +46,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window2,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 10 + 5,
 						Y = 10 + 5,
@@ -58,7 +58,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window3,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 960 + 5,
 						Y = 10 + 5,
@@ -81,7 +81,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window4,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 15 + 7,
 						Y = 15 + 7,
@@ -148,7 +148,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window1,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -179,7 +179,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window2,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -209,7 +209,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window3,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -240,7 +240,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window4,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -271,7 +271,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window5,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -301,7 +301,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window6,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -332,7 +332,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window7,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -362,7 +362,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window8,
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -394,7 +394,7 @@ public class GapsLayoutEngineTests
 					new WindowState()
 					{
 						Window = window,
-						Location = location,
+						Rectangle = location,
 						WindowSize = WindowSize.Normal
 					}
 				}

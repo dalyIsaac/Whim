@@ -113,7 +113,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 			yield return new WindowState()
 			{
 				Window = window,
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = x,
 					Y = y,

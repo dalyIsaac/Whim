@@ -147,7 +147,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 			return;
 		}
 
-		IRectangle<int> location = source.WindowState.Location.Add(offset);
+		IRectangle<int> location = source.WindowState.Rectangle.Add(offset);
 		WindowSize windowSize = source.WindowState.WindowSize;
 		SET_WINDOW_POS_FLAGS uFlags = source.Flags ?? DefaultFlags;
 

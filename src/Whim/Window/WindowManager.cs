@@ -507,11 +507,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		// Find the one or two edges to move.
-		int leftEdgeDelta = windowState.Location.X - newLocation.X;
-		int topEdgeDelta = windowState.Location.Y - newLocation.Y;
-		int rightEdgeDelta = newLocation.X + newLocation.Width - (windowState.Location.X + windowState.Location.Width);
+		int leftEdgeDelta = windowState.Rectangle.X - newLocation.X;
+		int topEdgeDelta = windowState.Rectangle.Y - newLocation.Y;
+		int rightEdgeDelta = newLocation.X + newLocation.Width - (windowState.Rectangle.X + windowState.Rectangle.Width);
 		int bottomEdgeDelta =
-			newLocation.Y + newLocation.Height - (windowState.Location.Y + windowState.Location.Height);
+			newLocation.Y + newLocation.Height - (windowState.Rectangle.Y + windowState.Rectangle.Height);
 
 		int movedEdgeCountX = 0;
 		int movedEdgeCountY = 0;

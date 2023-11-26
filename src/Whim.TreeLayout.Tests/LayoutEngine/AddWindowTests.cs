@@ -50,7 +50,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -62,7 +62,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 50,
 							Y = 0,
@@ -109,7 +109,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -121,7 +121,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 33,
 							Y = 0,
@@ -133,7 +133,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window3,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 67,
 							Y = 0,
@@ -180,7 +180,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -192,7 +192,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 33,
 							Y = 0,
@@ -204,7 +204,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window3,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 67,
 							Y = 0,
@@ -253,7 +253,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -265,7 +265,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window3,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 33,
 							Y = 0,
@@ -277,7 +277,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 67,
 							Y = 0,
@@ -326,7 +326,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -338,7 +338,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 50,
 							Y = 0,
@@ -350,7 +350,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window3,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 50,
 							Y = 50,
@@ -392,7 +392,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -404,7 +404,7 @@ public class AddWindowTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Rectangle<int>()
+						Rectangle = new Rectangle<int>()
 						{
 							X = 50,
 							Y = 0,

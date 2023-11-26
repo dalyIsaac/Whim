@@ -190,7 +190,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -221,7 +221,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -237,7 +237,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 640,
 					Y = 0,
@@ -253,7 +253,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 1280,
 					Y = 0,
@@ -283,7 +283,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -317,7 +317,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 1280,
 					Y = 0,
@@ -333,7 +333,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 640,
 					Y = 0,
@@ -349,7 +349,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Rectangle<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -552,10 +552,10 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(2, windows.Length);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -576,10 +576,10 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(2, windows.Length);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -600,10 +600,10 @@ public class ColumnLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(rightWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(leftWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -624,10 +624,10 @@ public class ColumnLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(rightWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(leftWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -648,10 +648,10 @@ public class ColumnLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(rightWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(leftWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -672,10 +672,10 @@ public class ColumnLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(rightWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(leftWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -698,10 +698,10 @@ public class ColumnLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(960, windows[0].Location.X);
+		Assert.Equal(960, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(0, windows[1].Location.X);
+		Assert.Equal(0, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -724,10 +724,10 @@ public class ColumnLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(960, windows[0].Location.X);
+		Assert.Equal(960, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(0, windows[1].Location.X);
+		Assert.Equal(0, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -750,10 +750,10 @@ public class ColumnLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(960, windows[0].Location.X);
+		Assert.Equal(960, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(0, windows[1].Location.X);
+		Assert.Equal(0, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -776,10 +776,10 @@ public class ColumnLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(960, windows[0].Location.X);
+		Assert.Equal(960, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(0, windows[1].Location.X);
+		Assert.Equal(0, windows[1].Rectangle.X);
 	}
 	#endregion
 

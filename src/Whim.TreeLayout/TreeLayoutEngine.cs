@@ -289,7 +289,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			yield return new WindowState()
 			{
 				Window = item.WindowNode.Window,
-				Location = item.Location,
+				Rectangle = item.Location,
 				WindowSize = item.WindowSize
 			};
 		}

@@ -97,8 +97,8 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 		}
 
 		// Convert the location to a unit square location.
-		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(windowState.Location);
-		IRectangle<double> unitSquareLocation = monitor.WorkingArea.ToUnitSquare(windowState.Location);
+		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(windowState.Rectangle);
+		IRectangle<double> unitSquareLocation = monitor.WorkingArea.ToUnitSquare(windowState.Rectangle);
 
 		workspace.MoveWindowToPoint(window, unitSquareLocation);
 	}

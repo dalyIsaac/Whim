@@ -38,7 +38,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		WindowState = new WindowState()
 		{
 			Window = window,
-			Location = GetUpdatedLocation(),
+			Rectangle = GetUpdatedLocation(),
 			WindowSize = WindowSize.Normal
 		};
 
@@ -56,7 +56,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 
 	internal void UpdateLocation()
 	{
-		WindowState.Location = GetUpdatedLocation();
+		WindowState.Rectangle = GetUpdatedLocation();
 	}
 
 	private Rectangle<int> GetUpdatedLocation()

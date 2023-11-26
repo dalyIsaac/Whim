@@ -979,7 +979,7 @@ public class WorkspaceTests
 		// Given
 		IWindowState expectedWindowState = new WindowState()
 		{
-			Location = new Rectangle<int>(),
+			Rectangle = new Rectangle<int>(),
 			Window = window,
 			WindowSize = WindowSize.Normal
 		};
@@ -1023,10 +1023,10 @@ public class WorkspaceTests
 
 		// Then
 		Assert.Equal(window, windowState.Window);
-		Assert.Equal(0, windowState.Location.X);
-		Assert.Equal(0, windowState.Location.Y);
-		Assert.Equal(0, windowState.Location.Width);
-		Assert.Equal(0, windowState.Location.Height);
+		Assert.Equal(0, windowState.Rectangle.X);
+		Assert.Equal(0, windowState.Rectangle.Y);
+		Assert.Equal(0, windowState.Rectangle.Width);
+		Assert.Equal(0, windowState.Rectangle.Height);
 		Assert.Equal(WindowSize.Minimized, windowState.WindowSize);
 	}
 

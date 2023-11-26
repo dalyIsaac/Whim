@@ -140,7 +140,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = leftEdgeLeftWindows[0],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 0,
@@ -152,7 +152,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = leftEdgeLeftWindows[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 23,
 						Y = 0,
@@ -164,7 +164,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = leftEdgeLeftWindows[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 67,
 						Y = 0,
@@ -188,7 +188,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = leftEdgeRightWindows[0],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 0,
@@ -200,7 +200,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = leftEdgeRightWindows[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 43,
 						Y = 0,
@@ -212,7 +212,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = leftEdgeRightWindows[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 67,
 						Y = 0,
@@ -236,7 +236,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = rightEdgeLeftWindows[0],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 0,
@@ -248,7 +248,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = rightEdgeLeftWindows[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 33,
 						Y = 0,
@@ -260,7 +260,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = rightEdgeLeftWindows[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 57,
 						Y = 0,
@@ -284,7 +284,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = rightEdgeRightWindows[0],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 0,
@@ -296,7 +296,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = rightEdgeRightWindows[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 33,
 						Y = 0,
@@ -308,7 +308,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = rightEdgeRightWindows[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 77,
 						Y = 0,
@@ -366,7 +366,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = topEdgeUpWindows[0],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 0,
@@ -378,7 +378,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = topEdgeUpWindows[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 23,
@@ -390,7 +390,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = topEdgeUpWindows[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 67,
@@ -414,7 +414,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = topEdgeDownWindows[0],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 0,
@@ -426,7 +426,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = topEdgeDownWindows[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 43,
@@ -438,7 +438,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = topEdgeDownWindows[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 0,
 						Y = 67,
@@ -462,13 +462,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = bottomEdgeUpWindows[0],
-					Location = new Rectangle<int>() { Width = 100, Height = 33 },
+					Rectangle = new Rectangle<int>() { Width = 100, Height = 33 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = bottomEdgeUpWindows[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 33,
 						Height = 23,
@@ -479,7 +479,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = bottomEdgeUpWindows[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 57,
 						Height = 43,
@@ -502,13 +502,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = bottomEdgeDownWindows[0],
-					Location = new Rectangle<int>() { Width = 100, Height = 33 },
+					Rectangle = new Rectangle<int>() { Width = 100, Height = 33 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = bottomEdgeDownWindows[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 33,
 						Height = 43,
@@ -519,7 +519,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = bottomEdgeDownWindows[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 77,
 						Height = 23,
@@ -577,13 +577,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows1[0],
-					Location = new Rectangle<int>() { Width = 40, Height = 40 },
+					Rectangle = new Rectangle<int>() { Width = 40, Height = 40 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = windows1[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 40,
 						Width = 40,
@@ -594,7 +594,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows1[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 40,
 						Height = 50,
@@ -605,7 +605,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows1[3],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 40,
 						Y = 50,
@@ -630,13 +630,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows2[0],
-					Location = new Rectangle<int>() { Width = 60, Height = 60 },
+					Rectangle = new Rectangle<int>() { Width = 60, Height = 60 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = windows2[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 60,
 						Height = 40,
@@ -647,7 +647,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows2[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 60,
 						Height = 50,
@@ -658,7 +658,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows2[3],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 60,
 						Y = 50,
@@ -683,13 +683,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows3[0],
-					Location = new Rectangle<int>() { Width = 60, Height = 50 },
+					Rectangle = new Rectangle<int>() { Width = 60, Height = 50 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = windows3[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 50,
 						Width = 60,
@@ -700,7 +700,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows3[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 60,
 						Width = 40,
@@ -711,7 +711,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows3[3],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 60,
 						Y = 40,
@@ -736,13 +736,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows4[0],
-					Location = new Rectangle<int>() { Width = 40, Height = 50 },
+					Rectangle = new Rectangle<int>() { Width = 40, Height = 50 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = windows4[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 50,
 						Width = 40,
@@ -753,7 +753,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows4[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 40,
 						Width = 60,
@@ -764,7 +764,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows4[3],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 40,
 						Y = 60,
@@ -789,13 +789,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows5[0],
-					Location = new Rectangle<int>() { Width = 40, Height = 40 },
+					Rectangle = new Rectangle<int>() { Width = 40, Height = 40 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = windows5[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 40,
 						Width = 40,
@@ -806,7 +806,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows5[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 40,
 						Width = 60,
@@ -817,7 +817,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows5[3],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 40,
 						Y = 50,
@@ -842,13 +842,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows6[0],
-					Location = new Rectangle<int>() { Width = 60, Height = 60 },
+					Rectangle = new Rectangle<int>() { Width = 60, Height = 60 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = windows6[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 60,
 						Width = 60,
@@ -859,7 +859,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows6[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 60,
 						Width = 40,
@@ -870,7 +870,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows6[3],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 60,
 						Y = 50,
@@ -895,13 +895,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows7[0],
-					Location = new Rectangle<int>() { Width = 60, Height = 50 },
+					Rectangle = new Rectangle<int>() { Width = 60, Height = 50 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = windows7[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 50,
 						Width = 60,
@@ -912,7 +912,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows7[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 60,
 						Width = 40,
@@ -923,7 +923,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows7[3],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 60,
 						Y = 40,
@@ -948,13 +948,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows8[0],
-					Location = new Rectangle<int>() { Width = 40, Height = 50 },
+					Rectangle = new Rectangle<int>() { Width = 40, Height = 50 },
 					WindowSize = WindowSize.Normal
 				},
 				new WindowState()
 				{
 					Window = windows8[1],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						Y = 50,
 						Width = 40,
@@ -965,7 +965,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows8[2],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 40,
 						Width = 60,
@@ -976,7 +976,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				new WindowState()
 				{
 					Window = windows8[3],
-					Location = new Rectangle<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 40,
 						Y = 60,

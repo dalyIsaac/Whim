@@ -514,7 +514,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			location = new WindowState()
 			{
 				Window = window,
-				Location = new Rectangle<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Minimized
 			};
 		}
@@ -573,7 +573,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				new(
 					new WindowState()
 					{
-						Location = minimizedLocation,
+						Rectangle = minimizedLocation,
 						WindowSize = WindowSize.Minimized,
 						Window = window
 					}
