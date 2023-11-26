@@ -179,7 +179,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> location, IMonitor monitor)
+	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
 		// Iterate over all windows in _windowToLocation.
 		foreach ((IWindow window, IRectangle<double> loc) in _floatingWindowLocations)
@@ -187,13 +187,13 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 			yield return new WindowState()
 			{
 				Window = window,
-				Rectangle = location.ToMonitor(loc),
+				Rectangle = rectangle.ToMonitor(loc),
 				WindowSize = WindowSize.Normal
 			};
 		}
 
 		// Iterate over all windows in the inner layout engine.
-		foreach (IWindowState windowLocation in InnerLayoutEngine.DoLayout(location, monitor))
+		foreach (IWindowState windowLocation in InnerLayoutEngine.DoLayout(rectangle, monitor))
 		{
 			yield return windowLocation;
 		}

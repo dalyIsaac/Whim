@@ -74,7 +74,7 @@ public abstract record BaseProxyLayoutEngine : ILayoutEngine
 	public abstract ILayoutEngine MoveWindowEdgesInDirection(Direction edge, IPoint<double> deltas, IWindow window);
 
 	/// <inheritdoc/>
-	public abstract IEnumerable<IWindowState> DoLayout(IRectangle<int> location, IMonitor monitor);
+	public abstract IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor);
 
 	/// <summary>
 	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>
