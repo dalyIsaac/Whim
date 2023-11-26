@@ -125,23 +125,23 @@ public partial class NativeManager : INativeManager
 			return null;
 		}
 
-		IRectangle<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
-		if (extendedFrameLocation == null)
+		IRectangle<int>? extendedFrameRectangle = DwmGetWindowRectangle(hwnd);
+		if (extendedFrameRectangle == null)
 		{
 			return null;
 		}
 
 		return new Rectangle<int>()
 		{
-			X = windowRect.left - extendedFrameLocation.X,
-			Y = windowRect.top - extendedFrameLocation.Y,
-			Width = windowRect.right - windowRect.left - extendedFrameLocation.Width,
-			Height = windowRect.bottom - windowRect.top - extendedFrameLocation.Height
+			X = windowRect.left - extendedFrameRectangle.X,
+			Y = windowRect.top - extendedFrameRectangle.Y,
+			Width = windowRect.right - windowRect.left - extendedFrameRectangle.Width,
+			Height = windowRect.bottom - windowRect.top - extendedFrameRectangle.Height
 		};
 	}
 
 	/// <inheritdoc/>
-	public IRectangle<int>? DwmGetWindowLocation(HWND hwnd)
+	public IRectangle<int>? DwmGetWindowRectangle(HWND hwnd)
 	{
 		unsafe
 		{

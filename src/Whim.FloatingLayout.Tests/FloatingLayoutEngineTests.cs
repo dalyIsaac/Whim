@@ -18,7 +18,7 @@ public class FloatingLayoutEngineCustomization : ICustomization
 		monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 1000, Height = 1000 });
 		context
 			.NativeManager
-			.DwmGetWindowLocation(Arg.Any<HWND>())
+			.DwmGetWindowRectangle(Arg.Any<HWND>())
 			.Returns(new Rectangle<int>() { Width = 100, Height = 100 });
 
 		fixture.Inject(context);
@@ -143,7 +143,7 @@ public class FloatingLayoutEngineTests
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
+		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window);
@@ -406,7 +406,7 @@ public class FloatingLayoutEngineTests
 			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
+		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -561,7 +561,7 @@ public class FloatingLayoutEngineTests
 			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
+		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);

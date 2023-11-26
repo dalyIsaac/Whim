@@ -41,13 +41,13 @@ public record Rectangle<T> : IRectangle<T>, IEquatable<Rectangle<T>>
 	/// <summary>
 	/// Creates a new <see cref="Rectangle{T}"/> with the given values.
 	/// </summary>
-	/// <param name="location"></param>
-	public Rectangle(IRectangle<T> location)
+	/// <param name="rectangle"></param>
+	public Rectangle(IRectangle<T> rectangle)
 	{
-		X = location.X;
-		Y = location.Y;
-		Width = location.Width;
-		Height = location.Height;
+		X = rectangle.X;
+		Y = rectangle.Y;
+		Width = rectangle.Width;
+		Height = rectangle.Height;
 	}
 
 	/// <inheritdoc />

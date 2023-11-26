@@ -152,7 +152,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 			: null;
 
 		// Since the window is floating, we update the location, and return.
-		IRectangle<int>? newActualLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
+		IRectangle<int>? newActualLocation = _context.NativeManager.DwmGetWindowRectangle(window.Handle);
 		if (newActualLocation == null)
 		{
 			Logger.Error($"Could not obtain location for floating window {window}");

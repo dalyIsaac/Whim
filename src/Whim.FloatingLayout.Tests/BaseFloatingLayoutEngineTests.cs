@@ -16,7 +16,7 @@ public class BaseFloatingLayoutEngineTests : ProxyLayoutEngineBaseTests
 
 			context
 				.NativeManager
-				.DwmGetWindowLocation(Arg.Any<HWND>())
+				.DwmGetWindowRectangle(Arg.Any<HWND>())
 				.Returns(new Rectangle<int>() { Width = 100, Height = 100 });
 			context.MonitorManager.GetMonitorAtPoint(Arg.Any<IRectangle<int>>()).Returns(monitor);
 			monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 1000, Height = 1000 });

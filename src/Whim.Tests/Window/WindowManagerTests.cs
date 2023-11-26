@@ -682,7 +682,7 @@ public class WindowManagerTests
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newLocation);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 		windowManager.PostInitialize();
@@ -985,7 +985,7 @@ public class WindowManagerTests
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newLocation);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1090,7 +1090,7 @@ public class WindowManagerTests
 
 		// Then
 		ctx.WorkspaceManager.Received(1).GetWorkspaceForWindow(Arg.Any<IWindow>());
-		ctx.NativeManager.DidNotReceive().DwmGetWindowLocation(Arg.Any<HWND>());
+		ctx.NativeManager.DidNotReceive().DwmGetWindowRectangle(Arg.Any<HWND>());
 		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 	}
 
@@ -1125,7 +1125,7 @@ public class WindowManagerTests
 
 		// Then
 		workspace.Received(1).TryGetWindowState(Arg.Any<IWindow>());
-		ctx.NativeManager.DidNotReceive().DwmGetWindowLocation(Arg.Any<HWND>());
+		ctx.NativeManager.DidNotReceive().DwmGetWindowRectangle(Arg.Any<HWND>());
 		internalCtx.CoreNativeManager.Received(1).GetCursorPos(out IPoint<int> _);
 		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 		Assert.Null(result.Arguments.CursorDraggedPoint);
@@ -1193,7 +1193,7 @@ public class WindowManagerTests
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1203,7 +1203,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		ctx.NativeManager.Received(1).DwmGetWindowLocation(Arg.Any<HWND>());
+		ctx.NativeManager.Received(1).DwmGetWindowRectangle(Arg.Any<HWND>());
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(1, 0, 1, 0)]
@@ -1247,7 +1247,7 @@ public class WindowManagerTests
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newLocation);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1257,7 +1257,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		ctx.NativeManager.Received(1).DwmGetWindowLocation(Arg.Any<HWND>());
+		ctx.NativeManager.Received(1).DwmGetWindowRectangle(Arg.Any<HWND>());
 		workspace
 			.DidNotReceive()
 			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow>());
@@ -1371,7 +1371,7 @@ public class WindowManagerTests
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newLocation);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1420,7 +1420,7 @@ public class WindowManagerTests
 			);
 
 		ctx.NativeManager
-			.DwmGetWindowLocation(Arg.Any<HWND>())
+			.DwmGetWindowRectangle(Arg.Any<HWND>())
 			.Returns(
 				new Rectangle<int>()
 				{

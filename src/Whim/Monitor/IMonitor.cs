@@ -83,20 +83,20 @@ public static class MonitorHelpers
 	}
 
 	/// <summary>
-	/// Translate the <paramref name="location"/> from the unit square to the
+	/// Translate the <paramref name="rectangle"/> from the unit square to the
 	/// <paramref name="monitor"/>'s coordinate system.
 	/// </summary>
 	/// <param name="monitor"></param>
-	/// <param name="location">The point to translate.</param>
+	/// <param name="rectangle">The point to translate.</param>
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
-	public static IRectangle<double> ToUnitSquare(this IRectangle<int> monitor, IRectangle<int> location)
+	public static IRectangle<double> ToUnitSquare(this IRectangle<int> monitor, IRectangle<int> rectangle)
 	{
 		Debug.Assert(monitor.Width != 0);
 		Debug.Assert(monitor.Height != 0);
-		double x = Math.Abs((double)location.X / monitor.Width);
-		double y = Math.Abs((double)location.Y / monitor.Height);
-		double width = Math.Abs((double)location.Width / monitor.Width);
-		double height = Math.Abs((double)location.Height / monitor.Height);
+		double x = Math.Abs((double)rectangle.X / monitor.Width);
+		double y = Math.Abs((double)rectangle.Y / monitor.Height);
+		double width = Math.Abs((double)rectangle.Width / monitor.Width);
+		double height = Math.Abs((double)rectangle.Height / monitor.Height);
 		return new Rectangle<double>()
 		{
 			X = x,
@@ -107,20 +107,20 @@ public static class MonitorHelpers
 	}
 
 	/// <summary>
-	/// Translate the <paramref name="location"/> from the unit square to the
+	/// Translate the <paramref name="rectangle"/> from the unit square to the
 	/// <paramref name="monitor"/>'s coordinate system.
 	/// </summary>
 	/// <param name="monitor"></param>
-	/// <param name="location">The location to translate.</param>
-	/// <returns>The converted location.</returns>
-	public static IRectangle<int> ToMonitor(this IRectangle<int> monitor, IRectangle<double> location)
+	/// <param name="rectangle">The rectangle to translate.</param>
+	/// <returns>The converted rectangle.</returns>
+	public static IRectangle<int> ToMonitor(this IRectangle<int> monitor, IRectangle<double> rectangle)
 	{
 		return new Rectangle<int>()
 		{
-			X = Math.Abs(Convert.ToInt32(monitor.X + (location.X * monitor.Width))),
-			Y = Math.Abs(Convert.ToInt32(monitor.Y + (location.Y * monitor.Height))),
-			Width = Math.Abs(Convert.ToInt32(location.Width * monitor.Width)),
-			Height = Math.Abs(Convert.ToInt32(location.Height * monitor.Height))
+			X = Math.Abs(Convert.ToInt32(monitor.X + (rectangle.X * monitor.Width))),
+			Y = Math.Abs(Convert.ToInt32(monitor.Y + (rectangle.Y * monitor.Height))),
+			Width = Math.Abs(Convert.ToInt32(rectangle.Width * monitor.Width)),
+			Height = Math.Abs(Convert.ToInt32(rectangle.Height * monitor.Height))
 		};
 	}
 }
