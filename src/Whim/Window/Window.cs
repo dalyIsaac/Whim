@@ -19,12 +19,12 @@ internal class Window : IWindow
 
 	public bool IsUwp => ProcessFileName == "ApplicationFrameHost.exe";
 
-	public ILocation<int> Location
+	public IRectangle<int> Location
 	{
 		get
 		{
 			_internalContext.CoreNativeManager.GetWindowRect(Handle, out RECT rect);
-			return new Location<int>()
+			return new Rectangle<int>()
 			{
 				X = rect.left,
 				Y = rect.top,
@@ -38,7 +38,7 @@ internal class Window : IWindow
 	{
 		get
 		{
-			ILocation<int> location = Location;
+			IRectangle<int> location = Location;
 			return new Point<int>() { X = location.X + (location.Width / 2), Y = location.Y + (location.Height / 2) };
 		}
 	}

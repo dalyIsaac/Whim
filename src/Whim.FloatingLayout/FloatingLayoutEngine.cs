@@ -11,7 +11,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
 	private readonly IInternalFloatingLayoutPlugin _plugin;
-	private readonly ImmutableDictionary<IWindow, ILocation<double>> _floatingWindowLocations;
+	private readonly ImmutableDictionary<IWindow, IRectangle<double>> _floatingWindowLocations;
 
 	/// <inheritdoc />
 	public override int Count => InnerLayoutEngine.Count + _floatingWindowLocations.Count;
@@ -27,7 +27,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	{
 		_context = context;
 		_plugin = plugin;
-		_floatingWindowLocations = ImmutableDictionary<IWindow, ILocation<double>>.Empty;
+		_floatingWindowLocations = ImmutableDictionary<IWindow, IRectangle<double>>.Empty;
 	}
 
 	private FloatingLayoutEngine(FloatingLayoutEngine oldEngine, ILayoutEngine newInnerLayoutEngine)
@@ -41,7 +41,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	private FloatingLayoutEngine(
 		FloatingLayoutEngine oldEngine,
 		ILayoutEngine newInnerLayoutEngine,
-		ImmutableDictionary<IWindow, ILocation<double>> floatingWindowLocations
+		ImmutableDictionary<IWindow, IRectangle<double>> floatingWindowLocations
 	)
 		: this(oldEngine, newInnerLayoutEngine)
 	{
@@ -61,7 +61,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <returns></returns>
 	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow gcWindow)
 	{
-		ImmutableDictionary<IWindow, ILocation<double>> newFloatingWindowLocations = _floatingWindowLocations.Remove(
+		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowLocations = _floatingWindowLocations.Remove(
 			gcWindow
 		);
 
@@ -147,12 +147,12 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	private (FloatingLayoutEngine, bool error) UpdateWindowLocation(IWindow window)
 	{
 		// Try get the old location.
-		ILocation<double>? oldLocation = _floatingWindowLocations.TryGetValue(window, out ILocation<double>? location)
+		IRectangle<double>? oldLocation = _floatingWindowLocations.TryGetValue(window, out IRectangle<double>? location)
 			? location
 			: null;
 
 		// Since the window is floating, we update the location, and return.
-		ILocation<int>? newActualLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
+		IRectangle<int>? newActualLocation = _context.NativeManager.DwmGetWindowLocation(window.Handle);
 		if (newActualLocation == null)
 		{
 			Logger.Error($"Could not obtain location for floating window {window}");
@@ -160,7 +160,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 
 		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualLocation);
-		ILocation<double> newUnitSquareLocation = newMonitor.WorkingArea.ToUnitSquare(newActualLocation);
+		IRectangle<double> newUnitSquareLocation = newMonitor.WorkingArea.ToUnitSquare(newActualLocation);
 		if (newUnitSquareLocation.Equals(oldLocation))
 		{
 			Logger.Debug($"Location for window {window} has not changed");
@@ -179,10 +179,10 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
+	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> location, IMonitor monitor)
 	{
 		// Iterate over all windows in _windowToLocation.
-		foreach ((IWindow window, ILocation<double> loc) in _floatingWindowLocations)
+		foreach ((IWindow window, IRectangle<double> loc) in _floatingWindowLocations)
 		{
 			yield return new WindowState()
 			{

@@ -7,35 +7,35 @@ public class LocationTests
 	[Fact]
 	public void IsPointInside_ReturnsTrue_WhenPointIsInside()
 	{
-		Location<int> location = new() { Width = 10, Height = 10 };
+		Rectangle<int> location = new() { Width = 10, Height = 10 };
 		Assert.True(location.ContainsPoint(new Point<int>() { X = 5, Y = 5 }));
 	}
 
 	[Fact]
 	public void IsPointInside_ReturnsFalse_WhenPointIsOutside()
 	{
-		Location<int> location = new() { Width = 10, Height = 10 };
+		Rectangle<int> location = new() { Width = 10, Height = 10 };
 		Assert.False(location.ContainsPoint(new Point<int>() { X = 15, Y = 15 }));
 	}
 
 	[Fact]
 	public void IsPointInside_ReturnsFalse_WhenPointIsOutsideX()
 	{
-		Location<int> location = new() { Width = 10, Height = 10 };
+		Rectangle<int> location = new() { Width = 10, Height = 10 };
 		Assert.False(location.ContainsPoint(new Point<int>() { X = -5, Y = 5 }));
 	}
 
 	[Fact]
 	public void IsPointInside_ReturnsFalse_WhenPointIsOutsideY()
 	{
-		Location<int> location = new() { Width = 10, Height = 10 };
+		Rectangle<int> location = new() { Width = 10, Height = 10 };
 		Assert.False(location.ContainsPoint(new Point<int>() { X = 5, Y = -5 }));
 	}
 
 	[Fact]
 	public void IsPointInside_ReturnsTrue_WhenPointIsOnEdge()
 	{
-		Location<int> location = new() { Width = 10, Height = 10 };
+		Rectangle<int> location = new() { Width = 10, Height = 10 };
 
 		// Extreme boundaries.
 		Assert.True(location.ContainsPoint(new Point<int>()));
@@ -59,8 +59,8 @@ public class LocationTests
 	[Fact]
 	public void Add_ReturnsNewLocation_WhenLocationsAreAdded()
 	{
-		Location<int> location1 = new() { Width = 10, Height = 10 };
-		Location<int> location2 =
+		Rectangle<int> location1 = new() { Width = 10, Height = 10 };
+		Rectangle<int> location2 =
 			new()
 			{
 				X = 5,
@@ -68,9 +68,9 @@ public class LocationTests
 				Width = 5,
 				Height = 5
 			};
-		ILocation<int> location3 = location1.Add(location2);
+		IRectangle<int> location3 = location1.Add(location2);
 		Assert.StrictEqual(
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -85,8 +85,8 @@ public class LocationTests
 	public void GetHashCode_NotEqual()
 	{
 		// Given
-		Location<int> location1 = new() { Width = 10, Height = 10 };
-		Location<int> location2 =
+		Rectangle<int> location1 = new() { Width = 10, Height = 10 };
+		Rectangle<int> location2 =
 			new()
 			{
 				X = 5,
@@ -107,8 +107,8 @@ public class LocationTests
 	public void GetHashCode_Equal()
 	{
 		// Given
-		Location<int> location1 = new() { Width = 10, Height = 10 };
-		Location<int> location2 = new() { Width = 10, Height = 10 };
+		Rectangle<int> location1 = new() { Width = 10, Height = 10 };
+		Rectangle<int> location2 = new() { Width = 10, Height = 10 };
 
 		// When
 		int hashCode1 = location1.GetHashCode();

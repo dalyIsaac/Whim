@@ -80,7 +80,7 @@ public interface ILayoutEngine
 	/// <param name="location">The available area to do a layout inside.</param>
 	/// <param name="monitor">The monitor which the layout is being done for.</param>
 	/// <returns>The layout result.</returns>
-	IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
+	IEnumerable<IWindowState> DoLayout(IRectangle<int> location, IMonitor monitor);
 
 	/// <summary>
 	/// Retrieves the first window in the layout engine.

@@ -34,7 +34,7 @@ public class MoveWindowToPointTests
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
@@ -54,7 +54,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -66,7 +66,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 50,
 							Y = 0,
@@ -89,7 +89,7 @@ public class MoveWindowToPointTests
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.7 };
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
@@ -109,7 +109,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -121,7 +121,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 50,
@@ -144,7 +144,7 @@ public class MoveWindowToPointTests
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.5 };
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
@@ -164,7 +164,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -176,7 +176,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 50,
 							Y = 0,
@@ -199,7 +199,7 @@ public class MoveWindowToPointTests
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.3 };
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
@@ -219,7 +219,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -231,7 +231,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 50,
@@ -282,7 +282,7 @@ public class MoveWindowToPointTests
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
@@ -303,7 +303,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -315,7 +315,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window3,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 33,
 							Y = 0,
@@ -327,7 +327,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 67,
 							Y = 0,
@@ -356,7 +356,7 @@ public class MoveWindowToPointTests
 
 		IPoint<double> point = new Point<double>() { X = 0.75, Y = 0.8 };
 
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
@@ -377,7 +377,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,
@@ -389,7 +389,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 50,
 							Y = 0,
@@ -401,7 +401,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window3,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 50,
 							Y = 50,
@@ -429,7 +429,7 @@ public class MoveWindowToPointTests
 
 		IPoint<double> point = new Point<double>() { X = x, Y = y };
 
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window, point);
@@ -448,7 +448,7 @@ public class MoveWindowToPointTests
 					new WindowState()
 					{
 						Window = window,
-						Location = new Location<int>()
+						Location = new Rectangle<int>()
 						{
 							X = 0,
 							Y = 0,

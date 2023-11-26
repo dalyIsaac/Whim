@@ -14,12 +14,12 @@ public class FloatingLayoutEngineCustomization : ICustomization
 		IContext context = fixture.Freeze<IContext>();
 		IMonitor monitor = fixture.Freeze<IMonitor>();
 
-		context.MonitorManager.GetMonitorAtPoint(Arg.Any<ILocation<int>>()).Returns(monitor);
-		monitor.WorkingArea.Returns(new Location<int>() { Width = 1000, Height = 1000 });
+		context.MonitorManager.GetMonitorAtPoint(Arg.Any<IRectangle<int>>()).Returns(monitor);
+		monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 1000, Height = 1000 });
 		context
 			.NativeManager
 			.DwmGetWindowLocation(Arg.Any<HWND>())
-			.Returns(new Location<int>() { Width = 100, Height = 100 });
+			.Returns(new Rectangle<int>() { Width = 100, Height = 100 });
 
 		fixture.Inject(context);
 		fixture.Inject(monitor);
@@ -143,7 +143,7 @@ public class FloatingLayoutEngineTests
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window);
@@ -283,7 +283,7 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> location = new Rectangle<double>();
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
@@ -303,7 +303,7 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> location = new Rectangle<double>();
 
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.MoveWindowToPoint(window, location).Returns(innerLayoutEngine);
@@ -325,7 +325,7 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> location = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
@@ -348,7 +348,7 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> location = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
@@ -374,7 +374,7 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> location = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
@@ -400,13 +400,13 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> location = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -561,7 +561,7 @@ public class FloatingLayoutEngineTests
 			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -595,20 +595,20 @@ public class FloatingLayoutEngineTests
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		newInnerLayoutEngine
-			.DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>())
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
 				new IWindowState[]
 				{
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Location<int>(),
+						Location = new Rectangle<int>(),
 						WindowSize = WindowSize.Normal
 					},
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Location<int>(),
+						Location = new Rectangle<int>(),
 						WindowSize = WindowSize.Normal
 					}
 				}
@@ -619,7 +619,7 @@ public class FloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.AddWindow(floatingWindow);
 		IWindowState[] windowStates = newEngine
 			.DoLayout(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -639,7 +639,7 @@ public class FloatingLayoutEngineTests
 			new WindowState()
 			{
 				Window = floatingWindow,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -651,13 +651,13 @@ public class FloatingLayoutEngineTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Location<int>(),
+				Location = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Location<int>(),
+				Location = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			}
 		};
@@ -994,12 +994,12 @@ public class FloatingLayoutEngineTests
 		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
 
 		// ... and then moved
-		ILayoutEngine newEngine2 = newEngine.MoveWindowToPoint(window, new Location<double>());
+		ILayoutEngine newEngine2 = newEngine.MoveWindowToPoint(window, new Rectangle<double>());
 
 		// Then MoveWindowToPoint should be called on the inner layout engine
 		Assert.NotSame(engine, newEngine);
 		Assert.NotSame(newEngine, newEngine2);
-		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, new Location<double>());
+		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, new Rectangle<double>());
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]

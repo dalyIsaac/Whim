@@ -102,7 +102,7 @@ public class WindowTests
 		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
-		ILocation<int> location = window.Location;
+		IRectangle<int> location = window.Location;
 
 		// Then
 		Assert.Equal(0, location.X);

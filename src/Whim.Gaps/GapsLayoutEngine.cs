@@ -40,7 +40,7 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 	public override bool ContainsWindow(IWindow window) => InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc />
-	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
+	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> location, IMonitor monitor)
 	{
 		double scaleFactor = monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
@@ -51,7 +51,7 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 		int doubleOuterGap = outerGap * 2;
 		int doubleInnerGap = innerGap * 2;
 
-		Location<int> proxiedLocation =
+		Rectangle<int> proxiedLocation =
 			new()
 			{
 				X = location.X + outerGap,
@@ -83,7 +83,7 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 			yield return new WindowState()
 			{
 				Window = loc.Window,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = x,
 					Y = y,

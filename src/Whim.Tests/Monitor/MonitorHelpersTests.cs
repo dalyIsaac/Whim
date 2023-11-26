@@ -9,19 +9,19 @@ public class MonitorHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<int>() { Width = 1920, Height = 1080 },
+			new Rectangle<int>() { Width = 1920, Height = 1080 },
 			new Point<int>() { X = 192, Y = 108 },
 			new Point<double>() { X = 0.1, Y = 0.1 }
 		};
 		yield return new object[]
 		{
-			new Location<int>() { Width = 1920, Height = 1080 },
+			new Rectangle<int>() { Width = 1920, Height = 1080 },
 			new Point<int>() { X = 960, Y = 270 },
 			new Point<double>() { X = 0.5, Y = 0.25 }
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 100,
 				Y = 100,
@@ -33,7 +33,7 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 100,
 				Y = 100,
@@ -45,7 +45,7 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = -100,
 				Y = 100,
@@ -57,7 +57,7 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = -100,
 				Y = 100,
@@ -71,7 +71,7 @@ public class MonitorHelpersTests
 
 	[Theory]
 	[MemberData(nameof(IntToUnitSquareData))]
-	public void ToUnitSquarePointTheory(ILocation<int> monitor, IPoint<int> point, IPoint<double> expected)
+	public void ToUnitSquarePointTheory(IRectangle<int> monitor, IPoint<int> point, IPoint<double> expected)
 	{
 		// When
 		IPoint<double> actual = monitor.ToUnitSquare(point);
@@ -85,19 +85,19 @@ public class MonitorHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<int>() { Width = 1920, Height = 1080 },
+			new Rectangle<int>() { Width = 1920, Height = 1080 },
 			new Point<int>() { X = -192, Y = 108 },
 			new Point<double>() { X = -0.1, Y = 0.1 }
 		};
 		yield return new object[]
 		{
-			new Location<int>() { Width = 1920, Height = 1080 },
+			new Rectangle<int>() { Width = 1920, Height = 1080 },
 			new Point<int>() { X = 960, Y = -270 },
 			new Point<double>() { X = 0.5, Y = -0.25 }
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 100,
 				Y = 100,
@@ -109,7 +109,7 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 100,
 				Y = 100,
@@ -121,7 +121,7 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = -100,
 				Y = 100,
@@ -133,7 +133,7 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = -100,
 				Y = 100,
@@ -147,7 +147,7 @@ public class MonitorHelpersTests
 
 	[Theory]
 	[MemberData(nameof(IntToUnitSquareRespectSignData))]
-	public void ToUnitSquarePointRespectSignTheory(ILocation<int> monitor, IPoint<int> point, IPoint<double> expected)
+	public void ToUnitSquarePointRespectSignTheory(IRectangle<int> monitor, IPoint<int> point, IPoint<double> expected)
 	{
 		// When
 		IPoint<double> actual = monitor.ToUnitSquare(point, respectSign: true);
@@ -161,15 +161,15 @@ public class MonitorHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<int>() { Width = 1920, Height = 1080 },
-			new Location<int>()
+			new Rectangle<int>() { Width = 1920, Height = 1080 },
+			new Rectangle<int>()
 			{
 				X = 192,
 				Y = 108,
 				Width = 192,
 				Height = 108
 			},
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 0.1,
 				Y = 0.1,
@@ -179,21 +179,21 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 100,
 				Y = 100,
 				Width = 1920,
 				Height = 1080
 			},
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 192,
 				Y = 108,
 				Width = 192,
 				Height = 108
 			},
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 0.1,
 				Y = 0.1,
@@ -203,21 +203,21 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = -100,
 				Y = -100,
 				Width = 1920,
 				Height = 1080
 			},
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 192,
 				Y = 108,
 				Width = 192,
 				Height = 108
 			},
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 0.1,
 				Y = 0.1,
@@ -229,10 +229,10 @@ public class MonitorHelpersTests
 
 	[Theory]
 	[MemberData(nameof(DoubleToUnitSquareData))]
-	public void ToUnitSquareLocationTheory(ILocation<int> monitor, ILocation<int> location, ILocation<double> expected)
+	public void ToUnitSquareLocationTheory(IRectangle<int> monitor, IRectangle<int> location, IRectangle<double> expected)
 	{
 		// When
-		ILocation<double> actual = monitor.ToUnitSquare(location);
+		IRectangle<double> actual = monitor.ToUnitSquare(location);
 
 		// Then
 		Assert.Equal(expected.X, actual.X);
@@ -243,15 +243,15 @@ public class MonitorHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<int>() { Width = 1920, Height = 1080 },
-			new Location<double>()
+			new Rectangle<int>() { Width = 1920, Height = 1080 },
+			new Rectangle<double>()
 			{
 				X = 0.1,
 				Y = 0.1,
 				Width = 0.1,
 				Height = 0.1
 			},
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 192,
 				Y = 108,
@@ -261,21 +261,21 @@ public class MonitorHelpersTests
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 100,
 				Y = 100,
 				Width = 1920,
 				Height = 1080
 			},
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 0.1,
 				Y = 0.1,
 				Width = 0.1,
 				Height = 0.1
 			},
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 192 + 100,
 				Y = 108 + 100,
@@ -287,10 +287,10 @@ public class MonitorHelpersTests
 
 	[Theory]
 	[MemberData(nameof(ToMonitorData))]
-	public void ToMonitorTheory(ILocation<int> monitor, ILocation<double> location, ILocation<int> expected)
+	public void ToMonitorTheory(IRectangle<int> monitor, IRectangle<double> location, IRectangle<int> expected)
 	{
 		// When
-		ILocation<int> actual = monitor.ToMonitor(location);
+		IRectangle<int> actual = monitor.ToMonitor(location);
 
 		// Then
 		Assert.Equal(expected.X, actual.X);
@@ -301,13 +301,13 @@ public class MonitorHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<int>() { Width = 1920, Height = 1080 },
+			new Rectangle<int>() { Width = 1920, Height = 1080 },
 			new Point<int>() { X = 192, Y = 108 },
 			new Point<int>() { X = 192, Y = 108 }
 		};
 		yield return new object[]
 		{
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 100,
 				Y = 100,
@@ -321,7 +321,7 @@ public class MonitorHelpersTests
 
 	[Theory]
 	[MemberData(nameof(ToMonitorCoordinatesData))]
-	public void ToMonitorCoordinatesTheory(ILocation<int> monitor, IPoint<int> point, IPoint<int> expected)
+	public void ToMonitorCoordinatesTheory(IRectangle<int> monitor, IPoint<int> point, IPoint<int> expected)
 	{
 		// When
 		IPoint<int> actual = monitor.ToMonitorCoordinates(point);

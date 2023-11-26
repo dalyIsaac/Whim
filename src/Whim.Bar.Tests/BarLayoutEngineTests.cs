@@ -249,7 +249,7 @@ public class BarLayoutEngineTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					Y = 30,
 					Width = 50,
@@ -260,7 +260,7 @@ public class BarLayoutEngineTests
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 30,
@@ -271,7 +271,7 @@ public class BarLayoutEngineTests
 			}
 		};
 
-		Location<int> expectedGivenLocation =
+		Rectangle<int> expectedGivenLocation =
 			new()
 			{
 				Y = 30,
@@ -282,7 +282,7 @@ public class BarLayoutEngineTests
 		innerLayoutEngine.DoLayout(expectedGivenLocation, monitor).Returns(expectedWindowStates);
 
 		// When
-		IWindowState[] layout = engine.DoLayout(new Location<int>() { Width = 100, Height = 100 }, monitor).ToArray();
+		IWindowState[] layout = engine.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor).ToArray();
 
 		// Then
 		Assert.Equal(2, layout.Length);
@@ -299,9 +299,9 @@ public class BarLayoutEngineTests
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
 		// When
-		engine.DoLayout(new Location<int>() { Width = 100, Height = height }, monitor);
+		engine.DoLayout(new Rectangle<int>() { Width = 100, Height = height }, monitor);
 
 		// Then
-		innerLayoutEngine.Received(1).DoLayout(Arg.Is<Location<int>>(l => l.Height == 0), monitor);
+		innerLayoutEngine.Received(1).DoLayout(Arg.Is<Rectangle<int>>(l => l.Height == 0), monitor);
 	}
 }

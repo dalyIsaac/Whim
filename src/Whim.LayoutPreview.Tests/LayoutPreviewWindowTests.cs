@@ -25,7 +25,7 @@ public class LayoutPreviewWindowTests
 		IWindowState[] prevWindowStates = Array.Empty<IWindowState>();
 		int prevHoveredIndex = -1;
 		IWindowState[] windowStates = new IWindowState[1];
-		IPoint<int> cursorPoint = new Location<int>();
+		IPoint<int> cursorPoint = new Rectangle<int>();
 
 		// When
 		bool shouldContinue = LayoutPreviewWindow.ShouldContinue(
@@ -48,13 +48,13 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Location<int>(),
+				Location = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Location<int>(),
+				Location = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 		};
@@ -65,11 +65,11 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Location<int>(),
+				Location = new Rectangle<int>(),
 				WindowSize = WindowSize.Maximized
 			},
 		};
-		IPoint<int> cursorPoint = new Location<int>();
+		IPoint<int> cursorPoint = new Rectangle<int>();
 
 		// When
 		bool shouldContinue = LayoutPreviewWindow.ShouldContinue(
@@ -87,7 +87,7 @@ public class LayoutPreviewWindowTests
 	public void ShouldContinue_HoveredIndexChanged()
 	{
 		// Given
-		Location<int> location = new() { Height = 100, Width = 100 };
+		Rectangle<int> location = new() { Height = 100, Width = 100 };
 		IWindowState[] prevWindowStates = new IWindowState[]
 		{
 			new WindowState()
@@ -99,7 +99,7 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Location<int>(),
+				Location = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 		};
@@ -115,11 +115,11 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Location<int>(),
+				Location = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 		};
-		IPoint<int> cursorPoint = new Location<int>() { X = 100, Y = 101 };
+		IPoint<int> cursorPoint = new Rectangle<int>() { X = 100, Y = 101 };
 
 		// When
 		bool shouldContinue = LayoutPreviewWindow.ShouldContinue(
@@ -137,7 +137,7 @@ public class LayoutPreviewWindowTests
 	public void ShouldContinue_HoveredIndexNotChanged()
 	{
 		// Given
-		Location<int> location = new() { Height = 100, Width = 100 };
+		Rectangle<int> location = new() { Height = 100, Width = 100 };
 		IWindowState[] prevWindowStates = new IWindowState[]
 		{
 			new WindowState()
@@ -149,12 +149,12 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Location = new Location<int>(),
+				Location = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 		};
 		int prevHoveredIndex = 0;
-		IPoint<int> cursorPoint = new Location<int>() { X = 50, Y = 50 };
+		IPoint<int> cursorPoint = new Rectangle<int>() { X = 50, Y = 50 };
 
 		// When
 		bool shouldContinue = LayoutPreviewWindow.ShouldContinue(

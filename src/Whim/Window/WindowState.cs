@@ -6,7 +6,7 @@ namespace Whim;
 public class WindowState : IWindowState
 {
 	/// <inheritdoc />
-	public required ILocation<int> Location { get; set; }
+	public required IRectangle<int> Location { get; set; }
 
 	/// <inheritdoc />
 	public required WindowSize WindowSize { get; set; }

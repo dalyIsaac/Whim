@@ -157,7 +157,7 @@ public class WorkspaceTests
 		workspace.DoLayout();
 
 		// Then
-		layoutEngine.DidNotReceive().DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>());
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
 		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
 		triggers.WorkspaceLayoutCompleted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
 	}
@@ -979,13 +979,13 @@ public class WorkspaceTests
 		// Given
 		IWindowState expectedWindowState = new WindowState()
 		{
-			Location = new Location<int>(),
+			Location = new Rectangle<int>(),
 			Window = window,
 			WindowSize = WindowSize.Normal
 		};
 		layoutEngine.AddWindow(window).Returns(resultingEngine);
 		resultingEngine
-			.DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>())
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(new IWindowState[] { expectedWindowState });
 
 		Workspace workspace =

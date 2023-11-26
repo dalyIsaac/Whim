@@ -13,7 +13,7 @@ internal record NonRootWindowData(
 	WindowNode WindowNode,
 	IReadOnlyList<ISplitNode> WindowAncestors,
 	ImmutableArray<int> WindowPath,
-	ILocation<double> WindowLocation
+	IRectangle<double> WindowLocation
 );
 
 /// <summary>
@@ -211,7 +211,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		if (_root is WindowNode focusedWindowNode)
 		{
 			Logger.Debug($"Root is window node, replacing with split node");
-			Direction newNodeDirection = Location.UnitSquare<double>().GetDirectionToPoint(point);
+			Direction newNodeDirection = Rectangle.UnitSquare<double>().GetDirectionToPoint(point);
 
 			ISplitNode newRoot = new SplitNode(focusedWindowNode, newWindowNode, newNodeDirection);
 			return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(newRoot));
@@ -275,7 +275,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
+	public IEnumerable<IWindowState> DoLayout(IRectangle<int> location, IMonitor monitor)
 	{
 		Logger.Debug($"Doing layout for engine {Name}");
 
@@ -380,7 +380,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			INode _,
 			IReadOnlyList<ISplitNode> windowAncestors,
 			ImmutableArray<int> windowPath,
-			ILocation<double> windowLocation
+			IRectangle<double> windowLocation
 		) = windowData;
 
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;

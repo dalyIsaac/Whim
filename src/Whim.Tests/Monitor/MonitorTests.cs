@@ -62,9 +62,9 @@ public class MonitorTests
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
 		Assert.True(monitor.IsPrimary);
-		Assert.Equal(new Location<int>() { Width = 1920, Height = 1080 }, monitor.Bounds);
+		Assert.Equal(new Rectangle<int>() { Width = 1920, Height = 1080 }, monitor.Bounds);
 		Assert.Equal(
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 10,
 				Y = 10,
@@ -89,9 +89,9 @@ public class MonitorTests
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
 		Assert.True(monitor.IsPrimary);
-		Assert.Equal(new Location<int>() { Width = 1920, Height = 1080 }, monitor.Bounds);
+		Assert.Equal(new Rectangle<int>() { Width = 1920, Height = 1080 }, monitor.Bounds);
 		Assert.Equal(
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 10,
 				Y = 10,
@@ -131,9 +131,9 @@ public class MonitorTests
 		// Then
 		Assert.Equal("DISPLAY", monitor.Name);
 		Assert.False(monitor.IsPrimary);
-		Assert.Equal(new Location<int>() { Width = 1920, Height = 1080 }, monitor.Bounds);
+		Assert.Equal(new Rectangle<int>() { Width = 1920, Height = 1080 }, monitor.Bounds);
 		Assert.Equal(
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 10,
 				Y = 10,
@@ -159,8 +159,8 @@ public class MonitorTests
 		// Then
 		Assert.Equal("NOT A DISPLAY", monitor.Name);
 		Assert.False(monitor.IsPrimary);
-		Assert.Equal(new Location<int>(), monitor.Bounds);
-		Assert.Equal(new Location<int>(), monitor.WorkingArea);
+		Assert.Equal(new Rectangle<int>(), monitor.Bounds);
+		Assert.Equal(new Rectangle<int>(), monitor.WorkingArea);
 	}
 
 	[Theory, AutoSubstituteData<MonitorCustomization>]

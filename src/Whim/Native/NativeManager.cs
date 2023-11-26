@@ -117,7 +117,7 @@ public partial class NativeManager : INativeManager
 	}
 
 	/// <inheritdoc/>
-	public ILocation<int>? GetWindowOffset(HWND hwnd)
+	public IRectangle<int>? GetWindowOffset(HWND hwnd)
 	{
 		if (!PInvoke.GetWindowRect(hwnd, out RECT windowRect))
 		{
@@ -125,13 +125,13 @@ public partial class NativeManager : INativeManager
 			return null;
 		}
 
-		ILocation<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
+		IRectangle<int>? extendedFrameLocation = DwmGetWindowLocation(hwnd);
 		if (extendedFrameLocation == null)
 		{
 			return null;
 		}
 
-		return new Location<int>()
+		return new Rectangle<int>()
 		{
 			X = windowRect.left - extendedFrameLocation.X,
 			Y = windowRect.top - extendedFrameLocation.Y,
@@ -141,7 +141,7 @@ public partial class NativeManager : INativeManager
 	}
 
 	/// <inheritdoc/>
-	public ILocation<int>? DwmGetWindowLocation(HWND hwnd)
+	public IRectangle<int>? DwmGetWindowLocation(HWND hwnd)
 	{
 		unsafe
 		{
@@ -160,7 +160,7 @@ public partial class NativeManager : INativeManager
 				return null;
 			}
 
-			return new Location<int>()
+			return new Rectangle<int>()
 			{
 				X = extendedFrameRect.left,
 				Y = extendedFrameRect.top,

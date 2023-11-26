@@ -22,7 +22,7 @@ public class CommandPaletteWindowViewModelTests
 		public Wrapper()
 		{
 			IMonitor monitor = Substitute.For<IMonitor>();
-			monitor.WorkingArea.Returns(new Location<int>() { Height = 1080, Width = 1920 });
+			monitor.WorkingArea.Returns(new Rectangle<int>() { Height = 1080, Width = 1920 });
 
 			Context.MonitorManager.ActiveMonitor.Returns(monitor);
 
@@ -123,7 +123,7 @@ public class CommandPaletteWindowViewModelTests
 		monitor
 			.WorkingArea
 			.Returns(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,

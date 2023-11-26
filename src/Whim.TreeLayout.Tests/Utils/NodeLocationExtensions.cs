@@ -2,9 +2,9 @@ namespace Whim.TreeLayout.Tests;
 
 internal static class NodeLocationExtensions
 {
-	public static Location<int> Scale(this ILocation<double> node, ILocation<int> scale)
+	public static Rectangle<int> Scale(this IRectangle<double> node, IRectangle<int> scale)
 	{
-		return new Location<int>
+		return new Rectangle<int>
 		{
 			X = (int)Math.Round(node.X * scale.Width),
 			Y = (int)Math.Round(node.Y * scale.Height),

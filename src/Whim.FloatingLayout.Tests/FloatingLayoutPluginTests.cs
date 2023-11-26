@@ -17,7 +17,7 @@ public class FloatingLayoutPluginCustomization : ICustomization
 		monitor
 			.WorkingArea
 			.Returns(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -121,7 +121,7 @@ public class FloatingLayoutPluginTests
 	)
 	{
 		// Given
-		Location<int> location = new();
+		Rectangle<int> location = new();
 		WindowState windowState =
 			new()
 			{
@@ -219,7 +219,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Location = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -262,7 +262,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Location = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -304,7 +304,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Location = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -330,7 +330,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Location = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -410,7 +410,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Location = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -455,7 +455,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Location = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}

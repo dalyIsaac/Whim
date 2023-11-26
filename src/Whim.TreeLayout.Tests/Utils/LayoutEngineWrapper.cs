@@ -12,7 +12,7 @@ internal class LayoutEngineWrapper
 
 	public LayoutEngineWrapper()
 	{
-		Monitor.WorkingArea.Returns(new Location<int>() { Width = 100, Height = 100 });
+		Monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 100, Height = 100 });
 
 		Context.WorkspaceManager.ActiveWorkspace.Returns(Workspace);
 		Context.MonitorManager.ActiveMonitor.Returns(Monitor);

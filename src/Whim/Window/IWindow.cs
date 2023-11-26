@@ -31,7 +31,7 @@ public interface IWindow
 	/// <summary>
 	/// The location of the window.
 	/// </summary>
-	ILocation<int> Location { get; }
+	IRectangle<int> Location { get; }
 
 	/// <summary>
 	/// The center of the window.

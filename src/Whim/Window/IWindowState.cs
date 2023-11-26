@@ -8,7 +8,7 @@ public interface IWindowState
 	/// <summary>
 	/// The dimensions of the bounding rectangle of the specified window.
 	/// </summary>
-	public ILocation<int> Location { get; set; }
+	public IRectangle<int> Location { get; set; }
 
 	/// <summary>
 	/// The state of the window.

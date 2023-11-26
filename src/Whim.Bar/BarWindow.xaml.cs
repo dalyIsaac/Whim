@@ -59,12 +59,12 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		WindowState.Location = GetUpdatedLocation();
 	}
 
-	private Location<int> GetUpdatedLocation()
+	private Rectangle<int> GetUpdatedLocation()
 	{
 		double scaleFactor = _monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
 
-		return new Location<int>()
+		return new Rectangle<int>()
 		{
 			X = _monitor.WorkingArea.X,
 			Y = _monitor.WorkingArea.Y,

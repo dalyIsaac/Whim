@@ -141,13 +141,13 @@ public sealed class DeferWindowPosHandle : IDisposable
 	{
 		IWindow window = source.WindowState.Window;
 
-		ILocation<int>? offset = _context.NativeManager.GetWindowOffset(window.Handle);
+		IRectangle<int>? offset = _context.NativeManager.GetWindowOffset(window.Handle);
 		if (offset is null)
 		{
 			return;
 		}
 
-		ILocation<int> location = source.WindowState.Location.Add(offset);
+		IRectangle<int> location = source.WindowState.Location.Add(offset);
 		WindowSize windowSize = source.WindowState.WindowSize;
 		SET_WINDOW_POS_FLAGS uFlags = source.Flags ?? DefaultFlags;
 

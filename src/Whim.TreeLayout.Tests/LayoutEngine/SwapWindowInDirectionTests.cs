@@ -31,7 +31,7 @@ public class SwapWindowInDirectionTests
 			.AddWindow(window1)
 			.AddWindow(window2);
 
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window1);
@@ -45,7 +45,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -57,7 +57,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 0,
@@ -80,7 +80,7 @@ public class SwapWindowInDirectionTests
 			.AddWindow(window1)
 			.AddWindow(window2);
 
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
@@ -94,7 +94,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -106,7 +106,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 0,
@@ -135,7 +135,7 @@ public class SwapWindowInDirectionTests
 			.AddWindow(window2)
 			.MoveWindowToPoint(window3, new Point<double>() { X = 0.75, Y = 0.75 });
 
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
@@ -149,13 +149,13 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Location<int>() { Width = 50, Height = 100 },
+				Location = new Rectangle<int>() { Width = 50, Height = 100 },
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 0,
@@ -167,7 +167,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = window3,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 50,
@@ -199,7 +199,7 @@ public class SwapWindowInDirectionTests
 			.MoveWindowToPoint(bottomLeft, new Point<double>() { X = 0.25, Y = 0.9 })
 			.MoveWindowToPoint(bottomRight, new Point<double>() { X = 0.75, Y = 0.9 });
 
-		ILocation<int> location = new Location<int>() { Width = 100, Height = 100 };
+		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.LeftUp, bottomRight);
@@ -213,7 +213,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = bottomRight,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -225,7 +225,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = bottomLeft,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 50,
@@ -237,7 +237,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = topRight,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 0,
@@ -249,7 +249,7 @@ public class SwapWindowInDirectionTests
 			new WindowState()
 			{
 				Window = topLeft,
-				Location = new Location<int>()
+				Location = new Rectangle<int>()
 				{
 					X = 50,
 					Y = 50,

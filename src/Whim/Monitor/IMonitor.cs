@@ -30,12 +30,12 @@ public interface IMonitor
 	/// The working area is the desktop area of the display, excluding taskbars,
 	/// docked windows, and docked tool bars.
 	/// </remarks>
-	public ILocation<int> WorkingArea { get; }
+	public IRectangle<int> WorkingArea { get; }
 
 	/// <summary>
 	/// The bounds of the monitor.
 	/// </summary>
-	public ILocation<int> Bounds { get; }
+	public IRectangle<int> Bounds { get; }
 }
 
 /// <summary>
@@ -55,7 +55,7 @@ public static class MonitorHelpers
 	/// <returns>
 	/// The converted point, where x and y are in the range [0, width) and [0, height).
 	/// </returns>
-	public static IPoint<int> ToMonitorCoordinates(this ILocation<int> monitor, IPoint<int> point)
+	public static IPoint<int> ToMonitorCoordinates(this IRectangle<int> monitor, IPoint<int> point)
 	{
 		return new Point<int>() { X = point.X - monitor.X, Y = point.Y - monitor.Y };
 	}
@@ -70,7 +70,7 @@ public static class MonitorHelpers
 	/// Whether to respect the sign. For example, values in [-infinity, 0] will become [-1, 0].
 	/// </param>
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
-	public static IPoint<double> ToUnitSquare(this ILocation<int> monitor, IPoint<int> point, bool respectSign = false)
+	public static IPoint<double> ToUnitSquare(this IRectangle<int> monitor, IPoint<int> point, bool respectSign = false)
 	{
 		Debug.Assert(monitor.Width != 0);
 		Debug.Assert(monitor.Height != 0);
@@ -89,7 +89,7 @@ public static class MonitorHelpers
 	/// <param name="monitor"></param>
 	/// <param name="location">The point to translate.</param>
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
-	public static ILocation<double> ToUnitSquare(this ILocation<int> monitor, ILocation<int> location)
+	public static IRectangle<double> ToUnitSquare(this IRectangle<int> monitor, IRectangle<int> location)
 	{
 		Debug.Assert(monitor.Width != 0);
 		Debug.Assert(monitor.Height != 0);
@@ -97,7 +97,7 @@ public static class MonitorHelpers
 		double y = Math.Abs((double)location.Y / monitor.Height);
 		double width = Math.Abs((double)location.Width / monitor.Width);
 		double height = Math.Abs((double)location.Height / monitor.Height);
-		return new Location<double>()
+		return new Rectangle<double>()
 		{
 			X = x,
 			Y = y,
@@ -113,9 +113,9 @@ public static class MonitorHelpers
 	/// <param name="monitor"></param>
 	/// <param name="location">The location to translate.</param>
 	/// <returns>The converted location.</returns>
-	public static ILocation<int> ToMonitor(this ILocation<int> monitor, ILocation<double> location)
+	public static IRectangle<int> ToMonitor(this IRectangle<int> monitor, IRectangle<double> location)
 	{
-		return new Location<int>()
+		return new Rectangle<int>()
 		{
 			X = Math.Abs(Convert.ToInt32(monitor.X + (location.X * monitor.Width))),
 			Y = Math.Abs(Convert.ToInt32(monitor.Y + (location.Y * monitor.Height))),

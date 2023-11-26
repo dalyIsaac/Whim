@@ -651,8 +651,8 @@ public class WindowManagerTests
 	[MemberData(nameof(MoveEdgesSuccessData))]
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameter
 	internal void WinEventProc_OnWindowMoveStart_MovedEdges(
-		ILocation<int> originalLocation,
-		ILocation<int> newLocation,
+		IRectangle<int> originalLocation,
+		IRectangle<int> newLocation,
 		Direction _direction,
 		IPoint<int> _pixelsDelta
 	)
@@ -967,8 +967,8 @@ public class WindowManagerTests
 	{
 		// Given
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
-		ILocation<int> originalLocation = new Location<int>() { X = 4, Width = 4 };
-		ILocation<int> newLocation = new Location<int>() { X = 3, Width = 5 };
+		IRectangle<int> originalLocation = new Rectangle<int>() { X = 4, Width = 4 };
+		IRectangle<int> newLocation = new Rectangle<int>() { X = 3, Width = 5 };
 		HWND hwnd = new(1);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
@@ -1187,13 +1187,13 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>(),
+					Location = new Rectangle<int>(),
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+		ctx.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1221,8 +1221,8 @@ public class WindowManagerTests
 	)
 	{
 		// Given
-		Location<int> originalLocation = new();
-		Location<int> newLocation =
+		Rectangle<int> originalLocation = new();
+		Rectangle<int> newLocation =
 			new()
 			{
 				X = newX,
@@ -1268,8 +1268,8 @@ public class WindowManagerTests
 		// Move left edge to the left
 		yield return new object[]
 		{
-			new Location<int>() { X = 4, Width = 4 },
-			new Location<int>() { X = 3, Width = 5 },
+			new Rectangle<int>() { X = 4, Width = 4 },
+			new Rectangle<int>() { X = 3, Width = 5 },
 			Direction.Left,
 			new Point<int>() { X = -1, Y = 0 }
 		};
@@ -1277,8 +1277,8 @@ public class WindowManagerTests
 		// Move left edge to the right
 		yield return new object[]
 		{
-			new Location<int>() { X = 4, Width = 4 },
-			new Location<int>() { X = 5, Width = 3 },
+			new Rectangle<int>() { X = 4, Width = 4 },
+			new Rectangle<int>() { X = 5, Width = 3 },
 			Direction.Left,
 			new Point<int>() { X = 1, Y = 0 }
 		};
@@ -1286,8 +1286,8 @@ public class WindowManagerTests
 		// Move right edge to the right
 		yield return new object[]
 		{
-			new Location<int>() { X = 4, Width = 4 },
-			new Location<int>() { X = 4, Width = 5 },
+			new Rectangle<int>() { X = 4, Width = 4 },
+			new Rectangle<int>() { X = 4, Width = 5 },
 			Direction.Right,
 			new Point<int>() { X = 1, Y = 0 }
 		};
@@ -1295,8 +1295,8 @@ public class WindowManagerTests
 		// Move right edge to the left
 		yield return new object[]
 		{
-			new Location<int>() { X = 4, Width = 4 },
-			new Location<int>() { X = 4, Width = 3 },
+			new Rectangle<int>() { X = 4, Width = 4 },
+			new Rectangle<int>() { X = 4, Width = 3 },
 			Direction.Right,
 			new Point<int>() { X = -1, Y = 0 }
 		};
@@ -1304,8 +1304,8 @@ public class WindowManagerTests
 		// Move top edge up
 		yield return new object[]
 		{
-			new Location<int>() { Y = 4, Height = 4 },
-			new Location<int>() { Y = 3, Height = 5 },
+			new Rectangle<int>() { Y = 4, Height = 4 },
+			new Rectangle<int>() { Y = 3, Height = 5 },
 			Direction.Up,
 			new Point<int>() { X = 0, Y = -1 }
 		};
@@ -1313,8 +1313,8 @@ public class WindowManagerTests
 		// Move top edge down
 		yield return new object[]
 		{
-			new Location<int>() { Y = 4, Height = 4 },
-			new Location<int>() { Y = 5, Height = 3 },
+			new Rectangle<int>() { Y = 4, Height = 4 },
+			new Rectangle<int>() { Y = 5, Height = 3 },
 			Direction.Up,
 			new Point<int>() { X = 0, Y = 1 }
 		};
@@ -1322,8 +1322,8 @@ public class WindowManagerTests
 		// Move bottom edge down
 		yield return new object[]
 		{
-			new Location<int>() { Y = 4, Height = 4 },
-			new Location<int>() { Y = 4, Height = 5 },
+			new Rectangle<int>() { Y = 4, Height = 4 },
+			new Rectangle<int>() { Y = 4, Height = 5 },
 			Direction.Down,
 			new Point<int>() { X = 0, Y = 1 }
 		};
@@ -1331,8 +1331,8 @@ public class WindowManagerTests
 		// Move bottom edge up
 		yield return new object[]
 		{
-			new Location<int>() { Y = 4, Height = 4 },
-			new Location<int>() { Y = 4, Height = 3 },
+			new Rectangle<int>() { Y = 4, Height = 4 },
+			new Rectangle<int>() { Y = 4, Height = 3 },
 			Direction.Down,
 			new Point<int>() { X = 0, Y = -1 }
 		};
@@ -1341,8 +1341,8 @@ public class WindowManagerTests
 	[Theory]
 	[MemberData(nameof(MoveEdgesSuccessData))]
 	internal void WinEventProc_OnWindowMoveEnd_Success(
-		ILocation<int> originalLocation,
-		ILocation<int> newLocation,
+		IRectangle<int> originalLocation,
+		IRectangle<int> newLocation,
 		Direction direction,
 		IPoint<int> pixelsDelta
 	)
@@ -1407,7 +1407,7 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>()
+					Location = new Rectangle<int>()
 					{
 						X = 4,
 						Y = 4,
@@ -1422,7 +1422,7 @@ public class WindowManagerTests
 		ctx.NativeManager
 			.DwmGetWindowLocation(Arg.Any<HWND>())
 			.Returns(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 5,
 					Y = 5,

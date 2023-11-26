@@ -8,12 +8,12 @@ namespace Whim;
 internal static class RectHelpers
 {
 	/// <summary>
-	/// Converts a <see cref="RECT"/> to a <see cref="ILocation{T}"/>.
+	/// Converts a <see cref="RECT"/> to a <see cref="IRectangle{T}"/>.
 	/// </summary>
 	/// <param name="rect">The <see cref="RECT"/> to convert.</param>
-	/// <returns>The converted <see cref="ILocation{T}"/>.</returns>
-	public static ILocation<int> ToLocation(this RECT rect) =>
-		new Location<int>()
+	/// <returns>The converted <see cref="IRectangle{T}"/>.</returns>
+	public static IRectangle<int> ToLocation(this RECT rect) =>
+		new Rectangle<int>()
 		{
 			X = rect.left,
 			Y = rect.top,

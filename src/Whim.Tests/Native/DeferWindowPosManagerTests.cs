@@ -15,7 +15,7 @@ public class DeferWindowPosManagerCustomization : ICustomization
 				new WindowPosState(
 					new WindowState()
 					{
-						Location = new Location<int>(),
+						Location = new Rectangle<int>(),
 						Window = Substitute.For<IWindow>(),
 						WindowSize = WindowSize.Normal
 					}
