@@ -30,11 +30,11 @@ public class AddWindowTests
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
 			window1
 		);
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window2);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -90,11 +90,11 @@ public class AddWindowTests
 			.AddWindow(window1)
 			.AddWindow(window2);
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -161,11 +161,11 @@ public class AddWindowTests
 			.AddWindow(window1)
 			.AddWindow(window2);
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -234,11 +234,11 @@ public class AddWindowTests
 
 		wrapper.SetAsLastFocusedWindow(window1);
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -307,11 +307,11 @@ public class AddWindowTests
 
 		wrapper.SetAddWindowDirection(Direction.Down);
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -373,11 +373,11 @@ public class AddWindowTests
 			.AddWindow(window1)
 			.AddWindow(window2);
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window2);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.Same(engine, result);

@@ -59,10 +59,10 @@ internal static class TreeHelpers
 	/// <returns></returns>
 	public static NodeState? GetNodeAtPath(this INode root, IReadOnlyList<int> path)
 	{
-		Rectangle<double> rectangle = Rectangle.UnitSquare<double>();
+		Rectangle<double> rect = Rectangle.UnitSquare<double>();
 		if (path.Count == 0)
 		{
-			return new NodeState(root, Array.Empty<ISplitNode>(), rectangle);
+			return new NodeState(root, Array.Empty<ISplitNode>(), rect);
 		}
 
 		ISplitNode[] ancestors = new ISplitNode[path.Count];
@@ -98,17 +98,17 @@ internal static class TreeHelpers
 
 			if (splitNode.IsHorizontal)
 			{
-				rectangle.X += precedingWeight * rectangle.Width;
-				rectangle.Width = weight * rectangle.Width;
+				rect.X += precedingWeight * rect.Width;
+				rect.Width = weight * rect.Width;
 			}
 			else
 			{
-				rectangle.Y += precedingWeight * rectangle.Height;
-				rectangle.Height = weight * rectangle.Height;
+				rect.Y += precedingWeight * rect.Height;
+				rect.Height = weight * rect.Height;
 			}
 		}
 
-		return new NodeState(currentNode, ancestors, rectangle);
+		return new NodeState(currentNode, ancestors, rect);
 	}
 
 	/// <summary>

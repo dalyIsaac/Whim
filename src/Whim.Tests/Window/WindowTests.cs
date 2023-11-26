@@ -102,13 +102,13 @@ public class WindowTests
 		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
-		IRectangle<int> rectangle = window.Rectangle;
+		IRectangle<int> rect = window.Rectangle;
 
 		// Then
-		Assert.Equal(0, rectangle.X);
-		Assert.Equal(0, rectangle.Y);
-		Assert.Equal(100, rectangle.Width);
-		Assert.Equal(200, rectangle.Height);
+		Assert.Equal(0, rect.X);
+		Assert.Equal(0, rect.Y);
+		Assert.Equal(100, rect.Width);
+		Assert.Equal(200, rect.Height);
 	}
 
 	[Theory, AutoSubstituteData<WindowCustomization>]

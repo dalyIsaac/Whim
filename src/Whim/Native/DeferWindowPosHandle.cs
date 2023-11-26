@@ -147,7 +147,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 			return;
 		}
 
-		IRectangle<int> rectangle = source.WindowState.Rectangle.Add(offset);
+		IRectangle<int> rect = source.WindowState.Rectangle.Add(offset);
 		WindowSize windowSize = source.WindowState.WindowSize;
 		SET_WINDOW_POS_FLAGS uFlags = source.Flags ?? DefaultFlags;
 
@@ -168,14 +168,6 @@ public sealed class DeferWindowPosHandle : IDisposable
 
 		_internalContext
 			.CoreNativeManager
-			.SetWindowPos(
-				window.Handle,
-				source.HwndInsertAfter,
-				rectangle.X,
-				rectangle.Y,
-				rectangle.Width,
-				rectangle.Height,
-				uFlags
-			);
+			.SetWindowPos(window.Handle, source.HwndInsertAfter, rect.X, rect.Y, rect.Width, rect.Height, uFlags);
 	}
 }

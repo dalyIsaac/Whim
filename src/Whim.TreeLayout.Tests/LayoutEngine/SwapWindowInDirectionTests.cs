@@ -31,11 +31,11 @@ public class SwapWindowInDirectionTests
 			.AddWindow(window1)
 			.AddWindow(window2);
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window1);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.Same(engine, result);
@@ -80,11 +80,11 @@ public class SwapWindowInDirectionTests
 			.AddWindow(window1)
 			.AddWindow(window2);
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -135,11 +135,11 @@ public class SwapWindowInDirectionTests
 			.AddWindow(window2)
 			.MoveWindowToPoint(window3, new Point<double>() { X = 0.75, Y = 0.75 });
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -199,11 +199,11 @@ public class SwapWindowInDirectionTests
 			.MoveWindowToPoint(bottomLeft, new Point<double>() { X = 0.25, Y = 0.9 })
 			.MoveWindowToPoint(bottomRight, new Point<double>() { X = 0.75, Y = 0.9 });
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.LeftUp, bottomRight);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);

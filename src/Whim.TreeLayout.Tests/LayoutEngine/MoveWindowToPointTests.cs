@@ -34,11 +34,11 @@ public class MoveWindowToPointTests
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -89,11 +89,11 @@ public class MoveWindowToPointTests
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.7 };
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -144,11 +144,11 @@ public class MoveWindowToPointTests
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.5 };
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -199,11 +199,11 @@ public class MoveWindowToPointTests
 		);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.3 };
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -282,11 +282,11 @@ public class MoveWindowToPointTests
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -356,11 +356,11 @@ public class MoveWindowToPointTests
 
 		IPoint<double> point = new Point<double>() { X = 0.75, Y = 0.8 };
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -429,11 +429,11 @@ public class MoveWindowToPointTests
 
 		IPoint<double> point = new Point<double>() { X = x, Y = y };
 
-		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window, point);
-		IWindowState[] windowStates = result.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		Assert.NotSame(engine, result);
