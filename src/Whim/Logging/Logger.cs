@@ -52,7 +52,14 @@ public class Logger : IDisposable
 		if (fileSink != null)
 		{
 			string loggerFilePath = fileManager.GetWhimFileDir(fileSink.FileName);
-			_loggerConfiguration.WriteTo.File(loggerFilePath, levelSwitch: fileSink.MinLogLevelSwitch);
+			_loggerConfiguration
+				.WriteTo
+				.File(
+					loggerFilePath,
+					levelSwitch: fileSink.MinLogLevelSwitch,
+					rollingInterval: fileSink.RollingInterval.ToSerilog(),
+					retainedFileCountLimit: 3
+				);
 		}
 
 		if (debugSink != null)
