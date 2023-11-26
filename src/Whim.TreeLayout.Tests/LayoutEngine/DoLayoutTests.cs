@@ -12,10 +12,10 @@ public class DoLayoutTests
 		LayoutEngineWrapper wrapper = new();
 		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
-		IRectangle<int> location = new Rectangle<int>() { Width = 100, Height = 100 };
+		IRectangle<int> rectangle = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
-		IWindowState[] windowStates = engine.DoLayout(location, monitor).ToArray();
+		IWindowState[] windowStates = engine.DoLayout(rectangle, monitor).ToArray();
 
 		// Then
 		Assert.Empty(windowStates);

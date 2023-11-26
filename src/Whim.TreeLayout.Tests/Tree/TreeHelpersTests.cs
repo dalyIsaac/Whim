@@ -44,7 +44,7 @@ public class TreeHelpersTests
 		Assert.NotNull(result);
 		Assert.Empty(result.Ancestors);
 		Assert.Equal(root, result.Node);
-		Assert.Equal(Rectangle.UnitSquare<double>(), result.Location);
+		Assert.Equal(Rectangle.UnitSquare<double>(), result.Rectangle);
 	}
 
 	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
@@ -80,7 +80,7 @@ public class TreeHelpersTests
 				Width = 0.5,
 				Height = 1
 			},
-			result.Location
+			result.Rectangle
 		);
 	}
 
@@ -105,7 +105,7 @@ public class TreeHelpersTests
 				Width = 0.5,
 				Height = 0.5
 			},
-			result.Location
+			result.Rectangle
 		);
 	}
 
@@ -122,7 +122,7 @@ public class TreeHelpersTests
 		// Then
 		Assert.NotNull(result);
 		Assert.Equal(tree.RightTopLeftBottomRightBottom, result.Node);
-		Assert.Equal(TestTreeWindowStates.RightTopLeftBottomRightBottom, result.Location);
+		Assert.Equal(TestTreeWindowStates.RightTopLeftBottomRightBottom, result.Rectangle);
 	}
 	#endregion
 
@@ -638,11 +638,11 @@ public class TreeHelpersTests
 	[MemberData(nameof(GetDirectionToPoint_UnitSquareData))]
 	[MemberData(nameof(GetDirectionToPoint_NonUnitSquareData))]
 	[MemberData(nameof(GetDirectionToPoint_NonSquareData))]
-	internal void GetDirectionToPoint(Rectangle<double> location, Point<double> point, Direction expected)
+	internal void GetDirectionToPoint(Rectangle<double> rectangle, Point<double> point, Direction expected)
 	{
 		// Given
 		// When
-		Direction result = location.GetDirectionToPoint(point);
+		Direction result = rectangle.GetDirectionToPoint(point);
 
 		// Then
 		Assert.Equal(expected, result);
@@ -650,15 +650,15 @@ public class TreeHelpersTests
 	#endregion
 
 	[Fact]
-	internal void GetWindowLocations()
+	internal void GetWindowRectangles()
 	{
 		// Given
 		TestTree tree = new();
-		IRectangle<int> location = new Rectangle<int>() { Width = 1920, Height = 1080 };
+		IRectangle<int> rectangle = new Rectangle<int>() { Width = 1920, Height = 1080 };
 
 		IWindowState[] expectedStates = TestTreeWindowStates
 			.GetAllWindowStates(
-				location,
+				rectangle,
 				tree.Left.Window,
 				tree.RightTopLeftTop.Window,
 				tree.RightTopLeftBottomLeft.Window,
@@ -672,16 +672,16 @@ public class TreeHelpersTests
 			.ToArray();
 
 		// When
-		WindowNodeLocationState[] windowLocations = tree.Root.GetWindowLocations(location).ToArray();
+		WindowNodeRectangleState[] windowRectangles = tree.Root.GetWindowRectangles(rectangle).ToArray();
 
 		// Then
-		windowLocations
+		windowRectangles
 			.Select(
 				nodeState =>
 					new WindowState()
 					{
 						Window = nodeState.WindowNode.Window,
-						Rectangle = nodeState.Location,
+						Rectangle = nodeState.Rectangle,
 						WindowSize = nodeState.WindowSize
 					}
 			)

@@ -1,6 +1,6 @@
 namespace Whim.TreeLayout.Tests;
 
-internal static class NodeLocationExtensions
+internal static class NodeRectangleExtensions
 {
 	public static Rectangle<int> Scale(this IRectangle<double> node, IRectangle<int> scale)
 	{

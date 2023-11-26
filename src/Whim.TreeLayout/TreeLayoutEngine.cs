@@ -13,7 +13,7 @@ internal record NonRootWindowData(
 	WindowNode WindowNode,
 	IReadOnlyList<ISplitNode> WindowAncestors,
 	ImmutableArray<int> WindowPath,
-	IRectangle<double> WindowLocation
+	IRectangle<double> WindowRectangle
 );
 
 /// <summary>
@@ -275,7 +275,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public IEnumerable<IWindowState> DoLayout(IRectangle<int> location, IMonitor monitor)
+	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
 		Logger.Debug($"Doing layout for engine {Name}");
 
@@ -284,12 +284,12 @@ public record TreeLayoutEngine : ILayoutEngine
 			yield break;
 		}
 
-		foreach (WindowNodeLocationState item in _root.GetWindowLocations(location))
+		foreach (WindowNodeRectangleState item in _root.GetWindowRectangles(rectangle))
 		{
 			yield return new WindowState()
 			{
 				Window = item.WindowNode.Window,
-				Rectangle = item.Location,
+				Rectangle = item.Rectangle,
 				WindowSize = item.WindowSize
 			};
 		}
@@ -362,7 +362,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			(WindowNode)windowResult.Node,
 			windowResult.Ancestors,
 			windowPath,
-			windowResult.Location
+			windowResult.Rectangle
 		);
 	}
 
@@ -380,7 +380,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			INode _,
 			IReadOnlyList<ISplitNode> windowAncestors,
 			ImmutableArray<int> windowPath,
-			IRectangle<double> windowLocation
+			IRectangle<double> windowRectangle
 		) = windowData;
 
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
@@ -400,7 +400,7 @@ public record TreeLayoutEngine : ILayoutEngine
 				windowData.RootSplitNode,
 				Direction.Left,
 				monitor,
-				windowLocation
+				windowRectangle
 			);
 
 			directionAdjustedDeltas.X = -directionAdjustedDeltas.X;
@@ -411,19 +411,24 @@ public record TreeLayoutEngine : ILayoutEngine
 				rootSplitNode,
 				Direction.Right,
 				monitor,
-				windowLocation
+				windowRectangle
 			);
 		}
 
 		if (edges.HasFlag(Direction.Up))
 		{
-			yAdjacentResult = TreeHelpers.GetAdjacentWindowNode(rootSplitNode, Direction.Up, monitor, windowLocation);
+			yAdjacentResult = TreeHelpers.GetAdjacentWindowNode(rootSplitNode, Direction.Up, monitor, windowRectangle);
 
 			directionAdjustedDeltas.Y = -directionAdjustedDeltas.Y;
 		}
 		else if (edges.HasFlag(Direction.Down))
 		{
-			yAdjacentResult = TreeHelpers.GetAdjacentWindowNode(rootSplitNode, Direction.Down, monitor, windowLocation);
+			yAdjacentResult = TreeHelpers.GetAdjacentWindowNode(
+				rootSplitNode,
+				Direction.Down,
+				monitor,
+				windowRectangle
+			);
 		}
 
 		if (xAdjacentResult == null && yAdjacentResult == null)
@@ -485,7 +490,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Adjust the weight of the focused node.
-		// First, we need to find the location of the parent node.
+		// First, we need to find the rectangle of the parent node.
 		ImmutableArray<int> parentNodePath = focusedNodePath.Take(parentDepth).ToImmutableArray();
 		NodeState? parentResult = root.GetNodeAtPath(parentNodePath);
 		if (parentResult is null || parentResult.Node is not ISplitNode parentSplitNode)
@@ -495,7 +500,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		}
 
 		// Figure out what the relative delta of pixelsDeltas is given the unit square.
-		double relativeDelta = delta / (isXAxis ? parentResult.Location.Width : parentResult.Location.Height);
+		double relativeDelta = delta / (isXAxis ? parentResult.Rectangle.Width : parentResult.Rectangle.Height);
 
 		// Now we can adjust the weights.
 		ISplitNode focusedNodeParent = parentSplitNode.AdjustChildWeight(focusedNodePath[parentDepth], relativeDelta);
@@ -585,7 +590,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			windowData.RootSplitNode,
 			direction,
 			_context.MonitorManager.ActiveMonitor,
-			windowData.WindowLocation
+			windowData.WindowRectangle
 		);
 		if (adjacentResult is null)
 		{
