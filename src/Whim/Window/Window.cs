@@ -19,7 +19,7 @@ internal class Window : IWindow
 
 	public bool IsUwp => ProcessFileName == "ApplicationFrameHost.exe";
 
-	public IRectangle<int> Location
+	public IRectangle<int> Rectangle
 	{
 		get
 		{
@@ -38,7 +38,7 @@ internal class Window : IWindow
 	{
 		get
 		{
-			IRectangle<int> location = Location;
+			IRectangle<int> location = Rectangle;
 			return new Point<int>() { X = location.X + (location.Width / 2), Y = location.Y + (location.Height / 2) };
 		}
 	}
