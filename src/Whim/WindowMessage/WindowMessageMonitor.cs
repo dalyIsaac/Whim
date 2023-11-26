@@ -19,7 +19,7 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_subclassProc = new SUBCLASSPROC(WindowProc);
+		_subclassProc = new SUBCLASSPROC(WindowProcWrapper);
 	}
 
 	public event EventHandler<WindowMessageMonitorEventArgs>? DisplayChanged;
@@ -48,6 +48,26 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 				_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
 				PInvoke.NOTIFY_FOR_ALL_SESSIONS
 			);
+	}
+
+	private LRESULT WindowProcWrapper(
+		HWND hWnd,
+		uint uMsg,
+		WPARAM wParam,
+		LPARAM lParam,
+		nuint uIdSubclass,
+		nuint dwRefData
+	)
+	{
+		try
+		{
+			return WindowProc(hWnd, uMsg, wParam, lParam, uIdSubclass, dwRefData);
+		}
+		catch (Exception e)
+		{
+			_context.HandleUncaughtException(nameof(WindowProc), e);
+			return _internalContext.CoreNativeManager.DefSubclassProc(hWnd, uMsg, wParam, lParam);
+		}
 	}
 
 	private LRESULT WindowProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam, nuint uIdSubclass, nuint dwRefData)
