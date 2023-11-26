@@ -63,7 +63,11 @@ public class WindowMessageMonitorTests
 		WindowMessageMonitor windowMessageMonitor = new(ctx, internalCtx);
 		windowMessageMonitor.PreInitialize();
 
-		EventHandler<WindowMessageMonitorEventArgs> handler = (sender, args) => throw new Exception("Test");
+		static void handler(object? sender, WindowMessageMonitorEventArgs args)
+		{
+			throw new Exception("Test");
+		}
+
 		windowMessageMonitor.DisplayChanged += handler;
 
 		// When we raise the event

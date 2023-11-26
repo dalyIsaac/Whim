@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace Whim;
 
 /// <summary>
@@ -19,4 +21,20 @@ public enum FileSinkConfigRollingInterval
 	/// Rolls over the file log each day.
 	/// </summary>
 	Day
+}
+
+internal static class FileSinkConfigRollingIntervalExtensions
+{
+	/// <summary>
+	/// Gets the associated Serilog <see cref="RollingInterval"/> for the <see cref="FileSinkConfigRollingInterval"/>.
+	/// </summary>
+	/// <param name="interval"></param>
+	/// <returns></returns>
+	internal static RollingInterval ToSerilog(this FileSinkConfigRollingInterval interval) =>
+		interval switch
+		{
+			FileSinkConfigRollingInterval.Infinite => RollingInterval.Infinite,
+			FileSinkConfigRollingInterval.Month => RollingInterval.Month,
+			_ => RollingInterval.Day
+		};
 }

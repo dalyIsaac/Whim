@@ -226,6 +226,28 @@ The `IWindowManager` also exposes an `IFilterManager` called `LocationRestoringF
 
 If this doesn't work, dragging a window's edge will force a layout, which should fix the window's position. This is an area which could use further improvement.
 
+### Logging
+
+Whim wraps [Serilog](https://serilog.net/) to provide logging functionality. It can be configured using the [`LoggerConfig`](src/Whim/Logging/LoggerConfig.cs) class. For example:
+
+```csharp
+// The logger will only log messages with a level of `Debug` or higher.
+context.Logger.Config = new LoggerConfig() { BaseMinLogLevel = LogLevel.Debug };
+
+// The logger will log messages with a level of `Debug` or higher to a file.
+if (context.Logger.Config.FileSink is FileSinkConfig fileSinkConfig)
+{
+    fileSinkConfig.MinLogLevel = LogLevel.Debug;
+}
+
+// The logger will log messages with a level of `Error` or higher to the debug console.
+// The debug sink is only available in debug builds, and can slow down Whim.
+if (context.Logger.Config.DebugSink is SinkConfig debugSinkConfig)
+{
+    debugSinkConfig.MinLogLevel = LogLevel.Error;
+}
+```
+
 ## Architecture
 
 ### Inspiration
