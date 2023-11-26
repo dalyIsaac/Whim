@@ -6,7 +6,7 @@ namespace Whim;
 public class WindowState : IWindowState
 {
 	/// <inheritdoc />
-	public required ILocation<int> Location { get; set; }
+	public required IRectangle<int> Rectangle { get; set; }
 
 	/// <inheritdoc />
 	public required WindowSize WindowSize { get; set; }
@@ -30,7 +30,7 @@ public class WindowState : IWindowState
 		}
 
 		return obj is WindowState state
-			&& Location.Equals(state.Location)
+			&& Rectangle.Equals(state.Rectangle)
 			&& WindowSize == state.WindowSize
 			&& Window.Equals(state.Window);
 	}
@@ -42,5 +42,5 @@ public class WindowState : IWindowState
 	public static bool operator !=(WindowState? left, WindowState? right) => !Equals(left, right);
 
 	/// <inheritdoc />
-	public override int GetHashCode() => HashCode.Combine(Location, WindowSize, Window);
+	public override int GetHashCode() => HashCode.Combine(Rectangle, WindowSize, Window);
 }

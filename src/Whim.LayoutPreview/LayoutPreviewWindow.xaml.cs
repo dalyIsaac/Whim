@@ -40,7 +40,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 	/// Update the preview window with the given window states.
 	/// </summary>
 	/// <param name="windowStates">The window states to display.</param>
-	/// <param name="cursorPoint">The cursor's location inside the monitor.</param>
+	/// <param name="cursorPoint">The cursor's rectangle inside the monitor.</param>
 	/// <param name="movingWindow">The window which is currently being dragged.</param>
 	/// <param name="monitor">The monitor corresponding to the <paramref name="cursorPoint"/>.</param>
 	public void Update(IWindowState[] windowStates, IPoint<int> cursorPoint, IWindow movingWindow, IMonitor monitor)
@@ -59,7 +59,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 		bool isFirst = true;
 		for (int idx = 0; idx < windowStates.Length; idx++)
 		{
-			bool isHovered = isFirst && windowStates[idx].Location.ContainsPoint(cursorPoint);
+			bool isHovered = isFirst && windowStates[idx].Rectangle.ContainsPoint(cursorPoint);
 			if (isHovered)
 			{
 				_prevHoveredIndex = idx;
@@ -68,8 +68,8 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 
 			items[idx] = new LayoutPreviewWindowItem(_context, windowStates[idx], isHovered);
 
-			Canvas.SetLeft(items[idx], windowStates[idx].Location.X);
-			Canvas.SetTop(items[idx], windowStates[idx].Location.Y);
+			Canvas.SetLeft(items[idx], windowStates[idx].Rectangle.X);
+			Canvas.SetTop(items[idx], windowStates[idx].Rectangle.Y);
 		}
 
 		LayoutPreviewCanvas.Children.Clear();
@@ -106,7 +106,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 		}
 
 		IWindowState prevHoveredState = prevWindowStates[prevHoveredIndex];
-		if (!prevHoveredState.Location.ContainsPoint(cursorPoint))
+		if (!prevHoveredState.Rectangle.ContainsPoint(cursorPoint))
 		{
 			return true;
 		}
@@ -121,7 +121,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 			new WindowState()
 			{
 				Window = layoutWindow,
-				Location = monitor.WorkingArea,
+				Rectangle = monitor.WorkingArea,
 				WindowSize = WindowSize.Normal
 			},
 			movingWindow.Handle,

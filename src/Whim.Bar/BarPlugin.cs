@@ -76,7 +76,7 @@ public class BarPlugin : IBarPlugin
 		using DeferWindowPosHandle deferPosHandle = _context.NativeManager.DeferWindowPos();
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
-			barWindow.UpdateLocation();
+			barWindow.UpdateRect();
 			deferPosHandle.DeferWindowPos(barWindow.WindowState);
 			_context
 				.NativeManager

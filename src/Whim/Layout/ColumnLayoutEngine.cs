@@ -78,7 +78,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor _)
+	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor _)
 	{
 		string direction = LeftToRight ? "left to right" : "right to left";
 		Logger.Debug($"Performing a column layout {direction}");
@@ -95,17 +95,17 @@ public record ColumnLayoutEngine : ILayoutEngine
 
 		if (LeftToRight)
 		{
-			width = location.Width / _stack.Count;
-			height = location.Height;
-			x = location.X;
-			y = location.Y;
+			width = rectangle.Width / _stack.Count;
+			height = rectangle.Height;
+			x = rectangle.X;
+			y = rectangle.Y;
 		}
 		else
 		{
-			width = location.Width / _stack.Count;
-			height = location.Height;
-			x = location.X + location.Width - width;
-			y = location.Y;
+			width = rectangle.Width / _stack.Count;
+			height = rectangle.Height;
+			x = rectangle.X + rectangle.Width - width;
+			y = rectangle.Y;
 		}
 
 		foreach (IWindow window in _stack)
@@ -113,7 +113,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 			yield return new WindowState()
 			{
 				Window = window,
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = x,
 					Y = y,

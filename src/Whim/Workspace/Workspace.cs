@@ -94,9 +94,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	/// <summary>
-	/// Map of window handles to their current location.
+	/// Map of window handles to their current rect.
 	/// </summary>
-	private Dictionary<HWND, IWindowState> _windowLocations = new();
+	private Dictionary<HWND, IWindowState> _windowRects = new();
 
 	public Workspace(
 		IContext context,
@@ -500,26 +500,24 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			window.Hide();
 		}
 
-		_windowLocations.Clear();
+		_windowRects.Clear();
 	}
-
-	public IWindowState? TryGetWindowLocation(IWindow window) => TryGetWindowState(window);
 
 	public IWindowState? TryGetWindowState(IWindow window)
 	{
-		_windowLocations.TryGetValue(window.Handle, out IWindowState? location);
+		_windowRects.TryGetValue(window.Handle, out IWindowState? rect);
 
-		if (location is null && _minimizedWindows.Contains(window))
+		if (rect is null && _minimizedWindows.Contains(window))
 		{
-			location = new WindowState()
+			rect = new WindowState()
 			{
 				Window = window,
-				Location = new Location<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Minimized
 			};
 		}
 
-		return location;
+		return rect;
 	}
 
 	public void DoLayout()
@@ -550,7 +548,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
 
 		// Execute the layout task
-		_windowLocations = SetWindowPos(engine: ActiveLayoutEngine, monitor);
+		_windowRects = SetWindowPos(engine: ActiveLayoutEngine, monitor);
 		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
@@ -558,22 +556,22 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug($"Setting window positions for workspace {Name}");
 		List<WindowPosState> windowStates = new();
-		Dictionary<HWND, IWindowState> windowLocations = new();
+		Dictionary<HWND, IWindowState> windowRects = new();
 
 		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
 		{
 			windowStates.Add(new(loc, (HWND)1, null));
-			windowLocations.Add(loc.Window.Handle, loc);
+			windowRects.Add(loc.Window.Handle, loc);
 		}
 
-		ILocation<int> minimizedLocation = new Location<int>();
+		IRectangle<int> minimizedRect = new Rectangle<int>();
 		foreach (IWindow window in _minimizedWindows)
 		{
 			windowStates.Add(
 				new(
 					new WindowState()
 					{
-						Location = minimizedLocation,
+						Rectangle = minimizedRect,
 						WindowSize = WindowSize.Minimized,
 						Window = window
 					}
@@ -583,7 +581,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);
 
-		return windowLocations;
+		return windowRects;
 	}
 
 	public bool ContainsWindow(IWindow window)

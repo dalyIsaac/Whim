@@ -27,7 +27,7 @@ public record TestLayoutEngine : ILayoutEngine
 	public bool ContainsWindow(IWindow window) => throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor) =>
+	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor) =>
 		throw new NotImplementedException();
 
 	/// <inheritdoc/>

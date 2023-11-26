@@ -287,9 +287,9 @@ public class MonitorManagerTests
 		List<IMonitor> monitors = monitorManager.ToList();
 		Assert.Equal(3, monitors.Count);
 
-		Assert.Equal(leftTop.ToLocation(), monitors[0].WorkingArea);
-		Assert.Equal(leftBottom.ToLocation(), monitors[1].WorkingArea);
-		Assert.Equal(right.ToLocation(), monitors[2].WorkingArea);
+		Assert.Equal(leftTop.ToRectangle(), monitors[0].WorkingArea);
+		Assert.Equal(leftBottom.ToRectangle(), monitors[1].WorkingArea);
+		Assert.Equal(right.ToRectangle(), monitors[2].WorkingArea);
 
 		Assert.Equal(2, raisedEvent.Arguments.UnchangedMonitors.Count());
 		Assert.Single(raisedEvent.Arguments.AddedMonitors);
@@ -301,7 +301,7 @@ public class MonitorManagerTests
 			.UnchangedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.Equal(expectedUnchangedRects.Select(r => r.ToLocation()));
+			.Equal(expectedUnchangedRects.Select(r => r.ToRectangle()));
 
 		RECT[] expectedAddedRects = new[] { leftBottom };
 		raisedEvent
@@ -309,7 +309,7 @@ public class MonitorManagerTests
 			.AddedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.Equal(expectedAddedRects.Select(r => r.ToLocation()));
+			.Equal(expectedAddedRects.Select(r => r.ToRectangle()));
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
@@ -358,8 +358,8 @@ public class MonitorManagerTests
 		List<IMonitor> monitors = monitorManager.ToList();
 		Assert.Equal(2, monitors.Count);
 
-		Assert.Equal(primaryRect.ToLocation(), monitors[0].WorkingArea);
-		Assert.Equal(right.ToLocation(), monitors[1].WorkingArea);
+		Assert.Equal(primaryRect.ToRectangle(), monitors[0].WorkingArea);
+		Assert.Equal(right.ToRectangle(), monitors[1].WorkingArea);
 
 		Assert.Single(raisedEvent.Arguments.UnchangedMonitors);
 		Assert.Single(raisedEvent.Arguments.AddedMonitors);
@@ -371,7 +371,7 @@ public class MonitorManagerTests
 			.UnchangedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.Equal(expectedUnchangedRects.Select(r => r.ToLocation()));
+			.Equal(expectedUnchangedRects.Select(r => r.ToRectangle()));
 
 		RECT[] expectedAddedRects = new[] { right };
 		raisedEvent
@@ -379,7 +379,7 @@ public class MonitorManagerTests
 			.AddedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.Equal(expectedAddedRects.Select(r => r.ToLocation()));
+			.Equal(expectedAddedRects.Select(r => r.ToRectangle()));
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
@@ -415,7 +415,7 @@ public class MonitorManagerTests
 		List<IMonitor> monitors = monitorManager.ToList();
 		Assert.Single(monitors);
 
-		Assert.Equal(left.ToLocation(), monitors[0].WorkingArea);
+		Assert.Equal(left.ToRectangle(), monitors[0].WorkingArea);
 
 		Assert.Single(raisedEvent.Arguments.UnchangedMonitors);
 		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
@@ -436,7 +436,7 @@ public class MonitorManagerTests
 			.RemovedMonitors
 			.Select(m => m.Bounds)
 			.Should()
-			.Equal(expectedRemovedRects.Select(r => r.ToLocation()));
+			.Equal(expectedRemovedRects.Select(r => r.ToRectangle()));
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]

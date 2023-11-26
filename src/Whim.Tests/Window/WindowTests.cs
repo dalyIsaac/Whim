@@ -96,19 +96,19 @@ public class WindowTests
 	}
 
 	[Theory, AutoSubstituteData<WindowCustomization>]
-	internal void Location(IContext ctx, IInternalContext internalCtx)
+	internal void Rectangle(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
 
 		// When
-		ILocation<int> location = window.Location;
+		IRectangle<int> rect = window.Rectangle;
 
 		// Then
-		Assert.Equal(0, location.X);
-		Assert.Equal(0, location.Y);
-		Assert.Equal(100, location.Width);
-		Assert.Equal(200, location.Height);
+		Assert.Equal(0, rect.X);
+		Assert.Equal(0, rect.Y);
+		Assert.Equal(100, rect.Width);
+		Assert.Equal(200, rect.Height);
 	}
 
 	[Theory, AutoSubstituteData<WindowCustomization>]

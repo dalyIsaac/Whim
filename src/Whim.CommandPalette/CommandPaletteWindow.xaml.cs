@@ -129,7 +129,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		int x = (ViewModel.Monitor.WorkingArea.Width / 2) - (width / 2);
 		int y = (int)(ViewModel.Monitor.WorkingArea.Height * ViewModel.Plugin.Config.YPositionPercent / 100.0);
 
-		ILocation<int> windowLocation = new Location<int>()
+		IRectangle<int> windowRect = new Rectangle<int>()
 		{
 			X = ViewModel.Monitor.WorkingArea.X + x,
 			Y = ViewModel.Monitor.WorkingArea.Y + y,
@@ -144,7 +144,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 			new WindowState()
 			{
 				Window = _window,
-				Location = windowLocation,
+				Rectangle = windowRect,
 				WindowSize = WindowSize.Normal
 			},
 			_window.Handle

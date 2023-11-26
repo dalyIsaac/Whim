@@ -653,7 +653,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point)
 	{
-		Logger.Debug($"Moving window {window} to location {point}");
+		Logger.Debug($"Moving window {window} to point {point}");
 
 		// Get the monitor.
 		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);

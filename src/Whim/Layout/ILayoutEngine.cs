@@ -71,16 +71,16 @@ public interface ILayoutEngine
 	bool ContainsWindow(IWindow window);
 
 	/// <summary>
-	/// Performs a layout inside the available <paramref name="location"/>.
+	/// Performs a layout inside the available <paramref name="rectangle"/>.
 	/// </summary>
 	/// <remarks>
-	/// For a given <paramref name="location"/>, the layout engine should return the same
+	/// For a given <paramref name="rectangle"/>, the layout engine should return the same
 	/// result every time.
 	/// </remarks>
-	/// <param name="location">The available area to do a layout inside.</param>
+	/// <param name="rectangle">The available area to do a layout inside.</param>
 	/// <param name="monitor">The monitor which the layout is being done for.</param>
 	/// <returns>The layout result.</returns>
-	IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor);
+	IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor);
 
 	/// <summary>
 	/// Retrieves the first window in the layout engine.

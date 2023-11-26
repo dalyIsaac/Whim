@@ -4,21 +4,21 @@ using System.Numerics;
 namespace Whim;
 
 /// <summary>
-/// Helpers for <see cref="ILocation{T}"/>.
+/// Helpers for <see cref="IRectangle{T}"/>.
 /// </summary>
-public static class Location
+public static class Rectangle
 {
 	/// <summary>
-	/// Creates a new <see cref="Location{T}"/> of the unit square.
+	/// Creates a new <see cref="Rectangle{T}"/> of the unit square.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	/// <returns></returns>
-	public static Location<T> UnitSquare<T>()
+	public static Rectangle<T> UnitSquare<T>()
 		where T : INumber<T> => new() { Width = T.One, Height = T.One };
 }
 
 /// <inheritdoc />
-public record Location<T> : ILocation<T>, IEquatable<Location<T>>
+public record Rectangle<T> : IRectangle<T>, IEquatable<Rectangle<T>>
 	where T : INumber<T>
 {
 	/// <inheritdoc />
@@ -34,20 +34,20 @@ public record Location<T> : ILocation<T>, IEquatable<Location<T>>
 	public T Height { get; set; } = T.Zero;
 
 	/// <summary>
-	/// Creates a new <see cref="Location{T}"/> with zero values.
+	/// Creates a new <see cref="Rectangle{T}"/> with zero values.
 	/// </summary>
-	public Location() { }
+	public Rectangle() { }
 
 	/// <summary>
-	/// Creates a new <see cref="Location{T}"/> with the given values.
+	/// Creates a new <see cref="Rectangle{T}"/> with the given values.
 	/// </summary>
-	/// <param name="location"></param>
-	public Location(ILocation<T> location)
+	/// <param name="rectangle"></param>
+	public Rectangle(IRectangle<T> rectangle)
 	{
-		X = location.X;
-		Y = location.Y;
-		Width = location.Width;
-		Height = location.Height;
+		X = rectangle.X;
+		Y = rectangle.Y;
+		Width = rectangle.Width;
+		Height = rectangle.Height;
 	}
 
 	/// <inheritdoc />

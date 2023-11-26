@@ -29,9 +29,9 @@ public interface IWindow
 	bool IsUwp { get; }
 
 	/// <summary>
-	/// The location of the window.
+	/// The containing rectangle for the window.
 	/// </summary>
-	ILocation<int> Location { get; }
+	IRectangle<int> Rectangle { get; }
 
 	/// <summary>
 	/// The center of the window.

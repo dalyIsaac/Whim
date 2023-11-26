@@ -12,7 +12,7 @@ public class TreeHelpersCustomization : ICustomization
 	public void Customize(IFixture fixture)
 	{
 		IMonitor monitor = fixture.Freeze<IMonitor>();
-		monitor.WorkingArea.Returns(new Location<int>() { Width = 1920, Height = 1080 });
+		monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 1920, Height = 1080 });
 	}
 }
 
@@ -44,7 +44,7 @@ public class TreeHelpersTests
 		Assert.NotNull(result);
 		Assert.Empty(result.Ancestors);
 		Assert.Equal(root, result.Node);
-		Assert.Equal(Location.UnitSquare<double>(), result.Location);
+		Assert.Equal(Rectangle.UnitSquare<double>(), result.Rectangle);
 	}
 
 	[Theory, AutoSubstituteData<TreeHelpersCustomization>]
@@ -74,13 +74,13 @@ public class TreeHelpersTests
 		Assert.NotNull(result);
 		Assert.Equal(tree.Right, result.Node);
 		Assert.Equal(
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 0.5,
 				Width = 0.5,
 				Height = 1
 			},
-			result.Location
+			result.Rectangle
 		);
 	}
 
@@ -98,14 +98,14 @@ public class TreeHelpersTests
 		Assert.NotNull(result);
 		Assert.Equal(tree.RightTop, result.Node);
 		Assert.Equal(
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 0.5,
 				Y = 0,
 				Width = 0.5,
 				Height = 0.5
 			},
-			result.Location
+			result.Rectangle
 		);
 	}
 
@@ -122,7 +122,7 @@ public class TreeHelpersTests
 		// Then
 		Assert.NotNull(result);
 		Assert.Equal(tree.RightTopLeftBottomRightBottom, result.Node);
-		Assert.Equal(TestTreeWindowStates.RightTopLeftBottomRightBottom, result.Location);
+		Assert.Equal(TestTreeWindowStates.RightTopLeftBottomRightBottom, result.Rectangle);
 	}
 	#endregion
 
@@ -321,18 +321,18 @@ public class TreeHelpersTests
 	public static IEnumerable<object[]> GetDirectionToPoint_UnitSquareData()
 	{
 		// Top left corner boundary
-		yield return new object[] { Location.UnitSquare<double>(), new Point<double>(), Direction.Up };
+		yield return new object[] { Rectangle.UnitSquare<double>(), new Point<double>(), Direction.Up };
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.1, Y = 0 },
 			Direction.Up
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0, Y = 0.1 },
 			Direction.Left
 		};
@@ -340,21 +340,21 @@ public class TreeHelpersTests
 		// Top right corner boundary
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 1, Y = 0 },
 			Direction.Up
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.9, Y = 0 },
 			Direction.Up
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 1, Y = 0.1 },
 			Direction.Right
 		};
@@ -362,35 +362,35 @@ public class TreeHelpersTests
 		// Middle
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.5, Y = 0.5 },
 			Direction.Up
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.5, Y = 0.4 },
 			Direction.Up
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.5, Y = 0.6 },
 			Direction.Down
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.4, Y = 0.5 },
 			Direction.Left
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.6, Y = 0.5 },
 			Direction.Right
 		};
@@ -398,21 +398,21 @@ public class TreeHelpersTests
 		// Bottom left corner boundary
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0, Y = 1 },
 			Direction.Left
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0, Y = 0.9 },
 			Direction.Left
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.1, Y = 1 },
 			Direction.Down
 		};
@@ -420,21 +420,21 @@ public class TreeHelpersTests
 		// Bottom right corner boundary
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 1, Y = 1 },
 			Direction.Right
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 1, Y = 0.9 },
 			Direction.Right
 		};
 
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.9, Y = 1 },
 			Direction.Down
 		};
@@ -442,7 +442,7 @@ public class TreeHelpersTests
 		// Middle of the top triangle
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.5, Y = 0.25 },
 			Direction.Up
 		};
@@ -450,7 +450,7 @@ public class TreeHelpersTests
 		// Middle of the bottom triangle
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.5, Y = 0.75 },
 			Direction.Down
 		};
@@ -458,7 +458,7 @@ public class TreeHelpersTests
 		// Middle of the left triangle
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.25, Y = 0.5 },
 			Direction.Left
 		};
@@ -466,7 +466,7 @@ public class TreeHelpersTests
 		// Middle of the right triangle
 		yield return new object[]
 		{
-			Location.UnitSquare<double>(),
+			Rectangle.UnitSquare<double>(),
 			new Point<double>() { X = 0.75, Y = 0.5 },
 			Direction.Right
 		};
@@ -476,7 +476,7 @@ public class TreeHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -489,7 +489,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -502,7 +502,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -515,7 +515,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -531,7 +531,7 @@ public class TreeHelpersTests
 	{
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -544,7 +544,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -557,7 +557,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -570,7 +570,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -583,7 +583,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -596,7 +596,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -609,7 +609,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -622,7 +622,7 @@ public class TreeHelpersTests
 
 		yield return new object[]
 		{
-			new Location<double>()
+			new Rectangle<double>()
 			{
 				X = 1,
 				Y = 1,
@@ -638,11 +638,11 @@ public class TreeHelpersTests
 	[MemberData(nameof(GetDirectionToPoint_UnitSquareData))]
 	[MemberData(nameof(GetDirectionToPoint_NonUnitSquareData))]
 	[MemberData(nameof(GetDirectionToPoint_NonSquareData))]
-	internal void GetDirectionToPoint(Location<double> location, Point<double> point, Direction expected)
+	internal void GetDirectionToPoint(Rectangle<double> rectangle, Point<double> point, Direction expected)
 	{
 		// Given
 		// When
-		Direction result = location.GetDirectionToPoint(point);
+		Direction result = rectangle.GetDirectionToPoint(point);
 
 		// Then
 		Assert.Equal(expected, result);
@@ -650,15 +650,15 @@ public class TreeHelpersTests
 	#endregion
 
 	[Fact]
-	internal void GetWindowLocations()
+	internal void GetWindowRectangles()
 	{
 		// Given
 		TestTree tree = new();
-		ILocation<int> location = new Location<int>() { Width = 1920, Height = 1080 };
+		IRectangle<int> rectangle = new Rectangle<int>() { Width = 1920, Height = 1080 };
 
 		IWindowState[] expectedStates = TestTreeWindowStates
 			.GetAllWindowStates(
-				location,
+				rectangle,
 				tree.Left.Window,
 				tree.RightTopLeftTop.Window,
 				tree.RightTopLeftBottomLeft.Window,
@@ -672,16 +672,16 @@ public class TreeHelpersTests
 			.ToArray();
 
 		// When
-		WindowNodeLocationState[] windowLocations = tree.Root.GetWindowLocations(location).ToArray();
+		WindowNodeRectangleState[] windowRectangles = tree.Root.GetWindowRectangles(rectangle).ToArray();
 
 		// Then
-		windowLocations
+		windowRectangles
 			.Select(
 				nodeState =>
 					new WindowState()
 					{
 						Window = nodeState.WindowNode.Window,
-						Location = nodeState.Location,
+						Rectangle = nodeState.Rectangle,
 						WindowSize = nodeState.WindowSize
 					}
 			)

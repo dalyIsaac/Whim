@@ -21,7 +21,7 @@ public class WorkspaceManagerCustomization : ICustomization
 		monitor1
 			.WorkingArea
 			.Returns(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -33,7 +33,7 @@ public class WorkspaceManagerCustomization : ICustomization
 		monitor2
 			.WorkingArea
 			.Returns(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 1920,
 					Y = 360,

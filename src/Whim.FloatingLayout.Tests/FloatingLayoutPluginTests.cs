@@ -17,7 +17,7 @@ public class FloatingLayoutPluginCustomization : ICustomization
 		monitor
 			.WorkingArea
 			.Returns(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -121,18 +121,18 @@ public class FloatingLayoutPluginTests
 	)
 	{
 		// Given
-		Location<int> location = new();
+		Rectangle<int> rect = new();
 		WindowState windowState =
 			new()
 			{
 				Window = window,
-				Location = location,
+				Rectangle = rect,
 				WindowSize = WindowSize.Normal
 			};
 
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace.TryGetWindowState(window).Returns(windowState);
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
+		context.MonitorManager.GetMonitorAtPoint(rect).Returns(monitor);
 
 		FloatingLayoutPlugin plugin = CreateSut(context);
 
@@ -219,7 +219,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -262,7 +262,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -304,7 +304,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -330,7 +330,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -410,7 +410,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}
@@ -455,7 +455,7 @@ public class FloatingLayoutPluginTests
 			.Returns(
 				new WindowState()
 				{
-					Location = new Location<int>() { X = 1, Y = 2 },
+					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
 					WindowSize = WindowSize.Normal
 				}

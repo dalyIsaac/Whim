@@ -75,14 +75,14 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	ILocation<int>? GetWindowOffset(HWND hwnd);
+	IRectangle<int>? GetWindowOffset(HWND hwnd);
 
 	/// <summary>
-	/// Returns the window's location from DWM.
+	/// Returns the window's rectangle from DWM.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	ILocation<int>? DwmGetWindowLocation(HWND hwnd);
+	IRectangle<int>? DwmGetWindowRectangle(HWND hwnd);
 
 	/// <summary>
 	/// Sets the preferred window corners for the given <paramref name="hwnd"/>.

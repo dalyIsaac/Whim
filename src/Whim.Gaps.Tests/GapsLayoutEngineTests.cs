@@ -22,7 +22,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window1,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 10 + 5,
 						Y = 10 + 5,
@@ -46,7 +46,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window2,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 10 + 5,
 						Y = 10 + 5,
@@ -58,7 +58,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window3,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 960 + 5,
 						Y = 10 + 5,
@@ -81,7 +81,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window4,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 15 + 7,
 						Y = 15 + 7,
@@ -108,7 +108,7 @@ public class GapsLayoutEngineTests
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
-		Location<int> location =
+		Rectangle<int> rect =
 			new()
 			{
 				X = 0,
@@ -121,7 +121,7 @@ public class GapsLayoutEngineTests
 		monitor.ScaleFactor.Returns(scale);
 
 		// When
-		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(location, monitor).ToArray();
+		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		windowStates.Should().Equal(expectedWindowStates);
@@ -136,7 +136,7 @@ public class GapsLayoutEngineTests
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
 			window1,
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -148,7 +148,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window1,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -167,7 +167,7 @@ public class GapsLayoutEngineTests
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
 			window2,
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -179,7 +179,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window2,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -197,7 +197,7 @@ public class GapsLayoutEngineTests
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
 			window3,
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -209,7 +209,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window3,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -228,7 +228,7 @@ public class GapsLayoutEngineTests
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
 			window4,
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -240,7 +240,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window4,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -259,7 +259,7 @@ public class GapsLayoutEngineTests
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
 			window5,
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -271,7 +271,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window5,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -289,7 +289,7 @@ public class GapsLayoutEngineTests
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
 			window6,
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -301,7 +301,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window6,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -320,7 +320,7 @@ public class GapsLayoutEngineTests
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
 			window7,
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -332,7 +332,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window7,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -350,7 +350,7 @@ public class GapsLayoutEngineTests
 		{
 			new GapsConfig { OuterGap = 10, InnerGap = 5 },
 			window8,
-			new Location<int>()
+			new Rectangle<int>()
 			{
 				X = 5,
 				Y = 5,
@@ -362,7 +362,7 @@ public class GapsLayoutEngineTests
 				new WindowState()
 				{
 					Window = window8,
-					Location = new Location<int>()
+					Rectangle = new Rectangle<int>()
 					{
 						X = 5,
 						Y = 5,
@@ -380,21 +380,21 @@ public class GapsLayoutEngineTests
 	public void DoLayout_OutOfBounds(
 		GapsConfig gapsConfig,
 		IWindow window,
-		Location<int> location,
+		Rectangle<int> rect,
 		IWindowState[] expectedWindowStates
 	)
 	{
 		// Given
 		ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
 		innerLayoutEngine
-			.DoLayout(location, Arg.Any<IMonitor>())
+			.DoLayout(rect, Arg.Any<IMonitor>())
 			.Returns(
 				new IWindowState[]
 				{
 					new WindowState()
 					{
 						Window = window,
-						Location = location,
+						Rectangle = rect,
 						WindowSize = WindowSize.Normal
 					}
 				}
@@ -403,7 +403,7 @@ public class GapsLayoutEngineTests
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		windowStates.Should().Equal(expectedWindowStates);

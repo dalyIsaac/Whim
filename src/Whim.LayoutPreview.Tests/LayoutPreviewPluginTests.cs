@@ -19,7 +19,7 @@ public class LayoutPreviewPluginCustomization : ICustomization
 		monitor
 			.WorkingArea
 			.Returns(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -171,7 +171,7 @@ public class LayoutPreviewPluginTests
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
-				CursorDraggedPoint = new Location<int>(),
+				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = Direction.LeftDown
 			};
 
@@ -193,7 +193,7 @@ public class LayoutPreviewPluginTests
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
-				CursorDraggedPoint = new Location<int>(),
+				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
 		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
@@ -220,7 +220,7 @@ public class LayoutPreviewPluginTests
 			new()
 			{
 				Window = window,
-				CursorDraggedPoint = new Location<int>(),
+				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
 
@@ -269,7 +269,7 @@ public class LayoutPreviewPluginTests
 			new()
 			{
 				Window = movedWindow,
-				CursorDraggedPoint = new Location<int>(),
+				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
 
@@ -294,7 +294,7 @@ public class LayoutPreviewPluginTests
 			new()
 			{
 				Window = movedWindow,
-				CursorDraggedPoint = new Location<int>(),
+				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
 
@@ -319,7 +319,7 @@ public class LayoutPreviewPluginTests
 			new()
 			{
 				Window = movedWindow,
-				CursorDraggedPoint = new Location<int>(),
+				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
 

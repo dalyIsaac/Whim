@@ -34,20 +34,20 @@ public record BarLayoutEngine : BaseProxyLayoutEngine
 	public override bool ContainsWindow(IWindow window) => InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc />
-	public override IEnumerable<IWindowState> DoLayout(ILocation<int> location, IMonitor monitor)
+	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
 		double scale = monitor.ScaleFactor / 100.0;
 		int height = (int)(_barConfig.Height * scale);
 
-		Location<int> proxiedLocation =
+		Rectangle<int> proxiedRect =
 			new()
 			{
-				X = location.X,
-				Y = location.Y + height,
-				Width = location.Width,
-				Height = Math.Max(0, location.Height - height)
+				X = rectangle.X,
+				Y = rectangle.Y + height,
+				Width = rectangle.Width,
+				Height = Math.Max(0, rectangle.Height - height)
 			};
-		return InnerLayoutEngine.DoLayout(proxiedLocation, monitor);
+		return InnerLayoutEngine.DoLayout(proxiedRect, monitor);
 	}
 
 	/// <inheritdoc />

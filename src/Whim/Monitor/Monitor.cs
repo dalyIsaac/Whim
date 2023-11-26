@@ -23,9 +23,9 @@ internal class Monitor : IMonitor
 
 	// Bounds and WorkingArea are lazily evaluated because sometimes they return incorrect values
 	// inside RDP sessions, during display changes. This is a workaround for that.
-	public ILocation<int> Bounds => GetBounds();
+	public IRectangle<int> Bounds => GetBounds();
 
-	public ILocation<int> WorkingArea => GetWorkingArea();
+	public IRectangle<int> WorkingArea => GetWorkingArea();
 
 	public int ScaleFactor { get; private set; }
 
@@ -56,31 +56,31 @@ internal class Monitor : IMonitor
 		ScaleFactor = (int)((double)effectiveDpiX / 96 * 100);
 	}
 
-	private ILocation<int> GetBounds()
+	private IRectangle<int> GetBounds()
 	{
 		if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
-			return infoEx.monitorInfo.rcMonitor.ToLocation();
+			return infoEx.monitorInfo.rcMonitor.ToRectangle();
 		}
 		else
 		{
 			Logger.Error($"Failed to get bounds for monitor {_hmonitor}");
-			return new Location<int>();
+			return new Rectangle<int>();
 		}
 	}
 
-	private ILocation<int> GetWorkingArea()
+	private IRectangle<int> GetWorkingArea()
 	{
 		if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
-			return infoEx.monitorInfo.rcWork.ToLocation();
+			return infoEx.monitorInfo.rcWork.ToRectangle();
 		}
 		else
 		{
 			Logger.Error($"Failed to get working area for monitor {_hmonitor}");
-			return new Location<int>();
+			return new Rectangle<int>();
 		}
 	}
 

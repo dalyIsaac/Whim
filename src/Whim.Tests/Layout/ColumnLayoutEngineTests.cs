@@ -167,7 +167,7 @@ public class ColumnLayoutEngineTests
 
 		// When
 		IWindowState[] windowStates = engine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		// Then
@@ -182,7 +182,7 @@ public class ColumnLayoutEngineTests
 
 		// When
 		IWindowState[] windowStates = engine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		// Then
@@ -190,7 +190,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -210,10 +210,10 @@ public class ColumnLayoutEngineTests
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window).AddWindow(window2).AddWindow(window3);
 
-		Location<int> location = new() { Width = 1920, Height = 1080 };
+		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Equal(3, result.Length);
@@ -221,7 +221,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -237,7 +237,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 640,
 					Y = 0,
@@ -253,7 +253,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 1280,
 					Y = 0,
@@ -273,17 +273,17 @@ public class ColumnLayoutEngineTests
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }.AddWindow(window);
 
-		Location<int> location = new() { Width = 1920, Height = 1080 };
+		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Single(result);
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -306,10 +306,10 @@ public class ColumnLayoutEngineTests
 			.AddWindow(window2)
 			.AddWindow(window3);
 
-		Location<int> location = new() { Width = 1920, Height = 1080 };
+		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Equal(3, result.Length);
@@ -317,7 +317,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 1280,
 					Y = 0,
@@ -333,7 +333,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 640,
 					Y = 0,
@@ -349,7 +349,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -545,17 +545,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Same(engine, newEngine);
 		Assert.Equal(2, windows.Length);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -569,17 +569,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Same(engine, newEngine);
 		Assert.Equal(2, windows.Length);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -593,17 +593,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(rightWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(leftWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -617,17 +617,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(rightWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(leftWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -641,17 +641,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(rightWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(leftWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -665,17 +665,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(rightWindow, windows[0].Window);
-		Assert.Equal(0, windows[0].Location.X);
+		Assert.Equal(0, windows[0].Rectangle.X);
 
 		Assert.Equal(leftWindow, windows[1].Window);
-		Assert.Equal(960, windows[1].Location.X);
+		Assert.Equal(960, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -691,17 +691,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(960, windows[0].Location.X);
+		Assert.Equal(960, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(0, windows[1].Location.X);
+		Assert.Equal(0, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -717,17 +717,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(960, windows[0].Location.X);
+		Assert.Equal(960, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(0, windows[1].Location.X);
+		Assert.Equal(0, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -743,17 +743,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(960, windows[0].Location.X);
+		Assert.Equal(960, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(0, windows[1].Location.X);
+		Assert.Equal(0, windows[1].Rectangle.X);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -769,17 +769,17 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		IWindowState[] windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToArray();
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
 
 		Assert.Equal(leftWindow, windows[0].Window);
-		Assert.Equal(960, windows[0].Location.X);
+		Assert.Equal(960, windows[0].Rectangle.X);
 
 		Assert.Equal(rightWindow, windows[1].Window);
-		Assert.Equal(0, windows[1].Location.X);
+		Assert.Equal(0, windows[1].Rectangle.X);
 	}
 	#endregion
 
@@ -810,7 +810,7 @@ public class ColumnLayoutEngineTests
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = -10 });
 		List<IWindowState> windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToList();
 
 		// Then
@@ -827,7 +827,7 @@ public class ColumnLayoutEngineTests
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 10 });
 		List<IWindowState> windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToList();
 
 		// Then
@@ -846,7 +846,7 @@ public class ColumnLayoutEngineTests
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 0.5 });
 		List<IWindowState> windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToList();
 
 		// Then
@@ -865,7 +865,7 @@ public class ColumnLayoutEngineTests
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 0.5 });
 		List<IWindowState> windows = newEngine
-			.DoLayout(new Location<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
 			.ToList();
 
 		// Then

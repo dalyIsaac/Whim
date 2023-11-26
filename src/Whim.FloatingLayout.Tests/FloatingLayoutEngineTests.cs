@@ -14,12 +14,12 @@ public class FloatingLayoutEngineCustomization : ICustomization
 		IContext context = fixture.Freeze<IContext>();
 		IMonitor monitor = fixture.Freeze<IMonitor>();
 
-		context.MonitorManager.GetMonitorAtPoint(Arg.Any<ILocation<int>>()).Returns(monitor);
-		monitor.WorkingArea.Returns(new Location<int>() { Width = 1000, Height = 1000 });
+		context.MonitorManager.GetMonitorAtPoint(Arg.Any<IRectangle<int>>()).Returns(monitor);
+		monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 1000, Height = 1000 });
 		context
 			.NativeManager
-			.DwmGetWindowLocation(Arg.Any<HWND>())
-			.Returns(new Location<int>() { Width = 100, Height = 100 });
+			.DwmGetWindowRectangle(Arg.Any<HWND>())
+			.Returns(new Rectangle<int>() { Width = 100, Height = 100 });
 
 		fixture.Inject(context);
 		fixture.Inject(monitor);
@@ -132,7 +132,7 @@ public class FloatingLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	internal void AddWindow_FloatingInPlugin_FailOnNoLocation(
+	internal void AddWindow_FloatingInPlugin_FailOnNoRectangle(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
@@ -143,7 +143,7 @@ public class FloatingLayoutEngineTests
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window);
@@ -154,7 +154,7 @@ public class FloatingLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	internal void AddWindow_FloatingInPlugin_FailOnSameLocation(
+	internal void AddWindow_FloatingInPlugin_FailOnSameRectangle(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
@@ -283,15 +283,15 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> rect = new Rectangle<double>();
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, location);
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, rect);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		innerLayoutEngine.Received(1).MoveWindowToPoint(window, location);
+		innerLayoutEngine.Received(1).MoveWindowToPoint(window, rect);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -303,17 +303,17 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> rect = new Rectangle<double>();
 
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-		innerLayoutEngine.MoveWindowToPoint(window, location).Returns(innerLayoutEngine);
+		innerLayoutEngine.MoveWindowToPoint(window, rect).Returns(innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, location);
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, rect);
 
 		// Then
 		Assert.Same(engine, newEngine);
-		innerLayoutEngine.Received(1).MoveWindowToPoint(window, location);
+		innerLayoutEngine.Received(1).MoveWindowToPoint(window, rect);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -325,21 +325,21 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> rect = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, location);
+		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, rect);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, location);
+		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, rect);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_SameLocation(
+	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_SameRectangle(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
@@ -348,7 +348,7 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> rect = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
@@ -356,16 +356,16 @@ public class FloatingLayoutEngineTests
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, location);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, rect);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, location);
+		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, rect);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_DifferentLocation(
+	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_DifferentRectangle(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
@@ -374,7 +374,7 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> rect = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
@@ -382,16 +382,16 @@ public class FloatingLayoutEngineTests
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, location);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, rect);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.Same(newEngine1, newEngine2);
-		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, location);
+		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, rect);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	internal void MoveWindowToPoint_FloatingInPlugin_CannotGetDwmLocation(
+	internal void MoveWindowToPoint_FloatingInPlugin_CannotGetDwmRectangle(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
@@ -400,23 +400,23 @@ public class FloatingLayoutEngineTests
 	)
 	{
 		// Given
-		ILocation<double> location = new Location<double>();
+		IRectangle<double> rect = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
-		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, location);
+		ILayoutEngine newEngine2 = newEngine1.MoveWindowToPoint(window, rect);
 
 		// Then
 		Assert.NotSame(engine, newEngine1);
 		Assert.NotSame(newEngine1, newEngine2);
 		innerLayoutEngine.Received(1).AddWindow(window);
-		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, location);
+		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, rect);
 	}
 	#endregion
 
@@ -491,7 +491,7 @@ public class FloatingLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_SameLocation(
+	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_SameRectangle(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
@@ -518,7 +518,7 @@ public class FloatingLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_DifferentLocation(
+	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_DifferentRectangle(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
@@ -545,7 +545,7 @@ public class FloatingLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	internal void MoveWindowEdgesInDirection_FloatingInPlugin_CannotGetDwmLocation(
+	internal void MoveWindowEdgesInDirection_FloatingInPlugin_CannotGetDwmRectangle(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
@@ -561,7 +561,7 @@ public class FloatingLayoutEngineTests
 			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
-		context.NativeManager.DwmGetWindowLocation(Arg.Any<HWND>()).Returns((Location<int>?)null);
+		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -595,20 +595,20 @@ public class FloatingLayoutEngineTests
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		newInnerLayoutEngine
-			.DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>())
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
 				new IWindowState[]
 				{
 					new WindowState()
 					{
 						Window = window1,
-						Location = new Location<int>(),
+						Rectangle = new Rectangle<int>(),
 						WindowSize = WindowSize.Normal
 					},
 					new WindowState()
 					{
 						Window = window2,
-						Location = new Location<int>(),
+						Rectangle = new Rectangle<int>(),
 						WindowSize = WindowSize.Normal
 					}
 				}
@@ -619,7 +619,7 @@ public class FloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.AddWindow(floatingWindow);
 		IWindowState[] windowStates = newEngine
 			.DoLayout(
-				new Location<int>()
+				new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -639,7 +639,7 @@ public class FloatingLayoutEngineTests
 			new WindowState()
 			{
 				Window = floatingWindow,
-				Location = new Location<int>()
+				Rectangle = new Rectangle<int>()
 				{
 					X = 0,
 					Y = 0,
@@ -651,13 +651,13 @@ public class FloatingLayoutEngineTests
 			new WindowState()
 			{
 				Window = window1,
-				Location = new Location<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
 			{
 				Window = window2,
-				Location = new Location<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			}
 		};
@@ -994,12 +994,12 @@ public class FloatingLayoutEngineTests
 		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
 
 		// ... and then moved
-		ILayoutEngine newEngine2 = newEngine.MoveWindowToPoint(window, new Location<double>());
+		ILayoutEngine newEngine2 = newEngine.MoveWindowToPoint(window, new Rectangle<double>());
 
 		// Then MoveWindowToPoint should be called on the inner layout engine
 		Assert.NotSame(engine, newEngine);
 		Assert.NotSame(newEngine, newEngine2);
-		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, new Location<double>());
+		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, new Rectangle<double>());
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]

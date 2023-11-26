@@ -157,7 +157,7 @@ public class WorkspaceTests
 		workspace.DoLayout();
 
 		// Then
-		layoutEngine.DidNotReceive().DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>());
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
 		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
 		triggers.WorkspaceLayoutCompleted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
 	}
@@ -979,13 +979,13 @@ public class WorkspaceTests
 		// Given
 		IWindowState expectedWindowState = new WindowState()
 		{
-			Location = new Location<int>(),
+			Rectangle = new Rectangle<int>(),
 			Window = window,
 			WindowSize = WindowSize.Normal
 		};
 		layoutEngine.AddWindow(window).Returns(resultingEngine);
 		resultingEngine
-			.DoLayout(Arg.Any<ILocation<int>>(), Arg.Any<IMonitor>())
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(new IWindowState[] { expectedWindowState });
 
 		Workspace workspace =
@@ -994,13 +994,10 @@ public class WorkspaceTests
 
 		// When TryGetWindowState is called
 		IWindowState? result = workspace.TryGetWindowState(window);
-		IWindowState? result2 = workspace.TryGetWindowLocation(window);
 
 		// Then the result is as expected
 		Assert.NotNull(result);
 		Assert.Equal(expectedWindowState, result);
-
-		Assert.Equal(result, result2);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -1023,10 +1020,10 @@ public class WorkspaceTests
 
 		// Then
 		Assert.Equal(window, windowState.Window);
-		Assert.Equal(0, windowState.Location.X);
-		Assert.Equal(0, windowState.Location.Y);
-		Assert.Equal(0, windowState.Location.Width);
-		Assert.Equal(0, windowState.Location.Height);
+		Assert.Equal(0, windowState.Rectangle.X);
+		Assert.Equal(0, windowState.Rectangle.Y);
+		Assert.Equal(0, windowState.Rectangle.Width);
+		Assert.Equal(0, windowState.Rectangle.Height);
 		Assert.Equal(WindowSize.Minimized, windowState.WindowSize);
 	}
 

@@ -38,7 +38,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		WindowState = new WindowState()
 		{
 			Window = window,
-			Location = GetUpdatedLocation(),
+			Rectangle = GetUpdatedRectangle(),
 			WindowSize = WindowSize.Normal
 		};
 
@@ -54,17 +54,17 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_context, _monitor, this)));
 	}
 
-	internal void UpdateLocation()
+	internal void UpdateRect()
 	{
-		WindowState.Location = GetUpdatedLocation();
+		WindowState.Rectangle = GetUpdatedRectangle();
 	}
 
-	private Location<int> GetUpdatedLocation()
+	private Rectangle<int> GetUpdatedRectangle()
 	{
 		double scaleFactor = _monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
 
-		return new Location<int>()
+		return new Rectangle<int>()
 		{
 			X = _monitor.WorkingArea.X,
 			Y = _monitor.WorkingArea.Y,

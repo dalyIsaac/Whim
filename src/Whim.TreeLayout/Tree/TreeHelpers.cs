@@ -10,8 +10,8 @@ namespace Whim.TreeLayout;
 /// </summary>
 /// <param name="Node">The node.</param>
 /// <param name="Ancestors">The ancestors of the node.</param>
-/// <param name="Location">The location of the node.</param>
-internal record NodeState(INode Node, IReadOnlyList<ISplitNode> Ancestors, ILocation<double> Location);
+/// <param name="Rectangle">The rectangle of the node.</param>
+internal record NodeState(INode Node, IReadOnlyList<ISplitNode> Ancestors, IRectangle<double> Rectangle);
 
 /// <summary>
 /// The state of a window node.
@@ -36,12 +36,12 @@ internal record WindowNodeStateAtPoint(
 );
 
 /// <summary>
-/// The location and size of the window in a monitor, using the monitor coordinate space.
+/// The rectangle and size of the window in a monitor, using the monitor coordinate space.
 /// </summary>
 /// <param name="WindowNode">The window node.</param>
-/// <param name="Location">The location of the window.</param>
+/// <param name="Rectangle">The rectangle of the window.</param>
 /// <param name="WindowSize">The <see cref="WindowSize"/>.</param>
-internal record WindowNodeLocationState(WindowNode WindowNode, ILocation<int> Location, WindowSize WindowSize);
+internal record WindowNodeRectangleState(WindowNode WindowNode, IRectangle<int> Rectangle, WindowSize WindowSize);
 
 internal static class TreeHelpers
 {
@@ -59,10 +59,10 @@ internal static class TreeHelpers
 	/// <returns></returns>
 	public static NodeState? GetNodeAtPath(this INode root, IReadOnlyList<int> path)
 	{
-		Location<double> location = Location.UnitSquare<double>();
+		Rectangle<double> rect = Rectangle.UnitSquare<double>();
 		if (path.Count == 0)
 		{
-			return new NodeState(root, Array.Empty<ISplitNode>(), location);
+			return new NodeState(root, Array.Empty<ISplitNode>(), rect);
 		}
 
 		ISplitNode[] ancestors = new ISplitNode[path.Count];
@@ -98,17 +98,17 @@ internal static class TreeHelpers
 
 			if (splitNode.IsHorizontal)
 			{
-				location.X += precedingWeight * location.Width;
-				location.Width = weight * location.Width;
+				rect.X += precedingWeight * rect.Width;
+				rect.Width = weight * rect.Width;
 			}
 			else
 			{
-				location.Y += precedingWeight * location.Height;
-				location.Height = weight * location.Height;
+				rect.Y += precedingWeight * rect.Height;
+				rect.Height = weight * rect.Height;
 			}
 		}
 
-		return new NodeState(currentNode, ancestors, location);
+		return new NodeState(currentNode, ancestors, rect);
 	}
 
 	/// <summary>
@@ -157,15 +157,15 @@ internal static class TreeHelpers
 
 	/// <summary>
 	/// Gets the window node containing the given point, or <see langword="null"/> if the point is not
-	/// inside the root location.
+	/// inside the root rectangle.
 	/// </summary>
 	/// <param name="rootNode">The root node of the tree.</param>
 	/// <param name="searchPoint">The point to search for.</param>
 	/// <returns></returns>
 	public static WindowNodeStateAtPoint? GetNodeContainingPoint(this INode rootNode, IPoint<double> searchPoint)
 	{
-		ILocation<double> parentLocation = Location.UnitSquare<double>();
-		if (!parentLocation.ContainsPoint(searchPoint))
+		IRectangle<double> parentRect = Rectangle.UnitSquare<double>();
+		if (!parentRect.ContainsPoint(searchPoint))
 		{
 			return null;
 		}
@@ -176,7 +176,7 @@ internal static class TreeHelpers
 				rootWindowNode,
 				ImmutableArray.Create<ISplitNode>(),
 				ImmutableArray.Create<int>(),
-				parentLocation.GetDirectionToPoint(searchPoint)
+				parentRect.GetDirectionToPoint(searchPoint)
 			);
 		}
 
@@ -203,30 +203,30 @@ internal static class TreeHelpers
 			{
 				double weight = parent.Weights[idx];
 				INode child = parent.Children[idx];
-				Location<double> childLocation = new(parentLocation);
-				childLocation.X += deltaX;
-				childLocation.Y += deltaY;
+				Rectangle<double> childRect = new(parentRect);
+				childRect.X += deltaX;
+				childRect.Y += deltaY;
 
 				// Scale the width/height of the child.
 				if (parent.IsHorizontal)
 				{
-					childLocation.Width = weight * parentLocation.Width;
+					childRect.Width = weight * parentRect.Width;
 				}
 				else
 				{
-					childLocation.Height = weight * parentLocation.Height;
+					childRect.Height = weight * parentRect.Height;
 				}
 
-				if (!childLocation.ContainsPoint(searchPoint))
+				if (!childRect.ContainsPoint(searchPoint))
 				{
 					// Since it wasn't a match, update the position of the child.
 					if (parent.IsHorizontal)
 					{
-						deltaX += childLocation.Width;
+						deltaX += childRect.Width;
 					}
 					else
 					{
-						deltaY += childLocation.Height;
+						deltaY += childRect.Height;
 					}
 					continue;
 				}
@@ -239,7 +239,7 @@ internal static class TreeHelpers
 					foundChild = true;
 					ancestorsBuilder.Add(splitNode);
 					parent = splitNode;
-					parentLocation = childLocation;
+					parentRect = childRect;
 					break;
 				}
 
@@ -249,7 +249,7 @@ internal static class TreeHelpers
 						WindowNode,
 						ancestorsBuilder.ToImmutable(),
 						pathBuilder.ToImmutable(),
-						childLocation.GetDirectionToPoint(searchPoint)
+						childRect.GetDirectionToPoint(searchPoint)
 					);
 				}
 
@@ -273,7 +273,7 @@ internal static class TreeHelpers
 	/// <param name="rectangle"></param>
 	/// <param name="searchPoint"></param>
 	/// <returns></returns>
-	public static Direction GetDirectionToPoint(this ILocation<double> rectangle, IPoint<double> searchPoint)
+	public static Direction GetDirectionToPoint(this IRectangle<double> rectangle, IPoint<double> searchPoint)
 	{
 		// We can figure out the direction of the point relative to the rectangle by comparing the
 		// point's actual y position compared to points given by the two diagonals of the rectangle.
@@ -336,14 +336,14 @@ internal static class TreeHelpers
 	/// Gets the <see cref="WindowState"/> for all windows, within the unit square.
 	/// </summary>
 	/// <param name="node">The root node of the tree.</param>
-	/// <param name="location">The location of the root node, in monitor coordinates.</param>
+	/// <param name="rectangle">The rectangle of the root node, in monitor coordinates.</param>
 	/// <returns></returns>
-	public static IEnumerable<WindowNodeLocationState> GetWindowLocations(this INode node, ILocation<int> location)
+	public static IEnumerable<WindowNodeRectangleState> GetWindowRectangles(this INode node, IRectangle<int> rectangle)
 	{
-		// If the node is a window node, then we can return the location, and break.
+		// If the node is a window node, then we can return the rectangle, and break.
 		if (node is WindowNode WindowNode)
 		{
-			yield return new WindowNodeLocationState(WindowNode, location, WindowSize.Normal);
+			yield return new WindowNodeRectangleState(WindowNode, rectangle, WindowSize.Normal);
 			yield break;
 		}
 
@@ -354,29 +354,29 @@ internal static class TreeHelpers
 		double precedingWeight = 0;
 		foreach ((double weight, INode child) in parent)
 		{
-			Location<int> childLocation =
+			Rectangle<int> childRectangle =
 				new()
 				{
-					X = location.X,
-					Y = location.Y,
-					Width = location.Width,
-					Height = location.Height
+					X = rectangle.X,
+					Y = rectangle.Y,
+					Width = rectangle.Width,
+					Height = rectangle.Height
 				};
 
 			if (parent.IsHorizontal)
 			{
-				childLocation.X += Convert.ToInt32(precedingWeight * location.Width);
-				childLocation.Width = Convert.ToInt32(weight * location.Width);
+				childRectangle.X += Convert.ToInt32(precedingWeight * rectangle.Width);
+				childRectangle.Width = Convert.ToInt32(weight * rectangle.Width);
 			}
 			else
 			{
-				childLocation.Y += Convert.ToInt32(precedingWeight * location.Height);
-				childLocation.Height = Convert.ToInt32(weight * location.Height);
+				childRectangle.Y += Convert.ToInt32(precedingWeight * rectangle.Height);
+				childRectangle.Height = Convert.ToInt32(weight * rectangle.Height);
 			}
 
-			foreach (WindowNodeLocationState childLocationResult in GetWindowLocations(child, childLocation))
+			foreach (WindowNodeRectangleState childRectangleResult in GetWindowRectangles(child, childRectangle))
 			{
-				yield return childLocationResult;
+				yield return childRectangleResult;
 			}
 
 			precedingWeight += weight;
@@ -419,28 +419,28 @@ internal static class TreeHelpers
 			return null;
 		}
 
-		return GetAdjacentWindowNode(rootSplitNode, direction, monitor, result.Location);
+		return GetAdjacentWindowNode(rootSplitNode, direction, monitor, result.Rectangle);
 	}
 
 	/// <summary>
-	/// Gets the adjacent node to the node at the <paramref name="nodeLocation"/>, in the given
+	/// Gets the adjacent node to the node at the <paramref name="nodeRectangle"/>, in the given
 	/// <paramref name="direction"/>.
 	/// </summary>
 	/// <param name="rootSplitNode">The root split node of the tree.</param>
 	/// <param name="direction">The direction to search in.</param>
 	/// <param name="monitor">The monitor that the root node is currently displayed in.</param>
-	/// <param name="nodeLocation">The location of the node, in monitor coordinates.</param>
+	/// <param name="nodeRectangle">The rectangle of the node, in monitor coordinates.</param>
 	/// <returns></returns>
 	public static WindowNodeStateAtPoint? GetAdjacentWindowNode(
 		ISplitNode rootSplitNode,
 		Direction direction,
 		IMonitor monitor,
-		ILocation<double> nodeLocation
+		IRectangle<double> nodeRectangle
 	)
 	{
-		// Next, we figure out the adjacent point of the nodeLocation.
-		double x = nodeLocation.X;
-		double y = nodeLocation.Y;
+		// Next, we figure out the adjacent point of the nodeRectangle.
+		double x = nodeRectangle.X;
+		double y = nodeRectangle.Y;
 
 		if (direction.HasFlag(Direction.Left))
 		{
@@ -448,7 +448,7 @@ internal static class TreeHelpers
 		}
 		else if (direction.HasFlag(Direction.Right))
 		{
-			x += nodeLocation.Width + (1d / monitor.WorkingArea.Width);
+			x += nodeRectangle.Width + (1d / monitor.WorkingArea.Width);
 		}
 
 		if (direction.HasFlag(Direction.Up))
@@ -457,7 +457,7 @@ internal static class TreeHelpers
 		}
 		else if (direction.HasFlag(Direction.Down))
 		{
-			y += nodeLocation.Height + (1d / monitor.WorkingArea.Height);
+			y += nodeRectangle.Height + (1d / monitor.WorkingArea.Height);
 		}
 
 		// Get the adjacent node (the node containing the point (x, y)).
