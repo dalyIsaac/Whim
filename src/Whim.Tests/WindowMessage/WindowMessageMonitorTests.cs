@@ -1,3 +1,4 @@
+using System;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32;
@@ -52,6 +53,27 @@ public class WindowMessageMonitorTests
 			.Received(1)
 			.SetWindowSubclass(Arg.Any<HWND>(), Arg.Any<SUBCLASSPROC>(), Arg.Any<nuint>(), Arg.Any<nuint>());
 		internalCtx.CoreNativeManager.Received(1).WTSRegisterSessionNotification(Arg.Any<HWND>(), Arg.Any<uint>());
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void HandlException(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given there is a subscriber to WM_DISPLAYCHANGE which throws
+		CaptureProc capture = CaptureProc.Create(internalCtx);
+		WindowMessageMonitor windowMessageMonitor = new(ctx, internalCtx);
+		windowMessageMonitor.PreInitialize();
+
+		EventHandler<WindowMessageMonitorEventArgs> handler = (sender, args) => throw new Exception("Test");
+		windowMessageMonitor.DisplayChanged += handler;
+
+		// When we raise the event
+		capture.SubclassProc?.Invoke((HWND)0, PInvoke.WM_DISPLAYCHANGE, (WPARAM)1, (LPARAM)1, 0, 0);
+
+		// Then the exception is handled
+		internalCtx
+			.CoreNativeManager
+			.Received(1)
+			.DefSubclassProc(Arg.Any<HWND>(), Arg.Any<uint>(), Arg.Any<WPARAM>(), Arg.Any<LPARAM>());
 	}
 
 	[Theory, AutoSubstituteData]
