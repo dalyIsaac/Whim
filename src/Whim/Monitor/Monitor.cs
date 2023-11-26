@@ -61,7 +61,7 @@ internal class Monitor : IMonitor
 		if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
-			return infoEx.monitorInfo.rcMonitor.ToLocation();
+			return infoEx.monitorInfo.rcMonitor.ToRectangle();
 		}
 		else
 		{
@@ -75,7 +75,7 @@ internal class Monitor : IMonitor
 		if (_internalContext.CoreNativeManager.GetMonitorInfoEx(_hmonitor) is MONITORINFOEXW infoEx)
 		{
 			// Multiple monitor system.
-			return infoEx.monitorInfo.rcWork.ToLocation();
+			return infoEx.monitorInfo.rcWork.ToRectangle();
 		}
 		else
 		{

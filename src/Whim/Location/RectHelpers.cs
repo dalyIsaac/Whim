@@ -12,7 +12,7 @@ internal static class RectHelpers
 	/// </summary>
 	/// <param name="rect">The <see cref="RECT"/> to convert.</param>
 	/// <returns>The converted <see cref="IRectangle{T}"/>.</returns>
-	public static IRectangle<int> ToLocation(this RECT rect) =>
+	public static IRectangle<int> ToRectangle(this RECT rect) =>
 		new Rectangle<int>()
 		{
 			X = rect.left,
