@@ -229,10 +229,10 @@ public class MonitorHelpersTests
 
 	[Theory]
 	[MemberData(nameof(DoubleToUnitSquareData))]
-	public void ToUnitSquareLocationTheory(IRectangle<int> monitor, IRectangle<int> location, IRectangle<double> expected)
+	public void ToUnitSquareRectangleTheory(IRectangle<int> monitor, IRectangle<int> rect, IRectangle<double> expected)
 	{
 		// When
-		IRectangle<double> actual = monitor.ToUnitSquare(location);
+		IRectangle<double> actual = monitor.ToUnitSquare(rect);
 
 		// Then
 		Assert.Equal(expected.X, actual.X);
@@ -287,10 +287,10 @@ public class MonitorHelpersTests
 
 	[Theory]
 	[MemberData(nameof(ToMonitorData))]
-	public void ToMonitorTheory(IRectangle<int> monitor, IRectangle<double> location, IRectangle<int> expected)
+	public void ToMonitorTheory(IRectangle<int> monitor, IRectangle<double> rect, IRectangle<int> expected)
 	{
 		// When
-		IRectangle<int> actual = monitor.ToMonitor(location);
+		IRectangle<int> actual = monitor.ToMonitor(rect);
 
 		// Then
 		Assert.Equal(expected.X, actual.X);

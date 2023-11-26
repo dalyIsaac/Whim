@@ -64,7 +64,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 
 		if (workspace.TryGetWindowState(window) is not IWindowState windowState)
 		{
-			Logger.Error($"Could not get location for window {window}");
+			Logger.Error($"Could not get window state for window {window}");
 			return;
 		}
 
@@ -96,11 +96,11 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 			_floatingWindows[window] = layoutEngines;
 		}
 
-		// Convert the location to a unit square location.
+		// Convert the rectangle to a unit square rectangle.
 		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(windowState.Rectangle);
-		IRectangle<double> unitSquareLocation = monitor.WorkingArea.ToUnitSquare(windowState.Rectangle);
+		IRectangle<double> unitSquareRect = monitor.WorkingArea.ToUnitSquare(windowState.Rectangle);
 
-		workspace.MoveWindowToPoint(window, unitSquareLocation);
+		workspace.MoveWindowToPoint(window, unitSquareRect);
 	}
 
 	/// <inheritdoc />

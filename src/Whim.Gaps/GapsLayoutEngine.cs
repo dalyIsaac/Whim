@@ -51,7 +51,7 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 		int doubleOuterGap = outerGap * 2;
 		int doubleInnerGap = innerGap * 2;
 
-		Rectangle<int> proxiedLocation =
+		Rectangle<int> proxiedRect =
 			new()
 			{
 				X = rectangle.X + outerGap,
@@ -60,14 +60,14 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 				Height = rectangle.Height - doubleOuterGap
 			};
 
-		foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(proxiedLocation, monitor))
+		foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(proxiedRect, monitor))
 		{
 			int x = windowState.Rectangle.X + innerGap;
 			int y = windowState.Rectangle.Y + innerGap;
 			int width = windowState.Rectangle.Width - doubleInnerGap;
 			int height = windowState.Rectangle.Height - doubleInnerGap;
 
-			// Get the location of the window with the gaps applied. If the window is too small in
+			// Get the rectangle of the window with the gaps applied. If the window is too small in
 			// a given dimension, then we don't apply the gap in that dimension.
 			if (width <= 0)
 			{

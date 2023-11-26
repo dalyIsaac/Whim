@@ -108,7 +108,7 @@ public class GapsLayoutEngineTests
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
-		Rectangle<int> location =
+		Rectangle<int> rect =
 			new()
 			{
 				X = 0,
@@ -121,7 +121,7 @@ public class GapsLayoutEngineTests
 		monitor.ScaleFactor.Returns(scale);
 
 		// When
-		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(location, monitor).ToArray();
+		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(rect, monitor).ToArray();
 
 		// Then
 		windowStates.Should().Equal(expectedWindowStates);
@@ -380,21 +380,21 @@ public class GapsLayoutEngineTests
 	public void DoLayout_OutOfBounds(
 		GapsConfig gapsConfig,
 		IWindow window,
-		Rectangle<int> location,
+		Rectangle<int> rect,
 		IWindowState[] expectedWindowStates
 	)
 	{
 		// Given
 		ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
 		innerLayoutEngine
-			.DoLayout(location, Arg.Any<IMonitor>())
+			.DoLayout(rect, Arg.Any<IMonitor>())
 			.Returns(
 				new IWindowState[]
 				{
 					new WindowState()
 					{
 						Window = window,
-						Rectangle = location,
+						Rectangle = rect,
 						WindowSize = WindowSize.Normal
 					}
 				}
@@ -403,7 +403,7 @@ public class GapsLayoutEngineTests
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		windowStates.Should().Equal(expectedWindowStates);

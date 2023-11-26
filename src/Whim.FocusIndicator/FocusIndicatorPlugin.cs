@@ -94,16 +94,16 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			return;
 		}
 
-		// Get the window location.
-		IWindowState? windowLocation = activeWorkspace.TryGetWindowState(window);
-		if (windowLocation == null)
+		// Get the window rectangle.
+		IWindowState? windowRect = activeWorkspace.TryGetWindowState(window);
+		if (windowRect == null)
 		{
-			Logger.Error($"Could not find window location for window {window}");
+			Logger.Error($"Could not find window rectangle for window {window}");
 			return;
 		}
 
 		IsVisible = true;
-		_focusIndicatorWindow?.Activate(windowLocation);
+		_focusIndicatorWindow?.Activate(windowRect);
 
 		// If the fade is enabled, start the timer.
 		if (_focusIndicatorConfig.FadeEnabled)

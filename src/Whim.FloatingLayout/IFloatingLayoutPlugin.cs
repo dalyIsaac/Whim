@@ -12,7 +12,7 @@ public interface IFloatingLayoutPlugin : IPlugin
 	public void MarkWindowAsFloating(IWindow? window = null);
 
 	/// <summary>
-	/// Update the floating window location.
+	/// Mark the given <paramref name="window"/> as a docked window
 	/// </summary>
 	/// <param name="window"></param>
 	public void MarkWindowAsDocked(IWindow? window = null);

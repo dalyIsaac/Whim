@@ -86,9 +86,9 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 			DraggedWindow = e.Window;
 			ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
 
-			Rectangle<int> location = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
+			Rectangle<int> rect = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
 
-			// Adjust the cursor point so that it's relative to the monitor's location.
+			// Adjust the cursor point so that it's relative to the monitor's rectangle.
 			Point<int> adjustedCursorPoint =
 				new()
 				{
@@ -97,7 +97,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 				};
 
 			_layoutPreviewWindow?.Update(
-				layoutEngine.DoLayout(location, monitor).ToArray(),
+				layoutEngine.DoLayout(rect, monitor).ToArray(),
 				adjustedCursorPoint,
 				e.Window,
 				monitor

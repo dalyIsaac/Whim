@@ -210,10 +210,10 @@ public class ColumnLayoutEngineTests
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window).AddWindow(window2).AddWindow(window3);
 
-		Rectangle<int> location = new() { Width = 1920, Height = 1080 };
+		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Equal(3, result.Length);
@@ -273,10 +273,10 @@ public class ColumnLayoutEngineTests
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity) { LeftToRight = false }.AddWindow(window);
 
-		Rectangle<int> location = new() { Width = 1920, Height = 1080 };
+		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Single(result);
@@ -306,10 +306,10 @@ public class ColumnLayoutEngineTests
 			.AddWindow(window2)
 			.AddWindow(window3);
 
-		Rectangle<int> location = new() { Width = 1920, Height = 1080 };
+		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(location, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Equal(3, result.Length);

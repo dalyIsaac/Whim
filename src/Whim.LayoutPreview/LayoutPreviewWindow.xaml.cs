@@ -40,7 +40,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 	/// Update the preview window with the given window states.
 	/// </summary>
 	/// <param name="windowStates">The window states to display.</param>
-	/// <param name="cursorPoint">The cursor's location inside the monitor.</param>
+	/// <param name="cursorPoint">The cursor's rectangle inside the monitor.</param>
 	/// <param name="movingWindow">The window which is currently being dragged.</param>
 	/// <param name="monitor">The monitor corresponding to the <paramref name="cursorPoint"/>.</param>
 	public void Update(IWindowState[] windowStates, IPoint<int> cursorPoint, IWindow movingWindow, IMonitor monitor)

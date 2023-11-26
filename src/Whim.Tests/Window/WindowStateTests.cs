@@ -25,7 +25,7 @@ public class WindowStateTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentLocation(IWindow window)
+	public void Equals_DifferentRect(IWindow window)
 	{
 		// Given
 		WindowState windowState1 =

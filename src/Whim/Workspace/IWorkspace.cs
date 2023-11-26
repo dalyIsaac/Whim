@@ -82,17 +82,6 @@ public interface IWorkspace : IDisposable
 	void Deactivate();
 
 	/// <summary>
-	/// Gets the current location (as of the last <see cref="DoLayout"/>) of the window.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns>
-	/// If the window is not in the workspace, or the workspace is not focused,
-	/// <c>null</c> is returned.
-	/// </returns>
-	[Obsolete("Use TryGetWindowState instead.")]
-	IWindowState? TryGetWindowLocation(IWindow window);
-
-	/// <summary>
 	/// Gets the current state (as of the last <see cref="DoLayout"/>) of the window.
 	/// </summary>
 	/// <param name="window"></param>

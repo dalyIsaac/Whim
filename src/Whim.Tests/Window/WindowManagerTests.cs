@@ -651,8 +651,8 @@ public class WindowManagerTests
 	[MemberData(nameof(MoveEdgesSuccessData))]
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameter
 	internal void WinEventProc_OnWindowMoveStart_MovedEdges(
-		IRectangle<int> originalLocation,
-		IRectangle<int> newLocation,
+		IRectangle<int> originalRect,
+		IRectangle<int> newRect,
 		Direction _direction,
 		IPoint<int> _pixelsDelta
 	)
@@ -676,13 +676,13 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Rectangle = originalLocation,
+					Rectangle = originalRect,
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 		windowManager.PostInitialize();
@@ -705,7 +705,7 @@ public class WindowManagerTests
 	#endregion
 
 	#region OnWindowMoved
-	private static (CaptureWinEventProc, WindowManager, HWND) Setup_LocationRestoring(
+	private static (CaptureWinEventProc, WindowManager, HWND) Setup_RectRestoring(
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -726,10 +726,7 @@ public class WindowManagerTests
 	{
 		// Given the window has no process file name
 		internalCtx.CoreNativeManager.GetProcessNameAndPath((int)_processId).Returns(("", null));
-		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
-			ctx,
-			internalCtx
-		);
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
 
 		// When the window is moved
 		// Then no event is raised
@@ -747,10 +744,7 @@ public class WindowManagerTests
 	)
 	{
 		// Given the window is not registered as restoring
-		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
-			ctx,
-			internalCtx
-		);
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
 
 		// When the window is moved
 		// Then no event is raised
@@ -761,7 +755,7 @@ public class WindowManagerTests
 		);
 	}
 
-	private static IWorkspace Setup_LocationRestoring_Success(IContext ctx, IInternalContext internalCtx, HWND hwnd)
+	private static IWorkspace Setup_RectRestoring_Success(IContext ctx, IInternalContext internalCtx, HWND hwnd)
 	{
 		IWindow window = Window.CreateWindow(ctx, internalCtx, hwnd)!;
 
@@ -792,11 +786,8 @@ public class WindowManagerTests
 	)
 	{
 		// Given the window is registered as restoring, but no workspace is found for it
-		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
-			ctx,
-			internalCtx
-		);
-		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
+		IWorkspace workspace = Setup_RectRestoring_Success(ctx, internalCtx, hwnd);
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
 
 		// When the window is moved
@@ -818,11 +809,8 @@ public class WindowManagerTests
 	internal async void WinEventProc_OnWindowMoved_Raises_DoLayout(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the window is registered as restoring, and a workspace is found for it
-		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
-			ctx,
-			internalCtx
-		);
-		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
+		IWorkspace workspace = Setup_RectRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved
 		// Then an event is raised, and the workspace is asked to do a layout
@@ -846,11 +834,8 @@ public class WindowManagerTests
 	)
 	{
 		// Given the window is registered as restoring, a workspace is found for it, and the window is already handled
-		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
-			ctx,
-			internalCtx
-		);
-		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
+		IWorkspace workspace = Setup_RectRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved for the second time
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
@@ -869,11 +854,8 @@ public class WindowManagerTests
 	internal async void WinEventProc_OnWindowMoved_WindowGetsRemoved(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the window has been been handled, but is removed
-		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_LocationRestoring(
-			ctx,
-			internalCtx
-		);
-		IWorkspace workspace = Setup_LocationRestoring_Success(ctx, internalCtx, hwnd);
+		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
+		IWorkspace workspace = Setup_RectRestoring_Success(ctx, internalCtx, hwnd);
 
 		// When the window is moved and then removed
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
@@ -967,8 +949,8 @@ public class WindowManagerTests
 	{
 		// Given
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
-		IRectangle<int> originalLocation = new Rectangle<int>() { X = 4, Width = 4 };
-		IRectangle<int> newLocation = new Rectangle<int>() { X = 3, Width = 5 };
+		IRectangle<int> originalRect = new Rectangle<int>() { X = 4, Width = 4 };
+		IRectangle<int> newRect = new Rectangle<int>() { X = 3, Width = 5 };
 		HWND hwnd = new(1);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
@@ -979,13 +961,13 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Rectangle = originalLocation,
+					Rectangle = originalRect,
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1169,7 +1151,7 @@ public class WindowManagerTests
 	#endregion
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WinEventProc_OnWindowMoved_GetMovedEdges_CannotGetNewWindowLocation(
+	internal void WinEventProc_OnWindowMoved_GetMovedEdges_CannotGetNewWindowRect(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IWorkspace workspace
@@ -1221,8 +1203,8 @@ public class WindowManagerTests
 	)
 	{
 		// Given
-		Rectangle<int> originalLocation = new();
-		Rectangle<int> newLocation =
+		Rectangle<int> originalRect = new();
+		Rectangle<int> newRect =
 			new()
 			{
 				X = newX,
@@ -1241,13 +1223,13 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Rectangle = originalLocation,
+					Rectangle = originalRect,
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1341,8 +1323,8 @@ public class WindowManagerTests
 	[Theory]
 	[MemberData(nameof(MoveEdgesSuccessData))]
 	internal void WinEventProc_OnWindowMoveEnd_Success(
-		IRectangle<int> originalLocation,
-		IRectangle<int> newLocation,
+		IRectangle<int> originalRect,
+		IRectangle<int> newRect,
 		Direction direction,
 		IPoint<int> pixelsDelta
 	)
@@ -1365,13 +1347,13 @@ public class WindowManagerTests
 			.Returns(
 				new WindowState()
 				{
-					Rectangle = originalLocation,
+					Rectangle = originalRect,
 					WindowSize = WindowSize.Normal,
 					Window = Substitute.For<IWindow>()
 				}
 			);
 
-		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newLocation);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 

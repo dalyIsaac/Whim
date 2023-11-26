@@ -271,7 +271,7 @@ public class BarLayoutEngineTests
 			}
 		};
 
-		Rectangle<int> expectedGivenLocation =
+		Rectangle<int> expectedGivenRect =
 			new()
 			{
 				Y = 30,
@@ -279,14 +279,14 @@ public class BarLayoutEngineTests
 				Height = 70
 			};
 
-		innerLayoutEngine.DoLayout(expectedGivenLocation, monitor).Returns(expectedWindowStates);
+		innerLayoutEngine.DoLayout(expectedGivenRect, monitor).Returns(expectedWindowStates);
 
 		// When
 		IWindowState[] layout = engine.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor).ToArray();
 
 		// Then
 		Assert.Equal(2, layout.Length);
-		innerLayoutEngine.Received(1).DoLayout(expectedGivenLocation, monitor);
+		innerLayoutEngine.Received(1).DoLayout(expectedGivenRect, monitor);
 		layout.Should().Equal(expectedWindowStates);
 	}
 

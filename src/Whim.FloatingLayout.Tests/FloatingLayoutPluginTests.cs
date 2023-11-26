@@ -121,18 +121,18 @@ public class FloatingLayoutPluginTests
 	)
 	{
 		// Given
-		Rectangle<int> location = new();
+		Rectangle<int> rect = new();
 		WindowState windowState =
 			new()
 			{
 				Window = window,
-				Rectangle = location,
+				Rectangle = rect,
 				WindowSize = WindowSize.Normal
 			};
 
 		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace.TryGetWindowState(window).Returns(windowState);
-		context.MonitorManager.GetMonitorAtPoint(location).Returns(monitor);
+		context.MonitorManager.GetMonitorAtPoint(rect).Returns(monitor);
 
 		FloatingLayoutPlugin plugin = CreateSut(context);
 

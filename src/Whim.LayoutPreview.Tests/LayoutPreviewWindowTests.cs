@@ -87,13 +87,13 @@ public class LayoutPreviewWindowTests
 	public void ShouldContinue_HoveredIndexChanged()
 	{
 		// Given
-		Rectangle<int> location = new() { Height = 100, Width = 100 };
+		Rectangle<int> rect = new() { Height = 100, Width = 100 };
 		IWindowState[] prevWindowStates = new IWindowState[]
 		{
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Rectangle = location,
+				Rectangle = rect,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
@@ -109,7 +109,7 @@ public class LayoutPreviewWindowTests
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Rectangle = location,
+				Rectangle = rect,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()
@@ -137,13 +137,13 @@ public class LayoutPreviewWindowTests
 	public void ShouldContinue_HoveredIndexNotChanged()
 	{
 		// Given
-		Rectangle<int> location = new() { Height = 100, Width = 100 };
+		Rectangle<int> rect = new() { Height = 100, Width = 100 };
 		IWindowState[] prevWindowStates = new IWindowState[]
 		{
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
-				Rectangle = location,
+				Rectangle = rect,
 				WindowSize = WindowSize.Normal
 			},
 			new WindowState()

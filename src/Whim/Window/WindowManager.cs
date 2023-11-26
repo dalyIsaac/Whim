@@ -499,20 +499,18 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		// Get the new window position.
-		IRectangle<int>? newLocation = _context.NativeManager.DwmGetWindowRectangle(window.Handle);
-		if (newLocation is null)
+		IRectangle<int>? newRect = _context.NativeManager.DwmGetWindowRectangle(window.Handle);
+		if (newRect is null)
 		{
-			Logger.Debug($"Could not get new window location for window {window}, failed to move window edges");
+			Logger.Debug($"Could not get new rectangle for window {window}, failed to move window edges");
 			return null;
 		}
 
 		// Find the one or two edges to move.
-		int leftEdgeDelta = windowState.Rectangle.X - newLocation.X;
-		int topEdgeDelta = windowState.Rectangle.Y - newLocation.Y;
-		int rightEdgeDelta =
-			newLocation.X + newLocation.Width - (windowState.Rectangle.X + windowState.Rectangle.Width);
-		int bottomEdgeDelta =
-			newLocation.Y + newLocation.Height - (windowState.Rectangle.Y + windowState.Rectangle.Height);
+		int leftEdgeDelta = windowState.Rectangle.X - newRect.X;
+		int topEdgeDelta = windowState.Rectangle.Y - newRect.Y;
+		int rightEdgeDelta = newRect.X + newRect.Width - (windowState.Rectangle.X + windowState.Rectangle.Width);
+		int bottomEdgeDelta = newRect.Y + newRect.Height - (windowState.Rectangle.Y + windowState.Rectangle.Height);
 
 		int movedEdgeCountX = 0;
 		int movedEdgeCountY = 0;

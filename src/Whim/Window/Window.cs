@@ -34,14 +34,8 @@ internal class Window : IWindow
 		}
 	}
 
-	public IPoint<int> Center
-	{
-		get
-		{
-			IRectangle<int> location = Rectangle;
-			return new Point<int>() { X = location.X + (location.Width / 2), Y = location.Y + (location.Height / 2) };
-		}
-	}
+	public IPoint<int> Center =>
+		new Point<int>() { X = Rectangle.X + (Rectangle.Width / 2), Y = Rectangle.Y + (Rectangle.Height / 2) };
 
 	public required int ProcessId { get; init; }
 

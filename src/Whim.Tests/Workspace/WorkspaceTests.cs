@@ -994,13 +994,10 @@ public class WorkspaceTests
 
 		// When TryGetWindowState is called
 		IWindowState? result = workspace.TryGetWindowState(window);
-		IWindowState? result2 = workspace.TryGetWindowLocation(window);
 
 		// Then the result is as expected
 		Assert.NotNull(result);
 		Assert.Equal(expectedWindowState, result);
-
-		Assert.Equal(result, result2);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]

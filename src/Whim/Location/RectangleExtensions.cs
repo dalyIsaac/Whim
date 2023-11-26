@@ -10,8 +10,8 @@ public static class RectangleExtensions
 	/// <summary>
 	/// Adds the given <paramref name="other"/> to this <see cref="IRectangle{T}"/>.
 	/// </summary>
-	/// <param name="rectangle">The location to add to.</param>
-	/// <param name="other">The location to add.</param>
+	/// <param name="rectangle">The rectangle to add to.</param>
+	/// <param name="other">The rectangle to add.</param>
 	/// <returns>A new <see cref="IRectangle{T}"/> with the given <paramref name="other"/> added to this one.</returns>
 	public static IRectangle<T> Add<T>(this IRectangle<T> rectangle, IRectangle<T> other)
 		where T : INumber<T> =>
