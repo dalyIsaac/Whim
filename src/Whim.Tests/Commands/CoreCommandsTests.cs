@@ -114,13 +114,8 @@ public class CoreCommandsTests
 		context.WorkspaceManager.ActiveWorkspace.Received(1).SwapWindowInDirection(direction, null);
 	}
 
-	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_left_edge_left", Direction.Left, 1, 0)]
-	[InlineAutoSubstituteData<CoreCommandsCustomization>(
-		"whim.core.move_window_left_edge_right",
-		Direction.Left,
-		-1,
-		0
-	)]
+	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_left_edge_left", Direction.Left, -1, 0)]
+	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_left_edge_right", Direction.Left, 1, 0)]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>(
 		"whim.core.move_window_right_edge_left",
 		Direction.Right,
@@ -133,8 +128,8 @@ public class CoreCommandsTests
 		1,
 		0
 	)]
-	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_top_edge_up", Direction.Up, 0, 1)]
-	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_top_edge_down", Direction.Up, 0, -1)]
+	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_top_edge_up", Direction.Up, 0, -1)]
+	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_top_edge_down", Direction.Up, 0, 1)]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_bottom_edge_up", Direction.Down, 0, -1)]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>(
 		"whim.core.move_window_bottom_edge_down",
