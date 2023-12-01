@@ -78,7 +78,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 		TextEntry.SelectAll();
 		Activate();
 		TextEntry.Focus(FocusState.Programmatic);
-		_window.FocusForceForeground();
+		_window.Focus();
 	}
 
 	/// <summary>
