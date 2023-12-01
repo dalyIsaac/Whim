@@ -270,21 +270,6 @@ public class WindowTests
 
 		// Then
 		internalCtx.CoreNativeManager.Received(1).SetForegroundWindow(Arg.Any<HWND>());
-	}
-
-	[Theory, AutoSubstituteData<WindowCustomization>]
-	internal void FocusForceForeground(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		internalCtx.CoreNativeManager.SetForegroundWindow(Arg.Any<HWND>());
-
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
-
-		// When
-		window.FocusForceForeground();
-
-		// Then
-		internalCtx.CoreNativeManager.Received(1).SetForegroundWindow(Arg.Any<HWND>());
 		// The following code doesn't work because SendInput accepts a Span.
 		internalCtx.CoreNativeManager.Received(1).SendInput(Arg.Any<INPUT[]>(), Arg.Any<int>());
 	}

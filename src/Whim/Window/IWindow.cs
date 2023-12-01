@@ -74,14 +74,9 @@ public interface IWindow
 	bool IsMaximized { get; }
 
 	/// <summary>
-	/// Moves the focus to this window.
-	/// </summary>
-	void Focus();
-
-	/// <summary>
 	/// Forces the window to the foreground and to be focused.
 	/// </summary>
-	void FocusForceForeground();
+	void Focus();
 
 	/// <summary>
 	/// Hides this window.

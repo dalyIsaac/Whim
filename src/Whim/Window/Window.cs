@@ -66,19 +66,6 @@ internal class Window : IWindow
 	public void Focus()
 	{
 		Logger.Debug(ToString());
-		if (!IsFocused)
-		{
-			_internalContext.CoreNativeManager.SetForegroundWindow(Handle);
-		}
-
-		// We manually call OnWindowFocused as an already focused window may have switched to a
-		// different workspace.
-		((IInternalWindowManager)_context.WindowManager).OnWindowFocused(this);
-	}
-
-	public void FocusForceForeground()
-	{
-		Logger.Debug(ToString());
 		// Use SendInput hack to allow Activate to work - required to resolve focus issue https://github.com/microsoft/PowerToys/issues/4270
 		unsafe
 		{
@@ -91,7 +78,7 @@ internal class Window : IWindow
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
-		((IInternalWindowManager)_context.WindowManager).OnWindowFocused(this);
+		_internalContext.WindowManager.OnWindowFocused(this);
 	}
 
 	public void Hide()
