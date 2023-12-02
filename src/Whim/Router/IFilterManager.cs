@@ -69,11 +69,19 @@ public interface IFilterManager
 	IFilterManager AddWindowClassFilter(string windowClass);
 
 	/// <summary>
-	/// Ignores the process name. Case insensitive.
+	/// Ignores the process name - see <see cref="IWindow.ProcessName"/>. Case insensitive.
 	/// </summary>
 	/// <param name="processName"></param>
 	/// <returns></returns>
+	[Obsolete("Use AddProcessFileNameFilter instead")]
 	IFilterManager AddProcessNameFilter(string processName);
+
+	/// <summary>
+	/// Ignores the process name - see <see cref="IWindow.ProcessFileName"/>. Case insensitive.
+	/// </summary>
+	/// <param name="processName"></param>
+	/// <returns></returns>
+	IFilterManager AddProcessFileNameFilter(string processName);
 
 	/// <summary>
 	/// Ignores the title. Case insensitive.

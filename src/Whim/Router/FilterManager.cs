@@ -9,6 +9,7 @@ internal class FilterManager : IFilterManager
 	#region Filters for specific properties
 	private readonly HashSet<string> _ignoreWindowClasses = new();
 	private readonly HashSet<string> _ignoreProcessNames = new();
+	private readonly HashSet<string> _ignoreProcessFileNames = new();
 	private readonly HashSet<string> _ignoreTitles = new();
 	#endregion
 
@@ -31,13 +32,15 @@ internal class FilterManager : IFilterManager
 		_filters.Clear();
 	}
 
-	public bool ShouldBeIgnored(IWindow window)
-	{
-		return _ignoreWindowClasses.Contains(window.WindowClass.ToLower())
-			|| (window.ProcessName is string processName && _ignoreProcessNames.Contains(processName.ToLower()))
-			|| _ignoreTitles.Contains(window.Title.ToLower())
-			|| _filters.Any(f => f(window));
-	}
+	public bool ShouldBeIgnored(IWindow window) =>
+		_ignoreWindowClasses.Contains(window.WindowClass.ToLower())
+		|| (
+			window.ProcessFileName is string processFileName
+			&& _ignoreProcessFileNames.Contains(processFileName.ToLower())
+		)
+		|| (window.ProcessName is string processName && _ignoreProcessNames.Contains(processName.ToLower()))
+		|| _ignoreTitles.Contains(window.Title.ToLower())
+		|| _filters.Any(f => f(window));
 
 	public IFilterManager AddWindowClassFilter(string windowClass)
 	{
@@ -50,6 +53,12 @@ internal class FilterManager : IFilterManager
 	public IFilterManager AddProcessNameFilter(string processName)
 	{
 		_ignoreProcessNames.Add(processName.ToLower());
+		return this;
+	}
+
+	public IFilterManager AddProcessFileNameFilter(string processFileName)
+	{
+		_ignoreProcessFileNames.Add(processFileName.ToLower());
 		return this;
 	}
 
