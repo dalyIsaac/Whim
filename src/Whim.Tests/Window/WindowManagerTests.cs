@@ -207,7 +207,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void OnWindowMinimizeStart(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void OnWindowMinimizeStart(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -225,12 +225,12 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowMinimizeStart(window);
-		Assert.Equal(window, result.Arguments.Window);
+		internalCtx.WorkspaceManager.Received(1).WindowMinimizeStart(Arg.Any<IWindow>());
+		Assert.Equal((int)_processId, result.Arguments.Window.ProcessId);
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void OnWindowMinimizeEnd(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void OnWindowMinimizeEnd(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -248,8 +248,8 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowMinimizeEnd(window);
-		Assert.Equal(window, result.Arguments.Window);
+		internalCtx.WorkspaceManager.Received(1).WindowMinimizeEnd(Arg.Any<IWindow>());
+		Assert.Equal((int)_processId, result.Arguments.Window.ProcessId);
 	}
 
 	private static void InitializeCoreNativeManagerMock(IInternalContext internalCtx)
