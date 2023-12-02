@@ -119,11 +119,11 @@ public class RouterManagerTests
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
-	public void AddProcessFileNameRoute_ProcessFileNameIsNull(IContext ctx, IWindow window)
+	public void AddProcessFileNameRoute_ProcessFileNameIsNull(IContext ctx, IWindow window, IWorkspace workspace)
 	{
 		// Given
 		RouterManager routerManager = new(ctx);
-		routerManager.AddProcessFileNameRoute("Test.exe", "Test");
+		routerManager.AddProcessFileNameRoute("Test.exe", workspace);
 
 		// When
 		window.ProcessFileName.Returns((string?)null);
