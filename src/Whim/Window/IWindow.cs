@@ -1,3 +1,4 @@
+using System;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Win32.Foundation;
 
@@ -45,6 +46,7 @@ public interface IWindow
 
 	/// <summary>
 	/// The file name of the module.
+	/// For example, <c>SnippingTool.exe</c>.
 	/// </summary>
 	string? ProcessFileName { get; }
 
@@ -55,7 +57,9 @@ public interface IWindow
 
 	/// <summary>
 	/// The name that the system uses to identify the process to the user.
+	/// For example, <c>SnippingTool</c>.
 	/// </summary>
+	[Obsolete("Use ProcessFileName instead.")]
 	string? ProcessName { get; }
 
 	/// <summary>
