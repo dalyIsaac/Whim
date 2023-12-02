@@ -53,7 +53,7 @@ public partial class FocusedWindowWidget : UserControl
 	}
 
 	/// <summary>
-	/// Returns the process name of the window.
+	/// Returns the process name of the window - e.g., <c>SnippingTool</c>.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>

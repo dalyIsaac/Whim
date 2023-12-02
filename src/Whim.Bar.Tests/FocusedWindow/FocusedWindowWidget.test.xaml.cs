@@ -57,4 +57,17 @@ public class FocusedWindowWidgetTests
 		// Then
 		Assert.Equal("code", processName);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void GetProcessName_Null(IWindow window)
+	{
+		// Given
+		window.ProcessFileName.Returns((string?)null);
+
+		// When
+		string? processName = FocusedWindowWidget.GetProcessName(window);
+
+		// Then
+		Assert.Null(processName);
+	}
 }
