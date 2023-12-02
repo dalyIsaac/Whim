@@ -49,7 +49,7 @@ public class FocusedWindowWidgetTests
 	public void GetProcessName(IWindow window)
 	{
 		// Given
-		window.ProcessName.Returns("code");
+		window.ProcessFileName.Returns("code");
 
 		// When
 		string? processName = FocusedWindowWidget.GetProcessName(window);

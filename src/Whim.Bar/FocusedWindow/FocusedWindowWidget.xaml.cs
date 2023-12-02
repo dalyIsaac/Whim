@@ -57,5 +57,5 @@ public partial class FocusedWindowWidget : UserControl
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	public static string? GetProcessName(IWindow window) => window.ProcessName;
+	public static string? GetProcessName(IWindow window) => window.ProcessFileName?.Replace(".exe", "");
 }
