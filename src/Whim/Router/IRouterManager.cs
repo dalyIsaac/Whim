@@ -1,4 +1,6 @@
-﻿namespace Whim;
+﻿using System;
+
+namespace Whim;
 
 /// <summary>
 /// Delegate which is called to route a <see cref="IWindow"/>.
@@ -16,7 +18,7 @@ public interface IRouterManager
 	/// Defaults to <see langword="false"/>.
 	/// This is overridden by any other routers in this <see cref="IRouterManager"/>.
 	/// </summary>
-	public bool RouteToActiveWorkspace { get; set; }
+	bool RouteToActiveWorkspace { get; set; }
 
 	/// <summary>
 	/// Routes a window to a workspace.
@@ -26,18 +28,18 @@ public interface IRouterManager
 	/// <see langword="null"/> when the window should be ignored, otherwise the
 	/// <see cref="IWorkspace"/> to route the window to.
 	/// </returns>
-	public IWorkspace? RouteWindow(IWindow window);
+	IWorkspace? RouteWindow(IWindow window);
 
 	/// <summary>
 	/// Clear all the routes.
 	/// </summary>
-	public void Clear();
+	void Clear();
 
 	/// <summary>
 	/// Add a router.
 	/// </summary>
 	/// <param name="router"></param>
-	public void Add(Router router);
+	void Add(Router router);
 
 	#region Routers helper methods
 	/// <summary>
@@ -46,7 +48,7 @@ public interface IRouterManager
 	/// </summary>
 	/// <param name="windowClass"></param>
 	/// <param name="workspaceName"></param>
-	public IRouterManager AddWindowClassRoute(string windowClass, string workspaceName);
+	IRouterManager AddWindowClassRoute(string windowClass, string workspaceName);
 
 	/// <summary>
 	/// Adds a router which moves windows matching <paramref name="windowClass"/> to the
@@ -54,23 +56,41 @@ public interface IRouterManager
 	/// </summary>
 	/// <param name="windowClass"></param>
 	/// <param name="workspace"></param>
-	public IRouterManager AddWindowClassRoute(string windowClass, IWorkspace workspace);
+	IRouterManager AddWindowClassRoute(string windowClass, IWorkspace workspace);
 
 	/// <summary>
-	/// Adds a router which moves processes matching <paramref name="processName"/> to the
+	/// Adds a router which moves processes matching <see cref="IWindow.ProcessName"/> to the
 	/// <paramref name="workspaceName"/>.
 	/// </summary>
 	/// <param name="processName"></param>
 	/// <param name="workspaceName"></param>
-	public IRouterManager AddProcessNameRoute(string processName, string workspaceName);
+	[Obsolete("Use AddProcessFileNameRoute instead")]
+	IRouterManager AddProcessNameRoute(string processName, string workspaceName);
 
 	/// <summary>
-	/// Adds a router which moves processes matching <paramref name="processName"/> to the
+	/// Adds a router which moves processes matching <see cref="IWindow.ProcessName"/> to the
 	/// <paramref name="workspace"/>.
 	/// </summary>
 	/// <param name="processName"></param>
 	/// <param name="workspace"></param>
-	public IRouterManager AddProcessNameRoute(string processName, IWorkspace workspace);
+	[Obsolete("Use AddProcessFileNameRoute instead")]
+	IRouterManager AddProcessNameRoute(string processName, IWorkspace workspace);
+
+	/// <summary>
+	/// Adds a router which moves windows matching <see cref="IWindow.ProcessFileName"/> to the
+	/// <paramref name="workspaceName"/>.
+	/// </summary>
+	/// <param name="processFileName"></param>
+	/// <param name="workspaceName"></param>
+	IRouterManager AddProcessFileNameRoute(string processFileName, string workspaceName);
+
+	/// <summary>
+	/// Adds a router which moves windows matching <see cref="IWindow.ProcessFileName"/> to the
+	/// <paramref name="workspace"/>.
+	/// </summary>
+	/// <param name="processFileName"></param>
+	/// <param name="workspace"></param>
+	IRouterManager AddProcessFileNameRoute(string processFileName, IWorkspace workspace);
 
 	/// <summary>
 	/// Adds a router which moves windows matching <paramref name="title"/> to the workspace
@@ -78,7 +98,7 @@ public interface IRouterManager
 	/// </summary>
 	/// <param name="title"></param>
 	/// <param name="workspaceName"></param>
-	public IRouterManager AddTitleRoute(string title, string workspaceName);
+	IRouterManager AddTitleRoute(string title, string workspaceName);
 
 	/// <summary>
 	/// Adds a router which moves windows matching <paramref name="title"/> to the
@@ -86,7 +106,7 @@ public interface IRouterManager
 	/// </summary>
 	/// <param name="title"></param>
 	/// <param name="workspace"></param>
-	public IRouterManager AddTitleRoute(string title, IWorkspace workspace);
+	IRouterManager AddTitleRoute(string title, IWorkspace workspace);
 
 	/// <summary>
 	/// Adds a router which moves windows matching regex <paramref name="match"/> string to the
@@ -94,7 +114,7 @@ public interface IRouterManager
 	/// </summary>
 	/// <param name="match"></param>
 	/// <param name="workspaceName"></param>
-	public IRouterManager AddTitleMatchRoute(string match, string workspaceName);
+	IRouterManager AddTitleMatchRoute(string match, string workspaceName);
 
 	/// <summary>
 	/// Adds a router which moves windows matching regex <paramref name="match"/> string to the
@@ -102,6 +122,6 @@ public interface IRouterManager
 	/// </summary>
 	/// <param name="match"></param>
 	/// <param name="workspace"></param>
-	public IRouterManager AddTitleMatchRoute(string match, IWorkspace workspace);
+	IRouterManager AddTitleMatchRoute(string match, IWorkspace workspace);
 	#endregion
 }

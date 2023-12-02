@@ -33,6 +33,19 @@ public class FilterManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
+	public void AddProcessFileNameFilter(IWindow window)
+	{
+		// Given
+		FilterManager filterManager = new();
+		filterManager.AddProcessFileNameFilter("Test.exe");
+
+		window.ProcessFileName.Returns("Test.exe");
+
+		// Then
+		Assert.True(filterManager.ShouldBeIgnored(window));
+	}
+
+	[Theory, AutoSubstituteData]
 	public void AddTitleFilter(IWindow window)
 	{
 		// Given
@@ -63,7 +76,7 @@ public class FilterManagerTests
 	{
 		// Given
 		FilterManager filterManager = new();
-		FilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
+		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
 		filterManager.AddWindowClassFilter("Test");
 
 		window.WindowClass.Returns("Test");

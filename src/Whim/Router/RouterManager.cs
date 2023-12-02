@@ -57,6 +57,36 @@ internal class RouterManager : IRouterManager
 		return this;
 	}
 
+	public IRouterManager AddProcessFileNameRoute(string processFileName, string workspaceName)
+	{
+		processFileName = processFileName.ToLower();
+		Logger.Debug($"Routing process file name {processFileName} to workspace {workspaceName}");
+		Add(window =>
+		{
+			if (window.ProcessFileName?.ToLower() == processFileName)
+			{
+				return _context.WorkspaceManager.TryGet(workspaceName);
+			}
+			return null;
+		});
+		return this;
+	}
+
+	public IRouterManager AddProcessFileNameRoute(string processFileName, IWorkspace workspace)
+	{
+		processFileName = processFileName.ToLower();
+		Logger.Debug($"Routing process file name: {processFileName} to workspace {workspace}");
+		Add(window =>
+		{
+			if (window.ProcessFileName?.ToLower() == processFileName)
+			{
+				return workspace;
+			}
+			return null;
+		});
+		return this;
+	}
+
 	public IRouterManager AddTitleRoute(string title, string workspaceName)
 	{
 		title = title.ToLower();

@@ -60,7 +60,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		_internalContext = internalContext;
 		_hookDelegate = new WINEVENTPROC(WinEventProcWrapper);
 
-		FilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
+		DefaultFilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
 	}
 
 	public void Initialize()
