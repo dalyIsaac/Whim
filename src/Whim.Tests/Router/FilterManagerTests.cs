@@ -76,7 +76,7 @@ public class FilterManagerTests
 	{
 		// Given
 		FilterManager filterManager = new();
-		FilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
+		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
 		filterManager.AddWindowClassFilter("Test");
 
 		window.WindowClass.Returns("Test");
