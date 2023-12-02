@@ -19,6 +19,7 @@ public class RouterManagerCustomization : ICustomization
 		IWindow window = fixture.Freeze<IWindow>();
 		window.WindowClass.Returns("Test");
 		window.ProcessName.Returns("Test");
+		window.ProcessFileName.Returns("Test.exe");
 		window.Title.Returns("Test");
 	}
 }
@@ -57,6 +58,24 @@ public class RouterManagerTests
 	{
 		RouterManager routerManager = new(ctx);
 		routerManager.AddProcessNameRoute("Test", workspace);
+
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
+	}
+
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddProcessFileNameRouteString(IContext ctx, IWindow window)
+	{
+		RouterManager routerManager = new(ctx);
+		routerManager.AddProcessFileNameRoute("Test.exe", "Test");
+
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
+	}
+
+	[Theory, AutoSubstituteData<RouterManagerCustomization>]
+	public void AddProcessFileNameRoute(IContext ctx, IWindow window, IWorkspace workspace)
+	{
+		RouterManager routerManager = new(ctx);
+		routerManager.AddProcessFileNameRoute("Test.exe", workspace);
 
 		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
