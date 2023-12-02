@@ -184,7 +184,7 @@ internal class Window : IWindow
 		return Handle.GetHashCode();
 	}
 
-	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle.Value}}}";
+	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle}}}";
 
 	public BitmapImage? GetIcon() => this.GetIcon(_context, _internalContext);
 }

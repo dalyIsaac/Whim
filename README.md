@@ -291,7 +291,7 @@ As Whim supports more novel layouts, it also has functionality to account for di
 
 #### `ILayoutEngine` Mutability
 
-Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support future functionality like previewing changes to layouts before committing them (see [#425](https://github.com/dalyIsaac/Whim/issues/425)). In comparison, workspacer's `ILayoutEngine` implementations are mutable.
+Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support functionality like previewing changes to layouts before committing them, with the `LayoutPreview` plugin. In comparison, workspacer's `ILayoutEngine` implementations are mutable.
 
 ## Contributing
 

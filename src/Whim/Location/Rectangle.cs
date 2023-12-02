@@ -33,6 +33,9 @@ public record Rectangle<T> : IRectangle<T>, IEquatable<Rectangle<T>>
 	/// <inheritdoc />
 	public T Height { get; set; } = T.Zero;
 
+	/// <inheritdoc />
+	public IPoint<T> Center => new Point<T>() { X = X + (Width / (T.One + T.One)), Y = Y + (Height / (T.One + T.One)) };
+
 	/// <summary>
 	/// Creates a new <see cref="Rectangle{T}"/> with zero values.
 	/// </summary>
