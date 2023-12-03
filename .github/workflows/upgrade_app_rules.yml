@@ -1,4 +1,4 @@
-name: Upgrade app-rules
+name: upgrade_app_rules
 
 on:
   workflow_dispatch: # Allow running on-demand
