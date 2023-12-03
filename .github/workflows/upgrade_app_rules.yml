@@ -40,7 +40,7 @@ jobs:
           python $APP_RULES_DIR/generate_app_rules.py
       - name: Move generated rules to destination
         run: |
-          mv $APP_RULES_DIR/DefaultFilteredWindows.cs src/Whim/Router/DefaultFilteredWindows.cs
+          mv $APP_RULES_DIR/DefaultFilteredWindowsKomorebi.g.cs src/Whim/Router/DefaultFilteredWindowsKomorebi.g.cs
 
       # OPEN PULL REQUEST
       - name: Detect changes
