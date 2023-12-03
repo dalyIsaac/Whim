@@ -9,8 +9,10 @@ public static class DefaultFilteredWindows
 	/// Load the windows which should be ignored by Whim by default.
 	/// </summary>
 	/// <param name="filterManager"></param>
-	public static void LoadWindowsIgnoredByWhim(IFilterManager filterManager) =>
-		filterManager.AddProcessFileNameFilter("SearchUI.exe");
+	public static void LoadWindowsIgnoredByWhim(IFilterManager filterManager)
+	{
+		DefaultFilteredWindowsKomorebi.LoadWindowsIgnoredByKomorebi(filterManager);
+	}
 
 	/// <summary>
 	/// Load the windows which try to set their own locations when the start up.
