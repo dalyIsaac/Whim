@@ -327,6 +327,22 @@ public class CoreCommandsTests
 		context.Received(1).Exit(null);
 	}
 
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void RestartWhim(IContext context)
+	{
+		// Given
+		CoreCommands commands = new(context);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand("whim.core.restart_whim");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		context.Received(1).Exit(Arg.Is<ExitEventArgs>(args => args.Reason == ExitReason.Restart));
+	}
+
 	private static List<IWorkspace> CreateWorkspaces(int count)
 	{
 		List<IWorkspace> workspaces = new();

@@ -226,7 +226,12 @@ internal class CoreCommands : PluginCommands
 				callback: () => _context.WorkspaceManager.Remove(_context.WorkspaceManager.ActiveWorkspace),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_W)
 			)
-			.Add(identifier: "exit_whim", title: "Exit Whim", callback: () => _context.Exit());
+			.Add(identifier: "exit_whim", title: "Exit Whim", callback: () => _context.Exit())
+			.Add(
+				identifier: "restart_whim",
+				title: "Restart Whim",
+				callback: () => _context.Exit(new ExitEventArgs() { Reason = ExitReason.Restart })
+			);
 
 		for (int idx = 1; idx <= 10; idx++)
 		{
