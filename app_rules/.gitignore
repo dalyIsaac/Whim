@@ -1,0 +1,4 @@
+*
+!.gitignore
+!generate_app_rules.py
+!requirements.txt
