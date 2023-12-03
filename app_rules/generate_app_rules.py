@@ -48,7 +48,7 @@ internal static class DefaultFilteredWindowsKomorebi
 	/// </summary>
 	/// <param name="filterManager"></param>
 	public static void LoadWindowsIgnoredByKomorebi(IFilterManager filterManager)
-	{
+	{\
 """
 
 # portion of file below auto-generated rules
