@@ -110,7 +110,7 @@ void DoConfig(IConfig context)
 
 ### Keybinds
 
-Commands can be bound to keybinds ([`IKeybind`](src/Whim/Keybinds/IKeybind.cs)).
+Commands can be bound to keybinds ([`IKeybind`](src/Whim/Keybind/IKeybind.cs)).
 
 **Each command is bound to a single keybind.**
 
@@ -243,7 +243,7 @@ context.RouterManager.Add((window) =>
 
 ### Filtering
 
-[`IFilterManager`](src/Whim/Router/IFilterManager.cs) tells Whim to ignore windows based on `Filter` delegates. A common use case is for plugins to filter out windows they manage themselves and want Whim to not lay out. For example, the bars and command palette are filtered out.
+[`IFilterManager`](src/Whim/Filter/IFilterManager.cs) tells Whim to ignore windows based on `Filter` delegates. A common use case is for plugins to filter out windows they manage themselves and want Whim to not lay out. For example, the bars and command palette are filtered out.
 
 ```csharp
 // Called by the bar plugin.
