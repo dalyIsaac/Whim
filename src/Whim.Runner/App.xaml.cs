@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.UI.Xaml;
+using Microsoft.Windows.AppLifecycle;
+using Windows.ApplicationModel.Core;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -64,10 +66,34 @@ public partial class App : Application
 		{
 			Exit();
 		}
+		else if (e.Reason == ExitReason.Restart)
+		{
+			Restart();
+		}
 		else
 		{
 			new ExceptionWindow(this, e).Activate();
 		}
+	}
+
+	private void Restart()
+	{
+		AppRestartFailureReason reason = AppInstance.Restart("");
+
+		switch (reason)
+		{
+			case AppRestartFailureReason.RestartPending:
+				Logger.Debug("Another restart is currently pending.");
+				break;
+			case AppRestartFailureReason.InvalidUser:
+				Logger.Fatal("Current user is not signed in or not a valid user.");
+				break;
+			case AppRestartFailureReason.Other:
+				Logger.Fatal("Failure restarting.");
+				break;
+		}
+
+		Exit();
 	}
 
 	private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
