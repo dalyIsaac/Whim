@@ -96,6 +96,7 @@ class GenerateRules:
 	def generate_all_rules(self):
 		for app in self.komorebi_rules:
 			if "float_identifiers" in app:
+				# windows matching `float_identifiers` are ignored by komorebi
 				Application(app["float_identifiers"], app["name"]).generate_rules()
 
 
@@ -108,10 +109,10 @@ class Application:
 		with open(OUTFILE, 'a') as o:
 			o.write("".join(["\n", TAB, COMMENT, self.app_name, "\n"]))
 		for r in self.app_rules:
-			FloatRule(r).add_rule()
+			IgnoreRule(r).add_rule()
 
 
-class FloatRule:
+class IgnoreRule:
 	def __init__(self, rule):
 		self.kind = rule["kind"]
 		self.id = rule["id"]
