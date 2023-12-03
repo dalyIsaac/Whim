@@ -53,6 +53,21 @@ public record Rectangle<T> : IRectangle<T>, IEquatable<Rectangle<T>>
 		Height = rectangle.Height;
 	}
 
+	/// <summary>
+	/// Creates a new <see cref="Rectangle{T}"/> with the given values.
+	/// </summary>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="width"></param>
+	/// <param name="height"></param>
+	public Rectangle(T x, T y, T width, T height)
+	{
+		X = x;
+		Y = y;
+		Width = width;
+		Height = height;
+	}
+
 	/// <inheritdoc />
 	public bool ContainsPoint(IPoint<T> point) =>
 		point.X >= X && point.X < X + Width && point.Y >= Y && point.Y < Y + Height;
