@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Numerics;
 using Xunit;
 
 namespace Whim.Tests;
@@ -116,5 +118,49 @@ public class RectangleTests
 
 		// Then
 		Assert.Equal(hashCode1, hashCode2);
+	}
+
+	public static IEnumerable<object[]> CenterData()
+	{
+		yield return new object[]
+		{
+			new Rectangle<int>() { Width = 10, Height = 10 },
+			new Point<int>() { X = 5, Y = 5 }
+		};
+		yield return new object[]
+		{
+			new Rectangle<double>()
+			{
+				X = 5,
+				Y = 5,
+				Width = 10,
+				Height = 10
+			},
+			new Point<double>() { X = 10, Y = 10 }
+		};
+		yield return new object[]
+		{
+			new Rectangle<double>()
+			{
+				X = -5,
+				Y = -5,
+				Width = 10,
+				Height = 10
+			},
+			new Point<double>() { X = 0, Y = 0 }
+		};
+	}
+
+	[Theory]
+	[MemberData(nameof(CenterData))]
+	public void Center<T>(IRectangle<T> rect, IPoint<T> expected)
+		where T : INumber<T>
+	{
+		// When
+		IPoint<T> actual = rect.Center;
+
+		// Then
+		Assert.Equal(expected.X, actual.X);
+		Assert.Equal(expected.Y, actual.Y);
 	}
 }
