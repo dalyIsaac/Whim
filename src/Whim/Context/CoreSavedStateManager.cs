@@ -46,7 +46,6 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 		SavedState = null;
 	}
 
-	#region Save state on dispose
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
@@ -91,5 +90,4 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 		CoreSavedState coreSavedState = new(savedWorkspaces);
 		_context.FileManager.WriteAllText(_savedStateFilePath, JsonSerializer.Serialize(coreSavedState));
 	}
-	#endregion
 }

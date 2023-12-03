@@ -27,6 +27,7 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 
 	/// <summary>
 	/// Creates a new window. If the window cannot be created, <see langword="null"/> is returned.
+	/// This will try reuse existing <see cref="IWindow"/>s if possible.
 	/// </summary>
 	/// <remarks>
 	/// This does not add the window to the <see cref="IWindowManager"/> or to the <see cref="IWorkspaceManager"/>.

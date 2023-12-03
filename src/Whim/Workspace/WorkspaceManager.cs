@@ -168,6 +168,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 	}
 
+	/// <summary>
+	/// Add the saved windows at their saved locations inside their saved workspaces.
+	/// Other windows are routed to the monitor they're on.
+	/// </summary>
 	private void InitializeWindows()
 	{
 		List<HWND> processedWindows = new();
