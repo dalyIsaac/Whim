@@ -47,14 +47,14 @@ void DoConfig(IContext context)
 	BarPlugin barPlugin = new(context, barConfig);
 	context.PluginManager.AddPlugin(barPlugin);
 
-	// Floating window plugin.
-	FloatingLayoutPlugin floatingLayoutPlugin = new(context);
-	context.PluginManager.AddPlugin(floatingLayoutPlugin);
-
 	// Gap plugin.
 	GapsConfig gapsConfig = new() { OuterGap = 0, InnerGap = 10 };
 	GapsPlugin gapsPlugin = new(context, gapsConfig);
 	context.PluginManager.AddPlugin(gapsPlugin);
+
+	// Floating window plugin.
+	FloatingLayoutPlugin floatingLayoutPlugin = new(context);
+	context.PluginManager.AddPlugin(floatingLayoutPlugin);
 
 	// Focus indicator.
 	FocusIndicatorConfig focusIndicatorConfig = new() { Color = new SolidColorBrush(Colors.Red), FadeEnabled = true };
