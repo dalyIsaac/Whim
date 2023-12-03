@@ -132,7 +132,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		)
 		{
 			int workspaceIdx = _workspacesToCreate.FindIndex(w => w.Name == savedWorkspace.Name);
-			if (workspaceIdx != -1)
+			if (workspaceIdx >= 0)
 			{
 				// Since we don't preserve the layout engines, use the ones provided by the user.
 				WorkspaceToCreate workspaceToCreate = _workspacesToCreate[workspaceIdx];
