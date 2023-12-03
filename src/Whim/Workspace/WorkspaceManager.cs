@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -15,6 +16,8 @@ internal record WorkspaceManagerTriggers
 	public required Action<WorkspaceEventArgs> WorkspaceLayoutStarted { get; init; }
 	public required Action<WorkspaceEventArgs> WorkspaceLayoutCompleted { get; init; }
 }
+
+internal record WorkspaceToCreate(string Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines);
 
 /// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
@@ -41,8 +44,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
 	/// The workspaces will have been created prior to <see cref="Initialize"/>.
 	/// </summary>
-	private readonly List<(string Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines)> _workspacesToCreate =
-		new();
+	private readonly List<WorkspaceToCreate> _workspacesToCreate = new();
 
 	/// <summary>
 	/// Maps monitors to their active workspace.
@@ -106,8 +108,48 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	{
 		Logger.Debug("Initializing workspace manager...");
 
+		InitializeWorkspaces();
+
+		_initialized = true;
+		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+
+		InitializeWindows();
+
+		Logger.Debug("Workspace manager initialized");
+	}
+
+	/// <summary>
+	/// Load the saved workspaces and merge them with the user-specified workspaces.
+	/// </summary>
+	/// <exception cref="InvalidOperationException"></exception>
+	private void InitializeWorkspaces()
+	{
+		List<WorkspaceToCreate> workspaces = new();
+
+		// Merge the saved state with the workspaces to create.
+		foreach (
+			SavedWorkspace savedWorkspace in _internalContext.CoreSavedStateManager.SavedState?.Workspaces ?? new()
+		)
+		{
+			int workspaceIdx = _workspacesToCreate.FindIndex(w => w.Name == savedWorkspace.Name);
+			if (workspaceIdx >= 0)
+			{
+				// Since we don't preserve the layout engines, use the ones provided by the user.
+				WorkspaceToCreate workspaceToCreate = _workspacesToCreate[workspaceIdx];
+				_workspacesToCreate.RemoveAt(workspaceIdx);
+				workspaces.Add(new(workspaceToCreate.Name, workspaceToCreate.LayoutEngines));
+			}
+			else
+			{
+				workspaces.Add(new(savedWorkspace.Name, null));
+			}
+		}
+
+		// Add the remaining workspaces to create.
+		workspaces.AddRange(_workspacesToCreate);
+
 		// Create the workspaces.
-		foreach ((string name, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines) in _workspacesToCreate)
+		foreach ((string name, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines) in workspaces)
 		{
 			CreateWorkspace(name, createLayoutEngines);
 		}
@@ -124,11 +166,65 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			Activate(workspace, monitor);
 			idx++;
 		}
+	}
 
-		_initialized = true;
-		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+	/// <summary>
+	/// Add the saved windows at their saved locations inside their saved workspaces.
+	/// Other windows are routed to the monitor they're on.
+	/// </summary>
+	private void InitializeWindows()
+	{
+		List<HWND> processedWindows = new();
 
-		Logger.Debug("Workspace manager initialized");
+		// Route windows to their saved workspaces.
+		foreach (
+			SavedWorkspace savedWorkspace in _internalContext.CoreSavedStateManager.SavedState?.Workspaces ?? new()
+		)
+		{
+			IWorkspace? workspace = TryGet(savedWorkspace.Name);
+			if (workspace == null)
+			{
+				Logger.Error($"Could not find workspace {savedWorkspace.Name}");
+				continue;
+			}
+
+			foreach (SavedWindow savedWindow in savedWorkspace.Windows)
+			{
+				HWND hwnd = (HWND)savedWindow.Handle;
+				IWindow? window = _context.WindowManager.CreateWindow(hwnd);
+				if (window == null)
+				{
+					Logger.Error($"Could not find window with handle {savedWindow.Handle}");
+					continue;
+				}
+
+				_windowWorkspaceMap[window] = workspace;
+				workspace.MoveWindowToPoint(window, savedWindow.Rectangle.Center);
+				processedWindows.Add(hwnd);
+
+				// Fire the window added event.
+				_internalContext.WindowManager.OnWindowAdded(window);
+			}
+		}
+
+		// Route the rest of the windows to the monitor they're on.
+		// Don't route to the active workspace while we're adding all the windows.
+		bool routeToActiveWorkspace = _context.RouterManager.RouteToActiveWorkspace;
+		_context.RouterManager.RouteToActiveWorkspace = false;
+
+		// Add all existing windows.
+		foreach (HWND hwnd in _internalContext.CoreNativeManager.GetAllWindows())
+		{
+			if (processedWindows.Contains(hwnd))
+			{
+				continue;
+			}
+
+			_internalContext.WindowManager.AddWindow(hwnd);
+		}
+
+		// Restore the route to active workspace setting.
+		_context.RouterManager.RouteToActiveWorkspace = routeToActiveWorkspace;
 	}
 
 	#region Workspaces
@@ -182,7 +278,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 		else
 		{
-			_workspacesToCreate.Add((name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines));
+			_workspacesToCreate.Add(new(name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines));
 		}
 	}
 
@@ -400,7 +496,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		if (workspace == null && !_context.RouterManager.RouteToActiveWorkspace)
 		{
-			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(window.Center);
+			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(window.Rectangle.Center);
 			if (monitor is not null)
 			{
 				workspace = GetWorkspaceForMonitor(monitor);

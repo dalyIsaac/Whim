@@ -37,6 +37,7 @@ public interface IWindow
 	/// <summary>
 	/// The center of the window.
 	/// </summary>
+	[Obsolete("Use Rectangle.Center instead.")]
 	IPoint<int> Center { get; }
 
 	/// <summary>

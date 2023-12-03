@@ -6,14 +6,13 @@ using System.Linq;
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Foundation;
 using Xunit;
-using static Xunit.Assert;
 
 namespace Whim.Tests;
 
 public class WorkspaceManagerCustomization : ICustomization
 {
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	public void Customize(IFixture fixture)
 	{
 		// By default, create two monitors.
@@ -132,7 +131,7 @@ public class WorkspaceManagerTests
 		}
 	}
 
-	#region Add
+	#region Initialize
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void Add_BeforeInitialization(IContext ctx, IInternalContext internalCtx)
 	{
@@ -177,36 +176,6 @@ public class WorkspaceManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void Add_SpecifyName(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
-		SetupMonitors(ctx, Array.Empty<IMonitor>());
-		workspaceManager.Initialize();
-
-		// When a workspace is added with a name
-		workspaceManager.Add("named workspace");
-
-		// Then the workspace is created with the specified name.
-		Assert.Equal("named workspace", workspaceManager.Single().Name);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void Add_SpecifyLayoutEngine(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
-		SetupMonitors(ctx, Array.Empty<IMonitor>());
-		workspaceManager.Initialize();
-
-		// When a workspace is added with a layout engine
-		workspaceManager.Add("workspace", new CreateLeafLayoutEngine[] { (id) => new TestLayoutEngine() });
-
-		// Then the workspace is created with the specified layout engine.
-		Assert.IsType<TestLayoutEngine>(workspaceManager.Single().ActiveLayoutEngine);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void Add_BeforeInitialization_DefaultLayoutEngine(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
@@ -222,6 +191,122 @@ public class WorkspaceManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_MergeWorkspacesWithSaved(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWindow window1,
+		IWindow window2,
+		IWindow window3
+	)
+	{
+		// Given:
+		// - a saved state with two workspaces, each with two handles
+		// - workspace 2's last handle not being valid
+		// - a window which is not saved
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, new[] { Substitute.For<IMonitor>(), ctx.MonitorManager.ActiveMonitor });
+
+		CoreSavedState savedState =
+			new(
+				new List<SavedWorkspace>()
+				{
+					new(
+						"workspace1",
+						new() { new SavedWindow(1, new(0, 0, 0.1, 0.1)), new SavedWindow(2, new(0.1, 0.1, 0.1, 0.1)), }
+					),
+					new(
+						"workspace2",
+						new()
+						{
+							new SavedWindow(3, new(0.2, 0.2, 0.1, 0.1)),
+							new SavedWindow(4, new(0.3, 0.3, 0.1, 0.1)),
+						}
+					)
+				}
+			);
+		internalCtx.CoreSavedStateManager.SavedState.Returns(savedState);
+
+		internalCtx.CoreNativeManager.GetAllWindows().Returns(new[] { (HWND)1, (HWND)2, (HWND)3, (HWND)5 });
+
+		window1.Handle.Returns((HWND)1);
+		window2.Handle.Returns((HWND)2);
+		window3.Handle.Returns((HWND)3);
+
+		ctx.WindowManager.CreateWindow((HWND)1).Returns(window1);
+		ctx.WindowManager.CreateWindow((HWND)2).Returns(window2);
+		ctx.WindowManager.CreateWindow((HWND)3).Returns(window3);
+
+		ctx.WindowManager.CreateWindow((HWND)4).Returns((IWindow?)null);
+
+		// When two workspaces are created, only one of which shares a name with a saved workspace
+		workspaceManager.Add("workspace1");
+		workspaceManager.Add("workspace3");
+		workspaceManager.Initialize();
+
+		// Then we will have three workspaces
+		IWorkspace[] workspaces = workspaceManager.ToArray();
+		Assert.Equal(3, workspaces.Length);
+
+		// The first workspace will have the same name as the saved workspace, and the same windows
+		IWorkspace workspace1 = workspaces[0];
+		Assert.Equal("workspace1", workspace1.Name);
+		Assert.Equal(2, workspace1.Windows.Count());
+		Assert.Equal((HWND)1, workspace1.Windows.ElementAt(0).Handle);
+		Assert.Equal((HWND)2, workspace1.Windows.ElementAt(1).Handle);
+		internalCtx.WindowManager.Received(1).OnWindowAdded(window1);
+		internalCtx.WindowManager.Received(1).OnWindowAdded(window2);
+
+		// The second workspace will have the same name as the saved workspace, one saved window.
+		IWorkspace workspace2 = workspaces[1];
+		Assert.Equal("workspace2", workspace2.Name);
+		Assert.Single(workspace2.Windows);
+		Assert.Equal((HWND)3, workspace2.Windows.ElementAt(0).Handle);
+		internalCtx.WindowManager.Received(1).OnWindowAdded(window3);
+
+		// The new window we expect to be eventually given to workspace 2 is processed by the window manager.
+		internalCtx.WindowManager.Received(1).AddWindow((HWND)5);
+
+		// The third workspace will have the same name as the saved workspace, and no windows.
+		IWorkspace workspace3 = workspaces[2];
+		Assert.Equal("workspace3", workspace3.Name);
+		Assert.Empty(workspace3.Windows);
+	}
+
+	#endregion
+
+
+	#region Add after initialization
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_AfterInitialization_SpecifyName(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, Array.Empty<IMonitor>());
+		workspaceManager.Initialize();
+
+		// When a workspace is added with a name
+		workspaceManager.Add("named workspace");
+
+		// Then the workspace is created with the specified name.
+		Assert.Equal("named workspace", workspaceManager.Single().Name);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Add_AfterInitialization_SpecifyLayoutEngine(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, Array.Empty<IMonitor>());
+		workspaceManager.Initialize();
+
+		// When a workspace is added with a layout engine
+		workspaceManager.Add("workspace", new CreateLeafLayoutEngine[] { (id) => new TestLayoutEngine() });
+
+		// Then the workspace is created with the specified layout engine.
+		Assert.IsType<TestLayoutEngine>(workspaceManager.Single().ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void Add_ThrowsWhenNoLayoutEngines(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
@@ -234,7 +319,9 @@ public class WorkspaceManagerTests
 		// Then an exception is thrown
 		Assert.Throws<InvalidOperationException>(workspaceManager.Initialize);
 	}
+
 	#endregion
+
 
 	#region Remove
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -660,7 +747,7 @@ public class WorkspaceManagerTests
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window is added
-		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+		Assert.RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
 			h => workspaceManager.WindowRouted += h,
 			h => workspaceManager.WindowRouted -= h,
 			() => workspaceManager.WindowAdded(window)
@@ -689,7 +776,7 @@ public class WorkspaceManagerTests
 		ctx.RouterManager.RouteWindow(window).Returns((IWorkspace?)null);
 
 		// When a window is added
-		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+		Assert.RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
 			h => workspaceManager.WindowRouted += h,
 			h => workspaceManager.WindowRouted -= h,
 			() => workspaceManager.WindowAdded(window)
@@ -719,7 +806,7 @@ public class WorkspaceManagerTests
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window is added
-		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+		Assert.RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
 			h => workspaceManager.WindowRouted += h,
 			h => workspaceManager.WindowRouted -= h,
 			() => workspaceManager.WindowAdded(window)
@@ -744,7 +831,7 @@ public class WorkspaceManagerTests
 		ctx.RouterManager.RouteWindow(window).Returns(workspaces[1]);
 
 		// When a window is added
-		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+		Assert.RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
 			h => workspaceManager.WindowRouted += h,
 			h => workspaceManager.WindowRouted -= h,
 			() => workspaceManager.WindowAdded(window)
@@ -775,7 +862,7 @@ public class WorkspaceManagerTests
 		ctx.RouterManager.RouteToActiveWorkspace.Returns(true);
 
 		// When a window is added
-		RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
+		Assert.RaisedEvent<RouteEventArgs> routeEvent = Assert.Raises<RouteEventArgs>(
 			h => workspaceManager.WindowRouted += h,
 			h => workspaceManager.WindowRouted -= h,
 			() => workspaceManager.WindowAdded(window)
@@ -788,7 +875,7 @@ public class WorkspaceManagerTests
 	private static void Assert_WindowAddedToWorkspace1(
 		IWorkspace[] workspaces,
 		IWindow window,
-		RaisedEvent<RouteEventArgs> routeEvent
+		Assert.RaisedEvent<RouteEventArgs> routeEvent
 	)
 	{
 		workspaces[0].Received(1).AddWindow(window);

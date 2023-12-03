@@ -7,9 +7,15 @@ namespace Whim;
 /// </summary>
 internal interface IInternalContext : IDisposable
 {
+	ICoreSavedStateManager CoreSavedStateManager { get; }
+
 	ICoreNativeManager CoreNativeManager { get; }
 
 	IWindowMessageMonitor WindowMessageMonitor { get; }
+
+	IInternalWorkspaceManager WorkspaceManager { get; }
+
+	IInternalMonitorManager MonitorManager { get; }
 
 	IInternalWindowManager WindowManager { get; }
 

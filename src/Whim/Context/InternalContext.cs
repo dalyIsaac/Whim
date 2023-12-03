@@ -6,9 +6,15 @@ internal class InternalContext : IInternalContext
 
 	private readonly IContext _context;
 
+	public ICoreSavedStateManager CoreSavedStateManager { get; }
+
 	public ICoreNativeManager CoreNativeManager { get; }
 
 	public IWindowMessageMonitor WindowMessageMonitor { get; }
+
+	public IInternalWorkspaceManager WorkspaceManager => (IInternalWorkspaceManager)_context.WorkspaceManager;
+
+	public IInternalMonitorManager MonitorManager => (IInternalMonitorManager)_context.MonitorManager;
 
 	public IInternalWindowManager WindowManager => (IInternalWindowManager)_context.WindowManager;
 
@@ -21,6 +27,7 @@ internal class InternalContext : IInternalContext
 	public InternalContext(IContext context)
 	{
 		_context = context;
+		CoreSavedStateManager = new CoreSavedStateManager(context);
 		CoreNativeManager = new CoreNativeManager(context);
 		WindowMessageMonitor = new WindowMessageMonitor(context, this);
 		KeybindHook = new KeybindHook(context, this);
@@ -31,10 +38,12 @@ internal class InternalContext : IInternalContext
 	public void PreInitialize()
 	{
 		WindowMessageMonitor.PreInitialize();
+		CoreSavedStateManager.PreInitialize();
 	}
 
 	public void PostInitialize()
 	{
+		CoreSavedStateManager.PostInitialize();
 		KeybindHook.PostInitialize();
 		MouseHook.PostInitialize();
 	}
@@ -46,6 +55,7 @@ internal class InternalContext : IInternalContext
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
+				CoreSavedStateManager.Dispose();
 				WindowMessageMonitor.Dispose();
 				KeybindHook.Dispose();
 				MouseHook.Dispose();

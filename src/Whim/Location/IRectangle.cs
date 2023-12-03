@@ -11,12 +11,17 @@ public interface IRectangle<T> : IPoint<T>
 	/// <summary>
 	/// The width, in pixels.
 	/// </summary>
-	public T Width { get; }
+	T Width { get; }
 
 	/// <summary>
 	/// The height, in pixels.
 	/// </summary>
-	public T Height { get; }
+	T Height { get; }
+
+	/// <summary>
+	/// The center of the rectangle.
+	/// </summary>
+	IPoint<T> Center { get; }
 
 	/// <summary>
 	/// Indicates whether the specified point is inside this item's bounding box.
@@ -30,5 +35,5 @@ public interface IRectangle<T> : IPoint<T>
 	/// <see langword="true"/> if the location given by <paramref name="point"/> is inside this
 	/// <see cref="IRectangle{T}"/>'s bounding box; otherwise, <see langword="false"/>.
 	/// </returns>
-	public bool ContainsPoint(IPoint<T> point);
+	bool ContainsPoint(IPoint<T> point);
 }
