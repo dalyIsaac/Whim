@@ -29,6 +29,8 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
+          # cache for pip requires all requirements to be frozen
+          # https://github.com/actions/setup-python#caching-packages-dependencies
           cache: pip
       - name: Install python dependencies
         run: |
