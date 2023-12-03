@@ -1,0 +1,75 @@
+name: upgrade_app_rules
+
+on:
+  workflow_dispatch: # Allow running on-demand
+  schedule:
+    # Runs every day at 19:00 UTC (14:00 ET, 05:00 AEST)
+  - cron: '0 19 * * *'
+
+jobs:
+  upgrade-app-rules:
+    name: Upgrade app-rules & Open PR
+    runs-on: ubuntu-latest
+    env:
+      # Relative path of `app_rules` within repo
+      APP_RULES_DIR: app_rules
+      # This branch will receive updates each time the workflow runs
+      # It doesn't matter if it's deleted when merged, it'll be re-created
+      BRANCH_NAME: auto-app-rules-upgrades
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        # with:
+          # [Optional] Use a separate key to automatically execute checks on the resulting PR
+          # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs
+          # ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      # UPGRADE APP-RULES
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          # cache for pip requires all requirements to be frozen
+          # https://github.com/actions/setup-python#caching-packages-dependencies
+          cache: pip
+      - name: Install python dependencies
+        run: |
+          pip install -r $APP_RULES_DIR/requirements.txt
+      - name: Fetch latest komerebi app-rules and generate whim rules
+        run: |
+          python $APP_RULES_DIR/generate_app_rules.py
+      - name: Move generated rules to destination
+        run: |
+          mv $APP_RULES_DIR/DefaultFilteredWindowsKomorebi.g.cs src/Whim/Filter/DefaultFilteredWindowsKomorebi.g.cs
+
+      # OPEN PULL REQUEST
+      - name: Detect changes
+        id: changes
+        run:
+          # This output boolean tells us if the dependencies have actually changed
+          echo "count=$(git status --porcelain=v1 2>/dev/null | wc -l)" >> $GITHUB_OUTPUT
+      - name: Commit & push changes
+        # Only push if changes exist
+        if: steps.changes.outputs.count > 0
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Automated app-rules upgrades"
+          git push -f origin ${{ github.ref_name }}:$BRANCH_NAME
+      - name: Open pull request if needed
+        if: steps.changes.outputs.count > 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Only open a PR if the branch is not attached to an existing one
+        run: |
+          PR=$(gh pr list --head $BRANCH_NAME --json number -q '.[0].number')
+          if [ -z $PR ]; then
+            gh pr create \
+            --head $BRANCH_NAME \
+            --title "Automated app-rules upgrades" \
+            --label "auto app rules" \
+            --body "Full log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          else
+            echo "Pull request already exists, won't create a new one."
+          fi
