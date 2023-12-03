@@ -3,8 +3,8 @@ name: Upgrade app-rules
 on:
   workflow_dispatch: # Allow running on-demand
   schedule:
-    # Runs every dat at 8:00 UTC (4:00 Eastern)
-  - cron: '0 8 * * *'
+    # Runs every day at 19:00 UTC (14:00 ET, 05:00 AEST)
+  - cron: '0 19 * * *'
 
 jobs:
   upgrade-app-rules:
