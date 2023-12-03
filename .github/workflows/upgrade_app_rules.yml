@@ -68,6 +68,7 @@ jobs:
             gh pr create \
             --head $BRANCH_NAME \
             --title "Automated app-rules upgrades" \
+            --label "auto app rules" \
             --body "Full log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           else
             echo "Pull request already exists, won't create a new one."
