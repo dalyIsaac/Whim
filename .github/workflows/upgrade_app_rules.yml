@@ -62,7 +62,7 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACTIONS_FG_PAT }}
         # Only open a PR if the branch is not attached to an existing one
         run: |
-          gh auth login --with-token < $ACCESS_TOKEN
+          echo "${ACCESS_TOKEN}" | gh auth login --with-token
           PR=$(gh pr list --head $BRANCH_NAME --json number -q '.[0].number')
           if [ -z $PR ]; then
             gh pr create \
