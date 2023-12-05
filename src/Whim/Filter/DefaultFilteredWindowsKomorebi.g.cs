@@ -37,11 +37,17 @@ internal static class DefaultFilteredWindowsKomorebi
 	public static void LoadWindowsIgnoredByKomorebi(IFilterManager filterManager)
 	{
 		// 1Password
+		filterManager.AddProcessFileNameFilter("Guitar Rig 7.exe");
+
+		// 1Password
 		filterManager.AddProcessFileNameFilter("1Password.exe");
 
 		// Ableton Live
 		filterManager.AddWindowClassFilter("AbletonVstPlugClass");  // Targets VST2 windows
 		filterManager.AddWindowClassFilter("Vst3PlugWindow");  // Targets VST3 windows
+
+		// Adobe Premiere Pro
+		filterManager.AddWindowClassFilter("DroverLord - Window Class");  // Premiere Pro effects popups
 
 		// Affinity Photo 2
 		filterManager.AddProcessFileNameFilter("Photo.exe");
@@ -141,8 +147,10 @@ internal static class DefaultFilteredWindowsKomorebi
 
 		// PowerToys
 		filterManager.AddProcessFileNameFilter("PowerToys.ColorPickerUI.exe");  // Target color picker dialog
+		filterManager.AddProcessFileNameFilter("PowerToys.CropAndLock.exe");  // Target thumbnail/cropped window
 		filterManager.AddProcessFileNameFilter("PowerToys.ImageResizer.exe");  // Target image resizer dialog
 		filterManager.AddProcessFileNameFilter("PowerToys.Peek.UI.exe");  // Target Peek popup
+		filterManager.AddProcessFileNameFilter("PowerToys.PowerLauncher.exe");  // PpowerLauncher popup
 
 		// Process Hacker
 		filterManager.AddProcessFileNameFilter("ProcessHacker.exe");
