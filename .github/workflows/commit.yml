@@ -11,6 +11,7 @@ on:
       - "Directory.Packages.props"
       - ".csharpierrc"
       - ".xamlstylerrc"
+      - ".config/dotnet-tools.json"
   pull_request:
     paths:
       - "src/**"
@@ -20,6 +21,7 @@ on:
       - "Directory.Packages.props"
       - ".csharpierrc"
       - ".xamlstylerrc"
+      - ".config/dotnet-tools.json"
 
 env:
   # We install the packages to the D:\ drive to avoid the slow IO on the C:\ drive.
