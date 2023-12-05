@@ -44,7 +44,7 @@ namespace Whim;
 internal static class DefaultFilteredWindowsKomorebi
 {
 	/// <summary>
-	/// Load the windows ignored by <see href="https://github.com/LGUG2Z/komorebi-application-specific-configuration"/>.
+	/// Load the windows ignored by Komorebi <see href="https://github.com/LGUG2Z/komorebi-application-specific-configuration"/>.
 	/// </summary>
 	/// <param name="filterManager"></param>
 	public static void LoadWindowsIgnoredByKomorebi(IFilterManager filterManager)
@@ -85,7 +85,7 @@ class GenerateRules:
 	def generate_all_rules(self):
 		for app in self.komorebi_rules:
 			if "float_identifiers" in app:
-				# windows matching `float_identifiers` are ignored by komorebi
+				# windows with matching `float_identifiers` are ignored by komorebi
 				Application(app["float_identifiers"], app["name"]).generate_rules()
 
 
@@ -142,12 +142,12 @@ with open(OUTFILE, 'w') as o:
 # Keep track of already generated rules to filter out duplicates
 _processed = {"Class": [], "Exe": [], "Title": []}
 
-# Load komorebi rules
+# Load Komorebi rules
 komorebi_rules = GetRules(URL)
 komorebi_rules.download()
 komorebi_rules.load_yaml()
 
-# Generate rules
+# Generate Whim rules
 GenerateRules(komorebi_rules.rules).generate_all_rules()
 
 # Add footer
