@@ -7,11 +7,12 @@ on:
       - release/v*
     tags:
       - v*
-    paths-ignore:
-      - ".github/ISSUE_TEMPLATE/*"
-      - ".github/workflows/pull_request_labels.yml"
-      - ".github/pull_request_template.md"
-      - "README.md"
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "whim-installer.iss"
+      - "Whim.sln"
+      - "Directory.Packages.props"
 
 jobs:
   create-release:

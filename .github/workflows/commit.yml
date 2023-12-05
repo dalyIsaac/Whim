@@ -3,17 +3,23 @@ name: commit
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - ".github/ISSUE_TEMPLATE/*"
-      - ".github/workflows/pull_request_labels.yml"
-      - ".github/pull_request_template.md"
-      - "README.md"
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "whim-installer.iss"
+      - "Whim.sln"
+      - "Directory.Packages.props"
+      - ".csharpierrc"
+      - ".xamlstylerrc"
   pull_request:
-    paths-ignore:
-      - ".github/ISSUE_TEMPLATE/*"
-      - ".github/workflows/pull_request_labels.yml"
-      - ".github/pull_request_template.md"
-      - "README.md"
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "whim-installer.iss"
+      - "Whim.sln"
+      - "Directory.Packages.props"
+      - ".csharpierrc"
+      - ".xamlstylerrc"
 
 env:
   # We install the packages to the D:\ drive to avoid the slow IO on the C:\ drive.
