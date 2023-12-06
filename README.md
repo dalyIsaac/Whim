@@ -123,7 +123,10 @@ Keybinds can be overridden and removed in the config. For example:
 context.KeybindManager.SetKeybind("whim.command_palette.toggle", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_P));
 
 // Remove the default keybind for closing the current workspace.
-context.KeybindManager.RemoveKeybind("whim.core.close_current_workspace");
+context.KeybindManager.Remove("whim.core.close_current_workspace");
+
+// Remove all keybinds - start from scratch.
+context.KeybindManager.RemoveAll();
 ```
 
 > [!WARNING]

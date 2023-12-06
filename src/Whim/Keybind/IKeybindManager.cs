@@ -51,6 +51,11 @@ public interface IKeybindManager
 	bool Remove(string commandId);
 
 	/// <summary>
+	/// Removes all keybinds.
+	/// </summary>
+	void RemoveAll();
+
+	/// <summary>
 	/// Gets the keybind for the given command.
 	/// </summary>
 	/// <param name="commandId">The identifier of the command to get the keybind for.</param>

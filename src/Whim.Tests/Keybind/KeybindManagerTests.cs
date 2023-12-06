@@ -397,4 +397,20 @@ public class KeybindManagerTests
 		Assert.Single(allCommands);
 		Assert.Same(command, allCommands[0]);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void RemoveAll_CommandsCleared(IContext context)
+	{
+		// Given
+		IKeybindManager keybindManager = new KeybindManager(context);
+		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
+
+		// When
+		keybindManager.SetKeybind("command", keybind);
+		keybindManager.RemoveAll();
+
+		// Then
+		Assert.Empty(keybindManager.GetCommands(keybind));
+		Assert.Null(keybindManager.TryGetKeybind("command"));
+	}
 }
