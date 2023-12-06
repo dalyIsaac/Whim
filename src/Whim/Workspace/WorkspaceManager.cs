@@ -124,34 +124,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	/// <exception cref="InvalidOperationException"></exception>
 	private void InitializeWorkspaces()
 	{
-		List<WorkspaceToCreate> workspaces = new();
-
-		// Merge the saved state with the workspaces to create.
-		foreach (
-			SavedWorkspace savedWorkspace in _internalContext.CoreSavedStateManager.SavedState?.Workspaces ?? new()
-		)
-		{
-			int workspaceIdx = _workspacesToCreate.FindIndex(w => w.Name == savedWorkspace.Name);
-			if (workspaceIdx >= 0)
-			{
-				// Since we don't preserve the layout engines, use the ones provided by the user.
-				WorkspaceToCreate workspaceToCreate = _workspacesToCreate[workspaceIdx];
-				_workspacesToCreate.RemoveAt(workspaceIdx);
-				workspaces.Add(new(workspaceToCreate.Name, workspaceToCreate.LayoutEngines));
-			}
-			else
-			{
-				workspaces.Add(new(savedWorkspace.Name, null));
-			}
-		}
-
-		// Add the remaining workspaces to create.
-		workspaces.AddRange(_workspacesToCreate);
-
 		// Create the workspaces.
-		foreach ((string name, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines) in workspaces)
+		foreach (WorkspaceToCreate workspaceToCreate in _workspacesToCreate)
 		{
-			CreateWorkspace(name, createLayoutEngines);
+			CreateWorkspace(workspaceToCreate.Name, workspaceToCreate.LayoutEngines);
 		}
 
 		// Assign workspaces to monitors.
@@ -184,7 +160,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			IWorkspace? workspace = TryGet(savedWorkspace.Name);
 			if (workspace == null)
 			{
-				Logger.Error($"Could not find workspace {savedWorkspace.Name}");
+				Logger.Debug($"Could not find workspace {savedWorkspace.Name}");
 				continue;
 			}
 
@@ -194,7 +170,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 				IWindow? window = _context.WindowManager.CreateWindow(hwnd);
 				if (window == null)
 				{
-					Logger.Error($"Could not find window with handle {savedWindow.Handle}");
+					Logger.Debug($"Could not find window with handle {savedWindow.Handle}");
 					continue;
 				}
 
