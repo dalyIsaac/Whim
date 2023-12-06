@@ -195,14 +195,14 @@ public class WorkspaceManagerTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		IWindow window1,
-		IWindow window2,
-		IWindow window3
+		IWindow window3,
+		IWindow window4
 	)
 	{
 		// Given:
 		// - a saved state with two workspaces, each with two handles
-		// - workspace 2's last handle not being valid
-		// - a window which is not saved
+		// - workspace 1 "john"'s last handle not being valid
+		// - workspace 2 "john" not being saved
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 		SetupMonitors(ctx, new[] { Substitute.For<IMonitor>(), ctx.MonitorManager.ActiveMonitor });
 
@@ -229,14 +229,13 @@ public class WorkspaceManagerTests
 		internalCtx.CoreNativeManager.GetAllWindows().Returns(new[] { (HWND)1, (HWND)2, (HWND)3, (HWND)5 });
 
 		window1.Handle.Returns((HWND)1);
-		window2.Handle.Returns((HWND)2);
 		window3.Handle.Returns((HWND)3);
+		window4.Handle.Returns((HWND)4);
 
 		ctx.WindowManager.CreateWindow((HWND)1).Returns(window1);
-		ctx.WindowManager.CreateWindow((HWND)2).Returns(window2);
+		ctx.WindowManager.CreateWindow((HWND)2).Returns((IWindow?)null);
 		ctx.WindowManager.CreateWindow((HWND)3).Returns(window3);
-
-		ctx.WindowManager.CreateWindow((HWND)4).Returns((IWindow?)null);
+		ctx.WindowManager.CreateWindow((HWND)4).Returns(window4);
 
 		// When two workspaces are created, only one of which shares a name with a saved workspace
 		workspaceManager.Add("john");
@@ -247,14 +246,13 @@ public class WorkspaceManagerTests
 		IWorkspace[] workspaces = workspaceManager.ToArray();
 		Assert.Equal(2, workspaces.Length);
 
-		// The first workspace will have the same name as the saved workspace, and the same windows
+		// The first workspace will have the same name as the saved workspace, and the first window.
+		// The second window was no longer valid, so it was not added.
 		IWorkspace johnWorkspace = workspaces[0];
 		Assert.Equal("john", johnWorkspace.Name);
-		Assert.Equal(2, johnWorkspace.Windows.Count());
+		Assert.Single(johnWorkspace.Windows);
 		Assert.Equal((HWND)1, johnWorkspace.Windows.ElementAt(0).Handle);
-		Assert.Equal((HWND)2, johnWorkspace.Windows.ElementAt(1).Handle);
 		internalCtx.WindowManager.Received(1).OnWindowAdded(window1);
-		internalCtx.WindowManager.Received(1).OnWindowAdded(window2);
 
 		// The new workspace "jane" will have no windows already added, but will have two windows
 		// added by the WindowManager.
