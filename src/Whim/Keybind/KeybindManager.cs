@@ -131,9 +131,7 @@ internal class KeybindManager : IKeybindManager
 	public void RemoveAll()
 	{
 		Logger.Debug("Removing all keybinds");
-		foreach (string commandId in _commandsKeybindsMap.Keys.ToArray())
-		{
-			Remove(commandId);
-		}
+		_commandsKeybindsMap.Clear();
+		_keybindsCommandsMap.Clear();
 	}
 }
