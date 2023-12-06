@@ -202,7 +202,7 @@ public class WorkspaceManagerTests
 		// Given:
 		// - a saved state with two workspaces, each with two handles
 		// - workspace 1 "john"'s last handle not being valid
-		// - workspace 2 "john" not being saved
+		// - workspace 2 "james" not being saved
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 		SetupMonitors(ctx, new[] { Substitute.For<IMonitor>(), ctx.MonitorManager.ActiveMonitor });
 
