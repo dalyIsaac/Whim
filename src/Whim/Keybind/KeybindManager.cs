@@ -128,7 +128,7 @@ internal class KeybindManager : IKeybindManager
 		return true;
 	}
 
-	public void RemoveAll()
+	public void Clear()
 	{
 		Logger.Debug("Removing all keybinds");
 		_commandsKeybindsMap.Clear();
