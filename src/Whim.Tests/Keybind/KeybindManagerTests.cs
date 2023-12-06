@@ -399,7 +399,7 @@ public class KeybindManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void RemoveAll_CommandsCleared(IContext context)
+	public void Clear_CommandsCleared(IContext context)
 	{
 		// Given
 		IKeybindManager keybindManager = new KeybindManager(context);
@@ -407,7 +407,7 @@ public class KeybindManagerTests
 
 		// When
 		keybindManager.SetKeybind("command", keybind);
-		keybindManager.RemoveAll();
+		keybindManager.Clear();
 
 		// Then
 		Assert.Empty(keybindManager.GetCommands(keybind));

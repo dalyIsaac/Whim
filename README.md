@@ -126,7 +126,7 @@ context.KeybindManager.SetKeybind("whim.command_palette.toggle", new Keybind(IKe
 context.KeybindManager.Remove("whim.core.close_current_workspace");
 
 // Remove all keybinds - start from scratch.
-context.KeybindManager.RemoveAll();
+context.KeybindManager.Clear();
 ```
 
 > [!WARNING]
@@ -331,6 +331,12 @@ As Whim supports more novel layouts, it also has functionality to account for di
 Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support functionality like previewing changes to layouts before committing them, with the `LayoutPreview` plugin. In comparison, workspacer's `ILayoutEngine` implementations are mutable.
 
 ## Contributing
+
+After cloning, make sure to run in the root Whim directory:
+
+```shell
+git config core.autocrlf true
+```
 
 Please file an issue if you find any bugs or have any feature requests. Pull requests are welcome.
 

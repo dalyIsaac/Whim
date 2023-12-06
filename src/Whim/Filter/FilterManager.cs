@@ -28,6 +28,7 @@ internal class FilterManager : IFilterManager
 		Logger.Debug($"Clearing filters");
 		_ignoreWindowClasses.Clear();
 		_ignoreProcessNames.Clear();
+		_ignoreProcessFileNames.Clear();
 		_ignoreTitles.Clear();
 		_filters.Clear();
 	}
