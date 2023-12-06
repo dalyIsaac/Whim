@@ -132,9 +132,13 @@ class IgnoreRule:
 		if self.not_implemented():
 			return
 
-		scheme = 'filterManager.Add((window) => window.{}.{}("{}"))'
-		rule = scheme.format(self.get_property_by_kind(), self.matching_strategy, self.id)
+		match self.matching_strategy:
+			case "Equals":
+				scheme = 'filterManager.Add{0}Filter("{2}");'
+			case _:
+				scheme = 'filterManager.Add((window) => window.{}.{}("{}"));'
 
+		rule = scheme.format(self.get_property_by_kind(), self.matching_strategy, self.id)
 		if rule in self._processed:
 			pre = TAB + "// "
 			post = "  // duplicate rule"
