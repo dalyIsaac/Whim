@@ -332,6 +332,12 @@ Implementations of Whim's `ILayoutEngine` should be immutable. This was done to 
 
 ## Contributing
 
+After cloning, make sure to run:
+
+```shell
+git config core.autocrlf false
+```
+
 Please file an issue if you find any bugs or have any feature requests. Pull requests are welcome.
 
 Work is currently being tracked in the [project board](https://github.com/users/dalyIsaac/projects/2/views/7).
