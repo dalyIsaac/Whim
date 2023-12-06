@@ -126,7 +126,7 @@ context.KeybindManager.SetKeybind("whim.command_palette.toggle", new Keybind(IKe
 context.KeybindManager.Remove("whim.core.close_current_workspace");
 
 // Remove all keybinds - start from scratch.
-context.KeybindManager.RemoveAll();
+context.KeybindManager.Clear();
 ```
 
 > [!WARNING]
