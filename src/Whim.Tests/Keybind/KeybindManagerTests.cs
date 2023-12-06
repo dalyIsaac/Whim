@@ -399,10 +399,10 @@ public class KeybindManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void RemoveAll_CommandsCleared()
+	public void RemoveAll_CommandsCleared(IContext context)
 	{
 		// Given
-		IKeybindManager keybindManager = new KeybindManager(Substitute.For<IContext>());
+		IKeybindManager keybindManager = new KeybindManager(context);
 		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
 
 		// When
@@ -411,5 +411,6 @@ public class KeybindManagerTests
 
 		// Then
 		Assert.Empty(keybindManager.GetCommands(keybind));
+		Assert.Null(keybindManager.TryGetKeybind("command"));
 	}
 }
