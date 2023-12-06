@@ -77,9 +77,17 @@ public class FilterManagerTests
 		// Given
 		FilterManager filterManager = new();
 		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
+
 		filterManager.AddWindowClassFilter("Test");
+		filterManager.AddProcessNameFilter("Test");
+		filterManager.AddProcessFileNameFilter("Test");
+		filterManager.AddTitleFilter("Test");
+		filterManager.AddTitleMatchFilter("Test");
 
 		window.WindowClass.Returns("Test");
+		window.ProcessName.Returns("Test");
+		window.ProcessFileName.Returns("Test");
+		window.Title.Returns("Test");
 
 		// When the filter manager is cleared
 		filterManager.Clear();
