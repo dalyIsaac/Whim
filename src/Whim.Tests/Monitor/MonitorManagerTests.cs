@@ -119,11 +119,11 @@ internal class MonitorManagerCustomization : ICustomization
 public class MonitorManagerTests
 {
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void Create(IInternalContext internalCtx)
+	internal void Create(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		// When
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// Then
 		Assert.Equal(new HMONITOR(2), (monitorManager.PrimaryMonitor as Monitor)!._hmonitor);
@@ -131,7 +131,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void Create_NoPrimaryMonitorFound(IInternalContext internalCtx)
+	internal void Create_NoPrimaryMonitorFound(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		internalCtx
@@ -141,15 +141,15 @@ public class MonitorManagerTests
 
 		// When
 		// Then
-		var result = Assert.Throws<Exception>(() => new MonitorManager(internalCtx));
+		var result = Assert.Throws<Exception>(() => new MonitorManager(ctx, internalCtx));
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
 	[SuppressMessage("Usage", "NS5000:Received check.")]
-	internal void Initialize(IInternalContext internalCtx)
+	internal void Initialize(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
 		monitorManager.Initialize();
@@ -170,7 +170,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused_NullMonitor(IInternalContext internalCtx)
+	internal void WindowFocused_NullMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		internalCtx
@@ -178,7 +178,7 @@ public class MonitorManagerTests
 			.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
 		monitorManager.WindowFocused(Substitute.For<IWindow>());
@@ -189,10 +189,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused(IInternalContext internalCtx)
+	internal void WindowFocused(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
 		monitorManager.WindowFocused(Substitute.For<IWindow>());
@@ -203,7 +203,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused_NullWindow(IInternalContext internalCtx)
+	internal void WindowFocused_NullWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		internalCtx
@@ -211,7 +211,7 @@ public class MonitorManagerTests
 			.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
 		monitorManager.WindowFocused(null);
@@ -236,11 +236,11 @@ public class MonitorManagerTests
 		};
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasMultipleMonitors(IInternalContext internalCtx)
+	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasMultipleMonitors(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		// Populate the monitor manager with the default two monitors
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to be given a new monitor
@@ -313,7 +313,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasSingleMonitor(IInternalContext internalCtx)
+	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasSingleMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		// Populate the monitor manager with a single monitor
@@ -327,7 +327,7 @@ public class MonitorManagerTests
 			};
 		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { (primaryRect, (HMONITOR)1) });
 
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to be given a new monitor
@@ -383,11 +383,11 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_DisplayChanged_RemoveMonitor_HasMultipleMonitors(IInternalContext internalCtx)
+	internal void WindowMessageMonitor_DisplayChanged_RemoveMonitor_HasMultipleMonitors(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		// Populate the monitor manager with the default two monitors
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// Set up the monitor manager to have only one monitor
@@ -440,10 +440,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_WorkAreaChanged(IInternalContext internalCtx)
+	internal void WindowMessageMonitor_WorkAreaChanged(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -461,10 +461,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_DpiChanged(IInternalContext internalCtx)
+	internal void WindowMessageMonitor_DpiChanged(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -483,10 +483,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_SessionChanged(IInternalContext internalCtx)
+	internal void WindowMessageMonitor_SessionChanged(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -500,7 +500,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetMonitorAtPoint_Error_ReturnsFirstMonitor(IInternalContext internalCtx)
+	internal void GetMonitorAtPoint_Error_ReturnsFirstMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		Point<int> point = new() { X = 10 * 1000, Y = 10 * 1000 };
@@ -510,7 +510,7 @@ public class MonitorManagerTests
 			.MonitorFromPoint(point.ToSystemPoint(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)0);
 
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -521,7 +521,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetMonitorAtPoint_MultipleMonitors_ReturnsCorrectMonitor(IInternalContext internalCtx)
+	internal void GetMonitorAtPoint_MultipleMonitors_ReturnsCorrectMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		Point<int> point = new() { X = 1930, Y = 10 };
@@ -531,7 +531,7 @@ public class MonitorManagerTests
 			.MonitorFromPoint(point.ToSystemPoint(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
 
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -542,10 +542,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetPreviousMonitor_Error_ReturnsFirstMonitor(IInternalContext internalCtx)
+	internal void GetPreviousMonitor_Error_ReturnsFirstMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -556,10 +556,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetPreviousMonitor_MultipleMonitors_ReturnsCorrectMonitor(IInternalContext internalCtx)
+	internal void GetPreviousMonitor_MultipleMonitors_ReturnsCorrectMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -570,10 +570,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetPreviousMonitor_MultipleMonitors_Mod(IInternalContext internalCtx)
+	internal void GetPreviousMonitor_MultipleMonitors_Mod(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -584,10 +584,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetNextMonitor_Error_ReturnsFirstMonitor(IInternalContext internalCtx)
+	internal void GetNextMonitor_Error_ReturnsFirstMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -598,10 +598,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetNextMonitor_MultipleMonitors_ReturnsCorrectMonitor(IInternalContext internalCtx)
+	internal void GetNextMonitor_MultipleMonitors_ReturnsCorrectMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -612,10 +612,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetNextMonitor_MultipleMonitors_Mod(IInternalContext internalCtx)
+	internal void GetNextMonitor_MultipleMonitors_Mod(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -627,10 +627,10 @@ public class MonitorManagerTests
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
 	[SuppressMessage("Usage", "NS5000:Received check.")]
-	internal void Dispose(IInternalContext internalCtx)
+	internal void Dispose(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		// When
@@ -652,10 +652,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void Length(IInternalContext internalCtx)
+	internal void Length(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
 		int length = monitorManager.Length;
@@ -665,10 +665,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void MouseHook_MouseLeftButtonUp(IInternalContext internalCtx)
+	internal void MouseHook_MouseLeftButtonUp(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Initialize();
 
 		IMonitor monitor = monitorManager.ActiveMonitor;
@@ -692,10 +692,10 @@ public class MonitorManagerTests
 
 	#region GetEnumerator
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetEnumerator(IInternalContext internalCtx)
+	internal void GetEnumerator(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
 		IEnumerator<IMonitor> enumerator = monitorManager.GetEnumerator();
@@ -711,10 +711,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void GetEnumerator_Explicit(IInternalContext internalCtx)
+	internal void GetEnumerator_Explicit(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorManager monitorManager = new(internalCtx);
+		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
 		IEnumerator enumerator = ((IEnumerable)monitorManager).GetEnumerator();
