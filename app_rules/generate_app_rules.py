@@ -1,6 +1,7 @@
 from pathlib import Path
-from requests import get
+
 import yaml
+from requests import get
 
 # path to generated file
 ROOT = Path(__file__).parents[0]
@@ -44,7 +45,7 @@ namespace Whim;
 internal static class DefaultFilteredWindowsKomorebi
 {
 	/// <summary>
-	/// Load the windows ignored by <see href="https://github.com/LGUG2Z/komorebi-application-specific-configuration"/>.
+	/// Load the windows ignored by Komorebi <see href="https://github.com/LGUG2Z/komorebi-application-specific-configuration"/>.
 	/// </summary>
 	/// <param name="filterManager"></param>
 	public static void LoadWindowsIgnoredByKomorebi(IFilterManager filterManager)
@@ -85,7 +86,7 @@ class GenerateRules:
 	def generate_all_rules(self):
 		for app in self.komorebi_rules:
 			if "float_identifiers" in app:
-				# windows matching `float_identifiers` are ignored by komorebi
+				# windows with matching `float_identifiers` are ignored by komorebi
 				Application(app["float_identifiers"], app["name"]).generate_rules()
 
 
@@ -95,63 +96,77 @@ class Application:
 		self.app_rules = app_rules
 
 	def generate_rules(self):
-		with open(OUTFILE, 'a') as o:
+		with open(OUTFILE, "a") as o:
 			o.write("".join(["\n", TAB, COMMENT, self.app_name, "\n"]))
 		for r in self.app_rules:
 			IgnoreRule(r).add_rule()
 
 
 class IgnoreRule:
+	_implemented = ("Equals", "StartsWith", "EndsWith", "Contains", "Legacy")
+	_processed = []
+
 	def __init__(self, rule):
 		self.kind = rule["kind"]
 		self.id = rule["id"]
-		self.matching_strategy = rule[_] if (_ := "matching_strategy") in rule else None
+		self.matching_strategy = rule[_] if (_ := "matching_strategy") in rule else "Legacy"
 		self.comment = rule[_] if (_ := "comment") in rule else None
 
-		# Raise error for unsupported matching strategies
-		# If future rules use regex, we can implement them via "AddTitleMatchFilter"
-		if self.matching_strategy and self.matching_strategy != "Equals":
-			raise RuntimeError('Matching strategy "{_}" unsupported')
+		if self.kind not in ("Class", "Exe", "Title"):
+			raise RuntimeError("Undefined kind: " + self.kind)
+
+		# "Legacy" maps to "Equals" for processes
+		if self.matching_strategy == "Legacy" and self.kind == "Exe":
+			self.matching_strategy = "Equals"
+
+	def get_property_by_kind(self):
+		return {"Class": "WindowClass", "Exe": "ProcessFileName", "Title": "Title"}[self.kind]
+
+	def not_implemented(self):
+		if self.matching_strategy not in self._implemented:
+			with open(OUTFILE, "a") as o:
+				o.write(TAB + f"// undefined matching strategy: {self.matching_strategy}\n")
+			return True
 
 	def add_rule(self):
-		match self.kind:
-			case "Class":
-				command = "AddWindowClassFilter"
-			case "Exe":
-				command = "AddProcessFileNameFilter"
-			case "Title":
-				command = "AddTitleFilter"
-			case _:
-				raise RuntimeError("Undefined kind: " + self.kind)
+		if self.not_implemented():
+			return
 
-		content = "".join(["filterManager.", command, '("', self.id, '");'])
-		comment = "  // " + self.comment if self.comment else ""
-		if self.id in _processed[self.kind]:  # duplicate rule
-			with open(OUTFILE, 'a') as o:
-				o.write("".join([TAB, "// ", content, "  // duplicate rule\n"]))
-		else:								  # new rule
-			_processed[self.kind] += [self.id]
-			with open(OUTFILE, 'a') as o:
-				o.write("".join([TAB, content, comment, "\n"]))
+		match self.matching_strategy:
+			case "Equals":
+				scheme = 'filterManager.Add{0}Filter("{2}");'
+			case "StartsWith" | "EndsWith" | "Contains":
+				scheme = 'filterManager.Add((window) => window.{}.{}("{}"));'
+			case "Legacy":
+				scheme = 'filterManager.Add((window) => window.{0}.StartsWith("{2}") || window.{0}.EndsWith("{2}"));'
+
+		rule = scheme.format(self.get_property_by_kind(), self.matching_strategy, self.id)
+		if rule in self._processed:
+			pre = TAB + "// "
+			post = "  // duplicate rule"
+		else:
+			self._processed.append(rule)
+			pre = TAB
+			post = "  // " + self.comment if self.comment else ""
+
+		with open(OUTFILE, "a") as o:
+			o.write("".join([pre, rule, post, "\n"]))
 
 
 # Add header
-with open(OUTFILE, 'w') as o:
+with open(OUTFILE, "w") as o:
 	o.write(HEADER)
 
-# Keep track of already generated rules to filter out duplicates
-_processed = {"Class": [], "Exe": [], "Title": []}
-
-# Load komorebi rules
+# Load Komorebi rules
 komorebi_rules = GetRules(URL)
 komorebi_rules.download()
 komorebi_rules.load_yaml()
 
-# Generate rules
+# Generate Whim rules
 GenerateRules(komorebi_rules.rules).generate_all_rules()
 
 # Add footer
-with open(OUTFILE, 'a') as o:
+with open(OUTFILE, "a") as o:
 	o.write(FOOTER)
 
 # vim: set ts=4 sw=4 noet :
