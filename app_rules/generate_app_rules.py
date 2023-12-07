@@ -103,7 +103,7 @@ class Application:
 
 
 class IgnoreRule:
-	_implemented = ("Equals", "StartsWith", "EndsWith", "Contains")
+	_implemented = ("Equals", "StartsWith", "EndsWith", "Contains", "Legacy")
 	_processed = []
 
 	def __init__(self, rule):
@@ -115,9 +115,9 @@ class IgnoreRule:
 		if self.kind not in ("Class", "Exe", "Title"):
 			raise RuntimeError("Undefined kind: " + self.kind)
 
-		# convert legacy to new matching strategy
-		if self.matching_strategy == "Legacy":
-			self.matching_strategy = "Equals" if self.kind == "Exe" else "Contains"
+		# "Legacy" maps to "Equals" for processes
+		if self.matching_strategy == "Legacy" and self.kind == "Exe":
+			self.matching_strategy = "Equals"
 
 	def get_property_by_kind(self):
 		return {"Class": "WindowClass", "Exe": "ProcessFileName", "Title": "Title"}[self.kind]
@@ -135,8 +135,10 @@ class IgnoreRule:
 		match self.matching_strategy:
 			case "Equals":
 				scheme = 'filterManager.Add{0}Filter("{2}");'
-			case _:
+			case "StartsWith" | "EndsWith" | "Contains":
 				scheme = 'filterManager.Add((window) => window.{}.{}("{}"));'
+			case "Legacy":
+				scheme = 'filterManager.Add((window) => window.{0}.StartsWith("{2}") || window.{0}.EndsWith("{2}"));'
 
 		rule = scheme.format(self.get_property_by_kind(), self.matching_strategy, self.id)
 		if rule in self._processed:
