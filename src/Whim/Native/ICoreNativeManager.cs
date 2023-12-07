@@ -284,6 +284,9 @@ internal interface ICoreNativeManager
 	/// <returns></returns>
 	bool IsSystemWindow(HWND hwnd, string className);
 
+	/// <inheritdoc cref="PInvoke.GetDesktopWindow"/>
+	HWND GetDesktopWindow();
+
 	/// <inheritdoc cref="PInvoke.IsWindow(HWND)"/>
 	bool IsWindow(HWND hWnd);
 

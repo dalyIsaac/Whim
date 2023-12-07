@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -7,16 +8,18 @@ namespace Whim;
 internal class CoreCommands : PluginCommands
 {
 	private readonly IContext _context;
+	private readonly IInternalContext _internalContext;
 
 	/// <summary>
 	/// The delta for moving a window's edges.
 	/// </summary>
 	public static int MoveWindowEdgeDelta { get; set; } = 40;
 
-	public CoreCommands(IContext context)
+	public CoreCommands(IContext context, IInternalContext internalContext)
 		: base("whim.core")
 	{
 		_context = context;
+		_internalContext = internalContext;
 
 		_ = Add(
 				identifier: "activate_previous_workspace",
@@ -201,24 +204,12 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "focus_previous_monitor",
 				title: "Focus the previous monitor",
-				callback: () =>
-				{
-					IMonitor active = _context.MonitorManager.ActiveMonitor;
-					IMonitor previous = _context.MonitorManager.GetPreviousMonitor(active);
-					IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(previous);
-					workspace?.LastFocusedWindow?.Focus();
-				}
+				callback: FocusMonitorInDirection(getNext: false)
 			)
 			.Add(
 				identifier: "focus_next_monitor",
 				title: "Focus the next monitor",
-				callback: () =>
-				{
-					IMonitor active = _context.MonitorManager.ActiveMonitor;
-					IMonitor next = _context.MonitorManager.GetNextMonitor(active);
-					IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(next);
-					workspace?.LastFocusedWindow?.Focus();
-				}
+				callback: FocusMonitorInDirection(getNext: true)
 			)
 			.Add(
 				identifier: "close_current_workspace",
@@ -267,6 +258,31 @@ internal class CoreCommands : PluginCommands
 		() =>
 		{
 			_context.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
+		};
+
+	internal Action FocusMonitorInDirection(bool getNext) =>
+		() =>
+		{
+			IMonitor active = _context.MonitorManager.ActiveMonitor;
+			IMonitor monitor = getNext
+				? _context.MonitorManager.GetNextMonitor(active)
+				: _context.MonitorManager.GetPreviousMonitor(active);
+
+			IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+
+			if (workspace?.LastFocusedWindow == null)
+			{
+				// The monitor's workspace is empty, so update the ActiveMonitor and focus the
+				// desktop window.
+				_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
+
+				HWND hwnd = _internalContext.CoreNativeManager.GetDesktopWindow();
+				_internalContext.CoreNativeManager.SetForegroundWindow(hwnd);
+				return;
+			}
+
+			// The monitor's workspace is not empty, so focus the last focused window.
+			workspace.LastFocusedWindow.Focus();
 		};
 
 	// This record is necessary, otherwise the index captured is the last one (11)

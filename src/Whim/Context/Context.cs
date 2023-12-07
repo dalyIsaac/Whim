@@ -47,7 +47,7 @@ internal class Context : IContext
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, _internalContext);
-		MonitorManager = new MonitorManager(_internalContext);
+		MonitorManager = new MonitorManager(this, _internalContext);
 		WorkspaceManager = new WorkspaceManager(this, _internalContext);
 		_commandManager = new CommandManager();
 		PluginManager = new PluginManager(this, _commandManager);
@@ -57,7 +57,7 @@ internal class Context : IContext
 	public void Initialize()
 	{
 		// Load the core commands
-		CoreCommands coreCommands = new(this);
+		CoreCommands coreCommands = new(this, _internalContext);
 
 		foreach (ICommand command in coreCommands.Commands)
 		{
