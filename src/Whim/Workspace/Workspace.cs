@@ -36,9 +36,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	private IWindow? _lastFocusedWindow;
 
-	/// <summary>
-	/// The last focused window in this workspace.
-	/// </summary>
 	public IWindow? LastFocusedWindow
 	{
 		get
@@ -182,10 +179,20 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			LastFocusedWindow.Focus();
 		}
-		else
+		else if (ActiveLayoutEngine.GetFirstWindow() is IWindow firstWindow)
 		{
 			Logger.Debug($"No last focused window in workspace {Name}, focusing first window");
-			ActiveLayoutEngine.GetFirstWindow()?.Focus();
+			firstWindow.Focus();
+		}
+		else
+		{
+			Logger.Debug($"No windows in workspace {Name} to focus, focusing desktop");
+			HWND hwnd = _internalContext.CoreNativeManager.GetDesktopWindow();
+
+			IWindow desktop = Window.CreateSystemWindow(_context, _internalContext, hwnd);
+			desktop.Focus();
+
+			_internalContext.WindowManager.OnWindowFocused(desktop);
 		}
 	}
 

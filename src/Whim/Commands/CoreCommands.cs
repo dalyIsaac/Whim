@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -8,18 +7,16 @@ namespace Whim;
 internal class CoreCommands : PluginCommands
 {
 	private readonly IContext _context;
-	private readonly IInternalContext _internalContext;
 
 	/// <summary>
 	/// The delta for moving a window's edges.
 	/// </summary>
 	public static int MoveWindowEdgeDelta { get; set; } = 40;
 
-	public CoreCommands(IContext context, IInternalContext internalContext)
+	public CoreCommands(IContext context)
 		: base("whim.core")
 	{
 		_context = context;
-		_internalContext = internalContext;
 
 		_ = Add(
 				identifier: "activate_previous_workspace",
@@ -269,20 +266,13 @@ internal class CoreCommands : PluginCommands
 				: _context.MonitorManager.GetPreviousMonitor(active);
 
 			IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
-
-			if (workspace?.LastFocusedWindow == null)
+			if (workspace == null)
 			{
-				// The monitor's workspace is empty, so update the ActiveMonitor and focus the
-				// desktop window.
-				_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
-
-				HWND hwnd = _internalContext.CoreNativeManager.GetDesktopWindow();
-				_internalContext.CoreNativeManager.SetForegroundWindow(hwnd);
+				Logger.Error($"Could not find workspace for monitor {monitor}");
 				return;
 			}
 
-			// The monitor's workspace is not empty, so focus the last focused window.
-			workspace.LastFocusedWindow.Focus();
+			_context.WorkspaceManager.Activate(workspace, monitor);
 		};
 
 	// This record is necessary, otherwise the index captured is the last one (11)

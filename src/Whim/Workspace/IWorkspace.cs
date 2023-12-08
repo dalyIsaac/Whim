@@ -53,6 +53,8 @@ public interface IWorkspace : IDisposable
 	/// The last focused window. This is still set when the window has lost focus (provided another
 	/// window in the workspace does not have focus). This is useful in cases like when the
 	/// command palette is opened and wants to perform an action on the last focused window.
+	///
+	/// To focus the last focused window, use <see cref="FocusLastFocusedWindow"/>.
 	/// </summary>
 	IWindow? LastFocusedWindow { get; }
 
@@ -99,7 +101,8 @@ public interface IWorkspace : IDisposable
 
 	/// <summary>
 	/// Focuses on the last window in the workspace. If <see cref="LastFocusedWindow"/> is null,
-	/// then we try focus the first window.
+	/// then we try focus the first window. If there are no windows, then we focus the Windows
+	/// desktop window.
 	/// </summary>
 	void FocusLastFocusedWindow();
 

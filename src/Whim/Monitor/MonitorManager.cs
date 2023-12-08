@@ -14,7 +14,6 @@ namespace Whim;
 /// </summary>
 internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 {
-	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
 	/// <summary>
@@ -46,11 +45,9 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	/// <exception cref="Exception">
 	/// When no monitors are found, or there is no primary monitor.
 	/// </exception>
-	/// <param name="context"></param>
 	/// <param name="internalContext"></param>
-	public MonitorManager(IContext context, IInternalContext internalContext)
+	public MonitorManager(IInternalContext internalContext)
 	{
-		_context = context;
 		_internalContext = internalContext;
 
 		// Get the monitors.
@@ -91,32 +88,6 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 				break;
 			}
 		}
-	}
-
-	public void ActivateEmptyMonitor(IMonitor monitor)
-	{
-		Logger.Debug($"Activating empty monitor {monitor}");
-
-		if (!_monitors.Contains(monitor))
-		{
-			Logger.Error($"Monitor {monitor} not found.");
-			return;
-		}
-
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
-		if (workspace is null)
-		{
-			Logger.Error($"No workspace found for monitor {monitor}");
-			return;
-		}
-
-		if (workspace.Windows.ToArray().Length > 0)
-		{
-			Logger.Error($"Workspace {workspace} has windows, cannot activate empty monitor.");
-			return;
-		}
-
-		ActiveMonitor = monitor;
 	}
 
 	private void WindowMessageMonitor_SessionChanged(object? sender, WindowMessageMonitorEventArgs e)

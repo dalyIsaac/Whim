@@ -164,6 +164,20 @@ internal class Window : IWindow
 		};
 	}
 
+	internal static IWindow CreateSystemWindow(IContext context, IInternalContext internalContext, HWND hwnd)
+	{
+		_ = internalContext.CoreNativeManager.GetWindowThreadProcessId(hwnd, out uint pid);
+		int processId = (int)pid;
+		return new Window(context, internalContext)
+		{
+			Handle = hwnd,
+			ProcessId = processId,
+			ProcessName = "System",
+			ProcessFileName = "System",
+			ProcessFilePath = "System"
+		};
+	}
+
 	public override bool Equals(object? obj)
 	{
 		if (obj == null || GetType() != obj.GetType())
