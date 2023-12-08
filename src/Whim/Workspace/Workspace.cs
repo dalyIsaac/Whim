@@ -78,7 +78,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private readonly HashSet<IWindow> _normalWindows = new();
 
 	/// <summary>
-	/// All the minimized windows in this workspace.
+	/// All the minimized windows in this workspace. These minimized windows includes which are
+	/// part of a layout engine, and those which are not but still exist in the workspace.
 	/// </summary>
 	private readonly HashSet<IWindow> _minimizedWindows = new();
 
@@ -380,15 +381,15 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return null;
 		}
 
-		if (!ContainsWindow(window))
-		{
-			Logger.Error($"Window {window} does not exist in workspace {Name}");
-			return null;
-		}
-
 		if (_minimizedWindows.Contains(window))
 		{
 			Logger.Error($"Window {window} is minimized in workspace {Name}");
+			return null;
+		}
+
+		if (!_normalWindows.Contains(window))
+		{
+			Logger.Error($"Window {window} does not exist in workspace {Name}");
 			return null;
 		}
 
@@ -471,10 +472,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			else
 			{
 				// If the window is minimized, remove it from the minimized list, and treat it as a new window
-				if (_minimizedWindows.Contains(window))
-				{
-					_minimizedWindows.Remove(window);
-				}
+				_minimizedWindows.Remove(window);
 
 				// The window is new to the workspace, so add it to all layout engines
 				_normalWindows.Add(window);
