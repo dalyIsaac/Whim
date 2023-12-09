@@ -112,7 +112,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 		if (workspace.Windows.ToArray().Length > 0)
 		{
-			Logger.Error($"Workspace {workspace} has windows, cannot activate empty monitor.");
+			Logger.Error($"Workspace {workspace} has windows, this method was called incorrectly.");
 			return;
 		}
 
