@@ -300,11 +300,12 @@ public class CoreCommandsTests
 	public void FocusMonitor_CannotGetWorkspaceForMonitor(IContext ctx, IWorkspace workspace)
 	{
 		// Given
-		workspace.LastFocusedWindow.Returns((IWindow?)null);
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.focus_previous_monitor");
+
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
 
 		// When
 		command.TryExecute();
