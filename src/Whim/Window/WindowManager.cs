@@ -240,7 +240,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		// Try get the window
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
-			Logger.Verbose($"Window {hwnd.Value} is not added, event type 0x{eventType:X4}");
+			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
 			window = AddWindow(hwnd);
 
 			if (
@@ -303,29 +303,29 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	public IWindow? AddWindow(HWND hwnd)
 	{
-		Logger.Debug($"Adding window {hwnd.Value}");
+		Logger.Debug($"Adding window {hwnd}");
 
 		if (_internalContext.CoreNativeManager.IsSplashScreen(hwnd))
 		{
-			Logger.Verbose($"Window {hwnd.Value} is a splash screen, ignoring");
+			Logger.Verbose($"Window {hwnd} is a splash screen, ignoring");
 			return null;
 		}
 
 		if (_internalContext.CoreNativeManager.IsCloakedWindow(hwnd))
 		{
-			Logger.Verbose($"Window {hwnd.Value} is cloaked, ignoring");
+			Logger.Verbose($"Window {hwnd} is cloaked, ignoring");
 			return null;
 		}
 
 		if (!_internalContext.CoreNativeManager.IsStandardWindow(hwnd))
 		{
-			Logger.Verbose($"Window {hwnd.Value} is not a standard window, ignoring");
+			Logger.Verbose($"Window {hwnd} is not a standard window, ignoring");
 			return null;
 		}
 
 		if (!_internalContext.CoreNativeManager.HasNoVisibleOwner(hwnd))
 		{
-			Logger.Verbose($"Window {hwnd.Value} has a visible owner, ignoring");
+			Logger.Verbose($"Window {hwnd} has a visible owner, ignoring");
 			return null;
 		}
 
