@@ -26,10 +26,10 @@ public class CoreCommandsCustomization : ICustomization
 public class CoreCommandsTests
 {
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void ActivatePreviousWorkspace(IContext ctx, IInternalContext internalCtx)
+	public void ActivatePreviousWorkspace(IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.activate_previous_workspace");
@@ -42,10 +42,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void ActivateNextWorkspace(IContext ctx, IInternalContext internalCtx)
+	public void ActivateNextWorkspace(IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.activate_next_workspace");
@@ -62,16 +62,10 @@ public class CoreCommandsTests
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_window_in_direction.up", Direction.Up)]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_window_in_direction.down", Direction.Down)]
 	[Theory]
-	internal void FocusWindowInDirection(
-		string commandName,
-		Direction direction,
-		IContext ctx,
-		IInternalContext internalCtx,
-		IWindow window
-	)
+	public void FocusWindowInDirection(string commandName, Direction direction, IContext ctx, IWindow window)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand(commandName);
@@ -84,11 +78,11 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void FocusWindowInDirection_NoLastFocusedWindow(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
+	public void FocusWindowInDirection_NoLastFocusedWindow(IContext ctx, IWorkspace workspace)
 	{
 		// Given
 		workspace.LastFocusedWindow.Returns((IWindow?)null);
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.focus_window_in_direction.left");
@@ -105,10 +99,10 @@ public class CoreCommandsTests
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.swap_window_in_direction.up", Direction.Up)]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.swap_window_in_direction.down", Direction.Down)]
 	[Theory]
-	internal void SwapWindowInDirection(string commandName, Direction direction, IContext ctx, IInternalContext internalCtx)
+	public void SwapWindowInDirection(string commandName, Direction direction, IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand(commandName);
@@ -144,10 +138,10 @@ public class CoreCommandsTests
 		1
 	)]
 	[Theory]
-	internal void MoveWindowEdgesInDirection(string commandName, Direction direction, int x, int y, IContext ctx, IInternalContext internalCtx)
+	public void MoveWindowEdgesInDirection(string commandName, Direction direction, int x, int y, IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 		IPoint<int> pixelsDeltas = new Point<int>()
 		{
@@ -165,10 +159,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void MoveWindowToPreviousMonitor(IContext ctx, IInternalContext internalCtx)
+	public void MoveWindowToPreviousMonitor(IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.move_window_to_previous_monitor");
@@ -181,10 +175,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void MoveWindowToNextMonitor(IContext ctx, IInternalContext internalCtx)
+	public void MoveWindowToNextMonitor(IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.move_window_to_next_monitor");
@@ -197,10 +191,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void MaximizeWindow(IContext ctx, IInternalContext internalCtx, IWindow window)
+	public void MaximizeWindow(IContext ctx, IWindow window)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
@@ -216,10 +210,10 @@ public class CoreCommandsTests
 
 	#region MinimizeWindow
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void MinimizeWindow(IContext ctx, IInternalContext internalCtx, IWindow window1, IWindow window2, IWindow window3)
+	public void MinimizeWindow(IContext ctx, IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		window3.IsMinimized.Returns(false);
@@ -239,10 +233,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void MinimizeWindow_NoLastFocusedWindow(IContext ctx, IInternalContext internalCtx, IWindow window1, IWindow window2)
+	public void MinimizeWindow_NoLastFocusedWindow(IContext ctx, IWindow window1, IWindow window2)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		window2.IsMinimized.Returns(false);
@@ -261,10 +255,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void MinimizeWindow_FocusFirstWindow(IContext ctx, IInternalContext internalCtx, IWindow window1, IWindow window2, IWindow window3)
+	public void MinimizeWindow_FocusFirstWindow(IContext ctx, IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
@@ -285,11 +279,11 @@ public class CoreCommandsTests
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_previous_monitor")]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_next_monitor")]
 	[Theory]
-	internal void FocusMonitor(string commandName, IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
+	public void FocusMonitor(string commandName, IContext ctx, IWorkspace workspace)
 	{
 		// Given
 		workspace.LastFocusedWindow.Returns((IWindow?)null);
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand(commandName);
@@ -302,10 +296,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void CloseCurrentWorkspace(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
+	public void CloseCurrentWorkspace(IContext ctx, IWorkspace workspace)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.close_current_workspace");
@@ -318,10 +312,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void ExitWhim(IContext ctx, IInternalContext internalCtx)
+	public void ExitWhim(IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.exit_whim");
@@ -334,10 +328,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void RestartWhim(IContext ctx, IInternalContext internalCtx)
+	public void RestartWhim(IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand("whim.core.restart_whim");
@@ -360,10 +354,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void ActivateWorkspaceAtIndex_IndexDoesNotExist(IContext ctx, IInternalContext internalCtx)
+	public void ActivateWorkspaceAtIndex_IndexDoesNotExist(IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 		List<IWorkspace> workspaces = CreateWorkspaces(2);
 		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.GetEnumerator());
@@ -383,10 +377,10 @@ public class CoreCommandsTests
 	[InlineAutoSubstituteData<CoreCommandsCustomization>(1)]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>(2)]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>(10)]
-	internal void ActivateWorkspaceAtIndex(int index, IContext ctx, IInternalContext internalCtx)
+	public void ActivateWorkspaceAtIndex(int index, IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 		List<IWorkspace> workspaces = CreateWorkspaces(10);
 		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.GetEnumerator());
@@ -401,10 +395,10 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
-	internal void ActivateWorkspaceAtIndex_VerifyKeybinds(IContext ctx, IInternalContext internalCtx)
+	public void ActivateWorkspaceAtIndex_VerifyKeybinds(IContext ctx)
 	{
 		// Given
-		CoreCommands commands = new(ctx, internalCtx);
+		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		// When
