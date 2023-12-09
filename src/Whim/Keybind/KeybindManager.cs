@@ -96,7 +96,7 @@ internal class KeybindManager : IKeybindManager
 				}
 				else
 				{
-					Logger.Warning($"Command '{commandId}' not found");
+					Logger.Error($"Command '{commandId}' not found");
 				}
 			}
 

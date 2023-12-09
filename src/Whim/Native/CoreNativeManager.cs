@@ -196,7 +196,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public bool IsSystemWindow(HWND hwnd, string className)
 	{
-		if (hwnd == PInvoke.GetDesktopWindow() || hwnd == PInvoke.GetShellWindow())
+		if (hwnd == GetDesktopWindow() || hwnd == PInvoke.GetShellWindow())
 		{
 			return true;
 		}
@@ -208,6 +208,8 @@ internal class CoreNativeManager : ICoreNativeManager
 
 		return false;
 	}
+
+	public HWND GetDesktopWindow() => PInvoke.GetDesktopWindow();
 
 	public bool IsWindow(HWND hWnd) => PInvoke.IsWindow(hWnd);
 

@@ -36,9 +36,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	private IWindow? _lastFocusedWindow;
 
-	/// <summary>
-	/// The last focused window in this workspace.
-	/// </summary>
 	public IWindow? LastFocusedWindow
 	{
 		get
@@ -78,7 +75,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private readonly HashSet<IWindow> _normalWindows = new();
 
 	/// <summary>
-	/// All the minimized windows in this workspace.
+	/// All the minimized windows in this workspace. These minimized windows includes which are
+	/// part of a layout engine, and those which are not but still exist in the workspace.
 	/// </summary>
 	private readonly HashSet<IWindow> _minimizedWindows = new();
 
@@ -183,8 +181,22 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 		else
 		{
-			Logger.Debug($"No last focused window in workspace {Name}, focusing first window");
-			ActiveLayoutEngine.GetFirstWindow()?.Focus();
+			Logger.Debug($"No windows in workspace {Name} to focus, focusing desktop");
+
+			// Get the bounds of the monitor for this workspace.
+			IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
+			if (monitor == null)
+			{
+				Logger.Debug($"No active monitors found for workspace {Name}.");
+				return;
+			}
+
+			// Focus the desktop.
+			HWND desktop = _internalContext.CoreNativeManager.GetDesktopWindow();
+			_internalContext.CoreNativeManager.SetForegroundWindow(desktop);
+			_internalContext.WindowManager.OnWindowFocused(null);
+
+			_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
 		}
 	}
 
@@ -315,7 +327,23 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 			if (window.Equals(LastFocusedWindow))
 			{
-				LastFocusedWindow = null;
+				// Find the next window to focus.
+				foreach (IWindow nextWindow in Windows)
+				{
+					if (nextWindow.Equals(window))
+					{
+						continue;
+					}
+
+					LastFocusedWindow = nextWindow;
+					break;
+				}
+
+				// If there are no other windows, set the last focused window to null.
+				if (LastFocusedWindow.Equals(window))
+				{
+					LastFocusedWindow = null;
+				}
 			}
 
 			bool isNormalWindow = _normalWindows.Contains(window);
@@ -380,15 +408,15 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return null;
 		}
 
-		if (!ContainsWindow(window))
-		{
-			Logger.Error($"Window {window} does not exist in workspace {Name}");
-			return null;
-		}
-
 		if (_minimizedWindows.Contains(window))
 		{
 			Logger.Error($"Window {window} is minimized in workspace {Name}");
+			return null;
+		}
+
+		if (!_normalWindows.Contains(window))
+		{
+			Logger.Error($"Window {window} does not exist in workspace {Name}");
 			return null;
 		}
 
@@ -471,10 +499,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			else
 			{
 				// If the window is minimized, remove it from the minimized list, and treat it as a new window
-				if (_minimizedWindows.Contains(window))
-				{
-					_minimizedWindows.Remove(window);
-				}
+				_minimizedWindows.Remove(window);
 
 				// The window is new to the workspace, so add it to all layout engines
 				_normalWindows.Add(window);
@@ -487,6 +512,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
+		window.Focus();
 	}
 
 	public override string ToString() => Name;

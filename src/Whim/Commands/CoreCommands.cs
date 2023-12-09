@@ -201,24 +201,12 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "focus_previous_monitor",
 				title: "Focus the previous monitor",
-				callback: () =>
-				{
-					IMonitor active = _context.MonitorManager.ActiveMonitor;
-					IMonitor previous = _context.MonitorManager.GetPreviousMonitor(active);
-					IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(previous);
-					workspace?.LastFocusedWindow?.Focus();
-				}
+				callback: FocusMonitorInDirection(getNext: false)
 			)
 			.Add(
 				identifier: "focus_next_monitor",
 				title: "Focus the next monitor",
-				callback: () =>
-				{
-					IMonitor active = _context.MonitorManager.ActiveMonitor;
-					IMonitor next = _context.MonitorManager.GetNextMonitor(active);
-					IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(next);
-					workspace?.LastFocusedWindow?.Focus();
-				}
+				callback: FocusMonitorInDirection(getNext: true)
 			)
 			.Add(
 				identifier: "close_current_workspace",
@@ -267,6 +255,24 @@ internal class CoreCommands : PluginCommands
 		() =>
 		{
 			_context.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
+		};
+
+	internal Action FocusMonitorInDirection(bool getNext) =>
+		() =>
+		{
+			IMonitor active = _context.MonitorManager.ActiveMonitor;
+			IMonitor monitor = getNext
+				? _context.MonitorManager.GetNextMonitor(active)
+				: _context.MonitorManager.GetPreviousMonitor(active);
+
+			IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+			if (workspace == null)
+			{
+				Logger.Error($"Could not find workspace for monitor {monitor}");
+				return;
+			}
+
+			workspace.FocusLastFocusedWindow();
 		};
 
 	// This record is necessary, otherwise the index captured is the last one (11)
