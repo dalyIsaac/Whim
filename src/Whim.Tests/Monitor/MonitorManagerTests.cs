@@ -236,7 +236,10 @@ public class MonitorManagerTests
 		};
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasMultipleMonitors(IContext ctx, IInternalContext internalCtx)
+	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasMultipleMonitors(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given
 		// Populate the monitor manager with the default two monitors
@@ -313,7 +316,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasSingleMonitor(IContext ctx, IInternalContext internalCtx)
+	internal void WindowMessageMonitor_DisplayChanged_AddMonitor_HasSingleMonitor(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given
 		// Populate the monitor manager with a single monitor
@@ -383,7 +389,10 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_DisplayChanged_RemoveMonitor_HasMultipleMonitors(IContext ctx, IInternalContext internalCtx)
+	internal void WindowMessageMonitor_DisplayChanged_RemoveMonitor_HasMultipleMonitors(
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given
 		// Populate the monitor manager with the default two monitors
