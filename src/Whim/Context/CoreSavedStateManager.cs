@@ -26,6 +26,8 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 		// If the saved plugin state file doesn't yet exist, we don't need to load anything.
 		if (!_context.FileManager.FileExists(_savedStateFilePath))
 		{
+			// Wipe the saved state file so that we don't try to load it again.
+			_context.FileManager.DeleteFile(_savedStateFilePath);
 			return;
 		}
 
@@ -39,6 +41,9 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 		{
 			Logger.Error($"Failed to deserialize saved state: {e}");
 		}
+
+		// Wipe the saved state file so that we don't try to load it again.
+		_context.FileManager.DeleteFile(_savedStateFilePath);
 	}
 
 	public void PostInitialize()
