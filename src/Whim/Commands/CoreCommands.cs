@@ -272,7 +272,7 @@ internal class CoreCommands : PluginCommands
 				return;
 			}
 
-			_context.WorkspaceManager.Activate(workspace, monitor);
+			workspace.FocusLastFocusedWindow();
 		};
 
 	// This record is necessary, otherwise the index captured is the last one (11)

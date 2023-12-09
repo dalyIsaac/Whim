@@ -187,12 +187,21 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		else
 		{
 			Logger.Debug($"No windows in workspace {Name} to focus, focusing desktop");
-			HWND hwnd = _internalContext.CoreNativeManager.GetDesktopWindow();
 
-			IWindow desktop = Window.CreateSystemWindow(_context, _internalContext, hwnd);
-			desktop.Focus();
+			// Get the bounds of the monitor for this workspace.
+			IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
+			if (monitor == null)
+			{
+				Logger.Debug($"No active monitors found for workspace {Name}.");
+				return;
+			}
 
-			_internalContext.WindowManager.OnWindowFocused(desktop);
+			// Focus the desktop.
+			HWND desktop = _internalContext.CoreNativeManager.GetDesktopWindow();
+			_internalContext.CoreNativeManager.SetForegroundWindow(desktop);
+			_internalContext.WindowManager.OnWindowFocused(null);
+
+			_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
 		}
 	}
 
