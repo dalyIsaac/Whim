@@ -10,7 +10,7 @@ Whim has the following release channels:
 - `beta`: The latest changes in a release branch `release/v*`.
 - `stable`: A release of the latest stable version, in a release branch.
 
-The release format is compatible with [Semantic Versioning 2.0](https://semver.org/spec/v2.0.0.html). The format is `MAJOR.MINOR.PATCH-CHANNEL+COMMIT`. For example, `0.5.1-beta.4+3b8c8aa`.
+The release format is compatible with [Semantic Versioning 2.0](https://semver.org/spec/v2.0.0.html). The format is `MAJOR.MINOR.PATCH-CHANNEL+COMMIT`. For example, `0.5.1-beta+3b8c8aa`.
 
 - `PATCH` is the number of commits since the last bump commit.
 - `COMMIT` is the first 8 characters of the commit hash.
