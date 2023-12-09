@@ -501,6 +501,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
+		window.Focus();
 	}
 
 	public override string ToString() => Name;

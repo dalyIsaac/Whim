@@ -861,6 +861,7 @@ public class WorkspaceTests
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
+		window.ClearReceivedCalls();
 
 		// When MoveWindowToPoint is called
 		workspace.MoveWindowToPoint(window, point);
@@ -868,6 +869,7 @@ public class WorkspaceTests
 		// Then the layout engine is told to move the window
 		layoutEngine.Received(1).MoveWindowToPoint(window, point);
 		layoutEngine.DidNotReceive().RemoveWindow(window);
+		window.Received(1).Focus();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -888,6 +890,7 @@ public class WorkspaceTests
 		workspace.WindowMinimizeStart(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
+		window.ClearReceivedCalls();
 
 		// When MoveWindowToPoint is called
 		workspace.MoveWindowToPoint(window, point);
@@ -895,6 +898,7 @@ public class WorkspaceTests
 		// Then the layout engine is told to move the window
 		givenEngine.Received(1).MoveWindowToPoint(window, point);
 		givenEngine.DidNotReceive().RemoveWindow(window);
+		window.Received(1).Focus();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -913,12 +917,14 @@ public class WorkspaceTests
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
+		window.ClearReceivedCalls();
 
 		// When MoveWindowToPoint is called
 		workspace.MoveWindowToPoint(window, point);
 
 		// Then the layout engine is told to remove and add the window
 		givenEngine.Received(1).MoveWindowToPoint(window, point);
+		window.Received(1).Focus();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
