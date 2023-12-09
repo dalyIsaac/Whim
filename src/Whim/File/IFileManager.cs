@@ -57,4 +57,10 @@ public interface IFileManager
 	/// <param name="filePath">The file path.</param>
 	/// <param name="contents">The contents to write.</param>
 	void WriteAllText(string filePath, string contents);
+
+	/// <summary>
+	/// Deletes the file at the given <paramref name="filePath"/>.
+	/// </summary>
+	/// <param name="filePath"></param>
+	void DeleteFile(string filePath);
 }

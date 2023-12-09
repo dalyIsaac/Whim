@@ -23,6 +23,7 @@ public class CoreSavedStateManagerTests
 		// Then
 		ctx.FileManager.Received(1).EnsureDirExists("savedStateDir");
 		ctx.FileManager.DidNotReceive().ReadAllText(Arg.Any<string>());
+		ctx.FileManager.Received(1).DeleteFile(Arg.Any<string>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -39,6 +40,7 @@ public class CoreSavedStateManagerTests
 
 		// Then
 		ctx.FileManager.Received(1).ReadAllText("savedStateDir\\core.json");
+		ctx.FileManager.Received(1).DeleteFile(Arg.Any<string>());
 	}
 
 	private static CoreSavedState CreateSavedState()
@@ -75,6 +77,7 @@ public class CoreSavedStateManagerTests
 		Assert.Equal(2, sut.SavedState!.Workspaces.Count);
 		Assert.Equal(2, sut.SavedState!.Workspaces[0].Windows.Count);
 		Assert.Equal(2, sut.SavedState!.Workspaces[1].Windows.Count);
+		ctx.FileManager.Received(1).DeleteFile(Arg.Any<string>());
 	}
 
 	[Theory, AutoSubstituteData]
