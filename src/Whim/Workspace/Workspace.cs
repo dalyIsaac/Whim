@@ -179,11 +179,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			LastFocusedWindow.Focus();
 		}
-		else if (ActiveLayoutEngine.GetFirstWindow() is IWindow firstWindow)
-		{
-			Logger.Debug($"No last focused window in workspace {Name}, focusing first window");
-			firstWindow.Focus();
-		}
 		else
 		{
 			Logger.Debug($"No windows in workspace {Name} to focus, focusing desktop");
@@ -332,7 +327,23 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 			if (window.Equals(LastFocusedWindow))
 			{
-				LastFocusedWindow = null;
+				// Find the next window to focus.
+				foreach (IWindow nextWindow in Windows)
+				{
+					if (nextWindow.Equals(window))
+					{
+						continue;
+					}
+
+					LastFocusedWindow = nextWindow;
+					break;
+				}
+
+				// If there are no other windows, set the last focused window to null.
+				if (LastFocusedWindow.Equals(window))
+				{
+					LastFocusedWindow = null;
+				}
 			}
 
 			bool isNormalWindow = _normalWindows.Contains(window);
