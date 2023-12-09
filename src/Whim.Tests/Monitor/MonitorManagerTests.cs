@@ -55,12 +55,12 @@ internal class MonitorManagerCustomization : ICustomization
 		internalCtx.CoreNativeManager.ClearSubstitute();
 		UpdateMultipleMonitors(internalCtx, monitors);
 
-		var potentialPrimaryMonitors = monitors.Select(m => m.Rect).Where(r => r.left == 0 && r.top == 0);
-		if (potentialPrimaryMonitors.Count() != 1)
+		RECT[] potentialPrimaryMonitors = monitors.Select(m => m.Rect).Where(r => r.left == 0 && r.top == 0).ToArray();
+		if (potentialPrimaryMonitors.Length != 1)
 		{
 			throw new Exception("No primary monitor found");
 		}
-		RECT primaryRect = potentialPrimaryMonitors.First();
+		RECT primaryRect = potentialPrimaryMonitors[0];
 
 		// The HMONITORs are non-zero
 		foreach ((RECT rect, HMONITOR hMonitor) in monitors)
@@ -736,6 +736,75 @@ public class MonitorManagerTests
 
 		// Then
 		Assert.Equal(monitorManager.ToList(), monitors);
+	}
+	#endregion
+
+	#region ActivateEmptyMonitor
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void ActivateEmptyMonitor_MonitorNotInManager(IContext ctx, IInternalContext internalCtx, IMonitor monitor)
+	{
+		// Given
+		MonitorManager monitorManager = new(ctx, internalCtx);
+
+		// When
+		monitorManager.ActivateEmptyMonitor(monitor);
+
+		// Then
+		Assert.Equal(monitorManager.ActiveMonitor, monitorManager.First());
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void ActivateEmptyMonitor_MonitorInManager_NoWorkspace(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor monitor = monitorManager.ElementAt(1);
+
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns((IWorkspace?)null);
+
+		// When
+		monitorManager.ActivateEmptyMonitor(monitor);
+
+		// Then
+		Assert.Equal(monitorManager.ActiveMonitor, monitorManager.First());
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void ActivateEmptyMonitor_MonitorIsNotEmpty(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace workspace
+	)
+	{
+		// Given
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor monitor = monitorManager.ElementAt(1);
+
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		workspace.Windows.GetEnumerator().Returns(new List<IWindow>() { Substitute.For<IWindow>() }.GetEnumerator());
+
+		// When
+		monitorManager.ActivateEmptyMonitor(monitor);
+
+		// Then
+		Assert.Equal(monitorManager.ActiveMonitor, monitorManager.First());
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void ActivateEmptyMonitor_MonitorIsEmpty(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
+	{
+		// Given
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor monitor = monitorManager.ElementAt(1);
+
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		workspace.Windows.GetEnumerator().Returns(new List<IWindow>().GetEnumerator());
+
+		// When
+		monitorManager.ActivateEmptyMonitor(monitor);
+
+		// Then
+		Assert.Equal(monitorManager.ActiveMonitor, monitor);
 	}
 	#endregion
 }

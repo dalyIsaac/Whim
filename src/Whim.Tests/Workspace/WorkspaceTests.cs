@@ -358,24 +358,8 @@ public class WorkspaceTests
 		layoutEngine.Received(1).GetFirstWindow();
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void FocusLastFocusedWindow_NoLastFocusedWindow(
-		IContext context,
-		IInternalContext internalContext,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine
-	)
-	{
-		// Given
-		Workspace workspace =
-			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+	#region FocusLastFocusedWindow
 
-		// When FocusLastFocusedWindow is called
-		workspace.FocusLastFocusedWindow();
-
-		// Then the LayoutEngine's GetFirstWindow method is called
-		layoutEngine.Received(1).GetFirstWindow();
-	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void FocusLastFocusedWindow_LastFocusedWindow(
@@ -400,6 +384,46 @@ public class WorkspaceTests
 		layoutEngine.DidNotReceive().GetFirstWindow();
 		window.Received(1).Focus();
 	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void FocusLastFocusedWindow_EmptyWorkspace_MonitorNotFound(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine
+	)
+	{
+		// Given there are no windows in the workspace, and the workspace is not on a monitor
+		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		ctx.WorkspaceManager.GetMonitorForWorkspace(workspace).Returns((IMonitor?)null);
+
+		// When FocusLastFocusedWindow is called
+		workspace.FocusLastFocusedWindow();
+
+		// Then
+		internalCtx.MonitorManager.DidNotReceive().ActivateEmptyMonitor(Arg.Any<IMonitor>());
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void FocusLastFocusedWindow_EmptyWorkspace_MonitorFound(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		IMonitor monitor
+	)
+	{
+		// Given there are no windows in the workspace, and the workspace is on a monitor
+		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		ctx.WorkspaceManager.GetMonitorForWorkspace(workspace).Returns(monitor);
+
+		// When FocusLastFocusedWindow is called
+		workspace.FocusLastFocusedWindow();
+
+		// Then
+		internalCtx.MonitorManager.Received(1).ActivateEmptyMonitor(monitor);
+	}
+	#endregion
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void NextLayoutEngine(
@@ -552,6 +576,7 @@ public class WorkspaceTests
 		window.Received(2).Focus();
 	}
 
+	#region RemoveWindow
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void RemoveWindow_Fails_AlreadyRemoved(
 		IContext context,
@@ -604,7 +629,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void RemoveWindow_Success(
+	internal void RemoveWindow_Success_OneWindow(
 		IContext context,
 		IInternalContext internalContext,
 		WorkspaceManagerTriggers triggers,
@@ -612,7 +637,7 @@ public class WorkspaceTests
 		IWindow window
 	)
 	{
-		// Given
+		// Given only one window is in the workspace
 		Workspace workspace =
 			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		workspace.AddWindow(window);
@@ -625,10 +650,42 @@ public class WorkspaceTests
 		// When RemoveWindow is called
 		bool result = workspace.RemoveWindow(window);
 
-		// Then the window is removed from the layout engine
+		// Then the window is removed from the layout engine, and LastFocusedWindow is set to null
 		Assert.True(result);
 		givenEngine.Received(1).RemoveWindow(window);
 		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
+		Assert.Null(workspace.LastFocusedWindow);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void RemoveWindow_Success_MultipleWindows(
+		IContext context,
+		IInternalContext internalContext,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		IWindow window,
+		IWindow window2
+	)
+	{
+		// Given multiple windows are in the workspace
+		Workspace workspace =
+			new(context, internalContext, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		workspace.AddWindow(window);
+		workspace.AddWindow(window2);
+		workspace.WindowFocused(window);
+
+		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
+		context.WorkspaceManager.ClearReceivedCalls();
+		internalContext.CoreNativeManager.ClearReceivedCalls();
+
+		// When RemoveWindow is called
+		bool result = workspace.RemoveWindow(window);
+
+		// Then the window is removed from the layout engine, and LastFocusedWindow is set to the next window
+		Assert.True(result);
+		givenEngine.Received(1).RemoveWindow(window);
+		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
+		Assert.Equal(window2, workspace.LastFocusedWindow);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -658,6 +715,7 @@ public class WorkspaceTests
 		layoutEngine.DidNotReceive().RemoveWindow(window);
 		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 	}
+	#endregion
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void FocusWindowInDirection_Fails_DoesNotContainWindow(

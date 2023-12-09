@@ -282,17 +282,35 @@ public class CoreCommandsTests
 	public void FocusMonitor(string commandName, IContext ctx, IWorkspace workspace)
 	{
 		// Given
-		workspace.LastFocusedWindow.Returns((IWindow?)null);
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		ICommand command = testUtils.GetCommand(commandName);
 
+		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
+
 		// When
 		command.TryExecute();
 
 		// Then
-		workspace.LastFocusedWindow?.DidNotReceive().Focus();
+		workspace.Received(1).FocusLastFocusedWindow();
+	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void FocusMonitor_CannotGetWorkspaceForMonitor(IContext ctx, IWorkspace workspace)
+	{
+		// Given
+		workspace.LastFocusedWindow.Returns((IWindow?)null);
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand("whim.core.focus_previous_monitor");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		workspace.DidNotReceive().FocusLastFocusedWindow();
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
