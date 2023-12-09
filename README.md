@@ -96,7 +96,7 @@ void DoConfig(IConfig context)
             {
                 // Minimize the window.
                 window.ShowMinimized();
-                context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Focus();
+                context.WorkspaceManager.ActiveWorkspace.FocusFirstWindow();
             }
         }
     );
