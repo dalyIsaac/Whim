@@ -118,7 +118,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		if (Window.CreateWindow(_context, _internalContext, hwnd) is IWindow newWindow)
 		{
-			_windows[hwnd] = newWindow;
+			Logger.Debug($"Created window {newWindow}");
 			return newWindow;
 		}
 
