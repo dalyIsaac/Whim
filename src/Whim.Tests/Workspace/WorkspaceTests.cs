@@ -607,6 +607,7 @@ public class WorkspaceTests
 		Assert.False(result);
 		givenEngine.Received(1).RemoveWindow(window);
 		internalCtx.CoreNativeManager.DidNotReceive().IsWindow(Arg.Any<HWND>());
+		Assert.Null(workspace.LastFocusedWindow);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
