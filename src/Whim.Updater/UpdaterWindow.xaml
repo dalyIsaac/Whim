@@ -39,6 +39,23 @@
 			</StackPanel>
 		</Border>
 
+		<ItemsView ItemTemplate="{StaticResource ImageTemplate}">
+			<ItemsView.Resources>
+				<DataTemplate x:Key="ReleaseTemplate" x:DataType="local:ReleaseInfo">
+					<ItemContainer>
+						<StackPanel Padding="8" Spacing="8">
+							<TextBlock FontWeight="bold" Text="{x:Bind Release.TagName}" />
+
+							<TextBlock TextWrapping="WrapWholeWords">
+								TODO: Replace with MarkdownTextBlock
+								Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+							</TextBlock>
+						</StackPanel>
+					</ItemContainer>
+				</DataTemplate>
+			</ItemsView.Resources>
+		</ItemsView>
+
 		<StackPanel
 			HorizontalAlignment="Right"
 			Orientation="Horizontal"

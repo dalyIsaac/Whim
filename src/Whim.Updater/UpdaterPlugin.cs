@@ -7,7 +7,9 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Timers;
 using Octokit;
 using Serilog;
 using Windows.System.UserProfile;
@@ -27,7 +29,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 	private readonly IGitHubClient _client;
 	private readonly Architecture _architecture = RuntimeInformation.ProcessArchitecture;
 
+	private readonly Timer _timer = new();
+	private bool _disposedValue;
+
 	public string Name => "Whim.Updater";
+
+	// TODO
+	public IPluginCommands PluginCommands => new PluginCommands(Name);
 
 	public UpdaterPlugin(IContext context, UpdaterConfig config)
 	{
@@ -35,9 +43,25 @@ public class UpdaterPlugin : IUpdaterPlugin
 		_config = config;
 		_currentRelease = ReleaseInfo.Create(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
 		_client = new GitHubClient(new ProductHeaderValue(Name));
+
+		_timer = config.UpdateFrequency.GetTimer();
+		// TODO: Timer subscribe
 	}
 
-	public async Task<ReleaseInfo?> GetProposedRelease()
+	public void PreInitialize()
+	{
+		// TODO
+		// TODO: Also unsubscribe
+		// _timer.Elapsed +=
+	}
+
+	public void PostInitialize() { }
+
+	public void LoadState(JsonElement state) { }
+
+	public JsonElement? SaveState() => null;
+
+	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
 	{
 		IReadOnlyList<Release> releases = await _client
 			.Repository
@@ -56,6 +80,12 @@ public class UpdaterPlugin : IUpdaterPlugin
 				continue;
 			}
 
+			if (info.Channel != _config.ReleaseChannel)
+			{
+				Logger.Debug($"Ignoring release for channel {info.Channel}");
+				continue;
+			}
+
 			if (info.IsNewerRelease(_currentRelease))
 			{
 				sortedReleases.Add(info);
@@ -63,54 +93,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 		sortedReleases.Sort((a, b) => a.IsNewerRelease(b) ? -1 : 1);
 
-		// TODO: Check pagination
-		// Find the newest release that matches the current release channel
-		ReleaseInfo? proposedRelease = null;
-		foreach (ReleaseInfo r in sortedReleases)
-		{
-			if (r.Channel == _config.ReleaseChannel)
-			{
-				proposedRelease = r;
-				break;
-			}
-		}
-
-		if (proposedRelease == null)
-		{
-			Logger.Debug($"No release found for channel {_config.ReleaseChannel}");
-			return null;
-		}
-
-		return proposedRelease;
-	}
-
-	public async Task<string> GetReleaseNotes(Release release)
-	{
-		string? releaseNotes = release.Body;
-		if (string.IsNullOrWhiteSpace(releaseNotes))
-		{
-			Logger.Debug($"No release notes found for {release}");
-			return string.Empty;
-		}
-
-		return releaseNotes;
-	}
-
-	public async Task<string> DownloadChangelog(Release release)
-	{
-		IReadOnlyList<RepositoryContent> pathContents = await _client
-			.Repository
-			.Content
-			.GetAllContents(Owner, Repository, "CHANGELOG.md")
-			.ConfigureAwait(false);
-
-		if (pathContents.Count == 0)
-		{
-			Logger.Debug($"No changelog found for {release}");
-			return string.Empty;
-		}
-
-		return pathContents[0].Content;
+		return sortedReleases;
 	}
 
 	public async Task InstallRelease(Release release)
@@ -163,5 +146,28 @@ public class UpdaterPlugin : IUpdaterPlugin
 		await streamToReadFrom.CopyToAsync(streamToWriteTo).ConfigureAwait(false);
 		streamToWriteTo.Close();
 		streamToReadFrom.Close();
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_timer.Dispose();
+			}
+
+			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+			// TODO: set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

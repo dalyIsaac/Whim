@@ -28,7 +28,7 @@
 		<Version>0.1.0</Version>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="UpdaterWindow.xaml" />
+		<None Remove="UpdaterWindow.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -46,8 +46,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="UpdaterWindow.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<Page Update="UpdaterWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 </Project>
