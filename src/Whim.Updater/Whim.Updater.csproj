@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
@@ -27,6 +27,9 @@
 		<UseWinUI>true</UseWinUI>
 		<Version>0.1.0</Version>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="UpdaterWindow.xaml" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.WindowsAppSDK" />
@@ -40,5 +43,11 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="Whim.Updater.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="UpdaterWindow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 </Project>

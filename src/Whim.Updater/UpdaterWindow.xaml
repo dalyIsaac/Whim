@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+	x:Class="Whim.Updater.UpdaterWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="using:Whim.Updater"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d">
+
+	<StackPanel Padding="8" Spacing="8">
+		<StackPanel>
+			<TextBlock FontSize="16" FontWeight="bold">
+				Whim update available
+			</TextBlock>
+
+			<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
+				Last checked: Today, 11:15
+			</TextBlock>
+
+			<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
+				Skipped releases: 4
+			</TextBlock>
+		</StackPanel>
+
+		<Border
+			BorderBrush="Gray"
+			BorderThickness="1"
+			CornerRadius="4">
+			<StackPanel Padding="8" Spacing="8">
+				<TextBlock FontWeight="bold">
+					v0.1.265-alpha+4e182196
+				</TextBlock>
+
+				<TextBlock TextWrapping="WrapWholeWords">
+					TODO: Replace with MarkdownTextBlock
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+				</TextBlock>
+			</StackPanel>
+		</Border>
+
+		<StackPanel
+			HorizontalAlignment="Right"
+			Orientation="Horizontal"
+			Spacing="4">
+			<Button>
+				Skip release
+			</Button>
+
+			<Button>
+				Not now
+			</Button>
+
+			<Button Style="{StaticResource AccentButtonStyle}">
+				Download and install
+			</Button>
+		</StackPanel>
+	</StackPanel>
+</Window>
