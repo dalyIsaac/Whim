@@ -74,9 +74,9 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void WindowFocused(IWindow? window)
 	{
-		Logger.Debug($"Focusing on {window}");
-
 		HWND hwnd = window?.Handle ?? _internalContext.CoreNativeManager.GetForegroundWindow();
+		Logger.Debug($"Focusing hwnd {hwnd}");
+
 		HMONITOR hMONITOR = _internalContext.CoreNativeManager.MonitorFromWindow(
 			hwnd,
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
