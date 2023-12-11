@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
@@ -105,6 +105,7 @@
 		<ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
 		<ProjectReference Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
 		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
+		<ProjectReference Include="..\Whim.Updater\Whim.Updater.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
@@ -189,5 +190,15 @@
 	<!--Whim.TreeLayout.CommandPalette-->
 	<Target Name="CopyTreeLayoutCommandPaletteAfterBuild" AfterTargets="Build;Publish;CopyCommandPaletteAfterBuild;CopyTreeLayoutAfterBuild">
 		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout.CommandPalette\$(OutDir)Whim.TreeLayout.CommandPalette.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.CommandPalette\" SkipUnchangedFiles="true" />
+	</Target>
+
+	<!-- Whim.Updater -->
+	<Target Name="CopyUpdaterAfterBuild" AfterTargets="Build;Publish">
+		<ItemGroup>
+			<UpdaterSourceFile Include="$(SolutionDir)\src\Whim.Updater\$(OutDir)\Whim.Updater\**\*" />
+			<UpdaterDestinationFile Include="@(UpdaterSourceFile->'$(TargetDir)plugins\Whim.Updater\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(UpdaterSourceFile)" DestinationFiles="@(UpdaterDestinationFile)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.Updater\$(OutDir)Whim.Updater.dll" DestinationFolder="$(TargetDir)plugins\Whim.Updater\" SkipUnchangedFiles="true" />
 	</Target>
 </Project>

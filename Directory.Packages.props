@@ -3,6 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="CommunityToolkit.WinUI.UI.Controls.Markdown" Version="7.1.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="4.8.0" />
     <PackageVersion Include="Microsoft.Win32.SystemEvents" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta" />

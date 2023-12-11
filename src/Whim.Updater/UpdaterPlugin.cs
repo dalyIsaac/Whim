@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
+using Microsoft.UI.Dispatching;
 using Octokit;
 using Serilog;
 using Windows.System.UserProfile;
@@ -22,11 +23,12 @@ public class UpdaterPlugin : IUpdaterPlugin
 	private const string Repository = "Whim";
 
 	private readonly IContext _context;
-	private readonly ReleaseInfo _currentRelease;
+	private readonly Version _currentVersion;
 	private readonly UpdaterConfig _config;
 
 	// TODO: This doesn't need to exist all the time.
 	private readonly IGitHubClient _client;
+	private UpdaterWindow? _updaterWindow;
 	private readonly Architecture _architecture = RuntimeInformation.ProcessArchitecture;
 
 	private readonly Timer _timer = new();
@@ -41,7 +43,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 	{
 		_context = context;
 		_config = config;
-		_currentRelease = ReleaseInfo.Create(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
+
+#if DEBUG
+		_currentVersion = new Version("v0.1.263-alpha+bc5c56c4");
+#else
+		_currentVersion = new Version(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
+#endif
+
 		_client = new GitHubClient(new ProductHeaderValue(Name));
 
 		_timer = config.UpdateFrequency.GetTimer();
@@ -55,7 +63,14 @@ public class UpdaterPlugin : IUpdaterPlugin
 		// _timer.Elapsed +=
 	}
 
-	public void PostInitialize() { }
+	public void PostInitialize()
+	{
+		_updaterWindow = new(this);
+		DispatcherQueue.GetForCurrentThread().TryEnqueue(async () =>
+		{
+			_updaterWindow.Activate(await GetNotInstalledReleases());
+		});
+	}
 
 	public void LoadState(JsonElement state) { }
 
@@ -66,32 +81,37 @@ public class UpdaterPlugin : IUpdaterPlugin
 		IReadOnlyList<Release> releases = await _client
 			.Repository
 			.Release
-			.GetAll(Owner, Repository)
+			.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
 			.ConfigureAwait(false);
 
 		// Sort the releases by semver
 		List<ReleaseInfo> sortedReleases = new();
 		foreach (Release r in releases)
 		{
-			ReleaseInfo? info = ReleaseInfo.Create(r.TagName, r);
-			if (info == null)
+			ReleaseInfo info;
+			try
 			{
-				Logger.Debug($"Invalid release tag: {r.TagName}");
+				info = new ReleaseInfo(r, new Version(r.TagName), releases.Count > 1);
+			}
+			catch (Exception ex)
+			{
+				// TODO: Don't throw, since early releases had an incorrect format.
+				Logger.Debug($"Invalid release tag: {r.TagName}: {ex}");
 				continue;
 			}
 
-			if (info.Channel != _config.ReleaseChannel)
+			if (info.Version.ReleaseChannel != _config.ReleaseChannel)
 			{
-				Logger.Debug($"Ignoring release for channel {info.Channel}");
+				Logger.Debug($"Ignoring release for channel {info.Version.ReleaseChannel}");
 				continue;
 			}
 
-			if (info.IsNewerRelease(_currentRelease))
+			if (info.Version.IsNewerVersion(_currentVersion))
 			{
 				sortedReleases.Add(info);
 			}
 		}
-		sortedReleases.Sort((a, b) => a.IsNewerRelease(b) ? -1 : 1);
+		sortedReleases.Sort((a, b) => a.Version.IsNewerVersion(b.Version) ? -1 : 1);
 
 		return sortedReleases;
 	}
