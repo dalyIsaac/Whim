@@ -387,7 +387,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		);
 	}
 
-	public void ActivatePrevious(IMonitor? monitor = null)
+	public void ActivatePrevious(IMonitor? monitor = null, bool skipActive = false)
 	{
 		Logger.Debug("Activating previous workspace");
 
@@ -402,12 +402,35 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		int idx = _workspaces.IndexOf(currentWorkspace);
 		int prevIdx = (idx - 1).Mod(_workspaces.Count);
 
+		if (skipActive)
+		{
+			if (_workspaces.Count <= _context.MonitorManager.Length)
+			{
+				Logger.Debug($"No inactive workspace found");
+				return;
+			}
+			foreach (IMonitor m in _context.MonitorManager)
+			{
+				IWorkspace? w = GetWorkspaceForMonitor(m);
+				if (w == null)
+				{
+					Logger.Debug($"No workspace found for monitor {m}");
+					return;
+				}
+				int wIdx = _workspaces.IndexOf(w);
+				if (prevIdx == wIdx)
+				{
+					prevIdx = (prevIdx - 1).Mod(_workspaces.Count);
+				}
+			}
+		}
+
 		IWorkspace prevWorkspace = _workspaces[prevIdx];
 
 		Activate(prevWorkspace, monitor);
 	}
 
-	public void ActivateNext(IMonitor? monitor = null)
+	public void ActivateNext(IMonitor? monitor = null, bool skipActive = false)
 	{
 		Logger.Debug("Activating next workspace");
 
@@ -421,6 +444,29 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		int idx = _workspaces.IndexOf(currentWorkspace);
 		int nextIdx = (idx + 1).Mod(_workspaces.Count);
+
+		if (skipActive)
+		{
+			if (_workspaces.Count <= _context.MonitorManager.Length)
+			{
+				Logger.Debug($"No inactive workspace found");
+				return;
+			}
+			foreach (IMonitor m in _context.MonitorManager)
+			{
+				IWorkspace? w = GetWorkspaceForMonitor(m);
+				if (w == null)
+				{
+					Logger.Debug($"No workspace found for monitor {m}");
+					return;
+				}
+				int wIdx = _workspaces.IndexOf(w);
+				if (nextIdx == wIdx)
+				{
+					nextIdx = (nextIdx + 1).Mod(_workspaces.Count);
+				}
+			}
+		}
 
 		IWorkspace nextWorkspace = _workspaces[nextIdx];
 
