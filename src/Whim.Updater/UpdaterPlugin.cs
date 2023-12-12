@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
+using Markdig;
 using Microsoft.UI.Dispatching;
 using Octokit;
 using Serilog;
@@ -66,10 +67,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 	public void PostInitialize()
 	{
 		_updaterWindow = new(this);
-		DispatcherQueue.GetForCurrentThread().TryEnqueue(async () =>
-		{
-			_updaterWindow.Activate(await GetNotInstalledReleases());
-		});
+		DispatcherQueue
+			.GetForCurrentThread()
+			.TryEnqueue(async () =>
+			{
+				_updaterWindow.Activate(await GetNotInstalledReleases());
+				// _updaterWindow.Activate(new List<ReleaseInfo>());
+			});
 	}
 
 	public void LoadState(JsonElement state) { }

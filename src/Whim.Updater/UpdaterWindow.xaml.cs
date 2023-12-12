@@ -1,14 +1,75 @@
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Markdig;
 using Microsoft.UI.Xaml;
 
 namespace Whim.Updater;
 
 public sealed partial class UpdaterWindow : Window
 {
-	private readonly IUpdaterPlugin _plugin;
+	// TODO: Link all users
+	// TODO: Link all PR links
+	// TODO: Links should redirect out
+	private const string _htmlTemplate =
+		@"
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Whim Updater</title>
+		<meta charset=""utf-8"" />
+		<link name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+	</head>
 
-	internal ObservableCollection<ReleaseInfo> Releases { get; } = new();
+	<style>
+		html {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		:root {
+			--border-color: rgb(216. 222, 228);
+			font-size: 14px;
+		}
+
+		a {
+			color: rgb(9, 105, 218);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			html {
+				background: black;
+				color: white;
+			}
+
+			:root {
+				--border-color: rgb(33, 38, 45);
+			}
+
+			a {
+				color: rgb(47, 129, 247);
+			}
+		}
+
+		h1, h2, h3 {
+			margin: 0;
+			margin-top: .2em;
+			padding-bottom: .3em;
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		h1 {
+			margin-top: 1em;
+		}
+	</style>
+
+	<body>
+		<!-- CONTENT -->
+	</body>
+</html>
+";
+	private readonly IUpdaterPlugin _plugin;
 
 	public UpdaterWindow(IUpdaterPlugin plugin)
 	{
@@ -16,14 +77,33 @@ public sealed partial class UpdaterWindow : Window
 		UIElementExtensions.InitializeComponent(this, "Whim.Updater", "UpdaterWindow");
 	}
 
-	public void Activate(IEnumerable<ReleaseInfo> releases)
+	public async Task Activate(List<ReleaseInfo> releases)
 	{
-		Releases.Clear();
-		foreach (ReleaseInfo release in releases)
+		if (releases.Count == 0)
 		{
-			Releases.Add(release);
+			return;
 		}
+
+		await UpdaterWebView.EnsureCoreWebView2Async();
+
+		StringBuilder contentBuilder = new();
+
+		foreach (ReleaseInfo r in releases)
+		{
+			contentBuilder.Append($"<h1>{r.Release.Name}</h1>");
+			string body = Markdown.ToHtml(r.Release.Body);
+
+			body = CompareLinkRegex().Replace(body, "<a href=\"$1\">$1</a>");
+			contentBuilder.Append(body);
+		}
+
+		string html = _htmlTemplate.Replace("<!-- CONTENT -->", contentBuilder.ToString());
+
+		UpdaterWebView.CoreWebView2.NavigateToString(html);
 
 		Activate();
 	}
+
+	[GeneratedRegex(@"(https://github.com/dalyIsaac/Whim/compare/[a-zA-Z0-9\-\.\+]*)")]
+	private static partial Regex CompareLinkRegex();
 }
