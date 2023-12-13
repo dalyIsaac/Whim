@@ -387,9 +387,9 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		);
 	}
 
-	public void ActivateAdjacent(int dir, IMonitor? monitor = null)
+	public void ActivatePrevious(IMonitor? monitor = null, bool skipActive = false)
 	{
-		Logger.Debug($"Activating adjacent workspace in direction {dir}");
+		Logger.Debug("Activating previous workspace");
 
 		monitor ??= _context.MonitorManager.ActiveMonitor;
 		IWorkspace? currentWorkspace = GetWorkspaceForMonitor(monitor);
@@ -399,58 +399,58 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		int idx = _workspaces.IndexOf(currentWorkspace);
-		int nextIdx = (idx + dir).Mod(_workspaces.Count);
+		IWorkspace? prevWorkspace = GetAdjacentWorkspace(currentWorkspace, getNext: false, skipActive);
+		if (prevWorkspace == null)
+		{
+			Logger.Debug($"No previous workspace found for monitor {monitor}");
+			return;
+		}
 
-		IWorkspace nextWorkspace = _workspaces[nextIdx];
+		Activate(prevWorkspace, monitor);
+	}
+
+	public void ActivateNext(IMonitor? monitor = null, bool skipActive = false)
+	{
+		Logger.Debug("Activating next workspace");
+
+		monitor ??= _context.MonitorManager.ActiveMonitor;
+		IWorkspace? currentWorkspace = GetWorkspaceForMonitor(monitor);
+		if (currentWorkspace == null)
+		{
+			Logger.Debug($"No workspace found for monitor {monitor}");
+			return;
+		}
+
+		IWorkspace? nextWorkspace = GetAdjacentWorkspace(currentWorkspace, getNext: true, skipActive);
+		if (nextWorkspace == null)
+		{
+			Logger.Debug($"No next workspace found for monitor {monitor}");
+			return;
+		}
 
 		Activate(nextWorkspace, monitor);
 	}
 
-	private int NextInactive(int idx, int dir)
+	private IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool getNext, bool skipActive)
 	{
-		List<int> active = new();
+		int idx = _workspaces.IndexOf(workspace);
+		int delta = getNext ? 1 : -1;
+		int nextIdx = (idx + delta).Mod(_workspaces.Count);
 
-		foreach (IMonitor m in _context.MonitorManager)
+		while (idx != nextIdx)
 		{
-			IWorkspace? w = GetWorkspaceForMonitor(m);
-			if (w != null)
+			IWorkspace nextWorkspace = _workspaces[nextIdx];
+			IMonitor? monitor = GetMonitorForWorkspace(nextWorkspace);
+
+			if (monitor == null || !skipActive)
 			{
-				active.Add(_workspaces.IndexOf(w));
+				return nextWorkspace;
 			}
+
+			nextIdx = (nextIdx + delta).Mod(_workspaces.Count);
 		}
 
-		do
-		{
-			idx = (idx + dir).Mod(_workspaces.Count);
-		} while (active.Contains(idx));
-
-		return idx;
-	}
-
-	public void ActivateInactive(int dir, IMonitor? monitor = null)
-	{
-		Logger.Debug($"Activating next inactive workspace in direction {dir}");
-
-		monitor ??= _context.MonitorManager.ActiveMonitor;
-		IWorkspace? currentWorkspace = GetWorkspaceForMonitor(monitor);
-		if (currentWorkspace == null)
-		{
-			Logger.Debug($"No workspace found for monitor {monitor}");
-			return;
-		}
-		if (_workspaces.Count <= _context.MonitorManager.Length)
-		{
-			Logger.Debug($"No inactive workspace found");
-			return;
-		}
-
-		int idx = _workspaces.IndexOf(currentWorkspace);
-		int nextIdx = NextInactive(idx, dir);
-
-		IWorkspace nextWorkspace = _workspaces[nextIdx];
-
-		Activate(nextWorkspace, monitor);
+		return null;
 	}
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)

@@ -119,24 +119,24 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	void Activate(IWorkspace workspace, IMonitor? monitor = null);
 
 	/// <summary>
-	/// Activates next workspace in the given direction in the given monitor, or the focused monitor (if provided).
+	/// Activates the previous workspace in the given monitor, or the focused monitor (if provided).
 	/// </summary>
-	/// <param name="dir">The direction in which the next workspace is activated.</param>
 	/// <param name="monitor">
 	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
 	/// the focused monitor.
 	/// </param>
-	void ActivateAdjacent(int dir, IMonitor? monitor = null);
+	/// <param name="skipActive">Skip workspaces that are active on any other monitor.</param>
+	void ActivatePrevious(IMonitor? monitor = null, bool skipActive = false);
 
 	/// <summary>
-	/// Activates next inactive workspace in the given direction in the given monitor, or the focused monitor (if provided).
+	/// Activates the next workspace in the given monitor, or the focused monitor (if provided).
 	/// </summary>
-	/// <param name="dir">The direction in which the next workspace is activated.</param>
 	/// <param name="monitor">
 	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
 	/// the focused monitor.
 	/// </param>
-	void ActivateInactive(int dir, IMonitor? monitor = null);
+	/// <param name="skipActive">Skip workspaces that are active on any other monitor.</param>
+	void ActivateNext(IMonitor? monitor = null, bool skipActive = false);
 
 	/// <summary>
 	/// Retrieves the monitor for the active workspace.

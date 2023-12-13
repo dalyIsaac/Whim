@@ -584,7 +584,7 @@ public class WorkspaceManagerTests
 		workspaces[currentIdx].ClearReceivedCalls();
 
 		// When the previous workspace is activated, then the previous workspace is activated
-		workspaceManager.ActivateAdjacent(-1);
+		workspaceManager.ActivatePrevious();
 
 		workspaces[currentIdx].Received(1).Deactivate();
 		workspaces[currentIdx].DidNotReceive().DoLayout();
@@ -610,7 +610,7 @@ public class WorkspaceManagerTests
 		ctx.MonitorManager.ActiveMonitor.Returns(Substitute.For<IMonitor>());
 
 		// When the previous workspace is activated, then the previous workspace is activated
-		workspaceManager.ActivateAdjacent(-1);
+		workspaceManager.ActivatePrevious();
 
 		workspaces[0].DidNotReceive().Deactivate();
 		workspaces[0].DidNotReceive().DoLayout();
@@ -637,7 +637,7 @@ public class WorkspaceManagerTests
 		workspaces[currentIdx].ClearReceivedCalls();
 
 		// When the next workspace is activated, then the next workspace is activated
-		workspaceManager.ActivateAdjacent(+1);
+		workspaceManager.ActivateNext();
 
 		workspaces[currentIdx].Received(1).Deactivate();
 		workspaces[currentIdx].DidNotReceive().DoLayout();
@@ -663,7 +663,7 @@ public class WorkspaceManagerTests
 		ctx.MonitorManager.ActiveMonitor.Returns(Substitute.For<IMonitor>());
 
 		// When the next workspace is activated, then the next workspace is activated
-		workspaceManager.ActivateAdjacent(+1);
+		workspaceManager.ActivateNext();
 
 		workspaces[0].DidNotReceive().Deactivate();
 		workspaces[0].DidNotReceive().DoLayout();
