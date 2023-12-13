@@ -5,6 +5,7 @@
   // List of extensions which should be recommended for users of this workspace.
   "recommendations": [
     "csharpier.csharpier-vscode",
+    "editorconfig.editorconfig",
     "esbenp.prettier-vscode",
     "Chouzz.vscode-innosetup",
     "ms-dotnettools.csdevkit"
