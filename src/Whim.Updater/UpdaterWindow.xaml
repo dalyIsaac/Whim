@@ -12,48 +12,52 @@
 	<Grid Padding="8">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="60" />
-			<RowDefinition />
-			<RowDefinition Height="36" />
+			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<StackPanel Grid.Row="0">
-			<TextBlock FontSize="16" FontWeight="bold">
-				Whim update available
-			</TextBlock>
+		<RelativePanel Grid.Row="0">
+			<StackPanel RelativePanel.AlignLeftWithPanel="True">
+				<TextBlock FontSize="16" FontWeight="bold">
+					Whim update available
+				</TextBlock>
 
-			<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
-				<Run Text="Last checked: " />
-				<!--  TODO  -->
-			</TextBlock>
+				<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
+					<Run Text="Last checked: " />
+					<!--  TODO  -->
+				</TextBlock>
 
-			<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
-				<Run Text="Skipped releases: " />
-				<!--  TODO  -->
-			</TextBlock>
-		</StackPanel>
+				<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
+					<Run Text="Skipped releases: " />
+					<!--  TODO  -->
+				</TextBlock>
+			</StackPanel>
+
+			<StackPanel
+				Grid.Row="2"
+				HorizontalAlignment="Right"
+				Orientation="Horizontal"
+				RelativePanel.AlignRightWithPanel="True"
+				RelativePanel.AlignVerticalCenterWithPanel="True"
+				Spacing="4">
+				<Button>
+					Skip release
+				</Button>
+
+				<Button>
+					Not now
+				</Button>
+
+				<Button Style="{StaticResource AccentButtonStyle}">
+					Download and install
+				</Button>
+			</StackPanel>
+		</RelativePanel>
+
 
 		<controls:WebView2
 			x:Name="UpdaterWebView"
 			Grid.Row="1"
 			HorizontalAlignment="Stretch"
 			VerticalAlignment="Stretch" />
-
-		<StackPanel
-			Grid.Row="2"
-			HorizontalAlignment="Right"
-			Orientation="Horizontal"
-			Spacing="4">
-			<Button>
-				Skip release
-			</Button>
-
-			<Button>
-				Not now
-			</Button>
-
-			<Button Style="{StaticResource AccentButtonStyle}">
-				Download and install
-			</Button>
-		</StackPanel>
 	</Grid>
 </Window>
