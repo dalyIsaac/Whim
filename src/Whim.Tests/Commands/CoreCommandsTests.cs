@@ -54,7 +54,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.Received(1).ActivateAdjacent(-1, null);
+		ctx.WorkspaceManager.Received(1).ActivateAdjacent(+1, null);
 	}
 
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_window_in_direction.left", Direction.Left)]
