@@ -400,11 +400,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 
 		int idx = _workspaces.IndexOf(currentWorkspace);
-		int adjIdx = (idx + dir).Mod(_workspaces.Count);
+		int nextIdx = (idx + dir).Mod(_workspaces.Count);
 
-		IWorkspace prevWorkspace = _workspaces[adjIdx];
+		IWorkspace nextWorkspace = _workspaces[nextIdx];
 
-		Activate(prevWorkspace, monitor);
+		Activate(nextWorkspace, monitor);
 	}
 
 	private int NextInactive(int idx, int dir)
@@ -446,11 +446,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 
 		int idx = _workspaces.IndexOf(currentWorkspace);
-		int adjIdx = NextInactive(idx, dir);
+		int nextIdx = NextInactive(idx, dir);
 
-		IWorkspace prevWorkspace = _workspaces[adjIdx];
+		IWorkspace nextWorkspace = _workspaces[nextIdx];
 
-		Activate(prevWorkspace, monitor);
+		Activate(nextWorkspace, monitor);
 	}
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
