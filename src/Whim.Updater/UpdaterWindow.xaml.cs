@@ -90,13 +90,15 @@ public sealed partial class UpdaterWindow : Window
 		// TODO: Unsubscribe in dispose
 		UpdaterWebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
 
-		MarkdownPipeline pipeline = new MarkdownPipelineBuilder().UseAutoLinks().Build();
+		MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
+			.UseAutoLinks()
+			.Use<GitHubUserProfileExtension>()
+			.Build();
 
 		StringBuilder contentBuilder = new();
 
 		foreach (ReleaseInfo r in releases)
 		{
-			// TODO: Usernames
 			contentBuilder.Append($"<h1>{r.Release.Name}</h1>");
 			string body = Markdown.ToHtml(r.Release.Body, pipeline);
 
@@ -117,6 +119,5 @@ public sealed partial class UpdaterWindow : Window
 			args.Cancel = true;
 			Process.Start(new ProcessStartInfo(args.Uri) { UseShellExecute = true });
 		}
-
 	}
 }
