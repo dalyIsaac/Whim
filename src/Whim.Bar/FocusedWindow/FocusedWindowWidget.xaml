@@ -13,6 +13,7 @@
 			RelativePanel.AlignLeftWithPanel="True"
 			RelativePanel.AlignRightWithPanel="True"
 			RelativePanel.AlignVerticalCenterWithPanel="True"
+			Style="{StaticResource bar:focused_window:text_block}"
 			Text="{x:Bind Path=ViewModel.Title, Mode=OneWay}"
 			TextTrimming="CharacterEllipsis"
 			TextWrapping="NoWrap" />

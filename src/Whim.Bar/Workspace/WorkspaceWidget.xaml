@@ -21,7 +21,19 @@
 				<Button
 					Command="{x:Bind SwitchWorkspaceCommand}"
 					CommandParameter="{x:Bind}"
-					Content="{x:Bind Name}" />
+					Content="{x:Bind Name}"
+					Style="{StaticResource bar:workspace:button}">
+					<Button.Resources>
+						<SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{StaticResource bar:active_workspace:background}" />
+						<SolidColorBrush x:Key="ButtonForegroundDisabled" Color="{StaticResource bar:active_workspace:foreground}" />
+						<SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{StaticResource bar:hover:background}" />
+						<SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{StaticResource bar:hover:foreground}" />
+						<!--  Button[Background|Foreground|Borderbrush]  -->
+						<!--  Button[Background|Foreground|Borderbrush]PointerOver  -->
+						<!--  Button[Background|Foreground|Borderbrush]Pressed  -->
+						<!--  Button[Background|Foreground|Borderbrush]Disabled  -->
+					</Button.Resources>
+				</Button>
 			</DataTemplate>
 		</ItemsControl.ItemTemplate>
 	</ItemsControl>

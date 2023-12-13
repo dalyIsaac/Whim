@@ -7,5 +7,5 @@
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
-	<TextBlock Text="{x:Bind Path=ViewModel.Value, Mode=OneWay}" />
+	<TextBlock Style="{StaticResource bar:date_time:text_block}" Text="{x:Bind Path=ViewModel.Value, Mode=OneWay}" />
 </UserControl>

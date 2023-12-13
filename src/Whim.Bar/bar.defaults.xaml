@@ -1,0 +1,87 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<!--  Font family  -->
+	<FontFamily x:Key="_font:family">Segoe UI</FontFamily>
+
+	<!--  Colors: Light mode, TODO: improve  -->
+	<!-- **************************************************
+	<Color x:Key="_base:background">#eceff4</Color>
+    <Color x:Key="_base:foreground">#1c1c1c</Color>
+    <Color x:Key="_button:background">#bbbbbb</Color>
+	<Color x:Key="_button:accent">#81a1c1</Color>
+	<Color x:Key="bar:hover:background">#15000000</Color>
+    <Color x:Key="bar:hover:foreground">#65000000</Color>
+    *******************************************************-->
+
+	<!--  Colors: dark mode  -->
+	<Color x:Key="_base:background">#1c1c1c</Color>
+	<Color x:Key="_base:foreground">#eceff4</Color>
+	<Color x:Key="_button:background">#2b2b2b</Color>
+	<Color x:Key="_button:accent">#81a1c1</Color>
+	<Color x:Key="bar:hover:background">#15ffffff</Color>
+	<Color x:Key="bar:hover:foreground">#65ffffff</Color>
+
+	<!--  Shared text block style  -->
+	<Style x:Key="_base:text_block" TargetType="TextBlock">
+		<Setter Property="Foreground" Value="{StaticResource _base:foreground}" />
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Padding" Value="8,2,8,3" />
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="FontFamily" Value="{StaticResource _font:family}" />
+	</Style>
+
+	<!--  Shared button style  -->
+	<Style x:Key="_base:button" TargetType="Button">
+		<Setter Property="Background" Value="{StaticResource _button:background}" />
+		<Setter Property="Foreground" Value="{StaticResource _base:foreground}" />
+		<Setter Property="Margin" Value="3,0" />
+		<Setter Property="Padding" Value="8,2,8,3" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="CornerRadius" Value="4" />
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="FontFamily" Value="{StaticResource _font:family}" />
+	</Style>
+
+	<!--  Root panel  -->
+	<Style x:Key="bar:root_panel" TargetType="RelativePanel">
+		<Setter Property="Background" Value="{StaticResource _base:background}" />
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Padding" Value="0,2" />
+	</Style>
+
+	<!--  Sub panels  -->
+	<Style x:Key="_sub_panel" TargetType="StackPanel" />
+	<StaticResource x:Key="bar:left_panel" ResourceKey="_sub_panel" />
+	<StaticResource x:Key="bar:center_panel" ResourceKey="_sub_panel" />
+	<StaticResource x:Key="bar:right_panel" ResourceKey="_sub_panel" />
+
+	<!--  Active layout widget  -->
+	<StaticResource x:Key="bar:active_layout:button" ResourceKey="_base:button" />
+
+	<!--  Tree layout engine widget  -->
+	<StaticResource x:Key="bar:tree_layout:button" ResourceKey="_base:button" />
+
+	<!--  Workspace widget  -->
+	<StaticResource x:Key="bar:active_workspace:background" ResourceKey="_button:accent" />
+	<StaticResource x:Key="bar:active_workspace:foreground" ResourceKey="_base:background" />
+	<Style
+		x:Key="bar:workspace:button"
+		BasedOn="{StaticResource _base:button}"
+		TargetType="Button">
+		<Setter Property="Background" Value="{StaticResource _base:background}" />
+		<Setter Property="Foreground" Value="{StaticResource _button:accent}" />
+		<Setter Property="Margin" Value="0" />
+	</Style>
+
+	<!--  Focused window widget  -->
+	<StaticResource x:Key="bar:focused_window:text_block" ResourceKey="_base:text_block" />
+
+	<!--  Date time widget  -->
+	<Style
+		x:Key="bar:date_time:text_block"
+		BasedOn="{StaticResource _base:text_block}"
+		TargetType="TextBlock">
+		<Setter Property="FontSize" Value="13" />
+	</Style>
+
+</ResourceDictionary>

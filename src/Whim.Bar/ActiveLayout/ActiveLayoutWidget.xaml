@@ -7,5 +7,13 @@
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
-	<Button Command="{x:Bind Path=ViewModel.NextLayoutEngineCommand}" Content="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=OneWay}" />
+	<Button
+		Command="{x:Bind Path=ViewModel.NextLayoutEngineCommand}"
+		Content="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=OneWay}"
+		Style="{StaticResource bar:active_layout:button}">
+		<Button.Resources>
+			<SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{StaticResource bar:hover:background}" />
+			<SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{StaticResource bar:hover:foreground}" />
+		</Button.Resources>
+	</Button>
 </UserControl>

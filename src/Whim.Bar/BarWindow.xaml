@@ -6,29 +6,14 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<RelativePanel>
-		<RelativePanel.Resources>
-			<Style TargetType="Grid">
-				<Setter Property="Padding" Value="4" />
-			</Style>
-
-			<Style TargetType="Button">
-				<Setter Property="Margin" Value="4" />
-				<Setter Property="CornerRadius" Value="4" />
-			</Style>
-
-			<Style TargetType="TextBlock">
-				<Setter Property="Margin" Value="4" />
-				<Setter Property="Padding" Value="6" />
-			</Style>
-		</RelativePanel.Resources>
-
+	<RelativePanel Style="{StaticResource bar:root_panel}">
 		<StackPanel
 			x:Name="LeftPanel"
 			Grid.Column="0"
 			VerticalAlignment="Center"
 			Orientation="Horizontal"
-			RelativePanel.AlignVerticalCenterWithPanel="True" />
+			RelativePanel.AlignVerticalCenterWithPanel="True"
+			Style="{StaticResource bar:left_panel}" />
 
 		<StackPanel
 			x:Name="CenterPanel"
@@ -39,7 +24,8 @@
 			RelativePanel.AlignHorizontalCenterWithPanel="True"
 			RelativePanel.AlignVerticalCenterWithPanel="True"
 			RelativePanel.LeftOf="RightPanel"
-			RelativePanel.RightOf="LeftPanel" />
+			RelativePanel.RightOf="LeftPanel"
+			Style="{StaticResource bar:center_panel}" />
 
 		<StackPanel
 			x:Name="RightPanel"
@@ -48,6 +34,7 @@
 			FlowDirection="RightToLeft"
 			Orientation="Horizontal"
 			RelativePanel.AlignRightWithPanel="True"
-			RelativePanel.AlignVerticalCenterWithPanel="True" />
+			RelativePanel.AlignVerticalCenterWithPanel="True"
+			Style="{StaticResource bar:right_panel}" />
 	</RelativePanel>
 </Window>
