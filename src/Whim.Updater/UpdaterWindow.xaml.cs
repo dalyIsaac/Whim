@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Markdig;
 using Microsoft.UI.Xaml;
+using Microsoft.Web.WebView2.Core;
 
 namespace Whim.Updater;
 
 public sealed partial class UpdaterWindow : Window
 {
-	// TODO: Links should redirect out
 	private const string _htmlTemplate =
 		@"
 <!DOCTYPE html>
@@ -82,15 +83,22 @@ public sealed partial class UpdaterWindow : Window
 		}
 
 		await UpdaterWebView.EnsureCoreWebView2Async();
+		UpdaterWebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
+		UpdaterWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+		UpdaterWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 
-		MarkdownPipelineBuilder pipeline = new().UseAutoLinks().Build();
+		// TODO: Unsubscribe in dispose
+		UpdaterWebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
+
+		MarkdownPipeline pipeline = new MarkdownPipelineBuilder().UseAutoLinks().Build();
 
 		StringBuilder contentBuilder = new();
 
 		foreach (ReleaseInfo r in releases)
 		{
+			// TODO: Usernames
 			contentBuilder.Append($"<h1>{r.Release.Name}</h1>");
-			string body = Markdown.ToHtml(r.Release.Body);
+			string body = Markdown.ToHtml(r.Release.Body, pipeline);
 
 			contentBuilder.Append(body);
 		}
@@ -100,5 +108,15 @@ public sealed partial class UpdaterWindow : Window
 		UpdaterWebView.CoreWebView2.NavigateToString(html);
 
 		Activate();
+	}
+
+	private void CoreWebView2_NavigationStarting(CoreWebView2 sender, CoreWebView2NavigationStartingEventArgs args)
+	{
+		if (args.IsUserInitiated)
+		{
+			args.Cancel = true;
+			Process.Start(new ProcessStartInfo(args.Uri) { UseShellExecute = true });
+		}
+
 	}
 }
