@@ -3,18 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
-using Markdig;
 using Microsoft.UI.Dispatching;
 using Octokit;
-using Serilog;
-using Windows.System.UserProfile;
 
 namespace Whim.Updater;
 
@@ -31,6 +26,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 	private readonly IGitHubClient _client;
 	private UpdaterWindow? _updaterWindow;
 	private readonly Architecture _architecture = RuntimeInformation.ProcessArchitecture;
+
+	/// <summary>
+	/// The release that the user has chosen to skip.
+	/// </summary>
+	private string? _skippedReleaseTagName;
+
+	private DateTime? _lastCheckedForUpdates;
 
 	private readonly Timer _timer = new();
 	private bool _disposedValue;
@@ -66,22 +68,54 @@ public class UpdaterPlugin : IUpdaterPlugin
 
 	public void PostInitialize()
 	{
+		// TODO: Destroy the window
 		_updaterWindow = new(this);
 		DispatcherQueue
 			.GetForCurrentThread()
 			.TryEnqueue(async () =>
 			{
-				_updaterWindow.Activate(await GetNotInstalledReleases());
+				await _updaterWindow.Activate(await GetNotInstalledReleases());
 				// _updaterWindow.Activate(new List<ReleaseInfo>());
 			});
 	}
 
-	public void LoadState(JsonElement state) { }
+	public void SkipRelease(Release release)
+	{
+		_skippedReleaseTagName = release.TagName;
+	}
 
-	public JsonElement? SaveState() => null;
+	public void LoadState(JsonElement state)
+	{
+		try
+		{
+			SavedUpdaterPluginState savedState = JsonSerializer.Deserialize<SavedUpdaterPluginState>(
+				state.GetRawText()
+			)!;
+			_skippedReleaseTagName = savedState.SkippedReleaseTagName;
+			_lastCheckedForUpdates = savedState.LastCheckedForUpdates;
+		}
+		catch (Exception e)
+		{
+			Logger.Error($"Failed to deserialize saved state: {e}");
+		}
+	}
+
+	public JsonElement? SaveState()
+	{
+		if (_skippedReleaseTagName == null)
+		{
+			return null;
+		}
+
+		return JsonSerializer.SerializeToElement(
+			new SavedUpdaterPluginState(_skippedReleaseTagName, _lastCheckedForUpdates)
+		);
+	}
 
 	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
 	{
+		_lastCheckedForUpdates = DateTime.Now;
+
 		IReadOnlyList<Release> releases = await _client
 			.Repository
 			.Release

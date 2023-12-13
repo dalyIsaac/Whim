@@ -69,6 +69,11 @@ public sealed partial class UpdaterWindow : Window
 ";
 	private readonly IUpdaterPlugin _plugin;
 
+	// TODO: move into the view model
+	public string LastCheckedForUpdates => _plugin.LastCheckedForUpdates?.ToString() ?? "Never";
+
+	// TODO: number of releases, in the view model.
+
 	public UpdaterWindow(IUpdaterPlugin plugin)
 	{
 		_plugin = plugin;
@@ -87,6 +92,7 @@ public sealed partial class UpdaterWindow : Window
 		UpdaterWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 		UpdaterWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 
+		// TODO: Move into the view model.
 		// TODO: Unsubscribe in dispose
 		UpdaterWebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
 

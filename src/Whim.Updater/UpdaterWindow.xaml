@@ -23,7 +23,7 @@
 
 				<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
 					<Run Text="Last checked: " />
-					<!--  TODO  -->
+					<Run Text="{x:Bind LastCheckedForUpdates}" />
 				</TextBlock>
 
 				<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">

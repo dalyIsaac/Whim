@@ -5,9 +5,15 @@ using Octokit;
 
 namespace Whim.Updater;
 
+internal record SavedUpdaterPluginState(string? SkippedReleaseTagName, DateTime? LastCheckedForUpdates);
+
 public interface IUpdaterPlugin : IPlugin, IDisposable
 {
-	public Task<List<ReleaseInfo>> GetNotInstalledReleases();
+	DateTime? LastCheckedForUpdates { get; }
 
-	public Task InstallRelease(Release release);
+	Task<List<ReleaseInfo>> GetNotInstalledReleases();
+
+	Task InstallRelease(Release release);
+
+	void SkipRelease(Release release);
 }
