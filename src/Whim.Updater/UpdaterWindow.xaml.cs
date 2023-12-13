@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Markdig;
 using Microsoft.UI.Xaml;
@@ -10,8 +9,6 @@ namespace Whim.Updater;
 
 public sealed partial class UpdaterWindow : Window
 {
-	// TODO: Link all users
-	// TODO: Link all PR links
 	// TODO: Links should redirect out
 	private const string _htmlTemplate =
 		@"
@@ -86,6 +83,8 @@ public sealed partial class UpdaterWindow : Window
 
 		await UpdaterWebView.EnsureCoreWebView2Async();
 
+		MarkdownPipelineBuilder pipeline = new().UseAutoLinks().Build();
+
 		StringBuilder contentBuilder = new();
 
 		foreach (ReleaseInfo r in releases)
@@ -93,7 +92,6 @@ public sealed partial class UpdaterWindow : Window
 			contentBuilder.Append($"<h1>{r.Release.Name}</h1>");
 			string body = Markdown.ToHtml(r.Release.Body);
 
-			body = CompareLinkRegex().Replace(body, "<a href=\"$1\">$1</a>");
 			contentBuilder.Append(body);
 		}
 
@@ -103,7 +101,4 @@ public sealed partial class UpdaterWindow : Window
 
 		Activate();
 	}
-
-	[GeneratedRegex(@"(https://github.com/dalyIsaac/Whim/compare/[a-zA-Z0-9\-\.\+]*)")]
-	private static partial Regex CompareLinkRegex();
 }
