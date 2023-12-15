@@ -333,6 +333,12 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	{
 		Logger.Debug($"Activating workspace {workspace}");
 
+		if (!_workspaces.Contains(workspace))
+		{
+			Logger.Error($"Workspace {workspace} is not tracked in Whim.");
+			return;
+		}
+
 		activeMonitor ??= _context.MonitorManager.ActiveMonitor;
 
 		// Get the old workspace for the event.
@@ -387,27 +393,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		);
 	}
 
-	public void ActivatePrevious(IMonitor? monitor = null)
-	{
-		Logger.Debug("Activating previous workspace");
+	public void ActivatePrevious(IMonitor? monitor = null) => ActivateAdjacent(monitor, true);
 
-		monitor ??= _context.MonitorManager.ActiveMonitor;
-		IWorkspace? currentWorkspace = GetWorkspaceForMonitor(monitor);
-		if (currentWorkspace == null)
-		{
-			Logger.Debug($"No workspace found for monitor {monitor}");
-			return;
-		}
+	public void ActivateNext(IMonitor? monitor = null) => ActivateAdjacent(monitor, false);
 
-		int idx = _workspaces.IndexOf(currentWorkspace);
-		int prevIdx = (idx - 1).Mod(_workspaces.Count);
-
-		IWorkspace prevWorkspace = _workspaces[prevIdx];
-
-		Activate(prevWorkspace, monitor);
-	}
-
-	public void ActivateNext(IMonitor? monitor = null)
+	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false)
 	{
 		Logger.Debug("Activating next workspace");
 
@@ -419,12 +409,36 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		int idx = _workspaces.IndexOf(currentWorkspace);
-		int nextIdx = (idx + 1).Mod(_workspaces.Count);
-
-		IWorkspace nextWorkspace = _workspaces[nextIdx];
+		IWorkspace? nextWorkspace = GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
+		if (nextWorkspace == null)
+		{
+			Logger.Debug($"No next workspace found for monitor {monitor}");
+			return;
+		}
 
 		Activate(nextWorkspace, monitor);
+	}
+
+	private IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive)
+	{
+		int idx = _workspaces.IndexOf(workspace);
+		int delta = reverse ? -1 : 1;
+		int nextIdx = (idx + delta).Mod(_workspaces.Count);
+
+		while (idx != nextIdx)
+		{
+			IWorkspace nextWorkspace = _workspaces[nextIdx];
+			IMonitor? monitor = GetMonitorForWorkspace(nextWorkspace);
+
+			if (monitor == null || !skipActive)
+			{
+				return nextWorkspace;
+			}
+
+			nextIdx = (nextIdx + delta).Mod(_workspaces.Count);
+		}
+
+		return null;
 	}
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)

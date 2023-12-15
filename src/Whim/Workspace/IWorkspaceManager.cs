@@ -125,6 +125,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
 	/// the focused monitor.
 	/// </param>
+	[Obsolete("Use ActivateAdjacent instead, with `reverse: true`")]
 	void ActivatePrevious(IMonitor? monitor = null);
 
 	/// <summary>
@@ -134,7 +135,23 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
 	/// the focused monitor.
 	/// </param>
+
+	[Obsolete("Use ActivateAdjacent instead, with `reverse: false`")]
 	void ActivateNext(IMonitor? monitor = null);
+
+	/// <summary>
+	/// Activates the next (or previous) workspace in the given monitor.
+	/// </summary>
+	/// <param name="monitor">
+	/// The monitor to activate the next workspace in. Defaults to <see cref="IMonitorManager.ActiveMonitor"/>.
+	/// </param>
+	/// <param name="reverse">
+	/// When <see langword="true"/>, gets the previous monitor, otherwise gets the next monitor. Defaults to <see langword="false" />.
+	/// </param>
+	/// <param name="skipActive">
+	/// When <see langword="true"/>, skips all workspaces that are active on any other monitor. Defaults to <see langword="false"/>.
+	/// </param>
+	void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false);
 
 	/// <summary>
 	/// Retrieves the monitor for the active workspace.
