@@ -333,6 +333,12 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	{
 		Logger.Debug($"Activating workspace {workspace}");
 
+		if (!_workspaces.Contains(workspace))
+		{
+			Logger.Error($"Workspace {workspace} is not tracked in Whim.");
+			return;
+		}
+
 		activeMonitor ??= _context.MonitorManager.ActiveMonitor;
 
 		// Get the old workspace for the event.
@@ -387,29 +393,11 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		);
 	}
 
-	public void ActivatePrevious(IMonitor? monitor = null, bool skipActive = false)
-	{
-		Logger.Debug("Activating previous workspace");
+	public void ActivatePrevious(IMonitor? monitor = null) => ActivateAdjacent(monitor, true);
 
-		monitor ??= _context.MonitorManager.ActiveMonitor;
-		IWorkspace? currentWorkspace = GetWorkspaceForMonitor(monitor);
-		if (currentWorkspace == null)
-		{
-			Logger.Debug($"No workspace found for monitor {monitor}");
-			return;
-		}
+	public void ActivateNext(IMonitor? monitor = null) => ActivateAdjacent(monitor, false);
 
-		IWorkspace? prevWorkspace = GetAdjacentWorkspace(currentWorkspace, getNext: false, skipActive);
-		if (prevWorkspace == null)
-		{
-			Logger.Debug($"No previous workspace found for monitor {monitor}");
-			return;
-		}
-
-		Activate(prevWorkspace, monitor);
-	}
-
-	public void ActivateNext(IMonitor? monitor = null, bool skipActive = false)
+	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false)
 	{
 		Logger.Debug("Activating next workspace");
 
@@ -421,7 +409,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 			return;
 		}
 
-		IWorkspace? nextWorkspace = GetAdjacentWorkspace(currentWorkspace, getNext: true, skipActive);
+		IWorkspace? nextWorkspace = GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
 		if (nextWorkspace == null)
 		{
 			Logger.Debug($"No next workspace found for monitor {monitor}");
@@ -431,10 +419,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		Activate(nextWorkspace, monitor);
 	}
 
-	private IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool getNext, bool skipActive)
+	private IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive)
 	{
 		int idx = _workspaces.IndexOf(workspace);
-		int delta = getNext ? 1 : -1;
+		int delta = reverse ? -1 : 1;
 		int nextIdx = (idx + delta).Mod(_workspaces.Count);
 
 		while (idx != nextIdx)
