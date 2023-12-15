@@ -13,6 +13,7 @@ using Octokit;
 
 namespace Whim.Updater;
 
+/// <inheritdoc />
 public class UpdaterPlugin : IUpdaterPlugin
 {
 	private const string Owner = "dalyIsaac";
@@ -35,13 +36,21 @@ public class UpdaterPlugin : IUpdaterPlugin
 	private readonly Timer _timer = new();
 	private bool _disposedValue;
 
+	/// <inheritdoc />
 	public DateTime? LastCheckedForUpdates { get; private set; }
 
+	/// <inheritdoc />
 	public string Name => "Whim.Updater";
 
 	// TODO
+	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new PluginCommands(Name);
 
+	/// <summary>
+	/// Initializes a new instance of <see cref="UpdaterPlugin"/>.
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="config"></param>
 	public UpdaterPlugin(IContext context, UpdaterConfig config)
 	{
 		_context = context;
@@ -59,6 +68,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		// TODO: Timer subscribe
 	}
 
+	/// <inheritdoc />
 	public void PreInitialize()
 	{
 		// TODO
@@ -66,6 +76,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		// _timer.Elapsed +=
 	}
 
+	/// <inheritdoc />
 	public void PostInitialize()
 	{
 		// TODO: Destroy the window
@@ -80,11 +91,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 			});
 	}
 
+	/// <inheritdoc />
 	public void SkipRelease(Release release)
 	{
 		_skippedReleaseTagName = release.TagName;
 	}
 
+	/// <inheritdoc />
 	public void LoadState(JsonElement state)
 	{
 		try
@@ -101,6 +114,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 	}
 
+	/// <inheritdoc />
 	public JsonElement? SaveState()
 	{
 		if (_skippedReleaseTagName == null)
@@ -113,6 +127,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		);
 	}
 
+	/// <inheritdoc />
 	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
 	{
 		LastCheckedForUpdates = DateTime.Now;
@@ -152,9 +167,12 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 		sortedReleases.Sort((a, b) => a.Version.IsNewerVersion(b.Version) ? -1 : 1);
 
+		Logger.Debug($"Found {sortedReleases.Count} releases");
+
 		return sortedReleases;
 	}
 
+	/// <inheritdoc />
 	public async Task InstallRelease(Release release)
 	{
 		// Get the release asset to install.
@@ -207,6 +225,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		streamToReadFrom.Close();
 	}
 
+	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
@@ -223,6 +242,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 	}
 
+	/// <inheritdoc />
 	public void Dispose()
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

@@ -29,7 +29,7 @@ Scripts will generally return the release string with no leading `v`. Builds wil
 
 ### Stable Releases
 
-`stable` releases are running [`scripts\Create-StableRelease.ps1`](#create-stablereleaseps1) locally.
+`stable` releases are created by running [`scripts\Create-StableRelease.ps1`](#create-stablereleaseps1) locally.
 
 ## Automating Releases
 

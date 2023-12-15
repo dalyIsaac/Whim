@@ -3,23 +3,63 @@ using System.Timers;
 
 namespace Whim.Updater;
 
+/// <summary>
+/// Release channels are used to determine which stream of release to install.
+/// </summary>
 public enum ReleaseChannel
 {
+	/// <summary>
+	/// Alpha releases are the latest changes in the <c>main</c> branch.
+	/// </summary>
 	Alpha = 0,
+
+	/// <summary>
+	/// Beta releases are the latest changes in a release branch <c>release/v*</c>.
+	/// </summary>
 	Beta = 1,
+
+	/// <summary>
+	/// Stable releases are specific releases in a release branch <c>release/v*</c>.
+	/// </summary>
 	Stable = 2,
 }
 
+/// <summary>
+/// The frequency at which the updater should check for updates.
+/// </summary>
 public enum UpdateFrequency
 {
+	/// <summary>
+	/// Check for updates daily.
+	/// </summary>
 	Daily,
+
+	/// <summary>
+	/// Check for updates weekly.
+	/// </summary>
 	Weekly,
+
+	/// <summary>
+	/// Check for updates monthly.
+	/// </summary>
 	Monthly,
+
+	/// <summary>
+	/// Never check for updates.
+	/// </summary>
 	Never,
 }
 
+/// <summary>
+/// Extensions for <see cref="UpdateFrequency"/>.
+/// </summary>
 public static class UpdateFrequencyExtensions
 {
+	/// <summary>
+	/// Gets a <see cref="Timer"/> for the given <see cref="UpdateFrequency"/>.
+	/// </summary>
+	/// <param name="frequency"></param>
+	/// <returns></returns>
 	public static Timer GetTimer(this UpdateFrequency frequency)
 	{
 		Timer timer = new();
