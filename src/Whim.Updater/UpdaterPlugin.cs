@@ -32,10 +32,10 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// </summary>
 	private string? _skippedReleaseTagName;
 
-	private DateTime? _lastCheckedForUpdates;
-
 	private readonly Timer _timer = new();
 	private bool _disposedValue;
+
+	public DateTime? LastCheckedForUpdates { get; private set; }
 
 	public string Name => "Whim.Updater";
 
@@ -92,7 +92,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 				state.GetRawText()
 			)!;
 			_skippedReleaseTagName = savedState.SkippedReleaseTagName;
-			_lastCheckedForUpdates = savedState.LastCheckedForUpdates;
+			LastCheckedForUpdates = savedState.LastCheckedForUpdates;
 		}
 		catch (Exception e)
 		{
@@ -108,13 +108,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 
 		return JsonSerializer.SerializeToElement(
-			new SavedUpdaterPluginState(_skippedReleaseTagName, _lastCheckedForUpdates)
+			new SavedUpdaterPluginState(_skippedReleaseTagName, LastCheckedForUpdates)
 		);
 	}
 
 	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
 	{
-		_lastCheckedForUpdates = DateTime.Now;
+		LastCheckedForUpdates = DateTime.Now;
 
 		IReadOnlyList<Release> releases = await _client
 			.Repository
