@@ -23,12 +23,12 @@
 
 				<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
 					<Run Text="Last checked: " />
-					<Run Text="{x:Bind LastCheckedForUpdates}" />
+					<Run Text="{x:Bind ViewModel.LastCheckedForUpdates}" />
 				</TextBlock>
 
 				<TextBlock Foreground="{StaticResource TextFillColorSecondaryBrush}">
 					<Run Text="Skipped releases: " />
-					<!--  TODO  -->
+					<Run Text="{x:Bind ViewModel.SkippedReleases}" />
 				</TextBlock>
 			</StackPanel>
 

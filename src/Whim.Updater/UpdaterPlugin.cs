@@ -69,12 +69,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 	public void PostInitialize()
 	{
 		// TODO: Destroy the window
-		_updaterWindow = new(this);
+		DateTime now = DateTime.Now;
+		_updaterWindow = new UpdaterWindow(this, null);
 		DispatcherQueue
 			.GetForCurrentThread()
 			.TryEnqueue(async () =>
 			{
-				await _updaterWindow.Activate(await GetNotInstalledReleases());
+				await _updaterWindow.Activate(DateTime.Now, await GetNotInstalledReleases());
 				// _updaterWindow.Activate(new List<ReleaseInfo>());
 			});
 	}
