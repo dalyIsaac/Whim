@@ -567,111 +567,237 @@ public class WorkspaceManagerTests
 		workspaces[1].Received(1).DoLayout();
 		workspaces[1].Received(1).FocusLastFocusedWindow();
 	}
+	#endregion
 
-	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, 2)]
-	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(2, 1)]
-	[Theory]
-	internal void ActivatePrevious(int currentIdx, int prevIdx, IContext ctx, IInternalContext internalCtx)
+	#region ActivateAdjacent
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActivateAdjacent_UseActiveMonitor(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
-		// Given
-		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
-		IWorkspace[] workspaces = CreateWorkspaces(3);
+		// Given no arguments are provided
+		IWorkspace[] workspaces = CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[currentIdx]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		// Reset wrapper
-		workspaces[currentIdx].ClearReceivedCalls();
+		ClearWorkspaceReceivedCalls(workspaces);
 
-		// When the previous workspace is activated, then the previous workspace is activated
-		workspaceManager.ActivatePrevious();
+		// When ActivateAdjacent is called, then an event is raised.
+		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivateAdjacent()
+		);
 
-		workspaces[currentIdx].Received(1).Deactivate();
-		workspaces[currentIdx].DidNotReceive().DoLayout();
-		workspaces[currentIdx].DidNotReceive().FocusLastFocusedWindow();
-
-		workspaces[prevIdx].DidNotReceive().Deactivate();
-		workspaces[prevIdx].Received(1).DoLayout();
-		workspaces[prevIdx].Received(1).FocusLastFocusedWindow();
+		// Then ActiveMonitor is called.
+		_ = ctx.MonitorManager.Received().ActiveMonitor;
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void ActivePrevious_CannotFindActiveMonitor(IContext ctx, IInternalContext internalCtx)
+	internal void ActivateAdjacent_UseProvidedMonitor(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
-		// Given
+		// Given a monitor is provided
 		IWorkspace[] workspaces = CreateWorkspaces(2);
-		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		// Reset wrapper
-		workspaces[0].ClearReceivedCalls();
-		ctx.MonitorManager.ActiveMonitor.Returns(Substitute.For<IMonitor>());
+		ClearWorkspaceReceivedCalls(workspaces);
 
-		// When the previous workspace is activated, then the previous workspace is activated
-		workspaceManager.ActivatePrevious();
+		// When ActivateAdjacent is called, then an event is raised
+		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivateAdjacent(monitors[0])
+		);
 
-		workspaces[0].DidNotReceive().Deactivate();
-		workspaces[0].DidNotReceive().DoLayout();
-		workspaces[0].DidNotReceive().FocusLastFocusedWindow();
-
-		workspaces[1].DidNotReceive().Deactivate();
-		workspaces[1].DidNotReceive().DoLayout();
-		workspaces[1].DidNotReceive().FocusLastFocusedWindow();
-	}
-
-	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, 1)]
-	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(2, 0)]
-	[Theory]
-	internal void ActivateNext(int currentIdx, int nextIdx, IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		IWorkspace[] workspaces = CreateWorkspaces(3);
-		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
-
-		workspaceManager.Activate(workspaces[currentIdx]);
-
-		// Reset wrapper
-		workspaces[currentIdx].ClearReceivedCalls();
-
-		// When the next workspace is activated, then the next workspace is activated
-		workspaceManager.ActivateNext();
-
-		workspaces[currentIdx].Received(1).Deactivate();
-		workspaces[currentIdx].DidNotReceive().DoLayout();
-		workspaces[currentIdx].DidNotReceive().FocusLastFocusedWindow();
-
-		workspaces[nextIdx].DidNotReceive().Deactivate();
-		workspaces[nextIdx].Received(1).DoLayout();
-		workspaces[nextIdx].Received(1).FocusLastFocusedWindow();
+		// Then ActiveMonitor is not called.
+		_ = ctx.MonitorManager.DidNotReceive().ActiveMonitor;
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void ActivateNext_CannotFindActiveMonitor(IContext ctx, IInternalContext internalCtx)
+	internal void ActivateAdjacent_SingleWorkspace(IContext ctx, IInternalContext internalCtx)
 	{
-		// Given
-		IWorkspace[] workspaces = CreateWorkspaces(2);
-		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
+		// Given there is only a single monitor and workspace...
+		IMonitor[] monitors = new[] { ctx.MonitorManager.ActiveMonitor };
+		SetupMonitors(ctx, monitors);
+		IWorkspace[] workspaces = CreateWorkspaces(1);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaceManager.Activate(workspaces[0]);
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		// Reset wrapper
-		workspaces[0].ClearReceivedCalls();
-		ctx.MonitorManager.ActiveMonitor.Returns(Substitute.For<IMonitor>());
+		ClearWorkspaceReceivedCalls(workspaces);
 
-		// When the next workspace is activated, then the next workspace is activated
-		workspaceManager.ActivateNext();
+		// When ActivateAdjacent is called, then no event is raised
+		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivateAdjacent()
+		);
+	}
 
-		workspaces[0].DidNotReceive().Deactivate();
-		workspaces[0].DidNotReceive().DoLayout();
-		workspaces[0].DidNotReceive().FocusLastFocusedWindow();
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActivateAdjacent_CannotFindWorkspaceForMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors
+	)
+	{
+		// Given a fake monitor is provided
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
-		workspaces[1].DidNotReceive().Deactivate();
-		workspaces[1].DidNotReceive().DoLayout();
-		workspaces[1].DidNotReceive().FocusLastFocusedWindow();
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// When ActivateAdjacent is called, then no event is raised
+		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivateAdjacent(Substitute.For<IMonitor>())
+		);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, false, 1)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(2, false, 0)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, true, 2)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(2, true, 1)]
+	internal void ActivateAdjacent_GetNextWorkspace(
+		int workspaceIdx,
+		bool reverse,
+		int activatedWorkspaceIdx,
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given
+		IMonitor[] monitors = new[] { ctx.MonitorManager.ActiveMonitor };
+		SetupMonitors(ctx, monitors);
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		IWorkspace workspaceToActivate = workspaces[workspaceIdx];
+		IWorkspace activatedWorkspace = workspaces[activatedWorkspaceIdx];
+
+		workspaceManager.Activate(workspaceToActivate);
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// When ActivateAdjacent is called
+		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivateAdjacent(monitors[0], reverse)
+		);
+
+		// Then the raised event will match the expected
+		Assert.Equal(activatedWorkspace, result.Arguments.CurrentWorkspace);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, 1, false, 2)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(1, 2, false, 0)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(0, 2, true, 1)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(2, 1, true, 0)]
+	internal void ActivateAdjacent_GetNextWorkspace_SkipActive(
+		int firstActivatedIdx,
+		int secondActivatedIdx,
+		bool reverse,
+		int activatedWorkspaceIdx,
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors
+	)
+	{
+		// Given we have activated the first and second workspace
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		workspaceManager.Activate(workspaces[firstActivatedIdx], monitors[0]);
+		workspaceManager.Activate(workspaces[secondActivatedIdx], monitors[1]);
+		IWorkspace activatedWorkspace = workspaces[activatedWorkspaceIdx];
+
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// When ActivatedAdjacent is called with skipActive
+		// When ActivateAdjacent is called
+		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivateAdjacent(monitors[0], reverse, true)
+		);
+
+		// Then the raised event will match the expected
+		Assert.Equal(activatedWorkspace, result.Arguments.CurrentWorkspace);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActivateAdjacent_GetNextWorkspace_SkipActive_NoActive(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors
+	)
+	{
+		// Given there are no free workspaces
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// When ActivateAdjacent is called with skipActive, then no event is raised
+		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivateAdjacent(skipActive: true)
+		);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActivateNext(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
+	{
+		// Given no arguments are provided
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// When ActivateAdjacent is called, then an event is raised.
+		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivateNext()
+		);
+
+		// Then ActiveMonitor is called.
+		_ = ctx.MonitorManager.Received().ActiveMonitor;
+		Assert.Equal(workspaces[1], result.Arguments.CurrentWorkspace);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void ActivatePrevious(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
+	{
+		// Given no arguments are provided
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// When ActivateAdjacent is called, then an event is raised.
+		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.ActivatePrevious()
+		);
+
+		// Then ActiveMonitor is called.
+		_ = ctx.MonitorManager.Received().ActiveMonitor;
+		Assert.Equal(workspaces[1], result.Arguments.CurrentWorkspace);
 	}
 	#endregion
 

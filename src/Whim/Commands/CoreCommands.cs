@@ -21,13 +21,13 @@ internal class CoreCommands : PluginCommands
 		_ = Add(
 				identifier: "activate_previous_workspace",
 				title: "Activate the previous workspace",
-				callback: () => _context.WorkspaceManager.ActivatePrevious(),
+				callback: () => _context.WorkspaceManager.ActivateAdjacent(reverse: true),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "activate_next_workspace",
 				title: "Activate the next workspace",
-				callback: () => _context.WorkspaceManager.ActivateNext(),
+				callback: () => _context.WorkspaceManager.ActivateAdjacent(),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
