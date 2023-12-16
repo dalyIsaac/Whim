@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Microsoft.Windows.AppNotifications.Builder;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -231,6 +232,23 @@ internal class CoreCommands : PluginCommands
 				keybind: new Keybind(KeyModifiers.LAlt | KeyModifiers.LShift, key: GetVirtualKeyForInt(idx))
 			);
 		}
+
+		Add(
+			identifier: "send_test_notification",
+			title: "Send a test notification",
+			callback: () =>
+			{
+				var appNotification = new AppNotificationBuilder()
+					.AddText("Whim notification")
+					.AddText("Example message")
+					.AddButton(
+						new AppNotificationButton("Click me").AddArgument("action", "click").AddArgument("key", "value")
+					)
+					.BuildNotification();
+
+				_context.NotificationManager.SendToastNotification(appNotification);
+			}
+		);
 	}
 
 	/// <summary>

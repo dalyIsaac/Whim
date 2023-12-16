@@ -27,6 +27,7 @@ internal class Context : IContext
 	public ICommandManager CommandManager => _commandManager;
 	public IPluginManager PluginManager { get; }
 	public IKeybindManager KeybindManager { get; }
+	public INotificationManager NotificationManager { get; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
@@ -52,6 +53,7 @@ internal class Context : IContext
 		_commandManager = new CommandManager();
 		PluginManager = new PluginManager(this, _commandManager);
 		KeybindManager = new KeybindManager(this);
+		NotificationManager = new NotificationManager(this);
 	}
 
 	public void Initialize()
@@ -84,6 +86,7 @@ internal class Context : IContext
 		_internalContext.PreInitialize();
 		PluginManager.PreInitialize();
 
+		NotificationManager.Initialize();
 		MonitorManager.Initialize();
 		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
@@ -122,6 +125,7 @@ internal class Context : IContext
 		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
+		NotificationManager.Dispose();
 		_internalContext.Dispose();
 
 		Logger.Debug("Mostly exited...");
