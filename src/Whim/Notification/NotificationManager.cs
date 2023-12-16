@@ -7,30 +7,15 @@ namespace Whim;
 
 internal class NotificationManager : INotificationManager
 {
-	public const string NOTIFICATION_ID_KEY = "notificationId";
-
 	private bool _disposedValue;
 	private bool _initialized;
 
 	private readonly IContext _context;
-	private readonly Dictionary<int, Action<AppNotificationActivatedEventArgs>> _notificationHandlers = new();
+	private readonly Dictionary<string, Action<AppNotificationActivatedEventArgs>> _notificationHandlers = new();
 
 	public NotificationManager(IContext context)
 	{
 		_context = context;
-	}
-
-	private void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
-	{
-		try
-		{
-			int notificationId = int.Parse(args.UserInput[NOTIFICATION_ID_KEY]);
-			_notificationHandlers[notificationId]?.Invoke(args);
-		}
-		catch (Exception e)
-		{
-			_context.HandleUncaughtException(nameof(OnNotificationInvoked), e);
-		}
 	}
 
 	public void Initialize()
@@ -39,21 +24,37 @@ internal class NotificationManager : INotificationManager
 		// NotificationInvoked before calling Register(). Without this a new process will
 		// be launched to handle the notification.
 		AppNotificationManager notificationManager = AppNotificationManager.Default;
-		notificationManager.NotificationInvoked += OnNotificationInvoked;
+		notificationManager.NotificationInvoked += AppNotificationManager_NotificationInvoked;
 		notificationManager.Register();
 		_initialized = true;
 
 		RegisterNotification(_context);
 	}
 
-	int NOTIFICATION_ID = 0;
+	private void AppNotificationManager_NotificationInvoked(
+		AppNotificationManager sender,
+		AppNotificationActivatedEventArgs args
+	)
+	{
+		try
+		{
+			string notificationId = args.Arguments[INotificationManager.NotificationIdKey];
+			_notificationHandlers[notificationId]?.Invoke(args);
+		}
+		catch (Exception e)
+		{
+			_context.HandleUncaughtException(nameof(AppNotificationManager_NotificationInvoked), e);
+		}
+	}
+
+	// TODO: Remove
 
 	void RegisterNotification(IContext context)
 	{
 		context
 			.NotificationManager
 			.Register(
-				NOTIFICATION_ID,
+				"0",
 				(a) =>
 				{
 					Logger.Debug("Notification clicked");
@@ -61,12 +62,12 @@ internal class NotificationManager : INotificationManager
 			);
 	}
 
-	public void Register(int notificationId, Action<AppNotificationActivatedEventArgs> notificationReceived)
+	public void Register(string notificationId, Action<AppNotificationActivatedEventArgs> notificationReceived)
 	{
 		_notificationHandlers.Add(notificationId, notificationReceived);
 	}
 
-	public void Unregister(int notificationId)
+	public void Unregister(string notificationId)
 	{
 		_notificationHandlers.Remove(notificationId);
 	}

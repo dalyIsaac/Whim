@@ -233,6 +233,7 @@ internal class CoreCommands : PluginCommands
 			);
 		}
 
+		// TODO: Remove
 		Add(
 			identifier: "send_test_notification",
 			title: "Send a test notification",
@@ -242,7 +243,10 @@ internal class CoreCommands : PluginCommands
 					.AddText("Whim notification")
 					.AddText("Example message")
 					.AddButton(
-						new AppNotificationButton("Click me").AddArgument("action", "click").AddArgument("key", "value")
+						new AppNotificationButton("Click me")
+							.AddArgument("action", "click")
+							.AddArgument("key", "value")
+							.AddArgument(INotificationManager.NotificationIdKey, "0")
 					)
 					.BuildNotification();
 
