@@ -90,6 +90,11 @@ public interface IContext
 	IFileManager FileManager { get; }
 
 	/// <summary>
+	/// Manager for interacting with notifications.
+	/// </summary>
+	INotificationManager NotificationManager { get; }
+
+	/// <summary>
 	/// This will be called by the Whim Runner.
 	/// You likely won't need to call it yourself.
 	/// </summary>
