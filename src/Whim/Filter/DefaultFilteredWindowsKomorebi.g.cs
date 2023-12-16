@@ -90,6 +90,9 @@ internal static class DefaultFilteredWindowsKomorebi
 		// GOG Galaxy
 		filterManager.Add((window) => window.WindowClass.StartsWith("Chrome_RenderWidgetHostHWND") || window.WindowClass.EndsWith("Chrome_RenderWidgetHostHWND"));  // Targets a hidden window spawned by GOG Galaxy
 
+		// GitHub Credential Manager
+		filterManager.AddProcessFileNameFilter("git-credential-manager.exe");
+
 		// Google Drive
 		filterManager.AddProcessFileNameFilter("GoogleDriveFS.exe");
 
