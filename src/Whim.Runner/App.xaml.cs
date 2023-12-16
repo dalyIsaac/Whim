@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
+using Microsoft.Windows.AppNotifications;
 using Windows.ApplicationModel.Core;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -35,7 +36,10 @@ public partial class App : Application
 	protected override void OnLaunched(LaunchActivatedEventArgs args)
 	{
 		StartWhim();
+		ProcessLaunchActivationArgs();
 	}
+
+
 
 	private void StartWhim()
 	{
@@ -45,13 +49,40 @@ public partial class App : Application
 
 			_context.Exited += Context_Exited;
 			_context.Initialize();
-
-			return;
 		}
 		catch (Exception ex)
 		{
 			_context?.Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = ex.ToString() });
 		}
+	}
+
+	private void ProcessLaunchActivationArgs()
+	{
+		// NOTE: AppInstance is ambiguous between
+		// Microsoft.Windows.AppLifecycle.AppInstance and
+		// Windows.ApplicationModel.AppInstance
+		AppInstance currentInstance = AppInstance.GetCurrent();
+		if (!currentInstance.IsCurrent)
+		{
+			return;
+		}
+
+		// AppInstance.GetActivatedEventArgs will report the correct ActivationKind,
+		// even in WinUI's OnLaunched.
+		AppActivationArguments activationArgs = currentInstance.GetActivatedEventArgs();
+		if (activationArgs == null)
+		{
+			return;
+		}
+
+		ExtendedActivationKind extendedKind = activationArgs.Kind;
+		if (extendedKind != ExtendedActivationKind.AppNotification)
+		{
+			return;
+		}
+
+		AppNotificationActivatedEventArgs notificationActivatedEventArgs = (AppNotificationActivatedEventArgs)activationArgs.Data;
+		_context?.NotificationManager.ProcessLaunchActivationArgs(notificationActivatedEventArgs);
 	}
 
 	private void Context_Exited(object? sender, ExitEventArgs e)

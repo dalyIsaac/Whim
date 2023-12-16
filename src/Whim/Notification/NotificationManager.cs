@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Windows.AppNotifications;
-using Microsoft.Windows.AppNotifications.Builder;
 
 namespace Whim;
 
@@ -45,6 +44,11 @@ internal class NotificationManager : INotificationManager
 		{
 			_context.HandleUncaughtException(nameof(AppNotificationManager_NotificationInvoked), e);
 		}
+	}
+
+	public void ProcessLaunchActivationArgs(AppNotificationActivatedEventArgs args)
+	{
+		AppNotificationManager_NotificationInvoked(AppNotificationManager.Default, args);
 	}
 
 	// TODO: Remove

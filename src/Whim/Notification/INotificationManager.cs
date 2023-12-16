@@ -45,4 +45,10 @@ public interface INotificationManager : IDisposable
 	/// </param>
 	/// <returns></returns>
 	bool SendToastNotification(AppNotification appNotification);
+
+	/// <summary>
+	/// Handles a toast notification activation on app launch.
+	/// </summary>
+	/// <param name="args"></param>
+	void ProcessLaunchActivationArgs(AppNotificationActivatedEventArgs args);
 }
