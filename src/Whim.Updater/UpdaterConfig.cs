@@ -82,10 +82,18 @@ public static class UpdateFrequencyExtensions
 	}
 }
 
-// TODO: bind
+/// <summary>
+/// Configuration for <see cref="UpdaterPlugin"/>.
+/// </summary>
 public class UpdaterConfig
 {
+	/// <summary>
+	/// The release channel to install. Defaults to <see cref="ReleaseChannel.Stable"/>.
+	/// </summary>
 	public ReleaseChannel ReleaseChannel { get; set; } = ReleaseChannel.Stable;
 
+	/// <summary>
+	/// The frequency at which the updater should check for updates. Defaults to <see cref="UpdateFrequency.Weekly"/>.
+	/// </summary>
 	public UpdateFrequency UpdateFrequency { get; set; } = UpdateFrequency.Weekly;
 }

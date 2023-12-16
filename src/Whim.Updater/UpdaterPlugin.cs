@@ -65,30 +65,50 @@ public class UpdaterPlugin : IUpdaterPlugin
 		_client = new GitHubClient(new ProductHeaderValue(Name));
 
 		_timer = config.UpdateFrequency.GetTimer();
-		// TODO: Timer subscribe
 	}
 
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		// TODO
-		// TODO: Also unsubscribe
-		// _timer.Elapsed +=
+
 	}
 
-	/// <inheritdoc />
-	public void PostInitialize()
+	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
 	{
-		// TODO: Destroy the window
+		Logger.Debug("Checking for updates...");
 		DateTime now = DateTime.Now;
-		_updaterWindow = new UpdaterWindow(this, null);
+
+		List<ReleaseInfo> releases = await GetNotInstalledReleases();
+		if (releases.Count == 0)
+		{
+			Logger.Debug("No updates found");
+			return;
+		}
+
+		ReleaseInfo lastRelease = releases[0];
+		if (_skippedReleaseTagName == lastRelease.Release.TagName)
+		{
+			Logger.Debug($"Skipping release {lastRelease.Release.TagName}");
+			return;
+		}
+
+		// TODO: Get DispatcherQueue and store that locally
+		// TODO: Move out of CoreNativeManager
 		DispatcherQueue
 			.GetForCurrentThread()
 			.TryEnqueue(async () =>
 			{
-				await _updaterWindow.Activate(DateTime.Now, await GetNotInstalledReleases());
-				// _updaterWindow.Activate(new List<ReleaseInfo>());
+				_updaterWindow ??= new UpdaterWindow(this, null);
+				await _updaterWindow.Activate(now, releases);
 			});
+	}
+
+	/// <inheritdoc />
+	public void PostInitialize() {
+		// TODO: Check now
+
+		_timer.Elapsed += Timer_Elapsed;
+		_timer.Start();
 	}
 
 	/// <inheritdoc />
@@ -132,6 +152,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	{
 		LastCheckedForUpdates = DateTime.Now;
 
+		// TODO: Do we need to get all?
 		IReadOnlyList<Release> releases = await _client
 			.Repository
 			.Release
@@ -233,7 +254,9 @@ public class UpdaterPlugin : IUpdaterPlugin
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
+				_timer.Elapsed -= Timer_Elapsed;
 				_timer.Dispose();
+				_updaterWindow?.Close();
 			}
 
 			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
