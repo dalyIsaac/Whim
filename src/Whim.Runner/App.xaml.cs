@@ -39,8 +39,6 @@ public partial class App : Application
 		ProcessLaunchActivationArgs();
 	}
 
-
-
 	private void StartWhim()
 	{
 		try
@@ -81,7 +79,8 @@ public partial class App : Application
 			return;
 		}
 
-		AppNotificationActivatedEventArgs notificationActivatedEventArgs = (AppNotificationActivatedEventArgs)activationArgs.Data;
+		AppNotificationActivatedEventArgs notificationActivatedEventArgs = (AppNotificationActivatedEventArgs)
+			activationArgs.Data;
 		_context?.NotificationManager.ProcessLaunchActivationArgs(notificationActivatedEventArgs);
 	}
 
