@@ -68,10 +68,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public void PreInitialize()
-	{
-
-	}
+	public void PreInitialize() { }
 
 	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
 	{
@@ -104,7 +101,8 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public void PostInitialize() {
+	public void PostInitialize()
+	{
 		// TODO: Check now
 
 		_timer.Elapsed += Timer_Elapsed;
@@ -116,6 +114,9 @@ public class UpdaterPlugin : IUpdaterPlugin
 	{
 		_skippedReleaseTagName = release.TagName;
 	}
+
+	/// <inheritdoc />
+	public void CloseUpdaterWindow() => _updaterWindow?.Close();
 
 	/// <inheritdoc />
 	public void LoadState(JsonElement state)

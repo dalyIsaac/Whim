@@ -95,8 +95,19 @@ internal class UpdaterWindowViewModel : INotifyPropertyChanged
 		}
 	}
 
-	public UpdaterWindowViewModel(DateTime? lastCheckedForUpdates)
+	public ReleaseInfo? LastRelease => _releases.Count > 0 ? _releases[0] : null;
+
+	public SkipReleaseCommand SkipReleaseCommand { get; }
+
+	public InstallReleaseCommand InstallReleaseCommand { get; }
+
+	public CloseUpdaterWindowCommand CloseUpdaterWindowCommand { get; }
+
+	public UpdaterWindowViewModel(IUpdaterPlugin plugin, DateTime? lastCheckedForUpdates)
 	{
+		SkipReleaseCommand = new SkipReleaseCommand(plugin, this);
+		InstallReleaseCommand = new InstallReleaseCommand(plugin, this);
+
 		_lastCheckedForUpdates = lastCheckedForUpdates?.ToString() ?? "Never";
 		ReleaseNotes = "<html><body><h1>Loading...</h1></body></html>";
 	}

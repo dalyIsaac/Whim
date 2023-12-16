@@ -39,15 +39,15 @@
 				RelativePanel.AlignRightWithPanel="True"
 				RelativePanel.AlignVerticalCenterWithPanel="True"
 				Spacing="4">
-				<Button>
+				<Button Command="{x:Bind ViewModel.SkipReleaseCommand}">
 					Skip release
 				</Button>
 
-				<Button>
+				<Button Command="{x:Bind ViewModel.CloseUpdaterWindowCommand}">
 					Not now
 				</Button>
 
-				<Button Style="{StaticResource AccentButtonStyle}">
+				<Button Command="{x:Bind ViewModel.InstallReleaseCommand}" Style="{StaticResource AccentButtonStyle}">
 					Download and install
 				</Button>
 			</StackPanel>

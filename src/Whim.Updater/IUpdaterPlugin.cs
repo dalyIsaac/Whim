@@ -35,4 +35,9 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	/// </summary>
 	/// <param name="release"></param>
 	void SkipRelease(Release release);
+
+	/// <summary>
+	/// Close the updater window.
+	/// </summary>
+	void CloseUpdaterWindow();
 }
