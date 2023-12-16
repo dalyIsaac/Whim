@@ -26,8 +26,6 @@ internal class NotificationManager : INotificationManager
 		notificationManager.NotificationInvoked += AppNotificationManager_NotificationInvoked;
 		notificationManager.Register();
 		_initialized = true;
-
-		RegisterNotification(_context);
 	}
 
 	private void AppNotificationManager_NotificationInvoked(
@@ -49,21 +47,6 @@ internal class NotificationManager : INotificationManager
 	public void ProcessLaunchActivationArgs(AppNotificationActivatedEventArgs args)
 	{
 		AppNotificationManager_NotificationInvoked(AppNotificationManager.Default, args);
-	}
-
-	// TODO: Remove
-
-	void RegisterNotification(IContext context)
-	{
-		context
-			.NotificationManager
-			.Register(
-				"0",
-				(a) =>
-				{
-					Logger.Debug("Notification clicked");
-				}
-			);
 	}
 
 	public void Register(string notificationId, Action<AppNotificationActivatedEventArgs> notificationReceived)
