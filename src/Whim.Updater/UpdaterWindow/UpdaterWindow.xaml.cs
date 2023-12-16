@@ -16,7 +16,7 @@ internal sealed partial class UpdaterWindow : Window
 	public UpdaterWindow(IUpdaterPlugin plugin, DateTime? lastCheckedForUpdates)
 	{
 		_plugin = plugin;
-		ViewModel = new UpdaterWindowViewModel(lastCheckedForUpdates);
+		ViewModel = new UpdaterWindowViewModel(_plugin, lastCheckedForUpdates);
 		UIElementExtensions.InitializeComponent(this, "Whim.Updater", "UpdaterWindow");
 	}
 

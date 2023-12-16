@@ -107,6 +107,7 @@ internal class UpdaterWindowViewModel : INotifyPropertyChanged
 	{
 		SkipReleaseCommand = new SkipReleaseCommand(plugin, this);
 		InstallReleaseCommand = new InstallReleaseCommand(plugin, this);
+		CloseUpdaterWindowCommand = new CloseUpdaterWindowCommand(plugin);
 
 		_lastCheckedForUpdates = lastCheckedForUpdates?.ToString() ?? "Never";
 		ReleaseNotes = "<html><body><h1>Loading...</h1></body></html>";
