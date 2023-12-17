@@ -17,7 +17,9 @@ internal sealed partial class UpdaterWindow : Window
 	{
 		_plugin = plugin;
 		ViewModel = new UpdaterWindowViewModel(_plugin, lastCheckedForUpdates);
-		UIElementExtensions.InitializeComponent(this, "Whim.Updater", "UpdaterWindow");
+		UIElementExtensions.InitializeComponent(this, "Whim.Updater", "UpdaterWindow/UpdaterWindow");
+
+		Closed += UpdaterWindow_Closed;
 	}
 
 	public async Task Activate(DateTime lastCheckedForUpdates, List<ReleaseInfo> releases)
@@ -51,5 +53,10 @@ internal sealed partial class UpdaterWindow : Window
 			args.Cancel = true;
 			Process.Start(new ProcessStartInfo(args.Uri) { UseShellExecute = true });
 		}
+	}
+
+	private void UpdaterWindow_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
+	{
+		UpdaterWebView.Close();
 	}
 }

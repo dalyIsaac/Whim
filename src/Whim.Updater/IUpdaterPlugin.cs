@@ -37,6 +37,11 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	void SkipRelease(Release release);
 
 	/// <summary>
+	/// Checks for updates. If there are updates, shows the updater window.
+	/// </summary>
+	Task CheckForUpdates();
+
+	/// <summary>
 	/// Close the updater window.
 	/// </summary>
 	void CloseUpdaterWindow();

@@ -42,9 +42,8 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public string Name => "Whim.Updater";
 
-	// TODO
 	/// <inheritdoc />
-	public IPluginCommands PluginCommands => new PluginCommands(Name);
+	public IPluginCommands PluginCommands => new UpdaterCommands(this);
 
 	/// <summary>
 	/// Initializes a new instance of <see cref="UpdaterPlugin"/>.
@@ -70,7 +69,25 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public void PreInitialize() { }
 
-	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) => await CheckForUpdates();
+
+	/// <inheritdoc />
+	public void PostInitialize()
+	{
+		// TODO: Check now
+
+		_timer.Elapsed += Timer_Elapsed;
+		_timer.Start();
+	}
+
+	/// <inheritdoc />
+	public void SkipRelease(Release release)
+	{
+		_skippedReleaseTagName = release.TagName;
+	}
+
+	/// <inheritdoc />
+	public async Task CheckForUpdates()
 	{
 		Logger.Debug("Checking for updates...");
 		DateTime now = DateTime.Now;
@@ -95,28 +112,17 @@ public class UpdaterPlugin : IUpdaterPlugin
 			.GetForCurrentThread()
 			.TryEnqueue(async () =>
 			{
-				_updaterWindow ??= new UpdaterWindow(this, null);
+				_updaterWindow = new UpdaterWindow(this, null);
 				await _updaterWindow.Activate(now, releases);
 			});
 	}
 
 	/// <inheritdoc />
-	public void PostInitialize()
+	public void CloseUpdaterWindow()
 	{
-		// TODO: Check now
-
-		_timer.Elapsed += Timer_Elapsed;
-		_timer.Start();
+		_updaterWindow?.Close();
+		_updaterWindow = null;
 	}
-
-	/// <inheritdoc />
-	public void SkipRelease(Release release)
-	{
-		_skippedReleaseTagName = release.TagName;
-	}
-
-	/// <inheritdoc />
-	public void CloseUpdaterWindow() => _updaterWindow?.Close();
 
 	/// <inheritdoc />
 	public void LoadState(JsonElement state)
@@ -204,7 +210,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 			.GetAllAssets(Owner, Repository, release.Id)
 			.ConfigureAwait(false);
 
-		string assetNameStart = $"WhimInstaller-{_architecture}-{release}";
+		string assetNameStart = $"WhimInstaller-{_architecture}-{release.TagName}";
 
 		ReleaseAsset? asset = assets.First(a => a.Name.StartsWith(assetNameStart) && a.Name.EndsWith(".exe"));
 		if (asset == null)
@@ -258,6 +264,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 				_timer.Elapsed -= Timer_Elapsed;
 				_timer.Dispose();
 				_updaterWindow?.Close();
+				_updaterWindow = null;
 			}
 
 			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
