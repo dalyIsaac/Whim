@@ -11,10 +11,15 @@ using Windows.Win32.UI.WindowsAndMessaging;
 namespace Whim;
 
 /// <inheritdoc/>
-public partial class NativeManager : INativeManager
+internal partial class NativeManager : INativeManager
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
+	private readonly Microsoft.UI.Dispatching.DispatcherQueue _dispatcherQueue = Microsoft
+		.UI
+		.Dispatching
+		.DispatcherQueue
+		.GetForCurrentThread();
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="NativeManager"/> class.
@@ -304,4 +309,8 @@ public partial class NativeManager : INativeManager
 			exStyle & ~(int)WINDOW_EX_STYLE.WS_EX_LAYERED
 		);
 	}
+
+	/// <inheritdoc/>
+	public bool TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueueHandler callback) =>
+		_dispatcherQueue.TryEnqueue(callback);
 }

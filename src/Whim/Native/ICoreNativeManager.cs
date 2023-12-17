@@ -413,14 +413,6 @@ internal interface ICoreNativeManager
 	BOOL WTSUnRegisterSessionNotification(HWND hWnd);
 
 	/// <summary>
-	/// Adds a task to the <see cref="DispatcherQueue" /> which will be executed on the thread associated
-	/// with the <see cref="DispatcherQueue" />.
-	/// </summary>
-	/// <param name="callback">The task to execute.</param>
-	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
-	bool TryEnqueue(DispatcherQueueHandler callback);
-
-	/// <summary>
 	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.
 	/// </summary>
 	/// <remarks>

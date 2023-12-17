@@ -124,8 +124,8 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		// If we update monitors too quickly, the reported working area can sometimes be the
 		// monitor's bounds, which is incorrect. So, we wait a bit before updating the monitors.
 		// This gives Windows some to figure out the correct working area.
-		_internalContext
-			.CoreNativeManager
+		_context
+			.NativeManager
 			.TryEnqueue(async () =>
 			{
 				await Task.Delay(5000).ConfigureAwait(true);

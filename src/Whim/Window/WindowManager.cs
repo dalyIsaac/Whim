@@ -546,8 +546,8 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			{
 				// The window's application tried to restore its position.
 				// Wait, then restore the position.
-				_internalContext
-					.CoreNativeManager
+				_context
+					.NativeManager
 					.TryEnqueue(async () =>
 					{
 						await Task.Delay(2000).ConfigureAwait(true);

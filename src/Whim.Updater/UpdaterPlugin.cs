@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
-using Microsoft.UI.Dispatching;
 using Octokit;
 
 namespace Whim.Updater;
@@ -69,7 +68,8 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public void PreInitialize() { }
 
-	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) => await CheckForUpdates().ConfigureAwait(true);
+	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) =>
+		await CheckForUpdates().ConfigureAwait(true);
 
 	/// <inheritdoc />
 	public void PostInitialize()
@@ -106,10 +106,8 @@ public class UpdaterPlugin : IUpdaterPlugin
 			return;
 		}
 
-		// TODO: Get DispatcherQueue and store that locally
-		// TODO: Move out of CoreNativeManager
-		DispatcherQueue
-			.GetForCurrentThread()
+		_context
+			.NativeManager
 			.TryEnqueue(async () =>
 			{
 				_updaterWindow = new UpdaterWindow(this, null);
@@ -159,7 +157,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	{
 		LastCheckedForUpdates = DateTime.Now;
 
-		// TODO: Do we need to get all?
+		// TODO: Get until we find a release that is installed.
 		IReadOnlyList<Release> releases = await _client
 			.Repository
 			.Release
@@ -233,11 +231,15 @@ public class UpdaterPlugin : IUpdaterPlugin
 			return;
 		}
 
+		// TODO: Make this async and try restarting the app.
 		// Run the installer.
-		Process.Start(tempPath);
+		using Process process = new();
+		process.StartInfo.FileName = tempPath;
+		process.Start();
+		await process.WaitForExitAsync().ConfigureAwait(false);
 
-		// Exit Whim while the installer runs.
-		_context.Exit(new ExitEventArgs() { Reason = ExitReason.Update });
+		// Exit Whim.
+		_context.NativeManager.TryEnqueue(() => _context.Exit(new ExitEventArgs() { Reason = ExitReason.Update }));
 	}
 
 	private static async Task DownloadRelease(string tempPath, Uri requestUri)

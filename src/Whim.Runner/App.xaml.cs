@@ -92,11 +92,11 @@ public partial class App : Application
 			_context = null;
 		}
 
-		if (e.Reason == ExitReason.User || e.Reason == ExitReason.Update)
+		if (e.Reason == ExitReason.User)
 		{
 			Exit();
 		}
-		else if (e.Reason == ExitReason.Restart)
+		else if (e.Reason == ExitReason.Restart || e.Reason == ExitReason.Update)
 		{
 			Restart();
 		}

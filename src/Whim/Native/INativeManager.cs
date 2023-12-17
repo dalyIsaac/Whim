@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.UI.Dispatching;
 using Windows.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -145,4 +146,12 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	void RemoveWindowExTransparent(HWND hwnd);
+
+	/// <summary>
+	/// Adds a task to the <see cref="DispatcherQueue" /> which will be executed on the thread associated
+	/// with the <see cref="DispatcherQueue" />.
+	/// </summary>
+	/// <param name="callback">The task to execute.</param>
+	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
+	bool TryEnqueue(DispatcherQueueHandler callback);
 }
