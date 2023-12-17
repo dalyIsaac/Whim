@@ -290,6 +290,12 @@ public class UpdaterPlugin : IUpdaterPlugin
 		process.Start();
 		await process.WaitForExitAsync().ConfigureAwait(false);
 
+		if (process.ExitCode != 0)
+		{
+			Logger.Error($"Installer exited with code {process.ExitCode}");
+			return;
+		}
+
 		// Exit Whim.
 		_context.NativeManager.TryEnqueue(() => _context.Exit(new ExitEventArgs() { Reason = ExitReason.Update }));
 	}
