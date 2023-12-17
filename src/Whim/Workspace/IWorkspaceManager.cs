@@ -154,6 +154,20 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false);
 
 	/// <summary>
+	/// Moves the given <paramref name="window"/> to the next (or previous) workspace.
+	/// </summary>
+	/// <param name="window">
+	/// The window to move. If <see langword="null"/>, this will default to the focused/active window.
+	/// </param>
+	/// <param name="reverse">
+	/// When <see langword="true"/>, moves to the previous workspace, otherwise moves to the next workspace. Defaults to <see langword="false" />.
+	/// </param>
+	/// <param name="skipActive">
+	/// When <see langword="true"/>, skips all workspaces that are active on any other monitor. Defaults to <see langword="false"/>.
+	/// </param>
+	void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false);
+
+	/// <summary>
 	/// Retrieves the monitor for the active workspace.
 	/// </summary>
 	/// <param name="workspace"></param>
