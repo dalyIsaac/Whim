@@ -419,6 +419,39 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		Activate(nextWorkspace, monitor);
 	}
 
+	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false)
+	{
+		window ??= ActiveWorkspace.LastFocusedWindow;
+		Logger.Debug($"Moving window {window} to next workspace");
+
+		if (window == null)
+		{
+			Logger.Error("No window was found");
+
+			return;
+		}
+
+		// Find the current workspace for the window.
+		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? currentWorkspace))
+		{
+			Logger.Error($"Window {window} was not found in any workspace");
+
+			return;
+		}
+
+		IWorkspace? nextWorkspace = GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
+		if (nextWorkspace == null)
+		{
+			Logger.Debug($"No next workspace found");
+			return;
+		}
+
+		_windowWorkspaceMap[window] = nextWorkspace;
+
+		currentWorkspace.RemoveWindow(window);
+		nextWorkspace.AddWindow(window);
+	}
+
 	private IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive)
 	{
 		int idx = _workspaces.IndexOf(workspace);
