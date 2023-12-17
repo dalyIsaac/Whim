@@ -26,7 +26,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	// TODO: This doesn't need to exist all the time.
 	private readonly IGitHubClient _client;
 	private UpdaterWindow? _updaterWindow;
-	private readonly Architecture _architecture = RuntimeInformation.ProcessArchitecture;
+	private readonly string _architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
 
 	/// <summary>
 	/// The release that the user has chosen to skip.
@@ -69,7 +69,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public void PreInitialize() { }
 
-	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) => await CheckForUpdates();
+	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) => await CheckForUpdates().ConfigureAwait(true);
 
 	/// <inheritdoc />
 	public void PostInitialize()
@@ -92,7 +92,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		Logger.Debug("Checking for updates...");
 		DateTime now = DateTime.Now;
 
-		List<ReleaseInfo> releases = await GetNotInstalledReleases();
+		List<ReleaseInfo> releases = await GetNotInstalledReleases().ConfigureAwait(true);
 		if (releases.Count == 0)
 		{
 			Logger.Debug("No updates found");
@@ -113,7 +113,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 			.TryEnqueue(async () =>
 			{
 				_updaterWindow = new UpdaterWindow(this, null);
-				await _updaterWindow.Activate(now, releases);
+				await _updaterWindow.Activate(now, releases).ConfigureAwait(true);
 			});
 	}
 
@@ -210,7 +210,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 			.GetAllAssets(Owner, Repository, release.Id)
 			.ConfigureAwait(false);
 
-		string assetNameStart = $"WhimInstaller-{_architecture}-{release.TagName}";
+		string assetNameStart = $"WhimInstaller-{_architecture}";
 
 		ReleaseAsset? asset = assets.First(a => a.Name.StartsWith(assetNameStart) && a.Name.EndsWith(".exe"));
 		if (asset == null)
