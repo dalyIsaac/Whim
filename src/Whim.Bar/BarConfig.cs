@@ -36,7 +36,8 @@ public class BarConfig : INotifyPropertyChanged
 	/// </summary>
 	internal IList<BarComponent> RightComponents;
 
-	private int _height = 48;
+	// The defaults set by "bar.defaults.xaml" look best with a height of 28 or 30
+	private int _height = 30;
 
 	/// <summary>
 	/// The height of the bar, in <see href="https://learn.microsoft.com/en-us/windows/win32/learnwin32/dpi-and-device-independent-pixels">device-independent pixels</see>.
