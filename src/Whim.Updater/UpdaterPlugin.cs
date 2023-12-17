@@ -34,8 +34,6 @@ public class UpdaterPlugin : IUpdaterPlugin
 	private readonly Version _currentVersion;
 	private readonly UpdaterConfig _config;
 
-	// TODO: This doesn't need to exist all the time.
-	private readonly IGitHubClient _client;
 	private UpdaterWindow? _updaterWindow;
 	private readonly string _architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
 
@@ -79,10 +77,10 @@ public class UpdaterPlugin : IUpdaterPlugin
 		_currentVersion = new Version(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
 #endif
 
-		_client = new GitHubClient(new ProductHeaderValue(Name));
-
 		_timer = config.UpdateFrequency.GetTimer();
 	}
+
+	private IGitHubClient CreateGitHubClient() => new GitHubClient(new ProductHeaderValue(Name));
 
 	/// <inheritdoc />
 	public void PreInitialize()
@@ -214,8 +212,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		Logger.Debug("Getting not installed releases");
 		LastCheckedForUpdates = DateTime.Now;
 
-		// TODO: Get until we find a release that is installed.
-		IReadOnlyList<Release> releases = await _client
+		IReadOnlyList<Release> releases = await CreateGitHubClient()
 			.Repository
 			.Release
 			.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
@@ -255,7 +252,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	public async Task InstallRelease(Release release)
 	{
 		// Get the release asset to install.
-		IReadOnlyList<ReleaseAsset> assets = await _client
+		IReadOnlyList<ReleaseAsset> assets = await CreateGitHubClient()
 			.Repository
 			.Release
 			.GetAllAssets(Owner, Repository, release.Id)
