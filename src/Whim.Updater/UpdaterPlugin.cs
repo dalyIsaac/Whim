@@ -69,7 +69,12 @@ public class UpdaterPlugin : IUpdaterPlugin
 		_config = config;
 
 #if DEBUG
-		_currentVersion = new Version("v0.1.263-alpha+bc5c56c4");
+		_currentVersion = Version.Parse("v0.1.263-alpha+bc5c56c4")!;
+
+		if (_currentVersion == null)
+		{
+			throw new Exception("Failed to parse version");
+		}
 #else
 		_currentVersion = new Version(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
 #endif
@@ -220,18 +225,14 @@ public class UpdaterPlugin : IUpdaterPlugin
 		List<ReleaseInfo> sortedReleases = new();
 		foreach (Release r in releases)
 		{
-			ReleaseInfo info;
-			try
+			Version? version = Version.Parse(r.TagName);
+			if (version == null)
 			{
-				info = new ReleaseInfo(r, new Version(r.TagName), releases.Count > 1);
-			}
-			catch (Exception ex)
-			{
-				// TODO: Don't throw, since early releases had an incorrect format.
-				Logger.Debug($"Invalid release tag: {r.TagName}: {ex}");
+				Logger.Debug($"Invalid release tag: {r.TagName}");
 				continue;
 			}
 
+			ReleaseInfo info = new(r, version);
 			if (info.Version.ReleaseChannel != _config.ReleaseChannel)
 			{
 				Logger.Debug($"Ignoring release for channel {info.Version.ReleaseChannel}");
@@ -283,7 +284,6 @@ public class UpdaterPlugin : IUpdaterPlugin
 			return;
 		}
 
-		// TODO: Make this async and try restarting the app.
 		// Run the installer.
 		using Process process = new();
 		process.StartInfo.FileName = tempPath;
@@ -327,8 +327,6 @@ public class UpdaterPlugin : IUpdaterPlugin
 				_updaterWindow = null;
 			}
 
-			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-			// TODO: set large fields to null
 			_disposedValue = true;
 		}
 	}

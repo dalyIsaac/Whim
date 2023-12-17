@@ -1,35 +1,74 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Whim.Updater;
 
+/// <summary>
+/// A semantic version.
+/// </summary>
 public partial record Version
 {
+	/// <summary>
+	/// The major version number.
+	/// </summary>
 	public int Major { get; }
+
+	/// <summary>
+	/// The minor version number.
+	/// </summary>
 	public int Minor { get; }
+
+	/// <summary>
+	/// The patch version number.
+	/// </summary>
 	public int Patch { get; }
+
+	/// <summary>
+	/// The release channel.
+	/// </summary>
 	public ReleaseChannel ReleaseChannel { get; }
+
+	/// <summary>
+	/// The commit hash.
+	/// </summary>
 	public string Commit { get; }
 
-	public Version(string tagName)
+	private Version(int major, int minor, int patch, ReleaseChannel releaseChannel, string commit)
+	{
+		Major = major;
+		Minor = minor;
+		Patch = patch;
+		ReleaseChannel = releaseChannel;
+		Commit = commit;
+	}
+
+	/// <summary>
+	/// Creates a new <see cref="Version"/> by parsing the given <paramref name="tagName"/>.
+	/// </summary>
+	/// <param name="tagName"></param>
+	/// <returns>
+	/// A new <see cref="Version"/> if the tag name is valid, otherwise null.
+	/// </returns>
+	public static Version? Parse(string tagName)
 	{
 		Match match = ReleaseTagRegex().Match(tagName);
 		if (!match.Success || match.Groups.Count != 6)
 		{
-			throw new ArgumentException($"The tag name '{tagName}' is not a valid release tag name.");
+			return null;
 		}
 
-		Major = int.Parse(match.Groups[1].Value);
-		Minor = int.Parse(match.Groups[2].Value);
-		Patch = int.Parse(match.Groups[3].Value);
-		ReleaseChannel = match.Groups[4].Value switch
+		int major = int.Parse(match.Groups[1].Value);
+		int minor = int.Parse(match.Groups[2].Value);
+		int patch = int.Parse(match.Groups[3].Value);
+		ReleaseChannel releaseChannel = match.Groups[4].Value switch
 		{
 			"alpha" => ReleaseChannel.Alpha,
 			"beta" => ReleaseChannel.Beta,
 			"stable" => ReleaseChannel.Stable,
 			_ => ReleaseChannel.Stable
 		};
-		Commit = match.Groups[5].Value;
+		string commit = match.Groups[5].Value;
+
+		return new Version(major, minor, patch, releaseChannel, commit);
 	}
 
 	[GeneratedRegex(@"^v(\d+).(\d+).(\d+)-(alpha|beta|stable)\+([a-z0-9]{8})$")]

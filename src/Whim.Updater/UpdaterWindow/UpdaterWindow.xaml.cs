@@ -36,7 +36,6 @@ internal sealed partial class UpdaterWindow : Window
 
 		ViewModel.Update(releases);
 
-		// TODO: Unsubscribe in dispose
 		UpdaterWebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
 		UpdaterWebView.CoreWebView2.NavigateToString(ViewModel.ReleaseNotes);
 
@@ -57,6 +56,7 @@ internal sealed partial class UpdaterWindow : Window
 
 	private void UpdaterWindow_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
 	{
+		UpdaterWebView.CoreWebView2.NavigationStarting -= CoreWebView2_NavigationStarting;
 		UpdaterWebView.Close();
 	}
 }
