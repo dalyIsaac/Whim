@@ -746,8 +746,7 @@ public class WindowManagerTests
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 		ctx.WorkspaceManager.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
-		ctx
-			.NativeManager
+		ctx.NativeManager
 			.When(cnm => cnm.TryEnqueue(Arg.Any<DispatcherQueueHandler>()))
 			.Do(callInfo =>
 			{
