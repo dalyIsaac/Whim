@@ -66,20 +66,13 @@ internal class UpdaterWindowViewModel : INotifyPropertyChanged
 </html>
 ";
 
+	private readonly IUpdaterPlugin _plugin;
+
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	private List<ReleaseInfo> _releases = new();
 
-	private string _lastCheckedForUpdates;
-	public string LastCheckedForUpdates
-	{
-		get => _lastCheckedForUpdates;
-		private set
-		{
-			_lastCheckedForUpdates = value;
-			OnPropertyChanged();
-		}
-	}
+	public string LastCheckedForUpdates => _plugin.LastCheckedForUpdates?.ToString() ?? "Never";
 
 	public int SkippedReleases => _releases.Count;
 
@@ -103,19 +96,18 @@ internal class UpdaterWindowViewModel : INotifyPropertyChanged
 
 	public CloseUpdaterWindowCommand CloseUpdaterWindowCommand { get; }
 
-	public UpdaterWindowViewModel(IUpdaterPlugin plugin, DateTime? lastCheckedForUpdates)
+	public UpdaterWindowViewModel(IUpdaterPlugin plugin)
 	{
+		_plugin = plugin;
 		SkipReleaseCommand = new SkipReleaseCommand(plugin, this);
 		InstallReleaseCommand = new InstallReleaseCommand(plugin, this);
 		CloseUpdaterWindowCommand = new CloseUpdaterWindowCommand(plugin);
 
-		_lastCheckedForUpdates = lastCheckedForUpdates?.ToString() ?? "Never";
 		ReleaseNotes = "<html><body><h1>Loading...</h1></body></html>";
 	}
 
-	public void Update(DateTime lastCheckedForUpdates, List<ReleaseInfo> releases)
+	public void Update(List<ReleaseInfo> releases)
 	{
-		LastCheckedForUpdates = lastCheckedForUpdates.ToString();
 		_releases = releases;
 		ReleaseNotes = GetReleaseNotes(releases);
 	}

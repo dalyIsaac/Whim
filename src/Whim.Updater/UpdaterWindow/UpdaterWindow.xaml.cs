@@ -16,13 +16,13 @@ internal sealed partial class UpdaterWindow : Window
 	public UpdaterWindow(IUpdaterPlugin plugin, DateTime? lastCheckedForUpdates)
 	{
 		_plugin = plugin;
-		ViewModel = new UpdaterWindowViewModel(_plugin, lastCheckedForUpdates);
+		ViewModel = new UpdaterWindowViewModel(_plugin);
 		UIElementExtensions.InitializeComponent(this, "Whim.Updater", "UpdaterWindow/UpdaterWindow");
 
 		Closed += UpdaterWindow_Closed;
 	}
 
-	public async Task Activate(DateTime lastCheckedForUpdates, List<ReleaseInfo> releases)
+	public async Task Activate(List<ReleaseInfo> releases)
 	{
 		if (releases.Count == 0)
 		{
@@ -34,7 +34,7 @@ internal sealed partial class UpdaterWindow : Window
 		UpdaterWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 		UpdaterWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 
-		ViewModel.Update(lastCheckedForUpdates, releases);
+		ViewModel.Update(releases);
 
 		// TODO: Unsubscribe in dispose
 		UpdaterWebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;

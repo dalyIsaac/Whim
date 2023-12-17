@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
+using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
 using Octokit;
 
 namespace Whim.Updater;
@@ -17,6 +19,16 @@ public class UpdaterPlugin : IUpdaterPlugin
 {
 	private const string Owner = "dalyIsaac";
 	private const string Repository = "Whim";
+
+	/// <summary>
+	/// Notification ID for showing the updater window.
+	/// </summary>
+	private string SHOW_WINDOW_NOTIFICATION_ID => $"{Name}.show_window";
+
+	/// <summary>
+	/// Notification ID for not performing an update.
+	/// </summary>
+	private string CANCEL_NOTIFICATION_ID => $"{Name}.cancel";
 
 	private readonly IContext _context;
 	private readonly Version _currentVersion;
@@ -33,13 +45,15 @@ public class UpdaterPlugin : IUpdaterPlugin
 	private string? _skippedReleaseTagName;
 
 	private readonly Timer _timer = new();
+
+	private List<ReleaseInfo> _notInstalledReleases = new();
 	private bool _disposedValue;
 
 	/// <inheritdoc />
 	public DateTime? LastCheckedForUpdates { get; private set; }
 
 	/// <inheritdoc />
-	public string Name => "Whim.Updater";
+	public string Name => "whim.updater";
 
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new UpdaterCommands(this);
@@ -66,19 +80,43 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public void PreInitialize() { }
+	public void PreInitialize()
+	{
+		_context.NotificationManager.Register(SHOW_WINDOW_NOTIFICATION_ID, HandleOnShowWindowNotification);
+		_context.NotificationManager.Register(CANCEL_NOTIFICATION_ID, HandleOnCancelNotification);
+	}
 
-	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) =>
-		await CheckForUpdates().ConfigureAwait(true);
+	private void HandleOnShowWindowNotification(AppNotificationActivatedEventArgs args)
+	{
+		Logger.Debug("Showing update window");
+
+		_context
+			.NativeManager
+			.TryEnqueue(async () =>
+			{
+				_updaterWindow = new UpdaterWindow(plugin: this, null);
+				await _updaterWindow.Activate(_notInstalledReleases).ConfigureAwait(true);
+			});
+	}
+
+	private void HandleOnCancelNotification(AppNotificationActivatedEventArgs args)
+	{
+		Logger.Debug("User cancelled update");
+	}
 
 	/// <inheritdoc />
 	public void PostInitialize()
 	{
-		// TODO: Check now
+#if !DEBUG
+		CheckForUpdates().ConfigureAwait(true);
+#endif
 
 		_timer.Elapsed += Timer_Elapsed;
 		_timer.Start();
 	}
+
+	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) =>
+		await CheckForUpdates().ConfigureAwait(true);
 
 	/// <inheritdoc />
 	public void SkipRelease(Release release)
@@ -90,29 +128,42 @@ public class UpdaterPlugin : IUpdaterPlugin
 	public async Task CheckForUpdates()
 	{
 		Logger.Debug("Checking for updates...");
-		DateTime now = DateTime.Now;
 
-		List<ReleaseInfo> releases = await GetNotInstalledReleases().ConfigureAwait(true);
-		if (releases.Count == 0)
+		_notInstalledReleases = await GetNotInstalledReleases().ConfigureAwait(true);
+		if (_notInstalledReleases.Count == 0)
 		{
 			Logger.Debug("No updates found");
 			return;
 		}
 
-		ReleaseInfo lastRelease = releases[0];
+		ReleaseInfo lastRelease = _notInstalledReleases[0];
 		if (_skippedReleaseTagName == lastRelease.Release.TagName)
 		{
 			Logger.Debug($"Skipping release {lastRelease.Release.TagName}");
 			return;
 		}
 
-		_context
-			.NativeManager
-			.TryEnqueue(async () =>
-			{
-				_updaterWindow = new UpdaterWindow(this, null);
-				await _updaterWindow.Activate(now, releases).ConfigureAwait(true);
-			});
+		Logger.Debug($"Found {lastRelease.Release.TagName}");
+
+		AppNotification notification = new AppNotificationBuilder()
+			.AddArgument(INotificationManager.NotificationIdKey, SHOW_WINDOW_NOTIFICATION_ID)
+			.AddText("Update available!")
+			.AddText(lastRelease.Release.TagName)
+			.AddButton(
+				new AppNotificationButton("Not now").AddArgument(
+					INotificationManager.NotificationIdKey,
+					CANCEL_NOTIFICATION_ID
+				)
+			)
+			.AddButton(
+				new AppNotificationButton("Open changelog").AddArgument(
+					INotificationManager.NotificationIdKey,
+					SHOW_WINDOW_NOTIFICATION_ID
+				)
+			)
+			.BuildNotification();
+
+		_context.NotificationManager.SendToastNotification(notification);
 	}
 
 	/// <inheritdoc />
@@ -155,6 +206,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
 	{
+		Logger.Debug("Getting not installed releases");
 		LastCheckedForUpdates = DateTime.Now;
 
 		// TODO: Get until we find a release that is installed.
