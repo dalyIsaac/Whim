@@ -48,6 +48,7 @@ internal class InstallReleaseCommand : System.Windows.Input.ICommand
 		if (_viewModel.LastRelease != null)
 		{
 			_plugin.InstallRelease(_viewModel.LastRelease.Release);
+			_plugin.CloseUpdaterWindow();
 		}
 	}
 }
