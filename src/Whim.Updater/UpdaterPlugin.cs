@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	private string CANCEL_NOTIFICATION_ID => $"{Name}.cancel";
 
 	private readonly IContext _context;
-	private readonly Version _currentVersion;
+	private readonly Version? _currentVersion;
 	private readonly UpdaterConfig _config;
 
 	private UpdaterWindow? _updaterWindow;
@@ -74,7 +75,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 			throw new Exception("Failed to parse version");
 		}
 #else
-		_currentVersion = new Version(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
+		_currentVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
 #endif
 
 		_timer = config.UpdateFrequency.GetTimer();
@@ -236,7 +237,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 				continue;
 			}
 
-			if (info.Version.IsNewerVersion(_currentVersion))
+			if (_currentVersion != null && info.Version.IsNewerVersion(_currentVersion))
 			{
 				sortedReleases.Add(info);
 			}
