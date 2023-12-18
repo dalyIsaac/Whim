@@ -3,27 +3,14 @@
 	<!--  Font family  -->
 	<FontFamily x:Key="_font:family">Segoe UI</FontFamily>
 
-	<!--  Colors: Light mode, TODO: improve  -->
-	<!-- **************************************************
-	<Color x:Key="_base:background">#eceff4</Color>
-    <Color x:Key="_base:foreground">#1c1c1c</Color>
-    <Color x:Key="_button:background">#bbbbbb</Color>
-	<Color x:Key="_button:accent">#81a1c1</Color>
-	<Color x:Key="bar:hover:background">#15000000</Color>
-    <Color x:Key="bar:hover:foreground">#65000000</Color>
-    *******************************************************-->
-
-	<!--  Colors: dark mode  -->
-	<Color x:Key="_base:background">#1c1c1c</Color>
-	<Color x:Key="_base:foreground">#eceff4</Color>
-	<Color x:Key="_button:background">#2b2b2b</Color>
-	<Color x:Key="_button:accent">#81a1c1</Color>
-	<Color x:Key="bar:hover:background">#15ffffff</Color>
-	<Color x:Key="bar:hover:foreground">#65ffffff</Color>
+	<!--  Explicit colors, rest is inherited from system settings  -->
+	<Color x:Key="bar:active_workspace:background">#81a1c1</Color>
+	<Color x:Key="bar:active_workspace:foreground">#1c1c1c</Color>
+	<Color x:Key="bar:hover:background">#15777777</Color>
+	<Color x:Key="bar:hover:foreground">#da777777</Color>
 
 	<!--  Shared text block style  -->
 	<Style x:Key="_base:text_block" TargetType="TextBlock">
-		<Setter Property="Foreground" Value="{StaticResource _base:foreground}" />
 		<Setter Property="Margin" Value="0" />
 		<Setter Property="Padding" Value="8,2,8,3" />
 		<Setter Property="FontSize" Value="14" />
@@ -32,8 +19,6 @@
 
 	<!--  Shared button style  -->
 	<Style x:Key="_base:button" TargetType="Button">
-		<Setter Property="Background" Value="{StaticResource _button:background}" />
-		<Setter Property="Foreground" Value="{StaticResource _base:foreground}" />
 		<Setter Property="Margin" Value="3,0" />
 		<Setter Property="Padding" Value="8,2,8,3" />
 		<Setter Property="BorderThickness" Value="0" />
@@ -44,7 +29,6 @@
 
 	<!--  Root panel  -->
 	<Style x:Key="bar:root_panel" TargetType="RelativePanel">
-		<Setter Property="Background" Value="{StaticResource _base:background}" />
 		<Setter Property="Margin" Value="0" />
 		<Setter Property="Padding" Value="0,2" />
 	</Style>
@@ -62,14 +46,10 @@
 	<StaticResource x:Key="bar:tree_layout:button" ResourceKey="_base:button" />
 
 	<!--  Workspace widget  -->
-	<StaticResource x:Key="bar:active_workspace:background" ResourceKey="_button:accent" />
-	<StaticResource x:Key="bar:active_workspace:foreground" ResourceKey="_base:background" />
 	<Style
 		x:Key="bar:workspace:button"
 		BasedOn="{StaticResource _base:button}"
 		TargetType="Button">
-		<Setter Property="Background" Value="{StaticResource _base:background}" />
-		<Setter Property="Foreground" Value="{StaticResource _button:accent}" />
 		<Setter Property="Margin" Value="0" />
 	</Style>
 
