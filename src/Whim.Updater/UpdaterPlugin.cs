@@ -4,6 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+// We do use this in non-DEBUG.
+#pragma warning disable IDE0005 // Using directive is unnecessary.
+using System.Reflection;
+#pragma warning restore IDE0005 // Using directive is unnecessary.
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
