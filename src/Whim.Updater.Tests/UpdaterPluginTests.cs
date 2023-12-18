@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.Windows.AppNotifications;
@@ -142,6 +143,82 @@ public class UpdaterPluginTests
 
 		// Then
 		releases.Select(r => r.Release.TagName).Should().BeEquivalentTo(expectedReleases);
+	}
+	#endregion
+
+	#region LoadState
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public void LoadState_InvalidFormat(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		JsonElement json = JsonDocument.Parse("[]").RootElement;
+
+		// When
+		plugin.LoadState(json);
+
+		// Then
+		Assert.Null(plugin.LastCheckedForUpdates);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public void LoadState_Valid(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		JsonElement json = JsonDocument
+			.Parse(
+				"{\"SkippedReleaseTagName\":\"v0.1.263-alpha+bc5c56c4\",\"LastCheckedForUpdates\":\"2021-09-05T21:00:00.0000000Z\"}"
+			)
+			.RootElement;
+
+		// When
+		plugin.LoadState(json);
+
+		// Then
+		Assert.Equal("v0.1.263-alpha+bc5c56c4", plugin.SkippedReleaseTagName);
+		Assert.NotNull(plugin.LastCheckedForUpdates);
+	}
+	#endregion
+
+	#region CheckForUpdates
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async void CheckForUpdates_WhenNoReleases(IContext ctx, IGitHubClient client)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+
+		// When
+		await plugin.CheckForUpdates(client);
+
+		// Then
+		ctx.NotificationManager.DidNotReceive().SendToastNotification(Arg.Any<AppNotification>());
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async void CheckForUpdates_ReleaseIsSkipped(IContext ctx, IGitHubClient client)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		client
+			.Repository
+			.Release
+			.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Returns(new[] { Data.CreateRelease242(tagName: "v0.1.263-alpha+bc5c56c4") });
+
+		plugin.LoadState(
+			JsonDocument
+				.Parse(
+					"{\"SkippedReleaseTagName\":\"v0.1.263-alpha+bc5c56c4\",\"LastCheckedForUpdates\":\"2021-09-05T21:00:00.0000000Z\"}"
+				)
+				.RootElement
+		);
+
+		// When
+		await plugin.CheckForUpdates(client);
+
+		// Then
+		ctx.NotificationManager.DidNotReceive().SendToastNotification(Arg.Any<AppNotification>());
 	}
 	#endregion
 }

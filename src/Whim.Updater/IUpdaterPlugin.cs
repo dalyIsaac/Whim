@@ -13,6 +13,11 @@ internal record SavedUpdaterPluginState(string? SkippedReleaseTagName, DateTime?
 public interface IUpdaterPlugin : IPlugin, IDisposable
 {
 	/// <summary>
+	/// The latest release that the user has chosen to skip.
+	/// </summary>
+	string? SkippedReleaseTagName { get; }
+
+	/// <summary>
 	/// The date and time that the updater last checked for updates.
 	/// </summary>
 	DateTime? LastCheckedForUpdates { get; }

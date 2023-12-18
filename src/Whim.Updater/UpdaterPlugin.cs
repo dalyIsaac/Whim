@@ -40,7 +40,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <summary>
 	/// The release that the user has chosen to skip.
 	/// </summary>
-	private string? _skippedReleaseTagName;
+	public string? SkippedReleaseTagName { get; private set; }
 
 	private readonly Timer _timer = new();
 
@@ -122,7 +122,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public void SkipRelease(Release release)
 	{
-		_skippedReleaseTagName = release.TagName;
+		SkippedReleaseTagName = release.TagName;
 	}
 
 	/// <inheritdoc />
@@ -140,7 +140,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 
 		ReleaseInfo lastRelease = _notInstalledReleases[0];
-		if (_skippedReleaseTagName == lastRelease.Release.TagName)
+		if (SkippedReleaseTagName == lastRelease.Release.TagName)
 		{
 			Logger.Debug($"Skipping release {lastRelease.Release.TagName}");
 			return;
@@ -184,7 +184,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 			SavedUpdaterPluginState savedState = JsonSerializer.Deserialize<SavedUpdaterPluginState>(
 				state.GetRawText()
 			)!;
-			_skippedReleaseTagName = savedState.SkippedReleaseTagName;
+			SkippedReleaseTagName = savedState.SkippedReleaseTagName;
 			LastCheckedForUpdates = savedState.LastCheckedForUpdates;
 		}
 		catch (Exception e)
@@ -196,13 +196,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public JsonElement? SaveState()
 	{
-		if (_skippedReleaseTagName == null)
+		if (SkippedReleaseTagName == null)
 		{
 			return null;
 		}
 
 		return JsonSerializer.SerializeToElement(
-			new SavedUpdaterPluginState(_skippedReleaseTagName, LastCheckedForUpdates)
+			new SavedUpdaterPluginState(SkippedReleaseTagName, LastCheckedForUpdates)
 		);
 	}
 
