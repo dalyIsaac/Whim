@@ -123,6 +123,20 @@ public class UpdaterWindowViewModelTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void SkipReleaseCommand_CanExecute(IUpdaterPlugin updaterPlugin, IReadOnlyList<ReleaseInfo> releases)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+		viewModel.Update(releases);
+
+		// When
+		bool canExecute = viewModel.SkipReleaseCommand.CanExecute(null);
+
+		// Then
+		Assert.True(canExecute);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
 	public void InstallReleaseCommand(IUpdaterPlugin updaterPlugin, IReadOnlyList<ReleaseInfo> releases)
 	{
 		// Given
@@ -138,6 +152,20 @@ public class UpdaterWindowViewModelTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void InstallReleaseCommand_CanExecute(IUpdaterPlugin updaterPlugin, IReadOnlyList<ReleaseInfo> releases)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+		viewModel.Update(releases);
+
+		// When
+		bool canExecute = viewModel.InstallReleaseCommand.CanExecute(null);
+
+		// Then
+		Assert.True(canExecute);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
 	public void CloseUpdaterWindowCommand(IUpdaterPlugin updaterPlugin)
 	{
 		// Given
@@ -148,6 +176,19 @@ public class UpdaterWindowViewModelTests
 
 		// Then
 		updaterPlugin.Received(1).CloseUpdaterWindow();
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void CloseUpdaterWindowCommand_CanExecute(IUpdaterPlugin updaterPlugin)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+
+		// When
+		bool canExecute = viewModel.CloseUpdaterWindowCommand.CanExecute(null);
+
+		// Then
+		Assert.True(canExecute);
 	}
 
 	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
