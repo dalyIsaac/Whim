@@ -51,7 +51,7 @@ internal partial class GitHubUserProfileParser : InlineParser
 		}
 
 		string username = match.Groups["username"].Value;
-		string literal = $"by <a href=\"https://github.com/{username}\"/>@{username}</a>";
+		string literal = $"by <a href=\"https://github.com/{username}\">@{username}</a>";
 
 		processor.Inline = new HtmlInline(literal)
 		{
