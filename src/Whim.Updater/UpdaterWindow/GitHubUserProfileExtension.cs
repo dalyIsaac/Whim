@@ -37,7 +37,7 @@ internal partial class GitHubUserProfileParser : InlineParser
 			return false;
 		}
 
-		while (!slice.Match("by @"))
+		while (!slice.Match("by @") && slice.Length > 0)
 		{
 			// keep skipping
 			slice.NextChar();

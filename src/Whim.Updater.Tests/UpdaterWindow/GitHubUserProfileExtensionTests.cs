@@ -9,6 +9,7 @@ public class GitHubUserProfileExtensionTests
 	[InlineData("PR by @dalyIsaac", "<p>PR by <a href=\"https://github.com/dalyIsaac\">@dalyIsaac</a></p>\n")]
 	[InlineData("PRby @dalyIsaac", "<p>PRby @dalyIsaac</p>\n")]
 	[InlineData("PR by @*dalyIsaac*", "<p>PR by @<em>dalyIsaac</em></p>\n")]
+	[InlineData("PR by@dalyIsaac", "<p>PR by@dalyIsaac</p>\n")]
 	public void Match(string markdown, string expected)
 	{
 		// Given
