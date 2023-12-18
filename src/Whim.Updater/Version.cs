@@ -113,5 +113,5 @@ public partial record Version
 	}
 
 	/// <inheritdoc/>
-	public override string ToString() => $"{Major}.{Minor}.{Patch}-{ReleaseChannel}+{Commit}";
+	public override string ToString() => $"v{Major}.{Minor}.{Patch}-{ReleaseChannel.ToString().ToLower()}+{Commit}";
 };
