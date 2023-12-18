@@ -201,20 +201,11 @@ public class UpdaterPluginTests
 	public async void CheckForUpdates_ReleaseIsSkipped(IContext ctx, IGitHubClient client)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
-		client
-			.Repository
-			.Release
-			.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
-			.Returns(new[] { Data.CreateRelease242(tagName: "v0.1.264-alpha+bc5c56c4") });
+		Release release = Data.CreateRelease242(tagName: "v0.1.265-alpha+bc5c56c4");
+		client.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>()).Returns(new[] { release });
 
-		plugin.LoadState(
-			JsonDocument
-				.Parse(
-					"{\"SkippedReleaseTagName\":\"v0.1.264-alpha+bc5c56c4\",\"LastCheckedForUpdates\":\"2021-09-05T21:00:00.0000000Z\"}"
-				)
-				.RootElement
-		);
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
+		plugin.SkipRelease(release);
 
 		// When
 		await plugin.CheckForUpdates(client);
