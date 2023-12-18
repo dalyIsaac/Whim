@@ -1,4 +1,8 @@
 using System.Collections.Generic;
+// We do use this in non-DEBUG.
+#pragma warning disable IDE0005 // Using directive is unnecessary.
+using System.Reflection;
+#pragma warning restore IDE0005 // Using directive is unnecessary.
 using System.Runtime.InteropServices;
 using Windows.System;
 using Windows.UI.Composition;
@@ -10,7 +14,6 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-/// <inheritdoc/>
 internal partial class NativeManager : INativeManager
 {
 	private readonly IContext _context;
@@ -34,14 +37,12 @@ internal partial class NativeManager : INativeManager
 
 	private const int _bufferCapacity = 255;
 
-	/// <inheritdoc/>
 	public void QuitWindow(HWND hwnd)
 	{
 		Logger.Debug($"Quitting application with HWND {hwnd}");
 		PInvoke.SendNotifyMessage(hwnd, PInvoke.WM_SYSCOMMAND, new WPARAM(PInvoke.SC_CLOSE), 0);
 	}
 
-	/// <inheritdoc/>
 	public void ForceForegroundWindow(HWND hwnd)
 	{
 		Logger.Debug($"Forcing window HWND {hwnd} to foreground");
@@ -51,42 +52,36 @@ internal partial class NativeManager : INativeManager
 		PInvoke.SetForegroundWindow(hwnd);
 	}
 
-	/// <inheritdoc/>
 	public bool HideWindow(HWND hwnd)
 	{
 		Logger.Debug($"Hiding window HWND {hwnd}");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_HIDE);
 	}
 
-	/// <inheritdoc/>
 	public bool ShowWindowMaximized(HWND hwnd)
 	{
 		Logger.Debug($"Showing window HWND {hwnd} maximized");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMAXIMIZED);
 	}
 
-	/// <inheritdoc/>
 	public bool ShowWindowMinimized(HWND hwnd)
 	{
 		Logger.Debug($"Showing window HWND {hwnd} minimized");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWMINIMIZED);
 	}
 
-	/// <inheritdoc/>
 	public bool MinimizeWindow(HWND hwnd)
 	{
 		Logger.Debug($"Minimizing window HWND {hwnd}");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_MINIMIZE);
 	}
 
-	/// <inheritdoc/>
 	public bool ShowWindowNoActivate(HWND hwnd)
 	{
 		Logger.Debug($"Showing window HWND {hwnd} no activate");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
 	}
 
-	/// <inheritdoc/>
 	public string GetClassName(HWND hwnd)
 	{
 		unsafe
@@ -99,7 +94,6 @@ internal partial class NativeManager : INativeManager
 		}
 	}
 
-	/// <inheritdoc/>
 	public void HideCaptionButtons(HWND hwnd)
 	{
 		int style = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
@@ -110,7 +104,6 @@ internal partial class NativeManager : INativeManager
 		_ = PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, style);
 	}
 
-	/// <inheritdoc/>
 	public void PreventWindowActivation(HWND hwnd)
 	{
 		int exStyle = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
@@ -121,7 +114,6 @@ internal partial class NativeManager : INativeManager
 		_ = PInvoke.SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, exStyle);
 	}
 
-	/// <inheritdoc/>
 	public IRectangle<int>? GetWindowOffset(HWND hwnd)
 	{
 		if (!PInvoke.GetWindowRect(hwnd, out RECT windowRect))
@@ -145,7 +137,6 @@ internal partial class NativeManager : INativeManager
 		};
 	}
 
-	/// <inheritdoc/>
 	public IRectangle<int>? DwmGetWindowRectangle(HWND hwnd)
 	{
 		unsafe
@@ -175,7 +166,6 @@ internal partial class NativeManager : INativeManager
 		}
 	}
 
-	/// <inheritdoc/>
 	public void SetWindowCorners(
 		HWND hwnd,
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND
@@ -233,7 +223,6 @@ internal partial class NativeManager : INativeManager
 	private static Compositor? _compositor;
 	private static readonly object _compositorLock = new();
 
-	/// <inheritdoc/>
 	public Compositor Compositor
 	{
 		get
@@ -281,14 +270,11 @@ internal partial class NativeManager : INativeManager
 	[return: MarshalAs(UnmanagedType.Bool)]
 	private static partial bool _ShouldSystemUseDarkMode();
 
-	/// <inheritdoc/>
 	public bool ShouldSystemUseDarkMode() => _ShouldSystemUseDarkMode();
 
-	/// <inheritdoc/>
 	public TransparentWindowController CreateTransparentWindowController(Microsoft.UI.Xaml.Window window) =>
 		new(_context, _internalContext, window);
 
-	/// <inheritdoc/>
 	public void SetWindowExTransparent(HWND hwnd)
 	{
 		int exStyle = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
@@ -299,7 +285,6 @@ internal partial class NativeManager : INativeManager
 		);
 	}
 
-	/// <inheritdoc/>
 	public void RemoveWindowExTransparent(HWND hwnd)
 	{
 		int exStyle = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
@@ -310,7 +295,16 @@ internal partial class NativeManager : INativeManager
 		);
 	}
 
-	/// <inheritdoc/>
 	public bool TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueueHandler callback) =>
 		_dispatcherQueue.TryEnqueue(callback);
+
+	public string GetWhimVersion()
+	{
+#if DEBUG
+		// An arbitrary version number for debugging.
+		return "v0.1.263-alpha+bc5c56c4";
+#else
+		return Assembly.GetExecutingAssembly().GetName().Version!.ToString();
+#endif
+	}
 }

@@ -36,7 +36,7 @@ internal static class Data
 **Full Changelog**: https://github.com/dalyIsaac/Whim/compare/v0.1.270-alpha+dfd0e637...v0.1.271-alpha+5ef9529c
 ";
 
-	public static Release CreateRelease242()
+	public static Release CreateRelease242(string? tagName = null)
 	{
 		ReleaseAsset[] assets = new ReleaseAsset[2];
 
@@ -79,7 +79,7 @@ internal static class Data
 			htmlUrl: "https://github.com/dalyIsaac/Whim/releases/tag/v0.1.242-alpha%2B823a398d",
 			id: 131450677,
 			nodeId: "RE_kwDOGWZ1Ts4H1cc1",
-			tagName: "v0.1.242-alpha+823a398d",
+			tagName: tagName ?? "v0.1.242-alpha+823a398d",
 			targetCommitish: "main",
 			name: "v0.1.242-alpha+823a398d",
 			draft: false,

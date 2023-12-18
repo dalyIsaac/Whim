@@ -154,4 +154,10 @@ public interface INativeManager
 	/// <param name="callback">The task to execute.</param>
 	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
 	bool TryEnqueue(DispatcherQueueHandler callback);
+
+	/// <summary>
+	/// Gets the version of Whim.
+	/// </summary>
+	/// <returns></returns>
+	string GetWhimVersion();
 }

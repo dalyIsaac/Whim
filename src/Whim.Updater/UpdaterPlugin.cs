@@ -4,10 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-// We do use this in non-DEBUG.
-#pragma warning disable IDE0005 // Using directive is unnecessary.
-using System.Reflection;
-#pragma warning restore IDE0005 // Using directive is unnecessary.
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -70,16 +66,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		_context = context;
 		_config = config;
 
-#if DEBUG
-		_currentVersion = Version.Parse("v0.1.263-alpha+bc5c56c4")!;
-
-		if (_currentVersion == null)
-		{
-			throw new Exception("Failed to parse version");
-		}
-#else
-		_currentVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
-#endif
+		_currentVersion = Version.Parse(_context.NativeManager.GetWhimVersion())!;
 
 		if (config.UpdateFrequency.GetInterval() is double interval)
 		{
@@ -139,11 +126,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public async Task CheckForUpdates()
+	public async Task CheckForUpdates(IGitHubClient? gitHubClient = null)
 	{
 		Logger.Debug("Checking for updates...");
 
-		_notInstalledReleases = await GetNotInstalledReleases().ConfigureAwait(true);
+		gitHubClient ??= CreateGitHubClient();
+
+		_notInstalledReleases = await GetNotInstalledReleases(gitHubClient).ConfigureAwait(true);
 		if (_notInstalledReleases.Count == 0)
 		{
 			Logger.Debug("No updates found");
@@ -218,12 +207,14 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
+	public async Task<List<ReleaseInfo>> GetNotInstalledReleases(IGitHubClient? gitHubClient = null)
 	{
 		Logger.Debug("Getting not installed releases");
 		LastCheckedForUpdates = DateTime.Now;
 
-		IReadOnlyList<Release> releases = await CreateGitHubClient()
+		gitHubClient ??= CreateGitHubClient();
+
+		IReadOnlyList<Release> releases = await gitHubClient
 			.Repository
 			.Release
 			.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
@@ -262,10 +253,14 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public async Task InstallRelease(Release release)
+	public async Task InstallRelease(Release release, IGitHubClient? gitHubClient = null)
 	{
+		Logger.Debug($"Installing release {release.TagName}");
+
+		gitHubClient ??= CreateGitHubClient();
+
 		// Get the release asset to install.
-		IReadOnlyList<ReleaseAsset> assets = await CreateGitHubClient()
+		IReadOnlyList<ReleaseAsset> assets = await gitHubClient
 			.Repository
 			.Release
 			.GetAllAssets(Owner, Repository, release.Id)

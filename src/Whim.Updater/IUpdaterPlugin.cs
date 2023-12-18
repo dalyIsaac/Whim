@@ -20,15 +20,17 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	/// <summary>
 	/// Gets the releases in the current <see cref="ReleaseChannel"/> that have not been installed.
 	/// </summary>
+	/// <param name="gitHubClient"></param>
 	/// <returns></returns>
-	Task<List<ReleaseInfo>> GetNotInstalledReleases();
+	Task<List<ReleaseInfo>> GetNotInstalledReleases(IGitHubClient? gitHubClient = null);
 
 	/// <summary>
 	/// Downloads and installs the given release.
 	/// </summary>
 	/// <param name="release"></param>
+	/// <param name="gitHubClient"></param>
 	/// <returns></returns>
-	Task InstallRelease(Release release);
+	Task InstallRelease(Release release, IGitHubClient? gitHubClient = null);
 
 	/// <summary>
 	/// Skips the given release.
@@ -39,7 +41,8 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	/// <summary>
 	/// Checks for updates. If there are updates, shows the updater window.
 	/// </summary>
-	Task CheckForUpdates();
+	/// <param name="gitHubClient"></param>
+	Task CheckForUpdates(IGitHubClient? gitHubClient = null);
 
 	/// <summary>
 	/// Close the updater window.
