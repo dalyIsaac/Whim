@@ -194,17 +194,8 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public JsonElement? SaveState()
-	{
-		if (SkippedReleaseTagName == null)
-		{
-			return null;
-		}
-
-		return JsonSerializer.SerializeToElement(
-			new SavedUpdaterPluginState(SkippedReleaseTagName, LastCheckedForUpdates)
-		);
-	}
+	public JsonElement? SaveState() =>
+		JsonSerializer.SerializeToElement(new SavedUpdaterPluginState(SkippedReleaseTagName, LastCheckedForUpdates));
 
 	/// <inheritdoc />
 	public async Task<List<ReleaseInfo>> GetNotInstalledReleases(IGitHubClient? gitHubClient = null)
@@ -238,7 +229,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 				continue;
 			}
 
-			if (_currentVersion != null && info.Version.IsNewerVersion(_currentVersion))
+			if (_currentVersion == null || info.Version.IsNewerVersion(_currentVersion))
 			{
 				sortedReleases.Add(info);
 			}

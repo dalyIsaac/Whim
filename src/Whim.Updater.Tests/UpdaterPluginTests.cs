@@ -204,12 +204,12 @@ public class UpdaterPluginTests
 			.Repository
 			.Release
 			.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
-			.Returns(new[] { Data.CreateRelease242(tagName: "v0.1.263-alpha+bc5c56c4") });
+			.Returns(new[] { Data.CreateRelease242(tagName: "v0.1.264-alpha+bc5c56c4") });
 
 		plugin.LoadState(
 			JsonDocument
 				.Parse(
-					"{\"SkippedReleaseTagName\":\"v0.1.263-alpha+bc5c56c4\",\"LastCheckedForUpdates\":\"2021-09-05T21:00:00.0000000Z\"}"
+					"{\"SkippedReleaseTagName\":\"v0.1.264-alpha+bc5c56c4\",\"LastCheckedForUpdates\":\"2021-09-05T21:00:00.0000000Z\"}"
 				)
 				.RootElement
 		);
@@ -221,4 +221,35 @@ public class UpdaterPluginTests
 		ctx.NotificationManager.DidNotReceive().SendToastNotification(Arg.Any<AppNotification>());
 	}
 	#endregion
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public void SkipRelease(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		Release release = Data.CreateRelease242();
+
+		// When
+		plugin.SkipRelease(release);
+
+		// Then
+		Assert.Equal(release.TagName, plugin.SkippedReleaseTagName);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public void SaveState(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		Release skippedRelease = Data.CreateRelease242();
+		plugin.SkipRelease(skippedRelease);
+
+		// When
+		JsonElement? json = plugin.SaveState();
+
+		// Then
+		Assert.NotNull(json);
+		Assert.Equal(skippedRelease.TagName, json.Value.GetProperty("SkippedReleaseTagName").GetString());
+		Assert.Null(json.Value.GetProperty("LastCheckedForUpdates").GetString());
+	}
 }
