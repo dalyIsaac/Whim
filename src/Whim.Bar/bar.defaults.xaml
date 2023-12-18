@@ -1,5 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+	<!--  Bar height  -->
+	<Style x:Key="bar:height" TargetType="RelativePanel">
+		<!--  Must be the only setter  -->
+		<Setter Property="Height" Value="30" />
+	</Style>
+
 	<!--  Font family  -->
 	<FontFamily x:Key="_font:family">Segoe UI</FontFamily>
 

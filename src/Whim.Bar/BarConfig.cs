@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Whim.Bar;
@@ -36,15 +38,15 @@ public class BarConfig : INotifyPropertyChanged
 	/// </summary>
 	internal IList<BarComponent> RightComponents;
 
-	// The defaults set by "bar.defaults.xaml" look best with a height of 28 or 30
 	private int _height = 30;
 
 	/// <summary>
 	/// The height of the bar, in <see href="https://learn.microsoft.com/en-us/windows/win32/learnwin32/dpi-and-device-independent-pixels">device-independent pixels</see>.
+	/// Setting "bar:height" in the resources style takes precedence over setting this.
 	/// </summary>
 	public int Height
 	{
-		get => _height;
+		get => GetHeightFromResourceDictionary() ?? _height;
 		set
 		{
 			_height = value;
@@ -76,5 +78,20 @@ public class BarConfig : INotifyPropertyChanged
 		LeftComponents = leftComponents;
 		CenterComponents = centerComponents;
 		RightComponents = rightComponents;
+	}
+
+	private int? GetHeightFromResourceDictionary()
+	{
+		try
+		{
+			Style style = (Style)Application.Current.Resources["bar:height"];
+			double height = (double)((Setter)style.Setters[0]).Value;
+			return Convert.ToInt32(height);
+		}
+		catch
+		{
+			Logger.Debug("Could not find valid <bar:height> in ResourceDictionary");
+			return null;
+		}
 	}
 }
