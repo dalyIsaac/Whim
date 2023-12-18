@@ -69,7 +69,7 @@ internal class UpdaterWindowViewModel : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	private List<ReleaseInfo> _releases = new();
+	private IReadOnlyList<ReleaseInfo> _releases = new List<ReleaseInfo>();
 
 	public string LastCheckedForUpdates => _plugin.LastCheckedForUpdates?.ToString() ?? "Never";
 
@@ -107,13 +107,13 @@ internal class UpdaterWindowViewModel : INotifyPropertyChanged
 		ReleaseNotes = "<html><body><h1>Loading...</h1></body></html>";
 	}
 
-	public void Update(List<ReleaseInfo> releases)
+	public void Update(IReadOnlyList<ReleaseInfo> releases)
 	{
 		_releases = releases;
 		ReleaseNotes = GetReleaseNotes(releases);
 	}
 
-	private static string GetReleaseNotes(List<ReleaseInfo> releases)
+	private static string GetReleaseNotes(IReadOnlyList<ReleaseInfo> releases)
 	{
 		MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
 			.UseAutoLinks()

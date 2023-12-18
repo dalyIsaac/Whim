@@ -1,5 +1,5 @@
 <Project>
 	<PropertyGroup>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 	</PropertyGroup>
 </Project>
