@@ -38,15 +38,15 @@ public class BarConfig : INotifyPropertyChanged
 	/// </summary>
 	internal IList<BarComponent> RightComponents;
 
-	private int _height = 30;
+	private int _height = GetHeightFromResourceDictionary() ?? 30;
 
 	/// <summary>
 	/// The height of the bar, in <see href="https://learn.microsoft.com/en-us/windows/win32/learnwin32/dpi-and-device-independent-pixels">device-independent pixels</see>.
-	/// Setting "bar:height" in the resources style takes precedence over setting this.
+	/// Setting this explicitly takes precedence over the ResourceDictionary.
 	/// </summary>
 	public int Height
 	{
-		get => GetHeightFromResourceDictionary() ?? _height;
+		get => _height;
 		set
 		{
 			_height = value;
@@ -80,7 +80,7 @@ public class BarConfig : INotifyPropertyChanged
 		RightComponents = rightComponents;
 	}
 
-	private int? GetHeightFromResourceDictionary()
+	private static int? GetHeightFromResourceDictionary()
 	{
 		try
 		{
