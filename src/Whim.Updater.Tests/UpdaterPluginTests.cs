@@ -113,7 +113,7 @@ public class UpdaterPluginTests
 	public async void GetNotInstalledReleases_Ordered(IContext ctx, IGitHubClient client)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig() {  ReleaseChannel = ReleaseChannel.Alpha});
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
 
 		string[] orderedReleases =
 		{
