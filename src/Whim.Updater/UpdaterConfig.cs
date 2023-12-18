@@ -56,30 +56,20 @@ public enum UpdateFrequency
 public static class UpdateFrequencyExtensions
 {
 	/// <summary>
-	/// Gets a <see cref="Timer"/> for the given <see cref="UpdateFrequency"/>.
+	/// Gets a <see cref="double"/> value <see cref="Timer.Interval"/> for the given
+	/// <see cref="UpdateFrequency"/>.
 	/// </summary>
 	/// <param name="frequency"></param>
 	/// <returns></returns>
-	public static Timer GetTimer(this UpdateFrequency frequency)
-	{
-		Timer timer = new();
-		switch (frequency)
+	public static double? GetInterval(this UpdateFrequency frequency) =>
+		frequency switch
 		{
-			case UpdateFrequency.Daily:
-				timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
-				break;
-			case UpdateFrequency.Weekly:
-				timer.Interval = TimeSpan.FromDays(7).TotalMilliseconds;
-				break;
-			case UpdateFrequency.Monthly:
-				timer.Interval = TimeSpan.FromDays(30).TotalMilliseconds;
-				break;
-			case UpdateFrequency.Never:
-				timer.Interval = -1;
-				break;
-		}
-		return timer;
-	}
+			UpdateFrequency.Daily => TimeSpan.FromDays(1).TotalMilliseconds,
+			UpdateFrequency.Weekly => TimeSpan.FromDays(7).TotalMilliseconds,
+			UpdateFrequency.Monthly => TimeSpan.FromDays(30).TotalMilliseconds,
+			UpdateFrequency.Never => null,
+			_ => null
+		};
 }
 
 /// <summary>

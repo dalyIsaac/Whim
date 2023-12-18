@@ -11,13 +11,13 @@ public class GitHubUserProfileExtensionTests
 	[InlineData("PR by @*dalyIsaac*", "<p>PR by @<em>dalyIsaac</em></p>\n")]
 	public void Match(string markdown, string expected)
 	{
-		// Arrange
+		// Given
 		MarkdownPipeline pipeline = new MarkdownPipelineBuilder().Use<GitHubUserProfileExtension>().Build();
 
-		// Act
+		// When
 		string html = Markdown.ToHtml(markdown, pipeline);
 
-		// Assert
+		// Then
 		Assert.Equal(expected, html);
 	}
 }

@@ -10,10 +10,10 @@ public class VersionTests
 	[InlineData("v1.0.0-stable+bc5c56c4", 1, 0, 0, ReleaseChannel.Stable, "bc5c56c4")]
 	public void Parse(string tagName, int major, int minor, int patch, ReleaseChannel releaseChannel, string commit)
 	{
-		// Act
+		// Given
 		Version? version = Version.Parse(tagName);
 
-		// Assert
+		// Then
 		Assert.NotNull(version);
 		Assert.Equal(major, version.Major);
 		Assert.Equal(minor, version.Minor);
@@ -30,10 +30,10 @@ public class VersionTests
 	[InlineData("v1.0.0-stable-bc5c56c4")]
 	public void Parse_Invalid(string tagName)
 	{
-		// Act
+		// Given
 		Version? version = Version.Parse(tagName);
 
-		// Assert
+		// Then
 		Assert.Null(version);
 	}
 
@@ -50,10 +50,10 @@ public class VersionTests
 		Version version = Version.Parse(tagName)!;
 		Version otherVersion = Version.Parse(otherTagName)!;
 
-		// Act
+		// Given
 		bool isNewer = version.IsNewerVersion(otherVersion);
 
-		// Assert
+		// Then
 		Assert.Equal(expected, isNewer);
 	}
 }

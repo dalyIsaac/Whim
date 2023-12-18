@@ -81,7 +81,14 @@ public class UpdaterPlugin : IUpdaterPlugin
 		_currentVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version!.ToString())!;
 #endif
 
-		_timer = config.UpdateFrequency.GetTimer();
+		if (config.UpdateFrequency.GetInterval() is double interval)
+		{
+			_timer.Interval = interval;
+		}
+		else
+		{
+			_timer.Enabled = false;
+		}
 	}
 
 	private IGitHubClient CreateGitHubClient() => new GitHubClient(new ProductHeaderValue(Name));
