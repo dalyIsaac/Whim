@@ -2,8 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.UI.Dispatching;
 using Microsoft.Windows.AppNotifications;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Octokit;
 using Whim.TestUtils;
 using Xunit;
@@ -136,7 +138,7 @@ public class UpdaterPluginTests
 			.Repository
 			.Release
 			.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
-			.Returns(orderedReleases.Select(Data.CreateRelease242).ToArray());
+			.Returns(orderedReleases.Select(t => Data.CreateRelease242(tagName: t)).ToArray());
 
 		// When
 		IEnumerable<ReleaseInfo> releases = await plugin.GetNotInstalledReleases(client);
@@ -252,4 +254,93 @@ public class UpdaterPluginTests
 		Assert.Equal(skippedRelease.TagName, json.Value.GetProperty("SkippedReleaseTagName").GetString());
 		Assert.Null(json.Value.GetProperty("LastCheckedForUpdates").GetString());
 	}
+
+	#region InstallRelease
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async void InstallRelease_NoAssets(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		Release release = Data.CreateRelease242(assets: Array.Empty<ReleaseAsset>());
+
+		// When
+		await plugin.InstallRelease(release);
+
+		// Then
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async void InstallRelease_DownloadThrows(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		Release release = Data.CreateRelease242();
+
+		ctx.NativeManager.DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>()).ThrowsAsync(new Exception());
+
+		// When
+		await plugin.InstallRelease(release);
+
+		// Then
+		await ctx.NativeManager.Received(1).DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>());
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async void InstallRelease_InstallerExitsWithNonZeroCode(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		Release release = Data.CreateRelease242();
+
+		ctx.NativeManager.DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>()).Returns(Task.CompletedTask);
+		ctx.NativeManager.RunFileAsync(Arg.Any<string>()).Returns(1);
+
+		// When
+		await plugin.InstallRelease(release);
+
+		// Then
+		await ctx.NativeManager.Received(1).DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>());
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async void InstallRelease_InstallerThrows(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		Release release = Data.CreateRelease242();
+
+		ctx.NativeManager.DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>()).Returns(Task.CompletedTask);
+		ctx.NativeManager.RunFileAsync(Arg.Any<string>()).ThrowsAsync(new Exception());
+
+		// When
+		await plugin.InstallRelease(release);
+
+		// Then
+		await ctx.NativeManager.Received(1).DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>());
+		await ctx.NativeManager.Received(1).RunFileAsync(Arg.Any<string>());
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async void InstallRelease_InstallerExitsWithZeroCode(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		Release release = Data.CreateRelease242();
+
+		ctx.NativeManager.DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>()).Returns(Task.CompletedTask);
+		ctx.NativeManager.RunFileAsync(Arg.Any<string>()).Returns(0);
+
+		// When
+		await plugin.InstallRelease(release);
+
+		// Then
+		await ctx.NativeManager.Received(1).DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>());
+		await ctx.NativeManager.Received(1).RunFileAsync(Arg.Any<string>());
+		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+	}
+	#endregion
 }

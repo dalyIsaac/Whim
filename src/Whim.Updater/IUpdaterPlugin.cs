@@ -33,9 +33,8 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	/// Downloads and installs the given release.
 	/// </summary>
 	/// <param name="release"></param>
-	/// <param name="gitHubClient"></param>
 	/// <returns></returns>
-	Task InstallRelease(Release release, IGitHubClient? gitHubClient = null);
+	Task InstallRelease(Release release);
 
 	/// <summary>
 	/// Skips the given release.

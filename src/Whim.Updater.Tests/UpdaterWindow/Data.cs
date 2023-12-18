@@ -28,6 +28,7 @@ internal static class Data
 	private const string Release242Body =
 		@"<!-- Release notes generated using configuration in .github/release.yml at main -->
 
+
 ## What's Changed
 ### Core
 * Add `IWorkspaceManager.MoveWindowToAdjacentWorkspace` by @urob in https://github.com/dalyIsaac/Whim/pull/719
@@ -36,11 +37,11 @@ internal static class Data
 **Full Changelog**: https://github.com/dalyIsaac/Whim/compare/v0.1.270-alpha+dfd0e637...v0.1.271-alpha+5ef9529c
 ";
 
-	public static Release CreateRelease242(string? tagName = null)
+	public static Release CreateRelease242(string? tagName = null, ReleaseAsset[]? assets = null)
 	{
-		ReleaseAsset[] assets = new ReleaseAsset[2];
+		ReleaseAsset[] defaultAssets = new ReleaseAsset[2];
 
-		assets[0] = new ReleaseAsset(
+		defaultAssets[0] = new ReleaseAsset(
 			url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137453491",
 			id: 137453491,
 			nodeId: "RA_kwDOGWZ1Ts4IMV-z",
@@ -56,7 +57,7 @@ internal static class Data
 			uploader: CreateAuthor()
 		);
 
-		assets[1] = new ReleaseAsset(
+		defaultAssets[1] = new ReleaseAsset(
 			url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137453051",
 			id: 137453051,
 			nodeId: "RA_kwDOGWZ1Ts4IMV37",
@@ -90,7 +91,7 @@ internal static class Data
 			zipballUrl: "https://api.github.com/repos/dalyIsaac/Whim/zipball/v0.1.242-alpha+823a398d",
 			body: Release242Body,
 			author: CreateAuthor(),
-			assets: assets
+			assets: assets ?? defaultAssets
 		);
 	}
 

@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -244,22 +241,23 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public async Task InstallRelease(Release release, IGitHubClient? gitHubClient = null)
+	public async Task InstallRelease(Release release)
 	{
 		Logger.Debug($"Installing release {release.TagName}");
 
-		gitHubClient ??= CreateGitHubClient();
-
 		// Get the release asset to install.
-		IReadOnlyList<ReleaseAsset> assets = await gitHubClient
-			.Repository
-			.Release
-			.GetAllAssets(Owner, Repository, release.Id)
-			.ConfigureAwait(false);
-
 		string assetNameStart = $"WhimInstaller-{_architecture}";
 
-		ReleaseAsset? asset = assets.First(a => a.Name.StartsWith(assetNameStart) && a.Name.EndsWith(".exe"));
+		ReleaseAsset? asset = null;
+		foreach (ReleaseAsset a in release.Assets)
+		{
+			if (a.Name.StartsWith(assetNameStart) && a.Name.EndsWith(".exe"))
+			{
+				asset = a;
+				break;
+			}
+		}
+
 		if (asset == null)
 		{
 			Logger.Debug($"No asset found for release {release}");
@@ -272,7 +270,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		// Download the asset.
 		try
 		{
-			await DownloadRelease(tempPath, requestUri).ConfigureAwait(false);
+			await _context.NativeManager.DownloadFileAsync(requestUri, tempPath).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -281,32 +279,23 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 
 		// Run the installer.
-		using Process process = new();
-		process.StartInfo.FileName = tempPath;
-		process.Start();
-		await process.WaitForExitAsync().ConfigureAwait(false);
-
-		if (process.ExitCode != 0)
+		try
 		{
-			Logger.Error($"Installer exited with code {process.ExitCode}");
+			int exitCode = await _context.NativeManager.RunFileAsync(tempPath).ConfigureAwait(false);
+			if (exitCode != 0)
+			{
+				Logger.Error($"Installer exited with code {exitCode}");
+				return;
+			}
+		}
+		catch (Exception ex)
+		{
+			Logger.Error($"Failed to run installer: {ex}");
 			return;
 		}
 
 		// Exit Whim.
 		_context.NativeManager.TryEnqueue(() => _context.Exit(new ExitEventArgs() { Reason = ExitReason.Update }));
-	}
-
-	private static async Task DownloadRelease(string tempPath, Uri requestUri)
-	{
-		using HttpClient httpClient = new();
-		using HttpResponseMessage response = await httpClient.GetAsync(requestUri).ConfigureAwait(false);
-
-		// Save the asset to a temporary file.
-		using Stream streamToReadFrom = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-		using Stream streamToWriteTo = File.Open(tempPath, System.IO.FileMode.Create);
-		await streamToReadFrom.CopyToAsync(streamToWriteTo).ConfigureAwait(false);
-		streamToWriteTo.Close();
-		streamToReadFrom.Close();
 	}
 
 	/// <inheritdoc />
