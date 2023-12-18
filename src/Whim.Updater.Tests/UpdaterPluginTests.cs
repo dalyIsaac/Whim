@@ -343,4 +343,18 @@ public class UpdaterPluginTests
 		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 	}
 	#endregion
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public void Dispose(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+
+		// When
+		plugin.Dispose();
+
+		// Then
+		ctx.NotificationManager.Received(1).Unregister("whim.updater.show_window");
+		ctx.NotificationManager.Received(1).Unregister("whim.updater.cancel");
+	}
 }

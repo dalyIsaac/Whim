@@ -310,6 +310,8 @@ public class UpdaterPlugin : IUpdaterPlugin
 				_timer.Dispose();
 				_updaterWindow?.Close();
 				_updaterWindow = null;
+				_context.NotificationManager.Unregister(SHOW_WINDOW_NOTIFICATION_ID);
+				_context.NotificationManager.Unregister(CANCEL_NOTIFICATION_ID);
 			}
 
 			_disposedValue = true;
