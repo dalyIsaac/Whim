@@ -1,4 +1,5 @@
 using AutoFixture;
+using NSubstitute;
 using Octokit;
 using Whim.TestUtils;
 using Xunit;
@@ -9,15 +10,15 @@ public class UpdaterWindowViewModelCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
-		Release release1 = Data.CreateRelease1();
-		Version version1 = Version.Parse(release1.TagName)!;
-		ReleaseInfo releaseInfo1 = new(release1, version1);
+		Release release243 = Data.CreateRelease243();
+		Version version243 = Version.Parse(release243.TagName)!;
+		ReleaseInfo releaseInfo243 = new(release243, version243);
 
-		Release release2 = Data.CreateRelease2();
-		Version version2 = Version.Parse(release2.TagName)!;
-		ReleaseInfo releaseInfo2 = new(release2, version2);
+		Release release242 = Data.CreateRelease242();
+		Version version242 = Version.Parse(release242.TagName)!;
+		ReleaseInfo releaseInfo242 = new(release242, version242);
 
-		fixture.Inject(new List<ReleaseInfo> { releaseInfo1, releaseInfo2 });
+		fixture.Inject(new List<ReleaseInfo> { releaseInfo243, releaseInfo242 });
 	}
 }
 
@@ -37,5 +38,128 @@ public class UpdaterWindowViewModelTests
 
 		// Then
 		Assert.Equal(ExpectedReleaseNotes, viewModel.ReleaseNotes);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void LastCheckedForUpdates_Never(IUpdaterPlugin updaterPlugin, List<ReleaseInfo> releases)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+
+		// When
+		viewModel.Update(releases);
+
+		// Then
+		Assert.Equal("Never", viewModel.LastCheckedForUpdates);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void LastCheckedForUpdates_DateTime(IUpdaterPlugin updaterPlugin, List<ReleaseInfo> releases)
+	{
+		// Given
+		DateTime lastCheckedForUpdates = DateTime.Now;
+		updaterPlugin.LastCheckedForUpdates.Returns(lastCheckedForUpdates);
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+
+		// When
+		viewModel.Update(releases);
+
+		// Then
+		Assert.Equal(lastCheckedForUpdates.ToString(), viewModel.LastCheckedForUpdates);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void LastRelease_Null(IUpdaterPlugin updaterPlugin)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+
+		// When
+		viewModel.Update(new List<ReleaseInfo>());
+
+		// Then
+		Assert.Null(viewModel.LastRelease);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void LastRelease_Defined(IUpdaterPlugin updaterPlugin, List<ReleaseInfo> releases)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+
+		// When
+		viewModel.Update(releases);
+
+		// Then
+		Assert.Equal(releases[0], viewModel.LastRelease);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void SkippedReleases(IUpdaterPlugin updaterPlugin, List<ReleaseInfo> releases)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+
+		// When
+		viewModel.Update(releases);
+
+		// Then
+		Assert.Equal(2, viewModel.SkippedReleases);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void SkipReleaseCommand(IUpdaterPlugin updaterPlugin, List<ReleaseInfo> releases)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+		viewModel.Update(releases);
+
+		// When
+		viewModel.SkipReleaseCommand.Execute(null);
+
+		// Then
+		updaterPlugin.Received(1).SkipRelease(releases[0].Release);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void InstallReleaseCommand(IUpdaterPlugin updaterPlugin, List<ReleaseInfo> releases)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+		viewModel.Update(releases);
+
+		// When
+		viewModel.InstallReleaseCommand.Execute(null);
+
+		// Then
+		updaterPlugin.Received(1).InstallRelease(releases[0].Release);
+		updaterPlugin.Received(1).CloseUpdaterWindow();
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void CloseUpdaterWindowCommand(IUpdaterPlugin updaterPlugin)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+
+		// When
+		viewModel.CloseUpdaterWindowCommand.Execute(null);
+
+		// Then
+		updaterPlugin.Received(1).CloseUpdaterWindow();
+	}
+
+	[Theory, AutoSubstituteData<UpdaterWindowViewModelCustomization>]
+	public void InstallButtonText(IUpdaterPlugin updaterPlugin, List<ReleaseInfo> releases)
+	{
+		// Given
+		UpdaterWindowViewModel viewModel = new(updaterPlugin);
+		viewModel.Update(releases);
+
+		// When
+		string installButtonText = viewModel.InstallButtonText;
+
+		// Then
+		Assert.Equal("Install v0.1.243-alpha+2ae89a20", installButtonText);
 	}
 }

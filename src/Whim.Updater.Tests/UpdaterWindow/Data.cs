@@ -25,7 +25,7 @@ internal static class Data
 			siteAdmin: false
 		);
 
-	private const string Release1Body =
+	private const string Release242Body =
 		@"<!-- Release notes generated using configuration in .github/release.yml at main -->
 
 ## What's Changed
@@ -36,7 +36,7 @@ internal static class Data
 **Full Changelog**: https://github.com/dalyIsaac/Whim/compare/v0.1.270-alpha+dfd0e637...v0.1.271-alpha+5ef9529c
 ";
 
-	public static Release CreateRelease1()
+	public static Release CreateRelease242()
 	{
 		ReleaseAsset[] assets = new ReleaseAsset[2];
 
@@ -88,13 +88,13 @@ internal static class Data
 			publishedAt: DateTimeOffset.Parse("2023-11-26T02:00:36Z"),
 			tarballUrl: "https://api.github.com/repos/dalyIsaac/Whim/tarball/v0.1.242-alpha+823a398d",
 			zipballUrl: "https://api.github.com/repos/dalyIsaac/Whim/zipball/v0.1.242-alpha+823a398d",
-			body: Release1Body,
+			body: Release242Body,
 			author: CreateAuthor(),
 			assets: assets
 		);
 	}
 
-	private const string Release2Body =
+	private const string Release243Body =
 		@"<!-- Release notes generated using configuration in .github/release.yml at main -->
 
 ## What's Changed
@@ -105,7 +105,7 @@ internal static class Data
 **Full Changelog**: https://github.com/dalyIsaac/Whim/compare/v0.1.269-alpha+150a91e8...v0.1.270-alpha+dfd0e637
 ";
 
-	public static Release CreateRelease2()
+	public static Release CreateRelease243()
 	{
 		ReleaseAsset[] assets = new ReleaseAsset[2];
 
@@ -157,7 +157,7 @@ internal static class Data
 			publishedAt: DateTimeOffset.Parse("2023-11-26T04:57:56Z"),
 			tarballUrl: "https://api.github.com/repos/dalyIsaac/Whim/tarball/v0.1.243-alpha+2ae89a20",
 			zipballUrl: "https://api.github.com/repos/dalyIsaac/Whim/zipball/v0.1.243-alpha+2ae89a20",
-			body: Release2Body,
+			body: Release243Body,
 			author: CreateAuthor(),
 			assets: assets
 		);

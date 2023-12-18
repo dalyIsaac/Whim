@@ -48,9 +48,10 @@
 					Not now
 				</Button>
 
-				<Button Command="{x:Bind ViewModel.InstallReleaseCommand}" Style="{StaticResource AccentButtonStyle}">
-					Download and install
-				</Button>
+				<Button
+					Command="{x:Bind ViewModel.InstallReleaseCommand}"
+					Content="{x:Bind ViewModel.InstallButtonText}"
+					Style="{StaticResource AccentButtonStyle}" />
 			</StackPanel>
 		</RelativePanel>
 

@@ -242,6 +242,8 @@ public class UpdaterPlugin : IUpdaterPlugin
 				sortedReleases.Add(info);
 			}
 		}
+
+		// Sort the releases by semver in descending order.
 		sortedReleases.Sort((a, b) => a.Version.IsNewerVersion(b.Version) ? -1 : 1);
 
 		Logger.Debug($"Found {sortedReleases.Count} releases");

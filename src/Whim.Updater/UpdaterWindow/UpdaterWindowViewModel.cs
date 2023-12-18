@@ -95,6 +95,8 @@ internal class UpdaterWindowViewModel : INotifyPropertyChanged
 
 	public CloseUpdaterWindowCommand CloseUpdaterWindowCommand { get; }
 
+	public string InstallButtonText => $"Install {LastRelease?.Release.TagName}";
+
 	public UpdaterWindowViewModel(IUpdaterPlugin plugin)
 	{
 		_plugin = plugin;
