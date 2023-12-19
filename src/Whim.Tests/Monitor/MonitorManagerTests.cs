@@ -494,7 +494,7 @@ public class MonitorManagerTests
 		);
 
 		// Then
-		internalCtx.CoreNativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]

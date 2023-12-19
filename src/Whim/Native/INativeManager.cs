@@ -1,4 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.UI.Dispatching;
 using Windows.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -145,4 +150,52 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="hwnd"></param>
 	void RemoveWindowExTransparent(HWND hwnd);
+
+	/// <summary>
+	/// Adds a task to the <see cref="DispatcherQueue" /> which will be executed on the thread associated
+	/// with the <see cref="DispatcherQueue" />.
+	/// </summary>
+	/// <param name="callback">The task to execute.</param>
+	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
+	bool TryEnqueue(DispatcherQueueHandler callback);
+
+	/// <summary>
+	/// Gets the version of Whim.
+	/// </summary>
+	/// <returns></returns>
+	string GetWhimVersion();
+
+	/// <summary>
+	/// Downloads the file at the given <paramref name="uri"/> to the given <paramref name="destinationPath"/>.
+	/// </summary>
+	/// <param name="uri"></param>
+	/// <param name="destinationPath"></param>
+	/// <returns></returns>
+	/// <exception cref="InvalidOperationException"></exception>
+	/// <exception cref="HttpRequestException"></exception>
+	/// <exception cref="TaskCanceledException"></exception>
+	/// <exception cref="ArgumentException"></exception>
+	/// <exception cref="ArgumentNullException"></exception>
+	/// <exception cref="PathTooLongException"></exception>
+	/// <exception cref="DirectoryNotFoundException"></exception>
+	/// <exception cref="IOException"></exception>
+	/// <exception cref="UnauthorizedAccessException"></exception>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	/// <exception cref="FileNotFoundException"></exception>
+	/// <exception cref="NotSupportedException"></exception>
+	/// <exception cref="ArgumentNullException"></exception>
+	/// <exception cref="ObjectDisposedException"></exception>
+	/// <exception cref="NotSupportedException"></exception>
+	Task DownloadFileAsync(Uri uri, string destinationPath);
+
+	/// <summary>
+	/// Runs the file at the given <paramref name="path"/>.
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns>The exit code of the process.</returns>
+	/// <exception cref="InvalidOperationException"></exception>
+	/// <exception cref="System.ComponentModel.Win32Exception"></exception>
+	/// <exception cref="ObjectDisposedException"></exception>
+	/// <exception cref="PlatformNotSupportedException"></exception>
+	Task<int> RunFileAsync(string path);
 }

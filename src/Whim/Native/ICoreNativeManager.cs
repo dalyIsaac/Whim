@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using Microsoft.UI.Dispatching;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -411,14 +410,6 @@ internal interface ICoreNativeManager
 	/// <para><see href="https://docs.microsoft.com/windows/win32/api//wtsapi32/nf-wtsapi32-wtsunregistersessionnotification">Learn more about this API from docs.microsoft.com</see>.</para>
 	/// </remarks>
 	BOOL WTSUnRegisterSessionNotification(HWND hWnd);
-
-	/// <summary>
-	/// Adds a task to the <see cref="DispatcherQueue" /> which will be executed on the thread associated
-	/// with the <see cref="DispatcherQueue" />.
-	/// </summary>
-	/// <param name="callback">The task to execute.</param>
-	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
-	bool TryEnqueue(DispatcherQueueHandler callback);
 
 	/// <summary>
 	/// Gets a <see cref="HWND" /> for the current window to use for the <see cref="WindowMessageMonitor" />.
