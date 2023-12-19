@@ -24,14 +24,19 @@
 					Content="{x:Bind Name}"
 					Style="{StaticResource bar:workspace:button}">
 					<Button.Resources>
+						<!--
+							WinUI doesn't let us set `Trigger` styles explicitly. We can
+							change them by modifying the theme resources in
+							Microsoft.UI.Xaml.Controls. The relevant keys are:
+							- Button[Background|Foreground|Borderbrush]
+							- Button[Background|Foreground|Borderbrush]PointerOver
+							- Button[Background|Foreground|Borderbrush]Pressed
+							- Button[Background|Foreground|Borderbrush]Disabled
+						-->
 						<SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{StaticResource bar:active_workspace:background}" />
 						<SolidColorBrush x:Key="ButtonForegroundDisabled" Color="{StaticResource bar:active_workspace:foreground}" />
 						<SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{StaticResource bar:hover:background}" />
 						<SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{StaticResource bar:hover:foreground}" />
-						<!--  Button[Background|Foreground|Borderbrush]  -->
-						<!--  Button[Background|Foreground|Borderbrush]PointerOver  -->
-						<!--  Button[Background|Foreground|Borderbrush]Pressed  -->
-						<!--  Button[Background|Foreground|Borderbrush]Disabled  -->
 					</Button.Resources>
 				</Button>
 			</DataTemplate>

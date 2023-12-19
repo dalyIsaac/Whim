@@ -75,7 +75,7 @@ internal class Context : IContext
 
 		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(FilterManager);
 
-		// Initialize before user's config so the latter takes precedence over the default.
+		// Initialize before ConfigLoader so user dicts take precedence over the default dict.
 		ResourceManager.Initialize();
 
 		// Load the user's config.

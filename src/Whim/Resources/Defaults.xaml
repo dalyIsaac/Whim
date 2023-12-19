@@ -1,6 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-	<!--  Bar height. Must not contain any property other than "Height"  -->
+	<!--
+		Bar height. Must not contain any property other than "Height". If set, this
+		overwrites `BarConfig._height`. It does not bear a *direct* effect on the UI.
+	-->
 	<Style x:Key="bar:height" TargetType="RelativePanel">
 		<Setter Property="Height" Value="30" />
 	</Style>
@@ -8,7 +11,7 @@
 	<!--  Font family  -->
 	<FontFamily x:Key="_font:family">Segoe UI</FontFamily>
 
-	<!--  Explicit colors, rest is inherited from system settings  -->
+	<!--  Explicit colors, other colors are inherited from the system settings  -->
 	<Color x:Key="bar:active_workspace:background">#81a1c1</Color>
 	<Color x:Key="bar:active_workspace:foreground">#1c1c1c</Color>
 	<Color x:Key="bar:hover:background">#15777777</Color>

@@ -7,17 +7,17 @@ namespace Whim;
 
 internal class ResourceManager : IResourceManager
 {
-	public string DefaultDict { get; set; } = "Resources/Defaults.xaml";
+	public string DefaultDictPath { get; set; } = "Resources/Defaults.xaml";
 
 	public void Initialize()
 	{
 		// Set default dictionary
-		SetAppDictionary(DefaultDict);
+		AddDictionary(DefaultDictPath);
 	}
 
-	public void SetAppDictionary(string filePath)
+	public void AddDictionary(string filePath)
 	{
-		Logger.Debug($"Setting App Dictionary from {filePath}");
+		Logger.Debug($"Adding ResourceDictionary from {filePath}");
 
 		Uri uri = new("ms-appx:///" + filePath);
 		ResourceDictionary dict = new() { Source = uri };
@@ -25,7 +25,7 @@ internal class ResourceManager : IResourceManager
 		AddMergedDictionary(dict);
 	}
 
-	public void SetUserDictionary(string filePath)
+	public void AddUserDictionary(string filePath)
 	{
 		if (!File.Exists(filePath))
 		{
@@ -33,9 +33,9 @@ internal class ResourceManager : IResourceManager
 			return;
 		}
 
-		Logger.Debug($"Setting User Dictionary from {filePath}");
+		Logger.Debug($"Adding User ResourceDictionary from {filePath}");
 
-		// We are reading the dict as a raw string as `ResourceDictionary.Source(uri)
+		// We are reading user dicts as raw strings as `ResourceDictionary.Source(uri)
 		// does not seem to work when `uri` uses the `file:///` scheme
 		string raw = File.ReadAllText(filePath);
 		ResourceDictionary dict = (ResourceDictionary)XamlReader.Load(raw);

@@ -10,7 +10,7 @@ public interface IResourceManager
 	/// <summary>
 	/// Path to default dictionary relative to package root. Omit the leading "/" when setting.
 	/// </summary>
-	string DefaultDict { get; set; }
+	string DefaultDictPath { get; set; }
 
 	/// <summary>
 	/// Initializes the <see cref="ResourceManager"/>.
@@ -21,11 +21,11 @@ public interface IResourceManager
 	/// Add new dictionary from the package.
 	/// <param name="filePath">Path to dictionary relative to the package root.</param>
 	/// </summary>
-	void SetAppDictionary(string filePath);
+	void AddDictionary(string filePath);
 
 	/// <summary>
 	/// Add new dictionary from the users file system.
 	/// <param name="filePath">Absolute path to dictionary in the local filesystem.</param>
 	/// </summary>
-	void SetUserDictionary(string filePath);
+	void AddUserDictionary(string filePath);
 }
