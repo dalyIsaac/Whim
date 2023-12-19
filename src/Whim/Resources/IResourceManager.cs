@@ -18,7 +18,7 @@ public interface IResourceManager
 	void Initialize();
 
 	/// <summary>
-	/// Add  new dictionary from the package.
+	/// Add new dictionary from the package.
 	/// <param name="filePath">Path to dictionary relative to the package root.</param>
 	/// </summary>
 	void SetAppDictionary(string filePath);
