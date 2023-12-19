@@ -338,4 +338,17 @@ public class UpdaterPluginTests
 		ctx.NotificationManager.Received(1).Unregister("whim.updater.show_window");
 		ctx.NotificationManager.Received(1).Unregister("whim.updater.cancel");
 	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public void PluginCommands(IContext ctx)
+	{
+		// Given
+		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+
+		// When
+		IPluginCommands pluginCommands = plugin.PluginCommands;
+
+		// Then
+		Assert.Single(pluginCommands.Commands);
+	}
 }
