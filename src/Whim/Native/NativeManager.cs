@@ -23,11 +23,8 @@ internal partial class NativeManager : INativeManager
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
-	private readonly Microsoft.UI.Dispatching.DispatcherQueue _dispatcherQueue = Microsoft
-		.UI
-		.Dispatching
-		.DispatcherQueue
-		.GetForCurrentThread();
+	private readonly Microsoft.UI.Dispatching.DispatcherQueue _dispatcherQueue =
+		Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="NativeManager"/> class.

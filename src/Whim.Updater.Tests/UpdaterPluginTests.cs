@@ -36,11 +36,9 @@ public class UpdaterPluginTests
 
 		// Then
 		Assert.Equal("whim.updater", plugin.Name);
-		ctx.NotificationManager
-			.Received(1)
+		ctx.NotificationManager.Received(1)
 			.Register("whim.updater.show_window", Arg.Any<Action<AppNotificationActivatedEventArgs>>());
-		ctx.NotificationManager
-			.Received(1)
+		ctx.NotificationManager.Received(1)
 			.Register("whim.updater.cancel", Arg.Any<Action<AppNotificationActivatedEventArgs>>());
 	}
 
@@ -64,9 +62,7 @@ public class UpdaterPluginTests
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
 		client
-			.Repository
-			.Release
-			.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
 			.Returns(new[] { Data.CreateRelease242(tagName: "welp") });
 
 		// When
@@ -82,9 +78,7 @@ public class UpdaterPluginTests
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
 		client
-			.Repository
-			.Release
-			.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
 			.Returns(new[] { Data.CreateRelease242(tagName: "v0.1.263-beta+bc5c56c4") });
 
 		// When
@@ -100,9 +94,7 @@ public class UpdaterPluginTests
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
 		client
-			.Repository
-			.Release
-			.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
 			.Returns(new[] { Data.CreateRelease242(tagName: "v0.1.261-alpha+bc5c56c4") });
 
 		// When
@@ -135,9 +127,7 @@ public class UpdaterPluginTests
 		};
 
 		client
-			.Repository
-			.Release
-			.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
 			.Returns(orderedReleases.Select(t => Data.CreateRelease242(tagName: t)).ToArray());
 
 		// When

@@ -21,8 +21,7 @@ internal class WindowCustomization : ICustomization
 		internalCtx.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>()).Returns(("processName", "processFileName"));
 
 		internalCtx
-			.CoreNativeManager
-			.GetWindowThreadProcessId(Arg.Any<HWND>(), out uint _)
+			.CoreNativeManager.GetWindowThreadProcessId(Arg.Any<HWND>(), out uint _)
 			.Returns(
 				(x) =>
 				{
@@ -32,8 +31,7 @@ internal class WindowCustomization : ICustomization
 			);
 
 		internalCtx
-			.CoreNativeManager
-			.GetWindowRect(Arg.Any<HWND>(), out RECT _)
+			.CoreNativeManager.GetWindowRect(Arg.Any<HWND>(), out RECT _)
 			.Returns(
 				(x) =>
 				{
@@ -339,8 +337,7 @@ public class WindowTests
 	{
 		// Given
 		internalCtx
-			.CoreNativeManager
-			.When(x => x.GetProcessNameAndPath(Arg.Any<int>()))
+			.CoreNativeManager.When(x => x.GetProcessNameAndPath(Arg.Any<int>()))
 			.Do(x => throw new Win32Exception());
 
 		// When
@@ -450,8 +447,7 @@ public class WindowTests
 	{
 		// Given
 		internalCtx
-			.CoreNativeManager
-			.GetProcessNameAndPath(Arg.Any<int>())
+			.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>())
 			.Returns(("processName", "app/ApplicationFrameHost.exe"));
 
 		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
@@ -468,8 +464,7 @@ public class WindowTests
 	{
 		// Given
 		internalCtx
-			.CoreNativeManager
-			.GetProcessNameAndPath(Arg.Any<int>())
+			.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>())
 			.Returns(("processName", "processFileName"));
 
 		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;

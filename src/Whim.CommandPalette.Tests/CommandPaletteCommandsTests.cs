@@ -27,8 +27,7 @@ public class CommandPaletteCommandsTests
 
 			Context.WorkspaceManager.ActiveWorkspace.Returns(Workspace);
 			Context
-				.WorkspaceManager
-				.GetEnumerator()
+				.WorkspaceManager.GetEnumerator()
 				.Returns((_) => new List<IWorkspace>() { Workspace, OtherWorkspace }.GetEnumerator());
 
 			Plugin = Substitute.For<ICommandPalettePlugin>();
@@ -239,8 +238,7 @@ public class CommandPaletteCommandsTests
 		// Then
 		string[] expectedWorkspaces = new string[] { "Workspace", "Other workspace" };
 		wrapper
-			.Plugin
-			.Received(1)
+			.Plugin.Received(1)
 			.Activate(
 				Arg.Is<MenuVariantConfig>(
 					c =>
@@ -264,14 +262,12 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		wrapper
-			.Plugin
-			.Received(1)
+			.Plugin.Received(1)
 			.Activate(
 				Arg.Is<SelectVariantConfig>(
 					c =>
 						c.Hint == "Select windows"
-						&& c.Options
-							.Select(y => y.Title)
+						&& c.Options.Select(y => y.Title)
 							.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
 				)
 			);
@@ -291,8 +287,7 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		wrapper
-			.Plugin
-			.Received(1)
+			.Plugin.Received(1)
 			.Activate(
 				Arg.Is<MenuVariantConfig>(
 					c =>
@@ -332,15 +327,13 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		wrapper
-			.Plugin
-			.Received(1)
+			.Plugin.Received(1)
 			.Activate(
 				Arg.Is<MenuVariantConfig>(
 					c =>
 						c.Hint == "Find window"
 						&& c.ConfirmButtonText == "Focus"
-						&& c.Commands
-							.Select(c => c.Title)
+						&& c.Commands.Select(c => c.Title)
 							.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
 				)
 			);

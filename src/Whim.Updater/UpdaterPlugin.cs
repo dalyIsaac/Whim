@@ -88,13 +88,11 @@ public class UpdaterPlugin : IUpdaterPlugin
 	{
 		Logger.Debug("Showing update window");
 
-		_context
-			.NativeManager
-			.TryEnqueue(async () =>
-			{
-				_updaterWindow = new UpdaterWindow(plugin: this, null);
-				await _updaterWindow.Activate(_notInstalledReleases).ConfigureAwait(true);
-			});
+		_context.NativeManager.TryEnqueue(async () =>
+		{
+			_updaterWindow = new UpdaterWindow(plugin: this, null);
+			await _updaterWindow.Activate(_notInstalledReleases).ConfigureAwait(true);
+		});
 	}
 
 	private void HandleOnCancelNotification(AppNotificationActivatedEventArgs args)
@@ -203,9 +201,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		gitHubClient ??= CreateGitHubClient();
 
 		IReadOnlyList<Release> releases = await gitHubClient
-			.Repository
-			.Release
-			.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
+			.Repository.Release.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
 			.ConfigureAwait(false);
 
 		// Sort the releases by semver

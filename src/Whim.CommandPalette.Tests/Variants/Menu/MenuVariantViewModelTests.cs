@@ -28,8 +28,7 @@ public class MenuVariantViewModelTests
 	internal void Constructor(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		ctx.CommandManager
-			.GetEnumerator()
+		ctx.CommandManager.GetEnumerator()
 			.Returns(new List<ICommand>() { new Command("id", "title", () => { }) }.GetEnumerator());
 
 		// When
@@ -465,8 +464,7 @@ public class MenuVariantViewModelTests
 
 		// Then
 		Assert.Equal(2, vm.MenuRows.Count);
-		vm.MenuRows
-			.Should()
+		vm.MenuRows.Should()
 			.AllSatisfy(r =>
 			{
 				Assert.True(r is MenuRowStub row && row.IsUpdated);
