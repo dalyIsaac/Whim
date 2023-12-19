@@ -66,8 +66,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\Defaults.xaml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+		<None Update="Resources\Defaults.xaml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>
