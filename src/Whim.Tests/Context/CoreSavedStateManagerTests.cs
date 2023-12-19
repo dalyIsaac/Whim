@@ -113,8 +113,7 @@ public class CoreSavedStateManagerTests
 		IWorkspace workspace1 = Substitute.For<IWorkspace>();
 		workspace1.Name.Returns("workspace1");
 		workspace1
-			.ActiveLayoutEngine
-			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
+			.ActiveLayoutEngine.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
 				new List<IWindowState>()
 				{
@@ -136,8 +135,7 @@ public class CoreSavedStateManagerTests
 		IWorkspace workspace2 = Substitute.For<IWorkspace>();
 		workspace2.Name.Returns("workspace2");
 		workspace2
-			.ActiveLayoutEngine
-			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
+			.ActiveLayoutEngine.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
 				new List<IWindowState>()
 				{
@@ -157,8 +155,7 @@ public class CoreSavedStateManagerTests
 			);
 
 		// Load the workspaces into the context.
-		ctx.WorkspaceManager
-			.GetEnumerator()
+		ctx.WorkspaceManager.GetEnumerator()
 			.Returns(new List<IWorkspace>() { workspace1, workspace2 }.GetEnumerator());
 
 		// Create the expected JSON.

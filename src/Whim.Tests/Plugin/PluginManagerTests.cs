@@ -235,11 +235,9 @@ public class PluginManagerTests
 		Assert.Equal("whim.plugin3.command3", commands[3].Id);
 
 		ctx.KeybindManager.Received(2).SetKeybind(Arg.Any<string>(), Arg.Any<Keybind>());
-		ctx.KeybindManager
-			.Received(1)
+		ctx.KeybindManager.Received(1)
 			.SetKeybind("whim.plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A));
-		ctx.KeybindManager
-			.Received(1)
+		ctx.KeybindManager.Received(1)
 			.SetKeybind("whim.plugin3.command3", new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_B));
 	}
 
@@ -321,8 +319,7 @@ public class PluginManagerTests
 		// Given
 		(IPlugin plugin1, IPlugin plugin2, IPlugin plugin3) = CreatePlugins();
 		string writtenTextContents = "";
-		ctx.FileManager
-			.WhenForAnyArgs(fm => fm.WriteAllText(Arg.Any<string>(), Arg.Any<string>()))
+		ctx.FileManager.WhenForAnyArgs(fm => fm.WriteAllText(Arg.Any<string>(), Arg.Any<string>()))
 			.Do(call =>
 			{
 				writtenTextContents = call.ArgAt<string>(1);
@@ -337,8 +334,7 @@ public class PluginManagerTests
 		pluginManager.Dispose();
 
 		// Then
-		ctx.FileManager
-			.Received(1)
+		ctx.FileManager.Received(1)
 			.WriteAllText($"{PluginManagerCustomization.SavedStateDir}\\plugins.json", Arg.Any<string>());
 		Assert.Equal("""{"Plugins":{"whim.plugin1":{},"whim.plugin2":{}}}""", writtenTextContents);
 

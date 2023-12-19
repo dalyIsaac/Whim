@@ -34,20 +34,16 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	{
 		_context.NativeManager.HideWindow(_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle);
 
-		_internalContext
-			.CoreNativeManager
-			.SetWindowSubclass(
-				_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
-				_subclassProc,
-				SUBCLASSID,
-				0
-			);
-		_internalContext
-			.CoreNativeManager
-			.WTSRegisterSessionNotification(
-				_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
-				PInvoke.NOTIFY_FOR_ALL_SESSIONS
-			);
+		_internalContext.CoreNativeManager.SetWindowSubclass(
+			_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
+			_subclassProc,
+			SUBCLASSID,
+			0
+		);
+		_internalContext.CoreNativeManager.WTSRegisterSessionNotification(
+			_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
+			PInvoke.NOTIFY_FOR_ALL_SESSIONS
+		);
 	}
 
 	private LRESULT WindowProcWrapper(
@@ -137,16 +133,14 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
 			// set large fields to null
-			_internalContext
-				.CoreNativeManager
-				.RemoveWindowSubclass(
-					_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
-					_subclassProc,
-					SUBCLASSID
-				);
-			_internalContext
-				.CoreNativeManager
-				.WTSUnRegisterSessionNotification(_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle);
+			_internalContext.CoreNativeManager.RemoveWindowSubclass(
+				_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle,
+				_subclassProc,
+				SUBCLASSID
+			);
+			_internalContext.CoreNativeManager.WTSUnRegisterSessionNotification(
+				_internalContext.CoreNativeManager.WindowMessageMonitorWindowHandle
+			);
 			_disposedValue = true;
 		}
 	}
