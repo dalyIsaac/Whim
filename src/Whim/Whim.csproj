@@ -33,7 +33,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Page Remove="Resources\Defaults.xaml" />
+		<Page Remove="Resources\Defaults.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
