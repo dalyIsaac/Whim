@@ -41,8 +41,11 @@ internal class ResourceManager : IResourceManager
 		AddMergedDictionary(dict);
 	}
 
-	// Merge ResourceDictionary with previously added dictionaries. If there is a key
-	// conflict, dictionaries that are merged later take precedence.
+	/// <summary>
+	/// Merge ResourceDictionary with previously added dictionaries. If there is a key
+	/// conflict, dictionaries that are merged later take precedence.
+	/// </summary>
+	/// <param name="dict"></param>
 	private static void AddMergedDictionary(ResourceDictionary dict)
 	{
 		Application.Current.Resources.MergedDictionaries.Add(dict);
