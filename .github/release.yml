@@ -45,6 +45,10 @@ changelog:
       labels:
         - "tree layout"
 
+    - title: Updater
+      labels:
+        - updater
+
     - title: Other Changes 🖋
       labels:
         - "*"
