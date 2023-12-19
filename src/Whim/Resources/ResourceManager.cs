@@ -35,6 +35,8 @@ internal class ResourceManager : IResourceManager
 
 		Logger.Debug($"Setting User Dictionary from {filePath}");
 
+		// We are reading the dict as a raw string as `ResourceDictionary.Source(uri)
+		// does not seem to work when `uri` uses the `file:///` scheme
 		string raw = File.ReadAllText(filePath);
 		ResourceDictionary dict = (ResourceDictionary)XamlReader.Load(raw);
 
