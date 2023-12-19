@@ -24,7 +24,7 @@ public interface IResourceManager
 	void SetAppDictionary(string filePath);
 
 	/// <summary>
-	/// Add  new dictionary from the users file system.
+	/// Add new dictionary from the users file system.
 	/// <param name="filePath">Absolute path to dictionary in the local filesystem.</param>
 	/// </summary>
 	void SetUserDictionary(string filePath);
