@@ -29,8 +29,7 @@ public class MouseHookTests
 		{
 			CaptureMouseHook captureMouseHook = new();
 			internalCtx
-				.CoreNativeManager
-				.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, Arg.Any<HOOKPROC>(), null, 0)
+				.CoreNativeManager.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, Arg.Any<HOOKPROC>(), null, 0)
 				.Returns(
 					(callInfo) =>
 					{
@@ -180,8 +179,7 @@ public class MouseHookTests
 
 		// When
 		internalCtx
-			.CoreNativeManager
-			.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>())
+			.CoreNativeManager.PtrToStructure<MSLLHOOKSTRUCT>(Arg.Any<nint>())
 			.Returns(_ => throw new System.Exception("Test exception"));
 		CustomAssert.DoesNotRaise<MouseEventArgs>(
 			h => mouseHook.MouseLeftButtonDown += h,

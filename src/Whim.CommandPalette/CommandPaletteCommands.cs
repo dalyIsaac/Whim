@@ -96,11 +96,9 @@ public class CommandPaletteCommands : PluginCommands
 						new MenuVariantConfig()
 						{
 							Hint = "Select window",
-							Commands = _context
-								.WorkspaceManager
-								.ActiveWorkspace
-								.Windows
-								.Select(w => RemoveWindowCommandCreator(w)),
+							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(
+								w => RemoveWindowCommandCreator(w)
+							),
 							ConfirmButtonText = "Remove"
 						}
 					)
@@ -115,8 +113,7 @@ public class CommandPaletteCommands : PluginCommands
 							Hint = "Find window",
 							ConfirmButtonText = "Focus",
 							Commands = _context
-								.WorkspaceManager
-								.SelectMany(w => w.Windows)
+								.WorkspaceManager.SelectMany(w => w.Windows)
 								.Select(w => FocusWindowCommandCreator(w))
 						}
 					)
@@ -158,8 +155,7 @@ public class CommandPaletteCommands : PluginCommands
 	{
 		// All the windows in all the workspaces.
 		IEnumerable<IWindow> windows = _context
-			.WorkspaceManager
-			.Select(w => w.Windows)
+			.WorkspaceManager.Select(w => w.Windows)
 			.SelectMany(w => w)
 			.OrderBy(w => w.Title);
 

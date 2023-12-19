@@ -14,17 +14,15 @@ public class FloatingLayoutPluginCustomization : ICustomization
 		IWorkspace workspace = fixture.Freeze<IWorkspace>();
 
 		IMonitor monitor = fixture.Freeze<IMonitor>();
-		monitor
-			.WorkingArea
-			.Returns(
-				new Rectangle<int>()
-				{
-					X = 0,
-					Y = 0,
-					Width = 3,
-					Height = 3
-				}
-			);
+		monitor.WorkingArea.Returns(
+			new Rectangle<int>()
+			{
+				X = 0,
+				Y = 0,
+				Width = 3,
+				Height = 3
+			}
+		);
 
 		// The workspace will have a null last focused window
 		workspace.LastFocusedWindow.Returns((IWindow?)null);

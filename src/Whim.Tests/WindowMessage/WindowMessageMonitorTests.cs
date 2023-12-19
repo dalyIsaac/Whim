@@ -24,8 +24,7 @@ public class WindowMessageMonitorTests
 		{
 			CaptureProc captureProc = new();
 			internalCtx
-				.CoreNativeManager
-				.SetWindowSubclass(Arg.Any<HWND>(), Arg.Any<SUBCLASSPROC>(), 4561, 0)
+				.CoreNativeManager.SetWindowSubclass(Arg.Any<HWND>(), Arg.Any<SUBCLASSPROC>(), 4561, 0)
 				.Returns(
 					(callInfo) =>
 					{
@@ -49,8 +48,7 @@ public class WindowMessageMonitorTests
 
 		// Then
 		internalCtx
-			.CoreNativeManager
-			.Received(1)
+			.CoreNativeManager.Received(1)
 			.SetWindowSubclass(Arg.Any<HWND>(), Arg.Any<SUBCLASSPROC>(), Arg.Any<nuint>(), Arg.Any<nuint>());
 		internalCtx.CoreNativeManager.Received(1).WTSRegisterSessionNotification(Arg.Any<HWND>(), Arg.Any<uint>());
 	}
@@ -75,8 +73,7 @@ public class WindowMessageMonitorTests
 
 		// Then the exception is handled
 		internalCtx
-			.CoreNativeManager
-			.Received(1)
+			.CoreNativeManager.Received(1)
 			.DefSubclassProc(Arg.Any<HWND>(), Arg.Any<uint>(), Arg.Any<WPARAM>(), Arg.Any<LPARAM>());
 	}
 
@@ -131,16 +128,14 @@ public class WindowMessageMonitorTests
 			h => windowMessageMonitor.WorkAreaChanged += h,
 			h => windowMessageMonitor.WorkAreaChanged -= h,
 			() =>
-				capture
-					.SubclassProc
-					?.Invoke(
-						(HWND)0,
-						PInvoke.WM_SETTINGCHANGE,
-						new WPARAM((nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA),
-						(LPARAM)1,
-						0,
-						0
-					)
+				capture.SubclassProc?.Invoke(
+					(HWND)0,
+					PInvoke.WM_SETTINGCHANGE,
+					new WPARAM((nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA),
+					(LPARAM)1,
+					0,
+					0
+				)
 		);
 	}
 
@@ -159,16 +154,14 @@ public class WindowMessageMonitorTests
 			h => windowMessageMonitor.DpiChanged += h,
 			h => windowMessageMonitor.DpiChanged -= h,
 			() =>
-				capture
-					.SubclassProc
-					?.Invoke(
-						(HWND)0,
-						PInvoke.WM_SETTINGCHANGE,
-						new WPARAM((nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_SETLOGICALDPIOVERRIDE),
-						(LPARAM)1,
-						0,
-						0
-					)
+				capture.SubclassProc?.Invoke(
+					(HWND)0,
+					PInvoke.WM_SETTINGCHANGE,
+					new WPARAM((nuint)SYSTEM_PARAMETERS_INFO_ACTION.SPI_SETLOGICALDPIOVERRIDE),
+					(LPARAM)1,
+					0,
+					0
+				)
 		);
 	}
 
@@ -185,8 +178,7 @@ public class WindowMessageMonitorTests
 
 		// Then
 		internalCtx
-			.CoreNativeManager
-			.Received(1)
+			.CoreNativeManager.Received(1)
 			.RemoveWindowSubclass(Arg.Any<HWND>(), Arg.Any<SUBCLASSPROC>(), Arg.Any<nuint>());
 		internalCtx.CoreNativeManager.Received(1).WTSUnRegisterSessionNotification(Arg.Any<HWND>());
 	}

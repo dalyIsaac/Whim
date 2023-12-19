@@ -82,84 +82,80 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
 				callback: () =>
-					_context
-						.WorkspaceManager
-						.MoveWindowEdgesInDirection(
-							Direction.Left,
-							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
-						),
+					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+						Direction.Left,
+						new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
+					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_H)
 			)
 			.Add(
 				identifier: "move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
 				callback: () =>
-					_context
-						.WorkspaceManager
-						.MoveWindowEdgesInDirection(
-							Direction.Left,
-							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
-						),
+					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+						Direction.Left,
+						new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
+					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_J)
 			)
 			.Add(
 				identifier: "move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
 				callback: () =>
-					_context
-						.WorkspaceManager
-						.MoveWindowEdgesInDirection(
-							Direction.Right,
-							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
-						),
+					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+						Direction.Right,
+						new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
+					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_K)
 			)
 			.Add(
 				identifier: "move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
 				callback: () =>
-					_context
-						.WorkspaceManager
-						.MoveWindowEdgesInDirection(
-							Direction.Right,
-							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
-						),
+					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+						Direction.Right,
+						new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
+					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_L)
 			)
 			.Add(
 				identifier: "move_window_top_edge_up",
 				title: "Move the current window's top edge up",
 				callback: () =>
-					_context
-						.WorkspaceManager
-						.MoveWindowEdgesInDirection(Direction.Up, new Point<int>() { Y = -MoveWindowEdgeDelta }),
+					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+						Direction.Up,
+						new Point<int>() { Y = -MoveWindowEdgeDelta }
+					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_U)
 			)
 			.Add(
 				identifier: "move_window_top_edge_down",
 				title: "Move the current window's top edge down",
 				callback: () =>
-					_context
-						.WorkspaceManager
-						.MoveWindowEdgesInDirection(Direction.Up, new Point<int>() { Y = MoveWindowEdgeDelta }),
+					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+						Direction.Up,
+						new Point<int>() { Y = MoveWindowEdgeDelta }
+					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_I)
 			)
 			.Add(
 				identifier: "move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
 				callback: () =>
-					_context
-						.WorkspaceManager
-						.MoveWindowEdgesInDirection(Direction.Down, new Point<int>() { Y = -MoveWindowEdgeDelta }),
+					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+						Direction.Down,
+						new Point<int>() { Y = -MoveWindowEdgeDelta }
+					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_O)
 			)
 			.Add(
 				identifier: "move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
 				callback: () =>
-					_context
-						.WorkspaceManager
-						.MoveWindowEdgesInDirection(Direction.Down, new Point<int>() { Y = MoveWindowEdgeDelta }),
+					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+						Direction.Down,
+						new Point<int>() { Y = MoveWindowEdgeDelta }
+					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_P)
 			)
 			.Add(

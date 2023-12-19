@@ -58,8 +58,7 @@ public class KeybindHookTests
 		{
 			CaptureKeybindHook captureKeybindHook = new();
 			internalCtx
-				.CoreNativeManager
-				.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0)
+				.CoreNativeManager.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0)
 				.Returns(
 					(callInfo) =>
 					{
@@ -87,8 +86,7 @@ public class KeybindHookTests
 		}
 
 		internalCtx
-			.CoreNativeManager
-			.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
 			.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)key });
 
 		ctx.KeybindManager.GetCommands(Arg.Any<IKeybind>()).Returns(commands);
@@ -106,8 +104,7 @@ public class KeybindHookTests
 
 		// Then
 		internalCtx
-			.CoreNativeManager
-			.Received(1)
+			.CoreNativeManager.Received(1)
 			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0);
 	}
 
@@ -136,8 +133,7 @@ public class KeybindHookTests
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
 		internalCtx
-			.CoreNativeManager
-			.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
 			.Returns(null as KBDLLHOOKSTRUCT?);
 
 		// When
@@ -311,8 +307,7 @@ public class KeybindHookTests
 		// When
 		keybindHook.PostInitialize();
 		internalCtx
-			.CoreNativeManager
-			.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
 			.Returns(_ => throw new Exception());
 		LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_SYSKEYDOWN, 0);
 
