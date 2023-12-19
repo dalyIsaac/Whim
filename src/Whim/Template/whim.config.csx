@@ -9,6 +9,7 @@
 #r "WHIM_PATH\plugins\Whim.TreeLayout\Whim.TreeLayout.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.dll"
+#r "WHIM_PATH\plugins\Whim.Updater\Whim.Updater.dll"
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ using Whim.LayoutPreview;
 using Whim.TreeLayout;
 using Whim.TreeLayout.Bar;
 using Whim.TreeLayout.CommandPalette;
+using Whim.Updater;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
@@ -82,6 +84,11 @@ void DoConfig(IContext context)
 	// Layout preview.
 	LayoutPreviewPlugin layoutPreviewPlugin = new(context);
 	context.PluginManager.AddPlugin(layoutPreviewPlugin);
+
+	// Updater.
+	UpdaterConfig updaterConfig = new() { ReleaseChannel = ReleaseChannel.Alpha };
+	UpdaterPlugin updaterPlugin = new(context, updaterConfig);
+	context.PluginManager.AddPlugin(updaterPlugin);
 
 	// Set up workspaces.
 	context.WorkspaceManager.Add("1");
