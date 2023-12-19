@@ -40,6 +40,11 @@ public interface IContext
 	UncaughtExceptionHandling UncaughtExceptionHandling { get; set; }
 
 	/// <summary>
+	/// Whim's <see cref="ResourceManager"/> instances.
+	/// </summary>
+	IResourceManager ResourceManager { get; }
+
+	/// <summary>
 	/// Whim's <see cref="IWorkspaceManager"/> instances.
 	/// </summary>
 	IWorkspaceManager WorkspaceManager { get; }

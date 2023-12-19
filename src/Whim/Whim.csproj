@@ -33,6 +33,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Page Remove="Resources\Defaults.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" />
 		<PackageReference Include="Microsoft.Win32.SystemEvents" />
 		<PackageReference Include="Microsoft.Windows.CsWin32">
@@ -59,5 +63,11 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Template\whim.config.csx" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Resources\Defaults.xaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>
