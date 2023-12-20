@@ -15,21 +15,18 @@ public interface IArea
 
 public record BaseArea : IArea
 {
-	public bool IsHorizontal { get; init; }
+	public bool IsHorizontal { get; protected set; }
 }
 
-public record SliceArea : BaseArea
+public record ParentArea : BaseArea
 {
-	public uint Priority { get; init; }
-
-	public uint MaxChildren { get; init; }
-
 	public ImmutableList<double> Weights { get; }
 
 	public ImmutableList<IArea> Children { get; }
 
-	public SliceArea(params (double Weight, IArea Child)[] children)
+	public ParentArea(bool isHorizontal = true, params (double Weight, IArea Child)[] children)
 	{
+		IsHorizontal = isHorizontal;
 		ImmutableList<double>.Builder weightsBuilder = ImmutableList.CreateBuilder<double>();
 		ImmutableList<IArea>.Builder childrenBuilder = ImmutableList.CreateBuilder<IArea>();
 
@@ -42,8 +39,23 @@ public record SliceArea : BaseArea
 		Weights = weightsBuilder.ToImmutable();
 		Children = childrenBuilder.ToImmutable();
 	}
+}
 
-	public static SliceArea SingleWindowArea => new((1, new BaseArea()));
+public record SliceArea : BaseArea
+{
+	/// <summary>
+	/// 0-indexed order of this area in the layout engine.
+	/// </summary>
+	public uint Order { get; }
+
+	public uint MaxChildren { get; }
+
+	public SliceArea(uint order = 0, uint maxChildren = 1, bool isHorizontal = true)
+	{
+		Order = order;
+		MaxChildren = maxChildren;
+		IsHorizontal = isHorizontal;
+	}
 }
 
 public static class SliceLayouts
@@ -54,10 +66,10 @@ public static class SliceLayouts
 	/// </summary>
 	/// <param name="identity"></param>
 	/// <returns></returns>
-	public static ILayoutEngine PrimaryStackLayout(LayoutEngineIdentity identity) =>
+	public static ILayoutEngine CreatePrimaryStackLayout(LayoutEngineIdentity identity) =>
 		new SliceLayoutEngine(
 			identity,
-			new SliceArea((0.5, SliceArea.SingleWindowArea), (0.5, new BaseArea() { IsHorizontal = false }))
+			new ParentArea(isHorizontal: true, (0.5, new SliceArea(maxChildren: 1, order: 0)), (0.5, new BaseArea()))
 		);
 
 	/// <summary>
@@ -91,10 +103,10 @@ public static class SliceLayouts
 			}
 			else
 			{
-				areas[idx] = (weight, new SliceArea((1.0 / capacity, SliceArea.SingleWindowArea)));
+				areas[idx] = (weight, new SliceArea(maxChildren: capacity, order: (uint)idx));
 			}
 		}
 
-		return new SliceLayoutEngine(identity, new SliceArea(areas));
+		return new SliceLayoutEngine(identity, new ParentArea(isHorizontal: true, areas));
 	}
 }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Whim.SliceLayout;
 
-internal record SliceItem(int Index, Rectangle<int> Rectangle);
+internal record SliceRectangleItem(int Index, Rectangle<int> Rectangle);
 
 public record SliceLayoutEngine : ILayoutEngine
 {
@@ -50,9 +50,18 @@ public record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Doing layout on {rectangle} on {monitor}");
 
+		if (_windows.Count == 0)
+		{
+			return Enumerable.Empty<IWindowState>();
+		}
+
 		// Construct an ordered list of the rectangles to be laid out
-		SliceItem[] items;
-		if (_rootArea is SliceArea sliceArea)
+		SliceRectangleItem[] items;
+		if (_rootArea is ParentArea parentArea)
+		{
+			items = DoLayoutParent(rectangle, parentArea, 0).ToArray();
+		}
+		else if (_rootArea is SliceArea sliceArea)
 		{
 			items = DoLayoutSlice(rectangle, sliceArea, 0).ToArray();
 		}
@@ -81,7 +90,7 @@ public record SliceLayoutEngine : ILayoutEngine
 		return windowStates;
 	}
 
-	private IEnumerable<SliceItem> DoLayoutSlice(IRectangle<int> rectangle, SliceArea area, int startIdx)
+	private IEnumerable<SliceRectangleItem> DoLayoutParent(IRectangle<int> rectangle, ParentArea area, int startIdx)
 	{
 		int x = rectangle.X;
 		int y = rectangle.Y;
@@ -106,14 +115,21 @@ public record SliceLayoutEngine : ILayoutEngine
 			int currentStartIdx = startIdx + idx;
 			if (childArea is BaseArea baseArea)
 			{
-				foreach (SliceItem sliceItem in DoLayoutBase(childRectangle, baseArea, currentStartIdx))
+				foreach (SliceRectangleItem sliceItem in DoLayoutBase(childRectangle, baseArea, currentStartIdx))
 				{
 					yield return sliceItem;
 				}
 			}
 			else if (childArea is SliceArea sliceArea)
 			{
-				foreach (SliceItem sliceItem in DoLayoutSlice(childRectangle, sliceArea, currentStartIdx))
+				foreach (SliceRectangleItem sliceItem in DoLayoutSlice(childRectangle, sliceArea, currentStartIdx))
+				{
+					yield return sliceItem;
+				}
+			}
+			else if (childArea is ParentArea parentArea)
+			{
+				foreach (SliceRectangleItem sliceItem in DoLayoutParent(childRectangle, parentArea, currentStartIdx))
 				{
 					yield return sliceItem;
 				}
@@ -130,8 +146,61 @@ public record SliceLayoutEngine : ILayoutEngine
 		}
 	}
 
-	private IEnumerable<SliceItem> DoLayoutBase(IRectangle<int> rectangle, BaseArea area, int startIdx)
+	private IEnumerable<SliceRectangleItem> DoLayoutSlice(IRectangle<int> rectangle, SliceArea area, int startIdx)
 	{
+		if (area.MaxChildren == 0 || startIdx >= _windows.Count)
+		{
+			yield break;
+		}
+
+		int x = rectangle.X;
+		int y = rectangle.Y;
+		int width = rectangle.Width;
+		int height = rectangle.Height;
+
+		int deltaX = 0;
+		int deltaY = 0;
+
+		int sliceItemsCount = _windows.Count - startIdx;
+
+		if (area.IsHorizontal)
+		{
+			deltaX = rectangle.Width / sliceItemsCount;
+			width = deltaX;
+		}
+		else
+		{
+			deltaY = rectangle.Height / sliceItemsCount;
+			height = deltaY;
+		}
+
+		for (int idx = startIdx; idx < area.MaxChildren; idx++)
+		{
+			if (idx >= _windows.Count)
+			{
+				break;
+			}
+
+			yield return new SliceRectangleItem(idx, new Rectangle<int>(x, y, width, height));
+
+			if (area.IsHorizontal)
+			{
+				x += deltaX;
+			}
+			else
+			{
+				y += deltaY;
+			}
+		}
+	}
+
+	private IEnumerable<SliceRectangleItem> DoLayoutBase(IRectangle<int> rectangle, BaseArea area, int startIdx)
+	{
+		if (startIdx >= _windows.Count)
+		{
+			yield break;
+		}
+
 		int x = rectangle.X;
 		int y = rectangle.Y;
 		int width = rectangle.Width;
@@ -155,7 +224,7 @@ public record SliceLayoutEngine : ILayoutEngine
 
 		for (int idx = startIdx; idx < _windows.Count; idx++)
 		{
-			yield return new SliceItem(idx, new Rectangle<int>(x, y, width, height));
+			yield return new SliceRectangleItem(idx, new Rectangle<int>(x, y, width, height));
 
 			if (area.IsHorizontal)
 			{
