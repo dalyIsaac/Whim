@@ -168,6 +168,14 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false);
 
 	/// <summary>
+	/// Swap the currently active workspace with the one active on the next (or previous) monitor.
+	/// </summary>
+	/// <param name="reverse">
+	/// When <see langword="true"/>, swaps workspace with the previous monitor, otherwise with the next. Defaults to <see langword="false" />.
+	/// </param>
+	void SwapActiveWorkspaceWithNextMonitor(bool reverse = false);
+
+	/// <summary>
 	/// Retrieves the monitor for the active workspace.
 	/// </summary>
 	/// <param name="workspace"></param>
