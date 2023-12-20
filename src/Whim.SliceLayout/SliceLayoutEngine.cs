@@ -11,6 +11,7 @@ public record SliceLayoutEngine : ILayoutEngine
 {
 	private readonly ImmutableList<IWindow> _windows;
 	private readonly IArea _rootArea;
+	private readonly ISliceLayoutPlugin _plugin;
 
 	public string Name { get; init; } = "Leader Stack";
 
@@ -18,26 +19,32 @@ public record SliceLayoutEngine : ILayoutEngine
 
 	public LayoutEngineIdentity Identity { get; }
 
-	private SliceLayoutEngine(LayoutEngineIdentity identity, ImmutableList<IWindow> windows, IArea rootArea)
+	private SliceLayoutEngine(
+		ISliceLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		ImmutableList<IWindow> windows,
+		IArea rootArea
+	)
 	{
+		_plugin = plugin;
 		Identity = identity;
 		_windows = windows;
 		_rootArea = rootArea;
 	}
 
-	public SliceLayoutEngine(LayoutEngineIdentity identity, IArea rootArea)
-		: this(identity, ImmutableList<IWindow>.Empty, rootArea) { }
+	public SliceLayoutEngine(ISliceLayoutPlugin plugin, LayoutEngineIdentity identity, IArea rootArea)
+		: this(plugin, identity, ImmutableList<IWindow>.Empty, rootArea) { }
 
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding {window}");
-		return new SliceLayoutEngine(Identity, _windows.Add(window), _rootArea);
+		return new SliceLayoutEngine(_plugin, Identity, _windows.Add(window), _rootArea);
 	}
 
 	public ILayoutEngine RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing {window}");
-		return new SliceLayoutEngine(Identity, _windows.Remove(window), _rootArea);
+		return new SliceLayoutEngine(_plugin, Identity, _windows.Remove(window), _rootArea);
 	}
 
 	public bool ContainsWindow(IWindow window)
@@ -237,8 +244,11 @@ public record SliceLayoutEngine : ILayoutEngine
 		}
 	}
 
-	public void FocusWindowInDirection(Direction direction, IWindow window) =>
+	public void FocusWindowInDirection(Direction direction, IWindow window)
+	{
+		// TODO
 		throw new System.NotImplementedException();
+	}
 
 	public IWindow? GetFirstWindow()
 	{
@@ -246,12 +256,69 @@ public record SliceLayoutEngine : ILayoutEngine
 		return _windows.Count > 0 ? _windows[0] : null;
 	}
 
-	public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
+	public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window)
+	{
+		// TODO
 		throw new System.NotImplementedException();
+	}
 
-	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) =>
-		throw new System.NotImplementedException();
+	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
+	{
+		Logger.Debug($"Moving {window} to {point}");
 
-	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
+		// TODO: Get the target rectangle from the point
+		// TODO: Get the target area from the rectangle
+		// TODO: Get the target index from the area
+		// TODO: Swap or rotate
+		return this;
+	}
+
+	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
+	{
+		// TODO
 		throw new System.NotImplementedException();
+	}
+
+	private ILayoutEngine MoveWindowToIndex(int currentIndex, int targetIndex)
+	{
+		if (_plugin.WindowInsertionType == WindowInsertionType.Swap)
+		{
+			return SwapWindowIndices(currentIndex, targetIndex);
+		}
+
+		return RotateWindowIndices(currentIndex, targetIndex);
+	}
+
+	private ILayoutEngine SwapWindowIndices(int currentIndex, int targetIndex)
+	{
+		Logger.Debug($"Swapping {currentIndex} and {targetIndex}");
+
+		if (currentIndex == targetIndex)
+		{
+			return this;
+		}
+
+		IWindow currentWindow = _windows[currentIndex];
+		IWindow targetWindow = _windows[targetIndex];
+
+		ImmutableList<IWindow> newWindows = _windows
+			.SetItem(currentIndex, targetWindow)
+			.SetItem(targetIndex, currentWindow);
+
+		return new SliceLayoutEngine(_plugin, Identity, newWindows, _rootArea);
+	}
+
+	private ILayoutEngine RotateWindowIndices(int currentIndex, int targetIndex)
+	{
+		Logger.Debug($"Rotating {currentIndex} and {targetIndex}");
+
+		if (currentIndex == targetIndex)
+		{
+			return this;
+		}
+
+		IWindow currentWindow = _windows[currentIndex];
+		ImmutableList<IWindow> newWindows = _windows.Insert(targetIndex, currentWindow).RemoveAt(currentIndex);
+		return new SliceLayoutEngine(_plugin, Identity, newWindows, _rootArea);
+	}
 }

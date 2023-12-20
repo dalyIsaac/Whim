@@ -9,6 +9,8 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 	// TODO
 	public IPluginCommands PluginCommands => new PluginCommands(Name);
 
+	public WindowInsertionType WindowInsertionType { get; set; }
+
 	public void PreInitialize()
 	{
 		// TODO
