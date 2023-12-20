@@ -13,7 +13,7 @@ public interface IArea
 	bool IsHorizontal { get; }
 }
 
-public record BaseArea : IArea
+public abstract record BaseArea : IArea
 {
 	public bool IsHorizontal { get; protected set; }
 }
@@ -39,9 +39,21 @@ public record ParentArea : BaseArea
 		Weights = weightsBuilder.ToImmutable();
 		Children = childrenBuilder.ToImmutable();
 	}
+
+	internal ParentArea(bool isHorizontal, ImmutableList<double> weights, ImmutableList<IArea> children)
+	{
+		IsHorizontal = isHorizontal;
+		Weights = weights;
+		Children = children;
+	}
 }
 
-public record SliceArea : BaseArea
+public record BaseSliceArea : BaseArea
+{
+	public uint StartIndex { get; }
+}
+
+public record SliceArea : BaseSliceArea
 {
 	/// <summary>
 	/// 0-indexed order of this area in the layout engine.
@@ -58,62 +70,159 @@ public record SliceArea : BaseArea
 	}
 }
 
-public static class SliceLayouts
+internal record OverflowArea : BaseSliceArea { }
+
+internal static class AreaHelpers
 {
 	/// <summary>
-	/// Creates a primary stack layout, where the first window takes up half the screen, and the
-	/// remaining windows are stacked vertically on the other half.
+	/// Prune the tree of empty areas.
 	/// </summary>
-	/// <param name="plugin"></param>
-	/// <param name="identity"></param>
+	/// <param name="area"></param>
+	/// <param name="windowCount"></param>
 	/// <returns></returns>
-	public static ILayoutEngine CreatePrimaryStackLayout(ISliceLayoutPlugin plugin, LayoutEngineIdentity identity) =>
-		new SliceLayoutEngine(
-			plugin,
-			identity,
-			new ParentArea(isHorizontal: true, (0.5, new SliceArea(maxChildren: 1, order: 0)), (0.5, new BaseArea()))
-		);
-
-	/// <summary>
-	/// Creates a multi-column layout with the given number of columns.
-	/// <br />
-	/// For example, new <c>uint[] { 2, 1, 0 }</c> will create a layout with 3 columns, where the
-	/// first column has 2 rows, the second column has 1 row, and the third column has infinite rows.
-	/// </summary>
-	/// <param name="plugin">The <see cref="ISliceLayoutPlugin"/> to use</param>
-	/// <param name="identity">The identity of the layout engine</param>
-	/// <param name="capacities">The number of rows in each column</param>
-	/// <returns></returns>
-	/// <exception cref="ArgumentException"></exception>
-	public static ILayoutEngine CreateMultiColumnLayout(
-		ISliceLayoutPlugin plugin,
-		LayoutEngineIdentity identity,
-		params uint[] capacities
-	)
+	public static ParentArea Prune(this ParentArea area, int windowCount)
 	{
-		double weight = 1.0 / capacities.Length;
-		(double, IArea)[] areas = new (double, IArea)[capacities.Length];
+		ImmutableList<IArea>.Builder childrenBuilder = ImmutableList.CreateBuilder<IArea>();
+		ImmutableList<double>.Builder weightsBuilder = ImmutableList.CreateBuilder<double>();
 
-		bool createdBaseArea = false;
-		for (int idx = 0; idx < capacities.Length; idx++)
+		for (int i = 0; i < area.Children.Count; i++)
 		{
-			uint capacity = capacities[idx];
-			if (capacity == 0)
+			IArea child = area.Children[i];
+			if (child is ParentArea parentArea)
 			{
-				if (createdBaseArea)
+				parentArea = parentArea.Prune(windowCount);
+				if (parentArea.Children.Count == 0)
 				{
-					throw new ArgumentException("Cannot have multiple base areas");
+					continue;
+				}
+			}
+			else if (child is BaseSliceArea baseSliceArea)
+			{
+				if (baseSliceArea.StartIndex >= windowCount)
+				{
+					continue;
 				}
 
-				areas[idx] = (weight, new BaseArea());
-				createdBaseArea = true;
+				if (baseSliceArea is SliceArea sliceArea && sliceArea.MaxChildren == 0)
+				{
+					continue;
+				}
+
+				childrenBuilder.Add(child);
+				weightsBuilder.Add(area.Weights[i]);
+			}
+
+			childrenBuilder.Add(child);
+			weightsBuilder.Add(area.Weights[i]);
+		}
+
+		return new ParentArea(area.IsHorizontal, weightsBuilder.ToImmutable(), childrenBuilder.ToImmutable());
+	}
+
+	public static void DoParentLayout(
+		this SliceRectangleItem[] items,
+		int startIdx,
+		IRectangle<int> rectangle,
+		ParentArea area
+	)
+	{
+		if (startIdx >= items.Length)
+		{
+			return;
+		}
+
+		int x = rectangle.X;
+		int y = rectangle.Y;
+		int width = rectangle.Width;
+		int height = rectangle.Height;
+
+		for (int currIdx = 0; currIdx < area.Children.Count; currIdx++)
+		{
+			double weight = area.Weights[currIdx];
+			IArea childArea = area.Children[currIdx];
+
+			if (area.IsHorizontal)
+			{
+				width = Convert.ToInt32(rectangle.Width * weight);
 			}
 			else
 			{
-				areas[idx] = (weight, new SliceArea(maxChildren: capacity, order: (uint)idx));
+				height = Convert.ToInt32(rectangle.Height * weight);
+			}
+
+			Rectangle<int> childRectangle = new(x, y, width, height);
+
+			if (childArea is ParentArea parentArea)
+			{
+				items.DoParentLayout(startIdx + currIdx, childRectangle, parentArea);
+			}
+			else if (childArea is BaseSliceArea sliceArea)
+			{
+				items.DoSliceLayout(startIdx + currIdx, childRectangle, sliceArea);
+			}
+
+			if (area.IsHorizontal)
+			{
+				x += width;
+			}
+			else
+			{
+				y += height;
 			}
 		}
+	}
 
-		return new SliceLayoutEngine(plugin, identity, new ParentArea(isHorizontal: true, areas));
+	public static void DoSliceLayout(
+		this SliceRectangleItem[] items,
+		int startIdx,
+		IRectangle<int> rectangle,
+		BaseSliceArea area
+	)
+	{
+		if (startIdx >= items.Length)
+		{
+			return;
+		}
+
+		int x = rectangle.X;
+		int y = rectangle.Y;
+		int width = rectangle.Width;
+		int height = rectangle.Height;
+
+		int deltaX = 0;
+		int deltaY = 0;
+
+		int remainingItemsCount = items.Length - startIdx;
+		int sliceItemsCount = remainingItemsCount;
+		if (area is SliceArea sliceArea)
+		{
+			sliceItemsCount = Convert.ToInt32(Math.Min(sliceArea.MaxChildren, remainingItemsCount));
+		}
+		int maxIdx = startIdx + sliceItemsCount;
+
+		if (area.IsHorizontal)
+		{
+			deltaX = rectangle.Width / sliceItemsCount;
+			width = deltaX;
+		}
+		else
+		{
+			deltaY = rectangle.Height / sliceItemsCount;
+			height = deltaY;
+		}
+
+		for (int currIdx = startIdx; currIdx < maxIdx; currIdx++)
+		{
+			items[currIdx] = new SliceRectangleItem(currIdx, new Rectangle<int>(x, y, width, height));
+
+			if (area.IsHorizontal)
+			{
+				x += deltaX;
+			}
+			else
+			{
+				y += deltaY;
+			}
+		}
 	}
 }
