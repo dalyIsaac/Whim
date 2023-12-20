@@ -10,5 +10,11 @@
 	<Button
 		Command="{x:Bind ViewModel.ToggleDirectionCommand}"
 		Content="{x:Bind Path=ViewModel.AddNodeDirection, Mode=OneWay}"
-		Visibility="{x:Bind Path=ViewModel.IsVisible, Mode=OneWay}" />
+		Style="{StaticResource bar:tree_layout:button}"
+		Visibility="{x:Bind Path=ViewModel.IsVisible, Mode=OneWay}">
+		<Button.Resources>
+			<SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{StaticResource bar:hover:background}" />
+			<SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{StaticResource bar:hover:foreground}" />
+		</Button.Resources>
+	</Button>
 </UserControl>

@@ -15,6 +15,7 @@ internal class Context : IContext
 {
 	private readonly IInternalContext _internalContext;
 	public IFileManager FileManager { get; }
+	public IResourceManager ResourceManager { get; }
 	public Logger Logger { get; }
 	public UncaughtExceptionHandling UncaughtExceptionHandling { get; set; } = UncaughtExceptionHandling.Log;
 	public INativeManager NativeManager { get; }
@@ -41,6 +42,7 @@ internal class Context : IContext
 
 		FileManager = new FileManager(args);
 		Logger = new Logger();
+		ResourceManager = new ResourceManager();
 		_internalContext = new InternalContext(this);
 
 		NativeManager = new NativeManager(this, _internalContext);
@@ -72,6 +74,9 @@ internal class Context : IContext
 		}
 
 		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(FilterManager);
+
+		// Initialize before ConfigLoader so user dicts take precedence over the default dict.
+		ResourceManager.Initialize();
 
 		// Load the user's config.
 		ConfigLoader configLoader = new(FileManager);
