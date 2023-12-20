@@ -25,6 +25,9 @@ public record SliceLayoutEngine : ILayoutEngine
 		_rootArea = rootArea;
 	}
 
+	public SliceLayoutEngine(LayoutEngineIdentity identity, IArea rootArea)
+		: this(identity, ImmutableList<IWindow>.Empty, rootArea) { }
+
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding {window}");
