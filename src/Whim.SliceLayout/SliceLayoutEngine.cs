@@ -8,6 +8,7 @@ internal record SliceRectangleItem(int Index, Rectangle<int> Rectangle);
 
 public record SliceLayoutEngine : ILayoutEngine
 {
+	private readonly IContext _context;
 	private readonly ImmutableList<IWindow> _windows;
 	private readonly ParentArea _rootArea;
 	private readonly ISliceLayoutPlugin _plugin;
@@ -19,31 +20,38 @@ public record SliceLayoutEngine : ILayoutEngine
 	public LayoutEngineIdentity Identity { get; }
 
 	private SliceLayoutEngine(
+		IContext context,
 		ISliceLayoutPlugin plugin,
 		LayoutEngineIdentity identity,
 		ImmutableList<IWindow> windows,
 		ParentArea rootArea
 	)
 	{
+		_context = context;
 		_plugin = plugin;
 		Identity = identity;
 		_windows = windows;
 		_rootArea = rootArea;
 	}
 
-	public SliceLayoutEngine(ISliceLayoutPlugin plugin, LayoutEngineIdentity identity, ParentArea rootArea)
-		: this(plugin, identity, ImmutableList<IWindow>.Empty, rootArea) { }
+	public SliceLayoutEngine(
+		IContext context,
+		ISliceLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		ParentArea rootArea
+	)
+		: this(context, plugin, identity, ImmutableList<IWindow>.Empty, rootArea) { }
 
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding {window}");
-		return new SliceLayoutEngine(_plugin, Identity, _windows.Add(window), _rootArea);
+		return new SliceLayoutEngine(_context, _plugin, Identity, _windows.Add(window), _rootArea);
 	}
 
 	public ILayoutEngine RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing {window}");
-		return new SliceLayoutEngine(_plugin, Identity, _windows.Remove(window), _rootArea);
+		return new SliceLayoutEngine(_context, _plugin, Identity, _windows.Remove(window), _rootArea);
 	}
 
 	public bool ContainsWindow(IWindow window)
@@ -106,11 +114,12 @@ public record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Moving {window} to {point}");
 
-		// TODO: Get the target rectangle from the point
-		// TODO: Get the target area from the rectangle
-		// TODO: Get the target index from the area
-		// TODO: Swap or rotate
-		return this;
+		if (GetWindowAtPoint(point) is not (int, IWindow) windowAtPoint)
+		{
+			return this;
+		}
+
+		return MoveWindowToIndex(_windows.IndexOf(window), windowAtPoint.Index);
 	}
 
 	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
@@ -145,7 +154,7 @@ public record SliceLayoutEngine : ILayoutEngine
 			.SetItem(currentIndex, targetWindow)
 			.SetItem(targetIndex, currentWindow);
 
-		return new SliceLayoutEngine(_plugin, Identity, newWindows, _rootArea);
+		return new SliceLayoutEngine(_context, _plugin, Identity, newWindows, _rootArea);
 	}
 
 	private ILayoutEngine RotateWindowIndices(int currentIndex, int targetIndex)
@@ -159,20 +168,30 @@ public record SliceLayoutEngine : ILayoutEngine
 
 		IWindow currentWindow = _windows[currentIndex];
 		ImmutableList<IWindow> newWindows = _windows.Insert(targetIndex, currentWindow).RemoveAt(currentIndex);
-		return new SliceLayoutEngine(_plugin, Identity, newWindows, _rootArea);
+		return new SliceLayoutEngine(_context, _plugin, Identity, newWindows, _rootArea);
 	}
 
 	private (int Index, IWindow Window)? GetWindowAtPoint(IPoint<double> point)
 	{
-		Rectangle<double> parentRect = Rectangle.UnitSquare<double>();
-		if (!parentRect.ContainsPoint(point))
+		Logger.Debug($"Getting window at {point}");
+
+		// This is the easy way - we DoLayout with fake coordinates, then linearly search for the
+		// window at the point, then swap or rotate.
+
+		Point<int> scaledPoint = new((int)(point.X * 10000), (int)(point.Y * 10000));
+		Rectangle<int> rectangle = new(0, 0, 10000, 10000);
+
+		int idx = 0;
+		foreach (IWindowState windowState in DoLayout(rectangle, _context.MonitorManager.PrimaryMonitor))
 		{
-			return null;
+			if (windowState.Rectangle.ContainsPoint(scaledPoint))
+			{
+				return (idx, windowState.Window);
+			}
+
+			idx++;
 		}
 
-		// TODO
-
-
-		throw new System.NotImplementedException();
+		return null;
 	}
 }
