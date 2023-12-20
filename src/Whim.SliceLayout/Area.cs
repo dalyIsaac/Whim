@@ -17,7 +17,7 @@ public record BaseArea : IArea
 	public bool IsHorizontal { get; init; }
 }
 
-internal record SliceArea : BaseArea
+public record SliceArea : BaseArea
 {
 	public uint Priority { get; init; }
 

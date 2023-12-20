@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Whim.SliceLayout;
+
+internal record SliceItem(int Index, Rectangle<int> Rectangle);
 
 public record SliceLayoutEngine : ILayoutEngine
 {
@@ -44,22 +47,38 @@ public record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Doing layout on {rectangle} on {monitor}");
 
+		// Construct an ordered list of the rectangles to be laid out
+		SliceItem[] items;
 		if (_rootArea is SliceArea sliceArea)
 		{
-			return DoLayoutSlice(rectangle, sliceArea, 0);
+			items = DoLayoutSlice(rectangle, sliceArea, 0).ToArray();
 		}
 		else if (_rootArea is BaseArea baseArea)
 		{
-			return DoLayoutBase(rectangle, baseArea, 0);
+			items = DoLayoutBase(rectangle, baseArea, 0).ToArray();
 		}
 		else
 		{
 			Logger.Error($"Unknown area type: {_rootArea.GetType()}");
 			return Array.Empty<IWindowState>();
 		}
+
+		// Assign the windows, in order
+		IWindowState[] windowStates = new IWindowState[_windows.Count];
+		for (int idx = 0; idx < _windows.Count; idx++)
+		{
+			windowStates[idx] = new WindowState()
+			{
+				Rectangle = items[idx].Rectangle,
+				Window = _windows[idx],
+				WindowSize = WindowSize.Normal
+			};
+		}
+
+		return windowStates;
 	}
 
-	private IEnumerable<IWindowState> DoLayoutSlice(IRectangle<int> rectangle, SliceArea area, int startIdx)
+	private IEnumerable<SliceItem> DoLayoutSlice(IRectangle<int> rectangle, SliceArea area, int startIdx)
 	{
 		int x = rectangle.X;
 		int y = rectangle.Y;
@@ -79,20 +98,21 @@ public record SliceLayoutEngine : ILayoutEngine
 				height = Convert.ToInt32(rectangle.Height * area.Weights[idx]);
 			}
 
-			IRectangle<int> childRectangle = new Rectangle<int>(x, y, width, height);
+			Rectangle<int> childRectangle = new(x, y, width, height);
 
+			int currentStartIdx = startIdx + idx;
 			if (childArea is BaseArea baseArea)
 			{
-				foreach (IWindowState windowState in DoLayoutBase(childRectangle, baseArea, startIdx))
+				foreach (SliceItem sliceItem in DoLayoutBase(childRectangle, baseArea, currentStartIdx))
 				{
-					yield return windowState;
+					yield return sliceItem;
 				}
 			}
 			else if (childArea is SliceArea sliceArea)
 			{
-				foreach (IWindowState windowState in DoLayoutSlice(childRectangle, sliceArea, startIdx))
+				foreach (SliceItem sliceItem in DoLayoutSlice(childRectangle, sliceArea, currentStartIdx))
 				{
-					yield return windowState;
+					yield return sliceItem;
 				}
 			}
 
@@ -107,7 +127,7 @@ public record SliceLayoutEngine : ILayoutEngine
 		}
 	}
 
-	private IEnumerable<IWindowState> DoLayoutBase(IRectangle<int> rectangle, BaseArea area, int startIdx)
+	private IEnumerable<SliceItem> DoLayoutBase(IRectangle<int> rectangle, BaseArea area, int startIdx)
 	{
 		int x = rectangle.X;
 		int y = rectangle.Y;
@@ -130,16 +150,9 @@ public record SliceLayoutEngine : ILayoutEngine
 			height = deltaY;
 		}
 
-		for (int i = startIdx; i < _windows.Count; i++)
+		for (int idx = startIdx; idx < _windows.Count; idx++)
 		{
-			IWindow window = _windows[i];
-
-			yield return new WindowState()
-			{
-				Window = window,
-				Rectangle = new Rectangle<int>(x, y, width, height),
-				WindowSize = WindowSize.Normal
-			};
+			yield return new SliceItem(idx, new Rectangle<int>(x, y, width, height));
 
 			if (area.IsHorizontal)
 			{
