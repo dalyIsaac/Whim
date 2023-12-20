@@ -1,8 +1,8 @@
 using System.Text.Json;
 
-namespace Whim.LeaderStackLayout;
+namespace Whim.SliceLayout;
 
-public class LeaderStackLayoutPlugin : ILeaderStackLayoutPlugin
+public class SliceLayoutPlugin : ISliceLayoutPlugin
 {
 	public string Name => "whim.leader_stack_layout";
 

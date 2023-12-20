@@ -191,6 +191,12 @@
 			DestinationFolder="$(TargetDir)plugins\Whim.LayoutPreview\" SkipUnchangedFiles="true" />
 	</Target>
 
+	<!--Whim.SliceLayout-->
+	<Target Name="CopySliceLayoutAfterBuild" AfterTargets="Build;Publish">
+		<Copy SourceFiles="$(SolutionDir)src\Whim.SliceLayout\$(OutDir)Whim.SliceLayout.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.SliceLayout\" SkipUnchangedFiles="true" />
+	</Target>
+
 	<!--Whim.TreeLayout-->
 	<Target Name="CopyTreeLayoutAfterBuild" AfterTargets="Build;Publish">
 		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll"

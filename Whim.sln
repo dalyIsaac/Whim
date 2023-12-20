@@ -62,7 +62,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Updater", "src\Whim.Up
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Updater.Tests", "src\Whim.Updater.Tests\Whim.Updater.Tests.csproj", "{741677F5-5C83-474E-83B7-08F7A84DE11D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whim.LeaderStackLayout", "src\Whim.LeaderStackLayout\Whim.LeaderStackLayout.csproj", "{38946E3C-F336-450F-8159-164AD14C025B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.SliceLayout", "src\Whim.SliceLayout\Whim.SliceLayout.csproj", "{38946E3C-F336-450F-8159-164AD14C025B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -358,8 +358,8 @@ Global
 		{38946E3C-F336-450F-8159-164AD14C025B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38946E3C-F336-450F-8159-164AD14C025B}.Debug|arm64.ActiveCfg = Debug|Any CPU
 		{38946E3C-F336-450F-8159-164AD14C025B}.Debug|arm64.Build.0 = Debug|Any CPU
-		{38946E3C-F336-450F-8159-164AD14C025B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{38946E3C-F336-450F-8159-164AD14C025B}.Debug|x64.Build.0 = Debug|Any CPU
+		{38946E3C-F336-450F-8159-164AD14C025B}.Debug|x64.ActiveCfg = Debug|x64
+		{38946E3C-F336-450F-8159-164AD14C025B}.Debug|x64.Build.0 = Debug|x64
 		{38946E3C-F336-450F-8159-164AD14C025B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38946E3C-F336-450F-8159-164AD14C025B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{38946E3C-F336-450F-8159-164AD14C025B}.Release|arm64.ActiveCfg = Release|Any CPU
