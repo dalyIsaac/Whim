@@ -70,7 +70,13 @@ public record SliceArea : BaseSliceArea
 	}
 }
 
-internal record OverflowArea : BaseSliceArea { }
+internal record OverflowArea : BaseSliceArea
+{
+	public OverflowArea(bool isHorizontal = true)
+	{
+		IsHorizontal = isHorizontal;
+	}
+}
 
 internal static class AreaHelpers
 {
