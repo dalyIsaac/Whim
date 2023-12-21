@@ -31,6 +31,7 @@ public record SliceLayoutEngine : ILayoutEngine
 
 	private const int _cachedWindowStatesScale = 10000;
 
+	// TODO: Make lazy instead of eager
 	/// <summary>
 	/// Cheekily cache the window states with fake coordinates, to facilitate linear searching.
 	/// </summary>
@@ -122,10 +123,16 @@ public record SliceLayoutEngine : ILayoutEngine
 
 	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
+		Logger.Debug($"Focusing window in direction {direction} from {window}");
+		GetWindowInDirection(direction, window)?.Focus();
+	}
+
+	private IWindow? GetWindowInDirection(Direction direction, IWindow window)
+	{
 		int index = _windows.IndexOf(window);
 		if (index == -1)
 		{
-			return;
+			return null;
 		}
 
 		// Figure out the adjacent point of the window
@@ -160,12 +167,12 @@ public record SliceLayoutEngine : ILayoutEngine
 				)
 			)
 			{
-				windowState.Window.Focus();
-				return;
+				return windowState.Window;
 			}
 		}
 
 		Logger.Debug($"No window found at {x}, {y}");
+		return null;
 	}
 
 	public IWindow? GetFirstWindow()
@@ -194,8 +201,15 @@ public record SliceLayoutEngine : ILayoutEngine
 
 	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
 	{
-		// TODO
-		throw new System.NotImplementedException();
+		Logger.Debug($"Swapping {window} in direction {direction}");
+
+		IWindow? windowInDirection = GetWindowInDirection(direction, window);
+		if (windowInDirection == null)
+		{
+			return this;
+		}
+
+		return MoveWindowToIndex(_windows.IndexOf(window), _windows.IndexOf(windowInDirection));
 	}
 
 	private ILayoutEngine MoveWindowToIndex(int currentIndex, int targetIndex)
