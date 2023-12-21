@@ -122,8 +122,50 @@ public record SliceLayoutEngine : ILayoutEngine
 
 	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
-		// TODO
-		throw new System.NotImplementedException();
+		int index = _windows.IndexOf(window);
+		if (index == -1)
+		{
+			return;
+		}
+
+		// Figure out the adjacent point of the window
+		IRectangle<int> rect = _cachedWindowStates[index].Rectangle;
+		double x = rect.X;
+		double y = rect.Y;
+
+		if (direction.HasFlag(Direction.Left))
+		{
+			x -= 1d / _cachedWindowStatesScale;
+		}
+		else if (direction.HasFlag(Direction.Right))
+		{
+			x += rect.Width + (1d / _cachedWindowStatesScale);
+		}
+
+		if (direction.HasFlag(Direction.Up))
+		{
+			y -= 1d / _cachedWindowStatesScale;
+		}
+		else if (direction.HasFlag(Direction.Down))
+		{
+			y += rect.Height + (1d / _cachedWindowStatesScale);
+		}
+
+		// Get the window at that point
+		foreach (IWindowState windowState in _cachedWindowStates)
+		{
+			if (
+				windowState.Rectangle.ContainsPoint(
+					new Point<int>((int)(x * _cachedWindowStatesScale), (int)(y * _cachedWindowStatesScale))
+				)
+			)
+			{
+				windowState.Window.Focus();
+				return;
+			}
+		}
+
+		Logger.Debug($"No window found at {x}, {y}");
 	}
 
 	public IWindow? GetFirstWindow()
