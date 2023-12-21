@@ -31,11 +31,12 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 	private const int _cachedWindowStatesScale = 10000;
 
-	// TODO: Make lazy instead of eager
 	/// <summary>
 	/// Cheekily cache the window states with fake coordinates, to facilitate linear searching.
+	///
+	/// NOTE: Do not access this directly - instead use <see cref="GetLazyWindowStates"/>
 	/// </summary>
-	private readonly IWindowState[] _cachedWindowStates;
+	private IWindowState[]? _cachedWindowStates;
 
 	private SliceLayoutEngine(
 		IContext context,
@@ -50,18 +51,6 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		Identity = identity;
 		_windows = windows;
 		_rootArea = rootArea;
-
-		_cachedWindowStates = CreateCachedWindowStates(windows, rootArea).ToArray();
-	}
-
-	private IEnumerable<IWindowState> CreateCachedWindowStates(ImmutableList<IWindow> windows, ParentArea rootArea)
-	{
-		Rectangle<int> rectangle = new(0, 0, _cachedWindowStatesScale, _cachedWindowStatesScale);
-
-		foreach (IWindowState windowState in DoLayout(rectangle, _context.MonitorManager.PrimaryMonitor))
-		{
-			yield return windowState;
-		}
 	}
 
 	public SliceLayoutEngine(

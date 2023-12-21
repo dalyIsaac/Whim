@@ -4,6 +4,27 @@ namespace Whim.SliceLayout;
 
 public partial record SliceLayoutEngine
 {
+	private IWindowState[] GetLazyWindowStates()
+	{
+		if (_cachedWindowStates is not null)
+		{
+			return _cachedWindowStates;
+		}
+
+		IWindowState[] cachedWindowStates = new IWindowState[_windows.Count];
+
+		Rectangle<int> rectangle = new(0, 0, _cachedWindowStatesScale, _cachedWindowStatesScale);
+		int idx = 0;
+		foreach (IWindowState windowState in DoLayout(rectangle, _context.MonitorManager.PrimaryMonitor))
+		{
+			cachedWindowStates[idx] = windowState;
+			idx++;
+		}
+
+		_cachedWindowStates = cachedWindowStates;
+		return cachedWindowStates;
+	}
+
 	private IWindow? GetWindowInDirection(Direction direction, IWindow window)
 	{
 		int index = _windows.IndexOf(window);
@@ -13,7 +34,8 @@ public partial record SliceLayoutEngine
 		}
 
 		// Figure out the adjacent point of the window
-		IRectangle<int> rect = _cachedWindowStates[index].Rectangle;
+		IWindowState[] windowStates = GetLazyWindowStates();
+		IRectangle<int> rect = windowStates[index].Rectangle;
 		double x = rect.X;
 		double y = rect.Y;
 
@@ -36,7 +58,7 @@ public partial record SliceLayoutEngine
 		}
 
 		// Get the window at that point
-		foreach (IWindowState windowState in _cachedWindowStates)
+		foreach (IWindowState windowState in windowStates)
 		{
 			if (
 				windowState.Rectangle.ContainsPoint(
@@ -101,12 +123,13 @@ public partial record SliceLayoutEngine
 
 		Point<int> scaledPoint =
 			new((int)(point.X * _cachedWindowStatesScale), (int)(point.Y * _cachedWindowStatesScale));
+		IWindowState[] windowStates = GetLazyWindowStates();
 
-		for (int idx = 0; idx < _cachedWindowStates.Length; idx++)
+		for (int idx = 0; idx < windowStates.Length; idx++)
 		{
-			if (_cachedWindowStates[idx].Rectangle.ContainsPoint(scaledPoint))
+			if (windowStates[idx].Rectangle.ContainsPoint(scaledPoint))
 			{
-				return (idx, _cachedWindowStates[idx].Window);
+				return (idx, windowStates[idx].Window);
 			}
 		}
 
