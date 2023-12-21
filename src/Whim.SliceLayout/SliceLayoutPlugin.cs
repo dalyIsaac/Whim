@@ -6,29 +6,16 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 {
 	public string Name => "whim.leader_stack_layout";
 
-	// TODO
-	public IPluginCommands PluginCommands => new PluginCommands(Name);
+	// TODO: Bar extension issue
+	public IPluginCommands PluginCommands => new SliceLayoutCommands(this);
 
 	public WindowInsertionType WindowInsertionType { get; set; }
 
-	public void PreInitialize()
-	{
-		// TODO
-	}
+	public void PreInitialize() { }
 
-	public void PostInitialize()
-	{
-		// TODO
-	}
+	public void PostInitialize() { }
 
-	public void LoadState(JsonElement state)
-	{
-		// TODO
-	}
+	public void LoadState(JsonElement state) { }
 
-	public JsonElement? SaveState()
-	{
-		// TODO
-		return null;
-	}
+	public JsonElement? SaveState() => null;
 }

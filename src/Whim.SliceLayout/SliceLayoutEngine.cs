@@ -124,8 +124,8 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 	public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window)
 	{
-		// TODO
-		throw new System.NotImplementedException();
+		// TODO: Put issue reference here
+		return this;
 	}
 
 	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
