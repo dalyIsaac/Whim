@@ -2,6 +2,7 @@ using System;
 
 namespace Whim.SliceLayout;
 
+// TODO: test custom layouts
 public static class SliceLayouts
 {
 	/// <summary>

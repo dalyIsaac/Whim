@@ -250,16 +250,16 @@ internal static class AreaHelpers
 		return (ParentArea)areaStack[0];
 	}
 
-	public static void DoParentLayout(
+	public static int DoParentLayout(
 		this SliceRectangleItem[] items,
-		int startIdx,
+		int windowStartIdx,
 		IRectangle<int> rectangle,
 		ParentArea area
 	)
 	{
-		if (startIdx >= items.Length)
+		if (windowStartIdx >= items.Length)
 		{
-			return;
+			return windowStartIdx;
 		}
 
 		int x = rectangle.X;
@@ -267,10 +267,11 @@ internal static class AreaHelpers
 		int width = rectangle.Width;
 		int height = rectangle.Height;
 
-		for (int currIdx = 0; currIdx < area.Children.Count; currIdx++)
+		int windowCurrIdx = 0;
+		for (int childIdx = 0; childIdx < area.Children.Count; childIdx++)
 		{
-			double weight = area.Weights[currIdx];
-			IArea childArea = area.Children[currIdx];
+			double weight = area.Weights[childIdx];
+			IArea childArea = area.Children[childIdx];
 
 			if (area.IsRow)
 			{
@@ -285,11 +286,11 @@ internal static class AreaHelpers
 
 			if (childArea is ParentArea parentArea)
 			{
-				items.DoParentLayout(startIdx + currIdx, childRectangle, parentArea);
+				windowCurrIdx = items.DoParentLayout(windowStartIdx + windowCurrIdx, childRectangle, parentArea);
 			}
 			else if (childArea is BaseSliceArea sliceArea)
 			{
-				items.DoSliceLayout(startIdx + currIdx, childRectangle, sliceArea);
+				windowCurrIdx = items.DoSliceLayout(windowStartIdx + windowCurrIdx, childRectangle, sliceArea);
 			}
 
 			if (area.IsRow)
@@ -301,18 +302,20 @@ internal static class AreaHelpers
 				y += height;
 			}
 		}
+
+		return windowStartIdx + windowCurrIdx;
 	}
 
-	public static void DoSliceLayout(
+	public static int DoSliceLayout(
 		this SliceRectangleItem[] items,
-		int startIdx,
+		int windowIdx,
 		IRectangle<int> rectangle,
 		BaseSliceArea area
 	)
 	{
-		if (startIdx >= items.Length)
+		if (windowIdx >= items.Length)
 		{
-			return;
+			return windowIdx;
 		}
 
 		int x = rectangle.X;
@@ -323,13 +326,13 @@ internal static class AreaHelpers
 		int deltaX = 0;
 		int deltaY = 0;
 
-		int remainingItemsCount = items.Length - startIdx;
+		int remainingItemsCount = items.Length - windowIdx;
 		int sliceItemsCount = remainingItemsCount;
 		if (area is SliceArea sliceArea)
 		{
-			sliceItemsCount = Convert.ToInt32(Math.Min(sliceArea.MaxChildren, remainingItemsCount));
+			sliceItemsCount = Math.Min((int)sliceArea.MaxChildren, remainingItemsCount);
 		}
-		int maxIdx = startIdx + sliceItemsCount;
+		int maxIdx = windowIdx + sliceItemsCount;
 
 		if (area.IsRow)
 		{
@@ -342,9 +345,9 @@ internal static class AreaHelpers
 			height = deltaY;
 		}
 
-		for (int currIdx = startIdx; currIdx < maxIdx; currIdx++)
+		for (int windowCurrIdx = windowIdx; windowCurrIdx < maxIdx; windowCurrIdx++)
 		{
-			items[currIdx] = new SliceRectangleItem(currIdx, new Rectangle<int>(x, y, width, height));
+			items[windowCurrIdx] = new SliceRectangleItem(windowCurrIdx, new Rectangle<int>(x, y, width, height));
 
 			if (area.IsRow)
 			{
@@ -355,5 +358,7 @@ internal static class AreaHelpers
 				y += deltaY;
 			}
 		}
+
+		return maxIdx;
 	}
 }
