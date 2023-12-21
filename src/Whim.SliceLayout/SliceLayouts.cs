@@ -21,11 +21,7 @@ public static class SliceLayouts
 			context,
 			plugin,
 			identity,
-			new ParentArea(
-				isHorizontal: true,
-				(0.5, new SliceArea(maxChildren: 1, order: 0)),
-				(0.5, new OverflowArea())
-			)
+			new ParentArea(isRow: true, (0.5, new SliceArea(maxChildren: 1, order: 0)), (0.5, new OverflowArea()))
 		);
 
 	/// <summary>
@@ -70,6 +66,6 @@ public static class SliceLayouts
 			}
 		}
 
-		return new SliceLayoutEngine(context, plugin, identity, new ParentArea(isHorizontal: true, areas));
+		return new SliceLayoutEngine(context, plugin, identity, new ParentArea(isRow: true, areas));
 	}
 }

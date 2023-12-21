@@ -60,6 +60,7 @@ public record SliceLayoutEngine : ILayoutEngine
 		return _windows.Contains(window);
 	}
 
+	// TODO: Cache layouts
 	// TODO: Handle when areas are partially or completely empty.
 	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{

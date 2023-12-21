@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Whim.SliceLayout;
@@ -10,12 +11,12 @@ public interface IArea
 	/// When <see langword="true"/>, the <see cref="Children"/> are arranged horizontally.
 	/// Otherwise, they are arranged vertically.
 	/// </summary>
-	bool IsHorizontal { get; }
+	bool IsRow { get; }
 }
 
 public abstract record BaseArea : IArea
 {
-	public bool IsHorizontal { get; protected set; }
+	public bool IsRow { get; protected set; }
 }
 
 public record ParentArea : BaseArea
@@ -24,9 +25,9 @@ public record ParentArea : BaseArea
 
 	public ImmutableList<IArea> Children { get; }
 
-	public ParentArea(bool isHorizontal = true, params (double Weight, IArea Child)[] children)
+	public ParentArea(bool isRow, params (double Weight, IArea Child)[] children)
 	{
-		IsHorizontal = isHorizontal;
+		IsRow = isRow;
 		ImmutableList<double>.Builder weightsBuilder = ImmutableList.CreateBuilder<double>();
 		ImmutableList<IArea>.Builder childrenBuilder = ImmutableList.CreateBuilder<IArea>();
 
@@ -40,9 +41,9 @@ public record ParentArea : BaseArea
 		Children = childrenBuilder.ToImmutable();
 	}
 
-	internal ParentArea(bool isHorizontal, ImmutableList<double> weights, ImmutableList<IArea> children)
+	internal ParentArea(bool isRow, ImmutableList<double> weights, ImmutableList<IArea> children)
 	{
-		IsHorizontal = isHorizontal;
+		IsRow = isRow;
 		Weights = weights;
 		Children = children;
 	}
@@ -50,7 +51,7 @@ public record ParentArea : BaseArea
 
 public record BaseSliceArea : BaseArea
 {
-	public uint StartIndex { get; }
+	internal uint StartIndex { get; set; }
 }
 
 public record SliceArea : BaseSliceArea
@@ -62,19 +63,19 @@ public record SliceArea : BaseSliceArea
 
 	public uint MaxChildren { get; }
 
-	public SliceArea(uint order = 0, uint maxChildren = 1, bool isHorizontal = true)
+	public SliceArea(uint order = 0, uint maxChildren = 1, bool isRow = false)
 	{
 		Order = order;
 		MaxChildren = maxChildren;
-		IsHorizontal = isHorizontal;
+		IsRow = isRow;
 	}
 }
 
 internal record OverflowArea : BaseSliceArea
 {
-	public OverflowArea(bool isHorizontal = true)
+	public OverflowArea(bool isRow = false)
 	{
-		IsHorizontal = isHorizontal;
+		IsRow = isRow;
 	}
 }
 
@@ -88,9 +89,13 @@ internal static class AreaHelpers
 	/// <returns></returns>
 	public static ParentArea Prune(this ParentArea area, int windowCount)
 	{
+		// Set the start indexes of the areas.
+		SetStartIndexes(area);
+
 		ImmutableList<IArea>.Builder childrenBuilder = ImmutableList.CreateBuilder<IArea>();
 		ImmutableList<double>.Builder weightsBuilder = ImmutableList.CreateBuilder<double>();
 
+		double ignoredWeight = 0;
 		for (int i = 0; i < area.Children.Count; i++)
 		{
 			IArea child = area.Children[i];
@@ -99,30 +104,150 @@ internal static class AreaHelpers
 				parentArea = parentArea.Prune(windowCount);
 				if (parentArea.Children.Count == 0)
 				{
+					ignoredWeight += area.Weights[i];
 					continue;
 				}
 			}
 			else if (child is BaseSliceArea baseSliceArea)
 			{
-				if (baseSliceArea.StartIndex >= windowCount)
+				if (
+					baseSliceArea.StartIndex >= windowCount
+					|| (baseSliceArea is SliceArea sliceArea && sliceArea.MaxChildren == 0)
+				)
 				{
+					ignoredWeight += area.Weights[i];
 					continue;
 				}
-
-				if (baseSliceArea is SliceArea sliceArea && sliceArea.MaxChildren == 0)
-				{
-					continue;
-				}
-
-				childrenBuilder.Add(child);
-				weightsBuilder.Add(area.Weights[i]);
 			}
 
 			childrenBuilder.Add(child);
 			weightsBuilder.Add(area.Weights[i]);
 		}
 
-		return new ParentArea(area.IsHorizontal, weightsBuilder.ToImmutable(), childrenBuilder.ToImmutable());
+		// Redistribute the weight of the ignored children to the remaining children.
+		if (ignoredWeight > 0)
+		{
+			double redistributedWeight = ignoredWeight / childrenBuilder.Count;
+			for (int i = 0; i < weightsBuilder.Count; i++)
+			{
+				weightsBuilder[i] += redistributedWeight;
+			}
+		}
+
+		return new ParentArea(area.IsRow, weightsBuilder.ToImmutable(), childrenBuilder.ToImmutable());
+	}
+
+	private static void SetStartIndexes(this ParentArea area)
+	{
+		if (area.Children.Count == 0)
+		{
+			return;
+		}
+
+		List<SliceArea> sliceAreas = new();
+		List<ParentArea> parentAreas = new();
+		OverflowArea? overflowArea = null;
+
+		// Iterate through the tree and add the areas to the list.
+		Queue<IArea> areas = new();
+		areas.Enqueue(area);
+
+		while (areas.Count > 0)
+		{
+			IArea currArea = areas.Dequeue();
+
+			if (currArea is ParentArea parentArea)
+			{
+				for (int i = 0; i < parentArea.Children.Count; i++)
+				{
+					areas.Enqueue(parentArea.Children[i]);
+				}
+
+				parentAreas.Add(parentArea);
+			}
+			else if (currArea is SliceArea sliceArea)
+			{
+				sliceAreas.Add(sliceArea);
+			}
+			else if (currArea is OverflowArea currOverflowArea)
+			{
+				overflowArea = currOverflowArea;
+			}
+		}
+
+		// Sort the areas by order.
+		sliceAreas.Sort((a, b) => a.Order.CompareTo(b.Order));
+
+		// Set the start indexes.
+		uint currIdx = 0;
+		foreach (SliceArea sliceArea in sliceAreas)
+		{
+			sliceArea.StartIndex = currIdx;
+			currIdx += sliceArea.MaxChildren;
+		}
+
+		if (overflowArea is null)
+		{
+			Logger.Error($"No overflow area found, replacing last slice area with overflow area");
+			overflowArea = ReplaceLastSliceAreaWithOverflowArea(area, sliceAreas[^1].Order);
+		}
+
+		if (overflowArea is not null)
+		{
+			SliceArea lastSlice = sliceAreas[^1];
+			overflowArea.StartIndex = lastSlice.StartIndex + lastSlice.MaxChildren;
+		}
+	}
+
+	private static OverflowArea? ReplaceLastSliceAreaWithOverflowArea(ParentArea rootArea, uint lastSliceOrder)
+	{
+		// DFS
+		List<IArea> areaStack = new() { rootArea };
+
+		while (areaStack.Count > 0)
+		{
+			ParentArea currParentArea = (ParentArea)areaStack[^1];
+			areaStack.RemoveAt(areaStack.Count - 1);
+
+			// Go over each of the children. If the child is the last slice, replace it.
+			// Otherwise, add it to the stack.
+			for (int i = 0; i < currParentArea.Children.Count; i++)
+			{
+				IArea child = currParentArea.Children[i];
+				if (child is ParentArea childParentArea)
+				{
+					areaStack.Add(childParentArea);
+				}
+				else if (child is SliceArea sliceArea && sliceArea.Order == lastSliceOrder)
+				{
+					OverflowArea newOverflow = new(sliceArea.IsRow);
+					areaStack.Add(newOverflow);
+					RebuildWithOverflowArea(areaStack);
+					return newOverflow;
+				}
+			}
+		}
+
+		Logger.Error("Could not replace last slice with overflow area");
+		return null;
+	}
+
+	private static ParentArea RebuildWithOverflowArea(List<IArea> areaStack)
+	{
+		for (int idx = areaStack.Count - 2; idx >= 0; idx--)
+		{
+			ParentArea currArea = (ParentArea)areaStack[idx];
+			IArea nextArea = areaStack[idx + 1];
+
+			ImmutableList<IArea> currAreaChildren = currArea.Children;
+			currAreaChildren = currAreaChildren.SetItem(currAreaChildren.IndexOf(nextArea), areaStack[idx + 1]);
+
+			ImmutableList<double> currAreaWeights = currArea.Weights;
+
+			areaStack[idx] = new ParentArea(currArea.IsRow, currAreaWeights, currAreaChildren);
+		}
+
+		return (ParentArea)areaStack[0];
 	}
 
 	public static void DoParentLayout(
@@ -147,7 +272,7 @@ internal static class AreaHelpers
 			double weight = area.Weights[currIdx];
 			IArea childArea = area.Children[currIdx];
 
-			if (area.IsHorizontal)
+			if (area.IsRow)
 			{
 				width = Convert.ToInt32(rectangle.Width * weight);
 			}
@@ -167,7 +292,7 @@ internal static class AreaHelpers
 				items.DoSliceLayout(startIdx + currIdx, childRectangle, sliceArea);
 			}
 
-			if (area.IsHorizontal)
+			if (area.IsRow)
 			{
 				x += width;
 			}
@@ -206,7 +331,7 @@ internal static class AreaHelpers
 		}
 		int maxIdx = startIdx + sliceItemsCount;
 
-		if (area.IsHorizontal)
+		if (area.IsRow)
 		{
 			deltaX = rectangle.Width / sliceItemsCount;
 			width = deltaX;
@@ -221,7 +346,7 @@ internal static class AreaHelpers
 		{
 			items[currIdx] = new SliceRectangleItem(currIdx, new Rectangle<int>(x, y, width, height));
 
-			if (area.IsHorizontal)
+			if (area.IsRow)
 			{
 				x += deltaX;
 			}
