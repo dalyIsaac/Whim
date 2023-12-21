@@ -75,6 +75,10 @@ public class WorkspaceManagerTests
 		if (monitors.Length > 0)
 		{
 			ctx.MonitorManager.ActiveMonitor.Returns(monitors[activeMonitorIndex]);
+
+			ctx.MonitorManager.GetPreviousMonitor(monitors[activeMonitorIndex])
+				.Returns(monitors[(activeMonitorIndex - 1).Mod(monitors.Length)]);
+			ctx.MonitorManager.GetNextMonitor(monitors[activeMonitorIndex]);
 		}
 	}
 
@@ -876,6 +880,95 @@ public class WorkspaceManagerTests
 		workspaces[firstActivatedIdx].Received(1).RemoveWindow(window);
 		activatedWorkspace.Received(1).AddWindow(window);
 		Assert.Equal(workspaces[activatedWorkspaceIdx], workspaceManager.GetWorkspaceForWindow(window));
+	}
+	#endregion
+
+	#region SwapActiveWorkspaceWithAdjacentMonitor
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(false)]
+	[InlineAutoSubstituteData<WorkspaceManagerCustomization>(true)]
+	internal void SwapActiveWorkspaceWithAdjacentMonitor_NoAdjacentMonitor(
+		bool reverse,
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given there is only a single monitor and workspace...
+		IMonitor[] monitors = new[] { ctx.MonitorManager.ActiveMonitor };
+		SetupMonitors(ctx, monitors);
+		IWorkspace[] workspaces = CreateWorkspaces(1);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// When SwapActiveWorkspaceWithAdjacentMonitor is called, then no event is raised
+		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.SwapActiveWorkspaceWithAdjacentMonitor(reverse)
+		);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void SwapActiveWorkspaceWithAdjacentMonitor_CouldNotFindWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors
+	)
+	{
+		// Given a fake monitor is provided
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		ctx.MonitorManager.GetNextMonitor(Arg.Any<IMonitor>()).Returns(Substitute.For<IMonitor>());
+
+		// When SwapActiveWorkspaceWithAdjacentMonitor is called, then no event is raised
+		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.SwapActiveWorkspaceWithAdjacentMonitor(reverse: false)
+		);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void SwapActiveWorkspaceWithAdjacentMonitor_Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors
+	)
+	{
+		// Given there are two workspaces and monitors
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		ctx.MonitorManager.GetNextMonitor(Arg.Any<IMonitor>()).Returns(monitors[1]);
+
+		// When SwapActiveWorkspaceWithAdjacentMonitor is called, then an event is raised
+		var result = Assert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => workspaceManager.MonitorWorkspaceChanged += h,
+			h => workspaceManager.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.SwapActiveWorkspaceWithAdjacentMonitor(reverse: false)
+		);
+
+		// Then the raised event will match the expected
+		Assert.Equal(monitors[0], result.Arguments.Monitor);
+		Assert.Equal(workspaces[1], result.Arguments.CurrentWorkspace);
+		Assert.Equal(workspaces[0], result.Arguments.PreviousWorkspace);
+
+		// The old workspace is deactivated, the new workspace is laid out, and the first window is
+		// focused.
+		workspaces[0].Received(1).DoLayout();
+		workspaces[1].Received(1).DoLayout();
 	}
 
 	#endregion

@@ -173,7 +173,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <param name="reverse">
 	/// When <see langword="true"/>, swaps workspace with the previous monitor, otherwise with the next. Defaults to <see langword="false" />.
 	/// </param>
-	void SwapActiveWorkspaceWithNextMonitor(bool reverse = false);
+	void SwapActiveWorkspaceWithAdjacentMonitor(bool reverse = false);
 
 	/// <summary>
 	/// Retrieves the monitor for the active workspace.
