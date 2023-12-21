@@ -6,6 +6,16 @@ namespace Whim.SliceLayout;
 
 internal record SliceRectangleItem(int Index, Rectangle<int> Rectangle);
 
+/// <summary>
+/// A layout engine that divides the screen into "areas", which correspond to "slices" of a list
+/// of windows. This can be used to accomplish a variety of layouts, including master-stack layouts.
+/// </summary>
+/// <remarks>
+/// The layout engine is a tree of <see cref="IArea"/>s. Each <see cref="IArea"/> is either a
+/// <see cref="ParentArea"/>, <see cref="SliceArea"/>, or <see cref="OverflowArea"/>.
+///
+/// Windows are assigned to <see cref="SliceArea"/>s according to the <see cref="SliceArea.Order"/>.
+/// </remarks>
 public record SliceLayoutEngine : ILayoutEngine
 {
 	private readonly IContext _context;
@@ -18,6 +28,13 @@ public record SliceLayoutEngine : ILayoutEngine
 	public int Count => _windows.Count;
 
 	public LayoutEngineIdentity Identity { get; }
+
+	private const int _cachedWindowStatesScale = 10000;
+
+	/// <summary>
+	/// Cheekily cache the window states with fake coordinates, to facilitate linear searching.
+	/// </summary>
+	private readonly IWindowState[] _cachedWindowStates;
 
 	private SliceLayoutEngine(
 		IContext context,
@@ -32,6 +49,18 @@ public record SliceLayoutEngine : ILayoutEngine
 		Identity = identity;
 		_windows = windows;
 		_rootArea = rootArea;
+
+		_cachedWindowStates = CreateCachedWindowStates(windows, rootArea).ToArray();
+	}
+
+	private IEnumerable<IWindowState> CreateCachedWindowStates(ImmutableList<IWindow> windows, ParentArea rootArea)
+	{
+		Rectangle<int> rectangle = new(0, 0, _cachedWindowStatesScale, _cachedWindowStatesScale);
+
+		foreach (IWindowState windowState in DoLayout(rectangle, _context.MonitorManager.PrimaryMonitor))
+		{
+			yield return windowState;
+		}
 	}
 
 	public SliceLayoutEngine(
@@ -60,8 +89,6 @@ public record SliceLayoutEngine : ILayoutEngine
 		return _windows.Contains(window);
 	}
 
-	// TODO: Cache layouts
-	// TODO: Handle when areas are partially or completely empty.
 	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
 		Logger.Debug($"Doing layout on {rectangle} on {monitor}");
@@ -176,21 +203,15 @@ public record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Getting window at {point}");
 
-		// This is the easy way - we DoLayout with fake coordinates, then linearly search for the
-		// window at the point, then swap or rotate.
+		Point<int> scaledPoint =
+			new((int)(point.X * _cachedWindowStatesScale), (int)(point.Y * _cachedWindowStatesScale));
 
-		Point<int> scaledPoint = new((int)(point.X * 10000), (int)(point.Y * 10000));
-		Rectangle<int> rectangle = new(0, 0, 10000, 10000);
-
-		int idx = 0;
-		foreach (IWindowState windowState in DoLayout(rectangle, _context.MonitorManager.PrimaryMonitor))
+		for (int idx = 0; idx < _cachedWindowStates.Length; idx++)
 		{
-			if (windowState.Rectangle.ContainsPoint(scaledPoint))
+			if (_cachedWindowStates[idx].Rectangle.ContainsPoint(scaledPoint))
 			{
-				return (idx, windowState.Window);
+				return (idx, _cachedWindowStates[idx].Window);
 			}
-
-			idx++;
 		}
 
 		return null;

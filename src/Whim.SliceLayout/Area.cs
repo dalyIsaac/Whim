@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 
 namespace Whim.SliceLayout;
 
-// TODO: docs
 public interface IArea
 {
 	/// <summary>
