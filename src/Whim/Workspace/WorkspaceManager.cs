@@ -474,24 +474,20 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		return null;
 	}
 
-	public void SwapActiveWorkspaceWithAdjacentMonitor(bool reverse = false)
+	public void SwapActiveWorkspaceWithNextMonitor(bool reverse = false)
 	{
 		// Get the next monitor.
 		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
 		IMonitor nextMonitor = reverse
 			? _context.MonitorManager.GetPreviousMonitor(monitor)
 			: _context.MonitorManager.GetNextMonitor(monitor);
-		if (nextMonitor.Equals(monitor))
-		{
-			Logger.Error($"No monitor adjacent to {monitor} found.");
-			return;
-		}
 
 		// Get workspace on next monitor.
 		IWorkspace? nextWorkspace = GetWorkspaceForMonitor(nextMonitor);
 		if (nextWorkspace == null)
 		{
 			Logger.Error($"Monitor {nextMonitor} was not found to correspond to any workspace");
+
 			return;
 		}
 
