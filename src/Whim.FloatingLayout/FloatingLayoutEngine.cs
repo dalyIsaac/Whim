@@ -68,6 +68,15 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 			: new FloatingLayoutEngine(this, newInnerLayoutEngine, newFloatingWindowRects);
 	}
 
+	/// <summary>
+	/// Returns a new instance of <see cref="FloatingLayoutEngine"/> with the given inner layout engine,
+	/// Only use this for updates that do not involve a window.
+	/// </summary>
+	/// <param name="newInnerLayoutEngine"></param>
+	/// <returns></returns>
+	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine) =>
+		InnerLayoutEngine == newInnerLayoutEngine ? this : new FloatingLayoutEngine(this, newInnerLayoutEngine);
+
 	/// <inheritdoc />
 	public override ILayoutEngine AddWindow(IWindow window)
 	{
@@ -245,4 +254,8 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override bool ContainsWindow(IWindow window) =>
 		_floatingWindowRects.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
+
+	/// <inheritdoc />
+	public override ILayoutEngine PerformCustomAction<T>(string actionName, T args) =>
+		UpdateInner(InnerLayoutEngine.PerformCustomAction(actionName, args));
 }

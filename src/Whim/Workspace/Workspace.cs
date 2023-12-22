@@ -657,6 +657,37 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return garbageCollected;
 	}
 
+	public void PerformCustomLayoutEngineAction<T>(string actionname, T args)
+	{
+		Logger.Debug($"Attempting to perform custom layout engine action {actionname} for workspace {Name}");
+
+		bool doLayout = false;
+		for (int idx = 0; idx < _layoutEngines.Length; idx++)
+		{
+			ILayoutEngine oldEngine = _layoutEngines[idx];
+			ILayoutEngine newEngine = oldEngine.PerformCustomAction(actionname, args);
+
+			if (newEngine.Equals(oldEngine))
+			{
+				Logger.Debug($"Layout engine {oldEngine} could not perform action {actionname}");
+			}
+			else
+			{
+				_layoutEngines[idx] = newEngine;
+
+				if (oldEngine == ActiveLayoutEngine)
+				{
+					doLayout = true;
+				}
+			}
+		}
+
+		if (doLayout)
+		{
+			DoLayout();
+		}
+	}
+
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)

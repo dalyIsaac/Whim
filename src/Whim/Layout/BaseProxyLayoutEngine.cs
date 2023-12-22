@@ -76,6 +76,8 @@ public abstract record BaseProxyLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor);
 
+	public abstract ILayoutEngine PerformCustomAction<T>(string actionName, T args);
+
 	/// <summary>
 	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.
