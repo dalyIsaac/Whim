@@ -46,4 +46,7 @@ public record TestLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
 		throw new NotImplementedException();
+
+	/// <inheritdoc/>
+	public ILayoutEngine PerformCustomAction<T>(string actionName, T args) => throw new NotImplementedException();
 }

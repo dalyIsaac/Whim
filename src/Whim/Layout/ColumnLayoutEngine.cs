@@ -235,4 +235,6 @@ public record ColumnLayoutEngine : ILayoutEngine
 			return direction == Direction.Left ? 1 : -1;
 		}
 	}
+
+	public ILayoutEngine PerformCustomAction<T>(string actionName, T args) => this;
 }
