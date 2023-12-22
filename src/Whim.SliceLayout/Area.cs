@@ -143,11 +143,11 @@ internal static class AreaHelpers
 	/// <returns>
 	/// The areas which directly contain windows, in order.
 	/// </returns>
-	public static IArea[] SetStartIndexes(this ParentArea area)
+	public static BaseSliceArea[] SetStartIndexes(this ParentArea area)
 	{
 		if (area.Children.Count == 0)
 		{
-			return Array.Empty<IArea>();
+			return Array.Empty<BaseSliceArea>();
 		}
 
 		List<SliceArea> sliceAreas = new();
@@ -196,14 +196,17 @@ internal static class AreaHelpers
 		{
 			Logger.Error($"No overflow area found, replacing last slice area with overflow area");
 			overflowArea = ReplaceLastSliceAreaWithOverflowArea(area, sliceAreas[^1].Order);
-
-			SliceArea lastSlice = sliceAreas[^1];
 			sliceAreas.RemoveAt(sliceAreas.Count - 1);
-			overflowArea.StartIndex = lastSlice.StartIndex + lastSlice.MaxChildren;
 		}
 
-		IArea[] windowAreas = new IArea[sliceAreas.Count + 1];
-		sliceAreas.CopyTo((SliceArea[])windowAreas);
+		SliceArea lastSlice = sliceAreas[^1];
+		overflowArea.StartIndex = lastSlice.StartIndex + lastSlice.MaxChildren;
+
+		BaseSliceArea[] windowAreas = new BaseSliceArea[sliceAreas.Count + 1];
+		for (int i = 0; i < sliceAreas.Count; i++)
+		{
+			windowAreas[i] = sliceAreas[i];
+		}
 		windowAreas[^1] = overflowArea;
 
 		return windowAreas;

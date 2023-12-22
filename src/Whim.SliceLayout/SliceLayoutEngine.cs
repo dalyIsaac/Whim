@@ -35,7 +35,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	/// The areas in the tree which contain windows, in order of the <see cref="SliceArea.Order"/>.
 	/// The last area is an <see cref="OverflowArea"/>.
 	/// </summary>
-	private readonly IArea[] _windowAreas;
+	private readonly BaseSliceArea[] _windowAreas;
 
 	/// <summary>
 	/// Cheekily cache the window states with fake coordinates, to facilitate linear searching.
@@ -43,6 +43,11 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	/// NOTE: Do not access this directly - instead use <see cref="GetLazyWindowStates"/>
 	/// </summary>
 	private IWindowState[]? _cachedWindowStates;
+
+	/// <summary>
+	/// The root area, with any empty areas pruned.
+	/// </summary>
+	private readonly ParentArea _prunedRootArea;
 
 	private SliceLayoutEngine(
 		IContext context,
@@ -59,6 +64,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		_rootArea = rootArea;
 
 		_windowAreas = _rootArea.SetStartIndexes();
+		_prunedRootArea = _rootArea.Prune(_windows.Count);
 	}
 
 	public SliceLayoutEngine(
@@ -96,12 +102,9 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			return Enumerable.Empty<IWindowState>();
 		}
 
-		// Prune the empty areas from the tree.
-		ParentArea prunedRootArea = _rootArea.Prune(_windows.Count);
-
 		// Get the rectangles for each window
 		SliceRectangleItem[] items = new SliceRectangleItem[_windows.Count];
-		items.DoParentLayout(0, rectangle, prunedRootArea);
+		items.DoParentLayout(0, rectangle, _prunedRootArea);
 
 		// Get the window states
 		IWindowState[] windowStates = new IWindowState[_windows.Count];
@@ -201,7 +204,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		SliceArea targetArea = (SliceArea)_windowAreas[areaIndex + 1];
+		BaseSliceArea targetArea = _windowAreas[areaIndex + 1];
 		int targetIndex = (int)targetArea.StartIndex;
 
 		return MoveWindowToIndex(windowIndex, targetIndex);
@@ -209,23 +212,21 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 	private int GetAreaStackForWindowIndex(int windowIndex)
 	{
-		int areaStartIndex = 0;
-		foreach (IArea area in _windowAreas)
+		for (int idx = 0; idx < _windowAreas.Length; idx++)
 		{
+			IArea area = _windowAreas[idx];
 			if (area is SliceArea sliceArea)
 			{
-				int areaEndIndex = areaStartIndex + (int)sliceArea.MaxChildren;
-				if (windowIndex >= areaStartIndex && windowIndex < areaEndIndex)
+				int areaEndIndex = (int)(sliceArea.StartIndex + sliceArea.MaxChildren);
+				if (windowIndex >= sliceArea.StartIndex && windowIndex < areaEndIndex)
 				{
-					return areaStartIndex;
+					return idx;
 				}
-
-				areaStartIndex = areaEndIndex;
 			}
 
 			if (area is OverflowArea)
 			{
-				return areaStartIndex;
+				return idx;
 			}
 		}
 

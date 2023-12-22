@@ -675,7 +675,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			{
 				_layoutEngines[idx] = newEngine;
 
-				if (oldEngine == ActiveLayoutEngine)
+				if (oldEngine.Identity == ActiveLayoutEngine.Identity)
 				{
 					doLayout = true;
 				}
