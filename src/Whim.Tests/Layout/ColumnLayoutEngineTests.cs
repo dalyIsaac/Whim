@@ -881,7 +881,7 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
-		ILayoutEngine newEngine = engine.PerformCustomAction("test", 1);
+		ILayoutEngine newEngine = engine.PerformCustomAction("test", 1, null);
 
 		// Then
 		Assert.Same(engine, newEngine);

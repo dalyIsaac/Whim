@@ -157,6 +157,23 @@ public interface IWorkspace : IDisposable
 	/// Layout engines need to handle the custom action in <see cref="ILayoutEngine.PerformCustomAction{T}(string, T)"/>.
 	/// For more, see <see cref="ILayoutEngine.PerformCustomAction{T}(string, T)"/>.
 	/// </remarks>
+	/// <param name="actionName">
+	/// The name of the action. This should be unique to the layout engine type.
+	/// </param>
+	/// <param name="triggerWindow">
+	/// The window that triggered the action, if any. Proxy layout engines may use this to.
+	/// This deliberately does not set the default value to null, so that the caller must
+	/// explicitly pass null if they do not have a trigger window.
+	/// </param>
+	void PerformCustomLayoutEngineAction<T>(string actionName, IWindow? triggerWindow);
+
+	/// <summary>
+	/// Performs a custom action in a layout engine.
+	/// </summary>
+	/// <remarks>
+	/// Layout engines need to handle the custom action in <see cref="ILayoutEngine.PerformCustomAction{T}(string, T)"/>.
+	/// For more, see <see cref="ILayoutEngine.PerformCustomAction{T}(string, T)"/>.
+	/// </remarks>
 	/// <typeparam name="T">
 	/// The type of <paramref name="args"/>.
 	/// </typeparam>
@@ -166,5 +183,10 @@ public interface IWorkspace : IDisposable
 	/// <param name="args">
 	/// The payload of the action, which the handler can use to perform the action.
 	/// </param>
-	void PerformCustomLayoutEngineAction<T>(string actionName, T args);
+	/// <param name="triggerWindow">
+	/// The window that triggered the action, if any. Proxy layout engines may use this to.
+	/// This deliberately does not set the default value to null, so that the caller must
+	/// explicitly pass null if they do not have a trigger window.
+	/// </param>
+	void PerformCustomLayoutEngineAction<T>(string actionName, T args, IWindow? triggerWindow);
 }

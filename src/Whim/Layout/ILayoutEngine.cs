@@ -137,10 +137,15 @@ public interface ILayoutEngine
 	/// <param name="args">
 	/// The payload of the action, which the handler can use to perform the action.
 	/// </param>
+	/// <param name="triggerWindow">
+	/// The window that triggered the action, if any. Proxy layout engines may use this to.
+	/// This deliberately does not set the default value to null, so that the caller must
+	/// explicitly pass null if they do not have a trigger window.
+	/// </param>
 	/// <returns>
 	/// A new layout engine if the action is handled, otherwise it returns the current layout engine.
 	/// </returns>
-	ILayoutEngine PerformCustomAction<T>(string actionName, T args);
+	ILayoutEngine PerformCustomAction<T>(string actionName, T args, IWindow? triggerWindow);
 
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type

@@ -188,7 +188,7 @@ public abstract class ProxyLayoutEngineBaseTests
 		ILayoutEngine layoutEngine = CreateLayoutEngine(inner).AddWindow(window1);
 
 		// When
-		layoutEngine.PerformCustomAction("action", 1);
+		layoutEngine.PerformCustomAction("action", 1, null);
 
 		// Then it shouldn't throw.
 	}

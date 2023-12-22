@@ -674,4 +674,43 @@ public class GapsLayoutEngineTests
 		Assert.Same(window, firstWindow);
 		innerLayoutEngine.Received(1).GetFirstWindow();
 	}
+
+	[Theory, AutoSubstituteData]
+	public void PerformCustomAction_NotSame(
+		ILayoutEngine innerLayoutEngine,
+		ILayoutEngine performCustomActionResult,
+		string actionName,
+		object args
+	)
+	{
+		// Given
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		innerLayoutEngine.PerformCustomAction(actionName, args, null).Returns(performCustomActionResult);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.PerformCustomAction(actionName, args, null);
+
+		// Then
+		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Received(1).PerformCustomAction(actionName, args, null);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PerformCustomAction_Same(ILayoutEngine innerLayoutEngine, string actionName, object args)
+	{
+		// Given
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		innerLayoutEngine.PerformCustomAction(actionName, args, null).Returns(innerLayoutEngine);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.PerformCustomAction(actionName, args, null);
+
+		// Then
+		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Received(1).PerformCustomAction(actionName, args, null);
+	}
 }

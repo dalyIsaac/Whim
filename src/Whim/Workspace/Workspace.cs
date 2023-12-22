@@ -657,7 +657,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return garbageCollected;
 	}
 
-	public void PerformCustomLayoutEngineAction<T>(string actionname, T args)
+	public void PerformCustomLayoutEngineAction<T>(string actionname, IWindow? triggerWindow)
+	{
+		PerformCustomLayoutEngineAction(actionname, triggerWindow, triggerWindow);
+	}
+
+	public void PerformCustomLayoutEngineAction<T>(string actionname, T args, IWindow? triggerWindow)
 	{
 		Logger.Debug($"Attempting to perform custom layout engine action {actionname} for workspace {Name}");
 
@@ -670,7 +675,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		for (int idx = 0; idx < _layoutEngines.Length; idx++)
 		{
 			ILayoutEngine oldEngine = _layoutEngines[idx];
-			ILayoutEngine newEngine = oldEngine.PerformCustomAction(actionname, args);
+			ILayoutEngine newEngine = oldEngine.PerformCustomAction(actionname, args, triggerWindow);
 
 			if (newEngine.Equals(oldEngine))
 			{

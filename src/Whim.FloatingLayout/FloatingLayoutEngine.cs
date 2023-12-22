@@ -59,23 +59,15 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// couldn't get the window's rectangle).
 	/// </param>
 	/// <returns></returns>
-	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow gcWindow)
+	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow? gcWindow)
 	{
-		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowRects = _floatingWindowRects.Remove(gcWindow);
+		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowRects =
+			gcWindow != null ? _floatingWindowRects.Remove(gcWindow) : _floatingWindowRects;
 
 		return InnerLayoutEngine == newInnerLayoutEngine && _floatingWindowRects == newFloatingWindowRects
 			? this
 			: new FloatingLayoutEngine(this, newInnerLayoutEngine, newFloatingWindowRects);
 	}
-
-	/// <summary>
-	/// Returns a new instance of <see cref="FloatingLayoutEngine"/> with the given inner layout engine,
-	/// Only use this for updates that do not involve a window.
-	/// </summary>
-	/// <param name="newInnerLayoutEngine"></param>
-	/// <returns></returns>
-	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine) =>
-		InnerLayoutEngine == newInnerLayoutEngine ? this : new FloatingLayoutEngine(this, newInnerLayoutEngine);
 
 	/// <inheritdoc />
 	public override ILayoutEngine AddWindow(IWindow window)
@@ -256,6 +248,16 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowRects.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc />
-	public override ILayoutEngine PerformCustomAction<T>(string actionName, T args) =>
-		UpdateInner(InnerLayoutEngine.PerformCustomAction(actionName, args));
+	public override ILayoutEngine PerformCustomAction<T>(string actionName, T args, IWindow? window)
+	{
+		if (window != null && IsWindowFloating(window))
+		{
+			// At this stage, we don't have a way to get the window in a child layout engine at
+			// a given point.
+			// For now, we do nothing.
+			return this;
+		}
+
+		return InnerLayoutEngine.PerformCustomAction(actionName, args, window);
+	}
 }

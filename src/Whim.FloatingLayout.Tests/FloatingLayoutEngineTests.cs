@@ -1090,4 +1090,71 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.Received(1).SwapWindowInDirection(Direction.Left, window);
 	}
 	#endregion
+
+	#region PerformCustomAction
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void PerformCustomAction_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		string action,
+		object args
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.PerformCustomAction(action, args, null);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+	}
+
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void PerformCustomAction_UseInner_WindowIsDefined(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		string action,
+		object args,
+		IWindow window
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.PerformCustomAction(action, args, window).Returns(innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.PerformCustomAction(action, args, window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		innerLayoutEngine.Received(1).PerformCustomAction(action, args, window);
+	}
+
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void PerformCustomAction_FloatingWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		string action,
+		object args,
+		IWindow window
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		ILayoutEngine newEngine = engine.AddWindow(window);
+
+		// When
+		ILayoutEngine newEngine2 = newEngine.PerformCustomAction(action, args, window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.Same(newEngine, newEngine2);
+		innerLayoutEngine.DidNotReceive().PerformCustomAction(action, args, null);
+	}
+	#endregion
 }

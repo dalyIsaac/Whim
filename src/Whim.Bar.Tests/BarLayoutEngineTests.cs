@@ -316,10 +316,10 @@ public class BarLayoutEngineTests
 		// Given
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		innerLayoutEngine.PerformCustomAction(actionName, args).Returns(performCustomActionResult);
+		innerLayoutEngine.PerformCustomAction(actionName, args, null).Returns(performCustomActionResult);
 
 		// When
-		ILayoutEngine newEngine = engine.PerformCustomAction(actionName, args);
+		ILayoutEngine newEngine = engine.PerformCustomAction(actionName, args, null);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
@@ -331,10 +331,10 @@ public class BarLayoutEngineTests
 		// Given
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		innerLayoutEngine.PerformCustomAction(actionName, args).Returns(innerLayoutEngine);
+		innerLayoutEngine.PerformCustomAction(actionName, args, null).Returns(innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.PerformCustomAction(actionName, args);
+		ILayoutEngine newEngine = engine.PerformCustomAction(actionName, args, null);
 
 		// Then
 		Assert.Same(engine, newEngine);
