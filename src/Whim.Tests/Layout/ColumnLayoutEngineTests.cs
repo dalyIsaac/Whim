@@ -879,9 +879,16 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = Substitute.For<IWindow>()
+			};
 
 		// When
-		ILayoutEngine newEngine = engine.PerformCustomAction("test", 1, null);
+		ILayoutEngine newEngine = engine.PerformCustomAction(action);
 
 		// Then
 		Assert.Same(engine, newEngine);

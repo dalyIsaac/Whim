@@ -236,5 +236,5 @@ public record ColumnLayoutEngine : ILayoutEngine
 		}
 	}
 
-	public ILayoutEngine PerformCustomAction<T>(string actionName, T args, IWindow? window) => this;
+	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) => this;
 }

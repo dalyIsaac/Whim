@@ -676,41 +676,52 @@ public class GapsLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void PerformCustomAction_NotSame(
-		ILayoutEngine innerLayoutEngine,
-		ILayoutEngine performCustomActionResult,
-		string actionName,
-		object args
-	)
+	public void PerformCustomAction_NotSame(ILayoutEngine innerLayoutEngine, ILayoutEngine performCustomActionResult)
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		innerLayoutEngine.PerformCustomAction(actionName, args, null).Returns(performCustomActionResult);
+
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = Substitute.For<IWindow>()
+			};
+		innerLayoutEngine.PerformCustomAction(action).Returns(performCustomActionResult);
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newLayoutEngine = gapsLayoutEngine.PerformCustomAction(actionName, args, null);
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.PerformCustomAction(action);
 
 		// Then
 		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
-		innerLayoutEngine.Received(1).PerformCustomAction(actionName, args, null);
+		innerLayoutEngine.Received(1).PerformCustomAction(action);
 	}
 
 	[Theory, AutoSubstituteData]
-	public void PerformCustomAction_Same(ILayoutEngine innerLayoutEngine, string actionName, object args)
+	public void PerformCustomAction_Same(ILayoutEngine innerLayoutEngine)
 	{
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
-		innerLayoutEngine.PerformCustomAction(actionName, args, null).Returns(innerLayoutEngine);
+
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = Substitute.For<IWindow>()
+			};
+		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		ILayoutEngine newLayoutEngine = gapsLayoutEngine.PerformCustomAction(actionName, args, null);
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.PerformCustomAction(action);
 
 		// Then
 		Assert.Same(gapsLayoutEngine, newLayoutEngine);
-		innerLayoutEngine.Received(1).PerformCustomAction(actionName, args, null);
+		innerLayoutEngine.Received(1).PerformCustomAction(action);
 	}
 }

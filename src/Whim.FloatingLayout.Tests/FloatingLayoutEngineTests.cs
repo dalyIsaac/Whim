@@ -1096,16 +1096,21 @@ public class FloatingLayoutEngineTests
 	internal void PerformCustomAction_UseInner(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
-		ILayoutEngine innerLayoutEngine,
-		string action,
-		object args
+		ILayoutEngine innerLayoutEngine
 	)
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = null
+			};
 
 		// When
-		ILayoutEngine newEngine = engine.PerformCustomAction(action, args, null);
+		ILayoutEngine newEngine = engine.PerformCustomAction(action);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
@@ -1115,22 +1120,26 @@ public class FloatingLayoutEngineTests
 	internal void PerformCustomAction_UseInner_WindowIsDefined(
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
-		ILayoutEngine innerLayoutEngine,
-		string action,
-		object args,
-		IWindow window
+		ILayoutEngine innerLayoutEngine
 	)
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-		innerLayoutEngine.PerformCustomAction(action, args, window).Returns(innerLayoutEngine);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = Substitute.For<IWindow>()
+			};
+		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
 
 		// When
-		ILayoutEngine newEngine = engine.PerformCustomAction(action, args, window);
+		ILayoutEngine newEngine = engine.PerformCustomAction(action);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		innerLayoutEngine.Received(1).PerformCustomAction(action, args, window);
+		innerLayoutEngine.Received(1).PerformCustomAction(action);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -1138,23 +1147,28 @@ public class FloatingLayoutEngineTests
 		IContext context,
 		IInternalFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
-		string action,
-		object args,
 		IWindow window
 	)
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = window
+			};
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
 		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// When
-		ILayoutEngine newEngine2 = newEngine.PerformCustomAction(action, args, window);
+		ILayoutEngine newEngine2 = newEngine.PerformCustomAction(action);
 
 		// Then
 		Assert.NotSame(engine, newEngine);
 		Assert.Same(newEngine, newEngine2);
-		innerLayoutEngine.DidNotReceive().PerformCustomAction(action, args, null);
+		innerLayoutEngine.DidNotReceive().PerformCustomAction(action);
 	}
 	#endregion
 }

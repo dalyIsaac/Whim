@@ -248,9 +248,9 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowRects.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc />
-	public override ILayoutEngine PerformCustomAction<T>(string actionName, T args, IWindow? window)
+	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
 	{
-		if (window != null && IsWindowFloating(window))
+		if (action.Window != null && IsWindowFloating(action.Window))
 		{
 			// At this stage, we don't have a way to get the window in a child layout engine at
 			// a given point.
@@ -258,6 +258,6 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 			return this;
 		}
 
-		return InnerLayoutEngine.PerformCustomAction(actionName, args, window);
+		return InnerLayoutEngine.PerformCustomAction(action);
 	}
 }

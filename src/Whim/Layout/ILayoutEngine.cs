@@ -119,8 +119,7 @@ public interface ILayoutEngine
 	ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window);
 
 	/// <summary>
-	/// A custom action handler for the given <paramref name="args"/>.
-	/// Each layout engine should handle the <paramref name="args"/> appropriately.
+	/// Attempts to trigger a custom action in a layout engine.
 	/// </summary>
 	/// <remarks>
 	/// This method is used to handle custom actions that are not part of the
@@ -129,23 +128,15 @@ public interface ILayoutEngine
 	/// window stack.
 	/// </remarks>
 	/// <typeparam name="T">
-	/// The type of <paramref name="args"/>.
+	/// The type of the <paramref name="action"/>'s payload.
 	/// </typeparam>
-	/// <param name="actionName">
-	/// The name of the action. This should be unique to the layout engine type.
-	/// </param>
-	/// <param name="args">
-	/// The payload of the action, which the handler can use to perform the action.
-	/// </param>
-	/// <param name="triggerWindow">
-	/// The window that triggered the action, if any. Proxy layout engines may use this to.
-	/// This deliberately does not set the default value to null, so that the caller must
-	/// explicitly pass null if they do not have a trigger window.
+	/// <param name="action">
+	/// Metadata about the action to perform, and the payload to perform it with.
 	/// </param>
 	/// <returns>
 	/// A new layout engine if the action is handled, otherwise it returns the current layout engine.
 	/// </returns>
-	ILayoutEngine PerformCustomAction<T>(string actionName, T args, IWindow? triggerWindow);
+	ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action);
 
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type

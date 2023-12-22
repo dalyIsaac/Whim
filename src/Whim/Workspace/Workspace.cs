@@ -657,14 +657,21 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return garbageCollected;
 	}
 
-	public void PerformCustomLayoutEngineAction<T>(string actionname, IWindow? triggerWindow)
+	public void PerformCustomLayoutEngineAction(LayoutEngineCustomAction action)
 	{
-		PerformCustomLayoutEngineAction(actionname, triggerWindow, triggerWindow);
+		PerformCustomLayoutEngineAction(
+			new LayoutEngineCustomAction<IWindow?>()
+			{
+				Name = action.Name,
+				Payload = action.Window,
+				Window = action.Window
+			}
+		);
 	}
 
-	public void PerformCustomLayoutEngineAction<T>(string actionname, T args, IWindow? triggerWindow)
+	public void PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action)
 	{
-		Logger.Debug($"Attempting to perform custom layout engine action {actionname} for workspace {Name}");
+		Logger.Debug($"Attempting to perform custom layout engine action {action.Name} for workspace {Name}");
 
 		bool doLayout = false;
 
@@ -675,11 +682,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		for (int idx = 0; idx < _layoutEngines.Length; idx++)
 		{
 			ILayoutEngine oldEngine = _layoutEngines[idx];
-			ILayoutEngine newEngine = oldEngine.PerformCustomAction(actionname, args, triggerWindow);
+			ILayoutEngine newEngine = oldEngine.PerformCustomAction(action);
 
 			if (newEngine.Equals(oldEngine))
 			{
-				Logger.Debug($"Layout engine {oldEngine} could not perform action {actionname}");
+				Logger.Debug($"Layout engine {oldEngine} could not perform action {action.Name}");
 			}
 			else
 			{
