@@ -149,4 +149,31 @@ public interface IWorkspace : IDisposable
 	/// <param name="point">The point to move the window to.</param>
 	void MoveWindowToPoint(IWindow window, IPoint<double> point);
 	#endregion
+
+	/// <summary>
+	/// Performs a custom action in a layout engine.
+	/// </summary>
+	/// <remarks>
+	/// Layout engines need to handle the custom action in <see cref="ILayoutEngine.PerformCustomAction{T}" />.
+	/// For more, see <see cref="ILayoutEngine.PerformCustomAction{T}" />.
+	/// </remarks>
+	/// <param name="action">
+	/// Metadata about the action to perform, and the payload to perform it with.
+	/// </param>
+	void PerformCustomLayoutEngineAction(LayoutEngineCustomAction action);
+
+	/// <summary>
+	/// Performs a custom action in a layout engine.
+	/// </summary>
+	/// <remarks>
+	/// Layout engines need to handle the custom action in <see cref="ILayoutEngine.PerformCustomAction{T}" />.
+	/// For more, see <see cref="ILayoutEngine.PerformCustomAction{T}" />.
+	/// </remarks>
+	/// <typeparam name="T">
+	/// The type of <paramref name="args" />'s payload.
+	/// </typeparam>
+	/// <param name="action">
+	/// Metadata about the action to perform, and the payload to perform it with.
+	/// </param>
+	void PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action);
 }

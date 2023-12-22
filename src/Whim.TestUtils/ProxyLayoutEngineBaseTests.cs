@@ -3,7 +3,6 @@ using Xunit;
 
 namespace Whim.TestUtils;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 /// <summary>
 /// Tests for <see cref="ILayoutEngine"/> implementations.
 /// </summary>
@@ -181,5 +180,23 @@ public abstract class ProxyLayoutEngineBaseTests
 
 		// Then it shouldn't throw.
 	}
+
+	[Theory, AutoSubstituteData]
+	public void PerformCustomAction_WindowIsPresent(ILayoutEngine inner, IWindow window1)
+	{
+		// Given
+		ILayoutEngine layoutEngine = CreateLayoutEngine(inner).AddWindow(window1);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = null
+			};
+
+		// When
+		layoutEngine.PerformCustomAction(action);
+
+		// Then it shouldn't throw.
+	}
 }
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

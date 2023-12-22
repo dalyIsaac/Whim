@@ -304,4 +304,46 @@ public class BarLayoutEngineTests
 		// Then
 		innerLayoutEngine.Received(1).DoLayout(Arg.Is<Rectangle<int>>(l => l.Height == 0), monitor);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void PerformCustomAction_NotSame(ILayoutEngine innerLayoutEngine, ILayoutEngine performCustomActionResult)
+	{
+		// Given
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = null
+			};
+		innerLayoutEngine.PerformCustomAction(action).Returns(performCustomActionResult);
+
+		// When
+		ILayoutEngine newEngine = engine.PerformCustomAction(action);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PerformCustomAction_Same(ILayoutEngine innerLayoutEngine)
+	{
+		// Given
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = null
+			};
+		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.PerformCustomAction(action);
+
+		// Then
+		Assert.Same(engine, newEngine);
+	}
 }

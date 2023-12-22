@@ -54,7 +54,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	private readonly ILayoutEngine[] _layoutEngines;
+	protected readonly ILayoutEngine[] _layoutEngines;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
@@ -655,6 +655,54 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		return garbageCollected;
+	}
+
+	public void PerformCustomLayoutEngineAction(LayoutEngineCustomAction action)
+	{
+		PerformCustomLayoutEngineAction(
+			new LayoutEngineCustomAction<IWindow?>()
+			{
+				Name = action.Name,
+				Payload = action.Window,
+				Window = action.Window
+			}
+		);
+	}
+
+	public void PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action)
+	{
+		Logger.Debug($"Attempting to perform custom layout engine action {action.Name} for workspace {Name}");
+
+		bool doLayout = false;
+
+		// Update the layout engine for a given index can change ActiveLayoutEngine, which breaks the
+		// doLayout test.
+		ILayoutEngine prevActiveLayoutEngine = ActiveLayoutEngine;
+
+		for (int idx = 0; idx < _layoutEngines.Length; idx++)
+		{
+			ILayoutEngine oldEngine = _layoutEngines[idx];
+			ILayoutEngine newEngine = oldEngine.PerformCustomAction(action);
+
+			if (newEngine.Equals(oldEngine))
+			{
+				Logger.Debug($"Layout engine {oldEngine} could not perform action {action.Name}");
+			}
+			else
+			{
+				_layoutEngines[idx] = newEngine;
+
+				if (oldEngine == prevActiveLayoutEngine)
+				{
+					doLayout = true;
+				}
+			}
+		}
+
+		if (doLayout)
+		{
+			DoLayout();
+		}
 	}
 
 	protected virtual void Dispose(bool disposing)

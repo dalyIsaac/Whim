@@ -71,4 +71,8 @@ public record BarLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) =>
 		UpdateInner(InnerLayoutEngine.SwapWindowInDirection(direction, window));
+
+	/// <inheritdoc />
+	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>
+		UpdateInner(InnerLayoutEngine.PerformCustomAction(action));
 }

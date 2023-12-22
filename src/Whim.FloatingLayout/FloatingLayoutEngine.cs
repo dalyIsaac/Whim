@@ -59,9 +59,10 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// couldn't get the window's rectangle).
 	/// </param>
 	/// <returns></returns>
-	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow gcWindow)
+	private FloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow? gcWindow)
 	{
-		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowRects = _floatingWindowRects.Remove(gcWindow);
+		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowRects =
+			gcWindow != null ? _floatingWindowRects.Remove(gcWindow) : _floatingWindowRects;
 
 		return InnerLayoutEngine == newInnerLayoutEngine && _floatingWindowRects == newFloatingWindowRects
 			? this
@@ -245,4 +246,18 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override bool ContainsWindow(IWindow window) =>
 		_floatingWindowRects.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
+
+	/// <inheritdoc />
+	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
+	{
+		if (action.Window != null && IsWindowFloating(action.Window))
+		{
+			// At this stage, we don't have a way to get the window in a child layout engine at
+			// a given point.
+			// For now, we do nothing.
+			return this;
+		}
+
+		return InnerLayoutEngine.PerformCustomAction(action);
+	}
 }

@@ -119,6 +119,26 @@ public interface ILayoutEngine
 	ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window);
 
 	/// <summary>
+	/// Attempts to trigger a custom action in a layout engine.
+	/// </summary>
+	/// <remarks>
+	/// This method is used to handle custom actions that are not part of the
+	/// <see cref="ILayoutEngine"/> interface.
+	/// For example, the SliceLayoutEngine uses this method to promote/demote windows in the
+	/// window stack.
+	/// </remarks>
+	/// <typeparam name="T">
+	/// The type of the <paramref name="action"/>'s payload.
+	/// </typeparam>
+	/// <param name="action">
+	/// Metadata about the action to perform, and the payload to perform it with.
+	/// </param>
+	/// <returns>
+	/// A new layout engine if the action is handled, otherwise it returns the current layout engine.
+	/// </returns>
+	ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action);
+
+	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type
 	/// <typeparamref name="T"/>.
 	/// </summary>
