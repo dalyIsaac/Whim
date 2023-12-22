@@ -76,6 +76,7 @@ public abstract record BaseProxyLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public abstract IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor);
 
+	/// <inheritdoc/>
 	public abstract ILayoutEngine PerformCustomAction<T>(string actionName, T args);
 
 	/// <summary>

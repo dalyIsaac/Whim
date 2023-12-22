@@ -1121,6 +1121,7 @@ public class WorkspaceTests
 		workspace.ActiveLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
+	#region WindowMinimizeEnd
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void WindowMinimizeEnd(
 		IContext ctx,
@@ -1165,4 +1166,106 @@ public class WorkspaceTests
 		// Then
 		givenEngine.DidNotReceive().AddWindow(window);
 	}
+	#endregion
+
+	#region PerformCustomLayoutEngineAction
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void PerformCustomLayoutEngineAction_NoChange(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine
+	)
+	{
+		// Given
+		layoutEngine.PerformCustomAction(Arg.Any<string>(), Arg.Any<string>()).Returns(layoutEngine);
+		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+
+		string actionName = "Action";
+		string args = "Args";
+
+		layoutEngine.ClearReceivedCalls();
+
+		// When PerformCustomLayoutEngineAction is called
+		workspace.PerformCustomLayoutEngineAction(actionName, args);
+
+		// Then the layout engine is not changed
+		layoutEngine.Received(1).PerformCustomAction(actionName, args);
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+		Assert.Equal(layoutEngine, workspace.ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void PerformCustomLayoutEngineAction_ChangeInInactiveEngine(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine1Result
+	)
+	{
+		// Given
+		layoutEngine.PerformCustomAction(Arg.Any<string>(), Arg.Any<string>()).Returns(layoutEngine);
+		layoutEngine1.PerformCustomAction(Arg.Any<string>(), Arg.Any<string>()).Returns(layoutEngine1Result);
+
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine1 });
+
+		string actionName = "Action";
+		string args = "Args";
+
+		layoutEngine.ClearReceivedCalls();
+
+		// When PerformCustomLayoutEngineAction is called
+		workspace.PerformCustomLayoutEngineAction(actionName, args);
+
+		// Then the layout engine is changed
+		layoutEngine.Received(1).PerformCustomAction(actionName, args);
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		layoutEngine1.Received(1).PerformCustomAction(actionName, args);
+		layoutEngine1.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+		layoutEngine1Result.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		Assert.Equal(layoutEngine, workspace.ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void PerformCustomLayoutEngineAction_ChangeInActiveEngine(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngineResult,
+		ILayoutEngine layoutEngine1
+	)
+	{
+		// Given
+		layoutEngine.PerformCustomAction(Arg.Any<string>(), Arg.Any<string>()).Returns(layoutEngineResult);
+		layoutEngine1.PerformCustomAction(Arg.Any<string>(), Arg.Any<string>()).Returns(layoutEngine1);
+
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine1 });
+
+		string actionName = "Action";
+		string args = "Args";
+
+		layoutEngine.ClearReceivedCalls();
+
+		// When PerformCustomLayoutEngineAction is called
+		workspace.PerformCustomLayoutEngineAction(actionName, args);
+
+		// Then the layout engine is changed
+		layoutEngine.Received(1).PerformCustomAction(actionName, args);
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		layoutEngineResult.Received(1).DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		layoutEngine1.Received(1).PerformCustomAction(actionName, args);
+		layoutEngine1.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		Assert.Equal(layoutEngineResult, workspace.ActiveLayoutEngine);
+	}
+	#endregion
 }
