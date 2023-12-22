@@ -1090,4 +1090,85 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.Received(1).SwapWindowInDirection(Direction.Left, window);
 	}
 	#endregion
+
+	#region PerformCustomAction
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void PerformCustomAction_UseInner(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = null
+			};
+
+		// When
+		ILayoutEngine newEngine = engine.PerformCustomAction(action);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+	}
+
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void PerformCustomAction_UseInner_WindowIsDefined(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = Substitute.For<IWindow>()
+			};
+		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.PerformCustomAction(action);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		innerLayoutEngine.Received(1).PerformCustomAction(action);
+	}
+
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	internal void PerformCustomAction_FloatingWindow(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = window
+			};
+		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
+		ILayoutEngine newEngine = engine.AddWindow(window);
+
+		// When
+		ILayoutEngine newEngine2 = newEngine.PerformCustomAction(action);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.Same(newEngine, newEngine2);
+		innerLayoutEngine.DidNotReceive().PerformCustomAction(action);
+	}
+	#endregion
 }

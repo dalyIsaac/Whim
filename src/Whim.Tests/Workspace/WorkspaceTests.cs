@@ -1121,6 +1121,7 @@ public class WorkspaceTests
 		workspace.ActiveLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
+	#region WindowMinimizeEnd
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void WindowMinimizeEnd(
 		IContext ctx,
@@ -1165,4 +1166,150 @@ public class WorkspaceTests
 		// Then
 		givenEngine.DidNotReceive().AddWindow(window);
 	}
+	#endregion
+
+	#region PerformCustomLayoutEngineAction
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void PerformCustomLayoutEngineAction_PassWindowThroughAsArgs(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		IWindow window
+	)
+	{
+		// Given
+		layoutEngine.PerformCustomAction(Arg.Any<LayoutEngineCustomAction<IWindow?>>()).Returns(layoutEngine);
+		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+
+		LayoutEngineCustomAction action = new() { Name = "Action", Window = window };
+
+		layoutEngine.ClearReceivedCalls();
+
+		// When PerformCustomLayoutEngineAction is called
+		workspace.PerformCustomLayoutEngineAction(action);
+
+		// Then the layout engine is not changed
+		layoutEngine.Received(1).PerformCustomAction(Arg.Any<LayoutEngineCustomAction<IWindow?>>());
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+		Assert.Equal(layoutEngine, workspace.ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void PerformCustomLayoutEngineAction_NoChange(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		IWindow window
+	)
+	{
+		// Given
+		layoutEngine.PerformCustomAction(Arg.Any<LayoutEngineCustomAction<string>>()).Returns(layoutEngine);
+		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = window
+			};
+
+		layoutEngine.ClearReceivedCalls();
+
+		// When PerformCustomLayoutEngineAction is called
+		workspace.PerformCustomLayoutEngineAction(action);
+
+		// Then the layout engine is not changed
+		layoutEngine.Received(1).PerformCustomAction(action);
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+		Assert.Equal(layoutEngine, workspace.ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void PerformCustomLayoutEngineAction_ChangeInInactiveEngine(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine1Result,
+		IWindow window
+	)
+	{
+		// Given
+		layoutEngine.PerformCustomAction(Arg.Any<LayoutEngineCustomAction<string>>()).Returns(layoutEngine);
+		layoutEngine1.PerformCustomAction(Arg.Any<LayoutEngineCustomAction<string>>()).Returns(layoutEngine1Result);
+
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine1 });
+
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = window
+			};
+
+		layoutEngine.ClearReceivedCalls();
+
+		// When PerformCustomLayoutEngineAction is called
+		workspace.PerformCustomLayoutEngineAction(action);
+
+		// Then the layout engine is changed
+		layoutEngine.Received(1).PerformCustomAction(action);
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		layoutEngine1.Received(1).PerformCustomAction(action);
+		layoutEngine1.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+		layoutEngine1Result.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		Assert.Equal(layoutEngine, workspace.ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void PerformCustomLayoutEngineAction_ChangeInActiveEngine(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngineResult,
+		ILayoutEngine layoutEngine1,
+		IWindow window
+	)
+	{
+		// Given
+		layoutEngine.PerformCustomAction(Arg.Any<LayoutEngineCustomAction<string>>()).Returns(layoutEngineResult);
+		layoutEngine1.PerformCustomAction(Arg.Any<LayoutEngineCustomAction<string>>()).Returns(layoutEngine1);
+
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine1 });
+
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = window
+			};
+
+		layoutEngine.ClearReceivedCalls();
+
+		// When PerformCustomLayoutEngineAction is called
+		workspace.PerformCustomLayoutEngineAction(action);
+
+		// Then the layout engine is changed
+		layoutEngine.Received(1).PerformCustomAction(action);
+		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		layoutEngineResult.Received(1).DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		layoutEngine1.Received(1).PerformCustomAction(action);
+		layoutEngine1.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+
+		Assert.Equal(layoutEngineResult, workspace.ActiveLayoutEngine);
+	}
+	#endregion
 }

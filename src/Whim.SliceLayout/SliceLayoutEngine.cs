@@ -233,17 +233,13 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		return -1;
 	}
 
-	public ILayoutEngine PerformCustomAction<T>(string actionName, T args)
-	{
-		if (actionName == _plugin.PromoteActionName && args is IWindow promoteWindow)
+	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>
+		action switch
 		{
-			return PromoteWindowInStack(promoteWindow);
-		}
-		else if (actionName == _plugin.DemoteActionName && args is IWindow demoteWindow)
-		{
-			return DemoteWindowInStack(demoteWindow);
-		}
-
-		return this;
-	}
+			LayoutEngineCustomAction<IWindow> promoteAction when promoteAction.Name == _plugin.PromoteActionName
+				=> PromoteWindowInStack(promoteAction.Payload),
+			LayoutEngineCustomAction<IWindow> demoteAction when demoteAction.Name == _plugin.DemoteActionName
+				=> DemoteWindowInStack(demoteAction.Payload),
+			_ => this
+		};
 }

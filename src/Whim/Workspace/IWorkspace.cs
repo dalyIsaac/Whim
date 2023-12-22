@@ -154,17 +154,26 @@ public interface IWorkspace : IDisposable
 	/// Performs a custom action in a layout engine.
 	/// </summary>
 	/// <remarks>
-	/// Layout engines need to handle the custom action in <see cref="ILayoutEngine.PerformCustomAction{T}(string, T)"/>.
-	/// For more, see <see cref="ILayoutEngine.PerformCustomAction{T}(string, T)"/>.
+	/// Layout engines need to handle the custom action in <see cref="ILayoutEngine.PerformCustomAction{T}" />.
+	/// For more, see <see cref="ILayoutEngine.PerformCustomAction{T}" />.
+	/// </remarks>
+	/// <param name="action">
+	/// Metadata about the action to perform, and the payload to perform it with.
+	/// </param>
+	void PerformCustomLayoutEngineAction(LayoutEngineCustomAction action);
+
+	/// <summary>
+	/// Performs a custom action in a layout engine.
+	/// </summary>
+	/// <remarks>
+	/// Layout engines need to handle the custom action in <see cref="ILayoutEngine.PerformCustomAction{T}" />.
+	/// For more, see <see cref="ILayoutEngine.PerformCustomAction{T}" />.
 	/// </remarks>
 	/// <typeparam name="T">
-	/// The type of <paramref name="args"/>.
+	/// The type of <paramref name="args" />'s payload.
 	/// </typeparam>
-	/// <param name="actionName">
-	/// The name of the action. This should be unique to the layout engine type.
+	/// <param name="action">
+	/// Metadata about the action to perform, and the payload to perform it with.
 	/// </param>
-	/// <param name="args">
-	/// The payload of the action, which the handler can use to perform the action.
-	/// </param>
-	void PerformCustomLayoutEngineAction<T>(string actionName, T args);
+	void PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action);
 }

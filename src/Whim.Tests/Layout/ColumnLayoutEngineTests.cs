@@ -873,4 +873,24 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(1, windows.FindIndex(w => w.Window == window));
 	}
 	#endregion
+
+	[Theory, AutoSubstituteData]
+	public void PerformCustomAction(IWindow window)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
+		LayoutEngineCustomAction<string> action =
+			new()
+			{
+				Name = "Action",
+				Payload = "payload",
+				Window = Substitute.For<IWindow>()
+			};
+
+		// When
+		ILayoutEngine newEngine = engine.PerformCustomAction(action);
+
+		// Then
+		Assert.Same(engine, newEngine);
+	}
 }

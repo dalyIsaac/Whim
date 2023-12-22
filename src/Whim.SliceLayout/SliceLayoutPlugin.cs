@@ -47,7 +47,9 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 			return;
 		}
 
-		workspace.PerformCustomLayoutEngineAction(promote ? PromoteActionName : DemoteActionName, window);
+		workspace.PerformCustomLayoutEngineAction(
+			new LayoutEngineCustomAction() { Name = promote ? PromoteActionName : DemoteActionName, Window = window, }
+		);
 	}
 
 	public void PromoteWindowInStack(IWindow? window = null) => ChangeWindowRank(window, promote: true);
