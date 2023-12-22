@@ -152,4 +152,10 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 		return MoveWindowToIndex(_windows.IndexOf(window), _windows.IndexOf(windowInDirection));
 	}
+
+	public ILayoutEngine PerformCustomAction<T>(string actionName, T args)
+	{
+		// TODO
+		return this;
+	}
 }
