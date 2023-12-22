@@ -39,22 +39,23 @@ public partial record SliceLayoutEngine
 		double x = rect.X;
 		double y = rect.Y;
 
+		double delta = 1d / _cachedWindowStatesScale;
 		if (direction.HasFlag(Direction.Left))
 		{
-			x -= 1d / _cachedWindowStatesScale;
+			x -= delta;
 		}
 		else if (direction.HasFlag(Direction.Right))
 		{
-			x += rect.Width + (1d / _cachedWindowStatesScale);
+			x += rect.Width + delta;
 		}
 
 		if (direction.HasFlag(Direction.Up))
 		{
-			y -= 1d / _cachedWindowStatesScale;
+			y -= delta;
 		}
 		else if (direction.HasFlag(Direction.Down))
 		{
-			y += rect.Height + (1d / _cachedWindowStatesScale);
+			y += rect.Height + delta;
 		}
 
 		// Get the window at that point

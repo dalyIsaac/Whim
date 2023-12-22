@@ -32,6 +32,12 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	private const int _cachedWindowStatesScale = 10000;
 
 	/// <summary>
+	/// The areas in the tree which contain windows, in order of the <see cref="SliceArea.Order"/>.
+	/// The last area is an <see cref="OverflowArea"/>.
+	/// </summary>
+	private readonly IArea[] _windowAreas;
+
+	/// <summary>
 	/// Cheekily cache the window states with fake coordinates, to facilitate linear searching.
 	///
 	/// NOTE: Do not access this directly - instead use <see cref="GetLazyWindowStates"/>
@@ -51,6 +57,8 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		Identity = identity;
 		_windows = windows;
 		_rootArea = rootArea;
+
+		_windowAreas = _rootArea.SetStartIndexes();
 	}
 
 	public SliceLayoutEngine(
@@ -88,7 +96,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			return Enumerable.Empty<IWindowState>();
 		}
 
-		// Prune the empty areas from the tree
+		// Prune the empty areas from the tree.
 		ParentArea prunedRootArea = _rootArea.Prune(_windows.Count);
 
 		// Get the rectangles for each window
@@ -153,9 +161,88 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		return MoveWindowToIndex(_windows.IndexOf(window), _windows.IndexOf(windowInDirection));
 	}
 
+	private ILayoutEngine PromoteWindowInStack(IWindow window)
+	{
+		Logger.Debug($"Promoting {window} in stack");
+
+		int windowIndex = _windows.IndexOf(window);
+		if (windowIndex == 0)
+		{
+			return this;
+		}
+
+		// Find the area which contains the window.
+		int areaIndex = GetAreaStackForWindowIndex(windowIndex);
+		if (areaIndex <= 0)
+		{
+			return this;
+		}
+
+		SliceArea targetArea = (SliceArea)_windowAreas[areaIndex - 1];
+		int targetIndex = (int)(targetArea.StartIndex + targetArea.MaxChildren - 1);
+
+		return MoveWindowToIndex(windowIndex, targetIndex);
+	}
+
+	private ILayoutEngine DemoteWindowInStack(IWindow window)
+	{
+		Logger.Debug($"Demoting {window} in stack");
+
+		int windowIndex = _windows.IndexOf(window);
+		if (windowIndex == _windows.Count - 1)
+		{
+			return this;
+		}
+
+		// Find the area which contains the window.
+		int areaIndex = GetAreaStackForWindowIndex(windowIndex);
+		if (areaIndex > _windowAreas.Length - 2 || areaIndex == -1)
+		{
+			return this;
+		}
+
+		SliceArea targetArea = (SliceArea)_windowAreas[areaIndex + 1];
+		int targetIndex = (int)targetArea.StartIndex;
+
+		return MoveWindowToIndex(windowIndex, targetIndex);
+	}
+
+	private int GetAreaStackForWindowIndex(int windowIndex)
+	{
+		int areaStartIndex = 0;
+		foreach (IArea area in _windowAreas)
+		{
+			if (area is SliceArea sliceArea)
+			{
+				int areaEndIndex = areaStartIndex + (int)sliceArea.MaxChildren;
+				if (windowIndex >= areaStartIndex && windowIndex < areaEndIndex)
+				{
+					return areaStartIndex;
+				}
+
+				areaStartIndex = areaEndIndex;
+			}
+
+			if (area is OverflowArea)
+			{
+				return areaStartIndex;
+			}
+		}
+
+		return -1;
+	}
+
 	public ILayoutEngine PerformCustomAction<T>(string actionName, T args)
 	{
-		// TODO
+		if (actionName == _plugin.PromoteActionName && args is IWindow promoteWindow)
+		{
+			return PromoteWindowInStack(promoteWindow);
+		}
+		else if (actionName == _plugin.DemoteActionName && args is IWindow demoteWindow)
+		{
+			return DemoteWindowInStack(demoteWindow);
+		}
+
 		return this;
 	}
 }

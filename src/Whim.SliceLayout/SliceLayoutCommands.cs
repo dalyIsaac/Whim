@@ -17,7 +17,7 @@ public class SliceLayoutCommands : PluginCommands
 	{
 		_sliceLayoutPlugin = sliceLayoutPlugin;
 
-		Add(
+		_ = Add(
 				identifier: "set_insertion_type.swap",
 				title: "Set slice insertion type to swap",
 				callback: () => _sliceLayoutPlugin.WindowInsertionType = WindowInsertionType.Swap
@@ -26,6 +26,16 @@ public class SliceLayoutCommands : PluginCommands
 				identifier: "set_insertion_type.rotate",
 				title: "Set slice insertion type to rotate",
 				callback: () => _sliceLayoutPlugin.WindowInsertionType = WindowInsertionType.Rotate
+			)
+			.Add(
+				identifier: "stack.promote",
+				title: "Promote window in stack",
+				callback: () => _sliceLayoutPlugin.PromoteWindowInStack()
+			)
+			.Add(
+				identifier: "stack.demote",
+				title: "Demote window in stack",
+				callback: () => _sliceLayoutPlugin.DemoteWindowInStack()
 			);
 	}
 }

@@ -60,6 +60,9 @@ public record SliceArea : BaseSliceArea
 	/// </summary>
 	public uint Order { get; }
 
+	/// <summary>
+	/// Maximum number of children this area can have. This must be a non-negative integer.
+	/// </summary>
 	public uint MaxChildren { get; }
 
 	public SliceArea(uint order = 0, uint maxChildren = 1, bool isRow = false)
@@ -88,9 +91,6 @@ internal static class AreaHelpers
 	/// <returns></returns>
 	public static ParentArea Prune(this ParentArea area, int windowCount)
 	{
-		// Set the start indexes of the areas.
-		SetStartIndexes(area);
-
 		ImmutableList<IArea>.Builder childrenBuilder = ImmutableList.CreateBuilder<IArea>();
 		ImmutableList<double>.Builder weightsBuilder = ImmutableList.CreateBuilder<double>();
 
@@ -136,11 +136,18 @@ internal static class AreaHelpers
 		return new ParentArea(area.IsRow, weightsBuilder.ToImmutable(), childrenBuilder.ToImmutable());
 	}
 
-	private static void SetStartIndexes(this ParentArea area)
+	/// <summary>
+	/// Set the start indexes of the areas.
+	/// </summary>
+	/// <param name="area"></param>
+	/// <returns>
+	/// The areas which directly contain windows, in order.
+	/// </returns>
+	public static IArea[] SetStartIndexes(this ParentArea area)
 	{
 		if (area.Children.Count == 0)
 		{
-			return;
+			return Array.Empty<IArea>();
 		}
 
 		List<SliceArea> sliceAreas = new();
@@ -189,16 +196,21 @@ internal static class AreaHelpers
 		{
 			Logger.Error($"No overflow area found, replacing last slice area with overflow area");
 			overflowArea = ReplaceLastSliceAreaWithOverflowArea(area, sliceAreas[^1].Order);
-		}
 
-		if (overflowArea is not null)
-		{
 			SliceArea lastSlice = sliceAreas[^1];
+			sliceAreas.RemoveAt(sliceAreas.Count - 1);
 			overflowArea.StartIndex = lastSlice.StartIndex + lastSlice.MaxChildren;
 		}
+
+		IArea[] windowAreas = new IArea[sliceAreas.Count + 1];
+		sliceAreas.CopyTo((SliceArea[])windowAreas);
+		windowAreas[^1] = overflowArea;
+
+		return windowAreas;
 	}
 
-	private static OverflowArea? ReplaceLastSliceAreaWithOverflowArea(ParentArea rootArea, uint lastSliceOrder)
+	// TODO: Test as public
+	private static OverflowArea ReplaceLastSliceAreaWithOverflowArea(ParentArea rootArea, uint lastSliceOrder)
 	{
 		// DFS
 		List<IArea> areaStack = new() { rootArea };
@@ -228,7 +240,7 @@ internal static class AreaHelpers
 		}
 
 		Logger.Error("Could not replace last slice with overflow area");
-		return null;
+		return null!;
 	}
 
 	private static ParentArea RebuildWithOverflowArea(List<IArea> areaStack)
