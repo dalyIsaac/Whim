@@ -107,12 +107,12 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 		// Get the window states
 		IWindowState[] windowStates = new IWindowState[_windows.Count];
-		for (int idx = 0; idx < _windows.Count; idx++)
+		for (int idx = 0; idx < items.Length; idx++)
 		{
 			windowStates[idx] = new WindowState()
 			{
 				Rectangle = items[idx].Rectangle,
-				Window = _windows[idx],
+				Window = _windows[items[idx].Index],
 				WindowSize = WindowSize.Normal
 			};
 		}

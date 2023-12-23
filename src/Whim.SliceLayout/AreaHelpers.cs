@@ -264,7 +264,7 @@ internal static class AreaHelpers
 		return windowStartIdx + windowCurrIdx;
 	}
 
-	public static int DoSliceLayout(
+	private static int DoSliceLayout(
 		this SliceRectangleItem[] items,
 		int windowIdx,
 		IRectangle<int> rectangle,
