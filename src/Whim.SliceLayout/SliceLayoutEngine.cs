@@ -61,9 +61,8 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		_plugin = plugin;
 		Identity = identity;
 		_windows = windows;
-		_rootArea = rootArea;
 
-		_windowAreas = _rootArea.SetStartIndexes();
+		(_rootArea, _windowAreas) = rootArea.SetStartIndexes();
 		_prunedRootArea = _rootArea.Prune(_windows.Count);
 	}
 

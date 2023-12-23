@@ -60,17 +60,18 @@ internal static class AreaHelpers
 	}
 
 	/// <summary>
-	/// Set the start indexes of the areas.
+	/// Set the start indexes of the areas. If there is no <see cref="OverflowArea"/>, then the last
+	/// <see cref="SliceArea"/> is replaced with an <see cref="OverflowArea"/>.
 	/// </summary>
-	/// <param name="area"></param>
+	/// <param name="rootArea"></param>
 	/// <returns>
-	/// The areas which directly contain windows, in order.
+	/// The <see cref="ParentArea"/> root area to use, and the areas which directly contain windows, in order.
 	/// </returns>
-	public static BaseSliceArea[] SetStartIndexes(this ParentArea area)
+	public static (ParentArea RootArea, BaseSliceArea[] OrderedSliceAreas) SetStartIndexes(this ParentArea rootArea)
 	{
-		if (area.Children.Count == 0)
+		if (rootArea.Children.Count == 0)
 		{
-			return Array.Empty<BaseSliceArea>();
+			return (rootArea, Array.Empty<BaseSliceArea>());
 		}
 
 		List<SliceArea> sliceAreas = new();
@@ -79,7 +80,7 @@ internal static class AreaHelpers
 
 		// Iterate through the tree and add the areas to the list.
 		Queue<IArea> areas = new();
-		areas.Enqueue(area);
+		areas.Enqueue(rootArea);
 
 		while (areas.Count > 0)
 		{
@@ -117,13 +118,28 @@ internal static class AreaHelpers
 
 		if (overflowArea is null)
 		{
+			// Replace the last slice area with an overflow area.
 			Logger.Error($"No overflow area found, replacing last slice area with overflow area");
-			overflowArea = ReplaceLastSliceAreaWithOverflowArea(area, sliceAreas[^1].Order);
+			(ParentArea, OverflowArea)? result = ReplaceLastSliceAreaWithOverflowArea(rootArea, sliceAreas[^1].Order);
+
+			if (result is null)
+			{
+				Logger.Error($"Failed to replace last slice area with overflow area");
+				return (rootArea, Array.Empty<BaseSliceArea>());
+			}
+			else
+			{
+				(rootArea, overflowArea) = result.Value;
+			}
 			sliceAreas.RemoveAt(sliceAreas.Count - 1);
 		}
 
-		SliceArea lastSlice = sliceAreas[^1];
-		overflowArea.StartIndex = lastSlice.StartIndex + lastSlice.MaxChildren;
+		// If there are multiple slice areas, then the overflow area should start after the last slice area.
+		if (sliceAreas.Count > 0)
+		{
+			SliceArea lastSlice = sliceAreas[^1];
+			overflowArea.StartIndex = lastSlice.StartIndex + lastSlice.MaxChildren;
+		}
 
 		BaseSliceArea[] windowAreas = new BaseSliceArea[sliceAreas.Count + 1];
 		for (int i = 0; i < sliceAreas.Count; i++)
@@ -132,59 +148,47 @@ internal static class AreaHelpers
 		}
 		windowAreas[^1] = overflowArea;
 
-		return windowAreas;
+		return (rootArea, windowAreas);
 	}
 
-	// TODO: Test as public
-	private static OverflowArea ReplaceLastSliceAreaWithOverflowArea(ParentArea rootArea, uint lastSliceOrder)
+	private static (ParentArea Parent, OverflowArea Overflow)? ReplaceLastSliceAreaWithOverflowArea(
+		ParentArea rootArea,
+		uint lastSliceOrder
+	)
 	{
-		// DFS
-		List<IArea> areaStack = new() { rootArea };
-
-		while (areaStack.Count > 0)
+		// Recursive DFS
+		foreach (IArea child in rootArea.Children)
 		{
-			ParentArea currParentArea = (ParentArea)areaStack[^1];
-			areaStack.RemoveAt(areaStack.Count - 1);
-
-			// Go over each of the children. If the child is the last slice, replace it.
-			// Otherwise, add it to the stack.
-			for (int i = 0; i < currParentArea.Children.Count; i++)
+			if (child is ParentArea parentArea)
 			{
-				IArea child = currParentArea.Children[i];
-				if (child is ParentArea childParentArea)
+				(ParentArea Parent, OverflowArea Overflow)? result = ReplaceLastSliceAreaWithOverflowArea(parentArea, lastSliceOrder);
+				if (result is not null)
 				{
-					areaStack.Add(childParentArea);
+					return (ReplaceParentArea(rootArea, parentArea, result.Value.Parent), result.Value.Overflow);
 				}
-				else if (child is SliceArea sliceArea && sliceArea.Order == lastSliceOrder)
-				{
-					OverflowArea newOverflow = new(sliceArea.IsRow);
-					areaStack.Add(newOverflow);
-					RebuildWithOverflowArea(areaStack);
-					return newOverflow;
-				}
+			}
+			else if (child is SliceArea sliceArea && sliceArea.Order == lastSliceOrder)
+			{
+				OverflowArea newOverflow = new(sliceArea.IsRow) { StartIndex = sliceArea.StartIndex };
+
+				ImmutableList<IArea> newRootAreaChildren = rootArea.Children;
+				newRootAreaChildren = newRootAreaChildren.SetItem(newRootAreaChildren.IndexOf(sliceArea), newOverflow);
+
+				return (new ParentArea(isRow: rootArea.IsRow, rootArea.Weights, newRootAreaChildren), newOverflow);
 			}
 		}
 
-		Logger.Error("Could not replace last slice with overflow area");
-		return null!;
+		return null;
 	}
 
-	private static ParentArea RebuildWithOverflowArea(List<IArea> areaStack)
+	private static ParentArea ReplaceParentArea(
+		ParentArea rootArea,
+		IArea oldChild, IArea newChild
+		)
 	{
-		for (int idx = areaStack.Count - 2; idx >= 0; idx--)
-		{
-			ParentArea currArea = (ParentArea)areaStack[idx];
-			IArea nextArea = areaStack[idx + 1];
-
-			ImmutableList<IArea> currAreaChildren = currArea.Children;
-			currAreaChildren = currAreaChildren.SetItem(currAreaChildren.IndexOf(nextArea), areaStack[idx + 1]);
-
-			ImmutableList<double> currAreaWeights = currArea.Weights;
-
-			areaStack[idx] = new ParentArea(currArea.IsRow, currAreaWeights, currAreaChildren);
-		}
-
-		return (ParentArea)areaStack[0];
+		ImmutableList<IArea> newRootAreaChildren = rootArea.Children;
+		newRootAreaChildren = newRootAreaChildren.SetItem(newRootAreaChildren.IndexOf(oldChild), newChild);
+		return new ParentArea(isRow: rootArea.IsRow, rootArea.Weights, newRootAreaChildren);
 	}
 
 	public static int DoParentLayout(

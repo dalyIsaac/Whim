@@ -17,19 +17,48 @@ public static class SliceLayouts
 		IContext context,
 		ISliceLayoutPlugin plugin,
 		LayoutEngineIdentity identity
-	) =>
-		new SliceLayoutEngine(
-			context,
-			plugin,
-			identity,
-			new ParentArea(isRow: true, (0.5, new SliceArea(maxChildren: 1, order: 0)), (0.5, new OverflowArea()))
-		);
+	) => new SliceLayoutEngine(context, plugin, identity, CreatePrimaryStackArea());
+
+	internal static ParentArea CreatePrimaryStackArea() =>
+		new(isRow: true, (0.5, new SliceArea(order: 0, maxChildren: 1)), (0.5, new OverflowArea()));
 
 	/// <summary>
 	/// Creates a multi-column layout with the given number of columns.
 	/// <br />
 	/// For example, new <c>uint[] { 2, 1, 0 }</c> will create a layout with 3 columns, where the
 	/// first column has 2 rows, the second column has 1 row, and the third column has infinite rows.
+	///
+	/// For example:
+	///
+	/// <example>
+	/// <code>
+	/// -------------------------------------------------------------------------------------------------
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |           Slice 1             |           Slice 2             |           Overflow            |
+	/// |          2 windows            |          1 window             |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// |                               |                               |                               |
+	/// -------------------------------------------------------------------------------------------------
+	/// </code>
+	/// </example>
 	/// </summary>
 	/// <param name="context">The <see cref="IContext"/> to use</param>
 	/// <param name="plugin">The <see cref="ISliceLayoutPlugin"/> to use</param>
@@ -42,7 +71,9 @@ public static class SliceLayouts
 		ISliceLayoutPlugin plugin,
 		LayoutEngineIdentity identity,
 		params uint[] capacities
-	)
+	) => new SliceLayoutEngine(context, plugin, identity, CreateMultiColumnArea(capacities));
+
+	internal static ParentArea CreateMultiColumnArea(uint[] capacities)
 	{
 		double weight = 1.0 / capacities.Length;
 		(double, IArea)[] areas = new (double, IArea)[capacities.Length];
@@ -55,6 +86,7 @@ public static class SliceLayouts
 			{
 				if (createdOverflow)
 				{
+					// TODO: Handle this
 					throw new ArgumentException("Cannot have multiple base areas");
 				}
 
@@ -63,10 +95,77 @@ public static class SliceLayouts
 			}
 			else
 			{
-				areas[idx] = (weight, new SliceArea(maxChildren: capacity, order: (uint)idx));
+				areas[idx] = (weight, new SliceArea(order: (uint)idx, maxChildren: capacity));
 			}
 		}
 
-		return new SliceLayoutEngine(context, plugin, identity, new ParentArea(isRow: true, areas));
+		ParentArea parentArea = new(isRow: true, areas);
+		return parentArea;
+	}
+
+	/// <summary>
+	/// Creates a multi-column layout, where the primary column is in the middle, the secondary
+	/// column is on the left, and the overflow column is on the right.
+	///
+	/// The middle column takes up 50% of the screen, and the left and right columns take up 25%.
+	///
+	/// For example:
+	///
+	/// <example>
+	/// <code>
+	/// ------------------------------------------------------------------------
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |     Slice 2     |           Slice 1           |       Overflow       |
+	/// |    2 windows    |          1 window           |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// |                 |                             |                      |
+	/// ------------------------------------------------------------------------
+	/// </code>
+	/// </example>
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="plugin"></param>
+	/// <param name="identity"></param>
+	/// <returns></returns>
+	public static ILayoutEngine CreateSecondaryPrimaryStackLayout(
+		IContext context,
+		ISliceLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		uint primaryColumnCapacity = 1,
+		uint secondaryColumnCapacity = 2
+	) =>
+		new SliceLayoutEngine(
+			context,
+			plugin,
+			identity,
+			CreateSecondaryPrimaryStackArea(primaryColumnCapacity, secondaryColumnCapacity)
+		);
+
+	internal static ParentArea CreateSecondaryPrimaryStackArea(uint primaryColumnCapacity, uint secondaryColumnCapacity)
+	{
+		return new ParentArea(
+			isRow: true,
+			(0.25, new SliceArea(order: 1, maxChildren: secondaryColumnCapacity)),
+			(0.5, new SliceArea(order: 0, maxChildren: primaryColumnCapacity)),
+			(0.25, new OverflowArea())
+		);
 	}
 }
