@@ -7,6 +7,14 @@ public class SetStartIndexesTests
 {
 	public static IEnumerable<object[]> SetStartIndexes_Data()
 	{
+		// Empty
+		yield return new object[]
+		{
+			new ParentArea(isRow: true),
+			new ParentArea(isRow: true, (1.0, new OverflowArea(isRow: true))),
+			1,
+		};
+
 		// Primary stack
 		yield return new object[]
 		{

@@ -71,7 +71,8 @@ internal static class AreaHelpers
 	{
 		if (rootArea.Children.Count == 0)
 		{
-			return (rootArea, Array.Empty<BaseSliceArea>());
+			Logger.Error($"No children found, creating single overflow area");
+			return SingleOverflowArea();
 		}
 
 		(List<SliceArea> sliceAreas, OverflowArea? overflowArea) = GetAreasSorted(rootArea);
@@ -92,8 +93,8 @@ internal static class AreaHelpers
 
 			if (result is null)
 			{
-				Logger.Error($"Failed to replace last slice area with overflow area");
-				return (rootArea, Array.Empty<BaseSliceArea>());
+				Logger.Error($"Failed to replace last slice area with overflow area, creating single overflow area");
+				return SingleOverflowArea();
 			}
 
 			(rootArea, overflowArea) = result.Value;
@@ -116,6 +117,13 @@ internal static class AreaHelpers
 		windowAreas[^1] = overflowArea;
 
 		return (rootArea, windowAreas);
+	}
+
+	private static (ParentArea Parent, BaseSliceArea[] OrderedSliceAreas) SingleOverflowArea()
+	{
+		OverflowArea overflowArea = new(isRow: true);
+		ParentArea parentArea = new(isRow: true, (1.0, overflowArea));
+		return (parentArea, new BaseSliceArea[] { overflowArea });
 	}
 
 	/// <summary>
