@@ -161,7 +161,10 @@ internal static class AreaHelpers
 		{
 			if (child is ParentArea parentArea)
 			{
-				(ParentArea Parent, OverflowArea Overflow)? result = ReplaceLastSliceAreaWithOverflowArea(parentArea, lastSliceOrder);
+				(ParentArea Parent, OverflowArea Overflow)? result = ReplaceLastSliceAreaWithOverflowArea(
+					parentArea,
+					lastSliceOrder
+				);
 				if (result is not null)
 				{
 					return (ReplaceParentArea(rootArea, parentArea, result.Value.Parent), result.Value.Overflow);
@@ -181,10 +184,7 @@ internal static class AreaHelpers
 		return null;
 	}
 
-	private static ParentArea ReplaceParentArea(
-		ParentArea rootArea,
-		IArea oldChild, IArea newChild
-		)
+	private static ParentArea ReplaceParentArea(ParentArea rootArea, IArea oldChild, IArea newChild)
 	{
 		ImmutableList<IArea> newRootAreaChildren = rootArea.Children;
 		newRootAreaChildren = newRootAreaChildren.SetItem(newRootAreaChildren.IndexOf(oldChild), newChild);
