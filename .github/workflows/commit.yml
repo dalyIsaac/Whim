@@ -80,6 +80,7 @@ jobs:
           msbuild Whim.sln `
             -p:Configuration=$env:Configuration `
             -p:Platform=$env:Platform `
+            -p:BuildInParallel=true `
             -maxCpuCount
         env:
           Configuration: ${{ matrix.configuration }}
