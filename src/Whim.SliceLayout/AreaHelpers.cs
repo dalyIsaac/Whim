@@ -23,12 +23,15 @@ internal static class AreaHelpers
 			IArea child = area.Children[i];
 			if (child is ParentArea parentArea)
 			{
-				parentArea = parentArea.Prune(windowCount);
-				if (parentArea.Children.Count == 0)
+				// Prune the child area. If the child tree has changed, then rebuild the tree.
+				ParentArea prunedParentArea = parentArea.Prune(windowCount);
+				if (prunedParentArea.Children.Count == 0)
 				{
 					ignoredWeight += area.Weights[i];
 					continue;
 				}
+
+				child = prunedParentArea;
 			}
 			else if (child is BaseSliceArea baseSliceArea)
 			{
@@ -89,15 +92,10 @@ internal static class AreaHelpers
 		{
 			// Replace the last slice area with an overflow area.
 			Logger.Error($"No overflow area found, replacing last slice area with overflow area");
-			(ParentArea, OverflowArea)? result = ReplaceLastSliceAreaWithOverflowArea(rootArea, sliceAreas[^1].Order);
+			SliceArea sliceToReplace = sliceAreas[^1];
 
-			if (result is null)
-			{
-				Logger.Error($"Failed to replace last slice area with overflow area, creating single overflow area");
-				return SingleOverflowArea();
-			}
-
-			(rootArea, overflowArea) = result.Value;
+			overflowArea = new(isRow: sliceToReplace.IsRow);
+			rootArea = RebuildTree(rootArea, sliceToReplace, overflowArea);
 			sliceAreas.RemoveAt(sliceAreas.Count - 1);
 		}
 
@@ -168,64 +166,61 @@ internal static class AreaHelpers
 		return (sliceAreas, overflowArea);
 	}
 
-	private static (ParentArea Parent, OverflowArea Overflow)? ReplaceLastSliceAreaWithOverflowArea(
-		ParentArea rootArea,
-		uint lastSliceOrder
-	)
+	/// <summary>
+	/// Use recursive DFS to find the parent area which contains the child area, then replace the
+	/// child area with the new child area.
+	/// </summary>
+	/// <param name="rootArea"></param>
+	/// <param name="oldChild"></param>
+	/// <param name="newChild"></param>
+	/// <returns></returns>
+	private static ParentArea RebuildTree(ParentArea rootArea, IArea oldChild, IArea newChild)
 	{
-		// Recursive DFS
 		foreach (IArea child in rootArea.Children)
 		{
-			if (child is ParentArea parentArea)
+			if (child == oldChild)
 			{
-				(ParentArea Parent, OverflowArea Overflow)? result = ReplaceLastSliceAreaWithOverflowArea(
-					parentArea,
-					lastSliceOrder
-				);
-				if (result is not null)
-				{
-					return (ReplaceParentArea(rootArea, parentArea, result.Value.Parent), result.Value.Overflow);
-				}
+				return ReplaceNode(rootArea, oldChild, newChild);
 			}
-			else if (child is SliceArea sliceArea && sliceArea.Order == lastSliceOrder)
+			else if (child is ParentArea parentArea)
 			{
-				OverflowArea newOverflow = new(sliceArea.IsRow) { StartIndex = sliceArea.StartIndex };
-
-				ImmutableList<IArea> newRootAreaChildren = rootArea.Children;
-				newRootAreaChildren = newRootAreaChildren.SetItem(newRootAreaChildren.IndexOf(sliceArea), newOverflow);
-
-				return (new ParentArea(isRow: rootArea.IsRow, rootArea.Weights, newRootAreaChildren), newOverflow);
+				ParentArea newParentArea = RebuildTree(parentArea, oldChild, newChild);
+				if (newParentArea != parentArea)
+				{
+					return ReplaceNode(rootArea, parentArea, newParentArea);
+				}
 			}
 		}
 
-		return null;
+		return rootArea;
 	}
 
-	private static ParentArea ReplaceParentArea(ParentArea rootArea, IArea oldChild, IArea newChild)
+	private static ParentArea ReplaceNode(ParentArea rootArea, IArea oldChild, IArea newChild)
 	{
 		ImmutableList<IArea> newRootAreaChildren = rootArea.Children;
 		newRootAreaChildren = newRootAreaChildren.SetItem(newRootAreaChildren.IndexOf(oldChild), newChild);
 		return new ParentArea(isRow: rootArea.IsRow, rootArea.Weights, newRootAreaChildren);
 	}
 
-	public static int DoParentLayout(
-		this SliceRectangleItem[] items,
-		int windowStartIdx,
-		IRectangle<int> rectangle,
-		ParentArea area
-	)
+	/// <summary>
+	/// Perform a general layout of the given <see cref="ParentArea"/>. This will recursively layout
+	/// the children of the <see cref="ParentArea"/>, and place the generated rectangles will be
+	/// placed inside <paramref name="items"/>.
+	///
+	/// <br />
+	///
+	/// The <paramref name="items"/> are in order of the tree, not the order of the windows.
+	/// </summary>
+	/// <param name="area"></param>
+	/// <param name="rectangle"></param>
+	/// <param name="items"></param>
+	public static void DoParentLayout(this ParentArea area, IRectangle<int> rectangle, SliceRectangleItem[] items)
 	{
-		if (windowStartIdx >= items.Length)
-		{
-			return windowStartIdx;
-		}
-
 		int x = rectangle.X;
 		int y = rectangle.Y;
 		int width = rectangle.Width;
 		int height = rectangle.Height;
 
-		int windowCurrIdx = 0;
 		for (int childIdx = 0; childIdx < area.Children.Count; childIdx++)
 		{
 			double weight = area.Weights[childIdx];
@@ -244,11 +239,11 @@ internal static class AreaHelpers
 
 			if (childArea is ParentArea parentArea)
 			{
-				windowCurrIdx = items.DoParentLayout(windowStartIdx + windowCurrIdx, childRectangle, parentArea);
+				parentArea.DoParentLayout(childRectangle, items);
 			}
 			else if (childArea is BaseSliceArea sliceArea)
 			{
-				windowCurrIdx = items.DoSliceLayout(windowStartIdx + windowCurrIdx, childRectangle, sliceArea);
+				sliceArea.DoSliceLayout(childRectangle, items);
 			}
 
 			if (area.IsRow)
@@ -260,22 +255,17 @@ internal static class AreaHelpers
 				y += height;
 			}
 		}
-
-		return windowStartIdx + windowCurrIdx;
 	}
 
-	private static int DoSliceLayout(
-		this SliceRectangleItem[] items,
-		int windowIdx,
-		IRectangle<int> rectangle,
-		BaseSliceArea area
-	)
+	/// <summary>
+	/// Perform a layout of the given <see cref="BaseSliceArea"/>. This will place the generated
+	/// rectangles inside <paramref name="items"/>.
+	/// </summary>
+	/// <param name="area"></param>
+	/// <param name="rectangle"></param>
+	/// <param name="items"></param>
+	private static void DoSliceLayout(this BaseSliceArea area, IRectangle<int> rectangle, SliceRectangleItem[] items)
 	{
-		if (windowIdx >= items.Length)
-		{
-			return windowIdx;
-		}
-
 		int x = rectangle.X;
 		int y = rectangle.Y;
 		int width = rectangle.Width;
@@ -284,13 +274,12 @@ internal static class AreaHelpers
 		int deltaX = 0;
 		int deltaY = 0;
 
-		int remainingItemsCount = items.Length - windowIdx;
-		int sliceItemsCount = remainingItemsCount;
+		int sliceItemsCount = (int)(items.Length - area.StartIndex);
 		if (area is SliceArea sliceArea)
 		{
-			sliceItemsCount = Math.Min((int)sliceArea.MaxChildren, remainingItemsCount);
+			sliceItemsCount = (int)Math.Min(sliceArea.MaxChildren, sliceItemsCount);
 		}
-		int maxIdx = windowIdx + sliceItemsCount;
+		int maxIdx = (int)(area.StartIndex + sliceItemsCount);
 
 		if (area.IsRow)
 		{
@@ -303,7 +292,7 @@ internal static class AreaHelpers
 			height = deltaY;
 		}
 
-		for (int windowCurrIdx = windowIdx; windowCurrIdx < maxIdx; windowCurrIdx++)
+		for (int windowCurrIdx = (int)area.StartIndex; windowCurrIdx < maxIdx; windowCurrIdx++)
 		{
 			items[windowCurrIdx] = new SliceRectangleItem(windowCurrIdx, new Rectangle<int>(x, y, width, height));
 
@@ -316,7 +305,5 @@ internal static class AreaHelpers
 				y += deltaY;
 			}
 		}
-
-		return maxIdx;
 	}
 }

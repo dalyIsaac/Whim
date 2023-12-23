@@ -179,11 +179,70 @@ public class DoLayoutTests
 		};
 	}
 
+	public static IEnumerable<object[]> DoLayout_Nested()
+	{
+		// Empty
+		yield return new object[]
+		{
+			new Rectangle<int>(0, 0, 100, 100),
+			SampleSliceLayouts.CreateNestedLayout(),
+			Array.Empty<IWindowState>(),
+		};
+
+		// Single window
+		yield return new object[]
+		{
+			new Rectangle<int>(0, 0, 100, 100),
+			SampleSliceLayouts.CreateNestedLayout(),
+			new[] { new Rectangle<int>(0, 0, 100, 100), },
+		};
+
+		// Fill primary
+		yield return new object[]
+		{
+			new Rectangle<int>(0, 0, 100, 100),
+			SampleSliceLayouts.CreateNestedLayout(),
+			new[] { new Rectangle<int>(0, 0, 100, 50), new Rectangle<int>(0, 50, 100, 50), },
+		};
+
+		//Fill secondary
+		yield return new object[]
+		{
+			new Rectangle<int>(0, 0, 100, 100),
+			SampleSliceLayouts.CreateNestedLayout(),
+			new[]
+			{
+				new Rectangle<int>(0, 0, 50, 50),
+				new Rectangle<int>(0, 50, 50, 50),
+				new Rectangle<int>(50, 0, 50, 50),
+				new Rectangle<int>(50, 50, 50, 50),
+			},
+		};
+
+		// Fill overflow
+		yield return new object[]
+		{
+			new Rectangle<int>(0, 0, 100, 100),
+			SampleSliceLayouts.CreateNestedLayout(),
+			new[]
+			{
+				new Rectangle<int>(0, 0, 50, 50),
+				new Rectangle<int>(0, 50, 50, 50),
+				new Rectangle<int>(50, 0, 50, 25),
+				new Rectangle<int>(50, 25, 50, 25),
+				new Rectangle<int>(50, 50, 50, 16),
+				new Rectangle<int>(50, 66, 50, 16),
+				new Rectangle<int>(50, 82, 50, 16),
+			},
+		};
+	}
+
 	[Theory]
 	[MemberAutoSubstituteData(nameof(DoLayout_PrimaryStack))]
 	[MemberAutoSubstituteData(nameof(DoLayout_MultiColumn))]
 	[MemberAutoSubstituteData(nameof(DoLayout_SecondaryPrimary))]
 	[MemberAutoSubstituteData(nameof(DoLayout_OverflowColumn))]
+	[MemberAutoSubstituteData(nameof(DoLayout_Nested))]
 	internal void DoLayout(
 		IRectangle<int> rectangle,
 		ParentArea area,

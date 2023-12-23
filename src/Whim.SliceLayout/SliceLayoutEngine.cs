@@ -4,6 +4,11 @@ using System.Linq;
 
 namespace Whim.SliceLayout;
 
+/// <summary>
+/// A rectangle, and the index of the windows to use.
+/// </summary>
+/// <param name="Index"></param>
+/// <param name="Rectangle"></param>
 internal record SliceRectangleItem(int Index, Rectangle<int> Rectangle);
 
 /// <summary>
@@ -103,7 +108,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 		// Get the rectangles for each window
 		SliceRectangleItem[] items = new SliceRectangleItem[_windows.Count];
-		items.DoParentLayout(0, rectangle, _prunedRootArea);
+		_prunedRootArea.DoParentLayout(rectangle, items);
 
 		// Get the window states
 		IWindowState[] windowStates = new IWindowState[_windows.Count];
