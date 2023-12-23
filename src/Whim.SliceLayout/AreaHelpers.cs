@@ -74,39 +74,7 @@ internal static class AreaHelpers
 			return (rootArea, Array.Empty<BaseSliceArea>());
 		}
 
-		List<SliceArea> sliceAreas = new();
-		List<ParentArea> parentAreas = new();
-		OverflowArea? overflowArea = null;
-
-		// Iterate through the tree and add the areas to the list.
-		Queue<IArea> areas = new();
-		areas.Enqueue(rootArea);
-
-		while (areas.Count > 0)
-		{
-			IArea currArea = areas.Dequeue();
-
-			if (currArea is ParentArea parentArea)
-			{
-				for (int i = 0; i < parentArea.Children.Count; i++)
-				{
-					areas.Enqueue(parentArea.Children[i]);
-				}
-
-				parentAreas.Add(parentArea);
-			}
-			else if (currArea is SliceArea sliceArea)
-			{
-				sliceAreas.Add(sliceArea);
-			}
-			else if (currArea is OverflowArea currOverflowArea)
-			{
-				overflowArea = currOverflowArea;
-			}
-		}
-
-		// Sort the areas by order.
-		sliceAreas.Sort((a, b) => a.Order.CompareTo(b.Order));
+		(List<SliceArea> sliceAreas, OverflowArea? overflowArea) = GetAreasSorted(rootArea);
 
 		// Set the start indexes.
 		uint currIdx = 0;
@@ -127,10 +95,8 @@ internal static class AreaHelpers
 				Logger.Error($"Failed to replace last slice area with overflow area");
 				return (rootArea, Array.Empty<BaseSliceArea>());
 			}
-			else
-			{
-				(rootArea, overflowArea) = result.Value;
-			}
+
+			(rootArea, overflowArea) = result.Value;
 			sliceAreas.RemoveAt(sliceAreas.Count - 1);
 		}
 
@@ -141,6 +107,7 @@ internal static class AreaHelpers
 			overflowArea.StartIndex = lastSlice.StartIndex + lastSlice.MaxChildren;
 		}
 
+		// Create an array of the slice areas, and add the overflow area to the end.
 		BaseSliceArea[] windowAreas = new BaseSliceArea[sliceAreas.Count + 1];
 		for (int i = 0; i < sliceAreas.Count; i++)
 		{
@@ -149,6 +116,48 @@ internal static class AreaHelpers
 		windowAreas[^1] = overflowArea;
 
 		return (rootArea, windowAreas);
+	}
+
+	/// <summary>
+	/// Get the areas sorted by order, and the overflow area if it exists.
+	/// We don't handle the case where there are multiple overflow areas, as overflow areas are
+	/// greedy.
+	/// </summary>
+	/// <param name="rootArea"></param>
+	/// <returns></returns>
+	private static (List<SliceArea> SliceAreas, OverflowArea? OverflowArea) GetAreasSorted(ParentArea rootArea)
+	{
+		// Iterate through the tree and add the areas to the list, using DFS.
+		List<SliceArea> sliceAreas = new();
+		OverflowArea? overflowArea = null;
+		List<IArea> areas = new() { rootArea };
+
+		while (areas.Count > 0)
+		{
+			IArea currArea = areas[^1];
+			areas.RemoveAt(areas.Count - 1);
+
+			if (currArea is ParentArea parentArea)
+			{
+				for (int i = 0; i < parentArea.Children.Count; i++)
+				{
+					areas.Add(parentArea.Children[i]);
+				}
+			}
+			else if (currArea is SliceArea sliceArea)
+			{
+				sliceAreas.Add(sliceArea);
+			}
+			else if (currArea is OverflowArea currOverflowArea)
+			{
+				overflowArea = currOverflowArea;
+			}
+		}
+
+		// Sort the areas by order.
+		sliceAreas.Sort((a, b) => a.Order.CompareTo(b.Order));
+
+		return (sliceAreas, overflowArea);
 	}
 
 	private static (ParentArea Parent, OverflowArea Overflow)? ReplaceLastSliceAreaWithOverflowArea(
