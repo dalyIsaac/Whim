@@ -179,6 +179,39 @@ public class DoLayoutTests
 		};
 	}
 
+	public static IEnumerable<object[]> DoLayout_OverflowRow()
+	{
+		// Empty
+		yield return new object[]
+		{
+			new Rectangle<int>(0, 0, 100, 100),
+			SampleSliceLayouts.CreateOverflowRowLayout(),
+			Array.Empty<IWindowState>(),
+		};
+
+		// Single window
+		yield return new object[]
+		{
+			new Rectangle<int>(0, 0, 100, 100),
+			SampleSliceLayouts.CreateOverflowRowLayout(),
+			new[] { new Rectangle<int>(0, 0, 100, 100), },
+		};
+
+		// Fill overflow
+		yield return new object[]
+		{
+			new Rectangle<int>(0, 0, 100, 100),
+			SampleSliceLayouts.CreateOverflowRowLayout(),
+			new[]
+			{
+				new Rectangle<int>(0, 0, 25, 100),
+				new Rectangle<int>(25, 0, 25, 100),
+				new Rectangle<int>(50, 0, 25, 100),
+				new Rectangle<int>(75, 0, 25, 100),
+			},
+		};
+	}
+
 	public static IEnumerable<object[]> DoLayout_Nested()
 	{
 		// Empty
@@ -242,6 +275,7 @@ public class DoLayoutTests
 	[MemberAutoSubstituteData(nameof(DoLayout_MultiColumn))]
 	[MemberAutoSubstituteData(nameof(DoLayout_SecondaryPrimary))]
 	[MemberAutoSubstituteData(nameof(DoLayout_OverflowColumn))]
+	[MemberAutoSubstituteData(nameof(DoLayout_OverflowRow))]
 	[MemberAutoSubstituteData(nameof(DoLayout_Nested))]
 	internal void DoLayout(
 		IRectangle<int> rectangle,

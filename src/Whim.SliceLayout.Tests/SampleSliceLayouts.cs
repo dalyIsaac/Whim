@@ -63,4 +63,15 @@ public static class SampleSliceLayouts
 	// |                              |
 	// --------------------------------
 	public static ParentArea CreateOverflowColumnLayout() => new(isRow: false, (1.0, new OverflowArea()));
+
+	// ------------------------------------------------------------------
+	// |                                                                |
+	// |                                                                |
+	// |                                                                |
+	// |                           Overflow                             |
+	// |                                                                |
+	// |                                                                |
+	// |                                                                |
+	// ------------------------------------------------------------------
+	public static ParentArea CreateOverflowRowLayout() => new(isRow: true, (1.0, new OverflowArea(isRow: true)));
 }
