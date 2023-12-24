@@ -52,9 +52,10 @@ public class FocusWindowInDirectionTests
 		}
 
 		sut.FocusWindowInDirection(direction, windows[focusedWindowIdx]);
+		sut.FocusWindowInDirection(direction, windows[focusedWindowIdx]);
 
 		// Then
-		windows[expectedWindowIdx].Received(1).Focus();
+		windows[expectedWindowIdx].Received(2).Focus();
 	}
 
 	public static IEnumerable<object[]> FocusWindowInDirection_NoWindowInDirection_Data()
