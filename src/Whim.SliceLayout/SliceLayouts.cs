@@ -87,7 +87,7 @@ public static class SliceLayouts
 				if (createdOverflow)
 				{
 					// TODO: Handle this
-					throw new ArgumentException("Cannot have multiple base areas");
+					throw new ArgumentException("Cannot have multiple overflow areas");
 				}
 
 				areas[idx] = (weight, new OverflowArea());
