@@ -111,7 +111,7 @@ public partial record SliceLayoutEngine
 		}
 
 		IWindow currentWindow = _windows[currentIndex];
-		ImmutableList<IWindow> newWindows = _windows.Insert(targetIndex, currentWindow).RemoveAt(currentIndex);
+		ImmutableList<IWindow> newWindows = _windows.RemoveAt(currentIndex).Insert(targetIndex, currentWindow);
 		return new SliceLayoutEngine(_context, _plugin, Identity, newWindows, _rootArea);
 	}
 
