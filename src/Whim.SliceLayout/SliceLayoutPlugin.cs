@@ -17,7 +17,6 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 
 	public string DemoteActionName => $"{Name}.stack.demote";
 
-	// TODO: Bar extension issue
 	public IPluginCommands PluginCommands => new SliceLayoutCommands(this);
 
 	public WindowInsertionType WindowInsertionType { get; set; }

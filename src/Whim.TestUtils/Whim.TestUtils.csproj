@@ -41,4 +41,8 @@
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="Whim.Tests" />
+	</ItemGroup>
+
 </Project>

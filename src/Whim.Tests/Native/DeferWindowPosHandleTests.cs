@@ -80,6 +80,8 @@ public class DeferWindowPosHandleTests
 		handle.Dispose();
 
 		// Then nothing happens
+		CustomAssert.NoContextCalls(ctx);
+		CustomAssert.NoInternalContextCalls(internalCtx);
 	}
 
 	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]

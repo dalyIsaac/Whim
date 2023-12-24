@@ -1,0 +1,194 @@
+using System.Text.Json;
+using NSubstitute;
+using NSubstitute.ReturnsExtensions;
+using Whim.TestUtils;
+using Xunit;
+
+namespace Whim.SliceLayout.Tests;
+
+public class SliceLayoutPluginTests
+{
+	[Theory, AutoSubstituteData]
+	public void Name(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+
+		// When
+		string name = plugin.Name;
+
+		// Then
+		Assert.Equal("whim.slice_layout", name);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PluginCommands(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+
+		// When
+		IPluginCommands commands = plugin.PluginCommands;
+
+		// Then
+		Assert.NotEmpty(commands.Commands);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PreInitialize(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+
+		// When
+		plugin.PreInitialize();
+
+		// Then nothing
+		CustomAssert.NoContextCalls(ctx);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PostInitialize(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+
+		// When
+		plugin.PostInitialize();
+
+		// Then nothing
+		CustomAssert.NoContextCalls(ctx);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void LoadState(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+
+		// When
+		plugin.LoadState(default);
+
+		// Then nothing
+		CustomAssert.NoContextCalls(ctx);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void SaveState(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+
+		// When
+		JsonElement? state = plugin.SaveState();
+
+		// Then
+		Assert.Null(state);
+	}
+
+	#region PromoteWindowInStack
+	[Theory, AutoSubstituteData]
+	public void PromoteWindowInStack_NoWindow(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.ReturnsNull();
+
+		// When
+		plugin.PromoteWindowInStack();
+
+		// Then nothing
+		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PromoteWindowInStack_NoWorkspace(IContext ctx, IWindow window)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(window).ReturnsNull();
+
+		// When
+		plugin.PromoteWindowInStack(window);
+
+		// Then nothing
+		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
+			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PromoteWindowInStack(IContext ctx, IWindow window, IWorkspace workspace)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(window).Returns(workspace);
+
+		// When
+		plugin.PromoteWindowInStack(window);
+
+		// Then
+		workspace
+			.Received(1)
+			.PerformCustomLayoutEngineAction(
+				Arg.Is<LayoutEngineCustomAction>(
+					action => action.Name == plugin.PromoteActionName && action.Window == window
+				)
+			);
+	}
+	#endregion
+
+	#region DemoteWindowInStack
+	[Theory, AutoSubstituteData]
+	public void DemoteWindowInStack_NoWindow(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.ReturnsNull();
+
+		// When
+		plugin.DemoteWindowInStack();
+
+		// Then nothing
+		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData]
+	public void DemoteWindowInStack_NoWorkspace(IContext ctx, IWindow window)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(window).ReturnsNull();
+
+		// When
+		plugin.DemoteWindowInStack(window);
+
+		// Then nothing
+		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
+			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+	}
+
+	[Theory, AutoSubstituteData]
+	public void DemoteWindowInStack(IContext ctx, IWindow window, IWorkspace workspace)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(window).Returns(workspace);
+
+		// When
+		plugin.DemoteWindowInStack(window);
+
+		// Then
+		workspace
+			.Received(1)
+			.PerformCustomLayoutEngineAction(
+				Arg.Is<LayoutEngineCustomAction>(
+					action => action.Name == plugin.DemoteActionName && action.Window == window
+				)
+			);
+	}
+	#endregion
+}
