@@ -173,8 +173,9 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		Logger.Debug($"Promoting {window} in stack");
 
 		int windowIndex = _windows.IndexOf(window);
-		if (windowIndex == 0)
+		if (windowIndex == -1)
 		{
+			Logger.Error($"Could not find {window} in stack");
 			return this;
 		}
 
@@ -182,6 +183,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		int areaIndex = GetAreaStackForWindowIndex(windowIndex);
 		if (areaIndex <= 0)
 		{
+			Logger.Error($"Could not promote {window} to higher area");
 			return this;
 		}
 
@@ -198,6 +200,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		int windowIndex = _windows.IndexOf(window);
 		if (windowIndex == _windows.Count - 1)
 		{
+			Logger.Error($"Could not find {window} in stack");
 			return this;
 		}
 
@@ -205,6 +208,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		int areaIndex = GetAreaStackForWindowIndex(windowIndex);
 		if (areaIndex > _windowAreas.Length - 2 || areaIndex == -1)
 		{
+			Logger.Error($"Could not demote {window} to lower area");
 			return this;
 		}
 
