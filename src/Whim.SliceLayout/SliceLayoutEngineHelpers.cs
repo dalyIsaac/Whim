@@ -36,10 +36,10 @@ public partial record SliceLayoutEngine
 		// Figure out the adjacent point of the window
 		IWindowState[] windowStates = GetLazyWindowStates();
 		IRectangle<int> rect = windowStates[index].Rectangle;
-		double x = rect.X;
-		double y = rect.Y;
+		int x = rect.X;
+		int y = rect.Y;
 
-		double delta = 1d / _cachedWindowStatesScale;
+		int delta = 1;
 		if (direction.HasFlag(Direction.Left))
 		{
 			x -= delta;
@@ -59,13 +59,10 @@ public partial record SliceLayoutEngine
 		}
 
 		// Get the window at that point
+		Point<int> point = new(x, y);
 		foreach (IWindowState windowState in windowStates)
 		{
-			if (
-				windowState.Rectangle.ContainsPoint(
-					new Point<int>((int)(x * _cachedWindowStatesScale), (int)(y * _cachedWindowStatesScale))
-				)
-			)
+			if (windowState.Rectangle.ContainsPoint(point))
 			{
 				return windowState.Window;
 			}
