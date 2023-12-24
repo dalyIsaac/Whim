@@ -191,4 +191,21 @@ public class SliceLayoutPluginTests
 			);
 	}
 	#endregion
+
+	[Theory]
+	[InlineAutoSubstituteData(WindowInsertionType.Swap)]
+	[InlineAutoSubstituteData(WindowInsertionType.Rotate)]
+	public void WindowInsertionType_Set(WindowInsertionType insertionType)
+	{
+		// Given
+		SliceLayoutPlugin plugin =
+			new(Substitute.For<IContext>())
+			{
+				// When
+				WindowInsertionType = insertionType
+			};
+
+		// Then
+		Assert.Equal(insertionType, plugin.WindowInsertionType);
+	}
 }
