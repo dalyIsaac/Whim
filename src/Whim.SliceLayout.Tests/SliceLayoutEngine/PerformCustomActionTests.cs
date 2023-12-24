@@ -8,6 +8,7 @@ namespace Whim.SliceLayout.Tests;
 public class PerformCustomActionTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
+	private static readonly IRectangle<int> primaryMonitorBounds = new Rectangle<int>(0, 0, 100, 100);
 
 	#region PromoteWindowInStack
 	[Theory, AutoSubstituteData]
@@ -23,8 +24,7 @@ public class PerformCustomActionTests
 			sut = sut.AddWindow(window);
 		}
 
-		IWindowState[] beforeStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
@@ -35,8 +35,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
@@ -85,12 +84,35 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Equal(windows[expectedWindowIdx], afterStates[focusedWindowIdx].Window);
 		Assert.Equal(windows[focusedWindowIdx], afterStates[expectedWindowIdx].Window);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PromoteWindowInStack_EmptyLayoutEngine(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+
+		sut = sut.PerformCustomAction(
+			new LayoutEngineCustomAction<IWindow>()
+			{
+				Name = "whim.slice_layout.stack.promote",
+				Window = window,
+				Payload = window
+			}
+		);
+
+		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+
+		// Then
+		beforeStates.Should().BeEquivalentTo(afterStates);
 	}
 	#endregion
 
@@ -108,8 +130,7 @@ public class PerformCustomActionTests
 			sut = sut.AddWindow(window);
 		}
 
-		IWindowState[] beforeStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
@@ -120,8 +141,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
@@ -165,12 +185,35 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		Assert.Equal(windows[expectedWindowIdx], afterStates[focusedWindowIdx].Window);
 		Assert.Equal(windows[focusedWindowIdx], afterStates[expectedWindowIdx].Window);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void DemoteWindowInStack_EmptyLayoutEngine(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+
+		sut = sut.PerformCustomAction(
+			new LayoutEngineCustomAction<IWindow>()
+			{
+				Name = "whim.slice_layout.stack.demote",
+				Window = window,
+				Payload = window
+			}
+		);
+
+		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+
+		// Then
+		beforeStates.Should().BeEquivalentTo(afterStates);
 	}
 	#endregion
 
@@ -187,8 +230,7 @@ public class PerformCustomActionTests
 			sut = sut.AddWindow(window);
 		}
 
-		IWindowState[] beforeStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
@@ -199,8 +241,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);

@@ -28,7 +28,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	private readonly ParentArea _rootArea;
 	private readonly ISliceLayoutPlugin _plugin;
 
-	public string Name { get; init; } = "Leader Stack";
+	public string Name { get; init; } = "Slice";
 
 	public int Count => _windows.Count;
 

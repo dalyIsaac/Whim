@@ -7,6 +7,7 @@ namespace Whim.SliceLayout.Tests;
 public class SwapWindowInDirectionTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
+	private static readonly IRectangle<int> primaryMonitorBounds = new Rectangle<int>(0, 0, 100, 100);
 
 	public static IEnumerable<object[]> SwapWindowInDirection_Swap_Data()
 	{
@@ -52,11 +53,7 @@ public class SwapWindowInDirectionTests
 		}
 
 		sut = sut.SwapWindowInDirection(direction, windows[focusedWindowIdx]);
-		IWindowState[] windowStates = sut.DoLayout(
-				new Rectangle<int>(0, 0, 100, 100),
-				ctx.MonitorManager.PrimaryMonitor
-			)
-			.ToArray();
+		IWindowState[] windowStates = sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor).ToArray();
 
 		// Then
 		Assert.Equal(windows[focusedWindowIdx], windowStates[targetWindowIdx].Window);
@@ -117,14 +114,27 @@ public class SwapWindowInDirectionTests
 
 		plugin.WindowInsertionType.Returns(WindowInsertionType.Rotate);
 		sut = sut.SwapWindowInDirection(direction, windows[focusedWindowIdx]);
-		IWindowState[] windowStates = sut.DoLayout(
-				new Rectangle<int>(0, 0, 100, 100),
-				ctx.MonitorManager.PrimaryMonitor
-			)
-			.ToArray();
+		IWindowState[] windowStates = sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor).ToArray();
 
 		// Then
 		Assert.Equal(windows[focusedWindowIdx], windowStates[targetWindowIdx].Window);
 		Assert.Equal(windows[targetWindowIdx], windowStates[targetWindowLocationIdx].Window);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_NoWindowInDirection(IContext ctx, ISliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor).ToArray();
+
+		sut = sut.SwapWindowInDirection(Direction.Up, window);
+
+		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor).ToArray();
+
+		// Then
+		Assert.Equal(beforeStates, afterStates);
 	}
 }

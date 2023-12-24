@@ -45,4 +45,41 @@ public class MoveWindowToPointTests
 		// Then
 		Assert.Equal(windows[expectedWindowIdx], windowStates[windowIdx].Window);
 	}
+
+	public static IEnumerable<object[]> MoveWindowToPoint_InvalidPoint_Data()
+	{
+		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(-0.1, 0.7) };
+		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, -0.1) };
+		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(1.1, 0.7) };
+		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, 1.1) };
+	}
+
+	[Theory]
+	[MemberAutoSubstituteData(nameof(MoveWindowToPoint_InvalidPoint_Data))]
+	public void MoveWindowToPoint_InvalidPoint(
+		ParentArea parentArea,
+		int windowCount,
+		int windowIdx,
+		IPoint<double> point,
+		IContext ctx,
+		ISliceLayoutPlugin plugin
+	)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, parentArea);
+		IWindow[] windows = Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>()).ToArray();
+
+		// When
+		foreach (IWindow window in windows)
+		{
+			sut = sut.AddWindow(window);
+		}
+
+		sut = sut.MoveWindowToPoint(windows[windowIdx], point);
+		IWindowState[] windowStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
+			.ToArray();
+
+		// Then the window should not have moved
+		Assert.Equal(windows[windowIdx], windowStates[windowIdx].Window);
+	}
 }
