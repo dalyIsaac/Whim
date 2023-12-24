@@ -115,6 +115,15 @@ public partial record SliceLayoutEngine
 		return new SliceLayoutEngine(_context, _plugin, Identity, newWindows, _rootArea);
 	}
 
+	/// <summary>
+	/// Does a linear search through the window states to find the window at the given point.
+	/// If the point is not in any window, then <see langword="null"/> is returned.
+	///
+	/// We do a linear search here, because we need to get the window index, and the position inside
+	/// the tree doesn't correspond to the window index.
+	/// </summary>
+	/// <param name="point"></param>
+	/// <returns></returns>
 	private (int Index, IWindow Window)? GetWindowAtPoint(IPoint<double> point)
 	{
 		Logger.Debug($"Getting window at {point}");
