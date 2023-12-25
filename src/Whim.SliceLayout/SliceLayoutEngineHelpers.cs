@@ -182,8 +182,7 @@ public partial record SliceLayoutEngine
 		{
 			if (areaIndex <= 0)
 			{
-				Logger.Error($"Could not promote {window} to an area with lower order");
-				return null;
+				return (windowIndex, 0);
 			}
 
 			SliceArea targetArea = (SliceArea)_windowAreas[areaIndex - 1];
@@ -193,8 +192,7 @@ public partial record SliceLayoutEngine
 		{
 			if (areaIndex >= _windowAreas.Length - 1)
 			{
-				Logger.Error($"Could not promote {window} to an area with higher order");
-				return null;
+				return (windowIndex, _windows.Count - 1);
 			}
 
 			BaseSliceArea targetArea = _windowAreas[areaIndex + 1];
