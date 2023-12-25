@@ -1,64 +1,56 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<AnalysisModeDesign>All</AnalysisModeDesign>
-		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
-		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
-		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
-		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-		<AnalysisModeNaming>All</AnalysisModeNaming>
-		<AnalysisModePerformance>All</AnalysisModePerformance>
-		<AnalysisModeReliability>All</AnalysisModeReliability>
-		<AnalysisModeSecurity>All</AnalysisModeSecurity>
-		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-		<AnalysisModeStyle>All</AnalysisModeStyle>
-		<AnalysisModeUsage>All</AnalysisModeUsage>
-		<Authors>Isaac Daly</Authors>
-		<BuildInParallel>true</BuildInParallel>
-		<Description>An extensible window manager for Windows.</Description>
-		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-		<GenerateLibraryLayout>true</GenerateLibraryLayout>
-		<Nullable>enable</Nullable>
-		<Platforms>x64;arm64;Any CPU</Platforms>
-		<RootNamespace>Whim.LayoutPreview</RootNamespace>
-		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
-		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
-		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-		<UseWinUI>true</UseWinUI>
-		<Version>0.2.0</Version>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<None Remove="LayoutPreviewWindow.xaml" />
-		<None Remove="LayoutPreviewWindowItem.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.WindowsAppSDK" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
-		<InternalsVisibleTo Include="Whim.LayoutPreview.Bar.Tests" />
-		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Whim\Whim.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="LayoutPreviewWindowItem.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="LayoutPreviewWindow.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AnalysisModeDesign>All</AnalysisModeDesign>
+    <AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+    <AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+    <AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+    <AnalysisModeNaming>All</AnalysisModeNaming>
+    <AnalysisModePerformance>All</AnalysisModePerformance>
+    <AnalysisModeReliability>All</AnalysisModeReliability>
+    <AnalysisModeSecurity>All</AnalysisModeSecurity>
+    <AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+    <AnalysisModeStyle>All</AnalysisModeStyle>
+    <AnalysisModeUsage>All</AnalysisModeUsage>
+    <Authors>Isaac Daly</Authors>
+    <BuildInParallel>true</BuildInParallel>
+    <Description>An extensible window manager for Windows.</Description>
+    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <Nullable>enable</Nullable>
+    <Platforms>x64;arm64;Any CPU</Platforms>
+    <RootNamespace>Whim.LayoutPreview</RootNamespace>
+    <RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <UseWinUI>true</UseWinUI>
+    <Version>0.3.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="LayoutPreviewWindow.xaml" />
+    <None Remove="LayoutPreviewWindowItem.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
+    <InternalsVisibleTo Include="Whim.LayoutPreview.Bar.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Whim\Whim.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="LayoutPreviewWindowItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="LayoutPreviewWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 </Project>
