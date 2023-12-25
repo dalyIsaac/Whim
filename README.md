@@ -36,6 +36,7 @@ context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[
 {
     (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
     (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
+    (id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
     (id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
     (id) => new ColumnLayoutEngine(id)
 };
@@ -73,47 +74,51 @@ Each plugin needs to be added to the `context` object.
 
 `SliceLayoutEngine` is a layout engine that internally stores an ordered list of `IWindow`s. The monitor is divided into a number of `IArea`s. Each `IArea` corresponds to a "slice" of the `IWindow` list.
 
-```csharp
-    context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
-    {
-        (id) => new SliceLayoutEngine(
-            context,
-            sliceLayoutPlugin,
-            id,
-            new ParentArea(
-                isRow: true,
-                (0.5, new OverflowArea()),
-                (0.5, new SliceArea(order: 0, maxChildren: 2))
-            )
-        ) { Name = "Overflow on left" },
-
-        (id) => new SliceLayoutEngine(
-            context,
-            sliceLayoutPlugin,
-            id,
-            new ParentArea(
-                isRow: true,
-                (0.5, new SliceArea(order: 0, maxChildren: 1)),
-                (0.25, new OverflowArea()), (0.25, new OverflowArea())
-            )
-        ) { Name = "Multiple overflows"},
-
-        (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
-        (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id)
-    };
-```
-
 There are three types of `IArea`s:
 
 - `ParentArea`: An area that can have any `IArea` implementation as a child
 - `SliceArea`: An ordered area that can have any `IWindow` as a child. There can be multiple `SliceArea`s in a `SliceLayoutEngine`, and they are ordered by the `Order` property/parameter.
-- `OverflowArea`: An area that can have any infinite number of `IWindow`s as a child. There can be only one `OverflowArea` in a `SliceLayoutEngine` - any additional `OverflowArea`s will be ignored. `OverflowArea`s implicitly are the last area in the layout engine, in comparison to all `SliceArea`s.
+- `OverflowArea`: An area that can have any infinite number of `IWindow`s as a child. There can be only one `OverflowArea` in a `SliceLayoutEngine` - any additional `OverflowArea`s will be ignored.
+
+`OverflowArea`s are implicitly the last ordered area in the layout engine, in comparison to all `SliceArea`s.
 
 The `SliceLayouts` contains methods to create a few common layouts:
 
 - primary/stack (master/stack)
 - multi-column layout
 - three-column layout, with the middle column being the primary
+
+Arbitrary layouts can be created by nesting areas.
+
+```csharp
+context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
+{
+    (id) => new SliceLayoutEngine(
+        context,
+        sliceLayoutPlugin,
+        id,
+        new ParentArea(
+            isRow: true,
+            (0.5, new OverflowArea()),
+            (0.5, new SliceArea(order: 0, maxChildren: 2))
+        )
+    ) { Name = "Overflow on left" },
+
+    (id) => new SliceLayoutEngine(
+        context,
+        sliceLayoutPlugin,
+        id,
+        new ParentArea(
+            isRow: true,
+            (0.5, new SliceArea(order: 0, maxChildren: 1)),
+            (0.25, new OverflowArea()), (0.25, new OverflowArea())
+        )
+    ) { Name = "Multiple overflows"},
+
+    (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+    (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id)
+};
+```
 
 `SliceLayoutEngine` requires the `SliceLayoutPlugin` to be added to the `context` object:
 
