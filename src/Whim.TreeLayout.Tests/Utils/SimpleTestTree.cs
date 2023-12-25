@@ -26,7 +26,7 @@ namespace Whim.TreeLayout.Tests;
 /// |                      |                      |
 /// -----------------------------------------------
 /// </summary>
-internal class SimpleTestTree
+internal sealed class SimpleTestTree
 {
 	public SplitNode Root;
 	public SplitNode Top;

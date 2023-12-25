@@ -48,7 +48,7 @@ namespace Whim.TreeLayout.Tests;
 /// |                                                                               |                                                                                |
 /// ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /// </summary>
-internal class TestTree
+internal sealed class TestTree
 {
 	public SplitNode Root;
 	public WindowNode Left;
