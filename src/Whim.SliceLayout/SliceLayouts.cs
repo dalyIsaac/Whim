@@ -86,7 +86,7 @@ public static class SliceLayouts
 				if (overflowIdx != -1)
 				{
 					// Replace the last overflow area with a slice area
-					areas[overflowIdx] = (weight, new SliceArea(order: (uint)overflowIdx, maxChildren: 1));
+					areas[overflowIdx] = (weight, new SliceArea(order: (uint)overflowIdx, maxChildren: 0));
 				}
 
 				areas[idx] = (weight, new OverflowArea());
