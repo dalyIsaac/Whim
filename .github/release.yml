@@ -41,6 +41,10 @@ changelog:
       labels:
         - "layout preview"
 
+    - title: Slice Layout 🍰
+      labels:
+        - "slice layout"
+
     - title: Tree Layout 🌳
       labels:
         - "tree layout"
