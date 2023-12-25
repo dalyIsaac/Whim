@@ -104,7 +104,7 @@ public class DoLayoutTests
 		yield return new object[]
 		{
 			new Rectangle<int>(0, 0, 100, 100),
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
+			SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
 			Array.Empty<IWindowState>(),
 		};
 
@@ -112,7 +112,7 @@ public class DoLayoutTests
 		yield return new object[]
 		{
 			new Rectangle<int>(0, 0, 100, 100),
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
+			SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
 			new[] { new Rectangle<int>(0, 0, 100, 100), },
 		};
 
@@ -120,7 +120,7 @@ public class DoLayoutTests
 		yield return new object[]
 		{
 			new Rectangle<int>(0, 0, 100, 100),
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
+			SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
 			new[]
 			{
 				new Rectangle<int>(38, 0, 62, 100),
@@ -133,7 +133,7 @@ public class DoLayoutTests
 		yield return new object[]
 		{
 			new Rectangle<int>(0, 0, 100, 100),
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
+			SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
 			new[]
 			{
 				new Rectangle<int>(25, 0, 50, 100),

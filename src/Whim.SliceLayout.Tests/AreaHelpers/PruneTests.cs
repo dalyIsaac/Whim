@@ -82,17 +82,12 @@ public class PruneTests
 	public static IEnumerable<object[]> Prune_SecondaryPrimary()
 	{
 		// Empty
-		yield return new object[]
-		{
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
-			0,
-			new ParentArea(isRow: true),
-		};
+		yield return new object[] { SliceLayouts.CreateSecondaryPrimaryArea(1, 2), 0, new ParentArea(isRow: true), };
 
 		// Fill primary
 		yield return new object[]
 		{
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
+			SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
 			1,
 			new ParentArea(isRow: true, (1.0, new SliceArea(order: 0, maxChildren: 1))),
 		};
@@ -100,7 +95,7 @@ public class PruneTests
 		// Fill secondary
 		yield return new object[]
 		{
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
+			SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
 			3,
 			new ParentArea(
 				isRow: true,
@@ -112,7 +107,7 @@ public class PruneTests
 		// Fill overflow
 		yield return new object[]
 		{
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
+			SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
 			5,
 			new ParentArea(
 				isRow: true,

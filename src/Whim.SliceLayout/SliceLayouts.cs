@@ -16,7 +16,7 @@ public static class SliceLayouts
 		IContext context,
 		ISliceLayoutPlugin plugin,
 		LayoutEngineIdentity identity
-	) => new SliceLayoutEngine(context, plugin, identity, CreatePrimaryStackArea());
+	) => new SliceLayoutEngine(context, plugin, identity, CreatePrimaryStackArea()) { Name = "Primary stack" };
 
 	internal static ParentArea CreatePrimaryStackArea() =>
 		new(isRow: true, (0.5, new SliceArea(order: 0, maxChildren: 1)), (0.5, new OverflowArea()));
@@ -70,7 +70,7 @@ public static class SliceLayouts
 		ISliceLayoutPlugin plugin,
 		LayoutEngineIdentity identity,
 		params uint[] capacities
-	) => new SliceLayoutEngine(context, plugin, identity, CreateMultiColumnArea(capacities));
+	) => new SliceLayoutEngine(context, plugin, identity, CreateMultiColumnArea(capacities)) { Name = "Multi-column " };
 
 	internal static ParentArea CreateMultiColumnArea(uint[] capacities)
 	{
@@ -144,7 +144,7 @@ public static class SliceLayouts
 	/// <param name="plugin"></param>
 	/// <param name="identity"></param>
 	/// <returns></returns>
-	public static ILayoutEngine CreateSecondaryPrimaryStackLayout(
+	public static ILayoutEngine CreateSecondaryPrimaryLayout(
 		IContext context,
 		ISliceLayoutPlugin plugin,
 		LayoutEngineIdentity identity,
@@ -155,10 +155,13 @@ public static class SliceLayouts
 			context,
 			plugin,
 			identity,
-			CreateSecondaryPrimaryStackArea(primaryColumnCapacity, secondaryColumnCapacity)
-		);
+			CreateSecondaryPrimaryArea(primaryColumnCapacity, secondaryColumnCapacity)
+		)
+		{
+			Name = "Secondary primary"
+		};
 
-	internal static ParentArea CreateSecondaryPrimaryStackArea(uint primaryColumnCapacity, uint secondaryColumnCapacity)
+	internal static ParentArea CreateSecondaryPrimaryArea(uint primaryColumnCapacity, uint secondaryColumnCapacity)
 	{
 		return new ParentArea(
 			isRow: true,

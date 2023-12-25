@@ -43,7 +43,7 @@ public class SetStartIndexesTests
 		// Secondary primary
 		yield return new object[]
 		{
-			SliceLayouts.CreateSecondaryPrimaryStackArea(1, 2),
+			SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
 			new ParentArea(
 				isRow: true,
 				(0.25, new SliceArea(order: 1, maxChildren: 2) { StartIndex = 1 }),
