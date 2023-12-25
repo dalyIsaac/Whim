@@ -23,6 +23,22 @@ public class SliceLayoutEngineTests
 		Assert.Equal("Slice", name);
 	}
 
+	[Theory, AutoSubstituteData]
+	public void Name_Changed(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout())
+		{
+			Name = "Paradise Shelduck"
+		};
+
+		// When
+		sut = sut.AddWindow(window);
+
+		// Then
+		Assert.Equal("Paradise Shelduck", sut.Name);
+	}
+
 	[Theory]
 	[InlineAutoSubstituteData(0)]
 	[InlineAutoSubstituteData(1)]

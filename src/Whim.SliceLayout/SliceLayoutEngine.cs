@@ -54,20 +54,16 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	/// </summary>
 	private readonly ParentArea _prunedRootArea;
 
-	private SliceLayoutEngine(
-		IContext context,
-		ISliceLayoutPlugin plugin,
-		LayoutEngineIdentity identity,
-		ImmutableList<IWindow> windows,
-		ParentArea rootArea
-	)
+	private SliceLayoutEngine(SliceLayoutEngine engine, ImmutableList<IWindow> windows)
 	{
-		_context = context;
-		_plugin = plugin;
-		Identity = identity;
+		_context = engine._context;
+		_plugin = engine._plugin;
+		Identity = engine.Identity;
+		Name = engine.Name;
+
 		_windows = windows;
 
-		(_rootArea, _windowAreas) = rootArea.SetStartIndexes();
+		(_rootArea, _windowAreas) = engine._rootArea.SetStartIndexes();
 		_prunedRootArea = _rootArea.Prune(_windows.Count);
 	}
 
@@ -77,18 +73,26 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		LayoutEngineIdentity identity,
 		ParentArea rootArea
 	)
-		: this(context, plugin, identity, ImmutableList<IWindow>.Empty, rootArea) { }
+	{
+		_context = context;
+		_plugin = plugin;
+		Identity = identity;
+		_windows = ImmutableList<IWindow>.Empty;
+
+		(_rootArea, _windowAreas) = rootArea.SetStartIndexes();
+		_prunedRootArea = _rootArea.Prune(_windows.Count);
+	}
 
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding {window}");
-		return new SliceLayoutEngine(_context, _plugin, Identity, _windows.Add(window), _rootArea);
+		return new SliceLayoutEngine(this, _windows.Add(window));
 	}
 
 	public ILayoutEngine RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing {window}");
-		return new SliceLayoutEngine(_context, _plugin, Identity, _windows.Remove(window), _rootArea);
+		return new SliceLayoutEngine(this, _windows.Remove(window));
 	}
 
 	public bool ContainsWindow(IWindow window)
