@@ -78,7 +78,7 @@ There are three types of `IArea`s:
 
 - `ParentArea`: An area that can have any `IArea` implementation as a child
 - `SliceArea`: An ordered area that can have any `IWindow` as a child. There can be multiple `SliceArea`s in a `SliceLayoutEngine`, and they are ordered by the `Order` property/parameter.
-- `OverflowArea`: An area that can have any infinite number of `IWindow`s as a child. There can be only one `OverflowArea` in a `SliceLayoutEngine` - any additional `OverflowArea`s will be ignored.
+- `OverflowArea`: An area that can have any infinite number of `IWindow`s as a child. There can be only one `OverflowArea` in a `SliceLayoutEngine` - any additional `OverflowArea`s will be ignored. If no `OverflowArea` is specified, the `SliceLayoutEngine` will replace the last `SliceArea` with an `OverflowArea`.
 
 `OverflowArea`s are implicitly the last ordered area in the layout engine, in comparison to all `SliceArea`s.
 

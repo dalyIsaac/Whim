@@ -10,6 +10,36 @@ public static class SliceLayouts
 	/// <summary>
 	/// Creates a primary stack layout, where the first window takes up half the screen, and the
 	/// remaining windows are stacked vertically on the other half.
+	///
+	/// <example>
+	/// <code>
+	/// ----------------------------------------------------------------
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |           Primary            |           Overflow            |
+	/// |          1 window            |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// |                              |                               |
+	/// ----------------------------------------------------------------
+	/// </code>
+	/// </example>
 	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>

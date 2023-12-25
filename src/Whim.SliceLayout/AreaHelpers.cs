@@ -139,9 +139,8 @@ internal static class AreaHelpers
 	}
 
 	/// <summary>
-	/// Get the areas sorted by order, and the overflow area if it exists.
-	/// We don't handle the case where there are multiple overflow areas, as overflow areas are
-	/// greedy.
+	/// Get the areas sorted by order, and the overflow area if it exists. We take the last overflow
+	/// area if there are multiple.
 	/// </summary>
 	/// <param name="rootArea"></param>
 	/// <returns></returns>
