@@ -43,8 +43,7 @@ public class TreeLayoutPluginTests
 		plugin.PreInitialize();
 
 		// Then nothing
-		Assert.Empty(ctx.WorkspaceManager.ReceivedCalls());
-		Assert.Empty(ctx.WindowManager.ReceivedCalls());
+		CustomAssert.NoContextCalls(ctx);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -57,8 +56,7 @@ public class TreeLayoutPluginTests
 		plugin.PostInitialize();
 
 		// Then nothing
-		Assert.Empty(ctx.WorkspaceManager.ReceivedCalls());
-		Assert.Empty(ctx.WindowManager.ReceivedCalls());
+		CustomAssert.NoContextCalls(ctx);
 	}
 
 	#region GetAddWindowDirection
@@ -275,8 +273,7 @@ public class TreeLayoutPluginTests
 		plugin.LoadState(JsonDocument.Parse("{}").RootElement);
 
 		// Then nothing
-		Assert.Empty(ctx.WorkspaceManager.ReceivedCalls());
-		Assert.Empty(ctx.WindowManager.ReceivedCalls());
+		CustomAssert.NoContextCalls(ctx);
 	}
 
 	[Theory, AutoSubstituteData]

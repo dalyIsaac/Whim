@@ -34,6 +34,9 @@ context.WorkspaceManager.Add("Alt");
 // Set up layout engines.
 context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
 {
+    (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+    (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
+    (id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
     (id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
     (id) => new ColumnLayoutEngine(id)
 };
@@ -64,6 +67,76 @@ context.PluginManager.AddPlugin(barPlugin);
 ```
 
 Each plugin needs to be added to the `context` object.
+
+### Layout Engines
+
+#### `SliceLayoutEngine`
+
+`SliceLayoutEngine` is a layout engine that internally stores an ordered list of `IWindow`s. The monitor is divided into a number of `IArea`s. Each `IArea` corresponds to a "slice" of the `IWindow` list.
+
+There are three types of `IArea`s:
+
+- `ParentArea`: An area that can have any `IArea` implementation as a child
+- `SliceArea`: An ordered area that can have any `IWindow` as a child. There can be multiple `SliceArea`s in a `SliceLayoutEngine`, and they are ordered by the `Order` property/parameter.
+- `OverflowArea`: An area that can have any infinite number of `IWindow`s as a child. There can be only one `OverflowArea` in a `SliceLayoutEngine` - any additional `OverflowArea`s will be ignored. If no `OverflowArea` is specified, the `SliceLayoutEngine` will replace the last `SliceArea` with an `OverflowArea`.
+
+`OverflowArea`s are implicitly the last ordered area in the layout engine, in comparison to all `SliceArea`s.
+
+The `SliceLayouts` contains methods to create a few common layouts:
+
+- primary/stack (master/stack)
+- multi-column layout
+- three-column layout, with the middle column being the primary
+
+Arbitrary layouts can be created by nesting areas.
+
+```csharp
+context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
+{
+    (id) => new SliceLayoutEngine(
+        context,
+        sliceLayoutPlugin,
+        id,
+        new ParentArea(
+            isRow: true,
+            (0.5, new OverflowArea()),
+            (0.5, new SliceArea(order: 0, maxChildren: 2))
+        )
+    ) { Name = "Overflow on left" },
+
+    (id) => new SliceLayoutEngine(
+        context,
+        sliceLayoutPlugin,
+        id,
+        new ParentArea(
+            isRow: true,
+            (0.5, new SliceArea(order: 0, maxChildren: 1)),
+            (0.25, new OverflowArea()), (0.25, new OverflowArea())
+        )
+    ) { Name = "Multiple overflows"},
+
+    (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+    (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id)
+};
+```
+
+`SliceLayoutEngine` requires the `SliceLayoutPlugin` to be added to the `context` object:
+
+```csharp
+SliceLayoutPlugin sliceLayoutPlugin = new(context);
+context.PluginManager.AddPlugin(sliceLayoutPlugin);
+```
+
+#### `TreeLayoutEngine`
+
+`TreeLayoutEngine` is a layout that allows users to create arbitrary grid layouts. Unlike `SliceLayoutEngine`, windows can can be added in any location.
+
+`TreeLayoutEngine` requires the `TreeLayoutPlugin` to be added to the `context` object:
+
+```csharp
+TreeLayoutPlugin treeLayoutPlugin = new(context);
+context.PluginManager.AddPlugin(treeLayoutPlugin);
+```
 
 ### Commands
 
@@ -215,6 +288,19 @@ See [`GapsCommands.cs`](src/Whim.Gaps/GapsCommands.cs).
 | `whim.gaps.outer.decrease` | Decrease outer gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd> |
 | `whim.gaps.inner.increase` | Increase inner gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> |
 | `whim.gaps.inner.decrease` | Decrease inner gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd> |
+
+##### Slice Layout Plugin Commands
+
+See [`SliceLayoutCommands.cs`](src/Whim.SliceLayout/SliceLayoutCommands.cs).
+
+| Identifier                                    | Title                              | Keybind            |
+| --------------------------------------------- | ---------------------------------- | ------------------ |
+| `whim.slice_layout.set_insertion_type.swap`   | Set slice insertion type to swap   | No default keybind |
+| `whim.slice_layout.set_insertion_type.rotate` | Set slice insertion type to rotate | No default keybind |
+| `whim.slice_layout.window.promote`            | Promote window in stack            | No default keybind |
+| `whim.slice_layout.window.demote`             | Demote window in stack             | No default keybind |
+| `whim.slice_layout.focus.promote`             | Promote focus in stack             | No default keybind |
+| `whim.slice_layout.focus.demote`              | Demote focus in stack              | No default keybind |
 
 ##### Tree Layout Plugin Commands
 

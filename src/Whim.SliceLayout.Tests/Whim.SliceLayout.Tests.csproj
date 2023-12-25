@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
 		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
@@ -20,7 +19,7 @@
 		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<GenerateLibraryLayout>true</GenerateLibraryLayout>
-		<IsPackable>false</IsPackable>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Platforms>x64;arm64;Any CPU</Platforms>
 		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
@@ -31,18 +30,24 @@
 		<PackageReference Include="AutoFixture" />
 		<PackageReference Include="AutoFixture.AutoNSubstitute" />
 		<PackageReference Include="AutoFixture.Xunit2" />
+		<PackageReference Include="coverlet.collector">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
 		<PackageReference Include="NSubstitute" />
 		<PackageReference Include="NSubstitute.Analyzers.CSharp" />
 		<PackageReference Include="xunit" />
+		<PackageReference Include="xunit.runner.visualstudio">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Whim\Whim.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<InternalsVisibleTo Include="Whim.Tests" />
+		<ProjectReference Include="..\Whim.SliceLayout\Whim.SliceLayout.csproj" />
+		<ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,7 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
 		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
@@ -20,29 +19,29 @@
 		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<GenerateLibraryLayout>true</GenerateLibraryLayout>
-		<IsPackable>false</IsPackable>
 		<Nullable>enable</Nullable>
 		<Platforms>x64;arm64;Any CPU</Platforms>
+		<RootNamespace>Whim.SliceLayout</RootNamespace>
+		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
 		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<UseWinUI>true</UseWinUI>
 		<Version>0.3.0</Version>
 	</PropertyGroup>
 
+
 	<ItemGroup>
-		<PackageReference Include="AutoFixture" />
-		<PackageReference Include="AutoFixture.AutoNSubstitute" />
-		<PackageReference Include="AutoFixture.Xunit2" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" />
-		<PackageReference Include="NSubstitute" />
-		<PackageReference Include="NSubstitute.Analyzers.CSharp" />
-		<PackageReference Include="xunit" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Whim.SliceLayout.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Whim\Whim.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<InternalsVisibleTo Include="Whim.Tests" />
 	</ItemGroup>
 
 </Project>

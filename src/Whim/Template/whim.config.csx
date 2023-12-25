@@ -6,6 +6,7 @@
 #r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
 #r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
 #r "WHIM_PATH\plugins\Whim.LayoutPreview\Whim.LayoutPreview.dll"
+#r "WHIM_PATH\plugins\Whim.SliceLayout\Whim.SliceLayout.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout\Whim.TreeLayout.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.dll"
 #r "WHIM_PATH\plugins\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.dll"
@@ -20,6 +21,7 @@ using Whim.FloatingLayout;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.LayoutPreview;
+using Whim.SliceLayout;
 using Whim.TreeLayout;
 using Whim.TreeLayout.Bar;
 using Whim.TreeLayout.CommandPalette;
@@ -68,6 +70,10 @@ void DoConfig(IContext context)
 	CommandPalettePlugin commandPalettePlugin = new(context, commandPaletteConfig);
 	context.PluginManager.AddPlugin(commandPalettePlugin);
 
+	// Slice layout.
+	SliceLayoutPlugin sliceLayoutPlugin = new(context);
+	context.PluginManager.AddPlugin(sliceLayoutPlugin);
+
 	// Tree layout.
 	TreeLayoutPlugin treeLayoutPlugin = new(context);
 	context.PluginManager.AddPlugin(treeLayoutPlugin);
@@ -99,6 +105,9 @@ void DoConfig(IContext context)
 	// Set up layout engines.
 	context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
 	{
+		(id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+		(id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
+		(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
 		(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
 		(id) => new ColumnLayoutEngine(id)
 	};

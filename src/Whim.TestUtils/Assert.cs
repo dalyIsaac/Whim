@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel;
+using NSubstitute;
+using Xunit;
 using Xunit.Sdk;
 
 namespace Whim.TestUtils;
@@ -87,5 +89,34 @@ public static class CustomAssert
 		{
 			throw new DoesNotRaiseException(typeof(PropertyChangedEventArgs));
 		}
+	}
+
+	public static void NoContextCalls(IContext ctx)
+	{
+		Assert.Empty(ctx.ResourceManager.ReceivedCalls());
+		Assert.Empty(ctx.WorkspaceManager.ReceivedCalls());
+		Assert.Empty(ctx.WindowManager.ReceivedCalls());
+		Assert.Empty(ctx.MonitorManager.ReceivedCalls());
+		Assert.Empty(ctx.RouterManager.ReceivedCalls());
+		Assert.Empty(ctx.FilterManager.ReceivedCalls());
+		Assert.Empty(ctx.CommandManager.ReceivedCalls());
+		Assert.Empty(ctx.KeybindManager.ReceivedCalls());
+		Assert.Empty(ctx.PluginManager.ReceivedCalls());
+		Assert.Empty(ctx.NativeManager.ReceivedCalls());
+		Assert.Empty(ctx.FileManager.ReceivedCalls());
+		Assert.Empty(ctx.NotificationManager.ReceivedCalls());
+	}
+
+	internal static void NoInternalContextCalls(IInternalContext internalCtx)
+	{
+		Assert.Empty(internalCtx.CoreSavedStateManager.ReceivedCalls());
+		Assert.Empty(internalCtx.CoreNativeManager.ReceivedCalls());
+		Assert.Empty(internalCtx.WindowMessageMonitor.ReceivedCalls());
+		Assert.Empty(internalCtx.WorkspaceManager.ReceivedCalls());
+		Assert.Empty(internalCtx.MonitorManager.ReceivedCalls());
+		Assert.Empty(internalCtx.WindowManager.ReceivedCalls());
+		Assert.Empty(internalCtx.KeybindHook.ReceivedCalls());
+		Assert.Empty(internalCtx.MouseHook.ReceivedCalls());
+		Assert.Empty(internalCtx.DeferWindowPosManager.ReceivedCalls());
 	}
 }
