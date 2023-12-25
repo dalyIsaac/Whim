@@ -208,4 +208,110 @@ public class SliceLayoutPluginTests
 		// Then
 		Assert.Equal(insertionType, plugin.WindowInsertionType);
 	}
+
+	#region PromoteFocusInStack
+	[Theory, AutoSubstituteData]
+	public void PromoteFocusInStack_NoWindow(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.ReturnsNull();
+
+		// When
+		plugin.PromoteFocusInStack();
+
+		// Then nothing
+		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PromoteFocusInStack_NoWorkspace(IContext ctx, IWindow window)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(window).ReturnsNull();
+
+		// When
+		plugin.PromoteFocusInStack(window);
+
+		// Then nothing
+		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
+			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+	}
+
+	[Theory, AutoSubstituteData]
+	public void PromoteFocusInStack(IContext ctx, IWindow window, IWorkspace workspace)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(window).Returns(workspace);
+
+		// When
+		plugin.PromoteFocusInStack(window);
+
+		// Then
+		workspace
+			.Received(1)
+			.PerformCustomLayoutEngineAction(
+				Arg.Is<LayoutEngineCustomAction>(
+					action => action.Name == plugin.PromoteFocusActionName && action.Window == window
+				)
+			);
+	}
+	#endregion
+
+	#region DemoteFocusInStack
+	[Theory, AutoSubstituteData]
+	public void DemoteFocusInStack_NoWindow(IContext ctx)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.ReturnsNull();
+
+		// When
+		plugin.DemoteFocusInStack();
+
+		// Then nothing
+		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData]
+	public void DemoteFocusInStack_NoWorkspace(IContext ctx, IWindow window)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(window).ReturnsNull();
+
+		// When
+		plugin.DemoteFocusInStack(window);
+
+		// Then nothing
+		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
+			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+	}
+
+	[Theory, AutoSubstituteData]
+	public void DemoteFocusInStack(IContext ctx, IWindow window, IWorkspace workspace)
+	{
+		// Given
+		SliceLayoutPlugin plugin = new(ctx);
+		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
+		ctx.WorkspaceManager.GetWorkspaceForWindow(window).Returns(workspace);
+
+		// When
+		plugin.DemoteFocusInStack(window);
+
+		// Then
+		workspace
+			.Received(1)
+			.PerformCustomLayoutEngineAction(
+				Arg.Is<LayoutEngineCustomAction>(
+					action => action.Name == plugin.DemoteFocusActionName && action.Window == window
+				)
+			);
+	}
+	#endregion
 }
