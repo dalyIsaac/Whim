@@ -49,7 +49,7 @@ public class SliceLayoutCommandsTests
 	public void PromoteWindowInStack(ISliceLayoutPlugin plugin)
 	{
 		// Given
-		ICommand command = CreateSut(plugin, "whim.slicelayout.stack.promote");
+		ICommand command = CreateSut(plugin, "whim.slicelayout.window.promote");
 
 		// When
 		command.TryExecute();
@@ -63,12 +63,40 @@ public class SliceLayoutCommandsTests
 	public void DemoteWindowInStack(ISliceLayoutPlugin plugin)
 	{
 		// Given
-		ICommand command = CreateSut(plugin, "whim.slicelayout.stack.demote");
+		ICommand command = CreateSut(plugin, "whim.slicelayout.window.demote");
 
 		// When
 		command.TryExecute();
 
 		// Then
 		plugin.Received(1).DemoteWindowInStack();
+	}
+
+	[Theory]
+	[AutoSubstituteData<SliceLayoutCommandsCustomization>]
+	public void PromoteFocusInStack(ISliceLayoutPlugin plugin)
+	{
+		// Given
+		ICommand command = CreateSut(plugin, "whim.slicelayout.focus.promote");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		plugin.Received(1).PromoteFocusInStack();
+	}
+
+	[Theory]
+	[AutoSubstituteData<SliceLayoutCommandsCustomization>]
+	public void DemoteFocusInStack(ISliceLayoutPlugin plugin)
+	{
+		// Given
+		ICommand command = CreateSut(plugin, "whim.slicelayout.focus.demote");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		plugin.Received(1).DemoteFocusInStack();
 	}
 }

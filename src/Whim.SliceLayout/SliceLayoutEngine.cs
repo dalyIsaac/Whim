@@ -168,86 +168,19 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		return MoveWindowToIndex(_windows.IndexOf(window), _windows.IndexOf(windowInDirection));
 	}
 
-	private ILayoutEngine PromoteWindowInStack(IWindow window)
-	{
-		Logger.Debug($"Promoting {window} in stack");
-
-		int windowIndex = _windows.IndexOf(window);
-		if (windowIndex == -1)
-		{
-			Logger.Error($"Could not find {window} in stack");
-			return this;
-		}
-
-		// Find the area which contains the window.
-		int areaIndex = GetAreaStackForWindowIndex(windowIndex);
-		if (areaIndex <= 0)
-		{
-			Logger.Error($"Could not promote {window} to higher area");
-			return this;
-		}
-
-		SliceArea targetArea = (SliceArea)_windowAreas[areaIndex - 1];
-		int targetIndex = targetArea.StartIndex + targetArea.MaxChildren - 1;
-
-		return MoveWindowToIndex(windowIndex, targetIndex);
-	}
-
-	private ILayoutEngine DemoteWindowInStack(IWindow window)
-	{
-		Logger.Debug($"Demoting {window} in stack");
-
-		int windowIndex = _windows.IndexOf(window);
-		if (windowIndex == _windows.Count - 1)
-		{
-			Logger.Error($"Could not find {window} in stack");
-			return this;
-		}
-
-		// Find the area which contains the window.
-		int areaIndex = GetAreaStackForWindowIndex(windowIndex);
-		if (areaIndex > _windowAreas.Length - 2 || areaIndex == -1)
-		{
-			Logger.Error($"Could not demote {window} to lower area");
-			return this;
-		}
-
-		BaseSliceArea targetArea = _windowAreas[areaIndex + 1];
-		int targetIndex = targetArea.StartIndex;
-
-		return MoveWindowToIndex(windowIndex, targetIndex);
-	}
-
-	private int GetAreaStackForWindowIndex(int windowIndex)
-	{
-		for (int idx = 0; idx < _windowAreas.Length; idx++)
-		{
-			IArea area = _windowAreas[idx];
-			if (area is SliceArea sliceArea)
-			{
-				int areaEndIndex = sliceArea.StartIndex + sliceArea.MaxChildren;
-				if (windowIndex >= sliceArea.StartIndex && windowIndex < areaEndIndex)
-				{
-					return idx;
-				}
-			}
-
-			if (area is OverflowArea)
-			{
-				return idx;
-			}
-		}
-
-		return -1;
-	}
-
 	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>
 		action switch
 		{
-			LayoutEngineCustomAction<IWindow> promoteAction when promoteAction.Name == _plugin.PromoteActionName
-				=> PromoteWindowInStack(promoteAction.Payload),
-			LayoutEngineCustomAction<IWindow> demoteAction when demoteAction.Name == _plugin.DemoteActionName
-				=> DemoteWindowInStack(demoteAction.Payload),
+			LayoutEngineCustomAction<IWindow> promoteAction when promoteAction.Name == _plugin.PromoteWindowActionName
+				=> PromoteWindowInStack(promoteAction.Payload, promote: true),
+			LayoutEngineCustomAction<IWindow> demoteAction when demoteAction.Name == _plugin.DemoteWindowActionName
+				=> PromoteWindowInStack(demoteAction.Payload, promote: false),
+			LayoutEngineCustomAction<IWindow> promoteFocusAction
+				when promoteFocusAction.Name == _plugin.PromoteFocusActionName
+				=> PromoteFocusInStack(promoteFocusAction.Payload, promote: true),
+			LayoutEngineCustomAction<IWindow> demoteFocusAction
+				when demoteFocusAction.Name == _plugin.DemoteFocusActionName
+				=> PromoteFocusInStack(demoteFocusAction.Payload, promote: false),
 			_ => this
 		};
 }

@@ -21,12 +21,22 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// <summary>
 	/// The name of the action that promotes a window in the stack to the next-higher slice.
 	/// </summary>
-	string PromoteActionName { get; }
+	string PromoteWindowActionName { get; }
 
 	/// <summary>
 	/// The name of the action that demotes a window in the stack to the next-lower slice.
 	/// </summary>
-	string DemoteActionName { get; }
+	string DemoteWindowActionName { get; }
+
+	/// <summary>
+	/// The name of the action that promotes the focus in the stack to the next-higher slice.
+	/// </summary>
+	string PromoteFocusActionName { get; }
+
+	/// <summary>
+	/// The name of the action that demotes the focus in the stack to the next-lower slice.
+	/// </summary>
+	string DemoteFocusActionName { get; }
 
 	/// <summary>
 	/// The type of insertion to use when adding a window to a slice.
@@ -50,4 +60,22 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// is used.
 	/// </param>
 	void DemoteWindowInStack(IWindow? window = null);
+
+	/// <summary>
+	/// Promotes the focus to the next slice with a lower order - see <see cref="SliceArea.Order"/>.
+	/// </summary>
+	/// <param name="window">
+	/// The current window. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
+	/// is used.
+	/// </param>
+	void PromoteFocusInStack(IWindow? window = null);
+
+	/// <summary>
+	/// Demotes the focus to the next slice with a higher order - see <see cref="SliceArea.Order"/>.
+	/// </summary>
+	/// <param name="window">
+	/// The current window. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
+	/// is used.
+	/// </param>
+	void DemoteFocusInStack(IWindow? window = null);
 }

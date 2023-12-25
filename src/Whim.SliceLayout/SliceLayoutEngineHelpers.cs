@@ -142,4 +142,86 @@ public partial record SliceLayoutEngine
 
 		return null;
 	}
+
+	private ILayoutEngine PromoteWindowInStack(IWindow window, bool promote)
+	{
+		Logger.Debug($"Promoting {window} in stack");
+		if (GetPromoteTargetIndex(window, promote) is not (int windowIndex, int targetIndex))
+		{
+			return this;
+		}
+
+		return MoveWindowToIndex(windowIndex, targetIndex);
+	}
+
+	private ILayoutEngine PromoteFocusInStack(IWindow window, bool promote)
+	{
+		Logger.Debug($"Promoting focus in stack");
+		if (GetPromoteTargetIndex(window, promote) is not (int, int targetIndex))
+		{
+			return this;
+		}
+
+		_windows[targetIndex].Focus();
+		return this;
+	}
+
+	private (int WindowIndex, int TargetIndex)? GetPromoteTargetIndex(IWindow window, bool promote)
+	{
+		int windowIndex = _windows.IndexOf(window);
+		if (windowIndex == -1)
+		{
+			Logger.Error($"Could not find {window} in stack");
+			return null;
+		}
+
+		// Find the area which contains the window.
+		int areaIndex = GetAreaStackForWindowIndex(windowIndex);
+
+		if (promote)
+		{
+			if (areaIndex <= 0)
+			{
+				Logger.Error($"Could not promote {window} to an area with lower order");
+				return null;
+			}
+
+			SliceArea targetArea = (SliceArea)_windowAreas[areaIndex - 1];
+			return (windowIndex, targetArea.StartIndex + targetArea.MaxChildren - 1);
+		}
+		else
+		{
+			if (areaIndex >= _windowAreas.Length - 1)
+			{
+				Logger.Error($"Could not promote {window} to an area with higher order");
+				return null;
+			}
+
+			BaseSliceArea targetArea = _windowAreas[areaIndex + 1];
+			return (windowIndex, targetArea.StartIndex);
+		}
+	}
+
+	private int GetAreaStackForWindowIndex(int windowIndex)
+	{
+		for (int idx = 0; idx < _windowAreas.Length; idx++)
+		{
+			IArea area = _windowAreas[idx];
+			if (area is SliceArea sliceArea)
+			{
+				int areaEndIndex = sliceArea.StartIndex + sliceArea.MaxChildren;
+				if (windowIndex >= sliceArea.StartIndex && windowIndex < areaEndIndex)
+				{
+					return idx;
+				}
+			}
+
+			if (area is OverflowArea)
+			{
+				return idx;
+			}
+		}
+
+		return -1;
+	}
 }

@@ -29,7 +29,7 @@ public class PerformCustomActionTests
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
 			{
-				Name = "whim.slice_layout.stack.promote",
+				Name = "whim.slice_layout.window.promote",
 				Window = untrackedWindow,
 				Payload = untrackedWindow
 			}
@@ -78,7 +78,7 @@ public class PerformCustomActionTests
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
 			{
-				Name = "whim.slice_layout.stack.promote",
+				Name = "whim.slice_layout.window.promote",
 				Window = windows[focusedWindowIdx],
 				Payload = windows[focusedWindowIdx]
 			}
@@ -103,7 +103,7 @@ public class PerformCustomActionTests
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
 			{
-				Name = "whim.slice_layout.stack.promote",
+				Name = "whim.slice_layout.window.promote",
 				Window = window,
 				Payload = window
 			}
@@ -135,7 +135,7 @@ public class PerformCustomActionTests
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
 			{
-				Name = "whim.slice_layout.stack.demote",
+				Name = "whim.slice_layout.window.demote",
 				Window = untrackedWindow,
 				Payload = untrackedWindow
 			}
@@ -179,7 +179,7 @@ public class PerformCustomActionTests
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
 			{
-				Name = "whim.slice_layout.stack.demote",
+				Name = "whim.slice_layout.window.demote",
 				Window = windows[focusedWindowIdx],
 				Payload = windows[focusedWindowIdx]
 			}
@@ -204,7 +204,7 @@ public class PerformCustomActionTests
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
 			{
-				Name = "whim.slice_layout.stack.demote",
+				Name = "whim.slice_layout.window.demote",
 				Window = window,
 				Payload = window
 			}
@@ -215,6 +215,50 @@ public class PerformCustomActionTests
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
 	}
+	#endregion
+
+	#region PromoteFocusInStack
+	[Theory]
+	[InlineAutoSubstituteData(0, 0, true)]
+	[InlineAutoSubstituteData(1, 0, true)]
+	[InlineAutoSubstituteData(2, 1, true)]
+	[InlineAutoSubstituteData(4, 3, true)]
+	[InlineAutoSubstituteData(0, 0, false)]
+	[InlineAutoSubstituteData(1, 2, false)]
+	[InlineAutoSubstituteData(2, 3, false)]
+	[InlineAutoSubstituteData(4, 5, false)]
+	public void PerformCustomAction_PromoteFocus(
+		int focusedWindowIdx,
+		int expectedWindowIdx,
+		bool promote,
+		IContext ctx,
+		SliceLayoutPlugin plugin
+	)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+
+		// When
+		foreach (IWindow window in windows)
+		{
+			sut = sut.AddWindow(window);
+		}
+
+		ILayoutEngine resultSut= sut.PerformCustomAction(
+			new LayoutEngineCustomAction<IWindow>()
+			{
+				Name = promote ? plugin.PromoteFocusActionName : plugin.DemoteFocusActionName,
+				Window = windows[focusedWindowIdx],
+				Payload = windows[focusedWindowIdx]
+			}
+		);
+
+		// Then
+		Assert.Same(sut, resultSut);
+		windows[expectedWindowIdx].Received(1).Focus();
+	}
+
 	#endregion
 
 	[Theory, AutoSubstituteData]
@@ -235,7 +279,7 @@ public class PerformCustomActionTests
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
 			{
-				Name = "whim.slice_layout.stack.unknown",
+				Name = "whim.slice_layout.window.unknown",
 				Window = windows[0],
 				Payload = windows[0]
 			}

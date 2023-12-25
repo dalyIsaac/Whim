@@ -28,14 +28,24 @@ public class SliceLayoutCommands : PluginCommands
 				callback: () => _sliceLayoutPlugin.WindowInsertionType = WindowInsertionType.Rotate
 			)
 			.Add(
-				identifier: "stack.promote",
+				identifier: "window.promote",
 				title: "Promote window in stack",
 				callback: () => _sliceLayoutPlugin.PromoteWindowInStack()
 			)
 			.Add(
-				identifier: "stack.demote",
+				identifier: "window.demote",
 				title: "Demote window in stack",
 				callback: () => _sliceLayoutPlugin.DemoteWindowInStack()
+			)
+			.Add(
+				identifier: "focus.promote",
+				title: "Promote focus in stack",
+				callback: () => _sliceLayoutPlugin.PromoteFocusInStack()
+			)
+			.Add(
+				identifier: "focus.demote",
+				title: "Demote focus in stack",
+				callback: () => _sliceLayoutPlugin.DemoteFocusInStack()
 			);
 	}
 }

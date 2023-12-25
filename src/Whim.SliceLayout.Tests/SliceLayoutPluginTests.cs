@@ -133,7 +133,7 @@ public class SliceLayoutPluginTests
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
 				Arg.Is<LayoutEngineCustomAction>(
-					action => action.Name == plugin.PromoteActionName && action.Window == window
+					action => action.Name == plugin.PromoteWindowActionName && action.Window == window
 				)
 			);
 	}
@@ -186,7 +186,7 @@ public class SliceLayoutPluginTests
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
 				Arg.Is<LayoutEngineCustomAction>(
-					action => action.Name == plugin.DemoteActionName && action.Window == window
+					action => action.Name == plugin.DemoteWindowActionName && action.Window == window
 				)
 			);
 	}
