@@ -2,7 +2,6 @@ using System;
 
 namespace Whim.SliceLayout;
 
-// TODO: test custom layouts
 public static class SliceLayouts
 {
 	/// <summary>
@@ -78,20 +77,20 @@ public static class SliceLayouts
 		double weight = 1.0 / capacities.Length;
 		(double, IArea)[] areas = new (double, IArea)[capacities.Length];
 
-		bool createdOverflow = false;
+		int overflowIdx = -1;
 		for (int idx = 0; idx < capacities.Length; idx++)
 		{
 			uint capacity = capacities[idx];
 			if (capacity == 0)
 			{
-				if (createdOverflow)
+				if (overflowIdx != -1)
 				{
-					// TODO: Handle this
-					throw new ArgumentException("Cannot have multiple overflow areas");
+					// Replace the last overflow area with a slice area
+					areas[overflowIdx] = (weight, new SliceArea(order: (uint)overflowIdx, maxChildren: 1));
 				}
 
 				areas[idx] = (weight, new OverflowArea());
-				createdOverflow = true;
+				overflowIdx = idx;
 			}
 			else
 			{

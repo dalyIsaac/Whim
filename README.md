@@ -216,6 +216,19 @@ See [`GapsCommands.cs`](src/Whim.Gaps/GapsCommands.cs).
 | `whim.gaps.inner.increase` | Increase inner gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> |
 | `whim.gaps.inner.decrease` | Decrease inner gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd> |
 
+##### Slice Layout Plugin Commands
+
+See [`SliceLayoutCommands.cs`](src/Whim.SliceLayout/SliceLayoutCommands.cs).
+
+| Identifier                  | Title                              | Keybind |
+| --------------------------- | ---------------------------------- | ------- | ------------------ |
+| `set_insertion_type.swap`   | Set slice insertion type to swap   | Keybind | No default keybind |
+| `set_insertion_type.rotate` | Set slice insertion type to rotate | Keybind | No default keybind |
+| `window.promote`            | Promote window in stack            | Keybind | No default keybind |
+| `window.demote`             | Demote window in stack             | Keybind | No default keybind |
+| `focus.promote`             | Promote focus in stack             | Keybind | No default keybind |
+| `focus.demote`              | Demote focus in stack              | Keybind | No default keybind |
+
 ##### Tree Layout Plugin Commands
 
 See [`TreeLayoutCommands.cs`](src/Whim.TreeLayout/TreeLayoutCommands.cs).

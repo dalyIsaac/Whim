@@ -7,7 +7,6 @@ public class SliceLayoutCommands : PluginCommands
 {
 	private readonly ISliceLayoutPlugin _sliceLayoutPlugin;
 
-	// TODO: Document in README
 	/// <summary>
 	/// Creates a new instance of the slice layout commands.
 	/// </summary>
