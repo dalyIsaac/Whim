@@ -2,7 +2,7 @@ using NSubstitute;
 
 namespace Whim.TreeLayout.Tests;
 
-internal class LayoutEngineWrapper
+internal sealed class LayoutEngineWrapper
 {
 	public IContext Context { get; } = Substitute.For<IContext>();
 	public ITreeLayoutPlugin Plugin { get; } = Substitute.For<ITreeLayoutPlugin>();

@@ -6,7 +6,7 @@ namespace Whim.TreeLayout.Tests;
 
 public class TreeLayoutCommandsTests
 {
-	private class Wrapper
+	private sealed class Wrapper
 	{
 		public IContext Context { get; } = Substitute.For<IContext>();
 		public IMonitor Monitor { get; } = Substitute.For<IMonitor>();

@@ -685,5 +685,6 @@ public record TreeLayoutEngine : ILayoutEngine
 		return new TreeLayoutEngine(this, currentNode, newWindows);
 	}
 
+	/// <inheritdoc />
 	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) => this;
 }
