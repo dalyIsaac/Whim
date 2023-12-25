@@ -143,7 +143,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 	public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window)
 	{
-		// TODO: Put issue reference here
+		// See #738
 		return this;
 	}
 
