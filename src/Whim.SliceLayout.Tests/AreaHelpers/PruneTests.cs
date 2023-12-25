@@ -193,6 +193,26 @@ public class PruneTests
 		};
 	}
 
+	// Take the first overflow area
+	public static IEnumerable<object[]> Prune_MultipleOverflows()
+	{
+		yield return new object[]
+		{
+			new ParentArea(
+				isRow: true,
+				(0.5, new SliceArea(order: 0, maxChildren: 1)),
+				(0.25, new OverflowArea()),
+				(0.25, new OverflowArea())
+			),
+			2,
+			new ParentArea(
+				isRow: true,
+				(0.5, new SliceArea(order: 0, maxChildren: 1)),
+				(0.5, new OverflowArea() { StartIndex = 1 })
+			),
+		};
+	}
+
 	[Theory]
 	[MemberData(nameof(Prune_PrimaryStack))]
 	[MemberData(nameof(Prune_MultiColumn))]

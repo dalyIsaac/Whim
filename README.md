@@ -34,6 +34,8 @@ context.WorkspaceManager.Add("Alt");
 // Set up layout engines.
 context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
 {
+    (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+    (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
     (id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
     (id) => new ColumnLayoutEngine(id)
 };

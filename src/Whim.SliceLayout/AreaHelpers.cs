@@ -18,6 +18,7 @@ internal static class AreaHelpers
 		ImmutableList<double>.Builder weightsBuilder = ImmutableList.CreateBuilder<double>();
 
 		double ignoredWeight = 0;
+		bool foundOverflowArea = false;
 		for (int i = 0; i < area.Children.Count; i++)
 		{
 			IArea child = area.Children[i];
@@ -33,12 +34,26 @@ internal static class AreaHelpers
 
 				child = prunedParentArea;
 			}
-			else if (child is BaseSliceArea baseSliceArea)
+			else if (child is OverflowArea overflowArea)
 			{
-				if (
-					baseSliceArea.StartIndex >= windowCount
-					|| (baseSliceArea is SliceArea sliceArea && sliceArea.MaxChildren == 0)
-				)
+				if (foundOverflowArea)
+				{
+					Logger.Error($"Found multiple overflow areas, ignoring");
+					ignoredWeight += area.Weights[i];
+					continue;
+				}
+
+				if (overflowArea.StartIndex >= windowCount)
+				{
+					ignoredWeight += area.Weights[i];
+					continue;
+				}
+
+				foundOverflowArea = true;
+			}
+			else if (child is SliceArea sliceArea)
+			{
+				if (sliceArea.StartIndex >= windowCount || sliceArea.MaxChildren == 0)
 				{
 					ignoredWeight += area.Weights[i];
 					continue;
