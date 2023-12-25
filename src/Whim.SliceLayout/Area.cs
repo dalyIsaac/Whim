@@ -48,7 +48,7 @@ public record ParentArea : BaseArea
 
 public record BaseSliceArea : BaseArea
 {
-	internal uint StartIndex { get; set; }
+	internal int StartIndex { get; set; }
 }
 
 public record SliceArea : BaseSliceArea
@@ -56,17 +56,17 @@ public record SliceArea : BaseSliceArea
 	/// <summary>
 	/// 0-indexed order of this area in the layout engine.
 	/// </summary>
-	public uint Order { get; }
+	public int Order { get; }
 
 	/// <summary>
 	/// Maximum number of children this area can have. This must be a non-negative integer.
 	/// </summary>
-	public uint MaxChildren { get; }
+	public int MaxChildren { get; }
 
 	public SliceArea(uint order = 0, uint maxChildren = 1, bool isRow = false)
 	{
-		Order = order;
-		MaxChildren = maxChildren;
+		Order = (int)order;
+		MaxChildren = (int)maxChildren;
 		IsRow = isRow;
 	}
 }

@@ -81,7 +81,7 @@ internal static class AreaHelpers
 		(List<SliceArea> sliceAreas, OverflowArea? overflowArea) = GetAreasSorted(rootArea);
 
 		// Set the start indexes.
-		uint currIdx = 0;
+		int currIdx = 0;
 		foreach (SliceArea sliceArea in sliceAreas)
 		{
 			sliceArea.StartIndex = currIdx;
@@ -274,12 +274,12 @@ internal static class AreaHelpers
 		int deltaX = 0;
 		int deltaY = 0;
 
-		int sliceItemsCount = (int)(items.Length - area.StartIndex);
+		int sliceItemsCount = items.Length - area.StartIndex;
 		if (area is SliceArea sliceArea)
 		{
-			sliceItemsCount = (int)Math.Min(sliceArea.MaxChildren, sliceItemsCount);
+			sliceItemsCount = Math.Min(sliceArea.MaxChildren, sliceItemsCount);
 		}
-		int maxIdx = (int)(area.StartIndex + sliceItemsCount);
+		int maxIdx = area.StartIndex + sliceItemsCount;
 
 		if (area.IsRow)
 		{
@@ -292,7 +292,7 @@ internal static class AreaHelpers
 			height = deltaY;
 		}
 
-		for (int windowCurrIdx = (int)area.StartIndex; windowCurrIdx < maxIdx; windowCurrIdx++)
+		for (int windowCurrIdx = area.StartIndex; windowCurrIdx < maxIdx; windowCurrIdx++)
 		{
 			items[windowCurrIdx] = new SliceRectangleItem(windowCurrIdx, new Rectangle<int>(x, y, width, height));
 

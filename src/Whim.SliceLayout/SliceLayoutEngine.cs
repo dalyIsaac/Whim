@@ -188,7 +188,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		}
 
 		SliceArea targetArea = (SliceArea)_windowAreas[areaIndex - 1];
-		int targetIndex = (int)(targetArea.StartIndex + targetArea.MaxChildren - 1);
+		int targetIndex = targetArea.StartIndex + targetArea.MaxChildren - 1;
 
 		return MoveWindowToIndex(windowIndex, targetIndex);
 	}
@@ -213,7 +213,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		}
 
 		BaseSliceArea targetArea = _windowAreas[areaIndex + 1];
-		int targetIndex = (int)targetArea.StartIndex;
+		int targetIndex = targetArea.StartIndex;
 
 		return MoveWindowToIndex(windowIndex, targetIndex);
 	}
@@ -225,7 +225,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			IArea area = _windowAreas[idx];
 			if (area is SliceArea sliceArea)
 			{
-				int areaEndIndex = (int)(sliceArea.StartIndex + sliceArea.MaxChildren);
+				int areaEndIndex = sliceArea.StartIndex + sliceArea.MaxChildren;
 				if (windowIndex >= sliceArea.StartIndex && windowIndex < areaEndIndex)
 				{
 					return idx;
