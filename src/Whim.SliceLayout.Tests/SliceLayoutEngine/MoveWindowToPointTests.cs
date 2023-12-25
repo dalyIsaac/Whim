@@ -118,4 +118,17 @@ public class MoveWindowToPointTests
 		// Then the window should not have moved
 		Assert.Equal(windows[windowIdx], windowStates[windowIdx].Window);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void MoveWindowToPoint_WindowNotFound(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		ILayoutEngine resultSut = sut.MoveWindowToPoint(window, new Point<double>(0.5, 0.5));
+
+		// Then
+		Assert.Same(sut, resultSut);
+	}
 }

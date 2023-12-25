@@ -151,17 +151,31 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Moving {window} to {point}");
 
+		int windowIdx = _windows.IndexOf(window);
+		if (windowIdx == -1)
+		{
+			Logger.Error($"Window not found");
+			return this;
+		}
+
 		if (GetWindowAtPoint(point) is not (int, IWindow) windowAtPoint)
 		{
 			return this;
 		}
 
-		return MoveWindowToIndex(_windows.IndexOf(window), windowAtPoint.Index);
+		return MoveWindowToIndex(windowIdx, windowAtPoint.Index);
 	}
 
 	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Swapping {window} in direction {direction}");
+
+		int windowIdx = _windows.IndexOf(window);
+		if (windowIdx == -1)
+		{
+			Logger.Error($"Window not found");
+			return this;
+		}
 
 		IWindow? windowInDirection = GetWindowInDirection(direction, window);
 		if (windowInDirection == null)
@@ -169,7 +183,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		return MoveWindowToIndex(_windows.IndexOf(window), _windows.IndexOf(windowInDirection));
+		return MoveWindowToIndex(windowIdx, _windows.IndexOf(windowInDirection));
 	}
 
 	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>

@@ -137,4 +137,17 @@ public class SwapWindowInDirectionTests
 		// Then
 		Assert.Equal(beforeStates, afterStates);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_WindowNotFound(IContext ctx, ISliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		ILayoutEngine resultSut = sut.SwapWindowInDirection(Direction.Up, window);
+
+		// Then
+		Assert.Equal(sut, resultSut);
+	}
 }
