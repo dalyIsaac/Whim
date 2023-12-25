@@ -204,6 +204,18 @@ public class PruneTests
 				(0.25, new OverflowArea()),
 				(0.25, new OverflowArea())
 			),
+			1,
+			new ParentArea(isRow: true, (0.5, new SliceArea(order: 0, maxChildren: 1))),
+		};
+
+		yield return new object[]
+		{
+			new ParentArea(
+				isRow: true,
+				(0.5, new SliceArea(order: 0, maxChildren: 1)),
+				(0.25, new OverflowArea()),
+				(0.25, new OverflowArea())
+			),
 			2,
 			new ParentArea(
 				isRow: true,

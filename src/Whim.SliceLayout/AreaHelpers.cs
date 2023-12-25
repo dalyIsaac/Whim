@@ -43,13 +43,12 @@ internal static class AreaHelpers
 					continue;
 				}
 
+				foundOverflowArea = true;
 				if (overflowArea.StartIndex >= windowCount)
 				{
 					ignoredWeight += area.Weights[i];
 					continue;
 				}
-
-				foundOverflowArea = true;
 			}
 			else if (child is SliceArea sliceArea)
 			{
