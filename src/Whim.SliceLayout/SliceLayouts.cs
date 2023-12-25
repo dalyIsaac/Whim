@@ -2,6 +2,9 @@ using System;
 
 namespace Whim.SliceLayout;
 
+/// <summary>
+/// Methods to create common slice layouts.
+/// </summary>
 public static class SliceLayouts
 {
 	/// <summary>
@@ -103,7 +106,7 @@ public static class SliceLayouts
 	}
 
 	/// <summary>
-	/// Creates a multi-column layout, where the primary column is in the middle, the secondary
+	/// Creates a three-column layout, where the primary column is in the middle, the secondary
 	/// column is on the left, and the overflow column is on the right.
 	///
 	/// The middle column takes up 50% of the screen, and the left and right columns take up 25%.
@@ -143,6 +146,12 @@ public static class SliceLayouts
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="identity"></param>
+	/// <param name="primaryColumnCapacity">
+	/// The number of rows in the primary column. This must be a non-negative integer.
+	/// </param>
+	/// <param name="secondaryColumnCapacity">
+	/// The number of rows in the secondary column. This must be a non-negative integer.
+	/// </param>
 	/// <returns></returns>
 	public static ILayoutEngine CreateSecondaryPrimaryLayout(
 		IContext context,

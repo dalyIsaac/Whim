@@ -28,10 +28,13 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	private readonly ParentArea _rootArea;
 	private readonly ISliceLayoutPlugin _plugin;
 
+	/// <inheritdoc />
 	public string Name { get; init; } = "Slice";
 
+	/// <inheritdoc />
 	public int Count => _windows.Count;
 
+	/// <inheritdoc />
 	public LayoutEngineIdentity Identity { get; }
 
 	private const int _cachedWindowStatesScale = 10000;
@@ -67,6 +70,16 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		_prunedRootArea = _rootArea.Prune(_windows.Count);
 	}
 
+	/// <summary>
+	/// Create a new <see cref="SliceLayoutEngine"/>.
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="plugin"></param>
+	/// <param name="identity"></param>
+	/// <param name="rootArea">
+	/// The structure of the tree of areas. This must be a <see cref="ParentArea"/>, and should
+	/// contain at least one <see cref="SliceArea"/>.
+	/// </param>
 	public SliceLayoutEngine(
 		IContext context,
 		ISliceLayoutPlugin plugin,
@@ -83,24 +96,28 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		_prunedRootArea = _rootArea.Prune(_windows.Count);
 	}
 
+	/// <inheritdoc />
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding {window}");
 		return new SliceLayoutEngine(this, _windows.Add(window));
 	}
 
+	/// <inheritdoc />
 	public ILayoutEngine RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing {window}");
 		return new SliceLayoutEngine(this, _windows.Remove(window));
 	}
 
+	/// <inheritdoc />
 	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if {window} is contained");
 		return _windows.Contains(window);
 	}
 
+	/// <inheritdoc />
 	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
 		Logger.Debug($"Doing layout on {rectangle} on {monitor}");
@@ -129,24 +146,28 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		return windowStates;
 	}
 
+	/// <inheritdoc />
 	public void FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window in direction {direction} from {window}");
 		GetWindowInDirection(direction, window)?.Focus();
 	}
 
+	/// <inheritdoc />
 	public IWindow? GetFirstWindow()
 	{
 		Logger.Debug($"Getting first window");
 		return _windows.Count > 0 ? _windows[0] : null;
 	}
 
+	/// <inheritdoc />
 	public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window)
 	{
 		// See #738
 		return this;
 	}
 
+	/// <inheritdoc />
 	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
 		Logger.Debug($"Moving {window} to {point}");
@@ -166,6 +187,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		return MoveWindowToIndex(windowIdx, windowAtPoint.Index);
 	}
 
+	/// <inheritdoc />
 	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Swapping {window} in direction {direction}");
@@ -186,6 +208,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		return MoveWindowToIndex(windowIdx, _windows.IndexOf(windowInDirection));
 	}
 
+	/// <inheritdoc />
 	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>
 		action switch
 		{

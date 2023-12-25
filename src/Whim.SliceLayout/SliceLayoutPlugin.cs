@@ -2,39 +2,57 @@ using System.Text.Json;
 
 namespace Whim.SliceLayout;
 
+/// <inheritdoc />
 public class SliceLayoutPlugin : ISliceLayoutPlugin
 {
 	private readonly IContext _context;
 
+	/// <summary>
+	/// Create a new <see cref="SliceLayoutPlugin"/>.
+	/// </summary>
+	/// <param name="context"></param>
 	public SliceLayoutPlugin(IContext context)
 	{
 		_context = context;
 	}
 
+	/// <inheritdoc />
 	public string Name => "whim.slice_layout";
 
+	/// <inheritdoc />
 	public string PromoteWindowActionName => $"{Name}.window.promote";
 
+	/// <inheritdoc />
 	public string DemoteWindowActionName => $"{Name}.window.demote";
 
+	/// <inheritdoc />
 	public string PromoteFocusActionName => $"{Name}.focus.promote";
 
+	/// <inheritdoc />
 	public string DemoteFocusActionName => $"{Name}.focus.demote";
 
+	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new SliceLayoutCommands(this);
 
+	/// <inheritdoc />
 	public WindowInsertionType WindowInsertionType { get; set; }
 
+	/// <inheritdoc />
 	public void PreInitialize() { }
 
+	/// <inheritdoc />
 	public void PostInitialize() { }
 
+	/// <inheritdoc />
 	public void LoadState(JsonElement state) { }
 
+	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
 
+	/// <inheritdoc />
 	public void PromoteWindowInStack(IWindow? window = null) => ChangeWindowRank(window, promote: true);
 
+	/// <inheritdoc />
 	public void DemoteWindowInStack(IWindow? window = null) => ChangeWindowRank(window, promote: false);
 
 	private void ChangeWindowRank(IWindow? window, bool promote)
@@ -73,8 +91,10 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 		return (window, workspace);
 	}
 
+	/// <inheritdoc />
 	public void PromoteFocusInStack(IWindow? window = null) => FocusWindowRank(window, promote: true);
 
+	/// <inheritdoc />
 	public void DemoteFocusInStack(IWindow? window = null) => FocusWindowRank(window, promote: false);
 
 	private void FocusWindowRank(IWindow? window, bool promote)

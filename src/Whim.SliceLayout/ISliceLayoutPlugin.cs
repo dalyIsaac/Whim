@@ -16,6 +16,11 @@ public enum WindowInsertionType
 	Rotate
 }
 
+/// <summary>
+/// <see cref="SliceLayoutPlugin"/> provides commands and functionality for the <see cref="SliceLayoutEngine"/>.
+/// <see cref="SliceLayoutPlugin"/> does not load the <see cref="SliceLayoutEngine"/> - that is done when creating
+/// a workspace via <see cref="IWorkspaceManager.Add"/>.
+/// </summary>
 public interface ISliceLayoutPlugin : IPlugin
 {
 	/// <summary>
