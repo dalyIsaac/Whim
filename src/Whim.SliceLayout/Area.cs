@@ -71,7 +71,7 @@ public record SliceArea : BaseSliceArea
 	}
 }
 
-internal record OverflowArea : BaseSliceArea
+public record OverflowArea : BaseSliceArea
 {
 	public OverflowArea(bool isRow = false)
 	{
