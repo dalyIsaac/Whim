@@ -10,7 +10,9 @@ public class ToggleDirectionCommand : System.Windows.Input.ICommand
 	private readonly TreeLayoutEngineWidgetViewModel _viewModel;
 
 	/// <inheritdoc/>
+#pragma warning disable CS0067 // The event 'ToggleDirectionCommand.CanExecuteChanged' is never used
 	public event EventHandler? CanExecuteChanged;
+#pragma warning restore CS0067 // The event 'ToggleDirectionCommand.CanExecuteChanged' is never used
 
 	/// <summary>
 	/// Creates a new instance of <see cref="ToggleDirectionCommand"/>.

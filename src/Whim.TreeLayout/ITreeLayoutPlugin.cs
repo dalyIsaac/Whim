@@ -3,8 +3,8 @@ using System;
 namespace Whim.TreeLayout;
 
 /// <summary>
-/// TreeLayoutPlugin provides commands and functionality for the <see cref="TreeLayoutEngine"/>.
-/// TreeLayoutPlugin does not load the <see cref="TreeLayoutEngine"/> - that is done when creating
+/// <see cref="TreeLayoutPlugin"/> provides commands and functionality for the <see cref="TreeLayoutEngine"/>.
+/// <see cref="TreeLayoutPlugin"/> does not load the <see cref="TreeLayoutEngine"/> - that is done when creating
 /// a workspace via <see cref="IWorkspaceManager.Add"/>.
 /// </summary>
 public interface ITreeLayoutPlugin : IPlugin

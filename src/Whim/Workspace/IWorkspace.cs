@@ -170,7 +170,7 @@ public interface IWorkspace : IDisposable
 	/// For more, see <see cref="ILayoutEngine.PerformCustomAction{T}" />.
 	/// </remarks>
 	/// <typeparam name="T">
-	/// The type of <paramref name="args" />'s payload.
+	/// The type of <paramref name="action" />'s payload.
 	/// </typeparam>
 	/// <param name="action">
 	/// Metadata about the action to perform, and the payload to perform it with.

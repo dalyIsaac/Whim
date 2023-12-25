@@ -236,5 +236,6 @@ public record ColumnLayoutEngine : ILayoutEngine
 		}
 	}
 
+	/// <inheritdoc/>
 	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) => this;
 }
