@@ -8,7 +8,13 @@ internal class RouterManager : IRouterManager
 	private readonly IContext _context;
 	private readonly List<Router> _routers = new();
 
-	public bool RouteToActiveWorkspace { get; set; }
+	public bool RouteToActiveWorkspace
+	{
+		get => RouterOptions == RouterOptions.RouteToActiveWorkspace;
+		set => RouterOptions = value ? RouterOptions.RouteToActiveWorkspace : RouterOptions.RouteToLaunchedWorkspace;
+	}
+
+	public RouterOptions RouterOptions { get; set; } = RouterOptions.RouteToLaunchedWorkspace;
 
 	public RouterManager(IContext context)
 	{

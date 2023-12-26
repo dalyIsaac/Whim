@@ -185,8 +185,8 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		// Route the rest of the windows to the monitor they're on.
 		// Don't route to the active workspace while we're adding all the windows.
-		bool routeToActiveWorkspace = _context.RouterManager.RouteToActiveWorkspace;
-		_context.RouterManager.RouteToActiveWorkspace = false;
+		RouterOptions routerOptions = _context.RouterManager.RouterOptions;
+		_context.RouterManager.RouterOptions = RouterOptions.RouteToLaunchedWorkspace;
 
 		// Add all existing windows.
 		foreach (HWND hwnd in _internalContext.CoreNativeManager.GetAllWindows())
@@ -200,7 +200,7 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		}
 
 		// Restore the route to active workspace setting.
-		_context.RouterManager.RouteToActiveWorkspace = routeToActiveWorkspace;
+		_context.RouterManager.RouterOptions = routerOptions;
 	}
 
 	#region Workspaces
@@ -533,9 +533,24 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 	public void WindowAdded(IWindow window)
 	{
 		Logger.Debug($"Adding window {window}");
-		IWorkspace? workspace = _context.RouterManager.RouteToActiveWorkspace
-			? ActiveWorkspace
-			: _context.RouterManager.RouteWindow(window);
+
+		IWorkspace? workspace = null;
+		if (_context.RouterManager.RouterOptions == RouterOptions.RouteToActiveWorkspace)
+		{
+			workspace = ActiveWorkspace;
+		}
+		else if (_context.RouterManager.RouterOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
+		{
+			workspace = _internalContext.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
+				? GetWorkspaceForMonitor(lastWhimActiveMonitor)
+				: ActiveWorkspace;
+		}
+
+		// RouteWindow takes precedence over RouterOptions.
+		if (_context.RouterManager.RouteWindow(window) is IWorkspace routedWorkspace)
+		{
+			workspace = routedWorkspace;
+		}
 
 		// Check the workspace exists. If it doesn't, clear the workspace.
 		if (workspace != null && !_workspaces.Contains(workspace))

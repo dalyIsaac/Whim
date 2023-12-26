@@ -25,12 +25,11 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	private Monitor[] _monitors = Array.Empty<Monitor>();
 	private bool _disposedValue;
 
-	/// <summary>
-	/// The <see cref="IMonitor"/> which currently has focus.
-	/// </summary>
 	public IMonitor ActiveMonitor { get; private set; }
 
 	public IMonitor PrimaryMonitor { get; private set; }
+
+	public IMonitor LastWhimActiveMonitor { get; set; }
 
 	public int Length => _monitors.Length;
 
@@ -61,6 +60,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 			(_monitors?.FirstOrDefault(m => m.IsPrimary)) ?? throw new Exception("No primary monitor found.");
 		ActiveMonitor = primaryMonitor;
 		PrimaryMonitor = primaryMonitor;
+		LastWhimActiveMonitor = primaryMonitor;
 	}
 
 	public void Initialize()
@@ -89,6 +89,11 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 				Logger.Debug($"Setting active monitor to {monitor}");
 
 				ActiveMonitor = monitor;
+
+				if (window is not null)
+				{
+					LastWhimActiveMonitor = monitor;
+				}
 				break;
 			}
 		}
