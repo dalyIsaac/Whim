@@ -18,7 +18,14 @@ public interface IRouterManager
 	/// Defaults to <see langword="false"/>.
 	/// This is overridden by any other routers in this <see cref="IRouterManager"/>.
 	/// </summary>
+	[Obsolete("Use RouterOptions instead")]
 	bool RouteToActiveWorkspace { get; set; }
+
+	/// <summary>
+	/// Describes how to route windows when they are added to Whim. <see cref="RouteWindow(IWindow)"/>
+	/// takes precedence over this.
+	/// </summary>
+	RouterOptions RouterOptions { get; set; }
 
 	/// <summary>
 	/// Routes a window to a workspace.

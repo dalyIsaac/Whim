@@ -26,6 +26,30 @@ public class RouterManagerCustomization : ICustomization
 
 public class RouterManagerTests
 {
+	[Theory]
+	[InlineAutoSubstituteData(true, RouterOptions.RouteToActiveWorkspace)]
+	[InlineAutoSubstituteData(false, RouterOptions.RouteToLaunchedWorkspace)]
+	public void RouteToActiveWorkspace_Get(bool routeToActiveWorkspace, RouterOptions routerOptions, IContext ctx)
+	{
+		// Given
+		RouterManager routerManager = new(ctx) { RouterOptions = routerOptions };
+
+		// Then
+		Assert.Equal(routeToActiveWorkspace, routerManager.RouteToActiveWorkspace);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData(true, RouterOptions.RouteToActiveWorkspace)]
+	[InlineAutoSubstituteData(false, RouterOptions.RouteToLaunchedWorkspace)]
+	public void RouteToActiveWorkspace_Set(bool routeToActiveWorkspace, RouterOptions routerOptions, IContext ctx)
+	{
+		// Given
+		RouterManager routerManager = new(ctx) { RouteToActiveWorkspace = routeToActiveWorkspace };
+
+		// Then
+		Assert.Equal(routerOptions, routerManager.RouterOptions);
+	}
+
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
 	public void AddWindowClassRouteString(IContext ctx, IWindow window)
 	{
