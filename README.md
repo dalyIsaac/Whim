@@ -430,15 +430,28 @@ Implementations of Whim's `ILayoutEngine` should be immutable. This was done to 
 
 ## Contributing
 
-After cloning, make sure to run in the root Whim directory:
+Please file an issue if you find any bugs or have any feature requests, or ask in the Discord. Pull requests are welcome.
+
+Work is currently being tracked in the [project board](https://github.com/users/dalyIsaac/projects/2/views/7).
+
+### Development Environment Setup
+
+1. Clone this repo
+2. Install tools for the Windows App SDK:
+   1. Go to the [Install tools for the Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/set-up-your-development-environment) page
+   2. Follow the instructions for [winget for C# developers](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/set-up-your-development-environment?tabs=cs-vs-community%2Ccpp-vs-community%2Cvs-2022-17-1-a%2Cvs-2022-17-1-b#for-c-developers), or [installing Visual Studio](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/set-up-your-development-environment?tabs=cs-vs-community%2Ccpp-vs-community%2Cvs-2022-17-1-a%2Cvs-2022-17-1-b#install-visual-studio)
+
+After cloning, make sure to run the following in a shell in the root Whim directory:
 
 ```shell
 git config core.autocrlf true
 ```
 
-Please file an issue if you find any bugs or have any feature requests. Pull requests are welcome.
+If you've already made changes with `core.autocrlf` set to `false`, you can fix the line endings with:
 
-Work is currently being tracked in the [project board](https://github.com/users/dalyIsaac/projects/2/views/7).
+```shell
+git add . --renormalize
+```
 
 Before making a pull request, please install the tools specified in [`.config/dotnet-tools.json`](.config/dotnet-tools.json):
 
@@ -449,7 +462,46 @@ dotnet tool run dotnet-csharpier .
 dotnet tool run xstyler --recursive --d . --config ./.xamlstylerrc
 ```
 
-Tests have not been written for all of Whim's code, but they are encouraged. Tests have not been written for UI code-behind files, as I committed to xUnit before I realized that Windows App SDK isn't easily compatible with xUnit. I'm open to suggestions on how to test UI code-behind files.
+### Building
+
+#### Visual Studio
+
+Visual Studio 2022 is the easiest way to get started with working on Whim. Check the following:
+
+- `nuget.org` is added to the [Package Sources](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio#package-sources)
+- The **Configuration Manager** is set to `Debug` and your target architecture is correct (e.g. `x64`).
+- Each project's platform matches the current target architecture.
+- `Whim.Runner` is set as the startup project.
+- The **green Start arrow** is labeled `Whim.Runner (Unpackaged)`.
+
+**Recommended Extensions:**
+
+- [CSharpier](https://marketplace.visualstudio.com/items?itemName=csharpier.CSharpier)
+- [XAML Styler for Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=TeamXavalon.XAMLStyler2022)
+
+> [!WARNING]
+>
+> Windows App SDK 1.4 introduced a bug which causes Visual Studio to crash Whim when debugging. Make sure to apply the workaround from <https://github.com/microsoft/microsoft-ui-xaml/issues/9008#issuecomment-1773734685/>.
+
+#### Visual Studio Code
+
+The Whim repository includes a `.vscode` directory with a [`launch.json`](.vscode/launch.json) file. This file contains a `Launch Whim.Runner` configuration which can be used to debug Whim in Visual Studio Code. Unfortunately tests do not appear in Visual Studio Code's Test Explorer.
+
+Check that `nuget.org` is added to the [Package Sources](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio#package-sources).
+
+Tasks to build, test, and format XAML can be found in [`tasks.json`](.vscode/tasks.json).
+
+To see the recommended extensions, open the Command Palette and run `Extensions: Show Recommended Extensions`.
+
+### Unhandled Exception Handling
+
+`IContext` has an `UncaughtExceptionHandling` property to specify how to handle uncaught exceptions. When developing, it's recommended to set this to `UncaughtExceptionHandling.Shutdown` to shutdown Whim when an uncaught exception occurs. This will make it easier to debug the exception.
+
+All uncaught exceptions will be logged as `Fatal`.
+
+### Tests
+
+Tests have not been written for all of Whim's code, but are encouraged. Tests have not been written for UI code-behind files, as I committed to xUnit before I realized that Windows App SDK isn't easily compatible with xUnit. I'm open to suggestions on how to test UI code-behind files.
 
 To use your existing configuration, make sure to update the `#r` directives to point to your newly compiled DLLs. In other words, replace `C:\Users\<USERNAME>\AppData\Local\Programs\Whim` with `C:\path\to\repo\Whim`:
 
@@ -477,36 +529,3 @@ To use your existing configuration, make sure to update the `#r` directives to p
 // #r "C:\Users\dalyisaac\AppData\Local\Programs\Whim\plugins\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.dll"
 // #r "C:\Users\dalyisaac\AppData\Local\Programs\Whim\plugins\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.dll"
 ```
-
-### Visual Studio
-
-Visual Studio 2022 is the easiest way to get started with working on Whim. Check the following:
-
-- The `.NET Desktop Development` workload is installed (see the Visual Studio Installer).
-- The **Configuration Manager** is set to `Debug` and your target architecture (e.g. `x64`).
-- Each project's platform matches the current target architecture.
-- `Whim.Runner` is set as the startup project.
-- The **green Start arrow** is labeled `Whim.Runner (Unpackaged)`.
-
-**Recommended Extensions:**
-
-- [CSharpier](https://marketplace.visualstudio.com/items?itemName=csharpier.CSharpier)
-- [XAML Styler for Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=TeamXavalon.XAMLStyler2022)
-
-> [!WARNING]
->
-> Windows App SDK 1.4 introduced a bug which causes Visual Studio to crash Whim when debugging. Make sure to apply the workaround from <https://github.com/microsoft/microsoft-ui-xaml/issues/9008#issuecomment-1773734685/>.
-
-### Visual Studio Code
-
-The Whim repository includes a `.vscode` directory with a [`launch.json`](.vscode/launch.json) file. This file contains a `Launch Whim.Runner` configuration which can be used to debug Whim in Visual Studio Code. Unfortunately tests do not appear in Visual Studio Code's Test Explorer.
-
-Tasks to build, test, and format XAML can be found in [`tasks.json`](.vscode/tasks.json).
-
-To see the recommended extensions, open the Command Palette and run `Extensions: Show Recommended Extensions`.
-
-### Unhandled Exception Handling
-
-`IContext` has an `UncaughtExceptionHandling` property to specify how to handle uncaught exceptions. When developing, it's recommended to set this to `UncaughtExceptionHandling.Shutdown` to shutdown Whim when an uncaught exception occurs. This will make it easier to debug the exception.
-
-All uncaught exceptions will be logged as `Fatal`.
