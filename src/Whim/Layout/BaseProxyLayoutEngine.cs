@@ -62,7 +62,7 @@ public abstract record BaseProxyLayoutEngine : ILayoutEngine
 	public abstract IWindow? GetFirstWindow();
 
 	/// <inheritdoc/>
-	public abstract void FocusWindowInDirection(Direction direction, IWindow window);
+	public abstract ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <inheritdoc/>
 	public abstract ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window);

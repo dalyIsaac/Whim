@@ -745,12 +745,14 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
-		engine.FocusWindowInDirection(direction, window);
+		ILayoutEngine newEngine = engine.FocusWindowInDirection(direction, window);
 
 		// Then
 		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
 		innerLayoutEngine.DidNotReceive().GetFirstWindow();
 		window.DidNotReceive().Focus();
+		Assert.NotSame(engine, newEngine);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -770,7 +772,7 @@ public class FloatingLayoutEngineTests
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		engine.AddWindow(window).FocusWindowInDirection(direction, window);
+		ILayoutEngine newEngine = engine.AddWindow(window).FocusWindowInDirection(direction, window);
 
 		// Then
 		innerLayoutEngine.DidNotReceive().FocusWindowInDirection(direction, window);
@@ -780,6 +782,8 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.Received(1).GetFirstWindow();
 
 		window.DidNotReceive().Focus();
+		Assert.NotSame(engine, newEngine);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -801,7 +805,7 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
-		engine.AddWindow(window).FocusWindowInDirection(direction, window);
+		ILayoutEngine newEngine = engine.AddWindow(window).FocusWindowInDirection(direction, window);
 
 		// Then
 		innerLayoutEngine.DidNotReceive().FocusWindowInDirection(direction, window);
@@ -811,6 +815,8 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.Received(1).GetFirstWindow();
 
 		window.Received(1).Focus();
+		Assert.NotSame(engine, newEngine);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 	#endregion
 
@@ -828,10 +834,12 @@ public class FloatingLayoutEngineTests
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		engine.SwapWindowInDirection(direction, window);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(direction, window);
 
 		// Then
 		innerLayoutEngine.Received(1).SwapWindowInDirection(direction, window);
+		Assert.NotSame(engine, newEngine);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -849,10 +857,12 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.SwapWindowInDirection(direction, window).Returns(innerLayoutEngine);
 
 		// When
-		engine.SwapWindowInDirection(direction, window);
+		ILayoutEngine newEngine = engine.SwapWindowInDirection(direction, window);
 
 		// Then
 		innerLayoutEngine.Received(1).SwapWindowInDirection(direction, window);
+		Assert.Same(engine, newEngine);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -872,10 +882,12 @@ public class FloatingLayoutEngineTests
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
-		engine.AddWindow(window).SwapWindowInDirection(direction, window);
+		ILayoutEngine newEngine = engine.AddWindow(window).SwapWindowInDirection(direction, window);
 
 		// Then
 		innerLayoutEngine.DidNotReceive().SwapWindowInDirection(direction, window);
+		Assert.NotSame(engine, newEngine);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 	#endregion
 
@@ -1114,6 +1126,7 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -1138,8 +1151,9 @@ public class FloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.PerformCustomAction(action);
 
 		// Then
-		Assert.NotSame(engine, newEngine);
+		Assert.Same(engine, newEngine);
 		innerLayoutEngine.Received(1).PerformCustomAction(action);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
@@ -1169,6 +1183,7 @@ public class FloatingLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 		Assert.Same(newEngine, newEngine2);
 		innerLayoutEngine.DidNotReceive().PerformCustomAction(action);
+		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 	#endregion
 }

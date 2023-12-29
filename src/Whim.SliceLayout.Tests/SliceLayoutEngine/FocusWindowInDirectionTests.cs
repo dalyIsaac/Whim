@@ -51,11 +51,13 @@ public class FocusWindowInDirectionTests
 			sut = sut.AddWindow(window);
 		}
 
-		sut.FocusWindowInDirection(direction, windows[focusedWindowIdx]);
-		sut.FocusWindowInDirection(direction, windows[focusedWindowIdx]);
+		ILayoutEngine newEngine1 = sut.FocusWindowInDirection(direction, windows[focusedWindowIdx]);
+		ILayoutEngine newEngine2 = sut.FocusWindowInDirection(direction, windows[focusedWindowIdx]);
 
 		// Then
 		windows[expectedWindowIdx].Received(2).Focus();
+		Assert.Same(sut, newEngine1);
+		Assert.Same(newEngine1, newEngine2);
 	}
 
 	public static IEnumerable<object[]> FocusWindowInDirection_NoWindowInDirection_Data()

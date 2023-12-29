@@ -147,10 +147,11 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public void FocusWindowInDirection(Direction direction, IWindow window)
+	public ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window in direction {direction} from {window}");
 		GetWindowInDirection(direction, window)?.Focus();
+		return this;
 	}
 
 	/// <inheritdoc />

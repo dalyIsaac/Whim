@@ -431,7 +431,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			if (GetValidVisibleWindow(window) is IWindow validWindow)
 			{
-				ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+				_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.FocusWindowInDirection(
+					direction,
+					validWindow
+				);
 			}
 		}
 	}

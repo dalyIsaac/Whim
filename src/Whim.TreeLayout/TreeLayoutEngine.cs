@@ -296,20 +296,20 @@ public record TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public void FocusWindowInDirection(Direction direction, IWindow window)
+	public ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window} in direction {direction}");
 
 		if (_root is null)
 		{
 			Logger.Error($"Root is null, cannot focus window {window}");
-			return;
+			return this;
 		}
 
 		if (!_windows.TryGetValue(window, out ImmutableArray<int> path))
 		{
 			Logger.Error($"Window {window} not found in layout engine {Name}");
-			return;
+			return this;
 		}
 
 		WindowNodeStateAtPoint? adjacentNodeResult = TreeHelpers.GetAdjacentWindowNode(
@@ -320,6 +320,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		);
 
 		adjacentNodeResult?.WindowNode.Focus();
+		return this;
 	}
 
 	/// <inheritdoc />

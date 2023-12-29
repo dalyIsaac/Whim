@@ -31,7 +31,8 @@ public record TestLayoutEngine : ILayoutEngine
 		throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public void FocusWindowInDirection(Direction direction, IWindow window) => throw new NotImplementedException();
+	public ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window) =>
+		throw new NotImplementedException();
 
 	/// <inheritdoc/>
 	public IWindow? GetFirstWindow() => throw new NotImplementedException();
