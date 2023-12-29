@@ -1,74 +1,67 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<AnalysisModeDesign>All</AnalysisModeDesign>
-		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
-		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
-		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
-		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-		<AnalysisModeNaming>All</AnalysisModeNaming>
-		<AnalysisModePerformance>All</AnalysisModePerformance>
-		<AnalysisModeReliability>All</AnalysisModeReliability>
-		<AnalysisModeSecurity>All</AnalysisModeSecurity>
-		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-		<AnalysisModeStyle>All</AnalysisModeStyle>
-		<AnalysisModeUsage>All</AnalysisModeUsage>
-		<Authors>Isaac Daly</Authors>
-		<BuildInParallel>true</BuildInParallel>
-		<Description>An extensible window manager for Windows.</Description>
-		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-		<GenerateLibraryLayout>true</GenerateLibraryLayout>
-		<Nullable>enable</Nullable>
-		<Platforms>x64;arm64;Any CPU</Platforms>
-		<RootNamespace>Whim</RootNamespace>
-		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
-		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
-		<Version>0.3.0</Version>
-		<WarningsAsErrors>Nullable</WarningsAsErrors>
-
-		<!-- Required for VSCode debugging -->
-		<Platform>x64</Platform>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<Page Remove="Resources\Defaults.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" />
-		<PackageReference Include="Microsoft.Win32.SystemEvents" />
-		<PackageReference Include="Microsoft.Windows.CsWin32">
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.WindowsAppSDK" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
-		<PackageReference Include="Serilog" />
-		<PackageReference Include="Serilog.Sinks.Async" />
-		<PackageReference Include="Serilog.Sinks.Debug" />
-		<PackageReference Include="Serilog.Sinks.File" />
-		<PackageReference Include="System.Drawing.Common" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
-		<InternalsVisibleTo Include="Whim.FloatingLayout.Tests" />
-		<InternalsVisibleTo Include="Whim.Gaps.Tests" />
-		<InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
-		<InternalsVisibleTo Include="Whim.SliceLayout.Tests" />
-		<InternalsVisibleTo Include="Whim.Tests" />
-		<InternalsVisibleTo Include="Whim.TestUtils" />
-		<InternalsVisibleTo Include="Whim.TreeLayout.Tests" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Template\whim.config.csx" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Resources\Defaults.xaml">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AnalysisModeDesign>All</AnalysisModeDesign>
+    <AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+    <AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+    <AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+    <AnalysisModeNaming>All</AnalysisModeNaming>
+    <AnalysisModePerformance>All</AnalysisModePerformance>
+    <AnalysisModeReliability>All</AnalysisModeReliability>
+    <AnalysisModeSecurity>All</AnalysisModeSecurity>
+    <AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+    <AnalysisModeStyle>All</AnalysisModeStyle>
+    <AnalysisModeUsage>All</AnalysisModeUsage>
+    <Authors>Isaac Daly</Authors>
+    <BuildInParallel>true</BuildInParallel>
+    <Description>An extensible window manager for Windows.</Description>
+    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <Nullable>enable</Nullable>
+    <Platforms>x64;arm64;Any CPU</Platforms>
+    <RootNamespace>Whim</RootNamespace>
+    <RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <Version>0.4.0</Version>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <!-- Required for VSCode debugging -->
+    <Platform>x64</Platform>
+  </PropertyGroup>
+  <ItemGroup>
+    <Page Remove="Resources\Defaults.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" />
+    <PackageReference Include="Microsoft.Windows.CsWin32">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Sinks.Async" />
+    <PackageReference Include="Serilog.Sinks.Debug" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="System.Drawing.Common" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    <InternalsVisibleTo Include="Whim.FloatingLayout.Tests" />
+    <InternalsVisibleTo Include="Whim.Gaps.Tests" />
+    <InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
+    <InternalsVisibleTo Include="Whim.SliceLayout.Tests" />
+    <InternalsVisibleTo Include="Whim.Tests" />
+    <InternalsVisibleTo Include="Whim.TestUtils" />
+    <InternalsVisibleTo Include="Whim.TreeLayout.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Template\whim.config.csx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Resources\Defaults.xaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
