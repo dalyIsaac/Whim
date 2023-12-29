@@ -73,12 +73,34 @@ public class BarLayoutEngineTests
 	{
 		// Given
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
+		innerLayoutEngine.FocusWindowInDirection(direction, window).Returns(innerLayoutEngine);
 
 		// When
-		engine.FocusWindowInDirection(direction, window);
+		ILayoutEngine newEngine = engine.FocusWindowInDirection(direction, window);
 
 		// Then
 		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
+		Assert.Same(engine, newEngine);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_NotSame(
+		ILayoutEngine innerLayoutEngine,
+		ILayoutEngine focusWindowInDirectionResult,
+		IWindow window,
+		[Frozen] Direction direction
+	)
+	{
+		// Given
+		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
+
+		innerLayoutEngine.FocusWindowInDirection(direction, window).Returns(focusWindowInDirectionResult);
+
+		// When
+		ILayoutEngine newEngine = engine.FocusWindowInDirection(direction, window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
 	}
 
 	[Theory, AutoSubstituteData]

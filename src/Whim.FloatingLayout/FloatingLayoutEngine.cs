@@ -215,7 +215,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override void FocusWindowInDirection(Direction direction, IWindow window)
+	public override ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		if (IsWindowFloating(window))
 		{
@@ -223,10 +223,10 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 			// a given point.
 			// As a workaround, we just focus the first window.
 			InnerLayoutEngine.GetFirstWindow()?.Focus();
-			return;
+			return this;
 		}
 
-		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+		return UpdateInner(InnerLayoutEngine.FocusWindowInDirection(direction, window), window);
 	}
 
 	/// <inheritdoc />
@@ -240,7 +240,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 			return this;
 		}
 
-		return InnerLayoutEngine.SwapWindowInDirection(direction, window);
+		return UpdateInner(InnerLayoutEngine.SwapWindowInDirection(direction, window), window);
 	}
 
 	/// <inheritdoc />
@@ -258,6 +258,6 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 			return this;
 		}
 
-		return InnerLayoutEngine.PerformCustomAction(action);
+		return UpdateInner(InnerLayoutEngine.PerformCustomAction(action), action.Window);
 	}
 }

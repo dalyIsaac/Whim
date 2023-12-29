@@ -51,8 +51,8 @@ public record BarLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override void FocusWindowInDirection(Direction direction, IWindow window) =>
-		InnerLayoutEngine.FocusWindowInDirection(direction, window);
+	public override ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window) =>
+		UpdateInner(InnerLayoutEngine.FocusWindowInDirection(direction, window));
 
 	/// <inheritdoc />
 	public override IWindow? GetFirstWindow() => InnerLayoutEngine.GetFirstWindow();

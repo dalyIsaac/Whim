@@ -1138,7 +1138,7 @@ public class FloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.PerformCustomAction(action);
 
 		// Then
-		Assert.NotSame(engine, newEngine);
+		Assert.Same(engine, newEngine);
 		innerLayoutEngine.Received(1).PerformCustomAction(action);
 	}
 

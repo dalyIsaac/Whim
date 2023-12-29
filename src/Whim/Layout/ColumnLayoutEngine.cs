@@ -138,13 +138,13 @@ public record ColumnLayoutEngine : ILayoutEngine
 	public IWindow? GetFirstWindow() => _stack.FirstOrDefault();
 
 	/// <inheritdoc/>
-	public void FocusWindowInDirection(Direction direction, IWindow window)
+	public ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window)
 	{
 		Logger.Debug($"Focusing window {window} in layout engine {Name}");
 
 		if (direction != Direction.Left && direction != Direction.Right)
 		{
-			return;
+			return this;
 		}
 
 		// Find the index of the window in the stack
@@ -152,7 +152,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		if (windowIndex == -1)
 		{
 			Logger.Error($"Window {window} not found in layout engine {Name}");
-			return;
+			return this;
 		}
 
 		int delta = GetDelta(LeftToRight, direction);
@@ -160,6 +160,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 
 		IWindow adjWindow = _stack[adjIndex];
 		adjWindow.Focus();
+		return this;
 	}
 
 	/// <inheritdoc/>

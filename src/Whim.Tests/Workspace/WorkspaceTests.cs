@@ -749,11 +749,13 @@ public class WorkspaceTests
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		workspace.AddWindow(window);
 
+		ILayoutEngine focusLayoutEngine = workspace.ActiveLayoutEngine;
+
 		// When FocusWindowInDirection is called
 		workspace.FocusWindowInDirection(Direction.Up, window);
 
 		// Then the layout engine is told to focus the window
-		workspace.ActiveLayoutEngine.Received(1).FocusWindowInDirection(Direction.Up, window);
+		focusLayoutEngine.Received(1).FocusWindowInDirection(Direction.Up, window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]

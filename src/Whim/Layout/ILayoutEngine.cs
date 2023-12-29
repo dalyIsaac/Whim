@@ -94,7 +94,7 @@ public interface ILayoutEngine
 	/// </summary>
 	/// <param name="direction">The direction to focus in.</param>
 	/// <param name="window">The origin window</param>
-	void FocusWindowInDirection(Direction direction, IWindow window);
+	ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.

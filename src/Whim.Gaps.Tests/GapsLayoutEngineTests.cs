@@ -443,18 +443,42 @@ public class GapsLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection(IWindow window, ILayoutEngine innerLayoutEngine)
+	public void FocusWindowInDirection_Same(IWindow window, ILayoutEngine innerLayoutEngine)
 	{
 		// Given
 		Direction direction = Direction.Left;
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+		innerLayoutEngine.FocusWindowInDirection(direction, window).Returns(innerLayoutEngine);
 
 		// When
-		gapsLayoutEngine.FocusWindowInDirection(direction, window);
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.FocusWindowInDirection(direction, window);
 
 		// Then
+		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void FocusWindowInDirection_NotSame(
+		IWindow window,
+		ILayoutEngine innerLayoutEngine,
+		ILayoutEngine newInnerLayoutEngine
+	)
+	{
+		// Given
+		Direction direction = Direction.Left;
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		innerLayoutEngine.FocusWindowInDirection(direction, window).Returns(newInnerLayoutEngine);
+
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+
+		// When
+		ILayoutEngine newLayoutEngine = gapsLayoutEngine.FocusWindowInDirection(direction, window);
+
+		// Then
+		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
 		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
 	}
 
