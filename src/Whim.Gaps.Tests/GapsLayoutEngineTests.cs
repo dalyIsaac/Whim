@@ -457,6 +457,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
 	}
 
@@ -479,6 +480,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
 	}
 
@@ -497,6 +499,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 
@@ -514,6 +517,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 	#endregion
@@ -533,6 +537,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
@@ -550,6 +555,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 	#endregion
@@ -571,6 +577,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
@@ -594,6 +601,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 	#endregion
@@ -614,6 +622,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).MoveWindowToPoint(window, point);
 	}
 
@@ -636,6 +645,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).MoveWindowToPoint(window, point);
 	}
 	#endregion
@@ -656,6 +666,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).SwapWindowInDirection(direction, window);
 	}
 
@@ -678,6 +689,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).SwapWindowInDirection(direction, window);
 	}
 	#endregion
@@ -721,6 +733,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.NotSame(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).PerformCustomAction(action);
 	}
 
@@ -746,6 +759,7 @@ public class GapsLayoutEngineTests
 
 		// Then
 		Assert.Same(gapsLayoutEngine, newLayoutEngine);
+		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).PerformCustomAction(action);
 	}
 }

@@ -51,6 +51,8 @@ public class BarLayoutEngineTests
 		// Then
 		Assert.NotSame(engine, newEngine);
 		Assert.Same(newEngine, newEngine2);
+		Assert.IsType<BarLayoutEngine>(newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine2);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -81,6 +83,7 @@ public class BarLayoutEngineTests
 		// Then
 		innerLayoutEngine.Received(1).FocusWindowInDirection(direction, window);
 		Assert.Same(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -101,6 +104,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -137,6 +141,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -157,6 +162,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.Same(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -177,6 +183,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -192,6 +199,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.Same(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -207,6 +215,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -222,6 +231,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.Same(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -242,6 +252,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -257,6 +268,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.Same(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -346,6 +358,7 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -367,5 +380,6 @@ public class BarLayoutEngineTests
 
 		// Then
 		Assert.Same(engine, newEngine);
+		Assert.IsType<BarLayoutEngine>(newEngine);
 	}
 }
