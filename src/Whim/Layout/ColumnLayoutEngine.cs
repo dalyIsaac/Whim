@@ -66,7 +66,10 @@ public record ColumnLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		return new ColumnLayoutEngine(this, _stack.Add(window), _minimizedStack);
+		ImmutableList<IWindow> newStack = _stack.Add(window);
+		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Remove(window);
+
+		return new ColumnLayoutEngine(this, newStack, newMinimizedStack);
 	}
 
 	/// <inheritdoc/>
@@ -75,14 +78,21 @@ public record ColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
 		ImmutableList<IWindow> newStack = _stack.Remove(window);
-		return newStack == _stack ? this : new ColumnLayoutEngine(this, newStack, _minimizedStack);
+		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Remove(window);
+
+		if (newStack == _stack && newMinimizedStack == _minimizedStack)
+		{
+			return this;
+		}
+
+		return new ColumnLayoutEngine(this, newStack, newMinimizedStack);
 	}
 
 	/// <inheritdoc/>
 	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
-		return _stack.Any(x => x.Equals(window));
+		return _stack.Any(x => x.Equals(window)) || _minimizedStack.Any(x => x.Equals(window));
 	}
 
 	/// <inheritdoc/>
@@ -140,6 +150,17 @@ public record ColumnLayoutEngine : ILayoutEngine
 				x -= width;
 			}
 		}
+
+		IRectangle<int> minimizedRectangle = Rectangle.UnitSquare<int>();
+		foreach (IWindow window in _minimizedStack)
+		{
+			yield return new WindowState()
+			{
+				Window = window,
+				Rectangle = minimizedRectangle,
+				WindowSize = WindowSize.Minimized
+			};
+		}
 	}
 
 	/// <inheritdoc/>
@@ -159,7 +180,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		int windowIndex = _stack.FindIndex(x => x.Equals(window));
 		if (windowIndex == -1)
 		{
-			Logger.Error($"Window {window} not found in layout engine {Name}");
+			Logger.Error($"Window {window} not found in layout engine {Name} as non-minimized");
 			return this;
 		}
 
@@ -185,7 +206,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		int windowIndex = _stack.FindIndex(x => x.Equals(window));
 		if (windowIndex == -1)
 		{
-			Logger.Error($"Window {window} not found in layout engine {Name}");
+			Logger.Error($"Window {window} not found in layout engine {Name} as non-minimized");
 			return this;
 		}
 
@@ -207,6 +228,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");
 
 		ImmutableList<IWindow> newStack = _stack.Remove(window);
+		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Remove(window);
 		// Calculate the index of the window in the stack.
 		int idx = (int)Math.Round(point.X * newStack.Count, MidpointRounding.AwayFromZero);
 
@@ -225,7 +247,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 			idx = newStack.Count - idx;
 		}
 
-		return new ColumnLayoutEngine(this, newStack.Insert(idx, window), _minimizedStack);
+		return new ColumnLayoutEngine(this, newStack.Insert(idx, window), newMinimizedStack);
 	}
 
 	/// <summary>
