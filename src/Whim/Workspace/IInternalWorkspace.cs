@@ -10,16 +10,4 @@ internal interface IInternalWorkspace
 	/// </summary>
 	/// <param name="window"></param>
 	void WindowFocused(IWindow? window);
-
-	/// <summary>
-	/// Called when a window is about to be minimized.
-	/// </summary>
-	/// <param name="window"></param>
-	void WindowMinimizeStart(IWindow window);
-
-	/// <summary>
-	/// Called when a window is about to be unminimized.
-	/// </summary>
-	/// <param name="window"></param>
-	void WindowMinimizeEnd(IWindow window);
 }

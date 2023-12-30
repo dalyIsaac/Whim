@@ -60,6 +60,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public ILayoutEngine ActiveLayoutEngine
 	{
+		private set => _layoutEngines[_activeLayoutEngineIndex] = value;
 		get
 		{
 			lock (_workspaceLock)
@@ -70,15 +71,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	/// <summary>
-	/// All the windows in this workspace which are <see cref="WindowSize.Normal"/>.
+	/// All the windows in this workspace.
 	/// </summary>
-	private readonly HashSet<IWindow> _normalWindows = new();
-
-	/// <summary>
-	/// All the minimized windows in this workspace. These minimized windows includes which are
-	/// part of a layout engine, and those which are not but still exist in the workspace.
-	/// </summary>
-	private readonly HashSet<IWindow> _minimizedWindows = new();
+	private readonly HashSet<IWindow> _windows = new();
 
 	public IEnumerable<IWindow> Windows
 	{
@@ -86,15 +81,15 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			lock (_workspaceLock)
 			{
-				return _normalWindows.Concat(_minimizedWindows);
+				return _windows;
 			}
 		}
 	}
 
 	/// <summary>
-	/// Map of window handles to their current rect.
+	/// Map of window handles to their current <see cref="IWindowState"/>.
 	/// </summary>
-	private Dictionary<HWND, IWindowState> _windowRects = new();
+	private Dictionary<HWND, IWindowState> _windowStates = new();
 
 	public Workspace(
 		IContext context,
@@ -121,7 +116,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		lock (_workspaceLock)
 		{
-			if (window != null && _normalWindows.Contains(window))
+			if (window != null && _windows.Contains(window))
 			{
 				LastFocusedWindow = window;
 				Logger.Debug($"Focused window {window} in workspace {Name}");
@@ -129,41 +124,24 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void WindowMinimizeStart(IWindow window)
+	public void MinimizeWindowStart(IWindow window)
 	{
 		lock (_workspaceLock)
 		{
-			if (!_normalWindows.Contains(window))
-			{
-				Logger.Error($"Window {window} is not a normal window in workspace {Name}");
-				return;
-			}
-
-			_normalWindows.Remove(window);
-			_minimizedWindows.Add(window);
-
-			for (int i = 0; i < _layoutEngines.Length; i++)
-			{
-				_layoutEngines[i] = _layoutEngines[i].RemoveWindow(window);
-			}
+			ActiveLayoutEngine = ActiveLayoutEngine.MinimizeWindowStart(window);
 		}
 
 		DoLayout();
 	}
 
-	public void WindowMinimizeEnd(IWindow window)
+	public void MinimizeWindowEnd(IWindow window)
 	{
 		lock (_workspaceLock)
 		{
-			if (!_minimizedWindows.Contains(window))
-			{
-				Logger.Error($"Window {window} is not a minimized window in workspace {Name}");
-				return;
-			}
-
-			_minimizedWindows.Remove(window);
-			AddWindow(window);
+			ActiveLayoutEngine = ActiveLayoutEngine.MinimizeWindowEnd(window);
 		}
+
+		DoLayout();
 	}
 
 	public void FocusFirstWindow()
@@ -293,20 +271,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			Logger.Debug($"Adding window {window} to workspace {Name}");
 
-			if (_normalWindows.Contains(window))
+			if (_windows.Contains(window))
 			{
 				Logger.Error($"Window {window} already exists in workspace {Name}");
 				window.Focus();
 				return;
 			}
 
-			if (_minimizedWindows.Contains(window))
-			{
-				Logger.Debug($"Window {window} is minimized in workspace {Name}, unminimizing");
-				_minimizedWindows.Remove(window);
-			}
-
-			_normalWindows.Add(window);
+			_windows.Add(window);
 			for (int i = 0; i < _layoutEngines.Length; i++)
 			{
 				_layoutEngines[i] = _layoutEngines[i].AddWindow(window);
@@ -346,40 +318,34 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				}
 			}
 
-			bool isNormalWindow = _normalWindows.Contains(window);
-			if (!isNormalWindow && !_minimizedWindows.Contains(window))
+			bool isWindow = _windows.Contains(window);
+			if (!isWindow)
 			{
 				Logger.Error($"Window {window} already does not exist in workspace {Name}");
 				return false;
 			}
 
 			success = true;
-			if (isNormalWindow)
+
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
-				for (int idx = 0; idx < _layoutEngines.Length; idx++)
-				{
-					ILayoutEngine oldEngine = _layoutEngines[idx];
-					ILayoutEngine newEngine = oldEngine.RemoveWindow(window);
+				ILayoutEngine oldEngine = _layoutEngines[idx];
+				ILayoutEngine newEngine = oldEngine.RemoveWindow(window);
 
-					if (newEngine == oldEngine)
-					{
-						Logger.Error($"Window {window} could not be removed from layout engine {oldEngine}");
-						success = false;
-					}
-					else
-					{
-						_layoutEngines[idx] = newEngine;
-					}
+				if (newEngine == oldEngine)
+				{
+					Logger.Error($"Window {window} could not be removed from layout engine {oldEngine}");
+					success = false;
 				}
-
-				if (success)
+				else
 				{
-					_normalWindows.Remove(window);
+					_layoutEngines[idx] = newEngine;
 				}
 			}
-			else
+
+			if (success)
 			{
-				_minimizedWindows.Remove(window);
+				_windows.Remove(window);
 			}
 		}
 
@@ -408,13 +374,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return null;
 		}
 
-		if (_minimizedWindows.Contains(window))
-		{
-			Logger.Error($"Window {window} is minimized in workspace {Name}");
-			return null;
-		}
-
-		if (!_normalWindows.Contains(window))
+		if (!_windows.Contains(window))
 		{
 			Logger.Error($"Window {window} does not exist in workspace {Name}");
 			return null;
@@ -494,18 +454,15 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
 
-			if (_normalWindows.Contains(window))
+			if (_windows.Contains(window))
 			{
 				// The window is already in the workspace, so move it in just the active layout engine
 				_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowToPoint(window, point);
 			}
 			else
 			{
-				// If the window is minimized, remove it from the minimized list, and treat it as a new window
-				_minimizedWindows.Remove(window);
-
 				// The window is new to the workspace, so add it to all layout engines
-				_normalWindows.Add(window);
+				_windows.Add(window);
 
 				for (int idx = 0; idx < _layoutEngines.Length; idx++)
 				{
@@ -529,23 +486,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			window.Hide();
 		}
 
-		_windowRects.Clear();
+		_windowStates.Clear();
 	}
 
 	public IWindowState? TryGetWindowState(IWindow window)
 	{
-		_windowRects.TryGetValue(window.Handle, out IWindowState? rect);
-
-		if (rect is null && _minimizedWindows.Contains(window))
-		{
-			rect = new WindowState()
-			{
-				Window = window,
-				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
-			};
-		}
-
+		_windowStates.TryGetValue(window.Handle, out IWindowState? rect);
 		return rect;
 	}
 
@@ -577,7 +523,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
 
 		// Execute the layout task
-		_windowRects = SetWindowPos(engine: ActiveLayoutEngine, monitor);
+		_windowStates = SetWindowPos(engine: ActiveLayoutEngine, monitor);
 		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
@@ -593,21 +539,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			windowRects.Add(loc.Window.Handle, loc);
 		}
 
-		IRectangle<int> minimizedRect = new Rectangle<int>();
-		foreach (IWindow window in _minimizedWindows)
-		{
-			windowStates.Add(
-				new(
-					new WindowState()
-					{
-						Rectangle = minimizedRect,
-						WindowSize = WindowSize.Minimized,
-						Window = window
-					}
-				)
-			);
-		}
-
 		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);
 
 		return windowRects;
@@ -617,7 +548,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		lock (_workspaceLock)
 		{
-			return _normalWindows.Contains(window) || _minimizedWindows.Contains(window);
+			return _windows.Contains(window);
 		}
 	}
 

@@ -150,6 +150,25 @@ public interface IWorkspace : IDisposable
 	void MoveWindowToPoint(IWindow window, IPoint<double> point);
 	#endregion
 
+	#region MinimizeWindow
+	/// <summary>
+	/// Called when a window is being minimized - i.e., the window size will become
+	/// <see cref="WindowSize.Minimized"/>.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	void MinimizeWindowStart(IWindow window);
+
+	/// <summary>
+	/// Called when a window is being unminimized - i.e., the window size will no longer be
+	/// <see cref="WindowSize.Minimized"/>.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	void MinimizeWindowEnd(IWindow window);
+	#endregion
+
+	#region PerformCustomLayoutEngineAction
 	/// <summary>
 	/// Performs a custom action in a layout engine.
 	/// </summary>
@@ -176,4 +195,5 @@ public interface IWorkspace : IDisposable
 	/// Metadata about the action to perform, and the payload to perform it with.
 	/// </param>
 	void PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action);
+	#endregion
 }
