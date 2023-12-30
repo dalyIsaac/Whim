@@ -631,11 +631,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-
 			return;
 		}
 
-		((IInternalWorkspace)workspace).WindowMinimizeStart(window);
+		workspace.MinimizeWindowStart(window);
 	}
 
 	public void WindowMinimizeEnd(IWindow window)
@@ -645,11 +644,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-
 			return;
 		}
 
-		((IInternalWorkspace)workspace).WindowMinimizeEnd(window);
+		workspace.MinimizeWindowEnd(window);
 	}
 	#endregion
 
