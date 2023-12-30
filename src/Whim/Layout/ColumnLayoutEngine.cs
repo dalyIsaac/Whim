@@ -15,6 +15,8 @@ public record ColumnLayoutEngine : ILayoutEngine
 	/// </summary>
 	private readonly ImmutableList<IWindow> _stack;
 
+	private readonly ImmutableList<IWindow> _minimizedStack;
+
 	/// <inheritdoc/>
 	public string Name { get; init; } = "Column";
 
@@ -37,14 +39,20 @@ public record ColumnLayoutEngine : ILayoutEngine
 	{
 		Identity = identity;
 		_stack = ImmutableList<IWindow>.Empty;
+		_minimizedStack = ImmutableList<IWindow>.Empty;
 	}
 
-	private ColumnLayoutEngine(ColumnLayoutEngine layoutEngine, ImmutableList<IWindow> stack)
+	private ColumnLayoutEngine(
+		ColumnLayoutEngine layoutEngine,
+		ImmutableList<IWindow> stack,
+		ImmutableList<IWindow> minimizedStack
+	)
 	{
 		Name = layoutEngine.Name;
 		Identity = layoutEngine.Identity;
 		LeftToRight = layoutEngine.LeftToRight;
 		_stack = stack;
+		_minimizedStack = minimizedStack;
 	}
 
 	/// <inheritdoc/>
@@ -58,7 +66,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		return new ColumnLayoutEngine(this, _stack.Add(window));
+		return new ColumnLayoutEngine(this, _stack.Add(window), _minimizedStack);
 	}
 
 	/// <inheritdoc/>
@@ -67,7 +75,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
 		ImmutableList<IWindow> newStack = _stack.Remove(window);
-		return newStack == _stack ? this : new ColumnLayoutEngine(this, newStack);
+		return newStack == _stack ? this : new ColumnLayoutEngine(this, newStack, _minimizedStack);
 	}
 
 	/// <inheritdoc/>
@@ -187,7 +195,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		// Swap window
 		IWindow adjWindow = _stack[adjIndex];
 		ImmutableList<IWindow> newStack = _stack.SetItem(windowIndex, adjWindow).SetItem(adjIndex, window);
-		return new ColumnLayoutEngine(this, newStack);
+		return new ColumnLayoutEngine(this, newStack, _minimizedStack);
 	}
 
 	/// <inheritdoc/>
@@ -217,7 +225,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 			idx = newStack.Count - idx;
 		}
 
-		return new ColumnLayoutEngine(this, newStack.Insert(idx, window));
+		return new ColumnLayoutEngine(this, newStack.Insert(idx, window), _minimizedStack);
 	}
 
 	/// <summary>
@@ -235,6 +243,28 @@ public record ColumnLayoutEngine : ILayoutEngine
 		{
 			return direction == Direction.Left ? 1 : -1;
 		}
+	}
+
+	/// <inheritdoc/>
+	public ILayoutEngine MinimizeWindowStart(IWindow window)
+	{
+		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
+
+		ImmutableList<IWindow> newStack = _stack.Remove(window);
+		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Add(window);
+
+		return new ColumnLayoutEngine(this, newStack, newMinimizedStack);
+	}
+
+	/// <inheritdoc/>
+	public ILayoutEngine MinimizeWindowEnd(IWindow window)
+	{
+		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
+
+		ImmutableList<IWindow> newStack = _stack.Remove(window);
+		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Insert(0, window);
+
+		return new ColumnLayoutEngine(this, newStack, newMinimizedStack);
 	}
 
 	/// <inheritdoc/>
