@@ -58,6 +58,36 @@ public class SliceLayoutEngineTests
 		Assert.Equal(windowCount, sut.Count);
 	}
 
+	#region AddWindow
+	[Theory, AutoSubstituteData]
+	public void AddWindow(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		sut = sut.AddWindow(window);
+
+		// Then
+		Assert.Equal(1, sut.Count);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void AddWindow_Minimized(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		sut = sut.MinimizeWindowStart(window);
+		sut = sut.AddWindow(window);
+
+		// Then
+		Assert.Equal(1, sut.Count);
+	}
+	#endregion
+
+	#region RemoveWindow
 	[Theory]
 	[InlineAutoSubstituteData(0, 1)]
 	[InlineAutoSubstituteData(1, 0)]
@@ -83,6 +113,21 @@ public class SliceLayoutEngineTests
 		// Then
 		Assert.Equal(Math.Max(0, addCount - removeCount), sut.Count);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void RemoveWindow_Minimized(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		sut = sut.MinimizeWindowStart(window);
+		sut = sut.RemoveWindow(window);
+
+		// Then
+		Assert.Equal(0, sut.Count);
+	}
+	#endregion
 
 	[Theory, AutoSubstituteData]
 	public void ContainsWindow_True(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
@@ -249,4 +294,64 @@ public class SliceLayoutEngineTests
 		// Then
 		windowStates.Should().BeEquivalentTo(expectedWindowStates);
 	}
+
+	#region MinimizeWindowStart
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		sut = sut.MinimizeWindowStart(window);
+
+		// Then
+		Assert.Equal(1, sut.Count);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_WindowAlreadyAdded(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		sut = sut.AddWindow(window);
+
+		// When
+		sut = sut.MinimizeWindowStart(window);
+
+		// Then
+		Assert.Equal(1, sut.Count);
+	}
+	#endregion
+
+	#region MinimizeWindowEnd
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		sut = sut.AddWindow(window);
+
+		// When
+		sut = sut.MinimizeWindowEnd(window);
+
+		// Then
+		Assert.Equal(1, sut.Count);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_WindowAlreadyAdded(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		sut = sut.AddWindow(window);
+		sut = sut.MinimizeWindowStart(window);
+
+		// When
+		sut = sut.MinimizeWindowEnd(window);
+
+		// Then
+		Assert.Equal(1, sut.Count);
+	}
+	#endregion
 }

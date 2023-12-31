@@ -33,7 +33,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	public string Name { get; init; } = "Slice";
 
 	/// <inheritdoc />
-	public int Count => _windows.Count;
+	public int Count => _windows.Count + _minimizedWindows.Count;
 
 	/// <inheritdoc />
 	public LayoutEngineIdentity Identity { get; }
@@ -248,8 +248,13 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing {window}");
 
-		ImmutableList<IWindow> windows = _windows.Remove(window);
-		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Insert(0, window);
+		ImmutableList<IWindow> windows = _windows;
+		if (!_windows.Contains(window))
+		{
+			windows = windows.Add(window);
+		}
+
+		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 
 		return new SliceLayoutEngine(this, windows, minimizedWindows);
 	}
