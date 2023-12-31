@@ -121,7 +121,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if {window} is contained");
-		return _windows.Contains(window);
+		return _windows.Contains(window) || _minimizedWindows.Contains(window);
 	}
 
 	/// <inheritdoc />

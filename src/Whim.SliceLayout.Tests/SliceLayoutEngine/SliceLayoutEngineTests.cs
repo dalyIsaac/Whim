@@ -135,6 +135,7 @@ public class SliceLayoutEngineTests
 	}
 	#endregion
 
+	#region ContainsWindow
 	[Theory, AutoSubstituteData]
 	public void ContainsWindow_True(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
 	{
@@ -162,6 +163,29 @@ public class SliceLayoutEngineTests
 		// Then
 		Assert.False(contains);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void ContainsWindow_MinimizedWindow(
+		IContext ctx,
+		SliceLayoutPlugin plugin,
+		IWindow window,
+		IWindow minimizedWindow
+	)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		sut = sut.AddWindow(window);
+		sut = sut.MinimizeWindowStart(minimizedWindow);
+
+		// Then
+		Assert.True(sut.ContainsWindow(minimizedWindow));
+		Assert.True(sut.ContainsWindow(window));
+		Assert.Equal(2, sut.Count);
+	}
+
+	#endregion
 
 	[Theory, AutoSubstituteData]
 	public void GetFirstWindow(IContext ctx, SliceLayoutPlugin plugin)
