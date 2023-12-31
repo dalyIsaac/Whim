@@ -151,7 +151,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 			}
 		}
 
-		IRectangle<int> minimizedRectangle = Rectangle.UnitSquare<int>();
+		Rectangle<int> minimizedRectangle = new();
 		foreach (IWindow window in _minimizedStack)
 		{
 			yield return new WindowState()

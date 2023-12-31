@@ -1012,7 +1012,7 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		IRectangle<int> unitSquare = Rectangle.UnitSquare<int>();
+		Rectangle<int> minimizedRectangle = new();
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
 		layoutEngine.AddWindow(window).Returns(layoutEngine);
@@ -1025,7 +1025,7 @@ public class WorkspaceTests
 				{
 					new WindowState()
 					{
-						Rectangle = unitSquare,
+						Rectangle = minimizedRectangle,
 						Window = window,
 						WindowSize = WindowSize.Minimized
 					}
@@ -1039,10 +1039,7 @@ public class WorkspaceTests
 
 		// Then
 		Assert.Equal(window, windowState.Window);
-		Assert.Equal(0, windowState.Rectangle.X);
-		Assert.Equal(0, windowState.Rectangle.Y);
-		Assert.Equal(1, windowState.Rectangle.Width);
-		Assert.Equal(1, windowState.Rectangle.Height);
+		Assert.Equal(new Rectangle<int>(), windowState.Rectangle);
 		Assert.Equal(WindowSize.Minimized, windowState.WindowSize);
 	}
 

@@ -63,13 +63,13 @@ public class DoLayoutTests
 			},
 			new WindowState()
 			{
-				Rectangle = Rectangle.UnitSquare<int>(),
+				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[0],
 				WindowSize = WindowSize.Minimized
 			},
 			new WindowState()
 			{
-				Rectangle = Rectangle.UnitSquare<int>(),
+				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[1],
 				WindowSize = WindowSize.Minimized
 			}

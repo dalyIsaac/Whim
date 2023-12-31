@@ -424,7 +424,7 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(
 			new WindowState()
 			{
-				Rectangle = Rectangle.UnitSquare<int>(),
+				Rectangle = new Rectangle<int>(),
 				Window = window2,
 				WindowSize = WindowSize.Minimized
 			},

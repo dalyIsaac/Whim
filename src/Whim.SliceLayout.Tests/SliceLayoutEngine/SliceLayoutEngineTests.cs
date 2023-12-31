@@ -294,13 +294,13 @@ public class SliceLayoutEngineTests
 			// Minimized windows
 			new WindowState()
 			{
-				Rectangle = new Rectangle<int>(0, 0, 1, 1),
+				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[0],
 				WindowSize = WindowSize.Minimized
 			},
 			new WindowState()
 			{
-				Rectangle = new Rectangle<int>(0, 0, 1, 1),
+				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[1],
 				WindowSize = WindowSize.Minimized
 			},

@@ -152,7 +152,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 		// Layout the minimized windows
 		IWindowState[] minimizedWindowStates = new IWindowState[_minimizedWindows.Count];
-		IRectangle<int> minimizedRectangle = Rectangle.UnitSquare<int>();
+		Rectangle<int> minimizedRectangle = new();
 		for (int idx = 0; idx < minimizedWindowStates.Length; idx++)
 		{
 			minimizedWindowStates[idx] = new WindowState()
@@ -237,8 +237,13 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing {window}");
 
-		ImmutableList<IWindow> windows = _windows.Remove(window);
 		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Add(window);
+		if (minimizedWindows == _minimizedWindows)
+		{
+			return this;
+		}
+
+		ImmutableList<IWindow> windows = _windows.Remove(window);
 
 		return new SliceLayoutEngine(this, windows, minimizedWindows);
 	}

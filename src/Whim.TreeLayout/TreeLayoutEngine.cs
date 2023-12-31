@@ -321,7 +321,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			yield return new WindowState()
 			{
 				Window = window,
-				Rectangle = Rectangle.UnitSquare<int>(),
+				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Minimized
 			};
 		}
