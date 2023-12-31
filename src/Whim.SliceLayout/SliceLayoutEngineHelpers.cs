@@ -98,7 +98,7 @@ public partial record SliceLayoutEngine
 			.SetItem(currentIndex, targetWindow)
 			.SetItem(targetIndex, currentWindow);
 
-		return new SliceLayoutEngine(this, newWindows);
+		return new SliceLayoutEngine(this, newWindows, _minimizedWindows);
 	}
 
 	private ILayoutEngine RotateWindowIndices(int currentIndex, int targetIndex)
@@ -112,7 +112,7 @@ public partial record SliceLayoutEngine
 
 		IWindow currentWindow = _windows[currentIndex];
 		ImmutableList<IWindow> newWindows = _windows.RemoveAt(currentIndex).Insert(targetIndex, currentWindow);
-		return new SliceLayoutEngine(this, newWindows);
+		return new SliceLayoutEngine(this, newWindows, _minimizedWindows);
 	}
 
 	/// <summary>
