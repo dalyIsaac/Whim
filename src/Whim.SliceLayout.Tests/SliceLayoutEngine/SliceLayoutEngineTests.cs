@@ -166,4 +166,87 @@ public class SliceLayoutEngineTests
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void DoLayout(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] minimizedWindows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+
+		int third = 100 / 3;
+		IRectangle<int> rectangle = new Rectangle<int>(0, 0, 100, 100);
+		ParentArea area = SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 });
+
+		IWindowState[] expectedWindowStates = new IWindowState[]
+		{
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(0, 0, third, 50),
+				Window = windows[0],
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(0, 50, third, 50),
+				Window = windows[1],
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(third, 0, third, 100),
+				Window = windows[2],
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(2 * third, 0, third, third),
+				Window = windows[3],
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(2 * third, third, third, third),
+				Window = windows[4],
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(2 * third, 2 * third, third, third),
+				Window = windows[5],
+				WindowSize = WindowSize.Normal
+			},
+			// Minimized windows
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(0, 0, 1, 1),
+				Window = minimizedWindows[0],
+				WindowSize = WindowSize.Minimized
+			},
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(0, 0, 1, 1),
+				Window = minimizedWindows[1],
+				WindowSize = WindowSize.Minimized
+			},
+		};
+
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, area);
+
+		// When
+		foreach (IWindow window in windows)
+		{
+			sut = sut.AddWindow(window);
+		}
+
+		foreach (IWindow window in minimizedWindows)
+		{
+			sut = sut.MinimizeWindowStart(window);
+		}
+
+		IWindowState[] windowStates = sut.DoLayout(rectangle, Substitute.For<IMonitor>()).ToArray();
+
+		// Then
+		windowStates.Should().BeEquivalentTo(expectedWindowStates);
+	}
 }

@@ -150,6 +150,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			};
 		}
 
+		// Layout the minimized windows
 		IWindowState[] minimizedWindowStates = new IWindowState[_minimizedWindows.Count];
 		IRectangle<int> minimizedRectangle = Rectangle.UnitSquare<int>();
 		for (int idx = 0; idx < minimizedWindowStates.Length; idx++)
