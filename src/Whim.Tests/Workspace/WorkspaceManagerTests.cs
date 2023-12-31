@@ -1764,9 +1764,7 @@ public class WorkspaceManagerTests
 		workspaceManager.WindowMinimizeStart(window);
 
 		// Then the workspace is notified
-		((IInternalWorkspace)workspace)
-			.Received(1)
-			.WindowMinimizeStart(window);
+		workspace.Received(1).MinimizeWindowStart(window);
 	}
 	#endregion
 
@@ -1786,9 +1784,7 @@ public class WorkspaceManagerTests
 		workspaceManager.WindowMinimizeEnd(window);
 
 		// Then the window is routed to the workspace
-		((IInternalWorkspace)workspace)
-			.Received(1)
-			.WindowMinimizeEnd(window);
+		workspace.Received(1).MinimizeWindowEnd(window);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1803,9 +1799,7 @@ public class WorkspaceManagerTests
 		workspaceManager.WindowMinimizeEnd(window);
 
 		// Then the workspace is not notified
-		((IInternalWorkspace)workspace)
-			.DidNotReceive()
-			.WindowMinimizeEnd(window);
+		workspace.DidNotReceive().MinimizeWindowEnd(window);
 	}
 	#endregion
 

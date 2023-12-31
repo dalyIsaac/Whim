@@ -199,6 +199,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		if (windowIdx == -1)
 		{
 			engine = (SliceLayoutEngine)engine.AddWindow(window);
+			windowIdx = engine._windows.IndexOf(window);
 		}
 
 		if (engine.GetWindowAtPoint(point) is not (int, IWindow) windowAtPoint)

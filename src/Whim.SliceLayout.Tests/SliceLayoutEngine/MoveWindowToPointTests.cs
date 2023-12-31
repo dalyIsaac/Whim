@@ -128,7 +128,8 @@ public class MoveWindowToPointTests
 		// When
 		ILayoutEngine resultSut = sut.MoveWindowToPoint(window, new Point<double>(0.5, 0.5));
 
-		// Then
-		Assert.Same(sut, resultSut);
+		// Then the window should have been added
+		Assert.NotSame(sut, resultSut);
+		Assert.Equal(1, resultSut.Count);
 	}
 }
