@@ -350,10 +350,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		{
 			return null;
 		}
-		if (window.IsMinimized)
-		{
-			return null;
-		}
 
 		_windows[hwnd] = window;
 		_internalContext.WorkspaceManager.WindowAdded(window);
