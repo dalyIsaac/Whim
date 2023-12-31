@@ -35,7 +35,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	public string Name { get; init; } = "Tree";
 
 	/// <inheritdoc/>
-	public int Count => _windows.Count;
+	public int Count => _windows.Count + _minimizedWindows.Count;
 
 	/// <inheritdoc/>
 	public LayoutEngineIdentity Identity { get; }
