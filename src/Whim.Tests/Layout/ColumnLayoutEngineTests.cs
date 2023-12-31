@@ -387,6 +387,50 @@ public class ColumnLayoutEngineTests
 			result[2]
 		);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void DoLayout_MinimizedWindows(IWindow window, IWindow window2)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(window)
+			.AddWindow(window2)
+			.MinimizeWindowStart(window2);
+
+		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
+
+		// When
+		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
+
+		// Then
+		Assert.Equal(2, result.Length);
+
+		Assert.Equal(
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>()
+				{
+					X = 0,
+					Y = 0,
+					Width = 1920,
+					Height = 1080
+				},
+				Window = window,
+				WindowSize = WindowSize.Normal
+			},
+			result[0]
+		);
+
+		Assert.Equal(
+			new WindowState()
+			{
+				Rectangle = Rectangle.UnitSquare<int>(),
+				Window = window2,
+				WindowSize = WindowSize.Minimized
+			},
+			result[1]
+		);
+	}
 	#endregion
 
 	[Fact]
