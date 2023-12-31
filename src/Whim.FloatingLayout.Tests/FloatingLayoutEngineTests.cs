@@ -1186,4 +1186,79 @@ public class FloatingLayoutEngineTests
 		Assert.IsType<FloatingLayoutEngine>(newEngine);
 	}
 	#endregion
+
+
+	[Theory, AutoSubstituteData]
+	internal void MinimizeWindowStart_NotSame(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MinimizeWindowStart_Same(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.MinimizeWindowStart(window).Returns(innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
+
+		// Then
+		Assert.Same(engine, newEngine);
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MinimizeWindowEnd_NotSame(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MinimizeWindowEnd_Same(
+		IContext context,
+		IInternalFloatingLayoutPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		IWindow window
+	)
+	{
+		// Given
+		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		innerLayoutEngine.MinimizeWindowEnd(window).Returns(innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
+
+		// Then
+		Assert.Same(engine, newEngine);
+	}
 }
