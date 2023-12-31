@@ -293,7 +293,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
 
-		return _windows.ContainsKey(window);
+		return _windows.ContainsKey(window) || _minimizedWindows.Contains(window);
 	}
 
 	/// <inheritdoc />
@@ -740,19 +740,37 @@ public record TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
-		TreeLayoutEngine newEngine = (TreeLayoutEngine)RemoveWindow(window);
-		return new TreeLayoutEngine(
-			newEngine,
-			newEngine._root,
-			newEngine._windows,
-			newEngine._minimizedWindows.Add(window)
-		);
+		TreeLayoutEngine newEngine = this;
+		if (newEngine._windows.ContainsKey(window))
+		{
+			newEngine = (TreeLayoutEngine)newEngine.RemoveWindow(window);
+		}
+
+		ImmutableList<IWindow> minimizedWindows = newEngine._minimizedWindows;
+		if (!minimizedWindows.Contains(window))
+		{
+			minimizedWindows = minimizedWindows.Add(window);
+		}
+
+		if (minimizedWindows == newEngine._minimizedWindows)
+		{
+			// The window is already minimized.
+			return newEngine;
+		}
+
+		return new TreeLayoutEngine(newEngine, newEngine._root, newEngine._windows, minimizedWindows);
 	}
 
 	/// <inheritdoc />
 	public ILayoutEngine MinimizeWindowEnd(IWindow window)
 	{
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
+
+		if (_windows.ContainsKey(window))
+		{
+			Logger.Debug($"Window {window} is already in layout engine {Name}");
+			return this;
+		}
 
 		TreeLayoutEngine newEngine = (TreeLayoutEngine)RemoveWindow(window);
 		return newEngine.AddWindow(window);
