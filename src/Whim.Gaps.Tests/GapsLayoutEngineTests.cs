@@ -762,4 +762,70 @@ public class GapsLayoutEngineTests
 		Assert.IsType<GapsLayoutEngine>(newLayoutEngine);
 		innerLayoutEngine.Received(1).PerformCustomAction(action);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_NotSame(ILayoutEngine innerLayoutEngine, ILayoutEngine minimizeWindowStartResult)
+	{
+		// Given
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		GapsLayoutEngine engine = new(gapsConfig, innerLayoutEngine);
+		IWindow window = Substitute.For<IWindow>();
+		innerLayoutEngine.MinimizeWindowStart(window).Returns(minimizeWindowStartResult);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.IsType<GapsLayoutEngine>(newEngine);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_Same(ILayoutEngine innerLayoutEngine, IWindow window)
+	{
+		// Given
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		GapsLayoutEngine engine = new(gapsConfig, innerLayoutEngine);
+		innerLayoutEngine.MinimizeWindowStart(window).Returns(innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
+
+		// Then
+		Assert.Same(engine, newEngine);
+		Assert.IsType<GapsLayoutEngine>(newEngine);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_NotSame(ILayoutEngine innerLayoutEngine, ILayoutEngine minimizeWindowEndResult)
+	{
+		// Given
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		GapsLayoutEngine engine = new(gapsConfig, innerLayoutEngine);
+		IWindow window = Substitute.For<IWindow>();
+		innerLayoutEngine.MinimizeWindowEnd(window).Returns(minimizeWindowEndResult);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.IsType<GapsLayoutEngine>(newEngine);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_Same(ILayoutEngine innerLayoutEngine, IWindow window)
+	{
+		// Given
+		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
+		GapsLayoutEngine engine = new(gapsConfig, innerLayoutEngine);
+		innerLayoutEngine.MinimizeWindowEnd(window).Returns(innerLayoutEngine);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
+
+		// Then
+		Assert.Same(engine, newEngine);
+		Assert.IsType<GapsLayoutEngine>(newEngine);
+	}
 }
