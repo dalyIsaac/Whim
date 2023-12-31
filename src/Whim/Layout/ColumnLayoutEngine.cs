@@ -29,7 +29,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 	public bool LeftToRight { get; init; } = true;
 
 	/// <inheritdoc/>
-	public int Count => _stack.Count;
+	public int Count => _stack.Count + _minimizedStack.Count;
 
 	/// <summary>
 	/// Creates a new instance of the <see cref="ColumnLayoutEngine"/> class.

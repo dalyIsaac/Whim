@@ -40,10 +40,11 @@ public class SliceLayoutEngineTests
 	}
 
 	[Theory]
-	[InlineAutoSubstituteData(0)]
-	[InlineAutoSubstituteData(1)]
-	[InlineAutoSubstituteData(5)]
-	public void Count(int windowCount, IContext ctx, SliceLayoutPlugin plugin)
+	[InlineAutoSubstituteData(0, 0)]
+	[InlineAutoSubstituteData(1, 1)]
+	[InlineAutoSubstituteData(5, 0)]
+	[InlineAutoSubstituteData(0, 5)]
+	public void Count(int windowCount, int minimizedWindowCount, IContext ctx, SliceLayoutPlugin plugin)
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
@@ -54,8 +55,13 @@ public class SliceLayoutEngineTests
 			sut = sut.AddWindow(window);
 		}
 
+		foreach (IWindow window in Enumerable.Range(0, minimizedWindowCount).Select(_ => Substitute.For<IWindow>()))
+		{
+			sut = sut.MinimizeWindowStart(window);
+		}
+
 		// Then
-		Assert.Equal(windowCount, sut.Count);
+		Assert.Equal(windowCount + minimizedWindowCount, sut.Count);
 	}
 
 	#region AddWindow

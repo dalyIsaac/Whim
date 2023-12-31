@@ -132,6 +132,31 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(1, newLayoutEngine.Count);
 	}
 
+	[Theory]
+	[InlineAutoSubstituteData(0, 0)]
+	[InlineAutoSubstituteData(1, 1)]
+	[InlineAutoSubstituteData(5, 0)]
+	[InlineAutoSubstituteData(0, 5)]
+	public void Count(int windowCount, int minimizedWindowCount)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity);
+
+		// When
+		for (int i = 0; i < windowCount; i++)
+		{
+			engine = engine.AddWindow(Substitute.For<IWindow>());
+		}
+
+		for (int i = 0; i < minimizedWindowCount; i++)
+		{
+			engine = engine.MinimizeWindowStart(Substitute.For<IWindow>());
+		}
+
+		// Then
+		Assert.Equal(windowCount + minimizedWindowCount, engine.Count);
+	}
+
 	[Theory, AutoSubstituteData]
 	public void Contains(IWindow window)
 	{
