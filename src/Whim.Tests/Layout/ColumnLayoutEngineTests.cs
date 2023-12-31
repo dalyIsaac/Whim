@@ -918,4 +918,68 @@ public class ColumnLayoutEngineTests
 		// Then
 		Assert.Same(engine, newEngine);
 	}
+
+	#region MinimizeWindowStart
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_WindowNotFound(IWindow window)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.Equal(1, newEngine.Count);
+		Assert.True(newEngine.ContainsWindow(window));
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_WindowAlreadyMinimized(IWindow window)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).MinimizeWindowStart(window);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
+
+		// Then
+		Assert.Same(engine, newEngine);
+		Assert.Equal(1, newEngine.Count);
+		Assert.True(newEngine.ContainsWindow(window));
+	}
+	#endregion
+
+	#region MinimizeWindowEnd
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_WindowNotFound(IWindow window)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
+
+		// Then
+		Assert.NotSame(engine, newEngine);
+		Assert.Equal(1, newEngine.Count);
+		Assert.True(newEngine.ContainsWindow(window));
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_WindowAlreadyMinimized(IWindow window)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).MinimizeWindowEnd(window);
+
+		// When
+		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
+
+		// Then
+		Assert.Same(engine, newEngine);
+		Assert.Equal(1, newEngine.Count);
+		Assert.True(newEngine.ContainsWindow(window));
+	}
+	#endregion
 }

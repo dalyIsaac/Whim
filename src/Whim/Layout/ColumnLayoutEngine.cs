@@ -273,7 +273,13 @@ public record ColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
 		ImmutableList<IWindow> newStack = _stack.Remove(window);
-		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Add(window);
+		ImmutableList<IWindow> newMinimizedStack = _minimizedStack;
+
+		if (newMinimizedStack.Contains(window))
+		{
+			return this;
+		}
+		newMinimizedStack = newMinimizedStack.Add(window);
 
 		return new ColumnLayoutEngine(this, newStack, newMinimizedStack);
 	}
@@ -283,8 +289,14 @@ public record ColumnLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
-		ImmutableList<IWindow> newStack = _stack.Remove(window);
-		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Insert(0, window);
+		ImmutableList<IWindow> newStack = _stack;
+		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Remove(window);
+
+		if (newStack.Contains(window))
+		{
+			return this;
+		}
+		newStack = newStack.Add(window);
 
 		return new ColumnLayoutEngine(this, newStack, newMinimizedStack);
 	}
