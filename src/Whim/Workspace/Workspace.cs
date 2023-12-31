@@ -128,6 +128,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		lock (_workspaceLock)
 		{
+			Logger.Debug($"Minimizing window {window} in workspace {Name}");
 			_windows.Add(window);
 			ActiveLayoutEngine = ActiveLayoutEngine.MinimizeWindowStart(window);
 		}
@@ -139,6 +140,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		lock (_workspaceLock)
 		{
+			Logger.Debug($"Minimizing window {window} in workspace {Name}");
 			_windows.Add(window);
 			ActiveLayoutEngine = ActiveLayoutEngine.MinimizeWindowEnd(window);
 		}

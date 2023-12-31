@@ -755,12 +755,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
 		TreeLayoutEngine newEngine = (TreeLayoutEngine)RemoveWindow(window);
-		return new TreeLayoutEngine(
-			newEngine,
-			newEngine._root,
-			newEngine._windows,
-			newEngine._minimizedWindows.Insert(0, window)
-		);
+		return newEngine.AddWindow(window);
 	}
 
 	/// <inheritdoc />
