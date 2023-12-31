@@ -1238,6 +1238,33 @@ public class WorkspaceManagerTests
 		Assert.Equal(workspaces[0], routeEvent.Arguments.CurrentWorkspace);
 		Assert.Equal(window, routeEvent.Arguments.Window);
 	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void WindowAdded_WindowIsMinimized(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
+	{
+		// Given
+		window.IsMinimized.Returns(true);
+
+		IWorkspace[] workspaces = CreateWorkspaces(2);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+
+		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		// When a window is added
+		workspaceManager.WindowAdded(window);
+
+		// Then the window is not added to the workspace, and MinimizeWindowStart is called
+		workspaces[0].DidNotReceive().AddWindow(window);
+		workspaces[1].DidNotReceive().AddWindow(window);
+		workspaces[0].Received(1).MinimizeWindowStart(window);
+	}
 	#endregion
 
 	#region WindowRemoved
