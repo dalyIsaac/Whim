@@ -414,12 +414,17 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		lock (_workspaceLock)
 		{
-			if (GetValidVisibleWindow(window) is IWindow validWindow)
+			if (GetValidVisibleWindow(window) is not IWindow validWindow)
 			{
-				_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.FocusWindowInDirection(
-					direction,
-					validWindow
-				);
+				return;
+			}
+
+			ILayoutEngine newEngine = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+
+			if (ActiveLayoutEngine != newEngine)
+			{
+				_layoutEngines[_activeLayoutEngineIndex] = newEngine;
+				DoLayout();
 			}
 		}
 	}
