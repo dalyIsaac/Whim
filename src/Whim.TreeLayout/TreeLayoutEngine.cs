@@ -24,7 +24,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	private readonly IContext _context;
 	private readonly ITreeLayoutPlugin _plugin;
 	private readonly INode? _root;
-	private readonly ImmutableList<IWindow> _minimizedWindows;
+	private readonly ImmutableHashSet<IWindow> _minimizedWindows;
 
 	/// <summary>
 	/// Map of windows to their paths in the tree.
@@ -44,7 +44,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		TreeLayoutEngine engine,
 		INode? root,
 		WindowPathDict windows,
-		ImmutableList<IWindow> minimizedWindows
+		ImmutableHashSet<IWindow> minimizedWindows
 	)
 	{
 		_context = engine._context;
@@ -70,7 +70,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		Identity = identity;
 		_root = null;
 		_windows = WindowPathDict.Empty;
-		_minimizedWindows = ImmutableList<IWindow>.Empty;
+		_minimizedWindows = ImmutableHashSet<IWindow>.Empty;
 	}
 
 	/// <summary>
@@ -88,7 +88,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		ImmutableArray<int> oldNodePath,
 		WindowPathDict windows,
 		INode newNode,
-		ImmutableList<IWindow> minimizedWindows
+		ImmutableHashSet<IWindow> minimizedWindows
 	)
 	{
 		// Rebuild the tree from the bottom up.
@@ -148,7 +148,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
+		ImmutableHashSet<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 		WindowNode newWindowNode = new(window);
 
 		switch (_root)
@@ -170,7 +170,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	private ILayoutEngine AddToSplitNode(
 		WindowNode newWindowNode,
 		ISplitNode rootNode,
-		ImmutableList<IWindow> minimizedWindows
+		ImmutableHashSet<IWindow> minimizedWindows
 	)
 	{
 		Logger.Debug($"Root is split node, adding new window node");
@@ -225,7 +225,7 @@ public record TreeLayoutEngine : ILayoutEngine
 
 	private ILayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point)
 	{
-		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
+		ImmutableHashSet<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 		WindowNode newWindowNode = new(window);
 
 		if (_root is WindowNode focusedWindowNode)
@@ -564,7 +564,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
+		ImmutableHashSet<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 		if (minimizedWindows != _minimizedWindows)
 		{
 			return new TreeLayoutEngine(this, _root, _windows, minimizedWindows);
@@ -746,7 +746,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			newEngine = (TreeLayoutEngine)newEngine.RemoveWindow(window);
 		}
 
-		ImmutableList<IWindow> minimizedWindows = newEngine._minimizedWindows;
+		ImmutableHashSet<IWindow> minimizedWindows = newEngine._minimizedWindows;
 		if (minimizedWindows.Contains(window))
 		{
 			return this;

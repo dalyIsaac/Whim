@@ -72,10 +72,11 @@ public class SliceLayoutEngineTests
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 
 		// When
-		sut = sut.AddWindow(window);
+		ILayoutEngine result = sut.AddWindow(window);
 
 		// Then
-		Assert.Equal(1, sut.Count);
+		Assert.Equal(1, result.Count);
+		Assert.True(result.ContainsWindow(window));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -104,10 +105,11 @@ public class SliceLayoutEngineTests
 
 		// When
 		sut = sut.MinimizeWindowStart(window);
-		sut = sut.AddWindow(window);
+		ILayoutEngine result = sut.AddWindow(window);
 
 		// Then
-		Assert.Equal(1, sut.Count);
+		Assert.Equal(1, result.Count);
+		Assert.True(result.ContainsWindow(window));
 	}
 	#endregion
 
@@ -146,10 +148,11 @@ public class SliceLayoutEngineTests
 
 		// When
 		sut = sut.MinimizeWindowStart(window);
-		sut = sut.RemoveWindow(window);
+		ILayoutEngine result = sut.RemoveWindow(window);
 
 		// Then
-		Assert.Equal(0, sut.Count);
+		Assert.Equal(0, result.Count);
+		Assert.NotSame(sut, result);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -210,12 +213,12 @@ public class SliceLayoutEngineTests
 
 		// When
 		sut = sut.AddWindow(window);
-		sut = sut.MinimizeWindowStart(minimizedWindow);
+		ILayoutEngine result = sut.MinimizeWindowStart(minimizedWindow);
 
 		// Then
-		Assert.True(sut.ContainsWindow(minimizedWindow));
-		Assert.True(sut.ContainsWindow(window));
-		Assert.Equal(2, sut.Count);
+		Assert.True(result.ContainsWindow(minimizedWindow));
+		Assert.True(result.ContainsWindow(window));
+		Assert.Equal(2, result.Count);
 	}
 
 	#endregion

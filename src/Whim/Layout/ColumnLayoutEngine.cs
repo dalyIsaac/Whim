@@ -15,7 +15,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 	/// </summary>
 	private readonly ImmutableList<IWindow> _stack;
 
-	private readonly ImmutableList<IWindow> _minimizedStack;
+	private readonly ImmutableHashSet<IWindow> _minimizedWindows;
 
 	/// <inheritdoc/>
 	public string Name { get; init; } = "Column";
@@ -29,7 +29,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 	public bool LeftToRight { get; init; } = true;
 
 	/// <inheritdoc/>
-	public int Count => _stack.Count + _minimizedStack.Count;
+	public int Count => _stack.Count + _minimizedWindows.Count;
 
 	/// <summary>
 	/// Creates a new instance of the <see cref="ColumnLayoutEngine"/> class.
@@ -39,20 +39,20 @@ public record ColumnLayoutEngine : ILayoutEngine
 	{
 		Identity = identity;
 		_stack = ImmutableList<IWindow>.Empty;
-		_minimizedStack = ImmutableList<IWindow>.Empty;
+		_minimizedWindows = ImmutableHashSet<IWindow>.Empty;
 	}
 
 	private ColumnLayoutEngine(
 		ColumnLayoutEngine layoutEngine,
 		ImmutableList<IWindow> stack,
-		ImmutableList<IWindow> minimizedStack
+		ImmutableHashSet<IWindow> minimizedStack
 	)
 	{
 		Name = layoutEngine.Name;
 		Identity = layoutEngine.Identity;
 		LeftToRight = layoutEngine.LeftToRight;
 		_stack = stack;
-		_minimizedStack = minimizedStack;
+		_minimizedWindows = minimizedStack;
 	}
 
 	/// <inheritdoc/>
@@ -67,7 +67,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		}
 
 		ImmutableList<IWindow> newStack = _stack.Add(window);
-		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Remove(window);
+		ImmutableHashSet<IWindow> newMinimizedStack = _minimizedWindows.Remove(window);
 
 		return new ColumnLayoutEngine(this, newStack, newMinimizedStack);
 	}
@@ -78,9 +78,9 @@ public record ColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
 		ImmutableList<IWindow> newStack = _stack.Remove(window);
-		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Remove(window);
+		ImmutableHashSet<IWindow> newMinimizedStack = _minimizedWindows.Remove(window);
 
-		if (newStack == _stack && newMinimizedStack == _minimizedStack)
+		if (newStack == _stack && newMinimizedStack == _minimizedWindows)
 		{
 			return this;
 		}
@@ -92,7 +92,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
-		return _stack.Any(x => x.Equals(window)) || _minimizedStack.Any(x => x.Equals(window));
+		return _stack.Contains(window) || _minimizedWindows.Contains(window);
 	}
 
 	/// <inheritdoc/>
@@ -152,7 +152,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		}
 
 		Rectangle<int> minimizedRectangle = new();
-		foreach (IWindow window in _minimizedStack)
+		foreach (IWindow window in _minimizedWindows)
 		{
 			yield return new WindowState()
 			{
@@ -216,7 +216,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		// Swap window
 		IWindow adjWindow = _stack[adjIndex];
 		ImmutableList<IWindow> newStack = _stack.SetItem(windowIndex, adjWindow).SetItem(adjIndex, window);
-		return new ColumnLayoutEngine(this, newStack, _minimizedStack);
+		return new ColumnLayoutEngine(this, newStack, _minimizedWindows);
 	}
 
 	/// <inheritdoc/>
@@ -228,7 +228,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Adding window {window} to layout engine {Name} at point {point}");
 
 		ImmutableList<IWindow> newStack = _stack.Remove(window);
-		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Remove(window);
+		ImmutableHashSet<IWindow> newMinimizedStack = _minimizedWindows.Remove(window);
 		// Calculate the index of the window in the stack.
 		int idx = (int)Math.Round(point.X * newStack.Count, MidpointRounding.AwayFromZero);
 
@@ -273,13 +273,12 @@ public record ColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
 		ImmutableList<IWindow> newStack = _stack.Remove(window);
-		ImmutableList<IWindow> newMinimizedStack = _minimizedStack;
+		ImmutableHashSet<IWindow> newMinimizedStack = _minimizedWindows.Add(window);
 
-		if (newMinimizedStack.Contains(window))
+		if (newMinimizedStack == _minimizedWindows)
 		{
 			return this;
 		}
-		newMinimizedStack = newMinimizedStack.Add(window);
 
 		return new ColumnLayoutEngine(this, newStack, newMinimizedStack);
 	}
@@ -290,7 +289,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
 		ImmutableList<IWindow> newStack = _stack;
-		ImmutableList<IWindow> newMinimizedStack = _minimizedStack.Remove(window);
+		ImmutableHashSet<IWindow> newMinimizedStack = _minimizedWindows.Remove(window);
 
 		if (newStack.Contains(window))
 		{

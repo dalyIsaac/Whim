@@ -26,7 +26,7 @@ public class DoLayoutTests
 	[Theory, AutoSubstituteData]
 	public void DoLayout_MinimizedWindows(IMonitor monitor)
 	{
-		// Given
+		// Given a layout with two windows and two minimized windows
 		LayoutEngineWrapper wrapper = new();
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 
@@ -75,7 +75,7 @@ public class DoLayoutTests
 			}
 		};
 
-		// When
+		// When the windows are added, and DoLayout is called
 		for (int idx = 0; idx < windows.Length; idx++)
 		{
 			engine = engine.AddWindow(windows[idx]);
@@ -88,8 +88,9 @@ public class DoLayoutTests
 
 		IWindowState[] windowStates = engine.DoLayout(rect, monitor).ToArray();
 
-		// Then
+		// Then there will be 4 windows from the result of DoLayout
 		Assert.Equal(4, windowStates.Length);
+		Assert.Equal(4, engine.Count);
 		expectedWindowStates.Should().BeEquivalentTo(windowStates);
 	}
 }

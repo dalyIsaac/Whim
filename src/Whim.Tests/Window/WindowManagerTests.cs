@@ -416,6 +416,28 @@ public class WindowManagerTests
 		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
 	}
 
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WinEventProc_WindowIsMinimized(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
+
+		WindowManager windowManager = new(ctx, internalCtx);
+
+		// When
+		windowManager.Initialize();
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+
+		// Then
+		internalCtx.WorkspaceManager.Received(1).WindowAdded(Arg.Any<IWindow>());
+		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
+		internalCtx.WorkspaceManager.Received(1).WindowAdded(Arg.Any<IWindow>());
+	}
+
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_UNCLOAKED)]
 	[Theory]

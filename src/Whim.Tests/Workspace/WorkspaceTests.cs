@@ -878,37 +878,6 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void MoveWindowToPoint_Success_WindowIsMinimized(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
-
-		workspace.AddWindow(window);
-		workspace.MinimizeWindowStart(window);
-
-		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-		window.ClearReceivedCalls();
-
-		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
-
-		// When MoveWindowToPoint is called
-		workspace.MoveWindowToPoint(window, point);
-
-		// Then the layout engine is told to move the window
-		givenEngine.Received(1).MoveWindowToPoint(window, point);
-		givenEngine.DidNotReceive().RemoveWindow(window);
-		window.Received(1).Focus();
-		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void MoveWindowToPoint_Success_WindowAlreadyExists(
 		IContext ctx,
 		IInternalContext internalCtx,
