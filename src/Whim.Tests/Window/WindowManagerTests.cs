@@ -433,9 +433,9 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then
-		internalCtx.WorkspaceManager.DidNotReceive().WindowAdded(Arg.Any<IWindow>());
+		internalCtx.WorkspaceManager.Received(1).WindowAdded(Arg.Any<IWindow>());
 		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
-		internalCtx.WorkspaceManager.DidNotReceive().WindowAdded(Arg.Any<IWindow>());
+		internalCtx.WorkspaceManager.Received(1).WindowAdded(Arg.Any<IWindow>());
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]

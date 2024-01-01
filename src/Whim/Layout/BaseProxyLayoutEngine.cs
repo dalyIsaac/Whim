@@ -79,6 +79,12 @@ public abstract record BaseProxyLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public abstract ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action);
 
+	/// <inheritdoc/>
+	public abstract ILayoutEngine MinimizeWindowStart(IWindow window);
+
+	/// <inheritdoc/>
+	public abstract ILayoutEngine MinimizeWindowEnd(IWindow window);
+
 	/// <summary>
 	/// Checks to see if this <cref name="IImmutableLayoutEngine"/>
 	/// or a child layout engine is type <typeparamref name="T"/>.

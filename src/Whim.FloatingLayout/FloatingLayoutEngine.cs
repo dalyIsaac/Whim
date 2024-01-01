@@ -248,6 +248,14 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 		_floatingWindowRects.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc />
+	public override ILayoutEngine MinimizeWindowStart(IWindow window) =>
+		UpdateInner(InnerLayoutEngine.MinimizeWindowStart(window), window);
+
+	/// <inheritdoc />
+	public override ILayoutEngine MinimizeWindowEnd(IWindow window) =>
+		UpdateInner(InnerLayoutEngine.MinimizeWindowEnd(window), window);
+
+	/// <inheritdoc />
 	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
 	{
 		if (action.Window != null && IsWindowFloating(action.Window))

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -25,6 +26,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 {
 	private readonly IContext _context;
 	private readonly ImmutableList<IWindow> _windows;
+	private readonly ImmutableList<IWindow> _minimizedWindows;
 	private readonly ParentArea _rootArea;
 	private readonly ISliceLayoutPlugin _plugin;
 
@@ -32,7 +34,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	public string Name { get; init; } = "Slice";
 
 	/// <inheritdoc />
-	public int Count => _windows.Count;
+	public int Count => _windows.Count + _minimizedWindows.Count;
 
 	/// <inheritdoc />
 	public LayoutEngineIdentity Identity { get; }
@@ -57,7 +59,11 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	/// </summary>
 	private readonly ParentArea _prunedRootArea;
 
-	private SliceLayoutEngine(SliceLayoutEngine engine, ImmutableList<IWindow> windows)
+	private SliceLayoutEngine(
+		SliceLayoutEngine engine,
+		ImmutableList<IWindow> windows,
+		ImmutableList<IWindow> minimizedWindows
+	)
 	{
 		_context = engine._context;
 		_plugin = engine._plugin;
@@ -65,6 +71,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		Name = engine.Name;
 
 		_windows = windows;
+		_minimizedWindows = minimizedWindows;
 
 		(_rootArea, _windowAreas) = engine._rootArea.SetStartIndexes();
 		_prunedRootArea = _rootArea.Prune(_windows.Count);
@@ -91,6 +98,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		_plugin = plugin;
 		Identity = identity;
 		_windows = ImmutableList<IWindow>.Empty;
+		_minimizedWindows = ImmutableList<IWindow>.Empty;
 
 		(_rootArea, _windowAreas) = rootArea.SetStartIndexes();
 		_prunedRootArea = _rootArea.Prune(_windows.Count);
@@ -100,31 +108,55 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding {window}");
-		return new SliceLayoutEngine(this, _windows.Add(window));
+
+		if (_windows.Contains(window))
+		{
+			return this;
+		}
+
+		return new SliceLayoutEngine(this, _windows.Add(window), _minimizedWindows.Remove(window));
 	}
 
 	/// <inheritdoc />
 	public ILayoutEngine RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing {window}");
-		return new SliceLayoutEngine(this, _windows.Remove(window));
+
+		ImmutableList<IWindow> windows = _windows.Remove(window);
+		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
+		if (windows == _windows && minimizedWindows == _minimizedWindows)
+		{
+			return this;
+		}
+
+		return new SliceLayoutEngine(this, windows, minimizedWindows);
 	}
 
 	/// <inheritdoc />
 	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if {window} is contained");
-		return _windows.Contains(window);
+		return _windows.Contains(window) || _minimizedWindows.Contains(window);
 	}
 
 	/// <inheritdoc />
 	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
-		Logger.Debug($"Doing layout on {rectangle} on {monitor}");
+		Logger.Debug(
+			$"Doing layout on {rectangle} on {monitor}, with {_windows.Count} windows and {_minimizedWindows.Count} minimized windows"
+		);
 
+		IWindowState[] windowStates = DoNormalLayout(rectangle);
+		IWindowState[] minimizedWindowStates = DoMinimizedLayout();
+
+		return windowStates.Concat(minimizedWindowStates);
+	}
+
+	private IWindowState[] DoNormalLayout(IRectangle<int> rectangle)
+	{
 		if (_windows.Count == 0)
 		{
-			return Enumerable.Empty<IWindowState>();
+			return Array.Empty<IWindowState>();
 		}
 
 		// Get the rectangles for each window
@@ -144,6 +176,28 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		}
 
 		return windowStates;
+	}
+
+	private IWindowState[] DoMinimizedLayout()
+	{
+		if (_minimizedWindows.Count == 0)
+		{
+			return Array.Empty<IWindowState>();
+		}
+
+		IWindowState[] minimizedWindowStates = new IWindowState[_minimizedWindows.Count];
+		Rectangle<int> minimizedRectangle = new();
+		for (int idx = 0; idx < minimizedWindowStates.Length; idx++)
+		{
+			minimizedWindowStates[idx] = new WindowState()
+			{
+				Rectangle = minimizedRectangle,
+				Window = _minimizedWindows[idx],
+				WindowSize = WindowSize.Minimized
+			};
+		}
+
+		return minimizedWindowStates;
 	}
 
 	/// <inheritdoc />
@@ -174,18 +228,21 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		Logger.Debug($"Moving {window} to {point}");
 
 		int windowIdx = _windows.IndexOf(window);
+		SliceLayoutEngine engine = this;
+
+		// If the window is not in the tree, add it.
 		if (windowIdx == -1)
 		{
-			Logger.Error($"Window not found");
-			return this;
+			engine = (SliceLayoutEngine)engine.AddWindow(window);
+			windowIdx = engine._windows.IndexOf(window);
 		}
 
-		if (GetWindowAtPoint(point) is not (int, IWindow) windowAtPoint)
+		if (engine.GetWindowAtPoint(point) is not (int, IWindow) windowAtPoint)
 		{
 			return this;
 		}
 
-		return MoveWindowToIndex(windowIdx, windowAtPoint.Index);
+		return engine.MoveWindowToIndex(windowIdx, windowAtPoint.Index);
 	}
 
 	/// <inheritdoc />
@@ -207,6 +264,38 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		}
 
 		return MoveWindowToIndex(windowIdx, _windows.IndexOf(windowInDirection));
+	}
+
+	/// <inheritdoc />
+	public ILayoutEngine MinimizeWindowStart(IWindow window)
+	{
+		Logger.Debug($"Minimizing {window}");
+
+		if (_minimizedWindows.Contains(window))
+		{
+			return this;
+		}
+
+		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Add(window);
+		ImmutableList<IWindow> windows = _windows.Remove(window);
+
+		return new SliceLayoutEngine(this, windows, minimizedWindows);
+	}
+
+	/// <inheritdoc />
+	public ILayoutEngine MinimizeWindowEnd(IWindow window)
+	{
+		Logger.Debug($"Minimizing {window}");
+
+		if (_windows.Contains(window))
+		{
+			return this;
+		}
+
+		ImmutableList<IWindow> windows = _windows.Add(window);
+		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
+
+		return new SliceLayoutEngine(this, windows, minimizedWindows);
 	}
 
 	/// <inheritdoc />

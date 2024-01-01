@@ -18,7 +18,7 @@ public static class IVariantRowExtensions
 	public static void SetTitle<T, TVM>(this IVariantRowView<T, TVM> row, InlineCollection inlines)
 		where TVM : IVariantRowViewModel<T>
 	{
-		Logger.Debug("Setting title");
+		Logger.Verbose("Setting title");
 		IList<PaletteTextSegment> segments = row.ViewModel.FormattedTitle.Segments;
 
 		int idx;
