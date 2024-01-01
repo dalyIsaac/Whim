@@ -154,6 +154,8 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Called when a window is being minimized - i.e., the window size will become
 	/// <see cref="WindowSize.Minimized"/>.
+	///
+	/// Will minimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
@@ -162,6 +164,8 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Called when a window is being unminimized - i.e., the window size will no longer be
 	/// <see cref="WindowSize.Minimized"/>.
+	///
+	/// Will unminimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>

@@ -101,6 +101,16 @@ public record ColumnLayoutEngine : ILayoutEngine
 		string direction = LeftToRight ? "left to right" : "right to left";
 		Logger.Debug($"Performing a column layout {direction}");
 
+		return DoNormalLayout(rectangle).Concat(DoMinimizedLayout());
+	}
+
+	/// <summary>
+	/// Layout the normal windows.
+	/// </summary>
+	/// <param name="rectangle"></param>
+	/// <returns></returns>
+	private IEnumerable<IWindowState> DoNormalLayout(IRectangle<int> rectangle)
+	{
 		if (_stack.Count == 0)
 		{
 			yield break;
@@ -150,7 +160,14 @@ public record ColumnLayoutEngine : ILayoutEngine
 				x -= width;
 			}
 		}
+	}
 
+	/// <summary>
+	/// Layout the minimized windows.
+	/// </summary>
+	/// <returns></returns>
+	private IEnumerable<IWindowState> DoMinimizedLayout()
+	{
 		Rectangle<int> minimizedRectangle = new();
 		foreach (IWindow window in _minimizedWindows)
 		{

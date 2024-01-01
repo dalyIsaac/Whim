@@ -129,11 +129,23 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		lock (_workspaceLock)
 		{
 			Logger.Debug($"Minimizing window {window} in workspace {Name}");
-			_windows.Add(window);
 
-			for (int idx = 0; idx < _layoutEngines.Length; idx++)
+			// If the window is already in the workspace, minimize it in just the active layout engine.
+			// If it isn't, then we assume it was provided during startup and minimize it in all layouts.
+			if (_windows.Contains(window))
 			{
-				_layoutEngines[idx] = _layoutEngines[idx].MinimizeWindowStart(window);
+				_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MinimizeWindowStart(
+					window
+				);
+			}
+			else
+			{
+				_windows.Add(window);
+
+				for (int idx = 0; idx < _layoutEngines.Length; idx++)
+				{
+					_layoutEngines[idx] = _layoutEngines[idx].MinimizeWindowStart(window);
+				}
 			}
 		}
 
@@ -147,10 +159,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			Logger.Debug($"Minimizing window {window} in workspace {Name}");
 			_windows.Add(window);
 
-			for (int idx = 0; idx < _layoutEngines.Length; idx++)
-			{
-				_layoutEngines[idx] = _layoutEngines[idx].MinimizeWindowEnd(window);
-			}
+			// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
+			// Whim starting up.
+			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MinimizeWindowEnd(
+				window
+			);
 		}
 
 		DoLayout();

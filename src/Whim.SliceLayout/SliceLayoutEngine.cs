@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -145,9 +146,17 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			$"Doing layout on {rectangle} on {monitor}, with {_windows.Count} windows and {_minimizedWindows.Count} minimized windows"
 		);
 
+		IWindowState[] windowStates = DoNormalLayout(rectangle);
+		IWindowState[] minimizedWindowStates = DoMinimizedLayout();
+
+		return windowStates.Concat(minimizedWindowStates);
+	}
+
+	private IWindowState[] DoNormalLayout(IRectangle<int> rectangle)
+	{
 		if (_windows.Count == 0)
 		{
-			return Enumerable.Empty<IWindowState>();
+			return Array.Empty<IWindowState>();
 		}
 
 		// Get the rectangles for each window
@@ -166,7 +175,16 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			};
 		}
 
-		// Layout the minimized windows
+		return windowStates;
+	}
+
+	private IWindowState[] DoMinimizedLayout()
+	{
+		if (_minimizedWindows.Count == 0)
+		{
+			return Array.Empty<IWindowState>();
+		}
+
 		IWindowState[] minimizedWindowStates = new IWindowState[_minimizedWindows.Count];
 		Rectangle<int> minimizedRectangle = new();
 		for (int idx = 0; idx < minimizedWindowStates.Length; idx++)
@@ -179,7 +197,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			};
 		}
 
-		return windowStates.Concat(minimizedWindowStates);
+		return minimizedWindowStates;
 	}
 
 	/// <inheritdoc />

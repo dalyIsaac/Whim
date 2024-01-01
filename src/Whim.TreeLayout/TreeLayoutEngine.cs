@@ -301,19 +301,17 @@ public record TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Doing layout for engine {Name}");
 
-		if (_root == null)
+		if (_root != null)
 		{
-			yield break;
-		}
-
-		foreach (WindowNodeRectangleState item in _root.GetWindowRectangles(rectangle))
-		{
-			yield return new WindowState()
+			foreach (WindowNodeRectangleState item in _root.GetWindowRectangles(rectangle))
 			{
-				Window = item.WindowNode.Window,
-				Rectangle = item.Rectangle,
-				WindowSize = item.WindowSize
-			};
+				yield return new WindowState()
+				{
+					Window = item.WindowNode.Window,
+					Rectangle = item.Rectangle,
+					WindowSize = item.WindowSize
+				};
+			}
 		}
 
 		foreach (IWindow window in _minimizedWindows)

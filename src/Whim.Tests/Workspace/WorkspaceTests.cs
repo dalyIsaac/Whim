@@ -1045,7 +1045,33 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void MinimizeWindowStart(
+	internal void MinimizeWindowStart_ContainsWindow(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
+		IWindow window
+	)
+	{
+		// Given the workspace doesn't contain the window
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
+		workspace.AddWindow(window);
+
+		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
+
+		// When MinimizeWindowStart is called
+		workspace.MinimizeWindowStart(window);
+
+		// Then
+		givenEngine.Received(1).MinimizeWindowStart(window);
+		layoutEngine2.DidNotReceive().MinimizeWindowStart(window);
+		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void MinimizeWindowStart_DoesNotContainWindow(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -1056,9 +1082,9 @@ public class WorkspaceTests
 	{
 		// Given
 		layoutEngine2.AddWindow(window).Returns(layoutEngine2);
+
 		Workspace workspace =
 			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
-		workspace.AddWindow(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
@@ -1082,9 +1108,6 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		layoutEngine2.AddWindow(window).Returns(layoutEngine2);
-		layoutEngine2.MinimizeWindowStart(window).Returns(layoutEngine2);
-
 		Workspace workspace =
 			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		workspace.AddWindow(window);
@@ -1097,7 +1120,7 @@ public class WorkspaceTests
 
 		// Then
 		givenEngine.Received(1).MinimizeWindowEnd(window);
-		layoutEngine2.Received(1).MinimizeWindowEnd(window);
+		layoutEngine2.DidNotReceive().MinimizeWindowEnd(window);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
 

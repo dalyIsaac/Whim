@@ -11,7 +11,7 @@ public partial record SliceLayoutEngine
 			return _cachedWindowStates;
 		}
 
-		IWindowState[] cachedWindowStates = new IWindowState[_windows.Count];
+		IWindowState[] cachedWindowStates = new IWindowState[_windows.Count + _minimizedWindows.Count];
 
 		Rectangle<int> rectangle = new(0, 0, _cachedWindowStatesScale, _cachedWindowStatesScale);
 		int idx = 0;

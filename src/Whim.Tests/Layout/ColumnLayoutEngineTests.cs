@@ -200,6 +200,30 @@ public class ColumnLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
+	public void DoLayout_OnlyMinimizedWindows(IWindow window)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).MinimizeWindowStart(window);
+
+		// When
+		IWindowState[] windowStates = engine
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.ToArray();
+
+		// Then
+		Assert.Single(windowStates);
+		Assert.Equal(
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(),
+				Window = window,
+				WindowSize = WindowSize.Minimized
+			},
+			windowStates[0]
+		);
+	}
+
+	[Theory, AutoSubstituteData]
 	public void DoLayout_LeftToRight_SingleWindow(IWindow window)
 	{
 		// Given
