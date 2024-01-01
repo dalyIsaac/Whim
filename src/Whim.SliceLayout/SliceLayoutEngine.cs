@@ -107,6 +107,12 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding {window}");
+
+		if (_windows.Contains(window))
+		{
+			return this;
+		}
+
 		return new SliceLayoutEngine(this, _windows.Add(window), _minimizedWindows.Remove(window));
 	}
 
@@ -114,7 +120,14 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	public ILayoutEngine RemoveWindow(IWindow window)
 	{
 		Logger.Debug($"Removing {window}");
-		return new SliceLayoutEngine(this, _windows.Remove(window), _minimizedWindows.Remove(window));
+
+		ImmutableList<IWindow> windows = _windows.Remove(window);
+		if (windows == _windows)
+		{
+			return this;
+		}
+
+		return new SliceLayoutEngine(this, windows, _minimizedWindows.Remove(window));
 	}
 
 	/// <inheritdoc />

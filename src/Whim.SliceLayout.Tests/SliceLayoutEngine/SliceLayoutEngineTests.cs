@@ -79,6 +79,24 @@ public class SliceLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
+	public void AddWindow_WindowAlreadyAdded(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given a window has been added
+		ILayoutEngine sut = new SliceLayoutEngine(
+			ctx,
+			plugin,
+			identity,
+			SampleSliceLayouts.CreateNestedLayout()
+		).AddWindow(window);
+
+		// When the window is added again
+		ILayoutEngine result = sut.AddWindow(window);
+
+		// Then nothing changes
+		Assert.Same(sut, result);
+	}
+
+	[Theory, AutoSubstituteData]
 	public void AddWindow_Minimized(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
 	{
 		// Given
@@ -132,6 +150,21 @@ public class SliceLayoutEngineTests
 
 		// Then
 		Assert.Equal(0, sut.Count);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void RemoveWindow_WindowAlreadyRemoved(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given a window has been added
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout())
+			.AddWindow(window)
+			.RemoveWindow(window);
+
+		// When the window is added again
+		ILayoutEngine result = sut.RemoveWindow(window);
+
+		// Then nothing changes
+		Assert.Same(sut, result);
 	}
 	#endregion
 
