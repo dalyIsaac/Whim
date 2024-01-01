@@ -747,18 +747,17 @@ public record TreeLayoutEngine : ILayoutEngine
 		}
 
 		ImmutableList<IWindow> minimizedWindows = newEngine._minimizedWindows;
-		if (!minimizedWindows.Contains(window))
+		if (minimizedWindows.Contains(window))
 		{
-			minimizedWindows = minimizedWindows.Add(window);
+			return this;
 		}
 
-		if (minimizedWindows == newEngine._minimizedWindows)
-		{
-			// The window is already minimized.
-			return newEngine;
-		}
-
-		return new TreeLayoutEngine(newEngine, newEngine._root, newEngine._windows, minimizedWindows);
+		return new TreeLayoutEngine(
+			newEngine,
+			newEngine._root,
+			newEngine._windows,
+			newEngine._minimizedWindows.Add(window)
+		);
 	}
 
 	/// <inheritdoc />

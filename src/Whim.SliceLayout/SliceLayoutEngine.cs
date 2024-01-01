@@ -122,12 +122,13 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		Logger.Debug($"Removing {window}");
 
 		ImmutableList<IWindow> windows = _windows.Remove(window);
-		if (windows == _windows)
+		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
+		if (windows == _windows && minimizedWindows == _minimizedWindows)
 		{
 			return this;
 		}
 
-		return new SliceLayoutEngine(this, windows, _minimizedWindows.Remove(window));
+		return new SliceLayoutEngine(this, windows, minimizedWindows);
 	}
 
 	/// <inheritdoc />
@@ -140,7 +141,9 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	/// <inheritdoc />
 	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
-		Logger.Debug($"Doing layout on {rectangle} on {monitor}");
+		Logger.Debug(
+			$"Doing layout on {rectangle} on {monitor}, with {_windows.Count} windows and {_minimizedWindows.Count} minimized windows"
+		);
 
 		if (_windows.Count == 0)
 		{
@@ -250,12 +253,12 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing {window}");
 
-		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Add(window);
-		if (minimizedWindows == _minimizedWindows)
+		if (_minimizedWindows.Contains(window))
 		{
 			return this;
 		}
 
+		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Add(window);
 		ImmutableList<IWindow> windows = _windows.Remove(window);
 
 		return new SliceLayoutEngine(this, windows, minimizedWindows);
