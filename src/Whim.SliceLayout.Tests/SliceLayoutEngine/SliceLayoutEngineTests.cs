@@ -366,10 +366,11 @@ public class SliceLayoutEngineTests
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 
 		// When
-		sut = sut.MinimizeWindowStart(window);
+		ILayoutEngine result = sut.MinimizeWindowStart(window);
 
 		// Then
-		Assert.Equal(1, sut.Count);
+		Assert.Equal(1, result.Count);
+		Assert.NotSame(sut, result);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -380,10 +381,26 @@ public class SliceLayoutEngineTests
 		sut = sut.AddWindow(window);
 
 		// When
-		sut = sut.MinimizeWindowStart(window);
+		ILayoutEngine result = sut.MinimizeWindowStart(window);
 
 		// Then
 		Assert.Equal(1, sut.Count);
+		Assert.NotSame(sut, result);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_WindowAlreadyMinimized(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		sut = sut.MinimizeWindowStart(window);
+
+		// When
+		ILayoutEngine result = sut.MinimizeWindowStart(window);
+
+		// Then
+		Assert.Equal(1, result.Count);
+		Assert.Same(sut, result);
 	}
 	#endregion
 
@@ -394,12 +411,15 @@ public class SliceLayoutEngineTests
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 		sut = sut.AddWindow(window);
+		sut = sut.MinimizeWindowStart(window);
 
 		// When
-		sut = sut.MinimizeWindowEnd(window);
+		ILayoutEngine result = sut.MinimizeWindowEnd(window);
 
 		// Then
-		Assert.Equal(1, sut.Count);
+		Assert.Equal(1, result.Count);
+		Assert.NotSame(sut, result);
+		Assert.True(result.ContainsWindow(window));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -408,13 +428,14 @@ public class SliceLayoutEngineTests
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 		sut = sut.AddWindow(window);
-		sut = sut.MinimizeWindowStart(window);
 
 		// When
-		sut = sut.MinimizeWindowEnd(window);
+		ILayoutEngine result = sut.MinimizeWindowEnd(window);
 
 		// Then
-		Assert.Equal(1, sut.Count);
+		Assert.Equal(1, result.Count);
+		Assert.Same(sut, result);
+		Assert.True(result.ContainsWindow(window));
 	}
 	#endregion
 }

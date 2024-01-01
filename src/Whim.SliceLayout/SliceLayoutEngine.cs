@@ -269,12 +269,12 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing {window}");
 
-		ImmutableList<IWindow> windows = _windows;
-		if (!_windows.Contains(window))
+		if (_windows.Contains(window))
 		{
-			windows = windows.Add(window);
+			return this;
 		}
 
+		ImmutableList<IWindow> windows = _windows.Add(window);
 		ImmutableList<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 
 		return new SliceLayoutEngine(this, windows, minimizedWindows);
