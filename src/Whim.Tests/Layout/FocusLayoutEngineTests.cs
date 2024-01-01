@@ -317,4 +317,56 @@ public class FocusLayoutEngineTests
 
 		expected.Should().BeEquivalentTo(windowStates);
 	}
+
+	#region SwapWindowInDirection
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_NoWindows(Direction direction, IWindow window)
+	{
+		// Given
+		ILayoutEngine sut = new FocusLayoutEngine(_identity);
+
+		// When
+		ILayoutEngine result = sut.SwapWindowInDirection(direction, window);
+
+		// Then
+		Assert.Same(sut, result);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void SwapWindowInDirection_CannotFindWindow(Direction direction, IWindow addedWindow, IWindow swapWindow)
+	{
+		// Given
+		ILayoutEngine sut = new FocusLayoutEngine(_identity);
+		sut = sut.AddWindow(addedWindow);
+
+		// When
+		ILayoutEngine result = sut.SwapWindowInDirection(direction, swapWindow);
+
+		// Then
+		Assert.Same(sut, result);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData(0, Direction.Right, 1)]
+	[InlineAutoSubstituteData(0, Direction.Down, 1)]
+	[InlineAutoSubstituteData(0, Direction.Left, 2)]
+	[InlineAutoSubstituteData(0, Direction.Up, 2)]
+	public void SwapWindowInDirection_CanFindWindow(int focusedIndex, Direction direction, int expectedIndex)
+	{
+		// Given
+		IWindow[] windows = Enumerable.Range(0, 3).Select(_ => Substitute.For<IWindow>()).ToArray();
+		ILayoutEngine sut = new FocusLayoutEngine(_identity);
+		sut = sut.AddWindow(windows[0]);
+		sut = sut.AddWindow(windows[1]);
+		sut = sut.AddWindow(windows[2]);
+
+		// When
+		ILayoutEngine result = sut.SwapWindowInDirection(direction, windows[focusedIndex]);
+
+		// Then
+		Assert.NotSame(sut, result);
+		Assert.Equal(sut.Count, result.Count);
+		Assert.Equal(windows[expectedIndex], result.GetFirstWindow());
+	}
+	#endregion
 }
