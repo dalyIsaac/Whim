@@ -58,9 +58,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
+	// NOTE: Don't set this directly. Usually all the layout engines will need to be updated.
 	public ILayoutEngine ActiveLayoutEngine
 	{
-		private set => _layoutEngines[_activeLayoutEngineIndex] = value;
 		get
 		{
 			lock (_workspaceLock)
@@ -130,7 +130,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			Logger.Debug($"Minimizing window {window} in workspace {Name}");
 			_windows.Add(window);
-			ActiveLayoutEngine = ActiveLayoutEngine.MinimizeWindowStart(window);
+
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
+			{
+				_layoutEngines[idx] = _layoutEngines[idx].MinimizeWindowStart(window);
+			}
 		}
 
 		DoLayout();
@@ -142,7 +146,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			Logger.Debug($"Minimizing window {window} in workspace {Name}");
 			_windows.Add(window);
-			ActiveLayoutEngine = ActiveLayoutEngine.MinimizeWindowEnd(window);
+
+			for (int idx = 0; idx < _layoutEngines.Length; idx++)
+			{
+				_layoutEngines[idx] = _layoutEngines[idx].MinimizeWindowEnd(window);
+			}
 		}
 
 		DoLayout();

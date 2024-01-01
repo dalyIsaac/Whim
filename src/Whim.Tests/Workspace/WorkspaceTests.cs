@@ -535,19 +535,23 @@ public class WorkspaceTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
 		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When AddWindow is called
 		workspace.AddWindow(window);
 
 		// Then the window is added to the layout engine
-		layoutEngine.Received(1).AddWindow(window);
+		layoutEngine1.Received(1).AddWindow(window);
+		layoutEngine2.Received(1).AddWindow(window);
+
 		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 		window.Received(1).Focus();
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
@@ -612,12 +616,16 @@ public class WorkspaceTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
 		// Given only one window is in the workspace
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		layoutEngine2.AddWindow(window).Returns(layoutEngine2);
+
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		workspace.AddWindow(window);
 		workspace.WindowFocused(window);
 
@@ -631,6 +639,8 @@ public class WorkspaceTests
 		// Then the window is removed from the layout engine, and LastFocusedWindow is set to null
 		Assert.True(result);
 		givenEngine.Received(1).RemoveWindow(window);
+		layoutEngine2.Received(1).RemoveWindow(window);
+
 		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 		Assert.Null(workspace.LastFocusedWindow);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
@@ -1070,12 +1080,15 @@ public class WorkspaceTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
 		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		layoutEngine2.AddWindow(window).Returns(layoutEngine2);
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		workspace.AddWindow(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
@@ -1085,6 +1098,7 @@ public class WorkspaceTests
 
 		// Then
 		givenEngine.Received(1).MinimizeWindowStart(window);
+		layoutEngine2.Received(1).MinimizeWindowStart(window);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
 
@@ -1093,12 +1107,17 @@ public class WorkspaceTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
 		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		layoutEngine2.AddWindow(window).Returns(layoutEngine2);
+		layoutEngine2.MinimizeWindowStart(window).Returns(layoutEngine2);
+
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		workspace.AddWindow(window);
 		workspace.MinimizeWindowStart(window);
 
@@ -1109,6 +1128,7 @@ public class WorkspaceTests
 
 		// Then
 		givenEngine.Received(1).MinimizeWindowEnd(window);
+		layoutEngine2.Received(1).MinimizeWindowEnd(window);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
 
