@@ -4,10 +4,12 @@ using System.Collections.Immutable;
 namespace Whim;
 
 // TODO: Describe SwapWindowInDirection and FocusWindowInDirection
+// NOTE: This LayoutEngine can have 0 or 1 windows shown
 public record FocusLayoutEngine : ILayoutEngine
 {
 	private readonly ImmutableList<IWindow> _list;
 	private readonly int _focusedIndex;
+	private readonly bool _hideFocusedWindow;
 	private readonly bool _maximized;
 
 	/// <inheritdoc/>
@@ -33,7 +35,8 @@ public record FocusLayoutEngine : ILayoutEngine
 		FocusLayoutEngine layoutEngine,
 		ImmutableList<IWindow> list,
 		int focusedIndex,
-		bool maximized
+		bool maximized,
+		bool hideFocusedWindow
 	)
 	{
 		Name = layoutEngine.Name;
@@ -41,6 +44,7 @@ public record FocusLayoutEngine : ILayoutEngine
 		_list = list;
 		_focusedIndex = focusedIndex < 0 || focusedIndex >= _list.Count ? 0 : focusedIndex;
 		_maximized = maximized;
+		_hideFocusedWindow = hideFocusedWindow;
 	}
 
 	/// <inheritdoc/>
@@ -55,7 +59,7 @@ public record FocusLayoutEngine : ILayoutEngine
 		}
 
 		ImmutableList<IWindow> newList = _list.Add(window);
-		return new FocusLayoutEngine(this, newList, newList.Count - 1, _maximized);
+		return new FocusLayoutEngine(this, newList, newList.Count - 1, _maximized, false);
 	}
 
 	/// <inheritdoc/>
@@ -69,7 +73,7 @@ public record FocusLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		return new FocusLayoutEngine(this, _list.Remove(window), _focusedIndex, _maximized);
+		return new FocusLayoutEngine(this, _list.Remove(window), _focusedIndex, _maximized, _hideFocusedWindow);
 	}
 
 	/// <inheritdoc/>
@@ -143,7 +147,7 @@ public record FocusLayoutEngine : ILayoutEngine
 		};
 		newIndex = newIndex.Mod(_list.Count);
 
-		return new FocusLayoutEngine(this, _list, newIndex, _maximized);
+		return new FocusLayoutEngine(this, _list, newIndex, _maximized, false);
 	}
 
 	/// <inheritdoc/>
@@ -170,7 +174,7 @@ public record FocusLayoutEngine : ILayoutEngine
 		IWindow newWindow = _list[newIndex];
 
 		ImmutableList<IWindow> newList = _list.SetItem(index, newWindow).SetItem(newIndex, oldWindow);
-		return new FocusLayoutEngine(this, newList, newIndex, _maximized);
+		return new FocusLayoutEngine(this, newList, newIndex, _maximized, false);
 	}
 
 	/// <inheritdoc/>
@@ -180,11 +184,49 @@ public record FocusLayoutEngine : ILayoutEngine
 	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) => AddWindow(window);
 
 	/// <inheritdoc/>
+	public ILayoutEngine MinimizeWindowStart(IWindow window)
+	{
+		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
+
+		if (window.Equals(_list[_focusedIndex]))
+		{
+			return new FocusLayoutEngine(this, _list, _focusedIndex, _maximized, true);
+		}
+
+		if (!_list.Contains(window))
+		{
+			return new FocusLayoutEngine(this, _list.Add(window), _list.Count, _maximized, _hideFocusedWindow);
+		}
+
+		return this;
+	}
+
+	/// <inheritdoc/>
+	public ILayoutEngine MinimizeWindowEnd(IWindow window)
+	{
+		Logger.Debug($"Restoring window {window} in layout engine {Name}");
+
+		ImmutableList<IWindow> newList = _list;
+		int idx;
+		if (!newList.Contains(window))
+		{
+			newList = newList.Add(window);
+			idx = newList.Count - 1;
+		}
+		else
+		{
+			idx = newList.IndexOf(window);
+		}
+
+		return new FocusLayoutEngine(this, newList, idx, _maximized, false);
+	}
+
+	/// <inheritdoc/>
 	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
 	{
 		if (action.Name == $"{Name}.toggle_maximized")
 		{
-			return new FocusLayoutEngine(this, _list, _focusedIndex, !_maximized);
+			return new FocusLayoutEngine(this, _list, _focusedIndex, !_maximized, _hideFocusedWindow);
 		}
 
 		return this;
