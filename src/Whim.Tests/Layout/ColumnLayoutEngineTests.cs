@@ -132,6 +132,31 @@ public class ColumnLayoutEngineTests
 		Assert.Equal(1, newLayoutEngine.Count);
 	}
 
+	[Theory]
+	[InlineAutoSubstituteData(0, 0)]
+	[InlineAutoSubstituteData(1, 1)]
+	[InlineAutoSubstituteData(5, 0)]
+	[InlineAutoSubstituteData(0, 5)]
+	public void Count(int windowCount, int minimizedWindowCount)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity);
+
+		// When some windows, and minimized windows are added
+		for (int i = 0; i < windowCount; i++)
+		{
+			engine = engine.AddWindow(Substitute.For<IWindow>());
+		}
+
+		for (int i = 0; i < minimizedWindowCount; i++)
+		{
+			engine = engine.MinimizeWindowStart(Substitute.For<IWindow>());
+		}
+
+		// Then the Count is the sum of the windows and minimized window count
+		Assert.Equal(windowCount + minimizedWindowCount, engine.Count);
+	}
+
 	[Theory, AutoSubstituteData]
 	public void Contains(IWindow window)
 	{
@@ -172,6 +197,30 @@ public class ColumnLayoutEngineTests
 
 		// Then
 		Assert.Empty(windowStates);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void DoLayout_OnlyMinimizedWindows(IWindow window)
+	{
+		// Given
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).MinimizeWindowStart(window);
+
+		// When
+		IWindowState[] windowStates = engine
+			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+			.ToArray();
+
+		// Then
+		Assert.Single(windowStates);
+		Assert.Equal(
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(),
+				Window = window,
+				WindowSize = WindowSize.Minimized
+			},
+			windowStates[0]
+		);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -360,6 +409,44 @@ public class ColumnLayoutEngineTests
 				WindowSize = WindowSize.Normal
 			},
 			result[2]
+		);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void DoLayout_MinimizedWindows(IWindow window, IWindow window2)
+	{
+		// Given one window is minimized
+		ILayoutEngine engine = new ColumnLayoutEngine(identity)
+			.AddWindow(window)
+			.AddWindow(window2)
+			.MinimizeWindowStart(window2);
+
+		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
+
+		// When performing a layout
+		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
+
+		// Then the resulting window states will include the minimized window
+		Assert.Equal(2, result.Length);
+
+		Assert.Equal(
+			new WindowState()
+			{
+				Rectangle = rect,
+				Window = window,
+				WindowSize = WindowSize.Normal
+			},
+			result[0]
+		);
+
+		Assert.Equal(
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(),
+				Window = window2,
+				WindowSize = WindowSize.Minimized
+			},
+			result[1]
 		);
 	}
 	#endregion
@@ -893,4 +980,68 @@ public class ColumnLayoutEngineTests
 		// Then
 		Assert.Same(engine, newEngine);
 	}
+
+	#region MinimizeWindowStart
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_WindowNotFound(IWindow window)
+	{
+		// Given an empty layout engine
+		ILayoutEngine engine = new ColumnLayoutEngine(identity);
+
+		// When an untracked window is minimized
+		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
+
+		// Then the window becomes tracked as a minimized window
+		Assert.NotSame(engine, newEngine);
+		Assert.Equal(1, newEngine.Count);
+		Assert.True(newEngine.ContainsWindow(window));
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_WindowAlreadyMinimized(IWindow window)
+	{
+		// Given a window has been tracked as minimized
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).MinimizeWindowStart(window);
+
+		// When the window is minimized again
+		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
+
+		// Then nothing changes
+		Assert.Same(engine, newEngine);
+		Assert.Equal(1, newEngine.Count);
+		Assert.True(newEngine.ContainsWindow(window));
+	}
+	#endregion
+
+	#region MinimizeWindowEnd
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_WindowNotFound(IWindow window)
+	{
+		// Given an empty layout engine
+		ILayoutEngine engine = new ColumnLayoutEngine(identity);
+
+		// When a window is restored from an empty layout engine
+		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
+
+		// Then the window is tracked as a normal window
+		Assert.NotSame(engine, newEngine);
+		Assert.Equal(1, newEngine.Count);
+		Assert.True(newEngine.ContainsWindow(window));
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_WindowAlreadyMinimized(IWindow window)
+	{
+		// Given a window has already been restored
+		ILayoutEngine engine = new ColumnLayoutEngine(identity).MinimizeWindowEnd(window);
+
+		// When the window is restored again
+		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
+
+		// Then nothing changes
+		Assert.Same(engine, newEngine);
+		Assert.Equal(1, newEngine.Count);
+		Assert.True(newEngine.ContainsWindow(window));
+	}
+	#endregion
 }

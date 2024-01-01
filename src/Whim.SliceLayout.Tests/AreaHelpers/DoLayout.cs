@@ -286,17 +286,26 @@ public class DoLayoutTests
 	)
 	{
 		// Given
+		int minimizedWindowCount = 2;
 		int windowCount = expectedRectangles.Length;
-		IWindow[] windows = Enumerable.Range(0, windowCount).Select(i => Substitute.For<IWindow>()).ToArray();
 
-		IWindowState[] expectedWindowStates = new IWindowState[windowCount];
+		IWindowState[] expectedWindowStates = new IWindowState[windowCount + minimizedWindowCount];
 		for (int i = 0; i < windowCount; i++)
 		{
 			expectedWindowStates[i] = new WindowState()
 			{
 				Rectangle = expectedRectangles[i],
-				Window = windows[i],
+				Window = Substitute.For<IWindow>(),
 				WindowSize = WindowSize.Normal
+			};
+		}
+		for (int i = 0; i < minimizedWindowCount; i++)
+		{
+			expectedWindowStates[windowCount + i] = new WindowState()
+			{
+				Rectangle = new Rectangle<int>(),
+				Window = Substitute.For<IWindow>(),
+				WindowSize = WindowSize.Minimized
 			};
 		}
 
@@ -305,12 +314,16 @@ public class DoLayoutTests
 		// When
 		for (int i = 0; i < windowCount; i++)
 		{
-			sliceLayoutEngine = sliceLayoutEngine.AddWindow(windows[i]);
+			sliceLayoutEngine = sliceLayoutEngine.AddWindow(expectedWindowStates[i].Window);
+		}
+		for (int i = 0; i < minimizedWindowCount; i++)
+		{
+			sliceLayoutEngine = sliceLayoutEngine.MinimizeWindowStart(expectedWindowStates[windowCount + i].Window);
 		}
 		IWindowState[] windowStates = sliceLayoutEngine.DoLayout(rectangle, Substitute.For<IMonitor>()).ToArray();
 
 		// Then
-		Assert.Equal(windowCount, windowStates.Length);
+		Assert.Equal(windowCount + minimizedWindowCount, windowStates.Length);
 		expectedWindowStates.Should().BeEquivalentTo(windowStates);
 	}
 }

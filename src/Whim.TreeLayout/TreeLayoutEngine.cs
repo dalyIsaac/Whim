@@ -24,6 +24,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	private readonly IContext _context;
 	private readonly ITreeLayoutPlugin _plugin;
 	private readonly INode? _root;
+	private readonly ImmutableHashSet<IWindow> _minimizedWindows;
 
 	/// <summary>
 	/// Map of windows to their paths in the tree.
@@ -34,17 +35,26 @@ public record TreeLayoutEngine : ILayoutEngine
 	public string Name { get; init; } = "Tree";
 
 	/// <inheritdoc/>
-	public int Count => _windows.Count;
+	public int Count => _windows.Count + _minimizedWindows.Count;
 
 	/// <inheritdoc/>
 	public LayoutEngineIdentity Identity { get; }
 
-	private TreeLayoutEngine(TreeLayoutEngine engine, INode root, WindowPathDict windows)
-		: this(engine._context, engine._plugin, engine.Identity)
+	private TreeLayoutEngine(
+		TreeLayoutEngine engine,
+		INode? root,
+		WindowPathDict windows,
+		ImmutableHashSet<IWindow> minimizedWindows
+	)
 	{
+		_context = engine._context;
+		_plugin = engine._plugin;
+		Identity = engine.Identity;
+
 		Name = engine.Name;
 		_root = root;
 		_windows = windows;
+		_minimizedWindows = minimizedWindows;
 	}
 
 	/// <summary>
@@ -60,6 +70,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		Identity = identity;
 		_root = null;
 		_windows = WindowPathDict.Empty;
+		_minimizedWindows = ImmutableHashSet<IWindow>.Empty;
 	}
 
 	/// <summary>
@@ -70,12 +81,14 @@ public record TreeLayoutEngine : ILayoutEngine
 	/// <param name="oldNodePath">The path to the old node.</param>
 	/// <param name="windows">The map of windows to their paths.</param>
 	/// <param name="newNode">The new node to replace the old node.</param>
+	/// <param name="minimizedWindows">The minimized stack.</param>
 	/// <returns></returns>
 	private TreeLayoutEngine CreateNewEngine(
 		IReadOnlyList<ISplitNode> oldNodeAncestors,
 		ImmutableArray<int> oldNodePath,
 		WindowPathDict windows,
-		INode newNode
+		INode newNode,
+		ImmutableHashSet<IWindow> minimizedWindows
 	)
 	{
 		// Rebuild the tree from the bottom up.
@@ -92,7 +105,8 @@ public record TreeLayoutEngine : ILayoutEngine
 		return new TreeLayoutEngine(
 			this,
 			current,
-			TreeHelpers.CreateUpdatedPaths(windows, oldNodePath, (ISplitNode)current)
+			TreeHelpers.CreateUpdatedPaths(windows, oldNodePath, (ISplitNode)current),
+			minimizedWindows
 		);
 	}
 
@@ -134,6 +148,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			return this;
 		}
 
+		ImmutableHashSet<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 		WindowNode newWindowNode = new(window);
 
 		switch (_root)
@@ -141,18 +156,22 @@ public record TreeLayoutEngine : ILayoutEngine
 			case WindowNode rootNode:
 				Logger.Debug($"Root is window node, replacing with split node");
 				ISplitNode newRoot = new SplitNode(rootNode, newWindowNode, _plugin.GetAddWindowDirection(this));
-				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(newRoot));
+				return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(newRoot), minimizedWindows);
 
 			case ISplitNode rootNode:
-				return AddToSplitNode(newWindowNode, rootNode);
+				return AddToSplitNode(newWindowNode, rootNode, minimizedWindows);
 
 			default:
 				Logger.Debug($"Root is null, creating new window node");
-				return new TreeLayoutEngine(this, newWindowNode, CreateRootNodeDict(window));
+				return new TreeLayoutEngine(this, newWindowNode, CreateRootNodeDict(window), minimizedWindows);
 		}
 	}
 
-	private ILayoutEngine AddToSplitNode(WindowNode newWindowNode, ISplitNode rootNode)
+	private ILayoutEngine AddToSplitNode(
+		WindowNode newWindowNode,
+		ISplitNode rootNode,
+		ImmutableHashSet<IWindow> minimizedWindows
+	)
 	{
 		Logger.Debug($"Root is split node, adding new window node");
 
@@ -192,7 +211,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			newParent = parentNode.Replace(path[^1], newChild);
 		}
 
-		return CreateNewEngine(ancestors, path.RemoveAt(path.Length - 1), _windows, newParent);
+		return CreateNewEngine(ancestors, path.RemoveAt(path.Length - 1), _windows, newParent, minimizedWindows);
 	}
 
 	/// <inheritdoc />
@@ -206,6 +225,7 @@ public record TreeLayoutEngine : ILayoutEngine
 
 	private ILayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point)
 	{
+		ImmutableHashSet<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 		WindowNode newWindowNode = new(window);
 
 		if (_root is WindowNode focusedWindowNode)
@@ -214,7 +234,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			Direction newNodeDirection = Rectangle.UnitSquare<double>().GetDirectionToPoint(point);
 
 			ISplitNode newRoot = new SplitNode(focusedWindowNode, newWindowNode, newNodeDirection);
-			return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(newRoot));
+			return new TreeLayoutEngine(this, newRoot, CreateTopSplitNodeDict(newRoot), minimizedWindows);
 		}
 
 		if (_root is ISplitNode splitNode)
@@ -223,7 +243,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		}
 
 		Logger.Debug($"Root is null, creating new window node");
-		return new TreeLayoutEngine(this, newWindowNode, CreateRootNodeDict(window));
+		return new TreeLayoutEngine(this, newWindowNode, CreateRootNodeDict(window), minimizedWindows);
 	}
 
 	private ILayoutEngine MoveWindowToPointSplitNode(
@@ -251,7 +271,8 @@ public record TreeLayoutEngine : ILayoutEngine
 				oldNodeAncestors: ancestors,
 				oldNodePath: path.RemoveAt(path.Length - 1),
 				_windows,
-				newNode: newParent
+				newNode: newParent,
+				_minimizedWindows
 			);
 		}
 
@@ -262,7 +283,8 @@ public record TreeLayoutEngine : ILayoutEngine
 			oldNodeAncestors: ancestors,
 			oldNodePath: path.RemoveAt(path.Length - 1),
 			_windows,
-			newNode: newParentNode
+			newNode: newParentNode,
+			_minimizedWindows
 		);
 	}
 
@@ -271,7 +293,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
 
-		return _windows.ContainsKey(window);
+		return _windows.ContainsKey(window) || _minimizedWindows.Contains(window);
 	}
 
 	/// <inheritdoc />
@@ -279,18 +301,26 @@ public record TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Doing layout for engine {Name}");
 
-		if (_root == null)
+		if (_root != null)
 		{
-			yield break;
+			foreach (WindowNodeRectangleState item in _root.GetWindowRectangles(rectangle))
+			{
+				yield return new WindowState()
+				{
+					Window = item.WindowNode.Window,
+					Rectangle = item.Rectangle,
+					WindowSize = item.WindowSize
+				};
+			}
 		}
 
-		foreach (WindowNodeRectangleState item in _root.GetWindowRectangles(rectangle))
+		foreach (IWindow window in _minimizedWindows)
 		{
 			yield return new WindowState()
 			{
-				Window = item.WindowNode.Window,
-				Rectangle = item.Rectangle,
-				WindowSize = item.WindowSize
+				Window = window,
+				Rectangle = new Rectangle<int>(),
+				WindowSize = WindowSize.Minimized
 			};
 		}
 	}
@@ -518,7 +548,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		return CreateNewEngine(parentResult.Ancestors, parentNodePath, _windows, newParent);
+		return CreateNewEngine(parentResult.Ancestors, parentNodePath, _windows, newParent, _minimizedWindows);
 	}
 
 	/// <inheritdoc />
@@ -530,6 +560,12 @@ public record TreeLayoutEngine : ILayoutEngine
 		{
 			Logger.Error($"Root is null, cannot remove window {window} from layout engine {Name}");
 			return this;
+		}
+
+		ImmutableHashSet<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
+		if (minimizedWindows != _minimizedWindows)
+		{
+			return new TreeLayoutEngine(this, _root, _windows, minimizedWindows);
 		}
 
 		if (_root is WindowNode windowNode)
@@ -561,7 +597,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		if (parentNode.Children.Count != 2)
 		{
 			ISplitNode newParentNode = parentNode.Remove(windowPath[^1]);
-			return CreateNewEngine(windowResult.Ancestors, windowPath[..^1], windows, newParentNode);
+			return CreateNewEngine(windowResult.Ancestors, windowPath[..^1], windows, newParentNode, minimizedWindows);
 		}
 
 		// If the parent node has just two children, remove the parent node and replace it with the other child.
@@ -570,10 +606,15 @@ public record TreeLayoutEngine : ILayoutEngine
 
 		if (parentNode == _root && otherChild is WindowNode otherWindowChild)
 		{
-			return new TreeLayoutEngine(this, otherChild, CreateRootNodeDict(otherWindowChild.Window));
+			return new TreeLayoutEngine(
+				this,
+				otherChild,
+				CreateRootNodeDict(otherWindowChild.Window),
+				_minimizedWindows
+			);
 		}
 
-		return CreateNewEngine(windowResult.Ancestors, windowPath[..^1], windows, otherChild);
+		return CreateNewEngine(windowResult.Ancestors, windowPath[..^1], windows, otherChild, minimizedWindows);
 	}
 
 	/// <inheritdoc />
@@ -607,7 +648,13 @@ public record TreeLayoutEngine : ILayoutEngine
 		if (windowParent == adjacentParent)
 		{
 			ISplitNode newParent = windowParent.Swap(windowData.WindowPath[^1], adjacentResult.Path[^1]);
-			return CreateNewEngine(windowData.WindowAncestors, windowData.WindowPath[..^1], _windows, newParent);
+			return CreateNewEngine(
+				windowData.WindowAncestors,
+				windowData.WindowPath[..^1],
+				_windows,
+				newParent,
+				_minimizedWindows
+			);
 		}
 
 		// If the parents are different, we need to swap the window nodes.
@@ -683,7 +730,47 @@ public record TreeLayoutEngine : ILayoutEngine
 			aPath[..commonAncestorIdx],
 			(ISplitNode)currentNode
 		);
-		return new TreeLayoutEngine(this, currentNode, newWindows);
+		return new TreeLayoutEngine(this, currentNode, newWindows, _minimizedWindows);
+	}
+
+	/// <inheritdoc />
+	public ILayoutEngine MinimizeWindowStart(IWindow window)
+	{
+		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
+
+		TreeLayoutEngine newEngine = this;
+		if (newEngine._windows.ContainsKey(window))
+		{
+			newEngine = (TreeLayoutEngine)newEngine.RemoveWindow(window);
+		}
+
+		ImmutableHashSet<IWindow> minimizedWindows = newEngine._minimizedWindows;
+		if (minimizedWindows.Contains(window))
+		{
+			return this;
+		}
+
+		return new TreeLayoutEngine(
+			newEngine,
+			newEngine._root,
+			newEngine._windows,
+			newEngine._minimizedWindows.Add(window)
+		);
+	}
+
+	/// <inheritdoc />
+	public ILayoutEngine MinimizeWindowEnd(IWindow window)
+	{
+		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
+
+		if (_windows.ContainsKey(window))
+		{
+			Logger.Debug($"Window {window} is already in layout engine {Name}");
+			return this;
+		}
+
+		TreeLayoutEngine newEngine = (TreeLayoutEngine)RemoveWindow(window);
+		return newEngine.AddWindow(window);
 	}
 
 	/// <inheritdoc />

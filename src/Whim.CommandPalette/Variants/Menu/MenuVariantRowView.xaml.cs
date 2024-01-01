@@ -39,7 +39,7 @@ internal sealed partial class MenuVariantRowView
 
 	private void SetKeybinds()
 	{
-		Logger.Debug("Setting keybinds");
+		Logger.Verbose("Setting keybinds");
 
 		if (ViewModel.Model.Data.Keybind is not null)
 		{

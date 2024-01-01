@@ -574,7 +574,15 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 
 		_windowWorkspaceMap[window] = workspace;
 
-		workspace.AddWindow(window);
+		if (window.IsMinimized)
+		{
+			workspace.MinimizeWindowStart(window);
+		}
+		else
+		{
+			workspace.AddWindow(window);
+		}
+
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
@@ -631,11 +639,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-
 			return;
 		}
 
-		((IInternalWorkspace)workspace).WindowMinimizeStart(window);
+		workspace.MinimizeWindowStart(window);
 	}
 
 	public void WindowMinimizeEnd(IWindow window)
@@ -645,11 +652,10 @@ internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 		if (!_windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-
 			return;
 		}
 
-		((IInternalWorkspace)workspace).WindowMinimizeEnd(window);
+		workspace.MinimizeWindowEnd(window);
 	}
 	#endregion
 

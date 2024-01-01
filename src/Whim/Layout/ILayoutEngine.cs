@@ -62,6 +62,28 @@ public interface ILayoutEngine
 	ILayoutEngine RemoveWindow(IWindow window);
 
 	/// <summary>
+	/// Called when a window is being minimized - i.e., the window size will become
+	/// <see cref="WindowSize.Minimized"/>.
+	///
+	/// The layout engine can choose to ignore this call, if it does not support minimizing
+	/// windows.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	ILayoutEngine MinimizeWindowStart(IWindow window);
+
+	/// <summary>
+	/// Called when a window is being unminimized - i.e., the window size will no longer be
+	/// <see cref="WindowSize.Minimized"/>.
+	///
+	/// The layout engine can choose to ignore this call, if it does not support unminimizing
+	/// windows.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	ILayoutEngine MinimizeWindowEnd(IWindow window);
+
+	/// <summary>
 	/// Determines whether the layout engine contains the <paramref name="window"/>.
 	/// </summary>
 	/// <param name="window"></param>

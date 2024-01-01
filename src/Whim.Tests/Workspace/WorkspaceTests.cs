@@ -263,7 +263,7 @@ public class WorkspaceTests
 		// Given
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		workspace.AddWindow(window);
-		workspace.WindowMinimizeStart(window);
+		workspace.MinimizeWindowStart(window);
 
 		// When
 		bool result = workspace.ContainsWindow(window);
@@ -535,46 +535,25 @@ public class WorkspaceTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
 		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When AddWindow is called
 		workspace.AddWindow(window);
 
 		// Then the window is added to the layout engine
-		layoutEngine.Received(1).AddWindow(window);
+		layoutEngine1.Received(1).AddWindow(window);
+		layoutEngine2.Received(1).AddWindow(window);
+
 		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 		window.Received(1).Focus();
-		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void AddWindow_Success_WindowWasMinimized(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given the window has already been added but was since minimized
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		workspace.AddWindow(window);
-		workspace.WindowMinimizeStart(window);
-		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-
-		// When AddWindow is called
-		workspace.AddWindow(window);
-
-		// Then the window is added to the layout engine
-		layoutEngine.Received(1).AddWindow(window);
-		ctx.WorkspaceManager.Received(3).GetMonitorForWorkspace(workspace);
-		window.Received(2).Focus();
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
 
@@ -637,12 +616,16 @@ public class WorkspaceTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
 		// Given only one window is in the workspace
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		layoutEngine2.AddWindow(window).Returns(layoutEngine2);
+
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		workspace.AddWindow(window);
 		workspace.WindowFocused(window);
 
@@ -656,6 +639,8 @@ public class WorkspaceTests
 		// Then the window is removed from the layout engine, and LastFocusedWindow is set to null
 		Assert.True(result);
 		givenEngine.Received(1).RemoveWindow(window);
+		layoutEngine2.Received(1).RemoveWindow(window);
+
 		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 		Assert.Null(workspace.LastFocusedWindow);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
@@ -691,35 +676,6 @@ public class WorkspaceTests
 		Assert.Equal(window2, workspace.LastFocusedWindow);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void RemoveWindow_MinimizedWindow(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given
-		window.IsMinimized.Returns(true);
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		workspace.AddWindow(window);
-		workspace.WindowMinimizeStart(window);
-
-		ctx.WorkspaceManager.ClearReceivedCalls();
-		internalCtx.CoreNativeManager.ClearReceivedCalls();
-		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-
-		// When RemoveWindow is called
-		bool result = workspace.RemoveWindow(window);
-
-		// Then the window is not removed from the layout engine
-		Assert.True(result);
-		layoutEngine.DidNotReceive().RemoveWindow(window);
-		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
-		Assert.Same(givenEngine, workspace.ActiveLayoutEngine);
-	}
 	#endregion
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -733,29 +689,6 @@ public class WorkspaceTests
 	{
 		// Given
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
-
-		// When FocusWindowInDirection is called
-		workspace.FocusWindowInDirection(Direction.Up, window);
-
-		// Then the layout engine is not told to focus the window
-		layoutEngine.DidNotReceive().FocusWindowInDirection(Direction.Up, window);
-		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void FocusWindowInDirection_Fails_WindowIsMinimized(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		workspace.AddWindow(window);
-		workspace.WindowMinimizeStart(window);
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When FocusWindowInDirection is called
@@ -945,37 +878,6 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void MoveWindowToPoint_Success_WindowIsMinimized(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.3 };
-
-		workspace.AddWindow(window);
-		workspace.WindowMinimizeStart(window);
-
-		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-		window.ClearReceivedCalls();
-
-		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
-
-		// When MoveWindowToPoint is called
-		workspace.MoveWindowToPoint(window, point);
-
-		// Then the layout engine is told to move the window
-		givenEngine.Received(1).MoveWindowToPoint(window, point);
-		givenEngine.DidNotReceive().RemoveWindow(window);
-		window.Received(1).Focus();
-		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void MoveWindowToPoint_Success_WindowAlreadyExists(
 		IContext ctx,
 		IInternalContext internalCtx,
@@ -1089,19 +991,34 @@ public class WorkspaceTests
 	)
 	{
 		// Given
+		Rectangle<int> minimizedRectangle = new();
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+
+		layoutEngine.AddWindow(window).Returns(layoutEngine);
+		layoutEngine.MinimizeWindowStart(window).Returns(layoutEngine);
+
+		layoutEngine
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
+			.Returns(
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Rectangle = minimizedRectangle,
+						Window = window,
+						WindowSize = WindowSize.Minimized
+					}
+				}
+			);
 
 		// When
 		workspace.AddWindow(window);
-		workspace.WindowMinimizeStart(window);
+		workspace.MinimizeWindowStart(window);
 		IWindowState windowState = workspace.TryGetWindowState(window)!;
 
 		// Then
 		Assert.Equal(window, windowState.Window);
-		Assert.Equal(0, windowState.Rectangle.X);
-		Assert.Equal(0, windowState.Rectangle.Y);
-		Assert.Equal(0, windowState.Rectangle.Width);
-		Assert.Equal(0, windowState.Rectangle.Height);
+		Assert.Equal(new Rectangle<int>(), windowState.Rectangle);
 		Assert.Equal(WindowSize.Minimized, windowState.WindowSize);
 	}
 
@@ -1128,99 +1045,84 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void WindowMinimizeStart(
+	internal void MinimizeWindowStart_ContainsWindow(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
-		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		// Given the workspace doesn't contain the window
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		workspace.AddWindow(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
-		// When WindowMinimizeStart is called
-		workspace.WindowMinimizeStart(window);
+		// When MinimizeWindowStart is called
+		workspace.MinimizeWindowStart(window);
 
 		// Then
-		givenEngine.Received(1).RemoveWindow(window);
+		givenEngine.Received(1).MinimizeWindowStart(window);
+		layoutEngine2.DidNotReceive().MinimizeWindowStart(window);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void WindowMinimizeStart_Twice(
+	internal void MinimizeWindowStart_DoesNotContainWindow(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
 		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		workspace.AddWindow(window);
+		layoutEngine2.AddWindow(window).Returns(layoutEngine2);
 
-		workspace.ActiveLayoutEngine.RemoveWindow(window).Returns(workspace.ActiveLayoutEngine);
-
-		// When WindowMinimizeStart is called
-		workspace.WindowMinimizeStart(window);
-		workspace.WindowMinimizeStart(window);
-
-		// Then the window is only removed the first time
-		workspace.ActiveLayoutEngine.Received(1).RemoveWindow(window);
-	}
-
-	#region WindowMinimizeEnd
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void WindowMinimizeEnd(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		workspace.AddWindow(window);
-		workspace.WindowMinimizeStart(window);
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
-		// When WindowMinimizeEnd is called
-		workspace.WindowMinimizeEnd(window);
+		// When MinimizeWindowStart is called
+		workspace.MinimizeWindowStart(window);
 
 		// Then
-		givenEngine.Received(1).AddWindow(window);
+		givenEngine.Received(1).MinimizeWindowStart(window);
+		layoutEngine2.Received(1).MinimizeWindowStart(window);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void WindowMinimizeEnd_NotMinimized(
+	internal void MinimizeWindowEnd(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
 		IWindow window
 	)
 	{
 		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
 		workspace.AddWindow(window);
+		workspace.MinimizeWindowStart(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
-		// When WindowMinimizeEnd is called
-		workspace.WindowMinimizeEnd(window);
+		// When MinimizeWindowEnd is called
+		workspace.MinimizeWindowEnd(window);
 
 		// Then
-		givenEngine.DidNotReceive().AddWindow(window);
-		Assert.Same(givenEngine, workspace.ActiveLayoutEngine);
+		givenEngine.Received(1).MinimizeWindowEnd(window);
+		layoutEngine2.DidNotReceive().MinimizeWindowEnd(window);
+		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
-	#endregion
 
 	#region PerformCustomLayoutEngineAction
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]

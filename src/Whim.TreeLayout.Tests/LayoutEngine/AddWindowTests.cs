@@ -416,4 +416,46 @@ public class AddWindowTests
 				}
 			);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void AddWindow_WindowWasMinimized(IWindow window)
+	{
+		// Given a window has been added
+		LayoutEngineWrapper wrapper = new();
+
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
+			window
+		);
+
+		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
+
+		// When the window has been minimized
+		ILayoutEngine result = engine.MinimizeWindowStart(window).AddWindow(window);
+		IWindowState[] windowStates = result.DoLayout(rect, wrapper.Monitor).ToArray();
+
+		// Then the window is minimized, and a new layout engine is created
+		Assert.NotSame(engine, result);
+		Assert.True(result.ContainsWindow(window));
+		Assert.Equal(1, result.Count);
+
+		windowStates
+			.Should()
+			.Equal(
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Window = window,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 0,
+							Y = 0,
+							Width = 100,
+							Height = 100
+						},
+						WindowSize = WindowSize.Normal
+					}
+				}
+			);
+	}
 }
