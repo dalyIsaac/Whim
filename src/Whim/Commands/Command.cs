@@ -27,6 +27,9 @@ public class Command : ICommand
 	/// <param name="condition">
 	/// A condition to determine if the command should be visible, or able to be
 	/// executed.
+	///
+	/// When this evaluates to false, the <paramref name="callback"/> will not be executed.
+	///
 	/// If this is null, the command will always be accessible.
 	/// </param>
 	public Command(string identifier, string title, Action callback, Func<bool>? condition = null)

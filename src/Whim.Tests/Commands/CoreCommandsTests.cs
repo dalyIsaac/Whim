@@ -437,4 +437,43 @@ public class CoreCommandsTests
 		Assert.Equal(KeyModifiers.LAlt | KeyModifiers.LShift, keybinds[9].Modifiers);
 		Assert.Equal("VK_0", keybinds[9].Key.ToString());
 	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void FocusLayoutToggleMaximized_NotFocusLayoutEngine(IContext ctx, ILayoutEngine layoutEngine)
+	{
+		// Given
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ctx.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine.Returns(layoutEngine);
+
+		ICommand command = testUtils.GetCommand("whim.core.focus_layout.toggle_maximized");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
+			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void FocusLayoutToggleMaximized_FocusLayoutEngine(IContext ctx)
+	{
+		// Given
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		FocusLayoutEngine engine = new(new LayoutEngineIdentity());
+		ctx.WorkspaceManager.ActiveWorkspace.ActiveLayoutEngine.Returns(engine);
+
+		ICommand command = testUtils.GetCommand("whim.core.focus_layout.toggle_maximized");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		ctx.WorkspaceManager.ActiveWorkspace.Received(1)
+			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+	}
 }

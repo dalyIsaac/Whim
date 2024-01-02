@@ -716,8 +716,38 @@ public class WorkspaceTests
 		// When FocusWindowInDirection is called
 		workspace.FocusWindowInDirection(Direction.Up, window);
 
-		// Then the layout engine is told to focus the window
+		// Then the layout engine is told to focus the window, and a layout occurs
 		activeLayoutEngine.Received(1).FocusWindowInDirection(Direction.Up, window);
+		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		activeLayoutEngine.Received(1).DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void FocusWindowInDirection_NoLayoutEngineChange(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2,
+		IWindow window
+	)
+	{
+		// Given the active layout engine does not change when calling FocusWindowInDirection
+		Workspace workspace =
+			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine1, layoutEngine2 });
+		workspace.AddWindow(window);
+
+		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
+		activeLayoutEngine.FocusWindowInDirection(Direction.Up, window).Returns(activeLayoutEngine);
+		activeLayoutEngine.ClearReceivedCalls();
+
+		// When FocusWindowInDirection is called
+		workspace.FocusWindowInDirection(Direction.Up, window);
+
+		// Then the layout engine is told to focus the window, and no layout occurs
+		activeLayoutEngine.Received(1).FocusWindowInDirection(Direction.Up, window);
+		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		activeLayoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]

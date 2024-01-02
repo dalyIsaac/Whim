@@ -205,6 +205,38 @@ internal class CoreCommands : PluginCommands
 				callback: FocusMonitorInDirection(getNext: true)
 			)
 			.Add(
+				identifier: "focus_layout.toggle_maximized",
+				title: "Toggle the maximized state for the current FocusLayoutEngine",
+				callback: () =>
+				{
+					IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
+					ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
+
+					if (
+						activeLayoutEngine.GetLayoutEngine<FocusLayoutEngine>()
+						is not FocusLayoutEngine focusLayoutEngine
+					)
+					{
+						return;
+					}
+
+					workspace.PerformCustomLayoutEngineAction(
+						new LayoutEngineCustomAction()
+						{
+							Name = $"{focusLayoutEngine.Name}.toggle_maximized",
+							Window = null
+						}
+					);
+				},
+				condition: () =>
+				{
+					IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
+					ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
+					return activeLayoutEngine.GetLayoutEngine<FocusLayoutEngine>()
+						is FocusLayoutEngine focusLayoutEngine;
+				}
+			)
+			.Add(
 				identifier: "close_current_workspace",
 				title: "Close the current workspace",
 				callback: () => _context.WorkspaceManager.Remove(_context.WorkspaceManager.ActiveWorkspace),

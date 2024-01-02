@@ -6,7 +6,7 @@ using System.Linq;
 namespace Whim;
 
 /// <summary>
-/// Column layout engine with a stack data structure.
+/// Layout engine that lays out windows in columns.
 /// </summary>
 public record ColumnLayoutEngine : ILayoutEngine
 {
