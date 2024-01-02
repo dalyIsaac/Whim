@@ -3,8 +3,30 @@ using System.Collections.Immutable;
 
 namespace Whim;
 
-// TODO: Describe SwapWindowInDirection and FocusWindowInDirection
-// NOTE: This LayoutEngine can have 0 or 1 windows shown
+/// <summary>
+/// A layout engine that displays one window at a time.
+///
+/// <br />
+///
+/// The behaviour <see cref="SwapWindowInDirection(Direction, IWindow)"/> and <see cref="FocusWindowInDirection(Direction, IWindow)"/>
+/// are a bit different to other layout engines:
+///
+/// <list type="bullet">
+/// <item>
+/// <description>
+/// When <see cref="SwapWindowInDirection(Direction, IWindow)"/> is called, the window in the direction of the given window
+/// will be swapped with the given window in the list of windows. This does not change the focused window.
+/// </description>
+/// </item>
+///
+/// <item>
+/// <description>
+/// When <see cref="FocusWindowInDirection(Direction, IWindow)"/> is called, the focused window will be changed to the window
+/// in the direction of the given window. This does not change the order of the windows.
+/// </description>
+/// </item>
+/// </list>
+/// </summary>
 public record FocusLayoutEngine : ILayoutEngine
 {
 	private readonly ImmutableList<IWindow> _list;

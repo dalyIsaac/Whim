@@ -70,6 +70,15 @@ Each plugin needs to be added to the `context` object.
 
 ### Layout Engines
 
+#### `FocusLayoutEngine`
+
+`FocusLayoutEngine` is a layout engine that displays one window at a time:
+
+- Calling `SwapWindowInDirection` will swap the current window with the window in the specified direction.
+- Calling `FocusWindowInDirection` will focus the window in the specified direction.
+
+Windows which are not focused are minimized to the taskbar.
+
 #### `SliceLayoutEngine`
 
 `SliceLayoutEngine` is a layout engine that internally stores an ordered list of `IWindow`s. The monitor is divided into a number of `IArea`s. Each `IArea` corresponds to a "slice" of the `IWindow` list.
