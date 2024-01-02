@@ -4,12 +4,33 @@ using System.Collections.Immutable;
 namespace Whim;
 
 /// <summary>
-/// A layout engine that displays one window at a time.
+/// A layout engine that displays one window at a time. <see cref="FocusLayoutEngine"/> supports showing windows as:
+///
+/// <list type="bullet">
+/// <item>
+/// <description>
+/// <see cref="WindowSize.Normal"/>: The focused window is shown in its normal size.
+/// </description>
+/// </item>
+///
+/// <item>
+/// <description>
+/// <see cref="WindowSize.Maximized"/>: The focused window is shown in its maximized size.
+/// </description>
+/// </item>
+///
+/// <item>
+/// <description>
+/// <see cref="WindowSize.Minimized"/>: The focused window can be hidden. Additionally, all non-focused windows are shown as minimized
+/// (minimized to the taskbar).
+/// </description>
+/// </item>
+/// </list>
 ///
 /// <br />
 ///
-/// The behaviour <see cref="SwapWindowInDirection(Direction, IWindow)"/> and <see cref="FocusWindowInDirection(Direction, IWindow)"/>
-/// are a bit different to other layout engines:
+/// The <see cref="SwapWindowInDirection(Direction, IWindow)"/> and <see cref="FocusWindowInDirection(Direction, IWindow)"/>
+/// behaviour are a bit different to other layout engines:
 ///
 /// <list type="bullet">
 /// <item>
