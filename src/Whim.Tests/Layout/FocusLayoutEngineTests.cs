@@ -318,6 +318,29 @@ public class FocusLayoutEngineTests
 		expected.Should().BeEquivalentTo(windowStates);
 	}
 
+	[Theory, AutoSubstituteData]
+	public void PerformCustomAction_UnknownAction(IWindow window1, IWindow window2)
+	{
+		// Given
+		ILayoutEngine sut = new FocusLayoutEngine(_identity);
+		sut = sut.AddWindow(window1);
+		sut = sut.AddWindow(window2);
+
+		// When
+		ILayoutEngine result = sut.PerformCustomAction(
+			new LayoutEngineCustomAction<IWindow?>()
+			{
+				Name = "Focus.unknown",
+				Window = null,
+				Payload = null
+			}
+		);
+
+		// Then
+		Assert.Same(sut, result);
+		Assert.Equal(2, result.Count);
+	}
+
 	#region SwapWindowInDirection
 	[Theory, AutoSubstituteData]
 	public void SwapWindowInDirection_NoWindows(Direction direction, IWindow window)
