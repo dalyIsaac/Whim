@@ -117,11 +117,25 @@ public record FocusLayoutEngine : ILayoutEngine
 			}
 			else
 			{
+				WindowSize windowSize;
+				if (maximized)
+				{
+					windowSize = WindowSize.Maximized;
+				}
+				else if (_hideFocusedWindow)
+				{
+					windowSize = WindowSize.Minimized;
+				}
+				else
+				{
+					windowSize = WindowSize.Normal;
+				}
+
 				yield return new WindowState()
 				{
 					Window = window,
 					Rectangle = rectangle,
-					WindowSize = maximized ? WindowSize.Maximized : WindowSize.Normal
+					WindowSize = windowSize,
 				};
 			}
 		}
