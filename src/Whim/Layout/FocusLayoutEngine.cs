@@ -25,9 +25,11 @@ public record FocusLayoutEngine : ILayoutEngine
 	/// Creates a new instance of the <see cref="FocusLayoutEngine"/> class.
 	/// </summary>
 	/// <param name="identity">The identity of the layout engine.</param>
-	public FocusLayoutEngine(LayoutEngineIdentity identity)
+	/// <param name="maximized">Whether the focused window should be maximized.</param>
+	public FocusLayoutEngine(LayoutEngineIdentity identity, bool maximized = false)
 	{
 		Identity = identity;
+		_maximized = maximized;
 		_list = ImmutableList<IWindow>.Empty;
 	}
 
