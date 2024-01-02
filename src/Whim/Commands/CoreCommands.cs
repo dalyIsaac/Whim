@@ -206,7 +206,7 @@ internal class CoreCommands : PluginCommands
 			)
 			.Add(
 				identifier: "focus_layout.toggle_maximized",
-				title: "Toggle the maximized state for the FocusLayoutEngine",
+				title: "Toggle the maximized state for the current FocusLayoutEngine",
 				callback: () =>
 				{
 					IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
@@ -233,7 +233,7 @@ internal class CoreCommands : PluginCommands
 					IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
 					ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 					return activeLayoutEngine.GetLayoutEngine<FocusLayoutEngine>()
-						is not FocusLayoutEngine focusLayoutEngine;
+						is FocusLayoutEngine focusLayoutEngine;
 				}
 			)
 			.Add(
