@@ -482,4 +482,82 @@ public class FocusLayoutEngineTests
 			.BeEquivalentTo(windowStates);
 	}
 	#endregion
+
+	#region MinimizeWindowEnd
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_DoesNotContainWindow(IMonitor monitor, IWindow newWindow)
+	{
+		// Given there are two windows in the layout
+		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		ILayoutEngine sut = new FocusLayoutEngine(_identity);
+		sut = sut.AddWindow(windows[0]);
+		sut = sut.AddWindow(windows[1]);
+
+		// When a new window is restored
+		ILayoutEngine result = sut.MinimizeWindowEnd(newWindow);
+		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+
+		// Then the window is added to the layout
+		Assert.NotSame(sut, result);
+		Assert.Equal(3, result.Count);
+		new IWindowState[]
+		{
+			new WindowState()
+			{
+				Window = windows[0],
+				Rectangle = new Rectangle<int>(),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = windows[1],
+				Rectangle = new Rectangle<int>(),
+				WindowSize = WindowSize.Minimized
+			},
+			new WindowState()
+			{
+				Window = newWindow,
+				Rectangle = new Rectangle<int>(),
+				WindowSize = WindowSize.Minimized
+			}
+		}
+			.Should()
+			.BeEquivalentTo(windowStates);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void MinimizeWindowEnd_ExistingWindow(IMonitor monitor)
+	{
+		// Given there are two windows in the layout
+		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		ILayoutEngine sut = new FocusLayoutEngine(_identity);
+		sut = sut.AddWindow(windows[0]);
+		sut = sut.AddWindow(windows[1]);
+
+		// When a new window is restored
+		ILayoutEngine result = sut.MinimizeWindowEnd(windows[0]);
+		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+
+		// Then the window is added to the layout
+		Assert.NotSame(sut, result);
+		Assert.Equal(2, result.Count);
+		new IWindowState[]
+		{
+			new WindowState()
+			{
+				Window = windows[0],
+				Rectangle = new Rectangle<int>(),
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Window = windows[1],
+				Rectangle = new Rectangle<int>(),
+				WindowSize = WindowSize.Minimized
+			}
+		}
+			.Should()
+			.BeEquivalentTo(windowStates);
+	}
+	#endregion
 }
