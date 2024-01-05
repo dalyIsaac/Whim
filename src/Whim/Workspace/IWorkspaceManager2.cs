@@ -1,73 +1,45 @@
-using System;
+using System.Collections.Generic;
 
 namespace Whim;
 
 // TODO: Order
-public interface IWorkspaceManager2 : IDisposable
+/// <summary>
+/// Container responsible for mapping <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s and
+/// <see cref="IWindow"/>s.
+///
+/// It is responsible for the creation and destruction of <see cref="IWorkspace"/>s.
+/// </summary>
+public interface IWorkspaceManager2 : IEnumerable<IWorkspace>
 {
-	/// <summary>
-	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
-	/// </summary>
-	event EventHandler<RouteEventArgs>? WindowRouted;
-
-	/// <summary>
-	/// Event for when a workspace is added.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
-
-	/// <summary>
-	/// Event for when a workspace is removed.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
-
-	/// <summary>
-	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
-
-	/// <summary>
-	/// Event for when <see cref="IWorkspace.DoLayout"/> has completed.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
-
-	/// <summary>
-	/// Event for when a monitor's workspace has changed.
-	/// </summary>
-	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
-	/// <summary>
-	/// Event for when a workspace's active layout engine has changed.
-	/// </summary>
-	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
-
-	/// <summary>
-	/// Event for when a workspace is renamed.
-	/// </summary>
-	event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
-
-	IWorkspace ActiveWorkspace { get; }
-
-	IWorkspaceContainer WorkspaceContainer { get; }
-
 	void Initialize();
 
-	void Activate(IWorkspace workspace, IMonitor? monitor = null);
+	IWorkspace? this[string workspaceName] { get; }
 
-	void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false);
+	IWorkspace? TryGet(string workspaceName);
 
-	void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false);
+	IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
 
-	void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false);
+	bool Remove(IWorkspace workspace);
 
-	void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null);
+	bool Remove(string workspaceName);
 
-	void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null);
+	bool Contains(IWorkspace workspace);
 
-	void MoveWindowToPreviousMonitor(IWindow? window = null);
+	bool RemoveWorkspace(IWorkspace workspace);
 
-	void MoveWindowToNextMonitor(IWindow? window = null);
+	bool RemoveWindow(IWindow window);
 
-	void MoveWindowToPoint(IWindow window, IPoint<int> point);
+	bool RemoveMonitor(IMonitor monitor);
 
-	bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null);
+	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
+
+	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
+
+	void SetWorkspaceMonitor(IWorkspace workspace, IMonitor monitor);
+
+	void SetWindowWorkspace(IWindow window, IWorkspace workspace);
+
+	IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive);
+
+	IWorkspace? GetWorkspaceForWindow(IWindow window);
 }

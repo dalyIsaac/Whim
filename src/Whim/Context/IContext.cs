@@ -44,6 +44,8 @@ public interface IContext
 	/// </summary>
 	IResourceManager ResourceManager { get; }
 
+	IButler Butler { get; }
+
 	/// <summary>
 	/// Whim's <see cref="IWorkspaceManager"/> instances.
 	/// </summary>

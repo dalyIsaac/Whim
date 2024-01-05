@@ -21,7 +21,7 @@ internal class WindowManagerCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
-		IWorkspaceManager workspaceManager = Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>();
+		IWorkspaceManager workspaceManager = Substitute.For<IWorkspaceManager, IInternalButler>();
 		IMonitorManager monitorManager = Substitute.For<IMonitorManager, IInternalMonitorManager>();
 
 		IContext context = fixture.Freeze<IContext>();
@@ -29,7 +29,7 @@ internal class WindowManagerCustomization : ICustomization
 		context.MonitorManager.Returns(monitorManager);
 
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-		internalCtx.WorkspaceManager.Returns((IInternalWorkspaceManager)workspaceManager);
+		internalCtx.WorkspaceManager.Returns((IInternalButler)workspaceManager);
 		internalCtx.MonitorManager.Returns((IInternalMonitorManager)monitorManager);
 	}
 }
@@ -633,7 +633,7 @@ public class WindowManagerTests
 	{
 		// Given
 		IContext ctx = Substitute.For<IContext>();
-		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>());
+		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager, IInternalButler>());
 		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
 		IInternalContext internalCtx = Substitute.For<IInternalContext>();
 		IWorkspace workspace = Substitute.For<IWorkspace>();
@@ -1297,7 +1297,7 @@ public class WindowManagerTests
 	{
 		// Given
 		IContext ctx = Substitute.For<IContext>();
-		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>());
+		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager, IInternalButler>());
 		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
 		IInternalContext internalCtx = Substitute.For<IInternalContext>();
 		IWorkspace workspace = Substitute.For<IWorkspace>();
@@ -1411,10 +1411,10 @@ public class WindowManagerTests
 
 		// Then
 		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
-		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.Received(1).WindowAdded(Arg.Any<IWindow>());
-		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowRemoved(Arg.Any<IWindow>());
-		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowMinimizeStart(Arg.Any<IWindow>());
-		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowMinimizeEnd(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalButler)!.Received(1).WindowAdded(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalButler)!.DidNotReceive().WindowRemoved(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalButler)!.DidNotReceive().WindowMinimizeStart(Arg.Any<IWindow>());
+		(ctx.WorkspaceManager as IInternalButler)!.DidNotReceive().WindowMinimizeEnd(Arg.Any<IWindow>());
 		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 		ctx.WorkspaceManager.DidNotReceive()
 			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<int>>(), Arg.Any<IWindow>());

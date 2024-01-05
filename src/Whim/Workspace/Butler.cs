@@ -5,14 +5,12 @@ using Windows.Win32.Foundation;
 namespace Whim;
 
 // TODO: Order
-internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspaceManager
+internal partial class Butler : IButler, IInternalButler
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
 	public IWorkspace ActiveWorkspace { get; }
-
-	public IWorkspaceContainer WorkspaceContainer { get; }
 
 	// TODO: Constructor
 
@@ -39,7 +37,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 	{
 		Logger.Debug("Initializing workspace manager...");
 
-		WorkspaceContainer.Initialize();
+		_context.WorkspaceManager2.Initialize();
 
 		// TODO: Replace
 		// _context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
@@ -62,7 +60,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 			SavedWorkspace savedWorkspace in _internalContext.CoreSavedStateManager.SavedState?.Workspaces ?? new()
 		)
 		{
-			IWorkspace? workspace = WorkspaceContainer.TryGet(savedWorkspace.Name);
+			IWorkspace? workspace = _context.WorkspaceManager2.TryGet(savedWorkspace.Name);
 			if (workspace == null)
 			{
 				Logger.Debug($"Could not find workspace {savedWorkspace.Name}");
@@ -79,7 +77,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 					continue;
 				}
 
-				WorkspaceContainer.SetWindowWorkspace(window, workspace);
+				_context.WorkspaceManager2.SetWindowWorkspace(window, workspace);
 				workspace.MoveWindowToPoint(window, savedWindow.Rectangle.Center);
 				processedWindows.Add(hwnd);
 
@@ -111,7 +109,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
 	{
-		if (!WorkspaceContainer.Contains(workspace))
+		if (!_context.WorkspaceManager2.Contains(workspace))
 		{
 			Logger.Error($"Workspace {workspace} is not in the workspace container.");
 			return;
@@ -122,20 +120,20 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		Logger.Debug($"Activating workspace {workspace} on monitor {monitor}");
 
 		// Get the old workspace for the monitor.
-		IWorkspace? oldWorkspace = WorkspaceContainer.GetWorkspaceForMonitor(monitor);
+		IWorkspace? oldWorkspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
 
 		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = WorkspaceContainer.GetMonitorForWorkspace(workspace);
+		IMonitor? loserMonitor = _context.WorkspaceManager2.GetMonitorForWorkspace(workspace);
 
 		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
-		WorkspaceContainer.SetWorkspaceMonitor(workspace, monitor);
+		_context.WorkspaceManager2.SetWorkspaceMonitor(workspace, monitor);
 
 		(IWorkspace workspace, IMonitor monitor)? layoutOldWorkspace = null;
 		if (loserMonitor != null && oldWorkspace != null && !loserMonitor.Equals(monitor))
 		{
-			WorkspaceContainer.SetWorkspaceMonitor(oldWorkspace, loserMonitor);
+			_context.WorkspaceManager2.SetWorkspaceMonitor(oldWorkspace, loserMonitor);
 			layoutOldWorkspace = (oldWorkspace, loserMonitor);
 		}
 
@@ -177,14 +175,14 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 	{
 		monitor ??= _context.MonitorManager.PrimaryMonitor;
 
-		IWorkspace? workspace = WorkspaceContainer.GetWorkspaceForMonitor(monitor);
+		IWorkspace? workspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
 		if (workspace == null)
 		{
 			Logger.Error($"No workspace found for monitor {monitor}");
 			return;
 		}
 
-		IWorkspace? adjacentWorkspace = WorkspaceContainer.GetAdjacentWorkspace(workspace, reverse, skipActive);
+		IWorkspace? adjacentWorkspace = _context.WorkspaceManager2.GetAdjacentWorkspace(workspace, reverse, skipActive);
 		if (adjacentWorkspace == null)
 		{
 			Logger.Error($"No adjacent workspace found for workspace {workspace}");
@@ -199,7 +197,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		Logger.Debug("Layout all active workspaces");
 
 		// For each workspace which is active in a monitor, do a layout.
-		foreach (IWorkspace workspace in WorkspaceContainer)
+		foreach (IWorkspace workspace in _context.WorkspaceManager2)
 		{
 			workspace.DoLayout();
 		}
@@ -215,14 +213,14 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Find the current workspace for the window.
-		if (WorkspaceContainer.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
+		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
 		{
 			Logger.Error($"No workspace found for window {window}");
 			return;
 		}
 
 		if (
-			WorkspaceContainer.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive)
+			_context.WorkspaceManager2.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive)
 			is not IWorkspace nextWorkspace
 		)
 		{
@@ -231,7 +229,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Move the window to the next workspace.
-		WorkspaceContainer.SetWindowWorkspace(window, nextWorkspace);
+		_context.WorkspaceManager2.SetWindowWorkspace(window, nextWorkspace);
 		currentWorkspace.RemoveWindow(window);
 		nextWorkspace.AddWindow(window);
 	}
@@ -240,7 +238,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 	{
 		workspace ??= _context.WorkspaceManager2.ActiveWorkspace;
 
-		IMonitor? monitor = WorkspaceContainer.GetMonitorForWorkspace(workspace);
+		IMonitor? monitor = _context.WorkspaceManager2.GetMonitorForWorkspace(workspace);
 		if (monitor == null)
 		{
 			Logger.Error($"No monitor found for workspace {workspace}");
@@ -257,7 +255,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Get workspace on next monitor.
-		IWorkspace? nextWorkspace = WorkspaceContainer.GetWorkspaceForMonitor(adjacentMonitor);
+		IWorkspace? nextWorkspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(adjacentMonitor);
 		if (nextWorkspace == null)
 		{
 			Logger.Error($"Monitor {adjacentMonitor} was not found to correspond to any workspace");
@@ -277,14 +275,14 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Find the current workspace for the window.
-		if (WorkspaceContainer.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
+		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
 		{
 			Logger.Error($"No workspace found for window {window}");
 			return;
 		}
 
 		// Move the window to the next workspace.
-		WorkspaceContainer.SetWindowWorkspace(window, workspace);
+		_context.WorkspaceManager2.SetWindowWorkspace(window, workspace);
 		currentWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
 	}
@@ -299,14 +297,14 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Find the current workspace for the window.
-		if (WorkspaceContainer.GetWorkspaceForWindow(window) is not IWorkspace oldWorkspace)
+		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace oldWorkspace)
 		{
 			Logger.Error($"No workspace found for window {window}");
 			return;
 		}
 
 		// Get the workspace for the monitor.
-		IWorkspace? targetWorkspace = WorkspaceContainer.GetWorkspaceForMonitor(monitor);
+		IWorkspace? targetWorkspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
 		if (targetWorkspace == null)
 		{
 			Logger.Error($"No workspace found for monitor {monitor}");
@@ -314,7 +312,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Move the window to the next workspace.
-		WorkspaceContainer.SetWindowWorkspace(window, targetWorkspace);
+		_context.WorkspaceManager2.SetWindowWorkspace(window, targetWorkspace);
 		oldWorkspace.RemoveWindow(window);
 		targetWorkspace.AddWindow(window);
 	}
@@ -349,7 +347,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);
 
 		// Get the target workspace.
-		IWorkspace? targetWorkspace = WorkspaceContainer.GetWorkspaceForMonitor(targetMonitor);
+		IWorkspace? targetWorkspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(targetMonitor);
 		if (targetWorkspace == null)
 		{
 			Logger.Error($"Monitor {targetMonitor} was not found to correspond to any workspace");
@@ -358,7 +356,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Get the old workspace.
-		IWorkspace? oldWorkspace = WorkspaceContainer.GetWorkspaceForWindow(window);
+		IWorkspace? oldWorkspace = _context.WorkspaceManager2.GetWorkspaceForWindow(window);
 		if (oldWorkspace == null)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
@@ -369,7 +367,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		bool isSameWorkspace = targetWorkspace.Equals(oldWorkspace);
 		if (!isSameWorkspace)
 		{
-			WorkspaceContainer.SetWindowWorkspace(window, targetWorkspace);
+			_context.WorkspaceManager2.SetWindowWorkspace(window, targetWorkspace);
 		}
 
 		// Normalize `point` into the unit square.
@@ -404,7 +402,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		Logger.Debug("Moving window {window} in direction {edges} by {pixelsDeltas}");
 
 		// Get the containing workspace.
-		IWorkspace? workspace = WorkspaceContainer.GetWorkspaceForWindow(window);
+		IWorkspace? workspace = _context.WorkspaceManager2.GetWorkspaceForWindow(window);
 		if (workspace == null)
 		{
 			Logger.Error($"Could not find workspace for window {window}");
@@ -412,7 +410,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Get the containing monitor.
-		IMonitor? monitor = WorkspaceContainer.GetMonitorForWorkspace(workspace);
+		IMonitor? monitor = _context.WorkspaceManager2.GetMonitorForWorkspace(workspace);
 		if (monitor == null)
 		{
 			Logger.Error($"Could not find monitor for workspace {workspace}");

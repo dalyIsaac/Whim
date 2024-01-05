@@ -1,6 +1,6 @@
 namespace Whim;
 
-internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspaceManager
+internal partial class Butler : IButler, IInternalButler
 {
 	// TODO: Rename methods to start with WindowManager_
 	public void WindowAdded(IWindow window)
@@ -15,7 +15,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		else if (_context.RouterManager.RouterOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
 			workspace = _internalContext.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
-				? WorkspaceContainer.GetWorkspaceForMonitor(lastWhimActiveMonitor)
+				? _context.WorkspaceManager2.GetWorkspaceForMonitor(lastWhimActiveMonitor)
 				: ActiveWorkspace;
 		}
 
@@ -26,7 +26,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		// Check the workspace exists. If it doesn't, clear the workspace.
-		if (workspace != null && !WorkspaceContainer.Contains(workspace))
+		if (workspace != null && !_context.WorkspaceManager2.Contains(workspace))
 		{
 			Logger.Error($"Workspace {workspace} was not found");
 			workspace = null;
@@ -38,14 +38,14 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(window.Rectangle.Center);
 			if (monitor is not null)
 			{
-				workspace = WorkspaceContainer.GetWorkspaceForMonitor(monitor);
+				workspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
 			}
 		}
 
 		// If that fails too, route the window to the active workspace.
 		workspace ??= ActiveWorkspace;
 
-		WorkspaceContainer.SetWindowWorkspace(window, workspace);
+		_context.WorkspaceManager2.SetWindowWorkspace(window, workspace);
 
 		if (window.IsMinimized)
 		{
@@ -64,14 +64,14 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 	{
 		Logger.Debug($"Window removed: {window}");
 
-		if (WorkspaceContainer.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 
 			return;
 		}
 
-		WorkspaceContainer.RemoveWindow(window);
+		_context.WorkspaceManager2.RemoveWindow(window);
 
 		workspace.RemoveWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
@@ -81,7 +81,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 	{
 		Logger.Debug($"Window focused: {window}");
 
-		foreach (IWorkspace workspace in WorkspaceContainer)
+		foreach (IWorkspace workspace in _context.WorkspaceManager2)
 		{
 			((IInternalWorkspace)workspace).WindowFocused(window);
 		}
@@ -91,13 +91,13 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 			return;
 		}
 
-		if (WorkspaceContainer.GetWorkspaceForWindow(window) is not IWorkspace workspaceForWindow)
+		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspaceForWindow)
 		{
 			Logger.Debug($"Window {window} was not found in any workspace");
 			return;
 		}
 
-		if (WorkspaceContainer.GetMonitorForWorkspace(workspaceForWindow) is null)
+		if (_context.WorkspaceManager2.GetMonitorForWorkspace(workspaceForWindow) is null)
 		{
 			Logger.Debug($"Window {window} is not in an active workspace");
 			Activate(workspaceForWindow);
@@ -109,7 +109,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 	{
 		Logger.Debug($"Window minimize start: {window}");
 
-		if (WorkspaceContainer.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 			return;
@@ -122,7 +122,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 	{
 		Logger.Debug($"Window minimize end: {window}");
 
-		if (WorkspaceContainer.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 			return;
@@ -138,8 +138,8 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		// If a monitor was removed, remove the workspace from the map.
 		foreach (IMonitor monitor in e.RemovedMonitors)
 		{
-			IWorkspace? workspace = WorkspaceContainer.GetWorkspaceForMonitor(monitor);
-			WorkspaceContainer.RemoveMonitor(monitor);
+			IWorkspace? workspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
+			_context.WorkspaceManager2.RemoveMonitor(monitor);
 
 			if (workspace is null)
 			{
@@ -154,12 +154,12 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		foreach (IMonitor monitor in e.AddedMonitors)
 		{
 			// Try find a workspace which doesn't have a monitor.
-			IWorkspace? workspace = WorkspaceContainer.Find(w => GetMonitorForWorkspace(w) == null);
+			IWorkspace? workspace = _context.WorkspaceManager2.Find(w => GetMonitorForWorkspace(w) == null);
 
 			// If there's no workspace, create one.
 			if (workspace is null)
 			{
-				if (WorkspaceContainer.Add() is IWorkspace newWorkspace)
+				if (_context.WorkspaceManager2.Add() is IWorkspace newWorkspace)
 				{
 					workspace = newWorkspace;
 					WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
