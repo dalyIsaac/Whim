@@ -9,6 +9,7 @@ internal partial class Butler : IButler
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
+	private IButlerPantry _pantry;
 	private bool _disposedValue;
 
 	public Butler(IContext context, IInternalContext internalContext)
@@ -70,7 +71,7 @@ internal partial class Butler : IButler
 					continue;
 				}
 
-				_context.WorkspaceManager2.SetWindowWorkspace(window, workspace);
+				_pantry.SetWindowWorkspace(window, workspace);
 				workspace.MoveWindowToPoint(window, savedWindow.Rectangle.Center);
 				processedWindows.Add(hwnd);
 
@@ -113,20 +114,20 @@ internal partial class Butler : IButler
 		Logger.Debug($"Activating workspace {workspace} on monitor {monitor}");
 
 		// Get the old workspace for the monitor.
-		IWorkspace? oldWorkspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
+		IWorkspace? oldWorkspace = _pantry.GetWorkspaceForMonitor(monitor);
 
 		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = _context.WorkspaceManager2.GetMonitorForWorkspace(workspace);
+		IMonitor? loserMonitor = _pantry.GetMonitorForWorkspace(workspace);
 
 		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
-		_context.WorkspaceManager2.SetWorkspaceMonitor(workspace, monitor);
+		_pantry.SetMonitorWorkspace(monitor, workspace);
 
 		(IWorkspace workspace, IMonitor monitor)? layoutOldWorkspace = null;
 		if (loserMonitor != null && oldWorkspace != null && !loserMonitor.Equals(monitor))
 		{
-			_context.WorkspaceManager2.SetWorkspaceMonitor(oldWorkspace, loserMonitor);
+			_pantry.SetMonitorWorkspace(loserMonitor, oldWorkspace);
 			layoutOldWorkspace = (oldWorkspace, loserMonitor);
 		}
 
@@ -168,7 +169,7 @@ internal partial class Butler : IButler
 	{
 		monitor ??= _context.MonitorManager.PrimaryMonitor;
 
-		IWorkspace? workspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
+		IWorkspace? workspace = _pantry.GetWorkspaceForMonitor(monitor);
 		if (workspace == null)
 		{
 			Logger.Error($"No workspace found for monitor {monitor}");
@@ -206,7 +207,7 @@ internal partial class Butler : IButler
 		}
 
 		// Find the current workspace for the window.
-		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
+		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
 		{
 			Logger.Error($"No workspace found for window {window}");
 			return;
@@ -222,7 +223,7 @@ internal partial class Butler : IButler
 		}
 
 		// Move the window to the next workspace.
-		_context.WorkspaceManager2.SetWindowWorkspace(window, nextWorkspace);
+		_pantry.SetWindowWorkspace(window, nextWorkspace);
 		currentWorkspace.RemoveWindow(window);
 		nextWorkspace.AddWindow(window);
 	}
@@ -231,7 +232,7 @@ internal partial class Butler : IButler
 	{
 		workspace ??= _context.WorkspaceManager2.ActiveWorkspace;
 
-		IMonitor? monitor = _context.WorkspaceManager2.GetMonitorForWorkspace(workspace);
+		IMonitor? monitor = _pantry.GetMonitorForWorkspace(workspace);
 		if (monitor == null)
 		{
 			Logger.Error($"No monitor found for workspace {workspace}");
@@ -248,7 +249,7 @@ internal partial class Butler : IButler
 		}
 
 		// Get workspace on next monitor.
-		IWorkspace? nextWorkspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(adjacentMonitor);
+		IWorkspace? nextWorkspace = _pantry.GetWorkspaceForMonitor(adjacentMonitor);
 		if (nextWorkspace == null)
 		{
 			Logger.Error($"Monitor {adjacentMonitor} was not found to correspond to any workspace");
@@ -268,14 +269,14 @@ internal partial class Butler : IButler
 		}
 
 		// Find the current workspace for the window.
-		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
+		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
 		{
 			Logger.Error($"No workspace found for window {window}");
 			return;
 		}
 
 		// Move the window to the next workspace.
-		_context.WorkspaceManager2.SetWindowWorkspace(window, workspace);
+		_pantry.SetWindowWorkspace(window, workspace);
 		currentWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
 	}
@@ -290,14 +291,14 @@ internal partial class Butler : IButler
 		}
 
 		// Find the current workspace for the window.
-		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace oldWorkspace)
+		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace oldWorkspace)
 		{
 			Logger.Error($"No workspace found for window {window}");
 			return;
 		}
 
 		// Get the workspace for the monitor.
-		IWorkspace? targetWorkspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
+		IWorkspace? targetWorkspace = _pantry.GetWorkspaceForMonitor(monitor);
 		if (targetWorkspace == null)
 		{
 			Logger.Error($"No workspace found for monitor {monitor}");
@@ -305,7 +306,7 @@ internal partial class Butler : IButler
 		}
 
 		// Move the window to the next workspace.
-		_context.WorkspaceManager2.SetWindowWorkspace(window, targetWorkspace);
+		_pantry.SetWindowWorkspace(window, targetWorkspace);
 		oldWorkspace.RemoveWindow(window);
 		targetWorkspace.AddWindow(window);
 	}
@@ -340,7 +341,7 @@ internal partial class Butler : IButler
 		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);
 
 		// Get the target workspace.
-		IWorkspace? targetWorkspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(targetMonitor);
+		IWorkspace? targetWorkspace = _pantry.GetWorkspaceForMonitor(targetMonitor);
 		if (targetWorkspace == null)
 		{
 			Logger.Error($"Monitor {targetMonitor} was not found to correspond to any workspace");
@@ -349,7 +350,7 @@ internal partial class Butler : IButler
 		}
 
 		// Get the old workspace.
-		IWorkspace? oldWorkspace = _context.WorkspaceManager2.GetWorkspaceForWindow(window);
+		IWorkspace? oldWorkspace = _pantry.GetWorkspaceForWindow(window);
 		if (oldWorkspace == null)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
@@ -360,7 +361,7 @@ internal partial class Butler : IButler
 		bool isSameWorkspace = targetWorkspace.Equals(oldWorkspace);
 		if (!isSameWorkspace)
 		{
-			_context.WorkspaceManager2.SetWindowWorkspace(window, targetWorkspace);
+			_pantry.SetWindowWorkspace(window, targetWorkspace);
 		}
 
 		// Normalize `point` into the unit square.
@@ -395,7 +396,7 @@ internal partial class Butler : IButler
 		Logger.Debug("Moving window {window} in direction {edges} by {pixelsDeltas}");
 
 		// Get the containing workspace.
-		IWorkspace? workspace = _context.WorkspaceManager2.GetWorkspaceForWindow(window);
+		IWorkspace? workspace = _pantry.GetWorkspaceForWindow(window);
 		if (workspace == null)
 		{
 			Logger.Error($"Could not find workspace for window {window}");
@@ -403,7 +404,7 @@ internal partial class Butler : IButler
 		}
 
 		// Get the containing monitor.
-		IMonitor? monitor = _context.WorkspaceManager2.GetMonitorForWorkspace(workspace);
+		IMonitor? monitor = _pantry.GetMonitorForWorkspace(workspace);
 		if (monitor == null)
 		{
 			Logger.Error($"Could not find monitor for workspace {workspace}");

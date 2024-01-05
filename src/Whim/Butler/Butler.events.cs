@@ -16,7 +16,7 @@ internal partial class Butler : IButler
 		else if (_context.RouterManager.RouterOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
 			workspace = _internalContext.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
-				? _context.WorkspaceManager2.GetWorkspaceForMonitor(lastWhimActiveMonitor)
+				? _pantry.GetWorkspaceForMonitor(lastWhimActiveMonitor)
 				: _context.WorkspaceManager2.ActiveWorkspace;
 		}
 
@@ -39,14 +39,14 @@ internal partial class Butler : IButler
 			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(window.Rectangle.Center);
 			if (monitor is not null)
 			{
-				workspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
+				workspace = _pantry.GetWorkspaceForMonitor(monitor);
 			}
 		}
 
 		// If that fails too, route the window to the active workspace.
 		workspace ??= _context.WorkspaceManager2.ActiveWorkspace;
 
-		_context.WorkspaceManager2.SetWindowWorkspace(window, workspace);
+		_pantry.SetWindowWorkspace(window, workspace);
 
 		if (window.IsMinimized)
 		{
@@ -66,13 +66,13 @@ internal partial class Butler : IButler
 		IWindow window = args.Window;
 		Logger.Debug($"Window removed: {window}");
 
-		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 			return;
 		}
 
-		_context.WorkspaceManager2.RemoveWindow(window);
+		_pantry.RemoveWindow(window);
 
 		workspace.RemoveWindow(window);
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
@@ -93,13 +93,13 @@ internal partial class Butler : IButler
 			return;
 		}
 
-		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspaceForWindow)
+		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace workspaceForWindow)
 		{
 			Logger.Debug($"Window {window} was not found in any workspace");
 			return;
 		}
 
-		if (_context.WorkspaceManager2.GetMonitorForWorkspace(workspaceForWindow) is null)
+		if (_pantry.GetMonitorForWorkspace(workspaceForWindow) is null)
 		{
 			Logger.Debug($"Window {window} is not in an active workspace");
 			Activate(workspaceForWindow);
@@ -112,7 +112,7 @@ internal partial class Butler : IButler
 		IWindow window = args.Window;
 		Logger.Debug($"Window minimize start: {window}");
 
-		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 			return;
@@ -126,7 +126,7 @@ internal partial class Butler : IButler
 		IWindow window = args.Window;
 		Logger.Debug($"Window minimize end: {window}");
 
-		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 			return;
@@ -142,8 +142,8 @@ internal partial class Butler : IButler
 		// If a monitor was removed, remove the workspace from the map.
 		foreach (IMonitor monitor in e.RemovedMonitors)
 		{
-			IWorkspace? workspace = _context.WorkspaceManager2.GetWorkspaceForMonitor(monitor);
-			_context.WorkspaceManager2.RemoveMonitor(monitor);
+			IWorkspace? workspace = _pantry.GetWorkspaceForMonitor(monitor);
+			_pantry.RemoveMonitor(monitor);
 
 			if (workspace is null)
 			{
