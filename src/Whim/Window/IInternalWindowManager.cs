@@ -31,7 +31,7 @@ internal interface IInternalWindowManager
 	/// Removes the given window from the <see cref="IWindowManager"/>, and fires:
 	///
 	/// <list type="bullet">
-	/// <item><description><see cref="IInternalButler.WindowRemoved(IWindow)" /></description></item>
+	/// <item><description><see cref="IInternalWorkspaceManager.WindowRemoved(IWindow)" /></description></item>
 	/// <item><description><see cref="IWindowManager.WindowRemoved"/></description></item>
 	/// </list>
 	/// </summary>

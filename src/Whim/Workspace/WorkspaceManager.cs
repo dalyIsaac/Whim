@@ -22,7 +22,7 @@ internal record WorkspaceToCreate(string Name, IEnumerable<CreateLeafLayoutEngin
 /// <summary>
 /// Implementation of <see cref="IWorkspaceManager"/>.
 /// </summary>
-internal class WorkspaceManager : IInternalButler, IWorkspaceManager
+internal class WorkspaceManager : IInternalWorkspaceManager, IWorkspaceManager
 {
 	private bool _initialized;
 

@@ -1,7 +1,6 @@
 namespace Whim;
 
-// TODO: Consider
-internal interface IInternalButler
+internal interface IInternalWorkspaceManager
 {
 	/// <summary>
 	/// Called when a window has been added by the <see cref="IWindowManager"/>.
