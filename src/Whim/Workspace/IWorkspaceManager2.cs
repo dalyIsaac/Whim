@@ -58,21 +58,18 @@ public interface IWorkspaceManager2 : IEnumerable<IWorkspace>
 
 	bool Contains(IWorkspace workspace);
 
-	bool RemoveWorkspace(IWorkspace workspace);
-
-	bool RemoveWindow(IWindow window);
-
-	bool RemoveMonitor(IMonitor monitor);
-
-	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
-
-	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
-
-	void SetWorkspaceMonitor(IWorkspace workspace, IMonitor monitor);
-
-	void SetWindowWorkspace(IWindow window, IWorkspace workspace);
-
 	IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive);
 
-	IWorkspace? GetWorkspaceForWindow(IWindow window);
+	// NOTE: Event handlers called by Workspace
+	void OnWorkspaceAdded(WorkspaceEventArgs? args);
+
+	void OnWorkspaceRemoved(WorkspaceEventArgs? args);
+
+	void OnWorkspaceRenamed(WorkspaceRenamedEventArgs? args);
+
+	void OnWorkspaceLayoutStarted(WorkspaceEventArgs? args);
+
+	void OnWorkspaceLayoutCompleted(WorkspaceEventArgs? args);
+
+	void OnActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs? args);
 }

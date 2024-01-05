@@ -44,4 +44,20 @@ public interface IButler : IDisposable
 	void MoveWindowToPoint(IWindow window, IPoint<int> point);
 
 	bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null);
+
+	bool RemoveWindow(IWindow window);
+
+	bool RemoveMonitor(IMonitor monitor);
+
+	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
+
+	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
+
+	bool RemoveWorkspace(IWorkspace workspace);
+
+	void SetWorkspaceMonitor(IWorkspace workspace, IMonitor monitor);
+
+	void SetWindowWorkspace(IWindow window, IWorkspace workspace);
+
+	IWorkspace? GetWorkspaceForWindow(IWindow window);
 }
