@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Whim;
@@ -11,6 +12,23 @@ namespace Whim;
 /// </summary>
 public interface IWorkspaceManager2 : IEnumerable<IWorkspace>
 {
+	IWorkspace ActiveWorkspace { get; }
+
+	/// <summary>
+	/// Event for when a workspace is added.
+	/// </summary>
+	event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+
+	/// <summary>
+	/// Event for when a workspace is removed.
+	/// </summary>
+	event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+
+	/// <summary>
+	/// Event for when a workspace is renamed.
+	/// </summary>
+	event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
+
 	void Initialize();
 
 	IWorkspace? this[string workspaceName] { get; }

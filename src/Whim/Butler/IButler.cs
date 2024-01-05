@@ -3,22 +3,18 @@ using System;
 namespace Whim;
 
 // TODO: Order
+
+/// <summary>
+/// The butler is responsible for using the <see cref="IWorkspaceManager"/> and <see cref="IMonitorManager"/>
+/// to handle events from the <see cref="IWindowManager"/> to update the assignment of <see cref="IWindow"/>s
+/// to <see cref="IWorkspace"/>s, and <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s.
+/// </summary>
 public interface IButler : IDisposable
 {
 	/// <summary>
 	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
 	/// </summary>
 	event EventHandler<RouteEventArgs>? WindowRouted;
-
-	/// <summary>
-	/// Event for when a workspace is added.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
-
-	/// <summary>
-	/// Event for when a workspace is removed.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
 
 	/// <summary>
 	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
@@ -39,15 +35,6 @@ public interface IButler : IDisposable
 	/// Event for when a workspace's active layout engine has changed.
 	/// </summary>
 	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
-
-	/// <summary>
-	/// Event for when a workspace is renamed.
-	/// </summary>
-	event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
-
-	IWorkspace ActiveWorkspace { get; }
-
-	IWorkspaceManager2 WorkspaceContainer { get; }
 
 	void Initialize();
 

@@ -10,13 +10,13 @@ internal partial class Butler : IButler, IInternalButler
 		IWorkspace? workspace = null;
 		if (_context.RouterManager.RouterOptions == RouterOptions.RouteToActiveWorkspace)
 		{
-			workspace = ActiveWorkspace;
+			workspace = _context.WorkspaceManager2.ActiveWorkspace;
 		}
 		else if (_context.RouterManager.RouterOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
 			workspace = _internalContext.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
 				? _context.WorkspaceManager2.GetWorkspaceForMonitor(lastWhimActiveMonitor)
-				: ActiveWorkspace;
+				: _context.WorkspaceManager2.ActiveWorkspace;
 		}
 
 		// RouteWindow takes precedence over RouterOptions.
@@ -43,7 +43,7 @@ internal partial class Butler : IButler, IInternalButler
 		}
 
 		// If that fails too, route the window to the active workspace.
-		workspace ??= ActiveWorkspace;
+		workspace ??= _context.WorkspaceManager2.ActiveWorkspace;
 
 		_context.WorkspaceManager2.SetWindowWorkspace(window, workspace);
 

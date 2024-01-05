@@ -10,8 +10,6 @@ internal partial class Butler : IButler, IInternalButler
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	public IWorkspace ActiveWorkspace { get; }
-
 	// TODO: Constructor
 
 	#region Events
@@ -25,26 +23,25 @@ internal partial class Butler : IButler, IInternalButler
 
 	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
 
-	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
-
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
 	#endregion
 
 	#region Initialize
+	// TODO: Make sure this occurs before anything.
 	public void Initialize()
 	{
-		Logger.Debug("Initializing workspace manager...");
-
-		_context.WorkspaceManager2.Initialize();
+		Logger.Debug("Initializing Butler...");
 
 		// TODO: Replace
 		// _context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 
+		// TODO: Make sure event listeners are subscribed to here.
+
 		InitializeWindows();
 
-		Logger.Debug("Workspace manager initialized");
+		Logger.Debug("Butler initialized");
 	}
 
 	/// <summary>
@@ -391,7 +388,7 @@ internal partial class Butler : IButler, IInternalButler
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)
 	{
-		window ??= ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.WorkspaceManager2.ActiveWorkspace.LastFocusedWindow;
 
 		if (window == null)
 		{
