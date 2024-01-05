@@ -63,8 +63,23 @@ internal class ButlerPantry : IButlerPantry
 		return _windowWorkspaceMap.Remove(window);
 	}
 
-	// TODO: Do I need this here?
-	public bool RemoveWorkspace(IWorkspace workspace) => throw new System.NotImplementedException();
+	public void RemoveWorkspace(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget)
+	{
+		Logger.Debug($"Removing workspace {workspaceToDelete} and moving windows to {workspaceMergeTarget}");
+
+		// Remove the workspace from the monitor map.
+		IMonitor? monitor = GetMonitorForWorkspace(workspaceToDelete);
+		if (monitor != null)
+		{
+			_monitorWorkspaceMap.Remove(monitor);
+		}
+
+		// Remap windows to the first workspace which isn't active.
+		foreach (IWindow window in workspaceToDelete.Windows)
+		{
+			_windowWorkspaceMap[window] = workspaceMergeTarget;
+		}
+	}
 
 	public void SetWindowWorkspace(IWindow window, IWorkspace workspace)
 	{

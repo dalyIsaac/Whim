@@ -10,22 +10,11 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 	private bool _initialized;
 
 	private readonly IContext _context;
-	private readonly IInternalContext _internalContext;
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/>s stored by this manager.
 	/// </summary>
 	protected readonly List<IWorkspace> _workspaces = new();
-
-	/// <summary>
-	/// Maps windows to their workspace.
-	/// </summary>
-	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
-
-	/// <summary>
-	/// Maps monitors to their active workspace.
-	/// </summary>
-	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
 
 	/// <summary>
 	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
@@ -35,10 +24,9 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 
 	private readonly List<CreateProxyLayoutEngine> _proxyLayoutEngines = new();
 
-	public WorkspaceManager2(IContext context, IInternalContext internalContext)
+	public WorkspaceManager2(IContext context)
 	{
 		_context = context;
-		_internalContext = internalContext;
 	}
 
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
@@ -49,10 +37,7 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 		{
 			IMonitor activeMonitor = _context.MonitorManager.ActiveMonitor;
 			Logger.Debug($"Getting active workspace for monitor {activeMonitor}");
-
-			return _monitorWorkspaceMap.TryGetValue(activeMonitor, out IWorkspace? workspace)
-				? workspace
-				: _workspaces[0];
+			return _context.Butler.GetWorkspaceForMonitor(activeMonitor) ?? _workspaces[0];
 		}
 	}
 
@@ -202,31 +187,8 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 			return false;
 		}
 
-		// Remap windows to the first workspace which isn't active.
-		IWorkspace workspaceToActivate = _workspaces[^1];
-		foreach (IWorkspace w in _workspaces)
-		{
-			if (!_monitorWorkspaceMap.ContainsValue(w))
-			{
-				workspaceToActivate = w;
-				break;
-			}
-		}
-
-		foreach (IWindow window in workspace.Windows)
-		{
-			_windowWorkspaceMap[window] = workspaceToActivate;
-		}
-
-		foreach (IWindow window in workspace.Windows)
-		{
-			workspaceToActivate.AddWindow(window);
-		}
-
+		_context.Butler.RemoveWorkspace(workspace, _workspaces[^1]);
 		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
-
-		// Activate the last workspace
-		Activate(workspaceToActivate);
 
 		return wasFound;
 	}

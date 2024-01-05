@@ -12,6 +12,8 @@ internal interface IButlerPantry
 
 	bool RemoveMonitor(IMonitor monitor);
 
+	void RemoveWorkspace(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget);
+
 	IEnumerable<IWorkspace> GetAllActiveWorkspaces();
 
 	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
@@ -21,8 +23,6 @@ internal interface IButlerPantry
 	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
 
 	IMonitor? GetMonitorForWindow(IWindow window);
-
-	bool RemoveWorkspace(IWorkspace workspace);
 
 	void SetMonitorWorkspace(IMonitor monitor, IWorkspace workspace);
 

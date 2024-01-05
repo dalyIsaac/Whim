@@ -303,7 +303,6 @@ internal class ButlerChores : IButlerChores
 		if (window == null)
 		{
 			Logger.Error("No window was found");
-
 			return;
 		}
 
@@ -313,7 +312,6 @@ internal class ButlerChores : IButlerChores
 		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-
 			return;
 		}
 
@@ -321,6 +319,19 @@ internal class ButlerChores : IButlerChores
 
 		currentWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
+	}
+
+	public void RemoveWorkspace(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget)
+	{
+		_pantry.RemoveWorkspace(workspaceToDelete, workspaceMergeTarget);
+
+		foreach (IWindow window in workspaceToDelete.Windows)
+		{
+			workspaceMergeTarget.AddWindow(window);
+		}
+
+		// Activate the last workspace
+		Activate(workspaceMergeTarget);
 	}
 
 	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false)

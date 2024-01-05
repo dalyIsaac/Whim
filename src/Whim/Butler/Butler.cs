@@ -119,6 +119,9 @@ internal partial class Butler : IButler
 
 	public void LayoutAllActiveWorkspaces() => _chores.LayoutAllActiveWorkspaces();
 
+	public void RemoveWorkspace(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget) =>
+		_chores.RemoveWorkspace(workspaceToDelete, workspaceMergeTarget);
+
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
 		_chores.MoveWindowEdgesInDirection(edges, pixelsDeltas, window);
 
