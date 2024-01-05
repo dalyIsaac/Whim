@@ -187,7 +187,8 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 			return false;
 		}
 
-		_context.Butler.RemoveWorkspace(workspace, _workspaces[^1]);
+		_context.Butler.MergeWorkspaceWindows(workspace, _workspaces[^1]);
+		_context.Butler.Activate(_workspaces[^1]);
 		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 
 		return wasFound;

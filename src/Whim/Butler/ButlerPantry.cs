@@ -63,7 +63,7 @@ internal class ButlerPantry : IButlerPantry
 		return _windowWorkspaceMap.Remove(window);
 	}
 
-	public void RemoveWorkspace(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget)
+	public void MergeWorkspaceWindows(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget)
 	{
 		Logger.Debug($"Removing workspace {workspaceToDelete} and moving windows to {workspaceMergeTarget}");
 

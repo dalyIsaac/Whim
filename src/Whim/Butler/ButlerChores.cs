@@ -321,17 +321,14 @@ internal class ButlerChores : IButlerChores
 		workspace.AddWindow(window);
 	}
 
-	public void RemoveWorkspace(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget)
+	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target)
 	{
-		_pantry.RemoveWorkspace(workspaceToDelete, workspaceMergeTarget);
+		_pantry.MergeWorkspaceWindows(source, target);
 
-		foreach (IWindow window in workspaceToDelete.Windows)
+		foreach (IWindow window in source.Windows)
 		{
-			workspaceMergeTarget.AddWindow(window);
+			target.AddWindow(window);
 		}
-
-		// Activate the last workspace
-		Activate(workspaceMergeTarget);
 	}
 
 	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false)

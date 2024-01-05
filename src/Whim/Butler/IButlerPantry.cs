@@ -12,7 +12,7 @@ internal interface IButlerPantry
 
 	bool RemoveMonitor(IMonitor monitor);
 
-	void RemoveWorkspace(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget);
+	void MergeWorkspaceWindows(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget);
 
 	IEnumerable<IWorkspace> GetAllActiveWorkspaces();
 

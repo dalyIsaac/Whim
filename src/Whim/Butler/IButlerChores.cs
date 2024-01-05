@@ -112,11 +112,11 @@ public interface IButlerChores
 	void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null);
 
 	/// <summary>
-	/// Removes the given workspace.
+	/// Merges the windows of the given <paramref name="source"/> into the given <paramref name="target"/>.
 	/// </summary>
-	/// <param name="workspaceToDelete">The workspace to remove.</param>
-	/// <param name="workspaceMergeTarget">The workspace to merge the windows into.</param>
-	void RemoveWorkspace(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget);
+	/// <param name="source">The workspace to remove.</param>
+	/// <param name="target">The workspace to merge the windows into.</param>
+	void MergeWorkspaceWindows(IWorkspace source, IWorkspace target);
 
 	/// <summary>
 	/// Swap the given <paramref name="workspace"/> with the adjacent monitor.
