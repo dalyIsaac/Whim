@@ -2,8 +2,6 @@ using System;
 
 namespace Whim;
 
-// TODO: Order
-
 /// <summary>
 /// The butler is responsible for using the <see cref="IWorkspaceManager"/> and <see cref="IMonitorManager"/>
 /// to handle events from the <see cref="IWindowManager"/> to update the assignment of <see cref="IWindow"/>s
@@ -21,17 +19,43 @@ public interface IButler : IDisposable, IButlerChores
 	/// </summary>
 	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
+	/// <summary>
+	/// Initialize the event listeners.
+	/// </summary>
 	void PreInitialize();
 
+	/// <summary>
+	/// Initialize the windows and workspaces.
+	/// </summary>
 	void Initialize();
 
 	#region ButlerPantry methods
-	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
+	/// <summary>
+	/// Retrieves the monitor for the given window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
+	IMonitor? GetMonitorForWindow(IWindow window);
 
-	IWorkspace? GetWorkspaceForWindow(IWindow window);
-
+	/// <summary>
+	/// Retrieves the monitor for the active workspace.
+	/// </summary>
+	/// <param name="workspace"></param>
+	/// <returns><see langword="null"/> if the workspace is not active.</returns>
 	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
 
-	IMonitor? GetMonitorForWindow(IWindow window);
+	/// <summary>
+	/// Retrieves the active workspace for the given monitor.
+	/// </summary>
+	/// <param name="monitor"></param>
+	/// <returns><see langword="null"/> if the monitor is not active.</returns>
+	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
+
+	/// <summary>
+	/// Retrieves the workspace for the given window.
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
+	IWorkspace? GetWorkspaceForWindow(IWindow window);
 	#endregion
 }

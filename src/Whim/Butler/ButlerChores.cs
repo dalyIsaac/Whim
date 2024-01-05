@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Whim;
 
 internal class ButlerChores : IButlerChores
