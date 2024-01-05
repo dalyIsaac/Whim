@@ -31,7 +31,12 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 	/// </summary>
 	private readonly List<WorkspaceToCreate> _workspacesToCreate = new();
 
-	public IWorkspace? this[string workspaceName] => throw new NotImplementedException();
+	public WorkspaceManager2(IContext context)
+	{
+		_context = context;
+	}
+
+	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
 	public IWorkspace ActiveWorkspace
 	{
@@ -65,9 +70,6 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 		}
 	}
 
-	// TODO: Move the mapping to the butler
-	public bool Contains(IWorkspace workspace) => throw new NotImplementedException();
-
 	public IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive)
 	{
 		int idx = _workspaces.IndexOf(workspace);
@@ -94,27 +96,85 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 
 	public void Initialize() => throw new NotImplementedException();
 
-	public void OnWorkspaceAdded(WorkspaceEventArgs? args) => throw new NotImplementedException();
+	public void OnWorkspaceAdded(WorkspaceEventArgs args) => WorkspaceAdded?.Invoke(this, args);
 
-	public void OnWorkspaceRemoved(WorkspaceEventArgs? args) => throw new NotImplementedException();
+	public void OnWorkspaceRemoved(WorkspaceEventArgs args) => WorkspaceRemoved?.Invoke(this, args);
 
-	public void OnWorkspaceRenamed(WorkspaceRenamedEventArgs? args) => throw new NotImplementedException();
+	public void OnWorkspaceRenamed(WorkspaceRenamedEventArgs args) => WorkspaceRenamed?.Invoke(this, args);
 
-	public void OnWorkspaceLayoutStarted(WorkspaceEventArgs? args) => throw new NotImplementedException();
+	public void OnWorkspaceLayoutStarted(WorkspaceEventArgs args) => WorkspaceLayoutStarted?.Invoke(this, args);
 
-	public void OnWorkspaceLayoutCompleted(WorkspaceEventArgs? args) => throw new NotImplementedException();
+	public void OnWorkspaceLayoutCompleted(WorkspaceEventArgs args) => WorkspaceLayoutCompleted?.Invoke(this, args);
 
-	public void OnActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs? args) =>
-		throw new NotImplementedException();
+	public void OnActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args) =>
+		ActiveLayoutEngineChanged?.Invoke(this, args);
 
-	public bool Remove(IWorkspace workspace) => throw new NotImplementedException();
+	public bool Remove(IWorkspace workspace)
+	{
+		Logger.Debug($"Removing workspace {workspace}");
 
-	public bool Remove(string workspaceName) => throw new NotImplementedException();
+		if (_workspaces.Count - 1 < _context.MonitorManager.Length)
+		{
+			Logger.Debug($"There must be at least {_context.MonitorManager.Length} workspaces.");
+			return false;
+		}
 
-	public IWorkspace? TryGet(string workspaceName) => throw new NotImplementedException();
+		bool wasFound = _workspaces.Remove(workspace);
 
-	IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+		if (!wasFound)
+		{
+			Logger.Debug($"Workspace {workspace} was not found");
+			return false;
+		}
 
-	IWorkspace? IWorkspaceManager2.Add(string? name, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines) =>
-		throw new NotImplementedException();
+		// Remap windows to the first workspace which isn't active.
+		IWorkspace workspaceToActivate = _workspaces[^1];
+		foreach (IWorkspace w in _workspaces)
+		{
+			if (!_monitorWorkspaceMap.ContainsValue(w))
+			{
+				workspaceToActivate = w;
+				break;
+			}
+		}
+
+		foreach (IWindow window in workspace.Windows)
+		{
+			_windowWorkspaceMap[window] = workspaceToActivate;
+		}
+
+		foreach (IWindow window in workspace.Windows)
+		{
+			workspaceToActivate.AddWindow(window);
+		}
+
+		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
+
+		// Activate the last workspace
+		Activate(workspaceToActivate);
+
+		return wasFound;
+	}
+
+	public bool Remove(string workspaceName)
+	{
+		Logger.Debug($"Trying to remove workspace {workspaceName}");
+
+		IWorkspace? workspace = _workspaces.Find(w => w.Name == workspaceName);
+		if (workspace == null)
+		{
+			Logger.Debug($"Workspace {workspaceName} not found");
+			return false;
+		}
+
+		return Remove(workspace);
+	}
+
+	public IWorkspace? TryGet(string workspaceName)
+	{
+		Logger.Debug($"Trying to get workspace {workspaceName}");
+		return _workspaces.Find(w => w.Name == workspaceName);
+	}
+
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

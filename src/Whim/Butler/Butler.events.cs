@@ -1,6 +1,7 @@
 namespace Whim;
 
-internal partial class Butler : IButler, IInternalButler
+// TODO: Consider making a composed class?
+internal partial class Butler : IButler
 {
 	private void WindowManager_WindowAdded(object? sender, WindowEventArgs args)
 	{
@@ -68,7 +69,6 @@ internal partial class Butler : IButler, IInternalButler
 		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-
 			return;
 		}
 

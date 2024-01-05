@@ -50,26 +50,24 @@ public interface IWorkspaceManager2 : IEnumerable<IWorkspace>
 
 	IWorkspace? TryGet(string workspaceName);
 
-	IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
+	void Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
 
 	bool Remove(IWorkspace workspace);
 
 	bool Remove(string workspaceName);
 
-	bool Contains(IWorkspace workspace);
-
 	IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive);
 
 	// NOTE: Event handlers called by Workspace
-	void OnWorkspaceAdded(WorkspaceEventArgs? args);
+	void OnWorkspaceAdded(WorkspaceEventArgs args);
 
-	void OnWorkspaceRemoved(WorkspaceEventArgs? args);
+	void OnWorkspaceRemoved(WorkspaceEventArgs args);
 
-	void OnWorkspaceRenamed(WorkspaceRenamedEventArgs? args);
+	void OnWorkspaceRenamed(WorkspaceRenamedEventArgs args);
 
-	void OnWorkspaceLayoutStarted(WorkspaceEventArgs? args);
+	void OnWorkspaceLayoutStarted(WorkspaceEventArgs args);
 
-	void OnWorkspaceLayoutCompleted(WorkspaceEventArgs? args);
+	void OnWorkspaceLayoutCompleted(WorkspaceEventArgs args);
 
-	void OnActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs? args);
+	void OnActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args);
 }
