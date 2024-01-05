@@ -5,12 +5,17 @@ using Windows.Win32.Foundation;
 namespace Whim;
 
 // TODO: Order
-internal partial class Butler : IButler, IInternalButler
+internal partial class Butler : IButler
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
+	private bool _disposedValue;
 
-	// TODO: Constructor
+	public Butler(IContext context, IInternalContext internalContext)
+	{
+		_context = context;
+		_internalContext = internalContext;
+	}
 
 	#region Events
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
@@ -29,19 +34,22 @@ internal partial class Butler : IButler, IInternalButler
 	#endregion
 
 	#region Initialize
-	// TODO: Make sure this occurs before anything.
+	public void PreInitialize()
+	{
+		Logger.Debug("Pre-initializing Butler");
+
+		_context.WindowManager.WindowAdded += WindowManager_WindowAdded;
+		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_context.WindowManager.WindowMinimizeStart += WindowManager_WindowMinimizeStart;
+		_context.WindowManager.WindowMinimizeEnd += WindowManager_WindowMinimizeEnd;
+		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+	}
+
 	public void Initialize()
 	{
-		Logger.Debug("Initializing Butler...");
-
-		// TODO: Replace
-		// _context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
-
-		// TODO: Make sure event listeners are subscribed to here.
-
 		InitializeWindows();
-
-		Logger.Debug("Butler initialized");
+		InitializeWorkspaces();
 	}
 
 	/// <summary>
@@ -422,5 +430,33 @@ internal partial class Butler : IButler, IInternalButler
 		Logger.Debug($"Normalized point: {normalized}");
 		workspace.MoveWindowEdgesInDirection(edges, normalized, window);
 		return true;
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_context.WindowManager.WindowAdded -= WindowManager_WindowAdded;
+				_context.WindowManager.WindowRemoved -= WindowManager_WindowRemoved;
+				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
+				_context.WindowManager.WindowMinimizeStart -= WindowManager_WindowMinimizeStart;
+				_context.WindowManager.WindowMinimizeEnd -= WindowManager_WindowMinimizeEnd;
+				_context.MonitorManager.MonitorsChanged -= MonitorManager_MonitorsChanged;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

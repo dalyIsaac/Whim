@@ -14,6 +14,7 @@ namespace Whim;
 internal class Context : IContext
 {
 	private readonly IInternalContext _internalContext;
+	public IButler Butler { get; }
 	public IFileManager FileManager { get; }
 	public IResourceManager ResourceManager { get; }
 	public Logger Logger { get; }
@@ -44,6 +45,7 @@ internal class Context : IContext
 		Logger = new Logger();
 		ResourceManager = new ResourceManager();
 		_internalContext = new InternalContext(this);
+		Butler = new Butler(this, _internalContext);
 
 		NativeManager = new NativeManager(this, _internalContext);
 
@@ -75,7 +77,10 @@ internal class Context : IContext
 
 		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(FilterManager);
 
-		// Initialize before ConfigLoader so user dicts take precedence over the default dict.
+		// Subscribe to the events.
+		Butler.PreInitialize();
+
+		// Initialize before ResourceManager so user dicts take precedence over the default dict.
 		ResourceManager.Initialize();
 
 		// Load the user's config.
@@ -95,6 +100,8 @@ internal class Context : IContext
 		MonitorManager.Initialize();
 		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
+
+		Butler.Initialize();
 
 		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();

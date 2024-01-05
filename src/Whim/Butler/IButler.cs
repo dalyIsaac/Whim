@@ -36,6 +36,8 @@ public interface IButler : IDisposable
 	/// </summary>
 	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
 
+	void PreInitialize();
+
 	void Initialize();
 
 	void Activate(IWorkspace workspace, IMonitor? monitor = null);

@@ -2,9 +2,9 @@ namespace Whim;
 
 internal partial class Butler : IButler, IInternalButler
 {
-	// TODO: Rename methods to start with WindowManager_
-	public void WindowAdded(IWindow window)
+	private void WindowManager_WindowAdded(object? sender, WindowEventArgs args)
 	{
+		IWindow window = args.Window;
 		Logger.Debug($"Adding window {window}");
 
 		IWorkspace? workspace = null;
@@ -60,8 +60,9 @@ internal partial class Butler : IButler, IInternalButler
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
-	public void WindowRemoved(IWindow window)
+	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs args)
 	{
+		IWindow window = args.Window;
 		Logger.Debug($"Window removed: {window}");
 
 		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
@@ -77,8 +78,9 @@ internal partial class Butler : IButler, IInternalButler
 		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
 	}
 
-	public void WindowFocused(IWindow? window)
+	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs args)
 	{
+		IWindow? window = args.Window;
 		Logger.Debug($"Window focused: {window}");
 
 		foreach (IWorkspace workspace in _context.WorkspaceManager2)
@@ -105,8 +107,9 @@ internal partial class Butler : IButler, IInternalButler
 		}
 	}
 
-	public void WindowMinimizeStart(IWindow window)
+	private void WindowManager_WindowMinimizeStart(object? sender, WindowEventArgs args)
 	{
+		IWindow window = args.Window;
 		Logger.Debug($"Window minimize start: {window}");
 
 		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
@@ -118,8 +121,9 @@ internal partial class Butler : IButler, IInternalButler
 		workspace.MinimizeWindowStart(window);
 	}
 
-	public void WindowMinimizeEnd(IWindow window)
+	private void WindowManager_WindowMinimizeEnd(object? sender, WindowEventArgs args)
 	{
+		IWindow window = args.Window;
 		Logger.Debug($"Window minimize end: {window}");
 
 		if (_context.WorkspaceManager2.GetWorkspaceForWindow(window) is not IWorkspace workspace)
@@ -131,7 +135,7 @@ internal partial class Butler : IButler, IInternalButler
 		workspace.MinimizeWindowEnd(window);
 	}
 
-	public void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
+	private void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
 	{
 		Logger.Debug($"MonitorManager_MonitorsChanged: {e}");
 
