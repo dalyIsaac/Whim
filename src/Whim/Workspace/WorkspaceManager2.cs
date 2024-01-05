@@ -1,9 +1,10 @@
 namespace Whim;
 
 // TODO: Order
-internal class WorkspaceManager2 : IWorkspaceManager2
+internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspaceManager
 {
 	private readonly IContext _context;
+	private readonly IInternalContext _internalContext;
 
 	public IWorkspace ActiveWorkspace { get; }
 
@@ -11,7 +12,7 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
 	{
-		if (!WorkspaceContainer.ContainsWorkspace(workspace))
+		if (!WorkspaceContainer.Contains(workspace))
 		{
 			Logger.Error($"Workspace {workspace} is not in the workspace container.");
 			return;

@@ -4,6 +4,7 @@ namespace Whim;
 public interface IWorkspaceManager2
 {
 	IWorkspace ActiveWorkspace { get; }
+
 	IWorkspaceContainer WorkspaceContainer { get; }
 
 	void Activate(IWorkspace workspace, IMonitor? monitor = null);
