@@ -1,23 +1,29 @@
+using System;
+
 namespace Whim;
 
-internal class ButlerEventHandlers
+internal class ButlerEventHandlers : IDisposable
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 	private readonly ButlerTriggers _triggers;
 	private readonly IButlerPantry _pantry;
+	private readonly IButlerChores _chores;
+	private bool _disposedValue;
 
 	public ButlerEventHandlers(
 		IContext context,
 		IInternalContext internalContext,
 		ButlerTriggers triggers,
-		IButlerPantry pantry
+		IButlerPantry pantry,
+		IButlerChores chores
 	)
 	{
 		_context = context;
 		_internalContext = internalContext;
 		_triggers = triggers;
 		_pantry = pantry;
+		_chores = chores;
 	}
 
 	public void PreInitialize()
@@ -129,7 +135,7 @@ internal class ButlerEventHandlers
 		if (_pantry.GetMonitorForWorkspace(workspaceForWindow) is null)
 		{
 			Logger.Debug($"Window {window} is not in an active workspace");
-			Activate(workspaceForWindow);
+			_chores.Activate(workspaceForWindow);
 			return;
 		}
 	}
@@ -210,11 +216,39 @@ internal class ButlerEventHandlers
 			}
 
 			// Add the workspace to the map.
-			Activate(workspace, monitor);
+			_chores.Activate(workspace, monitor);
 		}
 
 		// For each workspace which is active in a monitor, do a layout.
 		// This will handle cases when the monitor's properties have changed.
-		LayoutAllActiveWorkspaces();
+		_chores.LayoutAllActiveWorkspaces();
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_context.WindowManager.WindowAdded -= WindowManager_WindowAdded;
+				_context.WindowManager.WindowRemoved -= WindowManager_WindowRemoved;
+				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
+				_context.WindowManager.WindowMinimizeStart -= WindowManager_WindowMinimizeStart;
+				_context.WindowManager.WindowMinimizeEnd -= WindowManager_WindowMinimizeEnd;
+				_context.MonitorManager.MonitorsChanged -= MonitorManager_MonitorsChanged;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

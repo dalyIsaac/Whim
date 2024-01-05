@@ -27,7 +27,7 @@ internal partial class Butler : IButler
 		};
 		_pantry = new ButlerPantry();
 		_chores = new ButlerChores(_context, _triggers, _pantry);
-		_eventHandlers = new ButlerEventHandlers(_context, _internalContext, _triggers, _pantry);
+		_eventHandlers = new ButlerEventHandlers(_context, _internalContext, _triggers, _pantry, _chores);
 	}
 
 	public event EventHandler<RouteEventArgs>? WindowRouted;
@@ -152,12 +152,7 @@ internal partial class Butler : IButler
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WindowManager.WindowAdded -= WindowManager_WindowAdded;
-				_context.WindowManager.WindowRemoved -= WindowManager_WindowRemoved;
-				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
-				_context.WindowManager.WindowMinimizeStart -= WindowManager_WindowMinimizeStart;
-				_context.WindowManager.WindowMinimizeEnd -= WindowManager_WindowMinimizeEnd;
-				_context.MonitorManager.MonitorsChanged -= MonitorManager_MonitorsChanged;
+				_eventHandlers.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
