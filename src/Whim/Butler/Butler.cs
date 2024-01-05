@@ -17,21 +17,9 @@ internal partial class Butler : IButler
 		_internalContext = internalContext;
 	}
 
-	#region Events
-	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
 	public event EventHandler<RouteEventArgs>? WindowRouted;
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
-
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
-
-	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
-
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
-
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
-	#endregion
+	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
 	#region Initialize
 	public void PreInitialize()

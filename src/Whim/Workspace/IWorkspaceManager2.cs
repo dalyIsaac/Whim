@@ -29,6 +29,21 @@ public interface IWorkspaceManager2 : IEnumerable<IWorkspace>
 	/// </summary>
 	event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
+	/// <summary>
+	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
+	/// </summary>
+	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+
+	/// <summary>
+	/// Event for when <see cref="IWorkspace.DoLayout"/> has completed.
+	/// </summary>
+	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
+
+	/// <summary>
+	/// Event for when a workspace's active layout engine has changed.
+	/// </summary>
+	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+
 	void Initialize();
 
 	IWorkspace? this[string workspaceName] { get; }

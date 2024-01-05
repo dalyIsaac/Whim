@@ -17,24 +17,9 @@ public interface IButler : IDisposable
 	event EventHandler<RouteEventArgs>? WindowRouted;
 
 	/// <summary>
-	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
-
-	/// <summary>
-	/// Event for when <see cref="IWorkspace.DoLayout"/> has completed.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
-
-	/// <summary>
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
 	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
-	/// <summary>
-	/// Event for when a workspace's active layout engine has changed.
-	/// </summary>
-	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
 
 	void PreInitialize();
 
