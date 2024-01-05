@@ -11,11 +11,25 @@ namespace Whim;
 /// </summary>
 public interface IWorkspaceContainer : IEnumerable<IWorkspace>
 {
-	bool Contains(IWorkspace workspace);
+	void Initialize();
+
+	IWorkspace? this[string workspaceName] { get; }
+
+	IWorkspace? TryGet(string workspaceName);
+
+	IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
 
 	bool Remove(IWorkspace workspace);
 
-	bool Remove(IWindow window);
+	bool Remove(string workspaceName);
+
+	bool Contains(IWorkspace workspace);
+
+	bool RemoveWorkspace(IWorkspace workspace);
+
+	bool RemoveWindow(IWindow window);
+
+	bool RemoveMonitor(IMonitor monitor);
 
 	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
 

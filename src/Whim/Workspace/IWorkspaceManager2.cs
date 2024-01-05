@@ -1,11 +1,26 @@
+using System;
+using System.Collections.Generic;
+
 namespace Whim;
 
 // TODO: Order
-public interface IWorkspaceManager2
+public interface IWorkspaceManager2 : IEnumerable<IWorkspace>, IDisposable
 {
 	IWorkspace ActiveWorkspace { get; }
 
 	IWorkspaceContainer WorkspaceContainer { get; }
+
+	void Initialize();
+
+	IWorkspace? this[string workspaceName] { get; }
+
+	IWorkspace? TryGet(string workspaceName);
+
+	IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
+
+	bool Remove(IWorkspace workspace);
+
+	bool Remove(string workspaceName);
 
 	void Activate(IWorkspace workspace, IMonitor? monitor = null);
 

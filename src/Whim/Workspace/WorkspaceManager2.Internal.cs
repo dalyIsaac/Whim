@@ -2,6 +2,7 @@ namespace Whim;
 
 internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspaceManager
 {
+	// TODO: Rename methods to start with WindowManager_
 	public void WindowAdded(IWindow window)
 	{
 		Logger.Debug($"Adding window {window}");
@@ -71,7 +72,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 			return;
 		}
 
-		WorkspaceContainer.Remove(window);
+		WorkspaceContainer.RemoveWindow(window);
 
 		workspace.RemoveWindow(window);
 		// TODO
@@ -130,5 +131,54 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		workspace.MinimizeWindowEnd(window);
+	}
+
+	public void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
+	{
+		Logger.Debug($"MonitorManager_MonitorsChanged: {e}");
+
+		// If a monitor was removed, remove the workspace from the map.
+		foreach (IMonitor monitor in e.RemovedMonitors)
+		{
+			IWorkspace? workspace = WorkspaceContainer.GetWorkspaceForMonitor(monitor);
+			WorkspaceContainer.RemoveMonitor(monitor);
+
+			if (workspace is null)
+			{
+				Logger.Error($"Could not find workspace for monitor {monitor}");
+				continue;
+			}
+
+			workspace.Deactivate();
+		}
+
+		// If a monitor was added, set it to an inactive workspace.
+		foreach (IMonitor monitor in e.AddedMonitors)
+		{
+			// Try find a workspace which doesn't have a monitor.
+			IWorkspace? workspace = WorkspaceContainer.Find(w => GetMonitorForWorkspace(w) == null);
+
+			// If there's no workspace, create one.
+			if (workspace is null)
+			{
+				if (WorkspaceContainer.CreateWorkspace() is IWorkspace newWorkspace)
+				{
+					workspace = newWorkspace;
+					// TODO
+					//WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
+				}
+				else
+				{
+					continue;
+				}
+			}
+
+			// Add the workspace to the map.
+			Activate(workspace, monitor);
+		}
+
+		// For each workspace which is active in a monitor, do a layout.
+		// This will handle cases when the monitor's properties have changed.
+		LayoutAllActiveWorkspaces();
 	}
 }

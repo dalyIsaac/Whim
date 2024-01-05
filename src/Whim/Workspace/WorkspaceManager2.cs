@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Windows.Win32.Foundation;
+
 namespace Whim;
 
 // TODO: Order
@@ -9,6 +12,96 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 	public IWorkspace ActiveWorkspace { get; }
 
 	public IWorkspaceContainer WorkspaceContainer { get; }
+
+	// TODO: Constructor
+
+	#region WorkspaceContainer forwarding
+	public IWorkspace? this[string workspaceName] => WorkspaceContainer[workspaceName];
+
+	public IWorkspace? TryGet(string workspaceName) => WorkspaceContainer.TryGet(workspaceName);
+
+	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null) =>
+		WorkspaceContainer.Add(name, createLayoutEngines);
+
+	public bool Remove(IWorkspace workspace) => WorkspaceContainer.Remove(workspace);
+
+	public bool Remove(string workspaceName) => WorkspaceContainer.Remove(workspaceName);
+	#endregion
+
+	#region Initialize
+	public void Initialize()
+	{
+		Logger.Debug("Initializing workspace manager...");
+
+		WorkspaceContainer.Initialize();
+
+		// TODO: Replace
+		// _context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+
+		InitializeWindows();
+
+		Logger.Debug("Workspace manager initialized");
+	}
+
+	/// <summary>
+	/// Add the saved windows at their saved locations inside their saved workspaces.
+	/// Other windows are routed to the monitor they're on.
+	/// </summary>
+	private void InitializeWindows()
+	{
+		List<HWND> processedWindows = new();
+
+		// Route windows to their saved workspaces.
+		foreach (
+			SavedWorkspace savedWorkspace in _internalContext.CoreSavedStateManager.SavedState?.Workspaces ?? new()
+		)
+		{
+			IWorkspace? workspace = TryGet(savedWorkspace.Name);
+			if (workspace == null)
+			{
+				Logger.Debug($"Could not find workspace {savedWorkspace.Name}");
+				continue;
+			}
+
+			foreach (SavedWindow savedWindow in savedWorkspace.Windows)
+			{
+				HWND hwnd = (HWND)savedWindow.Handle;
+				IWindow? window = _context.WindowManager.CreateWindow(hwnd);
+				if (window == null)
+				{
+					Logger.Debug($"Could not find window with handle {savedWindow.Handle}");
+					continue;
+				}
+
+				WorkspaceContainer.SetWindowWorkspace(window, workspace);
+				workspace.MoveWindowToPoint(window, savedWindow.Rectangle.Center);
+				processedWindows.Add(hwnd);
+
+				// Fire the window added event.
+				_internalContext.WindowManager.OnWindowAdded(window);
+			}
+		}
+
+		// Route the rest of the windows to the monitor they're on.
+		// Don't route to the active workspace while we're adding all the windows.
+		RouterOptions routerOptions = _context.RouterManager.RouterOptions;
+		_context.RouterManager.RouterOptions = RouterOptions.RouteToLaunchedWorkspace;
+
+		// Add all existing windows.
+		foreach (HWND hwnd in _internalContext.CoreNativeManager.GetAllWindows())
+		{
+			if (processedWindows.Contains(hwnd))
+			{
+				continue;
+			}
+
+			_internalContext.WindowManager.AddWindow(hwnd);
+		}
+
+		// Restore the route to active workspace setting.
+		_context.RouterManager.RouterOptions = routerOptions;
+	}
+	#endregion
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
 	{
@@ -95,6 +188,17 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		}
 
 		Activate(adjacentWorkspace, monitor);
+	}
+
+	public void LayoutAllActiveWorkspaces()
+	{
+		Logger.Debug("Layout all active workspaces");
+
+		// For each workspace which is active in a monitor, do a layout.
+		foreach (IWorkspace workspace in WorkspaceContainer)
+		{
+			workspace.DoLayout();
+		}
 	}
 
 	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false)
