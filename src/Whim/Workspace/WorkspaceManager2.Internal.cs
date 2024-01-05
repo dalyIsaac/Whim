@@ -56,8 +56,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 			workspace.AddWindow(window);
 		}
 
-		// TODO
-		// WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
+		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
@@ -75,8 +74,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		WorkspaceContainer.RemoveWindow(window);
 
 		workspace.RemoveWindow(window);
-		// TODO
-		//WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
+		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
 	}
 
 	public void WindowFocused(IWindow? window)
@@ -161,11 +159,10 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 			// If there's no workspace, create one.
 			if (workspace is null)
 			{
-				if (WorkspaceContainer.CreateWorkspace() is IWorkspace newWorkspace)
+				if (WorkspaceContainer.Add() is IWorkspace newWorkspace)
 				{
 					workspace = newWorkspace;
-					// TODO
-					//WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
+					WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 				}
 				else
 				{

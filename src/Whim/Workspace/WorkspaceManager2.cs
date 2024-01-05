@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Windows.Win32.Foundation;
 
@@ -15,17 +16,22 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 
 	// TODO: Constructor
 
-	#region WorkspaceContainer forwarding
-	public IWorkspace? this[string workspaceName] => WorkspaceContainer[workspaceName];
+	#region Events
+	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
-	public IWorkspace? TryGet(string workspaceName) => WorkspaceContainer.TryGet(workspaceName);
+	public event EventHandler<RouteEventArgs>? WindowRouted;
 
-	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null) =>
-		WorkspaceContainer.Add(name, createLayoutEngines);
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
 
-	public bool Remove(IWorkspace workspace) => WorkspaceContainer.Remove(workspace);
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
 
-	public bool Remove(string workspaceName) => WorkspaceContainer.Remove(workspaceName);
+	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+
+	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
+
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
 	#endregion
 
 	#region Initialize
@@ -56,7 +62,7 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 			SavedWorkspace savedWorkspace in _internalContext.CoreSavedStateManager.SavedState?.Workspaces ?? new()
 		)
 		{
-			IWorkspace? workspace = TryGet(savedWorkspace.Name);
+			IWorkspace? workspace = WorkspaceContainer.TryGet(savedWorkspace.Name);
 			if (workspace == null)
 			{
 				Logger.Debug($"Could not find workspace {savedWorkspace.Name}");
@@ -137,16 +143,15 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		{
 			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
 			oldWorkspace?.DoLayout();
-			// TODO
-			// MonitorWorkspaceChanged?.Invoke(
-			// 	this,
-			// 	new MonitorWorkspaceChangedEventArgs()
-			// 	{
-			// 		Monitor = oldWorkspaceValue.monitor,
-			// 		PreviousWorkspace = workspace,
-			// 		CurrentWorkspace = oldWorkspaceValue.workspace
-			// 	}
-			// );
+			MonitorWorkspaceChanged?.Invoke(
+				this,
+				new MonitorWorkspaceChangedEventArgs()
+				{
+					Monitor = oldWorkspaceValue.monitor,
+					PreviousWorkspace = workspace,
+					CurrentWorkspace = oldWorkspaceValue.workspace
+				}
+			);
 		}
 		else
 		{
@@ -157,16 +162,15 @@ internal partial class WorkspaceManager2 : IWorkspaceManager2, IInternalWorkspac
 		// Layout the new workspace.
 		workspace.DoLayout();
 		workspace.FocusLastFocusedWindow();
-		// TODO
-		// MonitorWorkspaceChanged?.Invoke(
-		// 	this,
-		// 	new MonitorWorkspaceChangedEventArgs()
-		// 	{
-		// 		Monitor = monitor,
-		// 		PreviousWorkspace = oldWorkspace,
-		// 		CurrentWorkspace = workspace
-		// 	}
-		// );
+		MonitorWorkspaceChanged?.Invoke(
+			this,
+			new MonitorWorkspaceChangedEventArgs()
+			{
+				Monitor = monitor,
+				PreviousWorkspace = oldWorkspace,
+				CurrentWorkspace = workspace
+			}
+		);
 	}
 
 	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false)

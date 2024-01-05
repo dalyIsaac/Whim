@@ -25,46 +25,6 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	void Initialize();
 
 	/// <summary>
-	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
-	/// </summary>
-	event EventHandler<RouteEventArgs>? WindowRouted;
-
-	/// <summary>
-	/// Event for when a workspace is added.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
-
-	/// <summary>
-	/// Event for when a workspace is removed.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
-
-	/// <summary>
-	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
-
-	/// <summary>
-	/// Event for when <see cref="IWorkspace.DoLayout"/> has completed.
-	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
-
-	/// <summary>
-	/// Event for when a monitor's workspace has changed.
-	/// </summary>
-	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
-	/// <summary>
-	/// Event for when a workspace's active layout engine has changed.
-	/// </summary>
-	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
-
-	/// <summary>
-	/// Event for when a workspace is renamed.
-	/// </summary>
-	event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
-
-	/// <summary>
 	/// Triggers all active workspaces to update their layout.
 	/// Active workspaces are those that are visible on a monitor.
 	/// </summary>

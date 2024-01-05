@@ -1,26 +1,55 @@
 using System;
-using System.Collections.Generic;
 
 namespace Whim;
 
 // TODO: Order
-public interface IWorkspaceManager2 : IEnumerable<IWorkspace>, IDisposable
+public interface IWorkspaceManager2 : IDisposable
 {
+	/// <summary>
+	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
+	/// </summary>
+	event EventHandler<RouteEventArgs>? WindowRouted;
+
+	/// <summary>
+	/// Event for when a workspace is added.
+	/// </summary>
+	event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+
+	/// <summary>
+	/// Event for when a workspace is removed.
+	/// </summary>
+	event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+
+	/// <summary>
+	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
+	/// </summary>
+	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+
+	/// <summary>
+	/// Event for when <see cref="IWorkspace.DoLayout"/> has completed.
+	/// </summary>
+	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
+
+	/// <summary>
+	/// Event for when a monitor's workspace has changed.
+	/// </summary>
+	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
+
+	/// <summary>
+	/// Event for when a workspace's active layout engine has changed.
+	/// </summary>
+	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+
+	/// <summary>
+	/// Event for when a workspace is renamed.
+	/// </summary>
+	event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
+
 	IWorkspace ActiveWorkspace { get; }
 
 	IWorkspaceContainer WorkspaceContainer { get; }
 
 	void Initialize();
-
-	IWorkspace? this[string workspaceName] { get; }
-
-	IWorkspace? TryGet(string workspaceName);
-
-	IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
-
-	bool Remove(IWorkspace workspace);
-
-	bool Remove(string workspaceName);
 
 	void Activate(IWorkspace workspace, IMonitor? monitor = null);
 
