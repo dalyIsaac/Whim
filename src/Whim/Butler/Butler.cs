@@ -43,16 +43,9 @@ internal partial class Butler : IButler
 
 	public void Initialize()
 	{
-		InitializeWindows();
-		InitializeWorkspaces();
-	}
+		// Add the saved windows at their saved locations inside their saved workspaces.
+		// Other windows are routed to the monitor they're on.
 
-	/// <summary>
-	/// Add the saved windows at their saved locations inside their saved workspaces.
-	/// Other windows are routed to the monitor they're on.
-	/// </summary>
-	private void InitializeWindows()
-	{
 		List<HWND> processedWindows = new();
 
 		// Route windows to their saved workspaces.
@@ -105,16 +98,17 @@ internal partial class Butler : IButler
 		// Restore the route to active workspace setting.
 		_context.RouterManager.RouterOptions = routerOptions;
 	}
+
 	#endregion
 
 	#region Pantry
-	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor) => _pantry.GetWorkspaceForMonitor(monitor);
-
-	public IWorkspace? GetWorkspaceForWindow(IWindow window) => _pantry.GetWorkspaceForWindow(window);
+	public IMonitor? GetMonitorForWindow(IWindow window) => _pantry.GetMonitorForWindow(window);
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace) => _pantry.GetMonitorForWorkspace(workspace);
 
-	public IMonitor? GetMonitorForWindow(IWindow window) => _pantry.GetMonitorForWindow(window);
+	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor) => _pantry.GetWorkspaceForMonitor(monitor);
+
+	public IWorkspace? GetWorkspaceForWindow(IWindow window) => _pantry.GetWorkspaceForWindow(window);
 	#endregion
 
 	#region Chores
@@ -123,11 +117,13 @@ internal partial class Butler : IButler
 	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false) =>
 		_chores.ActivateAdjacent(monitor, reverse, skipActive);
 
+	public void LayoutAllActiveWorkspaces() => _chores.LayoutAllActiveWorkspaces();
+
+	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
+		_chores.MoveWindowEdgesInDirection(edges, pixelsDeltas, window);
+
 	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false) =>
 		_chores.MoveWindowToAdjacentWorkspace(window, reverse, skipActive);
-
-	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false) =>
-		_chores.SwapWorkspaceWithAdjacentMonitor(workspace, reverse);
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null) =>
 		_chores.MoveWindowToWorkspace(workspace, window);
@@ -135,14 +131,14 @@ internal partial class Butler : IButler
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null) =>
 		_chores.MoveWindowToMonitor(monitor, window);
 
-	public void MoveWindowToPreviousMonitor(IWindow? window = null) => _chores.MoveWindowToPreviousMonitor(window);
-
 	public void MoveWindowToNextMonitor(IWindow? window = null) => _chores.MoveWindowToNextMonitor(window);
+
+	public void MoveWindowToPreviousMonitor(IWindow? window = null) => _chores.MoveWindowToPreviousMonitor(window);
 
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point) => _chores.MoveWindowToPoint(window, point);
 
-	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
-		_chores.MoveWindowEdgesInDirection(edges, pixelsDeltas, window);
+	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false) =>
+		_chores.SwapWorkspaceWithAdjacentMonitor(workspace, reverse);
 	#endregion
 
 	protected virtual void Dispose(bool disposing)
