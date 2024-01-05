@@ -52,6 +52,8 @@ public interface IWorkspaceManager2 : IEnumerable<IWorkspace>
 
 	void Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
 
+	bool Contains(IWorkspace workspace);
+
 	bool Remove(IWorkspace workspace);
 
 	bool Remove(string workspaceName);

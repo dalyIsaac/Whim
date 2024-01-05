@@ -158,7 +158,15 @@ internal partial class Butler : IButler
 		foreach (IMonitor monitor in e.AddedMonitors)
 		{
 			// Try find a workspace which doesn't have a monitor.
-			IWorkspace? workspace = _context.WorkspaceManager2.Find(w => GetMonitorForWorkspace(w) == null);
+			IWorkspace? workspace = null;
+			foreach (IWorkspace w in _context.WorkspaceManager2)
+			{
+				if (_pantry.GetMonitorForWorkspace(w) is null)
+				{
+					_pantry.SetMonitorWorkspace(monitor, w);
+					break;
+				}
+			}
 
 			// If there's no workspace, create one.
 			if (workspace is null)
