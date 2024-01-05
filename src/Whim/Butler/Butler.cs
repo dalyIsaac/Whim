@@ -9,14 +9,25 @@ internal partial class Butler : IButler
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
+
 	private readonly IButlerPantry _pantry;
+	private readonly ButlerTriggers _triggers;
 	private readonly IButlerChores _chores;
+	private readonly ButlerEventHandlers _eventHandlers;
 	private bool _disposedValue;
 
 	public Butler(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
 		_internalContext = internalContext;
+		_triggers = new ButlerTriggers()
+		{
+			WindowRouted = (args) => WindowRouted?.Invoke(this, args),
+			MonitorWorkspaceChanged = (args) => MonitorWorkspaceChanged?.Invoke(this, args),
+		};
+		_pantry = new ButlerPantry();
+		_chores = new ButlerChores(_context, _triggers, _pantry);
+		_eventHandlers = new ButlerEventHandlers(_context, _internalContext, _triggers, _pantry);
 	}
 
 	public event EventHandler<RouteEventArgs>? WindowRouted;
@@ -27,13 +38,7 @@ internal partial class Butler : IButler
 	public void PreInitialize()
 	{
 		Logger.Debug("Pre-initializing Butler");
-
-		_context.WindowManager.WindowAdded += WindowManager_WindowAdded;
-		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
-		_context.WindowManager.WindowMinimizeStart += WindowManager_WindowMinimizeStart;
-		_context.WindowManager.WindowMinimizeEnd += WindowManager_WindowMinimizeEnd;
-		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+		_eventHandlers.PreInitialize();
 	}
 
 	public void Initialize()

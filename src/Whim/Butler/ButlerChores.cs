@@ -3,7 +3,15 @@ namespace Whim;
 internal class ButlerChores : IButlerChores
 {
 	private readonly IContext _context;
+	private readonly ButlerTriggers _triggers;
 	private readonly IButlerPantry _pantry;
+
+	public ButlerChores(IContext context, ButlerTriggers triggers, IButlerPantry pantry)
+	{
+		_context = context;
+		_triggers = triggers;
+		_pantry = pantry;
+	}
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
 	{
@@ -39,8 +47,7 @@ internal class ButlerChores : IButlerChores
 		{
 			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
 			oldWorkspace?.DoLayout();
-			MonitorWorkspaceChanged?.Invoke(
-				this,
+			_triggers.MonitorWorkspaceChanged(
 				new MonitorWorkspaceChangedEventArgs()
 				{
 					Monitor = oldWorkspaceValue.monitor,
@@ -58,8 +65,7 @@ internal class ButlerChores : IButlerChores
 		// Layout the new workspace.
 		workspace.DoLayout();
 		workspace.FocusLastFocusedWindow();
-		MonitorWorkspaceChanged?.Invoke(
-			this,
+		_triggers.MonitorWorkspaceChanged(
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = monitor,
@@ -93,6 +99,17 @@ internal class ButlerChores : IButlerChores
 		}
 
 		Activate(nextWorkspace, monitor);
+	}
+
+	public void LayoutAllActiveWorkspaces()
+	{
+		Logger.Debug("Layout all active workspaces");
+
+		// For each workspace which is active in a monitor, do a layout.
+		foreach (IWorkspace workspace in _monitorWorkspaceMap.Values.ToArray())
+		{
+			workspace.DoLayout();
+		}
 	}
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)

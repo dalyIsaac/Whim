@@ -1,8 +1,35 @@
 namespace Whim;
 
-// TODO: Consider making a composed class?
-internal partial class Butler : IButler
+internal class ButlerEventHandlers
 {
+	private readonly IContext _context;
+	private readonly IInternalContext _internalContext;
+	private readonly ButlerTriggers _triggers;
+	private readonly IButlerPantry _pantry;
+
+	public ButlerEventHandlers(
+		IContext context,
+		IInternalContext internalContext,
+		ButlerTriggers triggers,
+		IButlerPantry pantry
+	)
+	{
+		_context = context;
+		_internalContext = internalContext;
+		_triggers = triggers;
+		_pantry = pantry;
+	}
+
+	public void PreInitialize()
+	{
+		_context.WindowManager.WindowAdded += WindowManager_WindowAdded;
+		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_context.WindowManager.WindowMinimizeStart += WindowManager_WindowMinimizeStart;
+		_context.WindowManager.WindowMinimizeEnd += WindowManager_WindowMinimizeEnd;
+		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+	}
+
 	private void WindowManager_WindowAdded(object? sender, WindowEventArgs args)
 	{
 		IWindow window = args.Window;
@@ -57,7 +84,7 @@ internal partial class Butler : IButler
 			workspace.AddWindow(window);
 		}
 
-		WindowRouted?.Invoke(this, RouteEventArgs.WindowAdded(window, workspace));
+		_triggers.WindowRouted(RouteEventArgs.WindowAdded(window, workspace));
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
@@ -75,7 +102,7 @@ internal partial class Butler : IButler
 		_pantry.RemoveWindow(window);
 
 		workspace.RemoveWindow(window);
-		WindowRouted?.Invoke(this, RouteEventArgs.WindowRemoved(window, workspace));
+		_triggers.WindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs args)
