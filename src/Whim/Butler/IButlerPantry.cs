@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Whim;
 
 /// <summary>
@@ -9,6 +11,8 @@ internal interface IButlerPantry
 	bool RemoveWindow(IWindow window);
 
 	bool RemoveMonitor(IMonitor monitor);
+
+	IEnumerable<IWorkspace> GetAllActiveWorkspaces();
 
 	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
 

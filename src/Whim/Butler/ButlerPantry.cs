@@ -7,6 +7,12 @@ internal class ButlerPantry : IButlerPantry
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
 
+	public IEnumerable<IWorkspace> GetAllActiveWorkspaces()
+	{
+		Logger.Debug("Getting all active workspaces");
+		return _monitorWorkspaceMap.Values;
+	}
+
 	public IMonitor? GetMonitorForWindow(IWindow window)
 	{
 		Logger.Debug($"Getting monitor for window: {window}");
@@ -45,7 +51,11 @@ internal class ButlerPantry : IButlerPantry
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? workspace : null;
 	}
 
-	public bool RemoveMonitor(IMonitor monitor) => throw new System.NotImplementedException();
+	public bool RemoveMonitor(IMonitor monitor)
+	{
+		Logger.Debug($"Removing monitor {monitor}");
+		return _monitorWorkspaceMap.Remove(monitor);
+	}
 
 	public bool RemoveWindow(IWindow window)
 	{
@@ -53,6 +63,7 @@ internal class ButlerPantry : IButlerPantry
 		return _windowWorkspaceMap.Remove(window);
 	}
 
+	// TODO: Do I need this here?
 	public bool RemoveWorkspace(IWorkspace workspace) => throw new System.NotImplementedException();
 
 	public void SetWindowWorkspace(IWindow window, IWorkspace workspace)

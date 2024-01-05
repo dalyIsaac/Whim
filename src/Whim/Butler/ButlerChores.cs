@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Whim;
 
 internal class ButlerChores : IButlerChores
@@ -106,7 +108,7 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug("Layout all active workspaces");
 
 		// For each workspace which is active in a monitor, do a layout.
-		foreach (IWorkspace workspace in _monitorWorkspaceMap.Values.ToArray())
+		foreach (IWorkspace workspace in _pantry.GetAllActiveWorkspaces())
 		{
 			workspace.DoLayout();
 		}
