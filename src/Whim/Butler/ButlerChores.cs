@@ -4,13 +4,11 @@ internal class ButlerChores : IButlerChores
 {
 	private readonly IContext _context;
 	private readonly ButlerTriggers _triggers;
-	private readonly IButlerPantry _pantry;
 
-	public ButlerChores(IContext context, ButlerTriggers triggers, IButlerPantry pantry)
+	public ButlerChores(IContext context, ButlerTriggers triggers)
 	{
 		_context = context;
 		_triggers = triggers;
-		_pantry = pantry;
 	}
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
@@ -26,20 +24,20 @@ internal class ButlerChores : IButlerChores
 		monitor ??= _context.MonitorManager.ActiveMonitor;
 
 		// Get the old workspace for the event.
-		IWorkspace? oldWorkspace = _pantry.GetWorkspaceForMonitor(monitor);
+		IWorkspace? oldWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
 
 		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = _pantry.GetMonitorForWorkspace(workspace);
+		IMonitor? loserMonitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
 
 		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
-		_pantry.SetMonitorWorkspace(monitor, workspace);
+		_context.Butler.Pantry.SetMonitorWorkspace(monitor, workspace);
 
 		(IWorkspace workspace, IMonitor monitor)? layoutOldWorkspace = null;
 		if (loserMonitor != null && oldWorkspace != null && !loserMonitor.Equals(monitor))
 		{
-			_pantry.SetMonitorWorkspace(loserMonitor, oldWorkspace);
+			_context.Butler.Pantry.SetMonitorWorkspace(loserMonitor, oldWorkspace);
 			layoutOldWorkspace = (oldWorkspace, loserMonitor);
 		}
 
@@ -80,14 +78,14 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug("Activating next workspace");
 
 		monitor ??= _context.MonitorManager.ActiveMonitor;
-		IWorkspace? currentWorkspace = _pantry.GetWorkspaceForMonitor(monitor);
+		IWorkspace? currentWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
 		if (currentWorkspace == null)
 		{
 			Logger.Debug($"No workspace found for monitor {monitor}");
 			return;
 		}
 
-		IWorkspace? nextWorkspace = _pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
+		IWorkspace? nextWorkspace = _context.Butler.Pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
 		if (nextWorkspace == null)
 		{
 			Logger.Debug($"No next workspace found for monitor {monitor}");
@@ -102,7 +100,7 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug("Layout all active workspaces");
 
 		// For each workspace which is active in a monitor, do a layout.
-		foreach (IWorkspace workspace in _pantry.GetAllActiveWorkspaces())
+		foreach (IWorkspace workspace in _context.Butler.Pantry.GetAllActiveWorkspaces())
 		{
 			workspace.DoLayout();
 		}
@@ -121,7 +119,7 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug("Moving window {window} in direction {edges} by {pixelsDeltas}");
 
 		// Get the containing workspace.
-		IWorkspace? workspace = _pantry.GetWorkspaceForWindow(window);
+		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
 		if (workspace == null)
 		{
 			Logger.Error($"Could not find workspace for window {window}");
@@ -129,7 +127,7 @@ internal class ButlerChores : IButlerChores
 		}
 
 		// Get the containing monitor.
-		IMonitor? monitor = _pantry.GetMonitorForWorkspace(workspace);
+		IMonitor? monitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
 		if (monitor == null)
 		{
 			Logger.Error($"Could not find monitor for workspace {workspace}");
@@ -159,21 +157,21 @@ internal class ButlerChores : IButlerChores
 		}
 
 		// Find the current workspace for the window.
-		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
+		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 
 			return;
 		}
 
-		IWorkspace? nextWorkspace = _pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
+		IWorkspace? nextWorkspace = _context.Butler.Pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
 		if (nextWorkspace == null)
 		{
 			Logger.Debug($"No next workspace found");
 			return;
 		}
 
-		_pantry.SetWindowWorkspace(window, nextWorkspace);
+		_context.Butler.Pantry.SetWindowWorkspace(window, nextWorkspace);
 
 		currentWorkspace.RemoveWindow(window);
 		nextWorkspace.AddWindow(window);
@@ -192,7 +190,7 @@ internal class ButlerChores : IButlerChores
 		}
 
 		Logger.Debug($"Moving window {window} to monitor {monitor}");
-		IMonitor? oldMonitor = _pantry.GetMonitorForWindow(window);
+		IMonitor? oldMonitor = _context.Butler.Pantry.GetMonitorForWindow(window);
 		if (oldMonitor == null)
 		{
 			Logger.Error($"Window {window} was not found in any monitor");
@@ -205,7 +203,7 @@ internal class ButlerChores : IButlerChores
 			return;
 		}
 
-		IWorkspace? workspace = _pantry.GetWorkspaceForMonitor(monitor);
+		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
 		if (workspace == null)
 		{
 			Logger.Error($"Monitor {monitor} was not found in any workspace");
@@ -245,7 +243,7 @@ internal class ButlerChores : IButlerChores
 		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);
 
 		// Get the target workspace.
-		IWorkspace? targetWorkspace = _pantry.GetWorkspaceForMonitor(targetMonitor);
+		IWorkspace? targetWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(targetMonitor);
 		if (targetWorkspace == null)
 		{
 			Logger.Error($"Monitor {targetMonitor} was not found to correspond to any workspace");
@@ -254,7 +252,7 @@ internal class ButlerChores : IButlerChores
 		}
 
 		// Get the old workspace.
-		IWorkspace? oldWorkspace = _pantry.GetWorkspaceForWindow(window);
+		IWorkspace? oldWorkspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
 		if (oldWorkspace == null)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
@@ -265,7 +263,7 @@ internal class ButlerChores : IButlerChores
 		bool isSameWorkspace = targetWorkspace.Equals(oldWorkspace);
 		if (!isSameWorkspace)
 		{
-			_pantry.SetWindowWorkspace(window, targetWorkspace);
+			_context.Butler.Pantry.SetWindowWorkspace(window, targetWorkspace);
 		}
 
 		// Normalize `point` into the unit square.
@@ -301,13 +299,13 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
 		// Find the current workspace for the window.
-		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
+		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 			return;
 		}
 
-		_pantry.SetWindowWorkspace(window, workspace);
+		_context.Butler.Pantry.SetWindowWorkspace(window, workspace);
 
 		currentWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
@@ -315,7 +313,7 @@ internal class ButlerChores : IButlerChores
 
 	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target)
 	{
-		_pantry.MergeWorkspaceWindows(source, target);
+		_context.Butler.Pantry.MergeWorkspaceWindows(source, target);
 
 		foreach (IWindow window in source.Windows)
 		{
@@ -327,7 +325,7 @@ internal class ButlerChores : IButlerChores
 	{
 		// Get the current monitor.
 		workspace ??= _context.WorkspaceManager2.ActiveWorkspace;
-		IMonitor? currentMonitor = _pantry.GetMonitorForWorkspace(workspace);
+		IMonitor? currentMonitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
 
 		if (currentMonitor == null)
 		{
@@ -347,7 +345,7 @@ internal class ButlerChores : IButlerChores
 		}
 
 		// Get workspace on next monitor.
-		IWorkspace? nextWorkspace = _pantry.GetWorkspaceForMonitor(nextMonitor);
+		IWorkspace? nextWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(nextMonitor);
 		if (nextWorkspace == null)
 		{
 			Logger.Error($"Monitor {nextMonitor} was not found to correspond to any workspace");

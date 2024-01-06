@@ -103,7 +103,7 @@ internal class ButlerPantry : IButlerPantry
 		IMonitor? monitor = GetMonitorForWorkspace(workspaceToDelete);
 		if (monitor != null)
 		{
-			_monitorWorkspaceMap.Remove(monitor);
+			_monitorWorkspaceMap[monitor] = workspaceMergeTarget;
 		}
 
 		// Remap windows to the first workspace which isn't active.

@@ -4,17 +4,32 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-// TODO: Order
 internal partial class Butler : IButler
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	private readonly IButlerPantry _pantry;
 	private readonly ButlerTriggers _triggers;
 	private readonly IButlerChores _chores;
 	private readonly ButlerEventHandlers _eventHandlers;
 	private bool _disposedValue;
+	private bool _initialized;
+
+	private IButlerPantry _pantry;
+	public IButlerPantry Pantry
+	{
+		get => _pantry;
+		set
+		{
+			if (_initialized)
+			{
+				Logger.Error("Cannot set the pantry after initialization.");
+				return;
+			}
+
+			_pantry = value;
+		}
+	}
 
 	public Butler(IContext context, IInternalContext internalContext)
 	{
@@ -25,8 +40,9 @@ internal partial class Butler : IButler
 			WindowRouted = (args) => WindowRouted?.Invoke(this, args),
 			MonitorWorkspaceChanged = (args) => MonitorWorkspaceChanged?.Invoke(this, args),
 		};
-		_pantry = new ButlerPantry();
-		_chores = new ButlerChores(_context, _triggers, _pantry);
+
+		_pantry = new ButlerPantry(_context);
+		_chores = new ButlerChores(_context, _triggers);
 		_eventHandlers = new ButlerEventHandlers(_context, _internalContext, _triggers, _pantry, _chores);
 	}
 
@@ -43,9 +59,10 @@ internal partial class Butler : IButler
 
 	public void Initialize()
 	{
+		_initialized = true;
+
 		// Add the saved windows at their saved locations inside their saved workspaces.
 		// Other windows are routed to the monitor they're on.
-
 		List<HWND> processedWindows = new();
 
 		// Route windows to their saved workspaces.
