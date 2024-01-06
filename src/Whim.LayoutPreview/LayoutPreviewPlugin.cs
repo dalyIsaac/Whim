@@ -74,8 +74,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 			}
 
 			IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
-			IPoint<int> monitorPoint = monitor.WorkingArea.ToMonitorCoordinates(cursorDraggedPoint);
-			IPoint<double> normalizedPoint = monitor.WorkingArea.ToUnitSquare(monitorPoint);
+			IPoint<double> normalizedPoint = monitor.WorkingArea.ToUnitSquare(cursorDraggedPoint);
 
 			IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
 			if (workspace == null)

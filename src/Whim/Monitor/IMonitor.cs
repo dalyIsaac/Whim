@@ -44,7 +44,7 @@ public interface IMonitor
 public static class MonitorHelpers
 {
 	/// <summary>
-	/// Translated the <paramref name="point"/> from the system's coordinate system to the
+	/// Converts the <paramref name="point"/> from the system's coordinate system to the
 	/// <paramref name="monitor"/>'s coordinate system.
 	/// The <paramref name="monitor"/>'s coordinate system is defined in terms of the monitor's
 	/// width and height, <b>not</b> the unit square.
@@ -61,7 +61,7 @@ public static class MonitorHelpers
 	}
 
 	/// <summary>
-	/// Translate the <paramref name="point"/> from the <paramref name="monitor"/>'s coordinate
+	/// Converts the <paramref name="point"/> from the <paramref name="monitor"/>'s coordinate
 	/// system to the unit square.
 	/// </summary>
 	/// <param name="monitor"></param>
@@ -74,8 +74,12 @@ public static class MonitorHelpers
 	{
 		Debug.Assert(monitor.Width != 0);
 		Debug.Assert(monitor.Height != 0);
-		double x = (double)point.X / monitor.Width;
-		double y = (double)point.Y / monitor.Height;
+
+		int translatedX = point.X - monitor.X;
+		int translatedY = point.Y - monitor.Y;
+
+		double x = (double)translatedX / monitor.Width;
+		double y = (double)translatedY / monitor.Height;
 
 		return respectSign
 			? new Point<double>() { X = x, Y = y }
@@ -83,7 +87,7 @@ public static class MonitorHelpers
 	}
 
 	/// <summary>
-	/// Translate the <paramref name="rectangle"/> from the unit square to the
+	/// Converts the <paramref name="rectangle"/> from the unit square to the
 	/// <paramref name="monitor"/>'s coordinate system.
 	/// </summary>
 	/// <param name="monitor"></param>
@@ -93,8 +97,12 @@ public static class MonitorHelpers
 	{
 		Debug.Assert(monitor.Width != 0);
 		Debug.Assert(monitor.Height != 0);
-		double x = Math.Abs((double)rectangle.X / monitor.Width);
-		double y = Math.Abs((double)rectangle.Y / monitor.Height);
+
+		int translatedX = rectangle.X - monitor.X;
+		int translatedY = rectangle.Y - monitor.Y;
+
+		double x = Math.Abs((double)translatedX / monitor.Width);
+		double y = Math.Abs((double)translatedY / monitor.Height);
 		double width = Math.Abs((double)rectangle.Width / monitor.Width);
 		double height = Math.Abs((double)rectangle.Height / monitor.Height);
 		return new Rectangle<double>()
@@ -107,7 +115,7 @@ public static class MonitorHelpers
 	}
 
 	/// <summary>
-	/// Translate the <paramref name="rectangle"/> from the unit square to the
+	/// Converts the <paramref name="rectangle"/> from the unit square to the
 	/// <paramref name="monitor"/>'s coordinate system.
 	/// </summary>
 	/// <param name="monitor"></param>
