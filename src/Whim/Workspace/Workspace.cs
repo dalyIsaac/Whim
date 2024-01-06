@@ -13,7 +13,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private readonly object _workspaceLock = new();
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
-	private readonly WorkspaceManagerTriggers _triggers;
 
 	private string _name;
 	public string Name
@@ -23,7 +22,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			string oldName = _name;
 			_name = value;
-			_triggers.WorkspaceRenamed(
+			_context.WorkspaceManager2.OnWorkspaceRenamed(
 				new WorkspaceRenamedEventArgs()
 				{
 					Workspace = this,
@@ -94,14 +93,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public Workspace(
 		IContext context,
 		IInternalContext internalContext,
-		WorkspaceManagerTriggers triggers,
 		string name,
 		IEnumerable<ILayoutEngine> layoutEngines
 	)
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_triggers = triggers;
 
 		_name = name;
 		_layoutEngines = layoutEngines.ToArray();
@@ -112,6 +109,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
+	// TODO: Rename to be `On*` prefixed.
 	public void WindowFocused(IWindow? window)
 	{
 		lock (_workspaceLock)
@@ -218,7 +216,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
-		_triggers.ActiveLayoutEngineChanged(
+		_context.WorkspaceManager2.OnActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -279,7 +277,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
-		_triggers.ActiveLayoutEngineChanged(
+		_context.WorkspaceManager2.OnActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -550,11 +548,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		Logger.Debug($"Starting layout for workspace {Name}");
-		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
+		_context.WorkspaceManager2.OnWorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
 
 		// Execute the layout task
 		_windowStates = SetWindowPos(engine: ActiveLayoutEngine, monitor);
-		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		_context.WorkspaceManager2.OnWorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
 	private Dictionary<HWND, IWindowState> SetWindowPos(ILayoutEngine engine, IMonitor monitor)

@@ -84,15 +84,6 @@ public interface IWorkspaceManager2 : IEnumerable<IWorkspace>
 	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; }
 
 	/// <summary>
-	/// Gets the adjacent workspace to the given workspace.
-	/// </summary>
-	/// <param name="workspace"></param>
-	/// <param name="reverse"></param>
-	/// <param name="skipActive"></param>
-	/// <returns></returns>
-	IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive);
-
-	/// <summary>
 	/// Tries to remove the given workspace.
 	/// </summary>
 	/// <param name="workspace">The workspace to remove.</param>

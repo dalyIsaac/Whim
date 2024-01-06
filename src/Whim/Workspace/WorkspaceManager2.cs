@@ -11,6 +11,8 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 
 	private readonly IContext _context;
 
+	private readonly IInternalContext _internalContext;
+
 	/// <summary>
 	/// The <see cref="IWorkspace"/>s stored by this manager.
 	/// </summary>
@@ -24,9 +26,10 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 
 	private readonly List<CreateProxyLayoutEngine> _proxyLayoutEngines = new();
 
-	public WorkspaceManager2(IContext context)
+	public WorkspaceManager2(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
+		_internalContext = internalContext;
 	}
 
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
@@ -64,28 +67,6 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 	}
 
 	public bool Contains(IWorkspace workspace) => _workspaces.Contains(workspace);
-
-	public IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse, bool skipActive)
-	{
-		int idx = _workspaces.IndexOf(workspace);
-		int delta = reverse ? -1 : 1;
-		int nextIdx = (idx + delta).Mod(_workspaces.Count);
-
-		while (idx != nextIdx)
-		{
-			IWorkspace nextWorkspace = _workspaces[nextIdx];
-			IMonitor? monitor = _context.Butler.GetMonitorForWorkspace(nextWorkspace);
-
-			if (monitor == null || !skipActive)
-			{
-				return nextWorkspace;
-			}
-
-			nextIdx = (nextIdx + delta).Mod(_workspaces.Count);
-		}
-
-		return null;
-	}
 
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
 
@@ -147,10 +128,9 @@ internal class WorkspaceManager2 : IWorkspaceManager2
 			}
 		}
 
-		// TODO: What do we do about Workspace?
 		// Create the workspace.
 		Workspace workspace =
-			new(_context, _internalContext, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
+			new(_context, _internalContext, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
 		_workspaces.Add(workspace);
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 		return workspace;
