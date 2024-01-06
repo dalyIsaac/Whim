@@ -87,11 +87,7 @@ internal class ButlerChores : IButlerChores
 			return;
 		}
 
-		IWorkspace? nextWorkspace = _context.WorkspaceManager2.GetAdjacentWorkspace(
-			currentWorkspace,
-			reverse,
-			skipActive
-		);
+		IWorkspace? nextWorkspace = _pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
 		if (nextWorkspace == null)
 		{
 			Logger.Debug($"No next workspace found for monitor {monitor}");
@@ -170,11 +166,7 @@ internal class ButlerChores : IButlerChores
 			return;
 		}
 
-		IWorkspace? nextWorkspace = _context.WorkspaceManager2.GetAdjacentWorkspace(
-			currentWorkspace,
-			reverse,
-			skipActive
-		);
+		IWorkspace? nextWorkspace = _pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
 		if (nextWorkspace == null)
 		{
 			Logger.Debug($"No next workspace found");

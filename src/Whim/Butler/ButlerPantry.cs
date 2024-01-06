@@ -1,11 +1,43 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Whim;
 
 internal class ButlerPantry : IButlerPantry
 {
+	private readonly IContext _context;
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
+
+	public ButlerPantry(IContext context)
+	{
+		_context = context;
+	}
+
+	public IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse = false, bool skipActive = false)
+	{
+		IWorkspace[] workspaces = _context.WorkspaceManager.ToArray();
+
+		int idx = Array.IndexOf(workspaces, workspace);
+		int delta = reverse ? -1 : 1;
+		int nextIdx = (idx + delta).Mod(workspaces.Length);
+
+		while (idx != nextIdx)
+		{
+			IWorkspace nextWorkspace = workspaces[nextIdx];
+			IMonitor? monitor = GetMonitorForWorkspace(nextWorkspace);
+
+			if (monitor == null || !skipActive)
+			{
+				return nextWorkspace;
+			}
+
+			nextIdx = (nextIdx + delta).Mod(workspaces.Length);
+		}
+
+		return null;
+	}
 
 	public IEnumerable<IWorkspace> GetAllActiveWorkspaces()
 	{

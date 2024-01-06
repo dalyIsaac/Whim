@@ -8,21 +8,23 @@ namespace Whim;
 /// </summary>
 internal interface IButlerPantry
 {
-	bool RemoveWindow(IWindow window);
-
-	bool RemoveMonitor(IMonitor monitor);
-
-	void MergeWorkspaceWindows(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget);
+	IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse = false, bool skipActive = false);
 
 	IEnumerable<IWorkspace> GetAllActiveWorkspaces();
+
+	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
+
+	IMonitor? GetMonitorForWindow(IWindow window);
 
 	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
 
 	IWorkspace? GetWorkspaceForWindow(IWindow window);
 
-	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
+	void MergeWorkspaceWindows(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget);
 
-	IMonitor? GetMonitorForWindow(IWindow window);
+	bool RemoveWindow(IWindow window);
+
+	bool RemoveMonitor(IMonitor monitor);
 
 	void SetMonitorWorkspace(IMonitor monitor, IWorkspace workspace);
 
