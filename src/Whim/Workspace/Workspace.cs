@@ -22,7 +22,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			string oldName = _name;
 			_name = value;
-			_context.WorkspaceManager2.OnWorkspaceRenamed(
+			_context.WorkspaceManager.OnWorkspaceRenamed(
 				new WorkspaceRenamedEventArgs()
 				{
 					Workspace = this,
@@ -216,7 +216,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
-		_context.WorkspaceManager2.OnActiveLayoutEngineChanged(
+		_context.WorkspaceManager.OnActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -277,7 +277,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
-		_context.WorkspaceManager2.OnActiveLayoutEngineChanged(
+		_context.WorkspaceManager.OnActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -548,11 +548,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		Logger.Debug($"Starting layout for workspace {Name}");
-		_context.WorkspaceManager2.OnWorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
+		_context.WorkspaceManager.OnWorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
 
 		// Execute the layout task
 		_windowStates = SetWindowPos(engine: ActiveLayoutEngine, monitor);
-		_context.WorkspaceManager2.OnWorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		_context.WorkspaceManager.OnWorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
 	private Dictionary<HWND, IWindowState> SetWindowPos(ILayoutEngine engine, IMonitor monitor)

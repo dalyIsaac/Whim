@@ -44,13 +44,13 @@ internal class ButlerEventHandlers : IDisposable
 		IWorkspace? workspace = null;
 		if (_context.RouterManager.RouterOptions == RouterOptions.RouteToActiveWorkspace)
 		{
-			workspace = _context.WorkspaceManager2.ActiveWorkspace;
+			workspace = _context.WorkspaceManager.ActiveWorkspace;
 		}
 		else if (_context.RouterManager.RouterOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
 			workspace = _internalContext.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
 				? _pantry.GetWorkspaceForMonitor(lastWhimActiveMonitor)
-				: _context.WorkspaceManager2.ActiveWorkspace;
+				: _context.WorkspaceManager.ActiveWorkspace;
 		}
 
 		// RouteWindow takes precedence over RouterOptions.
@@ -60,7 +60,7 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		// Check the workspace exists. If it doesn't, clear the workspace.
-		if (workspace != null && !_context.WorkspaceManager2.Contains(workspace))
+		if (workspace != null && !_context.WorkspaceManager.Contains(workspace))
 		{
 			Logger.Error($"Workspace {workspace} was not found");
 			workspace = null;
@@ -77,7 +77,7 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		// If that fails too, route the window to the active workspace.
-		workspace ??= _context.WorkspaceManager2.ActiveWorkspace;
+		workspace ??= _context.WorkspaceManager.ActiveWorkspace;
 
 		_pantry.SetWindowWorkspace(window, workspace);
 
@@ -116,7 +116,7 @@ internal class ButlerEventHandlers : IDisposable
 		IWindow? window = args.Window;
 		Logger.Debug($"Window focused: {window}");
 
-		foreach (IWorkspace workspace in _context.WorkspaceManager2)
+		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
 			((IInternalWorkspace)workspace).WindowFocused(window);
 		}
@@ -192,7 +192,7 @@ internal class ButlerEventHandlers : IDisposable
 		{
 			// Try find a workspace which doesn't have a monitor.
 			IWorkspace? workspace = null;
-			foreach (IWorkspace w in _context.WorkspaceManager2)
+			foreach (IWorkspace w in _context.WorkspaceManager)
 			{
 				if (_pantry.GetMonitorForWorkspace(w) is null)
 				{
@@ -204,7 +204,7 @@ internal class ButlerEventHandlers : IDisposable
 			// If there's no workspace, create one.
 			if (workspace is null)
 			{
-				if (_context.WorkspaceManager2.Add() is IWorkspace newWorkspace)
+				if (_context.WorkspaceManager.Add() is IWorkspace newWorkspace)
 				{
 					workspace = newWorkspace;
 					WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });

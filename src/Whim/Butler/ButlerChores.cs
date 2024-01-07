@@ -15,7 +15,7 @@ internal class ButlerChores : IButlerChores
 	{
 		Logger.Debug($"Activating workspace {workspace}");
 
-		if (!_context.WorkspaceManager2.Contains(workspace))
+		if (!_context.WorkspaceManager.Contains(workspace))
 		{
 			Logger.Error($"Workspace {workspace} is not tracked in Whim.");
 			return;
@@ -108,7 +108,7 @@ internal class ButlerChores : IButlerChores
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)
 	{
-		window ??= _context.WorkspaceManager2.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 
 		if (window == null)
 		{
@@ -146,7 +146,7 @@ internal class ButlerChores : IButlerChores
 
 	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false)
 	{
-		window ??= _context.WorkspaceManager2.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Moving window {window} to next workspace");
 
 		if (window == null)
@@ -180,7 +180,7 @@ internal class ButlerChores : IButlerChores
 	// TODO: #734
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
 	{
-		window ??= _context.WorkspaceManager2.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Moving window {window} to monitor {monitor}");
 
 		if (window == null)
@@ -287,7 +287,7 @@ internal class ButlerChores : IButlerChores
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
 	{
-		window ??= _context.WorkspaceManager2.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
 		if (window == null)
@@ -324,7 +324,7 @@ internal class ButlerChores : IButlerChores
 	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false)
 	{
 		// Get the current monitor.
-		workspace ??= _context.WorkspaceManager2.ActiveWorkspace;
+		workspace ??= _context.WorkspaceManager.ActiveWorkspace;
 		IMonitor? currentMonitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
 
 		if (currentMonitor == null)

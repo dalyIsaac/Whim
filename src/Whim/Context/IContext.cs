@@ -51,8 +51,6 @@ public interface IContext
 	/// </summary>
 	IWorkspaceManager WorkspaceManager { get; }
 
-	IWorkspaceManager2 WorkspaceManager2 { get; }
-
 	/// <summary>
 	/// Whim's <see cref="IWindowManager"/> instances.
 	/// </summary>

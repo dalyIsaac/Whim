@@ -70,7 +70,7 @@ internal partial class Butler : IButler
 			SavedWorkspace savedWorkspace in _internalContext.CoreSavedStateManager.SavedState?.Workspaces ?? new()
 		)
 		{
-			IWorkspace? workspace = _context.WorkspaceManager2.TryGet(savedWorkspace.Name);
+			IWorkspace? workspace = _context.WorkspaceManager.TryGet(savedWorkspace.Name);
 			if (workspace == null)
 			{
 				Logger.Debug($"Could not find workspace {savedWorkspace.Name}");
