@@ -21,7 +21,6 @@ internal record WorkspaceToCreate(string Name, IEnumerable<CreateLeafLayoutEngin
 internal class WorkspaceManager : IWorkspaceManager
 {
 	private bool _initialized;
-
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 	protected readonly WorkspaceManagerTriggers _triggers;
@@ -70,6 +69,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		}
 	}
 
+	private bool _disposedValue;
+
 	public WorkspaceManager(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
@@ -112,8 +113,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		_initialized = true;
 
 		// Backwards compat.
-		_context.Butler.WindowRouted += (sender, args) => WindowRouted?.Invoke(sender, args);
-		_context.Butler.MonitorWorkspaceChanged += (sender, args) => MonitorWorkspaceChanged?.Invoke(sender, args);
+		_context.Butler.WindowRouted += Butler_WindowRouted;
+		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
 
 		// Create the workspaces.
 		foreach (WorkspaceToCreate workspaceToCreate in _workspacesToCreate)
@@ -134,6 +135,11 @@ internal class WorkspaceManager : IWorkspaceManager
 			idx++;
 		}
 	}
+
+	private void Butler_WindowRouted(object? sender, RouteEventArgs e) => WindowRouted?.Invoke(sender, e);
+
+	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e) =>
+		MonitorWorkspaceChanged?.Invoke(sender, e);
 
 	private Workspace? CreateWorkspace(
 		string? name = null,
@@ -266,4 +272,35 @@ internal class WorkspaceManager : IWorkspaceManager
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
 		_context.Butler.MoveWindowEdgesInDirection(edges, pixelsDeltas, window);
 	#endregion
+
+	protected void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				Logger.Debug("Disposing workspace manager");
+
+				// dispose managed state (managed objects)
+				foreach (IWorkspace workspace in _workspaces)
+				{
+					workspace.Dispose();
+				}
+
+				_context.Butler.WindowRouted -= Butler_WindowRouted;
+				_context.Butler.MonitorWorkspaceChanged -= Butler_MonitorWorkspaceChanged;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
 }

@@ -21,7 +21,7 @@ internal class WindowManagerCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
-		IWorkspaceManager workspaceManager = Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>();
+		IWorkspaceManager workspaceManager = Substitute.For<IWorkspaceManager>();
 		IMonitorManager monitorManager = Substitute.For<IMonitorManager, IInternalMonitorManager>();
 
 		IContext context = fixture.Freeze<IContext>();
@@ -29,8 +29,34 @@ internal class WindowManagerCustomization : ICustomization
 		context.MonitorManager.Returns(monitorManager);
 
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-		internalCtx.WorkspaceManager.Returns((IInternalWorkspaceManager)workspaceManager);
 		internalCtx.MonitorManager.Returns((IInternalMonitorManager)monitorManager);
+	}
+}
+
+internal class WindowManagerSubscriber
+{
+	public bool HasBeenInvoked { get; private set; }
+
+	public WindowManagerSubscriber(WindowManager windowManager)
+	{
+		windowManager.WindowAdded += Handler;
+		windowManager.WindowFocused += Handler;
+		windowManager.WindowRemoved += Handler;
+		windowManager.WindowMoveStart += Handler;
+		windowManager.WindowMoved += Handler;
+		windowManager.WindowMoveEnd += Handler;
+		windowManager.WindowMinimizeStart += Handler;
+		windowManager.WindowMinimizeEnd += Handler;
+	}
+
+	private void Handler(object sender, WindowEventArgs e)
+	{
+		HasBeenInvoked = true;
+	}
+
+	private void Handler(object sender, WindowFocusedEventArgs e)
+	{
+		HasBeenInvoked = true;
 	}
 }
 
@@ -179,7 +205,6 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowFocused(window);
 		internalCtx.MonitorManager.Received(1).WindowFocused(window);
 		Assert.Equal(window, result.Arguments.Window);
 	}
@@ -198,7 +223,6 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowRemoved(window);
 		Assert.Equal(window, result.Arguments.Window);
 	}
 
@@ -221,7 +245,6 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowMinimizeStart(Arg.Any<IWindow>());
 		Assert.Equal((int)_processId, result.Arguments.Window.ProcessId);
 	}
 
@@ -244,7 +267,6 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowMinimizeEnd(Arg.Any<IWindow>());
 		Assert.Equal((int)_processId, result.Arguments.Window.ProcessId);
 	}
 
@@ -326,18 +348,22 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		capture.WinEventProc!.Invoke(
-			(HWINEVENTHOOK)0,
-			PInvoke.EVENT_OBJECT_SHOW,
-			hwndValue == null ? HWND.Null : (HWND)hwndValue,
-			idObject,
-			idChild,
-			0,
-			0
-		);
 
 		// Then
-		internalCtx.WorkspaceManager.DidNotReceive().WindowAdded(Arg.Any<IWindow>());
+		CustomAssert.DoesNotRaise<WindowEventArgs>(
+			h => windowManager.WindowAdded += h,
+			h => windowManager.WindowAdded -= h,
+			() =>
+				capture.WinEventProc!.Invoke(
+					(HWINEVENTHOOK)0,
+					PInvoke.EVENT_OBJECT_SHOW,
+					hwndValue == null ? HWND.Null : (HWND)hwndValue,
+					idObject,
+					idChild,
+					0,
+					0
+				)
+		);
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(true, false, true, true)]
@@ -388,10 +414,13 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		CustomAssert.DoesNotRaise<WindowEventArgs>(
+			h => windowManager.WindowAdded += h,
+			h => windowManager.WindowAdded -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0)
+		);
 
 		// Then
-		internalCtx.WorkspaceManager.DidNotReceive().WindowAdded(Arg.Any<IWindow>());
 		ctx.FilterManager.DidNotReceive().ShouldBeIgnored(Arg.Any<IWindow>());
 	}
 
@@ -409,10 +438,14 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+
+		CustomAssert.DoesNotRaise<WindowEventArgs>(
+			h => windowManager.WindowAdded += h,
+			h => windowManager.WindowAdded -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0)
+		);
 
 		// Then
-		internalCtx.WorkspaceManager.DidNotReceive().WindowAdded(Arg.Any<IWindow>());
 		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
 	}
 
@@ -430,12 +463,14 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowMinimizeStart += h,
+			h => windowManager.WindowMinimizeStart -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0)
+		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowAdded(Arg.Any<IWindow>());
 		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
-		internalCtx.WorkspaceManager.Received(1).WindowAdded(Arg.Any<IWindow>());
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
@@ -460,7 +495,6 @@ public class WindowManagerTests
 
 		// Then
 		internalCtx.MonitorManager.Received(1).WindowFocused(Arg.Any<IWindow>());
-		internalCtx.WorkspaceManager.Received(1).WindowFocused(Arg.Any<IWindow>());
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
@@ -489,7 +523,6 @@ public class WindowManagerTests
 
 		// Then
 		internalCtx.MonitorManager.Received(1).WindowFocused(Arg.Any<IWindow>());
-		internalCtx.WorkspaceManager.Received(1).WindowFocused(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
@@ -524,14 +557,13 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
+
+		// Then
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowRemoved += h,
 			h => windowManager.WindowRemoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0)
 		);
-
-		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowRemoved(Arg.Any<IWindow>());
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_DESTROY)]
@@ -555,7 +587,6 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowRemoved(Arg.Any<IWindow>());
 		Assert.Empty(windowManager.HandleWindowMap);
 	}
 
@@ -633,7 +664,7 @@ public class WindowManagerTests
 	{
 		// Given
 		IContext ctx = Substitute.For<IContext>();
-		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>());
+		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager>());
 		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
 		IInternalContext internalCtx = Substitute.For<IInternalContext>();
 		IWorkspace workspace = Substitute.For<IWorkspace>();
@@ -975,7 +1006,6 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowMinimizeStart(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
@@ -997,7 +1027,6 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.WorkspaceManager.Received(1).WindowMinimizeEnd(Arg.Any<IWindow>());
 	}
 
 	#region OnWindowMoveEnd
@@ -1297,7 +1326,6 @@ public class WindowManagerTests
 	{
 		// Given
 		IContext ctx = Substitute.For<IContext>();
-		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager, IInternalWorkspaceManager>());
 		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
 		IInternalContext internalCtx = Substitute.For<IInternalContext>();
 		IWorkspace workspace = Substitute.For<IWorkspace>();
@@ -1404,17 +1432,15 @@ public class WindowManagerTests
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
 		WindowManager windowManager = new(ctx, internalCtx);
+		WindowManagerSubscriber subscriber = new(windowManager);
 
 		// When
 		windowManager.Initialize();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, 0xBAADF00D, hwnd, 0, 0, 0, 0);
 
 		// Then
+		Assert.False(subscriber.HasBeenInvoked);
 		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
-		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.Received(1).WindowAdded(Arg.Any<IWindow>());
-		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowRemoved(Arg.Any<IWindow>());
-		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowMinimizeStart(Arg.Any<IWindow>());
-		(ctx.WorkspaceManager as IInternalWorkspaceManager)!.DidNotReceive().WindowMinimizeEnd(Arg.Any<IWindow>());
 		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 		ctx.WorkspaceManager.DidNotReceive()
 			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<int>>(), Arg.Any<IWindow>());

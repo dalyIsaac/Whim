@@ -9,7 +9,7 @@ namespace Whim;
 ///
 /// It is responsible for the creation and destruction of <see cref="IWorkspace"/>s.
 /// </summary>
-public interface IWorkspaceManager : IEnumerable<IWorkspace>
+public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 {
 	/// <summary>
 	/// The active workspace.
