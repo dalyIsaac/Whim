@@ -21,13 +21,13 @@ internal class CoreCommands : PluginCommands
 		_ = Add(
 				identifier: "activate_previous_workspace",
 				title: "Activate the previous workspace",
-				callback: () => _context.WorkspaceManager.ActivateAdjacent(reverse: true),
+				callback: () => _context.Butler.ActivateAdjacent(reverse: true),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "activate_next_workspace",
 				title: "Activate the next workspace",
-				callback: () => _context.WorkspaceManager.ActivateAdjacent(),
+				callback: () => _context.Butler.ActivateAdjacent(),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
@@ -82,7 +82,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
 				callback: () =>
-					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+					_context.Butler.MoveWindowEdgesInDirection(
 						Direction.Left,
 						new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
 					),
@@ -92,7 +92,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
 				callback: () =>
-					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+					_context.Butler.MoveWindowEdgesInDirection(
 						Direction.Left,
 						new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
 					),
@@ -102,7 +102,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
 				callback: () =>
-					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+					_context.Butler.MoveWindowEdgesInDirection(
 						Direction.Right,
 						new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
 					),
@@ -112,7 +112,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
 				callback: () =>
-					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+					_context.Butler.MoveWindowEdgesInDirection(
 						Direction.Right,
 						new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
 					),
@@ -122,7 +122,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_up",
 				title: "Move the current window's top edge up",
 				callback: () =>
-					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+					_context.Butler.MoveWindowEdgesInDirection(
 						Direction.Up,
 						new Point<int>() { Y = -MoveWindowEdgeDelta }
 					),
@@ -132,7 +132,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_down",
 				title: "Move the current window's top edge down",
 				callback: () =>
-					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+					_context.Butler.MoveWindowEdgesInDirection(
 						Direction.Up,
 						new Point<int>() { Y = MoveWindowEdgeDelta }
 					),
@@ -142,7 +142,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
 				callback: () =>
-					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+					_context.Butler.MoveWindowEdgesInDirection(
 						Direction.Down,
 						new Point<int>() { Y = -MoveWindowEdgeDelta }
 					),
@@ -152,7 +152,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
 				callback: () =>
-					_context.WorkspaceManager.MoveWindowEdgesInDirection(
+					_context.Butler.MoveWindowEdgesInDirection(
 						Direction.Down,
 						new Point<int>() { Y = MoveWindowEdgeDelta }
 					),
@@ -161,13 +161,13 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "move_window_to_previous_monitor",
 				title: "Move the window to the previous monitor",
-				callback: () => _context.WorkspaceManager.MoveWindowToPreviousMonitor(),
+				callback: () => _context.Butler.MoveWindowToPreviousMonitor(),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "move_window_to_next_monitor",
 				title: "Move the window to the next monitor",
-				callback: () => _context.WorkspaceManager.MoveWindowToNextMonitor(),
+				callback: () => _context.Butler.MoveWindowToNextMonitor(),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
@@ -293,7 +293,7 @@ internal class CoreCommands : PluginCommands
 				? _context.MonitorManager.GetNextMonitor(active)
 				: _context.MonitorManager.GetPreviousMonitor(active);
 
-			IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+			IWorkspace? workspace = _context.Butler.GetWorkspaceForMonitor(monitor);
 			if (workspace == null)
 			{
 				Logger.Error($"Could not find workspace for monitor {monitor}");
@@ -312,7 +312,7 @@ internal class CoreCommands : PluginCommands
 			IWorkspace[] workspaces = context.WorkspaceManager.ToArray();
 			if (Index <= workspaces.Length)
 			{
-				context.WorkspaceManager.Activate(workspaces[Index - 1]);
+				context.Butler.Activate(workspaces[Index - 1]);
 			}
 		}
 	}

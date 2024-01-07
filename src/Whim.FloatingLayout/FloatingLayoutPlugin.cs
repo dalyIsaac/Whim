@@ -56,7 +56,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 			return;
 		}
 
-		if (_context.WorkspaceManager.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		if (_context.Butler.GetWorkspaceForWindow(window) is not IWorkspace workspace)
 		{
 			Logger.Error($"Window {window} is not in a workspace");
 			return;

@@ -43,7 +43,7 @@ public class GapsPlugin : IGapsPlugin
 	public void UpdateOuterGap(int delta)
 	{
 		GapsConfig.OuterGap += delta;
-		_context.WorkspaceManager.LayoutAllActiveWorkspaces();
+		_context.Butler.LayoutAllActiveWorkspaces();
 	}
 
 	/// <summary>
@@ -53,7 +53,7 @@ public class GapsPlugin : IGapsPlugin
 	public void UpdateInnerGap(int delta)
 	{
 		GapsConfig.InnerGap += delta;
-		_context.WorkspaceManager.LayoutAllActiveWorkspaces();
+		_context.Butler.LayoutAllActiveWorkspaces();
 	}
 
 	/// <inheritdoc />

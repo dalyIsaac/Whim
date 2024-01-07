@@ -20,8 +20,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <summary>
 	/// The name of the active layout engine.
 	/// </summary>
-	public string ActiveLayoutEngine =>
-		_context.WorkspaceManager.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
+	public string ActiveLayoutEngine => _context.Butler.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
 
 	/// <summary>
 	/// Command to switch to the next layout engine.
@@ -40,7 +39,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		NextLayoutEngineCommand = new NextLayoutEngineCommand(context, this);
 
 		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
-		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
+		_context.Butler.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
 	}
 
 	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, EventArgs e) =>
@@ -70,7 +69,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			{
 				// dispose managed state (managed objects)
 				_context.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
-				_context.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
+				_context.Butler.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

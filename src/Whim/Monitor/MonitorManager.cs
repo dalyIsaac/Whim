@@ -109,7 +109,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 			return;
 		}
 
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+		IWorkspace? workspace = _context.Butler.GetWorkspaceForMonitor(monitor);
 		if (workspace is null)
 		{
 			Logger.Error($"No workspace found for monitor {monitor}");

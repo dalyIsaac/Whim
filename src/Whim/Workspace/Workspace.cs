@@ -13,6 +13,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private readonly object _workspaceLock = new();
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
+	private readonly WorkspaceManagerTriggers _triggers;
 
 	private string _name;
 	public string Name
@@ -22,7 +23,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			string oldName = _name;
 			_name = value;
-			_context.WorkspaceManager.OnWorkspaceRenamed(
+			_triggers.WorkspaceRenamed(
 				new WorkspaceRenamedEventArgs()
 				{
 					Workspace = this,
@@ -93,12 +94,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public Workspace(
 		IContext context,
 		IInternalContext internalContext,
+		WorkspaceManagerTriggers triggers,
 		string name,
 		IEnumerable<ILayoutEngine> layoutEngines
 	)
 	{
 		_context = context;
 		_internalContext = internalContext;
+		_triggers = triggers;
 
 		_name = name;
 		_layoutEngines = layoutEngines.ToArray();
@@ -185,7 +188,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			Logger.Debug($"No windows in workspace {Name} to focus, focusing desktop");
 
 			// Get the bounds of the monitor for this workspace.
-			IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
+			IMonitor? monitor = _context.Butler.GetMonitorForWorkspace(this);
 			if (monitor == null)
 			{
 				Logger.Debug($"No active monitors found for workspace {Name}.");
@@ -216,7 +219,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
-		_context.WorkspaceManager.OnActiveLayoutEngineChanged(
+		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -277,7 +280,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
-		_context.WorkspaceManager.OnActiveLayoutEngineChanged(
+		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = this,
@@ -540,7 +543,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		// Get the monitor for this workspace
-		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
+		IMonitor? monitor = _context.Butler.GetMonitorForWorkspace(this);
 		if (monitor == null)
 		{
 			Logger.Debug($"No active monitors found for workspace {Name}.");
@@ -548,11 +551,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		Logger.Debug($"Starting layout for workspace {Name}");
-		_context.WorkspaceManager.OnWorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
+		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
 
 		// Execute the layout task
 		_windowStates = SetWindowPos(engine: ActiveLayoutEngine, monitor);
-		_context.WorkspaceManager.OnWorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
+		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
 	}
 
 	private Dictionary<HWND, IWindowState> SetWindowPos(ILayoutEngine engine, IMonitor monitor)
@@ -676,7 +679,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Disposing workspace {Name}");
 
 				// dispose managed state (managed objects)
-				bool isWorkspaceActive = _context.WorkspaceManager.GetMonitorForWorkspace(this) != null;
+				bool isWorkspaceActive = _context.Butler.GetMonitorForWorkspace(this) != null;
 
 				// If the workspace isn't active on the monitor, show all the windows in as minimized.
 				if (!isWorkspaceActive)

@@ -72,7 +72,7 @@ internal class DeferWindowPosManager : IDeferWindowPosManager
 		List<WindowPosState> deferredWindowStates = new();
 		foreach (WindowPosState windowState in _deferredWindowStates.Values)
 		{
-			IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(windowState.WindowState.Window);
+			IWorkspace? workspace = _context.Butler.GetWorkspaceForWindow(windowState.WindowState.Window);
 			if (workspace != null && !deferredWorkspaces.Contains(workspace))
 			{
 				deferredWorkspaces.Add(workspace);

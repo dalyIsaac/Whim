@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Whim;
 
-// TODO: Order
 /// <summary>
 /// Container responsible for mapping <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s and
 /// <see cref="IWindow"/>s.
@@ -16,6 +15,17 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	/// The active workspace.
 	/// </summary>
 	IWorkspace ActiveWorkspace { get; }
+
+	/// <summary>
+	/// Creates the default layout engines to add to a workspace.
+	/// </summary>
+	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; }
+
+	/// <summary>
+	/// Creates the workspaces from the provided names and <see cref="CreateLayoutEngines"/> function.
+	/// Do not call this directly - Whim will call this when it is ready.
+	/// </summary>
+	void Initialize();
 
 	/// <summary>
 	/// Event for when a workspace is added.
@@ -48,11 +58,6 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
 
 	/// <summary>
-	/// Creates the workspaces from the provided names and <see cref="CreateLayoutEngines"/> function.
-	/// </summary>
-	void Initialize();
-
-	/// <summary>
 	/// Tries to get a workspace by the given name.
 	/// </summary>
 	/// <param name="workspaceName">The workspace name to try and get.</param>
@@ -69,7 +74,20 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	/// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
 	/// use the <see cref="CreateLayoutEngines"/> function.
 	/// </param>
-	void Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
+	/// <returns>
+	/// <list type="bullet">
+	/// <item>
+	/// <description>If <see cref="Initialize"/> has not been called, returns <see langword="null"/>.</description>
+	/// </item>
+	/// <item>
+	/// <description>If a workspace cannot be created, returns <see langword="null"/>.</description>
+	/// </item>
+	/// <item>
+	/// <description>Otherwise, returns the created workspace.</description>
+	/// </item>
+	/// </list>
+	/// </returns>
+	IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
 
 	/// <summary>
 	/// Whether the manager contains the given workspace.
@@ -77,11 +95,6 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	/// <param name="workspace"></param>
 	/// <returns></returns>
 	bool Contains(IWorkspace workspace);
-
-	/// <summary>
-	/// Creates the default layout engines to add to a workspace.
-	/// </summary>
-	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; }
 
 	/// <summary>
 	/// Tries to remove the given workspace.
@@ -96,23 +109,18 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	/// <returns><c>true</c> when the workspace has been removed.</returns>
 	bool Remove(string workspaceName);
 
-	// TODO: Maybe use a triggers object?
-	// NOTE: Event handlers called by Workspace.
-	void OnWorkspaceAdded(WorkspaceEventArgs args);
-
-	void OnWorkspaceRemoved(WorkspaceEventArgs args);
-
-	void OnWorkspaceRenamed(WorkspaceRenamedEventArgs args);
-
-	void OnWorkspaceLayoutStarted(WorkspaceEventArgs args);
-
-	void OnWorkspaceLayoutCompleted(WorkspaceEventArgs args);
-
-	void OnActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args);
-
 	/// <summary>
 	/// Tries to get a workspace by the given name.
 	/// </summary>
 	/// <param name="workspaceName">The workspace name to try and get.</param>
 	IWorkspace? TryGet(string workspaceName);
+
+	/// <summary>
+	/// Adds a proxy layout engine to the workspace manager.
+	/// A proxy layout engine is used by plugins to add layout functionality to
+	/// all workspaces.
+	/// This should be used by <see cref="IPlugin"/>s.
+	/// </summary>
+	/// <param name="proxyLayoutEngine">The proxy layout engine to add.</param>
+	void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine);
 }

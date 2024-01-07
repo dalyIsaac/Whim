@@ -5,6 +5,17 @@ using System.Linq;
 
 namespace Whim;
 
+/// <summary>
+/// Functions to trigger <see cref="WorkspaceManager"/> events, for within <see cref="Workspace"/>.
+/// </summary>
+internal record WorkspaceManagerTriggers
+{
+	public required Action<ActiveLayoutEngineChangedEventArgs> ActiveLayoutEngineChanged { get; init; }
+	public required Action<WorkspaceRenamedEventArgs> WorkspaceRenamed { get; init; }
+	public required Action<WorkspaceEventArgs> WorkspaceLayoutStarted { get; init; }
+	public required Action<WorkspaceEventArgs> WorkspaceLayoutCompleted { get; init; }
+}
+
 internal record WorkspaceToCreate(string Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines);
 
 internal class WorkspaceManager : IWorkspaceManager
@@ -12,8 +23,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	private bool _initialized;
 
 	private readonly IContext _context;
-
 	private readonly IInternalContext _internalContext;
+	protected readonly WorkspaceManagerTriggers _triggers;
 
 	/// <summary>
 	/// The <see cref="IWorkspace"/>s stored by this manager.
@@ -54,18 +65,31 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		_context = context;
 		_internalContext = internalContext;
+		_triggers = new WorkspaceManagerTriggers()
+		{
+			ActiveLayoutEngineChanged = (ActiveLayoutEngineChangedEventArgs e) =>
+				ActiveLayoutEngineChanged?.Invoke(this, e),
+			WorkspaceRenamed = (WorkspaceRenamedEventArgs e) => WorkspaceRenamed?.Invoke(this, e),
+			WorkspaceLayoutStarted = (WorkspaceEventArgs e) => WorkspaceLayoutStarted?.Invoke(this, e),
+			WorkspaceLayoutCompleted = (WorkspaceEventArgs e) => WorkspaceLayoutCompleted?.Invoke(this, e)
+		};
 	}
 
-	public void Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null)
+	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null)
 	{
 		if (_initialized)
 		{
-			CreateWorkspace(name, createLayoutEngines);
+			return CreateWorkspace(name, createLayoutEngines);
 		}
-		else
-		{
-			_workspacesToCreate.Add(new(name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines));
-		}
+
+		_workspacesToCreate.Add(new(name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines));
+		return null;
+	}
+
+	public void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine)
+	{
+		Logger.Debug($"Adding proxy layout engine: {proxyLayoutEngine}");
+		_proxyLayoutEngines.Add(proxyLayoutEngine);
 	}
 
 	public bool Contains(IWorkspace workspace) => _workspaces.Contains(workspace);
@@ -132,24 +156,11 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		// Create the workspace.
 		Workspace workspace =
-			new(_context, _internalContext, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
+			new(_context, _internalContext, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
 		_workspaces.Add(workspace);
 		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 		return workspace;
 	}
-
-	public void OnWorkspaceAdded(WorkspaceEventArgs args) => WorkspaceAdded?.Invoke(this, args);
-
-	public void OnWorkspaceRemoved(WorkspaceEventArgs args) => WorkspaceRemoved?.Invoke(this, args);
-
-	public void OnWorkspaceRenamed(WorkspaceRenamedEventArgs args) => WorkspaceRenamed?.Invoke(this, args);
-
-	public void OnWorkspaceLayoutStarted(WorkspaceEventArgs args) => WorkspaceLayoutStarted?.Invoke(this, args);
-
-	public void OnWorkspaceLayoutCompleted(WorkspaceEventArgs args) => WorkspaceLayoutCompleted?.Invoke(this, args);
-
-	public void OnActiveLayoutEngineChanged(ActiveLayoutEngineChangedEventArgs args) =>
-		ActiveLayoutEngineChanged?.Invoke(this, args);
 
 	public bool Remove(IWorkspace workspace)
 	{
