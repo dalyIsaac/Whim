@@ -28,6 +28,12 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	void Initialize();
 
 	/// <summary>
+	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
+	/// </summary>
+	[Obsolete("Use context.Butler.WindowRouted instead.")]
+	event EventHandler<RouteEventArgs>? WindowRouted;
+
+	/// <summary>
 	/// Event for when a workspace is added.
 	/// </summary>
 	event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
@@ -48,6 +54,12 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
 
 	/// <summary>
+	/// Event for when a monitor's workspace has changed.
+	/// </summary>
+	[Obsolete("Use context.Butler.MonitorWorkspaceChanged instead.")]
+	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
+
+	/// <summary>
 	/// Event for when a workspace's active layout engine has changed.
 	/// </summary>
 	event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
@@ -56,6 +68,13 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	/// Event for when a workspace is renamed.
 	/// </summary>
 	event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
+
+	/// <summary>
+	/// Triggers all active workspaces to update their layout.
+	/// Active workspaces are those that are visible on a monitor.
+	/// </summary>
+	[Obsolete("Use context.Butler.LayoutAllActiveWorkspaces instead.")]
+	void LayoutAllActiveWorkspaces();
 
 	/// <summary>
 	/// Add a new workspace.

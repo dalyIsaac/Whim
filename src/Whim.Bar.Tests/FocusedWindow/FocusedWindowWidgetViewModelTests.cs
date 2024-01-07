@@ -18,7 +18,7 @@ public class FocusedWindowWidgetViewModelTests
 
 		window.Title.Returns("title");
 
-		context.Butler.GetMonitorForWindow(window).Returns(monitor);
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(
@@ -46,7 +46,7 @@ public class FocusedWindowWidgetViewModelTests
 		window.Title.Returns("title");
 		otherWindow.Title.Returns("other title");
 
-		context.Butler.GetMonitorForWindow(window).Returns(monitor);
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
@@ -95,7 +95,7 @@ public class FocusedWindowWidgetViewModelTests
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
-		context.Butler.GetMonitorForWindow(window).Returns(monitor);
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(
@@ -123,7 +123,7 @@ public class FocusedWindowWidgetViewModelTests
 		// Given
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
-		context.Butler.GetMonitorForWindow(window).Returns(monitor);
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		window.Title.Returns("title");
 		otherWindow.Title.Returns("other title");
@@ -154,7 +154,7 @@ public class FocusedWindowWidgetViewModelTests
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
-		context.Butler.GetMonitorForWindow(window).Returns(monitor);
+		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(

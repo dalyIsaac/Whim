@@ -150,7 +150,6 @@ public interface IWorkspace : IDisposable
 	void MoveWindowToPoint(IWindow window, IPoint<double> point);
 	#endregion
 
-	// TODO: Rename to be `On*` prefixed
 	#region MinimizeWindow
 	/// <summary>
 	/// Called when a window is being minimized - i.e., the window size will become

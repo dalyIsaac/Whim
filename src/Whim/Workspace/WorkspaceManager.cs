@@ -37,11 +37,20 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// </summary>
 	private readonly List<WorkspaceToCreate> _workspacesToCreate = new();
 
+	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
+
+	public event EventHandler<RouteEventArgs>? WindowRouted;
+
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+
 	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
+
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
@@ -101,6 +110,10 @@ internal class WorkspaceManager : IWorkspaceManager
 		Logger.Debug("Initializing workspace manager");
 
 		_initialized = true;
+
+		// Backwards compat.
+		_context.Butler.WindowRouted += (sender, args) => WindowRouted?.Invoke(sender, args);
+		_context.Butler.MonitorWorkspaceChanged += (sender, args) => MonitorWorkspaceChanged?.Invoke(sender, args);
 
 		// Create the workspaces.
 		foreach (WorkspaceToCreate workspaceToCreate in _workspacesToCreate)
@@ -233,6 +246,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	public IWorkspace? GetWorkspaceForWindow(IWindow window) => _context.Butler.GetWorkspaceForWindow(window);
 
 	public IMonitor? GetMonitorForWindow(IWindow window) => _context.Butler.GetMonitorForWindow(window);
+
+	public void LayoutAllActiveWorkspaces() => _context.Butler.LayoutAllActiveWorkspaces();
 
 	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null) =>
 		_context.Butler.MoveWindowToWorkspace(workspace, window);
