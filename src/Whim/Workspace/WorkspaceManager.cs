@@ -208,4 +208,47 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+	#region Backwards compatibility
+	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>
+		_context.Butler.Activate(workspace, monitor);
+
+	public void ActivatePrevious(IMonitor? monitor = null) => _context.Butler.ActivateAdjacent(reverse: true);
+
+	public void ActivateNext(IMonitor? monitor = null) => _context.Butler.ActivateAdjacent();
+
+	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false) =>
+		_context.Butler.ActivateAdjacent(monitor, reverse, skipActive);
+
+	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false) =>
+		_context.Butler.MoveWindowToAdjacentWorkspace(window, reverse, skipActive);
+
+	public void SwapActiveWorkspaceWithAdjacentMonitor(bool reverse = false) =>
+		_context.Butler.SwapWorkspaceWithAdjacentMonitor(_context.WorkspaceManager.ActiveWorkspace, reverse);
+
+	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace) => _context.Butler.GetMonitorForWorkspace(workspace);
+
+	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor) => _context.Butler.GetWorkspaceForMonitor(monitor);
+
+	public IWorkspace? GetWorkspaceForWindow(IWindow window) => _context.Butler.GetWorkspaceForWindow(window);
+
+	public IMonitor? GetMonitorForWindow(IWindow window) => _context.Butler.GetMonitorForWindow(window);
+
+	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null) =>
+		_context.Butler.MoveWindowToWorkspace(workspace, window);
+
+	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null) =>
+		_context.Butler.MoveWindowToMonitor(monitor, window);
+
+	public void MoveWindowToPreviousMonitor(IWindow? window = null) =>
+		_context.Butler.MoveWindowToPreviousMonitor(window);
+
+	public void MoveWindowToNextMonitor(IWindow? window = null) => _context.Butler.MoveWindowToNextMonitor(window);
+
+	public void MoveWindowToPoint(IWindow window, IPoint<int> point) =>
+		_context.Butler.MoveWindowToPoint(window, point);
+
+	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
+		_context.Butler.MoveWindowEdgesInDirection(edges, pixelsDeltas, window);
+	#endregion
 }
