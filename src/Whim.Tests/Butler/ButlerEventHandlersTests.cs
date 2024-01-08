@@ -423,4 +423,110 @@ public class ButlerEventHandlersTests
 		chores.DidNotReceive().Activate(workspace);
 	}
 	#endregion
+
+	#region WindowMinimizeStart
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowMinimizeStart_NoWorkspaceForWindow(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		IWindow window
+	)
+	{
+		// Given the pantry does not have a workspace for the window
+		pantry.GetWorkspaceForWindow(window).ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the window is minimized
+		sut.PreInitialize();
+		ctx.WindowManager.WindowMinimizeStart += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then nothing happens
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowMinimizeStart_WorkspaceForWindowIsNotActiveWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		IWindow window,
+		IWorkspace workspace
+	)
+	{
+		// Given the pantry has a workspace for the window
+		pantry.GetWorkspaceForWindow(window).Returns(workspace);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the window is minimized
+		sut.PreInitialize();
+		ctx.WindowManager.WindowMinimizeStart += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then MinimizeWindowStart is called on the workspace
+		workspace.Received().MinimizeWindowStart(window);
+	}
+	#endregion
+
+	#region WindowMinimizeEnd
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowMinimizeEnd_NoWorkspaceForWindow(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IWindow window
+	)
+	{
+		// Given the pantry does not have a workspace for the window
+		pantry.GetWorkspaceForWindow(window).ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+
+		// When the window is unminimized
+		sut.PreInitialize();
+		ctx.WindowManager.WindowMinimizeEnd += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then nothing happens
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowMinimizeEnd_WorkspaceForWindowIsNotActiveWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IWindow window,
+		IWorkspace workspace
+	)
+	{
+		// Given the pantry has a workspace for the window
+		pantry.GetWorkspaceForWindow(window).Returns(workspace);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+
+		// When the window is unminimized
+		sut.PreInitialize();
+		ctx.WindowManager.WindowMinimizeEnd += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then MinimizeWindowEnd is called on the workspace
+		workspace.Received().MinimizeWindowEnd(window);
+	}
+	#endregion
 }
