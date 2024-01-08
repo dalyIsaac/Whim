@@ -1,0 +1,86 @@
+using Xunit;
+
+namespace Whim.Bar.Tests;
+
+public class BatteryWidgetIconsTests
+{
+	[Theory]
+	[InlineData(-1, true, false, BatteryWidgetIcons.BatteryUnknown)]
+	[InlineData(0, false, false, BatteryWidgetIcons.Battery0)]
+	[InlineData(9, false, false, BatteryWidgetIcons.Battery0)]
+	[InlineData(10, false, false, BatteryWidgetIcons.Battery1)]
+	[InlineData(19, false, false, BatteryWidgetIcons.Battery1)]
+	[InlineData(20, false, false, BatteryWidgetIcons.Battery2)]
+	[InlineData(29, false, false, BatteryWidgetIcons.Battery2)]
+	[InlineData(30, false, false, BatteryWidgetIcons.Battery3)]
+	[InlineData(39, false, false, BatteryWidgetIcons.Battery3)]
+	[InlineData(40, false, false, BatteryWidgetIcons.Battery4)]
+	[InlineData(49, false, false, BatteryWidgetIcons.Battery4)]
+	[InlineData(50, false, false, BatteryWidgetIcons.Battery5)]
+	[InlineData(59, false, false, BatteryWidgetIcons.Battery5)]
+	[InlineData(60, false, false, BatteryWidgetIcons.Battery6)]
+	[InlineData(69, false, false, BatteryWidgetIcons.Battery6)]
+	[InlineData(70, false, false, BatteryWidgetIcons.Battery7)]
+	[InlineData(79, false, false, BatteryWidgetIcons.Battery7)]
+	[InlineData(80, false, false, BatteryWidgetIcons.Battery8)]
+	[InlineData(89, false, false, BatteryWidgetIcons.Battery8)]
+	[InlineData(90, false, false, BatteryWidgetIcons.Battery9)]
+	[InlineData(99, false, false, BatteryWidgetIcons.Battery9)]
+	[InlineData(100, false, false, BatteryWidgetIcons.Battery10)]
+	[InlineData(101, true, false, BatteryWidgetIcons.BatteryUnknown)]
+	[InlineData(-1, false, true, BatteryWidgetIcons.BatteryUnknown)]
+	[InlineData(0, true, false, BatteryWidgetIcons.BatteryCharging0)]
+	[InlineData(9, true, false, BatteryWidgetIcons.BatteryCharging0)]
+	[InlineData(10, true, false, BatteryWidgetIcons.BatteryCharging1)]
+	[InlineData(19, true, false, BatteryWidgetIcons.BatteryCharging1)]
+	[InlineData(20, true, false, BatteryWidgetIcons.BatteryCharging2)]
+	[InlineData(29, true, false, BatteryWidgetIcons.BatteryCharging2)]
+	[InlineData(30, true, false, BatteryWidgetIcons.BatteryCharging3)]
+	[InlineData(39, true, false, BatteryWidgetIcons.BatteryCharging3)]
+	[InlineData(40, true, false, BatteryWidgetIcons.BatteryCharging4)]
+	[InlineData(49, true, false, BatteryWidgetIcons.BatteryCharging4)]
+	[InlineData(50, true, false, BatteryWidgetIcons.BatteryCharging5)]
+	[InlineData(59, true, false, BatteryWidgetIcons.BatteryCharging5)]
+	[InlineData(60, true, false, BatteryWidgetIcons.BatteryCharging6)]
+	[InlineData(69, true, false, BatteryWidgetIcons.BatteryCharging6)]
+	[InlineData(70, true, false, BatteryWidgetIcons.BatteryCharging7)]
+	[InlineData(79, true, false, BatteryWidgetIcons.BatteryCharging7)]
+	[InlineData(80, true, false, BatteryWidgetIcons.BatteryCharging8)]
+	[InlineData(89, true, false, BatteryWidgetIcons.BatteryCharging8)]
+	[InlineData(90, true, false, BatteryWidgetIcons.BatteryCharging9)]
+	[InlineData(99, true, false, BatteryWidgetIcons.BatteryCharging9)]
+	[InlineData(100, true, false, BatteryWidgetIcons.BatteryCharging10)]
+	[InlineData(101, false, true, BatteryWidgetIcons.BatteryUnknown)]
+	[InlineData(-1, false, false, BatteryWidgetIcons.BatteryUnknown)]
+	[InlineData(0, false, true, BatteryWidgetIcons.BatterySaver0)]
+	[InlineData(9, false, true, BatteryWidgetIcons.BatterySaver0)]
+	[InlineData(10, false, true, BatteryWidgetIcons.BatterySaver1)]
+	[InlineData(19, false, true, BatteryWidgetIcons.BatterySaver1)]
+	[InlineData(20, false, true, BatteryWidgetIcons.BatterySaver2)]
+	[InlineData(29, false, true, BatteryWidgetIcons.BatterySaver2)]
+	[InlineData(30, false, true, BatteryWidgetIcons.BatterySaver3)]
+	[InlineData(39, false, true, BatteryWidgetIcons.BatterySaver3)]
+	[InlineData(40, false, true, BatteryWidgetIcons.BatterySaver4)]
+	[InlineData(49, false, true, BatteryWidgetIcons.BatterySaver4)]
+	[InlineData(50, false, true, BatteryWidgetIcons.BatterySaver5)]
+	[InlineData(59, false, true, BatteryWidgetIcons.BatterySaver5)]
+	[InlineData(60, false, true, BatteryWidgetIcons.BatterySaver6)]
+	[InlineData(69, false, true, BatteryWidgetIcons.BatterySaver6)]
+	[InlineData(70, false, true, BatteryWidgetIcons.BatterySaver7)]
+	[InlineData(79, false, true, BatteryWidgetIcons.BatterySaver7)]
+	[InlineData(80, false, true, BatteryWidgetIcons.BatterySaver8)]
+	[InlineData(89, false, true, BatteryWidgetIcons.BatterySaver8)]
+	[InlineData(90, false, true, BatteryWidgetIcons.BatterySaver9)]
+	[InlineData(99, false, true, BatteryWidgetIcons.BatterySaver9)]
+	[InlineData(100, false, true, BatteryWidgetIcons.BatterySaver10)]
+	[InlineData(101, false, false, BatteryWidgetIcons.BatteryUnknown)]
+	public void GetBatteryIcon(int percent, bool isCharging, bool isSaver, string expected)
+	{
+		// Given
+		// When
+		string actual = BatteryWidgetIcons.GetBatteryIcon(percent, isCharging, isSaver);
+
+		// Then
+		Assert.Equal(expected, actual);
+	}
+}

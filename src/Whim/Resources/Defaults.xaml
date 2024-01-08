@@ -35,6 +35,12 @@
 		<Setter Property="FontFamily" Value="{StaticResource _font:family}" />
 	</Style>
 
+	<!--  Shared font icon style  -->
+	<Style x:Key="_base:font_icon" TargetType="FontIcon">
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+	</Style>
+
 	<!--  Root panel  -->
 	<Style x:Key="bar:root_panel" TargetType="RelativePanel">
 		<Setter Property="Margin" Value="0" />
@@ -46,6 +52,11 @@
 	<StaticResource x:Key="bar:left_panel" ResourceKey="_sub_panel" />
 	<StaticResource x:Key="bar:center_panel" ResourceKey="_sub_panel" />
 	<StaticResource x:Key="bar:right_panel" ResourceKey="_sub_panel" />
+
+	<!--  Widget stack panels  -->
+	<Style x:Key="_widget_stack_panel" TargetType="StackPanel">
+		<Setter Property="Orientation" Value="Horizontal" />
+	</Style>
 
 	<!--  Active layout widget  -->
 	<StaticResource x:Key="bar:active_layout:button" ResourceKey="_base:button" />
@@ -70,6 +81,30 @@
 		BasedOn="{StaticResource _base:text_block}"
 		TargetType="TextBlock">
 		<Setter Property="FontSize" Value="13" />
+	</Style>
+
+	<!--  Battery widget  -->
+	<Style
+		x:Key="bar:battery:stack_panel"
+		BasedOn="{StaticResource _widget_stack_panel}"
+		TargetType="StackPanel">
+		<Setter Property="Margin" Value="3,0" />
+		<Setter Property="Padding" Value="8,2,8,3" />
+		<Setter Property="Spacing" Value="8" />
+	</Style>
+	<Style
+		x:Key="bar:battery:font_icon"
+		BasedOn="{StaticResource _base:font_icon}"
+		TargetType="FontIcon">
+		<Setter Property="FontSize" Value="16" />
+	</Style>
+	<Style
+		x:Key="bar:battery:text_block"
+		BasedOn="{StaticResource _base:text_block}"
+		TargetType="TextBlock">
+		<Setter Property="FontSize" Value="13" />
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Padding" Value="0" />
 	</Style>
 
 </ResourceDictionary>
