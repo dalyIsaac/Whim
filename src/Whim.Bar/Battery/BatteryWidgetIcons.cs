@@ -25,6 +25,7 @@ internal static class BatteryWidgetIcons
 	public const string BatteryCharging6 = "\xe860";
 	public const string BatteryCharging7 = "\xe861";
 	public const string BatteryCharging8 = "\xe862";
+	public const string BatteryCharging10 = "\xe83e";
 	public const string BatterySaver0 = "\xe863";
 	public const string BatterySaver1 = "\xe864";
 	public const string BatterySaver2 = "\xe865";
@@ -34,11 +35,19 @@ internal static class BatteryWidgetIcons
 	public const string BatterySaver6 = "\xe869";
 	public const string BatterySaver7 = "\xe86a";
 	public const string BatterySaver8 = "\xe86b";
+	public const string BatterySaver9 = "\xea94";
+	public const string BatterySaver10 = "\xea95";
 	public const string BatteryUnknown = "\xe996";
 
 	public static string GetBatteryIcon(int percent, bool isCharging, bool isSaver)
 	{
-		int iconNumber = (int)Math.Round(percent / 10.0);
+		int iconNumber = (int)Math.Round(percent / 10.0, MidpointRounding.ToZero);
+
+		// Force unknown icon if the icon number is out of range.
+		if (percent < 0 || percent > 100)
+		{
+			iconNumber = 11;
+		}
 
 		if (isCharging)
 		{
@@ -54,6 +63,7 @@ internal static class BatteryWidgetIcons
 				7 => BatteryCharging7,
 				8 => BatteryCharging8,
 				9 => BatteryCharging9,
+				10 => BatteryCharging10,
 				_ => BatteryUnknown,
 			};
 		}
@@ -70,7 +80,8 @@ internal static class BatteryWidgetIcons
 				6 => BatterySaver6,
 				7 => BatterySaver7,
 				8 => BatterySaver8,
-				9 => BatterySaver8,
+				9 => BatterySaver9,
+				10 => BatterySaver10,
 				_ => BatteryUnknown,
 			};
 		}
@@ -87,6 +98,7 @@ internal static class BatteryWidgetIcons
 			7 => Battery7,
 			8 => Battery8,
 			9 => Battery9,
+			10 => Battery10,
 			_ => BatteryUnknown,
 		};
 	}
