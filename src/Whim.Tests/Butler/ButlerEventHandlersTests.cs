@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using AutoFixture;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
@@ -229,7 +230,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void WindowAdded_WindowIsMinimized(
+	internal void WindowAdded_RouteWindow_WindowIsMinimized(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -237,10 +238,12 @@ public class ButlerEventHandlersTests
 		IButlerChores chores,
 		ButlerTriggersCalls triggersCalls,
 		IWindow window,
-		IWorkspace workspace
+		IWorkspace routedWorkspace
 	)
 	{
-		// Given the window is minimized
+		// Given a window is routed to a workspace, the workspace manager contains the workspace, and the window is minimized
+		ctx.RouterManager.RouteWindow(window).Returns(routedWorkspace);
+		ctx.WorkspaceManager.Contains(routedWorkspace).Returns(true);
 		window.IsMinimized.Returns(true);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
@@ -252,14 +255,172 @@ public class ButlerEventHandlersTests
 			new WindowEventArgs() { Window = window }
 		);
 
-		// Then the workspace receives MinimizeWindowStart
-		pantry.Received().SetWindowWorkspace(window, workspace);
-		workspace.Received().MinimizeWindowStart(window);
+		// Then the window is routed to the workspace
+		ctx.RouterManager.Received().RouteWindow(window);
+		pantry.Received().SetWindowWorkspace(window, routedWorkspace);
+		routedWorkspace.Received().MinimizeWindowStart(window);
 
+		Assert.Single(triggersCalls.WindowRouted);
+
+		AssertWindowAdded(window, routedWorkspace, triggersCalls.WindowRouted[0]);
+	}
+	#endregion
+
+	#region WindowRemoved
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowRemoved_NoWorkspaceForWindow(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		ButlerTriggersCalls triggersCalls,
+		IWindow window
+	)
+	{
+		// Given the pantry does not contain the window
+		pantry.GetWorkspaceForWindow(window).ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the window is removed
+		sut.PreInitialize();
+		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then nothing happens
+		pantry.DidNotReceive().RemoveWindow(window);
 		Assert.Empty(triggersCalls.WindowRouted);
-
-		AssertWindowAdded(window, workspace, triggersCalls.WindowRouted[0]);
 	}
 
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowRemoved_RemoveWindowFromWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		ButlerTriggersCalls triggersCalls,
+		IWindow window,
+		IWorkspace workspace
+	)
+	{
+		// Given the pantry contains the window and the window is in a workspace
+		pantry.GetWorkspaceForWindow(window).Returns(workspace);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the window is removed
+		sut.PreInitialize();
+		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then the window is removed from the workspace
+		pantry.Received().RemoveWindow(window);
+		workspace.Received().RemoveWindow(window);
+		Assert.Single(triggersCalls.WindowRouted);
+	}
+	#endregion
+
+	#region WindowFocused
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowFocused_WindowIsNull(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores
+	)
+	{
+		// Given the window is null
+		IWorkspace[] workspaces = Enumerable
+			.Range(0, 3)
+			.Select(_ => Substitute.For<IWorkspace, IInternalWorkspace>())
+			.ToArray();
+		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the window is focused
+		sut.PreInitialize();
+		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+			ctx.WindowManager,
+			new WindowFocusedEventArgs() { Window = null }
+		);
+
+		// Then each workspace receives WindowFocused(null), but nothing else happens
+		foreach (IWorkspace workspace in workspaces)
+		{
+			((IInternalWorkspace)workspace).Received().WindowFocused(null);
+		}
+		pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowFocused_WorkspaceIsNotActivated(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		IWindow window,
+		IWorkspace workspace
+	)
+	{
+		// Given the pantry contains the window and the window is in a workspace
+		pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		pantry.GetMonitorForWorkspace(workspace).ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+
+		// When the window is focused
+		sut.PreInitialize();
+		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+			ctx.WindowManager,
+			new WindowFocusedEventArgs() { Window = window }
+		);
+
+		// Then the window is not routed to a workspace
+		pantry.Received().GetWorkspaceForWindow(window);
+		pantry.Received().GetMonitorForWorkspace(workspace);
+		workspace.DidNotReceive().AddWindow(window);
+		chores.DidNotReceive().Activate(workspace);
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowFocused_WorkspaceIsActivated(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		IWindow window,
+		IWorkspace workspace,
+		IMonitor monitor
+	)
+	{
+		// Given the pantry contains the window and the window is in a workspace
+		pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+
+		// When the window is focused
+		sut.PreInitialize();
+		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+			ctx.WindowManager,
+			new WindowFocusedEventArgs() { Window = window }
+		);
+
+		// Then the window is routed to a workspace
+		pantry.Received().GetWorkspaceForWindow(window);
+		pantry.Received().GetMonitorForWorkspace(workspace);
+		workspace.DidNotReceive().AddWindow(window);
+		chores.DidNotReceive().Activate(workspace);
+	}
 	#endregion
 }
