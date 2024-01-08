@@ -35,28 +35,25 @@ internal class WindowManagerCustomization : ICustomization
 
 internal class WindowManagerSubscriber
 {
-	public bool HasBeenInvoked { get; private set; }
+	public WindowEventArgs? WindowAddedArgs { get; private set; }
+	public WindowFocusedEventArgs? WindowFocusedArgs { get; private set; }
+	public WindowEventArgs? WindowRemovedArgs { get; private set; }
+	public WindowEventArgs? WindowMoveStartArgs { get; private set; }
+	public WindowEventArgs? WindowMovedArgs { get; private set; }
+	public WindowEventArgs? WindowMoveEndArgs { get; private set; }
+	public WindowEventArgs? WindowMinimizeStartArgs { get; private set; }
+	public WindowEventArgs? WindowMinimizeEndArgs { get; private set; }
 
 	public WindowManagerSubscriber(WindowManager windowManager)
 	{
-		windowManager.WindowAdded += Handler;
-		windowManager.WindowFocused += Handler;
-		windowManager.WindowRemoved += Handler;
-		windowManager.WindowMoveStart += Handler;
-		windowManager.WindowMoved += Handler;
-		windowManager.WindowMoveEnd += Handler;
-		windowManager.WindowMinimizeStart += Handler;
-		windowManager.WindowMinimizeEnd += Handler;
-	}
-
-	private void Handler(object sender, WindowEventArgs e)
-	{
-		HasBeenInvoked = true;
-	}
-
-	private void Handler(object sender, WindowFocusedEventArgs e)
-	{
-		HasBeenInvoked = true;
+		windowManager.WindowAdded += (sender, args) => WindowAddedArgs = args;
+		windowManager.WindowFocused += (sender, args) => WindowFocusedArgs = args;
+		windowManager.WindowRemoved += (sender, args) => WindowRemovedArgs = args;
+		windowManager.WindowMoveStart += (sender, args) => WindowMoveStartArgs = args;
+		windowManager.WindowMoved += (sender, args) => WindowMovedArgs = args;
+		windowManager.WindowMoveEnd += (sender, args) => WindowMoveEndArgs = args;
+		windowManager.WindowMinimizeStart += (sender, args) => WindowMinimizeStartArgs = args;
+		windowManager.WindowMinimizeEnd += (sender, args) => WindowMinimizeEndArgs = args;
 	}
 }
 
@@ -464,8 +461,8 @@ public class WindowManagerTests
 		// When
 		windowManager.Initialize();
 		Assert.Raises<WindowEventArgs>(
-			h => windowManager.WindowMinimizeStart += h,
-			h => windowManager.WindowMinimizeStart -= h,
+			h => windowManager.WindowAdded += h,
+			h => windowManager.WindowAdded -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0)
 		);
 
@@ -1439,8 +1436,15 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, 0xBAADF00D, hwnd, 0, 0, 0, 0);
 
 		// Then
-		Assert.False(subscriber.HasBeenInvoked);
 		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		Assert.NotNull(subscriber.WindowAddedArgs);
+		Assert.Null(subscriber.WindowFocusedArgs);
+		Assert.Null(subscriber.WindowRemovedArgs);
+		Assert.Null(subscriber.WindowMoveStartArgs);
+		Assert.Null(subscriber.WindowMovedArgs);
+		Assert.Null(subscriber.WindowMoveEndArgs);
+		Assert.Null(subscriber.WindowMinimizeStartArgs);
+		Assert.Null(subscriber.WindowMinimizeEndArgs);
 		ctx.WorkspaceManager.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 		ctx.WorkspaceManager.DidNotReceive()
 			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<int>>(), Arg.Any<IWindow>());

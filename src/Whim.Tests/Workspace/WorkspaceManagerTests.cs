@@ -111,7 +111,6 @@ public class WorkspaceManagerTests
 		ctx.WorkspaceManager.Returns(sut);
 
 		ctx.Butler.PreInitialize();
-		ctx.Butler.Initialize();
 		return sut;
 	}
 
@@ -222,10 +221,7 @@ public class WorkspaceManagerTests
 		// - a saved state with two workspaces, each with two handles
 		// - workspace 1 "john"'s last handle not being valid
 		// - workspace 2 "james" not being saved
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
-		SetupMonitors(ctx, new[] { Substitute.For<IMonitor>(), ctx.MonitorManager.ActiveMonitor });
-
-		CoreSavedState savedState =
+				CoreSavedState savedState =
 			new(
 				new List<SavedWorkspace>()
 				{
@@ -256,10 +252,14 @@ public class WorkspaceManagerTests
 		ctx.WindowManager.CreateWindow((HWND)3).Returns(window3);
 		ctx.WindowManager.CreateWindow((HWND)4).Returns(window4);
 
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		SetupMonitors(ctx, new[] { Substitute.For<IMonitor>(), ctx.MonitorManager.ActiveMonitor });
+
 		// When two workspaces are created, only one of which shares a name with a saved workspace
 		workspaceManager.Add("john");
 		workspaceManager.Add("jane");
 		workspaceManager.Initialize();
+		ctx.Butler.Initialize();
 
 		// Then we will have two workspaces
 		IWorkspace[] workspaces = workspaceManager.ToArray();
