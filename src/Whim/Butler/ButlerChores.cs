@@ -177,7 +177,6 @@ internal class ButlerChores : IButlerChores
 		nextWorkspace.AddWindow(window);
 	}
 
-	// TODO: #734
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
 	{
 		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;

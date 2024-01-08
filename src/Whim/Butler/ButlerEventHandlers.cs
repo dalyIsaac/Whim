@@ -42,7 +42,13 @@ internal class ButlerEventHandlers : IDisposable
 		Logger.Debug($"Adding window {window}");
 
 		IWorkspace? workspace = null;
-		if (_context.RouterManager.RouterOptions == RouterOptions.RouteToActiveWorkspace)
+
+		// RouteWindow takes precedence over RouterOptions.
+		if (_context.RouterManager.RouteWindow(window) is IWorkspace routedWorkspace)
+		{
+			workspace = routedWorkspace;
+		}
+		else if (_context.RouterManager.RouterOptions == RouterOptions.RouteToActiveWorkspace)
 		{
 			workspace = _context.WorkspaceManager.ActiveWorkspace;
 		}
@@ -51,12 +57,6 @@ internal class ButlerEventHandlers : IDisposable
 			workspace = _internalContext.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
 				? _pantry.GetWorkspaceForMonitor(lastWhimActiveMonitor)
 				: _context.WorkspaceManager.ActiveWorkspace;
-		}
-
-		// RouteWindow takes precedence over RouterOptions.
-		if (_context.RouterManager.RouteWindow(window) is IWorkspace routedWorkspace)
-		{
-			workspace = routedWorkspace;
 		}
 
 		// Check the workspace exists. If it doesn't, clear the workspace.
