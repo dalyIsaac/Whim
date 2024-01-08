@@ -75,8 +75,45 @@ public class ButlerEventHandlersTests
 
 		Assert.Single(triggersCalls.WindowRouted);
 
-		RouteEventArgs actual = triggersCalls.WindowRouted[0];
-		AssertWindowAdded(window, routedWorkspace, actual);
+		AssertWindowAdded(window, routedWorkspace, triggersCalls.WindowRouted[0]);
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowAdded_RouteWindow_WorkspaceDoesNotExist(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		ButlerTriggersCalls triggersCalls,
+		IWindow window,
+		IWorkspace badWorkspace,
+		IWorkspace goodWorkspace
+	)
+	{
+		// Given a window is routed to a workspace and the workspace manager does not contain the workspace
+		ctx.RouterManager.RouteWindow(window).Returns(badWorkspace);
+		ctx.WorkspaceManager.Contains(badWorkspace).Returns(false);
+		pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(goodWorkspace);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the window is added
+		sut.PreInitialize();
+		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then the window is routed to the workspace
+		ctx.RouterManager.Received().RouteWindow(window);
+		pantry.Received().SetWindowWorkspace(window, goodWorkspace);
+		badWorkspace.DidNotReceive().AddWindow(window);
+		goodWorkspace.Received().AddWindow(window);
+
+		Assert.Single(triggersCalls.WindowRouted);
+
+		AssertWindowAdded(window, goodWorkspace, triggersCalls.WindowRouted[0]);
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
@@ -112,8 +149,7 @@ public class ButlerEventHandlersTests
 
 		Assert.Single(triggersCalls.WindowRouted);
 
-		RouteEventArgs actual = triggersCalls.WindowRouted[0];
-		AssertWindowAdded(window, activeWorkspace, actual);
+		AssertWindowAdded(window, activeWorkspace, triggersCalls.WindowRouted[0]);
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
@@ -152,8 +188,78 @@ public class ButlerEventHandlersTests
 
 		Assert.Single(triggersCalls.WindowRouted);
 
-		RouteEventArgs actual = triggersCalls.WindowRouted[0];
-		AssertWindowAdded(window, lastTrackedActiveWorkspace, actual);
+		AssertWindowAdded(window, lastTrackedActiveWorkspace, triggersCalls.WindowRouted[0]);
 	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowAdded_RouteToLaunchedWorkspace_GetMonitorAtPoint_ReturnsNull(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		ButlerTriggersCalls triggersCalls,
+		IWindow window,
+		IWorkspace workspace
+	)
+	{
+		// Given the router options are set to RouteToLaunchedWorkspace and the monitor manager returns null for GetMonitorAtPoint
+		ctx.RouterManager.RouteWindow(window).ReturnsNull();
+		ctx.RouterManager.RouterOptions.Returns(RouterOptions.RouteToLaunchedWorkspace);
+		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).ReturnsNull();
+		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the window is added
+		sut.PreInitialize();
+		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then the window is routed to the workspace
+		ctx.RouterManager.Received().RouteWindow(window);
+		pantry.Received().SetWindowWorkspace(window, workspace);
+		workspace.Received().AddWindow(window);
+
+		Assert.Single(triggersCalls.WindowRouted);
+
+		AssertWindowAdded(window, workspace, triggersCalls.WindowRouted[0]);
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowAdded_WindowIsMinimized(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		ButlerTriggersCalls triggersCalls,
+		IWindow window,
+		IWorkspace workspace
+	)
+	{
+		// Given the window is minimized
+		window.IsMinimized.Returns(true);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the window is added
+		sut.PreInitialize();
+		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then the workspace receives MinimizeWindowStart
+		pantry.Received().SetWindowWorkspace(window, workspace);
+		workspace.Received().MinimizeWindowStart(window);
+
+		Assert.Empty(triggersCalls.WindowRouted);
+
+		AssertWindowAdded(window, workspace, triggersCalls.WindowRouted[0]);
+	}
+
 	#endregion
 }
