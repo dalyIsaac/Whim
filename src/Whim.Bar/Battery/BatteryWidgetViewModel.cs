@@ -30,9 +30,7 @@ internal class BatteryWidgetViewModel : INotifyPropertyChanged, IDisposable
 	[MemberNotNull(nameof(RemainingChargePercent), nameof(Icon))]
 	private void Update(object? sender, object e)
 	{
-		// Update the icon.
 		RemainingChargePercent = $"{PowerManager.RemainingChargePercent}%";
-
 		Icon = BatteryWidgetIcons.GetBatteryIcon(
 			PowerManager.RemainingChargePercent,
 			PowerManager.BatteryStatus == BatteryStatus.Charging,
