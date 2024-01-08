@@ -43,6 +43,7 @@ void DoConfig(IContext context)
 	List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
 	List<BarComponent> rightComponents = new()
 	{
+		BatteryWidget.CreateComponent(),
 		ActiveLayoutWidget.CreateComponent(),
 		DateTimeWidget.CreateComponent()
 	};
