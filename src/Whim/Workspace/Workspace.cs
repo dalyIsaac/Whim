@@ -204,13 +204,26 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void TrySetLayoutEngineFromIndex(int nextIdx)
+	public bool TrySetLayoutEngineFromIndex(int nextIdx)
 	{
+		Logger.Debug($"Trying to set layout engine with index {nextIdx} for workspace");
+
 		ILayoutEngine prevLayoutEngine;
 		ILayoutEngine nextLayoutEngine;
 
 		lock (_workspaceLock)
 		{
+			if (nextIdx >= _layoutEngines.Length)
+			{
+				Logger.Error($"Index {nextIdx} exceeds number of layout engines for workspace");
+				return false;
+			}
+			if (nextIdx < 0)
+			{
+				Logger.Error($"Index {nextIdx} is negative");
+				return false;
+			}
+
 			_prevLayoutEngineIndex = _activeLayoutEngineIndex;
 			_activeLayoutEngineIndex = nextIdx;
 
@@ -227,6 +240,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				CurrentLayoutEngine = nextLayoutEngine
 			}
 		);
+		return true;
 	}
 
 	private void CycleLayoutEngine(int delta)
