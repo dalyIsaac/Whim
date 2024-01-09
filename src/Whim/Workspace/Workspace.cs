@@ -208,11 +208,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		ILayoutEngine prevLayoutEngine;
 		ILayoutEngine nextLayoutEngine;
-		
+
 		lock (_workspaceLock)
 		{
 			int prevIdx = _activeLayoutEngineIndex;
-			
+
 			_prevLayoutEngineIndex = prevIdx;
 			_activeLayoutEngineIndex = nextIdx;
 
@@ -230,16 +230,16 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		);
 	}
-	
+
 	private void CycleLayoutEngine(int delta)
 	{
 		int nextIdx;
-		
+
 		lock (_workspaceLock)
 		{
 			nextIdx = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
 		}
-		
+
 		SetLayoutEngine(nextIdx);
 	}
 
@@ -288,7 +288,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
 				return true;
 			}
-
 		}
 
 		SetLayoutEngine(nextIdx);
