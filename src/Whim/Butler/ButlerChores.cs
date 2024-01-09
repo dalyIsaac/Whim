@@ -266,8 +266,7 @@ internal class ButlerChores : IButlerChores
 		}
 
 		// Normalize `point` into the unit square.
-		IPoint<int> pointInMonitor = targetMonitor.WorkingArea.ToMonitorCoordinates(point);
-		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(pointInMonitor);
+		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(point);
 
 		Logger.Debug(
 			$"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor} at normalized point {normalized}"
