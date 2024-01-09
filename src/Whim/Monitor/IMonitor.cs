@@ -44,25 +44,7 @@ public interface IMonitor
 public static class MonitorHelpers
 {
 	/// <summary>
-	/// Converts the <paramref name="point"/> from the system's coordinate system to the
-	/// <paramref name="monitor"/>'s coordinate system.
-	/// The <paramref name="monitor"/>'s coordinate system is defined in terms of the monitor's
-	/// width and height, <b>not</b> the unit square.
-	/// This does not take into account the monitor's scale factor.
-	/// </summary>
-	/// <param name="monitor"></param>
-	/// <param name="point"></param>
-	/// <returns>
-	/// The converted point, where x and y are in the range [0, width) and [0, height).
-	/// </returns>
-	public static IPoint<int> ToMonitorCoordinates(this IRectangle<int> monitor, IPoint<int> point)
-	{
-		return new Point<int>() { X = point.X - monitor.X, Y = point.Y - monitor.Y };
-	}
-
-	/// <summary>
-	/// Converts the <paramref name="point"/> from the <paramref name="monitor"/>'s coordinate
-	/// system to the unit square.
+	/// Converts the <paramref name="point"/> from the system's coordinate system to the unit square.
 	/// </summary>
 	/// <param name="monitor"></param>
 	/// <param name="point">The point to translate.</param>
