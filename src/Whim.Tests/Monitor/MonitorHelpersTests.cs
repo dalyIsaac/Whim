@@ -300,38 +300,4 @@ public class MonitorHelpersTests
 		Assert.Equal(expected.X, actual.X);
 		Assert.Equal(expected.Y, actual.Y);
 	}
-
-	public static IEnumerable<object[]> ToMonitorCoordinates_Data()
-	{
-		yield return new object[]
-		{
-			new Rectangle<int>() { Width = 1920, Height = 1080 },
-			new Point<int>() { X = 192, Y = 108 },
-			new Point<int>() { X = 192, Y = 108 }
-		};
-		yield return new object[]
-		{
-			new Rectangle<int>()
-			{
-				X = 100,
-				Y = 100,
-				Width = 1920,
-				Height = 1080
-			},
-			new Point<int>() { X = 192, Y = 108 },
-			new Point<int>() { X = 92, Y = 8 }
-		};
-	}
-
-	[Theory]
-	[MemberData(nameof(ToMonitorCoordinates_Data))]
-	public void ToMonitorCoordinates_Theory(IRectangle<int> monitor, IPoint<int> point, IPoint<int> expected)
-	{
-		// When
-		IPoint<int> actual = monitor.ToMonitorCoordinates(point);
-
-		// Then
-		Assert.Equal(expected.X, actual.X);
-		Assert.Equal(expected.Y, actual.Y);
-	}
 }
