@@ -35,6 +35,11 @@ public interface IWorkspace : IDisposable
 	/// Rotate to the previous layout engine.
 	/// </summary>
 	void PreviousLayoutEngine();
+	
+	/// <summary>
+	/// Activates previously active layout engine.
+	/// </summary>
+	void LastActiveLayoutEngine();
 
 	/// <summary>
 	/// Tries to set the layout engine to one with the <c>name</c>.

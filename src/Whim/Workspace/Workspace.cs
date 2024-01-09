@@ -55,6 +55,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	protected readonly ILayoutEngine[] _layoutEngines;
+	private int _prevLayoutEngineIndex;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
@@ -212,6 +213,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			int prevIdx = _activeLayoutEngineIndex;
 			
+			_prevLayoutEngineIndex = prevIdx;
 			_activeLayoutEngineIndex = nextIdx;
 
 			prevLayoutEngine = _layoutEngines[prevIdx];
@@ -251,6 +253,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		Logger.Debug(Name);
 		CycleLayoutEngine(-1);
+	}
+
+	public void LastActiveLayoutEngine()
+	{
+		SetLayoutEngine(_prevLayoutEngineIndex);
 	}
 
 	public bool TrySetLayoutEngine(string name)
