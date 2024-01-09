@@ -203,18 +203,19 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	private void UpdateLayoutEngine(int delta)
+	public void SetLayoutEngine(int nextIdx)
 	{
 		ILayoutEngine prevLayoutEngine;
 		ILayoutEngine nextLayoutEngine;
-
+		
 		lock (_workspaceLock)
 		{
 			int prevIdx = _activeLayoutEngineIndex;
-			_activeLayoutEngineIndex = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
+			
+			_activeLayoutEngineIndex = nextIdx;
 
 			prevLayoutEngine = _layoutEngines[prevIdx];
-			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
+			nextLayoutEngine = _layoutEngines[nextIdx];
 		}
 
 		DoLayout();
@@ -227,29 +228,39 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		);
 	}
+	
+	private void CycleLayoutEngine(int delta)
+	{
+		int nextIdx;
+		
+		lock (_workspaceLock)
+		{
+			nextIdx = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
+		}
+		
+		SetLayoutEngine(nextIdx);
+	}
 
 	public void NextLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine(1);
+		CycleLayoutEngine(1);
 	}
 
 	public void PreviousLayoutEngine()
 	{
 		Logger.Debug(Name);
-		UpdateLayoutEngine(-1);
+		CycleLayoutEngine(-1);
 	}
 
 	public bool TrySetLayoutEngine(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
-		ILayoutEngine prevLayoutEngine;
-		ILayoutEngine nextLayoutEngine;
+		int nextIdx = -1;
 
 		lock (_workspaceLock)
 		{
-			int nextIdx = -1;
 			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
 				ILayoutEngine engine = _layoutEngines[idx];
@@ -271,22 +282,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				return true;
 			}
 
-			int prevIdx = _activeLayoutEngineIndex;
-			_activeLayoutEngineIndex = nextIdx;
-
-			prevLayoutEngine = _layoutEngines[prevIdx];
-			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		DoLayout();
-		_triggers.ActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = this,
-				PreviousLayoutEngine = prevLayoutEngine,
-				CurrentLayoutEngine = nextLayoutEngine
-			}
-		);
+		SetLayoutEngine(nextIdx);
 		return true;
 	}
 

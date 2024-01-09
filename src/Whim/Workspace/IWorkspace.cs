@@ -23,6 +23,12 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Rotate to the next layout engine.
 	/// </summary>
+	/// <param name="nextIdx">The index of the layout engine to make active.</param>
+	void SetLayoutEngine(int nextIdx);
+	
+	/// <summary>
+	/// Rotate to the next layout engine.
+	/// </summary>
 	void NextLayoutEngine();
 
 	/// <summary>
