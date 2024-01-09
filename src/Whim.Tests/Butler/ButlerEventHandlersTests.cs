@@ -643,7 +643,7 @@ public class ButlerEventHandlersTests
 			{
 				RemovedMonitors = Array.Empty<IMonitor>(),
 				UnchangedMonitors = monitors,
-				AddedMonitors = new[] {newMonitor }
+				AddedMonitors = new[] { newMonitor }
 			}
 		);
 

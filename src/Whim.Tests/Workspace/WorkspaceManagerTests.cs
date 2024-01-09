@@ -221,7 +221,7 @@ public class WorkspaceManagerTests
 		// - a saved state with two workspaces, each with two handles
 		// - workspace 1 "john"'s last handle not being valid
 		// - workspace 2 "james" not being saved
-				CoreSavedState savedState =
+		CoreSavedState savedState =
 			new(
 				new List<SavedWorkspace>()
 				{
