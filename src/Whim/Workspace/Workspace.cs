@@ -211,13 +211,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		lock (_workspaceLock)
 		{
-			int prevIdx = _activeLayoutEngineIndex;
-
-			_prevLayoutEngineIndex = prevIdx;
+			_prevLayoutEngineIndex = _activeLayoutEngineIndex;
 			_activeLayoutEngineIndex = nextIdx;
 
-			prevLayoutEngine = _layoutEngines[prevIdx];
-			nextLayoutEngine = _layoutEngines[nextIdx];
+			prevLayoutEngine = _layoutEngines[_prevLayoutEngineIndex];
+			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
 		DoLayout();
