@@ -46,7 +46,7 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="name">The name of the layout engine to make active.</param>
 	/// <returns></returns>
-	bool TrySetLayoutEngine(string name);
+	bool SetLayoutEngineFromName(string name);
 
 	/// <summary>
 	/// Trigger a layout.

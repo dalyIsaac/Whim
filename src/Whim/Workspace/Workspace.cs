@@ -260,7 +260,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		SetLayoutEngine(_prevLayoutEngineIndex);
 	}
 
-	public bool TrySetLayoutEngine(string name)
+	public bool SetLayoutEngineFromName(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 

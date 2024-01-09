@@ -63,7 +63,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void TrySetLayoutEngine_CannotFindEngine(
+	internal void SetLayoutEngineFromName_CannotFindEngine(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -75,7 +75,7 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When
-		bool result = workspace.TrySetLayoutEngine("Layout2");
+		bool result = workspace.SetLayoutEngineFromName("Layout2");
 
 		// Then
 		Assert.False(result);
@@ -83,7 +83,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void TrySetLayoutEngine_AlreadyActive(
+	internal void SetLayoutEngineFromName_AlreadyActive(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -98,7 +98,7 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When
-		bool result = workspace.TrySetLayoutEngine("Layout");
+		bool result = workspace.SetLayoutEngineFromName("Layout");
 
 		// Then
 		Assert.True(result);
@@ -106,7 +106,7 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void TrySetLayoutEngine_Success(
+	internal void SetLayoutEngineFromName_Success(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -122,7 +122,7 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When
-		bool result = workspace.TrySetLayoutEngine("Layout2");
+		bool result = workspace.SetLayoutEngineFromName("Layout2");
 
 		// Then
 		Assert.True(result);
