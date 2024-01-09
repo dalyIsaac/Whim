@@ -204,7 +204,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void SetLayoutEngine(int nextIdx)
+	public void TrySetLayoutEngineFromIndex(int nextIdx)
 	{
 		ILayoutEngine prevLayoutEngine;
 		ILayoutEngine nextLayoutEngine;
@@ -238,7 +238,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			nextIdx = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
 		}
 
-		SetLayoutEngine(nextIdx);
+		TrySetLayoutEngineFromIndex(nextIdx);
 	}
 
 	public void NextLayoutEngine()
@@ -255,10 +255,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void LastActiveLayoutEngine()
 	{
-		SetLayoutEngine(_prevLayoutEngineIndex);
+		TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
 	}
 
-	public bool SetLayoutEngineFromName(string name)
+	public bool TrySetLayoutEngineFromName(string name)
 	{
 		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
 
@@ -288,7 +288,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		SetLayoutEngine(nextIdx);
+		TrySetLayoutEngineFromIndex(nextIdx);
 		return true;
 	}
 

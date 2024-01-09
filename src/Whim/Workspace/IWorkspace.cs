@@ -24,7 +24,7 @@ public interface IWorkspace : IDisposable
 	/// Rotate to the next layout engine.
 	/// </summary>
 	/// <param name="nextIdx">The index of the layout engine to make active.</param>
-	void SetLayoutEngine(int nextIdx);
+	void TrySetLayoutEngineFromIndex(int nextIdx);
 
 	/// <summary>
 	/// Rotate to the next layout engine.
@@ -46,7 +46,7 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="name">The name of the layout engine to make active.</param>
 	/// <returns></returns>
-	bool SetLayoutEngineFromName(string name);
+	bool TrySetLayoutEngineFromName(string name);
 
 	/// <summary>
 	/// Trigger a layout.
