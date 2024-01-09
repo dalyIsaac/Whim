@@ -338,11 +338,7 @@ public class ButlerEventHandlersTests
 	)
 	{
 		// Given the window is null
-		IWorkspace[] workspaces = Enumerable
-			.Range(0, 3)
-			.Select(_ => Substitute.For<IWorkspace, IInternalWorkspace>())
-			.ToArray();
-		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
@@ -359,6 +355,36 @@ public class ButlerEventHandlersTests
 			((IInternalWorkspace)workspace).Received().WindowFocused(null);
 		}
 		pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowFocused_NoWorkspaceForWindow(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry
+	)
+	{
+		// Given the pantry does not have a workspace for the window
+		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);
+		pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+
+		// When the window is focused
+		sut.PreInitialize();
+		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+			ctx.WindowManager,
+			new WindowFocusedEventArgs() { Window = Substitute.For<IWindow>() }
+		);
+
+		// Then nothing happens
+		foreach (IWorkspace workspace in workspaces)
+		{
+			((IInternalWorkspace)workspace).Received().WindowFocused(Arg.Any<IWindow>());
+		}
+		pantry.Received(1).GetWorkspaceForWindow(Arg.Any<IWindow>());
+		pantry.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
@@ -772,6 +798,32 @@ public class ButlerEventHandlersTests
 		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[0]);
 		chores.Received().Activate(workspaces[0], newMonitor);
 		chores.Received().LayoutAllActiveWorkspaces();
+	}
+	#endregion
+
+	#region Dispose
+	[Theory, AutoSubstituteData]
+	internal void Dispose_Disposes(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores
+	)
+	{
+		// Given the event handlers are disposed
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When the event handlers are disposed
+		sut.Dispose();
+
+		// Then the event handlers are disposed
+		ctx.WindowManager.WindowAdded -= Arg.Any<EventHandler<WindowEventArgs>>();
+		ctx.WindowManager.WindowRemoved -= Arg.Any<EventHandler<WindowEventArgs>>();
+		ctx.WindowManager.WindowFocused -= Arg.Any<EventHandler<WindowFocusedEventArgs>>();
+		ctx.WindowManager.WindowMinimizeStart -= Arg.Any<EventHandler<WindowEventArgs>>();
+		ctx.WindowManager.WindowMinimizeEnd -= Arg.Any<EventHandler<WindowEventArgs>>();
+		ctx.MonitorManager.MonitorsChanged -= Arg.Any<EventHandler<MonitorsChangedEventArgs>>();
 	}
 	#endregion
 }
