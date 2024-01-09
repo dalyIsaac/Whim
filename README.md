@@ -501,6 +501,8 @@ All uncaught exceptions will be logged as `Fatal`.
 
 Tests have not been written for all of Whim's code, but are encouraged. Tests have not been written for UI code-behind files, as I committed to xUnit before I realized that Windows App SDK isn't easily compatible with xUnit. I'm open to suggestions on how to test UI code-behind files.
 
+### Updating `#r` directives
+
 To use your existing configuration, make sure to update the `#r` directives to point to your newly compiled DLLs. In other words, replace `C:\Users\<USERNAME>\AppData\Local\Programs\Whim` with `C:\path\to\repo\Whim`:
 
 ```csharp
@@ -526,4 +528,19 @@ To use your existing configuration, make sure to update the `#r` directives to p
 // #r "C:\Users\dalyisaac\AppData\Local\Programs\Whim\plugins\Whim.TreeLayout\Whim.TreeLayout.dll"
 // #r "C:\Users\dalyisaac\AppData\Local\Programs\Whim\plugins\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.dll"
 // #r "C:\Users\dalyisaac\AppData\Local\Programs\Whim\plugins\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.dll"
+```
+
+Alternatively, the `#r` directives can be specified using a magic path prefix `WHIM_PATH` that is automatically replaced by the assembly's path when reading the config file: 
+
+```csharp
+#r "WHIM_PATH\whim.dll"
+#r "WHIM_PATH\plugins\Whim.Bar\Whim.Bar.dll"
+#r "WHIM_PATH\plugins\Whim.CommandPalette\Whim.CommandPalette.dll"
+#r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
+#r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
+#r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
+#r "WHIM_PATH\plugins\Whim.LayoutPreview\Whim.LayoutPreview.dll"
+#r "WHIM_PATH\plugins\Whim.TreeLayout\Whim.TreeLayout.dll"
+#r "WHIM_PATH\plugins\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.dll"
+#r "WHIM_PATH\plugins\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.dll"
 ```
