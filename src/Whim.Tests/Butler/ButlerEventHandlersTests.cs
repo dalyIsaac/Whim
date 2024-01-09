@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
+using Microsoft.UI.Xaml.Input;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
@@ -527,6 +528,250 @@ public class ButlerEventHandlersTests
 
 		// Then MinimizeWindowEnd is called on the workspace
 		workspace.Received().MinimizeWindowEnd(window);
+	}
+	#endregion
+
+	#region MonitorManager_MonitorsChanged
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void MonitorsChanged_RemovedMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		IButlerChores chores,
+		IWorkspace workspace
+	)
+	{
+		// Given a workspace is on a monitor that is removed
+		IMonitor[] monitors = CreateMonitors(ctx, 3);
+		pantry.GetWorkspaceForMonitor(monitors[0]).Returns(workspace);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When a monitor is removed
+		sut.PreInitialize();
+		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
+			ctx.MonitorManager,
+			new MonitorsChangedEventArgs()
+			{
+				RemovedMonitors = new[] { monitors[0] },
+				UnchangedMonitors = monitors[1..],
+				AddedMonitors = Array.Empty<IMonitor>()
+			}
+		);
+
+		// Then the monitor is removed from the pantry
+		pantry.Received().RemoveMonitor(monitors[0]);
+		workspace.Received().Deactivate();
+		chores.Received().LayoutAllActiveWorkspaces();
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void MonitorsChanged_RemovedMonitor_NoWorkspaceForMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerChores chores,
+		IButlerPantry pantry
+	)
+	{
+		// Given a monitor is removed and the pantry does not have a workspace for the monitor
+		IMonitor[] monitors = CreateMonitors(ctx, 3);
+		pantry.GetWorkspaceForMonitor(monitors[0]).ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When a monitor is removed
+		sut.PreInitialize();
+		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
+			ctx.MonitorManager,
+			new MonitorsChangedEventArgs()
+			{
+				RemovedMonitors = new[] { monitors[0] },
+				UnchangedMonitors = monitors[1..],
+				AddedMonitors = Array.Empty<IMonitor>()
+			}
+		);
+
+		// Then nothing happens
+		pantry.Received().RemoveMonitor(monitors[0]);
+		pantry.DidNotReceive().SetMonitorWorkspace(Arg.Any<IMonitor>(), Arg.Any<IWorkspace>());
+		chores.Received().LayoutAllActiveWorkspaces();
+	}
+
+	private static IMonitor[] CreateMonitors(IContext context, int count)
+	{
+		IMonitor[] monitors = Enumerable.Range(0, count).Select(_ => Substitute.For<IMonitor>()).ToArray();
+		context.MonitorManager.GetEnumerator().Returns(monitors.AsEnumerable().GetEnumerator());
+		return monitors;
+	}
+
+	private static IWorkspace[] CreateWorkspaces(IContext context, int count)
+	{
+		IWorkspace[] workspaces = Enumerable
+			.Range(0, count)
+			.Select(_ => Substitute.For<IWorkspace, IInternalWorkspace>())
+			.ToArray();
+		context.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+		return workspaces;
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void MonitorsChanged_AddedMonitor_UseSpareWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerChores chores,
+		IButlerPantry pantry,
+		IMonitor newMonitor
+	)
+	{
+		// Given a monitor is added and the pantry has a spare workspace
+		IMonitor[] monitors = CreateMonitors(ctx, 2);
+		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);
+		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+
+		pantry.GetMonitorForWorkspace(workspaces[2]).ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When a monitor is added
+		sut.PreInitialize();
+		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
+			ctx.MonitorManager,
+			new MonitorsChangedEventArgs()
+			{
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = monitors,
+				AddedMonitors = new[] {newMonitor }
+			}
+		);
+
+		// Then the monitor is added to the pantry
+		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[2]);
+		chores.Received().Activate(workspaces[2], newMonitor);
+		chores.Received().LayoutAllActiveWorkspaces();
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void MonitorsChanged_AddedMonitor_CreateWorkspace_Succeeds(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerChores chores,
+		IButlerPantry pantry,
+		IMonitor newMonitor,
+		IWorkspace newWorkspace
+	)
+	{
+		// Given a monitor is added and the pantry does not have a spare workspace
+		IMonitor[] monitors = CreateMonitors(ctx, 2);
+		IWorkspace[] workspaces = CreateWorkspaces(ctx, 2);
+		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+
+		ctx.WorkspaceManager.Add().Returns(newWorkspace);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When a monitor is added
+		sut.PreInitialize();
+		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
+			ctx.MonitorManager,
+			new MonitorsChangedEventArgs()
+			{
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = monitors,
+				AddedMonitors = new[] { newMonitor }
+			}
+		);
+
+		// Then the monitor is added to the pantry
+		pantry.Received().SetMonitorWorkspace(newMonitor, newWorkspace);
+		chores.Received().Activate(newWorkspace, newMonitor);
+		chores.Received().LayoutAllActiveWorkspaces();
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void MonitorsChanged_AddedMonitor_CreateWorkspace_Fails(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerChores chores,
+		IButlerPantry pantry
+	)
+	{
+		// Given a monitor is added and the pantry does not have a spare workspace
+		IMonitor[] monitors = CreateMonitors(ctx, 2);
+		IWorkspace[] workspaces = CreateWorkspaces(ctx, 2);
+		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+
+		ctx.WorkspaceManager.Add().ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When a monitor is added
+		sut.PreInitialize();
+		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
+			ctx.MonitorManager,
+			new MonitorsChangedEventArgs()
+			{
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = monitors,
+				AddedMonitors = new[] { monitors[1] }
+			}
+		);
+
+		// Then the monitor is not added to the pantry
+		pantry.DidNotReceive().SetMonitorWorkspace(monitors[1], workspaces[0]);
+		chores.DidNotReceive().Activate(workspaces[0]);
+		chores.Received().LayoutAllActiveWorkspaces();
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void MonitorsChanged_RemovedAndAddedMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerChores chores,
+		IButlerPantry pantry,
+		IMonitor newMonitor
+	)
+	{
+		// Given a monitor is removed and another is added
+		IMonitor[] monitors = CreateMonitors(ctx, 3);
+		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);
+		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+
+		pantry.GetWorkspaceForMonitor(monitors[0]).Returns(workspaces[0]);
+		pantry.GetWorkspaceForMonitor(monitors[1]).Returns(workspaces[1]);
+		pantry.GetWorkspaceForMonitor(monitors[2]).Returns(workspaces[2]);
+
+		pantry.GetMonitorForWorkspace(workspaces[0]).ReturnsNull();
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+
+		// When a monitor is removed and another is added
+		sut.PreInitialize();
+		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
+			ctx.MonitorManager,
+			new MonitorsChangedEventArgs()
+			{
+				RemovedMonitors = new[] { monitors[0] },
+				UnchangedMonitors = new[] { monitors[1], monitors[2] },
+				AddedMonitors = new[] { newMonitor }
+			}
+		);
+
+		// Then the monitor is removed from the pantry
+		pantry.Received().RemoveMonitor(monitors[0]);
+		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[0]);
+		workspaces[0].Received().Deactivate();
+		chores.Received().LayoutAllActiveWorkspaces();
+
+		// And the monitor is added to the pantry
+		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[0]);
+		chores.Received().Activate(workspaces[0], newMonitor);
+		chores.Received().LayoutAllActiveWorkspaces();
 	}
 	#endregion
 }

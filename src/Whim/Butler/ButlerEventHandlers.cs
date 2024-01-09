@@ -208,6 +208,7 @@ internal class ButlerEventHandlers : IDisposable
 				if (_context.WorkspaceManager.Add() is IWorkspace newWorkspace)
 				{
 					workspace = newWorkspace;
+					_pantry.SetMonitorWorkspace(monitor, newWorkspace);
 				}
 				else
 				{
