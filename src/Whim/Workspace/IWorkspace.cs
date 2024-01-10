@@ -23,19 +23,40 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Rotate to the next layout engine.
 	/// </summary>
+	/// <param name="nextIdx">The index of the layout engine to make active.</param>
+	bool TrySetLayoutEngineFromIndex(int nextIdx);
+
+	/// <summary>
+	/// Cycle to the next or previous layout engine.
+	/// </summary>
+	/// <param name="reverse">
+	/// When <see langword="true"/>, activate the previous layout, otherwise activate the next layout. Defaults to <see langword="false" />.
+	/// </param>
+	void CycleLayoutEngine(bool reverse = false);
+
+	/// <summary>
+	/// Rotate to the next layout engine.
+	/// </summary>
+	[Obsolete("Use CycleLayoutEngine instead, with `reverse: false`")]
 	void NextLayoutEngine();
 
 	/// <summary>
 	/// Rotate to the previous layout engine.
 	/// </summary>
+	[Obsolete("Use CycleLayoutEngine instead, with `reverse: true`")]
 	void PreviousLayoutEngine();
+
+	/// <summary>
+	/// Activates previously active layout engine.
+	/// </summary>
+	void ActivatePreviouslyActiveLayoutEngine();
 
 	/// <summary>
 	/// Tries to set the layout engine to one with the <c>name</c>.
 	/// </summary>
 	/// <param name="name">The name of the layout engine to make active.</param>
 	/// <returns></returns>
-	bool TrySetLayoutEngine(string name);
+	bool TrySetLayoutEngineFromName(string name);
 
 	/// <summary>
 	/// Trigger a layout.

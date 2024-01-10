@@ -21,7 +21,7 @@ public class NextLayoutEngineCommandTests
 
 		// Then
 		context.WorkspaceManager.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
-		context.WorkspaceManager.GetWorkspaceForMonitor(monitor)!.Received(1).NextLayoutEngine();
+		context.WorkspaceManager.GetWorkspaceForMonitor(monitor)!.Received(1).CycleLayoutEngine(false);
 	}
 
 	[Theory, AutoSubstituteData]
