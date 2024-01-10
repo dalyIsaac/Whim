@@ -48,20 +48,16 @@ internal class ConfigLoader
 	}
 
 	/// <summary>
-	/// Load the Whim template from the assembly's resources, and replace the WHIM_PATH.
+	/// Replace WHIM_PATH with the assembly's path.
 	/// </summary>
-	/// <returns>The Whim template.</returns>
+	/// <returns>The modified raw config file.</returns>
 	/// <exception cref="ConfigLoaderException"></exception>
-	private static string ReadTemplateConfigFile(Assembly assembly)
+	private static string ReplaceAssemblyPath(string rawConfig, Assembly assembly)
 	{
-		// Load the Whim template from the assembly's resources.
-		string template = ReadFile(assembly, "whim.config.csx");
-
-		// Replace WHIM_PATH with the assembly's path.
 		string? assemblyPath = Path.GetDirectoryName(assembly.Location);
 		return assemblyPath == null
 			? throw new ConfigLoaderException($"Could not find assembly path for assembly {assembly.FullName}")
-			: template.Replace("WHIM_PATH", assemblyPath);
+			: rawConfig.Replace("WHIM_PATH", assemblyPath);
 	}
 
 	/// <summary>
@@ -69,13 +65,13 @@ internal class ConfigLoader
 	/// This will throw if any null values are encountered.
 	/// </summary>
 	/// <exception cref="ConfigLoaderException"></exception>
-	private void CreateConfig()
+	private void CreateConfig(Assembly assembly)
 	{
-		Assembly assembly =
-			Assembly.GetAssembly(typeof(ConfigLoader))
-			?? throw new ConfigLoaderException("Could not find assembly for ConfigLoader");
+		// Read the template.
+		string template = ReadFile(assembly, "whim.config.csx");
 
-		string template = ReadTemplateConfigFile(assembly);
+		// Replace WHIM_PATH with the assembly's path.
+		template = ReplaceAssemblyPath(template, assembly);
 
 		// Save the files.
 		_fileManager.WriteAllText(_configFilePath, template);
@@ -91,13 +87,21 @@ internal class ConfigLoader
 		// Ensure the Whim directory exists.
 		_fileManager.EnsureDirExists(_fileManager.WhimDir);
 
+		// Get the assembly.
+		Assembly assembly =
+			Assembly.GetAssembly(typeof(ConfigLoader))
+			?? throw new ConfigLoaderException("Could not find assembly for ConfigLoader");
+
 		// Acquire the Whim config.
 		if (!_fileManager.FileExists(_configFilePath))
 		{
-			CreateConfig();
+			CreateConfig(assembly);
 		}
 
 		string rawConfig = _fileManager.ReadAllText(_configFilePath);
+
+		// Replace WHIM_CONFIG with assembly's path.
+		rawConfig = ReplaceAssemblyPath(rawConfig, assembly);
 
 		// Evaluate the Whim config.
 		ScriptOptions options = ScriptOptions.Default;
