@@ -1370,12 +1370,16 @@ public class WorkspaceManagerTests
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[1]);
 		activeWorkspace.RemoveWindow(window).Returns(true);
 
+		Point<int> givenPoint = new() { X = 2460, Y = 720 };
+		Point<double> expectedPoint = new() { X = 0.5, Y = 0.5 };
+
 		// When a window is moved to a point
-		workspaceManager.MoveWindowToPoint(window, new Point<int>());
+		workspaceManager.MoveWindowToPoint(window, givenPoint);
 
 		// Then the window is removed from the old workspace and added to the new workspace
 		activeWorkspace.Received(1).RemoveWindow(window);
 		activeWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
+		targetWorkspace.Received(1).MoveWindowToPoint(window, expectedPoint);
 
 		Assert.Equal(targetWorkspace, workspaceManager.GetWorkspaceForWindow(window));
 
@@ -1407,12 +1411,15 @@ public class WorkspaceManagerTests
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[0]);
 		activeWorkspace.RemoveWindow(window).Returns(true);
 
+		Point<int> givenPoint = new() { X = 960, Y = 540 };
+		Point<double> expectedPoint = new() { X = 0.5, Y = 0.5 };
+
 		// When a window is moved to a point
-		workspaceManager.MoveWindowToPoint(window, new Point<int>());
+		workspaceManager.MoveWindowToPoint(window, givenPoint);
 
 		// Then the window is removed from the old workspace and added to the new workspace
 		activeWorkspace.DidNotReceive().RemoveWindow(window);
-		activeWorkspace.Received(1).MoveWindowToPoint(window, Arg.Any<Point<double>>());
+		activeWorkspace.Received(1).MoveWindowToPoint(window, expectedPoint);
 		anotherWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
 
 		Assert.Equal(activeWorkspace, workspaceManager.GetWorkspaceForWindow(window));
