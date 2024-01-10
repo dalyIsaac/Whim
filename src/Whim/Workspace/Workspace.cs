@@ -263,10 +263,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void PreviousLayoutEngine() => CycleLayoutEngine(true);
 
-	public void ActivatePreviouslyActiveLayoutEngine()
-	{
-		TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
-	}
+	public void ActivatePreviouslyActiveLayoutEngine() => TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
 
 	public bool TrySetLayoutEngineFromName(string name)
 	{
