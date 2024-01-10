@@ -261,6 +261,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			)
 			{
 				// Even if the window was ignored, we need to fire OnWindowFocused.
+				Logger.Debug($"Window {hwnd} was ignored, but still notifying listeners of focus");
 				OnWindowFocused(window);
 
 				_internalContext.DeferWindowPosManager.RecoverLayout();
@@ -273,7 +274,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			}
 		}
 
-		Logger.Verbose($"Windows event 0x{eventType:X4} for {window}");
+		Logger.Debug($"Windows event 0x{eventType:X4} for {window}");
 		switch (eventType)
 		{
 			// `EVENT_OBJECT_SHOW` is handled by the code above to `AddWindow`.
