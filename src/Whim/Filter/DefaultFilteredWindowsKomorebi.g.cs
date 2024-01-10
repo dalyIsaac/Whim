@@ -154,6 +154,7 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.AddProcessFileNameFilter("PowerToys.ImageResizer.exe");  // Target image resizer dialog
 		filterManager.AddProcessFileNameFilter("PowerToys.Peek.UI.exe");  // Target Peek popup
 		filterManager.AddProcessFileNameFilter("PowerToys.PowerLauncher.exe");  // PpowerLauncher popup
+		filterManager.AddProcessFileNameFilter("PowerToys.PowerAccent.exe");  // PowerAccent popup
 
 		// Process Hacker
 		filterManager.AddProcessFileNameFilter("ProcessHacker.exe");

@@ -287,6 +287,14 @@ public record FocusLayoutEngine : ILayoutEngine
 		{
 			return new FocusLayoutEngine(this, _list, _focusedIndex, !_maximized, _hideFocusedWindow);
 		}
+		if (action.Name == $"{Name}.set_maximized")
+		{
+			return new FocusLayoutEngine(this, _list, _focusedIndex, true, _hideFocusedWindow);
+		}
+		if (action.Name == $"{Name}.unset_maximized")
+		{
+			return new FocusLayoutEngine(this, _list, _focusedIndex, false, _hideFocusedWindow);
+		}
 
 		return this;
 	}

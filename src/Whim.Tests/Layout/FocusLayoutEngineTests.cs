@@ -276,11 +276,23 @@ public class FocusLayoutEngineTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PerformCustomAction_ToggleMaximized(IWindow window1, IWindow window2)
+	[Theory]
+	[InlineAutoSubstituteData("Focus.toggle_maximized", false, WindowSize.Maximized)]
+	[InlineAutoSubstituteData("Focus.toggle_maximized", true, WindowSize.Normal)]
+	[InlineAutoSubstituteData("Focus.set_maximized", false, WindowSize.Maximized)]
+	[InlineAutoSubstituteData("Focus.set_maximized", true, WindowSize.Maximized)]
+	[InlineAutoSubstituteData("Focus.unset_maximized", false, WindowSize.Normal)]
+	[InlineAutoSubstituteData("Focus.unset_maximized", true, WindowSize.Normal)]
+	public void PerformCustomAction_SetMaximized(
+		string actionName,
+		bool maximized,
+		WindowSize expectedWindowSize,
+		IWindow window1,
+		IWindow window2
+	)
 	{
 		// Given
-		ILayoutEngine sut = new FocusLayoutEngine(_identity);
+		ILayoutEngine sut = new FocusLayoutEngine(_identity, maximized);
 		sut = sut.AddWindow(window1);
 		sut = sut.AddWindow(window2);
 
@@ -288,7 +300,7 @@ public class FocusLayoutEngineTests
 		ILayoutEngine result = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow?>()
 			{
-				Name = "Focus.toggle_maximized",
+				Name = actionName,
 				Window = null,
 				Payload = null
 			}
@@ -305,7 +317,7 @@ public class FocusLayoutEngineTests
 			{
 				Window = window1,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Maximized
+				WindowSize = expectedWindowSize
 			},
 			new WindowState()
 			{
