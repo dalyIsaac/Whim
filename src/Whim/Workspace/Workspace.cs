@@ -55,6 +55,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	protected readonly ILayoutEngine[] _layoutEngines;
+	private int _prevLayoutEngineIndex;
 	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
@@ -203,17 +204,30 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	private void UpdateLayoutEngine(int delta)
+	public bool TrySetLayoutEngineFromIndex(int nextIdx)
 	{
+		Logger.Debug($"Trying to set layout engine with index {nextIdx} for workspace");
+
 		ILayoutEngine prevLayoutEngine;
 		ILayoutEngine nextLayoutEngine;
 
 		lock (_workspaceLock)
 		{
-			int prevIdx = _activeLayoutEngineIndex;
-			_activeLayoutEngineIndex = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
+			if (nextIdx >= _layoutEngines.Length)
+			{
+				Logger.Error($"Index {nextIdx} exceeds number of layout engines for workspace");
+				return false;
+			}
+			if (nextIdx < 0)
+			{
+				Logger.Error($"Index {nextIdx} is negative");
+				return false;
+			}
 
-			prevLayoutEngine = _layoutEngines[prevIdx];
+			_prevLayoutEngineIndex = _activeLayoutEngineIndex;
+			_activeLayoutEngineIndex = nextIdx;
+
+			prevLayoutEngine = _layoutEngines[_prevLayoutEngineIndex];
 			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
@@ -226,30 +240,39 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				CurrentLayoutEngine = nextLayoutEngine
 			}
 		);
+		return true;
 	}
 
-	public void NextLayoutEngine()
+	public void CycleLayoutEngine(bool reverse = false)
 	{
-		Logger.Debug(Name);
-		UpdateLayoutEngine(1);
-	}
+		Logger.Debug($"Cycling layout engine on workspace {Name}");
 
-	public void PreviousLayoutEngine()
-	{
-		Logger.Debug(Name);
-		UpdateLayoutEngine(-1);
-	}
+		int delta = reverse ? -1 : 1;
 
-	public bool TrySetLayoutEngine(string name)
-	{
-		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
-
-		ILayoutEngine prevLayoutEngine;
-		ILayoutEngine nextLayoutEngine;
+		int nextIdx;
 
 		lock (_workspaceLock)
 		{
-			int nextIdx = -1;
+			nextIdx = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
+		}
+
+		TrySetLayoutEngineFromIndex(nextIdx);
+	}
+
+	public void NextLayoutEngine() => CycleLayoutEngine(false);
+
+	public void PreviousLayoutEngine() => CycleLayoutEngine(true);
+
+	public void ActivatePreviouslyActiveLayoutEngine() => TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
+
+	public bool TrySetLayoutEngineFromName(string name)
+	{
+		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
+
+		int nextIdx = -1;
+
+		lock (_workspaceLock)
+		{
 			for (int idx = 0; idx < _layoutEngines.Length; idx++)
 			{
 				ILayoutEngine engine = _layoutEngines[idx];
@@ -270,23 +293,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
 				return true;
 			}
-
-			int prevIdx = _activeLayoutEngineIndex;
-			_activeLayoutEngineIndex = nextIdx;
-
-			prevLayoutEngine = _layoutEngines[prevIdx];
-			nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 		}
 
-		DoLayout();
-		_triggers.ActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = this,
-				PreviousLayoutEngine = prevLayoutEngine,
-				CurrentLayoutEngine = nextLayoutEngine
-			}
-		);
+		TrySetLayoutEngineFromIndex(nextIdx);
 		return true;
 	}
 

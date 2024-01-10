@@ -1506,7 +1506,7 @@ public class WorkspaceManagerTests
 		// Then changing the layout engine should trigger the event
 		try
 		{
-			workspace.NextLayoutEngine();
+			workspace.CycleLayoutEngine(false);
 		}
 		catch
 		{
