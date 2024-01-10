@@ -39,7 +39,7 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Activates previously active layout engine.
 	/// </summary>
-	void LastActiveLayoutEngine();
+	void ActivatePreviouslyActiveLayoutEngine();
 
 	/// <summary>
 	/// Tries to set the layout engine to one with the <c>name</c>.

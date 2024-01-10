@@ -267,7 +267,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		CycleLayoutEngine(-1);
 	}
 
-	public void LastActiveLayoutEngine()
+	public void ActivatePreviouslyActiveLayoutEngine()
 	{
 		TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
 	}
