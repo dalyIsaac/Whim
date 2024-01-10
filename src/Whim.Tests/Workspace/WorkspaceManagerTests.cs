@@ -519,6 +519,20 @@ public class WorkspaceManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Activate_WorkspaceDoesNotExist(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+
+		// When an invalid workspace is activated, then no event is raised
+		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
+			h => ctx.Butler.MonitorWorkspaceChanged += h,
+			h => ctx.Butler.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.Activate(Substitute.For<IWorkspace>())
+		);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void Activate_WithPreviousWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
