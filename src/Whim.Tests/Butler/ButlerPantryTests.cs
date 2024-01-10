@@ -66,22 +66,22 @@ public class ButlerPantryTests
 
 	#region MergeWorkspaceWindows
 	[Theory, AutoSubstituteData]
-	public void MergeWorkspaceWindows_NoMonitorForWorkspaceToDelete(
+	public void MergeWorkspaceWindows_ExistingMonitorForWorkspace(
 		IContext ctx,
 		IWorkspace workspaceToDelete,
-		IWorkspace workspaceMergeTarget
+		IWorkspace workspaceMergeTarget,
+		IMonitor monitor
 	)
 	{
-		// Given the workspace to delete is not mapped to a monitor
+		// Given the workspace to delete has a monitor
 		ButlerPantry sut = new(ctx);
+		sut.SetMonitorWorkspace(monitor, workspaceToDelete);
 
-		// When we add windows for the workspace to delete, and then merge the workspaces
-		sut.SetWindowWorkspace(Substitute.For<IWindow>(), workspaceToDelete);
-		sut.SetWindowWorkspace(Substitute.For<IWindow>(), workspaceToDelete);
+		// When we merge the workspace
 		sut.MergeWorkspaceWindows(workspaceToDelete, workspaceMergeTarget);
 
-		// Then the monitor is not remapped
-		Assert.Null(sut.GetMonitorForWorkspace(workspaceMergeTarget));
+		// Then the monitor is remapped to the merge target
+		Assert.Equal(monitor, sut.GetMonitorForWorkspace(workspaceMergeTarget));
 	}
 	#endregion
 }
