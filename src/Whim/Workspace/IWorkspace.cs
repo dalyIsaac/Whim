@@ -27,13 +27,23 @@ public interface IWorkspace : IDisposable
 	bool TrySetLayoutEngineFromIndex(int nextIdx);
 
 	/// <summary>
+	/// Cycle to the next or previous layout engine.
+	/// </summary>
+	/// <param name="reverse">
+	/// When <see langword="true"/>, activate the previous layout, otherwise activate the next layout. Defaults to <see langword="false" />.
+	/// </param>
+	void CycleLayoutEngine(bool reverse = false);
+
+	/// <summary>
 	/// Rotate to the next layout engine.
 	/// </summary>
+	[Obsolete("Use CycleLayoutEngine instead, with `reverse: false`")]
 	void NextLayoutEngine();
 
 	/// <summary>
 	/// Rotate to the previous layout engine.
 	/// </summary>
+	[Obsolete("Use CycleLayoutEngine instead, with `reverse: true`")]
 	void PreviousLayoutEngine();
 
 	/// <summary>

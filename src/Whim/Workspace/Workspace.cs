@@ -243,8 +243,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return true;
 	}
 
-	private void CycleLayoutEngine(int delta)
+	public void CycleLayoutEngine(bool reverse = false)
 	{
+		Logger.Debug($"Cycling layout engine on workspace {Name}");
+
+		int delta = reverse ? -1 : 1;
+
 		int nextIdx;
 
 		lock (_workspaceLock)
@@ -255,17 +259,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		TrySetLayoutEngineFromIndex(nextIdx);
 	}
 
-	public void NextLayoutEngine()
-	{
-		Logger.Debug(Name);
-		CycleLayoutEngine(1);
-	}
+	public void NextLayoutEngine() => CycleLayoutEngine(false);
 
-	public void PreviousLayoutEngine()
-	{
-		Logger.Debug(Name);
-		CycleLayoutEngine(-1);
-	}
+	public void PreviousLayoutEngine() => CycleLayoutEngine(true);
 
 	public void ActivatePreviouslyActiveLayoutEngine()
 	{
