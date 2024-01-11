@@ -1480,7 +1480,11 @@ public class WorkspaceManagerTests
 		// Given
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 		workspaceManager.CreateLayoutEngines = () =>
-			new CreateLeafLayoutEngine[] { (id) => Substitute.For<ILayoutEngine>(), (id) => Substitute.For<ILayoutEngine>() };
+			new CreateLeafLayoutEngine[]
+			{
+				(id) => Substitute.For<ILayoutEngine>(),
+				(id) => Substitute.For<ILayoutEngine>()
+			};
 		workspaceManager.Initialize();
 
 		// Then changing the layout engine should trigger the event
