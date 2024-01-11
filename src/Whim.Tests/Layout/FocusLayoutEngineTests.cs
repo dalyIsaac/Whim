@@ -207,6 +207,7 @@ public class FocusLayoutEngineTests
 
 		// Then
 		Assert.Same(sut, result);
+		window.DidNotReceive().Focus();
 	}
 
 	[Theory]
@@ -231,6 +232,7 @@ public class FocusLayoutEngineTests
 		Assert.NotSame(sut, result);
 		Assert.Equal(sut.Count, result.Count);
 		Assert.Equal(WindowSize.Normal, windowStates[expectedIndex].WindowSize);
+		windowStates[expectedIndex].Window.Received().Focus();
 	}
 
 	[Theory, AutoSubstituteData]

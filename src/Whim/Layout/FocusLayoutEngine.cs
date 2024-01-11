@@ -206,6 +206,7 @@ public record FocusLayoutEngine : ILayoutEngine
 		};
 		newIndex = newIndex.Mod(_list.Count);
 
+		_list[newIndex].Focus();
 		return new FocusLayoutEngine(this, _list, newIndex, _maximized, false);
 	}
 
