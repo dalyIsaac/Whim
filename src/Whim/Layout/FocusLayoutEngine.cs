@@ -248,14 +248,14 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
+		if (!_list.Contains(window))
+		{
+			return new FocusLayoutEngine(this, _list.Add(window), _list.Count, _maximized, _list.IsEmpty || _hideFocusedWindow);
+		}
+
 		if (window.Equals(_list[_focusedIndex]))
 		{
 			return new FocusLayoutEngine(this, _list, _focusedIndex, _maximized, true);
-		}
-
-		if (!_list.Contains(window))
-		{
-			return new FocusLayoutEngine(this, _list.Add(window), _list.Count, _maximized, _hideFocusedWindow);
 		}
 
 		return this;

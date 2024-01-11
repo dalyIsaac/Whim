@@ -444,6 +444,32 @@ public class FocusLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
+	public void MinimizeWindowStart_Empty(IMonitor monitor, IWindow newWindow)
+	{
+		// Given there are two windows in the layout
+		ILayoutEngine sut = new FocusLayoutEngine(_identity);
+
+		// When a new window is minimized
+		ILayoutEngine result = sut.MinimizeWindowStart(newWindow);
+		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+
+		// Then the window is added to the layout
+		Assert.NotSame(sut, result);
+		Assert.Equal(1, result.Count);
+		new IWindowState[]
+		{
+			new WindowState()
+			{
+				Window = newWindow,
+				Rectangle = new Rectangle<int>(),
+				WindowSize = WindowSize.Minimized
+			}
+		}
+			.Should()
+			.BeEquivalentTo(windowStates);
+	}
+
+	[Theory, AutoSubstituteData]
 	public void MinimizeWindowStart_WindowNotFound(IMonitor monitor, IWindow newWindow)
 	{
 		// Given there are two windows in the layout
