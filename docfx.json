@@ -1,0 +1,40 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "./src",
+          "files": ["**/Whim*.csproj"],
+          "exclude": [
+            "**/Whim*.Tests.csproj",
+            "**/Whim.Runner.csproj",
+            "**/Whim.TestUtils.csproj"
+          ]
+        }
+      ],
+      "dest": "api",
+      "shouldSkipMarkup": true
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": ["**/*.{md,yml}"],
+        "exclude": ["_site/**"]
+      }
+    ],
+    "resource": [
+      {
+        "files": ["images/**"]
+      }
+    ],
+    "output": "_site",
+    "template": ["default", "modern"],
+    "globalMetadata": {
+      "_appName": "Whim",
+      "_appTitle": "Whim",
+      "_enableSearch": true,
+      "pdf": false
+    }
+  }
+}
