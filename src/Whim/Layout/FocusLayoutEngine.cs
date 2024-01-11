@@ -250,7 +250,13 @@ public record FocusLayoutEngine : ILayoutEngine
 
 		if (!_list.Contains(window))
 		{
-			return new FocusLayoutEngine(this, _list.Add(window), _list.Count, _maximized, _list.IsEmpty || _hideFocusedWindow);
+			return new FocusLayoutEngine(
+				this,
+				_list.Add(window),
+				_list.Count,
+				_maximized,
+				_list.IsEmpty || _hideFocusedWindow
+			);
 		}
 
 		if (window.Equals(_list[_focusedIndex]))
