@@ -13,8 +13,6 @@ internal interface IInternalContext : IDisposable
 
 	IWindowMessageMonitor WindowMessageMonitor { get; }
 
-	IInternalWorkspaceManager WorkspaceManager { get; }
-
 	IInternalMonitorManager MonitorManager { get; }
 
 	IInternalWindowManager WindowManager { get; }

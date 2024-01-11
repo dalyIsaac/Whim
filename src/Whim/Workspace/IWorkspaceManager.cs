@@ -4,8 +4,10 @@ using System.Collections.Generic;
 namespace Whim;
 
 /// <summary>
-/// The manager for <see cref="IWorkspace"/>s. This is responsible for routing
-/// windows between workspaces.
+/// Container responsible for mapping <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s and
+/// <see cref="IWindow"/>s.
+///
+/// It is responsible for the creation and destruction of <see cref="IWorkspace"/>s.
 /// </summary>
 public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 {
@@ -20,13 +22,15 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; }
 
 	/// <summary>
-	/// Initialize the event listeners.
+	/// Creates the workspaces from the provided names and <see cref="CreateLayoutEngines"/> function.
+	/// Do not call this directly - Whim will call this when it is ready.
 	/// </summary>
 	void Initialize();
 
 	/// <summary>
 	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
 	/// </summary>
+	[Obsolete("Use context.Butler.WindowRouted instead.")]
 	event EventHandler<RouteEventArgs>? WindowRouted;
 
 	/// <summary>
@@ -52,6 +56,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <summary>
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
+	[Obsolete("Use context.Butler.MonitorWorkspaceChanged instead.")]
 	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
 	/// <summary>
@@ -68,6 +73,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// Triggers all active workspaces to update their layout.
 	/// Active workspaces are those that are visible on a monitor.
 	/// </summary>
+	[Obsolete("Use context.Butler.LayoutAllActiveWorkspaces instead.")]
 	void LayoutAllActiveWorkspaces();
 
 	/// <summary>
@@ -77,11 +83,31 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The name of the workspace. Defaults to <see langword="null"/>, which will generate the name
 	/// <c>Workspace {n}</c>.
 	/// </param>
-	/// <param name="layoutEngines">
+	/// <param name="createLayoutEngines">
 	/// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
 	/// use the <see cref="CreateLayoutEngines"/> function.
 	/// </param>
-	void Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? layoutEngines = null);
+	/// <returns>
+	/// <list type="bullet">
+	/// <item>
+	/// <description>If <see cref="Initialize"/> has not been called, returns <see langword="null"/>.</description>
+	/// </item>
+	/// <item>
+	/// <description>If a workspace cannot be created, returns <see langword="null"/>.</description>
+	/// </item>
+	/// <item>
+	/// <description>Otherwise, returns the created workspace.</description>
+	/// </item>
+	/// </list>
+	/// </returns>
+	IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
+
+	/// <summary>
+	/// Whether the manager contains the given workspace.
+	/// </summary>
+	/// <param name="workspace"></param>
+	/// <returns></returns>
+	bool Contains(IWorkspace workspace);
 
 	/// <summary>
 	/// Tries to remove the given workspace.
@@ -116,6 +142,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
 	/// the active monitor.
 	/// </param>
+	[Obsolete("Use context.Butler.Activate(workspace, monitor) instead.")]
 	void Activate(IWorkspace workspace, IMonitor? monitor = null);
 
 	/// <summary>
@@ -125,7 +152,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
 	/// the focused monitor.
 	/// </param>
-	[Obsolete("Use ActivateAdjacent instead, with `reverse: true`")]
+	[Obsolete("Use context.Butler.ActivateAdjacent instead, with `reverse: true`")]
 	void ActivatePrevious(IMonitor? monitor = null);
 
 	/// <summary>
@@ -136,7 +163,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// the focused monitor.
 	/// </param>
 
-	[Obsolete("Use ActivateAdjacent instead, with `reverse: false`")]
+	[Obsolete("Use context.Butler.ActivateAdjacent instead, with `reverse: false`")]
 	void ActivateNext(IMonitor? monitor = null);
 
 	/// <summary>
@@ -151,6 +178,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <param name="skipActive">
 	/// When <see langword="true"/>, skips all workspaces that are active on any other monitor. Defaults to <see langword="false"/>.
 	/// </param>
+	[Obsolete("Use context.Butler.ActivateAdjacent instead.")]
 	void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false);
 
 	/// <summary>
@@ -165,6 +193,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <param name="skipActive">
 	/// When <see langword="true"/>, skips all workspaces that are active on any other monitor. Defaults to <see langword="false"/>.
 	/// </param>
+	[Obsolete("Use context.Butler.MoveWindowToAdjacentWorkspace instead.")]
 	void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false);
 
 	/// <summary>
@@ -173,6 +202,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <param name="reverse">
 	/// When <see langword="true"/>, swaps workspace with the previous monitor, otherwise with the next. Defaults to <see langword="false" />.
 	/// </param>
+	[Obsolete("Use context.Butler.SwapActiveWorkspaceWithAdjacentMonitor instead.")]
 	void SwapActiveWorkspaceWithAdjacentMonitor(bool reverse = false);
 
 	/// <summary>
@@ -180,6 +210,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// </summary>
 	/// <param name="workspace"></param>
 	/// <returns><see langword="null"/> if the workspace is not active.</returns>
+	[Obsolete("Use context.Butler.GetMonitorForWorkspace instead.")]
 	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
 
 	/// <summary>
@@ -187,6 +218,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// </summary>
 	/// <param name="monitor"></param>
 	/// <returns><see langword="null"/> if the monitor is not active.</returns>
+	[Obsolete("Use context.Butler.GetWorkspaceForMonitor instead.")]
 	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
 
 	/// <summary>
@@ -194,6 +226,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
+	[Obsolete("Use context.Butler.GetWorkspaceForWindow instead.")]
 	IWorkspace? GetWorkspaceForWindow(IWindow window);
 
 	/// <summary>
@@ -201,6 +234,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
+	[Obsolete("Use context.Butler.GetMonitorForWindow instead.")]
 	IMonitor? GetMonitorForWindow(IWindow window);
 
 	/// <summary>
@@ -220,6 +254,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
+	[Obsolete("Use context.Butler.MoveWindowToWorkspace instead.")]
 	void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null);
 
 	/// <summary>
@@ -230,6 +265,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
+	[Obsolete("Use context.Butler.MoveWindowToMonitor instead.")]
 	void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null);
 
 	/// <summary>
@@ -239,6 +275,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
+	[Obsolete("Use context.Butler.MoveWindowToPreviousMonitor instead.")]
 	void MoveWindowToPreviousMonitor(IWindow? window = null);
 
 	/// <summary>
@@ -248,6 +285,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
+	[Obsolete("Use context.Butler.MoveWindowToNextMonitor instead.")]
 	void MoveWindowToNextMonitor(IWindow? window = null);
 
 	/// <summary>
@@ -258,6 +296,7 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// The point to move the window to. The point is in the coordinate space of the monitors,
 	/// not the unit square.
 	/// </param>
+	[Obsolete("Use context.Butler.MoveWindowToPoint instead.")]
 	void MoveWindowToPoint(IWindow window, IPoint<int> point);
 
 	/// <summary>
@@ -272,5 +311,6 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// </param>
 	/// <param name="window"></param>
 	/// <returns>Whether the window's edges were moved.</returns>
+	[Obsolete("Use context.Butler.MoveWindowEdgesInDirection instead.")]
 	bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null);
 }

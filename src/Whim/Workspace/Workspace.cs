@@ -224,6 +224,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				return false;
 			}
 
+			if (_activeLayoutEngineIndex == nextIdx)
+			{
+				Logger.Debug($"Layout engine with index {nextIdx} is already active for workspace");
+				return true;
+			}
+
 			_prevLayoutEngineIndex = _activeLayoutEngineIndex;
 			_activeLayoutEngineIndex = nextIdx;
 
