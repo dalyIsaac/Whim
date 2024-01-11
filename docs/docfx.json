@@ -3,7 +3,7 @@
     {
       "src": [
         {
-          "src": "./src",
+          "src": "../src",
           "files": ["**/Whim*.csproj"],
           "exclude": [
             "**/Whim*.Tests.csproj",

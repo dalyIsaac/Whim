@@ -2,7 +2,7 @@
 
 Whim is a pluggable and modern window manager for Windows 10 and 11, built using WinUI 3 and .NET. It is currently in active development.
 
-![Whim demo](old-docs/assets/readme-demo.gif)
+![Whim demo](docs/images/demo.gif)
 
 > [!NOTE]
 > Documentation is lacking in some areas, and is a work in progress. If you have any questions, feel free to ask in the [Discord server](https://discord.gg/gEFq9wr7jb), or [raise an issue on GitHub](https://github.com/dalyIsaac/Whim/issues/new/choose).
