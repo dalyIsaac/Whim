@@ -138,3 +138,13 @@ context.KeybindManager.Clear();
 > Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
 
 To treat key modifiers like `LWin` and `RWin` the same, see [`IKeybindManager.UnifyKeyModifiers`](api/Whim.IKeybindManager.html#Whim_IKeybindManager_UnifyKeyModifiers).
+
+### Plugins
+
+Whim is build around plugins. Plugins are referenced using `#r` and `using` statements at the top of the config file. Each plugin generally has a `Config` class, and a `Plugin` class, and needs to be added to the [`IPluginManager`](api/Whim.IPluginManager.html). For example:
+
+```csharp
+BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
+BarPlugin barPlugin = new(context, barConfig);
+context.PluginManager.AddPlugin(barPlugin);
+```

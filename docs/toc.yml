@@ -1,4 +1,4 @@
 - name: Documentation
-  href: index.html
+  href: index.md
 - name: API
   href: api/

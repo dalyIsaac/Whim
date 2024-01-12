@@ -1,3 +1,3 @@
 ---
-redirect_url: docs/index.md
+redirect_url: docs/
 ---

@@ -7,18 +7,6 @@ Whim is a pluggable and modern window manager for Windows 10 and 11, built using
 > [!NOTE]
 > Documentation is lacking in some areas, and is a work in progress. If you have any questions, feel free to ask in the [Discord server](https://discord.gg/gEFq9wr7jb), or [raise an issue on GitHub](https://github.com/dalyIsaac/Whim/issues/new/choose).
 
-### Plugins
-
-Whim is build around plugins. Plugins are referenced using `#r` and `using` statements at the top of the config file. Each plugin generally has a `Config` class, and a `Plugin` class. For example:
-
-```csharp
-BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
-BarPlugin barPlugin = new(context, barConfig);
-context.PluginManager.AddPlugin(barPlugin);
-```
-
-Each plugin needs to be added to the `context` object.
-
 ### Layout Engines
 
 #### `FocusLayoutEngine`
