@@ -111,3 +111,30 @@ void DoConfig(IConfig context)
     // ...
 }
 ```
+
+## Keybinds
+
+A [commands](#commands) can be bound to a single "keybind" [`IKeybind`](src/Whim/Keybind/IKeybind.cs). However, **each keybind can trigger multiple commands.**
+
+The [`IKeybind`](api/Whim.IKeybind.html) interface contains a number of constants with common [`KeyModifers`](api/Whim.KeyModifiers.html). When creating a custom [`Keybind`](api/Whim.Keybind.html), you can use these constants or a custom combination of [`KeyModifiers`](api/Whim.KeyModifiers.html).
+
+The available keys can be found in the [`VIRTUAL_KEY`](api/Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY.html) enum.
+Keybinds can be overridden and removed in the config. For example:
+
+```csharp
+// Override the default keybind for showing/hiding the command palette.
+context.KeybindManager.SetKeybind("whim.command_palette.toggle", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_P));
+
+// Remove the default keybind for closing the current workspace.
+context.KeybindManager.Remove("whim.core.close_current_workspace");
+
+// Remove all keybinds - start from scratch.
+context.KeybindManager.Clear();
+```
+
+> [!WARNING]
+> When overriding keybinds for plugins, make sure to set the keybind **after** calling `context.PluginManager.AddPlugin(plugin)`.
+>
+> Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
+
+To treat key modifiers like `LWin` and `RWin` the same, see [`IKeybindManager.UnifyKeyModifiers`](api/Whim.IKeybindManager.html#Whim_IKeybindManager_UnifyKeyModifiers).
