@@ -45,10 +45,6 @@ There are two different types of layout engines: proxy layout engines, and leaf 
 
 To see the available layout engines, see [Layout Engines](layout-engines.md).
 
-## Workspace Manager
-
-The "workspace manager" or [`IWorkspaceManager`](api/Whim.IWorkspaceManager.html) in Whim is responsible for the creation and removal of workspaces. It also manages the active workspace.
-
 ## Window Manager
 
 The "window manager" or [`IWindowManager`](api/Whim.IWindowManager.html) is used by Whim to manage [`IWindow`](apis/Whim.IWindow.html)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
@@ -59,13 +55,15 @@ The `IWindowManager` also exposes an `IFilterManager` called `LocationRestoringF
 
 If this doesn't work, dragging a window's edge will force a layout, which should fix the window's position. This is an area which could use further improvement.
 
-## Monitor Manager
+## Monitors
 
 The "monitor manager" or [`IMonitorManager`](api/Whim.IMonitorManager.html) in Whim stores the current monitor configuration. It provides methods to get adjacent monitors, and the monitor which contains a given point.
 
+Each [`IMonitor`](api/Whim.IMonitor.html) contains properties like its scale factor.
+
 ## Butler
 
-The "butler" or [`IButler`](api/Whim.IButler.html) in Whim is responsible for using the [workspace manager](#workspace-manager) and [monitor manager](#monitor-manager) to handle events from the [window manager](#window-manager) to its "butler pantry". The butler also provides access to methods via inheritance from its "butler chores" to manage the movement of windows between workspaces and monitors.
+The "butler" or [`IButler`](api/Whim.IButler.html) in Whim is responsible for using the [workspace manager](api/Whim.IWorkspaceManager.html) and [monitor manager](api/Whim.IMonitorManager.html) to handle events from the [window manager](#window-manager) to its "butler pantry". The butler also provides access to methods via inheritance from its "butler chores" to manage the movement of windows between workspaces and monitors.
 
 The "butler pantry" or [`IButlerPantry`](api/Whim.IButlerPantry.html) stores the assignment of windows to workspaces, and the assignment of workspaces to monitors.
 
@@ -73,7 +71,7 @@ When [scripting](scripting.md), use `IButler` methods to move windows between wo
 
 ## Commands
 
-Whim stores commands ([`ICommand`](api/Whim.ICommand.html)), which are objects with a unique identifier, title, and executable action. Commands expose easy access to functionality from Whim's core, and loaded plugins.
+Whim stores commands ([`ICommand`](api/Whim.ICommand.html)) in the [`ICommandManager`](api/Whim.ICommandManager.html). Commands are objects with a unique identifier, title, and executable action. Commands expose easy access to functionality from Whim's core, and loaded plugins.
 
 Command identifiers namespaced to the plugin which defines them. For example, the `whim.core` namespace is reserved for core commands, and `whim.gaps` is used by the `GapsPlugin` to define commands. Identifiers are based on the [`Name`](api/Whim.IPlugin.html) property of the plugin - for example, [`GapsPlugin.Name`](api/Whim.Gaps.GapsPlugin.html#Whim_Gaps_GapsPlugin_Name).
 
