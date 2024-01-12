@@ -1,0 +1,11 @@
+items:
+  - href: index.md
+  - href: concepts.md
+  - href: scripting.md
+  - href: layout-engines.md
+  - name: Plugins
+    items:
+      - href: plugins/plugins.md
+      - href: plugins/gaps.md
+  - href: architecture.md
+  - href: comparison.md
