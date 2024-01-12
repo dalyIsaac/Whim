@@ -1,6 +1,17 @@
 items:
   - href: index.md
-  - href: concepts.md
+  - name: Concepts
+    items:
+      - href: concepts/butler.md
+      - href: concepts/commands.md
+      - href: concepts/filtering.md
+      - href: concepts/keybinds.md
+      - href: concepts/layout-engines.md
+      - href: concepts/monitors.md
+      - href: concepts/plugins.md
+      - href: concepts/routing.md
+      - href: concepts/window-manager.md
+      - href: concepts/workspaces.md
   - href: scripting.md
   - href: layout-engines.md
   - name: Plugins

@@ -113,34 +113,6 @@ See [`TreeLayoutCommands.cs`](src/Whim.TreeLayout/TreeLayoutCommands.cs).
 | `whim.tree_layout.add_tree_direction_up`    | Add windows above the current window           | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>UP</kbd>    |
 | `whim.tree_layout.add_tree_direction_down`  | Add windows below the current window           | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>DOWN</kbd>  |
 
-### Routing
-
-[`IRouterManager`](src/Whim/Router/IRouterManager.cs) is used by Whim to route windows to specific workspaces. For example, to route Discord to a workspace "Chat", you can do the following:
-
-```csharp
-context.RouterManager.Add((window) =>
-{
-    if (window.ProcessFileName == "Discord.exe")
-    {
-        return context.WorkspaceManager.TryGet("Chat");
-    }
-
-    // Continue routing.
-    return null;
-});
-```
-
-`IRouterManager` has a `RouterOptions` property which can configure how new windows are routed - see [`RouterOptions`](src/Whim/Router/RouterOptions.cs).
-
-### Filtering
-
-[`IFilterManager`](src/Whim/Filter/IFilterManager.cs) tells Whim to ignore windows based on `Filter` delegates. A common use case is for plugins to filter out windows they manage themselves and want Whim to not lay out. For example, the bars and command palette are filtered out.
-
-```csharp
-// Called by the bar plugin.
-context.FilterManager.AddTitleMatchFilter("Whim Bar");
-```
-
 ### Window Manager
 
 The [`IWindowManager`](src/Whim/Window/IWindowManager.cs) is used by Whim to manage [`IWindow`](src/Whim/Window/IWindow.cs)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
