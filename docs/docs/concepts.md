@@ -2,9 +2,9 @@
 
 ## Workspaces
 
-A "workspace" or [`IWorkspace`](api/Whim.IWorkspace.html) in Whim is a collection of windows, displayed on a single monitor. The layouts of workspaces are determined by their [layout engines](#layout-engines). Each workspace has a single active layout engine, and can cycle through different layout engines.
+A "workspace" or <xref:Whim.IWorkspace> in Whim is a collection of windows, displayed on a single monitor. The layouts of workspaces are determined by their [layout engines](#layout-engines). Each workspace has a single active layout engine, and can cycle through different layout engines.
 
-The `WorkspaceManager` object has a customizable `CreateLayoutEngines` property which provides the default layout engines for workspaces. For example, the following config sets up three workspaces, and two layout engines:
+The <xref:Whim.IWorkspaceManager> object has a customizable <xref:Whim.IWorkspaceManager.CreateLayoutEngines> property which provides the default layout engines for workspaces. For example, the following config sets up three workspaces, and two layout engines:
 
 ```csharp
 // Set up workspaces.
@@ -39,7 +39,7 @@ When Whim exits, it will save the current workspaces and the current positions o
 
 ## Layout Engines
 
-A "layout engine" or [`ILayoutEngine`](api/Whim.ILayoutEngine.html) in Whim is responsible for arranging windows in a workspace. Each workspace has a single active layout engine, and can cycle through different layout engines.
+A "layout engine" or <xref:Whim.ILayoutEngine> in Whim is responsible for arranging windows in a workspace. Each workspace has a single active layout engine, and can cycle through different layout engines.
 
 There are two different types of layout engines: proxy layout engines, and leaf layout engines. Proxy layout engines wrap other engines, and can be used to modify the behavior of other engines. For example, the [`Gaps` plugin](plugins/gaps.md) will add gaps between windows - normally layout engines won't leave gaps between windows. Leaf layout engines are the lowest level layout engines, and are responsible for actually arranging windows.
 
@@ -47,7 +47,7 @@ To see the available layout engines, see [Layout Engines](layout-engines.md).
 
 ## Window Manager
 
-The "window manager" or [`IWindowManager`](api/Whim.IWindowManager.html) is used by Whim to manage [`IWindow`](apis/Whim.IWindow.html)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
+The "window manager" or <xref:Whim.IWindowManager> is used by Whim to manage <xref:Whim.IWindow>s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
 
 For example, the `WindowFocused` event is used by the `Whim.FocusIndicator` and `Whim.Bar` plugins to update their indications of the currently focused window.
 
@@ -57,25 +57,25 @@ If this doesn't work, dragging a window's edge will force a layout, which should
 
 ## Monitors
 
-The "monitor manager" or [`IMonitorManager`](api/Whim.IMonitorManager.html) in Whim stores the current monitor configuration. It provides methods to get adjacent monitors, and the monitor which contains a given point.
+The "monitor manager" or <xref:Whim.IMonitorManager> in Whim stores the current monitor configuration. It provides methods to get adjacent monitors, and the monitor which contains a given point.
 
-Each [`IMonitor`](api/Whim.IMonitor.html) contains properties like its scale factor.
+Each <xref:Whim.IMonitor> contains properties like its scale factor.
 
 ## Butler
 
-The "butler" or [`IButler`](api/Whim.IButler.html) in Whim is responsible for using the [workspace manager](api/Whim.IWorkspaceManager.html) and [monitor manager](api/Whim.IMonitorManager.html) to handle events from the [window manager](#window-manager) to its "butler pantry". The butler also provides access to methods via inheritance from its "butler chores" to manage the movement of windows between workspaces and monitors.
+The "butler" or <xref:Whim.IButler> in Whim is responsible for using the <xref:Whim.IWorkspaceManager> and <xref:Whim.IMonitorManager> to handle events from the [window manager](#window-manager) to its "butler pantry". The butler also provides access to methods via inheritance from its "butler chores" to manage the movement of windows between workspaces and monitors.
 
-The "butler pantry" or [`IButlerPantry`](api/Whim.IButlerPantry.html) stores the assignment of windows to workspaces, and the assignment of workspaces to monitors.
+The "butler pantry" or <xref:Whim.IButlerPantry> stores the assignment of windows to workspaces, and the assignment of workspaces to monitors.
 
 When [scripting](scripting.md), use `IButler` methods to move windows between workspaces and monitors.
 
 ## Commands
 
-Whim stores commands ([`ICommand`](api/Whim.ICommand.html)) in the [`ICommandManager`](api/Whim.ICommandManager.html). Commands are objects with a unique identifier, title, and executable action. Commands expose easy access to functionality from Whim's core, and loaded plugins.
+Whim stores commands (<xref:Whim.ICommand>) in the <xref:ICommandManager>. Commands are objects with a unique identifier, title, and executable action. Commands expose easy access to functionality from Whim's core, and loaded plugins.
 
-Command identifiers namespaced to the plugin which defines them. For example, the `whim.core` namespace is reserved for core commands, and `whim.gaps` is used by the `GapsPlugin` to define commands. Identifiers are based on the [`Name`](api/Whim.IPlugin.html) property of the plugin - for example, [`GapsPlugin.Name`](api/Whim.Gaps.GapsPlugin.html#Whim_Gaps_GapsPlugin_Name).
+Command identifiers namespaced to the plugin which defines them. For example, the `whim.core` namespace is reserved for core commands, and `whim.gaps` is used by the `GapsPlugin` to define commands. Identifiers are based on the <xref:Whim.IPlugin.Name> property of the plugin - for example, <xref:Whim.Gaps.GapsPlugin.Name>.
 
-Each plugin can provide commands through the `PluginCommands` property of the [`IPlugin`](api/Whim.IPlugin.html#Whim_IPlugin_PluginCommands) interface.
+Each plugin can provide commands through the <xref:Whim.IPlugin.PluginCommands> property of the <xref:Whim.IPlugin> interface.
 
 Custom commands are automatically added to the `whim.custom` namespace. For example, the following command minimizes Discord:
 
@@ -114,11 +114,11 @@ void DoConfig(IConfig context)
 
 ## Keybinds
 
-A [commands](#commands) can be bound to a single "keybind" [`IKeybind`](src/Whim/Keybind/IKeybind.cs). However, **each keybind can trigger multiple commands.**
+A [commands](#commands) can be bound to a single "keybind" <xref:IKeybind>. However, **each keybind can trigger multiple commands.**
 
-The [`IKeybind`](api/Whim.IKeybind.html) interface contains a number of constants with common [`KeyModifers`](api/Whim.KeyModifiers.html). When creating a custom [`Keybind`](api/Whim.Keybind.html), you can use these constants or a custom combination of [`KeyModifiers`](api/Whim.KeyModifiers.html).
+The <xref:Whim.IKeybind> interface contains a number of constants with common <xref:Whim.KeyModifiers>. When creating a custom <xref:Keybind>, you can use these constants or a custom combination of <xref:Whim.KeyModifiers>.
 
-The available keys can be found in the [`VIRTUAL_KEY`](api/Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY.html) enum.
+The available keys can be found in the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY> enum.
 Keybinds can be overridden and removed in the config. For example:
 
 ```csharp
@@ -137,11 +137,11 @@ context.KeybindManager.Clear();
 >
 > Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
 
-To treat key modifiers like `LWin` and `RWin` the same, see [`IKeybindManager.UnifyKeyModifiers`](api/Whim.IKeybindManager.html#Whim_IKeybindManager_UnifyKeyModifiers).
+To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
 
 ### Plugins
 
-Whim is build around plugins. Plugins are referenced using `#r` and `using` statements at the top of the config file. Each plugin generally has a `Config` class, and a `Plugin` class, and needs to be added to the [`IPluginManager`](api/Whim.IPluginManager.html). For example:
+Whim is build around plugins. Plugins are referenced using `#r` and `using` statements at the top of the config file. Each plugin generally has a `Config` class, and a `Plugin` class, and needs to be added to the <xref:Whim.IPluginManager>. For example:
 
 ```csharp
 BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);

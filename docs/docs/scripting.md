@@ -21,7 +21,7 @@ These add references to external assemblies. Your IDE can use these to access co
 
 ## The Code
 
-The rest of the file is largely typical C# code. There are `using` statements, and a `DoConfig` function which takes an [`IContext`](api/Whim.IContext.html) parameter. This is the entry point for your config. Prior to calling this function, Whim will set up the [`IContext`](api/Whim.IContext.html) and its constituent parts.
+The rest of the file is largely typical C# code. There are `using` statements, and a `DoConfig` function which takes an <xref:Whim.IContext> parameter. This is the entry point for your config. Prior to calling this function, Whim will set up the <xref:Whim.IContext> and its constituent parts.
 
 After the `DoConfig` function is called, Whim will initialize the various managers and plugins and start the main loop.
 
