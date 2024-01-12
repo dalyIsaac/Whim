@@ -7,6 +7,7 @@ items:
       - href: concepts/filtering.md
       - href: concepts/keybinds.md
       - href: concepts/layout-engines.md
+      - href: concepts/logging.md
       - href: concepts/monitors.md
       - href: concepts/plugins.md
       - href: concepts/routing.md

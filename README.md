@@ -113,40 +113,6 @@ See [`TreeLayoutCommands.cs`](src/Whim.TreeLayout/TreeLayoutCommands.cs).
 | `whim.tree_layout.add_tree_direction_up`    | Add windows above the current window           | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>UP</kbd>    |
 | `whim.tree_layout.add_tree_direction_down`  | Add windows below the current window           | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>DOWN</kbd>  |
 
-### Window Manager
-
-The [`IWindowManager`](src/Whim/Window/IWindowManager.cs) is used by Whim to manage [`IWindow`](src/Whim/Window/IWindow.cs)s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
-
-For example, the `WindowFocused` event is used by the `Whim.FocusIndicator` and `Whim.Bar` plugins to update their indications of the currently focused window.
-
-The `IWindowManager` also exposes an `IFilterManager` called `LocationRestoringFilterManager`. Some applications like to restore their window positions when they start (e.g., Firefox, JetBrains Gateway). As a window manager, this is undesirable. `LocationRestoringFilterManager` listens to `WindowMoved` events for these windows and will force their parent `IWorkspace` to do a layout two seconds after their first `WindowMoved` event, attempting to restore the window to its correct position.
-
-If this doesn't work, dragging a window's edge will force a layout, which should fix the window's position. This is an area which could use further improvement.
-
-### Logging
-
-Whim wraps [Serilog](https://serilog.net/) to provide logging functionality. It can be configured using the [`LoggerConfig`](src/Whim/Logging/LoggerConfig.cs) class. For example:
-
-```csharp
-// The logger will only log messages with a level of `Debug` or higher.
-context.Logger.Config = new LoggerConfig() { BaseMinLogLevel = LogLevel.Debug };
-
-// The logger will log messages with a level of `Debug` or higher to a file.
-if (context.Logger.Config.FileSink is FileSinkConfig fileSinkConfig)
-{
-    fileSinkConfig.MinLogLevel = LogLevel.Debug;
-}
-
-// The logger will log messages with a level of `Error` or higher to the debug console.
-// The debug sink is only available in debug builds, and can slow down Whim.
-if (context.Logger.Config.DebugSink is SinkConfig debugSinkConfig)
-{
-    debugSinkConfig.MinLogLevel = LogLevel.Error;
-}
-```
-
-Logging can be changed during runtime to be more restrictive, but cannot be made more permissive than the initial configuration.
-
 ## Automatic Updating
 
 The `Whim.Updater` plugin is in `alpha` (especially as Whim hasn't started releasing non-`alpha` builds). If the updater fails, you can manually update Whim by downloading the latest release from the [releases page](https://github.com/dalyIsaac/Whim/releases).
@@ -154,51 +120,6 @@ The `Whim.Updater` plugin is in `alpha` (especially as Whim hasn't started relea
 The updater will show a notification when a new version is available. Clicking on the notification will show the changelog for the delta between the current version and the latest version.
 
 The `UpdaterConfig` supports specifying the `ReleaseChannel` and `UpdateFrequency`.
-
-## Architecture
-
-### Inspiration
-
-Whim is heavily inspired by the [workspacer](https://github.com/workspacer/workspacer) project, to which I've contributed to in the past. However, there are a few key differences:
-
-- Whim is built using WinUI 3 instead of Windows Forms. This makes it easier to have a more modern UI.
-- Whim has a more powerful command palette, which supports fuzzy search.
-- Whim stores windows internally in a more flexible way. This facilitates more complex window management. For more, see [Layouts](#layouts).
-- Whim has a command system with common functionality, which makes it easier to interact with at a higher level.
-- Creating subclasses of internal classes is not encouraged in Whim - instead, plugins should suffice to add new functionality.
-
-Whim was not built to be a drop-in replacement for workspacer, but it does have a similar feel and many of the same features. It is not a fork of workspacer, and is built from the ground up.
-
-It should be noted that [workspacer is no longer in active development](https://github.com/workspacer/workspacer/discussions/485).
-
-I am grateful to the workspacer project for the inspiration and ideas it has provided.
-
-### Layouts
-
-This is one of the key areas where Whim differs from workspacer.
-
-| Concept                                                             | workspacer             | Whim                                                  |
-| ------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------- |
-| [Data structure for storing windows](#ilayoutengine-data-structure) | `IEnumerable<IWindow>` | Any                                                   |
-| [Primary area support](#primary-area-support)                       | Yes                    | Not built in but possible in a custom `ILayoutEngine` |
-| [Directional support](#directional-support)                         | No                     | Yes                                                   |
-| [`ILayoutEngine` mutability](#ilayoutengine-mutability)             | Mutable                | Immutable                                             |
-
-#### `ILayoutEngine` Data Structure
-
-Currently, workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). Relying so heavily on a stack prevents workspacer from supporting more complex window layouts. For example, Whim's [`TreeLayoutEngine`](src/Whim.TreeLayout/TreeLayoutEngine.cs) uses a n-ary tree structure to store windows in arbitrary grid layouts.
-
-#### Primary Area Support
-
-Whim does not have a core concept of a "primary area", as it's an idea which lends itself to a stack-based data structure. However, it is possible to implement this functionality in a custom `ILayoutEngine` and plugin.
-
-#### Directional Support
-
-As Whim supports more novel layouts, it also has functionality to account for directions, like `FocusWindowInDirection`, `SwapWindowInDirection`, and `MoveWindowEdgesInDirection`. For example, it's possible to drag a corner of a window diagonally to resize it (provided the underlying `ILayoutEngine` supports it).
-
-#### `ILayoutEngine` Mutability
-
-Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support functionality like previewing changes to layouts before committing them, with the `LayoutPreview` plugin. In comparison, workspacer's `ILayoutEngine` implementations are mutable.
 
 ## Contributing
 
