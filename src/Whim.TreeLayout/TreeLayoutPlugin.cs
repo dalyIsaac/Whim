@@ -12,7 +12,9 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	private readonly Dictionary<LayoutEngineIdentity, Direction> _addNodeDirections = new();
 	private const Direction DefaultAddNodeDirection = Direction.Right;
 
-	/// <inheritdoc/>
+	/// <summary>
+	/// <c>whim.tree_layout</c>
+	/// </summary>
 	public string Name => "whim.tree_layout";
 
 	/// <inheritdoc/>

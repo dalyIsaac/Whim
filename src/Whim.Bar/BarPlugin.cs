@@ -14,7 +14,9 @@ public class BarPlugin : IBarPlugin
 	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = new();
 	private bool _disposedValue;
 
-	/// <inheritdoc />
+	/// <summary>
+	/// <c>whim.bar</c>
+	/// </summary>
 	public string Name => "whim.bar";
 
 	/// <summary>

@@ -12,7 +12,9 @@ public class GapsPlugin : IGapsPlugin
 	/// </summary>
 	public GapsConfig GapsConfig { get; }
 
-	/// <inheritdoc />
+	/// <summary>
+	/// <c>whim.gaps</c>
+	/// </summary>
 	public string Name => "whim.gaps";
 
 	/// <summary>

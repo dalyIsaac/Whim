@@ -8,7 +8,9 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 {
 	private readonly IContext _context;
 
-	/// <inheritdoc />
+	/// <summary>
+	/// <c>whim.floating_layout</c>
+	/// </summary>
 	public string Name => "whim.floating_layout";
 
 	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = new();

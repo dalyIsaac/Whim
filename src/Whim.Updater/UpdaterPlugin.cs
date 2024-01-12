@@ -47,7 +47,9 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public DateTime? LastCheckedForUpdates { get; private set; }
 
-	/// <inheritdoc />
+	/// <summary>
+	/// <c>whim.updater</c>
+	/// </summary>
 	public string Name => "whim.updater";
 
 	/// <inheritdoc />

@@ -11,7 +11,9 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	private CommandPaletteWindow? _commandPaletteWindow;
 	private bool _disposedValue;
 
-	/// <inheritdoc />
+	/// <summary>
+	/// <c>whim.command_palette</c>
+	/// </summary>
 	public string Name => "whim.command_palette";
 
 	/// <summary>

@@ -4,10 +4,11 @@ using System.Collections.Generic;
 namespace Whim;
 
 /// <summary>
-/// Container responsible for mapping <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s and
-/// <see cref="IWindow"/>s.
+/// Container responsible for the creation and removal of <see cref="IWorkspace"/>s. Events for
+/// workspaces are exposed here.
 ///
-/// It is responsible for the creation and destruction of <see cref="IWorkspace"/>s.
+/// To activate a workspace, or changee the mapping between workspaces and monitors, use the
+/// <see cref="IButler"/>.
 /// </summary>
 public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 {
