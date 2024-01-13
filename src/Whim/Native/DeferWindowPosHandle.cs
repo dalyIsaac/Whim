@@ -142,6 +142,12 @@ public sealed class DeferWindowPosHandle : IDisposable
 		// This was done to prevent the minimized windows being hidden, and Windows focusing the previous window.
 		// When windows are restored, then we make sure to focus them - see the window.Focus()` in
 		// `Workspace.MinimizeWindowEnd`.
+		// This is delicate code - to test:
+		// 1. Set monitor 2 to FocusLayoutEngine
+		// 2. Focus a tracked window in monitor 1
+		// 3. Change focus to a tracked window in monitor 2
+		// 4. Focus next window
+		// If monitor 1 receives the focus indicator, then this code is broken.
 		WindowPosState[] allStates = new WindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
 		_windowStates.CopyTo(allStates);
 		_minimizedWindowStates.CopyTo(allStates, _windowStates.Count);
