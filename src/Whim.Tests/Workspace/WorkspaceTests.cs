@@ -1237,6 +1237,8 @@ public class WorkspaceTests
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
+		window.ClearReceivedCalls();
+
 		// When MinimizeWindowEnd is called
 		workspace.MinimizeWindowEnd(window);
 
