@@ -137,15 +137,23 @@ public sealed class DeferWindowPosHandle : IDisposable
 		}
 
 		Logger.Debug($"Setting window position {numPasses} times");
-		SetMultipleWindowPos(_minimizedWindowStates, numPasses);
-		SetMultipleWindowPos(_windowStates, numPasses);
+
+		// Set the window positions for non-minimized windows first, then minimized windows.
+		// This was done to prevent the minimized windows being hidden, and Windows focusing the previous window.
+		// When windows are restored, then we make sure to focus them - see the window.Focus()` in
+		// `Workspace.MinimizeWindowEnd`.
+		WindowPosState[] allStates = new WindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
+		_windowStates.CopyTo(allStates);
+		_minimizedWindowStates.CopyTo(allStates, _windowStates.Count);
+
+		SetWindowPos(allStates, numPasses);
 		Logger.Debug("Finished setting window position");
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private void SetMultipleWindowPos(List<WindowPosState> windowStates, int numPasses)
+	private void SetWindowPos(WindowPosState[] windowStates, int numPasses)
 	{
-		if (windowStates.Count == 1)
+		if (windowStates.Length == 1)
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
