@@ -19,10 +19,14 @@ internal class DeferWindowPosManager : IDeferWindowPosManager
 		_internalContext = internalContext;
 	}
 
-	public void DeferLayout(List<WindowPosState> windowStates)
+	public void DeferLayout(List<WindowPosState> windowStates, List<WindowPosState> minimizedWindowStates)
 	{
 		Logger.Debug("Deferring layout");
 		foreach (WindowPosState windowState in windowStates)
+		{
+			_deferredWindowStates[windowState.WindowState.Window] = windowState;
+		}
+		foreach (WindowPosState windowState in minimizedWindowStates)
 		{
 			_deferredWindowStates[windowState.WindowState.Window] = windowState;
 		}

@@ -85,10 +85,17 @@ public class DeferWindowPosHandleTests
 	}
 
 	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
-	internal void Dispose_CannotDoLayout(IContext ctx, IInternalContext internalCtx, WindowPosState windowPosState)
+	internal void Dispose_CannotDoLayout(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WindowPosState windowPosState,
+		WindowPosState windowPosState2
+	)
 	{
 		// Given DeferWindowPosManager.CanDoLayout() returns false
-		using DeferWindowPosHandle handle = new(ctx, internalCtx, new WindowPosState[] { windowPosState });
+		windowPosState2.WindowState.WindowSize = WindowSize.Minimized;
+		using DeferWindowPosHandle handle =
+			new(ctx, internalCtx, new WindowPosState[] { windowPosState, windowPosState2 });
 		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(false);
 
 		// When disposing
@@ -96,7 +103,8 @@ public class DeferWindowPosHandleTests
 
 		// Then the layout is deferred
 		internalCtx.DeferWindowPosManager.DeferLayout(
-			Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState)
+			Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState),
+			Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState2)
 		);
 	}
 

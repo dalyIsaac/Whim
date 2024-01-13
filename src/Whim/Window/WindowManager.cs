@@ -261,7 +261,9 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			)
 			{
 				// Even if the window was ignored, we need to fire OnWindowFocused.
-				Logger.Debug($"Window {hwnd} was ignored, but still notifying listeners of focus");
+				Logger.Debug(
+					$"Window {hwnd} with event 0x{eventType:X4} was ignored, but still notifying listeners of focus"
+				);
 				OnWindowFocused(window);
 
 				_internalContext.DeferWindowPosManager.RecoverLayout();

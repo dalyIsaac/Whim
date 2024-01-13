@@ -1237,6 +1237,8 @@ public class WorkspaceTests
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
+		window.ClearReceivedCalls();
+
 		// When MinimizeWindowEnd is called
 		workspace.MinimizeWindowEnd(window);
 
@@ -1244,6 +1246,7 @@ public class WorkspaceTests
 		givenEngine.Received(1).MinimizeWindowEnd(window);
 		layoutEngine2.DidNotReceive().MinimizeWindowEnd(window);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
+		window.Received(1).Focus();
 	}
 
 	#region PerformCustomLayoutEngineAction

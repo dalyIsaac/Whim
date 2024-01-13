@@ -56,7 +56,11 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		_context.WorkspaceManager.WorkspaceLayoutCompleted += WorkspaceManager_WorkspaceLayoutCompleted;
 	}
 
-	private void DispatcherTimer_Tick(object? sender, object e) => Hide();
+	private void DispatcherTimer_Tick(object? sender, object e)
+	{
+		Logger.Debug("Focus indicator timer ticked");
+		Hide();
+	}
 
 	private void WindowManager_WindowMoveStart(object? sender, WindowMovedEventArgs e) => Hide();
 

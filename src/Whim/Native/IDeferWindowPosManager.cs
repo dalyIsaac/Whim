@@ -48,7 +48,8 @@ internal interface IDeferWindowPosManager
 	/// Defers layout of the given windows until <see cref="RecoverLayout"/> is called.
 	/// </summary>
 	/// <param name="windowStates"></param>
-	void DeferLayout(List<WindowPosState> windowStates);
+	/// <param name="minimizedWindowStates"></param>
+	void DeferLayout(List<WindowPosState> windowStates, List<WindowPosState> minimizedWindowStates);
 
 	/// <summary>
 	/// Returns whether or not layout can be performed, based on whether Whim has been reentered.

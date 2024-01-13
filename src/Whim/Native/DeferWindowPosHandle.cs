@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -21,6 +22,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 	private readonly IInternalContext _internalContext;
 
 	private readonly List<WindowPosState> _windowStates = new();
+	private readonly List<WindowPosState> _minimizedWindowStates = new();
 
 	/// <summary>
 	/// The default flags to use when setting the window position.
@@ -63,7 +65,11 @@ public sealed class DeferWindowPosHandle : IDisposable
 	)
 		: this(context, internalContext)
 	{
-		_windowStates.AddRange(windowStates);
+		// Add each window state to the appropriate list.
+		foreach (WindowPosState windowState in windowStates)
+		{
+			AddToCorrectList(windowState);
+		}
 	}
 
 	/// <summary>
@@ -81,13 +87,32 @@ public sealed class DeferWindowPosHandle : IDisposable
 		SET_WINDOW_POS_FLAGS? flags = null
 	)
 	{
-		Logger.Debug($"Adding window {windowState} after {hwndInsertAfter} with flags {flags}");
+		Logger.Debug($"Adding window {windowState.Window} after {hwndInsertAfter} with flags {flags}");
 		// We use HWND_BOTTOM, as modifying the Z-order of a window
 		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
 		// causes the relevant window to be focused, when the user hasn't
 		// actually changed the focus.
 		HWND targetHwndInsertAfter = hwndInsertAfter ?? (HWND)1; // HWND_BOTTOM
-		_windowStates.Add(new(windowState, targetHwndInsertAfter, flags));
+		AddToCorrectList(new(windowState, targetHwndInsertAfter, flags));
+	}
+
+	/// <summary>
+	/// Adds the given <paramref name="windowPosState"/> to the appropriate list.
+	/// </summary>
+	/// <param name="windowPosState">
+	/// Minimized windows are added to <see cref="_minimizedWindowStates"/>, otherwise they are added to
+	/// <see cref="_windowStates"/>.
+	/// </param>
+	private void AddToCorrectList(WindowPosState windowPosState)
+	{
+		if (windowPosState.WindowState.WindowSize == WindowSize.Minimized)
+		{
+			_minimizedWindowStates.Add(windowPosState);
+		}
+		else
+		{
+			_windowStates.Add(windowPosState);
+		}
 	}
 
 	/// <inheritdoc />
@@ -95,7 +120,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 	{
 		Logger.Debug("Disposing WindowDeferPosHandle");
 
-		if (_windowStates.Count == 0)
+		if (_windowStates.Count == 0 && _minimizedWindowStates.Count == 0)
 		{
 			Logger.Debug("No windows to set position for");
 			return;
@@ -103,7 +128,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 
 		if (!_internalContext.DeferWindowPosManager.CanDoLayout())
 		{
-			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates);
+			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates, _minimizedWindowStates);
 			return;
 		}
 
@@ -120,20 +145,41 @@ public sealed class DeferWindowPosHandle : IDisposable
 		}
 
 		Logger.Debug($"Setting window position {numPasses} times");
-		if (_windowStates.Count == 1)
+
+		// Set the window positions for non-minimized windows first, then minimized windows.
+		// This was done to prevent the minimized windows being hidden, and Windows focusing the previous window.
+		// When windows are restored, then we make sure to focus them - see the window.Focus()` in
+		// `Workspace.MinimizeWindowEnd`.
+		// This is delicate code - to test:
+		// 1. Set monitor 2 to FocusLayoutEngine
+		// 2. Focus a tracked window in monitor 1
+		// 3. Change focus to a tracked window in monitor 2
+		// 4. Focus next window
+		// If monitor 1 receives the focus indicator, then this code is broken.
+		//
+		// This code has worked in the past - however, it relies on `Parallel.ForEach` API calls being ordered,
+		// which has no guarantees.
+		// However, calling `Paralle.ForEach` separately for minimized windows didn't result in the desired focus
+		// behaviour.
+		WindowPosState[] allStates = new WindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
+		_windowStates.CopyTo(allStates);
+		_minimizedWindowStates.CopyTo(allStates, _windowStates.Count);
+
+		if (allStates.Length == 1)
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				SetWindowPos(_windowStates[0]);
+				SetWindowPos(allStates[0]);
 			}
 		}
 		else
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				Parallel.ForEach(_windowStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
+				Parallel.ForEach(allStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
 			}
 		}
+
 		Logger.Debug("Finished setting window position");
 	}
 
