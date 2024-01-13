@@ -156,31 +156,31 @@ public sealed class DeferWindowPosHandle : IDisposable
 		// 3. Change focus to a tracked window in monitor 2
 		// 4. Focus next window
 		// If monitor 1 receives the focus indicator, then this code is broken.
+		//
+		// This code has worked in the past - however, it relies on `Parallel.ForEach` API calls being ordered,
+		// which has no guarantees.
+		// However, calling `Paralle.ForEach` separately for minimized windows didn't result in the desired focus
+		// behaviour.
 		WindowPosState[] allStates = new WindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
 		_windowStates.CopyTo(allStates);
 		_minimizedWindowStates.CopyTo(allStates, _windowStates.Count);
 
-		SetWindowPos(allStates, numPasses);
-		Logger.Debug("Finished setting window position");
-	}
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private void SetWindowPos(WindowPosState[] windowStates, int numPasses)
-	{
-		if (windowStates.Length == 1)
+		if (allStates.Length == 1)
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				SetWindowPos(windowStates[0]);
+				SetWindowPos(allStates[0]);
 			}
 		}
 		else
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				Parallel.ForEach(windowStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
+				Parallel.ForEach(allStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
 			}
 		}
+
+		Logger.Debug("Finished setting window position");
 	}
 
 	private void SetWindowPos(WindowPosState source)
