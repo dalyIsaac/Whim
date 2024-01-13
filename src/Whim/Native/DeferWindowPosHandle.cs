@@ -65,9 +65,10 @@ public sealed class DeferWindowPosHandle : IDisposable
 	)
 		: this(context, internalContext)
 	{
+		// Add each window state to the appropriate list.
 		foreach (WindowPosState windowState in windowStates)
 		{
-			Add(windowState);
+			AddToCorrectList(windowState);
 		}
 	}
 
@@ -92,10 +93,17 @@ public sealed class DeferWindowPosHandle : IDisposable
 		// causes the relevant window to be focused, when the user hasn't
 		// actually changed the focus.
 		HWND targetHwndInsertAfter = hwndInsertAfter ?? (HWND)1; // HWND_BOTTOM
-		Add(new(windowState, targetHwndInsertAfter, flags));
+		AddToCorrectList(new(windowState, targetHwndInsertAfter, flags));
 	}
 
-	private void Add(WindowPosState windowPosState)
+	/// <summary>
+	/// Adds the given <paramref name="windowPosState"/> to the appropriate list.
+	/// </summary>
+	/// <param name="windowPosState">
+	/// Minimized windows are added to <see cref="_minimizedWindowStates"/>, otherwise they are added to
+	/// <see cref="_windowStates"/>.
+	/// </param>
+	private void AddToCorrectList(WindowPosState windowPosState)
 	{
 		if (windowPosState.WindowState.WindowSize == WindowSize.Minimized)
 		{
