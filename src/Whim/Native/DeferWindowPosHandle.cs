@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -21,6 +22,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 	private readonly IInternalContext _internalContext;
 
 	private readonly List<WindowPosState> _windowStates = new();
+	private readonly List<WindowPosState> _minimizedWindowStates = new();
 
 	/// <summary>
 	/// The default flags to use when setting the window position.
@@ -63,7 +65,10 @@ public sealed class DeferWindowPosHandle : IDisposable
 	)
 		: this(context, internalContext)
 	{
-		_windowStates.AddRange(windowStates);
+		foreach (WindowPosState windowState in windowStates)
+		{
+			Add(windowState);
+		}
 	}
 
 	/// <summary>
@@ -87,7 +92,19 @@ public sealed class DeferWindowPosHandle : IDisposable
 		// causes the relevant window to be focused, when the user hasn't
 		// actually changed the focus.
 		HWND targetHwndInsertAfter = hwndInsertAfter ?? (HWND)1; // HWND_BOTTOM
-		_windowStates.Add(new(windowState, targetHwndInsertAfter, flags));
+		Add(new(windowState, targetHwndInsertAfter, flags));
+	}
+
+	private void Add(WindowPosState windowPosState)
+	{
+		if (windowPosState.WindowState.WindowSize == WindowSize.Minimized)
+		{
+			_minimizedWindowStates.Add(windowPosState);
+		}
+		else
+		{
+			_windowStates.Add(windowPosState);
+		}
 	}
 
 	/// <inheritdoc />
@@ -95,7 +112,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 	{
 		Logger.Debug("Disposing WindowDeferPosHandle");
 
-		if (_windowStates.Count == 0)
+		if (_windowStates.Count == 0 && _minimizedWindowStates.Count == 0)
 		{
 			Logger.Debug("No windows to set position for");
 			return;
@@ -103,7 +120,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 
 		if (!_internalContext.DeferWindowPosManager.CanDoLayout())
 		{
-			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates);
+			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates, _minimizedWindowStates);
 			return;
 		}
 
@@ -120,21 +137,28 @@ public sealed class DeferWindowPosHandle : IDisposable
 		}
 
 		Logger.Debug($"Setting window position {numPasses} times");
-		if (_windowStates.Count == 1)
+		SetMultipleWindowPos(_minimizedWindowStates, numPasses);
+		SetMultipleWindowPos(_windowStates, numPasses);
+		Logger.Debug("Finished setting window position");
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private void SetMultipleWindowPos(List<WindowPosState> windowStates, int numPasses)
+	{
+		if (windowStates.Count == 1)
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				SetWindowPos(_windowStates[0]);
+				SetWindowPos(windowStates[0]);
 			}
 		}
 		else
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				Parallel.ForEach(_windowStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
+				Parallel.ForEach(windowStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
 			}
 		}
-		Logger.Debug("Finished setting window position");
 	}
 
 	private void SetWindowPos(WindowPosState source)
