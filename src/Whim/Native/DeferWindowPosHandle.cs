@@ -86,7 +86,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		SET_WINDOW_POS_FLAGS? flags = null
 	)
 	{
-		Logger.Debug($"Adding window {windowState} after {hwndInsertAfter} with flags {flags}");
+		Logger.Debug($"Adding window {windowState.Window} after {hwndInsertAfter} with flags {flags}");
 		// We use HWND_BOTTOM, as modifying the Z-order of a window
 		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
 		// causes the relevant window to be focused, when the user hasn't
