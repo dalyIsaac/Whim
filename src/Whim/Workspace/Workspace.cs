@@ -168,6 +168,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		DoLayout();
+		window.Focus();
 	}
 
 	public void FocusFirstWindow()
