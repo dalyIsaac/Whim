@@ -21,7 +21,7 @@ public enum UncaughtExceptionHandling
 /// <summary>
 /// This is the core of Whim. <br/>
 ///
-/// <c>IContext</c> consists of managers which contain and control Whim's state, and thus
+/// <c>IContext</c> consists of managers which contain and control Whim's state, and
 /// functionality. <br/>
 ///
 /// <c>IContext</c> also contains other associated state and functionality, like the
