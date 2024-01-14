@@ -29,76 +29,49 @@ public enum UncaughtExceptionHandling
 /// </summary>
 public interface IContext
 {
-	/// <summary>
-	/// Whim's <see cref="Logger"/> instances.
-	/// </summary>
+	/// <inheritdoc cref="Logger" />
 	Logger Logger { get; }
 
-	/// <summary>
-	/// How to handle uncaught exceptions. Defaults to <see cref="UncaughtExceptionHandling.Log"/>.
-	/// </summary>
+	/// <inheritdoc cref="UncaughtExceptionHandling" />
 	UncaughtExceptionHandling UncaughtExceptionHandling { get; set; }
 
-	/// <summary>
-	/// Whim's <see cref="ResourceManager"/> instances.
-	/// </summary>
+	/// <inheritdoc cref="IResourceManager" />
 	IResourceManager ResourceManager { get; }
 
+	/// <inheritdoc cref="IButler"/>
 	IButler Butler { get; }
 
-	/// <summary>
-	/// Whim's <see cref="IWorkspaceManager"/> instances.
-	/// </summary>
+	/// <inheritdoc cref="IWorkspaceManager" />
 	IWorkspaceManager WorkspaceManager { get; }
 
-	/// <summary>
-	/// Whim's <see cref="IWindowManager"/> instances.
-	/// </summary>
+	/// <inheritdoc cref="IWindowManager" />
 	IWindowManager WindowManager { get; }
 
-	/// <summary>
-	/// Whim's <see cref="IMonitorManager"/> instances.
-	/// </summary>
+	/// <inheritdoc cref="IMonitorManager" />
 	IMonitorManager MonitorManager { get; }
 
-	/// <summary>
-	/// Whim's <see cref="IRouterManager"/> instances.
-	/// </summary>
+	/// <inheritdoc cref="IRouterManager" />
 	IRouterManager RouterManager { get; }
 
-	/// <summary>
-	/// Whim's <see cref="IFilterManager"/> instances.
-	/// </summary>
+	/// <inheritdoc cref="IFilterManager" />
 	IFilterManager FilterManager { get; }
 
-	/// <summary>
-	/// Whim's <see cref="ICommand"/>s.
-	/// </summary>
+	/// <inheritdoc cref="ICommandManager" />
 	ICommandManager CommandManager { get; }
 
-	/// <summary>
-	/// Whim's keybinds.
-	/// </summary>
+	/// <inheritdoc cref="IKeybindManager" />
 	IKeybindManager KeybindManager { get; }
 
-	/// <summary>
-	/// Whim's <see cref="IPluginManager"/> instances.
-	/// </summary>
+	/// <inheritdoc cref="IPluginManager" />
 	IPluginManager PluginManager { get; }
 
-	/// <summary>
-	/// Manager for interacting with native Windows config.
-	/// </summary>
+	/// <inheritdoc cref="INativeManager" />
 	INativeManager NativeManager { get; }
 
-	/// <summary>
-	/// Manager to help interacting with the file system.
-	/// </summary>
+	/// <inheritdoc cref="IFileManager" />
 	IFileManager FileManager { get; }
 
-	/// <summary>
-	/// Manager for interacting with notifications.
-	/// </summary>
+	/// <inheritdoc cref="INotificationManager" />
 	INotificationManager NotificationManager { get; }
 
 	/// <summary>

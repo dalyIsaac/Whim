@@ -19,5 +19,6 @@ items:
     items:
       - href: plugins/plugins.md
       - href: plugins/gaps.md
+  - href: styling.md
   - href: architecture.md
   - href: comparison.md
