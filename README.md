@@ -78,17 +78,6 @@ See [`FocusIndicatorCommands.cs`](src/Whim.FocusIndicator/FocusIndicatorCommands
 | `whim.focus_indicator.toggle_fade`    | Toggle whether the focus indicator fades      | No default keybind |
 | `whim.focus_indicator.toggle_enabled` | Toggle whether the focus indicator is enabled | No default keybind |
 
-##### Gaps Plugin Commands
-
-See [`GapsCommands.cs`](src/Whim.Gaps/GapsCommands.cs).
-
-| Identifier                 | Title              | Keybind                                                            |
-| -------------------------- | ------------------ | ------------------------------------------------------------------ |
-| `whim.gaps.outer.increase` | Increase outer gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> |
-| `whim.gaps.outer.decrease` | Decrease outer gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd> |
-| `whim.gaps.inner.increase` | Increase inner gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> |
-| `whim.gaps.inner.decrease` | Decrease inner gap | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd> |
-
 ##### Slice Layout Plugin Commands
 
 See [`SliceLayoutCommands.cs`](src/Whim.SliceLayout/SliceLayoutCommands.cs).

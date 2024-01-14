@@ -17,7 +17,6 @@ items:
   - href: layout-engines.md
   - name: Plugins
     items:
-      - href: plugins/plugins.md
       - href: plugins/gaps.md
   - href: styling.md
   - href: architecture.md
