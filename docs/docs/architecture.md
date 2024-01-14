@@ -31,4 +31,69 @@ The command palette in Whim is also more powerful than the one in , using a port
 
 Whim is built on top of WinUI 3 instead of Windows Forms. This makes it easier to have a more modern-looking UI, and means it's possible for users to specify styling using XAML - see [Styling](styling.md).
 
-## Structure
+## `IContext`
+
+The <xref:Whim.IContext> consists of:
+
+- the <xref:Whim.IButler>
+- managers which contain and control Whim's state and functionality
+- events related to the `IContext`
+- the <xref:Whim.IContext.UncaughtExceptionhandling> setting
+- the <xref:Whim.Logger>.
+
+The <xref:Whim.IButler> uses the various managers to handle events from Windows and the user to update the mapping of <xref:Whim.IWindow>s to <xref:Whim.IWorkspace>s to <xref:Whim.IMonitor>s.
+
+The <xref:Whim.IButler.Pantry> property can be set up until initialization to customize the behavior of the mappings.
+
+### `IInternalContext`
+
+Similarly to `IContext`, there is an internal-only interface `Whim.IInternalContext` which contains internal core functionality which are not necessary to be exposed to plugins. This includes:
+
+- the `ICoreSavedStateManager` to save core state
+- hooks for Windows event providers, like `IKeybindHook`, `IMouseHook`, and `IWindowMessageMonitor`
+- internal interface implementations of public managers - e.g., `MonitorManager` is an implementation of `IInternalMonitorManager` and `IMonitorManager`
+- `IDeferWindowPosManager` to [handle STA re-entrancy](#single-threaded-apartments)
+
+Plugins should subscribe to Whim's various `public` events.
+
+### Initialization
+
+Managers will generally implement a subset of the following methods:
+
+- `PreInitialize` - used for things like subscribing to event listeners
+- `Initialize` - used for loading state, (usually user-defined or saved state)
+- `PostInitialize` - used for actions which rely on other things being initialized, like creating windows, starting hooks, or subscribing to events which we only care about now that initialiation is complete
+
+Items should make the objects which expose events have been initialized prior to the subscription.
+
+### CsWin32
+
+Whim uses the [CsWin32](https://github.com/microsoft/CsWin32) source generator to add Win32 P/Invoke methods and types. The list of items added can be found in `NativeMethods.txt`.
+
+## Events
+
+There are a variety of ways that Whim receives events:
+
+- `IWindowMessageMonitor`, to receive `WM_MESSAGE` events in a dedicated Whim window whose only purpose is to receive said events
+- `IKeybindHook` to receive all keyboard events from `WH_KEYBOARD_LL`
+- `IMouseHook`, to receive all mouse events from `WH_MOUSE_LL`
+- `INotificationManager`, to receive events from user interactions with Windows events
+- WinUI elements like windows, to receive user interactions with visual elements
+
+Each of these entrypoints are wrapped with <xref:Whim.IContext.HandleUncaughtException>. The behavior of this wrapper method can be customized using <xref:Whim.IContxt.UncaughtExceptionhandling>.
+
+## Single Threaded Apartments
+
+Whim operates on a single thread and uses the [Single-Threaded Apartments (STAs)](https://learn.microsoft.com/en-us/windows/win32/com/single-threaded-apartments) model. Unfortunately, Whim is subject to reentrancy as part of using STAs. For a good overview of reentrancy, see [What is so special about the Application STA?](https://devblogs.microsoft.com/oldnewthing/20210224-00/?p=104901) by Raymond Chen's The New Old Thing blog.
+
+STA reentrancy has caused issues where Whim would:
+
+1. Enter and do some processing
+2. While waiting for something, enter again due to another event, and set the window positions
+3. Go back to the deferred block of execution and set the window positions
+
+This could cause loops where a sort of infinite loop would be entered, as windows would continually move between different positions ([dalyIsaac/Whim#446](https://github.com/dalyIsaac/Whim/issues/446)).
+
+As it is "[not possible to prevent reentrancy](https://learn.microsoft.com/en-us/windows/win32/winauto/guarding-against-reentrancy-in-hook-functions)", Whim has a `DeferWindowPosManager` which checks for reentrancy in the current stack. If reentrancy has been detected, `DeferWindowPosHandle` has its layout deferred until there are no reentrant execution blocks in the stack. This was implemented in [dalyIsaac/Whim#553](https://github.com/dalyIsaac/Whim/pull/553).
+
+On a similar vein, `Workspace` has a method `GarbageCollect` which attempts to remove windows from the workspace which are no longer valid.
