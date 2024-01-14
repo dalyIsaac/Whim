@@ -159,7 +159,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		//
 		// This code has worked in the past - however, it relies on `Parallel.ForEach` API calls being ordered,
 		// which has no guarantees.
-		// However, calling `Paralle.ForEach` separately for minimized windows didn't result in the desired focus
+		// However, calling `Parallel.ForEach` separately for minimized windows didn't result in the desired focus
 		// behaviour.
 		WindowPosState[] allStates = new WindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
 		_windowStates.CopyTo(allStates);

@@ -134,8 +134,10 @@ internal class Context : IContext
 		Exiting?.Invoke(this, args);
 
 		PluginManager.Dispose();
+		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
+		Butler.Dispose();
 		NotificationManager.Dispose();
 		_internalContext.Dispose();
 
