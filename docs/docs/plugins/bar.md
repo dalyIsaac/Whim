@@ -1,0 +1,35 @@
+# Bar Plugin
+
+The <xref:Whim.Bar.BarPlugin> adds a configurable bar at the top of a screen.
+
+<!-- TODO: Image -->
+
+## Configuration
+
+The <xref:Whim.Bar.BarConfig> takes in three lists of <xref:Whim.Bar.BarComponent>s in its constructor. These correspond to the left, center, and right components on the bar.
+
+The bar can be styled using XAML - see [Styling](../styling.md).
+
+> [!NOTE]
+> The height of the bar can be configured the XAML styling. However, [BarConfig.Height](xref:Whim.Bar.BarConfig.Height) takes precedence over the height specified in the XAML.
+
+## Available Widgets
+
+When creating a component, use the `CreateComponent` method on the widget class. For example:
+
+```csharp
+List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
+List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
+List<BarComponent> rightComponents = new()
+{
+  BatteryWidget.CreateComponent(),
+  ActiveLayoutWidget.CreateComponent(),
+  DateTimeWidget.CreateComponent(),
+};
+```
+
+- [ActiveLayoutWidget](xref:Whim.Bar.ActiveLayoutWidget.CreateComponent)
+- [BatteryWidget](xref:Whim.Bar.BatteryWidget.CreateComponent)
+- [DateTimeWidget](<xref:Whim.Bar.DateTimeWidget.CreateComponent(System.Int32,System.String)>)
+- [FocusedWindowWidget](<xref:Whim.Bar.FocusedWindowWidget.CreateComponent(System.Func{Whim.IWindow,System.String})>)
+- [WorkspaceWidget](xref:Whim.Bar.WorkspaceWidget.CreateComponent)

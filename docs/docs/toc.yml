@@ -17,7 +17,18 @@ items:
   - href: layout-engines.md
   - name: Plugins
     items:
+      - href: plugins/bar.md
+      - href: plugins/command-palette.md
+      - href: plugins/floating-layout.md
+      - href: plugins/focus-indicator.md
       - href: plugins/gaps.md
+      - href: plugins/layout-preview.md
+      - href: plugins/slice-layout.md
+      - href: plugins/tree-layout.md
+      - href: plugins/tree-layout-bar.md
+      - href: plugins/tree-layout-command-palette.md
+      - href: plugins/updater.md
+
   - href: styling.md
   - href: architecture.md
   - href: comparison.md
