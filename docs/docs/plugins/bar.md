@@ -2,7 +2,7 @@
 
 The <xref:Whim.Bar.BarPlugin> adds a configurable bar at the top of a screen.
 
-<!-- TODO: Image -->
+![Bar demo](../../images/bar-demo.png)
 
 ## Configuration
 
