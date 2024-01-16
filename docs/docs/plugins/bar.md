@@ -33,3 +33,7 @@ List<BarComponent> rightComponents = new()
 - [DateTimeWidget](<xref:Whim.Bar.DateTimeWidget.CreateComponent(System.Int32,System.String)>)
 - [FocusedWindowWidget](<xref:Whim.Bar.FocusedWindowWidget.CreateComponent(System.Func{Whim.IWindow,System.String})>)
 - [WorkspaceWidget](xref:Whim.Bar.WorkspaceWidget.CreateComponent)
+
+## Commands
+
+N/A
