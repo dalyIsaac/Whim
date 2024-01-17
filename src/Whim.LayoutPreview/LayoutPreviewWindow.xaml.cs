@@ -55,21 +55,35 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 		_prevWindowStates = windowStates;
 		_prevHoveredIndex = -1;
 
+		double scale = monitor.ScaleFactor / 100.0;
+
 		LayoutPreviewWindowItem[] items = new LayoutPreviewWindowItem[windowStates.Length];
 		bool isFirst = true;
 		for (int idx = 0; idx < windowStates.Length; idx++)
 		{
-			bool isHovered = isFirst && windowStates[idx].Rectangle.ContainsPoint(cursorPoint);
+			IRectangle<int> rectangle = windowStates[idx].Rectangle;
+			IWindow window = windowStates[idx].Window;
+			bool isHovered = isFirst && rectangle.ContainsPoint(cursorPoint);
+
 			if (isHovered)
 			{
 				_prevHoveredIndex = idx;
 				isFirst = false;
 			}
 
-			items[idx] = new LayoutPreviewWindowItem(_context, windowStates[idx], isHovered);
+			if (monitor.ScaleFactor != 100)
+			{
+				rectangle = new Rectangle<int>(
+					(int)(rectangle.X / scale),
+					(int)(rectangle.Y / scale),
+					(int)(rectangle.Width / scale),
+					(int)(rectangle.Height / scale)
+				);
+			}
+			items[idx] = new LayoutPreviewWindowItem(_context, window, rectangle, isHovered);
 
-			Canvas.SetLeft(items[idx], windowStates[idx].Rectangle.X);
-			Canvas.SetTop(items[idx], windowStates[idx].Rectangle.Y);
+			Canvas.SetLeft(items[idx], rectangle.X);
+			Canvas.SetTop(items[idx], rectangle.Y);
 		}
 
 		LayoutPreviewCanvas.Children.Clear();
