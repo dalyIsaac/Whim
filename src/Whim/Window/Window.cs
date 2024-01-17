@@ -105,6 +105,12 @@ internal class Window : IWindow
 		_context.NativeManager.ShowWindowNoActivate(Handle);
 	}
 
+	public void Restore()
+	{
+		Logger.Debug(ToString());
+		_context.NativeManager.RestoreWindow(Handle);
+	}
+
 	/// <summary>
 	/// Constructor for the <see cref="IWindow"/> implementation.
 	/// </summary>

@@ -55,6 +55,14 @@ public interface INativeManager
 	bool ShowWindowNoActivate(HWND hwnd);
 
 	/// <summary>
+	/// Activates and displays the window. If the window is minimized, maximized, or arranged,
+	/// the system restores it to its original size and position
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
+	bool RestoreWindow(HWND hwnd);
+
+	/// <summary>
 	/// Safe wrapper around <see cref="PInvoke.GetClassName"/>.
 	/// </summary>
 	/// <param name="hwnd"></param>

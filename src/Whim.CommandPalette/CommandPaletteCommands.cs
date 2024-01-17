@@ -96,8 +96,8 @@ public class CommandPaletteCommands : PluginCommands
 						new MenuVariantConfig()
 						{
 							Hint = "Select window",
-							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(w =>
-								RemoveWindowCommandCreator(w)
+							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(
+								w => RemoveWindowCommandCreator(w)
 							),
 							ConfirmButtonText = "Remove"
 						}
@@ -160,13 +160,16 @@ public class CommandPaletteCommands : PluginCommands
 			.OrderBy(w => w.Title);
 
 		return windows
-			.Select(w => new SelectOption()
-			{
-				Id = $"{PluginName}.move_multiple_windows_to_workspace.{w.Title}",
-				Title = w.Title,
-				IsEnabled = true,
-				IsSelected = false
-			})
+			.Select(
+				w =>
+					new SelectOption()
+					{
+						Id = $"{PluginName}.move_multiple_windows_to_workspace.{w.Title}",
+						Title = w.Title,
+						IsEnabled = true,
+						IsSelected = false
+					}
+			)
 			.ToArray();
 	}
 
@@ -261,14 +264,7 @@ public class CommandPaletteCommands : PluginCommands
 				if (_context.WorkspaceManager.ActiveWorkspace.Equals(window))
 				{
 					// The workspace is currently active.
-					if (window.IsMinimized)
-					{
-						workspace.MinimizeWindowEnd(window);
-					}
-					else
-					{
-						window.Focus();
-					}
+					FocusWindow(window);
 					return;
 				}
 
@@ -283,14 +279,23 @@ public class CommandPaletteCommands : PluginCommands
 					_context.Butler.Activate(workspace);
 				}
 
-				if (window.IsMinimized)
-				{
-					window.ShowNormal();
-				}
-				else
-				{
-					window.Focus();
-				}
+				FocusWindow(window);
 			}
 		);
+
+	/// <summary>
+	/// Focuses the given <paramref name="window"/>. If the window is minimized, it will be restored.
+	/// </summary>
+	/// <param name="window"></param>
+	private static void FocusWindow(IWindow window)
+	{
+		if (window.IsMinimized)
+		{
+			window.Restore();
+		}
+		else
+		{
+			window.Focus();
+		}
+	}
 }
