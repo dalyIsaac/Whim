@@ -258,18 +258,39 @@ public class CommandPaletteCommands : PluginCommands
 					return;
 				}
 
-				if (window.IsMinimized)
+				if (_context.WorkspaceManager.ActiveWorkspace.Equals(window))
 				{
-					workspace.MinimizeWindowEnd(window);
+					// The workspace is currently active.
+					if (window.IsMinimized)
+					{
+						workspace.MinimizeWindowEnd(window);
+					}
+					else
+					{
+						window.Focus();
+					}
+					return;
 				}
 
-				if (_context.Butler.GetMonitorForWindow(window) is null)
+				if (_context.Butler.GetMonitorForWorkspace(workspace) is IMonitor monitor)
 				{
+					// The workspace is not active, but is visible.
+					_context.Butler.Activate(workspace, monitor);
+				}
+				else
+				{
+					// The workspace is not active, and is not visible.
 					_context.Butler.Activate(workspace);
 				}
 
-				workspace.DoLayout();
-				window.Focus();
+				if (window.IsMinimized)
+				{
+					window.ShowNormal();
+				}
+				else
+				{
+					window.Focus();
+				}
 			}
 		);
 }
