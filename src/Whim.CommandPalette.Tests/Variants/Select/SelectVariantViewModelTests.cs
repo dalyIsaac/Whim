@@ -11,9 +11,11 @@ public class SelectVariantViewModelTests
 		IEnumerable<IVariantRowModel<SelectOption>> variantRowModels
 	)
 	{
-		return variantRowModels.Select(
-			v => new MatcherResult<SelectOption>(v, new[] { new FilterTextMatch(0, v.Title.Length) }, 0)
-		);
+		return variantRowModels.Select(v => new MatcherResult<SelectOption>(
+			v,
+			new[] { new FilterTextMatch(0, v.Title.Length) },
+			0
+		));
 	}
 
 	private static (
@@ -135,18 +137,17 @@ public class SelectVariantViewModelTests
 		IEnumerable<SelectOption> optionsMock = Substitute.For<IEnumerable<SelectOption>>();
 		optionsMock
 			.GetEnumerator()
-			.Returns(
-				_ =>
-					new List<SelectOption>
+			.Returns(_ =>
+				new List<SelectOption>
+				{
+					new()
 					{
-						new()
-						{
-							Id = "id",
-							Title = "title",
-							IsSelected = false,
-							IsEnabled = false,
-						}
-					}.GetEnumerator()
+						Id = "id",
+						Title = "title",
+						IsSelected = false,
+						IsEnabled = false,
+					}
+				}.GetEnumerator()
 			);
 
 		SelectVariantConfig activationConfig = new() { Callback = (items) => { }, Options = optionsMock, };
@@ -212,14 +213,11 @@ public class SelectVariantViewModelTests
 		matcherMock
 			.Match(Arg.Any<string>(), Arg.Any<IReadOnlyList<IVariantRowModel<SelectOption>>>())
 			.Returns(
-				options.Select(
-					o =>
-						new MatcherResult<SelectOption>(
-							new SelectVariantRowModel(o),
-							new[] { new FilterTextMatch(0, o.Title.Length) },
-							0
-						)
-				)
+				options.Select(o => new MatcherResult<SelectOption>(
+					new SelectVariantRowModel(o),
+					new[] { new FilterTextMatch(0, o.Title.Length) },
+					0
+				))
 			);
 
 		SelectVariantConfig activationConfig =

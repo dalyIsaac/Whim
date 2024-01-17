@@ -676,15 +676,12 @@ public class TreeHelpersTests
 
 		// Then
 		windowRectangles
-			.Select(
-				nodeState =>
-					new WindowState()
-					{
-						Window = nodeState.WindowNode.Window,
-						Rectangle = nodeState.Rectangle,
-						WindowSize = nodeState.WindowSize
-					}
-			)
+			.Select(nodeState => new WindowState()
+			{
+				Window = nodeState.WindowNode.Window,
+				Rectangle = nodeState.Rectangle,
+				WindowSize = nodeState.WindowSize
+			})
 			.Should()
 			.Equal(expectedStates, (a, b) => a.Equals(b));
 	}
