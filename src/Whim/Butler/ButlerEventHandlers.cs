@@ -1,4 +1,5 @@
 using System;
+using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -66,11 +67,15 @@ internal class ButlerEventHandlers : IDisposable
 			workspace = null;
 		}
 
-		// If no workspace has been selected, route the window to the monitor it's on.
+		// If the workspace is still null, try to find a workspace for the window's monitor.
 		if (workspace == null)
 		{
-			IMonitor? monitor = _context.MonitorManager.GetMonitorAtPoint(window.Rectangle.Center);
-			if (monitor is not null)
+			HMONITOR hmonitor = _internalContext.CoreNativeManager.MonitorFromWindow(
+				window.Handle,
+				MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
+			);
+
+			if (_internalContext.MonitorManager.GetMonitorByHandle(hmonitor) is IMonitor monitor)
 			{
 				workspace = _pantry.GetWorkspaceForMonitor(monitor);
 			}
