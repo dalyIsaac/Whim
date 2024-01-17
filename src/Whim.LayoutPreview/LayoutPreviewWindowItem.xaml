@@ -6,8 +6,8 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:local="using:Whim.LayoutPreview"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	Width="{x:Bind Path=WindowState.Rectangle.Width, Converter={StaticResource NonNegativeValueConverter}}"
-	Height="{x:Bind Path=WindowState.Rectangle.Height, Converter={StaticResource NonNegativeValueConverter}}"
+	Width="{x:Bind Path=Rectangle.Width, Converter={StaticResource NonNegativeValueConverter}}"
+	Height="{x:Bind Path=Rectangle.Height, Converter={StaticResource NonNegativeValueConverter}}"
 	HorizontalContentAlignment="Stretch"
 	VerticalContentAlignment="Stretch"
 	mc:Ignorable="d">
@@ -27,7 +27,7 @@
 			<TextBlock
 				x:Name="Title"
 				HorizontalTextAlignment="Center"
-				Text="{x:Bind Path=WindowState.Window.Title}"
+				Text="{x:Bind Path=Window.Title}"
 				TextWrapping="WrapWholeWords" />
 		</StackPanel>
 	</RelativePanel>

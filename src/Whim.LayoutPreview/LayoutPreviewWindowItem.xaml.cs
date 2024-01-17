@@ -12,19 +12,25 @@ namespace Whim.LayoutPreview;
 public sealed partial class LayoutPreviewWindowItem : UserControl
 {
 	/// <summary>
-	/// The <see cref="IWindowState"/> that this <see cref="LayoutPreviewWindowItem"/> represents.
+	/// The <see cref="IWindow"/> that this <see cref="LayoutPreviewWindowItem"/> represents.
 	/// </summary>
-	public IWindowState WindowState { get; }
+	public IWindow Window { get; }
+
+	/// <summary>
+	/// The dimensions and position of the window.
+	/// </summary>
+	public IRectangle<int> Rectangle { get; }
 
 	/// <summary>
 	/// The icon for the window.
 	/// </summary>
 	public ImageSource? ImageSource { get; }
 
-	internal LayoutPreviewWindowItem(IContext context, IWindowState windowState, bool isHovered)
+	internal LayoutPreviewWindowItem(IContext context, IWindow window, IRectangle<int> rectangle, bool isHovered)
 	{
-		WindowState = windowState;
-		ImageSource = windowState.Window.GetIcon();
+		Window = window;
+		ImageSource = window.GetIcon();
+		Rectangle = rectangle;
 
 		InitializeComponent();
 
