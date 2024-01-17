@@ -240,10 +240,8 @@ public class CommandPaletteCommandsTests
 		wrapper
 			.Plugin.Received(1)
 			.Activate(
-				Arg.Is<MenuVariantConfig>(
-					c =>
-						c.Hint == "Select workspace"
-						&& c.Commands.Select(c => c.Title).SequenceEqual(expectedWorkspaces)
+				Arg.Is<MenuVariantConfig>(c =>
+					c.Hint == "Select workspace" && c.Commands.Select(c => c.Title).SequenceEqual(expectedWorkspaces)
 				)
 			);
 	}
@@ -264,11 +262,9 @@ public class CommandPaletteCommandsTests
 		wrapper
 			.Plugin.Received(1)
 			.Activate(
-				Arg.Is<SelectVariantConfig>(
-					c =>
-						c.Hint == "Select windows"
-						&& c.Options.Select(y => y.Title)
-							.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
+				Arg.Is<SelectVariantConfig>(c =>
+					c.Hint == "Select windows"
+					&& c.Options.Select(y => y.Title).SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
 				)
 			);
 	}
@@ -289,11 +285,10 @@ public class CommandPaletteCommandsTests
 		wrapper
 			.Plugin.Received(1)
 			.Activate(
-				Arg.Is<MenuVariantConfig>(
-					c =>
-						c.Hint == "Select window"
-						&& c.ConfirmButtonText == "Remove"
-						&& c.Commands.Select(c => c.Title).SequenceEqual(new string[] { "Window 0", "Window 1" })
+				Arg.Is<MenuVariantConfig>(c =>
+					c.Hint == "Select window"
+					&& c.ConfirmButtonText == "Remove"
+					&& c.Commands.Select(c => c.Title).SequenceEqual(new string[] { "Window 0", "Window 1" })
 				)
 			);
 	}
@@ -329,12 +324,11 @@ public class CommandPaletteCommandsTests
 		wrapper
 			.Plugin.Received(1)
 			.Activate(
-				Arg.Is<MenuVariantConfig>(
-					c =>
-						c.Hint == "Find window"
-						&& c.ConfirmButtonText == "Focus"
-						&& c.Commands.Select(c => c.Title)
-							.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
+				Arg.Is<MenuVariantConfig>(c =>
+					c.Hint == "Find window"
+					&& c.ConfirmButtonText == "Focus"
+					&& c.Commands.Select(c => c.Title)
+						.SequenceEqual(new string[] { "Window 0", "Window 1", "Window 2" })
 				)
 			);
 	}

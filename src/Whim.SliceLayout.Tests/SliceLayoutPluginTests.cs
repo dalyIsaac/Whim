@@ -132,8 +132,8 @@ public class SliceLayoutPluginTests
 		workspace
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
-				Arg.Is<LayoutEngineCustomAction>(
-					action => action.Name == plugin.PromoteWindowActionName && action.Window == window
+				Arg.Is<LayoutEngineCustomAction>(action =>
+					action.Name == plugin.PromoteWindowActionName && action.Window == window
 				)
 			);
 	}
@@ -185,8 +185,8 @@ public class SliceLayoutPluginTests
 		workspace
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
-				Arg.Is<LayoutEngineCustomAction>(
-					action => action.Name == plugin.DemoteWindowActionName && action.Window == window
+				Arg.Is<LayoutEngineCustomAction>(action =>
+					action.Name == plugin.DemoteWindowActionName && action.Window == window
 				)
 			);
 	}
@@ -255,8 +255,8 @@ public class SliceLayoutPluginTests
 		workspace
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
-				Arg.Is<LayoutEngineCustomAction>(
-					action => action.Name == plugin.PromoteFocusActionName && action.Window == window
+				Arg.Is<LayoutEngineCustomAction>(action =>
+					action.Name == plugin.PromoteFocusActionName && action.Window == window
 				)
 			);
 	}
@@ -308,8 +308,8 @@ public class SliceLayoutPluginTests
 		workspace
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
-				Arg.Is<LayoutEngineCustomAction>(
-					action => action.Name == plugin.DemoteFocusActionName && action.Window == window
+				Arg.Is<LayoutEngineCustomAction>(action =>
+					action.Name == plugin.DemoteFocusActionName && action.Window == window
 				)
 			);
 	}
