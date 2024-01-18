@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
+using FluentAssertions;
 using Microsoft.UI.Xaml.Input;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Tests;
@@ -194,7 +196,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void WindowAdded_RouteToLaunchedWorkspace_GetMonitorAtPoint_ReturnsNull(
+	internal void WindowAdded_RouteToLaunchedWorkspace_MonitorFromWindow_GetMonitorByHandle_Failure(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -205,10 +207,14 @@ public class ButlerEventHandlersTests
 		IWorkspace workspace
 	)
 	{
-		// Given the router options are set to RouteToLaunchedWorkspace and the monitor manager returns null for GetMonitorAtPoint
+		// Given the router options are set to RouteToLaunchedWorkspace, the core native manager
+		// returns a monitor, but we can't find a monitor with that handle
 		ctx.RouterManager.RouteWindow(window).ReturnsNull();
 		ctx.RouterManager.RouterOptions.Returns(RouterOptions.RouteToLaunchedWorkspace);
-		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).ReturnsNull();
+		internalCtx
+			.CoreNativeManager.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
+			.Returns((HMONITOR)1);
+		internalCtx.MonitorManager.GetMonitorByHandle((HMONITOR)1).ReturnsNull();
 		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
@@ -222,6 +228,55 @@ public class ButlerEventHandlersTests
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
+		internalCtx
+			.CoreNativeManager.Received()
+			.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
+		pantry.DidNotReceive().GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		pantry.Received().SetWindowWorkspace(window, workspace);
+		workspace.Received().AddWindow(window);
+
+		Assert.Single(triggersCalls.WindowRouted);
+
+		AssertWindowAdded(window, workspace, triggersCalls.WindowRouted[0]);
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal void WindowAdded_RouteToLaunchedWorkspace_MonitorFromWindow_GetMonitorByHandle_Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerPantry pantry,
+		ButlerTriggersCalls triggersCalls,
+		IWindow window,
+		IWorkspace workspace,
+		IMonitor monitor
+	)
+	{
+		// Given the router options are set to RouteToLaunchedWorkspace, the core native manager
+		// returns a monitor, and we can find a workspace for the monitor
+		ctx.RouterManager.RouteWindow(window).ReturnsNull();
+		ctx.RouterManager.RouterOptions.Returns(RouterOptions.RouteToLaunchedWorkspace);
+		internalCtx
+			.CoreNativeManager.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
+			.Returns((HMONITOR)1);
+		internalCtx.MonitorManager.GetMonitorByHandle((HMONITOR)1).Returns(monitor);
+		pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+
+		// When the window is added
+		sut.PreInitialize();
+		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
+			ctx.WindowManager,
+			new WindowEventArgs() { Window = window }
+		);
+
+		// Then the window is routed to the workspace
+		ctx.RouterManager.Received().RouteWindow(window);
+		internalCtx
+			.CoreNativeManager.Received()
+			.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
+		pantry.Received().GetWorkspaceForMonitor(monitor);
 		pantry.Received().SetWindowWorkspace(window, workspace);
 		workspace.Received().AddWindow(window);
 
@@ -265,6 +320,7 @@ public class ButlerEventHandlersTests
 
 		AssertWindowAdded(window, routedWorkspace, triggersCalls.WindowRouted[0]);
 	}
+
 	#endregion
 
 	#region WindowRemoved

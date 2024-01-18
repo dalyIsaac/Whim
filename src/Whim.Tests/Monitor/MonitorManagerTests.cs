@@ -793,4 +793,33 @@ public class MonitorManagerTests
 		Assert.Equal(monitorManager.ActiveMonitor, monitor);
 	}
 	#endregion
+
+	#region GetMonitorByHandle
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetMonitorByHandle_ReturnsNull(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		MonitorManager monitorManager = new(ctx, internalCtx);
+
+		// When
+		IMonitor? monitor = monitorManager.GetMonitorByHandle((HMONITOR)5);
+
+		// Then
+		Assert.Null(monitor);
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void GetMonitorByHandle_ReturnsMonitor(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor monitor = monitorManager.ElementAt(1);
+
+		// When
+		IMonitor? result = monitorManager.GetMonitorByHandle((HMONITOR)1);
+
+		// Then
+		Assert.Equal(monitor, result);
+	}
+	#endregion
 }

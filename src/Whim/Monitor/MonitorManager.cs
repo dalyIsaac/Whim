@@ -302,6 +302,8 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		return _monitors[(index + 1).Mod(_monitors.Length)];
 	}
 
+	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) => _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
+
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
