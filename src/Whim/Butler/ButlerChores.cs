@@ -15,7 +15,7 @@ internal class ButlerChores : IButlerChores
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
 	{
-		Logger.Debug($"Activating workspace {workspace}");
+		Logger.Debug($"Activating workspace {workspace} in monitor {monitor}");
 
 		if (!_context.WorkspaceManager.Contains(workspace))
 		{

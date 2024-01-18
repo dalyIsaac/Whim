@@ -261,7 +261,7 @@ public class CommandPaletteCommands : PluginCommands
 					return;
 				}
 
-				if (_context.WorkspaceManager.ActiveWorkspace.Equals(window))
+				if (_context.WorkspaceManager.ActiveWorkspace.Equals(workspace))
 				{
 					// The workspace is currently active.
 					FocusWindow(window);
