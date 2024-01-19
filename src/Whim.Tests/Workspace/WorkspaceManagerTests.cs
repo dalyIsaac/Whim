@@ -822,6 +822,7 @@ public class WorkspaceManagerTests
 		{
 			workspace.DidNotReceive().RemoveWindow(Arg.Any<IWindow>());
 			workspace.DidNotReceive().AddWindow(Arg.Any<IWindow>());
+			workspace.DidNotReceive().DoLayout();
 		}
 	}
 
@@ -844,6 +845,7 @@ public class WorkspaceManagerTests
 		{
 			workspace.DidNotReceive().RemoveWindow(Arg.Any<IWindow>());
 			workspace.DidNotReceive().AddWindow(Arg.Any<IWindow>());
+			workspace.DidNotReceive().DoLayout();
 		}
 	}
 
@@ -871,6 +873,8 @@ public class WorkspaceManagerTests
 
 		// Then the workspace does not receive any calls
 		workspaces[0].DidNotReceive().RemoveWindow(Arg.Any<IWindow>());
+		workspaces[0].DidNotReceive().AddWindow(Arg.Any<IWindow>());
+		workspaces[0].DidNotReceive().DoLayout();
 	}
 
 	[Theory]
@@ -912,6 +916,9 @@ public class WorkspaceManagerTests
 		// Then the window is removed from the first workspace and added to the activated workspace
 		workspaces[firstActivatedIdx].Received(1).RemoveWindow(window);
 		activatedWorkspace.Received(1).AddWindow(window);
+		activatedWorkspace.Received(1).DoLayout();
+		window.Received(1).Focus();
+
 		Assert.Equal(workspaces[activatedWorkspaceIdx], workspaceManager.GetWorkspaceForWindow(window));
 	}
 	#endregion
