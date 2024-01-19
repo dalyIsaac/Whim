@@ -334,32 +334,13 @@ public class CommandPaletteCommandsTests
 	}
 
 	[Fact]
-	public void FocusWindowCommandCreator()
-	{
-		// Given
-		Wrapper wrapper = new();
-
-		IWindow window = wrapper.Windows[0];
-		wrapper.Context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
-
-		// When
-		ICommand command = commands.FocusWindowCommandCreator(window);
-		command.TryExecute();
-
-		// Then
-		wrapper.Workspace.Received(1).AddWindow(window);
-	}
-
-	[Fact]
 	public void FocusWindowCommandCreator_CannotFindWorkspace()
 	{
 		// Given
 		Wrapper wrapper = new();
 
 		IWindow window = wrapper.Windows[0];
-		wrapper.Context.WorkspaceManager.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
 
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
@@ -368,6 +349,52 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Then
-		wrapper.Workspace.DidNotReceive().AddWindow(window);
+		wrapper.Workspace.DidNotReceive().DoLayout();
+		window.DidNotReceive().Focus();
+	}
+
+	[Fact]
+	public void FocusWindowCommandCreator_WindowIsMinimized()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		IWindow window = wrapper.Windows[0];
+		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
+
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
+
+		// When
+		ICommand command = commands.FocusWindowCommandCreator(window);
+		command.TryExecute();
+
+		// Then
+		wrapper.Workspace.Received(1).MinimizeWindowEnd(window);
+		wrapper.Context.Butler.Received(1).Activate(Arg.Any<IWorkspace>());
+		wrapper.Workspace.Received(1).DoLayout();
+		window.Received(1).Focus();
+	}
+
+	[Fact]
+	public void FocusWindowCommandCreator_WindowIsNotMinimized()
+	{
+		// Given
+		Wrapper wrapper = new();
+
+		IWindow window = wrapper.Windows[0];
+		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
+		window.IsMinimized.Returns(false);
+
+		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
+
+		// When
+		ICommand command = commands.FocusWindowCommandCreator(window);
+		command.TryExecute();
+
+		// Then
+		wrapper.Workspace.DidNotReceive().MinimizeWindowEnd(window);
+		wrapper.Context.Butler.Received(1).Activate(Arg.Any<IWorkspace>());
+		wrapper.Workspace.Received(1).DoLayout();
+		window.Received(1).Focus();
 	}
 }
