@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
+using FluentAssertions;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -1722,6 +1723,17 @@ public class WorkspaceManagerTests
 	#endregion
 
 	#region MoveWindowEdgesInDirection
+	private static void Workspaces_DidNotMoveWindowEdgesInDirection(IWorkspace[] workspaces)
+	{
+		for (int i = 0; i < workspaces.Length; i++)
+		{
+			workspaces[i]
+				.DidNotReceive()
+				.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+			workspaces[i].DidNotReceive().DoLayout();
+		}
+	}
+
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void MoveWindowEdgesInDirection_NoWindow(IContext ctx, IInternalContext internalCtx)
 	{
@@ -1736,12 +1748,7 @@ public class WorkspaceManagerTests
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then nothing happens
-		workspaces[0]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
-		workspaces[1]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		Workspaces_DidNotMoveWindowEdgesInDirection(workspaces);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1766,12 +1773,7 @@ public class WorkspaceManagerTests
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then nothing happens
-		workspaces[0]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
-		workspaces[1]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		Workspaces_DidNotMoveWindowEdgesInDirection(workspaces);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1795,12 +1797,7 @@ public class WorkspaceManagerTests
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>(), window);
 
 		// Then nothing happens
-		workspaces[0]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
-		workspaces[1]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		Workspaces_DidNotMoveWindowEdgesInDirection(workspaces);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1827,9 +1824,11 @@ public class WorkspaceManagerTests
 
 		// Then the window edges are moved
 		workspaces[0].Received(1).MoveWindowEdgesInDirection(Direction.Left, Arg.Any<IPoint<double>>(), window);
+		workspaces[0].Received(1).DoLayout();
 		workspaces[1]
 			.DidNotReceive()
 			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		workspaces[1].DidNotReceive().DoLayout();
 	}
 	#endregion
 }
