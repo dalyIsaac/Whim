@@ -306,6 +306,7 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		wrapper.Workspace.Received(1).RemoveWindow(wrapper.Windows[0]);
+		wrapper.Workspace.Received(1).DoLayout();
 	}
 
 	[Fact]

@@ -369,6 +369,7 @@ public class ButlerEventHandlersTests
 		// Then the window is removed from the workspace
 		pantry.Received().RemoveWindow(window);
 		workspace.Received().RemoveWindow(window);
+		workspace.Received().DoLayout();
 		Assert.Single(triggersCalls.WindowRouted);
 	}
 	#endregion

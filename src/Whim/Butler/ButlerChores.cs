@@ -264,12 +264,6 @@ internal class ButlerChores : IButlerChores
 			return;
 		}
 
-		bool isSameWorkspace = targetWorkspace.Equals(oldWorkspace);
-		if (!isSameWorkspace)
-		{
-			_context.Butler.Pantry.SetWindowWorkspace(window, targetWorkspace);
-		}
-
 		// Normalize `point` into the unit square.
 		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(point);
 
@@ -278,11 +272,15 @@ internal class ButlerChores : IButlerChores
 		);
 
 		// If the window is being moved to a different workspace, remove it from the current workspace.
-		if (!isSameWorkspace)
+		if (!targetWorkspace.Equals(oldWorkspace))
 		{
+			_context.Butler.Pantry.SetWindowWorkspace(window, targetWorkspace);
 			oldWorkspace.RemoveWindow(window);
+			oldWorkspace.DoLayout();
 		}
+
 		targetWorkspace.MoveWindowToPoint(window, normalized);
+		targetWorkspace.DoLayout();
 
 		// Trigger layouts.
 		window.Focus();
