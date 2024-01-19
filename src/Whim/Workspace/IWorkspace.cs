@@ -84,7 +84,8 @@ public interface IWorkspace : IDisposable
 	/// Adds the window to the workspace.
 	/// </summary>
 	/// <param name="window"></param>
-	void AddWindow(IWindow window);
+	/// <returns>Whether the <paramref name="window"/> was added.</returns>
+	bool AddWindow(IWindow window);
 
 	/// <summary>
 	/// Removes the window from the workspace.
@@ -135,7 +136,10 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The origin window
 	/// </param>
-	void FocusWindowInDirection(Direction direction, IWindow? window = null);
+	/// <returns>
+	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
+	/// </returns>
+	bool FocusWindowInDirection(Direction direction, IWindow? window = null);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
@@ -144,7 +148,10 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The window to swap. If null, the currently focused window is swapped.
 	/// </param>
-	void SwapWindowInDirection(Direction direction, IWindow? window = null);
+	/// <returns>
+	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
+	/// </returns>
+	bool SwapWindowInDirection(Direction direction, IWindow? window = null);
 
 	/// <summary>
 	/// Change the <paramref name="window"/>'s <paramref name="edges"/> direction by
@@ -161,7 +168,10 @@ public interface IWorkspace : IDisposable
 	/// The window to change the edge of. If null, the currently focused window is
 	/// used.
 	/// </param>
-	void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null);
+	/// <returns>
+	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
+	/// </returns>
+	bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null);
 
 	/// <summary>
 	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.
@@ -180,7 +190,6 @@ public interface IWorkspace : IDisposable
 	/// Will minimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
 	/// <param name="window"></param>
-	/// <returns></returns>
 	void MinimizeWindowStart(IWindow window);
 
 	/// <summary>
@@ -205,7 +214,10 @@ public interface IWorkspace : IDisposable
 	/// <param name="action">
 	/// Metadata about the action to perform, and the payload to perform it with.
 	/// </param>
-	void PerformCustomLayoutEngineAction(LayoutEngineCustomAction action);
+	/// <returns>
+	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
+	/// </returns>
+	bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action);
 
 	/// <summary>
 	/// Performs a custom action in a layout engine.
@@ -220,6 +232,9 @@ public interface IWorkspace : IDisposable
 	/// <param name="action">
 	/// Metadata about the action to perform, and the payload to perform it with.
 	/// </param>
-	void PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action);
+	/// <returns>
+	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
+	/// </returns>
+	bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action);
 	#endregion
 }
