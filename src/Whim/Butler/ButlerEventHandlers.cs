@@ -162,6 +162,7 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		workspace.MinimizeWindowStart(window);
+		workspace.DoLayout();
 	}
 
 	private void WindowManager_WindowMinimizeEnd(object? sender, WindowEventArgs args)
@@ -176,6 +177,7 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		workspace.MinimizeWindowEnd(window);
+		workspace.DoLayout();
 	}
 
 	private void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
