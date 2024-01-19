@@ -1131,6 +1131,9 @@ public class WorkspaceManagerTests
 		// Then the window is removed from the first workspace and added to the second
 		workspaces[0].Received(1).RemoveWindow(window);
 		workspaces[1].Received(1).AddWindow(window);
+		workspaces[0].Received(1).DoLayout();
+		workspaces[1].Received(1).DoLayout();
+		window.Received(1).Focus();
 		window.DidNotReceive().Hide();
 	}
 	#endregion
