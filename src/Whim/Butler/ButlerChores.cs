@@ -312,6 +312,11 @@ internal class ButlerChores : IButlerChores
 
 		currentWorkspace.RemoveWindow(window);
 		workspace.AddWindow(window);
+
+		currentWorkspace.DoLayout();
+		workspace.DoLayout();
+
+		window.Focus();
 	}
 
 	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target)
