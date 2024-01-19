@@ -103,8 +103,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				_layoutEngines[idx] = _layoutEngines[idx].MinimizeWindowStart(window);
 			}
 		}
-
-		DoLayout();
 	}
 
 	public void MinimizeWindowEnd(IWindow window)
@@ -115,9 +113,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
 		// Whim starting up.
 		_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MinimizeWindowEnd(window);
-
-		DoLayout();
-		window.Focus();
 	}
 
 	public void FocusFirstWindow()
@@ -184,7 +179,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		prevLayoutEngine = _layoutEngines[_prevLayoutEngineIndex];
 		nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 
-		DoLayout();
 		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
@@ -246,7 +240,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return true;
 	}
 
-	public void AddWindow(IWindow window)
+	public bool AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to workspace {Name}");
 
@@ -254,7 +248,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			Logger.Error($"Window {window} already exists in workspace {Name}");
 			window.Focus();
-			return;
+			return false;
 		}
 
 		_windows.Add(window);
@@ -262,10 +256,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			_layoutEngines[i] = _layoutEngines[i].AddWindow(window);
 		}
-
-		DoLayout();
-		window.Focus();
-		LastFocusedWindow = window;
+		return true;
 	}
 
 	public bool RemoveWindow(IWindow window)
@@ -324,13 +315,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			_windows.Remove(window);
 		}
 
-		if (success)
-		{
-			DoLayout();
-			return true;
-		}
-
-		return false;
+		return success;
 	}
 
 	/// <summary>
@@ -358,13 +343,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return window;
 	}
 
-	public void FocusWindowInDirection(Direction direction, IWindow? window = null)
+	public bool FocusWindowInDirection(Direction direction, IWindow? window = null)
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
 		if (GetValidVisibleWindow(window) is not IWindow validWindow)
 		{
-			return;
+			return false;
 		}
 
 		ILayoutEngine newEngine = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
@@ -372,32 +357,26 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (ActiveLayoutEngine != newEngine)
 		{
 			_layoutEngines[_activeLayoutEngineIndex] = newEngine;
-			DoLayout();
+			return true;
 		}
+
+		return false;
 	}
 
-	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
+	public bool SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
-		bool success = false;
-
 		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
 			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
-			success = true;
+			return true;
 		}
 
-		if (success)
-		{
-			DoLayout();
-		}
-		return;
+		return false;
 	}
 
-	public void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
+	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
 	{
-		bool success = false;
-
 		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
@@ -406,14 +385,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				deltas,
 				validWindow
 			);
-			success = true;
+			return true;
 		}
 
-		if (success)
-		{
-			DoLayout();
-		}
-		return;
+		return false;
 	}
 
 	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
@@ -435,9 +410,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
 			}
 		}
-
-		DoLayout();
-		window.Focus();
 	}
 
 	public override string ToString() => Name;
@@ -550,8 +522,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return garbageCollected;
 	}
 
-	public void PerformCustomLayoutEngineAction(LayoutEngineCustomAction action)
-	{
+	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
 		PerformCustomLayoutEngineAction(
 			new LayoutEngineCustomAction<IWindow?>()
 			{
@@ -560,9 +531,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Window = action.Window
 			}
 		);
-	}
 
-	public void PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action)
+	public bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action)
 	{
 		Logger.Debug($"Attempting to perform custom layout engine action {action.Name} for workspace {Name}");
 
@@ -592,10 +562,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		if (doLayout)
-		{
-			DoLayout();
-		}
+		return doLayout;
 	}
 
 	protected virtual void Dispose(bool disposing)
