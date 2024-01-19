@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
@@ -361,6 +362,7 @@ public class CommandPaletteCommandsTests
 		Wrapper wrapper = new();
 
 		IWindow window = wrapper.Windows[0];
+		window.IsMinimized.Returns(true);
 		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
 
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
@@ -371,20 +373,20 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		wrapper.Workspace.Received(1).MinimizeWindowEnd(window);
-		wrapper.Context.Butler.Received(1).Activate(Arg.Any<IWorkspace>());
+		wrapper.Context.Butler.DidNotReceive().Activate(Arg.Any<IWorkspace>());
 		wrapper.Workspace.Received(1).DoLayout();
 		window.Received(1).Focus();
 	}
 
 	[Fact]
-	public void FocusWindowCommandCreator_WindowIsNotMinimized()
+	public void FocusWindowCommandCreator_ActivateWorkspace()
 	{
 		// Given
 		Wrapper wrapper = new();
 
 		IWindow window = wrapper.Windows[0];
 		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-		window.IsMinimized.Returns(false);
+		wrapper.Context.Butler.GetMonitorForWindow(window).ReturnsNull();
 
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
@@ -394,7 +396,7 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		wrapper.Workspace.DidNotReceive().MinimizeWindowEnd(window);
-		wrapper.Context.Butler.Received(1).Activate(Arg.Any<IWorkspace>());
+		wrapper.Context.Butler.Received(1).Activate(wrapper.Workspace);
 		wrapper.Workspace.Received(1).DoLayout();
 		window.Received(1).Focus();
 	}
