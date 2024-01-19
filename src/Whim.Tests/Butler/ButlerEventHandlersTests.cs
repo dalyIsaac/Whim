@@ -548,7 +548,8 @@ public class ButlerEventHandlersTests
 		);
 
 		// Then MinimizeWindowStart is called on the workspace
-		workspace.Received().MinimizeWindowStart(window);
+		workspace.Received(1).MinimizeWindowStart(window);
+		workspace.Received(1).DoLayout();
 	}
 	#endregion
 
@@ -600,7 +601,8 @@ public class ButlerEventHandlersTests
 		);
 
 		// Then MinimizeWindowEnd is called on the workspace
-		workspace.Received().MinimizeWindowEnd(window);
+		workspace.Received(1).MinimizeWindowEnd(window);
+		workspace.Received(1).DoLayout();
 	}
 	#endregion
 
