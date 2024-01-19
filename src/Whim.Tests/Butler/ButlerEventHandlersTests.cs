@@ -49,6 +49,18 @@ public class ButlerEventHandlersTests
 		window.Received().Focus();
 	}
 
+	private static void AssertWindowMinimized(IWindow window, IWorkspace currentWorkspace, RouteEventArgs actual)
+	{
+		Assert.Equal(window, actual.Window);
+		Assert.Null(actual.PreviousWorkspace);
+		Assert.Equal(currentWorkspace, actual.CurrentWorkspace);
+
+		currentWorkspace.Received().MinimizeWindowStart(window);
+		currentWorkspace.Received().DoLayout();
+
+		window.Received().Focus();
+	}
+
 	#region WindowAdded
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
 	internal void WindowAdded_RouteWindow(
@@ -308,9 +320,8 @@ public class ButlerEventHandlersTests
 		routedWorkspace.Received().MinimizeWindowStart(window);
 
 		Assert.Single(triggersCalls.WindowRouted);
-		AssertWindowAdded(window, routedWorkspace, triggersCalls.WindowRouted[0]);
+		AssertWindowMinimized(window, routedWorkspace, triggersCalls.WindowRouted[0]);
 	}
-
 	#endregion
 
 	#region WindowRemoved
