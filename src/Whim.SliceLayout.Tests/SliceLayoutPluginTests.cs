@@ -113,8 +113,9 @@ public class SliceLayoutPluginTests
 		plugin.PromoteWindowInStack(window);
 
 		// Then nothing
-		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
-			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
+		activeWorkspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		activeWorkspace.DidNotReceive().DoLayout();
 	}
 
 	[Theory, AutoSubstituteData]
@@ -136,6 +137,7 @@ public class SliceLayoutPluginTests
 					action.Name == plugin.PromoteWindowActionName && action.Window == window
 				)
 			);
+		workspace.Received(1).DoLayout();
 	}
 	#endregion
 
@@ -166,8 +168,9 @@ public class SliceLayoutPluginTests
 		plugin.DemoteWindowInStack(window);
 
 		// Then nothing
-		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
-			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
+		activeWorkspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		activeWorkspace.DidNotReceive().DoLayout();
 	}
 
 	[Theory, AutoSubstituteData]
@@ -189,6 +192,7 @@ public class SliceLayoutPluginTests
 					action.Name == plugin.DemoteWindowActionName && action.Window == window
 				)
 			);
+		workspace.Received(1).DoLayout();
 	}
 	#endregion
 
