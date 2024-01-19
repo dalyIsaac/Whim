@@ -141,6 +141,7 @@ internal class ButlerChores : IButlerChores
 
 		Logger.Debug($"Normalized point: {normalized}");
 		workspace.MoveWindowEdgesInDirection(edges, normalized, window);
+		workspace.DoLayout();
 		return true;
 	}
 
