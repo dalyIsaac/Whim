@@ -233,7 +233,12 @@ public class CommandPaletteCommands : PluginCommands
 		new Command(
 			identifier: $"{PluginName}.remove_window.{window.Title}",
 			title: window.Title,
-			callback: () => _context.WorkspaceManager.ActiveWorkspace.RemoveWindow(window)
+			callback: () =>
+			{
+				IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
+				workspace.RemoveWindow(window);
+				workspace.DoLayout();
+			}
 		);
 
 	/// <summary>

@@ -96,6 +96,7 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		_triggers.WindowRouted(RouteEventArgs.WindowAdded(window, workspace));
+
 		workspace.DoLayout();
 		window.Focus();
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
@@ -116,6 +117,8 @@ internal class ButlerEventHandlers : IDisposable
 
 		workspace.RemoveWindow(window);
 		_triggers.WindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
+
+		workspace.DoLayout();
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs args)
