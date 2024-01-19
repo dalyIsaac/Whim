@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
-using FluentAssertions;
-using Microsoft.UI.Xaml.Input;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
@@ -44,6 +42,11 @@ public class ButlerEventHandlersTests
 		Assert.Equal(window, actual.Window);
 		Assert.Null(actual.PreviousWorkspace);
 		Assert.Equal(currentWorkspace, actual.CurrentWorkspace);
+
+		currentWorkspace.Received().AddWindow(window);
+		currentWorkspace.Received().DoLayout();
+
+		window.Received().Focus();
 	}
 
 	#region WindowAdded
@@ -75,10 +78,8 @@ public class ButlerEventHandlersTests
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
 		pantry.Received().SetWindowWorkspace(window, routedWorkspace);
-		routedWorkspace.Received().AddWindow(window);
 
 		Assert.Single(triggersCalls.WindowRouted);
-
 		AssertWindowAdded(window, routedWorkspace, triggersCalls.WindowRouted[0]);
 	}
 
@@ -113,10 +114,8 @@ public class ButlerEventHandlersTests
 		ctx.RouterManager.Received().RouteWindow(window);
 		pantry.Received().SetWindowWorkspace(window, goodWorkspace);
 		badWorkspace.DidNotReceive().AddWindow(window);
-		goodWorkspace.Received().AddWindow(window);
 
 		Assert.Single(triggersCalls.WindowRouted);
-
 		AssertWindowAdded(window, goodWorkspace, triggersCalls.WindowRouted[0]);
 	}
 
@@ -149,10 +148,8 @@ public class ButlerEventHandlersTests
 
 		// Then the window is routed to the active workspace
 		pantry.Received().SetWindowWorkspace(window, activeWorkspace);
-		activeWorkspace.Received().AddWindow(window);
 
 		Assert.Single(triggersCalls.WindowRouted);
-
 		AssertWindowAdded(window, activeWorkspace, triggersCalls.WindowRouted[0]);
 	}
 
@@ -188,10 +185,8 @@ public class ButlerEventHandlersTests
 
 		// Then the window is routed to the last tracked active workspace
 		pantry.Received().SetWindowWorkspace(window, lastTrackedActiveWorkspace);
-		lastTrackedActiveWorkspace.Received().AddWindow(window);
 
 		Assert.Single(triggersCalls.WindowRouted);
-
 		AssertWindowAdded(window, lastTrackedActiveWorkspace, triggersCalls.WindowRouted[0]);
 	}
 
@@ -233,10 +228,8 @@ public class ButlerEventHandlersTests
 			.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
 		pantry.DidNotReceive().GetWorkspaceForMonitor(Arg.Any<IMonitor>());
 		pantry.Received().SetWindowWorkspace(window, workspace);
-		workspace.Received().AddWindow(window);
 
 		Assert.Single(triggersCalls.WindowRouted);
-
 		AssertWindowAdded(window, workspace, triggersCalls.WindowRouted[0]);
 	}
 
@@ -278,10 +271,8 @@ public class ButlerEventHandlersTests
 			.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
 		pantry.Received().GetWorkspaceForMonitor(monitor);
 		pantry.Received().SetWindowWorkspace(window, workspace);
-		workspace.Received().AddWindow(window);
 
 		Assert.Single(triggersCalls.WindowRouted);
-
 		AssertWindowAdded(window, workspace, triggersCalls.WindowRouted[0]);
 	}
 
@@ -317,7 +308,6 @@ public class ButlerEventHandlersTests
 		routedWorkspace.Received().MinimizeWindowStart(window);
 
 		Assert.Single(triggersCalls.WindowRouted);
-
 		AssertWindowAdded(window, routedWorkspace, triggersCalls.WindowRouted[0]);
 	}
 

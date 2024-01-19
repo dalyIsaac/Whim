@@ -96,6 +96,8 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		_triggers.WindowRouted(RouteEventArgs.WindowAdded(window, workspace));
+		workspace.DoLayout();
+		window.Focus();
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
