@@ -284,6 +284,7 @@ internal class CoreCommands : PluginCommands
 			}
 
 			workspace.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
+			workspace.DoLayout();
 		};
 
 	/// <summary>
