@@ -175,6 +175,11 @@ internal class ButlerChores : IButlerChores
 
 		currentWorkspace.RemoveWindow(window);
 		nextWorkspace.AddWindow(window);
+
+		currentWorkspace.DoLayout();
+		nextWorkspace.DoLayout();
+
+		window.Focus();
 	}
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
