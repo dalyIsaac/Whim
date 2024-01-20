@@ -211,6 +211,9 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Task Manager
 		filterManager.Add((window) => window.WindowClass.StartsWith("TaskManagerWindow") || window.WindowClass.EndsWith("TaskManagerWindow"));
 
+		// Total Commander
+		filterManager.AddWindowClassFilter("TDLG2FILEACTIONMIN");  // Target standard copy window
+
 		// TouchCursor
 		filterManager.AddProcessFileNameFilter("tcconfig.exe");
 
