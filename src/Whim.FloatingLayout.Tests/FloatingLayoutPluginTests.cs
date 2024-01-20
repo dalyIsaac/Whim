@@ -128,7 +128,7 @@ public class FloatingLayoutPluginTests
 				WindowSize = WindowSize.Normal
 			};
 
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Butler.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace.TryGetWindowState(window).Returns(windowState);
 		context.MonitorManager.GetMonitorAtPoint(rect).Returns(monitor);
 
@@ -162,7 +162,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		FloatingLayoutPlugin plugin = CreateSut(context);
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+		context.Butler.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
 
 		// When
 		plugin.MarkWindowAsFloating(window);
@@ -181,7 +181,7 @@ public class FloatingLayoutPluginTests
 		// Given
 		FloatingLayoutPlugin plugin = CreateSut(context);
 
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+		context.Butler.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
 		activeWorkspace.LastFocusedWindow.Returns(window);
 
 		// When
@@ -195,7 +195,7 @@ public class FloatingLayoutPluginTests
 	public void MarkWindowAsFloating_NoWindowState(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Butler.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace.TryGetWindowState(window).Returns((IWindowState?)null);
 
 		FloatingLayoutPlugin plugin = CreateSut(context);
@@ -211,7 +211,7 @@ public class FloatingLayoutPluginTests
 	public void MarkWindowAsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Butler.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -232,6 +232,7 @@ public class FloatingLayoutPluginTests
 		Assert.Single(plugin.FloatingWindows);
 		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
 		activeWorkspace.Received(1).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
+		activeWorkspace.Received(1).DoLayout();
 	}
 	#endregion
 
@@ -248,13 +249,14 @@ public class FloatingLayoutPluginTests
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 		activeWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
+		activeWorkspace.DidNotReceive().DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
 	public void MarkWindowAsDocked_WindowIsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Butler.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -275,6 +277,7 @@ public class FloatingLayoutPluginTests
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 		activeWorkspace.Received(2).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
+		activeWorkspace.Received(2).DoLayout();
 	}
 	#endregion
 
@@ -296,7 +299,7 @@ public class FloatingLayoutPluginTests
 	public void ToggleWindowFloating_ToFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Butler.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -322,7 +325,7 @@ public class FloatingLayoutPluginTests
 	public void ToggleWindowFloating_ToDocked(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Butler.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -402,7 +405,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Butler.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -447,7 +450,7 @@ public class FloatingLayoutPluginTests
 		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
 		layoutEngine2.Identity.Returns(new LayoutEngineIdentity());
 
-		context.WorkspaceManager.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Butler.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
