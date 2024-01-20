@@ -19,7 +19,7 @@ Whim's <xref:Whim.ILayoutEngine>s also have methods for directional operations, 
 
 Whim's <xref:Whim.ILayoutEngine> does not have the concept of a "primary area". However, this can be provided by `ILayoutEngine` implementations - for example, the <xref:Whim.SliceLayout.SliceLayoutEngine>.
 
-Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support functionality like previewing changes to layouts before committing them, with the `LayoutPreview` plugin. In comparison, workspacer's `ILayoutEngine` implementations are mutable.
+Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support functionality like previewing changes to layouts before committing them, with the [Layout Preview](plugins/layout-preview.md) plugin. In comparison, workspacer's `ILayoutEngine` implementations are mutable.
 
 ### Commands
 
