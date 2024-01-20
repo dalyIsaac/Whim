@@ -1,4 +1,4 @@
-# Gap Plugin
+# Gaps Plugin
 
 The <xref:Whim.Gaps.GapsPlugin> adds the config and commands for the <xref:Whim.Gaps.GapsLayoutEngine> proxy layout engine to add gaps between each of the windows in the layout.
 

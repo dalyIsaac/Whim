@@ -40,16 +40,6 @@ These are the commands and associated keybindings provided by Whim's core. See [
 | `whim.core.exit_whim`                       | Exit Whim                                                        | No default keybind                                   |
 | `whim.core.activate_workspace_{idx}`        | Activate workspace `{idx}` (where `idx` is an int 1, 2, ...9, 0) | <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>{idx}</kbd> |
 
-##### Floating Layout Plugin Commands
-
-See [`FloatingLayoutCommands.cs`](src/Whim.FloatingLayout/FloatingLayoutCommands.cs).
-
-| Identifier                                     | Title                   | Keybind                                          |
-| ---------------------------------------------- | ----------------------- | ------------------------------------------------ |
-| `whim.floating_layout.toggle_window_floating`  | Toggle window floating  | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd> |
-| `whim.floating_layout.mark_window_as_floating` | Mark window as floating | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> |
-| `whim.floating_layout.mark_window_as_docked`   | Mark window as docked   | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> |
-
 ##### Focus Indicator Plugin Commands
 
 See [`FocusIndicatorCommands.cs`](src/Whim.FocusIndicator/FocusIndicatorCommands.cs).
