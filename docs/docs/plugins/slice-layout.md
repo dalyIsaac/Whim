@@ -2,7 +2,7 @@
 
 <xref:Whim.SliceLayout.SliceLayoutPlugin> provides commands and functionality for the <xref:Whim.SliceLayout.SliceLayoutEngine>.
 
-<xref:Whim.SliceLayout.SliceLayoutPlugin> does not load the <xref:Whim.SliceLayout.SliceLayoutEngine> - that is done when creating a workspace via <xref:Whim.SliceLayout.IWorkspaceManager.Add>.
+<xref:Whim.SliceLayout.SliceLayoutPlugin> does not load the <xref:Whim.SliceLayout.SliceLayoutEngine> - that is done when creating a workspace via <xref:Whim.IWorkspaceManager.Add>.
 
 For more about the `SliceLayoutEngine`, see the [Layout Engines](../layout-engines.md#xrefwhimslicelayoutslicelayoutengine) page.
 
