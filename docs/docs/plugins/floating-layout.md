@@ -6,6 +6,28 @@ The <xref:Whim.FloatingLayout.FloatingLayoutPlugin> has no configuration options
 
 ![Floating layout demo](../../images/floating-layout-demo.gif)
 
+## Example Config
+
+```csharp
+#r "WHIM_PATH\whim.dll"
+#r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
+
+using Whim;
+using Whim.FloatingLayout;
+
+void DoConfig(IContext context)
+{
+  // ...
+
+  FloatingLayoutPlugin floatingLayoutPlugin = new(context);
+  context.PluginManager.AddPlugin(floatingLayoutPlugin);
+
+  // ...
+}
+
+return DoConfig;
+```
+
 ## Commands
 
 | Identifier                                     | Title                   | Keybind                                          |

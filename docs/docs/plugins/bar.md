@@ -34,6 +34,38 @@ List<BarComponent> rightComponents = new()
 - [FocusedWindowWidget](<xref:Whim.Bar.FocusedWindowWidget.CreateComponent(System.Func{Whim.IWindow,System.String})>)
 - [WorkspaceWidget](xref:Whim.Bar.WorkspaceWidget.CreateComponent)
 
+## Example Config
+
+```csharp
+#r "WHIM_PATH\whim.dll"
+#r "WHIM_PATH\plugins\Whim.Bar\Whim.Bar.dll"
+
+using Whim;
+using Whim.Bar;
+
+void DoConfig(IContext context)
+{
+  // ...
+
+  List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
+  List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
+  List<BarComponent> rightComponents = new()
+  {
+    BatteryWidget.CreateComponent(),
+    ActiveLayoutWidget.CreateComponent(),
+    DateTimeWidget.CreateComponent(),
+  };
+
+  BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
+  BarPlugin barPlugin = new(context, barConfig);
+  context.PluginManager.AddPlugin(barPlugin);
+
+  // ...
+}
+
+return DoConfig;
+```
+
 ## Commands
 
 N/A

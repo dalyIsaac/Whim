@@ -6,6 +6,29 @@ The <xref:Whim.Gaps.GapsPlugin> adds the config and commands for the <xref:Whim.
 
 This behavior can be customized with the <xref:Whim.Gaps.GapsConfig> provided to the <Whim.Gaps.GapsCommands.#ctor(Whim.Gaps.IGapsPlugin)>.
 
+## Example Config
+
+```csharp
+#r "WHIM_PATH\whim.dll"
+#r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
+
+using Whim;
+using Whim.Gaps;
+
+void DoConfig(IContext context)
+{
+  // ...
+
+  GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 10 };
+  GapsPlugin gapsPlugin = new(context, gapsConfig);
+  context.PluginManager.AddPlugin(gapsPlugin);
+
+  // ...
+}
+
+return DoConfig;
+```
+
 ## Commands
 
 | Identifier                 | Title              | Keybind                                                            |

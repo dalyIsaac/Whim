@@ -12,6 +12,29 @@ The <xref:Whim.CommandPalette.CommandPaletteConfig> can be used to configure the
 
 Custom instances of the command palette can be activated by calling <xref:Whim.CommandPalette.CommandPalettePlugin.Activate(Whim.CommandPalette.BaseVariantConfig)>.
 
+## Example Config
+
+```csharp
+#r "WHIM_PATH\whim.dll"
+#r "WHIM_PATH\plugins\Whim.CommandPalette\Whim.CommandPalette.dll"
+
+using Whim;
+using Whim.CommandPalette;
+
+void DoConfig(IContext context)
+{
+  // ...
+
+  CommandPaletteConfig commandPaletteConfig = new(context);
+  CommandPalettePlugin commandPalettePlugin = new(context, commandPaletteConfig);
+  context.PluginManager.AddPlugin(commandPalettePlugin);
+
+  // ...
+}
+
+return DoConfig;
+```
+
 ## Commands
 
 | Identifier                                                | Title                              | Keybind                                          |

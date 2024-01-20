@@ -40,17 +40,6 @@ These are the commands and associated keybindings provided by Whim's core. See [
 | `whim.core.exit_whim`                       | Exit Whim                                                        | No default keybind                                   |
 | `whim.core.activate_workspace_{idx}`        | Activate workspace `{idx}` (where `idx` is an int 1, 2, ...9, 0) | <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>{idx}</kbd> |
 
-##### Focus Indicator Plugin Commands
-
-See [`FocusIndicatorCommands.cs`](src/Whim.FocusIndicator/FocusIndicatorCommands.cs).
-
-| Identifier                            | Title                                         | Keybind            |
-| ------------------------------------- | --------------------------------------------- | ------------------ |
-| `whim.focus_indicator.show`           | Show focus indicator                          | No default keybind |
-| `whim.focus_indicator.toggle`         | Toggle focus indicator                        | No default keybind |
-| `whim.focus_indicator.toggle_fade`    | Toggle whether the focus indicator fades      | No default keybind |
-| `whim.focus_indicator.toggle_enabled` | Toggle whether the focus indicator is enabled | No default keybind |
-
 ##### Slice Layout Plugin Commands
 
 See [`SliceLayoutCommands.cs`](src/Whim.SliceLayout/SliceLayoutCommands.cs).
