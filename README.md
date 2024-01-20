@@ -40,20 +40,6 @@ These are the commands and associated keybindings provided by Whim's core. See [
 | `whim.core.exit_whim`                       | Exit Whim                                                        | No default keybind                                   |
 | `whim.core.activate_workspace_{idx}`        | Activate workspace `{idx}` (where `idx` is an int 1, 2, ...9, 0) | <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>{idx}</kbd> |
 
-##### Command Palette Plugin Commands
-
-See [`CommandPaletteCommands.cs`](src/Whim.CommandPalette/CommandPaletteCommands.cs).
-
-| Identifier                                                | Title                              | Keybind                                          |
-| --------------------------------------------------------- | ---------------------------------- | ------------------------------------------------ |
-| `whim.command_palette.toggle`                             | Toggle command palette             | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> |
-| `whim.command_palette.activate_workspace`                 | Activate workspace                 | No default keybind                               |
-| `whim.command_palette.rename_workspace`                   | Rename workspace                   | No default keybind                               |
-| `whim.command_palette.create_workspace`                   | Create workspace                   | No default keybind                               |
-| `whim.command_palette.move_window_to_workspace`           | Move window to workspace           | No default keybind                               |
-| `whim.command_palette.move_multiple_windows_to_workspace` | Move multiple windows to workspace | No default keybind                               |
-| `whim.command_palette.remove_window`                      | Select window to remove from Whim  | No default keybind                               |
-
 ##### Floating Layout Plugin Commands
 
 See [`FloatingLayoutCommands.cs`](src/Whim.FloatingLayout/FloatingLayoutCommands.cs).
