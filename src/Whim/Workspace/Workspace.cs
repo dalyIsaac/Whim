@@ -115,12 +115,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MinimizeWindowEnd(window);
 	}
 
-	public void FocusFirstWindow()
-	{
-		Logger.Debug($"Focusing first window in workspace {Name}");
-		ActiveLayoutEngine.GetFirstWindow()?.Focus();
-	}
-
 	public void FocusLastFocusedWindow()
 	{
 		Logger.Debug($"Focusing last focused window in workspace {Name}");
@@ -202,10 +196,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		TrySetLayoutEngineFromIndex(nextIdx);
 	}
-
-	public void NextLayoutEngine() => CycleLayoutEngine(false);
-
-	public void PreviousLayoutEngine() => CycleLayoutEngine(true);
 
 	public void ActivatePreviouslyActiveLayoutEngine() => TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
 

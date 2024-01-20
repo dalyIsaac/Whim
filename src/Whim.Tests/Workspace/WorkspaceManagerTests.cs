@@ -1510,7 +1510,7 @@ public class WorkspaceManagerTests
 		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
 			h => workspaceManager.ActiveLayoutEngineChanged += h,
 			h => workspaceManager.ActiveLayoutEngineChanged -= h,
-			workspaceManager.ActiveWorkspace.NextLayoutEngine
+			() => workspaceManager.ActiveWorkspace.CycleLayoutEngine(false)
 		);
 	}
 
