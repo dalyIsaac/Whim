@@ -40,19 +40,6 @@ These are the commands and associated keybindings provided by Whim's core. See [
 | `whim.core.exit_whim`                       | Exit Whim                                                        | No default keybind                                   |
 | `whim.core.activate_workspace_{idx}`        | Activate workspace `{idx}` (where `idx` is an int 1, 2, ...9, 0) | <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>{idx}</kbd> |
 
-##### Slice Layout Plugin Commands
-
-See [`SliceLayoutCommands.cs`](src/Whim.SliceLayout/SliceLayoutCommands.cs).
-
-| Identifier                                    | Title                              | Keybind            |
-| --------------------------------------------- | ---------------------------------- | ------------------ |
-| `whim.slice_layout.set_insertion_type.swap`   | Set slice insertion type to swap   | No default keybind |
-| `whim.slice_layout.set_insertion_type.rotate` | Set slice insertion type to rotate | No default keybind |
-| `whim.slice_layout.window.promote`            | Promote window in stack            | No default keybind |
-| `whim.slice_layout.window.demote`             | Demote window in stack             | No default keybind |
-| `whim.slice_layout.focus.promote`             | Promote focus in stack             | No default keybind |
-| `whim.slice_layout.focus.demote`              | Demote focus in stack              | No default keybind |
-
 ##### Tree Layout Plugin Commands
 
 See [`TreeLayoutCommands.cs`](src/Whim.TreeLayout/TreeLayoutCommands.cs).
