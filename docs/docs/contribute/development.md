@@ -1,7 +1,7 @@
 # Development
 
 > [!NOTE]
-> Make sure to read the [environment setup](../environment-setup.md) guide before continuing.
+> Make sure to read the [environment setup](environment-setup.md) guide before continuing.
 
 ## Visual Studio
 
@@ -26,11 +26,11 @@ Visual Studio 2022 is the easiest way to get started with working on Whim. Check
 
 ## Visual Studio Code
 
-The Whim repository includes a `.vscode` directory with a [`launch.json`](.vscode/launch.json) file. This file contains a `Launch Whim.Runner` configuration which can be used to debug Whim in Visual Studio Code. Unfortunately tests do not appear in Visual Studio Code's Test Explorer.
+The Whim repository includes a `.vscode` directory with a [`launch.json`](https://github.com/dalyIsaac/Whim/blob/main/.vscode/launch.json) file. This file contains a `Launch Whim.Runner` configuration which can be used to debug Whim in Visual Studio Code. Unfortunately tests do not appear in Visual Studio Code's Test Explorer.
 
 Check that `nuget.org` is added to the [Package Sources](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio#package-sources).
 
-Tasks to build, test, and format XAML can be found in [`tasks.json`](.vscode/tasks.json).
+Tasks to build, test, and format XAML can be found in [`tasks.json`](https://github.com/dalyIsaac/Whim/blob/main/.vscode/tasks.json).
 
 To see the recommended extensions, open the Command Palette and run `Extensions: Show Recommended Extensions`.
 

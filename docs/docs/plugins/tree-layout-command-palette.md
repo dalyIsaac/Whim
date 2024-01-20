@@ -1,6 +1,6 @@
 # Tree Layout Command Palette Plugin
 
-<xref:Whim.TreeLayout.CommandPalette> contains commands to interact with the tree layout via the command palette. The commands are automatically loaded in by <xref:Whim.IPluginManager.AddPlugin\*>.
+<xref:Whim.TreeLayout.CommandPalette> contains commands to interact with the tree layout via the command palette. The commands are automatically loaded in by <xref:Whim.IPluginManager>'s `AddPlugin` method.
 
 ## Example Config
 

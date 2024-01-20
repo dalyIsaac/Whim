@@ -1,7 +1,7 @@
 # Docs
 
 > [!NOTE]
-> Make sure to read the [environment setup](../environment-setup.md) guide before continuing.
+> Make sure to read the [environment setup](environment-setup.md) guide before continuing.
 
 The docs are built using [docfx](https://dotnet.github.io/docfx/). To get started:
 

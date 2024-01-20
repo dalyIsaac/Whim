@@ -8,4 +8,4 @@ There are a variety of ways that Whim receives events:
 - `INotificationManager`, to receive events from user interactions with Windows events
 - WinUI elements like windows, to receive user interactions with visual elements
 
-Each of these entrypoints are wrapped with <xref:Whim.IContext.HandleUncaughtException>. The behavior of this wrapper method can be customized using <Whim.IContext.UncaughtExceptionHandling>.
+Each of these entrypoints are wrapped with <xref:Whim.IContext.HandleUncaughtException(System.String,System.Exception)>. The behavior of this wrapper method can be customized using <Whim.IContext.UncaughtExceptionHandling>.

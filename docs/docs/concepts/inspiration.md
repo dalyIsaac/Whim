@@ -11,7 +11,7 @@ There are several key differences between Whim and workspacer:
 workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). This has a number of downsides:
 
 - All layout engines must work with the same list of windows.
-- workspacer cannot support more complex window layouts. In comparison, each <xref:Whim.ILayoutEngine> in Whim stores windows in their own manner. For example, Whim's [tree layout](plugins/tree-layout.md) uses a n-ary tree structure to store windows in arbitrary grid layouts. For more, see [Layout Engines](layout-engines.md).
+- workspacer cannot support more complex window layouts. In comparison, each <xref:Whim.ILayoutEngine> in Whim stores windows in their own manner. For example, Whim's [tree layout](../plugins/tree-layout.md) uses a n-ary tree structure to store windows in arbitrary grid layouts. For more, see [Layout Engines](layout-engines.md).
 
 Whim's <xref:Whim.ILayoutEngine>s also have methods for directional operations, like:
 
@@ -21,14 +21,14 @@ Whim's <xref:Whim.ILayoutEngine>s also have methods for directional operations, 
 
 Whim's <xref:Whim.ILayoutEngine> does not have the concept of a "primary area". However, this can be provided by `ILayoutEngine` implementations - for example, the <xref:Whim.SliceLayout.SliceLayoutEngine>.
 
-Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support functionality like previewing changes to layouts before committing them, with the [Layout Preview](plugins/layout-preview.md) plugin. In comparison, workspacer's `ILayoutEngine` implementations are mutable.
+Implementations of Whim's `ILayoutEngine` should be immutable. This was done to support functionality like previewing changes to layouts before committing them, with the [Layout Preview](../plugins/layout-preview.md) plugin. In comparison, workspacer's `ILayoutEngine` implementations are mutable.
 
 ## Commands
 
-Whim has a command system with common functionality, which makes it easier to interact with at a higher level. The command system is used by different components, like the <xref:Whim.IKeybindManager> and [Command Palette](plugins/command-palette.md).
+Whim has a command system with common functionality, which makes it easier to interact with at a higher level. The command system is used by different components, like the <xref:Whim.IKeybindManager> and [Command Palette](../plugins/command-palette.md).
 
 The command palette in Whim is also more powerful than the one in , using a port of the Visual Studio Code command palette fuzzy search algorithm.
 
 ## Appearance
 
-Whim is built on top of WinUI 3 instead of Windows Forms. This makes it easier to have a more modern-looking UI, and means it's possible for users to specify styling using XAML - see [Styling](styling.md).
+Whim is built on top of WinUI 3 instead of Windows Forms. This makes it easier to have a more modern-looking UI, and means it's possible for users to specify styling using XAML - see [Styling](../styling.md).

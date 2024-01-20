@@ -1,8 +1,8 @@
 # Layout Engines
 
-## <xref:Whim.FocusLayoutEngine>
+## `FocusLayoutEngine`
 
-`FocusLayoutEngine` is a layout engine that displays one window at a time:
+<xref:Whim.FocusLayoutEngine> is a layout engine that displays one window at a time:
 
 - Calling <Whim.ILayoutEngine.SwapWindowInDirection> will swap the current window with the window in the specified direction.
 - Calling <Whim.ILayoutEngine.FocusWindowInDirection> will focus the window in the specified direction.
@@ -11,9 +11,9 @@ Windows which are not focused are minimized to the taskbar.
 
 <!-- TODO: gif -->
 
-## <xref:Whim.SliceLayout.SliceLayoutEngine>
+## `SliceLayoutEngine`
 
-`SliceLayoutEngine` is a layout engine that internally stores an ordered list of <xref:Whim.IWindow>s. The monitor is divided into a number of <xref:Whim.SliceLayout.IArea>s. Each `IArea`corresponds to a "slice" of the`IWindow` list.
+<xref:Whim.SliceLayout.SliceLayoutEngine> is a layout engine that internally stores an ordered list of <xref:Whim.IWindow>s. The monitor is divided into a number of <xref:Whim.SliceLayout.IArea>s. Each `IArea`corresponds to a "slice" of the`IWindow` list.
 
 There are three types of `IArea`s:
 
@@ -59,9 +59,9 @@ context.PluginManager.AddPlugin(sliceLayoutPlugin);
 
 <!-- TODO: gif -->
 
-## <xref:Whim.TreeLayout.TreeLayoutEngine>
+## `TreeLayoutEngine`
 
-`TreeLayoutEngine` is a layout that allows users to create arbitrary grid layouts. Unlike `SliceLayoutEngine`, windows can can be added in any location.
+<xref:Whim.TreeLayout.TreeLayoutEngine> is a layout that allows users to create arbitrary grid layouts. Unlike `SliceLayoutEngine`, windows can can be added in any location.
 
 `TreeLayoutEngine` requires the <xref:Whim.TreeLayout.TreeLayoutPlugin> to be added to the <xref:Whim.IPluginManager> instance:
 

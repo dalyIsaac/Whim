@@ -17,11 +17,14 @@ If you've already made changes with `core.autocrlf` set to `false`, you can fix 
 git add . --renormalize
 ```
 
-Before making a pull request, please install the tools specified in [`.config/dotnet-tools.json`](.config/dotnet-tools.json), and run the formatters:
+Before making a pull request, please install the tools specified in [`.config/dotnet-tools.json`](https://github.com/dalyIsaac/Whim/blob/main/.config/dotnet-tools.json), and run the formatters:
 
 ```shell
+# In the repo root, install the tools
+cd Whim
 dotnet tool restore
-# To run the formatters:
+
+# Run the formatters
 dotnet tool run dotnet-csharpier .
 dotnet tool run xstyler --recursive --d . --config ./.xamlstylerrc
 ```
