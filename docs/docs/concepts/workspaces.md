@@ -33,4 +33,6 @@ context.WorkspaceManager.Add(
 );
 ```
 
+If no name is provided, the name will default to `Workspace {workspaces.Count + 1}.`
+
 When Whim exits, it will save the current workspaces and the current positions of each window within them. When Whim is started again, it will attempt to merge the saved workspaces with the workspaces defined in the config.

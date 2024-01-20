@@ -6,6 +6,11 @@ The <xref:Whim.LayoutPreview.LayoutPreviewPlugin> has no configuration options.
 
 ![Layout preview demo](../../images/layout-preview-demo.gif)
 
+## Things to Note
+
+- When there are multiple possible rectangles which could contain a window, the preview will highlight the first rectangle which contains the mouse.
+- The layout preview will not show the preview colors if the setting `Transparency effects` in Windows is turned off.
+
 ## Example Usage
 
 ```csharp

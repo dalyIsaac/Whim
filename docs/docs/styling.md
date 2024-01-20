@@ -27,6 +27,7 @@ void DoConfig(IContext context)
     string file = context.FileManager.GetWhimFileDir("Resources.xaml");
     context.ResourceManager.SetUserDictionary(file);
 }
+
 return DoConfig;
 ```
 
@@ -52,5 +53,8 @@ Currently, the following `x:key`s can be set by the user:
 <Color x:Key="bar:active_workspace:foreground" />                       <!-- Active workspace foreground color -->
 <Color x:Key="bar:hover:background" />                                  <!-- Mouse-over button background color -->
 <Color x:Key="bar:hover:foreground" />                                  <!-- Mouse-over button foreground color -->
-
 ```
+
+## Trigger Styles
+
+XAML in WinUI does not support "trigger styles" in a user dictionary. Thus, there is no direct way for us to define styling for scenarios like button `hover` or `disabled`. For the most part, the implicit theme defaults should suffice. To change them without being able to apply our own style, we would have to modify the resources in `Microsoft.UI.Xaml.Controls`.
