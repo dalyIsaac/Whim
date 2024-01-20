@@ -13,6 +13,12 @@ items:
       - href: concepts/routing.md
       - href: concepts/window-manager.md
       - href: concepts/workspaces.md
+      - name: Architecture
+      - href: concepts/inspiration.md
+      - href: concepts/context.md
+      - href: concepts/native-apis.md
+      - href: concepts/events.md
+      - href: concepts/threading.md
   - href: scripting.md
   - href: layout-engines.md
   - href: core-commands.md
@@ -30,7 +36,6 @@ items:
       - href: plugins/tree-layout-command-palette.md
       - href: plugins/updater.md
   - href: styling.md
-  - href: architecture.md
   - href: comparison.md
   - name: Contributing
     items:
