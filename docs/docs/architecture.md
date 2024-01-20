@@ -38,7 +38,7 @@ The <xref:Whim.IContext> consists of:
 - the <xref:Whim.IButler>
 - managers which contain and control Whim's state and functionality
 - events related to the `IContext`
-- the <xref:Whim.IContext.UncaughtExceptionhandling> setting
+- the <xref:Whim.IContext.UncaughtExceptionHandling> setting
 - the <xref:Whim.Logger>.
 
 The <xref:Whim.IButler> uses the various managers to handle events from Windows and the user to update the mapping of <xref:Whim.IWindow>s to <xref:Whim.IWorkspace>s to <xref:Whim.IMonitor>s.
@@ -80,7 +80,7 @@ There are a variety of ways that Whim receives events:
 - `INotificationManager`, to receive events from user interactions with Windows events
 - WinUI elements like windows, to receive user interactions with visual elements
 
-Each of these entrypoints are wrapped with <xref:Whim.IContext.HandleUncaughtException>. The behavior of this wrapper method can be customized using <xref:Whim.IContext.UncaughtExceptionHandling>.
+Each of these entrypoints are wrapped with <xref:Whim.IContext.HandleUncaughtException>. The behavior of this wrapper method can be customized using <xref:Whim.IContext.HandleUncaughtException(System.String,System.Exception)>.
 
 ## Single Threaded Apartments
 

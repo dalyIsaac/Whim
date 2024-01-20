@@ -33,4 +33,7 @@ items:
   - href: comparison.md
   - name: Contributing
     items:
+      - href: contribute/issues.md
+      - href: contribute/environment-setup.md
+      - href: contribute/development.md
       - href: contribute/docs.md
