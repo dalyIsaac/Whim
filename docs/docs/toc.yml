@@ -15,6 +15,7 @@ items:
       - href: concepts/workspaces.md
   - href: scripting.md
   - href: layout-engines.md
+  - href: core-commands.md
   - name: Plugins
     items:
       - href: plugins/bar.md
