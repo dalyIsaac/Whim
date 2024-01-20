@@ -36,18 +36,6 @@ public interface IWorkspace : IDisposable
 	void CycleLayoutEngine(bool reverse = false);
 
 	/// <summary>
-	/// Rotate to the next layout engine.
-	/// </summary>
-	[Obsolete("Use CycleLayoutEngine instead, with `reverse: false`")]
-	void NextLayoutEngine();
-
-	/// <summary>
-	/// Rotate to the previous layout engine.
-	/// </summary>
-	[Obsolete("Use CycleLayoutEngine instead, with `reverse: true`")]
-	void PreviousLayoutEngine();
-
-	/// <summary>
 	/// Activates previously active layout engine.
 	/// </summary>
 	void ActivatePreviouslyActiveLayoutEngine();
@@ -115,12 +103,6 @@ public interface IWorkspace : IDisposable
 	/// <c>null</c> is returned.
 	/// </returns>
 	IWindowState? TryGetWindowState(IWindow window);
-
-	/// <summary>
-	/// Focuses on the first window in the workspace.
-	/// </summary>
-	[Obsolete("Use FocusLastFocusedWindow instead.")]
-	void FocusFirstWindow();
 
 	/// <summary>
 	/// Focuses on the last window in the workspace. If <see cref="LastFocusedWindow"/> is null,

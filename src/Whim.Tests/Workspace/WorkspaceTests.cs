@@ -427,27 +427,9 @@ public class WorkspaceTests
 	}
 	#endregion
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void FocusFirstWindow(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine
-	)
-	{
-		// Given
-		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
-		// When FocusFirstWindow is called
-		workspace.FocusFirstWindow();
-
-		// Then the LayoutEngine's GetFirstWindow method is called
-		layoutEngine.Received(1).GetFirstWindow();
-	}
 
 	#region FocusLastFocusedWindow
-
-
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void FocusLastFocusedWindow_LastFocusedWindow(
 		IContext ctx,
