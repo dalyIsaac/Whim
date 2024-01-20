@@ -910,6 +910,7 @@ public class WorkspaceManagerTests
 		WindowAdded(ctx, window);
 
 		ClearWorkspaceReceivedCalls(workspaces);
+		window.ClearReceivedCalls();
 
 		// When MoveWindowToAdjacentWorkspace is called
 		workspaceManager.MoveWindowToAdjacentWorkspace(window, reverse, skipActive);
@@ -1386,6 +1387,8 @@ public class WorkspaceManagerTests
 		Point<int> givenPoint = new() { X = 2460, Y = 720 };
 		Point<double> expectedPoint = new() { X = 0.5, Y = 0.5 };
 
+		window.ClearReceivedCalls();
+
 		// When a window is moved to a point
 		workspaceManager.MoveWindowToPoint(window, givenPoint);
 
@@ -1429,6 +1432,7 @@ public class WorkspaceManagerTests
 
 		Point<int> givenPoint = new() { X = 960, Y = 540 };
 		Point<double> expectedPoint = new() { X = 0.5, Y = 0.5 };
+		window.ClearReceivedCalls();
 
 		// When a window is moved to a point
 		workspaceManager.MoveWindowToPoint(window, givenPoint);
@@ -1743,6 +1747,7 @@ public class WorkspaceManagerTests
 		workspaceManager.Initialize();
 
 		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
@@ -1768,6 +1773,7 @@ public class WorkspaceManagerTests
 
 		workspaceManager.Initialize();
 		ctx.MonitorManager.ActiveMonitor.Returns(monitors[1]);
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
@@ -1792,6 +1798,7 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		workspaceManager.Initialize();
 		WindowAdded(ctx, window);
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>(), window);
@@ -1818,6 +1825,7 @@ public class WorkspaceManagerTests
 
 		workspaceManager.Initialize();
 		WindowAdded(ctx, window);
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
