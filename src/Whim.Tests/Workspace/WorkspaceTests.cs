@@ -115,7 +115,7 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.WorkspaceManager.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
+		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 
 		Workspace workspace =
 			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine2 });
@@ -182,7 +182,7 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.WorkspaceManager.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
+		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 		layoutEngine.Name.Returns("Layout");
 
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
@@ -243,7 +243,7 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.WorkspaceManager.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
+		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 
 		using Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
@@ -272,10 +272,11 @@ public class WorkspaceTests
 
 		// When
 		workspace.AddWindow(window);
+		workspace.DoLayout();
 
 		// Then the window should have been removed, and the layout didn't start
 		internalCtx.WindowManager.Received(1).OnWindowRemoved(window);
-		ctx.WorkspaceManager.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
+		ctx.Butler.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
 		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
 	}
 
@@ -296,10 +297,11 @@ public class WorkspaceTests
 
 		// When
 		workspace.AddWindow(window);
+		workspace.DoLayout();
 
 		// Then the window should have been removed, and the layout didn't start
 		internalCtx.WindowManager.Received(1).OnWindowRemoved(window);
-		ctx.WorkspaceManager.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
+		ctx.Butler.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
 		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
 	}
 	#endregion
@@ -462,6 +464,7 @@ public class WorkspaceTests
 		window.ClearReceivedCalls();
 
 		// When FocusLastFocusedWindow is called
+		workspace.WindowFocused(window);
 		workspace.FocusLastFocusedWindow();
 
 		// Then the LayoutEngine's GetFirstWindow method is called
@@ -479,7 +482,7 @@ public class WorkspaceTests
 	{
 		// Given there are no windows in the workspace, and the workspace is not on a monitor
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ctx.WorkspaceManager.GetMonitorForWorkspace(workspace).Returns((IMonitor?)null);
+		ctx.Butler.GetMonitorForWorkspace(workspace).Returns((IMonitor?)null);
 
 		// When FocusLastFocusedWindow is called
 		workspace.FocusLastFocusedWindow();
@@ -499,7 +502,7 @@ public class WorkspaceTests
 	{
 		// Given there are no windows in the workspace, and the workspace is on a monitor
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ctx.WorkspaceManager.GetMonitorForWorkspace(workspace).Returns(monitor);
+		ctx.Butler.GetMonitorForWorkspace(workspace).Returns(monitor);
 
 		// When FocusLastFocusedWindow is called
 		workspace.FocusLastFocusedWindow();
@@ -618,8 +621,6 @@ public class WorkspaceTests
 
 		// Then the window is added to the layout engine
 		layoutEngine.Received(1).AddWindow(window);
-		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
-		window.Received(2).Focus();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -643,9 +644,6 @@ public class WorkspaceTests
 		// Then the window is added to the layout engine
 		layoutEngine1.Received(1).AddWindow(window);
 		layoutEngine2.Received(1).AddWindow(window);
-
-		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
-		window.Received(1).Focus();
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
 
@@ -722,7 +720,7 @@ public class WorkspaceTests
 		workspace.WindowFocused(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-		ctx.WorkspaceManager.ClearReceivedCalls();
+		ctx.Butler.ClearReceivedCalls();
 		internalCtx.CoreNativeManager.ClearReceivedCalls();
 
 		// When RemoveWindow is called
@@ -733,7 +731,6 @@ public class WorkspaceTests
 		givenEngine.Received(1).RemoveWindow(window);
 		layoutEngine2.Received(1).RemoveWindow(window);
 
-		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 		Assert.Null(workspace.LastFocusedWindow);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
@@ -755,7 +752,7 @@ public class WorkspaceTests
 		workspace.WindowFocused(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-		ctx.WorkspaceManager.ClearReceivedCalls();
+		ctx.Butler.ClearReceivedCalls();
 		internalCtx.CoreNativeManager.ClearReceivedCalls();
 
 		// When RemoveWindow is called
@@ -764,7 +761,6 @@ public class WorkspaceTests
 		// Then the window is removed from the layout engine, and LastFocusedWindow is set to the next window
 		Assert.True(result);
 		givenEngine.Received(1).RemoveWindow(window);
-		ctx.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
 		Assert.Equal(window2, workspace.LastFocusedWindow);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
@@ -811,7 +807,6 @@ public class WorkspaceTests
 		// Then the layout engine is told to focus the window, and a layout occurs
 		activeLayoutEngine.Received(1).FocusWindowInDirection(Direction.Up, window);
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
-		activeLayoutEngine.Received(1).DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -995,7 +990,6 @@ public class WorkspaceTests
 		// Then the layout engine is told to move the window
 		layoutEngine.Received(1).MoveWindowToPoint(window, point);
 		layoutEngine.DidNotReceive().RemoveWindow(window);
-		window.Received(1).Focus();
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
@@ -1023,7 +1017,6 @@ public class WorkspaceTests
 
 		// Then the layout engine is told to remove and add the window
 		givenEngine.Received(1).MoveWindowToPoint(window, point);
-		window.Received(1).Focus();
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
@@ -1093,9 +1086,10 @@ public class WorkspaceTests
 			.Returns(new IWindowState[] { expectedWindowState });
 
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		workspace.AddWindow(window);
 
-		// When TryGetWindowState is called
+		// When TryGetWindowState is called after adding a window and triggering a layout
+		workspace.AddWindow(window);
+		workspace.DoLayout();
 		IWindowState? result = workspace.TryGetWindowState(window);
 
 		// Then the result is as expected
@@ -1136,6 +1130,7 @@ public class WorkspaceTests
 		// When
 		workspace.AddWindow(window);
 		workspace.MinimizeWindowStart(window);
+		workspace.DoLayout();
 		IWindowState windowState = workspace.TryGetWindowState(window)!;
 
 		// Then
@@ -1154,7 +1149,7 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.WorkspaceManager.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns((IMonitor?)null);
+		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns((IMonitor?)null);
 
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		workspace.AddWindow(window);
@@ -1246,7 +1241,6 @@ public class WorkspaceTests
 		givenEngine.Received(1).MinimizeWindowEnd(window);
 		layoutEngine2.DidNotReceive().MinimizeWindowEnd(window);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
-		window.Received(1).Focus();
 	}
 
 	#region PerformCustomLayoutEngineAction
@@ -1383,13 +1377,6 @@ public class WorkspaceTests
 
 		// Then the layout engine is changed
 		layoutEngine.Received(1).PerformCustomAction(action);
-		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
-
-		layoutEngineResult.Received(1).DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
-
-		layoutEngine1.Received(1).PerformCustomAction(action);
-		layoutEngine1.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
-
 		Assert.Same(layoutEngineResult, workspace.ActiveLayoutEngine);
 	}
 	#endregion

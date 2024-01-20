@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
-using FluentAssertions;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
