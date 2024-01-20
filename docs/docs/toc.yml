@@ -28,7 +28,9 @@ items:
       - href: plugins/tree-layout-bar.md
       - href: plugins/tree-layout-command-palette.md
       - href: plugins/updater.md
-
   - href: styling.md
   - href: architecture.md
   - href: comparison.md
+  - name: Contributing
+    items:
+      - href: contribute/docs.md
