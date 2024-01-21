@@ -24,6 +24,8 @@ Keybindings can also be seen in the command palette, when it is activated (<kbd>
 | `whim.core.move_window_bottom_edge_down`    | Move the current window's bottom edge down                         | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>P</kbd>      |
 | `whim.core.move_window_to_previous_monitor` | Move the window to the previous monitor                            | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>LEFT</kbd>  |
 | `whim.core.move_window_to_next_monitor`     | Move the window to the next monitor                                | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>RIGHT</kbd> |
+| `whim.core.cycle_layout_engine.next`        | Cycle to the next layout engine                                    | No default keybind                                   |
+| `whim.core.cycle_layout_engine.previous`    | Cycle to the previous layout engine                                | No default keybind                                   |
 | `whim.core.focus_previous_monitor`          | Focus the previous monitor                                         | No default keybind                                   |
 | `whim.core.focus_next_monitor`              | Focus the next monitor                                             | No default keybind                                   |
 | `whim.core.close_current_workspace`         | Close the current workspace                                        | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>W</kbd>      |
