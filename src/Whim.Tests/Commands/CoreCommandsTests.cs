@@ -276,6 +276,45 @@ public class CoreCommandsTests
 	}
 	#endregion
 
+	#region Cycle layouts
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void CycleLayoutEngine_Next(IContext ctx)
+	{
+		// Given
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
+
+		ICommand command = testUtils.GetCommand("whim.core.cycle_layout_engine.next");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		activeWorkspace.Received(1).CycleLayoutEngine();
+	}
+
+	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
+	public void CycleLayoutEngine_Previous(IContext ctx)
+	{
+		// Given
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
+
+		ICommand command = testUtils.GetCommand("whim.core.cycle_layout_engine.previous");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		activeWorkspace.Received(1).CycleLayoutEngine(reverse: true);
+	}
+	#endregion
+
+
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_previous_monitor")]
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_next_monitor")]
 	[Theory]

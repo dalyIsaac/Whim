@@ -195,6 +195,16 @@ internal class CoreCommands : PluginCommands
 				}
 			)
 			.Add(
+				identifier: "cycle_layout_engine.next",
+				title: "Cycle to the next layout engine",
+				callback: () => _context.WorkspaceManager.ActiveWorkspace.CycleLayoutEngine()
+			)
+			.Add(
+				identifier: "cycle_layout_engine.previous",
+				title: "Cycle to the previous layout engine",
+				callback: () => _context.WorkspaceManager.ActiveWorkspace.CycleLayoutEngine(reverse: true)
+			)
+			.Add(
 				identifier: "focus_previous_monitor",
 				title: "Focus the previous monitor",
 				callback: FocusMonitorInDirection(getNext: false)
