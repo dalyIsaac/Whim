@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -144,7 +143,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 			}
 		}
 
-		Logger.Debug($"Setting window position {numPasses} times");
+		Logger.Debug($"Setting window position {numPasses} times for {_windowStates.Count} windows");
 
 		// Set the window positions for non-minimized windows first, then minimized windows.
 		// This was done to prevent the minimized windows being hidden, and Windows focusing the previous window.

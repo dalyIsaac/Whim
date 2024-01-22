@@ -463,6 +463,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			windowStates.Add(new(loc, (HWND)1, null));
 			windowRects.Add(loc.Window.Handle, loc);
+			Logger.Debug($"Window {loc.Window} has rectangle {loc.Rectangle}");
 		}
 
 		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);
