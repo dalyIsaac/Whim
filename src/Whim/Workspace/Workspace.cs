@@ -263,8 +263,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 					continue;
 				}
 
-				LastFocusedWindow = nextWindow;
-				break;
+				if (!nextWindow.IsMinimized)
+				{
+					LastFocusedWindow = nextWindow;
+					break;
+				}
 			}
 
 			// If there are no other windows, set the last focused window to null.
