@@ -1,27 +1,23 @@
 items:
   - href: index.md
+
   - name: Concepts
-    items:
-      - href: concepts/butler.md
-      - href: concepts/commands.md
-      - href: concepts/filtering.md
-      - href: concepts/keybinds.md
-      - href: concepts/layout-engines.md
-      - href: concepts/logging.md
-      - href: concepts/monitors.md
-      - href: concepts/plugins.md
-      - href: concepts/routing.md
-      - href: concepts/window-manager.md
-      - href: concepts/workspaces.md
-      - name: Architecture
-      - href: concepts/inspiration.md
-      - href: concepts/context.md
-      - href: concepts/native-apis.md
-      - href: concepts/events.md
-      - href: concepts/threading.md
+  - href: concepts/layout-engines.md
+  - href: concepts/workspaces.md
+  - href: concepts/commands.md
+  - href: concepts/keybinds.md
+  - href: concepts/plugins.md
+  - href: concepts/filtering.md
+  - href: concepts/routing.md
+  - href: concepts/butler.md
+  - href: concepts/monitors.md
+  - href: concepts/logging.md
+
+  - name: Usage
   - href: scripting.md
   - href: layout-engines.md
   - href: core-commands.md
+
   - name: Plugins
     items:
       - href: plugins/bar.md
@@ -35,8 +31,21 @@ items:
       - href: plugins/tree-layout-bar.md
       - href: plugins/tree-layout-command-palette.md
       - href: plugins/updater.md
+
   - href: styling.md
+
+  - name: Extra Topics
   - href: comparison.md
+
+  - name: Architecture
+    items:
+      - href: concepts/inspiration.md
+      - href: concepts/context.md
+      - href: concepts/native-apis.md
+      - href: concepts/events.md
+      - href: concepts/threading.md
+      - href: concepts/window-manager.md
+
   - name: Contributing
     items:
       - href: contribute/issues.md
