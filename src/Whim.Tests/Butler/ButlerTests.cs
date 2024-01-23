@@ -4,7 +4,7 @@ using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ButlerTests
