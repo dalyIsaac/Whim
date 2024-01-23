@@ -263,8 +263,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 					continue;
 				}
 
-				LastFocusedWindow = nextWindow;
-				break;
+				if (!nextWindow.IsMinimized)
+				{
+					LastFocusedWindow = nextWindow;
+					break;
+				}
 			}
 
 			// If there are no other windows, set the last focused window to null.
@@ -387,7 +390,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (_windows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowToPoint(window, point);
+			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MoveWindowToPoint(
+				window,
+				point
+			);
 		}
 		else
 		{
@@ -463,6 +469,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			windowStates.Add(new(loc, (HWND)1, null));
 			windowRects.Add(loc.Window.Handle, loc);
+			Logger.Debug($"Window {loc.Window} has rectangle {loc.Rectangle}");
 		}
 
 		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);

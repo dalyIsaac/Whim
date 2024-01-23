@@ -1106,6 +1106,28 @@ public class WorkspaceManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToWorkspace_SameWorkspace(IContext ctx, IInternalContext internalCtx, IWindow window)
+	{
+		// Given there are 3 workspaces
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		// and the window is added
+		WindowAdded(ctx, window);
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		IWorkspace workspace = workspaces[0];
+		workspace.ClearReceivedCalls();
+
+		// When a window in a workspace is moved to the same workspace
+		workspaceManager.MoveWindowToWorkspace(workspace, window);
+
+		// Then the window is not removed or added to any workspace
+		workspace.DidNotReceive().RemoveWindow(window);
+		workspace.DidNotReceive().AddWindow(window);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void MoveWindowToWorkspace_Success_WindowNotHidden(
 		IContext ctx,
 		IInternalContext internalCtx,
@@ -1133,6 +1155,38 @@ public class WorkspaceManagerTests
 		workspaces[0].Received(1).RemoveWindow(window);
 		workspaces[1].Received(1).AddWindow(window);
 		workspaces[0].Received(1).DoLayout();
+		workspaces[1].Received(1).DoLayout();
+		window.Received(1).Focus();
+		window.DidNotReceive().Hide();
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToWorkspace_Success_ActivateSingleWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
+	{
+		// Given there are 3 workspaces
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+
+		// and the window is added
+		WindowAdded(ctx, window);
+		ClearWorkspaceReceivedCalls(workspaces);
+		workspaces[2].ClearReceivedCalls();
+		window.ClearReceivedCalls();
+
+		// When a window in a workspace is moved to another workspace
+		workspaceManager.MoveWindowToWorkspace(workspaces[1], window);
+
+		// Then the window is removed from the first workspace and added to the second
+		workspaces[0].Received(1).RemoveWindow(window);
+		workspaces[1].Received(1).AddWindow(window);
+		workspaces[0].Received(1).Deactivate();
 		workspaces[1].Received(1).DoLayout();
 		window.Received(1).Focus();
 		window.DidNotReceive().Hide();

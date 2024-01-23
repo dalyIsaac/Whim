@@ -724,14 +724,18 @@ public class WorkspaceTests
 		WorkspaceManagerTriggers triggers,
 		ILayoutEngine layoutEngine,
 		IWindow window,
-		IWindow window2
+		IWindow window2,
+		IWindow window3
 	)
 	{
 		// Given multiple windows are in the workspace
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		workspace.AddWindow(window);
 		workspace.AddWindow(window2);
+		workspace.AddWindow(window3);
 		workspace.WindowFocused(window);
+
+		window2.IsMinimized.Returns(true);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 		ctx.Butler.ClearReceivedCalls();
@@ -743,7 +747,7 @@ public class WorkspaceTests
 		// Then the window is removed from the layout engine, and LastFocusedWindow is set to the next window
 		Assert.True(result);
 		givenEngine.Received(1).RemoveWindow(window);
-		Assert.Equal(window2, workspace.LastFocusedWindow);
+		Assert.Equal(window3, workspace.LastFocusedWindow);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
 	}
 	#endregion
