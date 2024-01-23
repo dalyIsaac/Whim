@@ -69,6 +69,7 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 				Window = definedWindow
 			}
 		);
+		workspace.DoLayout();
 	}
 
 	private (IWindow, IWorkspace)? GetWindowWithRankDelta(IWindow? window, bool promote)

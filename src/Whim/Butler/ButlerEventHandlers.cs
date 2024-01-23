@@ -96,6 +96,9 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		_triggers.WindowRouted(RouteEventArgs.WindowAdded(window, workspace));
+
+		workspace.DoLayout();
+		window.Focus();
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
@@ -114,6 +117,8 @@ internal class ButlerEventHandlers : IDisposable
 
 		workspace.RemoveWindow(window);
 		_triggers.WindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
+
+		workspace.DoLayout();
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs args)
@@ -157,6 +162,7 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		workspace.MinimizeWindowStart(window);
+		workspace.DoLayout();
 	}
 
 	private void WindowManager_WindowMinimizeEnd(object? sender, WindowEventArgs args)
@@ -171,6 +177,7 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		workspace.MinimizeWindowEnd(window);
+		workspace.DoLayout();
 	}
 
 	private void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)

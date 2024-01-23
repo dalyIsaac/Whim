@@ -822,6 +822,7 @@ public class WorkspaceManagerTests
 		{
 			workspace.DidNotReceive().RemoveWindow(Arg.Any<IWindow>());
 			workspace.DidNotReceive().AddWindow(Arg.Any<IWindow>());
+			workspace.DidNotReceive().DoLayout();
 		}
 	}
 
@@ -844,6 +845,7 @@ public class WorkspaceManagerTests
 		{
 			workspace.DidNotReceive().RemoveWindow(Arg.Any<IWindow>());
 			workspace.DidNotReceive().AddWindow(Arg.Any<IWindow>());
+			workspace.DidNotReceive().DoLayout();
 		}
 	}
 
@@ -871,6 +873,8 @@ public class WorkspaceManagerTests
 
 		// Then the workspace does not receive any calls
 		workspaces[0].DidNotReceive().RemoveWindow(Arg.Any<IWindow>());
+		workspaces[0].DidNotReceive().AddWindow(Arg.Any<IWindow>());
+		workspaces[0].DidNotReceive().DoLayout();
 	}
 
 	[Theory]
@@ -905,6 +909,7 @@ public class WorkspaceManagerTests
 		WindowAdded(ctx, window);
 
 		ClearWorkspaceReceivedCalls(workspaces);
+		window.ClearReceivedCalls();
 
 		// When MoveWindowToAdjacentWorkspace is called
 		workspaceManager.MoveWindowToAdjacentWorkspace(window, reverse, skipActive);
@@ -912,6 +917,9 @@ public class WorkspaceManagerTests
 		// Then the window is removed from the first workspace and added to the activated workspace
 		workspaces[firstActivatedIdx].Received(1).RemoveWindow(window);
 		activatedWorkspace.Received(1).AddWindow(window);
+		activatedWorkspace.Received(1).DoLayout();
+		window.Received(1).Focus();
+
 		Assert.Equal(workspaces[activatedWorkspaceIdx], workspaceManager.GetWorkspaceForWindow(window));
 	}
 	#endregion
@@ -1098,6 +1106,28 @@ public class WorkspaceManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToWorkspace_SameWorkspace(IContext ctx, IInternalContext internalCtx, IWindow window)
+	{
+		// Given there are 3 workspaces
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		// and the window is added
+		WindowAdded(ctx, window);
+		ClearWorkspaceReceivedCalls(workspaces);
+
+		IWorkspace workspace = workspaces[0];
+		workspace.ClearReceivedCalls();
+
+		// When a window in a workspace is moved to the same workspace
+		workspaceManager.MoveWindowToWorkspace(workspace, window);
+
+		// Then the window is not removed or added to any workspace
+		workspace.DidNotReceive().RemoveWindow(window);
+		workspace.DidNotReceive().AddWindow(window);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void MoveWindowToWorkspace_Success_WindowNotHidden(
 		IContext ctx,
 		IInternalContext internalCtx,
@@ -1124,6 +1154,41 @@ public class WorkspaceManagerTests
 		// Then the window is removed from the first workspace and added to the second
 		workspaces[0].Received(1).RemoveWindow(window);
 		workspaces[1].Received(1).AddWindow(window);
+		workspaces[0].Received(1).DoLayout();
+		workspaces[1].Received(1).DoLayout();
+		window.Received(1).Focus();
+		window.DidNotReceive().Hide();
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void MoveWindowToWorkspace_Success_ActivateSingleWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IMonitor[] monitors,
+		IWindow window
+	)
+	{
+		// Given there are 3 workspaces
+		IWorkspace[] workspaces = CreateWorkspaces(3);
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
+
+		workspaceManager.Activate(workspaces[0], monitors[0]);
+
+		// and the window is added
+		WindowAdded(ctx, window);
+		ClearWorkspaceReceivedCalls(workspaces);
+		workspaces[2].ClearReceivedCalls();
+		window.ClearReceivedCalls();
+
+		// When a window in a workspace is moved to another workspace
+		workspaceManager.MoveWindowToWorkspace(workspaces[1], window);
+
+		// Then the window is removed from the first workspace and added to the second
+		workspaces[0].Received(1).RemoveWindow(window);
+		workspaces[1].Received(1).AddWindow(window);
+		workspaces[0].Received(1).Deactivate();
+		workspaces[1].Received(1).DoLayout();
+		window.Received(1).Focus();
 		window.DidNotReceive().Hide();
 	}
 	#endregion
@@ -1323,6 +1388,7 @@ public class WorkspaceManagerTests
 		// Then the window is not removed from the old workspace and not added to the new workspace
 		workspace.DidNotReceive().RemoveWindow(window);
 		workspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
+		workspace.DidNotReceive().DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1347,6 +1413,7 @@ public class WorkspaceManagerTests
 		// Then the window is not removed from the old workspace and not added to the new workspace
 		workspace.DidNotReceive().RemoveWindow(window);
 		workspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
+		workspace.DidNotReceive().DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1373,13 +1440,18 @@ public class WorkspaceManagerTests
 		Point<int> givenPoint = new() { X = 2460, Y = 720 };
 		Point<double> expectedPoint = new() { X = 0.5, Y = 0.5 };
 
+		window.ClearReceivedCalls();
+
 		// When a window is moved to a point
 		workspaceManager.MoveWindowToPoint(window, givenPoint);
 
 		// Then the window is removed from the old workspace and added to the new workspace
 		activeWorkspace.Received(1).RemoveWindow(window);
 		activeWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
+		activeWorkspace.Received(1).DoLayout();
+
 		targetWorkspace.Received(1).MoveWindowToPoint(window, expectedPoint);
+		targetWorkspace.Received(1).DoLayout();
 
 		Assert.Equal(targetWorkspace, workspaceManager.GetWorkspaceForWindow(window));
 
@@ -1413,6 +1485,7 @@ public class WorkspaceManagerTests
 
 		Point<int> givenPoint = new() { X = 960, Y = 540 };
 		Point<double> expectedPoint = new() { X = 0.5, Y = 0.5 };
+		window.ClearReceivedCalls();
 
 		// When a window is moved to a point
 		workspaceManager.MoveWindowToPoint(window, givenPoint);
@@ -1491,7 +1564,7 @@ public class WorkspaceManagerTests
 		Assert.Raises<ActiveLayoutEngineChangedEventArgs>(
 			h => workspaceManager.ActiveLayoutEngineChanged += h,
 			h => workspaceManager.ActiveLayoutEngineChanged -= h,
-			workspaceManager.ActiveWorkspace.NextLayoutEngine
+			() => workspaceManager.ActiveWorkspace.CycleLayoutEngine(false)
 		);
 	}
 
@@ -1707,6 +1780,17 @@ public class WorkspaceManagerTests
 	#endregion
 
 	#region MoveWindowEdgesInDirection
+	private static void Workspaces_DidNotMoveWindowEdgesInDirection(IWorkspace[] workspaces)
+	{
+		for (int i = 0; i < workspaces.Length; i++)
+		{
+			workspaces[i]
+				.DidNotReceive()
+				.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+			workspaces[i].DidNotReceive().DoLayout();
+		}
+	}
+
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void MoveWindowEdgesInDirection_NoWindow(IContext ctx, IInternalContext internalCtx)
 	{
@@ -1716,17 +1800,13 @@ public class WorkspaceManagerTests
 		workspaceManager.Initialize();
 
 		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then nothing happens
-		workspaces[0]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
-		workspaces[1]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		Workspaces_DidNotMoveWindowEdgesInDirection(workspaces);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1746,17 +1826,13 @@ public class WorkspaceManagerTests
 
 		workspaceManager.Initialize();
 		ctx.MonitorManager.ActiveMonitor.Returns(monitors[1]);
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then nothing happens
-		workspaces[0]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
-		workspaces[1]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		Workspaces_DidNotMoveWindowEdgesInDirection(workspaces);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1775,17 +1851,13 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		workspaceManager.Initialize();
 		WindowAdded(ctx, window);
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>(), window);
 
 		// Then nothing happens
-		workspaces[0]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
-		workspaces[1]
-			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		Workspaces_DidNotMoveWindowEdgesInDirection(workspaces);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
@@ -1806,15 +1878,18 @@ public class WorkspaceManagerTests
 
 		workspaceManager.Initialize();
 		WindowAdded(ctx, window);
+		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then the window edges are moved
 		workspaces[0].Received(1).MoveWindowEdgesInDirection(Direction.Left, Arg.Any<IPoint<double>>(), window);
+		workspaces[0].Received(1).DoLayout();
 		workspaces[1]
 			.DidNotReceive()
 			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
+		workspaces[1].DidNotReceive().DoLayout();
 	}
 	#endregion
 }

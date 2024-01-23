@@ -233,7 +233,12 @@ public class CommandPaletteCommands : PluginCommands
 		new Command(
 			identifier: $"{PluginName}.remove_window.{window.Title}",
 			title: window.Title,
-			callback: () => _context.WorkspaceManager.ActiveWorkspace.RemoveWindow(window)
+			callback: () =>
+			{
+				IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
+				workspace.RemoveWindow(window);
+				workspace.DoLayout();
+			}
 		);
 
 	/// <summary>
@@ -247,15 +252,24 @@ public class CommandPaletteCommands : PluginCommands
 			title: window.Title,
 			callback: () =>
 			{
-				IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(window);
+				IWorkspace? workspace = _context.Butler.GetWorkspaceForWindow(window);
 				if (workspace == null)
 				{
 					return;
 				}
 
-				// A bit of a dirty hack to focus the window. If the window is minimised, it will
-				// now be shown. It will then be focused.
-				workspace.AddWindow(window);
+				if (window.IsMinimized)
+				{
+					workspace.MinimizeWindowEnd(window);
+				}
+
+				if (_context.Butler.GetMonitorForWindow(window) is null)
+				{
+					_context.Butler.Activate(workspace);
+				}
+
+				workspace.DoLayout();
+				window.Focus();
 			}
 		);
 }

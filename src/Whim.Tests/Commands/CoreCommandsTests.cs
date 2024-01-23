@@ -75,6 +75,7 @@ public class CoreCommandsTests
 
 		// Then
 		ctx.WorkspaceManager.ActiveWorkspace.Received(1).FocusWindowInDirection(direction, window);
+		ctx.WorkspaceManager.ActiveWorkspace.Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
@@ -112,6 +113,7 @@ public class CoreCommandsTests
 
 		// Then
 		ctx.WorkspaceManager.ActiveWorkspace.Received(1).SwapWindowInDirection(direction, null);
+		ctx.WorkspaceManager.ActiveWorkspace.Received(1).DoLayout();
 	}
 
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_left_edge_left", Direction.Left, -1, 0)]
@@ -492,8 +494,9 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
-			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		IWorkspace workspace = ctx.WorkspaceManager.ActiveWorkspace;
+		workspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		workspace.DidNotReceive().DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
@@ -512,7 +515,8 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.ActiveWorkspace.Received(1)
-			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		IWorkspace workspace = ctx.WorkspaceManager.ActiveWorkspace;
+		workspace.Received(1).PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		workspace.Received(1).DoLayout();
 	}
 }

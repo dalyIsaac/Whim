@@ -556,23 +556,23 @@ public record TreeLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
-		if (_root is null)
-		{
-			Logger.Error($"Root is null, cannot remove window {window} from layout engine {Name}");
-			return this;
-		}
-
 		ImmutableHashSet<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 		if (minimizedWindows != _minimizedWindows)
 		{
 			return new TreeLayoutEngine(this, _root, _windows, minimizedWindows);
 		}
 
+		if (_root is null)
+		{
+			Logger.Error($"Root is null, cannot remove window {window} from layout engine {Name}");
+			return this;
+		}
+
 		if (_root is WindowNode windowNode)
 		{
 			if (windowNode.Window.Equals(window))
 			{
-				return new TreeLayoutEngine(_context, _plugin, Identity);
+				return new TreeLayoutEngine(this, null, _windows.Remove(window), _minimizedWindows);
 			}
 			else
 			{
@@ -739,15 +739,15 @@ public record TreeLayoutEngine : ILayoutEngine
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
 		TreeLayoutEngine newEngine = this;
-		if (newEngine._windows.ContainsKey(window))
-		{
-			newEngine = (TreeLayoutEngine)newEngine.RemoveWindow(window);
-		}
-
 		ImmutableHashSet<IWindow> minimizedWindows = newEngine._minimizedWindows;
 		if (minimizedWindows.Contains(window))
 		{
 			return this;
+		}
+
+		if (newEngine._windows.ContainsKey(window))
+		{
+			newEngine = (TreeLayoutEngine)newEngine.RemoveWindow(window);
 		}
 
 		return new TreeLayoutEngine(

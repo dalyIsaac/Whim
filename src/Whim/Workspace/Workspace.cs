@@ -103,8 +103,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				_layoutEngines[idx] = _layoutEngines[idx].MinimizeWindowStart(window);
 			}
 		}
-
-		DoLayout();
 	}
 
 	public void MinimizeWindowEnd(IWindow window)
@@ -115,15 +113,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
 		// Whim starting up.
 		_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MinimizeWindowEnd(window);
-
-		DoLayout();
-		window.Focus();
-	}
-
-	public void FocusFirstWindow()
-	{
-		Logger.Debug($"Focusing first window in workspace {Name}");
-		ActiveLayoutEngine.GetFirstWindow()?.Focus();
 	}
 
 	public void FocusLastFocusedWindow()
@@ -138,7 +127,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			Logger.Debug($"No windows in workspace {Name} to focus, focusing desktop");
 
 			// Get the bounds of the monitor for this workspace.
-			IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
+			IMonitor? monitor = _context.Butler.GetMonitorForWorkspace(this);
 			if (monitor == null)
 			{
 				Logger.Debug($"No active monitors found for workspace {Name}.");
@@ -184,7 +173,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		prevLayoutEngine = _layoutEngines[_prevLayoutEngineIndex];
 		nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 
-		DoLayout();
 		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
@@ -208,10 +196,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 		TrySetLayoutEngineFromIndex(nextIdx);
 	}
-
-	public void NextLayoutEngine() => CycleLayoutEngine(false);
-
-	public void PreviousLayoutEngine() => CycleLayoutEngine(true);
 
 	public void ActivatePreviouslyActiveLayoutEngine() => TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
 
@@ -246,15 +230,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return true;
 	}
 
-	public void AddWindow(IWindow window)
+	public bool AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding window {window} to workspace {Name}");
 
 		if (_windows.Contains(window))
 		{
 			Logger.Error($"Window {window} already exists in workspace {Name}");
-			window.Focus();
-			return;
+			return false;
 		}
 
 		_windows.Add(window);
@@ -262,10 +245,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			_layoutEngines[i] = _layoutEngines[i].AddWindow(window);
 		}
-
-		DoLayout();
-		window.Focus();
-		LastFocusedWindow = window;
+		return true;
 	}
 
 	public bool RemoveWindow(IWindow window)
@@ -283,8 +263,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 					continue;
 				}
 
-				LastFocusedWindow = nextWindow;
-				break;
+				if (!nextWindow.IsMinimized)
+				{
+					LastFocusedWindow = nextWindow;
+					break;
+				}
 			}
 
 			// If there are no other windows, set the last focused window to null.
@@ -324,13 +307,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			_windows.Remove(window);
 		}
 
-		if (success)
-		{
-			DoLayout();
-			return true;
-		}
-
-		return false;
+		return success;
 	}
 
 	/// <summary>
@@ -358,13 +335,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return window;
 	}
 
-	public void FocusWindowInDirection(Direction direction, IWindow? window = null)
+	public bool FocusWindowInDirection(Direction direction, IWindow? window = null)
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
 		if (GetValidVisibleWindow(window) is not IWindow validWindow)
 		{
-			return;
+			return false;
 		}
 
 		ILayoutEngine newEngine = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
@@ -372,32 +349,26 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (ActiveLayoutEngine != newEngine)
 		{
 			_layoutEngines[_activeLayoutEngineIndex] = newEngine;
-			DoLayout();
+			return true;
 		}
+
+		return false;
 	}
 
-	public void SwapWindowInDirection(Direction direction, IWindow? window = null)
+	public bool SwapWindowInDirection(Direction direction, IWindow? window = null)
 	{
-		bool success = false;
-
 		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
 			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
-			success = true;
+			return true;
 		}
 
-		if (success)
-		{
-			DoLayout();
-		}
-		return;
+		return false;
 	}
 
-	public void MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
+	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
 	{
-		bool success = false;
-
 		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
 		if (GetValidVisibleWindow(window) is IWindow validWindow)
 		{
@@ -406,14 +377,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				deltas,
 				validWindow
 			);
-			success = true;
+			return true;
 		}
 
-		if (success)
-		{
-			DoLayout();
-		}
-		return;
+		return false;
 	}
 
 	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
@@ -423,7 +390,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (_windows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowToPoint(window, point);
+			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MoveWindowToPoint(
+				window,
+				point
+			);
 		}
 		else
 		{
@@ -435,9 +405,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
 			}
 		}
-
-		DoLayout();
-		window.Focus();
 	}
 
 	public override string ToString() => Name;
@@ -477,7 +444,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		// Get the monitor for this workspace
-		IMonitor? monitor = _context.WorkspaceManager.GetMonitorForWorkspace(this);
+		IMonitor? monitor = _context.Butler.GetMonitorForWorkspace(this);
 		if (monitor == null)
 		{
 			Logger.Debug($"No active monitors found for workspace {Name}.");
@@ -502,6 +469,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		{
 			windowStates.Add(new(loc, (HWND)1, null));
 			windowRects.Add(loc.Window.Handle, loc);
+			Logger.Debug($"Window {loc.Window} has rectangle {loc.Rectangle}");
 		}
 
 		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);
@@ -550,8 +518,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return garbageCollected;
 	}
 
-	public void PerformCustomLayoutEngineAction(LayoutEngineCustomAction action)
-	{
+	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
 		PerformCustomLayoutEngineAction(
 			new LayoutEngineCustomAction<IWindow?>()
 			{
@@ -560,9 +527,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Window = action.Window
 			}
 		);
-	}
 
-	public void PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action)
+	public bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action)
 	{
 		Logger.Debug($"Attempting to perform custom layout engine action {action.Name} for workspace {Name}");
 
@@ -592,10 +558,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
-		if (doLayout)
-		{
-			DoLayout();
-		}
+		return doLayout;
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -607,7 +570,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Disposing workspace {Name}");
 
 				// dispose managed state (managed objects)
-				bool isWorkspaceActive = _context.WorkspaceManager.GetMonitorForWorkspace(this) != null;
+				bool isWorkspaceActive = _context.Butler.GetMonitorForWorkspace(this) != null;
 
 				// If the workspace isn't active on the monitor, show all the windows in as minimized.
 				if (!isWorkspaceActive)

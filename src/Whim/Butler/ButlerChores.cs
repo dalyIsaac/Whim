@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Whim;
 
 internal class ButlerChores : IButlerChores
@@ -100,7 +102,9 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug("Layout all active workspaces");
 
 		// For each workspace which is active in a monitor, do a layout.
-		foreach (IWorkspace workspace in _context.Butler.Pantry.GetAllActiveWorkspaces())
+		// Convert to an array to prevent enumeration modification during execution.
+		IWorkspace[] workspaces = _context.Butler.Pantry.GetAllActiveWorkspaces().ToArray();
+		foreach (IWorkspace workspace in workspaces)
 		{
 			workspace.DoLayout();
 		}
@@ -141,6 +145,7 @@ internal class ButlerChores : IButlerChores
 
 		Logger.Debug($"Normalized point: {normalized}");
 		workspace.MoveWindowEdgesInDirection(edges, normalized, window);
+		workspace.DoLayout();
 		return true;
 	}
 
@@ -175,6 +180,11 @@ internal class ButlerChores : IButlerChores
 
 		currentWorkspace.RemoveWindow(window);
 		nextWorkspace.AddWindow(window);
+
+		currentWorkspace.DoLayout();
+		nextWorkspace.DoLayout();
+
+		window.Focus();
 	}
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
@@ -259,12 +269,6 @@ internal class ButlerChores : IButlerChores
 			return;
 		}
 
-		bool isSameWorkspace = targetWorkspace.Equals(oldWorkspace);
-		if (!isSameWorkspace)
-		{
-			_context.Butler.Pantry.SetWindowWorkspace(window, targetWorkspace);
-		}
-
 		// Normalize `point` into the unit square.
 		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(point);
 
@@ -273,20 +277,24 @@ internal class ButlerChores : IButlerChores
 		);
 
 		// If the window is being moved to a different workspace, remove it from the current workspace.
-		if (!isSameWorkspace)
+		if (!targetWorkspace.Equals(oldWorkspace))
 		{
+			_context.Butler.Pantry.SetWindowWorkspace(window, targetWorkspace);
 			oldWorkspace.RemoveWindow(window);
+			oldWorkspace.DoLayout();
 		}
+
 		targetWorkspace.MoveWindowToPoint(window, normalized);
+		targetWorkspace.DoLayout();
 
 		// Trigger layouts.
 		window.Focus();
 	}
 
-	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null)
+	public void MoveWindowToWorkspace(IWorkspace targetWorkspace, IWindow? window = null)
 	{
 		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
-		Logger.Debug($"Moving window {window} to workspace {workspace}");
+		Logger.Debug($"Moving window {window} to workspace {targetWorkspace}");
 
 		if (window == null)
 		{
@@ -294,19 +302,42 @@ internal class ButlerChores : IButlerChores
 			return;
 		}
 
-		Logger.Debug($"Moving window {window} to workspace {workspace}");
+		Logger.Debug($"Moving window {window} to workspace {targetWorkspace}");
 
 		// Find the current workspace for the window.
-		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
+		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace oldWorkspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 			return;
 		}
 
-		_context.Butler.Pantry.SetWindowWorkspace(window, workspace);
+		if (oldWorkspace.Equals(targetWorkspace))
+		{
+			Logger.Error($"Window {window} is already on workspace {targetWorkspace}");
+			return;
+		}
 
-		currentWorkspace.RemoveWindow(window);
-		workspace.AddWindow(window);
+		_context.Butler.Pantry.SetWindowWorkspace(window, targetWorkspace);
+
+		oldWorkspace.RemoveWindow(window);
+		targetWorkspace.AddWindow(window);
+
+		// If both workspaces are visible, activate both
+		// Otherwise, only layout the new workspace.
+		if (
+			_context.Butler.Pantry.GetMonitorForWorkspace(oldWorkspace) is not null
+			&& _context.Butler.Pantry.GetMonitorForWorkspace(targetWorkspace) is not null
+		)
+		{
+			targetWorkspace.DoLayout();
+			oldWorkspace.DoLayout();
+		}
+		else
+		{
+			Activate(targetWorkspace);
+		}
+
+		window.Focus();
 	}
 
 	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target)
