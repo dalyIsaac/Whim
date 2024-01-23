@@ -66,7 +66,7 @@ context.PluginManager.AddPlugin(sliceLayoutPlugin);
 
 ## `TreeLayoutEngine`
 
-<xref:Whim.TreeLayout.TreeLayoutEngine> is a layout that allows users to create arbitrary grid layouts. Unlike `SliceLayoutEngine`, windows can can be added in any location.
+<xref:Whim.TreeLayout.TreeLayoutEngine> is a layout that allows users to create arbitrary grid layouts, similar to `i3`. Unlike `SliceLayoutEngine`, windows can can be added in any location at runtime.
 
 `TreeLayoutEngine` requires the <xref:Whim.TreeLayout.TreeLayoutPlugin> to be added to the <xref:Whim.IPluginManager> instance:
 
