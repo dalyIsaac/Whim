@@ -180,4 +180,25 @@ public class RemoveTests
 		Assert.True(result.ContainsWindow(window2));
 		Assert.Equal(2, result.Count);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void Remove_WindowWasVisible(IWindow windowWasVisible, IWindow minimizedWindow1, IWindow minimizedWindow2)
+	{
+		// Given only one window is visible, and the others are minimized
+		LayoutEngineWrapper wrapper = new();
+		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+			.MinimizeWindowStart(minimizedWindow1)
+			.MinimizeWindowStart(minimizedWindow2)
+			.AddWindow(windowWasVisible);
+
+		// When the visible window is removed
+		ILayoutEngine result = engine.RemoveWindow(windowWasVisible);
+
+		// Then it is no longer tracked
+		Assert.NotSame(engine, result);
+		Assert.False(result.ContainsWindow(windowWasVisible));
+		Assert.True(result.ContainsWindow(minimizedWindow1));
+		Assert.True(result.ContainsWindow(minimizedWindow2));
+		Assert.Equal(2, result.Count);
+	}
 }
