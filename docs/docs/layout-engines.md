@@ -29,6 +29,14 @@ The `SliceLayouts` contains methods to create a few common layouts:
 - multi-column layout
 - three-column layout, with the middle column being the primary
 
+```csharp
+context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
+{
+    (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
+    (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+    (id) => CustomLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id)
+}
+
 Arbitrary layouts can be created by nesting areas:
 
 ```csharp
