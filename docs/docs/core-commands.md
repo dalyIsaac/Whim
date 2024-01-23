@@ -1,8 +1,6 @@
 # Core Commands
 
-Commands are used to interact with Whim at runtime. They can be used as [keybind](todo) or triggered from the [command palette](todo) (activated with <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> by default). 
-
-In addition to a customizable api to create arbitrary user [commands](todo), Whim also exposes a few commonly used "core commands". 
+Commands are used to interact with Whim at runtime. They can be used as [keybinds](./concepts/keybinds.md) or triggered from the [command palette](./plugins/command-palette.md) (activated with <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> by default).
 
 The following table lists all currently defined core commands and their default keybinds:
 

@@ -10,8 +10,8 @@
 
 <xref:Whim.FocusLayoutEngine> is a layout engine that displays one window at a time:
 
-- Calling <xref:Whim.ILayoutEngine.SwapWindowInDirection> will swap the current window with the window in the specified direction.
-- Calling <xref:Whim.ILayoutEngine.FocusWindowInDirection> will focus the window in the specified direction.
+- Calling <xref:Whim.ILayoutEngine.SwapWindowInDirection(Whim.Direction,Whim.IWindow)> will swap the current window with the window in the specified direction.
+- Calling <xref:Whim.ILayoutEngine.FocusWindowInDirection(Whim.Direction,Whim.IWindow)> will focus the window in the specified direction.
 
 Windows which are not focused are minimized to the taskbar.
 
