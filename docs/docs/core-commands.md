@@ -2,6 +2,8 @@
 
 Commands are used to interact with Whim at runtime. They can be used as [keybinds](./concepts/keybinds.md) or triggered from the [command palette](./plugins/command-palette.md) (activated with <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> by default).
 
+For more about commands, see [Commands](./concepts/commands.md).
+
 The following table lists all currently defined core commands and their default keybinds:
 
 | Identifier                                  | Title                                                              | Keybind                                              |
