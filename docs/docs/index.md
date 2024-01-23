@@ -4,7 +4,15 @@
 
 Whim is an hackable, pluggable and scriptable dynamic window manager for Windows 10 and 11, built using WinUI 3, .NET, and C# scripting.
 
-![Whim demo](/images/demo.gif)
+![Whim demo](../images/demo.gif)
+
+## Get Started
+
+Alpha builds are available on the [releases page](https://github.com/dalyIsaac/Whim/releases) on GitHub.
+
+When you run Whim for the first time, it will create the `C:\Users\{username}\.whim` directory populated with a [C# script](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Template/whim.config.csx) and resources. To see more about scripting, see [Scripting](./scripting.md).
+
+To customize the location of the `.whim` directory, set the `--dir` CLI argument when starting Whim.
 
 ## Why use Whim?
 
@@ -17,7 +25,3 @@ Whim is configured using C# scripting - no YAML to be found here. This means you
 Whim works by sitting on top of Windows' own window manager. It listens to window events and moves windows accordingly.
 
 To see how Whim compares to other Windows window managers, see [Whim vs. Other Window Managers](comparison.md).
-
-## Installation
-
-Alpha builds are available on the [releases page](https://github.com/dalyIsaac/Whim/releases) at GitHub.
