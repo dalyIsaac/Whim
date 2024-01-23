@@ -51,10 +51,7 @@ context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[
             (0.5, new OverflowArea()),
             (0.5, new SliceArea(order: 0, maxChildren: 2))
         )
-    ) { Name = "Overflow on left" },
-
-    (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
-    (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id)
+    ) { Name = "Overflow on left" }
 };
 ```
 
