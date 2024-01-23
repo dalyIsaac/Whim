@@ -91,10 +91,17 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <returns>
 	/// <list type="bullet">
 	/// <item>
-	/// <description>If <see cref="Initialize"/> has not been called, returns <see langword="null"/>.</description>
+	/// <description>
+	/// If <see cref="Initialize"/> has not been called, returns <see langword="null"/>. (i.e., will)
+	/// return null while running in the config phase.
+	/// </description>
 	/// </item>
 	/// <item>
-	/// <description>If a workspace cannot be created, returns <see langword="null"/>.</description>
+	/// <description>
+	/// If a workspace cannot be created due to <paramref name="createLayoutEngines"/> being
+	/// <see langword="null"/> and <see cref="CreateLayoutEngines"/> returning no layout engines,
+	/// returns <see langword="null"/>.
+	/// </description>
 	/// </item>
 	/// <item>
 	/// <description>Otherwise, returns the created workspace.</description>
