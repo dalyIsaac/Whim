@@ -10,7 +10,7 @@ Whim is an hackable, pluggable and scriptable dynamic window manager for Windows
 
 A window manager is responsible for controlling the layout of windows in your desktop environment. Whim is a [dynamic window manager](https://en.wikipedia.org/wiki/Dynamic_window_manager), where windows are arranged according to different layouts.
 
-Whim supports multiple layout engines. Each [workspace](concepts/workspaces.md) can switch between different layout engines. For example, the `TreeLayoutEngine` allows users to create arbitrary grids of windows, while the `FocusLayoutEngine` allows users to focus on a single window at a time. For more, see [Layout Engines](layout-engines.md).
+Whim supports multiple layout engines. Each [workspace](concepts/workspaces.md) can switch between different layout engines. For example, the `TreeLayoutEngine` allows users to create arbitrary grids of windows during runtime (similar to `i3`), while the `SliceLayoutEngine` fully automates windows placement using a predefined, customizable logic (similar to `Awesome` or `dwm`) . For more, see [Layout Engines](layout-engines.md).
 
 Whim is configured using C# scripting - no YAML to be found here. This means you can use the full power of C# to configure Whim. Whim also exposes its API for plugins to use. Accordingly, much of the more custom functionality has been implemented as plugins which users can choose to use or not.
 
