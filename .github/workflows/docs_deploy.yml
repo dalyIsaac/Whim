@@ -1,0 +1,65 @@
+name: docs-deploy
+
+on:
+  push:
+    branches:
+      - main
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  actions: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  # We install the packages to the D:\ drive to avoid the slow IO on the C:\ drive.
+  # Based on https://github.com/actions/setup-dotnet/issues/260#issuecomment-1790162905
+  NUGET_PACKAGES: D:\a\.nuget\packages
+  PLATFORM: x64
+  CONFIGURATION: Release
+
+jobs:
+  publish-docs:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ env.PLATFORM }}-nuget-${{ hashFiles('Directory.Packages.props') }}
+          restore-keys: |
+            ${{ env.PLATFORM }}-nuget-${{ hashFiles('Directory.Packages.props') }}
+            ${{ env.PLATFORM }}-nuget-
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore Whim.sln -p:Configuration=$env:Configuration
+        env:
+          Configuration: ${{ env.Configuration }}
+
+      - run: dotnet tool update -g docfx
+      - run: docfx docs/docfx.json
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: "docs/_site"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
