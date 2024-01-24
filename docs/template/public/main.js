@@ -17,6 +17,10 @@ export default {
      * @returns {void}
      */
     function listener(e) {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) {
+        return;
+      }
+
       if (e.key === "/") {
         const searchElement = document.getElementById("search-query");
 
