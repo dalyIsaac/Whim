@@ -13,43 +13,52 @@ export default {
   ],
   start: () => {
     /**
-     * @param {KeyboardEvent} e
+     * @param {KeyboardEvent} event
      * @returns {void}
      */
-    function listener(e) {
-      if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) {
+    function listener(event) {
+      // Ignore keypresses with modifiers.
+      if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) {
         return;
       }
 
-      if (e.key === "/") {
-        const searchElement = document.getElementById("search-query");
+      const searchElement = document.getElementById("search-query");
+      const filterElement = document.querySelector(
+        "input[placeholder='Filter by title']"
+      );
 
-        if (
-          searchElement === null ||
-          document.activeElement === searchElement
-        ) {
-          return;
+      // If either element is already focused, ignore.
+      if (
+        document.activeElement === searchElement ||
+        document.activeElement === filterElement
+      ) {
+        if (event.key === "Escape") {
+          document.activeElement.blur();
         }
 
-        e.preventDefault();
-        searchElement.focus();
+        return;
       }
 
-      if (e.key === "f") {
-        const filterElement = document.querySelector(
-          "input[placeholder='Filter by title']"
-        );
-
-        if (
-          filterElement === null ||
-          document.activeElement === filterElement
-        ) {
-          return;
-        }
-
-        e.preventDefault();
-        filterElement.focus();
+      // Try focus the search elements.
+      if (event.key === "/") {
+        focusElement(event, searchElement);
+      } else if (event.key === "f") {
+        focusElement(event, filterElement);
       }
+    }
+
+    /**
+     * @param {KeyboardEvent} event
+     * @param {HTMLElement | null} element
+     * @returns
+     */
+    function focusElement(event, element) {
+      if (element === null) {
+        return;
+      }
+
+      event.preventDefault();
+      element.focus();
     }
 
     document.addEventListener("keydown", listener);
