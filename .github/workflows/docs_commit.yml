@@ -23,8 +23,10 @@ jobs:
       - name: Run markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
-          globs: "**/*.md"
           config: .markdownlint-cli2.jsonc
+          globs: |
+            "**/*.md"
+            "!.github/**/*"
 
   build:
     # Run on Windows since docfx will build Whim to generate the API docs.
