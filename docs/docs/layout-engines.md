@@ -10,8 +10,9 @@
 
 <xref:Whim.FocusLayoutEngine> is a layout engine that displays one window at a time:
 
-- Calling <xref:Whim.ILayoutEngine.SwapWindowInDirection(Whim.Direction,Whim.IWindow)> will swap the current window with the window in the specified direction.
-- Calling <xref:Whim.ILayoutEngine.FocusWindowInDirection(Whim.Direction,Whim.IWindow)> will focus the window in the specified direction.
+To focus the window in the specified direction, call <xref:Whim.ILayoutEngine.FocusWindowInDirection(Whim.Direction,Whim.IWindow)>.
+
+To reorder windows, calling <xref:Whim.ILayoutEngine.SwapWindowInDirection(Whim.Direction,Whim.IWindow)> will swap the current window with the window in the specified direction. **This will not change the focused window.**
 
 Windows which are not focused are minimized to the taskbar.
 
@@ -28,8 +29,7 @@ Each `SliceLayoutEngine` is divided into a number of <xref:Whim.SliceLayout.IAre
 - <xref:Whim.SliceLayout.OverflowArea>: An area that can have any infinite number of `IWindow`s as a child. There can be only one `OverflowArea` in a `SliceLayoutEngine` - any additional `OverflowArea`s will be ignored. If no `OverflowArea` is specified, the `SliceLayoutEngine` will replace the last `SliceArea` with an `OverflowArea`.
 
 `OverflowArea`s are implicitly the last ordered area in the layout engine, in comparison to all `SliceArea`s.
-
-Internally, `SliceLayoutEngine` stores a list of <xref:Whim.IWindow>s. Each `IArea`corresponds to a "slice" of the`IWindow` list.
+Internally, `SliceLayoutEngine` stores a list of <xref:Whim.IWindow>s. Each `IArea` corresponds to a "slice" of the `IWindow` list.
 
 ### Defining `SliceLayoutEngine`s
 
