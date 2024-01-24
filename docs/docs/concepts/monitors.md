@@ -5,4 +5,4 @@ Whim supports multiple monitors via the <xref:Whim.IMonitorManager>, which store
 Each <xref:Whim.IMonitor> contains properties like its scale factor.
 
 > [!NOTE]
-> Whim does not support Window's native Virtual Desktops, as they lack the ability to activate "desktops" independently of monitors.
+> Whim does not support Windows' native "virtual" desktops, as they lack the ability to activate "desktops" independently of monitors.
