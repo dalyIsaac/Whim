@@ -6,37 +6,17 @@ Command identifiers namespaced to the plugin which defines them. For example, th
 
 Each plugin can provide commands through the <xref:Whim.IPlugin.PluginCommands> property of the <xref:Whim.IPlugin> interface.
 
-Custom commands are automatically added to the `whim.custom` namespace. For example, the following command minimizes Discord:
+Custom commands are automatically added to the `whim.custom` namespace. For example, the following command closes the current tracked window:
 
 ```csharp
-// Add to the top.
-using System.Linq;
+// Create the command.
+context.CommandManager.Add(
+    // Automatically namespaced to `whim.custom`.
+    identifier: "close_window",
+    title: "Close focused window",
+    callback: () => context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Close()
+);
 
-void DoConfig(IConfig context)
-{
-    // ...
-
-    // Create the command.
-    context.CommandManager.Add(
-        // Automatically namespaced to `whim.custom`.
-        identifier: "minimize_discord",
-        title: "Minimize Discord",
-        callback: () =>
-        {
-            // Get the first window with the process name "Discord.exe".
-            IWindow window = context.WindowManager.FirstOrDefault(w => w.ProcessFileName == "Discord.exe");
-            if (window != null)
-            {
-                // Minimize the window.
-                window.ShowMinimized();
-                context.WorkspaceManager.ActiveWorkspace.FocusFirstWindow();
-            }
-        }
-    );
-
-    // Create an associated keybind.
-    context.KeybindManager.SetKeybind("whim.custom.minimize_discord", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_D));
-
-    // ...
-}
+// Create an associated keybind.
+context.KeybindManager.SetKeybind("whim.custom.close_window", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_D));
 ```

@@ -33,6 +33,7 @@ items:
       - href: plugins/updater.md
 
   - href: styling.md
+  - href: snippets.md
 
   - name: Extra Topics
   - href: comparison.md

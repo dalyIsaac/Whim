@@ -26,3 +26,5 @@ The rest of the file is largely typical C# code. There are `using` statements, a
 After the `DoConfig` function is called, Whim will initialize the various managers and plugins and start the main loop.
 
 The `DoConfig` function is returned from the script so Whim can call it when it loads.
+
+To see some examples of what you can do in your config, see [Snippets](./snippets.md).
