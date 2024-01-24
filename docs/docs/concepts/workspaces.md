@@ -13,11 +13,8 @@ context.WorkspaceManager.Add("Alt");
 // Set up layout engines.
 context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
 {
-    (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
     (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
-    (id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
-    (id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
-    (id) => new ColumnLayoutEngine(id)
+    (id) => new TreeLayoutEngine(context, treeLayoutPlugin, id)
 };
 ```
 
@@ -32,6 +29,8 @@ context.WorkspaceManager.Add(
     }
 );
 ```
+
+The available layout engines are listed in [Layout Engines](./layout-engines.md).
 
 If no name is provided, the name will default to `Workspace {workspaces.Count + 1}.`
 
