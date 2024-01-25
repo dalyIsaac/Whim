@@ -14,14 +14,18 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		_internalContext = internalContext;
 	}
 
-	public Dictionary<HWND, IWindowState>? DoLayout(IWorkspace workspace, WorkspaceManagerTriggers triggers)
+	public void DoLayout(
+		IWorkspace workspace,
+		WorkspaceManagerTriggers triggers,
+		Dictionary<HWND, IWindowState> windowStates
+	)
 	{
 		Logger.Debug($"Layout {workspace}");
 
 		if (GarbageCollect(workspace))
 		{
 			Logger.Debug($"Garbage collected windows, skipping layout for workspace {workspace}");
-			return null;
+			return;
 		}
 
 		// Get the monitor for this workspace
@@ -29,36 +33,33 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		if (monitor == null)
 		{
 			Logger.Debug($"No active monitors found for workspace {workspace}.");
-			return null;
+			return;
 		}
 
 		Logger.Debug($"Starting layout for workspace {workspace}");
 		triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = workspace });
 
-		// Execute the layout task
-		Dictionary<HWND, IWindowState> windowStates = SetWindowPos(workspace, monitor);
-		triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = workspace });
+		// Execute the layout task, and update the window states before the completed event.
+		SetWindowPos(workspace, monitor, windowStates);
 
-		return windowStates;
+		triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = workspace });
 	}
 
-	private Dictionary<HWND, IWindowState> SetWindowPos(IWorkspace workspace, IMonitor monitor)
+	private void SetWindowPos(IWorkspace workspace, IMonitor monitor, Dictionary<HWND, IWindowState> windowStates)
 	{
 		Logger.Debug($"Setting window positions for workspace {workspace}");
 
-		List<WindowPosState> windowStates = new();
-		Dictionary<HWND, IWindowState> windowRects = new();
+		List<WindowPosState> windowStatesList = new();
+		windowStates.Clear();
 
 		foreach (IWindowState loc in workspace.ActiveLayoutEngine.DoLayout(monitor.WorkingArea, monitor))
 		{
-			windowStates.Add(new(loc, (HWND)1, null));
-			windowRects.Add(loc.Window.Handle, loc);
+			windowStatesList.Add(new(loc, (HWND)1, null));
+			windowStates.Add(loc.Window.Handle, loc);
 			Logger.Debug($"Window {loc.Window} has rectangle {loc.Rectangle}");
 		}
 
-		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);
-
-		return windowRects;
+		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStatesList);
 	}
 
 	/// <summary>

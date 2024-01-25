@@ -8,5 +8,14 @@ namespace Whim;
 /// </summary>
 internal interface IDeferWorkspacePosManager
 {
-	Dictionary<HWND, IWindowState>? DoLayout(IWorkspace workspace, WorkspaceManagerTriggers triggers);
+	/// <summary>
+	/// Sets the position of all the windows in a workspace at once.
+	/// </summary>
+	/// <param name="workspace"></param>
+	/// <param name="triggers"></param>
+	/// <param name="windowStates">
+	/// The window states dictionary to populate with the new window states.
+	/// The old window states should be removed from this dictionary.
+	/// </param>
+	void DoLayout(IWorkspace workspace, WorkspaceManagerTriggers triggers, Dictionary<HWND, IWindowState> windowStates);
 }

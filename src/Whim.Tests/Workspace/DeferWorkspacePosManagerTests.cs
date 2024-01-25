@@ -18,13 +18,14 @@ public class DeferWorkspacePosManagerTests
 	)
 	{
 		// Given the window is not a valid window
+		Dictionary<HWND, IWindowState> windowStates = new();
 		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(false);
 		workspace.Windows.Returns(new List<IWindow>() { Substitute.For<IWindow>() });
 
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
-		sut.DoLayout(workspace, triggers);
+		sut.DoLayout(workspace, triggers, windowStates);
 
 		// Then
 		internalCtx.WindowManager.Received(1).OnWindowRemoved(Arg.Any<IWindow>());
@@ -40,6 +41,7 @@ public class DeferWorkspacePosManagerTests
 	)
 	{
 		// Given the window is not tracked by the WindowManager
+		Dictionary<HWND, IWindowState> windowStates = new();
 		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
 		internalCtx.WindowManager.HandleWindowMap.ContainsKey(Arg.Any<HWND>()).Returns(false);
 		workspace.Windows.Returns(new List<IWindow>() { Substitute.For<IWindow>() });
@@ -47,7 +49,7 @@ public class DeferWorkspacePosManagerTests
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
-		sut.DoLayout(workspace, triggers);
+		sut.DoLayout(workspace, triggers, windowStates);
 
 		// Then
 		internalCtx.WindowManager.Received(1).OnWindowRemoved(Arg.Any<IWindow>());
@@ -63,12 +65,13 @@ public class DeferWorkspacePosManagerTests
 	)
 	{
 		// Given the workspace has no monitor
+		Dictionary<HWND, IWindowState> windowStates = new();
 		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
-		sut.DoLayout(workspace, triggers);
+		sut.DoLayout(workspace, triggers, windowStates);
 
 		// Then
 		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
@@ -87,6 +90,8 @@ public class DeferWorkspacePosManagerTests
 	)
 	{
 		// Given the workspace has a monitor
+		Dictionary<HWND, IWindowState> windowStatesDict = new() { { (HWND)3, Substitute.For<IWindowState>() }, };
+
 		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(monitor);
 
 		window.Handle.Returns((HWND)1);
@@ -112,12 +117,16 @@ public class DeferWorkspacePosManagerTests
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
-		sut.DoLayout(workspace, triggers);
+		sut.DoLayout(workspace, triggers, windowStatesDict);
 
 		// Then
 		triggers.WorkspaceLayoutStarted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());
 		triggers.WorkspaceLayoutCompleted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());
-
 		ctx.NativeManager.Received(1).DeferWindowPos(Arg.Is<IEnumerable<WindowPosState>>(x => x.Count() == 2));
+
+		Assert.DoesNotContain((HWND)3, windowStatesDict.Keys);
+		Assert.Equal(2, windowStatesDict.Count);
+		Assert.Contains((HWND)1, windowStatesDict.Keys);
+		Assert.Contains((HWND)2, windowStatesDict.Keys);
 	}
 }

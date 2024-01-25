@@ -800,7 +800,9 @@ public class WorkspaceTests
 		Assert.False(result);
 		layoutEngine.DidNotReceive().SwapWindowInDirection(Direction.Up, Arg.Any<IWindow>());
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
-		internalCtx.DeferWorkspacePosManager.DidNotReceive().DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -823,7 +825,9 @@ public class WorkspaceTests
 		Assert.False(result);
 		layoutEngine.DidNotReceive().SwapWindowInDirection(Direction.Up, window);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
-		internalCtx.DeferWorkspacePosManager.DidNotReceive().DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	//[Theory]
@@ -1062,8 +1066,20 @@ public class WorkspaceTests
 
 		Workspace sut = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 
-		Dictionary<HWND, IWindowState> resultDict = new() { { window.Handle, windowState } };
-		internalCtx.DeferWorkspacePosManager.DoLayout(Arg.Any<IWorkspace>(), triggers).Returns(resultDict);
+		internalCtx
+			.DeferWorkspacePosManager.WhenForAnyArgs(x =>
+				x.DoLayout(
+					Arg.Any<IWorkspace>(),
+					Arg.Any<WorkspaceManagerTriggers>(),
+					Arg.Any<Dictionary<HWND, IWindowState>>()
+				)
+			)
+			.Do(x =>
+			{
+				// Populate the dictionary with the window state
+				Dictionary<HWND, IWindowState> dict = x.ArgAt<Dictionary<HWND, IWindowState>>(2);
+				dict.Add(window.Handle, windowState);
+			});
 
 		// When TryGetWindowState is called after adding a window and triggering a layout
 		sut.AddWindow(window);
@@ -1195,7 +1211,9 @@ public class WorkspaceTests
 		workspace.DoLayout();
 
 		// Then
-		internalCtx.DeferWorkspacePosManager.DidNotReceive().DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	#region PerformCustomLayoutEngineAction

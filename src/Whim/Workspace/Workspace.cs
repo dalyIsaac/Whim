@@ -50,7 +50,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// <summary>
 	/// Map of window handles to their current <see cref="IWindowState"/>.
 	/// </summary>
-	private Dictionary<HWND, IWindowState> _windowStates = new();
+	private readonly Dictionary<HWND, IWindowState> _windowStates = new();
 
 	public Workspace(
 		IContext context,
@@ -437,13 +437,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return;
 		}
 
-		if (
-			_internalContext.DeferWorkspacePosManager.DoLayout(this, _triggers)
-			is Dictionary<HWND, IWindowState> windowStates
-		)
-		{
-			_windowStates = windowStates;
-		}
+		_internalContext.DeferWorkspacePosManager.DoLayout(this, _triggers, _windowStates);
 	}
 
 	public bool ContainsWindow(IWindow window) => _windows.Contains(window);
