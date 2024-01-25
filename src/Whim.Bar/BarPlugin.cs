@@ -54,7 +54,14 @@ public class BarPlugin : IBarPlugin
 		foreach (IMonitor monitor in e.RemovedMonitors)
 		{
 			_monitorBarMap.TryGetValue(monitor, out BarWindow? value);
-			value?.Close();
+			try
+			{
+				value?.Close();
+			}
+			catch (AccessViolationException ex)
+			{
+				Logger.Error($"Failed to close bar window for monitor {monitor} due to {ex}");
+			}
 			_monitorBarMap.Remove(monitor);
 		}
 
