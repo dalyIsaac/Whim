@@ -491,6 +491,35 @@ public class WorkspaceTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void ActivatePreviouslyActiveLayoutEngine(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine0,
+		ILayoutEngine layoutEngine1,
+		ILayoutEngine layoutEngine2
+	)
+	{
+		// Given
+		Workspace workspace =
+			new(
+				ctx,
+				internalCtx,
+				triggers,
+				"Workspace",
+				new ILayoutEngine[] { layoutEngine0, layoutEngine1, layoutEngine2 }
+			);
+
+		// When PreviousLayoutEngine is called
+		workspace.CycleLayoutEngine();
+		workspace.CycleLayoutEngine();
+		workspace.ActivatePreviouslyActiveLayoutEngine();
+
+		// Then the active layout engine is set to the first one
+		Assert.Same(layoutEngine1, workspace.ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void PreviousLayoutEngine_FirstEngine(
 		IContext ctx,
 		IInternalContext internalCtx,
@@ -1148,6 +1177,25 @@ public class WorkspaceTests
 		givenEngine.Received(1).MinimizeWindowEnd(window);
 		layoutEngine2.DidNotReceive().MinimizeWindowEnd(window);
 		Assert.NotSame(givenEngine, workspace.ActiveLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void DoLayout_Disposed(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine
+	)
+	{
+		// Given
+		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		workspace.Dispose();
+
+		// When DoLayout is called
+		workspace.DoLayout();
+
+		// Then
+		internalCtx.DeferWorkspacePosManager.DidNotReceive().DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
 	}
 
 	#region PerformCustomLayoutEngineAction
