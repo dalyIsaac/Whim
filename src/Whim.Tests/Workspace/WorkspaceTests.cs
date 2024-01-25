@@ -233,79 +233,6 @@ public class WorkspaceTests
 		);
 	}
 
-	#region DoLayout
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void DoLayout_CannotFindMonitorForWorkspace(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine
-	)
-	{
-		// Given
-		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
-
-		using Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-
-		// When
-		workspace.DoLayout();
-
-		// Then
-		layoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
-		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
-		triggers.WorkspaceLayoutCompleted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void DoLayout_GarbageCollect_IsNotAWindow(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given
-		using Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-
-		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(false);
-
-		// When
-		workspace.AddWindow(window);
-		workspace.DoLayout();
-
-		// Then the window should have been removed, and the layout didn't start
-		internalCtx.WindowManager.Received(1).OnWindowRemoved(window);
-		ctx.Butler.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
-		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
-	internal void DoLayout_GarbageCollect_HandleIsNotManaged(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WorkspaceManagerTriggers triggers,
-		ILayoutEngine layoutEngine,
-		IWindow window
-	)
-	{
-		// Given
-		using Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-
-		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
-		internalCtx.WindowManager.HandleWindowMap.ContainsKey(Arg.Any<HWND>()).Returns(false);
-
-		// When
-		workspace.AddWindow(window);
-		workspace.DoLayout();
-
-		// Then the window should have been removed, and the layout didn't start
-		internalCtx.WindowManager.Received(1).OnWindowRemoved(window);
-		ctx.Butler.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
-		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
-	}
-	#endregion
-
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void ContainsWindow_False(
 		IContext ctx,
@@ -823,6 +750,7 @@ public class WorkspaceTests
 		activeLayoutEngine.DidNotReceive().DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>());
 	}
 
+	#region SwapWindowInDirection
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void SwapWindowInDirection_Fails_WindowIsNull(
 		IContext ctx,
@@ -836,11 +764,13 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When SwapWindowInDirection is called
-		workspace.SwapWindowInDirection(Direction.Up, null);
+		bool result = workspace.SwapWindowInDirection(Direction.Up, null);
 
 		// Then the layout engine is not told to swap the window
+		Assert.False(result);
 		layoutEngine.DidNotReceive().SwapWindowInDirection(Direction.Up, Arg.Any<IWindow>());
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx.DeferWorkspacePosManager.DidNotReceive().DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -857,12 +787,44 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When SwapWindowInDirection is called
-		workspace.SwapWindowInDirection(Direction.Up, window);
+		bool result = workspace.SwapWindowInDirection(Direction.Up, window);
 
 		// Then the layout engine is not told to swap the window
+		Assert.False(result);
 		layoutEngine.DidNotReceive().SwapWindowInDirection(Direction.Up, window);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx.DeferWorkspacePosManager.DidNotReceive().DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
 	}
+
+	//[Theory]
+	//[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	//[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
+	//internal void SwapWindowInDirection_Success(
+	//	bool deferLayout,
+	//	int doLayoutCalls,
+	//	IContext ctx,
+	//	IInternalContext internalCtx,
+	//	WorkspaceManagerTriggers triggers,
+	//	ILayoutEngine layoutEngine,
+	//	IWindow window
+	//)
+	//{
+	//	// Given
+	//	Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+	//	workspace.AddWindow(window);
+	//	ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
+
+	//	ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
+
+	//	// When SwapWindowInDirection is called
+	//	bool result = workspace.SwapWindowInDirection(Direction.Up, window, deferLayout);
+
+	//	// Then the layout engine is told to swap the window
+	//	Assert.True(result);
+	//	givenEngine.Received(1).SwapWindowInDirection(Direction.Up, window);
+	//	Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
+	//	internalCtx.DeferWorkspacePosManager.Received(doLayoutCalls).DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
+	//}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void SwapWindowInDirection_Success(
@@ -887,6 +849,8 @@ public class WorkspaceTests
 		givenEngine.Received(1).SwapWindowInDirection(Direction.Up, window);
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
+	#endregion
+
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void MoveWindowEdgesInDirection_Fails_WindowIsNull(
