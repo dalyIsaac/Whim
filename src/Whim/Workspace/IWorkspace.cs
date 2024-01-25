@@ -130,10 +130,13 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The window to swap. If null, the currently focused window is swapped.
 	/// </param>
+	/// <param name="deferLayout">
+	/// Whether to defer the layout until the next <see cref="DoLayout"/>. Defaults to <c>false</c>.
+	/// </param>
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
-	bool SwapWindowInDirection(Direction direction, IWindow? window = null);
+	bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false);
 
 	/// <summary>
 	/// Change the <paramref name="window"/>'s <paramref name="edges"/> direction by

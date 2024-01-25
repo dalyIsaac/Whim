@@ -355,16 +355,25 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return false;
 	}
 
-	public bool SwapWindowInDirection(Direction direction, IWindow? window = null)
+	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
 		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+
+		if (GetValidVisibleWindow(window) is not IWindow validWindow)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
-			return true;
+			return false;
 		}
 
-		return false;
+		ILayoutEngine newEngine = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+		bool changed = ActiveLayoutEngine != newEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
+
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return changed;
 	}
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)

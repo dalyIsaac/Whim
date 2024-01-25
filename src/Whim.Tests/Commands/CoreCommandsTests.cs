@@ -113,7 +113,6 @@ public class CoreCommandsTests
 
 		// Then
 		ctx.WorkspaceManager.ActiveWorkspace.Received(1).SwapWindowInDirection(direction, null);
-		ctx.WorkspaceManager.ActiveWorkspace.Received(1).DoLayout();
 	}
 
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.move_window_left_edge_left", Direction.Left, -1, 0)]

@@ -830,38 +830,12 @@ public class WorkspaceTests
 			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
-	//[Theory]
-	//[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
-	//[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
-	//internal void SwapWindowInDirection_Success(
-	//	bool deferLayout,
-	//	int doLayoutCalls,
-	//	IContext ctx,
-	//	IInternalContext internalCtx,
-	//	WorkspaceManagerTriggers triggers,
-	//	ILayoutEngine layoutEngine,
-	//	IWindow window
-	//)
-	//{
-	//	// Given
-	//	Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-	//	workspace.AddWindow(window);
-	//	ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
-
-	//	ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-
-	//	// When SwapWindowInDirection is called
-	//	bool result = workspace.SwapWindowInDirection(Direction.Up, window, deferLayout);
-
-	//	// Then the layout engine is told to swap the window
-	//	Assert.True(result);
-	//	givenEngine.Received(1).SwapWindowInDirection(Direction.Up, window);
-	//	Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
-	//	internalCtx.DeferWorkspacePosManager.Received(doLayoutCalls).DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
-	//}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void SwapWindowInDirection_Success(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -877,11 +851,15 @@ public class WorkspaceTests
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When SwapWindowInDirection is called
-		workspace.SwapWindowInDirection(Direction.Up, window);
+		bool result = workspace.SwapWindowInDirection(Direction.Up, window, deferLayout);
 
 		// Then the layout engine is told to swap the window
+		Assert.True(result);
 		givenEngine.Received(1).SwapWindowInDirection(Direction.Up, window);
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
 	}
 	#endregion
 

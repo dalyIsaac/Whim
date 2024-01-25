@@ -292,12 +292,7 @@ internal class CoreCommands : PluginCommands
 	/// Action to swap the last focused window with the window in the specified direction command.
 	/// </summary>
 	internal Action SwapWindowInDirection(Direction direction) =>
-		() =>
-		{
-			IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
-			workspace.SwapWindowInDirection(direction);
-			workspace.DoLayout();
-		};
+		() => _context.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
 
 	internal Action FocusMonitorInDirection(bool getNext) =>
 		() =>
