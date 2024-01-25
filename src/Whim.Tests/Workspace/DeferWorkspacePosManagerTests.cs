@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -87,8 +88,27 @@ public class DeferWorkspacePosManagerTests
 	{
 		// Given the workspace has a monitor
 		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(monitor);
-		workspace.Windows.Returns(new List<IWindow>() { window, window2 });
 
+		window.Handle.Returns((HWND)1);
+		window2.Handle.Returns((HWND)2);
+
+		workspace.Windows.Returns(new List<IWindow>() { window, window2 });
+		IWindowState[] windowStates = new IWindowState[]
+		{
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(),
+				Window = window,
+				WindowSize = WindowSize.Normal
+			},
+			new WindowState()
+			{
+				Rectangle = new Rectangle<int>(),
+				Window = window2,
+				WindowSize = WindowSize.Normal
+			},
+		};
+		workspace.ActiveLayoutEngine.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>()).Returns(windowStates);
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
@@ -97,5 +117,7 @@ public class DeferWorkspacePosManagerTests
 		// Then
 		triggers.WorkspaceLayoutStarted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());
 		triggers.WorkspaceLayoutCompleted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());
+
+		ctx.NativeManager.Received(1).DeferWindowPos(Arg.Is<IEnumerable<WindowPosState>>(x => x.Count() == 2));
 	}
 }
