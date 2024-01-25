@@ -71,6 +71,12 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Adds the window to the workspace.
 	/// </summary>
+	/// <remarks>
+	/// WARNING: Be careful using this method outside of the Whim's core code. This method does not
+	/// update the <see cref="IButler"/> or other classes.
+	///
+	/// This does not call <see cref="DoLayout"/>.
+	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>Whether the <paramref name="window"/> was added.</returns>
 	bool AddWindow(IWindow window);
@@ -78,6 +84,12 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Removes the window from the workspace.
 	/// </summary>
+	/// <remarks>
+	/// WARNING: Be careful using this method outside of the Whim's core code. This method does not
+	/// update the <see cref="IButler"/> or other classes.
+	///
+	/// This does not call <see cref="DoLayout"/>.
+	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>True when the window was removed.</returns>
 	bool RemoveWindow(IWindow window);
@@ -164,13 +176,18 @@ public interface IWorkspace : IDisposable
 	void MoveWindowToPoint(IWindow window, IPoint<double> point);
 	#endregion
 
-	#region MinimizeWindow
 	/// <summary>
 	/// Called when a window is being minimized - i.e., the window size will become
 	/// <see cref="WindowSize.Minimized"/>.
 	///
 	/// Will minimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
+	/// <remarks>
+	/// WARNING: Be careful using this method outside of the Whim's core code. This method does not
+	/// update the <see cref="IButler"/> or other classes.
+	///
+	/// This does not call <see cref="DoLayout"/>.
+	/// </remarks>
 	/// <param name="window"></param>
 	void MinimizeWindowStart(IWindow window);
 
@@ -180,10 +197,15 @@ public interface IWorkspace : IDisposable
 	///
 	/// Will unminimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
+	/// <remarks>
+	/// WARNING: Be careful using this method outside of the Whim's core code. This method does not
+	/// update the <see cref="IButler"/> or other classes.
+	///
+	/// This does not call <see cref="DoLayout"/>.
+	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns></returns>
 	void MinimizeWindowEnd(IWindow window);
-	#endregion
 
 	#region PerformCustomLayoutEngineAction
 	/// <summary>
