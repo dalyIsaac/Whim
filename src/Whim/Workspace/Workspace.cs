@@ -376,20 +376,29 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return changed;
 	}
 
-	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
+	public bool MoveWindowEdgesInDirection(
+		Direction edges,
+		IPoint<double> deltas,
+		IWindow? window = null,
+		bool deferLayout = false
+	)
 	{
 		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		if (GetValidVisibleWindow(window) is not IWindow validWindow)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowEdgesInDirection(
-				edges,
-				deltas,
-				validWindow
-			);
-			return true;
+			return false;
 		}
 
-		return false;
+		ILayoutEngine newEngine = ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
+		bool changed = ActiveLayoutEngine != newEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
+
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return true;
 	}
 
 	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
