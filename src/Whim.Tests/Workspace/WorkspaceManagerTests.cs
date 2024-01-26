@@ -1781,7 +1781,12 @@ public class WorkspaceManagerTests
 		workspaces[0].Received(1).MoveWindowEdgesInDirection(Direction.Left, Arg.Any<IPoint<double>>(), window, false);
 		workspaces[1]
 			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>(), Arg.Any<bool>());
+			.MoveWindowEdgesInDirection(
+				Arg.Any<Direction>(),
+				Arg.Any<IPoint<double>>(),
+				Arg.Any<IWindow?>(),
+				Arg.Any<bool>()
+			);
 	}
 	#endregion
 }
