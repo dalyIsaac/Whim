@@ -130,10 +130,13 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The origin window
 	/// </param>
+	/// <param name="deferLayout">
+	/// Whether to defer the layout until the next <see cref="DoLayout"/>. Defaults to <c>false</c>.
+	/// </param>
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
-	bool FocusWindowInDirection(Direction direction, IWindow? window = null);
+	bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.

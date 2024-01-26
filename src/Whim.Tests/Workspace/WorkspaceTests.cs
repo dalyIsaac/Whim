@@ -723,15 +723,23 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When FocusWindowInDirection is called
-		workspace.FocusWindowInDirection(Direction.Up, window);
+		bool result = workspace.FocusWindowInDirection(Direction.Up, window);
 
 		// Then the layout engine is not told to focus the window
+		Assert.False(result);
 		layoutEngine.DidNotReceive().FocusWindowInDirection(Direction.Up, window);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void FocusWindowInDirection_Success(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -745,11 +753,15 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When FocusWindowInDirection is called
-		workspace.FocusWindowInDirection(Direction.Up, window);
+		bool result = workspace.FocusWindowInDirection(Direction.Up, window, deferLayout);
 
 		// Then the layout engine is told to focus the window, and a layout occurs
+		Assert.True(result);
 		activeLayoutEngine.Received(1).FocusWindowInDirection(Direction.Up, window);
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]

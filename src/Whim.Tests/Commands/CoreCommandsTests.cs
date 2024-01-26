@@ -75,7 +75,6 @@ public class CoreCommandsTests
 
 		// Then
 		ctx.WorkspaceManager.ActiveWorkspace.Received(1).FocusWindowInDirection(direction, window);
-		ctx.WorkspaceManager.ActiveWorkspace.Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]

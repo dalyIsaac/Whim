@@ -335,7 +335,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return window;
 	}
 
-	public bool FocusWindowInDirection(Direction direction, IWindow? window = null)
+	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
@@ -344,15 +344,16 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return false;
 		}
 
-		ILayoutEngine newEngine = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+		ILayoutEngine oldEngine = ActiveLayoutEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+		bool changed = ActiveLayoutEngine != oldEngine;
 
-		if (ActiveLayoutEngine != newEngine)
+		if (changed && !deferLayout)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = newEngine;
-			return true;
+			DoLayout();
 		}
 
-		return false;
+		return changed;
 	}
 
 	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
