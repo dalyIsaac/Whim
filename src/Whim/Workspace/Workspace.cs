@@ -173,6 +173,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		prevLayoutEngine = _layoutEngines[_prevLayoutEngineIndex];
 		nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 
+		DoLayout();
+
 		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
@@ -181,6 +183,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				CurrentLayoutEngine = nextLayoutEngine
 			}
 		);
+
 		return true;
 	}
 

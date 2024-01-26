@@ -82,6 +82,9 @@ public class WorkspaceTests
 		// Then
 		Assert.False(result);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -104,6 +107,9 @@ public class WorkspaceTests
 		// Then
 		Assert.False(result);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -128,6 +134,9 @@ public class WorkspaceTests
 		// Then
 		Assert.True(result);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -150,6 +159,9 @@ public class WorkspaceTests
 		// Then
 		Assert.True(result);
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.Received(1)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 	#endregion
 
