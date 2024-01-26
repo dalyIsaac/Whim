@@ -82,6 +82,9 @@ public class WorkspaceTests
 		// Then
 		Assert.False(result);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -104,6 +107,9 @@ public class WorkspaceTests
 		// Then
 		Assert.False(result);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -128,6 +134,9 @@ public class WorkspaceTests
 		// Then
 		Assert.True(result);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -150,6 +159,9 @@ public class WorkspaceTests
 		// Then
 		Assert.True(result);
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.Received(1)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 	#endregion
 
@@ -723,15 +735,23 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When FocusWindowInDirection is called
-		workspace.FocusWindowInDirection(Direction.Up, window);
+		bool result = workspace.FocusWindowInDirection(Direction.Up, window);
 
 		// Then the layout engine is not told to focus the window
+		Assert.False(result);
 		layoutEngine.DidNotReceive().FocusWindowInDirection(Direction.Up, window);
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void FocusWindowInDirection_Success(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -745,11 +765,15 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When FocusWindowInDirection is called
-		workspace.FocusWindowInDirection(Direction.Up, window);
+		bool result = workspace.FocusWindowInDirection(Direction.Up, window, deferLayout);
 
 		// Then the layout engine is told to focus the window, and a layout occurs
+		Assert.True(result);
 		activeLayoutEngine.Received(1).FocusWindowInDirection(Direction.Up, window);
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -830,38 +854,12 @@ public class WorkspaceTests
 			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 
-	//[Theory]
-	//[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
-	//[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
-	//internal void SwapWindowInDirection_Success(
-	//	bool deferLayout,
-	//	int doLayoutCalls,
-	//	IContext ctx,
-	//	IInternalContext internalCtx,
-	//	WorkspaceManagerTriggers triggers,
-	//	ILayoutEngine layoutEngine,
-	//	IWindow window
-	//)
-	//{
-	//	// Given
-	//	Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-	//	workspace.AddWindow(window);
-	//	ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
-
-	//	ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-
-	//	// When SwapWindowInDirection is called
-	//	bool result = workspace.SwapWindowInDirection(Direction.Up, window, deferLayout);
-
-	//	// Then the layout engine is told to swap the window
-	//	Assert.True(result);
-	//	givenEngine.Received(1).SwapWindowInDirection(Direction.Up, window);
-	//	Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
-	//	internalCtx.DeferWorkspacePosManager.Received(doLayoutCalls).DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
-	//}
-
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void SwapWindowInDirection_Success(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -877,11 +875,15 @@ public class WorkspaceTests
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
 
 		// When SwapWindowInDirection is called
-		workspace.SwapWindowInDirection(Direction.Up, window);
+		bool result = workspace.SwapWindowInDirection(Direction.Up, window, deferLayout);
 
 		// Then the layout engine is told to swap the window
+		Assert.True(result);
 		givenEngine.Received(1).SwapWindowInDirection(Direction.Up, window);
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 	#endregion
 
@@ -900,10 +902,14 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowEdgesInDirection is called
-		workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, null);
+		bool result = workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, null);
 
 		// Then the layout engine is not told to move the window
+		Assert.False(result);
 		layoutEngine.DidNotReceive().MoveWindowEdgesInDirection(Direction.Up, deltas, Arg.Any<IWindow>());
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
@@ -922,15 +928,23 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowEdgesInDirection is called
-		workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window);
+		bool result = workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window);
 
 		// Then the layout engine is not told to move the window
+		Assert.False(result);
 		layoutEngine.DidNotReceive().MoveWindowEdgesInDirection(Direction.Up, deltas, window);
+		internalCtx
+			.DeferWorkspacePosManager.DidNotReceive()
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void MoveWindowEdgesInDirection_Success(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -946,15 +960,23 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowEdgesInDirection is called
-		workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window);
+		bool result = workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window, deferLayout);
 
 		// Then the layout engine is told to move the window
+		Assert.True(result);
 		givenEngine.Received(1).MoveWindowEdgesInDirection(Direction.Up, deltas, window);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void MoveWindowToPoint_Success_AddWindow(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -969,16 +991,24 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowToPoint is called
-		workspace.MoveWindowToPoint(window, point);
+		bool result = workspace.MoveWindowToPoint(window, point, deferLayout);
 
 		// Then the layout engine is told to move the window
+		Assert.True(result);
 		layoutEngine.Received(1).MoveWindowToPoint(window, point);
 		layoutEngine.DidNotReceive().RemoveWindow(window);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void MoveWindowToPoint_Success_WindowAlreadyExists(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -997,10 +1027,14 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowToPoint is called
-		workspace.MoveWindowToPoint(window, point);
+		bool result = workspace.MoveWindowToPoint(window, point, deferLayout);
 
 		// Then the layout engine is told to remove and add the window
+		Assert.True(result);
 		givenEngine.Received(1).MoveWindowToPoint(window, point);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 

@@ -137,7 +137,6 @@ public class SliceLayoutPluginTests
 					action.Name == plugin.PromoteWindowActionName && action.Window == window
 				)
 			);
-		workspace.Received(1).DoLayout();
 	}
 	#endregion
 
@@ -192,7 +191,6 @@ public class SliceLayoutPluginTests
 					action.Name == plugin.DemoteWindowActionName && action.Window == window
 				)
 			);
-		workspace.Received(1).DoLayout();
 	}
 	#endregion
 

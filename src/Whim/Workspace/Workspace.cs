@@ -173,6 +173,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		prevLayoutEngine = _layoutEngines[_prevLayoutEngineIndex];
 		nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 
+		DoLayout();
+
 		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
@@ -181,6 +183,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				CurrentLayoutEngine = nextLayoutEngine
 			}
 		);
+
 		return true;
 	}
 
@@ -335,7 +338,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return window;
 	}
 
-	public bool FocusWindowInDirection(Direction direction, IWindow? window = null)
+	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
@@ -344,48 +347,69 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return false;
 		}
 
-		ILayoutEngine newEngine = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+		ILayoutEngine oldEngine = ActiveLayoutEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+		bool changed = ActiveLayoutEngine != oldEngine;
 
-		if (ActiveLayoutEngine != newEngine)
+		if (changed && !deferLayout)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = newEngine;
-			return true;
+			DoLayout();
 		}
 
-		return false;
+		return changed;
 	}
 
-	public bool SwapWindowInDirection(Direction direction, IWindow? window = null)
+	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
 		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+
+		if (GetValidVisibleWindow(window) is not IWindow validWindow)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
-			return true;
+			return false;
 		}
 
-		return false;
+		ILayoutEngine newEngine = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+		bool changed = ActiveLayoutEngine != newEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
+
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return changed;
 	}
 
-	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
+	public bool MoveWindowEdgesInDirection(
+		Direction edges,
+		IPoint<double> deltas,
+		IWindow? window = null,
+		bool deferLayout = false
+	)
 	{
 		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		if (GetValidVisibleWindow(window) is not IWindow validWindow)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowEdgesInDirection(
-				edges,
-				deltas,
-				validWindow
-			);
-			return true;
+			return false;
 		}
 
-		return false;
+		ILayoutEngine newEngine = ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
+		bool changed = ActiveLayoutEngine != newEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
+
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return true;
 	}
 
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
+	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false)
 	{
 		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
+
+		ILayoutEngine oldEngine = ActiveLayoutEngine;
 
 		if (_windows.Contains(window))
 		{
@@ -405,6 +429,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
 			}
 		}
+
+		bool changed = ActiveLayoutEngine != oldEngine;
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return changed;
 	}
 
 	public override string ToString() => Name;
@@ -480,6 +512,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 					doLayout = true;
 				}
 			}
+		}
+
+		if (doLayout && !action.DeferLayout)
+		{
+			DoLayout();
 		}
 
 		return doLayout;
