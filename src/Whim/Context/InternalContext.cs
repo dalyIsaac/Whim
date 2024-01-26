@@ -22,6 +22,8 @@ internal class InternalContext : IInternalContext
 
 	public IDeferWindowPosManager DeferWindowPosManager { get; }
 
+	public IDeferWorkspacePosManager DeferWorkspacePosManager { get; }
+
 	public InternalContext(IContext context)
 	{
 		_context = context;
@@ -31,6 +33,7 @@ internal class InternalContext : IInternalContext
 		KeybindHook = new KeybindHook(context, this);
 		MouseHook = new MouseHook(context, this);
 		DeferWindowPosManager = new DeferWindowPosManager(context, this);
+		DeferWorkspacePosManager = new DeferWorkspacePosManager(context, this);
 	}
 
 	public void PreInitialize()

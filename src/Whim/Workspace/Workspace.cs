@@ -50,7 +50,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// <summary>
 	/// Map of window handles to their current <see cref="IWindowState"/>.
 	/// </summary>
-	private Dictionary<HWND, IWindowState> _windowStates = new();
+	private readonly Dictionary<HWND, IWindowState> _windowStates = new();
 
 	public Workspace(
 		IContext context,
@@ -437,86 +437,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return;
 		}
 
-		if (GarbageCollect())
-		{
-			Logger.Debug($"Garbage collected windows, skipping layout for workspace {Name}");
-			return;
-		}
-
-		// Get the monitor for this workspace
-		IMonitor? monitor = _context.Butler.GetMonitorForWorkspace(this);
-		if (monitor == null)
-		{
-			Logger.Debug($"No active monitors found for workspace {Name}.");
-			return;
-		}
-
-		Logger.Debug($"Starting layout for workspace {Name}");
-		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
-
-		// Execute the layout task
-		_windowStates = SetWindowPos(engine: ActiveLayoutEngine, monitor);
-		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
-	}
-
-	private Dictionary<HWND, IWindowState> SetWindowPos(ILayoutEngine engine, IMonitor monitor)
-	{
-		Logger.Debug($"Setting window positions for workspace {Name}");
-		List<WindowPosState> windowStates = new();
-		Dictionary<HWND, IWindowState> windowRects = new();
-
-		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
-		{
-			windowStates.Add(new(loc, (HWND)1, null));
-			windowRects.Add(loc.Window.Handle, loc);
-			Logger.Debug($"Window {loc.Window} has rectangle {loc.Rectangle}");
-		}
-
-		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);
-
-		return windowRects;
+		_internalContext.DeferWorkspacePosManager.DoLayout(this, _triggers, _windowStates);
 	}
 
 	public bool ContainsWindow(IWindow window) => _windows.Contains(window);
-
-	/// <summary>
-	/// Garbage collects windows that are no longer valid.
-	/// </summary>
-	/// <returns></returns>
-	private bool GarbageCollect()
-	{
-		List<IWindow> garbageWindows = new();
-		bool garbageCollected = false;
-
-		foreach (IWindow window in Windows)
-		{
-			bool removeWindow = false;
-			if (!_internalContext.CoreNativeManager.IsWindow(window.Handle))
-			{
-				Logger.Debug($"Window {window.Handle} is no longer a window.");
-				removeWindow = true;
-			}
-			else if (!_internalContext.WindowManager.HandleWindowMap.ContainsKey(window.Handle))
-			{
-				Logger.Debug($"Window {window.Handle} is somehow no longer managed.");
-				removeWindow = true;
-			}
-
-			if (removeWindow)
-			{
-				garbageWindows.Add(window);
-				garbageCollected = true;
-			}
-		}
-
-		// Remove the windows by doing a sneaky call.
-		foreach (IWindow window in garbageWindows)
-		{
-			_internalContext.WindowManager.OnWindowRemoved(window);
-		}
-
-		return garbageCollected;
-	}
 
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
 		PerformCustomLayoutEngineAction(

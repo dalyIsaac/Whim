@@ -23,6 +23,9 @@ internal interface IInternalContext : IDisposable
 
 	IDeferWindowPosManager DeferWindowPosManager { get; }
 
+	/// <inheritdoc cref="IDeferWorkspacePosManager" />
+	IDeferWorkspacePosManager DeferWorkspacePosManager { get; }
+
 	void PreInitialize();
 
 	void PostInitialize();
