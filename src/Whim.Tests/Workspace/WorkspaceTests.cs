@@ -859,7 +859,7 @@ public class WorkspaceTests
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 		internalCtx
 			.DeferWorkspacePosManager.Received(doLayoutCalls)
-			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>());
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 	}
 	#endregion
 
