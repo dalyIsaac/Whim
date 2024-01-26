@@ -947,8 +947,12 @@ public class WorkspaceTests
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void MoveWindowToPoint_Success_AddWindow(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -963,16 +967,24 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowToPoint is called
-		workspace.MoveWindowToPoint(window, point);
+		bool result = workspace.MoveWindowToPoint(window, point, deferLayout);
 
 		// Then the layout engine is told to move the window
+		Assert.True(result);
 		layoutEngine.Received(1).MoveWindowToPoint(window, point);
 		layoutEngine.DidNotReceive().RemoveWindow(window);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void MoveWindowToPoint_Success_WindowAlreadyExists(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -991,10 +1003,14 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowToPoint is called
-		workspace.MoveWindowToPoint(window, point);
+		bool result = workspace.MoveWindowToPoint(window, point, deferLayout);
 
 		// Then the layout engine is told to remove and add the window
+		Assert.True(result);
 		givenEngine.Received(1).MoveWindowToPoint(window, point);
+		internalCtx
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
+			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 

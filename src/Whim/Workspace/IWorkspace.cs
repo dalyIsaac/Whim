@@ -184,7 +184,13 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
-	void MoveWindowToPoint(IWindow window, IPoint<double> point);
+	/// <param name="deferLayout">
+	/// Whether to defer the layout until the next <see cref="DoLayout"/>. Defaults to <c>false</c>.
+	/// </param>
+	/// <returns>
+	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
+	/// </returns>
+	bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false);
 	#endregion
 
 	#region MinimizeWindow

@@ -101,7 +101,6 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 		IRectangle<double> unitSquareRect = monitor.WorkingArea.ToUnitSquare(windowState.Rectangle);
 
 		workspace.MoveWindowToPoint(window, unitSquareRect);
-		workspace.DoLayout();
 	}
 
 	/// <inheritdoc />

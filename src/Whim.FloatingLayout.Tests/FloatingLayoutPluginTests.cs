@@ -232,7 +232,6 @@ public class FloatingLayoutPluginTests
 		Assert.Single(plugin.FloatingWindows);
 		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
 		activeWorkspace.Received(1).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
-		activeWorkspace.Received(1).DoLayout();
 	}
 	#endregion
 
@@ -277,7 +276,6 @@ public class FloatingLayoutPluginTests
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 		activeWorkspace.Received(2).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
-		activeWorkspace.Received(2).DoLayout();
 	}
 	#endregion
 

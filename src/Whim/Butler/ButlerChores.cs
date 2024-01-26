@@ -255,7 +255,6 @@ internal class ButlerChores : IButlerChores
 		if (targetWorkspace == null)
 		{
 			Logger.Error($"Monitor {targetMonitor} was not found to correspond to any workspace");
-
 			return;
 		}
 
@@ -264,7 +263,6 @@ internal class ButlerChores : IButlerChores
 		if (oldWorkspace == null)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-
 			return;
 		}
 
@@ -283,8 +281,7 @@ internal class ButlerChores : IButlerChores
 			oldWorkspace.DoLayout();
 		}
 
-		targetWorkspace.MoveWindowToPoint(window, normalized);
-		targetWorkspace.DoLayout();
+		targetWorkspace.MoveWindowToPoint(window, normalized, deferLayout: false);
 
 		// Trigger layouts.
 		window.Focus();

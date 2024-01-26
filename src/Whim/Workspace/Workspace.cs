@@ -401,9 +401,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return true;
 	}
 
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
+	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false)
 	{
 		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
+
+		ILayoutEngine oldEngine = ActiveLayoutEngine;
 
 		if (_windows.Contains(window))
 		{
@@ -423,6 +425,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
 			}
 		}
+
+		bool changed = ActiveLayoutEngine != oldEngine;
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return changed;
 	}
 
 	public override string ToString() => Name;

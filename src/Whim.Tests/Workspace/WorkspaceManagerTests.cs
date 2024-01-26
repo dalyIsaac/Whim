@@ -1448,10 +1448,8 @@ public class WorkspaceManagerTests
 		// Then the window is removed from the old workspace and added to the new workspace
 		activeWorkspace.Received(1).RemoveWindow(window);
 		activeWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
-		activeWorkspace.Received(1).DoLayout();
 
 		targetWorkspace.Received(1).MoveWindowToPoint(window, expectedPoint);
-		targetWorkspace.Received(1).DoLayout();
 
 		Assert.Equal(targetWorkspace, workspaceManager.GetWorkspaceForWindow(window));
 
