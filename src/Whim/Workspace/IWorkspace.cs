@@ -72,12 +72,24 @@ public interface IWorkspace : IDisposable
 	/// Adds the window to the workspace.
 	/// </summary>
 	/// <param name="window"></param>
+	/// <remarks>
+	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
+	/// become out of sync with the <see cref="IButlerPantry"/>.
+	///
+	/// <see cref="DoLayout"/> is not called in this method.
+	/// </remarks>
 	/// <returns>Whether the <paramref name="window"/> was added.</returns>
 	bool AddWindow(IWindow window);
 
 	/// <summary>
 	/// Removes the window from the workspace.
 	/// </summary>
+	/// <remarks>
+	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
+	/// become out of sync with the <see cref="IButlerPantry"/>.
+	///
+	/// <see cref="DoLayout"/> is not called in this method.
+	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>True when the window was removed.</returns>
 	bool RemoveWindow(IWindow window);
@@ -182,6 +194,12 @@ public interface IWorkspace : IDisposable
 	///
 	/// Will minimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
+	/// <remarks>
+	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
+	/// become out of sync with the <see cref="IButlerPantry"/>.
+	///
+	/// <see cref="DoLayout"/> is not called in this method.
+	/// </remarks>
 	/// <param name="window"></param>
 	void MinimizeWindowStart(IWindow window);
 
@@ -191,6 +209,12 @@ public interface IWorkspace : IDisposable
 	///
 	/// Will unminimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
+	/// <remarks>
+	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
+	/// become out of sync with the <see cref="IButlerPantry"/>.
+	///
+	/// <see cref="DoLayout"/> is not called in this method.
+	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns></returns>
 	void MinimizeWindowEnd(IWindow window);
