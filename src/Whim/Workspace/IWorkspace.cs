@@ -24,7 +24,9 @@ public interface IWorkspace : IDisposable
 	/// Rotate to the next layout engine.
 	/// </summary>
 	/// <param name="nextIdx">The index of the layout engine to make active.</param>
-	/// <returns><see langword="true"/> if the layout engine is the one specified by <paramref name="nextIdx"/>.</returns>
+	/// <returns>
+	/// <see langword="true"/> if the layout engine is the one specified by <paramref name="nextIdx"/>.
+	/// </returns>
 	bool TrySetLayoutEngineFromIndex(int nextIdx);
 
 	/// <summary>
@@ -72,10 +74,10 @@ public interface IWorkspace : IDisposable
 	/// Adds the window to the workspace.
 	/// </summary>
 	/// <remarks>
-	/// WARNING: Be careful using this method outside of the Whim's core code. This method does not
-	/// update the <see cref="IButler"/> or other classes.
+	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
+	/// become out of sync with the <see cref="IButlerPantry"/>.
 	///
-	/// This does not call <see cref="DoLayout"/>.
+	/// <see cref="DoLayout"/> is not called in this method.
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>Whether the <paramref name="window"/> was added.</returns>
@@ -85,10 +87,10 @@ public interface IWorkspace : IDisposable
 	/// Removes the window from the workspace.
 	/// </summary>
 	/// <remarks>
-	/// WARNING: Be careful using this method outside of the Whim's core code. This method does not
-	/// update the <see cref="IButler"/> or other classes.
+	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
+	/// become out of sync with the <see cref="IButlerPantry"/>.
 	///
-	/// This does not call <see cref="DoLayout"/>.
+	/// <see cref="DoLayout"/> is not called in this method.
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>True when the window was removed.</returns>
@@ -130,10 +132,13 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The origin window
 	/// </param>
+	/// <param name="deferLayout">
+	/// Whether to defer the layout until the next <see cref="DoLayout"/>. Defaults to <c>false</c>.
+	/// </param>
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
-	bool FocusWindowInDirection(Direction direction, IWindow? window = null);
+	bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false);
 
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
@@ -142,10 +147,13 @@ public interface IWorkspace : IDisposable
 	/// <param name="window">
 	/// The window to swap. If null, the currently focused window is swapped.
 	/// </param>
+	/// <param name="deferLayout">
+	/// Whether to defer the layout until the next <see cref="DoLayout"/>. Defaults to <c>false</c>.
+	/// </param>
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
-	bool SwapWindowInDirection(Direction direction, IWindow? window = null);
+	bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false);
 
 	/// <summary>
 	/// Change the <paramref name="window"/>'s <paramref name="edges"/> direction by
@@ -162,10 +170,18 @@ public interface IWorkspace : IDisposable
 	/// The window to change the edge of. If null, the currently focused window is
 	/// used.
 	/// </param>
+	/// <param name="deferLayout">
+	/// Whether to defer the layout until the next <see cref="DoLayout"/>. Defaults to <c>false</c>.
+	/// </param>
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
-	bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null);
+	bool MoveWindowEdgesInDirection(
+		Direction edges,
+		IPoint<double> deltas,
+		IWindow? window = null,
+		bool deferLayout = false
+	);
 
 	/// <summary>
 	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.
@@ -173,7 +189,13 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="window">The window to move.</param>
 	/// <param name="point">The point to move the window to.</param>
-	void MoveWindowToPoint(IWindow window, IPoint<double> point);
+	/// <param name="deferLayout">
+	/// Whether to defer the layout until the next <see cref="DoLayout"/>. Defaults to <c>false</c>.
+	/// </param>
+	/// <returns>
+	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
+	/// </returns>
+	bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false);
 	#endregion
 
 	/// <summary>
@@ -183,10 +205,10 @@ public interface IWorkspace : IDisposable
 	/// Will minimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
 	/// <remarks>
-	/// WARNING: Be careful using this method outside of the Whim's core code. This method does not
-	/// update the <see cref="IButler"/> or other classes.
+	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
+	/// become out of sync with the <see cref="IButlerPantry"/>.
 	///
-	/// This does not call <see cref="DoLayout"/>.
+	/// <see cref="DoLayout"/> is not called in this method.
 	/// </remarks>
 	/// <param name="window"></param>
 	void MinimizeWindowStart(IWindow window);
@@ -198,10 +220,10 @@ public interface IWorkspace : IDisposable
 	/// Will unminimize a window in the <see cref="ActiveLayoutEngine"/>.
 	/// </summary>
 	/// <remarks>
-	/// WARNING: Be careful using this method outside of the Whim's core code. This method does not
-	/// update the <see cref="IButler"/> or other classes.
+	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
+	/// become out of sync with the <see cref="IButlerPantry"/>.
 	///
-	/// This does not call <see cref="DoLayout"/>.
+	/// <see cref="DoLayout"/> is not called in this method.
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns></returns>

@@ -50,7 +50,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// <summary>
 	/// Map of window handles to their current <see cref="IWindowState"/>.
 	/// </summary>
-	private Dictionary<HWND, IWindowState> _windowStates = new();
+	private readonly Dictionary<HWND, IWindowState> _windowStates = new();
 
 	public Workspace(
 		IContext context,
@@ -173,6 +173,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		prevLayoutEngine = _layoutEngines[_prevLayoutEngineIndex];
 		nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
 
+		DoLayout();
+
 		_triggers.ActiveLayoutEngineChanged(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
@@ -181,6 +183,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				CurrentLayoutEngine = nextLayoutEngine
 			}
 		);
+
 		return true;
 	}
 
@@ -335,7 +338,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return window;
 	}
 
-	public bool FocusWindowInDirection(Direction direction, IWindow? window = null)
+	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
 		Logger.Debug($"Focusing window {window} in workspace {Name}");
 
@@ -344,48 +347,69 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return false;
 		}
 
-		ILayoutEngine newEngine = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+		ILayoutEngine oldEngine = ActiveLayoutEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
+		bool changed = ActiveLayoutEngine != oldEngine;
 
-		if (ActiveLayoutEngine != newEngine)
+		if (changed && !deferLayout)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = newEngine;
-			return true;
+			DoLayout();
 		}
 
-		return false;
+		return changed;
 	}
 
-	public bool SwapWindowInDirection(Direction direction, IWindow? window = null)
+	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
 		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+
+		if (GetValidVisibleWindow(window) is not IWindow validWindow)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
-			return true;
+			return false;
 		}
 
-		return false;
+		ILayoutEngine newEngine = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
+		bool changed = ActiveLayoutEngine != newEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
+
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return changed;
 	}
 
-	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null)
+	public bool MoveWindowEdgesInDirection(
+		Direction edges,
+		IPoint<double> deltas,
+		IWindow? window = null,
+		bool deferLayout = false
+	)
 	{
 		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
-		if (GetValidVisibleWindow(window) is IWindow validWindow)
+		if (GetValidVisibleWindow(window) is not IWindow validWindow)
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.MoveWindowEdgesInDirection(
-				edges,
-				deltas,
-				validWindow
-			);
-			return true;
+			return false;
 		}
 
-		return false;
+		ILayoutEngine newEngine = ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
+		bool changed = ActiveLayoutEngine != newEngine;
+		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
+
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return true;
 	}
 
-	public void MoveWindowToPoint(IWindow window, IPoint<double> point)
+	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false)
 	{
 		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
+
+		ILayoutEngine oldEngine = ActiveLayoutEngine;
 
 		if (_windows.Contains(window))
 		{
@@ -405,6 +429,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
 			}
 		}
+
+		bool changed = ActiveLayoutEngine != oldEngine;
+		if (changed && !deferLayout)
+		{
+			DoLayout();
+		}
+
+		return changed;
 	}
 
 	public override string ToString() => Name;
@@ -437,86 +469,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			return;
 		}
 
-		if (GarbageCollect())
-		{
-			Logger.Debug($"Garbage collected windows, skipping layout for workspace {Name}");
-			return;
-		}
-
-		// Get the monitor for this workspace
-		IMonitor? monitor = _context.Butler.GetMonitorForWorkspace(this);
-		if (monitor == null)
-		{
-			Logger.Debug($"No active monitors found for workspace {Name}.");
-			return;
-		}
-
-		Logger.Debug($"Starting layout for workspace {Name}");
-		_triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = this });
-
-		// Execute the layout task
-		_windowStates = SetWindowPos(engine: ActiveLayoutEngine, monitor);
-		_triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = this });
-	}
-
-	private Dictionary<HWND, IWindowState> SetWindowPos(ILayoutEngine engine, IMonitor monitor)
-	{
-		Logger.Debug($"Setting window positions for workspace {Name}");
-		List<WindowPosState> windowStates = new();
-		Dictionary<HWND, IWindowState> windowRects = new();
-
-		foreach (IWindowState loc in engine.DoLayout(monitor.WorkingArea, monitor))
-		{
-			windowStates.Add(new(loc, (HWND)1, null));
-			windowRects.Add(loc.Window.Handle, loc);
-			Logger.Debug($"Window {loc.Window} has rectangle {loc.Rectangle}");
-		}
-
-		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos(windowStates);
-
-		return windowRects;
+		_internalContext.DeferWorkspacePosManager.DoLayout(this, _triggers, _windowStates);
 	}
 
 	public bool ContainsWindow(IWindow window) => _windows.Contains(window);
-
-	/// <summary>
-	/// Garbage collects windows that are no longer valid.
-	/// </summary>
-	/// <returns></returns>
-	private bool GarbageCollect()
-	{
-		List<IWindow> garbageWindows = new();
-		bool garbageCollected = false;
-
-		foreach (IWindow window in Windows)
-		{
-			bool removeWindow = false;
-			if (!_internalContext.CoreNativeManager.IsWindow(window.Handle))
-			{
-				Logger.Debug($"Window {window.Handle} is no longer a window.");
-				removeWindow = true;
-			}
-			else if (!_internalContext.WindowManager.HandleWindowMap.ContainsKey(window.Handle))
-			{
-				Logger.Debug($"Window {window.Handle} is somehow no longer managed.");
-				removeWindow = true;
-			}
-
-			if (removeWindow)
-			{
-				garbageWindows.Add(window);
-				garbageCollected = true;
-			}
-		}
-
-		// Remove the windows by doing a sneaky call.
-		foreach (IWindow window in garbageWindows)
-		{
-			_internalContext.WindowManager.OnWindowRemoved(window);
-		}
-
-		return garbageCollected;
-	}
 
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
 		PerformCustomLayoutEngineAction(
@@ -556,6 +512,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 					doLayout = true;
 				}
 			}
+		}
+
+		if (doLayout && !action.DeferLayout)
+		{
+			DoLayout();
 		}
 
 		return doLayout;

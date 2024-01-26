@@ -237,7 +237,6 @@ internal class CoreCommands : PluginCommands
 							Window = null
 						}
 					);
-					workspace.DoLayout();
 				},
 				condition: () =>
 				{
@@ -284,20 +283,14 @@ internal class CoreCommands : PluginCommands
 				return;
 			}
 
-			workspace.FocusWindowInDirection(direction, workspace.LastFocusedWindow);
-			workspace.DoLayout();
+			workspace.FocusWindowInDirection(direction, workspace.LastFocusedWindow, deferLayout: false);
 		};
 
 	/// <summary>
 	/// Action to swap the last focused window with the window in the specified direction command.
 	/// </summary>
 	internal Action SwapWindowInDirection(Direction direction) =>
-		() =>
-		{
-			IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
-			workspace.SwapWindowInDirection(direction);
-			workspace.DoLayout();
-		};
+		() => _context.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
 
 	internal Action FocusMonitorInDirection(bool getNext) =>
 		() =>

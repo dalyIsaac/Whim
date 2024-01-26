@@ -88,7 +88,7 @@ internal partial class Butler : IButler
 				}
 
 				_pantry.SetWindowWorkspace(window, workspace);
-				workspace.MoveWindowToPoint(window, savedWindow.Rectangle.Center);
+				workspace.MoveWindowToPoint(window, savedWindow.Rectangle.Center, deferLayout: false);
 				processedWindows.Add(hwnd);
 
 				// Fire the window added event.

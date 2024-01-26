@@ -1448,10 +1448,8 @@ public class WorkspaceManagerTests
 		// Then the window is removed from the old workspace and added to the new workspace
 		activeWorkspace.Received(1).RemoveWindow(window);
 		activeWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Point<double>>());
-		activeWorkspace.Received(1).DoLayout();
 
 		targetWorkspace.Received(1).MoveWindowToPoint(window, expectedPoint);
-		targetWorkspace.Received(1).DoLayout();
 
 		Assert.Equal(targetWorkspace, workspaceManager.GetWorkspaceForWindow(window));
 
@@ -1636,112 +1634,6 @@ public class WorkspaceManagerTests
 			Assert.True(false);
 		}
 	}
-
-	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void WorkspaceManagerTriggers_WorkspaceLayoutStarted(
-		IContext ctx,
-		IInternalContext internalCtx,
-		Func<CreateLeafLayoutEngine[]> createLayoutEngines
-	)
-	{
-		// Given
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
-		workspaceManager.Initialize();
-		workspaceManager.CreateLayoutEngines = createLayoutEngines;
-
-		// When creating a workspace
-		workspaceManager.Add("workspace");
-		IWorkspace workspace = workspaceManager["workspace"]!;
-		workspaceManager.Activate(workspace);
-
-		// Then starting the layout should trigger the event
-		Assert.Raises<WorkspaceEventArgs>(
-			h => workspaceManager.WorkspaceLayoutStarted += h,
-			h => workspaceManager.WorkspaceLayoutStarted -= h,
-			workspace.DoLayout
-		);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void WorkspaceManagerTriggers_WorkspaceLayoutStarted_DoesNotThrowWhenNoListener(
-		IContext ctx,
-		IInternalContext internalCtx,
-		Func<CreateLeafLayoutEngine[]> createLayoutEngines
-	)
-	{
-		// Given
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
-		workspaceManager.Initialize();
-		workspaceManager.CreateLayoutEngines = createLayoutEngines;
-
-		// When creating a workspace
-		workspaceManager.Add("workspace");
-		IWorkspace workspace = workspaceManager["workspace"]!;
-		workspaceManager.Activate(workspace);
-
-		// Then starting the layout should trigger the event
-		try
-		{
-			workspace.DoLayout();
-		}
-		catch
-		{
-			Assert.True(false);
-		}
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void WorkspaceManagerTriggers_WorkspaceLayoutCompleted(
-		IContext ctx,
-		IInternalContext internalCtx,
-		Func<CreateLeafLayoutEngine[]> createLayoutEngines
-	)
-	{
-		// Given
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
-		workspaceManager.Initialize();
-		workspaceManager.CreateLayoutEngines = createLayoutEngines;
-
-		// When
-		workspaceManager.Add("workspace");
-		IWorkspace workspace = workspaceManager["workspace"]!;
-		workspaceManager.Activate(workspace);
-
-		// Then completing the layout should trigger the event
-		Assert.Raises<WorkspaceEventArgs>(
-			h => workspaceManager.WorkspaceLayoutCompleted += h,
-			h => workspaceManager.WorkspaceLayoutCompleted -= h,
-			workspace.DoLayout
-		);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
-	internal void WorkspaceManagerTriggers_WorkspaceLayoutCompleted_DoesNotThrowWhenNoListener(
-		IContext ctx,
-		IInternalContext internalCtx,
-		Func<CreateLeafLayoutEngine[]> createLayoutEngines
-	)
-	{
-		// Given
-		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
-		workspaceManager.Initialize();
-		workspaceManager.CreateLayoutEngines = createLayoutEngines;
-
-		// When
-		workspaceManager.Add("workspace");
-		IWorkspace workspace = workspaceManager["workspace"]!;
-		workspaceManager.Activate(workspace);
-
-		// Then completing the layout should trigger the event
-		try
-		{
-			workspace.DoLayout();
-		}
-		catch
-		{
-			Assert.True(false);
-		}
-	}
 	#endregion
 
 	#region ActiveWorkspace
@@ -1884,12 +1776,15 @@ public class WorkspaceManagerTests
 		workspaceManager.MoveWindowEdgesInDirection(Direction.Left, new Point<int>());
 
 		// Then the window edges are moved
-		workspaces[0].Received(1).MoveWindowEdgesInDirection(Direction.Left, Arg.Any<IPoint<double>>(), window);
-		workspaces[0].Received(1).DoLayout();
+		workspaces[0].Received(1).MoveWindowEdgesInDirection(Direction.Left, Arg.Any<IPoint<double>>(), window, false);
 		workspaces[1]
 			.DidNotReceive()
-			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow?>());
-		workspaces[1].DidNotReceive().DoLayout();
+			.MoveWindowEdgesInDirection(
+				Arg.Any<Direction>(),
+				Arg.Any<IPoint<double>>(),
+				Arg.Any<IWindow?>(),
+				Arg.Any<bool>()
+			);
 	}
 	#endregion
 }
