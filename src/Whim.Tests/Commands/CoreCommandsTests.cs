@@ -515,6 +515,5 @@ public class CoreCommandsTests
 		// Then
 		IWorkspace workspace = ctx.WorkspaceManager.ActiveWorkspace;
 		workspace.Received(1).PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
-		workspace.Received(1).DoLayout();
 	}
 }

@@ -514,6 +514,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		}
 
+		if (doLayout && !action.DeferLayout)
+		{
+			DoLayout();
+		}
+
 		return doLayout;
 	}
 

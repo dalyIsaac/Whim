@@ -237,7 +237,6 @@ internal class CoreCommands : PluginCommands
 							Window = null
 						}
 					);
-					workspace.DoLayout();
 				},
 				condition: () =>
 				{
