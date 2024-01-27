@@ -27,3 +27,9 @@ To see how Whim compares to other Windows window managers, see [Whim vs. Other W
 ## Documentation
 
 You can find the Whim documentation at [dalyisaac.github.io/Whim](https://dalyisaac.github.io/Whim).
+
+## Thanks
+
+Whim is heavily inspired by the [workspacer](https://github.com/workspacer/workspacer) project - for more, see the [Inspiration](https://dalyisaac.github.io/Whim/getting-started/inspiration.html) page.
+
+Thank you to all the contributors to Whim for their help and support! 💖
