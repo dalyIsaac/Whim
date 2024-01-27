@@ -25,7 +25,7 @@ context.WorkspaceManager.Add(
     "Alt",
     new CreateLeafLayoutEngine[]
     {
-        (id) => new ColumnLayoutEngine(id)
+        (id) => new FocusLayoutEngine(id)
     }
 );
 ```
