@@ -34,6 +34,7 @@
     "globalMetadata": {
       "_appName": "Whim",
       "_appTitle": "Whim",
+      "_appFooter": "Copyright © 2021-2024 Isaac Daly",
       "_enableSearch": true,
       "pdf": false
     }
