@@ -35,6 +35,8 @@
       "_appName": "Whim",
       "_appTitle": "Whim",
       "_appFooter": "Copyright © 2021-2024 Isaac Daly",
+      "_appFaviconPath": "images/icon.ico",
+      "_appLogoPath": "images/icon.svg",
       "_enableSearch": true,
       "pdf": false
     }
