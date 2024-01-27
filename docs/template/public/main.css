@@ -1,0 +1,9 @@
+.name-only {
+  color: var(--bs-body-color) !important;
+  font-weight: bold !important;
+  margin: 0.4rem 0 0 0 !important;
+}
+
+.nav-link {
+  color: var(--bs-secondary-color) !important;
+}
