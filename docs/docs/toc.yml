@@ -1,56 +1,45 @@
 items:
+  - name: Getting Started
   - href: index.md
+  - href: getting-started/comparison.md
+  - href: getting-started/customize.md
+  - href: getting-started/plugins.md
+  - href: getting-started/inspiration.md
 
-  - name: Concepts
-  - href: concepts/layout-engines.md
-  - href: concepts/workspaces.md
-  - href: concepts/commands.md
-  - href: concepts/keybinds.md
-  - href: concepts/plugins.md
-  - href: concepts/filtering.md
-  - href: concepts/routing.md
-  - href: concepts/butler.md
-  - href: concepts/monitors.md
-  - href: concepts/logging.md
-
-  - name: Usage
-  - href: scripting.md
-  - href: layout-engines.md
-  - href: core-commands.md
+  - name: Customize
+  - href: customize/scripting.md
+  - href: customize/commands.md
+  - href: customize/keybinds.md
+  - href: customize/workspaces.md
+  - href: customize/layout-engines.md
+  - href: customize/routing.md
+  - href: customize/filtering.md
+  - href: customize/logging.md
+  - href: customize/styling.md
+  - href: customize/snippets.md
 
   - name: Plugins
-    items:
-      - href: plugins/bar.md
-      - href: plugins/command-palette.md
-      - href: plugins/floating-layout.md
-      - href: plugins/focus-indicator.md
-      - href: plugins/gaps.md
-      - href: plugins/layout-preview.md
-      - href: plugins/slice-layout.md
-      - href: plugins/tree-layout.md
-      - href: plugins/tree-layout-bar.md
-      - href: plugins/tree-layout-command-palette.md
-      - href: plugins/updater.md
-
-  - href: styling.md
-  - href: snippets.md
-
-  - name: Extra Topics
-  - href: comparison.md
+  - href: plugins/bar.md
+  - href: plugins/command-palette.md
+  - href: plugins/floating-layout.md
+  - href: plugins/focus-indicator.md
+  - href: plugins/gaps.md
+  - href: plugins/layout-preview.md
+  - href: plugins/slice-layout.md
+  - href: plugins/tree-layout.md
+  - href: plugins/tree-layout-bar.md
+  - href: plugins/tree-layout-command-palette.md
+  - href: plugins/updater.md
 
   - name: Architecture
-    items:
-      - href: concepts/inspiration.md
-      - href: concepts/context.md
-      - href: concepts/native-apis.md
-      - href: concepts/events.md
-      - href: concepts/threading.md
-      - href: concepts/window-manager.md
+  - href: architecture/context.md
+  - href: architecture/events.md
+  - href: architecture/native-apis.md
+  - href: architecture/threading.md
 
   - name: Contributing
-    items:
-      - href: contribute/issues.md
-      - href: contribute/environment-setup.md
-      - href: contribute/development.md
-      - href: contribute/docs.md
-      - href: contribute/releases.md
+  - href: contribute/issues.md
+  - href: contribute/environment-setup.md
+  - href: contribute/development.md
+  - href: contribute/docs.md
+  - href: contribute/releases.md

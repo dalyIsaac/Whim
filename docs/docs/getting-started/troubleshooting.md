@@ -1,8 +1,4 @@
-# Window Manager
-
-The "window manager" or <xref:Whim.IWindowManager> is used by Whim to manage <xref:Whim.IWindow>s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
-
-For example, the `WindowFocused` event is used by the `Whim.FocusIndicator` and `Whim.Bar` plugins to update their indications of the currently focused window.
+# Troubleshooting
 
 ## Managing troublesome windows
 
@@ -13,3 +9,9 @@ The <xref:Whim.IWindowManager> exposes an <xref:Whim.IFilterManager> called <xre
 If this doesn't work, dragging a window's edge will force a layout, which should fix the window's position. This is an area which could use further improvement.
 
 Examples of troublesome windows include Firefox and JetBrains Gateway.
+
+## Window launch locations
+
+Windows can launch windows in different locations. Additionally, interacting with some untracked windows like the Windows Taskbar can break focus tracking in Whim.
+
+To counteract this, the <xref:Whim.IRouterManager> has a <xref:Whim.IRouterManager.RouterOptions> property which can configure how new windows are routed - see the <xref:Whim.RouterOptions> enum.

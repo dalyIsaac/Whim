@@ -1,6 +1,6 @@
 # `IContext`
 
-The <xref:Whim.IContext> is thre core of Whim. It consists of managers which contain and control Whim's state and functionality.
+The <xref:Whim.IContext> is the core of Whim. It consists of managers which contain and control Whim's state and functionality.
 
 The <xref:Whim.IContext> consists of:
 
@@ -39,3 +39,26 @@ Items should make the objects which expose events have been initialized prior to
 
 > [!NOTE]
 > The user should not initialize items, and should leave this to Whim.
+
+## Butler
+
+The "butler" or <xref:Whim.IButler> in Whim is responsible for using the <xref:Whim.IWorkspaceManager> and <xref:Whim.IMonitorManager> to handle events from the [window manager](#window-manager) to its "butler pantry". The butler also provides access to methods via inheritance from its "butler chores" to manage the movement of windows between workspaces and monitors.
+
+The "butler pantry" or <xref:Whim.IButlerPantry> stores the assignment of windows to workspaces, and the assignment of workspaces to monitors.
+
+When [scripting](../customize/scripting.md), use `IButler` methods to move windows between workspaces and monitors.
+
+## Monitors
+
+Whim supports multiple monitors via the <xref:Whim.IMonitorManager>, which stores the current monitor configuration. `IMonitorManager` provides various methods including the ability get adjacent monitors, and the monitor which contains a given point.
+
+Each <xref:Whim.IMonitor> contains properties like its scale factor.
+
+> [!NOTE]
+> Whim does not support Windows' native "virtual" desktops, as they lack the ability to activate "desktops" independently of monitors.
+
+## Window Manager
+
+The "window manager" or <xref:Whim.IWindowManager> is used by Whim to manage <xref:Whim.IWindow>s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
+
+For example, the `WindowFocused` event is used by the `Whim.FocusIndicator` and `Whim.Bar` plugins to update their indications of the currently focused window.

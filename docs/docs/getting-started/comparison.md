@@ -1,6 +1,6 @@
-# Whim vs. Other Window Managers
+# Whim vs. other window managers
 
-## Comparison Table
+## Comparison table
 
 > [!NOTE]
 > The table was last updated in January 2024.
@@ -39,7 +39,7 @@ Definitions:
 
 Whim is the only window manager which is capable of both dynamic and manual management, with the ability to add custom layouts.
 
-## Comparison Notes
+## Comparison notes
 
 > [!WARNING]
 > Some of the information presented in following sections is subjective.
@@ -84,4 +84,4 @@ FancyZones is a utility for arranging and snapping windows into sets of zone loc
 
 [Repository](https://github.com/workspacer/workspacer) | [Documentation](https://workspacer.org)
 
-Workspacer is the inspiration for Whim - see more at [Inspiration](concepts/inspiration.md).
+Workspacer is the inspiration for Whim - see more at [Inspiration](./inspiration.md).

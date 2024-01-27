@@ -1,12 +1,25 @@
 # Layout Engines
 
+A "layout engine" or <xref:Whim.ILayoutEngine> in Whim is responsible for arranging windows in a workspace. Each workspace has a single active layout engine, and can cycle through different layout engines.
+
+There are two different types of layout engines:
+
+- proxy layout engines
+- leaf layout engines
+
+**Proxy layout engines** wrap other engines, and can be used to modify the behavior of other engines. For example, the [`Gaps` plugin](../plugins/gaps.md) will add gaps between windows - normally layout engines won't leave gaps between windows.
+
+**Leaf layout engines** are the lowest level layout engines, and are responsible for actually arranging windows.
+
+## Available layout engines
+
 | Engine                                    | TL;DR                                                                    |
 | ----------------------------------------- | ------------------------------------------------------------------------ |
 | [`FocusLayoutEngine`](#focuslayoutengine) | One window at a time                                                     |
 | [`SliceLayoutEngine`](#slicelayoutengine) | `Awesome`/`dwm`-style dynamic tiling (primary/stack, multi-column, etc.) |
 | [`TreeLayoutEngine`](#treelayoutengine)   | `i3`-style dynamic tiling (arbitrary grids)                              |
 
-## `FocusLayoutEngine`
+### `FocusLayoutEngine`
 
 <xref:Whim.FocusLayoutEngine> is a layout engine that displays one window at a time:
 
@@ -18,7 +31,7 @@ Windows which are not focused are minimized to the taskbar.
 
 <!-- TODO: gif -->
 
-## `SliceLayoutEngine`
+### `SliceLayoutEngine`
 
 <xref:Whim.SliceLayout.SliceLayoutEngine> is an `Awesome`/`dwm`-style layout engine, which arranges following a deterministic algorithm filling a grid configured in the config file.
 
@@ -31,7 +44,7 @@ Each `SliceLayoutEngine` is divided into a number of <xref:Whim.SliceLayout.IAre
 `OverflowArea`s are implicitly the last ordered area in the layout engine, in comparison to all `SliceArea`s.
 Internally, `SliceLayoutEngine` stores a list of <xref:Whim.IWindow>s. Each `IArea` corresponds to a "slice" of the `IWindow` list.
 
-### Defining `SliceLayoutEngine`s
+#### Defining `SliceLayoutEngine`s
 
 The `SliceLayouts` contains methods to create a few common layouts:
 
@@ -75,7 +88,7 @@ context.PluginManager.AddPlugin(sliceLayoutPlugin);
 
 <!-- TODO: gif -->
 
-## `TreeLayoutEngine`
+### `TreeLayoutEngine`
 
 <xref:Whim.TreeLayout.TreeLayoutEngine> is a layout that allows users to create arbitrary grid layouts, similar to `i3`. Unlike [`SliceLayoutEngine`](#slicelayoutengine), windows can can be added in any location at runtime.
 

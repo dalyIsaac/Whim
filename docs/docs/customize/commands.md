@@ -1,10 +1,10 @@
-# Core Commands
+# Commands
 
-Commands are used to interact with Whim at runtime. They can be used as [keybinds](./concepts/keybinds.md) or triggered from the [command palette](./plugins/command-palette.md) (activated with <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> by default).
+Commands are used to interact with Whim at runtime. They can be used as [keybinds](./keybinds.md) or triggered from the [Command Palette](../plugins/command-palette.md) (activated by <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> by default).
 
-For more about commands and how to create custom ones, see [Commands](./concepts/commands.md).
+Whim supports the creation of arbitrary commands using the <xref:Whim.ICommandManager> - see [Custom commands](#custom-commands).
 
-The following table lists all currently defined core commands and their default keybinds:
+## Core commands
 
 | Identifier                                  | Title                                                              | Keybind                                              |
 | ------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------- |
@@ -35,3 +35,32 @@ The following table lists all currently defined core commands and their default 
 | `whim.core.close_current_workspace`         | Close the current workspace                                        | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>W</kbd>      |
 | `whim.core.exit_whim`                       | Exit Whim                                                          | No default keybind                                   |
 | `whim.core.activate_workspace_{idx}`        | Activate workspace `{idx}` (where `idx` is an `int` 1, 2, ...9, 0) | <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>{idx}</kbd> |
+
+## Advanced usage
+
+### Namespaces
+
+Whim stores commands (<xref:Whim.ICommand>) in the <xref:Whim.ICommandManager>. Commands are objects with a unique identifier, title, and executable action.
+
+Command identifiers are namespaced:
+
+- `whim.core` is reserved for [core commands](#core-commands)
+- the string defined in the <xref:Whim.IPlugin.Name> property for plugins - for example, `whim.gaps` for [`GapsPlugin`](../plugins/gaps.md)
+- `whim.custom` is reserved for [custom user-defined commands](#custom-commands)
+
+### Custom commands
+
+Custom commands are automatically added to the `whim.custom` namespace. For example, the following command closes the current tracked window:
+
+```csharp
+// Create the command.
+context.CommandManager.Add(
+    // Automatically namespaced to `whim.custom`.
+    identifier: "close_window",
+    title: "Close focused window",
+    callback: () => context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Close()
+);
+
+// Create an associated keybind.
+context.KeybindManager.SetKeybind("whim.custom.close_window", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_D));
+```

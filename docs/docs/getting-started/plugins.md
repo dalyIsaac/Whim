@@ -11,13 +11,13 @@ context.PluginManager.AddPlugin(barPlugin);
 | Plugin                                                                   | TL;DR                                                                                             |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
 | [Bar](../plugins/bar.md)                                                 | Adds a configurable bar to the top of each screen                                                 |
-| [Command Palette](../plugins/command-palette.md)                         | Fuzzy command palette filled with [commands](commands.md)                                         |
+| [Command Palette](../plugins/command-palette.md)                         | Fuzzy command palette filled with [commands](../customize/commands.md)                            |
 | [Floating Layout](../plugins/floating-layout.md)                         | Lets windows float outside other layout engines                                                   |
 | [Focus](../plugins/focus-indicator.md)                                   | Adds a border around the current window                                                           |
 | [Gaps](../plugins/gaps.md)                                               | Adds gaps between windows                                                                         |
 | [Layout Preview](../plugins/layout-preview.md)                           | Shows a preview when dragging windows                                                             |
-| [Slice Layout](../plugins/slice-layout.md)                               | Plugin for the [`SliceLayoutEngine`](../layout-engines.md#slicelayoutengine)                      |
-| [Tree Layout](../plugins/tree-layout.md)                                 | Plugin for the [`TreeLayoutEngine`](../layout-engines.md#treelayoutengine)                        |
+| [Slice Layout](../plugins/slice-layout.md)                               | Plugin for the [`SliceLayoutEngine`](../customize/layout-engines.md#slicelayoutengine)            |
+| [Tree Layout](../plugins/tree-layout.md)                                 | Plugin for the [`TreeLayoutEngine`](../customize//layout-engines.md#treelayoutengine)             |
 | [Tree Layout Bar](../plugins/tree-layout-bar.md)                         | Provides a widget for the [Bar](../plugins/bar.md), for the `TreeLayoutEngine`                    |
 | [Tree Layout Command Palette](../plugins/tree-layout-command-palette.md) | Adds `TreeLayoutEngine`-specific commands to the [Command Palette](../plugins/command-palette.md) |
 | [Updater](../plugins/updater.md)                                         | Plugin to automatically update Whim                                                               |

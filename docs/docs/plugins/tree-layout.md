@@ -4,7 +4,7 @@
 
 <xref:Whim.TreeLayout.TreeLayoutPlugin> does not load the <xref:Whim.TreeLayout.TreeLayoutEngine> - that is done when creating a workspace via <xref:Whim.IWorkspaceManager.Add(System.String,System.Collections.Generic.IEnumerable{Whim.CreateLeafLayoutEngine})>.
 
-For more about the `TreeLayoutEngine`, see the [Layout Engines](../layout-engines.md#treelayoutengine) page.
+For more about the `TreeLayoutEngine`, see the [Layout Engines](../customize/layout-engines.md#treelayoutengine) page.
 
 The [Tree Layout Bar plugin](./tree-layout-bar.md) provides a widget for the bar to set the direction to add the next window.
 

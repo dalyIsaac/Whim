@@ -4,7 +4,7 @@
 
 <xref:Whim.SliceLayout.SliceLayoutPlugin> does not load the <xref:Whim.SliceLayout.SliceLayoutEngine> - that is done when creating a workspace via <xref:Whim.IWorkspaceManager.Add(System.String,System.Collections.Generic.IEnumerable{Whim.CreateLeafLayoutEngine})>.
 
-For more about the `SliceLayoutEngine`, see the [Layout Engines](../layout-engines.md#slicelayoutengine) page.
+For more about the `SliceLayoutEngine`, see the [Layout Engines](../customize//layout-engines.md#slicelayoutengine) page.
 
 ## Example Config
 

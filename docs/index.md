@@ -1,3 +1,3 @@
 ---
-redirect_url: docs/
+redirect_url: /docs/
 ---
