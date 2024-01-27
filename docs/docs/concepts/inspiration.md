@@ -17,7 +17,7 @@ Whim's <xref:Whim.ILayoutEngine>s also have methods for directional operations, 
 
 - <xref:Whim.ILayoutEngine.FocusWindowInDirection(Whim.Direction,Whim.IWindow)>
 - <xref:Whim.ILayoutEngine.SwapWindowInDirection(Whim.Direction,Whim.IWindow)>
-- <xref:Whim.IWorkspace.MoveWindowEdgesInDirection(Whim.Direction,Whim.IPoint{System.Double},Whim.IWindow)>
+- <xref:Whim.IWorkspace.MoveWindowEdgesInDirection(Whim.Direction,Whim.IPoint{System.Double},Whim.IWindow,System.Boolean)>
 
 Whim's <xref:Whim.ILayoutEngine> does not have the concept of a "primary area". However, this can be provided by `ILayoutEngine` implementations - for example, the <xref:Whim.SliceLayout.SliceLayoutEngine>.
 
