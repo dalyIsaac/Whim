@@ -66,15 +66,63 @@
     <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="ExceptionWindow.xaml" />
+    <Content Remove="Assets\LargeTile.scale-100.png" />
+    <Content Remove="Assets\LargeTile.scale-125.png" />
+    <Content Remove="Assets\LargeTile.scale-150.png" />
+    <Content Remove="Assets\LargeTile.scale-200.png" />
+    <Content Remove="Assets\LargeTile.scale-400.png" />
+    <Content Remove="Assets\LockScreenLogo.scale-200.png" />
+    <Content Remove="Assets\SmallTile.scale-100.png" />
+    <Content Remove="Assets\SmallTile.scale-125.png" />
+    <Content Remove="Assets\SmallTile.scale-150.png" />
+    <Content Remove="Assets\SmallTile.scale-200.png" />
+    <Content Remove="Assets\SmallTile.scale-400.png" />
+    <Content Remove="Assets\SplashScreen.scale-100.png" />
+    <Content Remove="Assets\SplashScreen.scale-125.png" />
+    <Content Remove="Assets\SplashScreen.scale-150.png" />
+    <Content Remove="Assets\SplashScreen.scale-200.png" />
+    <Content Remove="Assets\SplashScreen.scale-400.png" />
+    <Content Remove="Assets\Square150x150Logo.scale-100.png" />
+    <Content Remove="Assets\Square150x150Logo.scale-125.png" />
+    <Content Remove="Assets\Square150x150Logo.scale-150.png" />
+    <Content Remove="Assets\Square150x150Logo.scale-200.png" />
+    <Content Remove="Assets\Square150x150Logo.scale-400.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-16.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-24.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-256.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-32.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-48.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-100.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-125.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-150.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-200.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-400.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-16.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-24.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-256.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-48.png" />
+    <Content Remove="Assets\StoreLogo.png" />
+    <Content Remove="Assets\StoreLogo.scale-100.png" />
+    <Content Remove="Assets\StoreLogo.scale-125.png" />
+    <Content Remove="Assets\StoreLogo.scale-150.png" />
+    <Content Remove="Assets\StoreLogo.scale-200.png" />
+    <Content Remove="Assets\StoreLogo.scale-400.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-100.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-125.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-150.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-400.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <None Remove="Assets\Icon.ico" />
+    <None Remove="ExceptionWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" />
@@ -103,12 +151,6 @@
     <ProjectReference Include="..\Whim\Whim.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Assets\StoreLogo.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="ExceptionWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -117,7 +159,7 @@
   <Target Name="CopyBarAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
-      <BarDestinationFile Include="@(BarSourceFile-&gt;'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <BarDestinationFile Include="@(BarSourceFile->'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(BarSourceFile)" DestinationFiles="@(BarDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.Bar\" SkipUnchangedFiles="true" />
@@ -126,7 +168,7 @@
   <Target Name="CopyCommandPaletteAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <CommandPaletteSourceFile Include="$(SolutionDir)\src\Whim.CommandPalette\$(OutDir)\Whim.CommandPalette\**\*" />
-      <CommandPaletteDestinationFile Include="@(CommandPaletteSourceFile-&gt;'$(TargetDir)plugins\Whim.CommandPalette\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <CommandPaletteDestinationFile Include="@(CommandPaletteSourceFile->'$(TargetDir)plugins\Whim.CommandPalette\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(CommandPaletteSourceFile)" DestinationFiles="@(CommandPaletteDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.CommandPalette\$(OutDir)Whim.CommandPalette.dll" DestinationFolder="$(TargetDir)plugins\Whim.CommandPalette\" SkipUnchangedFiles="true" />
@@ -139,7 +181,7 @@
   <Target Name="CopyFocusIndicatorAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <FocusIndicatorSourceFile Include="$(SolutionDir)\src\Whim.FocusIndicator\$(OutDir)\Whim.FocusIndicator\**\*" />
-      <FocusIndicatorDestinationFile Include="@(FocusIndicatorSourceFile-&gt;'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <FocusIndicatorDestinationFile Include="@(FocusIndicatorSourceFile->'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(FocusIndicatorSourceFile)" DestinationFiles="@(FocusIndicatorDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(OutDir)Whim.FocusIndicator.dll" DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" SkipUnchangedFiles="true" />
@@ -152,7 +194,7 @@
   <Target Name="CopyLayoutPreviewAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <LayoutPreviewSourceFile Include="$(SolutionDir)\src\Whim.LayoutPreview\$(OutDir)\Whim.LayoutPreview\**\*" />
-      <LayoutPreviewDestinationFile Include="@(LayoutPreviewSourceFile-&gt;'$(TargetDir)plugins\Whim.LayoutPreview\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <LayoutPreviewDestinationFile Include="@(LayoutPreviewSourceFile->'$(TargetDir)plugins\Whim.LayoutPreview\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(LayoutPreviewSourceFile)" DestinationFiles="@(LayoutPreviewDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.LayoutPreview\$(OutDir)Whim.LayoutPreview.dll" DestinationFolder="$(TargetDir)plugins\Whim.LayoutPreview\" SkipUnchangedFiles="true" />
@@ -169,7 +211,7 @@
   <Target Name="CopyTreeLayoutBarAfterBuild" AfterTargets="Build;Publish;CopyBarAfterBuild;CopyTreeLayoutAfterBuild">
     <ItemGroup>
       <TreeLayoutBarSourceFile Include="$(SolutionDir)\src\Whim.TreeLayout.Bar\$(OutDir)\Whim.TreeLayout.Bar\**\*" />
-      <TreeLayoutBarDestinationFile Include="@(TreeLayoutBarSourceFile-&gt;'$(TargetDir)plugins\Whim.TreeLayout.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <TreeLayoutBarDestinationFile Include="@(TreeLayoutBarSourceFile->'$(TargetDir)plugins\Whim.TreeLayout.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(TreeLayoutBarSourceFile)" DestinationFiles="@(TreeLayoutBarDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout.Bar\$(OutDir)Whim.TreeLayout.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.Bar\" SkipUnchangedFiles="true" />
@@ -182,9 +224,12 @@
   <Target Name="CopyUpdaterAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <UpdaterSourceFile Include="$(SolutionDir)\src\Whim.Updater\$(OutDir)\Whim.Updater\**\*" />
-      <UpdaterDestinationFile Include="@(UpdaterSourceFile-&gt;'$(TargetDir)plugins\Whim.Updater\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <UpdaterDestinationFile Include="@(UpdaterSourceFile->'$(TargetDir)plugins\Whim.Updater\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(UpdaterSourceFile)" DestinationFiles="@(UpdaterDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.Updater\$(OutDir)Whim.Updater.dll" DestinationFolder="$(TargetDir)plugins\Whim.Updater\" SkipUnchangedFiles="true" />
   </Target>
+  <ItemGroup>
+    <_DeploymentManifestIconFile Remove="Assets\Icon.ico" />
+  </ItemGroup>
 </Project>
