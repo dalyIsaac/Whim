@@ -1,4 +1,4 @@
-# Focus Indicator
+# Focus Indicator Plugin
 
 The <xref:Whim.FocusIndicator.FocusIndicatorPlugin> adds a border around the current window which Whim has tracked as having focus. Various options can be configured using the <xref:Whim.FocusIndicator.FocusIndicatorConfig>.
 
