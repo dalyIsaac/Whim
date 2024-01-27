@@ -50,12 +50,12 @@ When [scripting](../customize/scripting.md), use `IButler` methods to move windo
 
 ## Workspaces
 
-Some <xref:IWorkspace> methods refer to `Workspace`-specific state:
+Some <xref:Whim.IWorkspace> methods refer to `Workspace`-specific state:
 
 - the currently active layout engine
 - moving/focusing windows in a workspace
 
-These methods will generally call <xref:Whim.IWorkspace.DoLayout()>.
+These methods will generally call <xref:Whim.IWorkspace.DoLayout>.
 
 Methods which are typically used for internal Whim functionality will not call `DoLayout()`. These methods will include comments in the documentation warning against using them in scripts or plugins. Misuse of these methods can lead to unexpected behavior, as workspaces become out of sync with the [butler pantry](#butler).
 
