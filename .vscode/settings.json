@@ -1,7 +1,7 @@
 {
-  "editor.insertSpaces": false,
   "editor.formatOnSave": true,
   "[csharp]": {
+    "editor.insertSpaces": false,
     "editor.defaultFormatter": "csharpier.csharpier-vscode"
   },
   "[json]": {
@@ -11,13 +11,15 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[yaml]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 2,
     "editor.autoIndent": "keep",
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.quickSuggestions": {
