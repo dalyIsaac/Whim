@@ -44,15 +44,34 @@ public interface IMonitor
 public static class MonitorHelpers
 {
 	/// <summary>
-	/// Converts the <paramref name="point"/> from the system's coordinate system to the unit square.
+	/// Converts the <paramref name="point"/> from the system's coordinate system to the unit square,
+	/// where the unit square is the monitor's working area, ignoring the origin of the monitor.
+	/// This is good for converting deltas.
 	/// </summary>
 	/// <param name="monitor"></param>
-	/// <param name="point">The point to translate.</param>
+	/// <param name="point"></param>
+	/// <returns></returns>
+	public static IPoint<double> NormalizeDeltaPoint(this IRectangle<int> monitor, IPoint<int> point) =>
+		new Point<double>() { X = (double)point.X / monitor.Width, Y = (double)point.Y / monitor.Height };
+
+	/// <summary>
+	/// Converts the <paramref name="point"/> from the system's coordinate system to the unit square,
+	/// where the unit square is the monitor's working area, accounting for the origin of the monitor.
+	/// This is good for converting absolute positions.
+	/// </summary>
+	/// <param name="monitor"></param>
+	/// <param name="point">
+	/// The point to translate, in the system's coordinate system.
+	/// </param>
 	/// <param name="respectSign">
 	/// Whether to respect the sign. For example, values in [-infinity, 0] will become [-1, 0].
 	/// </param>
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
-	public static IPoint<double> ToUnitSquare(this IRectangle<int> monitor, IPoint<int> point, bool respectSign = false)
+	public static IPoint<double> NormalizeAbsolutePoint(
+		this IRectangle<int> monitor,
+		IPoint<int> point,
+		bool respectSign = false
+	)
 	{
 		Debug.Assert(monitor.Width != 0);
 		Debug.Assert(monitor.Height != 0);
@@ -75,7 +94,7 @@ public static class MonitorHelpers
 	/// <param name="monitor"></param>
 	/// <param name="rectangle">The point to translate.</param>
 	/// <returns>The converted point, where x and y are in the range [0, 1].</returns>
-	public static IRectangle<double> ToUnitSquare(this IRectangle<int> monitor, IRectangle<int> rectangle)
+	public static IRectangle<double> NormalizeRectangle(this IRectangle<int> monitor, IRectangle<int> rectangle)
 	{
 		Debug.Assert(monitor.Width != 0);
 		Debug.Assert(monitor.Height != 0);

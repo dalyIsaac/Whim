@@ -98,7 +98,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 
 		// Convert the rectangle to a unit square rectangle.
 		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(windowState.Rectangle);
-		IRectangle<double> unitSquareRect = monitor.WorkingArea.ToUnitSquare(windowState.Rectangle);
+		IRectangle<double> unitSquareRect = monitor.WorkingArea.NormalizeRectangle(windowState.Rectangle);
 
 		workspace.MoveWindowToPoint(window, unitSquareRect);
 	}

@@ -402,7 +402,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			DoLayout();
 		}
 
-		return true;
+		return changed;
 	}
 
 	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false)
