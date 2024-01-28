@@ -29,7 +29,7 @@ To reorder windows, calling <xref:Whim.ILayoutEngine.SwapWindowInDirection(Whim.
 
 Windows which are not focused are minimized to the taskbar.
 
-<!-- TODO: gif -->
+![FocusLayoutEngine demo](../../images/focus-layout-demo.gif)
 
 ### `SliceLayoutEngine`
 
@@ -86,7 +86,7 @@ SliceLayoutPlugin sliceLayoutPlugin = new(context);
 context.PluginManager.AddPlugin(sliceLayoutPlugin);
 ```
 
-<!-- TODO: gif -->
+![SliceLayoutEngine demo](../../images/slice-layout-demo.gif)
 
 ### `TreeLayoutEngine`
 
@@ -99,4 +99,4 @@ TreeLayoutPlugin treeLayoutPlugin = new(context);
 context.PluginManager.AddPlugin(treeLayoutPlugin);
 ```
 
-<!-- TODO: gif -->
+![TreeLayoutEngine demo](../../images/tree-layout-demo.gif)
