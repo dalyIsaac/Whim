@@ -10,6 +10,7 @@ namespace Whim.Bar;
 /// </summary>
 internal class BatteryWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
+	private readonly IContext _context;
 	private bool _disposedValue;
 
 	public string RemainingChargePercent { get; private set; }
@@ -18,8 +19,9 @@ internal class BatteryWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	public BatteryWidgetViewModel()
+	public BatteryWidgetViewModel(IContext context)
 	{
+		_context = context;
 		PowerManager.BatteryStatusChanged += Update;
 		PowerManager.EnergySaverStatusChanged += Update;
 		PowerManager.RemainingChargePercentChanged += Update;
@@ -37,8 +39,11 @@ internal class BatteryWidgetViewModel : INotifyPropertyChanged, IDisposable
 			PowerManager.EnergySaverStatus == EnergySaverStatus.On
 		);
 
-		OnPropertyChanged(nameof(RemainingChargePercent));
-		OnPropertyChanged(nameof(Icon));
+		_context.NativeManager.TryEnqueue(() =>
+		{
+			OnPropertyChanged(nameof(RemainingChargePercent));
+			OnPropertyChanged(nameof(Icon));
+		});
 	}
 
 	protected virtual void OnPropertyChanged(string propertyName)

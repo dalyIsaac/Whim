@@ -12,9 +12,9 @@ public partial class BatteryWidget : UserControl
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ActiveLayoutWidget"/> class.
 	/// </summary>
-	public BatteryWidget(IContext config, IMonitor monitor)
+	internal BatteryWidget(IContext context, IMonitor monitor)
 	{
-		ViewModel = new BatteryWidgetViewModel();
+		ViewModel = new BatteryWidgetViewModel(context);
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "Battery/BatteryWidget");
 	}
 
