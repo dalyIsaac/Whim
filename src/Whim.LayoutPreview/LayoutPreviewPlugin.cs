@@ -18,7 +18,9 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	/// </summary>
 	public IWindow? DraggedWindow { get; private set; }
 
-	/// <inheritdoc/>
+	/// <summary>
+	/// <c>whim.layout_preview</c>
+	/// </summary>
 	public string Name => "whim.layout_preview";
 
 	/// <inheritdoc/>

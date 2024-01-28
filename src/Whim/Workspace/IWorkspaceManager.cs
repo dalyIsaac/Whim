@@ -4,10 +4,11 @@ using System.Collections.Generic;
 namespace Whim;
 
 /// <summary>
-/// Container responsible for mapping <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s and
-/// <see cref="IWindow"/>s.
+/// Container responsible for the creation and removal of <see cref="IWorkspace"/>s. Events for
+/// workspaces are exposed here.
 ///
-/// It is responsible for the creation and destruction of <see cref="IWorkspace"/>s.
+/// To activate a workspace, or changee the mapping between workspaces and monitors, use the
+/// <see cref="IButler"/>.
 /// </summary>
 public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 {
@@ -90,10 +91,17 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <returns>
 	/// <list type="bullet">
 	/// <item>
-	/// <description>If <see cref="Initialize"/> has not been called, returns <see langword="null"/>.</description>
+	/// <description>
+	/// If <see cref="Initialize"/> has not been called, returns <see langword="null"/>. (i.e., will)
+	/// return null while running in the config phase.
+	/// </description>
 	/// </item>
 	/// <item>
-	/// <description>If a workspace cannot be created, returns <see langword="null"/>.</description>
+	/// <description>
+	/// If a workspace cannot be created due to <paramref name="createLayoutEngines"/> being
+	/// <see langword="null"/> and <see cref="CreateLayoutEngines"/> returning no layout engines,
+	/// returns <see langword="null"/>.
+	/// </description>
 	/// </item>
 	/// <item>
 	/// <description>Otherwise, returns the created workspace.</description>

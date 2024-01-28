@@ -10,7 +10,9 @@ public class TreeLayoutBarPlugin : IPlugin
 {
 	private readonly ITreeLayoutPlugin _plugin;
 
-	/// <inheritdoc/>
+	/// <summary>
+	/// <c>whim.tree_layout.bar</c>
+	/// </summary>
 	public string Name => "whim.tree_layout.bar";
 
 	/// <inheritdoc/>

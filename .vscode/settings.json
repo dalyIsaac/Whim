@@ -1,7 +1,7 @@
 {
-  "editor.insertSpaces": false,
   "editor.formatOnSave": true,
   "[csharp]": {
+    "editor.insertSpaces": false,
     "editor.defaultFormatter": "csharpier.csharpier-vscode"
   },
   "[json]": {
@@ -12,6 +12,21 @@
   },
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.autoIndent": "keep",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    }
   },
   "files.exclude": {
     "src/Whim*/bin": true,

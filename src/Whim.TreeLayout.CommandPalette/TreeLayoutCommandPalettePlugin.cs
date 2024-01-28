@@ -12,7 +12,9 @@ public class TreeLayoutCommandPalettePlugin : IPlugin
 	private readonly ITreeLayoutPlugin _treeLayoutPlugin;
 	private readonly ICommandPalettePlugin _commandLayoutPlugin;
 
-	/// <inheritdoc/>
+	/// <summary>
+	/// <c>whim.tree_layout.command_palette</c>
+	/// </summary>
 	public string Name => "whim.tree_layout.command_palette";
 
 	/// <summary>

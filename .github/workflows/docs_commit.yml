@@ -1,0 +1,59 @@
+name: docs-commit
+
+on:
+  pull_request:
+    paths:
+      - docs/**
+      - toc.yml
+
+env:
+  # We install the packages to the D:\ drive to avoid the slow IO on the C:\ drive.
+  # Based on https://github.com/actions/setup-dotnet/issues/260#issuecomment-1790162905
+  NUGET_PACKAGES: D:\a\.nuget\packages
+  PLATFORM: x64
+  CONFIGURATION: Release
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v15
+        with:
+          config: .markdownlint-cli2.jsonc
+          globs: |
+            "**/*.md"
+            "!.github/**/*"
+
+  build:
+    # Run on Windows since docfx will build Whim to generate the API docs.
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ env.PLATFORM }}-nuget-${{ hashFiles('Directory.Packages.props') }}
+          restore-keys: |
+            ${{ env.PLATFORM }}-nuget-${{ hashFiles('Directory.Packages.props') }}
+            ${{ env.PLATFORM }}-nuget-
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore Whim.sln -p:Configuration=$env:Configuration
+        env:
+          Configuration: ${{ env.CONFIGURATION }}
+
+      - name: Install dotnet tools
+        run: |
+          dotnet tool restore
+
+      - name: Run docfx
+        run: dotnet docfx .\docs\docfx.json

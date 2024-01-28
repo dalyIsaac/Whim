@@ -16,7 +16,9 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 		_context = context;
 	}
 
-	/// <inheritdoc />
+	/// <summary>
+	/// <c>whim.slice_layout</c>
+	/// </summary>
 	public string Name => "whim.slice_layout";
 
 	/// <inheritdoc />

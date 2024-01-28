@@ -357,3 +357,7 @@ bin/whim-install.exe
 
 # Rider
 .idea/
+
+# docfx
+api
+_site

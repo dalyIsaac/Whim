@@ -42,6 +42,9 @@ public record WindowPosState
 	}
 }
 
+/// <summary>
+/// Manager to defer the setting of window positions.
+/// </summary>
 internal interface IDeferWindowPosManager
 {
 	/// <summary>

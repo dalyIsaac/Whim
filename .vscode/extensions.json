@@ -7,7 +7,15 @@
     "csharpier.csharpier-vscode",
     "esbenp.prettier-vscode",
     "Chouzz.vscode-innosetup",
-    "ms-dotnettools.csdevkit"
+    "ms-dotnettools.csdevkit",
+    "bierner.github-markdown-preview",
+    "yzhang.markdown-all-in-one",
+    "bierner.markdown-checkbox",
+    "bierner.markdown-footnotes",
+    "bierner.markdown-preview-github-styles",
+    "bierner.markdown-mermaid",
+    "bierner.markdown-yaml-preamble",
+    "davidanson.vscode-markdownlint"
   ],
   // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
   "unwantedRecommendations": []

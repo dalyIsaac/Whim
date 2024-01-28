@@ -13,6 +13,12 @@
       "commands": [
         "dotnet-csharpier"
       ]
+    },
+    "docfx": {
+      "version": "2.75.2",
+      "commands": [
+        "docfx"
+      ]
     }
   }
 }

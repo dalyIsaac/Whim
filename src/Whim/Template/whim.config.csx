@@ -110,8 +110,7 @@ void DoConfig(IContext context)
 		(id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
 		(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
 		(id) => new FocusLayoutEngine(id),
-		(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
-		(id) => new ColumnLayoutEngine(id)
+		(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id)
 	};
 }
 

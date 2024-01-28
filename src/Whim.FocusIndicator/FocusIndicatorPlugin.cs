@@ -14,7 +14,9 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	private DispatcherTimer? _dispatcherTimer;
 	private bool _disposedValue;
 
-	/// <inheritdoc />
+	/// <summary>
+	/// <c>whim.focus_indicator</c>
+	/// </summary>
 	public string Name => "whim.focus_indicator";
 
 	/// <inheritdoc />

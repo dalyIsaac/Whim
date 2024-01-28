@@ -1,8 +1,6 @@
-# Development Process
+# Releases
 
 The main development branch is `main`.
-
-## Releases
 
 Whim has the following release channels:
 
@@ -17,17 +15,17 @@ The release format is compatible with [Semantic Versioning 2.0](https://semver.o
 
 Scripts will generally return the release string with no leading `v`. Builds will similarly have no leading `v`. However, **GitHub releases** (and thus tags) **will have a leading `v`**.
 
-### Alpha Releases
+## Alpha Releases
 
 `alpha` releases are created by making a commit to `main`, typically via a squashed pull request. This will run [`release.yml`](#releaseyml).
 
-### Beta Releases
+## Beta Releases
 
 `beta` releases are created by making a commit to a release branch. This will run [`release.yml`](#releaseyml).
 
 `beta` release branches are created by running [`scripts\Create-ReleaseBranch.ps1`](#create-releasebranchps1).
 
-### Stable Releases
+## Stable Releases
 
 `stable` releases are created by running [`scripts\Create-StableRelease.ps1`](#create-stablereleaseps1) locally.
 

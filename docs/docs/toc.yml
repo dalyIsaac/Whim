@@ -1,0 +1,45 @@
+items:
+  - name: Getting Started
+  - href: index.md
+  - href: getting-started/comparison.md
+  - href: getting-started/customize.md
+  - href: getting-started/plugins.md
+  - href: getting-started/inspiration.md
+
+  - name: Customize
+  - href: customize/scripting.md
+  - href: customize/commands.md
+  - href: customize/keybinds.md
+  - href: customize/workspaces.md
+  - href: customize/layout-engines.md
+  - href: customize/routing.md
+  - href: customize/filtering.md
+  - href: customize/logging.md
+  - href: customize/styling.md
+  - href: customize/snippets.md
+
+  - name: Plugins
+  - href: plugins/bar.md
+  - href: plugins/command-palette.md
+  - href: plugins/floating-layout.md
+  - href: plugins/focus-indicator.md
+  - href: plugins/gaps.md
+  - href: plugins/layout-preview.md
+  - href: plugins/slice-layout.md
+  - href: plugins/tree-layout.md
+  - href: plugins/tree-layout-bar.md
+  - href: plugins/tree-layout-command-palette.md
+  - href: plugins/updater.md
+
+  - name: Architecture
+  - href: architecture/context.md
+  - href: architecture/events.md
+  - href: architecture/native-apis.md
+  - href: architecture/threading.md
+
+  - name: Contributing
+  - href: contribute/issues.md
+  - href: contribute/environment-setup.md
+  - href: contribute/development.md
+  - href: contribute/docs.md
+  - href: contribute/releases.md

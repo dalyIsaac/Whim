@@ -73,13 +73,13 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Adds the window to the workspace.
 	/// </summary>
-	/// <param name="window"></param>
 	/// <remarks>
 	/// Be careful of calling this outside of Whim's core code. It may cause the workspace to
 	/// become out of sync with the <see cref="IButlerPantry"/>.
 	///
 	/// <see cref="DoLayout"/> is not called in this method.
 	/// </remarks>
+	/// <param name="window"></param>
 	/// <returns>Whether the <paramref name="window"/> was added.</returns>
 	bool AddWindow(IWindow window);
 
@@ -198,7 +198,6 @@ public interface IWorkspace : IDisposable
 	bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false);
 	#endregion
 
-	#region MinimizeWindow
 	/// <summary>
 	/// Called when a window is being minimized - i.e., the window size will become
 	/// <see cref="WindowSize.Minimized"/>.
@@ -229,7 +228,6 @@ public interface IWorkspace : IDisposable
 	/// <param name="window"></param>
 	/// <returns></returns>
 	void MinimizeWindowEnd(IWindow window);
-	#endregion
 
 	#region PerformCustomLayoutEngineAction
 	/// <summary>
