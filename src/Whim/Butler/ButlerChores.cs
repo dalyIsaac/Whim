@@ -141,7 +141,7 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
 
 		// Normalize `pixelsDeltas` into the unit square.
-		IPoint<double> normalized = monitor.WorkingArea.ToUnitSquare(pixelsDeltas, respectSign: true);
+		IPoint<double> normalized = monitor.WorkingArea.NormalizeDeltaPoint(pixelsDeltas);
 
 		Logger.Debug($"Normalized point: {normalized}");
 		workspace.MoveWindowEdgesInDirection(edges, normalized, window, deferLayout: false);
@@ -267,7 +267,7 @@ internal class ButlerChores : IButlerChores
 		}
 
 		// Normalize `point` into the unit square.
-		IPoint<double> normalized = targetMonitor.WorkingArea.ToUnitSquare(point);
+		IPoint<double> normalized = targetMonitor.WorkingArea.NormalizeAbsolutePoint(point);
 
 		Logger.Debug(
 			$"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor} at normalized point {normalized}"

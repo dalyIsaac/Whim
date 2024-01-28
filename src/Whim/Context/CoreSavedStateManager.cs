@@ -85,7 +85,7 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 			foreach (IWindowState windowState in workspace.ActiveLayoutEngine.DoLayout(fakeMonitorRect, monitor))
 			{
 				Rectangle<double> scaled =
-					(Rectangle<double>)MonitorHelpers.ToUnitSquare(fakeMonitorRect, windowState.Rectangle);
+					(Rectangle<double>)MonitorHelpers.NormalizeRectangle(fakeMonitorRect, windowState.Rectangle);
 				savedWindows.Add(new SavedWindow(windowState.Window.Handle, scaled));
 			}
 

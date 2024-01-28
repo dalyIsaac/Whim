@@ -159,7 +159,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 		}
 
 		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualRectangle);
-		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.ToUnitSquare(newActualRectangle);
+		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.NormalizeRectangle(newActualRectangle);
 		if (newUnitSquareRectangle.Equals(oldRectangle))
 		{
 			Logger.Debug($"Rectangle for window {window} has not changed");
