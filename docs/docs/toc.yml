@@ -1,6 +1,6 @@
 items:
   - name: Getting Started
-  - href: index.md
+  - href: ../index.md
   - href: getting-started/comparison.md
   - href: getting-started/customize.md
   - href: getting-started/plugins.md
