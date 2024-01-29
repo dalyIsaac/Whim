@@ -333,6 +333,21 @@ public class WindowTests
 	}
 
 	[Theory, AutoSubstituteData<WindowCustomization>]
+	internal void Restore(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		ctx.NativeManager.RestoreWindow(Arg.Any<HWND>());
+
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
+
+		// When
+		window.Restore();
+
+		// Then
+		ctx.NativeManager.Received(1).RestoreWindow(Arg.Any<HWND>());
+	}
+
+	[Theory, AutoSubstituteData<WindowCustomization>]
 	internal void CreateWindow_Null(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given

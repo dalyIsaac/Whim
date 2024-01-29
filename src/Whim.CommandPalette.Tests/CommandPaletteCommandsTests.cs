@@ -363,6 +363,7 @@ public class CommandPaletteCommandsTests
 		// Given the window is in a workspace.
 		Wrapper wrapper = new();
 		IWindow window = wrapper.Windows[0];
+		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
 		wrapper.Context.Butler.GetMonitorForWorkspace(wrapper.Workspace).Returns(Substitute.For<IMonitor>());
 
 		window.IsMinimized.Returns(isMinimized);
@@ -386,6 +387,7 @@ public class CommandPaletteCommandsTests
 		// Given the window is in a workspace.
 		Wrapper wrapper = new();
 		IWindow window = wrapper.Windows[0];
+		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
 		wrapper.Context.Butler.GetMonitorForWorkspace(wrapper.Workspace).Returns((IMonitor?)null);
 
 		window.IsMinimized.Returns(isMinimized);
