@@ -96,8 +96,8 @@ public class CommandPaletteCommands : PluginCommands
 						new MenuVariantConfig()
 						{
 							Hint = "Select window",
-							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(
-								w => RemoveWindowCommandCreator(w)
+							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(w =>
+								RemoveWindowCommandCreator(w)
 							),
 							ConfirmButtonText = "Remove"
 						}
@@ -160,16 +160,13 @@ public class CommandPaletteCommands : PluginCommands
 			.OrderBy(w => w.Title);
 
 		return windows
-			.Select(
-				w =>
-					new SelectOption()
-					{
-						Id = $"{PluginName}.move_multiple_windows_to_workspace.{w.Title}",
-						Title = w.Title,
-						IsEnabled = true,
-						IsSelected = false
-					}
-			)
+			.Select(w => new SelectOption()
+			{
+				Id = $"{PluginName}.move_multiple_windows_to_workspace.{w.Title}",
+				Title = w.Title,
+				IsEnabled = true,
+				IsSelected = false
+			})
 			.ToArray();
 	}
 
@@ -261,19 +258,7 @@ public class CommandPaletteCommands : PluginCommands
 					return;
 				}
 
-				if (_context.WorkspaceManager.ActiveWorkspace.Equals(workspace))
-				{
-					// The workspace is currently active.
-					FocusWindow(window);
-					return;
-				}
-
-				if (_context.Butler.GetMonitorForWorkspace(workspace) is IMonitor monitor)
-				{
-					// The workspace is not active, but is visible.
-					_context.Butler.Activate(workspace, monitor);
-				}
-				else
+				if (_context.Butler.GetMonitorForWorkspace(workspace) is null)
 				{
 					// The workspace is not active, and is not visible.
 					_context.Butler.Activate(workspace);
