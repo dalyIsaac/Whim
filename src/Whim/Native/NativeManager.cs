@@ -84,6 +84,12 @@ internal partial class NativeManager : INativeManager
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
 	}
 
+	public bool RestoreWindow(HWND hwnd)
+	{
+		Logger.Debug($"Restoring window HWND {hwnd}");
+		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_RESTORE);
+	}
+
 	public string GetClassName(HWND hwnd)
 	{
 		unsafe

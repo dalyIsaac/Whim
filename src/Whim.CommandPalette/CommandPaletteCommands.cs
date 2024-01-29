@@ -258,18 +258,29 @@ public class CommandPaletteCommands : PluginCommands
 					return;
 				}
 
-				if (window.IsMinimized)
+				if (_context.Butler.GetMonitorForWorkspace(workspace) is null)
 				{
-					workspace.MinimizeWindowEnd(window);
-				}
-
-				if (_context.Butler.GetMonitorForWindow(window) is null)
-				{
+					// The workspace is not active, and is not visible.
 					_context.Butler.Activate(workspace);
 				}
 
-				workspace.DoLayout();
-				window.Focus();
+				FocusWindow(window);
 			}
 		);
+
+	/// <summary>
+	/// Focuses the given <paramref name="window"/>. If the window is minimized, it will be restored.
+	/// </summary>
+	/// <param name="window"></param>
+	private static void FocusWindow(IWindow window)
+	{
+		if (window.IsMinimized)
+		{
+			window.Restore();
+		}
+		else
+		{
+			window.Focus();
+		}
+	}
 }

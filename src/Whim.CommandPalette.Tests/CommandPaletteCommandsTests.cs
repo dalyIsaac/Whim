@@ -1,6 +1,7 @@
 using FluentAssertions;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.CommandPalette.Tests;
@@ -338,66 +339,67 @@ public class CommandPaletteCommandsTests
 	[Fact]
 	public void FocusWindowCommandCreator_CannotFindWorkspace()
 	{
-		// Given
+		// Given the window is not in a workspace.
 		Wrapper wrapper = new();
-
 		IWindow window = wrapper.Windows[0];
 		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
 
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
-		// When
+		// When the command is executed.
 		ICommand command = commands.FocusWindowCommandCreator(window);
 		command.TryExecute();
 
-		// Then
+		// Then the window is not focused.
 		wrapper.Workspace.DidNotReceive().DoLayout();
 		window.DidNotReceive().Focus();
 	}
 
-	[Fact]
-	public void FocusWindowCommandCreator_WindowIsMinimized()
+	[Theory]
+	[InlineAutoSubstituteData(false, 0, 1)]
+	[InlineAutoSubstituteData(true, 1, 0)]
+	public void FocusWindowCommandCreator_WorkspaceIsVisible(bool isMinimized, int restoredCount, int focusedCount)
 	{
-		// Given
+		// Given the window is in a workspace.
 		Wrapper wrapper = new();
-
 		IWindow window = wrapper.Windows[0];
-		window.IsMinimized.Returns(true);
 		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
+		wrapper.Context.Butler.GetMonitorForWorkspace(wrapper.Workspace).Returns(Substitute.For<IMonitor>());
+
+		window.IsMinimized.Returns(isMinimized);
 
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
-		// When
+		// When the command is executed.
 		ICommand command = commands.FocusWindowCommandCreator(window);
 		command.TryExecute();
 
-		// Then
-		wrapper.Workspace.Received(1).MinimizeWindowEnd(window);
-		wrapper.Context.Butler.DidNotReceive().Activate(Arg.Any<IWorkspace>());
-		wrapper.Workspace.Received(1).DoLayout();
-		window.Received(1).Focus();
+		// Then the window is focused.
+		window.Received(restoredCount).Restore();
+		window.Received(focusedCount).Focus();
 	}
 
-	[Fact]
-	public void FocusWindowCommandCreator_ActivateWorkspace()
+	[Theory]
+	[InlineAutoSubstituteData(false, 0, 1)]
+	[InlineAutoSubstituteData(true, 1, 0)]
+	public void FocusWindowCommandCreator_WorkspaceIsNotVisible(bool isMinimized, int restoredCount, int focusedCount)
 	{
-		// Given
+		// Given the window is in a workspace.
 		Wrapper wrapper = new();
-
 		IWindow window = wrapper.Windows[0];
 		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-		wrapper.Context.Butler.GetMonitorForWindow(window).ReturnsNull();
+		wrapper.Context.Butler.GetMonitorForWorkspace(wrapper.Workspace).Returns((IMonitor?)null);
+
+		window.IsMinimized.Returns(isMinimized);
 
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
-		// When
+		// When the command is executed.
 		ICommand command = commands.FocusWindowCommandCreator(window);
 		command.TryExecute();
 
-		// Then
-		wrapper.Workspace.DidNotReceive().MinimizeWindowEnd(window);
-		wrapper.Context.Butler.Received(1).Activate(wrapper.Workspace);
-		wrapper.Workspace.Received(1).DoLayout();
-		window.Received(1).Focus();
+		// Then the window is focused.
+		window.Received(restoredCount).Restore();
+		window.Received(focusedCount).Focus();
 	}
 }

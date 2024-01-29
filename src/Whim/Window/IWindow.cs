@@ -104,6 +104,12 @@ public interface IWindow
 	void ShowMinimized();
 
 	/// <summary>
+	/// Activates and displays the window. If the window is minimized, maximized, or arranged,
+	/// the system restores it to its original size and position
+	/// </summary>
+	void Restore();
+
+	/// <summary>
 	/// Brings the window to the top.
 	/// </summary>
 	void BringToTop();
