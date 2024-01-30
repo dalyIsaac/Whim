@@ -65,6 +65,9 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Citrix Receiver
 		filterManager.AddProcessFileNameFilter("SelfService.exe");
 
+		// CLion
+		filterManager.AddWindowClassFilter("SunAwtDialog");  // Targets JetBrains IDE popups and floating windows
+
 		// Credential Manager UI Host
 		filterManager.AddProcessFileNameFilter("CredentialUIBroker.exe");  // Targets the Windows popup prompting you for a PIN instead of a password on 1Password etc.
 
@@ -97,7 +100,7 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.AddProcessFileNameFilter("GoogleDriveFS.exe");
 
 		// IntelliJ IDEA
-		filterManager.AddWindowClassFilter("SunAwtDialog");  // Targets JetBrains IDE popups and floating windows
+		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
 		// Keyviz
 		filterManager.AddProcessFileNameFilter("keyviz.exe");
@@ -219,6 +222,9 @@ internal static class DefaultFilteredWindowsKomorebi
 
 		// TranslucentTB
 		filterManager.AddProcessFileNameFilter("TranslucentTB.exe");
+
+		// WebStorm
+		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
 		// WinZip (32-bit)
 		filterManager.AddProcessFileNameFilter("winzip32.exe");
