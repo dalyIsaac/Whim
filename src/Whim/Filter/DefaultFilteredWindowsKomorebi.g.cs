@@ -59,14 +59,14 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Bloxstrap
 		filterManager.AddProcessFileNameFilter("Bloxstrap.exe");
 
+		// CLion
+		filterManager.AddWindowClassFilter("SunAwtDialog");  // Targets JetBrains IDE popups and floating windows
+
 		// Calculator
 		filterManager.AddTitleFilter("Calculator");
 
 		// Citrix Receiver
 		filterManager.AddProcessFileNameFilter("SelfService.exe");
-
-		// CLion
-		filterManager.AddWindowClassFilter("SunAwtDialog");  // Targets JetBrains IDE popups and floating windows
 
 		// Credential Manager UI Host
 		filterManager.AddProcessFileNameFilter("CredentialUIBroker.exe");  // Targets the Windows popup prompting you for a PIN instead of a password on 1Password etc.
