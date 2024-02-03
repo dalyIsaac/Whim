@@ -39,7 +39,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	private bool _isMovingWindow;
 	private bool _isLeftMouseButtonDown;
-	private readonly object _mouseMoveLock = new();
 
 	/// <summary>
 	/// Indicates whether values have been disposed.
@@ -403,10 +402,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private void OnWindowMoveStart(IWindow window)
 	{
 		Logger.Debug($"Window move started: {window}");
-		lock (_mouseMoveLock)
-		{
-			_isMovingWindow = true;
-		}
+		_isMovingWindow = true;
 
 		IPoint<int>? cursorPoint = null;
 		if (_isLeftMouseButtonDown && _internalContext.CoreNativeManager.GetCursorPos(out IPoint<int> point))
@@ -435,25 +431,24 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		IPoint<int>? point = null;
 		Direction? movedEdges = null;
-		lock (_mouseMoveLock)
+
+		if (!_isMovingWindow)
 		{
-			if (!_isMovingWindow)
-			{
-				return;
-			}
-
-			if (GetMovedEdges(window) is (Direction MovedEdges, IPoint<int> MovedPoint) moved)
-			{
-				movedEdges = moved.MovedEdges;
-				_context.WorkspaceManager.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
-			}
-			else if (_internalContext.CoreNativeManager.GetCursorPos(out point))
-			{
-				_context.WorkspaceManager.MoveWindowToPoint(window, point);
-			}
-
-			_isMovingWindow = false;
+			return;
 		}
+
+		if (GetMovedEdges(window) is (Direction MovedEdges, IPoint<int> MovedPoint) moved)
+		{
+			movedEdges = moved.MovedEdges;
+			_context.WorkspaceManager.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
+		}
+		else if (_internalContext.CoreNativeManager.GetCursorPos(out point))
+		{
+			_context.WorkspaceManager.MoveWindowToPoint(window, point);
+		}
+
+		_isMovingWindow = false;
+
 		WindowMoveEnd?.Invoke(
 			this,
 			new WindowMovedEventArgs()
