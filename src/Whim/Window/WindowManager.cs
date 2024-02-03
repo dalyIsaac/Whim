@@ -382,7 +382,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		Logger.Debug($"Window hidden: {window}");
 
-		if (_context.WorkspaceManager.GetMonitorForWindow(window) == null)
+		if (_context.Butler.GetMonitorForWindow(window) == null)
 		{
 			Logger.Debug($"Window {window} is not tracked in a monitor, ignoring event");
 			return;
@@ -440,11 +440,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		if (GetMovedEdges(window) is (Direction MovedEdges, IPoint<int> MovedPoint) moved)
 		{
 			movedEdges = moved.MovedEdges;
-			_context.WorkspaceManager.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
+			_context.Butler.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
 		}
 		else if (_internalContext.CoreNativeManager.GetCursorPos(out point))
 		{
-			_context.WorkspaceManager.MoveWindowToPoint(window, point);
+			_context.Butler.MoveWindowToPoint(window, point);
 		}
 
 		_isMovingWindow = false;
@@ -468,7 +468,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private (Direction MovedEdges, IPoint<int> MovedPoint)? GetMovedEdges(IWindow window)
 	{
 		Logger.Debug("Trying to move window edges in direction of mouse movement");
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(window);
+		IWorkspace? workspace = _context.Butler.GetWorkspaceForWindow(window);
 		if (workspace is null)
 		{
 			Logger.Debug($"Could not find workspace for window {window}, failed to move window edges");
@@ -552,7 +552,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				_context.NativeManager.TryEnqueue(async () =>
 				{
 					await Task.Delay(2000).ConfigureAwait(true);
-					if (_context.WorkspaceManager.GetWorkspaceForWindow(window) is IWorkspace workspace)
+					if (_context.Butler.GetWorkspaceForWindow(window) is IWorkspace workspace)
 					{
 						_handledLocationRestoringWindows.Add(window);
 						workspace.DoLayout();
