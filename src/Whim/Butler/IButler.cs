@@ -30,11 +30,6 @@ public interface IButler : IDisposable, IButlerChores
 	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
 	/// <summary>
-	/// Initialize the event listeners.
-	/// </summary>
-	void PreInitialize();
-
-	/// <summary>
 	/// Initialize the windows and workspaces.
 	/// </summary>
 	void Initialize();

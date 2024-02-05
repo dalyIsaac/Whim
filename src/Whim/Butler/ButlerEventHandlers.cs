@@ -1,9 +1,9 @@
-using System;
+using System.Threading.Tasks;
 using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
-internal class ButlerEventHandlers : IDisposable
+internal class ButlerEventHandlers : IButlerEventHandlers
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
@@ -11,6 +11,9 @@ internal class ButlerEventHandlers : IDisposable
 	private readonly IButlerPantry _pantry;
 	private readonly IButlerChores _chores;
 	private bool _disposedValue;
+
+	private int _monitorsChangingTasks;
+	public bool AreMonitorsChanging => _monitorsChangingTasks > 0;
 
 	public ButlerEventHandlers(
 		IContext context,
@@ -27,17 +30,7 @@ internal class ButlerEventHandlers : IDisposable
 		_chores = chores;
 	}
 
-	public void PreInitialize()
-	{
-		_context.WindowManager.WindowAdded += WindowManager_WindowAdded;
-		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
-		_context.WindowManager.WindowMinimizeStart += WindowManager_WindowMinimizeStart;
-		_context.WindowManager.WindowMinimizeEnd += WindowManager_WindowMinimizeEnd;
-		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
-	}
-
-	private void WindowManager_WindowAdded(object? sender, WindowEventArgs args)
+	public void OnWindowAdded(WindowEventArgs args)
 	{
 		IWindow window = args.Window;
 		Logger.Debug($"Adding window {window}");
@@ -102,7 +95,7 @@ internal class ButlerEventHandlers : IDisposable
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
-	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs args)
+	public void OnWindowRemoved(WindowEventArgs args)
 	{
 		IWindow window = args.Window;
 		Logger.Debug($"Window removed: {window}");
@@ -114,14 +107,13 @@ internal class ButlerEventHandlers : IDisposable
 		}
 
 		_pantry.RemoveWindow(window);
-
 		workspace.RemoveWindow(window);
-		_triggers.WindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
 
+		_triggers.WindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
 		workspace.DoLayout();
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs args)
+	public void OnWindowFocused(WindowFocusedEventArgs args)
 	{
 		IWindow? window = args.Window;
 		Logger.Debug($"Window focused: {window}");
@@ -150,7 +142,7 @@ internal class ButlerEventHandlers : IDisposable
 		}
 	}
 
-	private void WindowManager_WindowMinimizeStart(object? sender, WindowEventArgs args)
+	public void OnWindowMinimizeStart(WindowEventArgs args)
 	{
 		IWindow window = args.Window;
 		Logger.Debug($"Window minimize start: {window}");
@@ -165,7 +157,7 @@ internal class ButlerEventHandlers : IDisposable
 		workspace.DoLayout();
 	}
 
-	private void WindowManager_WindowMinimizeEnd(object? sender, WindowEventArgs args)
+	public void OnWindowMinimizeEnd(WindowEventArgs args)
 	{
 		IWindow window = args.Window;
 		Logger.Debug($"Window minimize end: {window}");
@@ -180,9 +172,17 @@ internal class ButlerEventHandlers : IDisposable
 		workspace.DoLayout();
 	}
 
-	private void MonitorManager_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
+	public void OnMonitorsChanged(MonitorsChangedEventArgs e)
 	{
-		Logger.Debug($"MonitorManager_MonitorsChanged: {e}");
+		Logger.Debug($"Monitors changed: {e}");
+
+		_monitorsChangingTasks++;
+
+		// Deactivate all workspaces.
+		foreach (IWorkspace visibleWorkspace in _pantry.GetAllActiveWorkspaces())
+		{
+			visibleWorkspace.Deactivate();
+		}
 
 		// If a monitor was removed, remove the workspace from the map.
 		foreach (IMonitor monitor in e.RemovedMonitors)
@@ -195,8 +195,6 @@ internal class ButlerEventHandlers : IDisposable
 				Logger.Error($"Could not find workspace for monitor {monitor}");
 				continue;
 			}
-
-			workspace.Deactivate();
 		}
 
 		// If a monitor was added, set it to an inactive workspace.
@@ -219,7 +217,6 @@ internal class ButlerEventHandlers : IDisposable
 			{
 				if (_context.WorkspaceManager.Add() is IWorkspace newWorkspace)
 				{
-					workspace = newWorkspace;
 					_pantry.SetMonitorWorkspace(monitor, newWorkspace);
 				}
 				else
@@ -227,16 +224,31 @@ internal class ButlerEventHandlers : IDisposable
 					continue;
 				}
 			}
-
-			// Add the workspace to the map.
-			_chores.Activate(workspace, monitor);
 		}
 
-		// For each workspace which is active in a monitor, do a layout.
-		// This will handle cases when the monitor's properties have changed.
-		_chores.LayoutAllActiveWorkspaces();
+		// Hack to only accept window events after Windows has been given a chance to stop moving
+		// windows around after a monitor change.
+		_context.NativeManager.TryEnqueue(async () =>
+		{
+			// TODO: Try decrease this delay
+			await Task.Delay(10 * 1000).ConfigureAwait(true);
+
+			_monitorsChangingTasks--;
+			if (_monitorsChangingTasks > 0)
+			{
+				Logger.Debug("Monitors changed: More tasks are pending");
+				return;
+			}
+
+			Logger.Debug("Cleared AreMonitorsChanging");
+
+			// For each workspace which is active in a monitor, do a layout.
+			// This will handle cases when the monitor's properties have changed.
+			_chores.LayoutAllActiveWorkspaces();
+		});
 	}
 
+	// TODO: Remove
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
@@ -244,12 +256,6 @@ internal class ButlerEventHandlers : IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WindowManager.WindowAdded -= WindowManager_WindowAdded;
-				_context.WindowManager.WindowRemoved -= WindowManager_WindowRemoved;
-				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
-				_context.WindowManager.WindowMinimizeStart -= WindowManager_WindowMinimizeStart;
-				_context.WindowManager.WindowMinimizeEnd -= WindowManager_WindowMinimizeEnd;
-				_context.MonitorManager.MonitorsChanged -= MonitorManager_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
@@ -262,6 +268,6 @@ internal class ButlerEventHandlers : IDisposable
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
+		System.GC.SuppressFinalize(this);
 	}
 }

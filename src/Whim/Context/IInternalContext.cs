@@ -7,6 +7,8 @@ namespace Whim;
 /// </summary>
 internal interface IInternalContext : IDisposable
 {
+	IButlerEventHandlers ButlerEventHandlers { get; }
+
 	/// <inheritdoc cref="ICoreSavedStateManager" />
 	ICoreSavedStateManager CoreSavedStateManager { get; }
 

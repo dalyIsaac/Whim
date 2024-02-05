@@ -275,6 +275,12 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			}
 		}
 
+		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging)
+		{
+			Logger.Debug($"Monitors are changing, ignoring event 0x{eventType:X4} for {window}");
+			return;
+		}
+
 		Logger.Debug($"Windows event 0x{eventType:X4} for {window}");
 		switch (eventType)
 		{
@@ -354,21 +360,34 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		_windows[hwnd] = window;
-		OnWindowAdded(window);
+
+		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging)
+		{
+			Logger.Debug($"Monitors are changing, not notifying listeners of window {window}");
+		}
+		else
+		{
+			OnWindowAdded(window);
+		}
 
 		return window;
 	}
 
 	public void OnWindowAdded(IWindow window)
 	{
-		WindowAdded?.Invoke(this, new WindowEventArgs() { Window = window });
+		WindowEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowAdded(args);
+		WindowAdded?.Invoke(this, args);
 	}
 
 	public void OnWindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Window focused: {window}");
-		_internalContext.MonitorManager.WindowFocused(window);
-		WindowFocused?.Invoke(this, new WindowFocusedEventArgs() { Window = window });
+		_internalContext.MonitorManager.OnWindowFocused(window);
+
+		WindowFocusedEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowFocused(args);
+		WindowFocused?.Invoke(this, args);
 	}
 
 	/// <summary>
@@ -394,9 +413,13 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	public void OnWindowRemoved(IWindow window)
 	{
 		Logger.Debug($"Window removed: {window}");
+
 		_windows.TryRemove(window.Handle, out _);
 		_handledLocationRestoringWindows.Remove(window);
-		WindowRemoved?.Invoke(this, new WindowEventArgs() { Window = window });
+
+		WindowEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowRemoved(args);
+		WindowRemoved?.Invoke(this, args);
 	}
 
 	private void OnWindowMoveStart(IWindow window)
@@ -586,13 +609,19 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
-		WindowMinimizeStart?.Invoke(this, new WindowEventArgs() { Window = window });
+
+		WindowEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowMinimizeStart(args);
+		WindowMinimizeStart?.Invoke(this, args);
 	}
 
 	private void OnWindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize ended: {window}");
-		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs() { Window = window });
+
+		WindowEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowMinimizeEnd(args);
+		WindowMinimizeEnd?.Invoke(this, args);
 	}
 
 	public IEnumerator<IWindow> GetEnumerator() => _windows.Values.GetEnumerator();

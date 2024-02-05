@@ -20,7 +20,7 @@ internal interface IInternalMonitorManager
 	/// Called when the window has been focused.
 	/// </summary>
 	/// <param name="window"></param>
-	void WindowFocused(IWindow? window);
+	void OnWindowFocused(IWindow? window);
 
 	/// <summary>
 	/// Set the active monitor to the given monitor. This monitor must have no windows.

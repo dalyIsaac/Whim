@@ -202,7 +202,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).WindowFocused(window);
+		internalCtx.MonitorManager.Received(1).OnWindowFocused(window);
 		Assert.Equal(window, result.Arguments.Window);
 	}
 
@@ -491,7 +491,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).WindowFocused(Arg.Any<IWindow>());
+		internalCtx.MonitorManager.Received(1).OnWindowFocused(Arg.Any<IWindow>());
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
@@ -519,7 +519,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).WindowFocused(Arg.Any<IWindow>());
+		internalCtx.MonitorManager.Received(1).OnWindowFocused(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]

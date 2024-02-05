@@ -181,7 +181,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
-		monitorManager.WindowFocused(Substitute.For<IWindow>());
+		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
 
 		// Then
 		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
@@ -195,7 +195,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
-		monitorManager.WindowFocused(Substitute.For<IWindow>());
+		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
 
 		// Then
 		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
@@ -213,7 +213,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
-		monitorManager.WindowFocused(null);
+		monitorManager.OnWindowFocused(null);
 
 		// Then
 		internalCtx.CoreNativeManager.Received(1).GetForegroundWindow();
