@@ -13,7 +13,6 @@ namespace Whim.Tests;
 
 public class WorkspaceManagerCustomization : ICustomization
 {
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	public void Customize(IFixture fixture)
 	{
 		// By default, create two monitors.
@@ -46,7 +45,9 @@ public class WorkspaceManagerCustomization : ICustomization
 
 		WorkspaceManagerTests.SetupMonitors(ctx, monitors);
 
-		ctx.Butler.Returns(new Butler(ctx, internalCtx));
+		Butler butler = new(ctx, internalCtx);
+		ctx.Butler.Returns(butler);
+		internalCtx.ButlerEventHandlers.Returns(butler.EventHandlers);
 
 		// Don't route things.
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
@@ -87,13 +88,10 @@ public class WorkspaceManagerTests
 		}
 	}
 
-	private static void WindowAdded(IContext ctx, IWindow window)
+	private static void WindowAdded(IInternalContext internalCtx, IWindow window)
 	{
 		// Raise the WindowAdded event.
-		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		internalCtx.ButlerEventHandlers.OnWindowAdded(new WindowEventArgs() { Window = window });
 	}
 
 	private static WorkspaceManagerTestWrapper CreateSut(
@@ -863,7 +861,7 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 
 		workspaces[0].ClearReceivedCalls();
 
@@ -905,7 +903,7 @@ public class WorkspaceManagerTests
 		workspaceManager.Activate(workspaces[secondActivatedIdx], monitors[1]);
 		IWorkspace activatedWorkspace = workspaces[activatedWorkspaceIdx];
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 
 		ClearWorkspaceReceivedCalls(workspaces);
 		window.ClearReceivedCalls();
@@ -1112,7 +1110,7 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// and the window is added
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		IWorkspace workspace = workspaces[0];
@@ -1142,7 +1140,7 @@ public class WorkspaceManagerTests
 		workspaceManager.Activate(workspaces[1], monitors[1]);
 
 		// and the window is added
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 		workspaces[2].ClearReceivedCalls();
 		window.ClearReceivedCalls();
@@ -1174,7 +1172,7 @@ public class WorkspaceManagerTests
 		workspaceManager.Activate(workspaces[0], monitors[0]);
 
 		// and the window is added
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 		workspaces[2].ClearReceivedCalls();
 		window.ClearReceivedCalls();
@@ -1250,7 +1248,7 @@ public class WorkspaceManagerTests
 
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window which is in a workspace is moved to the same monitor
@@ -1275,7 +1273,7 @@ public class WorkspaceManagerTests
 
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window which is in a workspace is moved to a monitor which isn't registered
@@ -1300,7 +1298,7 @@ public class WorkspaceManagerTests
 
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window which is in a workspace is moved to a monitor
@@ -1327,7 +1325,7 @@ public class WorkspaceManagerTests
 
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window which is in a workspace is moved to the previous monitor
@@ -1353,7 +1351,7 @@ public class WorkspaceManagerTests
 
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When a window which is in a workspace is moved to the next monitor
@@ -1378,7 +1376,7 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, new[] { workspace });
 		workspaceManager.Activate(workspace, monitors[0]);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		workspace.ClearReceivedCalls();
 
 		// When a window which is in a workspace is moved to a point which doesn't correspond to any workspaces
@@ -1430,7 +1428,7 @@ public class WorkspaceManagerTests
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		ActivateWorkspacesOnMonitors(workspaceManager, workspaces, monitors);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[1]);
@@ -1474,7 +1472,7 @@ public class WorkspaceManagerTests
 
 		workspaceManager.Activate(activeWorkspace, monitors[0]);
 
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		activeWorkspace.ClearReceivedCalls();
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitors[0]);
@@ -1741,7 +1739,7 @@ public class WorkspaceManagerTests
 		ctx.RouterManager.RouteWindow(window).Returns(workspaces[1]);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		workspaceManager.Initialize();
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
@@ -1768,7 +1766,7 @@ public class WorkspaceManagerTests
 		ctx.MonitorManager.ActiveMonitor.Returns(monitors[0]);
 
 		workspaceManager.Initialize();
-		WindowAdded(ctx, window);
+		WindowAdded(internalCtx, window);
 		ClearWorkspaceReceivedCalls(workspaces);
 
 		// When moving the window edges in a direction
