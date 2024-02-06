@@ -1,6 +1,6 @@
 # Commands
 
-Commands are used to interact with Whim at runtime. They can be used as [keybinds](./keybinds.md) or triggered from the [Command Palette](../plugins/command-palette.md) (activated by <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> by default).
+Commands are used to interact with Whim at runtime. They can be used as [keybinds](./keybinds.md) or triggered from the [Command Palette](../plugins/command-palette.md) (activated by <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> by default).
 
 Whim supports the creation of arbitrary commands using the <xref:Whim.ICommandManager> - see [Custom commands](#custom-commands).
 
