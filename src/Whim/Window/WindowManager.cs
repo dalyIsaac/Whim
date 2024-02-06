@@ -249,9 +249,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		// Try get the window
+		bool hasWindow = true;
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
 			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
+			hasWindow = false;
 			window = AddWindow(hwnd);
 
 			if (
@@ -275,7 +277,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			}
 		}
 
-		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging)
+		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging && hasWindow)
 		{
 			Logger.Debug($"Monitors are changing, ignoring event 0x{eventType:X4} for {window}");
 			return;
