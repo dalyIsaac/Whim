@@ -1,8 +1,6 @@
-using System;
-
 namespace Whim;
 
-internal interface IButlerEventHandlers : IDisposable
+internal interface IButlerEventHandlers
 {
 	bool AreMonitorsChanging { get; }
 	void OnWindowAdded(WindowEventArgs args);

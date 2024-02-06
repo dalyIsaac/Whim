@@ -10,7 +10,6 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 	private readonly ButlerTriggers _triggers;
 	private readonly IButlerPantry _pantry;
 	private readonly IButlerChores _chores;
-	private bool _disposedValue;
 
 	private int _monitorsChangingTasks;
 	public bool AreMonitorsChanging => _monitorsChangingTasks > 0;
@@ -230,8 +229,7 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		// windows around after a monitor change.
 		_context.NativeManager.TryEnqueue(async () =>
 		{
-			// TODO: Try decrease this delay
-			await Task.Delay(10 * 1000).ConfigureAwait(true);
+			await Task.Delay(3 * 1000).ConfigureAwait(true);
 
 			_monitorsChangingTasks--;
 			if (_monitorsChangingTasks > 0)
@@ -246,28 +244,5 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 			// This will handle cases when the monitor's properties have changed.
 			_chores.LayoutAllActiveWorkspaces();
 		});
-	}
-
-	// TODO: Remove
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			_disposedValue = true;
-		}
-	}
-
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		System.GC.SuppressFinalize(this);
 	}
 }
