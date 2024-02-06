@@ -81,7 +81,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
 		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -116,7 +115,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
 		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -152,7 +150,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
 		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -189,7 +186,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
 		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -227,7 +223,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
 		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -270,7 +265,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is added
-		sut.PreInitialize();
 		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -308,7 +302,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
 		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -342,7 +335,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is removed
-		sut.PreInitialize();
 		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -371,7 +363,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is removed
-		sut.PreInitialize();
 		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -401,7 +392,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is focused
-		sut.PreInitialize();
 		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
 			ctx.WindowManager,
 			new WindowFocusedEventArgs() { Window = null }
@@ -430,7 +420,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
-		sut.PreInitialize();
 		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
 			ctx.WindowManager,
 			new WindowFocusedEventArgs() { Window = Substitute.For<IWindow>() }
@@ -463,7 +452,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
-		sut.PreInitialize();
 		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
 			ctx.WindowManager,
 			new WindowFocusedEventArgs() { Window = window }
@@ -495,7 +483,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
-		sut.PreInitialize();
 		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
 			ctx.WindowManager,
 			new WindowFocusedEventArgs() { Window = window }
@@ -526,7 +513,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is minimized
-		sut.PreInitialize();
 		ctx.WindowManager.WindowMinimizeStart += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -552,7 +538,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is minimized
-		sut.PreInitialize();
 		ctx.WindowManager.WindowMinimizeStart += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -580,7 +565,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is unminimized
-		sut.PreInitialize();
 		ctx.WindowManager.WindowMinimizeEnd += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -605,7 +589,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is unminimized
-		sut.PreInitialize();
 		ctx.WindowManager.WindowMinimizeEnd += Raise.Event<EventHandler<WindowEventArgs>>(
 			ctx.WindowManager,
 			new WindowEventArgs() { Window = window }
@@ -635,7 +618,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When a monitor is removed
-		sut.PreInitialize();
 		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
 			ctx.MonitorManager,
 			new MonitorsChangedEventArgs()
@@ -668,7 +650,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When a monitor is removed
-		sut.PreInitialize();
 		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
 			ctx.MonitorManager,
 			new MonitorsChangedEventArgs()
@@ -722,7 +703,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When a monitor is added
-		sut.PreInitialize();
 		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
 			ctx.MonitorManager,
 			new MonitorsChangedEventArgs()
@@ -760,7 +740,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When a monitor is added
-		sut.PreInitialize();
 		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
 			ctx.MonitorManager,
 			new MonitorsChangedEventArgs()
@@ -796,7 +775,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When a monitor is added
-		sut.PreInitialize();
 		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
 			ctx.MonitorManager,
 			new MonitorsChangedEventArgs()
@@ -837,7 +815,6 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When a monitor is removed and another is added
-		sut.PreInitialize();
 		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
 			ctx.MonitorManager,
 			new MonitorsChangedEventArgs()
@@ -858,32 +835,6 @@ public class ButlerEventHandlersTests
 		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[0]);
 		chores.Received().Activate(workspaces[0], newMonitor);
 		chores.Received().LayoutAllActiveWorkspaces();
-	}
-	#endregion
-
-	#region Dispose
-	[Theory, AutoSubstituteData]
-	internal void Dispose_Disposes(
-		IContext ctx,
-		IInternalContext internalCtx,
-		ButlerTriggers triggers,
-		IButlerPantry pantry,
-		IButlerChores chores
-	)
-	{
-		// Given the event handlers are disposed
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
-
-		// When the event handlers are disposed
-		sut.Dispose();
-
-		// Then the event handlers are disposed
-		ctx.WindowManager.WindowAdded -= Arg.Any<EventHandler<WindowEventArgs>>();
-		ctx.WindowManager.WindowRemoved -= Arg.Any<EventHandler<WindowEventArgs>>();
-		ctx.WindowManager.WindowFocused -= Arg.Any<EventHandler<WindowFocusedEventArgs>>();
-		ctx.WindowManager.WindowMinimizeStart -= Arg.Any<EventHandler<WindowEventArgs>>();
-		ctx.WindowManager.WindowMinimizeEnd -= Arg.Any<EventHandler<WindowEventArgs>>();
-		ctx.MonitorManager.MonitorsChanged -= Arg.Any<EventHandler<MonitorsChangedEventArgs>>();
 	}
 	#endregion
 }

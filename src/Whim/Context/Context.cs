@@ -134,7 +134,6 @@ internal class Context : IContext
 		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
-		Butler.Dispose();
 		NotificationManager.Dispose();
 		_internalContext.Dispose();
 

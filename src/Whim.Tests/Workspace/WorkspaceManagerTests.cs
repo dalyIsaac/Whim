@@ -110,7 +110,6 @@ public class WorkspaceManagerTests
 
 		ctx.WorkspaceManager.Returns(sut);
 
-		ctx.Butler.PreInitialize();
 		return sut;
 	}
 

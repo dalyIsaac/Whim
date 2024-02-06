@@ -11,7 +11,6 @@ internal partial class Butler : IButler
 
 	private readonly ButlerTriggers _triggers;
 	private readonly IButlerChores _chores;
-	private bool _disposedValue;
 	private bool _initialized;
 	internal readonly ButlerEventHandlers EventHandlers;
 
@@ -151,27 +150,4 @@ internal partial class Butler : IButler
 	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false) =>
 		_chores.SwapWorkspaceWithAdjacentMonitor(workspace, reverse);
 	#endregion
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				EventHandlers.Dispose();
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			_disposedValue = true;
-		}
-	}
-
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
-	}
 }

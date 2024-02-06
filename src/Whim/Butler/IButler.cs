@@ -7,7 +7,7 @@ namespace Whim;
 /// to handle events from the <see cref="IWindowManager"/> to update the assignment of <see cref="IWindow"/>s
 /// to <see cref="IWorkspace"/>s, and <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s.
 /// </summary>
-public interface IButler : IDisposable, IButlerChores
+public interface IButler : IButlerChores
 {
 	/// <summary>
 	/// The pantry - responsible for mapping <see cref="IWindow"/>s to <see cref="IWorkspace"/>s
