@@ -194,6 +194,8 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 				Logger.Error($"Could not find workspace for monitor {monitor}");
 				continue;
 			}
+
+			workspace.Deactivate();
 		}
 
 		// If a monitor was added, set it to an inactive workspace.
