@@ -39,7 +39,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	private bool _isMovingWindow;
 	private bool _isLeftMouseButtonDown;
-	private readonly object _mouseMoveLock = new();
 
 	/// <summary>
 	/// Indicates whether values have been disposed.
@@ -250,9 +249,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		// Try get the window
+		bool hasWindow = true;
 		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
 		{
 			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
+			hasWindow = false;
 			window = AddWindow(hwnd);
 
 			if (
@@ -274,6 +275,12 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			{
 				return;
 			}
+		}
+
+		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging && hasWindow)
+		{
+			Logger.Debug($"Monitors are changing, ignoring event 0x{eventType:X4} for {window}");
+			return;
 		}
 
 		Logger.Debug($"Windows event 0x{eventType:X4} for {window}");
@@ -362,14 +369,19 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	public void OnWindowAdded(IWindow window)
 	{
-		WindowAdded?.Invoke(this, new WindowEventArgs() { Window = window });
+		WindowEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowAdded(args);
+		WindowAdded?.Invoke(this, args);
 	}
 
 	public void OnWindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Window focused: {window}");
-		_internalContext.MonitorManager.WindowFocused(window);
-		WindowFocused?.Invoke(this, new WindowFocusedEventArgs() { Window = window });
+		_internalContext.MonitorManager.OnWindowFocused(window);
+
+		WindowFocusedEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowFocused(args);
+		WindowFocused?.Invoke(this, args);
 	}
 
 	/// <summary>
@@ -383,7 +395,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		Logger.Debug($"Window hidden: {window}");
 
-		if (_context.WorkspaceManager.GetMonitorForWindow(window) == null)
+		if (_context.Butler.GetMonitorForWindow(window) == null)
 		{
 			Logger.Debug($"Window {window} is not tracked in a monitor, ignoring event");
 			return;
@@ -395,18 +407,19 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	public void OnWindowRemoved(IWindow window)
 	{
 		Logger.Debug($"Window removed: {window}");
+
 		_windows.TryRemove(window.Handle, out _);
 		_handledLocationRestoringWindows.Remove(window);
-		WindowRemoved?.Invoke(this, new WindowEventArgs() { Window = window });
+
+		WindowEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowRemoved(args);
+		WindowRemoved?.Invoke(this, args);
 	}
 
 	private void OnWindowMoveStart(IWindow window)
 	{
 		Logger.Debug($"Window move started: {window}");
-		lock (_mouseMoveLock)
-		{
-			_isMovingWindow = true;
-		}
+		_isMovingWindow = true;
 
 		IPoint<int>? cursorPoint = null;
 		if (_isLeftMouseButtonDown && _internalContext.CoreNativeManager.GetCursorPos(out IPoint<int> point))
@@ -435,25 +448,24 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		IPoint<int>? point = null;
 		Direction? movedEdges = null;
-		lock (_mouseMoveLock)
+
+		if (!_isMovingWindow)
 		{
-			if (!_isMovingWindow)
-			{
-				return;
-			}
-
-			if (GetMovedEdges(window) is (Direction MovedEdges, IPoint<int> MovedPoint) moved)
-			{
-				movedEdges = moved.MovedEdges;
-				_context.WorkspaceManager.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
-			}
-			else if (_internalContext.CoreNativeManager.GetCursorPos(out point))
-			{
-				_context.WorkspaceManager.MoveWindowToPoint(window, point);
-			}
-
-			_isMovingWindow = false;
+			return;
 		}
+
+		if (GetMovedEdges(window) is (Direction MovedEdges, IPoint<int> MovedPoint) moved)
+		{
+			movedEdges = moved.MovedEdges;
+			_context.Butler.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
+		}
+		else if (_internalContext.CoreNativeManager.GetCursorPos(out point))
+		{
+			_context.Butler.MoveWindowToPoint(window, point);
+		}
+
+		_isMovingWindow = false;
+
 		WindowMoveEnd?.Invoke(
 			this,
 			new WindowMovedEventArgs()
@@ -473,7 +485,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private (Direction MovedEdges, IPoint<int> MovedPoint)? GetMovedEdges(IWindow window)
 	{
 		Logger.Debug("Trying to move window edges in direction of mouse movement");
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForWindow(window);
+		IWorkspace? workspace = _context.Butler.GetWorkspaceForWindow(window);
 		if (workspace is null)
 		{
 			Logger.Debug($"Could not find workspace for window {window}, failed to move window edges");
@@ -557,7 +569,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				_context.NativeManager.TryEnqueue(async () =>
 				{
 					await Task.Delay(2000).ConfigureAwait(true);
-					if (_context.WorkspaceManager.GetWorkspaceForWindow(window) is IWorkspace workspace)
+					if (_context.Butler.GetWorkspaceForWindow(window) is IWorkspace workspace)
 					{
 						_handledLocationRestoringWindows.Add(window);
 						workspace.DoLayout();
@@ -591,13 +603,19 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private void OnWindowMinimizeStart(IWindow window)
 	{
 		Logger.Debug($"Window minimize started: {window}");
-		WindowMinimizeStart?.Invoke(this, new WindowEventArgs() { Window = window });
+
+		WindowEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowMinimizeStart(args);
+		WindowMinimizeStart?.Invoke(this, args);
 	}
 
 	private void OnWindowMinimizeEnd(IWindow window)
 	{
 		Logger.Debug($"Window minimize ended: {window}");
-		WindowMinimizeEnd?.Invoke(this, new WindowEventArgs() { Window = window });
+
+		WindowEventArgs args = new() { Window = window };
+		_internalContext.ButlerEventHandlers.OnWindowMinimizeEnd(args);
+		WindowMinimizeEnd?.Invoke(this, args);
 	}
 
 	public IEnumerator<IWindow> GetEnumerator() => _windows.Values.GetEnumerator();

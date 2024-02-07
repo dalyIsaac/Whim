@@ -72,7 +72,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		_internalContext.MouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
 	}
 
-	public void WindowFocused(IWindow? window)
+	public void OnWindowFocused(IWindow? window)
 	{
 		HWND hwnd = window?.Handle ?? _internalContext.CoreNativeManager.GetForegroundWindow();
 		Logger.Debug($"Focusing hwnd {hwnd}");
@@ -109,7 +109,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 			return;
 		}
 
-		IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+		IWorkspace? workspace = _context.Butler.GetWorkspaceForMonitor(monitor);
 		if (workspace is null)
 		{
 			Logger.Error($"No workspace found for monitor {monitor}");
@@ -180,15 +180,15 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		}
 
 		// Notify listeners of the unchanged, removed, and added monitors.
-		MonitorsChanged?.Invoke(
-			this,
-			new MonitorsChangedEventArgs()
+		MonitorsChangedEventArgs args =
+			new()
 			{
 				UnchangedMonitors = unchangedMonitors,
 				RemovedMonitors = removedMonitors,
 				AddedMonitors = addedMonitors
-			}
-		);
+			};
+		_internalContext.ButlerEventHandlers.OnMonitorsChanged(args);
+		MonitorsChanged?.Invoke(this, args);
 	}
 
 	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)

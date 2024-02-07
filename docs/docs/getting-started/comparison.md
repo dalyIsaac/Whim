@@ -48,7 +48,7 @@ Whim is the only window manager which is capable of both dynamic and manual mana
 
 [Repository](https://github.com/fuhsjr00/bug.n) | [Documentation](https://github.com/fuhsjr00/bug.n/wiki)
 
-bug.n is an interesting idea, especiallly for users who already use AutoHotKey. Unfortunately, bug.n is no longer actively developed or maintained.
+bug.n is an interesting idea, especially for users who already use AutoHotKey. Unfortunately, bug.n is no longer actively developed or maintained.
 
 ## FancyWM
 

@@ -77,9 +77,6 @@ internal class Context : IContext
 
 		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(FilterManager);
 
-		// Subscribe to the events.
-		Butler.PreInitialize();
-
 		// Initialize before ResourceManager so user dicts take precedence over the default dict.
 		ResourceManager.Initialize();
 
@@ -137,7 +134,6 @@ internal class Context : IContext
 		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
-		Butler.Dispose();
 		NotificationManager.Dispose();
 		_internalContext.Dispose();
 

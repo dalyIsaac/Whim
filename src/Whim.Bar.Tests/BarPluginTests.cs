@@ -1,3 +1,4 @@
+using Microsoft.UI.Dispatching;
 using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
@@ -12,6 +13,7 @@ public class BarPluginTests
 		// Given
 		BarConfig barConfig = new(new List<BarComponent>(), new List<BarComponent>(), new List<BarComponent>());
 		BarPlugin barPlugin = new(context, barConfig);
+		NativeManagerUtils.SetupTryEnqueue(context);
 
 		// When MonitorManager_MonitorsChanged is called with a removed monitor which is not in the map
 		barPlugin.PreInitialize();
@@ -26,5 +28,6 @@ public class BarPluginTests
 
 		// Then an exception is not thrown.
 		barPlugin.Dispose();
+		context.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 	}
 }

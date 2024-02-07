@@ -24,6 +24,8 @@ internal class InternalContext : IInternalContext
 
 	public IDeferWorkspacePosManager DeferWorkspacePosManager { get; }
 
+	public IButlerEventHandlers ButlerEventHandlers => ((Butler)_context.Butler).EventHandlers;
+
 	public InternalContext(IContext context)
 	{
 		_context = context;

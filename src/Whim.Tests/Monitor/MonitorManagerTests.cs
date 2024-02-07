@@ -181,7 +181,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
-		monitorManager.WindowFocused(Substitute.For<IWindow>());
+		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
 
 		// Then
 		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
@@ -195,7 +195,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
-		monitorManager.WindowFocused(Substitute.For<IWindow>());
+		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
 
 		// Then
 		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
@@ -213,7 +213,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
-		monitorManager.WindowFocused(null);
+		monitorManager.OnWindowFocused(null);
 
 		// Then
 		internalCtx.CoreNativeManager.Received(1).GetForegroundWindow();
@@ -746,7 +746,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 		IMonitor monitor = monitorManager.ElementAt(1);
 
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns((IWorkspace?)null);
+		ctx.Butler.GetWorkspaceForMonitor(monitor).Returns((IWorkspace?)null);
 
 		// When
 		monitorManager.ActivateEmptyMonitor(monitor);
@@ -766,7 +766,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 		IMonitor monitor = monitorManager.ElementAt(1);
 
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.GetWorkspaceForMonitor(monitor).Returns(workspace);
 		workspace.Windows.GetEnumerator().Returns(new List<IWindow>() { Substitute.For<IWindow>() }.GetEnumerator());
 
 		// When
@@ -783,7 +783,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 		IMonitor monitor = monitorManager.ElementAt(1);
 
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.GetWorkspaceForMonitor(monitor).Returns(workspace);
 		workspace.Windows.GetEnumerator().Returns(new List<IWindow>().GetEnumerator());
 
 		// When

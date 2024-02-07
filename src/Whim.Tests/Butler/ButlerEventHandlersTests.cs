@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoFixture;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
@@ -34,9 +34,10 @@ internal class ButlerEventHandlersCustomization : ICustomization
 	}
 }
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Test code")]
 public class ButlerEventHandlersTests
 {
+	private const int DELAY_MS = 3500;
+
 	private static void AssertWindowAdded(IWindow window, IWorkspace currentWorkspace, RouteEventArgs actual)
 	{
 		Assert.Equal(window, actual.Window);
@@ -81,11 +82,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
-		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -116,11 +113,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
-		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -152,11 +145,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
-		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
 
 		// Then the window is routed to the active workspace
 		pantry.Received().SetWindowWorkspace(window, activeWorkspace);
@@ -189,11 +178,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
-		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
 
 		// Then the window is routed to the last tracked active workspace
 		pantry.Received().SetWindowWorkspace(window, lastTrackedActiveWorkspace);
@@ -227,11 +212,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
-		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -270,11 +251,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is added
-		sut.PreInitialize();
-		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -308,11 +285,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is added
-		sut.PreInitialize();
-		ctx.WindowManager.WindowAdded += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -342,11 +315,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is removed
-		sut.PreInitialize();
-		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowRemoved(new WindowEventArgs() { Window = window });
 
 		// Then nothing happens
 		pantry.DidNotReceive().RemoveWindow(window);
@@ -371,11 +340,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is removed
-		sut.PreInitialize();
-		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowRemoved(new WindowEventArgs() { Window = window });
 
 		// Then the window is removed from the workspace
 		pantry.Received().RemoveWindow(window);
@@ -401,11 +366,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is focused
-		sut.PreInitialize();
-		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
-			ctx.WindowManager,
-			new WindowFocusedEventArgs() { Window = null }
-		);
+		sut.OnWindowFocused(new WindowFocusedEventArgs() { Window = null });
 
 		// Then each workspace receives WindowFocused(null), but nothing else happens
 		foreach (IWorkspace workspace in workspaces)
@@ -430,11 +391,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
-		sut.PreInitialize();
-		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
-			ctx.WindowManager,
-			new WindowFocusedEventArgs() { Window = Substitute.For<IWindow>() }
-		);
+		sut.OnWindowFocused(new WindowFocusedEventArgs() { Window = Substitute.For<IWindow>() });
 
 		// Then nothing happens
 		foreach (IWorkspace workspace in workspaces)
@@ -463,11 +420,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
-		sut.PreInitialize();
-		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
-			ctx.WindowManager,
-			new WindowFocusedEventArgs() { Window = window }
-		);
+		sut.OnWindowFocused(new WindowFocusedEventArgs() { Window = window });
 
 		// Then the window is not routed to a workspace
 		pantry.Received().GetWorkspaceForWindow(window);
@@ -495,11 +448,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
-		sut.PreInitialize();
-		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
-			ctx.WindowManager,
-			new WindowFocusedEventArgs() { Window = window }
-		);
+		sut.OnWindowFocused(new WindowFocusedEventArgs() { Window = window });
 
 		// Then the window is routed to a workspace
 		pantry.Received().GetWorkspaceForWindow(window);
@@ -526,11 +475,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is minimized
-		sut.PreInitialize();
-		ctx.WindowManager.WindowMinimizeStart += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowMinimizeStart(new WindowEventArgs() { Window = window });
 
 		// Then nothing happens
 	}
@@ -552,11 +497,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
 
 		// When the window is minimized
-		sut.PreInitialize();
-		ctx.WindowManager.WindowMinimizeStart += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowMinimizeStart(new WindowEventArgs() { Window = window });
 
 		// Then MinimizeWindowStart is called on the workspace
 		workspace.Received(1).MinimizeWindowStart(window);
@@ -580,11 +521,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is unminimized
-		sut.PreInitialize();
-		ctx.WindowManager.WindowMinimizeEnd += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowMinimizeEnd(new WindowEventArgs() { Window = window });
 
 		// Then nothing happens
 	}
@@ -605,11 +542,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is unminimized
-		sut.PreInitialize();
-		ctx.WindowManager.WindowMinimizeEnd += Raise.Event<EventHandler<WindowEventArgs>>(
-			ctx.WindowManager,
-			new WindowEventArgs() { Window = window }
-		);
+		sut.OnWindowMinimizeEnd(new WindowEventArgs() { Window = window });
 
 		// Then MinimizeWindowEnd is called on the workspace
 		workspace.Received(1).MinimizeWindowEnd(window);
@@ -617,9 +550,9 @@ public class ButlerEventHandlersTests
 	}
 	#endregion
 
-	#region MonitorManager_MonitorsChanged
+	#region OnMonitorsChanged
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void MonitorsChanged_RemovedMonitor(
+	internal async void OnMonitorsChanged_RemovedMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -633,11 +566,10 @@ public class ButlerEventHandlersTests
 		pantry.GetWorkspaceForMonitor(monitors[0]).Returns(workspace);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed
-		sut.PreInitialize();
-		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
-			ctx.MonitorManager,
+		sut.OnMonitorsChanged(
 			new MonitorsChangedEventArgs()
 			{
 				RemovedMonitors = new[] { monitors[0] },
@@ -645,6 +577,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = Array.Empty<IMonitor>()
 			}
 		);
+		await Task.Delay(DELAY_MS);
 
 		// Then the monitor is removed from the pantry
 		pantry.Received().RemoveMonitor(monitors[0]);
@@ -653,7 +586,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void MonitorsChanged_RemovedMonitor_NoWorkspaceForMonitor(
+	internal async void OnMonitorsChanged_RemovedMonitor_NoWorkspaceForMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -666,11 +599,10 @@ public class ButlerEventHandlersTests
 		pantry.GetWorkspaceForMonitor(monitors[0]).ReturnsNull();
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed
-		sut.PreInitialize();
-		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
-			ctx.MonitorManager,
+		sut.OnMonitorsChanged(
 			new MonitorsChangedEventArgs()
 			{
 				RemovedMonitors = new[] { monitors[0] },
@@ -678,6 +610,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = Array.Empty<IMonitor>()
 			}
 		);
+		await Task.Delay(DELAY_MS);
 
 		// Then nothing happens
 		pantry.Received().RemoveMonitor(monitors[0]);
@@ -703,7 +636,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void MonitorsChanged_AddedMonitor_UseSpareWorkspace(
+	internal async void OnMonitorsChanged_AddedMonitor_UseSpareWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -720,11 +653,10 @@ public class ButlerEventHandlersTests
 		pantry.GetMonitorForWorkspace(workspaces[2]).ReturnsNull();
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
-		sut.PreInitialize();
-		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
-			ctx.MonitorManager,
+		sut.OnMonitorsChanged(
 			new MonitorsChangedEventArgs()
 			{
 				RemovedMonitors = Array.Empty<IMonitor>(),
@@ -732,15 +664,15 @@ public class ButlerEventHandlersTests
 				AddedMonitors = new[] { newMonitor }
 			}
 		);
+		await Task.Delay(DELAY_MS);
 
 		// Then the monitor is added to the pantry
 		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[2]);
-		chores.Received().Activate(workspaces[2], newMonitor);
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void MonitorsChanged_AddedMonitor_CreateWorkspace_Succeeds(
+	internal async void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Succeeds(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -758,11 +690,10 @@ public class ButlerEventHandlersTests
 		ctx.WorkspaceManager.Add().Returns(newWorkspace);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
-		sut.PreInitialize();
-		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
-			ctx.MonitorManager,
+		sut.OnMonitorsChanged(
 			new MonitorsChangedEventArgs()
 			{
 				RemovedMonitors = Array.Empty<IMonitor>(),
@@ -770,15 +701,15 @@ public class ButlerEventHandlersTests
 				AddedMonitors = new[] { newMonitor }
 			}
 		);
+		await Task.Delay(DELAY_MS);
 
 		// Then the monitor is added to the pantry
 		pantry.Received().SetMonitorWorkspace(newMonitor, newWorkspace);
-		chores.Received().Activate(newWorkspace, newMonitor);
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void MonitorsChanged_AddedMonitor_CreateWorkspace_Fails(
+	internal async void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Fails(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -794,11 +725,10 @@ public class ButlerEventHandlersTests
 		ctx.WorkspaceManager.Add().ReturnsNull();
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
-		sut.PreInitialize();
-		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
-			ctx.MonitorManager,
+		sut.OnMonitorsChanged(
 			new MonitorsChangedEventArgs()
 			{
 				RemovedMonitors = Array.Empty<IMonitor>(),
@@ -806,15 +736,15 @@ public class ButlerEventHandlersTests
 				AddedMonitors = new[] { monitors[1] }
 			}
 		);
+		await Task.Delay(DELAY_MS);
 
 		// Then the monitor is not added to the pantry
 		pantry.DidNotReceive().SetMonitorWorkspace(monitors[1], workspaces[0]);
-		chores.DidNotReceive().Activate(workspaces[0]);
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void MonitorsChanged_RemovedAndAddedMonitor(
+	internal async void OnMonitorsChanged_RemovedAndAddedMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -835,11 +765,10 @@ public class ButlerEventHandlersTests
 		pantry.GetMonitorForWorkspace(workspaces[0]).ReturnsNull();
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed and another is added
-		sut.PreInitialize();
-		ctx.MonitorManager.MonitorsChanged += Raise.Event<EventHandler<MonitorsChangedEventArgs>>(
-			ctx.MonitorManager,
+		sut.OnMonitorsChanged(
 			new MonitorsChangedEventArgs()
 			{
 				RemovedMonitors = new[] { monitors[0] },
@@ -847,6 +776,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = new[] { newMonitor }
 			}
 		);
+		await Task.Delay(DELAY_MS);
 
 		// Then the monitor is removed from the pantry
 		pantry.Received().RemoveMonitor(monitors[0]);
@@ -856,34 +786,49 @@ public class ButlerEventHandlersTests
 
 		// And the monitor is added to the pantry
 		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[0]);
-		chores.Received().Activate(workspaces[0], newMonitor);
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
-	#endregion
 
-	#region Dispose
-	[Theory, AutoSubstituteData]
-	internal void Dispose_Disposes(
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal async void OnMonitorsChanged_DelayLayouts(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
-		IButlerPantry pantry,
-		IButlerChores chores
+		IButlerChores chores,
+		IButlerPantry pantry
 	)
 	{
-		// Given the event handlers are disposed
+		// Given
+		IMonitor[] monitors = CreateMonitors(ctx, 3);
+		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);
+		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+
+		pantry.GetAllActiveWorkspaces().Returns(workspaces);
+		pantry.GetWorkspaceForMonitor(monitors[0]).Returns(workspaces[0]);
+		pantry.GetWorkspaceForMonitor(monitors[1]).Returns(workspaces[1]);
+		pantry.GetWorkspaceForMonitor(monitors[2]).Returns(workspaces[2]);
+
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
-		// When the event handlers are disposed
-		sut.Dispose();
+		// When there are two events in quick succession
+		MonitorsChangedEventArgs e =
+			new()
+			{
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = new[] { monitors[1], monitors[2], monitors[0] },
+				AddedMonitors = Array.Empty<IMonitor>()
+			};
+		sut.OnMonitorsChanged(e);
+		sut.OnMonitorsChanged(e);
+		Assert.True(sut.AreMonitorsChanging);
+		await Task.Delay(DELAY_MS);
 
-		// Then the event handlers are disposed
-		ctx.WindowManager.WindowAdded -= Arg.Any<EventHandler<WindowEventArgs>>();
-		ctx.WindowManager.WindowRemoved -= Arg.Any<EventHandler<WindowEventArgs>>();
-		ctx.WindowManager.WindowFocused -= Arg.Any<EventHandler<WindowFocusedEventArgs>>();
-		ctx.WindowManager.WindowMinimizeStart -= Arg.Any<EventHandler<WindowEventArgs>>();
-		ctx.WindowManager.WindowMinimizeEnd -= Arg.Any<EventHandler<WindowEventArgs>>();
-		ctx.MonitorManager.MonitorsChanged -= Arg.Any<EventHandler<MonitorsChangedEventArgs>>();
+		// Then LayoutAllActiveWorkspaces is called just once
+		workspaces[0].Received().Deactivate();
+		workspaces[1].Received().Deactivate();
+		workspaces[2].Received().Deactivate();
+		chores.Received(1).LayoutAllActiveWorkspaces();
 	}
 	#endregion
 }

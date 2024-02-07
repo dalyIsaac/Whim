@@ -11,9 +11,8 @@ internal partial class Butler : IButler
 
 	private readonly ButlerTriggers _triggers;
 	private readonly IButlerChores _chores;
-	private readonly ButlerEventHandlers _eventHandlers;
-	private bool _disposedValue;
 	private bool _initialized;
+	internal readonly ButlerEventHandlers EventHandlers;
 
 	private IButlerPantry _pantry;
 	public IButlerPantry Pantry
@@ -43,19 +42,12 @@ internal partial class Butler : IButler
 
 		_pantry = new ButlerPantry(_context);
 		_chores = new ButlerChores(_context, _triggers);
-		_eventHandlers = new ButlerEventHandlers(_context, _internalContext, _triggers, _pantry, _chores);
+		EventHandlers = new ButlerEventHandlers(_context, _internalContext, _triggers, _pantry, _chores);
 	}
 
 	public event EventHandler<RouteEventArgs>? WindowRouted;
 
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
-	#region Initialize
-	public void PreInitialize()
-	{
-		Logger.Debug("Pre-initializing Butler");
-		_eventHandlers.PreInitialize();
-	}
 
 	public void Initialize()
 	{
@@ -116,8 +108,6 @@ internal partial class Butler : IButler
 		_context.RouterManager.RouterOptions = routerOptions;
 	}
 
-	#endregion
-
 	#region Pantry
 	public IMonitor? GetMonitorForWindow(IWindow window) => _pantry.GetMonitorForWindow(window);
 
@@ -160,27 +150,4 @@ internal partial class Butler : IButler
 	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false) =>
 		_chores.SwapWorkspaceWithAdjacentMonitor(workspace, reverse);
 	#endregion
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				_eventHandlers.Dispose();
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			_disposedValue = true;
-		}
-	}
-
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
-	}
 }
