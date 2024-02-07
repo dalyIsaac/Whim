@@ -19,3 +19,7 @@ To counteract this, the <xref:Whim.IRouterManager> has a <xref:Whim.IRouterManag
 ## Adding/removing monitors
 
 When adding and removing monitors, Windows will very helpfully move windows between monitors. However, this conflicts with Whim. To work around Windows' helpfulness, Whim (in the `WindowManager` and `ButlerEventHandlers` will) ignore [`WinEvents`](../architecture/events.md) for 3 seconds for tracked windows. After the 3 seconds have elapsed, Whim will layout all the active workspaces.
+
+## Window overflows given area
+
+Whim will request windows to have a specific size, but some windows (like Spotify) enforce a minimum size and will ignore Whim's instructions. Whim does not account for this. As a result, these stubborn windows will overflow the expected area. This will also result in the [focus indicator](../plugins/focus-indicator.md) highlighting the expected area, not the window's actual area.
