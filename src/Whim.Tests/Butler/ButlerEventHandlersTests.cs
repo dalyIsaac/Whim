@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
-using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
@@ -61,16 +60,6 @@ public class ButlerEventHandlersTests
 		currentWorkspace.Received().DoLayout();
 
 		window.Received().Focus();
-	}
-
-	private static void Setup_TryEnqueue(IContext ctx)
-	{
-		ctx.NativeManager.When(cnm => cnm.TryEnqueue(Arg.Any<DispatcherQueueHandler>()))
-			.Do(callInfo =>
-			{
-				var handler = callInfo.ArgAt<DispatcherQueueHandler>(0);
-				handler.Invoke();
-			});
 	}
 
 	#region WindowAdded
@@ -577,7 +566,7 @@ public class ButlerEventHandlersTests
 		pantry.GetWorkspaceForMonitor(monitors[0]).Returns(workspace);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
-		Setup_TryEnqueue(ctx);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed
 		sut.OnMonitorsChanged(
@@ -610,7 +599,7 @@ public class ButlerEventHandlersTests
 		pantry.GetWorkspaceForMonitor(monitors[0]).ReturnsNull();
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
-		Setup_TryEnqueue(ctx);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed
 		sut.OnMonitorsChanged(
@@ -664,7 +653,7 @@ public class ButlerEventHandlersTests
 		pantry.GetMonitorForWorkspace(workspaces[2]).ReturnsNull();
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
-		Setup_TryEnqueue(ctx);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
 		sut.OnMonitorsChanged(
@@ -701,7 +690,7 @@ public class ButlerEventHandlersTests
 		ctx.WorkspaceManager.Add().Returns(newWorkspace);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
-		Setup_TryEnqueue(ctx);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
 		sut.OnMonitorsChanged(
@@ -736,7 +725,7 @@ public class ButlerEventHandlersTests
 		ctx.WorkspaceManager.Add().ReturnsNull();
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
-		Setup_TryEnqueue(ctx);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
 		sut.OnMonitorsChanged(
@@ -776,7 +765,7 @@ public class ButlerEventHandlersTests
 		pantry.GetMonitorForWorkspace(workspaces[0]).ReturnsNull();
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
-		Setup_TryEnqueue(ctx);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed and another is added
 		sut.OnMonitorsChanged(
@@ -820,7 +809,7 @@ public class ButlerEventHandlersTests
 		pantry.GetWorkspaceForMonitor(monitors[2]).Returns(workspaces[2]);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
-		Setup_TryEnqueue(ctx);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When there are two events in quick succession
 		MonitorsChangedEventArgs e =
@@ -832,6 +821,7 @@ public class ButlerEventHandlersTests
 			};
 		sut.OnMonitorsChanged(e);
 		sut.OnMonitorsChanged(e);
+		Assert.True(sut.AreMonitorsChanging);
 		await Task.Delay(DELAY_MS);
 
 		// Then LayoutAllActiveWorkspaces is called just once

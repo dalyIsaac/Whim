@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using Whim.TestUtils;
@@ -839,17 +838,11 @@ public class WindowManagerTests
 
 	private static IWorkspace Setup_RectRestoring_Success(IContext ctx, IInternalContext internalCtx, HWND hwnd)
 	{
-		IWindow window = Window.CreateWindow(ctx, internalCtx, hwnd)!;
+		Window.CreateWindow(ctx, internalCtx, hwnd);
 
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
-
-		ctx.NativeManager.When(cnm => cnm.TryEnqueue(Arg.Any<DispatcherQueueHandler>()))
-			.Do(callInfo =>
-			{
-				var handler = callInfo.ArgAt<DispatcherQueueHandler>(0);
-				handler.Invoke();
-			});
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		internalCtx
 			.CoreNativeManager.GetProcessNameAndPath((int)_processId)
