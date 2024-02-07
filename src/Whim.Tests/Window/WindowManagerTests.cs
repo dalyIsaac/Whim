@@ -363,6 +363,7 @@ public class WindowManagerTests
 		);
 	}
 
+	#region AddWindow
 	[InlineAutoSubstituteData<WindowManagerCustomization>(true, false, true, true)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(false, true, true, true)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(false, false, false, true)]
@@ -396,7 +397,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WinEventProc_CreateWindow_Null(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_AddWindow_CreateWindowNull(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -422,7 +423,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WinEventProc_IgnoreWindow(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_AddWindow_IgnoreWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -447,7 +448,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WinEventProc_WindowIsMinimized(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_AddWindow_WindowIsMinimized(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		HWND hwnd = new(1);
@@ -469,6 +470,86 @@ public class WindowManagerTests
 		// Then
 		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
 	}
+	#endregion
+
+	#region MonitorsAreChanging
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WinEventProc_MonitorsAreChanging_NewWindow(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
+
+		WindowManager windowManager = new(ctx, internalCtx);
+		internalCtx.ButlerEventHandlers.AreMonitorsChanging.Returns(true);
+
+		// When
+		windowManager.Initialize();
+		Assert.Raises<WindowEventArgs>(
+			h => windowManager.WindowAdded += h,
+			h => windowManager.WindowAdded -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_FOREGROUND, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WinEventProc_MonitorsAreNotChanging_OldWindow(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
+
+		WindowManager windowManager = new(ctx, internalCtx);
+		internalCtx.ButlerEventHandlers.AreMonitorsChanging.Returns(false);
+
+		// When
+		windowManager.Initialize();
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_FOREGROUND, hwnd, 0, 0, 0, 0);
+		CustomAssert.DoesNotRaise<WindowEventArgs>(
+			h => windowManager.WindowAdded += h,
+			h => windowManager.WindowAdded -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_FOREGROUND, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData<WindowManagerCustomization>]
+	internal void WinEventProc_MonitorsAreChanging_OldWindow(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		AllowWindowCreation(ctx, internalCtx, hwnd);
+
+		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
+
+		WindowManager windowManager = new(ctx, internalCtx);
+		internalCtx.ButlerEventHandlers.AreMonitorsChanging.Returns(true);
+
+		// When
+		windowManager.Initialize();
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_FOREGROUND, hwnd, 0, 0, 0, 0);
+		CustomAssert.DoesNotRaise<WindowEventArgs>(
+			h => windowManager.WindowAdded += h,
+			h => windowManager.WindowAdded -= h,
+			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_FOREGROUND, hwnd, 0, 0, 0, 0)
+		);
+
+		// Then
+		ctx.FilterManager.Received(1).ShouldBeIgnored(Arg.Any<IWindow>());
+	}
+	#endregion
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_OBJECT_UNCLOAKED)]

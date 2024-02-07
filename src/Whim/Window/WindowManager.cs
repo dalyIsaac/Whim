@@ -362,15 +362,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		_windows[hwnd] = window;
-
-		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging)
-		{
-			Logger.Debug($"Monitors are changing, not notifying listeners of window {window}");
-		}
-		else
-		{
-			OnWindowAdded(window);
-		}
+		OnWindowAdded(window);
 
 		return window;
 	}
