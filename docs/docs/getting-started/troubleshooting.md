@@ -15,3 +15,7 @@ Examples of troublesome windows include Firefox and JetBrains Gateway.
 Windows can launch windows in different locations. Additionally, interacting with some untracked windows like the Windows Taskbar can break focus tracking in Whim.
 
 To counteract this, the <xref:Whim.IRouterManager> has a <xref:Whim.IRouterManager.RouterOptions> property which can configure how new windows are routed - see the <xref:Whim.RouterOptions> enum.
+
+## Adding/removing monitors
+
+When adding and removing monitors, Windows will very helpfully move windows between monitors. However, this conflicts with Whim. To work around Windows' helpfulness, Whim (in the `WindowManager` and `ButlerEventHandlers` will) ignore [`WinEvents`](../architecture/events.md) for 3 seconds for tracked windows. After the 3 seconds have elapsed, Whim will layout all the active workspaces.
