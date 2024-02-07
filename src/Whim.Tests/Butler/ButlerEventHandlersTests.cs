@@ -561,9 +561,9 @@ public class ButlerEventHandlersTests
 	}
 	#endregion
 
-	#region MonitorManager_MonitorsChanged
+	#region OnMonitorsChanged
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal async void MonitorsChanged_RemovedMonitor(
+	internal async void OnMonitorsChanged_RemovedMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -597,7 +597,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal async void MonitorsChanged_RemovedMonitor_NoWorkspaceForMonitor(
+	internal async void OnMonitorsChanged_RemovedMonitor_NoWorkspaceForMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -647,7 +647,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal async void MonitorsChanged_AddedMonitor_UseSpareWorkspace(
+	internal async void OnMonitorsChanged_AddedMonitor_UseSpareWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -683,7 +683,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal async void MonitorsChanged_AddedMonitor_CreateWorkspace_Succeeds(
+	internal async void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Succeeds(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -720,7 +720,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal async void MonitorsChanged_AddedMonitor_CreateWorkspace_Fails(
+	internal async void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Fails(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -755,7 +755,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal async void MonitorsChanged_RemovedAndAddedMonitor(
+	internal async void OnMonitorsChanged_RemovedAndAddedMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
 		ButlerTriggers triggers,
@@ -798,6 +798,47 @@ public class ButlerEventHandlersTests
 		// And the monitor is added to the pantry
 		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[0]);
 		chores.Received().LayoutAllActiveWorkspaces();
+	}
+
+	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	internal async void OnMonitorsChanged_DelayLayouts(
+		IContext ctx,
+		IInternalContext internalCtx,
+		ButlerTriggers triggers,
+		IButlerChores chores,
+		IButlerPantry pantry
+	)
+	{
+		// Given
+		IMonitor[] monitors = CreateMonitors(ctx, 3);
+		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);
+		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.AsEnumerable().GetEnumerator());
+
+		pantry.GetAllActiveWorkspaces().Returns(workspaces);
+		pantry.GetWorkspaceForMonitor(monitors[0]).Returns(workspaces[0]);
+		pantry.GetWorkspaceForMonitor(monitors[1]).Returns(workspaces[1]);
+		pantry.GetWorkspaceForMonitor(monitors[2]).Returns(workspaces[2]);
+
+		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		Setup_TryEnqueue(ctx);
+
+		// When there are two events in quick succession
+		MonitorsChangedEventArgs e =
+			new()
+			{
+				RemovedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = new[] { monitors[1], monitors[2], monitors[0] },
+				AddedMonitors = Array.Empty<IMonitor>()
+			};
+		sut.OnMonitorsChanged(e);
+		sut.OnMonitorsChanged(e);
+		await Task.Delay(DELAY_MS);
+
+		// Then LayoutAllActiveWorkspaces is called just once
+		workspaces[0].Received().Deactivate();
+		workspaces[1].Received().Deactivate();
+		workspaces[2].Received().Deactivate();
+		chores.Received(1).LayoutAllActiveWorkspaces();
 	}
 	#endregion
 }
