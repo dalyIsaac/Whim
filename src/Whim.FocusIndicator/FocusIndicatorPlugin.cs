@@ -108,6 +108,12 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			return;
 		}
 
+		if (windowRect.WindowSize == WindowSize.Minimized)
+		{
+			Logger.Debug($"Window {window} is minimized");
+			return;
+		}
+
 		IsVisible = true;
 		_focusIndicatorWindow?.Activate(windowRect);
 
