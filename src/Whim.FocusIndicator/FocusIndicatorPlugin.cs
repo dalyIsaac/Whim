@@ -105,6 +105,14 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		if (windowRect == null)
 		{
 			Logger.Error($"Could not find window rectangle for window {window}");
+			Hide();
+			return;
+		}
+
+		if (windowRect.WindowSize == WindowSize.Minimized)
+		{
+			Logger.Debug($"Window {window} is minimized");
+			Hide();
 			return;
 		}
 
