@@ -118,7 +118,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public void FocusLastFocusedWindow()
 	{
 		Logger.Debug($"Focusing last focused window in workspace {Name}");
-		if (LastFocusedWindow != null)
+		if (LastFocusedWindow != null && !LastFocusedWindow.IsMinimized)
 		{
 			LastFocusedWindow.Focus();
 		}

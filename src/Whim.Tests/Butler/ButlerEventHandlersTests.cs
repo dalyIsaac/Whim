@@ -36,7 +36,7 @@ internal class ButlerEventHandlersCustomization : ICustomization
 
 public class ButlerEventHandlersTests
 {
-	private const int DELAY_MS = 3500;
+	private const int DELAY_MS = 4000;
 
 	private static void AssertWindowAdded(IWindow window, IWorkspace currentWorkspace, RouteEventArgs actual)
 	{

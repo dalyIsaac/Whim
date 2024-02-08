@@ -119,9 +119,8 @@ public interface IWorkspace : IDisposable
 	IWindowState? TryGetWindowState(IWindow window);
 
 	/// <summary>
-	/// Focuses on the last window in the workspace. If <see cref="LastFocusedWindow"/> is null,
-	/// then we try focus the first window. If there are no windows, then we focus the Windows
-	/// desktop window.
+	/// If <see cref="LastFocusedWindow"/> is not <see langword="null"/> or not minimized, then we focus the
+	/// last window in the workspace.
 	/// </summary>
 	void FocusLastFocusedWindow();
 
