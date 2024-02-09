@@ -31,6 +31,12 @@ internal class ButlerChores : IButlerChores
 		// Find the monitor which just lost `workspace`.
 		IMonitor? loserMonitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
 
+		if (monitor.Equals(loserMonitor))
+		{
+			Logger.Debug("Workspace is already activated");
+			return;
+		}
+
 		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.

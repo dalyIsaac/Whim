@@ -530,6 +530,26 @@ public class WorkspaceManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
+	internal void Activate_WorkspaceAlreadyActivated(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWorkspace workspace,
+		IMonitor monitor
+	)
+	{
+		// Given the workspace is already assigned to the monitor
+		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
+		ctx.Butler.Pantry.SetMonitorWorkspace(monitor, workspace);
+
+		// When we activate the workspace, then nothing happens
+		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
+			h => ctx.Butler.MonitorWorkspaceChanged += h,
+			h => ctx.Butler.MonitorWorkspaceChanged -= h,
+			() => workspaceManager.Activate(workspace)
+		);
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceManagerCustomization>]
 	internal void Activate_WithPreviousWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
