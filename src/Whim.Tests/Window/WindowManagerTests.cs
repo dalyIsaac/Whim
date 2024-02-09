@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
@@ -794,7 +793,7 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
-		WindowManager windowManager = new(ctx, internalCtx);
+		WindowManager windowManager = new(ctx, internalCtx) { MonitorChangedDelay = 0 };
 		windowManager.Initialize();
 		return (capture, windowManager, hwnd);
 	}
@@ -852,7 +851,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal async void WinEventProc_OnWindowMoved_Raises_CannotFindWorkspaceForWindow(
+	internal void WinEventProc_OnWindowMoved_Raises_CannotFindWorkspaceForWindow(
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -869,7 +868,6 @@ public class WindowManagerTests
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
-		await Task.Delay(2200);
 
 		Assert.Null(result.Arguments.CursorDraggedPoint);
 		Assert.Null(result.Arguments.MovedEdges);
@@ -878,7 +876,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal async void WinEventProc_OnWindowMoved_Raises_DoLayout(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMoved_Raises_DoLayout(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the window is registered as restoring, and a workspace is found for it
 		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
@@ -891,7 +889,6 @@ public class WindowManagerTests
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
-		await Task.Delay(2200);
 
 		Assert.Null(result.Arguments.CursorDraggedPoint);
 		Assert.Equal(result.Arguments.MovedEdges, Direction.None);
@@ -900,7 +897,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal async void WinEventProc_OnWindowMoved_DoesNotRaise_WindowAlreadyHandled(
+	internal void WinEventProc_OnWindowMoved_DoesNotRaise_WindowAlreadyHandled(
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -911,7 +908,6 @@ public class WindowManagerTests
 
 		// When the window is moved for the second time
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
-		await Task.Delay(2200).ConfigureAwait(true);
 
 		// Then no event is raised
 		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
@@ -919,11 +915,10 @@ public class WindowManagerTests
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
 		);
-		await Task.Delay(2200).ConfigureAwait(true);
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal async void WinEventProc_OnWindowMoved_WindowGetsRemoved(IContext ctx, IInternalContext internalCtx)
+	internal void WinEventProc_OnWindowMoved_WindowGetsRemoved(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the window has been been handled, but is removed
 		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
@@ -931,13 +926,10 @@ public class WindowManagerTests
 
 		// When the window is moved and then removed
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
-		await Task.Delay(2200).ConfigureAwait(true);
 
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_DESTROY, hwnd, 0, 0, 0, 0);
-		await Task.Delay(2200).ConfigureAwait(true);
 
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
-		await Task.Delay(2200).ConfigureAwait(true);
 
 		// Then the workspace is asked to do two layouts
 		workspace.Received(2).DoLayout();
