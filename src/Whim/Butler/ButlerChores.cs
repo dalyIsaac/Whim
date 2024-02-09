@@ -1,15 +1,18 @@
 using System.Linq;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
 internal class ButlerChores : IButlerChores
 {
 	private readonly IContext _context;
+	private readonly IInternalContext _internalContext;
 	private readonly ButlerTriggers _triggers;
 
-	public ButlerChores(IContext context, ButlerTriggers triggers)
+	public ButlerChores(IContext context, IInternalContext internalContext, ButlerTriggers triggers)
 	{
 		_context = context;
+		_internalContext = internalContext;
 		_triggers = triggers;
 	}
 
@@ -64,8 +67,10 @@ internal class ButlerChores : IButlerChores
 		}
 		else
 		{
-			// Hide all the windows from the old workspace.
 			oldWorkspace?.Deactivate();
+
+			// Temporarily focus the monitor's desktop HWND, to prevent another window from being focused.
+			FocusMonitorDesktop(monitor);
 		}
 
 		// Layout the new workspace.
@@ -114,6 +119,14 @@ internal class ButlerChores : IButlerChores
 		{
 			workspace.DoLayout();
 		}
+	}
+
+	public void FocusMonitorDesktop(IMonitor monitor)
+	{
+		HWND desktop = _internalContext.CoreNativeManager.GetDesktopWindow();
+		_internalContext.CoreNativeManager.SetForegroundWindow(desktop);
+		_internalContext.WindowManager.OnWindowFocused(null);
+		_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
 	}
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)

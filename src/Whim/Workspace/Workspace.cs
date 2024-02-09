@@ -134,12 +134,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				return;
 			}
 
-			// Focus the desktop.
-			HWND desktop = _internalContext.CoreNativeManager.GetDesktopWindow();
-			_internalContext.CoreNativeManager.SetForegroundWindow(desktop);
-			_internalContext.WindowManager.OnWindowFocused(null);
-
-			_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
+			_context.Butler.FocusMonitorDesktop(monitor);
 		}
 	}
 
