@@ -22,7 +22,7 @@ internal class ButlerChores : IButlerChores
 
 		if (!_context.WorkspaceManager.Contains(workspace))
 		{
-			Logger.Error($"Workspace {workspace} is not tracked in Whim.");
+			Logger.Error($"Workspace {workspace} is not tracked");
 			return;
 		}
 
@@ -32,7 +32,7 @@ internal class ButlerChores : IButlerChores
 		}
 		else if (!_context.MonitorManager.Contains(monitor))
 		{
-			Logger.Error($"Workspace {monitor} is not tracked in Whim");
+			Logger.Error($"Workspace {monitor} is not tracked");
 			return;
 		}
 

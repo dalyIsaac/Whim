@@ -39,7 +39,7 @@ public class ButlerChoresTests
 	{
 		// Given the monitor does not exist
 		ButlerChores sut = new(ctx, internalCtx, triggers);
-		ctx.WorkspaceManager.GetEnumerator().Returns(new List<IWorkspace> { workspace }.GetEnumerator());
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
 
 		// When Activate is called
 		sut.Activate(workspace, monitor);
@@ -60,7 +60,7 @@ public class ButlerChoresTests
 		// Given the workspace is already activated
 		ButlerChores sut = new(ctx, internalCtx, triggers);
 
-		ctx.WorkspaceManager.GetEnumerator().Returns(new List<IWorkspace> { workspace }.GetEnumerator());
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
 		ctx.MonitorManager.GetEnumerator().Returns(new List<IMonitor> { monitor }.GetEnumerator());
 		ctx.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
 
