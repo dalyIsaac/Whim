@@ -26,6 +26,12 @@ internal class ButlerChores : IButlerChores
 			return;
 		}
 
+		if (!_context.MonitorManager.Contains(monitor))
+		{
+			Logger.Error($"Workspace {monitor} is not tracked in Whim");
+			return;
+		}
+
 		monitor ??= _context.MonitorManager.ActiveMonitor;
 
 		// Get the old workspace for the event.
