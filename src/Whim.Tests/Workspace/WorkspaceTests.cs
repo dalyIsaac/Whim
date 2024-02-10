@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
@@ -415,7 +416,7 @@ public class WorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then the monitor is focused
-		internalCtx.MonitorManager.Received(1).ActivateEmptyMonitor(monitor);
+		ctx.Butler.Received(1).FocusMonitorDesktop(monitor);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -434,7 +435,7 @@ public class WorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then
-		internalCtx.MonitorManager.DidNotReceive().ActivateEmptyMonitor(Arg.Any<IMonitor>());
+		ctx.Butler.DidNotReceive().FocusMonitorDesktop(Arg.Any<IMonitor>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -454,7 +455,7 @@ public class WorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then
-		internalCtx.MonitorManager.Received(1).ActivateEmptyMonitor(monitor);
+		ctx.Butler.Received(1).FocusMonitorDesktop(monitor);
 	}
 	#endregion
 
