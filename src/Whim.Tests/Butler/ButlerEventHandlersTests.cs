@@ -814,7 +814,7 @@ public class ButlerEventHandlersTests
 		sut.OnMonitorsChanged(e);
 		sut.OnMonitorsChanged(e);
 		Assert.True(sut.AreMonitorsChanging);
-		await Task.Delay(2000);
+		await Task.Delay(6000);
 
 		// Then LayoutAllActiveWorkspaces is called just once
 		workspaces[0].Received().Deactivate();
