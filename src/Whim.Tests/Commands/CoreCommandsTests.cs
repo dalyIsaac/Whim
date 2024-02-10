@@ -38,7 +38,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.Received(1).ActivateAdjacent(reverse: true);
+		ctx.Butler.Received(1).ActivateAdjacent(reverse: true);
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
@@ -54,7 +54,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.Received(1).ActivateAdjacent();
+		ctx.Butler.Received(1).ActivateAdjacent();
 	}
 
 	[InlineAutoSubstituteData<CoreCommandsCustomization>("whim.core.focus_window_in_direction.left", Direction.Left)]
@@ -155,7 +155,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.Received(1).MoveWindowEdgesInDirection(direction, pixelsDeltas, null);
+		ctx.Butler.Received(1).MoveWindowEdgesInDirection(direction, pixelsDeltas, null);
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
@@ -171,7 +171,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.Received(1).MoveWindowToPreviousMonitor(null);
+		ctx.Butler.Received(1).MoveWindowToPreviousMonitor(null);
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
@@ -187,7 +187,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.Received(1).MoveWindowToNextMonitor(null);
+		ctx.Butler.Received(1).MoveWindowToNextMonitor(null);
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
@@ -326,7 +326,7 @@ public class CoreCommandsTests
 
 		ICommand command = testUtils.GetCommand(commandName);
 
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
+		ctx.Butler.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
 
 		// When
 		command.TryExecute();
@@ -344,7 +344,7 @@ public class CoreCommandsTests
 
 		ICommand command = testUtils.GetCommand("whim.core.focus_previous_monitor");
 
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
+		ctx.Butler.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
 
 		// When
 		command.TryExecute();
@@ -428,7 +428,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.DidNotReceive().Activate(Arg.Any<IWorkspace>());
+		ctx.Butler.DidNotReceive().Activate(Arg.Any<IWorkspace>());
 	}
 
 	[Theory]
@@ -449,7 +449,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.WorkspaceManager.Received(1).Activate(workspaces[index - 1]);
+		ctx.Butler.Received(1).Activate(workspaces[index - 1]);
 	}
 
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
