@@ -231,6 +231,7 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 
 		// Hack to only accept window events after Windows has been given a chance to stop moving
 		// windows around after a monitor change.
+		// NOTE: There is a commented out test in ButlerEventHandlersTests. It is flaky
 		_context.NativeManager.TryEnqueue(async () =>
 		{
 			await Task.Delay(MonitorsChangedDelay).ConfigureAwait(true);
