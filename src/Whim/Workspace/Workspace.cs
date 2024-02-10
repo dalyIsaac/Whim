@@ -118,7 +118,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public void FocusLastFocusedWindow()
 	{
 		Logger.Debug($"Focusing last focused window in workspace {Name}");
-		if (LastFocusedWindow != null)
+		if (LastFocusedWindow != null && !LastFocusedWindow.IsMinimized)
 		{
 			LastFocusedWindow.Focus();
 		}
@@ -134,12 +134,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				return;
 			}
 
-			// Focus the desktop.
-			HWND desktop = _internalContext.CoreNativeManager.GetDesktopWindow();
-			_internalContext.CoreNativeManager.SetForegroundWindow(desktop);
-			_internalContext.WindowManager.OnWindowFocused(null);
-
-			_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
+			_context.Butler.FocusMonitorDesktop(monitor);
 		}
 	}
 

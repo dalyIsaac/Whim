@@ -47,6 +47,8 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	public IFilterManager LocationRestoringFilterManager { get; } = new FilterManager();
 
+	internal int WindowMovedDelay { get; init; } = 2000;
+
 	/// <summary>
 	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringFilterManager"/>.
 	/// We maintain a set of the windows that have been handled so that we don't enter an infinite loop of location change events.
@@ -568,7 +570,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				// Wait, then restore the position.
 				_context.NativeManager.TryEnqueue(async () =>
 				{
-					await Task.Delay(2000).ConfigureAwait(true);
+					await Task.Delay(WindowMovedDelay).ConfigureAwait(true);
 					if (_context.Butler.GetWorkspaceForWindow(window) is IWorkspace workspace)
 					{
 						_handledLocationRestoringWindows.Add(window);

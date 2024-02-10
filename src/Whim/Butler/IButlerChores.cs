@@ -36,6 +36,12 @@ public interface IButlerChores
 	void LayoutAllActiveWorkspaces();
 
 	/// <summary>
+	/// Focus the Windows desktop's window.
+	/// </summary>
+	/// <param name="monitor"></param>
+	void FocusMonitorDesktop(IMonitor monitor);
+
+	/// <summary>
 	/// Moves the given <paramref name="window"/> by the given <paramref name="pixelsDeltas"/>.
 	/// </summary>
 	/// <param name="edges">The edges to change.</param>

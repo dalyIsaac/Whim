@@ -41,7 +41,7 @@ internal partial class Butler : IButler
 		};
 
 		_pantry = new ButlerPantry(_context);
-		_chores = new ButlerChores(_context, _triggers);
+		_chores = new ButlerChores(_context, _internalContext, _triggers);
 		EventHandlers = new ButlerEventHandlers(_context, _internalContext, _triggers, _pantry, _chores);
 	}
 
@@ -125,6 +125,8 @@ internal partial class Butler : IButler
 		_chores.ActivateAdjacent(monitor, reverse, skipActive);
 
 	public void LayoutAllActiveWorkspaces() => _chores.LayoutAllActiveWorkspaces();
+
+	public void FocusMonitorDesktop(IMonitor monitor) => _chores.FocusMonitorDesktop(monitor);
 
 	public void MergeWorkspaceWindows(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget) =>
 		_chores.MergeWorkspaceWindows(workspaceToDelete, workspaceMergeTarget);

@@ -14,6 +14,8 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 	private int _monitorsChangingTasks;
 	public bool AreMonitorsChanging => _monitorsChangingTasks > 0;
 
+	public int MonitorsChangedDelay { init; get; } = 3 * 1000;
+
 	public ButlerEventHandlers(
 		IContext context,
 		IInternalContext internalContext,
@@ -231,7 +233,7 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		// windows around after a monitor change.
 		_context.NativeManager.TryEnqueue(async () =>
 		{
-			await Task.Delay(3 * 1000).ConfigureAwait(true);
+			await Task.Delay(MonitorsChangedDelay).ConfigureAwait(true);
 
 			_monitorsChangingTasks--;
 			if (_monitorsChangingTasks > 0)

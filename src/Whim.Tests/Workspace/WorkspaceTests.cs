@@ -367,8 +367,6 @@ public class WorkspaceTests
 	}
 	#endregion
 
-
-
 	#region FocusLastFocusedWindow
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
 	internal void FocusLastFocusedWindow_LastFocusedWindow(
@@ -389,9 +387,35 @@ public class WorkspaceTests
 		workspace.WindowFocused(window);
 		workspace.FocusLastFocusedWindow();
 
-		// Then the LayoutEngine's GetFirstWindow method is called
-		layoutEngine.DidNotReceive().GetFirstWindow();
+		// Then the window is focused
 		window.Received(1).Focus();
+	}
+
+	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	internal void FocusLastFocusedWindow_MinimizedLastFocusedWindow(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceManagerTriggers triggers,
+		ILayoutEngine layoutEngine,
+		IWindow window,
+		IMonitor monitor
+	)
+	{
+		// Given the window is in the workspace
+		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
+		ctx.Butler.GetMonitorForWorkspace(workspace).Returns(monitor);
+
+		workspace.AddWindow(window);
+		window.IsMinimized.Returns(true);
+
+		window.ClearReceivedCalls();
+
+		// When FocusLastFocusedWindow is called
+		workspace.WindowFocused(window);
+		workspace.FocusLastFocusedWindow();
+
+		// Then the monitor is focused
+		ctx.Butler.Received(1).FocusMonitorDesktop(monitor);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -410,7 +434,7 @@ public class WorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then
-		internalCtx.MonitorManager.DidNotReceive().ActivateEmptyMonitor(Arg.Any<IMonitor>());
+		ctx.Butler.DidNotReceive().FocusMonitorDesktop(Arg.Any<IMonitor>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -430,7 +454,7 @@ public class WorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then
-		internalCtx.MonitorManager.Received(1).ActivateEmptyMonitor(monitor);
+		ctx.Butler.Received(1).FocusMonitorDesktop(monitor);
 	}
 	#endregion
 

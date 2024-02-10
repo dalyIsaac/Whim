@@ -1,15 +1,18 @@
 using System.Linq;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
 internal class ButlerChores : IButlerChores
 {
 	private readonly IContext _context;
+	private readonly IInternalContext _internalContext;
 	private readonly ButlerTriggers _triggers;
 
-	public ButlerChores(IContext context, ButlerTriggers triggers)
+	public ButlerChores(IContext context, IInternalContext internalContext, ButlerTriggers triggers)
 	{
 		_context = context;
+		_internalContext = internalContext;
 		_triggers = triggers;
 	}
 
@@ -19,17 +22,31 @@ internal class ButlerChores : IButlerChores
 
 		if (!_context.WorkspaceManager.Contains(workspace))
 		{
-			Logger.Error($"Workspace {workspace} is not tracked in Whim.");
+			Logger.Error($"Workspace {workspace} is not tracked");
 			return;
 		}
 
-		monitor ??= _context.MonitorManager.ActiveMonitor;
+		if (monitor is null)
+		{
+			monitor = _context.MonitorManager.ActiveMonitor;
+		}
+		else if (!_context.MonitorManager.Contains(monitor))
+		{
+			Logger.Error($"Workspace {monitor} is not tracked");
+			return;
+		}
 
 		// Get the old workspace for the event.
 		IWorkspace? oldWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
 
 		// Find the monitor which just lost `workspace`.
 		IMonitor? loserMonitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
+
+		if (monitor.Equals(loserMonitor))
+		{
+			Logger.Debug("Workspace is already activated");
+			return;
+		}
 
 		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
@@ -58,8 +75,10 @@ internal class ButlerChores : IButlerChores
 		}
 		else
 		{
-			// Hide all the windows from the old workspace.
 			oldWorkspace?.Deactivate();
+
+			// Temporarily focus the monitor's desktop HWND, to prevent another window from being focused.
+			FocusMonitorDesktop(monitor);
 		}
 
 		// Layout the new workspace.
@@ -108,6 +127,14 @@ internal class ButlerChores : IButlerChores
 		{
 			workspace.DoLayout();
 		}
+	}
+
+	public void FocusMonitorDesktop(IMonitor monitor)
+	{
+		HWND desktop = _internalContext.CoreNativeManager.GetDesktopWindow();
+		_internalContext.CoreNativeManager.SetForegroundWindow(desktop);
+		_internalContext.WindowManager.OnWindowFocused(null);
+		_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
 	}
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)
