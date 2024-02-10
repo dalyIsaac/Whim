@@ -121,7 +121,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	public IWindow? CreateWindow(HWND hwnd)
 	{
-		Logger.Debug($"Adding window {hwnd}");
+		Logger.Verbose($"Adding window {hwnd}");
 
 		if (_windows.TryGetValue(hwnd, out IWindow? window) && window != null)
 		{

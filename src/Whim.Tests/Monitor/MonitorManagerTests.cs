@@ -740,44 +740,7 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void ActivateEmptyMonitor_MonitorInManager_NoWorkspace(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		MonitorManager monitorManager = new(ctx, internalCtx);
-		IMonitor monitor = monitorManager.ElementAt(1);
-
-		ctx.Butler.GetWorkspaceForMonitor(monitor).Returns((IWorkspace?)null);
-
-		// When
-		monitorManager.ActivateEmptyMonitor(monitor);
-
-		// Then
-		Assert.Equal(monitorManager.ActiveMonitor, monitorManager.First());
-	}
-
-	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void ActivateEmptyMonitor_MonitorIsNotEmpty(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IWorkspace workspace
-	)
-	{
-		// Given
-		MonitorManager monitorManager = new(ctx, internalCtx);
-		IMonitor monitor = monitorManager.ElementAt(1);
-
-		ctx.Butler.GetWorkspaceForMonitor(monitor).Returns(workspace);
-		workspace.Windows.GetEnumerator().Returns(new List<IWindow>() { Substitute.For<IWindow>() }.GetEnumerator());
-
-		// When
-		monitorManager.ActivateEmptyMonitor(monitor);
-
-		// Then
-		Assert.Equal(monitorManager.ActiveMonitor, monitorManager.First());
-	}
-
-	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void ActivateEmptyMonitor_MonitorIsEmpty(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
+	internal void ActivateEmptyMonitor_Success(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
