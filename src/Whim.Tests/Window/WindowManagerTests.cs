@@ -793,7 +793,7 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
-		WindowManager windowManager = new(ctx, internalCtx) { MonitorChangedDelay = 0 };
+		WindowManager windowManager = new(ctx, internalCtx) { WindowMovedDelay = 0 };
 		windowManager.Initialize();
 		return (capture, windowManager, hwnd);
 	}
