@@ -802,6 +802,7 @@ public class ButlerEventHandlersTests
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores) { MonitorsChangedDelay = 500 };
 		NativeManagerUtils.SetupTryEnqueue(ctx);
+		chores.ClearReceivedCalls();
 
 		// When there are two events in quick succession
 		MonitorsChangedEventArgs e =
