@@ -31,7 +31,7 @@ internal sealed partial class MenuVariantRowView
 
 	public void Update(MatcherResult<MenuVariantRowModelData> matcherResult)
 	{
-		Logger.Debug("Updating with a new item");
+		Logger.Verbose("Updating with a new item");
 		ViewModel.Update(matcherResult);
 		this.SetTitle(CommandTitle.Inlines);
 		SetKeybinds();
