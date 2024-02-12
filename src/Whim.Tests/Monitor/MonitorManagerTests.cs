@@ -170,8 +170,9 @@ public class MonitorManagerTests
 		>();
 	}
 
+	#region OnWindowFocused
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused_NullMonitor(IContext ctx, IInternalContext internalCtx)
+	internal void WindowFocused_NullWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		internalCtx
@@ -179,33 +180,64 @@ public class MonitorManagerTests
 			.Returns((HMONITOR)1);
 
 		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor monitorBefore = monitorManager.ActiveMonitor;
 
 		// When
 		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
 
 		// Then
 		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
-		internalCtx.CoreNativeManager.Received(1).MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
+		internalCtx.CoreNativeManager.DidNotReceive().MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
+		Assert.Equal(monitorBefore, monitorManager.ActiveMonitor);
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused(IContext ctx, IInternalContext internalCtx)
+	internal void WindowFocused_NullMonitor(IContext ctx, IInternalContext internalCtx, IWindow window)
+	{
+		// Given
+		window.Handle.Returns((HWND)1);
+		internalCtx
+			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
+			.Returns((HMONITOR)1);
+
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor monitorBefore = monitorManager.ActiveMonitor;
+
+		// When
+		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
+
+		// Then
+		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
+		internalCtx.CoreNativeManager.DidNotReceive().MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
+		Assert.Equal(monitorBefore, monitorManager.ActiveMonitor);
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowFocused_Success(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor monitorBefore = monitorManager.ActiveMonitor;
+
+		window.Handle.Returns((HWND)1);
+		internalCtx
+			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
+			.Returns((HMONITOR)1);
 
 		// When
-		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
+		monitorManager.OnWindowFocused(window);
 
 		// Then
 		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
 		internalCtx.CoreNativeManager.Received(1).MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
+		Assert.NotEqual(monitorBefore, monitorManager.ActiveMonitor);
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused_NullWindow(IContext ctx, IInternalContext internalCtx)
+	internal void WindowFocused_GetForegroundWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
+		internalCtx.CoreNativeManager.GetForegroundWindow().Returns((HWND)1);
 		internalCtx
 			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
 			.Returns((HMONITOR)1);
@@ -219,6 +251,7 @@ public class MonitorManagerTests
 		internalCtx.CoreNativeManager.Received(1).GetForegroundWindow();
 		internalCtx.CoreNativeManager.Received(1).MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
 	}
+	#endregion
 
 	private static WindowMessageMonitorEventArgs WindowMessageMonitorEventArgs =>
 		new()
