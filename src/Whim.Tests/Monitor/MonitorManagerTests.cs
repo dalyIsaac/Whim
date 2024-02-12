@@ -218,7 +218,7 @@ public class MonitorManagerTests
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
 		IMonitor monitorBefore = monitorManager.ActiveMonitor;
-		
+
 		window.Handle.Returns((HWND)1);
 		internalCtx
 			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
