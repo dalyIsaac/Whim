@@ -1,10 +1,16 @@
 # Commands
 
-Commands are used to interact with Whim at runtime. They can be used as [keybinds](./keybinds.md) or triggered from the [Command Palette](../plugins/command-palette.md) (activated by <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> by default).
+Commands (<xref:Whim.ICommand>) are objects with a unique identifier, title, and executable action. They are used to interact with Whim at runtime, for instance, by being bound to [keybinds](./keybinds.md) or the [Command Palette](../plugins/command-palette.md).
 
-Whim supports the creation of arbitrary commands using the <xref:Whim.ICommandManager> - see [Custom commands](#custom-commands).
+Whim differentiates three types of commands.
+
+1. [Core commands](#core-commands) expose common functions as ready-to-use commands, many of which come with a default keybinding.
+2. [Plugin commands](#plugin-commands) are ready-to-use commands exposed by plugins. 
+3. [Custom commands](#custom-commands) are user-defined commands, which can compose arbitrary functions.
 
 ## Core commands
+
+Core commands have identifiers under the `whim.core` namespace.
 
 | Identifier                                  | Title                                                              | Default Keybind                                      |
 |---------------------------------------------| ------------------------------------------------------------------ |------------------------------------------------------|
@@ -40,21 +46,13 @@ Whim supports the creation of arbitrary commands using the <xref:Whim.ICommandMa
 | `whim.core.restart_whim`                    | Restart Whim                                                       | No default keybind                                   |
 | `whim.core.activate_workspace_{idx}`        | Activate workspace `{idx}` (where `idx` is an `int` 1, 2, ...9, 0) | <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>{idx}</kbd> |
 
-## Advanced usage
+## Plugin commands
 
-### Namespaces
+Plugin commands are namespaced by the string defined in the <xref:Whim.IPlugin.Name> property for plugins - for example, `whim.gaps` for [`GapsPlugin`](../plugins/gaps.md). For a list of available plugin commands, see the "Plugins" section.
 
-Whim stores commands (<xref:Whim.ICommand>) in the <xref:Whim.ICommandManager>. Commands are objects with a unique identifier, title, and executable action.
+## Custom commands
 
-Command identifiers are namespaced:
-
-- `whim.core` is reserved for [core commands](#core-commands)
-- the string defined in the <xref:Whim.IPlugin.Name> property for plugins - for example, `whim.gaps` for [`GapsPlugin`](../plugins/gaps.md)
-- `whim.custom` is reserved for [custom user-defined commands](#custom-commands)
-
-### Custom commands
-
-Custom commands are automatically added to the `whim.custom` namespace. For example, the following command closes the current tracked window:
+Custom commands can be created using the <xref:Whim.ICommandManager>. They are automatically added to the `whim.custom` namespace. For example, the following command closes the current tracked window:
 
 ```csharp
 // Create the command.
