@@ -26,6 +26,7 @@ jobs:
           config: .markdownlint-cli2.jsonc
           globs: |
             **/*.md
+            !.github/**/*.md
 
   build:
     # Run on Windows since docfx will build Whim to generate the API docs.
