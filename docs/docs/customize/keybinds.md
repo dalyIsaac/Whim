@@ -1,16 +1,39 @@
 # Keybinds
 
-A [command](commands.md) can be bound to a single "keybind" <xref:Whim.IKeybind>. However, **each keybind can trigger multiple commands.**
+Keybinds are managed using the <xref:Whim.IKeybindManager>, which can be used to create new keybinds and to remove or overwrite existing keybinds.
 
-The <xref:Whim.IKeybind> interface contains a number of constants with common <xref:Whim.KeyModifiers>. When creating a custom <xref:Whim.Keybind>, you can use these constants or a custom combination of <xref:Whim.KeyModifiers>.
+## Default Keybinds
 
-The available keys can be found in the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY> enum.
-Keybinds can be overridden and removed in the config. For example:
+See the listing of [core commands](commands.md#core-commands) for a summary of default keybinds. Some plugins also come with additional default keybinds, which are documented on the individual plugin pages.
+
+## Creating Keybinds
+
+New keybindings are created by binding a [command](commands.md) identifier to a "Keybind" (<xref:Whim.IKeybind>). For instance, the following binds `whim.core.cycle_layout_engine.next` to <kbd>Alt</kbd> + <kbd>SPACE</kbd>.
+```csharp
+context.KeybindManager.SetKeybind("whim.core.cycle_layout_engine.next", new Keybind(KeyModifiers.LAlt, VIRTUAL_KEY.VK_SPACE));
+```
+Keybinds have a `Modifiers` and `Key` property. The available modifiers and keys can be found in the <xref:Whim.KeyModifiers> and <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY> enums. Modifiers can be combined using the bitwise OR operator. For instance, the following creates a new <kbd>Alt</kbd> + <kbd>Shift</kbd> modifier, which can be used to create Keybinds:
+```csharp
+KeyModifiers AltShift = KeyModifiers.LAlt | KeyModifiers.LShift;
+```
+A number of common modifiers combinations is also accessible from the <xref:Whim.IKeybind> interface. 
+
+To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
+
+## Overwriting Keybinds
+
+Each command can only be bound to a single keybind. Hence, any default binding can be overwritten by rebinding the corresponding command as described above.
+
+> [!WARNING]
+> When overriding keybinds for plugins, make sure to set the keybind **after** calling `context.PluginManager.AddPlugin(plugin)`.
+>
+> Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
+
+## Removing Keybinds
+
+Keybinds can be removed for individual commands or entirely:
 
 ```csharp
-// Override the default keybind for showing/hiding the command palette.
-context.KeybindManager.SetKeybind("whim.command_palette.toggle", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_P));
-
 // Remove the default keybind for closing the current workspace.
 context.KeybindManager.Remove("whim.core.close_current_workspace");
 
@@ -18,9 +41,5 @@ context.KeybindManager.Remove("whim.core.close_current_workspace");
 context.KeybindManager.Clear();
 ```
 
-> [!WARNING]
-> When overriding keybinds for plugins, make sure to set the keybind **after** calling `context.PluginManager.AddPlugin(plugin)`.
->
-> Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
 
-To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
+
