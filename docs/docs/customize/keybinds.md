@@ -22,7 +22,7 @@ A number of common modifiers combinations are also accessible from the <xref:Whi
 
 To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
 
-> [ !NOTE]
+> [!NOTE]
 > Each _command_ can only be bound to a single keybind -- subsequent bindings to the same command will overwrite earlier ones. However, each _keybind_ can be assigned to multiple commands. If more than one command is triggered to a keymap, they will be triggered in the order of their assignment.
 
 ## Overwriting Keybinds
