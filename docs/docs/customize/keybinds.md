@@ -24,3 +24,5 @@ context.KeybindManager.Clear();
 > Otherwise, `PluginManager.AddPlugin` will set the default keybinds, overriding custom keybinds set before the plugin is added.
 
 To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
+
+
