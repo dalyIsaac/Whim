@@ -18,7 +18,7 @@ Keybinds have a `Modifiers` and `Key` property. The available modifiers and keys
 ```csharp
 KeyModifiers AltShift = KeyModifiers.LAlt | KeyModifiers.LShift;
 ```
-A number of common modifiers combinations is also accessible from the <xref:Whim.IKeybind> interface. 
+A number of common modifiers combinations are also accessible from the <xref:Whim.IKeybind> interface. 
 
 To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
 
