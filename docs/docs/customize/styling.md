@@ -65,6 +65,11 @@ Notes:
 - This setting is overwritten if `Height` is explicitly set in <xref:Whim.Bar.BarConfig>.
 - The actual height of the bar may differ from the specified one due to overflowing elements.
 
+> [!NOTE]
+> The scaling of the bar and its child elements depends on various Windows settings, which can lead to overflows and cropping.
+> 
+> For example, the font size is scaled by Window's "Accessibility / Text size" setting, which may change the appearance of the bar - see [here](https://github.com/dalyIsaac/Whim/issues/730#issuecomment-1863761492).
+
 ### Special color keys
 
 XAML in WinUI does not support "trigger styles" in a user dictionary. Thus, there is no direct way for us to define styling for scenarios like button `hover` or `disabled`. As a workaround, Whim defines the following color keys which can be used to overwrite the system resources in `Microsoft.UI.Xaml.Controls`.
