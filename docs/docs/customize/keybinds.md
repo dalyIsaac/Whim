@@ -12,7 +12,9 @@ New keybindings are created by binding a [command](commands.md) identifier to a 
 ```csharp
 context.KeybindManager.SetKeybind("whim.core.cycle_layout_engine.next", new Keybind(KeyModifiers.LAlt, VIRTUAL_KEY.VK_SPACE));
 ```
+
 Keybinds have a `Modifiers` and `Key` property. The available modifiers and keys can be found in the <xref:Whim.KeyModifiers> and <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY> enums. Modifiers can be combined using the bitwise OR operator. For instance, the following creates a new <kbd>Alt</kbd> + <kbd>Shift</kbd> modifier, which can be used to create Keybinds:
+
 ```csharp
 KeyModifiers AltShift = KeyModifiers.LAlt | KeyModifiers.LShift;
 ```
@@ -20,9 +22,12 @@ A number of common modifiers combinations is also accessible from the <xref:Whim
 
 To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
 
+> [ !NOTE]
+> Each _command_ can only be bound to a single keybind -- subsequent bindings to the same command will overwrite earlier ones. However, each _keybind_ can be assigned to multiple commands. If more than one command is triggered to a keymap, they will be triggered in the order of their assignment.
+
 ## Overwriting Keybinds
 
-Each command can only be bound to a single keybind. Hence, any default binding can be overwritten by rebinding the corresponding command as described above.
+Default bindings can be overwritten by simply rebinding the corresponding _command_ as described above.
 
 > [!WARNING]
 > When overriding keybinds for plugins, make sure to set the keybind **after** calling `context.PluginManager.AddPlugin(plugin)`.
