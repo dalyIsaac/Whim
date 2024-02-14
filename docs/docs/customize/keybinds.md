@@ -8,7 +8,7 @@ See the listing of [core commands](commands.md#core-commands) for a summary of d
 
 ## Creating Keybinds
 
-New keybindings are created by binding a [command](commands.md) identifier to a "Keybind" (<xref:Whim.IKeybind>). For instance, the following binds `whim.core.cycle_layout_engine.next` to <kbd>Alt</kbd> + <kbd>SPACE</kbd>.
+New keybindings are created by binding a [command](commands.md) identifier to a "Keybind" (<xref:Whim.Keybind>). For instance, the following binds `whim.core.cycle_layout_engine.next` to <kbd>Alt</kbd> + <kbd>SPACE</kbd>.
 ```csharp
 context.KeybindManager.SetKeybind("whim.core.cycle_layout_engine.next", new Keybind(KeyModifiers.LAlt, VIRTUAL_KEY.VK_SPACE));
 ```
