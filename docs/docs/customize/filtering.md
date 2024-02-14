@@ -21,4 +21,4 @@ context.FilterManager.Clear();
 ### Caveats
 
 - Turning off individual komorebi rules is not currently supported but is planned - see [dalyIsaac/Whim#702](https://github.com/dalyIsaac/Whim/issues/702).
-- Whim does not support komorebi rules defined using regular expressions, as komorebi is written in Rust and the regular expressions are likely to have compatibility issues with .NET - see [dalyIsaac/Whim#690](https://github.com/dalyIsaac/Whim/issues/690). In practice, this is not much of a concern as there are currently no such rules defined by komorebi.
+- Whim does not support komorebi rules defined using regular expressions, as komorebi is written in Rust and the regular expressions are likely to have compatibility issues with .NET - see [dalyIsaac/Whim#690](https://github.com/dalyIsaac/Whim/issues/690). In practice, this is not much of a concern; as of February 2024, there are no such rules defined by komorebi.
