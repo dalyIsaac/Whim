@@ -27,6 +27,8 @@ context.CommandManager.Add(
 
 ## Skip over active workspaces
 
+The following commands can be useful on multi-monitor setups. When bound to keybinds, these can be used to cycle through the list of workspaces, skipping over those that are active on other monitors to avoid accidental swapping.
+
 ```csharp
 // Activate next workspace, skipping over those that are active on other monitors
 context.CommandManager.Add(
