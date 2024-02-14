@@ -1,6 +1,6 @@
 # Logging
 
-Whim wraps [Serilog](https://serilog.net/) to provide logging functionality. It can be configured using the <xref:Whim.LoggerConfig> class. For example:
+Whim provides logging by wrapping the [Serilog](https://serilog.net/) library. It can be configured using the <xref:Whim.LoggerConfig> class. For example:
 
 ```csharp
 // The logger will only log messages with a level of `Debug` or higher.
