@@ -25,7 +25,6 @@ jobs:
         with:
           config: .markdownlint-cli2.jsonc
           globs: |
-            "**/**.md"
             "!.github/**"
 
   build:
