@@ -329,6 +329,7 @@ public class MonitorManagerTests
 		Assert.Equal(2, raisedEvent.Arguments.UnchangedMonitors.Count());
 		Assert.Single(raisedEvent.Arguments.AddedMonitors);
 		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
+		internalCtx.ButlerEventHandlers.Received().OnMonitorsChanged(Arg.Any<MonitorsChangedEventArgs>());
 
 		RECT[] expectedUnchangedRects = new[] { leftTop, right };
 		raisedEvent
@@ -398,6 +399,7 @@ public class MonitorManagerTests
 		Assert.Single(raisedEvent.Arguments.UnchangedMonitors);
 		Assert.Single(raisedEvent.Arguments.AddedMonitors);
 		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
+		internalCtx.ButlerEventHandlers.Received().OnMonitorsChanged(Arg.Any<MonitorsChangedEventArgs>());
 
 		RECT[] expectedUnchangedRects = new[] { primaryRect };
 		raisedEvent
@@ -453,6 +455,7 @@ public class MonitorManagerTests
 		Assert.Single(raisedEvent.Arguments.UnchangedMonitors);
 		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
 		Assert.Single(raisedEvent.Arguments.RemovedMonitors);
+		internalCtx.ButlerEventHandlers.Received().OnMonitorsChanged(Arg.Any<MonitorsChangedEventArgs>());
 
 		RECT[] expectedRemovedRects = new[]
 		{
@@ -468,6 +471,62 @@ public class MonitorManagerTests
 			.Arguments.RemovedMonitors.Select(m => m.Bounds)
 			.Should()
 			.Equal(expectedRemovedRects.Select(r => r.ToRectangle()));
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void WindowMessageMonitor_DisplayChanged_NoChange(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		// Populate the monitor manager with the default two monitors
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		monitorManager.Initialize();
+
+		// Set up the monitor manager to have the two monitors
+		MonitorManagerCustomization.UpdateMultipleMonitors(
+			internalCtx,
+			new[]
+			{
+				(
+					new RECT()
+					{
+						left = 1920,
+						top = 0,
+						right = 3840,
+						bottom = 1080
+					},
+					(HMONITOR)1
+				),
+				(
+					new RECT()
+					{
+						left = 0,
+						top = 0,
+						right = 1920,
+						bottom = 1080
+					},
+					(HMONITOR)2
+				)
+			}
+		);
+
+		// When
+		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
+			h => monitorManager.MonitorsChanged += h,
+			h => monitorManager.MonitorsChanged -= h,
+			() =>
+				internalCtx.WindowMessageMonitor.DisplayChanged += Raise.Event<
+					EventHandler<WindowMessageMonitorEventArgs>
+				>(internalCtx.WindowMessageMonitor, WindowMessageMonitorEventArgs)
+		);
+
+		// Then
+		List<IMonitor> monitors = monitorManager.ToList();
+		Assert.Equal(2, monitors.Count);
+
+		Assert.Equal(2, raisedEvent.Arguments.UnchangedMonitors.Count());
+		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
+		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
+		internalCtx.ButlerEventHandlers.DidNotReceive().OnMonitorsChanged(Arg.Any<MonitorsChangedEventArgs>());
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
