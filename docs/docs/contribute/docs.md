@@ -25,8 +25,16 @@ When linking to the docs for one of Whim's automatically generated docs, prefer 
 
 The IDs to use can be found in the `uid` field of the `xrefmap.yml` file. The `xrefmap.yml` will be generated at `docs/_site/xrefmap.yml`.
 
+## Linting
+
+Before making a pull request, please run the `markdownlint` formatter, available as a [Visual Studio Code extension](https://github.com/markdownlint/markdownlint) and as [command line tool](https://github.com/DavidAnson/markdownlint-cli2).
+
+```shell
+# In the repo root, run the CLI formatter
+markdownlint-cli2 --fix --config ".markdownlint-cli2.jsonc" "docs/**/*.md"  
+```
+
 ## Things to keep in mind
 
 - Use American English spelling for the docs.
 - The table of contents are not automatically built - to add a new page, you need to add it to the respective `toc.yml`.
-- The recommended extensions for Visual Studio Code include a variety of useful extensions, including [markdownlint](https://github.com/markdownlint/markdownlint).

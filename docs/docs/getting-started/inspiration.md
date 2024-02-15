@@ -27,7 +27,7 @@ Implementations of Whim's `ILayoutEngine` should be immutable. This was done to 
 
 Whim has a command system with common functionality, which makes it easier to interact with at a higher level. The command system is used by different components, like the <xref:Whim.IKeybindManager> and [Command Palette](../plugins/command-palette.md).
 
-The command palette in Whim is also more powerful than the one in , using a port of the Visual Studio Code command palette fuzzy search algorithm.
+The command palette in Whim is also more powerful than the one in workspacer, using a port of the Visual Studio Code command palette fuzzy search algorithm.
 
 ## Appearance
 
