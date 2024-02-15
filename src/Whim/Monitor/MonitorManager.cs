@@ -74,6 +74,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void OnWindowFocused(IWindow? window)
 	{
+		// If we know the window, use what the butler knows instead of Windows.
 		if (window is not null)
 		{
 			Logger.Debug($"Focusing window {window}");
@@ -86,7 +87,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 			}
 		}
 
-		HWND hwnd = _internalContext.CoreNativeManager.GetForegroundWindow();
+		HWND hwnd = window?.Handle ?? _internalContext.CoreNativeManager.GetForegroundWindow();
 		Logger.Debug($"Focusing hwnd {hwnd}");
 
 		if (hwnd.IsNull)
