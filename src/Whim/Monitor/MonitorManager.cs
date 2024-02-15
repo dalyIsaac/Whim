@@ -180,7 +180,11 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 				RemovedMonitors = removedMonitors,
 				AddedMonitors = addedMonitors
 			};
-		_internalContext.ButlerEventHandlers.OnMonitorsChanged(args);
+
+		if (addedMonitors.Count != 0 || removedMonitors.Count != 0)
+		{
+			_internalContext.ButlerEventHandlers.OnMonitorsChanged(args);
+		}
 		MonitorsChanged?.Invoke(this, args);
 	}
 
