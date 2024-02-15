@@ -1,6 +1,6 @@
 # Styling
 
-Whim uses XAML resources to style the appearance of certain user interfaces such as the [Bar Plugin](../plugins/bar.md). By default, Whim loads its resources from [Defaults.xaml](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Resources/Defaults.xaml). 
+Whim uses XAML resources to style the appearance of certain user interfaces such as the [Bar Plugin](../plugins/bar.md). By default, Whim loads its resources from [Defaults.xaml](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Resources/Defaults.xaml).
 
 ## Loading custom dictionaries
 
@@ -60,14 +60,16 @@ The `bar:height` key is a special key that is used to communicate to Whim the de
     <Setter Property="Height" Value="28" />
 </Style>
 ```
+
 Notes:
+
 - The corresponding style must not contain any property other than `Height`.
 - This setting is overwritten if `Height` is explicitly set in <xref:Whim.Bar.BarConfig>.
 - The actual height of the bar may differ from the specified one due to overflowing elements.
 
 > [!NOTE]
 > The scaling of the bar and its child elements depends on various Windows settings, which can lead to overflows and cropping.
-> 
+>
 > For example, the font size is scaled by Window's "Accessibility / Text size" setting, which may change the appearance of the bar - see [here](https://github.com/dalyIsaac/Whim/issues/730#issuecomment-1863761492).
 
 ### Special color keys

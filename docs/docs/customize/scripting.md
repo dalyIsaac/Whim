@@ -1,8 +1,8 @@
 # Scripting
 
-Whim uses the [Microsoft.CodeAnalysis.CSharp](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp) scripting engine to run your `.whim/whim.config.csx` file. 
+Whim uses the [Microsoft.CodeAnalysis.CSharp](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp) scripting engine to run your `.whim/whim.config.csx` file.
 
-An example config file is created in your `.whim` directory when Whim is first run. 
+An example config file is created in your `.whim` directory when Whim is first run.
 
 ## Directives
 
@@ -27,7 +27,7 @@ using Whim;
 
 ## The DoConfig Function
 
-Following the various directives goes the `DoConfig` function which takes an <xref:Whim.IContext> parameter and is written in largely typically C# code. 
+Following the various directives goes the `DoConfig` function which takes an <xref:Whim.IContext> parameter and is written in largely typically C# code.
 
 ```csharp
 void DoConfig(IContext context)

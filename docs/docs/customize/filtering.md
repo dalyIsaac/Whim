@@ -6,6 +6,7 @@
 // Called by the bar plugin.
 context.FilterManager.AddTitleMatchFilter("Whim Bar");
 ```
+
 Besides by their `Title`, windows can also be matched by their `WindowClass`, by their `ProcessFileName` or via custom rules -- see <xref:Whim.IFilterManager>.
 
 ## Built-in filters

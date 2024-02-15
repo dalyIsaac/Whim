@@ -9,6 +9,7 @@ See the listing of [core commands](commands.md#core-commands) for a summary of d
 ## Creating Keybinds
 
 New keybindings are created by binding a [command](commands.md) identifier to a "Keybind" (<xref:Whim.Keybind>). For instance, the following binds `whim.core.cycle_layout_engine.next` to <kbd>Alt</kbd> + <kbd>SPACE</kbd>.
+
 ```csharp
 context.KeybindManager.SetKeybind("whim.core.cycle_layout_engine.next", new Keybind(KeyModifiers.LAlt, VIRTUAL_KEY.VK_SPACE));
 ```
@@ -18,7 +19,8 @@ Keybinds have a `Modifiers` and `Key` property. The available modifiers and keys
 ```csharp
 KeyModifiers AltShift = KeyModifiers.LAlt | KeyModifiers.LShift;
 ```
-A number of common modifiers combinations are also accessible from the <xref:Whim.IKeybind> interface. 
+
+A number of common modifiers combinations are also accessible from the <xref:Whim.IKeybind> interface.
 
 To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
 
@@ -45,6 +47,3 @@ context.KeybindManager.Remove("whim.core.close_current_workspace");
 // Remove all keybinds - start from scratch.
 context.KeybindManager.Clear();
 ```
-
-
-

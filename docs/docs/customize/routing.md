@@ -7,4 +7,3 @@ context.RouterManager.AddProcessFileNameRoute("Discord.exe", "Chat");
 ```
 
 Besides by their `ProcessFileName`, windows can also be matched by their `WindowClass`, by their `Title` or via custom rules -- see <xref:Whim.IRouterManager>.
-

@@ -5,7 +5,7 @@ Commands (<xref:Whim.ICommand>) are objects with a unique identifier, title, and
 Whim differentiates three types of commands.
 
 1. [Core commands](#core-commands) expose common functions as ready-to-use commands, many of which come with a default keybinding.
-2. [Plugin commands](#plugin-commands) are ready-to-use commands exposed by plugins. 
+2. [Plugin commands](#plugin-commands) are ready-to-use commands exposed by plugins.
 3. [Custom commands](#custom-commands) are user-defined commands, which can compose arbitrary functions.
 
 ## Core commands
