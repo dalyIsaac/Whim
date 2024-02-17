@@ -74,7 +74,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void OnWindowFocused(IWindow? window)
 	{
-		// If we know the window, use what the butler knows instead of Windows.
+		// If we know the window, use what the Butler knows instead of Windows.
 		if (window is not null)
 		{
 			Logger.Debug($"Focusing window {window}");
@@ -107,6 +107,11 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 			{
 				Logger.Debug($"Setting active monitor to {monitor}");
 				ActiveMonitor = monitor;
+
+				if (window is not null)
+				{
+					LastWhimActiveMonitor = monitor;
+				}
 				break;
 			}
 		}

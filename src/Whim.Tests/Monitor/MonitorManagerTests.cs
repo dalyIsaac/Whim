@@ -216,8 +216,9 @@ public class MonitorManagerTests
 
 		// Then the active monitor is updated, but not the LastWhimActiveMonitor
 		Assert.NotEqual(originalMonitor, monitorManager.ActiveMonitor);
+		Assert.NotEqual(originalMonitor, monitorManager.LastWhimActiveMonitor);
 		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.ActiveMonitor)._hmonitor);
-		Assert.Equal(originalMonitor, monitorManager.LastWhimActiveMonitor);
+		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.LastWhimActiveMonitor)._hmonitor);
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
@@ -280,7 +281,6 @@ public class MonitorManagerTests
 		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.ActiveMonitor)._hmonitor);
 		Assert.Equal(originalMonitor, monitorManager.LastWhimActiveMonitor);
 	}
-
 	#endregion
 
 	private static WindowMessageMonitorEventArgs WindowMessageMonitorEventArgs =>
