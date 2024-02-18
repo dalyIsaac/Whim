@@ -346,7 +346,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
 		bool changed = ActiveLayoutEngine != oldEngine;
 
-		if (changed && !deferLayout)
+		if (!deferLayout)
 		{
 			DoLayout();
 		}
@@ -367,7 +367,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		bool changed = ActiveLayoutEngine != newEngine;
 		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
 
-		if (changed && !deferLayout)
+		if (!deferLayout)
 		{
 			DoLayout();
 		}
@@ -392,7 +392,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		bool changed = ActiveLayoutEngine != newEngine;
 		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
 
-		if (changed && !deferLayout)
+		if (!deferLayout)
 		{
 			DoLayout();
 		}
@@ -426,7 +426,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		bool changed = ActiveLayoutEngine != oldEngine;
-		if (changed && !deferLayout)
+		if (!deferLayout)
 		{
 			DoLayout();
 		}
