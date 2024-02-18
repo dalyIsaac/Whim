@@ -963,8 +963,12 @@ public class WorkspaceTests
 		Assert.Same(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceCustomization>]
+	[Theory]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(false, 1)]
+	[InlineAutoSubstituteData<WorkspaceCustomization>(true, 0)]
 	internal void MoveWindowEdgesInDirection_Success(
+		bool deferLayout,
+		int doLayoutCalls,
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
@@ -980,13 +984,13 @@ public class WorkspaceTests
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
 
 		// When MoveWindowEdgesInDirection is called
-		bool result = workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window);
+		bool result = workspace.MoveWindowEdgesInDirection(Direction.Up, deltas, window, deferLayout);
 
 		// Then the layout engine is told to move the window
 		Assert.True(result);
 		givenEngine.Received(1).MoveWindowEdgesInDirection(Direction.Up, deltas, window);
 		internalCtx
-			.DeferWorkspacePosManager.Received(1)
+			.DeferWorkspacePosManager.Received(doLayoutCalls)
 			.DoLayout(workspace, Arg.Any<WorkspaceManagerTriggers>(), Arg.Any<Dictionary<HWND, IWindowState>>());
 		Assert.NotSame(activeLayoutEngine, workspace.ActiveLayoutEngine);
 	}

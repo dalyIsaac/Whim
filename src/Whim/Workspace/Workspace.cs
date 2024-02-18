@@ -346,7 +346,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
 		bool changed = ActiveLayoutEngine != oldEngine;
 
-		if (changed && !deferLayout)
+		if (!deferLayout)
 		{
 			DoLayout();
 		}
@@ -367,7 +367,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		bool changed = ActiveLayoutEngine != newEngine;
 		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
 
-		if (changed && !deferLayout)
+		if (!deferLayout)
 		{
 			DoLayout();
 		}
@@ -378,7 +378,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public bool MoveWindowEdgesInDirection(
 		Direction edges,
 		IPoint<double> deltas,
-		IWindow? window = null
+		IWindow? window = null,
+		bool deferLayout = false
 	)
 	{
 		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
@@ -391,7 +392,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		bool changed = ActiveLayoutEngine != newEngine;
 		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
 
-		DoLayout();
+		if (!deferLayout)
+		{
+			DoLayout();
+		}
 
 		return changed;
 	}
@@ -422,7 +426,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 
 		bool changed = ActiveLayoutEngine != oldEngine;
-		if (changed && !deferLayout)
+		if (!deferLayout)
 		{
 			DoLayout();
 		}
