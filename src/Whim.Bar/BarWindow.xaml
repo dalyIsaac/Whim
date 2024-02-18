@@ -9,7 +9,6 @@
 	<RelativePanel Style="{StaticResource bar:root_panel}">
 		<StackPanel
 			x:Name="LeftPanel"
-			Grid.Column="0"
 			VerticalAlignment="Center"
 			Orientation="Horizontal"
 			RelativePanel.AlignVerticalCenterWithPanel="True"
@@ -17,19 +16,15 @@
 
 		<StackPanel
 			x:Name="CenterPanel"
-			Grid.Column="1"
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
 			Orientation="Horizontal"
 			RelativePanel.AlignHorizontalCenterWithPanel="True"
 			RelativePanel.AlignVerticalCenterWithPanel="True"
-			RelativePanel.LeftOf="RightPanel"
-			RelativePanel.RightOf="LeftPanel"
 			Style="{StaticResource bar:center_panel}" />
 
 		<StackPanel
 			x:Name="RightPanel"
-			Grid.Column="2"
 			VerticalAlignment="Center"
 			FlowDirection="RightToLeft"
 			Orientation="Horizontal"
