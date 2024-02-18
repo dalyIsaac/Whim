@@ -274,13 +274,10 @@ public class CommandPaletteCommands : PluginCommands
 	/// <param name="window"></param>
 	private static void FocusWindow(IWindow window)
 	{
+		window.Focus();
 		if (window.IsMinimized)
 		{
 			window.Restore();
-		}
-		else
-		{
-			window.Focus();
 		}
 	}
 }
