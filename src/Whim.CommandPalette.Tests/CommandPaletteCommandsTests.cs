@@ -357,7 +357,7 @@ public class CommandPaletteCommandsTests
 
 	[Theory]
 	[InlineAutoSubstituteData(false, 0, 1)]
-	[InlineAutoSubstituteData(true, 1, 0)]
+	[InlineAutoSubstituteData(true, 1, 1)]
 	public void FocusWindowCommandCreator_WorkspaceIsVisible(bool isMinimized, int restoredCount, int focusedCount)
 	{
 		// Given the window is in a workspace.
@@ -381,7 +381,7 @@ public class CommandPaletteCommandsTests
 
 	[Theory]
 	[InlineAutoSubstituteData(false, 0, 1)]
-	[InlineAutoSubstituteData(true, 1, 0)]
+	[InlineAutoSubstituteData(true, 1, 1)]
 	public void FocusWindowCommandCreator_WorkspaceIsNotVisible(bool isMinimized, int restoredCount, int focusedCount)
 	{
 		// Given the window is in a workspace.

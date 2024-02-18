@@ -10,6 +10,7 @@ using FluentAssertions;
 using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ClearExtensions;
+using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -172,84 +173,113 @@ public class MonitorManagerTests
 
 	#region OnWindowFocused
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused_NullWindow(IContext ctx, IInternalContext internalCtx)
+	internal void OnWindowFocused_DefinedWindow_MonitorDefined_Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWindow window,
+		IMonitor monitor
+	)
 	{
-		// Given
-		internalCtx
-			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
-			.Returns((HMONITOR)1);
-
+		// Given the window is defined, and GetMonitorForWindow returns a monitor
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		IMonitor monitorBefore = monitorManager.ActiveMonitor;
+		IMonitor originalMonitor = monitorManager.ActiveMonitor;
+		ctx.Butler.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
-		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
+		monitorManager.OnWindowFocused(window);
 
-		// Then
-		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
-		internalCtx.CoreNativeManager.DidNotReceive().MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
-		Assert.Equal(monitorBefore, monitorManager.ActiveMonitor);
+		// Then the active monitors are both updated
+		Assert.NotEqual(originalMonitor, monitorManager.ActiveMonitor);
+		Assert.Equal(monitor, monitorManager.ActiveMonitor);
+		Assert.Equal(monitor, monitorManager.LastWhimActiveMonitor);
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused_NullMonitor(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void OnWindowFocused_DefinedWindow_MonitorNotDefined(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IWindow window
+	)
 	{
-		// Given
+		// Given the window is defined, and GetMonitorForWindow does not return a monitor
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor originalMonitor = monitorManager.ActiveMonitor;
+
+		ctx.Butler.GetMonitorForWindow(window).ReturnsNull();
 		window.Handle.Returns((HWND)1);
 		internalCtx
-			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
-			.Returns((HMONITOR)1);
-
-		MonitorManager monitorManager = new(ctx, internalCtx);
-		IMonitor monitorBefore = monitorManager.ActiveMonitor;
-
-		// When
-		monitorManager.OnWindowFocused(Substitute.For<IWindow>());
-
-		// Then
-		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
-		internalCtx.CoreNativeManager.DidNotReceive().MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
-		Assert.Equal(monitorBefore, monitorManager.ActiveMonitor);
-	}
-
-	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused_Success(IContext ctx, IInternalContext internalCtx, IWindow window)
-	{
-		// Given
-		MonitorManager monitorManager = new(ctx, internalCtx);
-		IMonitor monitorBefore = monitorManager.ActiveMonitor;
-
-		window.Handle.Returns((HWND)1);
-		internalCtx
-			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
+			.CoreNativeManager.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
 			.Returns((HMONITOR)1);
 
 		// When
 		monitorManager.OnWindowFocused(window);
 
-		// Then
-		internalCtx.CoreNativeManager.DidNotReceive().GetForegroundWindow();
-		internalCtx.CoreNativeManager.Received(1).MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
-		Assert.NotEqual(monitorBefore, monitorManager.ActiveMonitor);
+		// Then the active monitor is updated, but not the LastWhimActiveMonitor
+		Assert.NotEqual(originalMonitor, monitorManager.ActiveMonitor);
+		Assert.NotEqual(originalMonitor, monitorManager.LastWhimActiveMonitor);
+		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.ActiveMonitor)._hmonitor);
+		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.LastWhimActiveMonitor)._hmonitor);
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowFocused_GetForegroundWindow(IContext ctx, IInternalContext internalCtx)
+	internal void OnWindowFocused_NullWindow_InvalidHandle(IContext ctx, IInternalContext internalCtx)
 	{
-		// Given
-		internalCtx.CoreNativeManager.GetForegroundWindow().Returns((HWND)1);
-		internalCtx
-			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>())
-			.Returns((HMONITOR)1);
-
+		// Given the window is null, and Windows returns an invalid handle
 		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor originalMonitor = monitorManager.ActiveMonitor;
+		internalCtx.CoreNativeManager.GetForegroundWindow().Returns((HWND)0);
 
 		// When
 		monitorManager.OnWindowFocused(null);
 
-		// Then
-		internalCtx.CoreNativeManager.Received(1).GetForegroundWindow();
-		internalCtx.CoreNativeManager.Received(1).MonitorFromWindow(Arg.Any<HWND>(), Arg.Any<MONITOR_FROM_FLAGS>());
+		// Then neither active monitors are updated
+		Assert.Equal(originalMonitor, monitorManager.ActiveMonitor);
+		Assert.Equal(originalMonitor, monitorManager.LastWhimActiveMonitor);
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void OnWindowFocused_NullWindow_CannotFindHMonitor(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given the window is null, we get a valid HWND, but we can't find the monitor
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor originalMonitor = monitorManager.ActiveMonitor;
+
+		HWND hwnd = (HWND)100;
+		HMONITOR hmonitor = (HMONITOR)100;
+		internalCtx.CoreNativeManager.GetForegroundWindow().Returns(hwnd);
+		internalCtx
+			.CoreNativeManager.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
+			.Returns(hmonitor);
+
+		// When
+		monitorManager.OnWindowFocused(null);
+
+		// Then neither active monitors are updated
+		Assert.Equal(originalMonitor, monitorManager.ActiveMonitor);
+		Assert.Equal(originalMonitor, monitorManager.LastWhimActiveMonitor);
+	}
+
+	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
+	internal void OnWindowFocused_NullWindow_Success(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given the window is null, we get a valid HWND, but we can't find the monitor
+		MonitorManager monitorManager = new(ctx, internalCtx);
+		IMonitor originalMonitor = monitorManager.ActiveMonitor;
+
+		HWND hwnd = (HWND)100;
+		HMONITOR hmonitor = (HMONITOR)1;
+		internalCtx.CoreNativeManager.GetForegroundWindow().Returns(hwnd);
+		internalCtx
+			.CoreNativeManager.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
+			.Returns(hmonitor);
+
+		// When
+		monitorManager.OnWindowFocused(null);
+
+		// Then the active monitor is updated, but not the LastWhimActiveMonitor
+		Assert.NotEqual(originalMonitor, monitorManager.ActiveMonitor);
+		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.ActiveMonitor)._hmonitor);
+		Assert.Equal(originalMonitor, monitorManager.LastWhimActiveMonitor);
 	}
 	#endregion
 
