@@ -171,7 +171,7 @@ internal class ButlerChores : IButlerChores
 		IPoint<double> normalized = monitor.WorkingArea.NormalizeDeltaPoint(pixelsDeltas);
 
 		Logger.Debug($"Normalized point: {normalized}");
-		workspace.MoveWindowEdgesInDirection(edges, normalized, window, deferLayout: false);
+		workspace.MoveWindowEdgesInDirection(edges, normalized, window);
 		return true;
 	}
 

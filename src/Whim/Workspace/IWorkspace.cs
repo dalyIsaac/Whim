@@ -169,18 +169,10 @@ public interface IWorkspace : IDisposable
 	/// The window to change the edge of. If null, the currently focused window is
 	/// used.
 	/// </param>
-	/// <param name="deferLayout">
-	/// Whether to defer the layout until the next <see cref="DoLayout"/>. Defaults to <c>false</c>.
-	/// </param>
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
-	bool MoveWindowEdgesInDirection(
-		Direction edges,
-		IPoint<double> deltas,
-		IWindow? window = null,
-		bool deferLayout = false
-	);
+	bool MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow? window = null);
 
 	/// <summary>
 	/// Moves or adds the given <paramref name="window"/> to the given <paramref name="point"/>.

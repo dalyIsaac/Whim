@@ -378,8 +378,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public bool MoveWindowEdgesInDirection(
 		Direction edges,
 		IPoint<double> deltas,
-		IWindow? window = null,
-		bool deferLayout = false
+		IWindow? window = null
 	)
 	{
 		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
@@ -392,10 +391,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		bool changed = ActiveLayoutEngine != newEngine;
 		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
 
-		if (changed && !deferLayout)
-		{
-			DoLayout();
-		}
+		DoLayout();
 
 		return changed;
 	}
