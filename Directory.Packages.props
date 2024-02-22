@@ -18,8 +18,8 @@
   </ItemGroup>
   <!-- Test dependencies -->
   <ItemGroup>
-    <PackageVersion Include="AutoFixture" Version="4.18.0" />
-    <PackageVersion Include="AutoFixture.AutoNSubstitute" Version="4.18.0" />
+    <PackageVersion Include="AutoFixture" Version="4.18.1" />
+    <PackageVersion Include="AutoFixture.AutoNSubstitute" Version="4.18.1" />
     <PackageVersion Include="AutoFixture.Xunit2" Version="4.18.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
