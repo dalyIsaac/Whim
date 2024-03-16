@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Whim;
 
 internal class InternalContext : IInternalContext
@@ -5,6 +7,8 @@ internal class InternalContext : IInternalContext
 	private bool _disposedValue;
 
 	private readonly IContext _context;
+
+	public ParallelOptions ParallelOptions { get; } = new();
 
 	public ICoreSavedStateManager CoreSavedStateManager { get; }
 

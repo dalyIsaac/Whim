@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Whim;
 
@@ -7,6 +8,8 @@ namespace Whim;
 /// </summary>
 internal interface IInternalContext : IDisposable
 {
+	ParallelOptions ParallelOptions { get; }
+
 	IInternalButler Butler { get; }
 
 	IButlerEventHandlers ButlerEventHandlers { get; }
