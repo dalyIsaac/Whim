@@ -215,7 +215,10 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		try
 		{
-			WinEventProc(hWinEventHook, eventType, hwnd, idObject, idChild, idEventThread, dwmsEventTime);
+			Task.Run(
+					() => WinEventProc(hWinEventHook, eventType, hwnd, idObject, idChild, idEventThread, dwmsEventTime)
+				)
+				.Wait();
 		}
 		catch (Exception e)
 		{

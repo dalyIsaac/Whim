@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Shell;
@@ -57,7 +58,7 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 	{
 		try
 		{
-			return WindowProc(hWnd, uMsg, wParam, lParam, uIdSubclass, dwRefData);
+			return Task.Run(() => WindowProc(hWnd, uMsg, wParam, lParam, uIdSubclass, dwRefData)).Result;
 		}
 		catch (Exception e)
 		{

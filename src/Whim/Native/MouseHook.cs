@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -40,7 +41,7 @@ internal class MouseHook : IMouseHook
 	{
 		try
 		{
-			return LowLevelMouseProc(nCode, wParam, lParam);
+			return Task.Run(() => LowLevelMouseProc(nCode, wParam, lParam)).Result;
 		}
 		catch (Exception e)
 		{
