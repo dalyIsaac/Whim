@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -39,7 +40,7 @@ internal class KeybindHook : IKeybindHook
 	{
 		try
 		{
-			return LowLevelKeyboardProc(nCode, wParam, lParam);
+			return Task.Run(() => LowLevelKeyboardProc(nCode, wParam, lParam)).Result;
 		}
 		catch (Exception e)
 		{
