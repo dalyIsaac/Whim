@@ -237,20 +237,18 @@ internal partial class NativeManager : INativeManager
 		{
 			if (_compositor == null)
 			{
-				lock (_compositorLock)
-				{
+				using Lock _ = new(_compositorLock);
 #pragma warning disable CA1508 // Avoid dead conditional code, because of the lock.
-					if (_compositor == null)
+				if (_compositor == null)
+				{
+					if (DispatcherQueue.GetForCurrentThread() == null)
 					{
-						if (DispatcherQueue.GetForCurrentThread() == null)
-						{
-							InitializeCoreDispatcher();
-						}
-
-						_compositor = new Compositor();
+						InitializeCoreDispatcher();
 					}
-#pragma warning restore CA1508 // Avoid dead conditional code
+
+					_compositor = new Compositor();
 				}
+#pragma warning restore CA1508 // Avoid dead conditional code
 			}
 
 			return _compositor;
