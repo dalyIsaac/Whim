@@ -118,14 +118,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 	/// <inheritdoc />
 	public void Dispose()
 	{
-		lock (_lock)
-		{
-			SetAllWindowPos();
-		}
-	}
-
-	private void SetAllWindowPos()
-	{
+		using Lock _ = new(_lock);
 		Logger.Debug("Disposing WindowDeferPosHandle");
 
 		if (_windowStates.Count == 0 && _minimizedWindowStates.Count == 0)
