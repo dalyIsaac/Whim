@@ -90,9 +90,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		// If it isn't, then we assume it was provided during startup and minimize it in all layouts.
 		if (_windows.Contains(window))
 		{
-			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MinimizeWindowStart(
-				window
-			);
+			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex]
+				.MinimizeWindowStart(window);
 		}
 		else
 		{
@@ -409,10 +408,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		if (_windows.Contains(window))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine
-			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MoveWindowToPoint(
-				window,
-				point
-			);
+			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex]
+				.MoveWindowToPoint(window, point);
 		}
 		else
 		{
