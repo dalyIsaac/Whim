@@ -18,10 +18,8 @@ internal class CommandManager : ICommandManager
 	/// <exception cref="InvalidOperationException"></exception>
 	internal void AddPluginCommand(ICommand item)
 	{
-		lock (_lock)
-		{
-			AddPluginFn(item);
-		}
+		using Lock _ = new(_lock);
+		AddPluginFn(item);
 	}
 
 	private void AddPluginFn(ICommand item)
@@ -36,10 +34,8 @@ internal class CommandManager : ICommandManager
 
 	public void Add(string identifier, string title, Action callback, Func<bool>? condition = null)
 	{
-		lock (_lock)
-		{
-			AddFn(identifier, title, callback, condition);
-		}
+		using Lock _ = new(_lock);
+		AddFn(identifier, title, callback, condition);
 	}
 
 	private void AddFn(string identifier, string title, Action callback, Func<bool>? condition)
@@ -54,15 +50,13 @@ internal class CommandManager : ICommandManager
 
 	public ICommand? TryGetCommand(string commandId)
 	{
-		lock (_lock)
+		using Lock _ = new(_lock);
+		if (_commands.TryGetValue(commandId, out ICommand? command))
 		{
-			if (_commands.TryGetValue(commandId, out ICommand? command))
-			{
-				return command;
-			}
-
-			return null;
+			return command;
 		}
+
+		return null;
 	}
 
 	public IEnumerator<ICommand> GetEnumerator() => _commands.Values.GetEnumerator();
