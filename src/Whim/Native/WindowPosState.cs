@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -40,34 +38,4 @@ public record WindowPosState
 		HwndInsertAfter = hwndInsertAfter ?? new(1);
 		Flags = flags;
 	}
-}
-
-/// <summary>
-/// Manager to defer the setting of window positions.
-/// </summary>
-internal interface IDeferWindowPosManager
-{
-	/// <summary>
-	/// Defers layout of the given windows until <see cref="RecoverLayout"/> is called.
-	/// </summary>
-	/// <param name="windowStates"></param>
-	/// <param name="minimizedWindowStates"></param>
-	void DeferLayout(List<WindowPosState> windowStates, List<WindowPosState> minimizedWindowStates);
-
-	/// <summary>
-	/// Returns whether or not layout can be performed, based on whether Whim has been reentered.
-	/// </summary>
-	/// <returns></returns>
-	bool CanDoLayout();
-
-	/// <summary>
-	/// Performs layout of all the windows that were deferred, if they have not been laid out in
-	/// after the last call to <see cref="RecoverLayout"/>.
-	/// </summary>
-	void RecoverLayout();
-
-	/// <summary>
-	/// The <see cref="ParallelOptions"/> to use when performing layout.
-	/// </summary>
-	ParallelOptions ParallelOptions { get; }
 }

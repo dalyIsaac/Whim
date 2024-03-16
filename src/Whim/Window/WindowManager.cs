@@ -271,8 +271,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 					$"Window {hwnd} with event 0x{eventType:X4} was ignored, but still notifying listeners of focus"
 				);
 				OnWindowFocused(window);
-
-				_internalContext.DeferWindowPosManager.RecoverLayout();
 				return;
 			}
 
@@ -324,8 +322,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				Logger.Error($"Unhandled event 0x{eventType:X4}");
 				break;
 		}
-
-		_internalContext.DeferWindowPosManager.RecoverLayout();
 	}
 
 	public IWindow? AddWindow(HWND hwnd)

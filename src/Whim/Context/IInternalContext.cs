@@ -30,9 +30,6 @@ internal interface IInternalContext : IDisposable
 	/// <inheritdoc cref="IMouseHook" />
 	IMouseHook MouseHook { get; }
 
-	/// <inheritdoc cref="IDeferWindowPosManager" />
-	IDeferWindowPosManager DeferWindowPosManager { get; }
-
 	/// <inheritdoc cref="IDeferWorkspacePosManager" />
 	IDeferWorkspacePosManager DeferWorkspacePosManager { get; }
 
