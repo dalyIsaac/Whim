@@ -181,8 +181,6 @@ public class LayoutPreviewWindowTests
 	{
 		// Given
 		ctx.NativeManager.DeferWindowPos().Returns(new DeferWindowPosHandle(ctx, internalCtx));
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
-		internalCtx.DeferWindowPosManager.ParallelOptions.Returns(new ParallelOptions { MaxDegreeOfParallelism = 1 });
 
 		// When
 		LayoutPreviewWindow.Activate(ctx, layoutWindow, movingWindow, monitor);
