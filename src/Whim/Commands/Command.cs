@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Whim;
 
@@ -41,17 +42,18 @@ public class Command : ICommand
 	}
 
 	/// <inheritdoc />
-	public bool CanExecute()
-	{
-		return _condition?.Invoke() ?? true;
-	}
+	public bool CanExecute() => Task.Run(CanExecuteFn).Result;
+
+	private bool CanExecuteFn() => _condition?.Invoke() ?? true;
 
 	/// <inheritdoc />
-	public bool TryExecute()
+	public bool TryExecute() => Task.Run(TryExecuteFn).Result;
+
+	private bool TryExecuteFn()
 	{
 		Logger.Debug($"Trying to execute command {Id}");
 
-		if (CanExecute())
+		if (_condition?.Invoke() ?? true)
 		{
 			_callback();
 			return true;
