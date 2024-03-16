@@ -14,6 +14,8 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media;
 using Whim;
 using Whim.Bar;
 using Whim.CommandPalette;
@@ -27,8 +29,6 @@ using Whim.TreeLayout.Bar;
 using Whim.TreeLayout.CommandPalette;
 using Whim.Updater;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using Microsoft.UI;
-using Microsoft.UI.Xaml.Media;
 
 /// <summary>
 /// This is what's called when Whim is loaded.
@@ -41,12 +41,13 @@ void DoConfig(IContext context)
 	// Bar plugin.
 	List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
 	List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
-	List<BarComponent> rightComponents = new()
-	{
-		BatteryWidget.CreateComponent(),
-		ActiveLayoutWidget.CreateComponent(),
-		DateTimeWidget.CreateComponent()
-	};
+	List<BarComponent> rightComponents =
+		new()
+		{
+			BatteryWidget.CreateComponent(),
+			ActiveLayoutWidget.CreateComponent(),
+			DateTimeWidget.CreateComponent()
+		};
 
 	BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
 	BarPlugin barPlugin = new(context, barConfig);
@@ -85,7 +86,8 @@ void DoConfig(IContext context)
 	rightComponents.Add(treeLayoutBarPlugin.CreateComponent());
 
 	// Tree layout command palette.
-	TreeLayoutCommandPalettePlugin treeLayoutCommandPalettePlugin = new(context, treeLayoutPlugin, commandPalettePlugin);
+	TreeLayoutCommandPalettePlugin treeLayoutCommandPalettePlugin =
+		new(context, treeLayoutPlugin, commandPalettePlugin);
 	context.PluginManager.AddPlugin(treeLayoutCommandPalettePlugin);
 
 	// Layout preview.
@@ -104,14 +106,15 @@ void DoConfig(IContext context)
 	context.WorkspaceManager.Add("4");
 
 	// Set up layout engines.
-	context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
-	{
-		(id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
-		(id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
-		(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
-		(id) => new FocusLayoutEngine(id),
-		(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id)
-	};
+	context.WorkspaceManager.CreateLayoutEngines = () =>
+		new CreateLeafLayoutEngine[]
+		{
+			(id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+			(id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
+			(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
+			(id) => new FocusLayoutEngine(id),
+			(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id)
+		};
 }
 
 // We return doConfig here so that Whim can call it when it loads.

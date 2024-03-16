@@ -565,9 +565,8 @@ public class SelectVariantViewModelTests
 
 		// Then
 		Assert.Equal(3, selectVariantViewModel.SelectRows.Count);
-		createdRows[1].Update(
-			Arg.Is<MatcherResult<SelectOption>>(m => (SelectVariantRowModel)m.Model == updatedVariantItems[1])
-		);
+		createdRows[1]
+			.Update(Arg.Is<MatcherResult<SelectOption>>(m => (SelectVariantRowModel)m.Model == updatedVariantItems[1]));
 	}
 
 	/// <summary>
