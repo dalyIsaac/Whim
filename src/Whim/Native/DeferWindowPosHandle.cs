@@ -178,7 +178,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				Parallel.ForEach(allStates, SetWindowPos);
+				Parallel.ForEach(allStates, _internalContext.ParallelOptions, SetWindowPos);
 			}
 		}
 
