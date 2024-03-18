@@ -88,6 +88,7 @@ internal partial class PluginManager : IPluginManager
 	public T AddPlugin<T>(T plugin)
 		where T : IPlugin
 	{
+		using Lock _ = new();
 		switch (plugin.Name)
 		{
 			case ICommandManager.CustomCommandPrefix:
@@ -124,6 +125,7 @@ internal partial class PluginManager : IPluginManager
 
 	public bool Contains(string pluginName)
 	{
+		using Lock _ = new();
 		return _plugins.Exists(plugin => plugin.Name == pluginName);
 	}
 
