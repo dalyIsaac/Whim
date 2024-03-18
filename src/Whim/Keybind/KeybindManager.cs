@@ -21,6 +21,7 @@ internal class KeybindManager : IKeybindManager
 		get => _uniqueKeyModifiers;
 		set
 		{
+			using Lock _ = new();
 			if (value && _uniqueKeyModifiers == false)
 			{
 				_uniqueKeyModifiers = true;
@@ -46,6 +47,7 @@ internal class KeybindManager : IKeybindManager
 	[Obsolete("Method is deprecated, please use SetKeybind(string, IKeybind) instead.")]
 	public void Add(string commandId, IKeybind keybind)
 	{
+		using Lock _ = new();
 		Logger.Warning("Method is deprecated, please use SetKeybind(string, IKeybind) instead.");
 		Logger.Debug($"Adding keybind '{keybind}' for command '{commandId}'");
 
@@ -59,6 +61,7 @@ internal class KeybindManager : IKeybindManager
 
 	public void SetKeybind(string commandId, IKeybind keybind)
 	{
+		using Lock _ = new();
 		Logger.Debug($"Setting keybind '{keybind}' for command '{commandId}'");
 		keybind = UnifyKeyModifiers ? keybind.UnifyModifiers() : keybind;
 
@@ -79,6 +82,7 @@ internal class KeybindManager : IKeybindManager
 
 	public ICommand[] GetCommands(IKeybind keybind)
 	{
+		using Lock _ = new();
 		Logger.Debug($"Getting commands for keybind '{keybind}'");
 		keybind = UnifyKeyModifiers ? keybind.UnifyModifiers() : keybind;
 
@@ -108,13 +112,14 @@ internal class KeybindManager : IKeybindManager
 
 	public IKeybind? TryGetKeybind(string commandId)
 	{
+		using Lock _ = new();
 		Logger.Debug($"Getting keybind for command '{commandId}'");
-
 		return _commandsKeybindsMap.TryGetValue(commandId, out IKeybind? keybind) ? keybind : null;
 	}
 
 	public bool Remove(string commandId)
 	{
+		using Lock _ = new();
 		Logger.Debug($"Removing keybind for command '{commandId}'");
 
 		IKeybind? keybind = TryGetKeybind(commandId);
@@ -130,6 +135,7 @@ internal class KeybindManager : IKeybindManager
 
 	public void Clear()
 	{
+		using Lock _ = new();
 		Logger.Debug("Removing all keybinds");
 		_commandsKeybindsMap.Clear();
 		_keybindsCommandsMap.Clear();
