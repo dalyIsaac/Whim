@@ -20,6 +20,7 @@ internal record WorkspaceToCreate(string Name, IEnumerable<CreateLeafLayoutEngin
 
 internal class WorkspaceManager : IWorkspaceManager
 {
+	private readonly object _lockObj = new();
 	private bool _initialized;
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
@@ -63,6 +64,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		get
 		{
+			using Lock _ = new(_lockObj);
 			IMonitor activeMonitor = _context.MonitorManager.ActiveMonitor;
 			Logger.Debug($"Getting active workspace for monitor {activeMonitor}");
 			return _context.Butler.GetWorkspaceForMonitor(activeMonitor) ?? _workspaces[0];
@@ -87,6 +89,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null)
 	{
+		using Lock _ = new(_lockObj);
 		if (_initialized)
 		{
 			return CreateWorkspace(name, createLayoutEngines);
@@ -98,16 +101,26 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Adding proxy layout engine: {proxyLayoutEngine}");
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
 	}
 
-	public bool Contains(IWorkspace workspace) => _workspaces.Contains(workspace);
+	public bool Contains(IWorkspace workspace)
+	{
+		using Lock _ = new(_lockObj);
+		return _workspaces.Contains(workspace);
+	}
 
-	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
+	public IEnumerator<IWorkspace> GetEnumerator()
+	{
+		using Lock _ = new(_lockObj);
+		return _workspaces.GetEnumerator();
+	}
 
 	public void Initialize()
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug("Initializing workspace manager");
 
 		_initialized = true;
@@ -146,6 +159,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null
 	)
 	{
+		using Lock _ = new(_lockObj);
 		CreateLeafLayoutEngine[] engineCreators = createLayoutEngines?.ToArray() ?? CreateLayoutEngines();
 
 		if (engineCreators.Length == 0)
@@ -183,6 +197,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public bool Remove(IWorkspace workspace)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Removing workspace {workspace}");
 
 		if (_workspaces.Count - 1 < _context.MonitorManager.Length)
@@ -208,6 +223,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public bool Remove(string workspaceName)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Trying to remove workspace {workspaceName}");
 
 		IWorkspace? workspace = _workspaces.Find(w => w.Name == workspaceName);
@@ -222,6 +238,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? TryGet(string workspaceName)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Trying to get workspace {workspaceName}");
 		return _workspaces.Find(w => w.Name == workspaceName);
 	}
