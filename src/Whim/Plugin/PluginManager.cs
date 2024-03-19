@@ -8,6 +8,7 @@ namespace Whim;
 
 internal partial class PluginManager : IPluginManager
 {
+	private readonly object _lockObj = new();
 	private readonly IContext _context;
 	private readonly CommandManager _commandManager;
 	private readonly string _savedStateFilePath;
@@ -88,7 +89,7 @@ internal partial class PluginManager : IPluginManager
 	public T AddPlugin<T>(T plugin)
 		where T : IPlugin
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		switch (plugin.Name)
 		{
 			case ICommandManager.CustomCommandPrefix:
@@ -125,7 +126,7 @@ internal partial class PluginManager : IPluginManager
 
 	public bool Contains(string pluginName)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		return _plugins.Exists(plugin => plugin.Name == pluginName);
 	}
 

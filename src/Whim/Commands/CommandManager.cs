@@ -6,7 +6,7 @@ namespace Whim;
 
 internal class CommandManager : ICommandManager
 {
-	private readonly object _lock = new();
+	private readonly object _lockObj = new();
 	private readonly Dictionary<string, ICommand> _commands = new();
 
 	public int Count => _commands.Count;
@@ -18,7 +18,7 @@ internal class CommandManager : ICommandManager
 	/// <exception cref="InvalidOperationException"></exception>
 	internal void AddPluginCommand(ICommand item)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		AddPluginFn(item);
 	}
 
@@ -34,7 +34,7 @@ internal class CommandManager : ICommandManager
 
 	public void Add(string identifier, string title, Action callback, Func<bool>? condition = null)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		AddFn(identifier, title, callback, condition);
 	}
 
@@ -50,7 +50,7 @@ internal class CommandManager : ICommandManager
 
 	public ICommand? TryGetCommand(string commandId)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		if (_commands.TryGetValue(commandId, out ICommand? command))
 		{
 			return command;

@@ -17,7 +17,7 @@ namespace Whim;
 /// </summary>
 public sealed class DeferWindowPosHandle : IDisposable
 {
-	private static readonly object _lock = new();
+	private static readonly object _lockObj = new();
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
@@ -118,7 +118,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 	/// <inheritdoc />
 	public void Dispose()
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug("Disposing WindowDeferPosHandle");
 
 		if (_windowStates.Count == 0 && _minimizedWindowStates.Count == 0)

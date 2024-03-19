@@ -6,10 +6,10 @@ namespace Whim;
 
 // Despite what the compiler says, `_lockWasTaken` is reassigned by `Monitor.Enter`.
 [SuppressMessage("Style", "IDE0044:Make field readonly")]
-internal struct Lock : IDisposable
+internal class Lock : IDisposable
 {
 	private readonly object _lockObj;
-	private bool _lockWasTaken = false;
+	private bool _lockWasTaken;
 
 	public Lock(object lockObj)
 	{
@@ -18,7 +18,7 @@ internal struct Lock : IDisposable
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public readonly void Dispose()
+	public void Dispose()
 	{
 		if (_lockWasTaken)
 		{
