@@ -9,7 +9,7 @@
     <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta" />
     <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.5.240311000" />
     <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
-    <PackageVersion Include="Octokit" Version="9.0.0" />
+    <PackageVersion Include="Octokit" Version="10.0.0" />
     <PackageVersion Include="Serilog" Version="3.1.1" />
     <PackageVersion Include="Serilog.Sinks.Async" Version="1.5.0" />
     <PackageVersion Include="Serilog.Sinks.Debug" Version="2.0.0" />
