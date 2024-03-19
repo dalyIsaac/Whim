@@ -6,6 +6,7 @@ namespace Whim;
 
 internal class FilterManager : IFilterManager
 {
+	private readonly object _lockObj = new();
 	#region Filters for specific properties
 	private readonly HashSet<string> _ignoreWindowClasses = new();
 	private readonly HashSet<string> _ignoreProcessFileNames = new();
@@ -33,7 +34,7 @@ internal class FilterManager : IFilterManager
 
 	public bool ShouldBeIgnored(IWindow window)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		return _ignoreWindowClasses.Contains(window.WindowClass.ToLower())
 			|| (
 				window.ProcessFileName is string processFileName
@@ -45,28 +46,28 @@ internal class FilterManager : IFilterManager
 
 	public IFilterManager AddWindowClassFilter(string windowClass)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		_ignoreWindowClasses.Add(windowClass.ToLower());
 		return this;
 	}
 
 	public IFilterManager AddProcessFileNameFilter(string processFileName)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		_ignoreProcessFileNames.Add(processFileName.ToLower());
 		return this;
 	}
 
 	public IFilterManager AddTitleFilter(string title)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		_ignoreTitles.Add(title.ToLower());
 		return this;
 	}
 
 	public IFilterManager AddTitleMatchFilter(string title)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Regex regex = new(title);
 		_filters.Add(window => regex.IsMatch(window.Title));
 		return this;

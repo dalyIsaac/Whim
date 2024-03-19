@@ -5,6 +5,7 @@ namespace Whim;
 
 internal class RouterManager : IRouterManager
 {
+	private readonly object _lockObj = new();
 	private readonly IContext _context;
 	private readonly List<Router> _routers = new();
 
@@ -17,21 +18,21 @@ internal class RouterManager : IRouterManager
 
 	public void Add(Router router)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Adding router {router}");
 		_routers.Add(router);
 	}
 
 	public void Clear()
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug("Clearing routes");
 		_routers.Clear();
 	}
 
 	public IRouterManager AddProcessFileNameRoute(string processFileName, string workspaceName)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		processFileName = processFileName.ToLower();
 		Logger.Debug($"Routing process file name {processFileName} to workspace {workspaceName}");
 		Add(window =>
@@ -47,7 +48,7 @@ internal class RouterManager : IRouterManager
 
 	public IRouterManager AddProcessFileNameRoute(string processFileName, IWorkspace workspace)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		processFileName = processFileName.ToLower();
 		Logger.Debug($"Routing process file name: {processFileName} to workspace {workspace}");
 		Add(window =>
@@ -63,7 +64,7 @@ internal class RouterManager : IRouterManager
 
 	public IRouterManager AddTitleRoute(string title, string workspaceName)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		title = title.ToLower();
 		Logger.Debug($"Routing title: {title} to workspace {workspaceName}");
 		Add(window =>
@@ -79,7 +80,7 @@ internal class RouterManager : IRouterManager
 
 	public IRouterManager AddTitleRoute(string title, IWorkspace workspace)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		title = title.ToLower();
 		Logger.Debug($"Routing title: {title} to workspace {workspace}");
 		Add(window =>
@@ -95,7 +96,7 @@ internal class RouterManager : IRouterManager
 
 	public IRouterManager AddTitleMatchRoute(string match, string workspaceName)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Routing title match: {match} to workspace {workspaceName}");
 		Regex regex = new(match);
 		Add(window =>
@@ -111,7 +112,7 @@ internal class RouterManager : IRouterManager
 
 	public IRouterManager AddTitleMatchRoute(string match, IWorkspace workspace)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Routing title match: {match} to workspace {workspace}");
 		Regex regex = new(match);
 		Add(window =>
@@ -127,7 +128,7 @@ internal class RouterManager : IRouterManager
 
 	public IWorkspace? RouteWindow(IWindow window)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Routing window {window}");
 
 		foreach (Router router in _routers)
@@ -145,7 +146,7 @@ internal class RouterManager : IRouterManager
 
 	public IRouterManager AddWindowClassRoute(string windowClass, string workspaceName)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		windowClass = windowClass.ToLower();
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspaceName}");
 		Add(window =>
@@ -161,7 +162,7 @@ internal class RouterManager : IRouterManager
 
 	public IRouterManager AddWindowClassRoute(string windowClass, IWorkspace workspace)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		windowClass = windowClass.ToLower();
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace}");
 		Add(window =>

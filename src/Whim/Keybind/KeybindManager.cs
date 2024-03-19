@@ -6,6 +6,7 @@ namespace Whim;
 
 internal class KeybindManager : IKeybindManager
 {
+	private readonly object _lockObj = new();
 	private readonly IContext _context;
 	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = new();
 	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = new();
@@ -21,7 +22,7 @@ internal class KeybindManager : IKeybindManager
 		get => _uniqueKeyModifiers;
 		set
 		{
-			using Lock _ = new();
+			using Lock _ = new(_lockObj);
 			if (value && _uniqueKeyModifiers == false)
 			{
 				_uniqueKeyModifiers = true;
@@ -46,7 +47,7 @@ internal class KeybindManager : IKeybindManager
 
 	public void SetKeybind(string commandId, IKeybind keybind)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Setting keybind '{keybind}' for command '{commandId}'");
 		keybind = UnifyKeyModifiers ? keybind.UnifyModifiers() : keybind;
 
@@ -67,7 +68,7 @@ internal class KeybindManager : IKeybindManager
 
 	public ICommand[] GetCommands(IKeybind keybind)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting commands for keybind '{keybind}'");
 		keybind = UnifyKeyModifiers ? keybind.UnifyModifiers() : keybind;
 
@@ -97,14 +98,14 @@ internal class KeybindManager : IKeybindManager
 
 	public IKeybind? TryGetKeybind(string commandId)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting keybind for command '{commandId}'");
 		return _commandsKeybindsMap.TryGetValue(commandId, out IKeybind? keybind) ? keybind : null;
 	}
 
 	public bool Remove(string commandId)
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Removing keybind for command '{commandId}'");
 
 		IKeybind? keybind = TryGetKeybind(commandId);
@@ -120,7 +121,7 @@ internal class KeybindManager : IKeybindManager
 
 	public void Clear()
 	{
-		using Lock _ = new();
+		using Lock _ = new(_lockObj);
 		Logger.Debug("Removing all keybinds");
 		_commandsKeybindsMap.Clear();
 		_keybindsCommandsMap.Clear();

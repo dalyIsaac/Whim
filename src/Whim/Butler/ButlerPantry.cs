@@ -6,7 +6,7 @@ namespace Whim;
 
 internal class ButlerPantry : IButlerPantry
 {
-	private readonly object _lock = new();
+	private readonly object _lockObj = new();
 	private readonly IContext _context;
 	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
 	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
@@ -18,7 +18,7 @@ internal class ButlerPantry : IButlerPantry
 
 	public IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse = false, bool skipActive = false)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		IWorkspace[] workspaces = _context.WorkspaceManager.ToArray();
 
 		int idx = Array.IndexOf(workspaces, workspace);
@@ -43,14 +43,14 @@ internal class ButlerPantry : IButlerPantry
 
 	public IEnumerable<IWorkspace> GetAllActiveWorkspaces()
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug("Getting all active workspaces");
 		return _monitorWorkspaceMap.Values;
 	}
 
 	public IMonitor? GetMonitorForWindow(IWindow window)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting monitor for window: {window}");
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace)
 			? GetMonitorForWorkspace(workspace)
@@ -59,7 +59,7 @@ internal class ButlerPantry : IButlerPantry
 
 	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting monitor for workspace {workspace}");
 
 		// Linear search for the monitor that contains the workspace.
@@ -78,35 +78,35 @@ internal class ButlerPantry : IButlerPantry
 
 	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting workspace for monitor {monitor}");
 		return _monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? workspace) ? workspace : null;
 	}
 
 	public IWorkspace? GetWorkspaceForWindow(IWindow window)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting workspace for window {window}");
 		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? workspace : null;
 	}
 
 	public bool RemoveMonitor(IMonitor monitor)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Removing monitor {monitor}");
 		return _monitorWorkspaceMap.Remove(monitor);
 	}
 
 	public bool RemoveWindow(IWindow window)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Removing window {window}");
 		return _windowWorkspaceMap.Remove(window);
 	}
 
 	public void MergeWorkspaceWindows(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Removing workspace {workspaceToDelete} and moving windows to {workspaceMergeTarget}");
 
 		// Remove the workspace from the monitor map.
@@ -125,14 +125,14 @@ internal class ButlerPantry : IButlerPantry
 
 	public void SetWindowWorkspace(IWindow window, IWorkspace workspace)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Setting window {window} to workspace {workspace}");
 		_windowWorkspaceMap[window] = workspace;
 	}
 
 	public void SetMonitorWorkspace(IMonitor monitor, IWorkspace workspace)
 	{
-		using Lock _ = new(_lock);
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Setting workspace {workspace} to monitor {monitor}");
 		_monitorWorkspaceMap[monitor] = workspace;
 	}
