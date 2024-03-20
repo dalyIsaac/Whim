@@ -12,6 +12,7 @@ namespace Whim;
 
 internal class WindowManager : IWindowManager, IInternalWindowManager
 {
+	private readonly object _lockObj = new();
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
@@ -121,6 +122,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	public IWindow? CreateWindow(HWND hwnd)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Verbose($"Adding window {hwnd}");
 
 		if (_windows.TryGetValue(hwnd, out IWindow? window) && window != null)
@@ -253,34 +255,39 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			return;
 		}
 
-		// Try get the window
-		bool hasWindow = true;
-		if (!_windows.TryGetValue(hwnd, out IWindow? window) || window == null)
+		bool windowWasCreated = false;
+		IWindow? window = null;
+
+		using (Lock _ = new(_lockObj))
 		{
-			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
-			hasWindow = false;
-			window = AddWindow(hwnd);
-
-			if (
-				window == null
-				&& (eventType == PInvoke.EVENT_SYSTEM_FOREGROUND || eventType == PInvoke.EVENT_OBJECT_UNCLOAKED)
-			)
+			if (!_windows.TryGetValue(hwnd, out window))
 			{
-				// Even if the window was ignored, we need to fire OnWindowFocused.
-				Logger.Debug(
-					$"Window {hwnd} with event 0x{eventType:X4} was ignored, but still notifying listeners of focus"
-				);
-				OnWindowFocused(window);
-				return;
-			}
-
-			if (window == null)
-			{
-				return;
+				Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
+				windowWasCreated = true;
+				window = AddWindow(hwnd);
 			}
 		}
 
-		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging && hasWindow)
+		if (
+			windowWasCreated
+			&& window == null
+			&& (eventType == PInvoke.EVENT_SYSTEM_FOREGROUND || eventType == PInvoke.EVENT_OBJECT_UNCLOAKED)
+		)
+		{
+			// Even if the window was ignored, we need to fire OnWindowFocused.
+			Logger.Debug(
+				$"Window {hwnd} with event 0x{eventType:X4} was ignored, but still notifying listeners of focus"
+			);
+			OnWindowFocused(window);
+			return;
+		}
+
+		if (window == null)
+		{
+			return;
+		}
+
+		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging && windowWasCreated == false)
 		{
 			Logger.Debug($"Monitors are changing, ignoring event 0x{eventType:X4} for {window}");
 			return;
@@ -362,7 +369,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			return null;
 		}
 
-		_windows[hwnd] = window;
+		using (Lock _ = new(_lockObj))
+		{
+			_windows[hwnd] = window;
+		}
+
 		OnWindowAdded(window);
 
 		return window;
@@ -409,8 +420,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		Logger.Debug($"Window removed: {window}");
 
-		_windows.TryRemove(window.Handle, out _);
-		_handledLocationRestoringWindows.Remove(window);
+		using (Lock _lock = new(_lockObj))
+		{
+			_windows.TryRemove(window.Handle, out _);
+			_handledLocationRestoringWindows.Remove(window);
+		}
 
 		WindowEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowRemoved(args);
