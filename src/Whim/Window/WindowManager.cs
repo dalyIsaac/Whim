@@ -255,36 +255,31 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			return;
 		}
 
+		// Try get the window
 		bool windowWasCreated = false;
-		IWindow? window = null;
-
-		using (Lock _ = new(_lockObj))
+		if (!_windows.TryGetValue(hwnd, out IWindow? window))
 		{
-			if (!_windows.TryGetValue(hwnd, out window))
+			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
+			windowWasCreated = true;
+			window = AddWindow(hwnd);
+
+			if (
+				window == null
+				&& (eventType == PInvoke.EVENT_SYSTEM_FOREGROUND || eventType == PInvoke.EVENT_OBJECT_UNCLOAKED)
+			)
 			{
-				Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
-				windowWasCreated = true;
-				window = AddWindow(hwnd);
+				// Even if the window was ignored, we need to fire OnWindowFocused.
+				Logger.Debug(
+					$"Window {hwnd} with event 0x{eventType:X4} was ignored, but still notifying listeners of focus"
+				);
+				OnWindowFocused(window);
+				return;
 			}
-		}
 
-		if (
-			windowWasCreated
-			&& window == null
-			&& (eventType == PInvoke.EVENT_SYSTEM_FOREGROUND || eventType == PInvoke.EVENT_OBJECT_UNCLOAKED)
-		)
-		{
-			// Even if the window was ignored, we need to fire OnWindowFocused.
-			Logger.Debug(
-				$"Window {hwnd} with event 0x{eventType:X4} was ignored, but still notifying listeners of focus"
-			);
-			OnWindowFocused(window);
-			return;
-		}
-
-		if (window == null)
-		{
-			return;
+			if (window == null)
+			{
+				return;
+			}
 		}
 
 		if (_internalContext.ButlerEventHandlers.AreMonitorsChanging && windowWasCreated == false)
@@ -333,44 +328,45 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	public IWindow? AddWindow(HWND hwnd)
 	{
-		Logger.Debug($"Adding window {hwnd}");
-
-		if (_internalContext.CoreNativeManager.IsSplashScreen(hwnd))
-		{
-			Logger.Verbose($"Window {hwnd} is a splash screen, ignoring");
-			return null;
-		}
-
-		if (_internalContext.CoreNativeManager.IsCloakedWindow(hwnd))
-		{
-			Logger.Verbose($"Window {hwnd} is cloaked, ignoring");
-			return null;
-		}
-
-		if (!_internalContext.CoreNativeManager.IsStandardWindow(hwnd))
-		{
-			Logger.Verbose($"Window {hwnd} is not a standard window, ignoring");
-			return null;
-		}
-
-		if (!_internalContext.CoreNativeManager.HasNoVisibleOwner(hwnd))
-		{
-			Logger.Verbose($"Window {hwnd} has a visible owner, ignoring");
-			return null;
-		}
-
-		IWindow? window = CreateWindow(hwnd);
-		if (window == null)
-		{
-			return null;
-		}
-		if (_context.FilterManager.ShouldBeIgnored(window))
-		{
-			return null;
-		}
-
+		IWindow? window;
 		using (Lock _ = new(_lockObj))
 		{
+			Logger.Debug($"Adding window {hwnd}");
+
+			if (_internalContext.CoreNativeManager.IsSplashScreen(hwnd))
+			{
+				Logger.Verbose($"Window {hwnd} is a splash screen, ignoring");
+				return null;
+			}
+
+			if (_internalContext.CoreNativeManager.IsCloakedWindow(hwnd))
+			{
+				Logger.Verbose($"Window {hwnd} is cloaked, ignoring");
+				return null;
+			}
+
+			if (!_internalContext.CoreNativeManager.IsStandardWindow(hwnd))
+			{
+				Logger.Verbose($"Window {hwnd} is not a standard window, ignoring");
+				return null;
+			}
+
+			if (!_internalContext.CoreNativeManager.HasNoVisibleOwner(hwnd))
+			{
+				Logger.Verbose($"Window {hwnd} has a visible owner, ignoring");
+				return null;
+			}
+
+			window = CreateWindow(hwnd);
+			if (window == null)
+			{
+				return null;
+			}
+			if (_context.FilterManager.ShouldBeIgnored(window))
+			{
+				return null;
+			}
+
 			_windows[hwnd] = window;
 		}
 
