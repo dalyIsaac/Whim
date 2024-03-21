@@ -6,6 +6,7 @@ namespace Whim;
 
 internal class FilterManager : IFilterManager
 {
+	private readonly object _lockObj = new();
 	#region Filters for specific properties
 	private readonly HashSet<string> _ignoreWindowClasses = new();
 	private readonly HashSet<string> _ignoreProcessNames = new();
@@ -33,18 +34,22 @@ internal class FilterManager : IFilterManager
 		_filters.Clear();
 	}
 
-	public bool ShouldBeIgnored(IWindow window) =>
-		_ignoreWindowClasses.Contains(window.WindowClass.ToLower())
-		|| (
-			window.ProcessFileName is string processFileName
-			&& _ignoreProcessFileNames.Contains(processFileName.ToLower())
-		)
-		|| (window.ProcessName is string processName && _ignoreProcessNames.Contains(processName.ToLower()))
-		|| _ignoreTitles.Contains(window.Title.ToLower())
-		|| _filters.Any(f => f(window));
+	public bool ShouldBeIgnored(IWindow window)
+	{
+		using Lock _ = new(_lockObj);
+		return _ignoreWindowClasses.Contains(window.WindowClass.ToLower())
+			|| (
+				window.ProcessFileName is string processFileName
+				&& _ignoreProcessFileNames.Contains(processFileName.ToLower())
+			)
+			|| (window.ProcessName is string processName && _ignoreProcessNames.Contains(processName.ToLower()))
+			|| _ignoreTitles.Contains(window.Title.ToLower())
+			|| _filters.Any(f => f(window));
+	}
 
 	public IFilterManager AddWindowClassFilter(string windowClass)
 	{
+		using Lock _ = new(_lockObj);
 		_ignoreWindowClasses.Add(windowClass.ToLower());
 		return this;
 	}
@@ -53,12 +58,14 @@ internal class FilterManager : IFilterManager
 
 	public IFilterManager AddProcessNameFilter(string processName)
 	{
+		using Lock _ = new(_lockObj);
 		_ignoreProcessNames.Add(processName.ToLower());
 		return this;
 	}
 
 	public IFilterManager AddProcessFileNameFilter(string processFileName)
 	{
+		using Lock _ = new(_lockObj);
 		_ignoreProcessFileNames.Add(processFileName.ToLower());
 		return this;
 	}
@@ -67,6 +74,7 @@ internal class FilterManager : IFilterManager
 
 	public IFilterManager AddTitleFilter(string title)
 	{
+		using Lock _ = new(_lockObj);
 		_ignoreTitles.Add(title.ToLower());
 		return this;
 	}
@@ -75,6 +83,7 @@ internal class FilterManager : IFilterManager
 
 	public IFilterManager AddTitleMatchFilter(string title)
 	{
+		using Lock _ = new(_lockObj);
 		Regex regex = new(title);
 		_filters.Add(window => regex.IsMatch(window.Title));
 		return this;

@@ -17,6 +17,7 @@ namespace Whim;
 /// </summary>
 public sealed class DeferWindowPosHandle : IDisposable
 {
+	private static readonly object _lockObj = new();
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
@@ -117,17 +118,12 @@ public sealed class DeferWindowPosHandle : IDisposable
 	/// <inheritdoc />
 	public void Dispose()
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug("Disposing WindowDeferPosHandle");
 
 		if (_windowStates.Count == 0 && _minimizedWindowStates.Count == 0)
 		{
 			Logger.Debug("No windows to set position for");
-			return;
-		}
-
-		if (!_internalContext.DeferWindowPosManager.CanDoLayout())
-		{
-			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates, _minimizedWindowStates);
 			return;
 		}
 
@@ -175,7 +171,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				Parallel.ForEach(allStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
+				Parallel.ForEach(allStates, _internalContext.ParallelOptions, SetWindowPos);
 			}
 		}
 

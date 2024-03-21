@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Whim;
 
@@ -7,6 +8,8 @@ namespace Whim;
 /// </summary>
 internal interface IInternalContext : IDisposable
 {
+	ParallelOptions ParallelOptions { get; }
+
 	IButlerEventHandlers ButlerEventHandlers { get; }
 
 	/// <inheritdoc cref="ICoreSavedStateManager" />
@@ -29,9 +32,6 @@ internal interface IInternalContext : IDisposable
 
 	/// <inheritdoc cref="IMouseHook" />
 	IMouseHook MouseHook { get; }
-
-	/// <inheritdoc cref="IDeferWindowPosManager" />
-	IDeferWindowPosManager DeferWindowPosManager { get; }
 
 	/// <inheritdoc cref="IDeferWorkspacePosManager" />
 	IDeferWorkspacePosManager DeferWorkspacePosManager { get; }

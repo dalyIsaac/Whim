@@ -37,7 +37,7 @@ public class DeferWindowPosHandleCustomization : ICustomization
 		});
 
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-		internalCtx.DeferWindowPosManager.ParallelOptions.Returns(new ParallelOptions { MaxDegreeOfParallelism = 1 });
+		internalCtx.ParallelOptions.Returns(new ParallelOptions { MaxDegreeOfParallelism = 1 });
 	}
 }
 
@@ -84,30 +84,6 @@ public class DeferWindowPosHandleTests
 		CustomAssert.NoInternalContextCalls(internalCtx);
 	}
 
-	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
-	internal void Dispose_CannotDoLayout(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WindowPosState windowPosState,
-		WindowPosState windowPosState2
-	)
-	{
-		// Given DeferWindowPosManager.CanDoLayout() returns false
-		windowPosState2.WindowState.WindowSize = WindowSize.Minimized;
-		using DeferWindowPosHandle handle =
-			new(ctx, internalCtx, new WindowPosState[] { windowPosState, windowPosState2 });
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(false);
-
-		// When disposing
-		handle.Dispose();
-
-		// Then the layout is deferred
-		internalCtx.DeferWindowPosManager.DeferLayout(
-			Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState),
-			Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState2)
-		);
-	}
-
 	[Theory]
 	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(100, 1)]
 	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(200, 2)]
@@ -121,7 +97,6 @@ public class DeferWindowPosHandleTests
 	{
 		// Given a single window, and a monitor which has a scale factor != 100
 		using DeferWindowPosHandle handle = new(ctx, internalCtx);
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
 
 		IMonitor monitor1 = Substitute.For<IMonitor>();
 		monitor1.ScaleFactor.Returns(100);
@@ -153,7 +128,6 @@ public class DeferWindowPosHandleTests
 		// Given multiple windows, and a monitor which has a scale factor != 100
 		using DeferWindowPosHandle handle =
 			new(ctx, internalCtx, new WindowPosState[] { windowPosState1, windowPosState2 });
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
 
 		IMonitor monitor1 = Substitute.For<IMonitor>();
 		monitor1.ScaleFactor.Returns(100);
@@ -177,7 +151,6 @@ public class DeferWindowPosHandleTests
 		ctx.NativeManager.GetWindowOffset(windowPosState.WindowState.Window.Handle).Returns((Rectangle<int>?)null);
 
 		using DeferWindowPosHandle handle = new(ctx, internalCtx, new WindowPosState[] { windowPosState });
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
 
 		// When disposing
 		handle.Dispose();
@@ -214,7 +187,6 @@ public class DeferWindowPosHandleTests
 		windowPosState.WindowState.WindowSize = windowSize;
 
 		using DeferWindowPosHandle handle = new(ctx, internalCtx, new WindowPosState[] { windowPosState });
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
 
 		// When disposing
 		handle.Dispose();
@@ -242,7 +214,6 @@ public class DeferWindowPosHandleTests
 	{
 		// Given no HWND is provided
 		using DeferWindowPosHandle handle = new(ctx, internalCtx);
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
 
 		handle.DeferWindowPos(windowPosState.WindowState, null, null);
 
