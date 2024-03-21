@@ -14,6 +14,7 @@ namespace Whim;
 /// </summary>
 internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 {
+	private readonly object _lockObj = new();
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
@@ -74,6 +75,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void OnWindowFocused(IWindow? window)
 	{
+		using Lock _ = new(_lockObj);
 		// If we know the window, use what the Butler knows instead of Windows.
 		if (window is not null)
 		{
@@ -119,6 +121,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void ActivateEmptyMonitor(IMonitor monitor)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Activating empty monitor {monitor}");
 
 		if (!_monitors.Contains(monitor))
@@ -144,16 +147,46 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	private void WindowMessageMonitor_MonitorsChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{
+		OnMonitorsChanged(
+			e,
+			out List<IMonitor> unchangedMonitors,
+			out List<IMonitor> removedMonitors,
+			out List<IMonitor> addedMonitors
+		);
+
+		// Notify listeners of the unchanged, removed, and added monitors.
+		MonitorsChangedEventArgs args =
+			new()
+			{
+				UnchangedMonitors = unchangedMonitors,
+				RemovedMonitors = removedMonitors,
+				AddedMonitors = addedMonitors
+			};
+
+		if (addedMonitors.Count != 0 || removedMonitors.Count != 0)
+		{
+			_internalContext.ButlerEventHandlers.OnMonitorsChanged(args);
+		}
+		MonitorsChanged?.Invoke(this, args);
+	}
+
+	private void OnMonitorsChanged(
+		WindowMessageMonitorEventArgs e,
+		out List<IMonitor> unchangedMonitors,
+		out List<IMonitor> removedMonitors,
+		out List<IMonitor> addedMonitors
+	)
+	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Monitors changed: {e.MessagePayload}");
 
 		// Get the new monitors.
 		IMonitor[] previousMonitors = _monitors;
 		_monitors = GetCurrentMonitors();
 
-		List<IMonitor> unchangedMonitors = new();
-		List<IMonitor> removedMonitors = new();
-		List<IMonitor> addedMonitors = new();
-
+		unchangedMonitors = new();
+		removedMonitors = new();
+		addedMonitors = new();
 		HashSet<IMonitor> previousMonitorsSet = new(previousMonitors);
 		HashSet<IMonitor> currentMonitorsSet = new(_monitors);
 
@@ -183,21 +216,6 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 				PrimaryMonitor = monitor;
 			}
 		}
-
-		// Notify listeners of the unchanged, removed, and added monitors.
-		MonitorsChangedEventArgs args =
-			new()
-			{
-				UnchangedMonitors = unchangedMonitors,
-				RemovedMonitors = removedMonitors,
-				AddedMonitors = addedMonitors
-			};
-
-		if (addedMonitors.Count != 0 || removedMonitors.Count != 0)
-		{
-			_internalContext.ButlerEventHandlers.OnMonitorsChanged(args);
-		}
-		MonitorsChanged?.Invoke(this, args);
 	}
 
 	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)
@@ -267,6 +285,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting monitor at point {point}");
 		HMONITOR hmonitor = _internalContext.CoreNativeManager.MonitorFromPoint(
 			point.ToSystemPoint(),
@@ -285,6 +304,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting previous monitor for {monitor}");
 
 		int index = Array.IndexOf(_monitors, monitor);
@@ -299,6 +319,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public IMonitor GetNextMonitor(IMonitor monitor)
 	{
+		using Lock _ = new(_lockObj);
 		Logger.Debug($"Getting next monitor for {monitor}");
 
 		int index = Array.IndexOf(_monitors, monitor);
