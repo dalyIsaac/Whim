@@ -304,6 +304,18 @@ internal partial class NativeManager : INativeManager
 	public bool TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueueHandler callback) =>
 		_dispatcherQueue.TryEnqueue(callback);
 
+	public Task InvokeOnUIThread(Microsoft.UI.Dispatching.DispatcherQueueHandler callback)
+	{
+		TaskCompletionSource<bool> tcs = new();
+		bool isQueued = _dispatcherQueue.TryEnqueue(() =>
+		{
+			callback();
+			tcs.SetResult(true);
+		});
+
+		return tcs.Task;
+	}
+
 	public string GetWhimVersion()
 	{
 #if DEBUG

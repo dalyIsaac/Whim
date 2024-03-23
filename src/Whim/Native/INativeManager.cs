@@ -160,12 +160,20 @@ public interface INativeManager
 	void RemoveWindowExTransparent(HWND hwnd);
 
 	/// <summary>
-	/// Adds a task to the <see cref="DispatcherQueue" /> which will be executed on the thread associated
+	/// Adds a callback to the <see cref="DispatcherQueue" /> which will be executed on the thread associated
 	/// with the <see cref="DispatcherQueue" />.
 	/// </summary>
 	/// <param name="callback">The task to execute.</param>
 	/// <returns><see langword="true" /> indicates that the task was added to the queue; <see langword="false" />, otherwise.</returns>
+	[Obsolete("Method is deprecated, use InvokeOnUIThread instead")]
 	bool TryEnqueue(DispatcherQueueHandler callback);
+
+	/// <summary>
+	/// Adds a <paramref name="callback"/> to the <see cref="DispatcherQueue"/> to run on the UI (STA) thread.
+	/// </summary>
+	/// <param name="callback">The task to execute.</param>
+	/// <returns>A task indicating the task's completion status.</returns>
+	Task InvokeOnUIThread(DispatcherQueueHandler callback);
 
 	/// <summary>
 	/// Gets the version of Whim.
