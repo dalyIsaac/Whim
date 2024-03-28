@@ -1,4 +1,3 @@
-using System;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -8,85 +7,6 @@ namespace Whim.Tests;
 
 public class KeybindManagerTests
 {
-	[Theory, AutoSubstituteData]
-	[Obsolete("Test for a deprecated method.")]
-	public void Add_DoesNotContainKeybind(IContext context, ICommand command)
-	{
-		// Given
-		IKeybindManager keybindManager = new KeybindManager(context);
-		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
-
-		context.CommandManager.TryGetCommand("command").Returns(command);
-
-		// When
-		keybindManager.Add("command", keybind);
-
-		// Then
-		ICommand[] allCommands = keybindManager.GetCommands(keybind);
-		Assert.Single(allCommands);
-		Assert.Equal(command, allCommands[0]);
-	}
-
-	[Theory, AutoSubstituteData]
-	[Obsolete("Test for a deprecated method.")]
-	public void Add_ContainsKeybind(IContext context, ICommand command, ICommand command2)
-	{
-		// Given
-		IKeybindManager keybindManager = new KeybindManager(context);
-		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
-
-		context.CommandManager.TryGetCommand("command").Returns(command);
-		context.CommandManager.TryGetCommand("command2").Returns(command2);
-
-		// When
-		keybindManager.Add("command", keybind);
-		keybindManager.Add("command2", keybind);
-
-		// Then
-		ICommand[] allCommands = keybindManager.GetCommands(keybind);
-		Assert.Equal(2, allCommands.Length);
-		Assert.Equal(command, allCommands[0]);
-		Assert.Equal(command2, allCommands[1]);
-	}
-
-	[Theory, AutoSubstituteData]
-	[Obsolete("Test for a deprecated method.")]
-	public void Add_AlreadyContainsKeybindForCommand(IContext context, ICommand command)
-	{
-		// Given
-		IKeybindManager keybindManager = new KeybindManager(context);
-		IKeybind keybind = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_A);
-		IKeybind keybind2 = new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_B);
-
-		context.CommandManager.TryGetCommand("command").Returns(command);
-
-		// When
-		keybindManager.Add("command", keybind);
-
-		// Then
-		Assert.Throws<ArgumentException>(() => keybindManager.Add("command", keybind2));
-	}
-
-	[Theory, AutoSubstituteData]
-	[Obsolete("Test for a deprecated method.")]
-	public void Add_UnifyKeyModifiers(IContext context, ICommand command)
-	{
-		// Given
-		IKeybindManager keybindManager = new KeybindManager(context);
-		IKeybind keybind = new Keybind(KeyModifiers.RWin | KeyModifiers.RControl, VIRTUAL_KEY.VK_A);
-
-		context.CommandManager.TryGetCommand("command").Returns(command);
-
-		// When
-		keybindManager.UnifyKeyModifiers = true;
-		keybindManager.Add("command", keybind);
-
-		// Then
-		IKeybind? result = keybindManager.TryGetKeybind("command");
-		Assert.NotNull(result);
-		Assert.Equal(new Keybind(KeyModifiers.LWin | KeyModifiers.LControl, VIRTUAL_KEY.VK_A), result);
-	}
-
 	[Theory, AutoSubstituteData]
 	public void SetKeybind_DoesNotContainKeybind(IContext context, ICommand command)
 	{
