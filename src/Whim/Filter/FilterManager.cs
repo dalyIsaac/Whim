@@ -49,21 +49,11 @@ internal class FilterManager : IFilterManager
 		return this;
 	}
 
-	public IFilterManager IgnoreWindowClass(string windowClass) => AddWindowClassFilter(windowClass);
-
-	public IFilterManager AddProcessNameFilter(string processName)
-	{
-		_ignoreProcessNames.Add(processName.ToLower());
-		return this;
-	}
-
 	public IFilterManager AddProcessFileNameFilter(string processFileName)
 	{
 		_ignoreProcessFileNames.Add(processFileName.ToLower());
 		return this;
 	}
-
-	public IFilterManager IgnoreProcessName(string processName) => AddProcessNameFilter(processName);
 
 	public IFilterManager AddTitleFilter(string title)
 	{
@@ -71,14 +61,10 @@ internal class FilterManager : IFilterManager
 		return this;
 	}
 
-	public IFilterManager IgnoreTitle(string title) => AddTitleFilter(title);
-
 	public IFilterManager AddTitleMatchFilter(string title)
 	{
 		Regex regex = new(title);
 		_filters.Add(window => regex.IsMatch(window.Title));
 		return this;
 	}
-
-	public IFilterManager IgnoreTitleMatch(string title) => AddTitleMatchFilter(title);
 }
