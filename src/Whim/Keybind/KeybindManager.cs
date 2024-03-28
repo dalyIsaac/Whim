@@ -43,20 +43,6 @@ internal class KeybindManager : IKeybindManager
 		}
 	}
 
-	[Obsolete("Method is deprecated, please use SetKeybind(string, IKeybind) instead.")]
-	public void Add(string commandId, IKeybind keybind)
-	{
-		Logger.Warning("Method is deprecated, please use SetKeybind(string, IKeybind) instead.");
-		Logger.Debug($"Adding keybind '{keybind}' for command '{commandId}'");
-
-		if (_commandsKeybindsMap.ContainsKey(commandId))
-		{
-			throw new ArgumentException($"Command '{commandId}' already has a keybind");
-		}
-
-		SetKeybind(commandId, keybind);
-	}
-
 	public void SetKeybind(string commandId, IKeybind keybind)
 	{
 		Logger.Debug($"Setting keybind '{keybind}' for command '{commandId}'");
