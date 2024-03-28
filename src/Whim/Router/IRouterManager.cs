@@ -13,15 +13,6 @@ public delegate IWorkspace? Router(IWindow window);
 public interface IRouterManager
 {
 	/// <summary>
-	/// When <see langword="true"/>, windows are routed to the active workspace.
-	/// When <see langword="false"/>, windows are routed to the active workspace on the monitor they are on.
-	/// Defaults to <see langword="false"/>.
-	/// This is overridden by any other routers in this <see cref="IRouterManager"/>.
-	/// </summary>
-	[Obsolete("Use RouterOptions instead")]
-	bool RouteToActiveWorkspace { get; set; }
-
-	/// <summary>
 	/// Describes how to route windows when they are added to Whim. <see cref="RouteWindow(IWindow)"/>
 	/// takes precedence over this.
 	/// </summary>
@@ -64,24 +55,6 @@ public interface IRouterManager
 	/// <param name="windowClass"></param>
 	/// <param name="workspace"></param>
 	IRouterManager AddWindowClassRoute(string windowClass, IWorkspace workspace);
-
-	/// <summary>
-	/// Adds a router which moves processes matching <see cref="IWindow.ProcessName"/> to the
-	/// <paramref name="workspaceName"/>.
-	/// </summary>
-	/// <param name="processName"></param>
-	/// <param name="workspaceName"></param>
-	[Obsolete("Use AddProcessFileNameRoute instead")]
-	IRouterManager AddProcessNameRoute(string processName, string workspaceName);
-
-	/// <summary>
-	/// Adds a router which moves processes matching <see cref="IWindow.ProcessName"/> to the
-	/// <paramref name="workspace"/>.
-	/// </summary>
-	/// <param name="processName"></param>
-	/// <param name="workspace"></param>
-	[Obsolete("Use AddProcessFileNameRoute instead")]
-	IRouterManager AddProcessNameRoute(string processName, IWorkspace workspace);
 
 	/// <summary>
 	/// Adds a router which moves windows matching <see cref="IWindow.ProcessFileName"/> to the
