@@ -110,20 +110,6 @@ public class WindowTests
 	}
 
 	[Theory, AutoSubstituteData<WindowCustomization>]
-	internal void Center(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
-
-		// When
-		IPoint<int> center = window.Center;
-
-		// Then
-		Assert.Equal(50, center.X);
-		Assert.Equal(100, center.Y);
-	}
-
-	[Theory, AutoSubstituteData<WindowCustomization>]
 	internal void ProcessId(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
@@ -165,19 +151,6 @@ public class WindowTests
 
 		// Then
 		Assert.Null(processFileName);
-	}
-
-	[Theory, AutoSubstituteData<WindowCustomization>]
-	internal void ProcessName(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!;
-
-		// When
-		string? processName = window.ProcessName;
-
-		// Then
-		Assert.Equal("processName", processName);
 	}
 
 	[Theory, AutoSubstituteData<WindowCustomization>]

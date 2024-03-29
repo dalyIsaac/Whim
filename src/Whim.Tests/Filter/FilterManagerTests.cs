@@ -20,19 +20,6 @@ public class FilterManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void AddProcessNameFilter(IWindow window)
-	{
-		// Given
-		FilterManager filterManager = new();
-		filterManager.AddProcessNameFilter("Test");
-
-		window.ProcessName.Returns("Test");
-
-		// Then
-		Assert.True(filterManager.ShouldBeIgnored(window));
-	}
-
-	[Theory, AutoSubstituteData]
 	public void AddProcessFileNameFilter(IWindow window)
 	{
 		// Given
@@ -79,13 +66,11 @@ public class FilterManagerTests
 		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
 
 		filterManager.AddWindowClassFilter("Test");
-		filterManager.AddProcessNameFilter("Test");
 		filterManager.AddProcessFileNameFilter("Test");
 		filterManager.AddTitleFilter("Test");
 		filterManager.AddTitleMatchFilter("Test");
 
 		window.WindowClass.Returns("Test");
-		window.ProcessName.Returns("Test");
 		window.ProcessFileName.Returns("Test");
 		window.Title.Returns("Test");
 

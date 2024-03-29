@@ -33,34 +33,4 @@ public interface IButler : IButlerChores
 	/// Initialize the windows and workspaces.
 	/// </summary>
 	void Initialize();
-
-	#region ButlerPantry methods
-	/// <summary>
-	/// Retrieves the monitor for the given window.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
-	IMonitor? GetMonitorForWindow(IWindow window);
-
-	/// <summary>
-	/// Retrieves the monitor for the active workspace.
-	/// </summary>
-	/// <param name="workspace"></param>
-	/// <returns><see langword="null"/> if the workspace is not active.</returns>
-	IMonitor? GetMonitorForWorkspace(IWorkspace workspace);
-
-	/// <summary>
-	/// Retrieves the active workspace for the given monitor.
-	/// </summary>
-	/// <param name="monitor"></param>
-	/// <returns><see langword="null"/> if the monitor is not active.</returns>
-	IWorkspace? GetWorkspaceForMonitor(IMonitor monitor);
-
-	/// <summary>
-	/// Retrieves the workspace for the given window.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
-	IWorkspace? GetWorkspaceForWindow(IWindow window);
-	#endregion
 }

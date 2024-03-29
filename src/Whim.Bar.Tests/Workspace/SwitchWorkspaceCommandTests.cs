@@ -46,7 +46,7 @@ public class SwitchWorkspaceCommandTests
 		command.Execute(null);
 
 		// Then
-		context.WorkspaceManager.DidNotReceive().Activate(workspaceModel.Workspace, viewModel.Monitor);
+		context.Butler.DidNotReceive().Activate(workspaceModel.Workspace, viewModel.Monitor);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -63,7 +63,7 @@ public class SwitchWorkspaceCommandTests
 		command.Execute(workspaceModel);
 
 		// Then
-		context.WorkspaceManager.Received(1).Activate(workspaceModel.Workspace, viewModel.Monitor);
+		context.Butler.Received(1).Activate(workspaceModel.Workspace, viewModel.Monitor);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -76,6 +76,6 @@ public class SwitchWorkspaceCommandTests
 		command.Dispose();
 
 		// Then
-		context.WorkspaceManager.DidNotReceive().Activate(workspaceModel.Workspace, viewModel.Monitor);
+		context.Butler.DidNotReceive().Activate(workspaceModel.Workspace, viewModel.Monitor);
 	}
 }

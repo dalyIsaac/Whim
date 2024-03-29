@@ -21,4 +21,25 @@ public class MonitorWorkspaceChangedEventArgs : EventArgs
 	/// The new workspace shown on the monitor.
 	/// </summary>
 	public required IWorkspace CurrentWorkspace { get; init; }
+
+	/// <inheritdoc/>
+	public override bool Equals(object? obj)
+	{
+		if (obj is null)
+		{
+			return false;
+		}
+
+		if (obj is not MonitorWorkspaceChangedEventArgs other)
+		{
+			return false;
+		}
+
+		return other.Monitor.Equals(Monitor)
+			&& other.PreviousWorkspace == PreviousWorkspace
+			&& other.CurrentWorkspace == CurrentWorkspace;
+	}
+
+	/// <inheritdoc/>
+	public override int GetHashCode() => HashCode.Combine(Monitor, PreviousWorkspace, CurrentWorkspace);
 }

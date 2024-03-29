@@ -12,6 +12,8 @@ internal class InternalContext : IInternalContext
 
 	public IWindowMessageMonitor WindowMessageMonitor { get; }
 
+	public IInternalButler Butler => (IInternalButler)_context.Butler;
+
 	public IInternalMonitorManager MonitorManager => (IInternalMonitorManager)_context.MonitorManager;
 
 	public IInternalWindowManager WindowManager => (IInternalWindowManager)_context.WindowManager;

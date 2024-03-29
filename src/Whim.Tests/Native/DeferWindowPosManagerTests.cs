@@ -44,8 +44,8 @@ public class DeferWindowPosManagerTests
 		// When RecoverLayout is called
 		manager.RecoverLayout();
 
-		// Then no calls to WorkspaceManager.GetWorkspaceForWindow are made
-		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		// Then no calls to Butler.Pantry.GetWorkspaceForWindow are made
+		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData<DeferWindowPosManagerCustomization>]
@@ -62,7 +62,7 @@ public class DeferWindowPosManagerTests
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState }, new() { minimizedWindowPosState });
 
-		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns(workspace);
 
 		// When RecoverLayout is called
 		manager.RecoverLayout();
@@ -86,9 +86,9 @@ public class DeferWindowPosManagerTests
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState1, windowPosState2 }, new() { minimizedWindowPosState });
 
-		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState1.WindowState.Window).Returns(workspace);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState2.WindowState.Window).Returns(workspace);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(minimizedWindowPosState.WindowState.Window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState1.WindowState.Window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState2.WindowState.Window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(minimizedWindowPosState.WindowState.Window).Returns(workspace);
 
 		// When RecoverLayout is called
 		manager.RecoverLayout();
@@ -110,7 +110,7 @@ public class DeferWindowPosManagerTests
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState }, new());
 
-		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns((IWorkspace?)null);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns((IWorkspace?)null);
 		ctx.FilterManager.ShouldBeIgnored(windowPosState.WindowState.Window).Returns(true);
 
 		// When RecoverLayout is called
@@ -132,7 +132,7 @@ public class DeferWindowPosManagerTests
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState }, new());
 
-		ctx.WorkspaceManager.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns((IWorkspace?)null);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns((IWorkspace?)null);
 		ctx.FilterManager.ShouldBeIgnored(windowPosState.WindowState.Window).Returns(false);
 
 		// When RecoverLayout is called

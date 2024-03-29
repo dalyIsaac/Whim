@@ -183,7 +183,7 @@ public class MonitorManagerTests
 		// Given the window is defined, and GetMonitorForWindow returns a monitor
 		MonitorManager monitorManager = new(ctx, internalCtx);
 		IMonitor originalMonitor = monitorManager.ActiveMonitor;
-		ctx.Butler.GetMonitorForWindow(window).Returns(monitor);
+		ctx.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		monitorManager.OnWindowFocused(window);
@@ -205,7 +205,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 		IMonitor originalMonitor = monitorManager.ActiveMonitor;
 
-		ctx.Butler.GetMonitorForWindow(window).ReturnsNull();
+		ctx.Butler.Pantry.GetMonitorForWindow(window).ReturnsNull();
 		window.Handle.Returns((HWND)1);
 		internalCtx
 			.CoreNativeManager.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
@@ -868,7 +868,7 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 		IMonitor monitor = monitorManager.ElementAt(1);
 
-		ctx.Butler.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 		workspace.Windows.GetEnumerator().Returns(new List<IWindow>().GetEnumerator());
 
 		// When

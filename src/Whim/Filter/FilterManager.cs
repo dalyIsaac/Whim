@@ -8,7 +8,6 @@ internal class FilterManager : IFilterManager
 {
 	#region Filters for specific properties
 	private readonly HashSet<string> _ignoreWindowClasses = new();
-	private readonly HashSet<string> _ignoreProcessNames = new();
 	private readonly HashSet<string> _ignoreProcessFileNames = new();
 	private readonly HashSet<string> _ignoreTitles = new();
 	#endregion
@@ -27,7 +26,6 @@ internal class FilterManager : IFilterManager
 	{
 		Logger.Debug($"Clearing filters");
 		_ignoreWindowClasses.Clear();
-		_ignoreProcessNames.Clear();
 		_ignoreProcessFileNames.Clear();
 		_ignoreTitles.Clear();
 		_filters.Clear();
@@ -39,7 +37,6 @@ internal class FilterManager : IFilterManager
 			window.ProcessFileName is string processFileName
 			&& _ignoreProcessFileNames.Contains(processFileName.ToLower())
 		)
-		|| (window.ProcessName is string processName && _ignoreProcessNames.Contains(processName.ToLower()))
 		|| _ignoreTitles.Contains(window.Title.ToLower())
 		|| _filters.Any(f => f(window));
 
@@ -49,21 +46,11 @@ internal class FilterManager : IFilterManager
 		return this;
 	}
 
-	public IFilterManager IgnoreWindowClass(string windowClass) => AddWindowClassFilter(windowClass);
-
-	public IFilterManager AddProcessNameFilter(string processName)
-	{
-		_ignoreProcessNames.Add(processName.ToLower());
-		return this;
-	}
-
 	public IFilterManager AddProcessFileNameFilter(string processFileName)
 	{
 		_ignoreProcessFileNames.Add(processFileName.ToLower());
 		return this;
 	}
-
-	public IFilterManager IgnoreProcessName(string processName) => AddProcessNameFilter(processName);
 
 	public IFilterManager AddTitleFilter(string title)
 	{
@@ -71,14 +58,10 @@ internal class FilterManager : IFilterManager
 		return this;
 	}
 
-	public IFilterManager IgnoreTitle(string title) => AddTitleFilter(title);
-
 	public IFilterManager AddTitleMatchFilter(string title)
 	{
 		Regex regex = new(title);
 		_filters.Add(window => regex.IsMatch(window.Title));
 		return this;
 	}
-
-	public IFilterManager IgnoreTitleMatch(string title) => AddTitleMatchFilter(title);
 }

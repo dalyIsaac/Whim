@@ -20,8 +20,8 @@ public class NextLayoutEngineCommandTests
 		command.Execute(null);
 
 		// Then
-		context.Butler.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
-		context.Butler.GetWorkspaceForMonitor(monitor)!.Received(1).CycleLayoutEngine(false);
+		context.Butler.Pantry.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		context.Butler.Pantry.GetWorkspaceForMonitor(monitor)!.Received(1).CycleLayoutEngine(false);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -30,13 +30,13 @@ public class NextLayoutEngineCommandTests
 		// Given
 		ActiveLayoutWidgetViewModel viewModel = CreateSut(context, monitor);
 		NextLayoutEngineCommand command = new(context, viewModel);
-		context.Butler.GetWorkspaceForMonitor(monitor).Returns((IWorkspace?)null);
+		context.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns((IWorkspace?)null);
 
 		// When
 		command.Execute(null);
 
 		// Then
-		context.Butler.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		context.Butler.Pantry.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
 	}
 
 	[Theory, AutoSubstituteData]

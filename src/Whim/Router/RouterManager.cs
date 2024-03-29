@@ -8,12 +8,6 @@ internal class RouterManager : IRouterManager
 	private readonly IContext _context;
 	private readonly List<Router> _routers = new();
 
-	public bool RouteToActiveWorkspace
-	{
-		get => RouterOptions == RouterOptions.RouteToActiveWorkspace;
-		set => RouterOptions = value ? RouterOptions.RouteToActiveWorkspace : RouterOptions.RouteToLaunchedWorkspace;
-	}
-
 	public RouterOptions RouterOptions { get; set; } = RouterOptions.RouteToLaunchedWorkspace;
 
 	public RouterManager(IContext context)
@@ -31,36 +25,6 @@ internal class RouterManager : IRouterManager
 	{
 		Logger.Debug("Clearing routes");
 		_routers.Clear();
-	}
-
-	public IRouterManager AddProcessNameRoute(string processName, string workspaceName)
-	{
-		processName = processName.ToLower();
-		Logger.Debug($"Routing process name: {processName} to workspace {workspaceName}");
-		Add(window =>
-		{
-			if (window.ProcessName?.ToLower() == processName)
-			{
-				return _context.WorkspaceManager.TryGet(workspaceName);
-			}
-			return null;
-		});
-		return this;
-	}
-
-	public IRouterManager AddProcessNameRoute(string processName, IWorkspace workspace)
-	{
-		processName = processName.ToLower();
-		Logger.Debug($"Routing process name: {processName} to workspace {workspace}");
-		Add(window =>
-		{
-			if (window.ProcessName?.ToLower() == processName)
-			{
-				return workspace;
-			}
-			return null;
-		});
-		return this;
 	}
 
 	public IRouterManager AddProcessFileNameRoute(string processFileName, string workspaceName)

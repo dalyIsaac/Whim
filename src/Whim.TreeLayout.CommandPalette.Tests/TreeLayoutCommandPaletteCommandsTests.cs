@@ -106,12 +106,12 @@ public class TreeLayoutCommandPaletteCommandsTests
 		TreeLayoutCommandPalettePluginCommands commands,
 		ITreeLayoutPlugin treeLayoutPlugin,
 		IMonitor monitor,
-		IWorkspaceManager workspaceManager,
+		IContext ctx,
 		IWorkspace workspace
 	)
 	{
 		// Given
-		workspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 		workspace.ActiveLayoutEngine.Returns((ILayoutEngine?)null);
 
 		// When

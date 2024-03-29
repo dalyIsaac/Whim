@@ -82,7 +82,7 @@ public class TreeLayoutPluginTests
 	)
 	{
 		// Given
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 		workspace.ActiveLayoutEngine.Returns(layoutEngine);
 
 		TreeLayoutPlugin plugin = new(ctx);
@@ -98,7 +98,7 @@ public class TreeLayoutPluginTests
 	public void GetAddWindowDirection_Monitor_LazyInit(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -117,7 +117,7 @@ public class TreeLayoutPluginTests
 	public void GetAddWindowDirection_Monitor_AlreadyInit(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -189,7 +189,7 @@ public class TreeLayoutPluginTests
 	)
 	{
 		// Given
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -207,7 +207,7 @@ public class TreeLayoutPluginTests
 	public void SetAddWindowDirection_DirectionNotSet(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -236,7 +236,7 @@ public class TreeLayoutPluginTests
 	public void SetAddWindowDirection_DirectionAlreadySet(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
 		TreeLayoutPlugin plugin = new(ctx);
 

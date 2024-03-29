@@ -7,7 +7,6 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
-	private readonly ButlerTriggers _triggers;
 	private readonly IButlerPantry _pantry;
 	private readonly IButlerChores _chores;
 
@@ -19,14 +18,12 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 	public ButlerEventHandlers(
 		IContext context,
 		IInternalContext internalContext,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores
 	)
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_triggers = triggers;
 		_pantry = pantry;
 		_chores = chores;
 	}
@@ -89,7 +86,7 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 			workspace.AddWindow(window);
 		}
 
-		_triggers.WindowRouted(RouteEventArgs.WindowAdded(window, workspace));
+		_internalContext.Butler.TriggerWindowRouted(RouteEventArgs.WindowAdded(window, workspace));
 
 		workspace.DoLayout();
 		window.Focus();
@@ -110,7 +107,7 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		_pantry.RemoveWindow(window);
 		workspace.RemoveWindow(window);
 
-		_triggers.WindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
+		_internalContext.Butler.TriggerWindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
 		workspace.DoLayout();
 	}
 

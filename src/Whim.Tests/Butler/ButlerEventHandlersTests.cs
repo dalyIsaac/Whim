@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
@@ -11,36 +9,11 @@ using Xunit;
 
 namespace Whim.Tests;
 
-internal record ButlerTriggersCalls()
-{
-	public List<MonitorWorkspaceChangedEventArgs> MonitorWorkspaceChanged { get; } = new();
-	public List<RouteEventArgs> WindowRouted { get; } = new();
-}
-
-internal class ButlerEventHandlersCustomization : ICustomization
-{
-	public void Customize(IFixture fixture)
-	{
-		ButlerTriggersCalls calls = fixture.Create<ButlerTriggersCalls>();
-		fixture.Inject(calls);
-
-		fixture.Inject(
-			new ButlerTriggers()
-			{
-				MonitorWorkspaceChanged = calls.MonitorWorkspaceChanged.Add,
-				WindowRouted = calls.WindowRouted.Add
-			}
-		);
-	}
-}
-
 public class ButlerEventHandlersTests
 {
-	private static void AssertWindowAdded(IWindow window, IWorkspace currentWorkspace, RouteEventArgs actual)
+	private static void AssertWindowAdded(IInternalContext internalCtx, IWindow window, IWorkspace currentWorkspace)
 	{
-		Assert.Equal(window, actual.Window);
-		Assert.Null(actual.PreviousWorkspace);
-		Assert.Equal(currentWorkspace, actual.CurrentWorkspace);
+		internalCtx.Butler.Received(1).TriggerWindowRouted(RouteEventArgs.WindowAdded(window, currentWorkspace));
 
 		currentWorkspace.Received().AddWindow(window);
 		currentWorkspace.Received().DoLayout();
@@ -48,11 +21,9 @@ public class ButlerEventHandlersTests
 		window.Received().Focus();
 	}
 
-	private static void AssertWindowMinimized(IWindow window, IWorkspace currentWorkspace, RouteEventArgs actual)
+	private static void AssertWindowMinimized(IInternalContext internalCtx, IWindow window, IWorkspace currentWorkspace)
 	{
-		Assert.Equal(window, actual.Window);
-		Assert.Null(actual.PreviousWorkspace);
-		Assert.Equal(currentWorkspace, actual.CurrentWorkspace);
+		internalCtx.Butler.Received(1).TriggerWindowRouted(RouteEventArgs.WindowAdded(window, currentWorkspace));
 
 		currentWorkspace.Received().MinimizeWindowStart(window);
 		currentWorkspace.Received().DoLayout();
@@ -61,14 +32,12 @@ public class ButlerEventHandlersTests
 	}
 
 	#region WindowAdded
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowAdded_RouteWindow(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window,
 		IWorkspace routedWorkspace
 	)
@@ -77,7 +46,7 @@ public class ButlerEventHandlersTests
 		ctx.RouterManager.RouteWindow(window).Returns(routedWorkspace);
 		ctx.WorkspaceManager.Contains(routedWorkspace).Returns(true);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
 		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
@@ -86,18 +55,15 @@ public class ButlerEventHandlersTests
 		ctx.RouterManager.Received().RouteWindow(window);
 		pantry.Received().SetWindowWorkspace(window, routedWorkspace);
 
-		Assert.Single(triggersCalls.WindowRouted);
-		AssertWindowAdded(window, routedWorkspace, triggersCalls.WindowRouted[0]);
+		AssertWindowAdded(internalCtx, window, routedWorkspace);
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowAdded_RouteWindow_WorkspaceDoesNotExist(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window,
 		IWorkspace badWorkspace,
 		IWorkspace goodWorkspace
@@ -108,7 +74,7 @@ public class ButlerEventHandlersTests
 		ctx.WorkspaceManager.Contains(badWorkspace).Returns(false);
 		pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(goodWorkspace);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
 		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
@@ -118,18 +84,15 @@ public class ButlerEventHandlersTests
 		pantry.Received().SetWindowWorkspace(window, goodWorkspace);
 		badWorkspace.DidNotReceive().AddWindow(window);
 
-		Assert.Single(triggersCalls.WindowRouted);
-		AssertWindowAdded(window, goodWorkspace, triggersCalls.WindowRouted[0]);
+		AssertWindowAdded(internalCtx, window, goodWorkspace);
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowAdded_RouteToActiveWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window,
 		IWorkspace activeWorkspace
 	)
@@ -140,7 +103,7 @@ public class ButlerEventHandlersTests
 		ctx.WorkspaceManager.ActiveWorkspace.Returns(activeWorkspace);
 		ctx.WorkspaceManager.Contains(activeWorkspace).Returns(true);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
 		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
@@ -148,18 +111,15 @@ public class ButlerEventHandlersTests
 		// Then the window is routed to the active workspace
 		pantry.Received().SetWindowWorkspace(window, activeWorkspace);
 
-		Assert.Single(triggersCalls.WindowRouted);
-		AssertWindowAdded(window, activeWorkspace, triggersCalls.WindowRouted[0]);
+		AssertWindowAdded(internalCtx, window, activeWorkspace);
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowAdded_RouteToLastTrackedActiveWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window,
 		IWorkspace lastTrackedActiveWorkspace
 	)
@@ -173,7 +133,7 @@ public class ButlerEventHandlersTests
 			.Returns(lastTrackedActiveWorkspace);
 		ctx.WorkspaceManager.Contains(lastTrackedActiveWorkspace).Returns(true);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
 		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
@@ -181,18 +141,15 @@ public class ButlerEventHandlersTests
 		// Then the window is routed to the last tracked active workspace
 		pantry.Received().SetWindowWorkspace(window, lastTrackedActiveWorkspace);
 
-		Assert.Single(triggersCalls.WindowRouted);
-		AssertWindowAdded(window, lastTrackedActiveWorkspace, triggersCalls.WindowRouted[0]);
+		AssertWindowAdded(internalCtx, window, lastTrackedActiveWorkspace);
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowAdded_RouteToLaunchedWorkspace_MonitorFromWindow_GetMonitorByHandle_Failure(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window,
 		IWorkspace workspace
 	)
@@ -207,7 +164,7 @@ public class ButlerEventHandlersTests
 		internalCtx.MonitorManager.GetMonitorByHandle((HMONITOR)1).ReturnsNull();
 		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
 		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
@@ -220,17 +177,14 @@ public class ButlerEventHandlersTests
 		pantry.DidNotReceive().GetWorkspaceForMonitor(Arg.Any<IMonitor>());
 		pantry.Received().SetWindowWorkspace(window, workspace);
 
-		Assert.Single(triggersCalls.WindowRouted);
-		AssertWindowAdded(window, workspace, triggersCalls.WindowRouted[0]);
+		AssertWindowAdded(internalCtx, window, workspace);
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowAdded_RouteToLaunchedWorkspace_MonitorFromWindow_GetMonitorByHandle_Success(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window,
 		IWorkspace workspace,
 		IMonitor monitor
@@ -246,7 +200,7 @@ public class ButlerEventHandlersTests
 		internalCtx.MonitorManager.GetMonitorByHandle((HMONITOR)1).Returns(monitor);
 		pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is added
 		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
@@ -259,18 +213,15 @@ public class ButlerEventHandlersTests
 		pantry.Received().GetWorkspaceForMonitor(monitor);
 		pantry.Received().SetWindowWorkspace(window, workspace);
 
-		Assert.Single(triggersCalls.WindowRouted);
-		AssertWindowAdded(window, workspace, triggersCalls.WindowRouted[0]);
+		AssertWindowAdded(internalCtx, window, workspace);
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowAdded_RouteWindow_WindowIsMinimized(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window,
 		IWorkspace routedWorkspace
 	)
@@ -280,7 +231,7 @@ public class ButlerEventHandlersTests
 		ctx.WorkspaceManager.Contains(routedWorkspace).Returns(true);
 		window.IsMinimized.Returns(true);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
 		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
@@ -290,44 +241,39 @@ public class ButlerEventHandlersTests
 		pantry.Received().SetWindowWorkspace(window, routedWorkspace);
 		routedWorkspace.Received().MinimizeWindowStart(window);
 
-		Assert.Single(triggersCalls.WindowRouted);
-		AssertWindowMinimized(window, routedWorkspace, triggersCalls.WindowRouted[0]);
+		AssertWindowMinimized(internalCtx, window, routedWorkspace);
 	}
 	#endregion
 
 	#region WindowRemoved
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowRemoved_NoWorkspaceForWindow(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window
 	)
 	{
 		// Given the pantry does not contain the window
 		pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is removed
 		sut.OnWindowRemoved(new WindowEventArgs() { Window = window });
 
 		// Then nothing happens
 		pantry.DidNotReceive().RemoveWindow(window);
-		Assert.Empty(triggersCalls.WindowRouted);
+		internalCtx.Butler.DidNotReceive().TriggerWindowRouted(Arg.Any<RouteEventArgs>());
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowRemoved_RemoveWindowFromWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
-		ButlerTriggersCalls triggersCalls,
 		IWindow window,
 		IWorkspace workspace
 	)
@@ -335,7 +281,7 @@ public class ButlerEventHandlersTests
 		// Given the pantry contains the window and the window is in a workspace
 		pantry.GetWorkspaceForWindow(window).Returns(workspace);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is removed
 		sut.OnWindowRemoved(new WindowEventArgs() { Window = window });
@@ -344,16 +290,15 @@ public class ButlerEventHandlersTests
 		pantry.Received().RemoveWindow(window);
 		workspace.Received().RemoveWindow(window);
 		workspace.Received().DoLayout();
-		Assert.Single(triggersCalls.WindowRouted);
+		internalCtx.Butler.Received(1).TriggerWindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
 	}
 	#endregion
 
 	#region WindowFocused
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowFocused_WindowIsNull(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores
 	)
@@ -361,7 +306,7 @@ public class ButlerEventHandlersTests
 		// Given the window is null
 		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is focused
 		sut.OnWindowFocused(new WindowFocusedEventArgs() { Window = null });
@@ -374,19 +319,14 @@ public class ButlerEventHandlersTests
 		pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
-	internal void WindowFocused_NoWorkspaceForWindow(
-		IContext ctx,
-		IInternalContext internalCtx,
-		ButlerTriggers triggers,
-		IButlerPantry pantry
-	)
+	[Theory, AutoSubstituteData]
+	internal void WindowFocused_NoWorkspaceForWindow(IContext ctx, IInternalContext internalCtx, IButlerPantry pantry)
 	{
 		// Given the pantry does not have a workspace for the window
 		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);
 		pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
 		sut.OnWindowFocused(new WindowFocusedEventArgs() { Window = Substitute.For<IWindow>() });
@@ -400,11 +340,10 @@ public class ButlerEventHandlersTests
 		pantry.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowFocused_WorkspaceIsNotActivated(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
 		IWindow window,
@@ -415,7 +354,7 @@ public class ButlerEventHandlersTests
 		pantry.GetWorkspaceForWindow(window).Returns(workspace);
 		pantry.GetMonitorForWorkspace(workspace).ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
 		sut.OnWindowFocused(new WindowFocusedEventArgs() { Window = window });
@@ -427,11 +366,10 @@ public class ButlerEventHandlersTests
 		chores.DidNotReceive().Activate(workspace);
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowFocused_WorkspaceIsActivated(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
 		IWindow window,
@@ -443,7 +381,7 @@ public class ButlerEventHandlersTests
 		pantry.GetWorkspaceForWindow(window).Returns(workspace);
 		pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is focused
 		sut.OnWindowFocused(new WindowFocusedEventArgs() { Window = window });
@@ -457,11 +395,10 @@ public class ButlerEventHandlersTests
 	#endregion
 
 	#region WindowMinimizeStart
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowMinimizeStart_NoWorkspaceForWindow(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
 		IWindow window
@@ -470,7 +407,7 @@ public class ButlerEventHandlersTests
 		// Given the pantry does not have a workspace for the window
 		pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is minimized
 		sut.OnWindowMinimizeStart(new WindowEventArgs() { Window = window });
@@ -478,11 +415,10 @@ public class ButlerEventHandlersTests
 		// Then nothing happens
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowMinimizeStart_WorkspaceForWindowIsNotActiveWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
 		IWindow window,
@@ -492,7 +428,7 @@ public class ButlerEventHandlersTests
 		// Given the pantry has a workspace for the window
 		pantry.GetWorkspaceForWindow(window).Returns(workspace);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores);
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is minimized
 		sut.OnWindowMinimizeStart(new WindowEventArgs() { Window = window });
@@ -504,11 +440,10 @@ public class ButlerEventHandlersTests
 	#endregion
 
 	#region WindowMinimizeEnd
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowMinimizeEnd_NoWorkspaceForWindow(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IWindow window
 	)
@@ -516,7 +451,7 @@ public class ButlerEventHandlersTests
 		// Given the pantry does not have a workspace for the window
 		pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is unminimized
 		sut.OnWindowMinimizeEnd(new WindowEventArgs() { Window = window });
@@ -524,11 +459,10 @@ public class ButlerEventHandlersTests
 		// Then nothing happens
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void WindowMinimizeEnd_WorkspaceForWindowIsNotActiveWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IWindow window,
 		IWorkspace workspace
@@ -537,7 +471,7 @@ public class ButlerEventHandlersTests
 		// Given the pantry has a workspace for the window
 		pantry.GetWorkspaceForWindow(window).Returns(workspace);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, Substitute.For<IButlerChores>());
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is unminimized
 		sut.OnWindowMinimizeEnd(new WindowEventArgs() { Window = window });
@@ -549,11 +483,10 @@ public class ButlerEventHandlersTests
 	#endregion
 
 	#region OnMonitorsChanged
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void OnMonitorsChanged_RemovedMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerPantry pantry,
 		IButlerChores chores,
 		IWorkspace workspace
@@ -563,7 +496,7 @@ public class ButlerEventHandlersTests
 		IMonitor[] monitors = CreateMonitors(ctx, 3);
 		pantry.GetWorkspaceForMonitor(monitors[0]).Returns(workspace);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores) { MonitorsChangedDelay = 0 };
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores) { MonitorsChangedDelay = 0 };
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed
@@ -582,11 +515,10 @@ public class ButlerEventHandlersTests
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void OnMonitorsChanged_RemovedMonitor_NoWorkspaceForMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerChores chores,
 		IButlerPantry pantry
 	)
@@ -595,7 +527,7 @@ public class ButlerEventHandlersTests
 		IMonitor[] monitors = CreateMonitors(ctx, 3);
 		pantry.GetWorkspaceForMonitor(monitors[0]).ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores) { MonitorsChangedDelay = 0 };
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores) { MonitorsChangedDelay = 0 };
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed
@@ -631,11 +563,10 @@ public class ButlerEventHandlersTests
 		return workspaces;
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void OnMonitorsChanged_AddedMonitor_UseSpareWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerChores chores,
 		IButlerPantry pantry,
 		IMonitor newMonitor
@@ -648,7 +579,7 @@ public class ButlerEventHandlersTests
 
 		pantry.GetMonitorForWorkspace(workspaces[2]).ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores) { MonitorsChangedDelay = 0 };
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores) { MonitorsChangedDelay = 0 };
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
@@ -666,11 +597,10 @@ public class ButlerEventHandlersTests
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Succeeds(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerChores chores,
 		IButlerPantry pantry,
 		IMonitor newMonitor,
@@ -684,7 +614,7 @@ public class ButlerEventHandlersTests
 
 		ctx.WorkspaceManager.Add().Returns(newWorkspace);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores) { MonitorsChangedDelay = 0 };
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores) { MonitorsChangedDelay = 0 };
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
@@ -702,11 +632,10 @@ public class ButlerEventHandlersTests
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Fails(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerChores chores,
 		IButlerPantry pantry
 	)
@@ -718,7 +647,7 @@ public class ButlerEventHandlersTests
 
 		ctx.WorkspaceManager.Add().ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores) { MonitorsChangedDelay = 0 };
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores) { MonitorsChangedDelay = 0 };
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is added
@@ -736,11 +665,10 @@ public class ButlerEventHandlersTests
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal void OnMonitorsChanged_RemovedAndAddedMonitor(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerChores chores,
 		IButlerPantry pantry,
 		IMonitor newMonitor
@@ -757,7 +685,7 @@ public class ButlerEventHandlersTests
 
 		pantry.GetMonitorForWorkspace(workspaces[0]).ReturnsNull();
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores) { MonitorsChangedDelay = 0 };
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores) { MonitorsChangedDelay = 0 };
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When a monitor is removed and another is added
@@ -781,11 +709,10 @@ public class ButlerEventHandlersTests
 		chores.Received().LayoutAllActiveWorkspaces();
 	}
 
-	[Theory, AutoSubstituteData<ButlerEventHandlersCustomization>]
+	[Theory, AutoSubstituteData]
 	internal async void OnMonitorsChanged_DelayLayouts(
 		IContext ctx,
 		IInternalContext internalCtx,
-		ButlerTriggers triggers,
 		IButlerChores chores,
 		IButlerPantry pantry
 	)
@@ -806,7 +733,7 @@ public class ButlerEventHandlersTests
 		pantry.GetWorkspaceForMonitor(monitors[1]).Returns(workspaces[1]);
 		pantry.GetWorkspaceForMonitor(monitors[2]).Returns(workspaces[2]);
 
-		ButlerEventHandlers sut = new(ctx, internalCtx, triggers, pantry, chores) { MonitorsChangedDelay = 500 };
+		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores) { MonitorsChangedDelay = 500 };
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		// When there are two events in quick succession

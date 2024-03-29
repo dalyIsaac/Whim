@@ -4,12 +4,11 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal partial class Butler : IButler
+internal partial class Butler : IButler, IInternalButler
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	private readonly ButlerTriggers _triggers;
 	private readonly IButlerChores _chores;
 	private bool _initialized;
 	internal readonly ButlerEventHandlers EventHandlers;
@@ -34,20 +33,20 @@ internal partial class Butler : IButler
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_triggers = new ButlerTriggers()
-		{
-			WindowRouted = (args) => WindowRouted?.Invoke(this, args),
-			MonitorWorkspaceChanged = (args) => MonitorWorkspaceChanged?.Invoke(this, args),
-		};
 
 		_pantry = new ButlerPantry(_context);
-		_chores = new ButlerChores(_context, _internalContext, _triggers);
-		EventHandlers = new ButlerEventHandlers(_context, _internalContext, _triggers, _pantry, _chores);
+		_chores = new ButlerChores(_context, _internalContext);
+		EventHandlers = new ButlerEventHandlers(_context, _internalContext, _pantry, _chores);
 	}
 
 	public event EventHandler<RouteEventArgs>? WindowRouted;
 
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
+
+	public void TriggerWindowRouted(RouteEventArgs args) => WindowRouted?.Invoke(this, args);
+
+	public void TriggerMonitorWorkspaceChanged(MonitorWorkspaceChangedEventArgs args) =>
+		MonitorWorkspaceChanged?.Invoke(this, args);
 
 	public void Initialize()
 	{
@@ -107,16 +106,6 @@ internal partial class Butler : IButler
 		// Restore the route to active workspace setting.
 		_context.RouterManager.RouterOptions = routerOptions;
 	}
-
-	#region Pantry
-	public IMonitor? GetMonitorForWindow(IWindow window) => _pantry.GetMonitorForWindow(window);
-
-	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace) => _pantry.GetMonitorForWorkspace(workspace);
-
-	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor) => _pantry.GetWorkspaceForMonitor(monitor);
-
-	public IWorkspace? GetWorkspaceForWindow(IWindow window) => _pantry.GetWorkspaceForWindow(window);
-	#endregion
 
 	#region Chores
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null) => _chores.Activate(workspace, monitor);

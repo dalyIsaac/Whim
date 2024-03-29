@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim;
 
 /// <summary>
@@ -37,44 +35,8 @@ public interface IFilterManager
 	/// Ignores the window class. Case insensitive.
 	/// </summary>
 	/// <param name="windowClass"></param>
-	[Obsolete("Use AddWindowClassFilter instead")]
-	IFilterManager IgnoreWindowClass(string windowClass);
-
-	/// <summary>
-	/// Ignores the process name. Case insensitive.
-	/// </summary>
-	/// <param name="processName"></param>
-	[Obsolete("Use AddProcessNameFilter instead")]
-	IFilterManager IgnoreProcessName(string processName);
-
-	/// <summary>
-	/// Ignores the title. Case insensitive.
-	/// </summary>
-	/// <param name="title"></param>
-	[Obsolete("Use AddTitleFilter instead")]
-	IFilterManager IgnoreTitle(string title);
-
-	/// <summary>
-	/// Filter the title according to the regex pattern.
-	/// </summary>
-	/// <param name="match"></param>
-	[Obsolete("Use AddTitleMatchFilter instead")]
-	IFilterManager IgnoreTitleMatch(string match);
-
-	/// <summary>
-	/// Ignores the window class. Case insensitive.
-	/// </summary>
-	/// <param name="windowClass"></param>
 	/// <returns></returns>
 	IFilterManager AddWindowClassFilter(string windowClass);
-
-	/// <summary>
-	/// Ignores the process name - see <see cref="IWindow.ProcessName"/>. Case insensitive.
-	/// </summary>
-	/// <param name="processName"></param>
-	/// <returns></returns>
-	[Obsolete("Use AddProcessFileNameFilter instead")]
-	IFilterManager AddProcessNameFilter(string processName);
 
 	/// <summary>
 	/// Ignores the process name - see <see cref="IWindow.ProcessFileName"/>. Case insensitive.
