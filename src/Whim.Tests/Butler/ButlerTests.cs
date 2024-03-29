@@ -33,4 +33,45 @@ public class ButlerTests
 		// Then the pantry is not set
 		Assert.NotEqual(pantry, sut.Pantry);
 	}
+
+	[Theory, AutoSubstituteData]
+	internal void TriggerWindowRouted(
+		IContext ctx,
+		IInternalContext internalContext,
+		IWindow window,
+		IWorkspace workspace
+	)
+	{
+		// Given
+		Butler sut = new(ctx, internalContext);
+
+		// When we call TriggerWindowRouted, then the event is triggered
+		Assert.Raises<RouteEventArgs>(
+			h => sut.WindowRouted += h,
+			h => sut.WindowRouted -= h,
+			() => sut.TriggerWindowRouted(RouteEventArgs.WindowAdded(window, workspace))
+		);
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void TriggerMonitorWorkspaceChanged(
+		IContext ctx,
+		IInternalContext internalContext,
+		IMonitor monitor,
+		IWorkspace workspace
+	)
+	{
+		// Given
+		Butler sut = new(ctx, internalContext);
+
+		// When we call TriggerMonitorWorkspaceChanged, then the event is triggered
+		Assert.Raises<RouteEventArgs>(
+			h => sut.WindowRouted += h,
+			h => sut.WindowRouted -= h,
+			() =>
+				sut.TriggerMonitorWorkspaceChanged(
+					new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = workspace, Monitor = monitor }
+				)
+		);
+	}
 }
