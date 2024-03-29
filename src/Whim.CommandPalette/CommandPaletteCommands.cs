@@ -132,7 +132,7 @@ public class CommandPaletteCommands : PluginCommands
 					new Command(
 						identifier: $"{PluginName}.activate_workspace.{workspace.Name}",
 						title: workspace.Name,
-						callback: () => _context.WorkspaceManager.Activate(workspace)
+						callback: () => _context.Butler.Activate(workspace)
 					)
 				);
 			}
@@ -184,7 +184,7 @@ public class CommandPaletteCommands : PluginCommands
 			{
 				foreach (IWindow window in windows)
 				{
-					_context.WorkspaceManager.MoveWindowToWorkspace(workspace, window);
+					_context.Butler.MoveWindowToWorkspace(workspace, window);
 				}
 			}
 		);
@@ -216,7 +216,7 @@ public class CommandPaletteCommands : PluginCommands
 		new Command(
 			identifier: $"{PluginName}.move_window_to_workspace.{workspace.Name}",
 			title: $"Move window to workspace \"{workspace.Name}\"",
-			callback: () => _context.WorkspaceManager.MoveWindowToWorkspace(workspace)
+			callback: () => _context.Butler.MoveWindowToWorkspace(workspace)
 		);
 
 	/// <summary>
@@ -252,13 +252,13 @@ public class CommandPaletteCommands : PluginCommands
 			title: window.Title,
 			callback: () =>
 			{
-				IWorkspace? workspace = _context.Butler.GetWorkspaceForWindow(window);
+				IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
 				if (workspace == null)
 				{
 					return;
 				}
 
-				if (_context.Butler.GetMonitorForWorkspace(workspace) is null)
+				if (_context.Butler.Pantry.GetMonitorForWorkspace(workspace) is null)
 				{
 					// The workspace is not active, and is not visible.
 					_context.Butler.Activate(workspace);

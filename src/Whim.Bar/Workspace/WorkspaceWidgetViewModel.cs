@@ -33,13 +33,13 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 		_context.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
 		_context.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
-		_context.WorkspaceManager.MonitorWorkspaceChanged += WorkspaceManager_MonitorWorkspaceChanged;
+		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
 		_context.WorkspaceManager.WorkspaceRenamed += WorkspaceManager_WorkspaceRenamed;
 
 		// Populate the list of workspaces
 		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
-			IMonitor? monitorForWorkspace = _context.WorkspaceManager.GetMonitorForWorkspace(workspace);
+			IMonitor? monitorForWorkspace = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
 			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor.Equals(monitorForWorkspace)));
 		}
 	}
@@ -51,7 +51,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 			return;
 		}
 
-		IMonitor? monitorForWorkspace = _context.WorkspaceManager.GetMonitorForWorkspace(args.Workspace);
+		IMonitor? monitorForWorkspace = _context.Butler.Pantry.GetMonitorForWorkspace(args.Workspace);
 		Workspaces.Add(new WorkspaceModel(_context, this, args.Workspace, Monitor.Equals(monitorForWorkspace)));
 	}
 
@@ -66,7 +66,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		Workspaces.Remove(workspaceModel);
 	}
 
-	private void WorkspaceManager_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
+	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
 	{
 		if (!args.Monitor.Equals(Monitor))
 		{
@@ -100,7 +100,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 				// dispose managed state (managed objects)
 				_context.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
 				_context.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
-				_context.WorkspaceManager.MonitorWorkspaceChanged -= WorkspaceManager_MonitorWorkspaceChanged;
+				_context.Butler.MonitorWorkspaceChanged -= Butler_MonitorWorkspaceChanged;
 				_context.WorkspaceManager.WorkspaceRenamed -= WorkspaceManager_WorkspaceRenamed;
 			}
 

@@ -78,7 +78,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		if (window is not null)
 		{
 			Logger.Debug($"Focusing window {window}");
-			if (_context.Butler.GetMonitorForWindow(window) is IMonitor monitor)
+			if (_context.Butler.Pantry.GetMonitorForWindow(window) is IMonitor monitor)
 			{
 				Logger.Debug($"Setting active monitor to {monitor}");
 				ActiveMonitor = monitor;

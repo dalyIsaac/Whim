@@ -36,10 +36,6 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// </summary>
 	private readonly List<WorkspaceToCreate> _workspacesToCreate = new();
 
-	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
-	public event EventHandler<RouteEventArgs>? WindowRouted;
-
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
@@ -65,7 +61,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			IMonitor activeMonitor = _context.MonitorManager.ActiveMonitor;
 			Logger.Debug($"Getting active workspace for monitor {activeMonitor}");
-			return _context.Butler.GetWorkspaceForMonitor(activeMonitor) ?? _workspaces[0];
+			return _context.Butler.Pantry.GetWorkspaceForMonitor(activeMonitor) ?? _workspaces[0];
 		}
 	}
 
@@ -109,12 +105,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	public void Initialize()
 	{
 		Logger.Debug("Initializing workspace manager");
-
 		_initialized = true;
-
-		// Backwards compat.
-		_context.Butler.WindowRouted += Butler_WindowRouted;
-		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
 
 		// Create the workspaces.
 		foreach (WorkspaceToCreate workspaceToCreate in _workspacesToCreate)
@@ -135,11 +126,6 @@ internal class WorkspaceManager : IWorkspaceManager
 			idx++;
 		}
 	}
-
-	private void Butler_WindowRouted(object? sender, RouteEventArgs e) => WindowRouted?.Invoke(sender, e);
-
-	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e) =>
-		MonitorWorkspaceChanged?.Invoke(sender, e);
 
 	private Workspace? CreateWorkspace(
 		string? name = null,
@@ -228,51 +214,6 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	#region Backwards compatibility
-	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>
-		_context.Butler.Activate(workspace, monitor);
-
-	public void ActivatePrevious(IMonitor? monitor = null) => _context.Butler.ActivateAdjacent(reverse: true);
-
-	public void ActivateNext(IMonitor? monitor = null) => _context.Butler.ActivateAdjacent();
-
-	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false) =>
-		_context.Butler.ActivateAdjacent(monitor, reverse, skipActive);
-
-	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false) =>
-		_context.Butler.MoveWindowToAdjacentWorkspace(window, reverse, skipActive);
-
-	public void SwapActiveWorkspaceWithAdjacentMonitor(bool reverse = false) =>
-		_context.Butler.SwapWorkspaceWithAdjacentMonitor(_context.WorkspaceManager.ActiveWorkspace, reverse);
-
-	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace) => _context.Butler.GetMonitorForWorkspace(workspace);
-
-	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor) => _context.Butler.GetWorkspaceForMonitor(monitor);
-
-	public IWorkspace? GetWorkspaceForWindow(IWindow window) => _context.Butler.GetWorkspaceForWindow(window);
-
-	public IMonitor? GetMonitorForWindow(IWindow window) => _context.Butler.GetMonitorForWindow(window);
-
-	public void LayoutAllActiveWorkspaces() => _context.Butler.LayoutAllActiveWorkspaces();
-
-	public void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null) =>
-		_context.Butler.MoveWindowToWorkspace(workspace, window);
-
-	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null) =>
-		_context.Butler.MoveWindowToMonitor(monitor, window);
-
-	public void MoveWindowToPreviousMonitor(IWindow? window = null) =>
-		_context.Butler.MoveWindowToPreviousMonitor(window);
-
-	public void MoveWindowToNextMonitor(IWindow? window = null) => _context.Butler.MoveWindowToNextMonitor(window);
-
-	public void MoveWindowToPoint(IWindow window, IPoint<int> point) =>
-		_context.Butler.MoveWindowToPoint(window, point);
-
-	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
-		_context.Butler.MoveWindowEdgesInDirection(edges, pixelsDeltas, window);
-	#endregion
-
 	protected void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
@@ -286,9 +227,6 @@ internal class WorkspaceManager : IWorkspaceManager
 				{
 					workspace.Dispose();
 				}
-
-				_context.Butler.WindowRouted -= Butler_WindowRouted;
-				_context.Butler.MonitorWorkspaceChanged -= Butler_MonitorWorkspaceChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

@@ -19,7 +19,7 @@ public class ToggleDirectionCommandCustomization : ICustomization
 		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
 		fixture.Inject(viewModel);
 
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
 	}
 }

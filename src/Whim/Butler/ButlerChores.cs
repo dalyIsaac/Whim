@@ -7,13 +7,11 @@ internal class ButlerChores : IButlerChores
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
-	private readonly ButlerTriggers _triggers;
 
-	public ButlerChores(IContext context, IInternalContext internalContext, ButlerTriggers triggers)
+	public ButlerChores(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_triggers = triggers;
 	}
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
@@ -64,7 +62,7 @@ internal class ButlerChores : IButlerChores
 		{
 			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
 			oldWorkspace?.DoLayout();
-			_triggers.MonitorWorkspaceChanged(
+			_internalContext.Butler.TriggerMonitorWorkspaceChanged(
 				new MonitorWorkspaceChangedEventArgs()
 				{
 					Monitor = oldWorkspaceValue.monitor,
@@ -84,7 +82,7 @@ internal class ButlerChores : IButlerChores
 		// Layout the new workspace.
 		workspace.DoLayout();
 		workspace.FocusLastFocusedWindow();
-		_triggers.MonitorWorkspaceChanged(
+		_internalContext.Butler.TriggerMonitorWorkspaceChanged(
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = monitor,
@@ -183,7 +181,6 @@ internal class ButlerChores : IButlerChores
 		if (window == null)
 		{
 			Logger.Error("No window was found");
-
 			return;
 		}
 
@@ -191,10 +188,10 @@ internal class ButlerChores : IButlerChores
 		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
-
 			return;
 		}
 
+		// Get the adjacent workspace for the current workspace.
 		IWorkspace? nextWorkspace = _context.Butler.Pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
 		if (nextWorkspace == null)
 		{

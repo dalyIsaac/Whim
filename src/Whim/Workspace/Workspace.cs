@@ -126,7 +126,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			Logger.Debug($"No windows in workspace {Name} to focus, focusing desktop");
 
 			// Get the bounds of the monitor for this workspace.
-			IMonitor? monitor = _context.Butler.GetMonitorForWorkspace(this);
+			IMonitor? monitor = _context.Butler.Pantry.GetMonitorForWorkspace(this);
 			if (monitor == null)
 			{
 				Logger.Debug($"No active monitors found for workspace {Name}.");
@@ -523,7 +523,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				Logger.Debug($"Disposing workspace {Name}");
 
 				// dispose managed state (managed objects)
-				bool isWorkspaceActive = _context.Butler.GetMonitorForWorkspace(this) != null;
+				bool isWorkspaceActive = _context.Butler.Pantry.GetMonitorForWorkspace(this) != null;
 
 				// If the workspace isn't active on the monitor, show all the windows in as minimized.
 				if (!isWorkspaceActive)

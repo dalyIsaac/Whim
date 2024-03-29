@@ -27,7 +27,7 @@ public class LayoutPreviewPluginCustomization : ICustomization
 		);
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitor);
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
 	}
 }
 
@@ -194,7 +194,7 @@ public class LayoutPreviewPluginTests
 				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
-		ctx.WorkspaceManager.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
 
 		workspace.ActiveLayoutEngine.ClearReceivedCalls();
 
@@ -204,7 +204,7 @@ public class LayoutPreviewPluginTests
 
 		// Then
 		ctx.MonitorManager.Received(1).GetMonitorAtPoint(Arg.Any<IPoint<int>>());
-		ctx.WorkspaceManager.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		ctx.Butler.Pantry.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
 		Assert.Empty(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Null(plugin.DraggedWindow);
 	}
@@ -230,7 +230,7 @@ public class LayoutPreviewPluginTests
 
 		// Then
 		ctx.MonitorManager.Received(1).GetMonitorAtPoint(Arg.Any<IPoint<int>>());
-		ctx.WorkspaceManager.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		ctx.Butler.Pantry.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
 		Assert.Single(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Equal(window, plugin.DraggedWindow);
 	}

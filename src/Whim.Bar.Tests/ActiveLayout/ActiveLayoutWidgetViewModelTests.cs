@@ -47,10 +47,10 @@ public class ActiveLayoutWidgetViewModelTests
 			viewModel,
 			nameof(viewModel.ActiveLayoutEngine),
 			() =>
-				context.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<
+				context.Butler.MonitorWorkspaceChanged += Raise.Event<
 					EventHandler<MonitorWorkspaceChangedEventArgs>
 				>(
-					context.WorkspaceManager,
+					context.Butler,
 					new MonitorWorkspaceChangedEventArgs() { Monitor = monitor, CurrentWorkspace = workspace }
 				)
 		);
@@ -74,7 +74,7 @@ public class ActiveLayoutWidgetViewModelTests
 		context.WorkspaceManager.Received(1).ActiveLayoutEngineChanged -= Arg.Any<
 			EventHandler<ActiveLayoutEngineChangedEventArgs>
 		>();
-		context.WorkspaceManager.Received(1).MonitorWorkspaceChanged -= Arg.Any<
+		context.Butler.Received(1).MonitorWorkspaceChanged -= Arg.Any<
 			EventHandler<MonitorWorkspaceChangedEventArgs>
 		>();
 	}

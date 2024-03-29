@@ -31,7 +31,7 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(20, gapsConfig.OuterGap);
-		context.WorkspaceManager.Received(1).LayoutAllActiveWorkspaces();
+		context.Butler.Received(1).LayoutAllActiveWorkspaces();
 	}
 
 	[Theory, AutoSubstituteData<GapsPluginCustomization>]
@@ -45,7 +45,7 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(20, gapsConfig.InnerGap);
-		context.WorkspaceManager.Received(1).LayoutAllActiveWorkspaces();
+		context.Butler.Received(1).LayoutAllActiveWorkspaces();
 	}
 
 	[Theory, AutoSubstituteData<GapsPluginCustomization>]
@@ -59,7 +59,7 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(0, gapsConfig.OuterGap);
-		context.WorkspaceManager.Received(1).LayoutAllActiveWorkspaces();
+		context.Butler.Received(1).LayoutAllActiveWorkspaces();
 	}
 
 	[Theory, AutoSubstituteData<GapsPluginCustomization>]
@@ -73,7 +73,7 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(0, gapsConfig.InnerGap);
-		context.WorkspaceManager.Received(1).LayoutAllActiveWorkspaces();
+		context.Butler.Received(1).LayoutAllActiveWorkspaces();
 	}
 
 	[Theory, AutoSubstituteData<GapsPluginCustomization>]

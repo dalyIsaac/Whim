@@ -38,7 +38,7 @@ public class WorkspaceWidgetViewModelTests
 		// Then
 		Assert.Single(viewModel.Workspaces);
 		Assert.Equal(workspace, viewModel.Workspaces[0].Workspace);
-		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
+		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(workspace);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
@@ -56,8 +56,8 @@ public class WorkspaceWidgetViewModelTests
 
 		// Then
 		Assert.Equal(2, viewModel.Workspaces.Count);
-		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(workspace);
-		context.WorkspaceManager.Received(1).GetMonitorForWorkspace(addedWorkspace);
+		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(workspace);
+		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(addedWorkspace);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
@@ -112,7 +112,7 @@ public class WorkspaceWidgetViewModelTests
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
-		context.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
+		context.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
 			context.WorkspaceManager,
 			new MonitorWorkspaceChangedEventArgs()
 			{
@@ -136,7 +136,7 @@ public class WorkspaceWidgetViewModelTests
 	{
 		// Given
 		IWorkspace workspace = context.WorkspaceManager.First();
-		context.WorkspaceManager.GetMonitorForWorkspace(workspace).Returns(monitor);
+		context.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// Add workspace
@@ -152,7 +152,7 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
 
 		// When
-		context.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
+		context.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
 			context.WorkspaceManager,
 			new MonitorWorkspaceChangedEventArgs()
 			{
@@ -177,7 +177,7 @@ public class WorkspaceWidgetViewModelTests
 	{
 		// Given
 		IWorkspace workspace = context.WorkspaceManager.First();
-		context.WorkspaceManager.GetMonitorForWorkspace(workspace).Returns(monitor);
+		context.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// Add workspace
@@ -193,7 +193,7 @@ public class WorkspaceWidgetViewModelTests
 		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
 
 		// When
-		context.WorkspaceManager.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
+		context.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
 			context.WorkspaceManager,
 			new MonitorWorkspaceChangedEventArgs()
 			{
@@ -285,7 +285,7 @@ public class WorkspaceWidgetViewModelTests
 		// Then
 		context.WorkspaceManager.Received(1).WorkspaceAdded -= Arg.Any<EventHandler<WorkspaceEventArgs>>();
 		context.WorkspaceManager.Received(1).WorkspaceRemoved -= Arg.Any<EventHandler<WorkspaceEventArgs>>();
-		context.WorkspaceManager.Received(1).MonitorWorkspaceChanged -= Arg.Any<
+		context.Butler.Received(1).MonitorWorkspaceChanged -= Arg.Any<
 			EventHandler<MonitorWorkspaceChangedEventArgs>
 		>();
 		context.WorkspaceManager.Received(1).WorkspaceRenamed -= Arg.Any<EventHandler<WorkspaceRenamedEventArgs>>();

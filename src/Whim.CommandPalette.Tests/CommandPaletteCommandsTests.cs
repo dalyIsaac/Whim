@@ -1,6 +1,5 @@
 using FluentAssertions;
 using NSubstitute;
-using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Xunit;
 
@@ -72,7 +71,7 @@ public class CommandPaletteCommandsTests
 		activeWorkspaceCommand.TryExecute();
 
 		// Verify that the workspace was activated.
-		wrapper.Context.WorkspaceManager.Received(1).Activate(wrapper.OtherWorkspace, null);
+		wrapper.Context.Butler.Received(1).Activate(wrapper.OtherWorkspace, null);
 	}
 
 	[Fact]
@@ -167,7 +166,7 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Verify that MoveWindowToWorkspace was called with the workspace.
-		wrapper.Context.WorkspaceManager.Received(1).MoveWindowToWorkspace(wrapper.Workspace, null);
+		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace, null);
 	}
 
 	[Fact]
@@ -201,8 +200,8 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		command.TryExecute();
-		wrapper.Context.WorkspaceManager.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[0]);
-		wrapper.Context.WorkspaceManager.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[1]);
+		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[0]);
+		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[1]);
 	}
 
 	[Fact]
@@ -342,7 +341,7 @@ public class CommandPaletteCommandsTests
 		// Given the window is not in a workspace.
 		Wrapper wrapper = new();
 		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
 
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
@@ -363,8 +362,8 @@ public class CommandPaletteCommandsTests
 		// Given the window is in a workspace.
 		Wrapper wrapper = new();
 		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-		wrapper.Context.Butler.GetMonitorForWorkspace(wrapper.Workspace).Returns(Substitute.For<IMonitor>());
+		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
+		wrapper.Context.Butler.Pantry.GetMonitorForWorkspace(wrapper.Workspace).Returns(Substitute.For<IMonitor>());
 
 		window.IsMinimized.Returns(isMinimized);
 
@@ -387,8 +386,8 @@ public class CommandPaletteCommandsTests
 		// Given the window is in a workspace.
 		Wrapper wrapper = new();
 		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-		wrapper.Context.Butler.GetMonitorForWorkspace(wrapper.Workspace).Returns((IMonitor?)null);
+		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
+		wrapper.Context.Butler.Pantry.GetMonitorForWorkspace(wrapper.Workspace).Returns((IMonitor?)null);
 
 		window.IsMinimized.Returns(isMinimized);
 

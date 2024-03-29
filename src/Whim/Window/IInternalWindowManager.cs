@@ -28,12 +28,8 @@ internal interface IInternalWindowManager
 	void OnWindowFocused(IWindow? window);
 
 	/// <summary>
-	/// Removes the given window from the <see cref="IWindowManager"/>, and fires:
-	///
-	/// <list type="bullet">
-	/// <item><description><see cref="IInternalWorkspaceManager.WindowRemoved(IWindow)" /></description></item>
-	/// <item><description><see cref="IWindowManager.WindowRemoved"/></description></item>
-	/// </list>
+	/// Removes the given window from the <see cref="IWindowManager"/>, and fires 
+	/// <see cref="ButlerEventHandlers.OnWindowRemoved(WindowEventArgs)" />.
 	/// </summary>
 	/// <param name="window"></param>
 	void OnWindowRemoved(IWindow window);

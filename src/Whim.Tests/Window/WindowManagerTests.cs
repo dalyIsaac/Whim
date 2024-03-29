@@ -611,14 +611,14 @@ public class WindowManagerTests
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
-		ctx.Butler.GetMonitorForWindow(Arg.Any<IWindow>()).Returns((IMonitor?)null);
+		ctx.Butler.Pantry.GetMonitorForWindow(Arg.Any<IWindow>()).Returns((IMonitor?)null);
 
 		// When
 		windowManager.Initialize();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0);
 
 		// Then
-		ctx.Butler.Received(1).GetMonitorForWindow(Arg.Any<IWindow>());
+		ctx.Butler.Pantry.Received(1).GetMonitorForWindow(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
@@ -683,7 +683,7 @@ public class WindowManagerTests
 					return (BOOL)false;
 				}
 			);
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 		workspace.TryGetWindowState(Arg.Any<IWindow>()).Returns((IWindowState?)null);
 
 		WindowManager windowManager = new(ctx, internalCtx);
@@ -749,7 +749,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
 			.TryGetWindowState(Arg.Any<IWindow>())
@@ -840,7 +840,7 @@ public class WindowManagerTests
 		Window.CreateWindow(ctx, internalCtx, hwnd);
 
 		IWorkspace workspace = Substitute.For<IWorkspace>();
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 
 		internalCtx
@@ -859,7 +859,7 @@ public class WindowManagerTests
 		// Given the window is registered as restoring, but no workspace is found for it
 		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
 		IWorkspace workspace = Setup_RectRestoring_Success(ctx, internalCtx, hwnd);
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
 
 		// When the window is moved
 		// Then an event is raised, but the workspace is not asked to do a layout
@@ -1018,7 +1018,7 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
 			.TryGetWindowState(Arg.Any<IWindow>())
@@ -1108,7 +1108,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		ctx.Butler.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
 		ctx.Butler.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 	}
 
@@ -1119,7 +1119,7 @@ public class WindowManagerTests
 		HWND hwnd = new(1);
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
@@ -1129,7 +1129,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
-		ctx.Butler.Received(1).GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.Butler.Pantry.Received(1).GetWorkspaceForWindow(Arg.Any<IWindow>());
 		ctx.NativeManager.DidNotReceive().DwmGetWindowRectangle(Arg.Any<HWND>());
 		ctx.Butler.DidNotReceive().MoveWindowToPoint(Arg.Any<IWindow>(), Arg.Any<IPoint<int>>());
 	}
@@ -1146,7 +1146,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 		workspace.TryGetWindowState(Arg.Any<IWindow>()).Returns((IWindowState?)null);
 
 		WindowManager windowManager = new(ctx, internalCtx);
@@ -1183,7 +1183,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 		workspace.TryGetWindowState(Arg.Any<IWindow>()).Returns((IWindowState?)null);
 		internalCtx.CoreNativeManager.GetCursorPos(out IPoint<int> _).Returns((BOOL)true);
 
@@ -1220,7 +1220,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
 			.TryGetWindowState(Arg.Any<IWindow>())
@@ -1274,7 +1274,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
 			.TryGetWindowState(Arg.Any<IWindow>())
@@ -1397,7 +1397,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
 			.TryGetWindowState(Arg.Any<IWindow>())
@@ -1439,7 +1439,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		ctx.Butler.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		workspace
 			.TryGetWindowState(Arg.Any<IWindow>())
@@ -1502,7 +1502,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, 0xBAADF00D, hwnd, 0, 0, 0, 0);
 
 		// Then
-		ctx.Butler.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
 		Assert.NotNull(subscriber.WindowAddedArgs);
 		Assert.Null(subscriber.WindowFocusedArgs);
 		Assert.Null(subscriber.WindowRemovedArgs);

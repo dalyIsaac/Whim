@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
@@ -326,7 +327,7 @@ public class CoreCommandsTests
 
 		ICommand command = testUtils.GetCommand(commandName);
 
-		ctx.Butler.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
 
 		// When
 		command.TryExecute();
@@ -344,7 +345,7 @@ public class CoreCommandsTests
 
 		ICommand command = testUtils.GetCommand("whim.core.focus_previous_monitor");
 
-		ctx.Butler.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
+		ctx.Butler.Pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
 
 		// When
 		command.TryExecute();
@@ -401,23 +402,13 @@ public class CoreCommandsTests
 		ctx.Received(1).Exit(Arg.Is<ExitEventArgs>(args => args.Reason == ExitReason.Restart));
 	}
 
-	private static List<IWorkspace> CreateWorkspaces(int count)
-	{
-		List<IWorkspace> workspaces = new();
-		for (int idx = 0; idx < count; idx++)
-		{
-			workspaces.Add(Substitute.For<IWorkspace>());
-		}
-		return workspaces;
-	}
-
 	[Theory, AutoSubstituteData<CoreCommandsCustomization>]
 	public void ActivateWorkspaceAtIndex_IndexDoesNotExist(IContext ctx)
 	{
 		// Given
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
-		List<IWorkspace> workspaces = CreateWorkspaces(2);
+		List<IWorkspace> workspaces = WorkspaceUtils.CreateWorkspaces(2).ToList();
 		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.GetEnumerator());
 
 		int index = 3;
@@ -440,7 +431,7 @@ public class CoreCommandsTests
 		// Given
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
-		List<IWorkspace> workspaces = CreateWorkspaces(10);
+		List<IWorkspace> workspaces = WorkspaceUtils.CreateWorkspaces(10).ToList();
 		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.GetEnumerator());
 
 		ICommand command = testUtils.GetCommand($"whim.core.activate_workspace_{index}");

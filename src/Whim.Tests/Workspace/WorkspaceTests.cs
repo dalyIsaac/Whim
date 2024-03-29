@@ -122,7 +122,7 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
+		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 
 		Workspace workspace =
 			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine2 });
@@ -195,7 +195,7 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
+		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 		layoutEngine.Name.Returns("Layout");
 
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
@@ -403,7 +403,7 @@ public class WorkspaceTests
 	{
 		// Given the window is in the workspace
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ctx.Butler.GetMonitorForWorkspace(workspace).Returns(monitor);
+		ctx.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
 
 		workspace.AddWindow(window);
 		window.IsMinimized.Returns(true);
@@ -428,7 +428,7 @@ public class WorkspaceTests
 	{
 		// Given there are no windows in the workspace, and the workspace is not on a monitor
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ctx.Butler.GetMonitorForWorkspace(workspace).Returns((IMonitor?)null);
+		ctx.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns((IMonitor?)null);
 
 		// When FocusLastFocusedWindow is called
 		workspace.FocusLastFocusedWindow();
@@ -448,7 +448,7 @@ public class WorkspaceTests
 	{
 		// Given there are no windows in the workspace, and the workspace is on a monitor
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ctx.Butler.GetMonitorForWorkspace(workspace).Returns(monitor);
+		ctx.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
 
 		// When FocusLastFocusedWindow is called
 		workspace.FocusLastFocusedWindow();
@@ -1159,7 +1159,7 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns((IMonitor?)null);
+		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns((IMonitor?)null);
 
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		workspace.AddWindow(window);

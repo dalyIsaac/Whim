@@ -29,7 +29,7 @@ public class DeferWorkspacePosManagerTests
 
 		// Then
 		internalCtx.WindowManager.Received(1).OnWindowRemoved(Arg.Any<IWindow>());
-		ctx.Butler.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
+		ctx.Butler.Pantry.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -53,7 +53,7 @@ public class DeferWorkspacePosManagerTests
 
 		// Then
 		internalCtx.WindowManager.Received(1).OnWindowRemoved(Arg.Any<IWindow>());
-		ctx.Butler.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
+		ctx.Butler.Pantry.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -66,7 +66,7 @@ public class DeferWorkspacePosManagerTests
 	{
 		// Given the workspace has no monitor
 		Dictionary<HWND, IWindowState> windowStates = new();
-		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
+		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
@@ -92,7 +92,7 @@ public class DeferWorkspacePosManagerTests
 		// Given the workspace has a monitor
 		Dictionary<HWND, IWindowState> windowStatesDict = new() { { (HWND)3, Substitute.For<IWindowState>() }, };
 
-		ctx.Butler.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(monitor);
+		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(monitor);
 
 		window.Handle.Returns((HWND)1);
 		window2.Handle.Returns((HWND)2);
