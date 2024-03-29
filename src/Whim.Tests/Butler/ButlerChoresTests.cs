@@ -3,7 +3,6 @@ using System.Linq;
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
-using Windows.Web.AtomPub;
 using Windows.Win32.Foundation;
 using Xunit;
 

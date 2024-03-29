@@ -71,7 +71,6 @@ public class FilterManagerTests
 		filterManager.AddTitleMatchFilter("Test");
 
 		window.WindowClass.Returns("Test");
-		window.ProcessName.Returns("Test");
 		window.ProcessFileName.Returns("Test");
 		window.Title.Returns("Test");
 

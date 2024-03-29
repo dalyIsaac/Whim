@@ -18,7 +18,6 @@ public class RouterManagerCustomization : ICustomization
 
 		IWindow window = fixture.Freeze<IWindow>();
 		window.WindowClass.Returns("Test");
-		window.ProcessName.Returns("Test");
 		window.ProcessFileName.Returns("Test.exe");
 		window.Title.Returns("Test");
 	}

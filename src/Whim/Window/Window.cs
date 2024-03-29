@@ -34,16 +34,11 @@ internal class Window : IWindow
 		}
 	}
 
-	public IPoint<int> Center =>
-		new Point<int>() { X = Rectangle.X + (Rectangle.Width / 2), Y = Rectangle.Y + (Rectangle.Height / 2) };
-
 	public required int ProcessId { get; init; }
 
 	public required string? ProcessFileName { get; init; }
 
 	public required string? ProcessFilePath { get; init; }
-
-	public required string? ProcessName { get; init; }
 
 	public bool IsFocused => _internalContext.CoreNativeManager.GetForegroundWindow() == Handle;
 
@@ -135,7 +130,6 @@ internal class Window : IWindow
 	{
 		_ = internalContext.CoreNativeManager.GetWindowThreadProcessId(hwnd, out uint pid);
 		int processId = (int)pid;
-		string? processName;
 		string? processPath;
 		string? processFileName;
 
@@ -144,7 +138,6 @@ internal class Window : IWindow
 			(string ProcessName, string? ProcessPath)? result = internalContext.CoreNativeManager.GetProcessNameAndPath(
 				processId
 			);
-			processName = result?.ProcessName;
 			processPath = result?.ProcessPath;
 
 			processFileName = Path.GetFileName(processPath);
@@ -164,7 +157,6 @@ internal class Window : IWindow
 		{
 			Handle = hwnd,
 			ProcessId = processId,
-			ProcessName = processName,
 			ProcessFileName = processFileName,
 			ProcessFilePath = processPath
 		};
@@ -190,7 +182,7 @@ internal class Window : IWindow
 		return Handle.GetHashCode();
 	}
 
-	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle}}}";
+	public override string ToString() => $"{Title} ({ProcessFileName}) [{ProcessId}] <{WindowClass}> {{{Handle}}}";
 
 	public BitmapImage? GetIcon() => this.GetIcon(_context, _internalContext);
 }
