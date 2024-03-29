@@ -65,9 +65,9 @@ public class ButlerTests
 		Butler sut = new(ctx, internalContext);
 
 		// When we call TriggerMonitorWorkspaceChanged, then the event is triggered
-		Assert.Raises<RouteEventArgs>(
-			h => sut.WindowRouted += h,
-			h => sut.WindowRouted -= h,
+		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => sut.MonitorWorkspaceChanged += h,
+			h => sut.MonitorWorkspaceChanged -= h,
 			() =>
 				sut.TriggerMonitorWorkspaceChanged(
 					new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = workspace, Monitor = monitor }
