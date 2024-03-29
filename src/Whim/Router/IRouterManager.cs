@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Whim;
+﻿namespace Whim;
 
 /// <summary>
 /// Delegate which is called to route a <see cref="IWindow"/>.
