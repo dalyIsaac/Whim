@@ -45,10 +45,8 @@ internal partial class Butler : IButler, IInternalButler
 
 	public void TriggerWindowRouted(RouteEventArgs args) => WindowRouted?.Invoke(this, args);
 
-	public void TriggerMonitorWorkspaceChanged(MonitorWorkspaceChangedEventArgs args)
-	=>
+	public void TriggerMonitorWorkspaceChanged(MonitorWorkspaceChangedEventArgs args) =>
 		MonitorWorkspaceChanged?.Invoke(this, args);
-	
 
 	public void Initialize()
 	{

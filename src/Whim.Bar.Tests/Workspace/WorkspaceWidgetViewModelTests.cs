@@ -285,9 +285,7 @@ public class WorkspaceWidgetViewModelTests
 		// Then
 		context.WorkspaceManager.Received(1).WorkspaceAdded -= Arg.Any<EventHandler<WorkspaceEventArgs>>();
 		context.WorkspaceManager.Received(1).WorkspaceRemoved -= Arg.Any<EventHandler<WorkspaceEventArgs>>();
-		context.Butler.Received(1).MonitorWorkspaceChanged -= Arg.Any<
-			EventHandler<MonitorWorkspaceChangedEventArgs>
-		>();
+		context.Butler.Received(1).MonitorWorkspaceChanged -= Arg.Any<EventHandler<MonitorWorkspaceChangedEventArgs>>();
 		context.WorkspaceManager.Received(1).WorkspaceRenamed -= Arg.Any<EventHandler<WorkspaceRenamedEventArgs>>();
 	}
 }

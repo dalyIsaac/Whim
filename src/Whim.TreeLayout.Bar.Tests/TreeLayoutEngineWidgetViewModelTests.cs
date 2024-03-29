@@ -172,11 +172,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 	}
 
 	[Theory, AutoSubstituteData<TreeLayoutEngineWidgetViewModelCustomization>]
-	public void Butler_MonitorWorkspaceChanged_Success(
-		IContext ctx,
-		ITreeLayoutPlugin plugin,
-		IMonitor monitor
-	)
+	public void Butler_MonitorWorkspaceChanged_Success(IContext ctx, ITreeLayoutPlugin plugin, IMonitor monitor)
 	{
 		// Given
 		plugin.GetAddWindowDirection(monitor).Returns(Direction.Right);
@@ -198,11 +194,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 	}
 
 	[Theory, AutoSubstituteData<TreeLayoutEngineWidgetViewModelCustomization>]
-	public void Butler_MonitorWorkspaceChanged_WrongMonitor(
-		IContext ctx,
-		ITreeLayoutPlugin plugin,
-		IMonitor monitor
-	)
+	public void Butler_MonitorWorkspaceChanged_WrongMonitor(IContext ctx, ITreeLayoutPlugin plugin, IMonitor monitor)
 	{
 		// Given
 		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
@@ -212,9 +204,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 			h => viewModel.PropertyChanged += h,
 			h => viewModel.PropertyChanged -= h,
 			() =>
-				ctx.Butler.MonitorWorkspaceChanged += Raise.Event<
-					EventHandler<MonitorWorkspaceChangedEventArgs>
-				>(
+				ctx.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
 					new MonitorWorkspaceChangedEventArgs()
 					{
 						Monitor = Substitute.For<IMonitor>(),
@@ -288,9 +278,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 		viewModel.Dispose();
 
 		// Then
-		ctx.Butler.Received(1).MonitorWorkspaceChanged -= Arg.Any<
-			EventHandler<MonitorWorkspaceChangedEventArgs>
-		>();
+		ctx.Butler.Received(1).MonitorWorkspaceChanged -= Arg.Any<EventHandler<MonitorWorkspaceChangedEventArgs>>();
 		ctx.WorkspaceManager.Received(1).ActiveLayoutEngineChanged -= Arg.Any<
 			EventHandler<ActiveLayoutEngineChangedEventArgs>
 		>();

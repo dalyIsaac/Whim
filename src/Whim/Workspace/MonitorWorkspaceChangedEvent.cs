@@ -25,14 +25,19 @@ public class MonitorWorkspaceChangedEventArgs : EventArgs
 	/// <inheritdoc/>
 	public override bool Equals(object? obj)
 	{
-		if (obj is null) { return false; }
+		if (obj is null)
+		{
+			return false;
+		}
 
 		if (obj is not MonitorWorkspaceChangedEventArgs other)
 		{
 			return false;
 		}
 
-		return other.Monitor.Equals(Monitor) && other.PreviousWorkspace == PreviousWorkspace && other.CurrentWorkspace == CurrentWorkspace;
+		return other.Monitor.Equals(Monitor)
+			&& other.PreviousWorkspace == PreviousWorkspace
+			&& other.CurrentWorkspace == CurrentWorkspace;
 	}
 
 	/// <inheritdoc/>

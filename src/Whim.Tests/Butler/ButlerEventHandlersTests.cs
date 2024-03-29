@@ -322,11 +322,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void WindowFocused_NoWorkspaceForWindow(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IButlerPantry pantry
-	)
+	internal void WindowFocused_NoWorkspaceForWindow(IContext ctx, IInternalContext internalCtx, IButlerPantry pantry)
 	{
 		// Given the pantry does not have a workspace for the window
 		IWorkspace[] workspaces = CreateWorkspaces(ctx, 3);

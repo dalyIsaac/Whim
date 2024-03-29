@@ -106,11 +106,7 @@ public class ButlerChoresTests
 		}
 	}
 
-	private static ButlerChores CreateSut(
-		IContext ctx,
-		IInternalContext internalCtx,
-		params IWorkspace[] workspaces
-	)
+	private static ButlerChores CreateSut(IContext ctx, IInternalContext internalCtx, params IWorkspace[] workspaces)
 	{
 		ButlerChores sut = new(ctx, internalCtx);
 
@@ -119,7 +115,7 @@ public class ButlerChoresTests
 			ctx.WorkspaceManager.ActiveWorkspace.Returns(workspaces[0]);
 		}
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.ToList().GetEnumerator());
-		
+
 		foreach (IWorkspace w in workspaces)
 		{
 			ctx.WorkspaceManager.Contains(w).Returns(true);
@@ -131,11 +127,7 @@ public class ButlerChoresTests
 
 	#region Activate
 	[Theory, AutoSubstituteData]
-	internal void Activate_WorkspaceNotFound(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IWorkspace workspace
-	)
+	internal void Activate_WorkspaceNotFound(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given the workspace does not exist
 		ButlerChores sut = new(ctx, internalCtx);
@@ -189,11 +181,7 @@ public class ButlerChoresTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void Activate_NoPreviousWorkspace(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IWorkspace workspace
-	)
+	internal void Activate_NoPreviousWorkspace(IContext ctx, IInternalContext internalCtx, IWorkspace workspace)
 	{
 		// Given
 		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
@@ -204,7 +192,15 @@ public class ButlerChoresTests
 		butlerChores.Activate(workspace);
 
 		// Layout is done, and the first window is focused.
-		internalCtx.Butler.Received(1).TriggerMonitorWorkspaceChanged(new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = workspace, Monitor = ctx.MonitorManager.ActiveMonitor });
+		internalCtx
+			.Butler.Received(1)
+			.TriggerMonitorWorkspaceChanged(
+				new MonitorWorkspaceChangedEventArgs()
+				{
+					CurrentWorkspace = workspace,
+					Monitor = ctx.MonitorManager.ActiveMonitor
+				}
+			);
 		workspace.Received(1).DoLayout();
 		workspace.Received(1).FocusLastFocusedWindow();
 	}
@@ -264,7 +260,14 @@ public class ButlerChoresTests
 
 		// Then the old workspace is deactivated, the new workspace is activated, an event is raised
 		// and the first window is focused.
-		internalCtx.Butler.TriggerMonitorWorkspaceChanged(new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = currentWorkspace, PreviousWorkspace = previousWorkspace, Monitor=ctx.MonitorManager.ActiveMonitor });
+		internalCtx.Butler.TriggerMonitorWorkspaceChanged(
+			new MonitorWorkspaceChangedEventArgs()
+			{
+				CurrentWorkspace = currentWorkspace,
+				PreviousWorkspace = previousWorkspace,
+				Monitor = ctx.MonitorManager.ActiveMonitor
+			}
+		);
 		previousWorkspace.Received(1).Deactivate();
 		previousWorkspace.DidNotReceive().DoLayout();
 		currentWorkspace.Received(1).DoLayout();
@@ -272,11 +275,7 @@ public class ButlerChoresTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void Activate_MultipleMonitors(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IMonitor[] monitors
-	)
+	internal void Activate_MultipleMonitors(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given there are two workspaces and monitors
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
@@ -292,7 +291,14 @@ public class ButlerChoresTests
 		butlerChores.Activate(workspaces[1], monitors[0]);
 
 		// Then an event is raised.
-		internalCtx.Butler.TriggerMonitorWorkspaceChanged(new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = workspaces[1], PreviousWorkspace = workspaces[0], Monitor = monitors[0] });
+		internalCtx.Butler.TriggerMonitorWorkspaceChanged(
+			new MonitorWorkspaceChangedEventArgs()
+			{
+				CurrentWorkspace = workspaces[1],
+				PreviousWorkspace = workspaces[0],
+				Monitor = monitors[0]
+			}
+		);
 
 		workspaces[0].DidNotReceive().Deactivate();
 		workspaces[0].Received(1).DoLayout();
@@ -305,11 +311,7 @@ public class ButlerChoresTests
 	#endregion
 
 	[Theory, AutoSubstituteData]
-	internal void FocusMonitorDesktop(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IMonitor monitor
-	)
+	internal void FocusMonitorDesktop(IContext ctx, IInternalContext internalCtx, IMonitor monitor)
 	{
 		// Given
 		ButlerChores sut = new(ctx, internalCtx);
@@ -326,11 +328,7 @@ public class ButlerChoresTests
 
 	#region ActivateAdjacent
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void ActivateAdjacent_UseActiveMonitor(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IMonitor[] monitors
-	)
+	internal void ActivateAdjacent_UseActiveMonitor(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given no arguments are provided
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
@@ -348,11 +346,7 @@ public class ButlerChoresTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void ActivateAdjacent_UseProvidedMonitor(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IMonitor[] monitors
-	)
+	internal void ActivateAdjacent_UseProvidedMonitor(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given a monitor is provided
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
@@ -447,7 +441,9 @@ public class ButlerChoresTests
 		butlerChores.ActivateAdjacent(monitors[0], reverse, skipActive);
 
 		// Then the raised event will match the expected
-		internalCtx.Butler.TriggerMonitorWorkspaceChanged(new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = activatedWorkspace, Monitor = monitors[0] });
+		internalCtx.Butler.TriggerMonitorWorkspaceChanged(
+			new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = activatedWorkspace, Monitor = monitors[0] }
+		);
 	}
 
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
@@ -476,10 +472,7 @@ public class ButlerChoresTests
 
 	#region MoveWindowToAdjacentWorkspace
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void MoveWindowToAdjacentWorkspace_WindowIsNull(
-		IContext ctx,
-		IInternalContext internalCtx
-	)
+	internal void MoveWindowToAdjacentWorkspace_WindowIsNull(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the provided window is null, and workspaces' last focused window are null
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
@@ -673,7 +666,14 @@ public class ButlerChoresTests
 		butlerChores.SwapWorkspaceWithAdjacentMonitor(reverse: false);
 
 		// Then the raised event will match the expected
-		internalCtx.Butler.TriggerMonitorWorkspaceChanged(new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = workspaces[1], PreviousWorkspace=workspaces[0], Monitor = monitors[0] });
+		internalCtx.Butler.TriggerMonitorWorkspaceChanged(
+			new MonitorWorkspaceChangedEventArgs()
+			{
+				CurrentWorkspace = workspaces[1],
+				PreviousWorkspace = workspaces[0],
+				Monitor = monitors[0]
+			}
+		);
 
 		// The old workspace is deactivated, the new workspace is laid out, and the first window is
 		// focused.
@@ -684,11 +684,7 @@ public class ButlerChoresTests
 	#endregion
 
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void LayoutAllActiveWorkspaces(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IMonitor[] monitors
-	)
+	internal void LayoutAllActiveWorkspaces(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
@@ -707,11 +703,7 @@ public class ButlerChoresTests
 
 	#region MoveWindowToWorkspace
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void MoveWindowToWorkspace_NoWindow(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IMonitor[] monitors
-	)
+	internal void MoveWindowToWorkspace_NoWindow(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
@@ -731,11 +723,7 @@ public class ButlerChoresTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void MoveWindowToWorkspace_CannotFindWindow(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IWindow window
-	)
+	internal void MoveWindowToWorkspace_CannotFindWindow(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given there are 3 workspaces
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
@@ -752,11 +740,7 @@ public class ButlerChoresTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void MoveWindowToWorkspace_SameWorkspace(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IWindow window
-	)
+	internal void MoveWindowToWorkspace_SameWorkspace(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given there are 3 workspaces
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
@@ -845,11 +829,7 @@ public class ButlerChoresTests
 
 	#region MoveWindowToMonitor
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void MoveWindowToMonitor_NoWindow(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IMonitor[] monitors
-	)
+	internal void MoveWindowToMonitor_NoWindow(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given there are 2 workspaces
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
@@ -1162,10 +1142,7 @@ public class ButlerChoresTests
 	}
 
 	[Theory, AutoSubstituteData<ButlerChoresCustomization>]
-	internal void MoveWindowEdgesInDirection_NoWindow(
-		IContext ctx,
-		IInternalContext internalCtx
-	)
+	internal void MoveWindowEdgesInDirection_NoWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);

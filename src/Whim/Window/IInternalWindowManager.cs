@@ -28,7 +28,7 @@ internal interface IInternalWindowManager
 	void OnWindowFocused(IWindow? window);
 
 	/// <summary>
-	/// Removes the given window from the <see cref="IWindowManager"/>, and fires 
+	/// Removes the given window from the <see cref="IWindowManager"/>, and fires
 	/// <see cref="ButlerEventHandlers.OnWindowRemoved(WindowEventArgs)" />.
 	/// </summary>
 	/// <param name="window"></param>
