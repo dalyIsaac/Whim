@@ -8,6 +8,8 @@ namespace Whim;
 /// Invokes event handlers more safely than normal event handlers. If the UI thread subscribes to an
 /// event, then when the event is invoked the delegate is called on the UI thread.
 /// Otherwise, the event is invocation continues on the current thread.
+///
+/// For Whim's core, only <c>public</c> events in <c>public</c> classes need to implement this.
 /// </summary>
 public class ThreadSafeEvent<T>
 {

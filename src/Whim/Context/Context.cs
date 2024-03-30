@@ -31,14 +31,28 @@ internal class Context : IContext
 	public IKeybindManager KeybindManager { get; }
 	public INotificationManager NotificationManager { get; }
 
-	public event EventHandler<ExitEventArgs>? Exiting;
-	public event EventHandler<ExitEventArgs>? Exited;
+	private readonly ThreadSafeEvent<ExitEventArgs> _exitingEvent;
+	public event EventHandler<ExitEventArgs>? Exiting
+	{
+		add => _exitingEvent.Add(value);
+		remove => _exitingEvent.Remove(value);
+	}
+
+	private readonly ThreadSafeEvent<ExitEventArgs> _exitedEvent;
+	public event EventHandler<ExitEventArgs>? Exited
+	{
+		add => _exitedEvent.Add(value);
+		remove => _exitedEvent.Remove(value);
+	}
 
 	/// <summary>
 	/// Create a new <see cref="IContext"/>.
 	/// </summary>
 	public Context()
 	{
+		_exitingEvent = new(this);
+		_exitedEvent = new(this);
+
 		string[] args = Environment.GetCommandLineArgs();
 
 		FileManager = new FileManager(args);
@@ -123,7 +137,7 @@ internal class Context : IContext
 		Logger.Debug("Exiting context...");
 		args ??= new ExitEventArgs() { Reason = ExitReason.User };
 
-		Exiting?.Invoke(this, args);
+		_exitingEvent.Invoke(this, args);
 
 		PluginManager.Dispose();
 		WorkspaceManager.Dispose();
@@ -135,6 +149,6 @@ internal class Context : IContext
 		Logger.Debug("Mostly exited...");
 
 		Logger.Dispose();
-		Exited?.Invoke(this, args);
+		_exitedEvent.Invoke(this, args);
 	}
 }

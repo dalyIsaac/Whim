@@ -37,17 +37,47 @@ internal class WorkspaceManager : IWorkspaceManager
 	/// </summary>
 	private readonly List<WorkspaceToCreate> _workspacesToCreate = new();
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+	private readonly ThreadSafeEvent<WorkspaceEventArgs> _workspaceAddedEvent;
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded
+	{
+		add => _workspaceAddedEvent.Add(value);
+		remove => _workspaceAddedEvent.Remove(value);
+	}
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+	private readonly ThreadSafeEvent<WorkspaceEventArgs> _workspaceRemovedEvent;
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved
+	{
+		add => _workspaceRemovedEvent.Add(value);
+		remove => _workspaceRemovedEvent.Remove(value);
+	}
 
-	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+	private readonly ThreadSafeEvent<ActiveLayoutEngineChangedEventArgs> _activeLayoutEngineChangedEvent;
+	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged
+	{
+		add => _activeLayoutEngineChangedEvent.Add(value);
+		remove => _activeLayoutEngineChangedEvent.Remove(value);
+	}
 
-	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
+	private readonly ThreadSafeEvent<WorkspaceRenamedEventArgs> _workspaceRenamedEvent;
+	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed
+	{
+		add => _workspaceRenamedEvent.Add(value);
+		remove => _workspaceRenamedEvent.Remove(value);
+	}
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+	private readonly ThreadSafeEvent<WorkspaceEventArgs> _workspaceLayoutStartedEvent;
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted
+	{
+		add => _workspaceLayoutStartedEvent.Add(value);
+		remove => _workspaceLayoutStartedEvent.Remove(value);
+	}
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
+	private readonly ThreadSafeEvent<WorkspaceEventArgs> _workspaceLayoutCompletedEvent;
+	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted
+	{
+		add => _workspaceLayoutCompletedEvent.Add(value);
+		remove => _workspaceLayoutCompletedEvent.Remove(value);
+	}
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
 		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
@@ -73,13 +103,21 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		_context = context;
 		_internalContext = internalContext;
+
+		_workspaceAddedEvent = new(context);
+		_workspaceRemovedEvent = new(context);
+		_activeLayoutEngineChangedEvent = new(context);
+		_workspaceRenamedEvent = new(context);
+		_workspaceLayoutStartedEvent = new(context);
+		_workspaceLayoutCompletedEvent = new(context);
+
 		_triggers = new WorkspaceManagerTriggers()
 		{
 			ActiveLayoutEngineChanged = (ActiveLayoutEngineChangedEventArgs e) =>
-				ActiveLayoutEngineChanged?.Invoke(this, e),
-			WorkspaceRenamed = (WorkspaceRenamedEventArgs e) => WorkspaceRenamed?.Invoke(this, e),
-			WorkspaceLayoutStarted = (WorkspaceEventArgs e) => WorkspaceLayoutStarted?.Invoke(this, e),
-			WorkspaceLayoutCompleted = (WorkspaceEventArgs e) => WorkspaceLayoutCompleted?.Invoke(this, e)
+				_activeLayoutEngineChangedEvent.Invoke(this, e),
+			WorkspaceRenamed = (WorkspaceRenamedEventArgs e) => _workspaceRenamedEvent.Invoke(this, e),
+			WorkspaceLayoutStarted = (WorkspaceEventArgs e) => _workspaceLayoutStartedEvent.Invoke(this, e),
+			WorkspaceLayoutCompleted = (WorkspaceEventArgs e) => _workspaceLayoutCompletedEvent.Invoke(this, e)
 		};
 	}
 
@@ -177,7 +215,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		Workspace workspace =
 			new(_context, _internalContext, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
 		_workspaces.Add(workspace);
-		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
+		_workspaceAddedEvent.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 		return workspace;
 	}
 
@@ -202,7 +240,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 		_context.Butler.MergeWorkspaceWindows(workspace, _workspaces[^1]);
 		_context.Butler.Activate(_workspaces[^1]);
-		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
+		_workspaceRemovedEvent.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
 
 		return wasFound;
 	}

@@ -16,14 +16,61 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	public event EventHandler<WindowEventArgs>? WindowAdded;
-	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
-	public event EventHandler<WindowEventArgs>? WindowRemoved;
-	public event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
-	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
-	public event EventHandler<WindowMovedEventArgs>? WindowMoveEnd;
-	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
-	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
+	private readonly ThreadSafeEvent<WindowEventArgs> _windowAddedEvent;
+	public event EventHandler<WindowEventArgs>? WindowAdded
+	{
+		add => _windowAddedEvent.Equals(value);
+		remove => _windowAddedEvent.Remove(value);
+	}
+
+	private readonly ThreadSafeEvent<WindowFocusedEventArgs> _windowFocusedEvent;
+	public event EventHandler<WindowFocusedEventArgs>? WindowFocused
+	{
+		add => _windowFocusedEvent.Equals(value);
+		remove => _windowFocusedEvent.Remove(value);
+	}
+
+	private readonly ThreadSafeEvent<WindowEventArgs> _windowRemovedEvent;
+	public event EventHandler<WindowEventArgs>? WindowRemoved
+	{
+		add => _windowRemovedEvent.Equals(value);
+		remove => _windowRemovedEvent.Remove(value);
+	}
+
+	private readonly ThreadSafeEvent<WindowMovedEventArgs> _windowMoveStartEvent;
+	public event EventHandler<WindowMovedEventArgs>? WindowMoveStart
+	{
+		add => _windowMoveStartEvent.Equals(value);
+		remove => _windowMoveStartEvent.Remove(value);
+	}
+
+	private readonly ThreadSafeEvent<WindowMovedEventArgs> _windowMovedEvent;
+	public event EventHandler<WindowMovedEventArgs>? WindowMoved
+	{
+		add => _windowMovedEvent.Equals(value);
+		remove => _windowMovedEvent.Remove(value);
+	}
+
+	private readonly ThreadSafeEvent<WindowMovedEventArgs> _windowMoveEndEvent;
+	public event EventHandler<WindowMovedEventArgs>? WindowMoveEnd
+	{
+		add => _windowMoveEndEvent.Equals(value);
+		remove => _windowMoveEndEvent.Remove(value);
+	}
+
+	private readonly ThreadSafeEvent<WindowEventArgs> _windowMinimizeStartEvent;
+	public event EventHandler<WindowEventArgs>? WindowMinimizeStart
+	{
+		add => _windowMinimizeStartEvent.Equals(value);
+		remove => _windowMinimizeStartEvent.Remove(value);
+	}
+
+	private readonly ThreadSafeEvent<WindowEventArgs> _windowMinimizeEndEvent;
+	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd
+	{
+		add => _windowMinimizeEndEvent.Equals(value);
+		remove => _windowMinimizeEndEvent.Remove(value);
+	}
 
 	private readonly ConcurrentDictionary<HWND, IWindow> _windows = new();
 	public IReadOnlyDictionary<HWND, IWindow> HandleWindowMap => _windows;
@@ -61,6 +108,15 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		_context = context;
 		_internalContext = internalContext;
 		_hookDelegate = new WINEVENTPROC(WinEventProcWrapper);
+
+		_windowAddedEvent = new(context);
+		_windowFocusedEvent = new(context);
+		_windowRemovedEvent = new(context);
+		_windowMoveStartEvent = new(context);
+		_windowMovedEvent = new(context);
+		_windowMoveEndEvent = new(context);
+		_windowMinimizeStartEvent = new(context);
+		_windowMinimizeEndEvent = new(context);
 
 		DefaultFilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
 	}
@@ -376,7 +432,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		WindowEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowAdded(args);
-		WindowAdded?.Invoke(this, args);
+		_windowAddedEvent.Invoke(this, args);
 	}
 
 	public void OnWindowFocused(IWindow? window)
@@ -386,7 +442,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		WindowFocusedEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowFocused(args);
-		WindowFocused?.Invoke(this, args);
+		_windowFocusedEvent.Invoke(this, args);
 	}
 
 	/// <summary>
@@ -421,7 +477,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		WindowEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowRemoved(args);
-		WindowRemoved?.Invoke(this, args);
+		_windowRemovedEvent.Invoke(this, args);
 	}
 
 	private void OnWindowMoveStart(IWindow window)
@@ -435,7 +491,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			cursorPoint = point;
 		}
 
-		WindowMoveStart?.Invoke(
+		_windowMoveStartEvent.Invoke(
 			this,
 			new WindowMovedEventArgs()
 			{
@@ -462,7 +518,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			return;
 		}
 
-		if (GetMovedEdges(window) is (Direction MovedEdges, IPoint<int> MovedPoint) moved)
+		if (GetMovedEdges(window) is (Direction, IPoint<int>) moved)
 		{
 			movedEdges = moved.MovedEdges;
 			_context.Butler.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
@@ -474,7 +530,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		_isMovingWindow = false;
 
-		WindowMoveEnd?.Invoke(
+		_windowMoveEndEvent.Invoke(
 			this,
 			new WindowMovedEventArgs()
 			{
@@ -574,7 +630,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			{
 				// The window's application tried to restore its position.
 				// Wait, then restore the position.
-				_context.NativeManager.TryEnqueue(async () =>
+				Task.Run(async () =>
 				{
 					await Task.Delay(WindowMovedDelay).ConfigureAwait(true);
 					if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is IWorkspace workspace)
@@ -597,7 +653,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			cursorPoint = point;
 		}
 
-		WindowMoved?.Invoke(
+		_windowMovedEvent.Invoke(
 			this,
 			new WindowMovedEventArgs()
 			{
@@ -614,7 +670,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		WindowEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowMinimizeStart(args);
-		WindowMinimizeStart?.Invoke(this, args);
+		_windowMinimizeStartEvent.Invoke(this, args);
 	}
 
 	private void OnWindowMinimizeEnd(IWindow window)
@@ -623,7 +679,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		WindowEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowMinimizeEnd(args);
-		WindowMinimizeEnd?.Invoke(this, args);
+		_windowMinimizeEndEvent.Invoke(this, args);
 	}
 
 	public IEnumerator<IWindow> GetEnumerator() => _windows.Values.GetEnumerator();

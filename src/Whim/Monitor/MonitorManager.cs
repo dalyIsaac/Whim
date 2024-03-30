@@ -38,7 +38,12 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
+	private readonly ThreadSafeEvent<MonitorsChangedEventArgs> _monitorsChangedEvent;
+	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged
+	{
+		add => _monitorsChangedEvent.Add(value);
+		remove => _monitorsChangedEvent.Remove(value);
+	}
 
 	/// <summary>
 	/// Creates a new instance of <see cref="MonitorManager"/>.
@@ -52,6 +57,8 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	{
 		_context = context;
 		_internalContext = internalContext;
+
+		_monitorsChangedEvent = new(context);
 
 		// Get the monitors.
 		_monitors = GetCurrentMonitors();
@@ -138,7 +145,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		// If we update monitors too quickly, the reported working area can sometimes be the
 		// monitor's bounds, which is incorrect. So, we wait a bit before updating the monitors.
 		// This gives Windows some to figure out the correct working area.
-		_context.NativeManager.TryEnqueue(async () =>
+		Task.Run(async () =>
 		{
 			await Task.Delay(5000).ConfigureAwait(true);
 			WindowMessageMonitor_MonitorsChanged(sender, e);
@@ -167,7 +174,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		{
 			_internalContext.ButlerEventHandlers.OnMonitorsChanged(args);
 		}
-		MonitorsChanged?.Invoke(this, args);
+		_monitorsChangedEvent.Invoke(this, args);
 	}
 
 	private void OnMonitorsChanged(
