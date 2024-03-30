@@ -30,6 +30,8 @@ internal interface IInternalContext : IDisposable
 
 	IDeferWorkspacePosManager DeferWorkspacePosManager { get; }
 
+	ISubscriber NotificationManager { get; }
+
 	void PreInitialize();
 
 	void PostInitialize();

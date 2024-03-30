@@ -30,6 +30,8 @@ internal class InternalContext : IInternalContext
 
 	public IButlerEventHandlers ButlerEventHandlers => ((Butler)_context.Butler).EventHandlers;
 
+	public ISubscriber NotificationManager => (ISubscriber)_context.NotificationManager;
+
 	public InternalContext(IContext context)
 	{
 		_context = context;
@@ -52,6 +54,15 @@ internal class InternalContext : IInternalContext
 		CoreSavedStateManager.PostInitialize();
 		KeybindHook.PostInitialize();
 		MouseHook.PostInitialize();
+
+		_context.NativeManager.InvokeOnUIThread(Subscribe);
+	}
+
+	private void Subscribe()
+	{
+		MonitorManager.Subscribe();
+		NotificationManager.Subscribe();
+		WindowManager.Subscribe();
 	}
 
 	protected virtual void Dispose(bool disposing)

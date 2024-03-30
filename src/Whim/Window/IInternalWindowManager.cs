@@ -3,7 +3,7 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal interface IInternalWindowManager
+internal interface IInternalWindowManager : ISubscriber
 {
 	/// <summary>
 	/// Add the given <see cref="HWND"/> as an <see cref="IWindow"/> inside this

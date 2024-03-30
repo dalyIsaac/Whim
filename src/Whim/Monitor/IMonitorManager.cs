@@ -24,11 +24,6 @@ public interface IMonitorManager : IEnumerable<IMonitor>, IDisposable
 	IMonitor PrimaryMonitor { get; }
 
 	/// <summary>
-	/// Initialize the windows event hooks.
-	/// </summary>
-	void Initialize();
-
-	/// <summary>
 	/// Returns the <see cref="IMonitor"/> at the given <i>x</i> and <i>y</i> coordinates.
 	/// </summary>
 	/// <param name="point">Point defined in terms of the real monitor coordinates.</param>

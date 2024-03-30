@@ -15,17 +15,6 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	IFilterManager LocationRestoringFilterManager { get; }
 
 	/// <summary>
-	/// Initialize the windows event hooks.
-	/// </summary>
-	/// <returns></returns>
-	void Initialize();
-
-	/// <summary>
-	/// Add the top-level windows.
-	/// </summary>
-	void PostInitialize();
-
-	/// <summary>
 	/// Creates a new window. If the window cannot be created, <see langword="null"/> is returned.
 	/// This will try reuse existing <see cref="IWindow"/>s if possible.
 	/// </summary>

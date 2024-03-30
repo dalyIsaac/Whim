@@ -64,7 +64,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		LastWhimActiveMonitor = primaryMonitor;
 	}
 
-	public void Initialize()
+	public void Subscribe()
 	{
 		_internalContext.WindowMessageMonitor.DisplayChanged += WindowMessageMonitor_MonitorsChanged;
 		_internalContext.WindowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_MonitorsChanged;

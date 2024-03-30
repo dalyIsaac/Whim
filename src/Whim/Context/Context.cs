@@ -93,14 +93,9 @@ internal class Context : IContext
 		_internalContext.PreInitialize();
 		PluginManager.PreInitialize();
 
-		NotificationManager.Initialize();
-		MonitorManager.Initialize();
-		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
-
 		Butler.Initialize();
 
-		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
 		_internalContext.PostInitialize();
 

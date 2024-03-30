@@ -65,9 +65,9 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		DefaultFilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
 	}
 
-	public void Initialize()
+	public void Subscribe()
 	{
-		Logger.Debug("Initializing window manager...");
+		Logger.Debug("Start subscriptions");
 
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
 		_addedHooks[0] = _internalContext.CoreNativeManager.SetWinEventHook(
@@ -110,14 +110,11 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				throw new InvalidOperationException($"Failed to add hook {i}");
 			}
 		}
-	}
-
-	public void PostInitialize()
-	{
-		Logger.Debug("Post-initializing window manager...");
 
 		_internalContext.MouseHook.MouseLeftButtonDown += MouseHook_MouseLeftButtonDown;
 		_internalContext.MouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
+
+		Logger.Debug("Completed subscriptions");
 	}
 
 	public IWindow? CreateWindow(HWND hwnd)

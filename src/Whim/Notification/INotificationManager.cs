@@ -14,11 +14,6 @@ public interface INotificationManager : IDisposable
 	public const string NotificationIdKey = "WHIM_NOTIFICATION_ID";
 
 	/// <summary>
-	/// Initialize the notification manager.
-	/// </summary>
-	void Initialize();
-
-	/// <summary>
 	/// Register a notification handler for a given notification id.
 	/// </summary>
 	/// <param name="notificationId">

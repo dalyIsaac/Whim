@@ -4,7 +4,7 @@ using Microsoft.Windows.AppNotifications;
 
 namespace Whim;
 
-internal class NotificationManager : INotificationManager
+internal class NotificationManager : INotificationManager, ISubscriber
 {
 	private bool _disposedValue;
 	private bool _initialized;
@@ -17,7 +17,7 @@ internal class NotificationManager : INotificationManager
 		_context = context;
 	}
 
-	public void Initialize()
+	public void Subscribe()
 	{
 		// To ensure all Notification handling happens in this process instance, register for
 		// NotificationInvoked before calling Register(). Without this a new process will

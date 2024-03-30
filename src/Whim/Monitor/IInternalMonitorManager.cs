@@ -2,7 +2,7 @@ using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
-internal interface IInternalMonitorManager
+internal interface IInternalMonitorManager : ISubscriber
 {
 	/// <summary>
 	/// The last <see cref="IMonitor"/> which received an event sent by Windows which Whim did not ignore.
