@@ -148,13 +148,13 @@ public class MonitorManagerTests
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
 	[SuppressMessage("Usage", "NS5000:Received check.")]
-	internal void Initialize(IContext ctx, IInternalContext internalCtx)
+	internal void Subscribe(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// When
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// Then
 		internalCtx.WindowMessageMonitor.Received(1).DisplayChanged += Arg.Any<
@@ -306,7 +306,7 @@ public class MonitorManagerTests
 		// Given
 		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// Set up the monitor manager to be given a new monitor
 		RECT right =
@@ -393,7 +393,7 @@ public class MonitorManagerTests
 		MonitorManagerCustomization.UpdateGetCurrentMonitors(internalCtx, new[] { (primaryRect, (HMONITOR)1) });
 
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// Set up the monitor manager to be given a new monitor
 		RECT right =
@@ -453,7 +453,7 @@ public class MonitorManagerTests
 		// Given
 		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// Set up the monitor manager to have only one monitor
 		RECT left =
@@ -509,7 +509,7 @@ public class MonitorManagerTests
 		// Given
 		// Populate the monitor manager with the default two monitors
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// Set up the monitor manager to have the two monitors
 		MonitorManagerCustomization.UpdateMultipleMonitors(
@@ -564,7 +564,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
@@ -585,7 +585,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		var raisedEvent = Assert.Raises<MonitorsChangedEventArgs>(
@@ -607,7 +607,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		internalCtx.WindowMessageMonitor.SessionChanged += Raise.Event<EventHandler<WindowMessageMonitorEventArgs>>(
@@ -630,7 +630,7 @@ public class MonitorManagerTests
 			.Returns((HMONITOR)0);
 
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		IMonitor monitor = monitorManager.GetMonitorAtPoint(point);
@@ -650,7 +650,7 @@ public class MonitorManagerTests
 			.Returns((HMONITOR)1);
 
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		IMonitor monitor = monitorManager.GetMonitorAtPoint(point);
@@ -664,7 +664,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		IMonitor monitor = monitorManager.GetPreviousMonitor(Substitute.For<IMonitor>());
@@ -678,7 +678,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		IMonitor monitor = monitorManager.GetPreviousMonitor(monitorManager.ElementAt(1));
@@ -692,7 +692,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		IMonitor monitor = monitorManager.GetPreviousMonitor(monitorManager.ElementAt(0));
@@ -706,7 +706,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		IMonitor monitor = monitorManager.GetNextMonitor(Substitute.For<IMonitor>());
@@ -720,7 +720,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		IMonitor monitor = monitorManager.GetNextMonitor(monitorManager.First());
@@ -734,7 +734,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		IMonitor monitor = monitorManager.GetNextMonitor(monitorManager.ElementAt(1));
@@ -749,7 +749,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		// When
 		monitorManager.Dispose();
@@ -787,7 +787,7 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
-		monitorManager.Initialize();
+		monitorManager.Subscribe();
 
 		IMonitor monitor = monitorManager.ActiveMonitor;
 		IMonitor? monitor2 = monitorManager.ElementAt(1);

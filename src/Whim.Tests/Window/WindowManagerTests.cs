@@ -230,7 +230,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// When
 		var result = Assert.Raises<WindowEventArgs>(
@@ -252,7 +252,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// When
 		var result = Assert.Raises<WindowEventArgs>(
@@ -265,7 +265,7 @@ public class WindowManagerTests
 		Assert.Equal((int)_processId, result.Arguments.Window.ProcessId);
 	}
 
-	private static void InitializeCoreNativeManagerMock(IInternalContext internalCtx)
+	private static void SubscribeCoreNativeManagerMock(IInternalContext internalCtx)
 	{
 		(uint, uint)[] events = new[]
 		{
@@ -286,15 +286,15 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void Initialize(IContext ctx, IInternalContext internalCtx)
+	internal void Subscribe(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		InitializeCoreNativeManagerMock(internalCtx);
+		SubscribeCoreNativeManagerMock(internalCtx);
 
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// Then
 		internalCtx
@@ -303,10 +303,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void Initialize_Fail(IContext ctx, IInternalContext internalCtx)
+	internal void Subscribe_Fail(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		InitializeCoreNativeManagerMock(internalCtx);
+		SubscribeCoreNativeManagerMock(internalCtx);
 
 		internalCtx
 			.CoreNativeManager.SetWinEventHook(
@@ -320,7 +320,7 @@ public class WindowManagerTests
 
 		// When
 		// Then
-		Assert.Throws<InvalidOperationException>(windowManager.Initialize);
+		Assert.Throws<InvalidOperationException>(windowManager.Subscribe);
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.CHILDID_SELF + 1, 0, 0)]
@@ -342,7 +342,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// Then
 		CustomAssert.DoesNotRaise<WindowEventArgs>(
@@ -387,7 +387,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then
@@ -409,7 +409,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		CustomAssert.DoesNotRaise<WindowEventArgs>(
 			h => windowManager.WindowAdded += h,
 			h => windowManager.WindowAdded -= h,
@@ -433,7 +433,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		CustomAssert.DoesNotRaise<WindowEventArgs>(
 			h => windowManager.WindowAdded += h,
@@ -458,7 +458,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowAdded += h,
 			h => windowManager.WindowAdded -= h,
@@ -485,7 +485,7 @@ public class WindowManagerTests
 		internalCtx.ButlerEventHandlers.AreMonitorsChanging.Returns(true);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowAdded += h,
 			h => windowManager.WindowAdded -= h,
@@ -510,7 +510,7 @@ public class WindowManagerTests
 		internalCtx.ButlerEventHandlers.AreMonitorsChanging.Returns(false);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_FOREGROUND, hwnd, 0, 0, 0, 0);
 		CustomAssert.DoesNotRaise<WindowEventArgs>(
 			h => windowManager.WindowAdded += h,
@@ -536,7 +536,7 @@ public class WindowManagerTests
 		internalCtx.ButlerEventHandlers.AreMonitorsChanging.Returns(true);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_FOREGROUND, hwnd, 0, 0, 0, 0);
 		CustomAssert.DoesNotRaise<WindowEventArgs>(
 			h => windowManager.WindowAdded += h,
@@ -562,7 +562,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		Assert.Raises<WindowFocusedEventArgs>(
 			h => windowManager.WindowFocused += h,
 			h => windowManager.WindowFocused -= h,
@@ -588,7 +588,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// Then
 		Assert.Raises<WindowFocusedEventArgs>(
@@ -614,7 +614,7 @@ public class WindowManagerTests
 		ctx.Butler.Pantry.GetMonitorForWindow(Arg.Any<IWindow>()).Returns((IMonitor?)null);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_HIDE, hwnd, 0, 0, 0, 0);
 
 		// Then
@@ -632,7 +632,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// Then
 		Assert.Raises<WindowEventArgs>(
@@ -655,7 +655,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowRemoved += h,
 			h => windowManager.WindowRemoved -= h,
@@ -689,7 +689,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// Then
 		var result = Assert.Raises<WindowMovedEventArgs>(
@@ -710,12 +710,12 @@ public class WindowManagerTests
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
 		WindowManager windowManager = new(ctx, internalCtx);
-		windowManager.PostInitialize();
+		windowManager.Subscribe();
 
 		Trigger_MouseLeftButtonDown(internalCtx).Setup_GetCursorPos(internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
@@ -765,12 +765,12 @@ public class WindowManagerTests
 		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 
 		WindowManager windowManager = new(ctx, internalCtx);
-		windowManager.PostInitialize();
+		windowManager.Subscribe();
 
 		Trigger_MouseLeftButtonDown(internalCtx).Setup_GetCursorPos(internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
@@ -794,7 +794,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 		WindowManager windowManager = new(ctx, internalCtx) { WindowMovedDelay = 0 };
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		return (capture, windowManager, hwnd);
 	}
 
@@ -946,7 +946,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// Then
 		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
@@ -967,8 +967,8 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When the window is moved
-		windowManager.Initialize();
-		windowManager.PostInitialize();
+		windowManager.Subscribe();
+		windowManager.Subscribe();
 
 		Trigger_MouseLeftButtonDown(internalCtx).Trigger_MouseLeftButtonUp(internalCtx);
 
@@ -990,12 +990,12 @@ public class WindowManagerTests
 		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)false);
 
 		WindowManager windowManager = new(ctx, internalCtx);
-		windowManager.PostInitialize();
+		windowManager.Subscribe();
 
 		Trigger_MouseLeftButtonDown(internalCtx).Setup_GetCursorPos(internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
@@ -1036,7 +1036,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoved += h,
@@ -1061,7 +1061,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowMinimizeStart += h,
 			h => windowManager.WindowMinimizeStart -= h,
@@ -1082,7 +1082,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		Assert.Raises<WindowEventArgs>(
 			h => windowManager.WindowMinimizeEnd += h,
 			h => windowManager.WindowMinimizeEnd -= h,
@@ -1104,7 +1104,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
@@ -1124,7 +1124,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
@@ -1152,7 +1152,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		var result = Assert.Raises<WindowMovedEventArgs>(
 			h => windowManager.WindowMoveEnd += h,
 			h => windowManager.WindowMoveEnd -= h,
@@ -1195,7 +1195,7 @@ public class WindowManagerTests
 			h => windowManager.WindowMoveEnd -= h,
 			() =>
 			{
-				windowManager.Initialize();
+				windowManager.Subscribe();
 				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 			}
@@ -1238,7 +1238,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
@@ -1292,7 +1292,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
@@ -1415,7 +1415,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 
 		// Then
@@ -1475,7 +1475,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 
 		// Then
@@ -1498,7 +1498,7 @@ public class WindowManagerTests
 		WindowManagerSubscriber subscriber = new(windowManager);
 
 		// When
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, 0xBAADF00D, hwnd, 0, 0, 0, 0);
 
 		// Then
@@ -1519,7 +1519,7 @@ public class WindowManagerTests
 
 	#region Dispose
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void Dispose_NotInitialized(IContext ctx, IInternalContext internalCtx)
+	internal void Dispose_NotSubscribed(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
@@ -1539,7 +1539,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx, false, true);
 		WindowManager windowManager = new(ctx, internalCtx);
 
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		capture.Handles.ForEach(h => h.HasDisposed = false);
 
@@ -1557,7 +1557,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx, false, true);
 		WindowManager windowManager = new(ctx, internalCtx);
 
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		capture.Handles.ForEach(h =>
 		{
@@ -1579,7 +1579,7 @@ public class WindowManagerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		WindowManager windowManager = new(ctx, internalCtx);
 
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// When
 		windowManager.Dispose();
@@ -1601,7 +1601,7 @@ public class WindowManagerTests
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
 		WindowManager windowManager = new(ctx, internalCtx);
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// When
@@ -1620,7 +1620,7 @@ public class WindowManagerTests
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
 		WindowManager windowManager = new(ctx, internalCtx);
-		windowManager.Initialize();
+		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// When
@@ -1645,7 +1645,7 @@ public class WindowManagerTests
 		AllowWindowCreation(ctx, internalCtx, hwnd);
 
 		WindowManager windowManager = new(ctx, internalCtx);
-		windowManager.Initialize();
+		windowManager.Subscribe();
 
 		// When
 		internalCtx
