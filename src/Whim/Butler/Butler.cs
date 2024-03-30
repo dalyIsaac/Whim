@@ -37,16 +37,29 @@ internal partial class Butler : IButler, IInternalButler
 		_pantry = new ButlerPantry(_context);
 		_chores = new ButlerChores(_context, _internalContext);
 		EventHandlers = new ButlerEventHandlers(_context, _internalContext, _pantry, _chores);
+
+		_windowRoutedEvent = new(context);
+		_monitorWorkspaceChangedEvent = new(context);
 	}
 
-	public event EventHandler<RouteEventArgs>? WindowRouted;
+	private readonly ThreadSafeEvent<RouteEventArgs> _windowRoutedEvent;
+	public event EventHandler<RouteEventArgs>? WindowRouted
+	{
+		add => _windowRoutedEvent.Add(value);
+		remove => _windowRoutedEvent.Remove(value);
+	}
 
-	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
+	private readonly ThreadSafeEvent<MonitorWorkspaceChangedEventArgs> _monitorWorkspaceChangedEvent;
+	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged
+	{
+		add => _monitorWorkspaceChangedEvent.Add(value);
+		remove => _monitorWorkspaceChangedEvent.Remove(value);
+	}
 
-	public void TriggerWindowRouted(RouteEventArgs args) => WindowRouted?.Invoke(this, args);
+	public void TriggerWindowRouted(RouteEventArgs args) => _windowRoutedEvent.Invoke(this, args);
 
 	public void TriggerMonitorWorkspaceChanged(MonitorWorkspaceChangedEventArgs args) =>
-		MonitorWorkspaceChanged?.Invoke(this, args);
+		_monitorWorkspaceChangedEvent?.Invoke(this, args);
 
 	public void Initialize()
 	{
