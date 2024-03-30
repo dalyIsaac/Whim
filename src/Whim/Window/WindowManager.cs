@@ -19,56 +19,56 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private readonly ThreadSafeEvent<WindowEventArgs> _windowAddedEvent;
 	public event EventHandler<WindowEventArgs>? WindowAdded
 	{
-		add => _windowAddedEvent.Equals(value);
+		add => _windowAddedEvent.Add(value);
 		remove => _windowAddedEvent.Remove(value);
 	}
 
 	private readonly ThreadSafeEvent<WindowFocusedEventArgs> _windowFocusedEvent;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused
 	{
-		add => _windowFocusedEvent.Equals(value);
+		add => _windowFocusedEvent.Add(value);
 		remove => _windowFocusedEvent.Remove(value);
 	}
 
 	private readonly ThreadSafeEvent<WindowEventArgs> _windowRemovedEvent;
 	public event EventHandler<WindowEventArgs>? WindowRemoved
 	{
-		add => _windowRemovedEvent.Equals(value);
+		add => _windowRemovedEvent.Add(value);
 		remove => _windowRemovedEvent.Remove(value);
 	}
 
 	private readonly ThreadSafeEvent<WindowMovedEventArgs> _windowMoveStartEvent;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoveStart
 	{
-		add => _windowMoveStartEvent.Equals(value);
+		add => _windowMoveStartEvent.Add(value);
 		remove => _windowMoveStartEvent.Remove(value);
 	}
 
 	private readonly ThreadSafeEvent<WindowMovedEventArgs> _windowMovedEvent;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoved
 	{
-		add => _windowMovedEvent.Equals(value);
+		add => _windowMovedEvent.Add(value);
 		remove => _windowMovedEvent.Remove(value);
 	}
 
 	private readonly ThreadSafeEvent<WindowMovedEventArgs> _windowMoveEndEvent;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoveEnd
 	{
-		add => _windowMoveEndEvent.Equals(value);
+		add => _windowMoveEndEvent.Add(value);
 		remove => _windowMoveEndEvent.Remove(value);
 	}
 
 	private readonly ThreadSafeEvent<WindowEventArgs> _windowMinimizeStartEvent;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeStart
 	{
-		add => _windowMinimizeStartEvent.Equals(value);
+		add => _windowMinimizeStartEvent.Add(value);
 		remove => _windowMinimizeStartEvent.Remove(value);
 	}
 
 	private readonly ThreadSafeEvent<WindowEventArgs> _windowMinimizeEndEvent;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd
 	{
-		add => _windowMinimizeEndEvent.Equals(value);
+		add => _windowMinimizeEndEvent.Add(value);
 		remove => _windowMinimizeEndEvent.Remove(value);
 	}
 
