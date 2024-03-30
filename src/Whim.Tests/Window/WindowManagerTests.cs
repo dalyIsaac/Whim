@@ -938,7 +938,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_DESTROY, hwnd, 0, 0, 0, 0);
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
-        await Task.Delay(windowManager.WindowMovedDelay * 2 + 200);
+		await Task.Delay(windowManager.WindowMovedDelay * 2 + 200);
 
 		// Then the workspace is asked to do two layouts
 		workspace.Received(2).DoLayout();
