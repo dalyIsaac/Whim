@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using NSubstitute;
 using Xunit;
 using Xunit.Sdk;
@@ -7,18 +8,19 @@ using Xunit.Sdk;
 namespace Whim.TestUtils;
 
 /// <summary>
-/// Exception thrown when an event is raised when it should not have been.
+/// Exception thrown when an event is not raises when it should have been (or vice versa).
 /// </summary>
 #pragma warning disable CA1032 // Implement standard exception constructors
-public class DoesNotRaiseException : XunitException
+public class ShouldRaiseException : XunitException
 #pragma warning restore CA1032 // Implement standard exception constructors
 {
 	/// <summary>
-	/// Creates a new instance of the <see cref="DoesNotRaiseException"/> class.
+	/// Creates a new instance of the <see cref="ShouldRaiseException"/> class.
 	/// </summary>
 	/// <param name="type"></param>
-	public DoesNotRaiseException(Type type)
-		: base($"Expected event of type {type} to not be raised.") { }
+	/// <param name="expected">Whether it was expected that the exception was raised.</param>
+	public ShouldRaiseException(Type type, bool expected)
+		: base($"Expected event of type {type} to {(expected ? "not" : "")} be raised.") { }
 }
 
 /// <summary>
@@ -33,7 +35,7 @@ public static class CustomAssert
 	/// <param name="attach">The method to attach the event handler.</param>
 	/// <param name="detach">The method to detach the event handler.</param>
 	/// <param name="action">The action to perform.</param>
-	/// <exception cref="DoesNotRaiseException">Thrown when the event is raised.</exception>
+	/// <exception cref="ShouldRaiseException">Thrown when the event is raised.</exception>
 	public static void DoesNotRaise<T>(Action<EventHandler<T>> attach, Action<EventHandler<T>> detach, Action action)
 	{
 		bool raised = false;
@@ -53,7 +55,45 @@ public static class CustomAssert
 
 		if (raised)
 		{
-			throw new DoesNotRaiseException(typeof(T));
+			throw new ShouldRaiseException(typeof(T), expected: false);
+		}
+	}
+
+	/// <summary>
+	/// Asserts that an event is not raised.
+	/// </summary>
+	/// <typeparam name="T">The type of event to check.</typeparam>
+	/// <param name="attach">The method to attach the event handler.</param>
+	/// <param name="detach">The method to detach the event handler.</param>
+	/// <param name="action">The action to perform.</param>
+	/// <param name="delayMs">The delay in milliseconds to wait.</param>
+	/// <exception cref="ShouldRaiseException">Thrown when the event is raised.</exception>
+	public static async Task RaisesAsync<T>(
+		Action<EventHandler<T>> attach,
+		Action<EventHandler<T>> detach,
+		Action action,
+		int delayMs
+	)
+	{
+		bool raised = false;
+		void handler(object? sender, T e)
+		{
+			raised = true;
+		}
+		attach(handler);
+		try
+		{
+			action();
+			await Task.Delay(delayMs).ConfigureAwait(true);
+		}
+		finally
+		{
+			detach(handler);
+		}
+
+		if (!raised)
+		{
+			throw new ShouldRaiseException(typeof(T), expected: true);
 		}
 	}
 
@@ -63,7 +103,7 @@ public static class CustomAssert
 	/// <param name="attach">The method to attach the event handler.</param>
 	/// <param name="detach">The method to detach the event handler.</param>
 	/// <param name="action">The action to perform.</param>
-	/// <exception cref="DoesNotRaiseException">Thrown when the event is raised.</exception>
+	/// <exception cref="ShouldRaiseException">Thrown when the event is raised.</exception>
 	public static void DoesNotPropertyChange(
 		Action<PropertyChangedEventHandler> attach,
 		Action<PropertyChangedEventHandler> detach,
@@ -87,7 +127,7 @@ public static class CustomAssert
 
 		if (raised)
 		{
-			throw new DoesNotRaiseException(typeof(PropertyChangedEventArgs));
+			throw new ShouldRaiseException(typeof(PropertyChangedEventArgs), expected: false);
 		}
 	}
 

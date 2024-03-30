@@ -172,6 +172,15 @@ public class WindowManagerTests
 		return this;
 	}
 
+	private static void ClearReceivedCalls(IContext ctx, IInternalContext internalCtx, IWorkspace? workspace = null)
+	{
+		ctx.ClearReceivedCalls();
+		ctx.NativeManager.ClearReceivedCalls();
+		ctx.Butler.Pantry.ClearReceivedCalls();
+		internalCtx.ClearReceivedCalls();
+		workspace?.ClearReceivedCalls();
+	}
+
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
 	internal void OnWindowAdded(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
@@ -1126,6 +1135,7 @@ public class WindowManagerTests
 		// When
 		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		ClearReceivedCalls(ctx, internalCtx);
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
@@ -1159,6 +1169,7 @@ public class WindowManagerTests
 			() =>
 			{
 				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+				ClearReceivedCalls(ctx, internalCtx, workspace);
 				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 			}
 		);
@@ -1197,6 +1208,7 @@ public class WindowManagerTests
 			{
 				windowManager.Subscribe();
 				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+				ClearReceivedCalls(ctx, internalCtx, workspace);
 				capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 			}
 		);
@@ -1240,6 +1252,7 @@ public class WindowManagerTests
 		// When
 		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		ClearReceivedCalls(ctx, internalCtx);
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then
@@ -1294,6 +1307,7 @@ public class WindowManagerTests
 		// When
 		windowManager.Subscribe();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
+		ClearReceivedCalls(ctx, internalCtx, workspace);
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0);
 
 		// Then

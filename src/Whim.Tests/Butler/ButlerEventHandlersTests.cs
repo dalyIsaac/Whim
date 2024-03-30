@@ -484,7 +484,7 @@ public class ButlerEventHandlersTests
 
 	#region OnMonitorsChanged
 	[Theory, AutoSubstituteData]
-	internal void OnMonitorsChanged_RemovedMonitor(
+	internal async Task OnMonitorsChanged_RemovedMonitorAsync(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IButlerPantry pantry,
@@ -508,6 +508,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = Array.Empty<IMonitor>()
 			}
 		);
+		await Task.Delay(sut.MonitorsChangedDelay + 100);
 
 		// Then the monitor is removed from the pantry
 		pantry.Received().RemoveMonitor(monitors[0]);
@@ -516,7 +517,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMonitorsChanged_RemovedMonitor_NoWorkspaceForMonitor(
+	internal async Task OnMonitorsChanged_RemovedMonitor_NoWorkspaceForMonitorAsync(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IButlerChores chores,
@@ -539,6 +540,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = Array.Empty<IMonitor>()
 			}
 		);
+		await Task.Delay(sut.MonitorsChangedDelay + 100);
 
 		// Then nothing happens
 		pantry.Received().RemoveMonitor(monitors[0]);
@@ -564,7 +566,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMonitorsChanged_AddedMonitor_UseSpareWorkspace(
+	internal async void OnMonitorsChanged_AddedMonitor_UseSpareWorkspace(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IButlerChores chores,
@@ -591,6 +593,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = new[] { newMonitor }
 			}
 		);
+		await Task.Delay(sut.MonitorsChangedDelay + 100);
 
 		// Then the monitor is added to the pantry
 		pantry.Received().SetMonitorWorkspace(newMonitor, workspaces[2]);
@@ -598,7 +601,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Succeeds(
+	internal async Task OnMonitorsChanged_AddedMonitor_CreateWorkspace_SucceedsAsync(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IButlerChores chores,
@@ -626,6 +629,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = new[] { newMonitor }
 			}
 		);
+		await Task.Delay(sut.MonitorsChangedDelay + 100);
 
 		// Then the monitor is added to the pantry
 		pantry.Received().SetMonitorWorkspace(newMonitor, newWorkspace);
@@ -633,7 +637,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Fails(
+	internal async void OnMonitorsChanged_AddedMonitor_CreateWorkspace_Fails(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IButlerChores chores,
@@ -659,6 +663,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = new[] { monitors[1] }
 			}
 		);
+		await Task.Delay(sut.MonitorsChangedDelay + 100);
 
 		// Then the monitor is not added to the pantry
 		pantry.DidNotReceive().SetMonitorWorkspace(monitors[1], workspaces[0]);
@@ -666,7 +671,7 @@ public class ButlerEventHandlersTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnMonitorsChanged_RemovedAndAddedMonitor(
+	internal async Task OnMonitorsChanged_RemovedAndAddedMonitorAsync(
 		IContext ctx,
 		IInternalContext internalCtx,
 		IButlerChores chores,
@@ -697,6 +702,7 @@ public class ButlerEventHandlersTests
 				AddedMonitors = new[] { newMonitor }
 			}
 		);
+		await Task.Delay(sut.MonitorsChangedDelay + 100);
 
 		// Then the monitor is removed from the pantry
 		pantry.Received().RemoveMonitor(monitors[0]);

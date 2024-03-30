@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.UI.Dispatching;
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 using NSubstitute.ReturnsExtensions;
@@ -603,20 +602,23 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
-	internal void WindowMessageMonitor_SessionChanged(IContext ctx, IInternalContext internalCtx)
+	internal async void WindowMessageMonitor_SessionChanged(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
 		MonitorManager monitorManager = new(ctx, internalCtx);
 		monitorManager.Subscribe();
 
-		// When
-		internalCtx.WindowMessageMonitor.SessionChanged += Raise.Event<EventHandler<WindowMessageMonitorEventArgs>>(
-			internalCtx.WindowMessageMonitor,
-			WindowMessageMonitorEventArgs
+		// When the WindowMessageMonitor raises the SessionChanged event,
+		// Then the MonitorManager will raise the MonitorsChanged event
+		await CustomAssert.RaisesAsync<MonitorsChangedEventArgs>(
+			h => monitorManager.MonitorsChanged += h,
+			h => monitorManager.MonitorsChanged -= h,
+			() =>
+				internalCtx.WindowMessageMonitor.SessionChanged += Raise.Event<
+					EventHandler<WindowMessageMonitorEventArgs>
+				>(internalCtx.WindowMessageMonitor, WindowMessageMonitorEventArgs),
+			5100
 		);
-
-		// Then
-		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
