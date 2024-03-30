@@ -230,7 +230,7 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		// windows around after a monitor change.
 		// NOTE: ButlerEventHandlersTests has a test for this which only runs locally - it is
 		// turned off in CI as it has proved flaky when running on GitHub Actions.
-		_context.NativeManager.TryEnqueue(async () =>
+		Task.Run(async () =>
 		{
 			await Task.Delay(MonitorsChangedDelay).ConfigureAwait(true);
 
