@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
@@ -927,7 +928,7 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
-	internal void WinEventProc_OnWindowMoved_WindowGetsRemoved(IContext ctx, IInternalContext internalCtx)
+	internal async void WinEventProc_OnWindowMoved_WindowGetsRemoved(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the window has been been handled, but is removed
 		(CaptureWinEventProc capture, WindowManager windowManager, HWND hwnd) = Setup_RectRestoring(ctx, internalCtx);
@@ -935,10 +936,9 @@ public class WindowManagerTests
 
 		// When the window is moved and then removed
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
-
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_DESTROY, hwnd, 0, 0, 0, 0);
-
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
+        await Task.Delay(windowManager.WindowMovedDelay * 2 + 200);
 
 		// Then the workspace is asked to do two layouts
 		workspace.Received(2).DoLayout();
