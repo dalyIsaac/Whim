@@ -17,18 +17,27 @@ public interface IPlugin
 
 	/// <summary>
 	/// <b>This method is to be called by the plugin manager.</b>
-	/// Initializes the plugin before the <see cref="IContext"/> has been initialized.
-	/// Put things like event listeners here or adding proxy layout engines
+	/// Initializes the plugin before the <see cref="IWorkspaceManager"/> and <see cref="IButler"/>
+	/// have completed initialization.
+	/// This should be used for things like adding proxy layout engines
 	/// (see <see cref="IWorkspaceManager.AddProxyLayoutEngine(CreateProxyLayoutEngine)"/>).
 	/// </summary>
 	void PreInitialize();
 
 	/// <summary>
 	/// <b>This method is to be called by the plugin manager.</b>
-	/// Initializes the plugin after the rest of the <see cref="IContext"/> has been initialized.
-	/// Put things which rely on the rest of the context here.
+	/// Initializes the plugin after the <see cref="IWorkspaceManager"/> and <see cref="IButler"/>
+	/// have completed initialization.
+	/// Put things which rely on the rest of the context here. Event listeners which don't need
+	/// to run on the UI/STA thread can be placed here.
 	/// </summary>
 	void PostInitialize();
+
+	/// <summary>
+	/// <b>This method is to be called by the plugin manager.</b>
+	/// Put event listeners which need to run on the UI/STA thread here.
+	/// </summary>
+	void Subscribe();
 
 	/// <summary>
 	/// The commands and keybinds for this plugin. These are registered during <see cref="IPluginManager.PreInitialize"/>.

@@ -46,6 +46,9 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 	public void PostInitialize() { }
 
 	/// <inheritdoc />
+	public void Subscribe() { }
+
+	/// <inheritdoc />
 	public void LoadState(JsonElement state) { }
 
 	/// <inheritdoc />

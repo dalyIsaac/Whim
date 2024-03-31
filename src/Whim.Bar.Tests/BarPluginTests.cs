@@ -16,7 +16,7 @@ public class BarPluginTests
 		NativeManagerUtils.SetupTryEnqueue(context);
 
 		// When MonitorManager_MonitorsChanged is called with a removed monitor which is not in the map
-		barPlugin.PreInitialize();
+		barPlugin.Subscribe();
 		context.MonitorManager.MonitorsChanged += Raise.EventWith(
 			new MonitorsChangedEventArgs()
 			{
@@ -28,6 +28,6 @@ public class BarPluginTests
 
 		// Then an exception is not thrown.
 		barPlugin.Dispose();
-		context.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		context.NativeManager.Received(1).InvokeOnUIThread(Arg.Any<DispatcherQueueHandler>());
 	}
 }

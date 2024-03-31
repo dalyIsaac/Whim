@@ -37,9 +37,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	public void PreInitialize()
 	{
 		_context.FilterManager.AddTitleMatchFilter(FocusIndicatorConfig.Title);
-
-		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
 	/// <inheritdoc/>
@@ -51,6 +48,13 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		// Activate the window so it renders.
 		_focusIndicatorWindow.Activate();
 		_focusIndicatorWindow.Hide(_context);
+	}
+
+	/// <inheritdoc/>
+	public void Subscribe()
+	{
+		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 
 		// Only subscribe to workspace changes once the indicator window has been created - we shouldn't
 		// show a window which doesn't yet exist (it'll just crash Whim).

@@ -50,6 +50,9 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 		_commandPaletteWindow = new CommandPaletteWindow(_context, this);
 	}
 
+	/// <inheritdoc />
+	public void Subscribe() { }
+
 	/// <summary>
 	/// Activate the command palette.
 	/// </summary>

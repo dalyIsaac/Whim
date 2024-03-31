@@ -33,7 +33,6 @@ public class BarPlugin : IBarPlugin
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 		_context.FilterManager.AddTitleMatchFilter("Whim Bar");
 		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
 	}
@@ -56,7 +55,7 @@ public class BarPlugin : IBarPlugin
 		foreach (IMonitor monitor in e.RemovedMonitors)
 		{
 			_monitorBarMap.TryGetValue(monitor, out BarWindow? value);
-			_context.NativeManager.TryEnqueue(() => value?.Close());
+			_context.NativeManager.InvokeOnUIThread(() => value?.Close());
 			_monitorBarMap.Remove(monitor);
 		}
 
@@ -85,6 +84,12 @@ public class BarPlugin : IBarPlugin
 				DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND
 			);
 		}
+	}
+
+	/// <inheritdoc />
+	public void Subscribe()
+	{
+		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 	}
 
 	/// <inheritdoc />

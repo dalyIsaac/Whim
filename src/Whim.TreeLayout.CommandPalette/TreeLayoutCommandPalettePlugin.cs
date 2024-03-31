@@ -45,6 +45,9 @@ public class TreeLayoutCommandPalettePlugin : IPlugin
 	public void PreInitialize() { }
 
 	/// <inheritdoc />
+	public void Subscribe() { }
+
+	/// <inheritdoc />
 	public void LoadState(JsonElement state) { }
 
 	/// <inheritdoc />

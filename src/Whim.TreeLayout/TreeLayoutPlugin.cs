@@ -38,6 +38,9 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	public void PostInitialize() { }
 
 	/// <inheritdoc />
+	public void Subscribe() { }
+
+	/// <inheritdoc />
 	public Direction? GetAddWindowDirection(IMonitor monitor)
 	{
 		ILayoutEngine? layoutEngine = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;

@@ -37,6 +37,9 @@ public class GapsPlugin : IGapsPlugin
 	/// <inheritdoc />
 	public void PostInitialize() { }
 
+	/// <inheritdoc />
+	public void Subscribe() { }
+
 	/// <summary>
 	/// Update the gap between the parent layout engine and the area where windows are placed by
 	/// the <paramref name="delta"/>.

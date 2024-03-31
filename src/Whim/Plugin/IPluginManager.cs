@@ -14,7 +14,7 @@ public interface IPluginManager : IDisposable
 	IReadOnlyCollection<IPlugin> LoadedPlugins { get; }
 
 	/// <summary>
-	/// Calls all plugins' <see cref="IPlugin.PreInitialize"/> method.
+	/// Calls all plugins' <see cref="IPlugin.PreInitialize"/> methods.
 	/// This runs before the rest of the context has been initialized.
 	/// </summary>
 	void PreInitialize();
@@ -39,6 +39,11 @@ public interface IPluginManager : IDisposable
 	/// </list>
 	/// </summary>
 	void PostInitialize();
+
+	/// <summary>
+	/// Calls all plugins' <see cref="IPlugin.Subscribe"/> methods. This runs on the UI thread.
+	/// </summary>
+	void Subscribe();
 
 	/// <summary>
 	/// Adds a plugin, registers its commands and keybinds from <see cref="IPlugin.PluginCommands"/>.

@@ -37,16 +37,21 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	/// <inheritdoc	/>
 	public void PreInitialize()
 	{
-		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
-		_context.WindowManager.WindowMoved += WindowMoved;
-		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
-		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 		_context.FilterManager.AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
 	/// <inheritdoc	/>
 	public void PostInitialize() { }
+
+	/// <inheritdoc	/>
+	public void Subscribe()
+	{
+		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
+		_context.WindowManager.WindowMoved += WindowMoved;
+		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
+		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
+	}
 
 	/// <inheritdoc />
 	public void LoadState(JsonElement state) { }

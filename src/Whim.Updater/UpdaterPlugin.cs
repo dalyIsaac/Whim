@@ -90,7 +90,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	{
 		Logger.Debug("Showing update window");
 
-		_context.NativeManager.TryEnqueue(async () =>
+		_context.NativeManager.InvokeOnUIThread(async () =>
 		{
 			_updaterWindow = new UpdaterWindow(plugin: this, null);
 			await _updaterWindow.Activate(_notInstalledReleases).ConfigureAwait(true);
@@ -112,6 +112,9 @@ public class UpdaterPlugin : IUpdaterPlugin
 		_timer.Elapsed += Timer_Elapsed;
 		_timer.Start();
 	}
+
+	/// <inheritdoc/>
+	public void Subscribe() { }
 
 	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) =>
 		await CheckForUpdates().ConfigureAwait(true);

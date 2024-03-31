@@ -63,6 +63,7 @@ internal class InternalContext : IInternalContext
 		MonitorManager.Subscribe();
 		NotificationManager.Subscribe();
 		WindowManager.Subscribe();
+		_context.PluginManager.Subscribe();
 	}
 
 	protected virtual void Dispose(bool disposing)

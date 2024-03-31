@@ -33,6 +33,9 @@ public class TreeLayoutBarPlugin : IPlugin
 	/// <inheritdoc/>
 	public void PostInitialize() { }
 
+	/// <inheritdoc />
+	public void Subscribe() { }
+
 	/// <summary>
 	/// Create the tree layout engine bar component.
 	/// </summary>

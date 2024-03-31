@@ -31,11 +31,19 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	public void PreInitialize()
 	{
 		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, this, layout));
+	}
+
+	/// <inheritdoc />
+	public void PostInitialize()
+	{
 		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
 	}
 
 	/// <inheritdoc />
-	public void PostInitialize() { }
+	public void Subscribe()
+	{
+		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
+	}
 
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);

@@ -86,6 +86,16 @@ internal partial class PluginManager : IPluginManager
 		}
 	}
 
+	public void Subscribe()
+	{
+		Logger.Debug("Subscribing each plugin...");
+
+		foreach (IPlugin plugin in _plugins)
+		{
+			plugin.Subscribe();
+		}
+	}
+
 	public T AddPlugin<T>(T plugin)
 		where T : IPlugin
 	{
