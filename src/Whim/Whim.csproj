@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AnalysisModeDesign>All</AnalysisModeDesign>
@@ -58,6 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Template\whim.config.csx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Whim.SourceGenerators\Whim.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Resources\Defaults.xaml">
