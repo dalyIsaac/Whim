@@ -9,6 +9,8 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Whim.SourceGenerators;
 
+internal readonly record struct SliceData(string Name, string Type, bool Nullable);
+
 internal readonly record struct SliceTransformParam(string Name, string Type, bool Nullable);
 
 internal readonly record struct SliceTransform(string Name, SliceTransformParam[] Parameters)
@@ -21,7 +23,8 @@ internal readonly record struct SliceToGenerate(
 	string Path,
 	string Key,
 	string Accessibility,
-	List<SliceTransform> Transforms
+	List<SliceTransform> Transforms,
+	SliceData Data
 );
 
 [Generator]
@@ -56,7 +59,7 @@ public class SliceGenerator : IIncrementalGenerator
 		}
 
 		// Get the full type of the class, e.g., WindowSlice.
-		if (classSymbol.ToString() is not string className)
+		if (classSymbol.ToString() is null)
 		{
 			return null;
 		}
@@ -67,48 +70,24 @@ public class SliceGenerator : IIncrementalGenerator
 		string path = GetSliceAttributeArgument(classSymbol, "Path");
 		string key = GetSliceAttributeArgument(classSymbol, "Key");
 
-		// Get all the members in the enum with the Whim.TransformerAttribute.
-		ISymbol[] transformerMembers = classMembers
-			.Where(m => m.GetAttributes().Any(a => a.Equals("Whim.TransformerAttribute")))
-			.ToArray();
-		List<SliceTransform> transforms = [];
+		List<SliceTransform> transforms = GetSliceTransforms(classMembers);
+		SliceData data = GetSliceData(classMembers);
 
-		// Get all the methods and add them to the list.
-		for (int mIdx = 0; mIdx < classMembers.Length; mIdx++)
-		{
-			if (classMembers[mIdx] is not IMethodSymbol methodSymbol)
-			{
-				continue;
-			}
-
-			ImmutableArray<AttributeData> methodAttributes = methodSymbol.GetAttributes();
-			if (methodAttributes.Any(m => m.AttributeClass?.Name == "TransformerAttribute") == false)
-			{
-				continue;
-			}
-
-			SliceTransformParam[] parameters = new SliceTransformParam[methodSymbol.Parameters.Length];
-			for (int pIdx = 0; pIdx < methodSymbol.Parameters.Length; pIdx++)
-			{
-				IParameterSymbol current = methodSymbol.Parameters[pIdx];
-				parameters[pIdx] = new SliceTransformParam(
-					current.Name,
-					current.Type.Name,
-					current.NullableAnnotation == NullableAnnotation.Annotated
-				);
-			}
-
-			transforms.Add(new(methodSymbol.Name, parameters));
-		}
-
-		return new(classSymbol.Name, path, key, classSymbol.DeclaredAccessibility.ToString().ToLower(), transforms);
+		return new(
+			classSymbol.Name,
+			path,
+			key,
+			classSymbol.DeclaredAccessibility.ToString().ToLower(),
+			transforms,
+			data
+		);
 	}
 
 	private static string GetSliceAttributeArgument(INamedTypeSymbol symbol, string fieldName)
 	{
 		foreach (AttributeData attribute in symbol.GetAttributes())
 		{
-			if (attribute.AttributeClass?.Name != "SliceAttribute")
+			if (attribute.AttributeClass?.ToString() != "Whim.SliceAttribute")
 			{
 				continue;
 			}
@@ -131,6 +110,63 @@ public class SliceGenerator : IIncrementalGenerator
 		}
 
 		throw new ArgumentException($"Could not find a valid string field for the name '{fieldName}'");
+	}
+
+	private static List<SliceTransform> GetSliceTransforms(ImmutableArray<ISymbol> classMembers)
+	{
+		// Get all the members with the Whim.TransformerAttribute enum.
+		ISymbol[] transformerMembers = classMembers
+			.Where(m => m.GetAttributes().Any(a => a.AttributeClass?.ToString() == "Whim.TransformerAttribute"))
+			.ToArray();
+		List<SliceTransform> transforms = [];
+
+		// Get all the methods and add them to the list.
+		for (int mIdx = 0; mIdx < transformerMembers.Length; mIdx++)
+		{
+			if (transformerMembers[mIdx] is not IMethodSymbol methodSymbol)
+			{
+				continue;
+			}
+
+			SliceTransformParam[] parameters = new SliceTransformParam[methodSymbol.Parameters.Length];
+			for (int pIdx = 0; pIdx < methodSymbol.Parameters.Length; pIdx++)
+			{
+				IParameterSymbol current = methodSymbol.Parameters[pIdx];
+				parameters[pIdx] = new SliceTransformParam(
+					current.Name,
+					current.Type.Name,
+					current.NullableAnnotation == NullableAnnotation.Annotated
+				);
+			}
+
+			transforms.Add(new(methodSymbol.Name, parameters));
+		}
+
+		return transforms;
+	}
+
+	private static SliceData GetSliceData(ImmutableArray<ISymbol> classMembers)
+	{
+		// Get all the members with the Whim.SliceDataAttribute enum.
+		ISymbol[] dataMembers = classMembers
+			.Where(m => m.GetAttributes().Any(a => a.AttributeClass?.ToString() == "Whim.SliceDataAttribute"))
+			.ToArray();
+
+		if (dataMembers.Length != 1)
+		{
+			throw new Exception("There must be exactly one usage of Whim.SliceDataAttribute in this class");
+		}
+
+		if (dataMembers[0] is not IFieldSymbol fieldSymbol)
+		{
+			throw new Exception("Whim.SliceDataAttribute can only be applied to fields");
+		}
+
+		return new SliceData(
+			fieldSymbol.Name,
+			fieldSymbol.Type.ToDisplayString(),
+			fieldSymbol.NullableAnnotation == NullableAnnotation.Annotated
+		);
 	}
 
 	private static void Execute(SourceProductionContext context, SliceToGenerate? sliceToGenerate)
@@ -163,6 +199,9 @@ internal static class SliceGeneratorHelper
 		[System.AttributeUsage(System.AttributeTargets.Method)]
 		public sealed class TransformerAttribute : System.Attribute { }
 
+		[System.AttributeUsage(System.AttributeTargets.Field)]
+		public sealed class SliceDataAttribute : System.Attribute { }
+
 		""";
 
 	public static string GenerateExtensionClass(SliceToGenerate slice)
@@ -180,8 +219,8 @@ internal static class SliceGeneratorHelper
 			"""
 		);
 
-		CreateTransformsRecords(slice, path, sb);
-		CreatePartialClass(slice, sb);
+		CreateTransformsRecords(sb, slice, path);
+		CreatePartialClass(sb, slice);
 
 		return sb.ToString();
 	}
@@ -189,16 +228,14 @@ internal static class SliceGeneratorHelper
 	/// <summary>
 	/// Create a record for each transformer.
 	/// </summary>
+	/// <param name="sb"></param>
 	/// <param name="slice"></param>
 	/// <param name="path"></param>
-	/// <param name="sb"></param>
-	private static void CreateTransformsRecords(SliceToGenerate slice, string path, StringBuilder sb)
+	private static void CreateTransformsRecords(StringBuilder sb, SliceToGenerate slice, string path)
 	{
 		foreach (SliceTransform transform in slice.Transforms)
 		{
-			sb.AppendLine().Append("public sealed record ")
-				.Append(transform.RecordName)
-				.Append('(');
+			sb.AppendLine().Append("public sealed record ").Append(transform.RecordName).Append('(');
 
 			AppendTransformParams(sb, transform);
 
@@ -230,9 +267,10 @@ internal static class SliceGeneratorHelper
 	/// </summary>
 	/// <param name="slice"></param>
 	/// <param name="sb"></param>
-	private static void CreatePartialClass(SliceToGenerate slice, StringBuilder sb)
+	private static void CreatePartialClass(StringBuilder sb, SliceToGenerate slice)
 	{
-		sb.AppendLine().AppendLine()
+		sb.AppendLine()
+			.AppendLine()
 			.Append(slice.Accessibility)
 			.Append(" partial class ")
 			.Append(slice.Name)
@@ -240,8 +278,8 @@ internal static class SliceGeneratorHelper
 			.AppendLine()
 			.Append('{');
 
-		CreateDispatch(slice, sb);
-		// CreatePick(slice, sb);
+		CreateDispatch(sb, slice);
+		CreatePick(sb, slice.Data);
 
 		sb.AppendLine().Append('}');
 	}
@@ -251,7 +289,7 @@ internal static class SliceGeneratorHelper
 	/// </summary>
 	/// <param name="slice"></param>
 	/// <param name="sb"></param>
-	private static void CreateDispatch(SliceToGenerate slice, StringBuilder sb)
+	private static void CreateDispatch(StringBuilder sb, SliceToGenerate slice)
 	{
 		sb.AppendLine()
 			.Append(
@@ -268,9 +306,7 @@ internal static class SliceGeneratorHelper
 			sb.AppendLine()
 				.Append("\t\t\tcase ")
 				.Append(transform.RecordName)
-				.Append(
-					" transform:"
-				)
+				.Append(" transform:")
 				.AppendLine()
 				.Append("\t\t\t\t")
 				.Append(transform.Name)
@@ -293,6 +329,8 @@ internal static class SliceGeneratorHelper
 							break;
 					}
 				}
+
+
 			"""
 		);
 	}
@@ -310,6 +348,28 @@ internal static class SliceGeneratorHelper
 				sb.Append(", ");
 			}
 		}
+	}
+
+	private static void CreatePick(StringBuilder sb, SliceData data)
+	{
+		sb.Append("\tpublic TResult Pick<TResult>(Func<")
+			.Append(data.Type)
+			.Append(
+				"""
+				, TResult> picker)
+					{
+
+				"""
+			)
+			.Append("\t\t")
+			.Append("return picker(")
+			.Append(data.Name)
+			.Append(
+				"""
+				);
+					}
+				"""
+			);
 	}
 
 	private static string Capitalize(this string source)

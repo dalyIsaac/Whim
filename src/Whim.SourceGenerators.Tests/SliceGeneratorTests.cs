@@ -8,11 +8,16 @@ namespace Whim.SourceGenerators.Tests;
 public class SliceGeneratorTests
 {
 	private const string SampleSliceString = """
+		using System.Collections.Generic;
+
 		namespace Whim;
 
 		[Slice(Path = "/Parent", Key = "Sample")]
 		internal partial class SampleSlice
 		{
+			[SliceData]
+			private readonly Dictionary<string, int> _data = new();
+
 			[Transformer]
 			private void AddTestData(int a, int b)
 			{
@@ -46,6 +51,11 @@ public class SliceGeneratorTests
 						break;
 				}
 			}
+
+			public TResult Pick<TResult>(Func<System.Collections.Generic.Dictionary<string, int>, TResult> picker)
+			{
+				return picker(_data);
+			}
 		}
 		""";
 
@@ -78,10 +88,8 @@ public class SliceGeneratorTests
 		var result = outputCompilation.GetDiagnostics();
 		var s = outputCompilation.SyntaxTrees.ElementAt(2).ToString();
 
-		Assert.True(outputCompilation.GetDiagnostics().IsEmpty);
-
-		// Verify that the generated slice matches.
 		Assert.Equal(ExpectedGeneratedSlice, outputCompilation.SyntaxTrees.ElementAt(2).ToString());
+		Assert.True(outputCompilation.GetDiagnostics().IsEmpty);
 	}
 
 	private static CSharpCompilation CreateCompilation() =>
