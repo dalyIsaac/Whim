@@ -38,7 +38,7 @@ public class SliceGeneratorTests
 
 		public sealed record AddTestDataTransform(Int32 A, Int32 B) : Transform("/ParentSample/AddTestData");
 
-		internal partial class SampleSlice : ISlice
+		internal partial class SampleSlice : ISlice<System.Collections.Generic.Dictionary<string, int>>
 		{
 			public void Dispatch(Transform storeAction)
 			{

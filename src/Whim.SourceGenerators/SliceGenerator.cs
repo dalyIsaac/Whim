@@ -274,7 +274,9 @@ internal static class SliceGeneratorHelper
 			.Append(slice.Accessibility)
 			.Append(" partial class ")
 			.Append(slice.Name)
-			.Append(" : ISlice")
+			.Append(" : ISlice<")
+			.Append(slice.Data.Type)
+			.Append(">")
 			.AppendLine()
 			.Append('{');
 
