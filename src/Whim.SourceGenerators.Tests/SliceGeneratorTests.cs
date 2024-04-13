@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Whim.SourceGenerators.Tests;
 
+// TODO: REmove
 public class SliceGeneratorTests
 {
 	private const string SampleSliceString = """
@@ -38,7 +39,7 @@ public class SliceGeneratorTests
 
 		public sealed record AddTestDataTransform(Int32 A, Int32 B) : Transform("/ParentSample/AddTestData");
 
-		internal partial class SampleSlice : ISlice<System.Collections.Generic.Dictionary<string, int>>
+		internal partial class SampleSlice : ISlice
 		{
 			public void Dispatch(Transform storeAction)
 			{
@@ -50,11 +51,6 @@ public class SliceGeneratorTests
 					default:
 						break;
 				}
-			}
-
-			public TResult Pick<TResult>(Func<System.Collections.Generic.Dictionary<string, int>, TResult> picker)
-			{
-				return picker(_data);
 			}
 		}
 		""";
@@ -77,7 +73,7 @@ public class SliceGeneratorTests
 		);
 
 		Assert.True(diagnostics.IsEmpty);
-		
+
 		// We have three syntax trees:
 		// 1. the original 'user' provided one
 		// 2. the generated attributes

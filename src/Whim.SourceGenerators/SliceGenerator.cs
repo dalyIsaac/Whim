@@ -9,8 +9,6 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Whim.SourceGenerators;
 
-internal readonly record struct SliceData(string Name, string Type, bool Nullable);
-
 internal readonly record struct SliceTransformParam(string Name, string Type, bool Nullable);
 
 internal readonly record struct SliceTransform(string Name, SliceTransformParam[] Parameters)
@@ -23,8 +21,7 @@ internal readonly record struct SliceToGenerate(
 	string Path,
 	string Key,
 	string Accessibility,
-	List<SliceTransform> Transforms,
-	SliceData Data
+	List<SliceTransform> Transforms
 );
 
 [Generator]
@@ -71,16 +68,8 @@ public class SliceGenerator : IIncrementalGenerator
 		string key = GetSliceAttributeArgument(classSymbol, "Key");
 
 		List<SliceTransform> transforms = GetSliceTransforms(classMembers);
-		SliceData data = GetSliceData(classMembers);
 
-		return new(
-			classSymbol.Name,
-			path,
-			key,
-			classSymbol.DeclaredAccessibility.ToString().ToLower(),
-			transforms,
-			data
-		);
+		return new(classSymbol.Name, path, key, classSymbol.DeclaredAccessibility.ToString().ToLower(), transforms);
 	}
 
 	private static string GetSliceAttributeArgument(INamedTypeSymbol symbol, string fieldName)
@@ -143,30 +132,6 @@ public class SliceGenerator : IIncrementalGenerator
 		}
 
 		return transforms;
-	}
-
-	private static SliceData GetSliceData(ImmutableArray<ISymbol> classMembers)
-	{
-		// Get all the members with the Whim.SliceDataAttribute enum.
-		ISymbol[] dataMembers = classMembers
-			.Where(m => m.GetAttributes().Any(a => a.AttributeClass?.ToString() == "Whim.SliceDataAttribute"))
-			.ToArray();
-
-		if (dataMembers.Length != 1)
-		{
-			throw new Exception("There must be exactly one usage of Whim.SliceDataAttribute in this class");
-		}
-
-		if (dataMembers[0] is not IFieldSymbol fieldSymbol)
-		{
-			throw new Exception("Whim.SliceDataAttribute can only be applied to fields");
-		}
-
-		return new SliceData(
-			fieldSymbol.Name,
-			fieldSymbol.Type.ToDisplayString(),
-			fieldSymbol.NullableAnnotation == NullableAnnotation.Annotated
-		);
 	}
 
 	private static void Execute(SourceProductionContext context, SliceToGenerate? sliceToGenerate)
@@ -263,7 +228,7 @@ internal static class SliceGeneratorHelper
 	}
 
 	/// <summary>
-	/// Create the partial class with the Dispatch and Pick methods.
+	/// Create the partial class with the Dispatch method.
 	/// </summary>
 	/// <param name="slice"></param>
 	/// <param name="sb"></param>
@@ -274,14 +239,11 @@ internal static class SliceGeneratorHelper
 			.Append(slice.Accessibility)
 			.Append(" partial class ")
 			.Append(slice.Name)
-			.Append(" : ISlice<")
-			.Append(slice.Data.Type)
-			.Append(">")
+			.Append(" : ISlice")
 			.AppendLine()
 			.Append('{');
 
 		CreateDispatch(sb, slice);
-		CreatePick(sb, slice.Data);
 
 		sb.AppendLine().Append('}');
 	}
@@ -350,28 +312,6 @@ internal static class SliceGeneratorHelper
 				sb.Append(", ");
 			}
 		}
-	}
-
-	private static void CreatePick(StringBuilder sb, SliceData data)
-	{
-		sb.Append("\tpublic TResult Pick<TResult>(Func<")
-			.Append(data.Type)
-			.Append(
-				"""
-				, TResult> picker)
-					{
-
-				"""
-			)
-			.Append("\t\t")
-			.Append("return picker(")
-			.Append(data.Name)
-			.Append(
-				"""
-				);
-					}
-				"""
-			);
 	}
 
 	private static string Capitalize(this string source)
