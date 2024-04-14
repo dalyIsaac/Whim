@@ -60,9 +60,6 @@
     <EmbeddedResource Include="Template\whim.config.csx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Whim.SourceGenerators\Whim.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-  </ItemGroup>
-  <ItemGroup>
     <None Update="Resources\Defaults.xaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
