@@ -31,6 +31,8 @@ internal class Context : IContext
 	public IKeybindManager KeybindManager { get; }
 	public INotificationManager NotificationManager { get; }
 
+	public Store Store { get; }
+
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
 
@@ -45,6 +47,9 @@ internal class Context : IContext
 		Logger = new Logger();
 		ResourceManager = new ResourceManager();
 		_internalContext = new InternalContext(this);
+
+		Store = new Store(this, _internalContext);
+
 		Butler = new Butler(this, _internalContext);
 
 		NativeManager = new NativeManager(this, _internalContext);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 
 namespace Whim;
@@ -5,7 +6,7 @@ namespace Whim;
 /// <summary>
 /// The slice containing window-workspace and workspace-monitor mappings.
 /// </summary>
-public class MapSlice
+public class MapSlice : ISlice
 {
 	/// <summary>
 	/// The mappings of windows to workspaces.
@@ -18,4 +19,21 @@ public class MapSlice
 	/// </summary>
 	public ImmutableDictionary<IMonitor, IWorkspace> MonitorWorkspaceMap { get; internal set; } =
 		ImmutableDictionary<IMonitor, IWorkspace>.Empty;
+
+	internal override void Initialize() { }
+
+	internal override void DispatchEvents()
+	{
+		foreach (EventArgs eventArgs in _events)
+		{
+			switch (eventArgs)
+			{
+				// TODO
+				default:
+					break;
+			}
+		}
+
+		_events.Clear();
+	}
 }

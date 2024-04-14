@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -8,6 +9,11 @@ namespace Whim;
 /// </summary>
 public interface IMonitor
 {
+	/// <summary>
+	/// The handle of the monitor.
+	/// </summary>
+	public HMONITOR Handle { get; }
+
 	/// <summary>
 	/// The name of the monitor.
 	/// </summary>
