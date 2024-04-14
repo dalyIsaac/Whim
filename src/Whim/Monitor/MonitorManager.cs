@@ -49,8 +49,11 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	public void Initialize()
 	{
 		// TODO: subscribe to monitorslice MonitorsChanged
-		throw new NotImplementedException();
+		_context.Store.MonitorSlice.MonitorsChanged += MonitorSlice_MonitorsChanged;
 	}
+
+	private void MonitorSlice_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
+		MonitorsChanged?.Invoke(sender, e);
 
 	public void OnWindowFocused(IWindow? window)
 	{
