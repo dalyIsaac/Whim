@@ -43,24 +43,24 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.AddProcessFileNameFilter("1Password.exe");
 
 		// Ableton Live
-		filterManager.Add((window) => window.WindowClass.StartsWith("AbletonVstPlugClass") || window.WindowClass.EndsWith("AbletonVstPlugClass"));  // Targets VST2 windows
-		filterManager.Add((window) => window.WindowClass.StartsWith("Vst3PlugWindow") || window.WindowClass.EndsWith("Vst3PlugWindow"));  // Targets VST3 windows
+		filterManager.Add((window) => window.WindowClass.StartsWith("AbletonVstPlugClass") || window.WindowClass.EndsWith("AbletonVstPlugClass"));
+		filterManager.Add((window) => window.WindowClass.StartsWith("Vst3PlugWindow") || window.WindowClass.EndsWith("Vst3PlugWindow"));
 
 		// Adobe Premiere Pro
-		filterManager.AddWindowClassFilter("DroverLord - Window Class");  // Premiere Pro effects popups
+		filterManager.AddWindowClassFilter("DroverLord - Window Class");
 
 		// Affinity Photo 2
 		filterManager.AddProcessFileNameFilter("Photo.exe");
 
 		// AutoHotkey
-		filterManager.Add((window) => window.Title.StartsWith("Window Spy"));  // Uses `StartsWith` to also match `* for AHKv2`
+		filterManager.Add((window) => window.Title.StartsWith("Window Spy"));
 		filterManager.AddProcessFileNameFilter("AutoHotkeyUX.exe");
 
 		// Bloxstrap
 		filterManager.AddProcessFileNameFilter("Bloxstrap.exe");
 
 		// CLion
-		filterManager.AddWindowClassFilter("SunAwtDialog");  // Targets JetBrains IDE popups and floating windows
+		filterManager.AddWindowClassFilter("SunAwtDialog");
 
 		// Calculator
 		filterManager.AddTitleFilter("Calculator");
@@ -69,11 +69,11 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.AddProcessFileNameFilter("SelfService.exe");
 
 		// Credential Manager UI Host
-		filterManager.AddProcessFileNameFilter("CredentialUIBroker.exe");  // Targets the Windows popup prompting you for a PIN instead of a password on 1Password etc.
+		filterManager.AddProcessFileNameFilter("CredentialUIBroker.exe");
 
 		// Delphi applications
-		filterManager.Add((window) => window.WindowClass.StartsWith("TApplication") || window.WindowClass.EndsWith("TApplication"));  // Target hidden window spawned by Delphi applications
-		filterManager.Add((window) => window.WindowClass.StartsWith("TWizardForm") || window.WindowClass.EndsWith("TWizardForm"));  // Target Inno Setup installers
+		filterManager.Add((window) => window.WindowClass.StartsWith("TApplication") || window.WindowClass.EndsWith("TApplication"));
+		filterManager.Add((window) => window.WindowClass.StartsWith("TWizardForm") || window.WindowClass.EndsWith("TWizardForm"));
 
 		// Dropbox
 		filterManager.AddProcessFileNameFilter("Dropbox.exe");
@@ -91,7 +91,7 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.AddProcessFileNameFilter("WaveLink.exe");
 
 		// GOG Galaxy
-		filterManager.Add((window) => window.WindowClass.StartsWith("Chrome_RenderWidgetHostHWND") || window.WindowClass.EndsWith("Chrome_RenderWidgetHostHWND"));  // Targets a hidden window spawned by GOG Galaxy
+		filterManager.Add((window) => window.WindowClass.StartsWith("Chrome_RenderWidgetHostHWND") || window.WindowClass.EndsWith("Chrome_RenderWidgetHostHWND"));
 
 		// GitHub Credential Manager
 		filterManager.AddProcessFileNameFilter("git-credential-manager.exe");
@@ -115,10 +115,10 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.AddProcessFileNameFilter("LogiOptionsUI.exe");
 
 		// Microsoft Active Accessibility
-		filterManager.Add((window) => window.WindowClass.StartsWith("#32770") || window.WindowClass.EndsWith("#32770"));  // Dialog Box
+		filterManager.Add((window) => window.WindowClass.StartsWith("#32770") || window.WindowClass.EndsWith("#32770"));
 
 		// Microsoft Excel
-		filterManager.Add((window) => window.WindowClass.StartsWith("_WwB") || window.WindowClass.EndsWith("_WwB"));  // Targets a hidden window spawned by Microsoft Office applications
+		filterManager.Add((window) => window.WindowClass.StartsWith("_WwB") || window.WindowClass.EndsWith("_WwB"));
 
 		// Microsoft Outlook
 		// filterManager.Add((window) => window.WindowClass.StartsWith("_WwB") || window.WindowClass.EndsWith("_WwB"));  // duplicate rule
@@ -130,14 +130,14 @@ internal static class DefaultFilteredWindowsKomorebi
 		// filterManager.Add((window) => window.WindowClass.StartsWith("_WwB") || window.WindowClass.EndsWith("_WwB"));  // duplicate rule
 
 		// Microsoft Teams classic
-		filterManager.Add((window) => window.Title.StartsWith("Microsoft Teams Notification") || window.Title.EndsWith("Microsoft Teams Notification"));  // Target Teams pop-up notification windows
-		filterManager.Add((window) => window.Title.StartsWith("Microsoft Teams Call") || window.Title.EndsWith("Microsoft Teams Call"));  // Target Teams call in progress windows
+		filterManager.Add((window) => window.Title.StartsWith("Microsoft Teams Notification") || window.Title.EndsWith("Microsoft Teams Notification"));
+		filterManager.Add((window) => window.Title.StartsWith("Microsoft Teams Call") || window.Title.EndsWith("Microsoft Teams Call"));
 
 		// Microsoft Word
 		// filterManager.Add((window) => window.WindowClass.StartsWith("_WwB") || window.WindowClass.EndsWith("_WwB"));  // duplicate rule
 
 		// Mozilla Firefox
-		filterManager.Add((window) => window.WindowClass.StartsWith("MozillaTaskbarPreviewClass") || window.WindowClass.EndsWith("MozillaTaskbarPreviewClass"));  // Targets invisible windows spawned by Firefox to show tab previews in the taskbar
+		filterManager.Add((window) => window.WindowClass.StartsWith("MozillaTaskbarPreviewClass") || window.WindowClass.EndsWith("MozillaTaskbarPreviewClass"));
 
 		// NohBoard
 		filterManager.AddProcessFileNameFilter("NohBoard.exe");
@@ -149,15 +149,15 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.AddProcessFileNameFilter("Paradox Launcher.exe");
 
 		// Playnite
-		filterManager.AddProcessFileNameFilter("Playnite.FullscreenApp.exe");  // Target fullscreen app
+		filterManager.AddProcessFileNameFilter("Playnite.FullscreenApp.exe");
 
 		// PowerToys
-		filterManager.AddProcessFileNameFilter("PowerToys.ColorPickerUI.exe");  // Target color picker dialog
-		filterManager.AddProcessFileNameFilter("PowerToys.CropAndLock.exe");  // Target thumbnail/cropped window
-		filterManager.AddProcessFileNameFilter("PowerToys.ImageResizer.exe");  // Target image resizer dialog
-		filterManager.AddProcessFileNameFilter("PowerToys.Peek.UI.exe");  // Target Peek popup
-		filterManager.AddProcessFileNameFilter("PowerToys.PowerLauncher.exe");  // PpowerLauncher popup
-		filterManager.AddProcessFileNameFilter("PowerToys.PowerAccent.exe");  // PowerAccent popup
+		filterManager.AddProcessFileNameFilter("PowerToys.ColorPickerUI.exe");
+		filterManager.AddProcessFileNameFilter("PowerToys.CropAndLock.exe");
+		filterManager.AddProcessFileNameFilter("PowerToys.ImageResizer.exe");
+		filterManager.AddProcessFileNameFilter("PowerToys.Peek.UI.exe");
+		filterManager.AddProcessFileNameFilter("PowerToys.PowerLauncher.exe");
+		filterManager.AddProcessFileNameFilter("PowerToys.PowerAccent.exe");
 
 		// Process Hacker
 		filterManager.AddProcessFileNameFilter("ProcessHacker.exe");
@@ -178,7 +178,7 @@ internal static class DefaultFilteredWindowsKomorebi
 
 		// Rider
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
-		filterManager.Add((window) => window.Title.StartsWith("PopupMessageWindow") || window.Title.EndsWith("PopupMessageWindow"));  // Targets JetBrains IDE popups
+		filterManager.Add((window) => window.Title.StartsWith("PopupMessageWindow") || window.Title.EndsWith("PopupMessageWindow"));
 
 		// RoundedTB
 		filterManager.AddProcessFileNameFilter("RoundedTB.exe");
@@ -196,14 +196,14 @@ internal static class DefaultFilteredWindowsKomorebi
 		// filterManager.Add((window) => window.WindowClass.StartsWith("Chrome_RenderWidgetHostHWND") || window.WindowClass.EndsWith("Chrome_RenderWidgetHostHWND"));  // duplicate rule
 
 		// Smart Install Maker
-		filterManager.Add((window) => window.WindowClass.StartsWith("obj_App") || window.WindowClass.EndsWith("obj_App"));  // Target hidden window spawned by installer
-		filterManager.Add((window) => window.WindowClass.StartsWith("obj_Form") || window.WindowClass.EndsWith("obj_Form"));  // Target installer
+		filterManager.Add((window) => window.WindowClass.StartsWith("obj_App") || window.WindowClass.EndsWith("obj_App"));
+		filterManager.Add((window) => window.WindowClass.StartsWith("obj_Form") || window.WindowClass.EndsWith("obj_Form"));
 
 		// SnippingTool
 		filterManager.AddProcessFileNameFilter("SnippingTool.exe");
 
 		// Steam Beta
-		filterManager.Add((window) => window.Title.StartsWith("notificationtoasts_") || window.Title.EndsWith("notificationtoasts_"));  // Target notification toast popups
+		filterManager.Add((window) => window.Title.StartsWith("notificationtoasts_") || window.Title.EndsWith("notificationtoasts_"));
 
 		// System Informer
 		filterManager.AddProcessFileNameFilter("SystemInformer.exe");
@@ -215,7 +215,7 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.Add((window) => window.WindowClass.StartsWith("TaskManagerWindow") || window.WindowClass.EndsWith("TaskManagerWindow"));
 
 		// Total Commander
-		filterManager.AddWindowClassFilter("TDLG2FILEACTIONMIN");  // Target standard copy window
+		filterManager.AddWindowClassFilter("TDLG2FILEACTIONMIN");
 
 		// TouchCursor
 		filterManager.AddProcessFileNameFilter("tcconfig.exe");
@@ -233,17 +233,17 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.AddProcessFileNameFilter("winzip64.exe");
 
 		// Windows Explorer
-		filterManager.Add((window) => window.WindowClass.StartsWith("OperationStatusWindow") || window.WindowClass.EndsWith("OperationStatusWindow"));  // Targets copy/move operation windows
+		filterManager.Add((window) => window.WindowClass.StartsWith("OperationStatusWindow") || window.WindowClass.EndsWith("OperationStatusWindow"));
 		filterManager.Add((window) => window.Title.StartsWith("Control Panel") || window.Title.EndsWith("Control Panel"));
 
 		// Windows Installer
 		filterManager.AddProcessFileNameFilter("msiexec.exe");
 
 		// Windows Subsystem for Android
-		filterManager.Add((window) => window.WindowClass.StartsWith("android(splash)") || window.WindowClass.EndsWith("android(splash)"));  // Targets splash/startup screen
+		filterManager.Add((window) => window.WindowClass.StartsWith("android(splash)") || window.WindowClass.EndsWith("android(splash)"));
 
 		// Wox
-		filterManager.Add((window) => window.Title.StartsWith("Hotkey sink") || window.Title.EndsWith("Hotkey sink"));  // Targets a hidden window spawned by Wox
+		filterManager.Add((window) => window.Title.StartsWith("Hotkey sink") || window.Title.EndsWith("Hotkey sink"));
 
 		// Zoom
 		filterManager.AddProcessFileNameFilter("Zoom.exe");
