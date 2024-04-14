@@ -5,7 +5,7 @@ namespace Whim;
 
 internal record WindowFocusedTransform(IWindow? Window) : Transform()
 {
-	internal override void Execute(IContext ctx, IInternalContext internalCtx, RootSlice root)
+	internal override void Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		// If we know the window, use what the Butler knows instead of Windows.
 		if (Window is not null)
@@ -15,9 +15,9 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			if (ctx.Butler.Pantry.GetMonitorForWindow(Window) is IMonitor monitor)
 			{
 				Logger.Debug($"Setting active monitor to {monitor}");
-				int idx = root.MonitorSlice.Monitors.IndexOf(monitor);
-				root.MonitorSlice.ActiveMonitorIndex = idx;
-				root.MonitorSlice.LastWhimActiveMonitorIndex = idx;
+				int idx = ctx.Store.MonitorSlice.Monitors.IndexOf(monitor);
+				ctx.Store.MonitorSlice.ActiveMonitorIndex = idx;
+				ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex = idx;
 
 				return;
 			}
@@ -37,9 +37,9 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
 
-		for (int idx = 0; idx < root.MonitorSlice.Monitors.Length; idx++)
+		for (int idx = 0; idx < ctx.Store.MonitorSlice.Monitors.Length; idx++)
 		{
-			IMonitor monitor = root.MonitorSlice.Monitors[idx];
+			IMonitor monitor = ctx.Store.MonitorSlice.Monitors[idx];
 
 			if (!monitor.Handle.Equals(hMONITOR))
 			{
@@ -47,11 +47,11 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			}
 
 			Logger.Debug($"Setting active monitor to {monitor}");
-			root.MonitorSlice.ActiveMonitorIndex = idx;
+			ctx.Store.MonitorSlice.ActiveMonitorIndex = idx;
 
 			if (Window is not null)
 			{
-				root.MonitorSlice.LastWhimActiveMonitorIndex = idx;
+				ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex = idx;
 			}
 
 			break;

@@ -8,9 +8,9 @@ namespace Whim;
 /// <param name="Monitor"></param>
 public record GetNextMonitorSelector(IMonitor Monitor) : Selector<IMonitor>()
 {
-	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx, RootSlice root)
+	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		ImmutableArray<IMonitor> monitors = root.MonitorSlice.Monitors;
+		ImmutableArray<IMonitor> monitors = ctx.Store.MonitorSlice.Monitors;
 
 		int idx = monitors.IndexOf(Monitor);
 		if (idx == -1)

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Whim;
 
 /// <summary>
-/// Operation describing how to update the <see cref="RootSlice"/> for the <see cref="Store"/>.
+/// Operation describing how to update the state of the <see cref="Store"/>.
 /// The implementing record should be populated with the payload.
 /// <see cref="Execute"/> will specify how to update the store.
 /// </summary>
@@ -15,8 +15,7 @@ public abstract record Transform()
 	/// </summary>
 	/// <param name="ctx">Whim's context.</param>
 	/// <param name="internalCtx">Internal-only parts of Whim's API.</param>
-	/// <param name="root">The root slice.</param>
-	internal abstract void Execute(IContext ctx, IInternalContext internalCtx, RootSlice root);
+	internal abstract void Execute(IContext ctx, IInternalContext internalCtx);
 }
 
 /// <summary>
@@ -31,9 +30,8 @@ public abstract record Selector<TResult>()
 	/// </summary>
 	/// <param name="ctx">Whim's context.</param>
 	/// <param name="internalCtx">Internal-only parts of Whim's API.</param>
-	/// <param name="root">The root slice.</param>
 	/// <returns></returns>
-	internal abstract TResult Execute(IContext ctx, IInternalContext internalCtx, RootSlice root);
+	internal abstract TResult Execute(IContext ctx, IInternalContext internalCtx);
 }
 
 /// <summary>
@@ -67,34 +65,6 @@ public abstract class ISlice
 }
 
 /// <summary>
-/// The root slice for the <see cref="Store"/>.
-/// </summary>
-internal class RootSlice
-{
-	public MonitorSlice MonitorSlice { get; }
-	public WorkspaceSlice WorkspaceSlice { get; }
-	public MapSlice MapSlice { get; }
-	public WindowSlice WindowSlice { get; }
-
-	public RootSlice(IContext ctx, IInternalContext internalCtx)
-	{
-		MonitorSlice = new MonitorSlice(ctx, internalCtx);
-		WorkspaceSlice = new WorkspaceSlice();
-		MapSlice = new MapSlice();
-		WindowSlice = new WindowSlice();
-	}
-
-	public void DispatchEvents()
-	{
-		Logger.Debug("Dispatching events");
-		MonitorSlice.DispatchEvents();
-		WorkspaceSlice.DispatchEvents();
-		MapSlice.DispatchEvents();
-		WindowSlice.DispatchEvents();
-	}
-}
-
-/// <summary>
 /// Whim's store.
 /// </summary>
 public class Store
@@ -102,13 +72,27 @@ public class Store
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
 
-	private readonly RootSlice _rootSlice;
+	/// <inheritdoc cref="MonitorSlice"/>
+	public MonitorSlice MonitorSlice { get; }
+
+	/// <inheritdoc cref="WorkspaceSlice" />
+	public WorkspaceSlice WorkspaceSlice { get; }
+
+	/// <inheritdoc cref="MapSlice" />
+	public MapSlice MapSlice { get; }
+
+	/// <inheritdoc cref="WindowSlice" />
+	public WindowSlice WindowSlice { get; }
 
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
 		_internalCtx = internalCtx;
-		_rootSlice = new(ctx, internalCtx);
+
+		MonitorSlice = new MonitorSlice(ctx, internalCtx);
+		WorkspaceSlice = new WorkspaceSlice();
+		MapSlice = new MapSlice();
+		WindowSlice = new WindowSlice();
 	}
 
 	/// <summary>
@@ -120,7 +104,17 @@ public class Store
 	public void Dispatch(Transform transform)
 	{
 		// TODO: reader-writer lock.
-		transform.Execute(_ctx, _internalCtx, _rootSlice);
+		transform.Execute(_ctx, _internalCtx);
+		DispatchEvents();
+	}
+
+	private void DispatchEvents()
+	{
+		Logger.Debug("Dispatching events");
+		MonitorSlice.DispatchEvents();
+		WorkspaceSlice.DispatchEvents();
+		MapSlice.DispatchEvents();
+		WindowSlice.DispatchEvents();
 	}
 
 	/// <summary>
@@ -137,6 +131,6 @@ public class Store
 	{
 		// TODO: reader-writer lock.
 		// TODO: don't do a read lock if a transform is currently in progress.
-		return selector.Execute(_ctx, _internalCtx, _rootSlice);
+		return selector.Execute(_ctx, _internalCtx);
 	}
 }

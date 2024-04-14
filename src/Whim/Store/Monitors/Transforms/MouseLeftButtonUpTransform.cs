@@ -2,7 +2,7 @@ namespace Whim;
 
 internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
 {
-	internal override void Execute(IContext ctx, IInternalContext internalCtx, RootSlice root)
+	internal override void Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug($"Mouse left button up");
 		int? idx = ctx.Store.Select(new GetMonitorIndexAtPointSelector(Point));
@@ -12,6 +12,6 @@ internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
 			return;
 		}
 
-		root.MonitorSlice.ActiveMonitorIndex = idxVal;
+		ctx.Store.MonitorSlice.ActiveMonitorIndex = idxVal;
 	}
 }

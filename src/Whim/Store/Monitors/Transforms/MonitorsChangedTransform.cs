@@ -8,14 +8,14 @@ namespace Whim;
 /// </summary>
 internal record MonitorsChangedTransform : Transform
 {
-	internal override void Execute(IContext ctx, IInternalContext internalCtx, RootSlice root)
+	internal override void Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug($"Monitors changed");
 
 		// Get the new monitors.
-		ImmutableArray<IMonitor> previousMonitors = root.MonitorSlice.Monitors;
+		ImmutableArray<IMonitor> previousMonitors = ctx.Store.MonitorSlice.Monitors;
 
-		root.MonitorSlice.Monitors = MonitorUtils.GetCurrentMonitors(internalCtx);
+		ctx.Store.MonitorSlice.Monitors = MonitorUtils.GetCurrentMonitors(internalCtx);
 
 		List<IMonitor> unchangedMonitors = new();
 		List<IMonitor> removedMonitors = new();
@@ -24,7 +24,7 @@ internal record MonitorsChangedTransform : Transform
 		// For each monitor in the previous set, check if it's in the current set.
 		foreach (IMonitor monitor in previousMonitors)
 		{
-			if (root.MonitorSlice.Monitors.Contains(monitor))
+			if (ctx.Store.MonitorSlice.Monitors.Contains(monitor))
 			{
 				unchangedMonitors.Add(monitor);
 			}
@@ -35,9 +35,9 @@ internal record MonitorsChangedTransform : Transform
 		}
 
 		// For each monitor in the current set, check if it's in the previous set.
-		for (int idx = 0; idx < root.MonitorSlice.Monitors.Length; idx += 1)
+		for (int idx = 0; idx < ctx.Store.MonitorSlice.Monitors.Length; idx += 1)
 		{
-			IMonitor monitor = root.MonitorSlice.Monitors[idx];
+			IMonitor monitor = ctx.Store.MonitorSlice.Monitors[idx];
 			if (!previousMonitors.Contains(monitor))
 			{
 				addedMonitors.Add(monitor);
@@ -45,7 +45,7 @@ internal record MonitorsChangedTransform : Transform
 
 			if (monitor.IsPrimary)
 			{
-				root.MonitorSlice.PrimaryMonitorIndex = idx;
+				ctx.Store.MonitorSlice.PrimaryMonitorIndex = idx;
 			}
 		}
 
@@ -62,7 +62,7 @@ internal record MonitorsChangedTransform : Transform
 			internalCtx.ButlerEventHandlers.OnMonitorsChanged(args);
 		}
 
-		root.MonitorSlice.QueueEvent(args);
+		ctx.Store.MonitorSlice.QueueEvent(args);
 		// TODO: Emit event in MonitorManager.
 	}
 }

@@ -13,7 +13,7 @@ namespace Whim;
 /// </param>
 public record GetMonitorIndexAtPointSelector(IPoint<int> Point, bool GetFirst = false) : Selector<int?>
 {
-	internal override int? Execute(IContext ctx, IInternalContext internalCtx, RootSlice root)
+	internal override int? Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug($"Getting monitor at point {Point}");
 		HMONITOR hmonitor = internalCtx.CoreNativeManager.MonitorFromPoint(
@@ -21,9 +21,9 @@ public record GetMonitorIndexAtPointSelector(IPoint<int> Point, bool GetFirst = 
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
 
-		for (int idx = 0; idx < root.MonitorSlice.Monitors.Length; idx += 1)
+		for (int idx = 0; idx < ctx.Store.MonitorSlice.Monitors.Length; idx += 1)
 		{
-			IMonitor m = root.MonitorSlice.Monitors[idx];
+			IMonitor m = ctx.Store.MonitorSlice.Monitors[idx];
 			if (m.Handle == hmonitor)
 			{
 				return idx;
@@ -51,20 +51,20 @@ public record GetMonitorIndexAtPointSelector(IPoint<int> Point, bool GetFirst = 
 /// </param>
 public record GetMonitorAtPointSelector(IPoint<int> Point, bool GetFirst = false) : Selector<IMonitor?>
 {
-	internal override IMonitor? Execute(IContext ctx, IInternalContext internalCtx, RootSlice root)
+	internal override IMonitor? Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		int? idx = ctx.Store.Select(new GetMonitorIndexAtPointSelector(Point, GetFirst));
+		int? idx = ctx.ctx.StoreSelect(new GetMonitorIndexAtPointSelector(Point, GetFirst));
 		if (idx is not int idxVal)
 		{
 			return null;
 		}
 
-		if (idxVal > root.MonitorSlice.Monitors.Length)
+		if (idxVal > ctx.Store.MonitorSlice.Monitors.Length)
 		{
 			Logger.Error("Monitor index is invalid");
 			return null;
 		}
 
-		return root.MonitorSlice.Monitors[idxVal];
+		return ctx.Store.MonitorSlice.Monitors[idxVal];
 	}
 }
