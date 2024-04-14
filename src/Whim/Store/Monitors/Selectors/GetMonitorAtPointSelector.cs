@@ -53,7 +53,7 @@ public record GetMonitorAtPointSelector(IPoint<int> Point, bool GetFirst = false
 {
 	internal override IMonitor? Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		int? idx = ctx.ctx.StoreSelect(new GetMonitorIndexAtPointSelector(Point, GetFirst));
+		int? idx = ctx.Store.Select(new GetMonitorIndexAtPointSelector(Point, GetFirst));
 		if (idx is not int idxVal)
 		{
 			return null;

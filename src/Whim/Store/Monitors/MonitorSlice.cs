@@ -13,7 +13,7 @@ public class MonitorSlice : ISlice
 	/// <summary>
 	/// All the monitors currently tracked by Whim.
 	/// </summary>
-	internal ImmutableArray<IMonitor> Monitors { get; set; }
+	internal ImmutableArray<IMonitor> Monitors { get; set; } = ImmutableArray<IMonitor>.Empty;
 
 	/// <summary>
 	/// The index of the monitor which is currently active, in <see cref="Monitors"/>.

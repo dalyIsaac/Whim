@@ -42,13 +42,11 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	{
 		_context = context;
 		_internalContext = internalContext;
-
-		context.Store.Dispatch(new MonitorsChangedTransform());
 	}
 
 	public void Initialize()
 	{
-		// TODO: subscribe to monitorslice MonitorsChanged
+		_context.Store.Dispatch(new MonitorsChangedTransform());
 		_context.Store.MonitorSlice.MonitorsChanged += MonitorSlice_MonitorsChanged;
 	}
 

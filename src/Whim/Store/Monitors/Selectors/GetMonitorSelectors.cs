@@ -7,7 +7,7 @@ namespace Whim;
 /// </summary>
 public record GetActiveMonitor() : Selector<IMonitor>()
 {
-	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx, Store store) =>
+	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.MonitorSlice.Monitors[ctx.Store.MonitorSlice.ActiveMonitorIndex];
 }
 
@@ -16,7 +16,7 @@ public record GetActiveMonitor() : Selector<IMonitor>()
 /// </summary>
 public record GetPrimaryMonitor() : Selector<IMonitor>()
 {
-	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx, Store store) =>
+	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.MonitorSlice.Monitors[ctx.Store.MonitorSlice.PrimaryMonitorIndex];
 }
 
@@ -25,7 +25,7 @@ public record GetPrimaryMonitor() : Selector<IMonitor>()
 /// </summary>
 public record GetLastWhimActiveMonitor() : Selector<IMonitor>()
 {
-	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx, Store store) =>
+	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.MonitorSlice.Monitors[ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex];
 }
 
@@ -34,6 +34,6 @@ public record GetLastWhimActiveMonitor() : Selector<IMonitor>()
 /// </summary>
 public record GetAllMonitors() : Selector<IReadOnlyList<IMonitor>>()
 {
-	internal override IReadOnlyList<IMonitor> Execute(IContext ctx, IInternalContext internalCtx, Store store) =>
+	internal override IReadOnlyList<IMonitor> Execute(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.MonitorSlice.Monitors;
 }
