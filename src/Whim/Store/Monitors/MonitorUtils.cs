@@ -30,7 +30,6 @@ internal static class MonitorUtils
 			MONITORENUMPROC proc = new(closure.Callback);
 
 			internalCtx.CoreNativeManager.EnumDisplayMonitors(null, null, proc, (LPARAM)0);
-
 			hmonitors = closure.Monitors;
 		}
 

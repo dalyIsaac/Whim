@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.HiDpi;
 
@@ -14,24 +13,6 @@ internal class Monitor : IMonitor
 		_internalContext = internalContext;
 		Handle = monitor;
 
-		Update(isPrimaryHMonitor);
-	}
-
-	public string Name { get; private set; }
-
-	public bool IsPrimary { get; private set; }
-
-	// Bounds and WorkingArea are lazily evaluated because sometimes they return incorrect values
-	// inside RDP sessions, during display changes. This is a workaround for that.
-	public IRectangle<int> Bounds => GetBounds();
-
-	public IRectangle<int> WorkingArea => GetWorkingArea();
-
-	public int ScaleFactor { get; private set; }
-
-	[MemberNotNull(nameof(IsPrimary), nameof(Name), nameof(ScaleFactor))]
-	internal unsafe void Update(bool isPrimaryHMonitor)
-	{
 		IsPrimary = isPrimaryHMonitor || _internalContext.CoreNativeManager.HasMultipleMonitors() == false;
 		if (IsPrimary)
 		{
@@ -58,6 +39,18 @@ internal class Monitor : IMonitor
 		);
 		ScaleFactor = (int)((double)effectiveDpiX / 96 * 100);
 	}
+
+	public string Name { get; private set; }
+
+	public bool IsPrimary { get; private set; }
+
+	// Bounds and WorkingArea are lazily evaluated because sometimes they return incorrect values
+	// inside RDP sessions, during display changes. This is a workaround for that.
+	public IRectangle<int> Bounds => GetBounds();
+
+	public IRectangle<int> WorkingArea => GetWorkingArea();
+
+	public int ScaleFactor { get; private set; }
 
 	private IRectangle<int> GetBounds()
 	{
