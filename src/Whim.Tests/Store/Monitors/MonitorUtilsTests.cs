@@ -25,6 +25,7 @@ public class MonitorUtilsTests
 {
 	private static readonly (RECT, HMONITOR)[] MULTI_MONITOR_SETUP = new[]
 	{
+		// right
 		(
 			new RECT()
 			{
@@ -35,6 +36,7 @@ public class MonitorUtilsTests
 			},
 			(HMONITOR)1
 		),
+		// left top
 		(
 			new RECT()
 			{
@@ -44,11 +46,22 @@ public class MonitorUtilsTests
 				bottom = 1080
 			},
 			(HMONITOR)2
-		)
+		),
+		// left bottom
+		(
+			new RECT()
+			{
+				left = 0,
+				top = 1080,
+				right = 1920,
+				bottom = 2160
+			},
+			(HMONITOR)3
+		),
 	};
 
 	[Theory, AutoSubstituteData<MonitorUtilsTestCustomization>]
-	internal void GetCurrentMonitors_SingleMonitor(IInternalContext internalCtx)
+	internal void SingleMonitor(IInternalContext internalCtx)
 	{
 		// Given there is a single monitor
 		internalCtx.CoreNativeManager.HasMultipleMonitors().Returns(false);
@@ -64,7 +77,7 @@ public class MonitorUtilsTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorUtilsTestCustomization>]
-	internal void GetCurrentMonitors_MultipleMonitors(IInternalContext internalCtx)
+	internal void MultipleMonitors(IInternalContext internalCtx)
 	{
 		// Given there are multiple monitors
 		MonitorTestUtils.SetupMultipleMonitors(internalCtx, MULTI_MONITOR_SETUP);
@@ -72,19 +85,16 @@ public class MonitorUtilsTests
 		// When we get the current monitors
 		ImmutableArray<IMonitor> monitors = MonitorUtils.GetCurrentMonitors(internalCtx);
 
-		// Then there are two monitors, one of which is the primary.
-		Assert.Equal(2, monitors.Length);
+		// Then there are three monitors, the first of which is the primary.
+		// The monitors are ordered.
+		Assert.Equal(3, monitors.Length);
 
-		Assert.Equal(1920, monitors[0].WorkingArea.Width);
-		Assert.Equal(1080, monitors[0].WorkingArea.Height);
-		Assert.Equal(0, monitors[0].WorkingArea.X);
-		Assert.Equal(0, monitors[0].WorkingArea.Y);
 		Assert.True(monitors[0].IsPrimary);
-
-		Assert.Equal(1920, monitors[1].WorkingArea.Width);
-		Assert.Equal(1080, monitors[1].WorkingArea.Height);
-		Assert.Equal(1920, monitors[1].WorkingArea.X);
-		Assert.Equal(0, monitors[1].WorkingArea.Y);
 		Assert.False(monitors[1].IsPrimary);
+		Assert.False(monitors[2].IsPrimary);
+
+		Assert.Equal((HMONITOR)2, monitors[0].Handle);
+		Assert.Equal((HMONITOR)3, monitors[1].Handle);
+		Assert.Equal((HMONITOR)1, monitors[2].Handle);
 	}
 }
