@@ -74,8 +74,8 @@ public interface IContext
 	/// <inheritdoc cref="INotificationManager" />
 	INotificationManager NotificationManager { get; }
 
-	/// <inheritdoc cref="Store" />
-	Store Store { get; }
+	/// <inheritdoc cref="IStore" />
+	IStore Store { get; }
 
 	/// <summary>
 	/// This will be called by the Whim Runner.

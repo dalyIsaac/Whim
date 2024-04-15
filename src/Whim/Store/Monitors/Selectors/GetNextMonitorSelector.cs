@@ -6,7 +6,7 @@ namespace Whim;
 /// Gets the monitor after the given monitor.
 /// </summary>
 /// <param name="Monitor"></param>
-public record GetNextMonitorSelector(IMonitor Monitor) : Selector<IMonitor>()
+public record GetNextMonitorSelector(IMonitor Monitor) : Picker<IMonitor>()
 {
 	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx)
 	{

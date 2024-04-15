@@ -23,7 +23,7 @@ public abstract record Transform()
 /// The implementing record should be populated with the payload.
 /// </summary>
 /// <typeparam name="TResult">The type of the resulting data from the store.</typeparam>
-public abstract record Selector<TResult>()
+public abstract record Picker<TResult>()
 {
 	/// <summary>
 	/// How to fetch the data from the store.
@@ -67,11 +67,8 @@ public abstract class ISlice
 /// <summary>
 /// Whim's store.
 /// </summary>
-public class Store
+public interface IStore
 {
-	private readonly IContext _ctx;
-	private readonly IInternalContext _internalCtx;
-
 	/// <inheritdoc cref="MonitorSlice"/>
 	public MonitorSlice MonitorSlice { get; }
 
@@ -82,6 +79,45 @@ public class Store
 	public MapSlice MapSlice { get; }
 
 	/// <inheritdoc cref="WindowSlice" />
+	public WindowSlice WindowSlice { get; }
+
+	/// <summary>
+	/// Dispatch updates to transform Whim's state.
+	/// </summary>
+	/// <param name="transform">
+	/// The record implementing <see cref="Dispatch"/> to update Whim's state.
+	/// </param>
+	public void Dispatch(Transform transform);
+
+	/// <summary>
+	/// Entry-point to pick from Whim's state.
+	/// </summary>
+	/// <typeparam name="TResult">
+	/// The type of the resulting data from the store.
+	/// </typeparam>
+	/// <param name="picker">
+	/// The record implementing <see cref="Pick"/> to fetch from Whim's state.
+	/// </param>
+	/// <returns></returns>
+	public TResult Pick<TResult>(Picker<TResult> picker);
+}
+
+/// <inheritdoc />
+public class Store : IStore
+{
+	private readonly IContext _ctx;
+	private readonly IInternalContext _internalCtx;
+
+	/// <inheritdoc />
+	public MonitorSlice MonitorSlice { get; }
+
+	/// <inheritdoc />
+	public WorkspaceSlice WorkspaceSlice { get; }
+
+	/// <inheritdoc />
+	public MapSlice MapSlice { get; }
+
+	/// <inheritdoc />
 	public WindowSlice WindowSlice { get; }
 
 	internal Store(IContext ctx, IInternalContext internalCtx)
@@ -95,12 +131,7 @@ public class Store
 		WindowSlice = new WindowSlice();
 	}
 
-	/// <summary>
-	/// Dispatch updates to transform Whim's state.
-	/// </summary>
-	/// <param name="transform">
-	/// The record implementing <see cref="Dispatch"/> to update Whim's state.
-	/// </param>
+	/// <inheritdoc />
 	public void Dispatch(Transform transform)
 	{
 		// TODO: reader-writer lock.
@@ -117,17 +148,8 @@ public class Store
 		WindowSlice.DispatchEvents();
 	}
 
-	/// <summary>
-	/// Entry-point to select from Whim's state.
-	/// </summary>
-	/// <typeparam name="TResult">
-	/// The type of the resulting data from the store.
-	/// </typeparam>
-	/// <param name="selector">
-	/// The record implementing <see cref="Select"/> to fetch from Whim's state.
-	/// </param>
-	/// <returns></returns>
-	public TResult Select<TResult>(Selector<TResult> selector)
+	/// <inheritdoc cref="WindowSlice" />
+	public TResult Pick<TResult>(Picker<TResult> selector)
 	{
 		// TODO: reader-writer lock.
 		// TODO: don't do a read lock if a transform is currently in progress.
