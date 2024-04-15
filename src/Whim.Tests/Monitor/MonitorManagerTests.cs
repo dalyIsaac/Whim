@@ -129,8 +129,8 @@ public class MonitorManagerTests
 		MonitorManager monitorManager = new(ctx, internalCtx);
 
 		// Then
-		Assert.Equal(new HMONITOR(2), (monitorManager.PrimaryMonitor as Monitor)!._hmonitor);
-		Assert.Equal(new HMONITOR(2), (monitorManager.ActiveMonitor as Monitor)!._hmonitor);
+		Assert.Equal(new HMONITOR(2), (monitorManager.PrimaryMonitor as Monitor)!.Handle);
+		Assert.Equal(new HMONITOR(2), (monitorManager.ActiveMonitor as Monitor)!.Handle);
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
@@ -217,8 +217,8 @@ public class MonitorManagerTests
 		// Then the active monitor is updated, but not the LastWhimActiveMonitor
 		Assert.NotEqual(originalMonitor, monitorManager.ActiveMonitor);
 		Assert.NotEqual(originalMonitor, monitorManager.LastWhimActiveMonitor);
-		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.ActiveMonitor)._hmonitor);
-		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.LastWhimActiveMonitor)._hmonitor);
+		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.ActiveMonitor).Handle);
+		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.LastWhimActiveMonitor).Handle);
 	}
 
 	[Theory, AutoSubstituteData<MonitorManagerCustomization>]
@@ -278,7 +278,7 @@ public class MonitorManagerTests
 
 		// Then the active monitor is updated, but not the LastWhimActiveMonitor
 		Assert.NotEqual(originalMonitor, monitorManager.ActiveMonitor);
-		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.ActiveMonitor)._hmonitor);
+		Assert.Equal((HMONITOR)1, ((Monitor)monitorManager.ActiveMonitor).Handle);
 		Assert.Equal(originalMonitor, monitorManager.LastWhimActiveMonitor);
 	}
 	#endregion
@@ -794,7 +794,7 @@ public class MonitorManagerTests
 
 		internalCtx
 			.CoreNativeManager.MonitorFromPoint(Arg.Any<Point>(), Arg.Any<MONITOR_FROM_FLAGS>())
-			.Returns(((Monitor)monitor2)._hmonitor);
+			.Returns(((Monitor)monitor2).Handle);
 
 		// When
 		Assert.Equal(monitor, monitorManager.ActiveMonitor);
