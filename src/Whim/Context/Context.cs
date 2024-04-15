@@ -31,7 +31,7 @@ internal class Context : IContext
 	public IKeybindManager KeybindManager { get; }
 	public INotificationManager NotificationManager { get; }
 
-	public Store Store { get; }
+	public IStore Store { get; }
 
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
@@ -140,6 +140,7 @@ internal class Context : IContext
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
 		NotificationManager.Dispose();
+		Store.Dispose();
 		_internalContext.Dispose();
 
 		Logger.Debug("Mostly exited...");

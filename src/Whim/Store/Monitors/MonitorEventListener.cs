@@ -1,12 +1,13 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Whim;
 
-// TODO: Initialize
-internal class MonitorEventListener
+internal class MonitorEventListener : IDisposable
 {
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
+	private bool _disposedValue;
 
 	public MonitorEventListener(IContext ctx, IInternalContext internalCtx)
 	{
@@ -28,11 +29,6 @@ internal class MonitorEventListener
 		_ctx.Store.Dispatch(new MonitorsChangedTransform());
 	}
 
-	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)
-	{
-		_ctx.Store.Dispatch(new MouseLeftButtonUpTransform(e.Point));
-	}
-
 	private void WindowMessageMonitor_SessionChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{
 		// If we update monitors too quickly, the reported working area can sometimes be the
@@ -43,5 +39,37 @@ internal class MonitorEventListener
 			await Task.Delay(5000).ConfigureAwait(true);
 			WindowMessageMonitor_MonitorsChanged(sender, e);
 		});
+	}
+
+	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)
+	{
+		_ctx.Store.Dispatch(new MouseLeftButtonUpTransform(e.Point));
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_internalCtx.WindowMessageMonitor.DisplayChanged -= WindowMessageMonitor_MonitorsChanged;
+				_internalCtx.WindowMessageMonitor.WorkAreaChanged -= WindowMessageMonitor_MonitorsChanged;
+				_internalCtx.WindowMessageMonitor.DpiChanged -= WindowMessageMonitor_MonitorsChanged;
+				_internalCtx.WindowMessageMonitor.SessionChanged -= WindowMessageMonitor_SessionChanged;
+				_internalCtx.MouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }

@@ -6,9 +6,10 @@ namespace Whim;
 /// <summary>
 /// The slice containing monitors.
 /// </summary>
-public class MonitorSlice : ISlice
+public class MonitorSlice : ISlice, IDisposable
 {
 	private readonly MonitorEventListener _listener;
+	private bool _disposedValue;
 
 	/// <summary>
 	/// All the monitors currently tracked by Whim.
@@ -60,5 +61,30 @@ public class MonitorSlice : ISlice
 		}
 
 		_events.Clear();
+	}
+
+	/// <inheritdoc/>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+				_listener.Dispose();
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	/// <inheritdoc/>
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
 	}
 }
