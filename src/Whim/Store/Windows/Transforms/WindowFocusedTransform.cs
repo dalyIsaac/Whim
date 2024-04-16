@@ -7,6 +7,16 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 {
 	internal override void Execute(IContext ctx, IInternalContext internalCtx)
 	{
+		SetActiveMonitor(ctx, internalCtx);
+	}
+
+	/// <summary>
+	/// Set the active monitor.
+	/// </summary>
+	/// <param name="ctx"></param>
+	/// <param name="internalCtx"></param>
+	private void SetActiveMonitor(IContext ctx, IInternalContext internalCtx)
+	{
 		// If we know the window, use what the Butler knows instead of Windows.
 		if (Window is not null)
 		{
@@ -23,7 +33,8 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			}
 		}
 
-		HWND hwnd = Window?.Handle ?? internalCtx.CoreNativeManager.GetForegroundWindow();
+		// We don't know the window, so get the foreground window.
+		HWND hwnd = internalCtx.CoreNativeManager.GetForegroundWindow();
 		Logger.Debug($"Focusing hwnd {hwnd}");
 
 		if (hwnd.IsNull)
