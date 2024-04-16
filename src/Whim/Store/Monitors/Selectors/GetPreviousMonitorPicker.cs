@@ -3,10 +3,10 @@ using System.Collections.Immutable;
 namespace Whim;
 
 /// <summary>
-/// Gets the monitor after the given monitor.
+/// Gets the monitor before the given monitor.
 /// </summary>
 /// <param name="Monitor"></param>
-public record GetNextMonitorSelector(IMonitor Monitor) : Picker<IMonitor>()
+public record GetPreviousMonitorPicker(IMonitor Monitor) : Picker<IMonitor>()
 {
 	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx)
 	{
@@ -19,6 +19,6 @@ public record GetNextMonitorSelector(IMonitor Monitor) : Picker<IMonitor>()
 			return monitors[0];
 		}
 
-		return monitors[(idx + 1).Mod(monitors.Length)];
+		return monitors[(idx - 1).Mod(monitors.Length)];
 	}
 }

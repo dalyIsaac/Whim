@@ -16,15 +16,15 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	private bool _disposedValue;
 
-	public IMonitor ActiveMonitor => _context.Store.Pick(new GetActiveMonitor());
+	public IMonitor ActiveMonitor => _context.Store.Pick(new GetActiveMonitorPicker());
 
-	public IMonitor PrimaryMonitor => _context.Store.Pick(new GetPrimaryMonitor());
+	public IMonitor PrimaryMonitor => _context.Store.Pick(new GetPrimaryMonitorPicker());
 
-	public IMonitor LastWhimActiveMonitor => _context.Store.Pick(new GetLastWhimActiveMonitor());
+	public IMonitor LastWhimActiveMonitor => _context.Store.Pick(new GetLastWhimActiveMonitorPicker());
 
-	public int Length => _context.Store.Pick(new GetAllMonitors()).Count;
+	public int Length => _context.Store.Pick(new GetAllMonitorsPicker()).Count;
 
-	public IEnumerator<IMonitor> GetEnumerator() => _context.Store.Pick(new GetAllMonitors()).GetEnumerator();
+	public IEnumerator<IMonitor> GetEnumerator() => _context.Store.Pick(new GetAllMonitorsPicker()).GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -65,22 +65,22 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
-		return _context.Store.Pick(new GetMonitorAtPointSelector(point, GetFirst: true))!;
+		return _context.Store.Pick(new GetMonitorAtPointPicker(point, GetFirst: true))!;
 	}
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor)
 	{
-		return _context.Store.Pick(new GetPreviousMonitorSelector(monitor));
+		return _context.Store.Pick(new GetPreviousMonitorPicker(monitor));
 	}
 
 	public IMonitor GetNextMonitor(IMonitor monitor)
 	{
-		return _context.Store.Pick(new GetNextMonitorSelector(monitor));
+		return _context.Store.Pick(new GetNextMonitorPicker(monitor));
 	}
 
 	// TODO: Remove when removing butler.
 	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) =>
-		_context.Store.Pick(new GetAllMonitors()).FirstOrDefault(m => m.Handle == hmonitor);
+		_context.Store.Pick(new GetAllMonitorsPicker()).FirstOrDefault(m => m.Handle == hmonitor);
 
 	protected virtual void Dispose(bool disposing)
 	{

@@ -5,7 +5,7 @@ namespace Whim;
 /// <summary>
 /// Get the currently active monitor.
 /// </summary>
-public record GetActiveMonitor() : Picker<IMonitor>()
+public record GetActiveMonitorPicker() : Picker<IMonitor>()
 {
 	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.MonitorSlice.Monitors[ctx.Store.MonitorSlice.ActiveMonitorIndex];
@@ -14,7 +14,7 @@ public record GetActiveMonitor() : Picker<IMonitor>()
 /// <summary>
 /// Get the primary monitor.
 /// </summary>
-public record GetPrimaryMonitor() : Picker<IMonitor>()
+public record GetPrimaryMonitorPicker() : Picker<IMonitor>()
 {
 	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.MonitorSlice.Monitors[ctx.Store.MonitorSlice.PrimaryMonitorIndex];
@@ -23,7 +23,7 @@ public record GetPrimaryMonitor() : Picker<IMonitor>()
 /// <summary>
 /// Get the last <see cref="IMonitor"/> which received an event sent by Windows which Whim did not ignore.
 /// </summary>
-public record GetLastWhimActiveMonitor() : Picker<IMonitor>()
+public record GetLastWhimActiveMonitorPicker() : Picker<IMonitor>()
 {
 	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.MonitorSlice.Monitors[ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex];
@@ -32,7 +32,7 @@ public record GetLastWhimActiveMonitor() : Picker<IMonitor>()
 /// <summary>
 /// Get all the <see cref="IMonitor"/>s tracked by Whim.
 /// </summary>
-public record GetAllMonitors() : Picker<IReadOnlyList<IMonitor>>()
+public record GetAllMonitorsPicker() : Picker<IReadOnlyList<IMonitor>>()
 {
 	internal override IReadOnlyList<IMonitor> Execute(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.MonitorSlice.Monitors;

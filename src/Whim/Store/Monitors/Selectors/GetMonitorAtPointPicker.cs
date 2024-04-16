@@ -11,7 +11,7 @@ namespace Whim;
 /// <param name="GetFirst">
 /// If <see langword="true"/>, get the first monitor if there is no monitor at <paramref name="Point"/>.
 /// </param>
-public record GetMonitorIndexAtPointSelector(IPoint<int> Point, bool GetFirst = false) : Picker<int?>
+public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<int?>
 {
 	internal override int? Execute(IContext ctx, IInternalContext internalCtx)
 	{
@@ -49,11 +49,11 @@ public record GetMonitorIndexAtPointSelector(IPoint<int> Point, bool GetFirst = 
 /// <param name="GetFirst">
 /// If <see langword="true"/>, get the first monitor if there is no monitor at <paramref name="Point"/>.
 /// </param>
-public record GetMonitorAtPointSelector(IPoint<int> Point, bool GetFirst = false) : Picker<IMonitor?>
+public record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<IMonitor?>
 {
 	internal override IMonitor? Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		int? idx = ctx.Store.Pick(new GetMonitorIndexAtPointSelector(Point, GetFirst));
+		int? idx = ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point, GetFirst));
 		if (idx is not int idxVal)
 		{
 			return null;

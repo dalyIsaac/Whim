@@ -150,11 +150,11 @@ public class Store : IStore
 	}
 
 	/// <inheritdoc cref="WindowSlice" />
-	public TResult Pick<TResult>(Picker<TResult> selector)
+	public TResult Pick<TResult>(Picker<TResult> picker)
 	{
 		// TODO: reader-writer lock.
 		// don't do a read lock if a transform is currently in progress.
-		return selector.Execute(_ctx, _internalCtx);
+		return picker.Execute(_ctx, _internalCtx);
 	}
 
 	/// <inheritdoc/>
