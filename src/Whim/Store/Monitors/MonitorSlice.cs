@@ -8,6 +8,7 @@ namespace Whim;
 /// </summary>
 public class MonitorSlice : ISlice, IDisposable
 {
+	private readonly IContext _ctx;
 	private readonly MonitorEventListener _listener;
 	private bool _disposedValue;
 
@@ -38,12 +39,14 @@ public class MonitorSlice : ISlice, IDisposable
 
 	internal MonitorSlice(IContext ctx, IInternalContext internalCtx)
 	{
+		_ctx = ctx;
 		_listener = new(ctx, internalCtx);
 	}
 
 	/// <inheritdoc/>
 	internal override void Initialize()
 	{
+		_ctx.Store.Dispatch(new MonitorsChangedTransform());
 		_listener.Initialize();
 	}
 

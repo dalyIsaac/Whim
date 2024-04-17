@@ -46,7 +46,6 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void Initialize()
 	{
-		_context.Store.Dispatch(new MonitorsChangedTransform());
 		_context.Store.MonitorSlice.MonitorsChanged += MonitorSlice_MonitorsChanged;
 	}
 

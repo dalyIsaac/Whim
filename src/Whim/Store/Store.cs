@@ -82,6 +82,11 @@ public interface IStore : IDisposable
 	public WindowSlice WindowSlice { get; }
 
 	/// <summary>
+	/// Initialize the event listeners.
+	/// </summary>
+	public void Initialize();
+
+	/// <summary>
 	/// Dispatch updates to transform Whim's state.
 	/// </summary>
 	/// <param name="transform">
@@ -130,6 +135,15 @@ public class Store : IStore
 		WorkspaceSlice = new WorkspaceSlice();
 		MapSlice = new MapSlice();
 		WindowSlice = new WindowSlice();
+	}
+
+	/// <inheritdoc />
+	public void Initialize()
+	{
+		MonitorSlice.Initialize();
+		WorkspaceSlice.Initialize();
+		MapSlice.Initialize();
+		WindowSlice.Initialize();
 	}
 
 	/// <inheritdoc />
