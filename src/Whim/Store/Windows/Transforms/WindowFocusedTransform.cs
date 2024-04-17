@@ -34,7 +34,7 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		}
 
 		// We don't know the window, so get the foreground window.
-		HWND hwnd = internalCtx.CoreNativeManager.GetForegroundWindow();
+		HWND hwnd = Window?.Handle ?? internalCtx.CoreNativeManager.GetForegroundWindow();
 		Logger.Debug($"Focusing hwnd {hwnd}");
 
 		if (hwnd.IsNull)
