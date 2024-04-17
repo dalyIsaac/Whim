@@ -1,6 +1,7 @@
 name: commit
 
 on:
+  workflow_dispatch: # Allow running on-demand
   push:
     branches: [main]
     paths:
