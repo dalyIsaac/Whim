@@ -1,6 +1,7 @@
 name: commit
 
 on:
+  workflow_dispatch: # Allow running on-demand
   push:
     branches: [main]
     paths:
@@ -91,6 +92,6 @@ jobs:
           dotnet test Whim.sln --collect:"XPlat Code Coverage;Format=opencover"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v4.3.0
         with:
           files: src/**/TestResults/**/coverage.opencover.xml
