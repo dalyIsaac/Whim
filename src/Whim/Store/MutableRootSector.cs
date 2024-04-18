@@ -7,33 +7,33 @@ internal class MutableRootSector : IDisposable
 	private bool _disposedValue;
 
 	public MonitorSector Monitors { get; }
+	public WindowSector Windows { get; }
 	public WorkspaceSector Workspaces { get; }
 	public MapSector Maps { get; }
-	public WindowSector Windows { get; }
 
 	public MutableRootSector(IContext ctx, IInternalContext internalCtx)
 	{
 		Monitors = new MonitorSector(ctx, internalCtx);
+		Windows = new WindowSector(ctx, internalCtx);
 		Workspaces = new WorkspaceSector();
 		Maps = new MapSector();
-		Windows = new WindowSector();
 	}
 
 	public void Initialize()
 	{
 		Monitors.Initialize();
+		Windows.Initialize();
 		Workspaces.Initialize();
 		Maps.Initialize();
-		Windows.Initialize();
 	}
 
 	public void DispatchEvents()
 	{
 		Logger.Debug("Dispatching events");
 		Monitors.DispatchEvents();
+		Windows.DispatchEvents();
 		Workspaces.DispatchEvents();
 		Maps.DispatchEvents();
-		Windows.DispatchEvents();
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -44,6 +44,7 @@ internal class MutableRootSector : IDisposable
 			{
 				// dispose managed state (managed objects)
 				Monitors.Dispose();
+				Windows.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
