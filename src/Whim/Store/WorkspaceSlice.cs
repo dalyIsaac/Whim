@@ -18,6 +18,7 @@ public class WorkspaceSlice : ISlice
 	/// </summary>
 	public int ActiveWorkspaceIndex { get; } = -1;
 
+	// TODO: Add to StoreTests
 	internal override void Initialize() { }
 
 	internal override void DispatchEvents()

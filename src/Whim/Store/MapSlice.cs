@@ -20,6 +20,7 @@ public class MapSlice : ISlice
 	public ImmutableDictionary<IMonitor, IWorkspace> MonitorWorkspaceMap { get; internal set; } =
 		ImmutableDictionary<IMonitor, IWorkspace>.Empty;
 
+	// TODO: Add to StoreTests
 	internal override void Initialize() { }
 
 	internal override void DispatchEvents()

@@ -14,6 +14,7 @@ public class WindowSlice : ISlice
 	/// </summary>
 	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
+	// TODO: Add to StoreTests
 	internal override void Initialize() { }
 
 	internal override void DispatchEvents()
