@@ -14,9 +14,6 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	private readonly WindowEventListener _listener;
 	private bool _disposedValue;
 
-	/// <summary>
-	/// All the windows currently tracked by Whim.
-	/// </summary>
 	public ImmutableDictionary<HWND, IWindow> Windows { get; set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
 	internal WindowSector(IContext ctx, IInternalContext internalCtx)
