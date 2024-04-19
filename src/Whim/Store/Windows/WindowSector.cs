@@ -14,9 +14,17 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	private readonly WindowEventListener _listener;
 	private bool _disposedValue;
 
-	public ImmutableDictionary<HWND, IWindow> Windows { get; set; } = ImmutableDictionary<HWND, IWindow>.Empty;
+	/// <summary>
+	/// All the windows currently tracked by Whim.
+	/// </summary>
+	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
-	internal WindowSector(IContext ctx, IInternalContext internalCtx)
+	/// <summary>
+	/// Event for when a window is added by the <see cref="IWindowManager"/>.
+	/// </summary>
+	public event EventHandler<WindowEventArgs>? WindowAdded;
+
+	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
 		_internalCtx = internalCtx;
@@ -24,7 +32,10 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	}
 
 	// TODO: Add to StoreTests
-	public override void Initialize() { }
+	public override void Initialize()
+	{
+		_listener.Initialize();
+	}
 
 	public override void DispatchEvents()
 	{
@@ -32,7 +43,9 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 		{
 			switch (eventArgs)
 			{
-				// TODO
+				case WindowAddedEventArgs args:
+					WindowAdded?.Invoke(this, args);
+					break;
 				default:
 					break;
 			}

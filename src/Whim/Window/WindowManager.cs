@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotNext;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
@@ -171,10 +172,9 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		if (!_context.Store.WindowSlice.Windows.TryGetValue(hwnd, out IWindow? window))
 		{
 			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
-			window = _context.Store.Dispatch(new AddWindowTransform(hwnd));
 
-			// TODO: Make transform be able to return a value.
-			if (window == null)
+			Result<IWindow> windowResult = _context.Store.Dispatch(new AddWindowTransform(hwnd));
+			if (!windowResult.TryGet(out window))
 			{
 				return;
 			}
@@ -190,7 +190,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				break;
 			case PInvoke.EVENT_SYSTEM_FOREGROUND:
 			case PInvoke.EVENT_OBJECT_UNCLOAKED:
-				OnWindowFocused(window);
+				_context.Store.Dispatch(new WindowFocusedTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_HIDE:
 				OnWindowHidden(window);
@@ -218,8 +218,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				Logger.Error($"Unhandled event 0x{eventType:X4}");
 				break;
 		}
-
-		_internalContext.DeferWindowPosManager.RecoverLayout();
 	}
 
 	public IWindow? AddWindow(HWND hwnd)
@@ -271,16 +269,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		WindowEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowAdded(args);
 		WindowAdded?.Invoke(this, args);
-	}
-
-	public void OnWindowFocused(IWindow? window)
-	{
-		Logger.Debug($"Window focused: {window}");
-		_internalContext.MonitorManager.OnWindowFocused(window);
-
-		WindowFocusedEventArgs args = new() { Window = window };
-		_internalContext.ButlerEventHandlers.OnWindowFocused(args);
-		WindowFocused?.Invoke(this, args);
 	}
 
 	/// <summary>

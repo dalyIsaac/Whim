@@ -17,12 +17,6 @@ internal interface IInternalMonitorManager
 	IMonitor? GetMonitorByHandle(HMONITOR hmonitor);
 
 	/// <summary>
-	/// Called when the window has been focused.
-	/// </summary>
-	/// <param name="window"></param>
-	void OnWindowFocused(IWindow? window);
-
-	/// <summary>
 	/// Set the <see cref="IMonitorManager.ActiveMonitor"/> to the given <paramref name="monitor"/>.
 	/// This is intended to be used for only empty monitors.
 	/// </summary>

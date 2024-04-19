@@ -48,11 +48,6 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	private void MonitorSector_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
 		MonitorsChanged?.Invoke(sender, e);
 
-	public void OnWindowFocused(IWindow? window)
-	{
-		_context.Store.Dispatch(new WindowFocusedTransform(window));
-	}
-
 	public void ActivateEmptyMonitor(IMonitor monitor)
 	{
 		_context.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor));
