@@ -18,9 +18,9 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	public event EventHandler<WindowEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
 	public event EventHandler<WindowEventArgs>? WindowRemoved;
-	public event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
-	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
-	public event EventHandler<WindowMovedEventArgs>? WindowMoveEnd;
+	public event EventHandler<WindowMoveEventArgs>? WindowMoveStart;
+	public event EventHandler<WindowMoveEventArgs>? WindowMoved;
+	public event EventHandler<WindowMoveEventArgs>? WindowMoveEnd;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
 	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
 
@@ -36,9 +36,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// The delegate for handling all events triggered by <see cref="ICoreNativeManager.SetWinEventHook"/>.
 	/// </summary>
 	private readonly WINEVENTPROC _hookDelegate;
-
-	private bool _isMovingWindow;
-	private bool _isLeftMouseButtonDown;
 
 	/// <summary>
 	/// Indicates whether values have been disposed.
@@ -194,7 +191,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				_context.Store.Dispatch(new WindowRemovedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
-				OnWindowMoveStart(window);
+				_context.Store.Dispatch(new WindowMoveStartedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
 				OnWindowMoveEnd(window);
@@ -234,28 +231,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		OnWindowRemoved(window);
 	}
 
-	private void OnWindowMoveStart(IWindow window)
-	{
-		Logger.Debug($"Window move started: {window}");
-		_isMovingWindow = true;
-
-		IPoint<int>? cursorPoint = null;
-		if (_isLeftMouseButtonDown && _internalContext.CoreNativeManager.GetCursorPos(out IPoint<int> point))
-		{
-			cursorPoint = point;
-		}
-
-		WindowMoveStart?.Invoke(
-			this,
-			new WindowMovedEventArgs()
-			{
-				Window = window,
-				CursorDraggedPoint = cursorPoint,
-				MovedEdges = GetMovedEdges(window)?.MovedEdges
-			}
-		);
-	}
-
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = true;
 
 	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = false;
@@ -286,88 +261,13 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		WindowMoveEnd?.Invoke(
 			this,
-			new WindowMovedEventArgs()
+			new WindowMoveEventArgs()
 			{
 				Window = window,
 				CursorDraggedPoint = point,
 				MovedEdges = movedEdges
 			}
 		);
-	}
-
-	/// <summary>
-	/// Tries to move the given window's edges in the direction of the mouse movement.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns></returns>
-	private (Direction MovedEdges, IPoint<int> MovedPoint)? GetMovedEdges(IWindow window)
-	{
-		Logger.Debug("Trying to move window edges in direction of mouse movement");
-		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
-		if (workspace is null)
-		{
-			Logger.Debug($"Could not find workspace for window {window}, failed to move window edges");
-			return null;
-		}
-
-		IWindowState? windowState = workspace.TryGetWindowState(window);
-		if (windowState is null)
-		{
-			Logger.Debug($"Could not find window state for window {window}, failed to move window edges");
-			return null;
-		}
-
-		// Get the new window position.
-		IRectangle<int>? newRect = _context.NativeManager.DwmGetWindowRectangle(window.Handle);
-		if (newRect is null)
-		{
-			Logger.Debug($"Could not get new rectangle for window {window}, failed to move window edges");
-			return null;
-		}
-
-		// Find the one or two edges to move.
-		int leftEdgeDelta = windowState.Rectangle.X - newRect.X;
-		int topEdgeDelta = windowState.Rectangle.Y - newRect.Y;
-		int rightEdgeDelta = newRect.X + newRect.Width - (windowState.Rectangle.X + windowState.Rectangle.Width);
-		int bottomEdgeDelta = newRect.Y + newRect.Height - (windowState.Rectangle.Y + windowState.Rectangle.Height);
-
-		int movedEdgeCountX = 0;
-		int movedEdgeCountY = 0;
-		int movedEdgeDeltaX = 0;
-		int movedEdgeDeltaY = 0;
-		Direction movedEdges = Direction.None;
-		if (leftEdgeDelta != 0)
-		{
-			movedEdges |= Direction.Left;
-			movedEdgeDeltaX = -leftEdgeDelta;
-			movedEdgeCountX++;
-		}
-		if (topEdgeDelta != 0)
-		{
-			movedEdges |= Direction.Up;
-			movedEdgeDeltaY = -topEdgeDelta;
-			movedEdgeCountY++;
-		}
-		if (rightEdgeDelta != 0)
-		{
-			movedEdges |= Direction.Right;
-			movedEdgeDeltaX = rightEdgeDelta;
-			movedEdgeCountX++;
-		}
-		if (bottomEdgeDelta != 0)
-		{
-			movedEdges |= Direction.Down;
-			movedEdgeDeltaY = bottomEdgeDelta;
-			movedEdgeCountY++;
-		}
-
-		if (movedEdgeCountX > 1 || movedEdgeCountY > 1)
-		{
-			Logger.Debug($"Window {window} moved more than one edge in the same axis, failed to move window edges");
-			return null;
-		}
-
-		return (movedEdges, new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, });
 	}
 
 	private void OnWindowMoved(IWindow window)
@@ -409,7 +309,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 		WindowMoved?.Invoke(
 			this,
-			new WindowMovedEventArgs()
+			new WindowMoveEventArgs()
 			{
 				Window = window,
 				CursorDraggedPoint = cursorPoint,

@@ -692,7 +692,7 @@ public class WindowManagerTests
 		windowManager.Initialize();
 
 		// Then
-		var result = Assert.Raises<WindowMovedEventArgs>(
+		var result = Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
@@ -716,7 +716,7 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		var result = Assert.Raises<WindowMovedEventArgs>(
+		var result = Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
@@ -771,7 +771,7 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		var result = Assert.Raises<WindowMovedEventArgs>(
+		var result = Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoveStart += h,
 			h => windowManager.WindowMoveStart -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0)
@@ -810,7 +810,7 @@ public class WindowManagerTests
 
 		// When the window is moved
 		// Then no event is raised
-		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -828,7 +828,7 @@ public class WindowManagerTests
 
 		// When the window is moved
 		// Then no event is raised
-		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -863,7 +863,7 @@ public class WindowManagerTests
 
 		// When the window is moved
 		// Then an event is raised, but the workspace is not asked to do a layout
-		var result = Assert.Raises<WindowMovedEventArgs>(
+		var result = Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -884,7 +884,7 @@ public class WindowManagerTests
 
 		// When the window is moved
 		// Then an event is raised, and the workspace is asked to do a layout
-		var result = Assert.Raises<WindowMovedEventArgs>(
+		var result = Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -910,7 +910,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0);
 
 		// Then no event is raised
-		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -949,7 +949,7 @@ public class WindowManagerTests
 		windowManager.Initialize();
 
 		// Then
-		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -973,7 +973,7 @@ public class WindowManagerTests
 		Trigger_MouseLeftButtonDown(internalCtx).Trigger_MouseLeftButtonUp(internalCtx);
 
 		// Then no event is raised
-		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
+		CustomAssert.DoesNotRaise<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -997,7 +997,7 @@ public class WindowManagerTests
 		// When
 		windowManager.Initialize();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-		var result = Assert.Raises<WindowMovedEventArgs>(
+		var result = Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -1038,7 +1038,7 @@ public class WindowManagerTests
 		// When
 		windowManager.Initialize();
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
-		var result = Assert.Raises<WindowMovedEventArgs>(
+		var result = Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)
@@ -1153,7 +1153,7 @@ public class WindowManagerTests
 
 		// When
 		windowManager.Initialize();
-		var result = Assert.Raises<WindowMovedEventArgs>(
+		var result = Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoveEnd += h,
 			h => windowManager.WindowMoveEnd -= h,
 			() =>
@@ -1190,7 +1190,7 @@ public class WindowManagerTests
 		WindowManager windowManager = new(ctx, internalCtx);
 
 		// When
-		Assert.Raises<WindowMovedEventArgs>(
+		Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoveEnd += h,
 			h => windowManager.WindowMoveEnd -= h,
 			() =>
@@ -1419,7 +1419,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 
 		// Then
-		Assert.Raises<WindowMovedEventArgs>(
+		Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoveEnd += h,
 			h => windowManager.WindowMoveEnd -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZEEND, hwnd, 0, 0, 0, 0)
@@ -1479,7 +1479,7 @@ public class WindowManagerTests
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MOVESIZESTART, hwnd, 0, 0, 0, 0);
 
 		// Then
-		Assert.Raises<WindowMovedEventArgs>(
+		Assert.Raises<WindowMoveEventArgs>(
 			h => windowManager.WindowMoved += h,
 			h => windowManager.WindowMoved -= h,
 			() => capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, hwnd, 0, 0, 0, 0)

@@ -54,7 +54,7 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	/// <summary>
 	/// Event for when a window is being moved or resized.
 	/// </summary>
-	event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
+	event EventHandler<WindowMoveEventArgs>? WindowMoveStart;
 
 	/// <summary>
 	/// Event for when a window has changed location, shape, or size.
@@ -62,7 +62,7 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	/// This event is fired when Windows sends the
 	/// <see cref="Windows.Win32.PInvoke.EVENT_OBJECT_LOCATIONCHANGE"/> event.
 	/// </summary>
-	event EventHandler<WindowMovedEventArgs>? WindowMoved;
+	event EventHandler<WindowMoveEventArgs>? WindowMoved;
 
 	/// <summary>
 	/// Event for when a window has changed location, shape, or size.
@@ -71,7 +71,7 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	/// <see cref="Windows.Win32.PInvoke.EVENT_SYSTEM_MOVESIZEEND"/> event.
 	/// See https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants for more information.
 	/// </summary>
-	event EventHandler<WindowMovedEventArgs>? WindowMoveEnd;
+	event EventHandler<WindowMoveEventArgs>? WindowMoveEnd;
 
 	/// <summary>
 	/// Event for when a window has started being minimized.

@@ -70,9 +70,9 @@ public class LayoutPreviewPluginTests
 		plugin.PreInitialize();
 
 		// Then
-		ctx.WindowManager.Received(1).WindowMoveStart += Arg.Any<EventHandler<WindowMovedEventArgs>>();
-		ctx.WindowManager.Received(1).WindowMoved += Arg.Any<EventHandler<WindowMovedEventArgs>>();
-		ctx.WindowManager.Received(1).WindowMoveEnd += Arg.Any<EventHandler<WindowMovedEventArgs>>();
+		ctx.WindowManager.Received(1).WindowMoveStart += Arg.Any<EventHandler<WindowMoveEventArgs>>();
+		ctx.WindowManager.Received(1).WindowMoved += Arg.Any<EventHandler<WindowMoveEventArgs>>();
+		ctx.WindowManager.Received(1).WindowMoveEnd += Arg.Any<EventHandler<WindowMoveEventArgs>>();
 		ctx.WindowManager.Received(1).WindowRemoved += Arg.Any<EventHandler<WindowEventArgs>>();
 		ctx.FilterManager.Received(1).AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
@@ -121,7 +121,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
+		WindowMoveEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -131,7 +131,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoveStart += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoveStart += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
@@ -143,7 +143,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
+		WindowMoveEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -153,7 +153,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		ctx.MonitorManager.DidNotReceive().GetMonitorAtPoint(Arg.Any<IPoint<int>>());
@@ -165,7 +165,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
+		WindowMoveEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -175,7 +175,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		ctx.MonitorManager.DidNotReceive().GetMonitorAtPoint(Arg.Any<IPoint<int>>());
@@ -187,7 +187,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
+		WindowMoveEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -200,7 +200,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		ctx.MonitorManager.Received(1).GetMonitorAtPoint(Arg.Any<IPoint<int>>());
@@ -214,7 +214,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
+		WindowMoveEventArgs e =
 			new()
 			{
 				Window = window,
@@ -226,7 +226,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		ctx.MonitorManager.Received(1).GetMonitorAtPoint(Arg.Any<IPoint<int>>());
@@ -241,7 +241,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
+		WindowMoveEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -251,7 +251,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoveEnd += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoveEnd += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
@@ -263,7 +263,7 @@ public class LayoutPreviewPluginTests
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
 
-		WindowMovedEventArgs moveArgs =
+		WindowMoveEventArgs moveArgs =
 			new()
 			{
 				Window = movedWindow,
@@ -275,7 +275,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, moveArgs);
 		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(ctx.WindowManager, removeArgs);
 
 		// Then
@@ -288,7 +288,7 @@ public class LayoutPreviewPluginTests
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
 
-		WindowMovedEventArgs moveArgs =
+		WindowMoveEventArgs moveArgs =
 			new()
 			{
 				Window = movedWindow,
@@ -300,7 +300,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, moveArgs);
 		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(ctx.WindowManager, removeArgs);
 
 		// Then
@@ -313,7 +313,7 @@ public class LayoutPreviewPluginTests
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
 
-		WindowMovedEventArgs moveArgs =
+		WindowMoveEventArgs moveArgs =
 			new()
 			{
 				Window = movedWindow,
@@ -325,7 +325,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
+		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMoveEventArgs>>(ctx.WindowManager, moveArgs);
 		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
 			ctx.WindowManager,
 			focusArgs

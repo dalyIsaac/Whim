@@ -3,7 +3,7 @@ using System;
 namespace Whim;
 
 /// <summary>
-/// Event arguments for when a <see cref="IWindow"/> has had something happen to it.
+/// Base event arguments for when a <see cref="IWindow"/> has had something happen to it.
 /// </summary>
 public abstract class WindowEventArgs : EventArgs
 {
@@ -19,7 +19,7 @@ public abstract class WindowEventArgs : EventArgs
 public class WindowAddedEventArgs : WindowEventArgs { }
 
 /// <summary>
-/// Event arguments for when a <see cref="IWindow"/> has been added to Whim and Windows.
+/// Event arguments for when a <see cref="IWindow"/> has been removed from Whim and Windows.
 /// </summary>
 public class WindowRemovedEventArgs : WindowEventArgs { }
 
@@ -35,3 +35,24 @@ public class WindowFocusedEventArgs : EventArgs
 	/// </summary>
 	public IWindow? Window { get; init; }
 }
+
+/// <summary>
+/// Base event arguments for when a <see cref="IWindow"/> has been moved.
+/// </summary>
+public abstract class WindowMoveEventArgs : WindowEventArgs
+{
+	/// <summary>
+	/// The cursor point. Only set if the window is being dragged.
+	/// </summary>
+	public required IPoint<int>? CursorDraggedPoint { get; init; }
+
+	/// <summary>
+	/// The edges that were moved, if the window was being resized by dragging the edges.
+	/// </summary>
+	public required Direction? MovedEdges { get; init; }
+}
+
+/// <summary>
+/// Event arguments for when a <see cref="IWindow"/> has started moving.
+/// </summary>
+public class WindowMoveStartedEventArgs : WindowMoveEventArgs { }

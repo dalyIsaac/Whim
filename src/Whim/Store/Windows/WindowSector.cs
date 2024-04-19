@@ -20,6 +20,13 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
 	/// <summary>
+	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringFilterManager"/>.
+	/// We maintain a set of the windows that have been handled so that we don't enter an infinite loop of location change events.
+	/// </summary>
+	public ImmutableHashSet<IWindow> HandledLocationRestoringWindows { get; internal set; } =
+		ImmutableHashSet<IWindow>.Empty;
+
+	/// <summary>
 	/// Event for when a window is added by the <see cref="IWindowManager"/>.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowAdded;
@@ -28,6 +35,11 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// Event for when a window is focused.
 	/// </summary>
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
+
+	/// <summary>
+	/// Event for when a window is removed from Whim.
+	/// </summary>
+	public event EventHandler<WindowEventArgs>? WindowRemoved;
 
 	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
@@ -53,6 +65,9 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 					break;
 				case WindowFocusedEventArgs args:
 					WindowFocused?.Invoke(this, args);
+					break;
+				case WindowRemovedEventArgs args:
+					WindowRemoved?.Invoke(this, args);
 					break;
 				default:
 					break;
