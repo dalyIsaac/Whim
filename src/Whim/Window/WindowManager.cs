@@ -214,57 +214,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 	}
 
-	public IWindow? AddWindow(HWND hwnd)
-	{
-		Logger.Debug($"Adding window {hwnd}");
-
-		if (_internalContext.CoreNativeManager.IsSplashScreen(hwnd))
-		{
-			Logger.Verbose($"Window {hwnd} is a splash screen, ignoring");
-			return null;
-		}
-
-		if (_internalContext.CoreNativeManager.IsCloakedWindow(hwnd))
-		{
-			Logger.Verbose($"Window {hwnd} is cloaked, ignoring");
-			return null;
-		}
-
-		if (!_internalContext.CoreNativeManager.IsStandardWindow(hwnd))
-		{
-			Logger.Verbose($"Window {hwnd} is not a standard window, ignoring");
-			return null;
-		}
-
-		if (!_internalContext.CoreNativeManager.HasNoVisibleOwner(hwnd))
-		{
-			Logger.Verbose($"Window {hwnd} has a visible owner, ignoring");
-			return null;
-		}
-
-		IWindow? window = CreateWindow(hwnd);
-		if (window == null)
-		{
-			return null;
-		}
-		if (_context.FilterManager.ShouldBeIgnored(window))
-		{
-			return null;
-		}
-
-		_windows[hwnd] = window;
-		OnWindowAdded(window);
-
-		return window;
-	}
-
-	public void OnWindowAdded(IWindow window)
-	{
-		WindowEventArgs args = new() { Window = window };
-		_internalContext.ButlerEventHandlers.OnWindowAdded(args);
-		WindowAdded?.Invoke(this, args);
-	}
-
 	/// <summary>
 	/// Handles when a window is hidden.
 	/// This will be called when a workspace is deactivated, or when a process hides a window.
