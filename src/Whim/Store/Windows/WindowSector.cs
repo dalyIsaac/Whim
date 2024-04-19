@@ -24,6 +24,11 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowAdded;
 
+	/// <summary>
+	/// Event for when a window is focused.
+	/// </summary>
+	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
+
 	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
@@ -45,6 +50,9 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 			{
 				case WindowAddedEventArgs args:
 					WindowAdded?.Invoke(this, args);
+					break;
+				case WindowFocusedEventArgs args:
+					WindowFocused?.Invoke(this, args);
 					break;
 				default:
 					break;

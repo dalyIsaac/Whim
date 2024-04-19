@@ -14,9 +14,14 @@ public abstract class WindowEventArgs : EventArgs
 }
 
 /// <summary>
-/// Event arguments for when a <see cref="IWindow"/> has a window added.
+/// Event arguments for when a <see cref="IWindow"/> has been added to Whim and Windows.
 /// </summary>
 public class WindowAddedEventArgs : WindowEventArgs { }
+
+/// <summary>
+/// Event arguments for when a <see cref="IWindow"/> has been added to Whim and Windows.
+/// </summary>
+public class WindowRemovedEventArgs : WindowEventArgs { }
 
 /// <summary>
 /// Event arguments for when the focused window has changed. When <see cref="Window"/> is

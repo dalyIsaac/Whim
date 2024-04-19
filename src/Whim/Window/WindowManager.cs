@@ -49,12 +49,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	internal int WindowMovedDelay { get; init; } = 2000;
 
-	/// <summary>
-	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringFilterManager"/>.
-	/// We maintain a set of the windows that have been handled so that we don't enter an infinite loop of location change events.
-	/// </summary>
-	private readonly HashSet<IWindow> _handledLocationRestoringWindows = new();
-
 	public WindowManager(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
@@ -197,7 +191,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
-				OnWindowRemoved(window);
+				_context.Store.Dispatch(new WindowRemovedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
 				OnWindowMoveStart(window);
@@ -289,18 +283,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		}
 
 		OnWindowRemoved(window);
-	}
-
-	public void OnWindowRemoved(IWindow window)
-	{
-		Logger.Debug($"Window removed: {window}");
-
-		_windows.TryRemove(window.Handle, out _);
-		_handledLocationRestoringWindows.Remove(window);
-
-		WindowEventArgs args = new() { Window = window };
-		_internalContext.ButlerEventHandlers.OnWindowRemoved(args);
-		WindowRemoved?.Invoke(this, args);
 	}
 
 	private void OnWindowMoveStart(IWindow window)
