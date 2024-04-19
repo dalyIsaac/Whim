@@ -1,47 +1,45 @@
+using DotNext;
 using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal record AddWindowTransform(HWND Handle) : Transform()
+internal record AddWindowTransform(HWND Handle) : Transform<IWindow>()
 {
-	internal override void Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<IWindow> Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		// Filter the handle.
 		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
 		{
-			Logger.Verbose($"Window {Handle} is a splash screen, ignoring");
-			return;
+			return Result.FromException<IWindow>(new WhimException($"Window {Handle} is a splash screen, ignoring"));
 		}
 
 		if (internalCtx.CoreNativeManager.IsCloakedWindow(Handle))
 		{
-			Logger.Verbose($"Window {Handle} is cloaked, ignoring");
-			return;
+			return Result.FromException<IWindow>(new WhimException($"Window {Handle} is cloaked, ignoring"));
 		}
 
 		if (!internalCtx.CoreNativeManager.IsStandardWindow(Handle))
 		{
-			Logger.Verbose($"Window {Handle} is not a standard window, ignoring");
-			return;
+			return Result.FromException<IWindow>(
+				new WhimException($"Window {Handle} is not a standard window, ignoring")
+			);
 		}
 
 		if (!internalCtx.CoreNativeManager.HasNoVisibleOwner(Handle))
 		{
-			Logger.Verbose($"Window {Handle} has a visible owner, ignoring");
-			return;
+			return Result.FromException<IWindow>(new WhimException($"Window {Handle} has a visible owner, ignoring"));
 		}
 
-		IWindow? window = Window.CreateWindow(ctx, internalCtx, Handle);
+		Result<IWindow> windowResult = Window.CreateWindow(ctx, internalCtx, Handle);
+		if (!windowResult.TryGet(out IWindow window))
+		{
+			return windowResult;
+		}
 
 		// Filter the window.
-		if (window == null)
-		{
-			return;
-		}
-
 		if (ctx.FilterManager.ShouldBeIgnored(window))
 		{
-			return;
+			return Result.FromException<IWindow>(new WhimException("Window was ignored by filter"));
 		}
 
 		// Store the window.
@@ -52,5 +50,7 @@ internal record AddWindowTransform(HWND Handle) : Transform()
 		internalCtx.ButlerEventHandlers.OnWindowAdded(args);
 
 		ctx.Store.WindowSlice.QueueEvent(args);
+
+		return Result.FromValue(window);
 	}
 }
