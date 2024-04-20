@@ -106,7 +106,6 @@ internal class Context : IContext
 
 		Butler.Initialize();
 
-		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
 		_internalContext.PostInitialize();
 

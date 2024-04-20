@@ -8,12 +8,18 @@ namespace Whim;
 /// <summary>
 /// The manager for <see cref="IWindow"/>s.
 /// </summary>
-public interface IWindowManager : IEnumerable<IWindow>
+public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 {
 	/// <summary>
 	/// Filters for windows that will try restore window locations after their windows are created.
 	/// </summary>
 	IFilterManager LocationRestoringFilterManager { get; }
+
+	/// <summary>
+	/// Initialize the windows event hooks.
+	/// </summary>
+	/// <returns></returns>
+	void Initialize();
 
 	/// <summary>
 	/// Creates a new window. If the window cannot be created, <see langword="null"/> is returned.

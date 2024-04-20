@@ -77,6 +77,16 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// </summary>
 	public event EventHandler<WindowMoveEventArgs>? WindowMoved;
 
+	/// <summary>
+	/// Event for when a window has started being minimized.
+	/// </summary>
+	public event EventHandler<WindowEventArgs>? WindowMinimizeStarted;
+
+	/// <summary>
+	/// Event for when a window has ended being minimized.
+	/// </summary>
+	public event EventHandler<WindowEventArgs>? WindowMinimizeEnded;
+
 	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
 		_listener = new WindowEventListener(ctx, internalCtx);
@@ -111,6 +121,12 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 					break;
 				case WindowMovedEventArgs args:
 					WindowMoved?.Invoke(this, args);
+					break;
+				case WindowMinimizeStartedEventArgs args:
+					WindowMinimizeStarted?.Invoke(this, args);
+					break;
+				case WindowMinimizeEndedEventArgs args:
+					WindowMinimizeEnded?.Invoke(this, args);
 					break;
 				default:
 					break;
