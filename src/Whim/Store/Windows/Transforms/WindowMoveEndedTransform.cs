@@ -6,10 +6,12 @@ internal record WindowMoveEndedTransform(IWindow Window) : Transform
 {
 	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
 	{
+		WindowSlice slice = ctx.Store.WindowSlice;
+
 		IPoint<int>? point = null;
 		Direction? movedEdges = null;
 
-		if (!ctx.Store.WindowSlice.IsMovingWindow)
+		if (!slice.IsMovingWindow)
 		{
 			return Empty.Result;
 		}
@@ -24,9 +26,9 @@ internal record WindowMoveEndedTransform(IWindow Window) : Transform
 			ctx.Butler.MoveWindowToPoint(Window, point);
 		}
 
-		ctx.Store.WindowSlice.IsMovingWindow = false;
+		slice.IsMovingWindow = false;
 
-		ctx.Store.WindowSlice.QueueEvent(
+		slice.QueueEvent(
 			new WindowMoveEndedEventArgs()
 			{
 				Window = Window,

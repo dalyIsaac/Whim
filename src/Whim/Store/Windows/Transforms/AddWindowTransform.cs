@@ -7,6 +7,8 @@ internal record AddWindowTransform(HWND Handle) : Transform<IWindow>()
 {
 	internal override Result<IWindow> Execute(IContext ctx, IInternalContext internalCtx)
 	{
+		WindowSlice slice = ctx.Store.WindowSlice;
+
 		// Filter the handle.
 		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
 		{
@@ -43,13 +45,13 @@ internal record AddWindowTransform(HWND Handle) : Transform<IWindow>()
 		}
 
 		// Store the window.
-		ctx.Store.WindowSlice.Windows = ctx.Store.WindowSlice.Windows.Add(Handle, window);
+		slice.Windows = slice.Windows.Add(Handle, window);
 
 		// Filter the args.
 		WindowAddedEventArgs args = new() { Window = window };
 		internalCtx.ButlerEventHandlers.OnWindowAdded(args);
 
-		ctx.Store.WindowSlice.QueueEvent(args);
+		slice.QueueEvent(args);
 
 		return Result.FromValue(window);
 	}

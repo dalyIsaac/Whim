@@ -6,13 +6,14 @@ internal record WindowRemovedTransform(IWindow Window) : Transform
 {
 	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		ctx.Store.WindowSlice.Windows = ctx.Store.WindowSlice.Windows.Remove(Window.Handle);
-		ctx.Store.WindowSlice.HandledLocationRestoringWindows =
-			ctx.Store.WindowSlice.HandledLocationRestoringWindows.Remove(Window);
+		WindowSlice slice = ctx.Store.WindowSlice;
+
+		slice.Windows = slice.Windows.Remove(Window.Handle);
+		slice.HandledLocationRestoringWindows = slice.HandledLocationRestoringWindows.Remove(Window);
 
 		WindowRemovedEventArgs args = new() { Window = Window };
 		internalCtx.ButlerEventHandlers.OnWindowRemoved(args);
-		ctx.Store.WindowSlice.QueueEvent(args);
+		slice.QueueEvent(args);
 		return Empty.Result;
 	}
 }
