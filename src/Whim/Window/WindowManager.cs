@@ -194,7 +194,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				_context.Store.Dispatch(new WindowMoveStartedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
-				OnWindowMoveEnd(window);
+				_context.Store.Dispatch(new WindowMoveEndedTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
 				OnWindowMoved(window);
@@ -234,41 +234,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = true;
 
 	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = false;
-
-	private void OnWindowMoveEnd(IWindow window)
-	{
-		Logger.Debug($"Window move ended: {window}");
-
-		IPoint<int>? point = null;
-		Direction? movedEdges = null;
-
-		if (!_isMovingWindow)
-		{
-			return;
-		}
-
-		if (GetMovedEdges(window) is (Direction MovedEdges, IPoint<int> MovedPoint) moved)
-		{
-			movedEdges = moved.MovedEdges;
-			_context.Butler.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, window);
-		}
-		else if (_internalContext.CoreNativeManager.GetCursorPos(out point))
-		{
-			_context.Butler.MoveWindowToPoint(window, point);
-		}
-
-		_isMovingWindow = false;
-
-		WindowMoveEnd?.Invoke(
-			this,
-			new WindowMoveEventArgs()
-			{
-				Window = window,
-				CursorDraggedPoint = point,
-				MovedEdges = movedEdges
-			}
-		);
-	}
 
 	private void OnWindowMoved(IWindow window)
 	{

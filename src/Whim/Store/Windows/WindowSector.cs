@@ -27,6 +27,17 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 		ImmutableHashSet<IWindow>.Empty;
 
 	/// <summary>
+	/// Whether a window is currently moving.
+	/// </summary>
+	public bool IsMovingWindow { get; internal set; }
+
+	/// <summary>
+	/// Whether the user currently has the left mouse button down.
+	/// Used for window movement.
+	/// </summary>
+	public bool IsLeftMouseButtonDown { get; internal set; }
+
+	/// <summary>
 	/// Event for when a window is added by the <see cref="IWindowManager"/>.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowAdded;
@@ -40,6 +51,11 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// Event for when a window is removed from Whim.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowRemoved;
+
+	/// <summary>
+	/// Event for when a window is being moved or resized.
+	/// </summary>
+	public event EventHandler<WindowMoveEventArgs>? WindowMoveStarted;
 
 	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
@@ -68,6 +84,9 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 					break;
 				case WindowRemovedEventArgs args:
 					WindowRemoved?.Invoke(this, args);
+					break;
+				case WindowMoveStartedEventArgs args:
+					WindowMoveStarted?.Invoke(this, args);
 					break;
 				default:
 					break;
