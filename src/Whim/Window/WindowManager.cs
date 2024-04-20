@@ -200,10 +200,10 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				_context.Store.Dispatch(new WindowMovedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
-				OnWindowMinimizeStart(window);
+				_context.Store.Dispatch(new WindowMinimizeStartedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
-				OnWindowMinimizeEnd(window);
+				_context.Store.Dispatch(new WindowMinimizeEndedTransform(window));
 				break;
 			default:
 				Logger.Error($"Unhandled event 0x{eventType:X4}");
@@ -234,24 +234,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = true;
 
 	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = false;
-
-	private void OnWindowMinimizeStart(IWindow window)
-	{
-		Logger.Debug($"Window minimize started: {window}");
-
-		WindowEventArgs args = new() { Window = window };
-		_internalContext.ButlerEventHandlers.OnWindowMinimizeStart(args);
-		WindowMinimizeStart?.Invoke(this, args);
-	}
-
-	private void OnWindowMinimizeEnd(IWindow window)
-	{
-		Logger.Debug($"Window minimize ended: {window}");
-
-		WindowEventArgs args = new() { Window = window };
-		_internalContext.ButlerEventHandlers.OnWindowMinimizeEnd(args);
-		WindowMinimizeEnd?.Invoke(this, args);
-	}
 
 	public IEnumerator<IWindow> GetEnumerator() => _windows.Values.GetEnumerator();
 

@@ -24,6 +24,16 @@ public class WindowAddedEventArgs : WindowEventArgs { }
 public class WindowRemovedEventArgs : WindowEventArgs { }
 
 /// <summary>
+/// Event arguments for when a <see cref="IWindow"/> has been minimized.
+/// </summary>
+public class WindowMinimizeStartedEventArgs : WindowEventArgs { }
+
+/// <summary>
+/// Event arguments for when a <see cref="IWindow"/> is no longer minimized.
+/// </summary>
+public class WindowMinimizeEndedEventArgs : WindowEventArgs { }
+
+/// <summary>
 /// Event arguments for when the focused window has changed. When <see cref="Window"/> is
 /// <see langword="null"/>, then Whim does not track the focused window.
 /// </summary>

@@ -38,6 +38,11 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	public bool IsLeftMouseButtonDown { get; internal set; }
 
 	/// <summary>
+	/// The delay to wait when trying to restore windows from <see cref="IWindowManager.LocationRestoringFilterManager"/>.
+	/// </summary>
+	public int WindowMovedDelay { get; init; } = 2000;
+
+	/// <summary>
 	/// Event for when a window is added by the <see cref="IWindowManager"/>.
 	/// </summary>
 	public event EventHandler<WindowEventArgs>? WindowAdded;
@@ -65,6 +70,14 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// See https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants for more information.
 	/// </summary>
 	public event EventHandler<WindowMoveEventArgs>? WindowMoveEnded;
+
+	/// <summary>
+	/// Event for when a window has changed location, shape, or size.
+	///
+	/// This event is fired when Windows sends the
+	/// <see cref="Windows.Win32.PInvoke.EVENT_OBJECT_LOCATIONCHANGE"/> event.
+	/// </summary>
+	public event EventHandler<WindowMoveEventArgs>? WindowMoved;
 
 	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
@@ -99,6 +112,9 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 					break;
 				case WindowMoveEndedEventArgs args:
 					WindowMoveEnded?.Invoke(this, args);
+					break;
+				case WindowMovedEventArgs args:
+					WindowMoved?.Invoke(this, args);
 					break;
 				default:
 					break;
