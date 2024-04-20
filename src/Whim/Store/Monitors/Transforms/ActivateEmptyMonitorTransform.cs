@@ -10,13 +10,15 @@ public record ActivateEmptyMonitorTransform(IMonitor Monitor) : Transform
 {
 	internal override void Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		if (!ctx.Store.MonitorSlice.Monitors.Contains(Monitor))
+		MonitorSlice slice = ctx.Store.MonitorSlice;
+
+		if (!slice.Monitors.Contains(Monitor))
 		{
 			Logger.Error($"Monitor {Monitor} not found.");
 			return;
 		}
 
-		int idx = ctx.Store.MonitorSlice.Monitors.IndexOf(Monitor);
-		ctx.Store.MonitorSlice.ActiveMonitorIndex = idx;
+		int idx = slice.Monitors.IndexOf(Monitor);
+		slice.ActiveMonitorIndex = idx;
 	}
 }

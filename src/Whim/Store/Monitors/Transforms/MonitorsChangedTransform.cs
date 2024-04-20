@@ -11,11 +11,12 @@ internal record MonitorsChangedTransform : Transform
 	internal override void Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug($"Monitors changed");
+		MonitorSlice slice = ctx.Store.MonitorSlice;
 
 		// Get the new monitors.
-		ImmutableArray<IMonitor> previousMonitors = ctx.Store.MonitorSlice.Monitors;
+		ImmutableArray<IMonitor> previousMonitors = slice.Monitors;
 
-		ctx.Store.MonitorSlice.Monitors = MonitorUtils.GetCurrentMonitors(internalCtx);
+		slice.Monitors = MonitorUtils.GetCurrentMonitors(internalCtx);
 
 		List<IMonitor> unchangedMonitors = new();
 		List<IMonitor> removedMonitors = new();
@@ -24,7 +25,7 @@ internal record MonitorsChangedTransform : Transform
 		// For each monitor in the previous set, check if it's in the current set.
 		foreach (IMonitor monitor in previousMonitors)
 		{
-			if (ctx.Store.MonitorSlice.Monitors.Contains(monitor))
+			if (slice.Monitors.Contains(monitor))
 			{
 				unchangedMonitors.Add(monitor);
 			}
@@ -35,9 +36,9 @@ internal record MonitorsChangedTransform : Transform
 		}
 
 		// For each monitor in the current set, check if it's in the previous set.
-		for (int idx = 0; idx < ctx.Store.MonitorSlice.Monitors.Length; idx += 1)
+		for (int idx = 0; idx < slice.Monitors.Length; idx += 1)
 		{
-			IMonitor monitor = ctx.Store.MonitorSlice.Monitors[idx];
+			IMonitor monitor = slice.Monitors[idx];
 			if (!previousMonitors.Contains(monitor))
 			{
 				addedMonitors.Add(monitor);
@@ -45,7 +46,7 @@ internal record MonitorsChangedTransform : Transform
 
 			if (monitor.IsPrimary)
 			{
-				ctx.Store.MonitorSlice.PrimaryMonitorIndex = idx;
+				slice.PrimaryMonitorIndex = idx;
 			}
 		}
 
@@ -62,7 +63,6 @@ internal record MonitorsChangedTransform : Transform
 			internalCtx.ButlerEventHandlers.OnMonitorsChanged(args);
 		}
 
-		ctx.Store.MonitorSlice.QueueEvent(args);
-		// TODO: Emit event in MonitorManager.
+		slice.QueueEvent(args);
 	}
 }
