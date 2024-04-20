@@ -61,3 +61,8 @@ public class WindowMoveStartedEventArgs : WindowMoveEventArgs { }
 /// Event arguments for when a <see cref="IWindow"/> has stopped moving.
 /// </summary>
 public class WindowMoveEndedEventArgs : WindowMoveEventArgs { }
+
+/// <summary>
+/// Event arguments for when a window has changed location, shape, or size.
+/// </summary>
+public class WindowMovedEventArgs : WindowMoveEventArgs { }

@@ -197,7 +197,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				_context.Store.Dispatch(new WindowMoveEndedTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
-				OnWindowMoved(window);
+				_context.Store.Dispatch(new WindowMovedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
 				OnWindowMinimizeStart(window);
@@ -234,54 +234,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = true;
 
 	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = false;
-
-	private void OnWindowMoved(IWindow window)
-	{
-		Logger.Debug($"Window moved: {window}");
-
-		if (!_isMovingWindow)
-		{
-			if (
-				window.ProcessFileName != null
-				&& !_handledLocationRestoringWindows.Contains(window)
-				&& LocationRestoringFilterManager.ShouldBeIgnored(window)
-			)
-			{
-				// The window's application tried to restore its position.
-				// Wait, then restore the position.
-				_context.NativeManager.TryEnqueue(async () =>
-				{
-					await Task.Delay(WindowMovedDelay).ConfigureAwait(true);
-					if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is IWorkspace workspace)
-					{
-						_handledLocationRestoringWindows.Add(window);
-						workspace.DoLayout();
-					}
-				});
-			}
-			else
-			{
-				// Ignore the window moving event.
-				return;
-			}
-		}
-
-		IPoint<int>? cursorPoint = null;
-		if (_isLeftMouseButtonDown && _internalContext.CoreNativeManager.GetCursorPos(out IPoint<int> point))
-		{
-			cursorPoint = point;
-		}
-
-		WindowMoved?.Invoke(
-			this,
-			new WindowMoveEventArgs()
-			{
-				Window = window,
-				CursorDraggedPoint = cursorPoint,
-				MovedEdges = GetMovedEdges(window)?.MovedEdges
-			}
-		);
-	}
 
 	private void OnWindowMinimizeStart(IWindow window)
 	{

@@ -57,6 +57,15 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// </summary>
 	public event EventHandler<WindowMoveEventArgs>? WindowMoveStarted;
 
+	/// <summary>
+	/// Event for when a window has changed location, shape, or size.
+	///
+	/// This event is fired when Windows sends the
+	/// <see cref="Windows.Win32.PInvoke.EVENT_SYSTEM_MOVESIZEEND"/> event.
+	/// See https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants for more information.
+	/// </summary>
+	public event EventHandler<WindowMoveEventArgs>? WindowMoveEnded;
+
 	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
@@ -87,6 +96,9 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 					break;
 				case WindowMoveStartedEventArgs args:
 					WindowMoveStarted?.Invoke(this, args);
+					break;
+				case WindowMoveEndedEventArgs args:
+					WindowMoveEnded?.Invoke(this, args);
 					break;
 				default:
 					break;
