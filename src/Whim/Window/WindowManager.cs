@@ -184,7 +184,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				_context.Store.Dispatch(new WindowFocusedTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_HIDE:
-				OnWindowHidden(window);
+				_context.Store.Dispatch(new WindowHiddenTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
@@ -209,26 +209,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 				Logger.Error($"Unhandled event 0x{eventType:X4}");
 				break;
 		}
-	}
-
-	/// <summary>
-	/// Handles when a window is hidden.
-	/// This will be called when a workspace is deactivated, or when a process hides a window.
-	/// For example, Discord will hide its window when it is minimized.
-	/// We only care about the hide event if the workspace is active.
-	/// </summary>
-	/// <param name="window"></param>
-	private void OnWindowHidden(IWindow window)
-	{
-		Logger.Debug($"Window hidden: {window}");
-
-		if (_context.Butler.Pantry.GetMonitorForWindow(window) == null)
-		{
-			Logger.Debug($"Window {window} is not tracked in a monitor, ignoring event");
-			return;
-		}
-
-		OnWindowRemoved(window);
 	}
 
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) => _isLeftMouseButtonDown = true;
