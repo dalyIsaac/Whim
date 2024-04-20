@@ -9,8 +9,6 @@ namespace Whim;
 /// </summary>
 internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSectorEvents
 {
-	private readonly IContext _ctx;
-	private readonly IInternalContext _internalCtx;
 	private readonly WindowEventListener _listener;
 	private bool _disposedValue;
 
@@ -81,8 +79,6 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 
 	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
-		_ctx = ctx;
-		_internalCtx = internalCtx;
 		_listener = new WindowEventListener(ctx, internalCtx);
 	}
 

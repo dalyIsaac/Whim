@@ -8,6 +8,8 @@ public class Store : IStore
 {
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
+	private readonly StoreEventListener _storeListener;
+
 	private bool _disposedValue;
 
 	internal readonly RootSector _root;
@@ -21,6 +23,7 @@ public class Store : IStore
 		_internalCtx = internalCtx;
 
 		_root = new RootSector(ctx, internalCtx);
+		_storeListener = new(ctx, internalCtx);
 	}
 
 	/// <inheritdoc />
@@ -69,6 +72,7 @@ public class Store : IStore
 			{
 				// dispose managed state (managed objects)
 				_root.Dispose();
+				_storeListener.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

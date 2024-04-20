@@ -1,4 +1,5 @@
 using System;
+using DotNext;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
@@ -119,9 +120,54 @@ internal class WindowEventListener : IDisposable
 		uint _dwmsEventTime
 	)
 	{
-		if (!IsEventWindowValid(idObject, idChild, hwnd))
+		if (!_ctx.Store.WindowSlice.Windows.TryGetValue(hwnd, out IWindow? window))
 		{
-			return;
+			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
+
+			Result<IWindow> windowResult = _ctx.Store.Dispatch(new AddWindowTransform(hwnd));
+			if (!windowResult.TryGet(out window))
+			{
+				return;
+			}
+		}
+
+		// TODO
+
+		Logger.Debug($"Windows event 0x{eventType:X4} for {window}");
+		switch (eventType)
+		{
+			// `EVENT_OBJECT_SHOW` is handled by the code above to `AddWindow`.
+			case PInvoke.EVENT_OBJECT_SHOW:
+				break;
+			case PInvoke.EVENT_SYSTEM_FOREGROUND:
+			case PInvoke.EVENT_OBJECT_UNCLOAKED:
+				_ctx.Store.Dispatch(new WindowFocusedTransform(window));
+				break;
+			case PInvoke.EVENT_OBJECT_HIDE:
+				_ctx.Store.Dispatch(new WindowHiddenTransform(window));
+				break;
+			case PInvoke.EVENT_OBJECT_DESTROY:
+			case PInvoke.EVENT_OBJECT_CLOAKED:
+				_ctx.Store.Dispatch(new WindowRemovedTransform(window));
+				break;
+			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
+				_ctx.Store.Dispatch(new WindowMoveStartedTransform(window));
+				break;
+			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
+				_ctx.Store.Dispatch(new WindowMoveEndedTransform(window));
+				break;
+			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
+				_ctx.Store.Dispatch(new WindowMovedTransform(window));
+				break;
+			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
+				_ctx.Store.Dispatch(new WindowMinimizeStartedTransform(window));
+				break;
+			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
+				_ctx.Store.Dispatch(new WindowMinimizeEndedTransform(window));
+				break;
+			default:
+				Logger.Error($"Unhandled event 0x{eventType:X4}");
+				break;
 		}
 	}
 
@@ -160,21 +206,23 @@ internal class WindowEventListener : IDisposable
 		{
 			if (disposing)
 			{
-				// TODO: dispose managed state (managed objects)
+				// dispose managed state (managed objects)
+				foreach (UnhookWinEventSafeHandle? hook in _addedHooks)
+				{
+					if (hook == null || hook.IsClosed || hook.IsInvalid)
+					{
+						continue;
+					}
+
+					hook.Dispose();
+				}
 			}
 
-			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-			// TODO: set large fields to null
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
 			_disposedValue = true;
 		}
 	}
-
-	// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-	// ~WindowEventListener()
-	// {
-	//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-	//     Dispose(disposing: false);
-	// }
 
 	public void Dispose()
 	{

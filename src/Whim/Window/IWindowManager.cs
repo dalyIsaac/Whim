@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DotNext;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -7,23 +8,12 @@ namespace Whim;
 /// <summary>
 /// The manager for <see cref="IWindow"/>s.
 /// </summary>
-public interface IWindowManager : IEnumerable<IWindow>, IDisposable
+public interface IWindowManager : IEnumerable<IWindow>
 {
 	/// <summary>
 	/// Filters for windows that will try restore window locations after their windows are created.
 	/// </summary>
 	IFilterManager LocationRestoringFilterManager { get; }
-
-	/// <summary>
-	/// Initialize the windows event hooks.
-	/// </summary>
-	/// <returns></returns>
-	void Initialize();
-
-	/// <summary>
-	/// Add the top-level windows.
-	/// </summary>
-	void PostInitialize();
 
 	/// <summary>
 	/// Creates a new window. If the window cannot be created, <see langword="null"/> is returned.
@@ -34,7 +24,7 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	/// </remarks>
 	/// <param name="hWnd">The window handle.</param>
 	/// <returns></returns>
-	IWindow? CreateWindow(HWND hWnd);
+	Result<IWindow> CreateWindow(HWND hWnd);
 
 	/// <summary>
 	/// Event for when a window is added by the <see cref="IWindowManager"/>.
