@@ -7,7 +7,11 @@ namespace Whim;
 /// Gets the monitor before the given monitor.
 /// </summary>
 /// <param name="Monitor"></param>
-public record GetPreviousMonitorPicker(IMonitor Monitor) : Picker<Result<IMonitor>>()
+/// <param name="GetFirst">
+/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the 
+/// result.
+/// </param>
+public record GetPreviousMonitorPicker(IMonitor Monitor, bool GetFirst = false) : Picker<Result<IMonitor>>()
 {
 	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx)
 	{
@@ -16,6 +20,11 @@ public record GetPreviousMonitorPicker(IMonitor Monitor) : Picker<Result<IMonito
 		int idx = monitors.IndexOf(Monitor);
 		if (idx == -1)
 		{
+			if (GetFirst)
+			{
+				return Result.FromValue(monitors[0]);
+			}
+			
 			return Result.FromException<IMonitor>(new WhimException($"Monitor {Monitor} not found."));
 		}
 

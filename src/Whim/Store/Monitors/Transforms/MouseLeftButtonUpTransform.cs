@@ -11,14 +11,11 @@ internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
 	/// <param name="internalCtx"></param>
 	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		int? idx = ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point));
-
-		if (idx is not int idxVal)
+		if (ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point)).TryGet(out int idx))
 		{
-			return Empty.Result;
+			ctx.Store.MonitorSlice.ActiveMonitorIndex = idx;
 		}
 
-		ctx.Store.MonitorSlice.ActiveMonitorIndex = idxVal;
 		return Empty.Result;
 	}
 }
