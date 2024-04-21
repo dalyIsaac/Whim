@@ -44,7 +44,8 @@ public class DeferWorkspacePosManagerTests
 		// Given the window is not tracked by the WindowManager
 		Dictionary<HWND, IWindowState> windowStates = new();
 		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
-		ctx.Store.Pick(Arg.Any<TryGetWindowPicker>()).Returns(Result.FromException<IWindow>(new WhimException("whoops")));
+		ctx.Store.Pick(Arg.Any<TryGetWindowPicker>())
+			.Returns(Result.FromException<IWindow>(new WhimException("whoops")));
 		workspace.Windows.Returns(new List<IWindow>() { Substitute.For<IWindow>() });
 
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
