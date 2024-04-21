@@ -1,3 +1,4 @@
+using DotNext;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 
@@ -5,9 +6,10 @@ namespace Whim;
 
 internal record WindowFocusedTransform(IWindow? Window) : Transform()
 {
-	internal override void Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		SetActiveMonitor(ctx, internalCtx);
+		return Empty.Result;
 	}
 
 	/// <summary>

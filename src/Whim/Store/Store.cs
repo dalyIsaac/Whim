@@ -7,7 +7,7 @@ namespace Whim;
 /// <summary>
 /// An empty type for <see cref="Result{T}"/>s which don't return anything.
 /// </summary>
-public readonly record struct Empty()
+public record Empty()
 {
 	/// <summary>
 	/// Default placeholder for empty result.

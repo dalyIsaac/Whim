@@ -64,17 +64,17 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point)
 	{
-		return _context.Store.Pick(new GetMonitorAtPointPicker(point, GetFirst: true))!;
+		return _context.Store.Pick(new GetMonitorAtPointPicker(point, GetFirst: true)).Value;
 	}
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor)
 	{
-		return _context.Store.Pick(new GetPreviousMonitorPicker(monitor));
+		return _context.Store.Pick(new GetPreviousMonitorPicker(monitor, GetFirst: true)).Value;
 	}
 
 	public IMonitor GetNextMonitor(IMonitor monitor)
 	{
-		return _context.Store.Pick(new GetNextMonitorPicker(monitor));
+		return _context.Store.Pick(new GetNextMonitorPicker(monitor, GetFirst: true)).Value;
 	}
 
 	// TODO: Remove when removing butler.

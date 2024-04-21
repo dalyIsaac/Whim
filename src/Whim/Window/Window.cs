@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.IO;
-using DotNext;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -127,7 +126,7 @@ internal class Window : IWindow
 	/// <param name="internalContext"></param>
 	/// <param name="hwnd">The handle of the window.</param>
 	/// <returns></returns>
-	public static Result<IWindow> CreateWindow(IContext context, IInternalContext internalContext, HWND hwnd)
+	public static IWindow? CreateWindow(IContext context, IInternalContext internalContext, HWND hwnd)
 	{
 		_ = internalContext.CoreNativeManager.GetWindowThreadProcessId(hwnd, out uint pid);
 		int processId = (int)pid;
@@ -150,9 +149,8 @@ internal class Window : IWindow
 			// The exception will usually have a message of:
 			// "Unable to enumerate the process modules."
 			// This will be thrown by Path.GetFileName.
-			return Result.FromException<IWindow>(
-				new WhimException($"Could not create a Window instance for {hwnd.Value}, {ex.Message}", ex)
-			);
+			Logger.Error($"Could not create a Window instance for {hwnd.Value}, {ex.Message}");
+			return null;
 		}
 
 		return new Window(context, internalContext)
