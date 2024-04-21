@@ -82,7 +82,7 @@ internal partial class Butler : IButler, IInternalButler
 				processedWindows.Add(hwnd);
 
 				// Fire the window added event.
-				_context.Store.Dispatch(new AddWindowTransform(window.Handle));
+				_context.Store.Dispatch(new WindowAddedTransform(window.Handle));
 			}
 		}
 
@@ -99,7 +99,7 @@ internal partial class Butler : IButler, IInternalButler
 				continue;
 			}
 
-			_context.Store.Dispatch(new AddWindowTransform(hwnd));
+			_context.Store.Dispatch(new WindowAddedTransform(hwnd));
 		}
 
 		// Restore the route to active workspace setting.

@@ -3,7 +3,7 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal record AddWindowTransform(HWND Handle) : Transform<IWindow>()
+internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 {
 	internal override Result<IWindow> Execute(IContext ctx, IInternalContext internalCtx)
 	{
