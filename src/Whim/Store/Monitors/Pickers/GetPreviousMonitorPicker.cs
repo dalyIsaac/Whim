@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DotNext;
 
 namespace Whim;
 
@@ -6,19 +7,18 @@ namespace Whim;
 /// Gets the monitor before the given monitor.
 /// </summary>
 /// <param name="Monitor"></param>
-public record GetPreviousMonitorPicker(IMonitor Monitor) : Picker<IMonitor>()
+public record GetPreviousMonitorPicker(IMonitor Monitor) : Picker<Result<IMonitor>>()
 {
-	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		ImmutableArray<IMonitor> monitors = ctx.Store.MonitorSlice.Monitors;
 
 		int idx = monitors.IndexOf(Monitor);
 		if (idx == -1)
 		{
-			Logger.Error($"Monitor {Monitor} not found.");
-			return monitors[0];
+			return Result.FromException<IMonitor>(new WhimException($"Monitor {Monitor} not found."));
 		}
 
-		return monitors[(idx - 1).Mod(monitors.Length)];
+		return Result.FromValue(monitors[(idx - 1).Mod(monitors.Length)]);
 	}
 }

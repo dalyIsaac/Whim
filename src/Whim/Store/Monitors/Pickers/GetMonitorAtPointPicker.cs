@@ -1,3 +1,4 @@
+using DotNext;
 using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
@@ -8,12 +9,9 @@ namespace Whim;
 /// <param name="Point">
 /// The point to get the monitor for.
 /// </param>
-/// <param name="GetFirst">
-/// If <see langword="true"/>, get the first monitor if there is no monitor at <paramref name="Point"/>.
-/// </param>
-public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<int?>
+public record GetMonitorIndexAtPointPicker(IPoint<int> Point) : Picker<Result<int>>
 {
-	internal override int? Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<int> Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug($"Getting monitor at point {Point}");
 		MonitorSlice slice = ctx.Store.MonitorSlice;
@@ -28,17 +26,11 @@ public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = fa
 			IMonitor m = slice.Monitors[idx];
 			if (m.Handle == hmonitor)
 			{
-				return idx;
+				return Result.FromValue(idx);
 			}
 		}
 
-		if (GetFirst)
-		{
-			return 0;
-		}
-
-		Logger.Error($"No monitor found at point {Point}");
-		return null;
+		return Result.FromException<int>(new WhimException($"No monitor found at point {Point}"));
 	}
 }
 
@@ -48,26 +40,22 @@ public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = fa
 /// <param name="Point">
 /// The point to get the monitor for.
 /// </param>
-/// <param name="GetFirst">
-/// If <see langword="true"/>, get the first monitor if there is no monitor at <paramref name="Point"/>.
-/// </param>
-public record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<IMonitor?>
+public record GetMonitorAtPointPicker(IPoint<int> Point) : Picker<Result<IMonitor>>
 {
-	internal override IMonitor? Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		int? idx = ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point, GetFirst));
-		if (idx is not int idxVal)
+		Result<int> idxResult = ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point));
+		if (!idxResult.TryGet(out int idxVal))
 		{
-			return null;
+			return Result.FromException<IMonitor>(idxResult.Error!);
 		}
 
 		MonitorSlice slice = ctx.Store.MonitorSlice;
 		if (idxVal > slice.Monitors.Length)
 		{
-			Logger.Error("Monitor index is invalid");
-			return null;
+			return Result.FromException<IMonitor>(new WhimException("Monitor index is invalid"));
 		}
 
-		return slice.Monitors[idxVal];
+		return Result.FromValue(slice.Monitors[idxVal]);
 	}
 }
