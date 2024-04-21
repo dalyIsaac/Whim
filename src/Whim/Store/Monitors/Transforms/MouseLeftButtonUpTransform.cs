@@ -1,3 +1,5 @@
+using DotNext;
+
 namespace Whim;
 
 internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
@@ -7,15 +9,16 @@ internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
 	/// </summary>
 	/// <param name="ctx"></param>
 	/// <param name="internalCtx"></param>
-	internal override void Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		int? idx = ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point));
 
 		if (idx is not int idxVal)
 		{
-			return;
+			return Empty.Result;
 		}
 
 		ctx.Store.MonitorSlice.ActiveMonitorIndex = idxVal;
+		return Empty.Result;
 	}
 }

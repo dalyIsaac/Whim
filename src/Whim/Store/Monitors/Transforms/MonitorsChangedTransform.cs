@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using DotNext;
 
 namespace Whim;
 
@@ -8,7 +9,7 @@ namespace Whim;
 /// </summary>
 internal record MonitorsChangedTransform : Transform
 {
-	internal override void Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug($"Monitors changed");
 		MonitorSlice slice = ctx.Store.MonitorSlice;
@@ -64,5 +65,7 @@ internal record MonitorsChangedTransform : Transform
 		}
 
 		slice.QueueEvent(args);
+
+		return Empty.Result;
 	}
 }
