@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -183,10 +184,10 @@ public class WorkspaceManagerTests
 		window3.Handle.Returns((HWND)3);
 		window4.Handle.Returns((HWND)4);
 
-		ctx.WindowManager.CreateWindow((HWND)1).Returns(window1);
-		ctx.WindowManager.CreateWindow((HWND)2).Returns((IWindow?)null);
-		ctx.WindowManager.CreateWindow((HWND)3).Returns(window3);
-		ctx.WindowManager.CreateWindow((HWND)4).Returns(window4);
+		ctx.WindowManager.CreateWindow((HWND)1).Returns(Result.FromValue(window1));
+		ctx.WindowManager.CreateWindow((HWND)2).Returns(Result.FromException<IWindow>(new WhimException("whoops")));
+		ctx.WindowManager.CreateWindow((HWND)3).Returns(Result.FromValue(window3));
+		ctx.WindowManager.CreateWindow((HWND)4).Returns(Result.FromValue(window4));
 
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 		MonitorManagerUtils.SetupMonitors(ctx, new[] { Substitute.For<IMonitor>(), ctx.MonitorManager.ActiveMonitor });
@@ -207,17 +208,17 @@ public class WorkspaceManagerTests
 		Assert.Equal("john", johnWorkspace.Name);
 		Assert.Single(johnWorkspace.Windows);
 		Assert.Equal((HWND)1, johnWorkspace.Windows.ElementAt(0).Handle);
-		internalCtx.WindowManager.Received(1).OnWindowAdded(window1);
+		ctx.Store.Received(1).Dispatch(new WindowAddedTransform(window1.Handle));
 
 		// The new workspace "jane" will have no windows already added, but will have two windows
 		// added by the WindowManager.
 		IWorkspace janeWorkspace = workspaces[1];
 		Assert.Equal("jane", janeWorkspace.Name);
 		Assert.Empty(janeWorkspace.Windows);
-		internalCtx.WindowManager.Received(1).AddWindow((HWND)3);
-		internalCtx.WindowManager.Received(1).AddWindow((HWND)5);
+		ctx.Store.Received(1).Dispatch(new WindowAddedTransform((HWND)3));
+		ctx.Store.Received(1).Dispatch(new WindowAddedTransform((HWND)5));
 
-		internalCtx.WindowManager.DidNotReceive().AddWindow((HWND)4);
+		ctx.Store.DidNotReceive().Dispatch(new WindowAddedTransform((HWND)4));
 	}
 	#endregion
 

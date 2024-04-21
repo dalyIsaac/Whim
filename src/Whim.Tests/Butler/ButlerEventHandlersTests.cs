@@ -49,7 +49,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
-		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
+		sut.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -77,7 +77,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
-		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
+		sut.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -106,7 +106,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
-		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
+		sut.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 
 		// Then the window is routed to the active workspace
 		pantry.Received().SetWindowWorkspace(window, activeWorkspace);
@@ -136,7 +136,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
-		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
+		sut.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 
 		// Then the window is routed to the last tracked active workspace
 		pantry.Received().SetWindowWorkspace(window, lastTrackedActiveWorkspace);
@@ -167,7 +167,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
-		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
+		sut.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -203,7 +203,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is added
-		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
+		sut.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -234,7 +234,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is added
-		sut.OnWindowAdded(new WindowEventArgs() { Window = window });
+		sut.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 
 		// Then the window is routed to the workspace
 		ctx.RouterManager.Received().RouteWindow(window);
@@ -261,7 +261,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is removed
-		sut.OnWindowRemoved(new WindowEventArgs() { Window = window });
+		sut.OnWindowRemoved(new WindowRemovedEventArgs() { Window = window });
 
 		// Then nothing happens
 		pantry.DidNotReceive().RemoveWindow(window);
@@ -284,7 +284,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is removed
-		sut.OnWindowRemoved(new WindowEventArgs() { Window = window });
+		sut.OnWindowRemoved(new WindowRemovedEventArgs() { Window = window });
 
 		// Then the window is removed from the workspace
 		pantry.Received().RemoveWindow(window);
@@ -410,7 +410,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is minimized
-		sut.OnWindowMinimizeStart(new WindowEventArgs() { Window = window });
+		sut.OnWindowMinimizeStart(new WindowMinimizeStartedEventArgs() { Window = window });
 
 		// Then nothing happens
 	}
@@ -431,7 +431,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
 
 		// When the window is minimized
-		sut.OnWindowMinimizeStart(new WindowEventArgs() { Window = window });
+		sut.OnWindowMinimizeStart(new WindowMinimizeStartedEventArgs() { Window = window });
 
 		// Then MinimizeWindowStart is called on the workspace
 		workspace.Received(1).MinimizeWindowStart(window);
@@ -454,7 +454,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is unminimized
-		sut.OnWindowMinimizeEnd(new WindowEventArgs() { Window = window });
+		sut.OnWindowMinimizeEnd(new WindowMinimizeEndedEventArgs() { Window = window });
 
 		// Then nothing happens
 	}
@@ -474,7 +474,7 @@ public class ButlerEventHandlersTests
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
 
 		// When the window is unminimized
-		sut.OnWindowMinimizeEnd(new WindowEventArgs() { Window = window });
+		sut.OnWindowMinimizeEnd(new WindowMinimizeEndedEventArgs() { Window = window });
 
 		// Then MinimizeWindowEnd is called on the workspace
 		workspace.Received(1).MinimizeWindowEnd(window);

@@ -57,7 +57,7 @@ public class ButlerChoresTests
 	private static void WindowAdded(IInternalContext internalCtx, IWindow window)
 	{
 		// Raise the WindowAdded event.
-		internalCtx.ButlerEventHandlers.OnWindowAdded(new WindowEventArgs() { Window = window });
+		internalCtx.ButlerEventHandlers.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 	}
 
 	private static void ActivateWorkspacesOnMonitors(
@@ -321,7 +321,7 @@ public class ButlerChoresTests
 		// Then
 		internalCtx.CoreNativeManager.Received(1).GetDesktopWindow();
 		internalCtx.CoreNativeManager.Received(1).SetForegroundWindow(Arg.Any<HWND>());
-		internalCtx.WindowManager.Received(1).OnWindowFocused(null);
+		ctx.Store.Received(1).Dispatch(new WindowFocusedTransform(null));
 		internalCtx.MonitorManager.Received(1).ActivateEmptyMonitor(monitor);
 	}
 

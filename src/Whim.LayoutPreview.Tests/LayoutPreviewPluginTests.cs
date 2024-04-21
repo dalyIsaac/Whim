@@ -121,7 +121,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMoveEventArgs e =
+		WindowMovedEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -143,7 +143,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMoveEventArgs e =
+		WindowMovedEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -165,7 +165,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMoveEventArgs e =
+		WindowMovedEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -187,7 +187,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMoveEventArgs e =
+		WindowMovedEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -214,7 +214,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMoveEventArgs e =
+		WindowMovedEventArgs e =
 			new()
 			{
 				Window = window,
@@ -241,7 +241,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMoveEventArgs e =
+		WindowMovedEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -263,7 +263,7 @@ public class LayoutPreviewPluginTests
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
 
-		WindowMoveEventArgs moveArgs =
+		WindowMovedEventArgs moveArgs =
 			new()
 			{
 				Window = movedWindow,
@@ -271,7 +271,7 @@ public class LayoutPreviewPluginTests
 				MovedEdges = null
 			};
 
-		WindowEventArgs removeArgs = new() { Window = removedWindow };
+		WindowRemovedEventArgs removeArgs = new() { Window = removedWindow };
 
 		// When
 		plugin.PreInitialize();
@@ -288,7 +288,7 @@ public class LayoutPreviewPluginTests
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
 
-		WindowMoveEventArgs moveArgs =
+		WindowMovedEventArgs moveArgs =
 			new()
 			{
 				Window = movedWindow,
@@ -296,7 +296,7 @@ public class LayoutPreviewPluginTests
 				MovedEdges = null
 			};
 
-		WindowEventArgs removeArgs = new() { Window = movedWindow };
+		WindowRemovedEventArgs removeArgs = new() { Window = movedWindow };
 
 		// When
 		plugin.PreInitialize();
@@ -313,7 +313,7 @@ public class LayoutPreviewPluginTests
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
 
-		WindowMoveEventArgs moveArgs =
+		WindowMovedEventArgs moveArgs =
 			new()
 			{
 				Window = movedWindow,

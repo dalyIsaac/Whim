@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -28,7 +29,7 @@ public class DeferWorkspacePosManagerTests
 		sut.DoLayout(workspace, triggers, windowStates);
 
 		// Then
-		internalCtx.WindowManager.Received(1).OnWindowRemoved(Arg.Any<IWindow>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<WindowRemovedTransform>());
 		ctx.Butler.Pantry.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
 	}
 
@@ -43,7 +44,7 @@ public class DeferWorkspacePosManagerTests
 		// Given the window is not tracked by the WindowManager
 		Dictionary<HWND, IWindowState> windowStates = new();
 		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
-		internalCtx.WindowManager.HandleWindowMap.ContainsKey(Arg.Any<HWND>()).Returns(false);
+		ctx.Store.Pick(Arg.Any<TryGetWindowPicker>()).Returns(Result.FromException<IWindow>(new WhimException("whoops")));
 		workspace.Windows.Returns(new List<IWindow>() { Substitute.For<IWindow>() });
 
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
@@ -52,7 +53,7 @@ public class DeferWorkspacePosManagerTests
 		sut.DoLayout(workspace, triggers, windowStates);
 
 		// Then
-		internalCtx.WindowManager.Received(1).OnWindowRemoved(Arg.Any<IWindow>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<WindowRemovedTransform>());
 		ctx.Butler.Pantry.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
 	}
 
