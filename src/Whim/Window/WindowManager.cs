@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using DotNext;
 using Windows.Win32.Foundation;
 
@@ -73,10 +72,11 @@ internal class WindowManager : IWindowManager
 	{
 		Logger.Verbose($"Adding window {hwnd}");
 
-		if (_windows.TryGetValue(hwnd, out IWindow? window) && window != null)
+		Result<IWindow> res = _context.Store.Pick(new TryGetWindowPicker(hwnd));
+		if (res.IsSuccessful)
 		{
 			Logger.Debug($"Window {hwnd} already exists");
-			return Result.FromValue(window);
+			return res;
 		}
 
 		return Window.CreateWindow(_context, _internalContext, hwnd);
