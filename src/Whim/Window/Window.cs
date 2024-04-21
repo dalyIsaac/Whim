@@ -74,7 +74,7 @@ internal class Window : IWindow
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
-		_internalContext.WindowManager.OnWindowFocused(this);
+		_context.Store.Dispatch(new WindowFocusedTransform(null));
 	}
 
 	public void Hide()

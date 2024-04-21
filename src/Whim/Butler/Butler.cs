@@ -71,8 +71,7 @@ internal partial class Butler : IButler, IInternalButler
 			foreach (SavedWindow savedWindow in savedWorkspace.Windows)
 			{
 				HWND hwnd = (HWND)savedWindow.Handle;
-				IWindow? window = _context.WindowManager.CreateWindow(hwnd);
-				if (window == null)
+				if (_context.WindowManager.CreateWindow(hwnd).TryGet(out IWindow window))
 				{
 					Logger.Debug($"Could not find window with handle {savedWindow.Handle}");
 					continue;
@@ -83,7 +82,7 @@ internal partial class Butler : IButler, IInternalButler
 				processedWindows.Add(hwnd);
 
 				// Fire the window added event.
-				_internalContext.WindowManager.OnWindowAdded(window);
+				_context.Store.Dispatch(new AddWindowTransform(window.Handle));
 			}
 		}
 
@@ -100,7 +99,7 @@ internal partial class Butler : IButler, IInternalButler
 				continue;
 			}
 
-			_internalContext.WindowManager.AddWindow(hwnd);
+			_context.Store.Dispatch(new AddWindowTransform(hwnd));
 		}
 
 		// Restore the route to active workspace setting.

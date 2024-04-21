@@ -79,7 +79,7 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 				Logger.Debug($"Window {window.Handle} is no longer a window.");
 				removeWindow = true;
 			}
-			else if (!_internalContext.WindowManager.HandleWindowMap.ContainsKey(window.Handle))
+			else if (_context.Store.Pick(new TryGetWindowPicker(window.Handle)).IsSuccessful == false)
 			{
 				Logger.Debug($"Window {window.Handle} is somehow no longer managed.");
 				removeWindow = true;
@@ -95,7 +95,7 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		// Remove the windows by doing a sneaky call.
 		foreach (IWindow window in garbageWindows)
 		{
-			_internalContext.WindowManager.OnWindowRemoved(window);
+			_context.Store.Dispatch(new WindowRemovedTransform(window));
 		}
 
 		return garbageCollected;

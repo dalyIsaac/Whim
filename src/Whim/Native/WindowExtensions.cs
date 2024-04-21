@@ -86,9 +86,11 @@ public static class WindowExtensions
 		UIElementExtensions.InitializeComponent(uiWindow, componentNamespace, componentPath);
 
 		HWND hwnd = new(WinRT.Interop.WindowNative.GetWindowHandle(uiWindow));
-		IWindow window =
-			context.WindowManager.CreateWindow(GetHandle(uiWindow))
-			?? throw new InitializeWindowException("Window was unexpectedly null");
+
+		if (!context.WindowManager.CreateWindow(GetHandle(uiWindow)).TryGet(out IWindow window))
+		{
+			throw new InitializeWindowException("Window was unexpectedly null");
+		}
 
 		context.NativeManager.HideCaptionButtons(hwnd);
 		context.NativeManager.SetWindowCorners(hwnd);

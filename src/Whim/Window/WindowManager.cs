@@ -56,7 +56,7 @@ internal class WindowManager : IWindowManager
 	public void WindowSlice_WindowMoveStarted(object? sender, WindowMoveStartedEventArgs ev) =>
 		WindowMoveStart?.Invoke(sender, ev);
 
-	public void WindowSlice_WindowMoved(object? sender, WindowMovedStartedEventArgs ev) =>
+	public void WindowSlice_WindowMoved(object? sender, WindowMovedEventArgs ev) =>
 		WindowMoved?.Invoke(sender, ev);
 
 	public void WindowSlice_WindowMoveEnd(object? sender, WindowMoveEndedEventArgs ev) =>

@@ -43,7 +43,7 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// <summary>
 	/// Event for when a window is added by the <see cref="IWindowManager"/>.
 	/// </summary>
-	public event EventHandler<WindowEventArgs>? WindowAdded;
+	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
 
 	/// <summary>
 	/// Event for when a window is focused.
@@ -53,12 +53,12 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// <summary>
 	/// Event for when a window is removed from Whim.
 	/// </summary>
-	public event EventHandler<WindowEventArgs>? WindowRemoved;
+	public event EventHandler<WindowRemovedEventArgs>? WindowRemoved;
 
 	/// <summary>
 	/// Event for when a window is being moved or resized.
 	/// </summary>
-	public event EventHandler<WindowMoveEventArgs>? WindowMoveStarted;
+	public event EventHandler<WindowMoveStartedEventArgs>? WindowMoveStarted;
 
 	/// <summary>
 	/// Event for when a window has changed location, shape, or size.
@@ -67,7 +67,7 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// <see cref="Windows.Win32.PInvoke.EVENT_SYSTEM_MOVESIZEEND"/> event.
 	/// See https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants for more information.
 	/// </summary>
-	public event EventHandler<WindowMoveEventArgs>? WindowMoveEnded;
+	public event EventHandler<WindowMoveEndedEventArgs>? WindowMoveEnded;
 
 	/// <summary>
 	/// Event for when a window has changed location, shape, or size.
@@ -75,30 +75,30 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// This event is fired when Windows sends the
 	/// <see cref="Windows.Win32.PInvoke.EVENT_OBJECT_LOCATIONCHANGE"/> event.
 	/// </summary>
-	public event EventHandler<WindowMoveEventArgs>? WindowMoved;
+	public event EventHandler<WindowMovedStartedEventArgs>? WindowMoved;
 
 	/// <summary>
 	/// Event for when a window has started being minimized.
 	/// </summary>
-	public event EventHandler<WindowEventArgs>? WindowMinimizeStarted;
+	public event EventHandler<WindowMinimizeStartedEventArgs>? WindowMinimizeStarted;
 
 	/// <summary>
 	/// Event for when a window has ended being minimized.
 	/// </summary>
-	public event EventHandler<WindowEventArgs>? WindowMinimizeEnded;
+	public event EventHandler<WindowMinimizeEndedEventArgs>? WindowMinimizeEnded;
 
-	public WindowSector(IContext ctx, IInternalContext internalCtx)
+	internal WindowSlice(IContext ctx, IInternalContext internalCtx)
 	{
 		_listener = new WindowEventListener(ctx, internalCtx);
 	}
 
 	// TODO: Add to StoreTests
-	public override void Initialize()
+	internal override void Initialize()
 	{
 		_listener.Initialize();
 	}
 
-	public override void DispatchEvents()
+	internal override void DispatchEvents()
 	{
 		foreach (EventArgs eventArgs in _events)
 		{

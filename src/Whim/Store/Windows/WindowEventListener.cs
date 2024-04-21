@@ -77,7 +77,8 @@ internal class WindowEventListener : IDisposable
 		}
 	}
 
-	private void WinEventProcWrapper(
+	// TODO: Make private
+	internal void WinEventProcWrapper(
 		HWINEVENTHOOK hWinEventHook,
 		uint eventType,
 		HWND hwnd,
@@ -89,7 +90,6 @@ internal class WindowEventListener : IDisposable
 	{
 		try
 		{
-			// TODO
 			WinEventProc(hWinEventHook, eventType, hwnd, idObject, idChild, idEventThread, dwmsEventTime);
 		}
 		catch (Exception e)
@@ -130,8 +130,6 @@ internal class WindowEventListener : IDisposable
 				return;
 			}
 		}
-
-		// TODO
 
 		Logger.Debug($"Windows event 0x{eventType:X4} for {window}");
 		switch (eventType)
