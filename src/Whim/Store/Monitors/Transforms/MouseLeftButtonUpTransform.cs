@@ -13,9 +13,7 @@ internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
 		// TODO: Test
 		ctx.Store.WindowSlice.IsLeftMouseButtonDown = false;
 
-		int? idx = ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point));
-
-		if (idx is not int idxVal)
+		if (ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point)).TryGet(out int idx))
 		{
 			mutableRootSector.Monitors.ActiveMonitorIndex = idx;
 		}
