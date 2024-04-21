@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Drawing;
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
@@ -44,10 +45,10 @@ public class GetMonitorAtPointPickerTests
 		GetMonitorIndexAtPointPicker sut = new(_point);
 
 		// When we try get the monitor at said point
-		int? result = ctx.Store.Pick(sut);
+		Result<int> result = ctx.Store.Pick(sut);
 
-		// Then we get null
-		Assert.Null(result);
+		// Then we don't get the value
+		Assert.False(result.IsSuccessful);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -58,7 +59,7 @@ public class GetMonitorAtPointPickerTests
 		GetMonitorIndexAtPointPicker sut = new(_point, true);
 
 		// When we try get the monitor at said point
-		int? result = ctx.Store.Pick(sut);
+		Result<int> result = ctx.Store.Pick(sut);
 
 		// Then we get the first monitor
 		Assert.Equal(0, result);
@@ -72,7 +73,7 @@ public class GetMonitorAtPointPickerTests
 		GetMonitorIndexAtPointPicker sut = new(_point);
 
 		// When we try get the monitor at said point
-		int? result = ctx.Store.Pick(sut);
+		Result<int> result = ctx.Store.Pick(sut);
 
 		// Then we get it
 		Assert.Equal(0, result);
@@ -86,10 +87,10 @@ public class GetMonitorAtPointPickerTests
 		GetMonitorAtPointPicker sut = new(_point);
 
 		// When we try get the monitor at said point
-		IMonitor? result = ctx.Store.Pick(sut);
+		Result<IMonitor> result = ctx.Store.Pick(sut);
 
-		// Then we get null
-		Assert.Null(result);
+		// Then we don't get the value
+		Assert.False(result.IsSuccessful);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -100,10 +101,10 @@ public class GetMonitorAtPointPickerTests
 		GetMonitorAtPointPicker sut = new(_point, true);
 
 		// When we try get the monitor at said point
-		IMonitor? result = ctx.Store.Pick(sut);
+		Result<IMonitor> result = ctx.Store.Pick(sut);
 
 		// Then we get the first monitor
-		Assert.Equal(monitor, result);
+		Assert.Equal(monitor, result.Value);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -114,9 +115,9 @@ public class GetMonitorAtPointPickerTests
 		GetMonitorAtPointPicker sut = new(_point);
 
 		// When we try get the monitor at said point
-		IMonitor? result = ctx.Store.Pick(sut);
+		Result<IMonitor> result = ctx.Store.Pick(sut);
 
 		// Then we get it
-		Assert.Equal(monitor, result);
+		Assert.Equal(monitor, result.Value);
 	}
 }

@@ -1,3 +1,4 @@
+using DotNext;
 using System.Collections.Immutable;
 using Whim.TestUtils;
 using Xunit;
@@ -14,10 +15,10 @@ public class GetPreviousMonitorPickerTests
 		GetPreviousMonitorPicker sut = new(unknownMonitor);
 
 		// When
-		IMonitor result = ctx.Store.Pick(sut);
+		Result<IMonitor> result = ctx.Store.Pick(sut);
 
 		// Then
-		Assert.Equal(monitor1, result);
+		Assert.Equal(monitor1, result.Value);
 	}
 
 	[InlineAutoSubstituteData<StoreCustomization>(0, 2)]
@@ -37,9 +38,9 @@ public class GetPreviousMonitorPickerTests
 		GetPreviousMonitorPicker sut = new(ctx.Store.MonitorSlice.Monitors[startIdx]);
 
 		// When
-		IMonitor result = ctx.Store.Pick(sut);
+		Result<IMonitor> result = ctx.Store.Pick(sut);
 
 		// Then
-		Assert.Equal(ctx.Store.MonitorSlice.Monitors[endIdx], result);
+		Assert.Equal(ctx.Store.MonitorSlice.Monitors[endIdx], result.Value);
 	}
 }
