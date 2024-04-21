@@ -8,7 +8,7 @@ namespace Whim;
 /// </summary>
 /// <param name="Monitor"></param>
 /// <param name="GetFirst">
-/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the 
+/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
 /// result.
 /// </param>
 public record GetPreviousMonitorPicker(IMonitor Monitor, bool GetFirst = false) : Picker<Result<IMonitor>>()
@@ -24,7 +24,7 @@ public record GetPreviousMonitorPicker(IMonitor Monitor, bool GetFirst = false) 
 			{
 				return Result.FromValue(monitors[0]);
 			}
-			
+
 			return Result.FromException<IMonitor>(new WhimException($"Monitor {Monitor} not found."));
 		}
 

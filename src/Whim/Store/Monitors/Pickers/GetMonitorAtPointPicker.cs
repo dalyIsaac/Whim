@@ -10,7 +10,7 @@ namespace Whim;
 /// The point to get the monitor for.
 /// </param>
 /// <param name="GetFirst">
-/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the 
+/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
 /// result.
 /// </param>
 public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<Result<int>>
@@ -50,7 +50,7 @@ public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = fa
 /// The point to get the monitor for.
 /// </param>
 /// <param name="GetFirst">
-/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the 
+/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
 /// result.
 /// </param>
 public record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<Result<IMonitor>>

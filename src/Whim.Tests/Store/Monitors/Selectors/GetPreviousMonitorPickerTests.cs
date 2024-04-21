@@ -1,5 +1,5 @@
-using DotNext;
 using System.Collections.Immutable;
+using DotNext;
 using Whim.TestUtils;
 using Xunit;
 

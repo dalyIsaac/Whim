@@ -8,7 +8,7 @@ namespace Whim;
 /// </summary>
 /// <param name="Monitor"></param>
 /// <param name="GetFirst">
-/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the 
+/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
 /// result.
 /// </param>
 public record GetNextMonitorPicker(IMonitor Monitor, bool GetFirst = false) : Picker<Result<IMonitor>>()
