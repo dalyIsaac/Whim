@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using Whim.TestUtils;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class GetNextMonitorPickerTests
 {
@@ -12,7 +12,7 @@ public class GetNextMonitorPickerTests
 	{
 		// Given
 		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor1, monitor2);
-		GetNextMonitorPicker sut = new(unknownMonitor);
+		GetNextMonitorPicker sut = new(unknownMonitor, GetFirst: true);
 
 		// When
 		Result<IMonitor> result = ctx.Store.Pick(sut);
