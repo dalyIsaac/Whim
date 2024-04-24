@@ -12,28 +12,26 @@ internal record WindowMovedTransform(IWindow Window) : Transform
 		if (!slice.IsMovingWindow)
 		{
 			if (
-				Window.ProcessFileName != null
-				&& !slice.HandledLocationRestoringWindows.Contains(Window)
-				&& ctx.WindowManager.LocationRestoringFilterManager.ShouldBeIgnored(Window)
+				Window.ProcessFileName == null
+				|| slice.HandledLocationRestoringWindows.Contains(Window)
+				|| !ctx.WindowManager.LocationRestoringFilterManager.ShouldBeIgnored(Window)
 			)
-			{
-				// The window's application tried to restore its position.
-				// Wait, then restore the position.
-				ctx.NativeManager.TryEnqueue(async () =>
-				{
-					await Task.Delay(slice.WindowMovedDelay).ConfigureAwait(true);
-					if (ctx.Butler.Pantry.GetWorkspaceForWindow(Window) is IWorkspace workspace)
-					{
-						slice.HandledLocationRestoringWindows.Add(Window);
-						workspace.DoLayout();
-					}
-				});
-			}
-			else
 			{
 				// Ignore the window moving event.
 				return Empty.Result;
 			}
+
+			// The window's application tried to restore its position.
+			// Wait, then restore the position.
+			ctx.NativeManager.TryEnqueue(async () =>
+			{
+				await Task.Delay(slice.WindowMovedDelay).ConfigureAwait(true);
+				if (ctx.Butler.Pantry.GetWorkspaceForWindow(Window) is IWorkspace workspace)
+				{
+					slice.HandledLocationRestoringWindows.Add(Window);
+					workspace.DoLayout();
+				}
+			});
 		}
 
 		IPoint<int>? cursorPoint = null;

@@ -38,7 +38,7 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	/// <summary>
 	/// The delay to wait when trying to restore windows from <see cref="IWindowManager.LocationRestoringFilterManager"/>.
 	/// </summary>
-	public int WindowMovedDelay { get; init; } = 2000;
+	public int WindowMovedDelay { get; internal set; } = 2000;
 
 	/// <summary>
 	/// Event for when a window is added by the <see cref="IWindowManager"/>.
