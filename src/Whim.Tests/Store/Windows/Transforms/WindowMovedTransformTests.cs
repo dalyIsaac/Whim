@@ -109,6 +109,7 @@ public class WindowMovedTransformTests
 	internal void IsNotMoving_GetPos(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given the window is not moving, we don't ignore the window moving event, but we can get the pos
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 		ctx.Store.WindowSlice.IsMovingWindow = false;
 		ctx.Store.WindowSlice.WindowMovedDelay = 0;
 		ctx.Store.WindowSlice.IsLeftMouseButtonDown = true;
@@ -125,6 +126,7 @@ public class WindowMovedTransformTests
 		Assert.True(result!.Value.IsSuccessful);
 		Assert.Equal(new Point<int>(1, 2), ev.Arguments.CursorDraggedPoint);
 		Assert.Equal(window, ev.Arguments.Window);
+		ctx.Butler.Pantry.Received(2).GetWorkspaceForWindow(window);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
