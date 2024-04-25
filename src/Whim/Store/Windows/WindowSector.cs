@@ -92,7 +92,6 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 		_listener = new WindowEventListener(ctx, internalCtx);
 	}
 
-	// TODO: Add to StoreTests
 	internal override void Initialize()
 	{
 		_listener.Initialize();

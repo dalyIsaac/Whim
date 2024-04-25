@@ -12,18 +12,16 @@ internal class WindowManager : IWindowManager
 	private readonly IInternalContext _internalContext;
 	private bool _disposedValue;
 
-	public event EventHandler<WindowEventArgs>? WindowAdded;
+	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
-	public event EventHandler<WindowEventArgs>? WindowRemoved;
-	public event EventHandler<WindowMoveEventArgs>? WindowMoveStart;
-	public event EventHandler<WindowMoveEventArgs>? WindowMoved;
-	public event EventHandler<WindowMoveEventArgs>? WindowMoveEnd;
-	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
-	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
+	public event EventHandler<WindowRemovedEventArgs>? WindowRemoved;
+	public event EventHandler<WindowMoveStartedEventArgs>? WindowMoveStart;
+	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
+	public event EventHandler<WindowMoveEndedEventArgs>? WindowMoveEnd;
+	public event EventHandler<WindowMinimizeStartedEventArgs>? WindowMinimizeStart;
+	public event EventHandler<WindowMinimizeEndedEventArgs>? WindowMinimizeEnd;
 
 	public IFilterManager LocationRestoringFilterManager { get; } = new FilterManager();
-
-	internal int WindowMovedDelay { get; init; } = 2000;
 
 	public WindowManager(IContext context, IInternalContext internalContext)
 	{
@@ -45,26 +43,26 @@ internal class WindowManager : IWindowManager
 		_context.Store.WindowSlice.WindowMinimizeEnded += WindowSlice_WindowMinimizeEnded;
 	}
 
-	public void WindowSlice_WindowAdded(object? sender, WindowAddedEventArgs ev) => WindowAdded?.Invoke(sender, ev);
+	private void WindowSlice_WindowAdded(object? sender, WindowAddedEventArgs ev) => WindowAdded?.Invoke(sender, ev);
 
-	public void WindowSlice_WindowFocused(object? sender, WindowFocusedEventArgs ev) =>
+	private void WindowSlice_WindowFocused(object? sender, WindowFocusedEventArgs ev) =>
 		WindowFocused?.Invoke(sender, ev);
 
-	public void WindowSlice_WindowRemoved(object? sender, WindowRemovedEventArgs ev) =>
+	private void WindowSlice_WindowRemoved(object? sender, WindowRemovedEventArgs ev) =>
 		WindowRemoved?.Invoke(sender, ev);
 
-	public void WindowSlice_WindowMoveStarted(object? sender, WindowMoveStartedEventArgs ev) =>
+	private void WindowSlice_WindowMoveStarted(object? sender, WindowMoveStartedEventArgs ev) =>
 		WindowMoveStart?.Invoke(sender, ev);
 
-	public void WindowSlice_WindowMoved(object? sender, WindowMovedEventArgs ev) => WindowMoved?.Invoke(sender, ev);
+	private void WindowSlice_WindowMoved(object? sender, WindowMovedEventArgs ev) => WindowMoved?.Invoke(sender, ev);
 
-	public void WindowSlice_WindowMoveEnd(object? sender, WindowMoveEndedEventArgs ev) =>
+	private void WindowSlice_WindowMoveEnd(object? sender, WindowMoveEndedEventArgs ev) =>
 		WindowMoveEnd?.Invoke(sender, ev);
 
-	public void WindowSlice_WindowMinimizeStarted(object? sender, WindowMinimizeStartedEventArgs ev) =>
+	private void WindowSlice_WindowMinimizeStarted(object? sender, WindowMinimizeStartedEventArgs ev) =>
 		WindowMinimizeStart?.Invoke(sender, ev);
 
-	public void WindowSlice_WindowMinimizeEnded(object? sender, WindowMinimizeEndedEventArgs ev) =>
+	private void WindowSlice_WindowMinimizeEnded(object? sender, WindowMinimizeEndedEventArgs ev) =>
 		WindowMinimizeEnd?.Invoke(sender, ev);
 
 	public Result<IWindow> CreateWindow(HWND hwnd)
