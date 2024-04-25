@@ -1,3 +1,4 @@
+using System.Collections;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
@@ -67,10 +68,11 @@ public class MonitorManagerTests
 		MonitorManager sut = new(ctx);
 
 		// When
-		var _ = sut.GetEnumerator();
+		sut.GetEnumerator();
+		((IEnumerable)sut).GetEnumerator();
 
 		// Then
-		ctx.Store.Received(1).Pick(new GetAllMonitorsPicker());
+		ctx.Store.Received(2).Pick(new GetAllMonitorsPicker());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
