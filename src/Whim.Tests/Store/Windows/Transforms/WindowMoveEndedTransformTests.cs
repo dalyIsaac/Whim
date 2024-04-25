@@ -26,7 +26,7 @@ public class WindowMoveEndedTransformTests
 					WindowSize = WindowSize.Normal
 				}
 			);
-		ctx.NativeManager.DwmGetWindowRectangle((HWND)1).Returns(newRect);
+		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 	}
 
 	private static (Result<Empty>, Assert.RaisedEvent<WindowMoveEndedEventArgs>) AssertRaises(
