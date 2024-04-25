@@ -92,19 +92,6 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnWindowFocused(IContext ctx, IWindow window)
-	{
-		// Given
-		MonitorManager sut = new(ctx);
-
-		// When
-		sut.OnWindowFocused(window);
-
-		// Then
-		ctx.Store.Received(1).Dispatch(new WindowFocusedTransform(window));
-	}
-
-	[Theory, AutoSubstituteData]
 	internal void ActivateEmptyMonitor(IContext ctx, IMonitor monitor)
 	{
 		// Given
