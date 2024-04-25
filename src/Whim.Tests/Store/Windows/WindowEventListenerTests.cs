@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DotNext;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Whim.TestUtils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -95,6 +96,19 @@ public class WindowEventListenerTests
 
 	private static void Setup_EmptyWindowSlice(IContext ctx, IInternalContext internalCtx) =>
 		ctx.Store.WindowSlice.Returns(new WindowSlice(ctx, internalCtx));
+
+	private static IWindow Setup_FilledWindowSlice(IContext ctx, IInternalContext internalCtx)
+	{
+		IWindow window = Substitute.For<IWindow>();
+		window.Handle.Returns((HWND)1);
+
+		WindowSlice slice = new(ctx, internalCtx);
+		slice.Windows = slice.Windows.Add(window.Handle, window);
+
+		ctx.Store.WindowSlice.Returns(slice);
+
+		return window;
+	}
 
 	private static void AssertDispatches(
 		IContext ctx,
@@ -200,126 +214,157 @@ public class WindowEventListenerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		Setup_EmptyWindowSlice(ctx, internalCtx);
 
-		WindowEventListener sut = new(ctx, internalCtx);
-		sut.Initialize();
-
 		ctx.Store.Dispatch(Arg.Any<WindowAddedTransform>())
 			.Returns(Result.FromException<IWindow>(new WhimException("welp")));
 
-		// When create a window
+		WindowEventListener sut = new(ctx, internalCtx);
+		sut.Initialize();
+
+		// When we create a window
 		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then we don't receive any further dispatches
 		AssertDispatches(ctx, windowAddedTransformCount: 1);
 	}
 
-	// [Theory, AutoSubstituteData]
-	// internal void CreateWindow_Success(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+	[Theory, AutoSubstituteData]
+	internal void CreateWindow_ShowWindow(IContext ctx, IInternalContext internalCtx, IWindow window)
+	{
+		// Given the window doesn't exist and we can create a window
+		HWND hwnd = new(1);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+		Setup_EmptyWindowSlice(ctx, internalCtx);
 
-	// 	// When
+		ctx.Store.Dispatch(Arg.Any<WindowAddedTransform>()).Returns(Result.FromValue(window));
 
-	// 	// Then
-	// }
+		WindowEventListener sut = new(ctx, internalCtx);
+		sut.Initialize();
 
-	// [Theory, AutoSubstituteData]
-	// internal void ShowWindow(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+		// When we create a window
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
-	// 	// When
+		// Then we don't receive any further dispatches
+		AssertDispatches(ctx, windowAddedTransformCount: 1);
+	}
 
-	// 	// Then
-	// }
+	public static IEnumerable<object[]> WinEventProcCasesData()
+	{
+		yield return new object[]
+		{
+			PInvoke.EVENT_SYSTEM_FOREGROUND,
+			new Func<IWindow, Transform>(window => new WindowFocusedTransform(window))
+		};
+		yield return new object[]
+		{
+			PInvoke.EVENT_OBJECT_UNCLOAKED,
+			new Func<IWindow, Transform>(window => new WindowFocusedTransform(window))
+		};
 
-	// [Theory, AutoSubstituteData]
-	// internal void WindowFocusedTransform(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+		yield return new object[]
+		{
+			PInvoke.EVENT_OBJECT_HIDE,
+			new Func<IWindow, Transform>(window => new WindowHiddenTransform(window))
+		};
 
-	// 	// When
+		yield return new object[]
+		{
+			PInvoke.EVENT_OBJECT_DESTROY,
+			new Func<IWindow, Transform>(window => new WindowRemovedTransform(window))
+		};
 
-	// 	// Then
-	// }
+		yield return new object[]
+		{
+			PInvoke.EVENT_OBJECT_CLOAKED,
+			new Func<IWindow, Transform>(window => new WindowRemovedTransform(window))
+		};
 
-	// [Theory, AutoSubstituteData]
-	// internal void WindowRemovedTransform(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+		yield return new object[]
+		{
+			PInvoke.EVENT_SYSTEM_MOVESIZESTART,
+			new Func<IWindow, Transform>(window => new WindowMoveStartedTransform(window))
+		};
 
-	// 	// When
+		yield return new object[]
+		{
+			PInvoke.EVENT_SYSTEM_MOVESIZEEND,
+			new Func<IWindow, Transform>(window => new WindowMoveEndedTransform(window))
+		};
 
-	// 	// Then
-	// }
+		yield return new object[]
+		{
+			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
+			new Func<IWindow, Transform>(window => new WindowMovedTransform(window))
+		};
 
-	// [Theory, AutoSubstituteData]
-	// internal void WindowMoveStartedTransform(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+		yield return new object[]
+		{
+			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
+			new Func<IWindow, Transform>(window => new WindowMinimizeStartedTransform(window))
+		};
 
-	// 	// When
+		yield return new object[]
+		{
+			PInvoke.EVENT_SYSTEM_MINIMIZEEND,
+			new Func<IWindow, Transform>(window => new WindowMinimizeEndedTransform(window))
+		};
+	}
 
-	// 	// Then
-	// }
+	[MemberAutoSubstituteData(nameof(WinEventProcCasesData))]
+	[Theory]
+	internal void WindowFocusedTransform(
+		uint ev,
+		Func<IWindow, Transform> createTransform,
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given the window exists
+		IWindow window = Setup_FilledWindowSlice(ctx, internalCtx);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 
-	// [Theory, AutoSubstituteData]
-	// internal void WindowMoveEndedTransform(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+		WindowEventListener sut = new(ctx, internalCtx);
+		sut.Initialize();
 
-	// 	// When
+		// When we send through the event
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, ev, window.Handle, 0, 0, 0, 0);
 
-	// 	// Then
-	// }
+		// Then a transform was dispatched
+		ctx.Store.Received(1).Dispatch(createTransform(window));
+	}
 
-	// [Theory, AutoSubstituteData]
-	// internal void WindowMovedTransform(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+	[Theory, AutoSubstituteData]
+	internal void Default(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given the window exists
+		IWindow window = Setup_FilledWindowSlice(ctx, internalCtx);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 
-	// 	// When
+		WindowEventListener sut = new(ctx, internalCtx);
+		sut.Initialize();
 
-	// 	// Then
-	// }
+		// When we send through the event
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, 0xBAAAD, window.Handle, 0, 0, 0, 0);
 
-	// [Theory, AutoSubstituteData]
-	// internal void WindowMinimizeStartedTransform(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+		// Then nothing happens
+		AssertDispatches(ctx);
+	}
 
-	// 	// When
+	[Theory, AutoSubstituteData]
+	internal void Throws(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given the window exists, and dispatching throws
+		IWindow window = Setup_FilledWindowSlice(ctx, internalCtx);
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 
-	// 	// Then
-	// }
+		WindowEventListener sut = new(ctx, internalCtx);
+		sut.Initialize();
 
-	// [Theory, AutoSubstituteData]
-	// internal void WindowMinimizeEndedTransform(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
+		ctx.Store.Dispatch(Arg.Any<WindowMinimizeStartedTransform>()).Throws(new WhimException("welp"));
 
-	// 	// When
+		// When we send through the event
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MINIMIZESTART, window.Handle, 0, 0, 0, 0);
 
-	// 	// Then
-	// }
-
-	// [Theory, AutoSubstituteData]
-	// internal void Default(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
-
-	// 	// When
-
-	// 	// Then
-	// }
-
-	// [Theory, AutoSubstituteData]
-	// internal void Throws(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
-
-	// 	// When
-
-	// 	// Then
-	// }
+		// Then nothing happens
+		AssertDispatches(ctx, windowMinimizeStartedTransformCount: 1);
+	}
 }
