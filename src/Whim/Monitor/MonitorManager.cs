@@ -12,8 +12,6 @@ namespace Whim;
 internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 {
 	private readonly IContext _context;
-	private readonly IInternalContext _internalContext;
-
 	private bool _disposedValue;
 
 	public IMonitor ActiveMonitor => _context.Store.Pick(new GetActiveMonitorPicker());
@@ -37,11 +35,9 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	/// When no monitors are found, or there is no primary monitor.
 	/// </exception>
 	/// <param name="context"></param>
-	/// <param name="internalContext"></param>
-	public MonitorManager(IContext context, IInternalContext internalContext)
+	public MonitorManager(IContext context)
 	{
 		_context = context;
-		_internalContext = internalContext;
 	}
 
 	public void Initialize()
@@ -87,8 +83,8 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		{
 			if (disposing)
 			{
-				Logger.Debug("Disposing monitor manager");
-				_internalContext.Dispose();
+				// dispose managed state (managed objects)
+				_context.Store.MonitorSlice.MonitorsChanged -= MonitorSlice_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
