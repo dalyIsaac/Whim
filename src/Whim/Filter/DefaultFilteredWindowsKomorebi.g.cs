@@ -242,6 +242,9 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Windows Subsystem for Android
 		filterManager.Add((window) => window.WindowClass.StartsWith("android(splash)") || window.WindowClass.EndsWith("android(splash)"));
 
+		// Windows Update Standalone Installer
+		filterManager.AddProcessFileNameFilter("wusa.exe");
+
 		// Wox
 		filterManager.Add((window) => window.Title.StartsWith("Hotkey sink") || window.Title.EndsWith("Hotkey sink"));
 
