@@ -10,7 +10,7 @@ public class ActiveLayoutEngineChangedEventArgs : EventArgs
 	/// <summary>
 	/// The workspace that has a new active layout engine.
 	/// </summary>
-	public required IWorkspace Workspace { get; init; }
+	public required ImmutableWorkspace Workspace { get; init; }
 
 	/// <summary>
 	/// The previous active layout engine.

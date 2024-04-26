@@ -19,6 +19,8 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
+	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
+
 	// TODO: Add to StoreTests
 	public override void Initialize() { }
 
@@ -36,6 +38,9 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 					break;
 				case WorkspaceRenamedEventArgs args:
 					WorkspaceRenamed?.Invoke(this, args);
+					break;
+				case ActiveLayoutEngineChangedEventArgs args:
+					ActiveLayoutEngineChanged?.Invoke(this, args);
 					break;
 				default:
 					break;
