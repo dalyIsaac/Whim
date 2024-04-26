@@ -31,7 +31,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 			return WorkspaceUtils.Remove(ctx, idx);
 		}
 
-		return Result.FromException<Empty>(WorkspaceUtils.RemoveWorkspaceFailed());
+		return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
 	}
 }
 

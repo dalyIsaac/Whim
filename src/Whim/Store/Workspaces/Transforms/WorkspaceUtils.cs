@@ -28,6 +28,30 @@ internal static class WorkspaceUtils
 		return Empty.Result;
 	}
 
-	public static WhimException RemoveWorkspaceFailed() =>
+	public static void SetActiveLayoutEngine(WorkspaceSlice slice, int workspaceIdx, int layoutEngineIdx)
+	{
+		ImmutableWorkspace workspace = slice.Workspaces[workspaceIdx];
+
+		int previousLayoutEngineIdx = workspace.ActiveLayoutEngineIndex;
+		slice.Workspaces = slice.Workspaces.SetItem(
+			workspaceIdx,
+			workspace with
+			{
+				ActiveLayoutEngineIndex = layoutEngineIdx
+			}
+		);
+
+		slice.WorkspacesToLayout.Add(workspace.Id);
+		slice.QueueEvent(
+			new ActiveLayoutEngineChangedEventArgs()
+			{
+				Workspace = workspace,
+				PreviousLayoutEngine = workspace.LayoutEngines[previousLayoutEngineIdx],
+				CurrentLayoutEngine = workspace.LayoutEngines[layoutEngineIdx]
+			}
+		);
+	}
+
+	public static WhimException WorkspaceDoesNotExist() =>
 		new("Provided workspace did not exist in collection, could not remove");
 }

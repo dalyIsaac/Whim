@@ -109,95 +109,24 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public bool TrySetLayoutEngineFromIndex(int nextIdx)
-	{
-		Logger.Debug($"Trying to set layout engine with index {nextIdx} for workspace");
+	private bool GetWorkspace(ImmutableWorkspace w, int _) => w.Id == Id;
 
-		ILayoutEngine prevLayoutEngine;
-		ILayoutEngine nextLayoutEngine;
+	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
+		_context
+			.Store.Dispatch(new SetActiveLayoutEngineTransform(GetWorkspace, (_, idx) => idx == nextIdx))
+			.IsSuccessful;
 
-		if (nextIdx >= _layoutEngines.Length)
-		{
-			Logger.Error($"Index {nextIdx} exceeds number of layout engines for workspace");
-			return false;
-		}
-		if (nextIdx < 0)
-		{
-			Logger.Error($"Index {nextIdx} is negative");
-			return false;
-		}
-
-		if (_activeLayoutEngineIndex == nextIdx)
-		{
-			Logger.Debug($"Layout engine with index {nextIdx} is already active for workspace");
-			return true;
-		}
-
-		_prevLayoutEngineIndex = _activeLayoutEngineIndex;
-		_activeLayoutEngineIndex = nextIdx;
-
-		prevLayoutEngine = _layoutEngines[_prevLayoutEngineIndex];
-		nextLayoutEngine = _layoutEngines[_activeLayoutEngineIndex];
-
-		DoLayout();
-
-		_triggers.ActiveLayoutEngineChanged(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = this,
-				PreviousLayoutEngine = prevLayoutEngine,
-				CurrentLayoutEngine = nextLayoutEngine
-			}
-		);
-
-		return true;
-	}
-
-	public void CycleLayoutEngine(bool reverse = false)
-	{
-		Logger.Debug($"Cycling layout engine on workspace {Name}");
-
-		int delta = reverse ? -1 : 1;
-
-		int nextIdx;
-
-		nextIdx = (_activeLayoutEngineIndex + delta).Mod(_layoutEngines.Length);
-
-		TrySetLayoutEngineFromIndex(nextIdx);
-	}
+	public void CycleLayoutEngine(bool reverse = false) =>
+		_context.Store.Dispatch(new CycleLayoutEngineTransform(GetWorkspace, reverse));
 
 	public void ActivatePreviouslyActiveLayoutEngine() => TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
 
-	public bool TrySetLayoutEngineFromName(string name)
-	{
-		Logger.Debug($"Trying to set layout engine {name} for workspace {Name}");
-
-		int nextIdx = -1;
-
-		for (int idx = 0; idx < _layoutEngines.Length; idx++)
-		{
-			ILayoutEngine engine = _layoutEngines[idx];
-			if (engine.Name == name)
-			{
-				nextIdx = idx;
-				break;
-			}
-		}
-
-		if (nextIdx == -1)
-		{
-			Logger.Error($"Layout engine {name} not found for workspace {Name}");
-			return false;
-		}
-		else if (_activeLayoutEngineIndex == nextIdx)
-		{
-			Logger.Debug($"Layout engine {name} is already active for workspace {Name}");
-			return true;
-		}
-
-		TrySetLayoutEngineFromIndex(nextIdx);
-		return true;
-	}
+	public bool TrySetLayoutEngineFromName(string name) =>
+		_context
+			.Store.Dispatch(
+				new SetActiveLayoutEngineTransform(GetWorkspace, (_, idx) => _layoutEngines[idx].Name == name)
+			)
+			.IsSuccessful;
 
 	public bool AddWindow(IWindow window)
 	{

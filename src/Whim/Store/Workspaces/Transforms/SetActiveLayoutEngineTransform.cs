@@ -1,4 +1,3 @@
-using System;
 using DotNext;
 
 namespace Whim;
@@ -13,47 +12,29 @@ namespace Whim;
 /// A predicate which determines which layout engine should be activated.
 /// </param>
 public record SetActiveLayoutEngineTransform(
-	Predicate<ImmutableWorkspace> WorkspacePredicate,
-	Predicate<ILayoutEngine> LayoutEnginePredicate
+	Pred<ImmutableWorkspace> WorkspacePredicate,
+	Pred<ILayoutEngine> LayoutEnginePredicate
 ) : Transform
 {
 	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
 
-		int workspaceIdx = slice.Workspaces.FindIndex(WorkspacePredicate);
+		int workspaceIdx = slice.Workspaces.GetMatchingIndex(WorkspacePredicate);
 		if (workspaceIdx == -1)
 		{
-			return Result.FromException<Empty>(new WhimException("Workspace not found"));
+			return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
 		}
 
 		ImmutableWorkspace workspace = slice.Workspaces[workspaceIdx];
-		int layoutEngineIdx = workspace.LayoutEngines.FindIndex(LayoutEnginePredicate);
+
+		int layoutEngineIdx = workspace.LayoutEngines.GetMatchingIndex(LayoutEnginePredicate);
 		if (layoutEngineIdx == -1)
 		{
-			return Result.FromException<Empty>(new WhimException("Layout engine not found"));
+			return Result.FromException<Empty>(new WhimException("Provided layout engine not found"));
 		}
 
-		int previousLayoutEngineIdx = workspace.ActiveLayoutEngineIndex;
-		slice.Workspaces = slice.Workspaces.SetItem(
-			workspaceIdx,
-			workspace with
-			{
-				ActiveLayoutEngineIndex = layoutEngineIdx
-			}
-		);
-
-		slice.WorkspacesToLayout.Add(workspace.Id);
-
-		slice.QueueEvent(
-			new ActiveLayoutEngineChangedEventArgs()
-			{
-				Workspace = workspace,
-				PreviousLayoutEngine = workspace.LayoutEngines[previousLayoutEngineIdx],
-				CurrentLayoutEngine = workspace.LayoutEngines[layoutEngineIdx]
-			}
-		);
-
+		WorkspaceUtils.SetActiveLayoutEngine(slice, workspaceIdx, layoutEngineIdx);
 		return Empty.Result;
 	}
 }
