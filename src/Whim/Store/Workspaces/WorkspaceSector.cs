@@ -3,11 +3,17 @@ using System.Collections.Immutable;
 
 namespace Whim;
 
-internal class WorkspaceSector : SectorBase, IWorkspaceSector
+internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents
 {
-	public ImmutableList<IWorkspace> Workspaces { get; set; } = ImmutableList<IWorkspace>.Empty;
+	public ImmutableList<ImmutableWorkspace> Workspaces { get; set; } = ImmutableList<ImmutableWorkspace>.Empty;
 
-	public int ActiveWorkspaceIndex { get; set; } = -1;
+	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
+		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
+
+	public ImmutableList<CreateProxyLayoutEngine> ProxyLayoutEngines { get; set; } =
+		ImmutableList<CreateProxyLayoutEngine>.Empty;
+
+	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 
 	// TODO: Add to StoreTests
 	public override void Initialize() { }
@@ -18,7 +24,9 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector
 		{
 			switch (eventArgs)
 			{
-				// TODO
+				case WorkspaceAddedEventArgs args:
+					WorkspaceAdded?.Invoke(this, args);
+					break;
 				default:
 					break;
 			}

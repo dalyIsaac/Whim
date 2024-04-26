@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 
 namespace Whim;
@@ -10,10 +11,14 @@ public interface IWorkspaceSector
 	/// <summary>
 	/// All the workspaces currently tracked by Whim.
 	/// </summary>
-	public ImmutableList<IWorkspace> Workspaces { get; }
+	ImmutableList<IWorkspace> Workspaces { get; }
+
+	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; }
+
+	ImmutableList<CreateProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
 	/// The index of the workspace which is currently active, in <see cref="Workspaces"/>.
 	/// </summary>
-	public int ActiveWorkspaceIndex { get; }
+	int ActiveWorkspaceIndex { get; }
 }

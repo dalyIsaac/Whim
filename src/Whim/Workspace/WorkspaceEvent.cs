@@ -13,3 +13,9 @@ public class WorkspaceEventArgs : EventArgs
 	/// </summary>
 	public required IWorkspace Workspace { get; init; }
 }
+
+// TODO: Make WorkspaceEventArgs the base when Workspace is no longer mutable
+public class WorkspaceAddedEventArgs : EventArgs
+{
+	public required ImmutableWorkspace Workspace { get; init; }
+}
