@@ -17,11 +17,6 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		set => _context.Store.Dispatch(new SetWorkspaceNameTransform(Id, value));
 	}
 
-	public IWindow? LastFocusedWindow { get; private set; }
-
-	protected readonly ILayoutEngine[] _layoutEngines;
-	private int _prevLayoutEngineIndex;
-	private int _activeLayoutEngineIndex;
 	private bool _disposedValue;
 
 	// NOTE: Don't set this directly. Usually all the layout engines will need to be updated.
