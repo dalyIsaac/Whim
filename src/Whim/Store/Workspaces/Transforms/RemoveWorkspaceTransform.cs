@@ -22,10 +22,12 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 		{
 			ImmutableWorkspace workspace = slice.Workspaces[idx];
 
-			if (ShouldRemove(workspace))
+			if (!ShouldRemove(workspace))
 			{
-				return WorkspaceUtils.Remove(ctx, idx);
+				continue;
 			}
+
+			return WorkspaceUtils.Remove(ctx, idx);
 		}
 
 		return Result.FromException<Empty>(WorkspaceUtils.RemoveWorkspaceFailed());

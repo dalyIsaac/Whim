@@ -43,7 +43,7 @@ public record SetActiveLayoutEngineTransform(
 			}
 		);
 
-		// TODO: Queue DoLayout
+		slice.WorkspacesToLayout.Add(workspace.Id);
 
 		slice.QueueEvent(
 			new ActiveLayoutEngineChangedEventArgs()

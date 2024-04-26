@@ -23,6 +23,8 @@ internal static class WorkspaceUtils
 		ctx.Butler.Activate(slice.MutableWorkspaces[^1]);
 
 		slice.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = oldWorkspace });
+		slice.WorkspacesToLayout.Remove(oldWorkspace.Id);
+
 		return Empty.Result;
 	}
 
