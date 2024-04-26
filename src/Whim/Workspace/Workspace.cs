@@ -19,8 +19,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	private bool _disposedValue;
 
-	// NOTE: Don't set this directly. Usually all the layout engines will need to be updated.
-	public ILayoutEngine ActiveLayoutEngine => _layoutEngines[_activeLayoutEngineIndex];
+	private bool GetThis(ImmutableWorkspace w, int _) => w.Id == Id;
+
+	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(new GetActiveLayoutEnginePicker(GetThis));
 
 	/// <summary>
 	/// All the windows in this workspace.
@@ -104,15 +105,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	private bool GetWorkspace(ImmutableWorkspace w, int _) => w.Id == Id;
-
 	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
-		_context
-			.Store.Dispatch(new SetActiveLayoutEngineTransform(GetWorkspace, (_, idx) => idx == nextIdx))
-			.IsSuccessful;
+		_context.Store.Dispatch(new SetActiveLayoutEngineTransform(GetThis, (_, idx) => idx == nextIdx)).IsSuccessful;
 
 	public void CycleLayoutEngine(bool reverse = false) =>
-		_context.Store.Dispatch(new CycleLayoutEngineTransform(GetWorkspace, reverse));
+		_context.Store.Dispatch(new CycleLayoutEngineTransform(GetThis, reverse));
 
 	public void ActivatePreviouslyActiveLayoutEngine() => TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
 
