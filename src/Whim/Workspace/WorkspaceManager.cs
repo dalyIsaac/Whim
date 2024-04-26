@@ -6,17 +6,6 @@ using DotNext;
 
 namespace Whim;
 
-/// <summary>
-/// Functions to trigger <see cref="WorkspaceManager"/> events, for within <see cref="Workspace"/>.
-/// </summary>
-internal record WorkspaceManagerTriggers
-{
-	public required Action<ActiveLayoutEngineChangedEventArgs> ActiveLayoutEngineChanged { get; init; }
-	public required Action<WorkspaceRenamedEventArgs> WorkspaceRenamed { get; init; }
-	public required Action<WorkspaceEventArgs> WorkspaceLayoutStarted { get; init; }
-	public required Action<WorkspaceEventArgs> WorkspaceLayoutCompleted { get; init; }
-}
-
 internal record WorkspaceToCreate(string Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines);
 
 internal class WorkspaceManager : IWorkspaceManager
@@ -24,7 +13,6 @@ internal class WorkspaceManager : IWorkspaceManager
 	private bool _initialized;
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
-	protected readonly WorkspaceManagerTriggers _triggers;
 
 	/// <summary>
 	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
@@ -69,14 +57,6 @@ internal class WorkspaceManager : IWorkspaceManager
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_triggers = new WorkspaceManagerTriggers()
-		{
-			ActiveLayoutEngineChanged = (ActiveLayoutEngineChangedEventArgs e) =>
-				ActiveLayoutEngineChanged?.Invoke(this, e),
-			WorkspaceRenamed = (WorkspaceRenamedEventArgs e) => WorkspaceRenamed?.Invoke(this, e),
-			WorkspaceLayoutStarted = (WorkspaceEventArgs e) => WorkspaceLayoutStarted?.Invoke(this, e),
-			WorkspaceLayoutCompleted = (WorkspaceEventArgs e) => WorkspaceLayoutCompleted?.Invoke(this, e)
-		};
 	}
 
 	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null)
