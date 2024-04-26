@@ -26,11 +26,6 @@ internal class WorkspaceManager : IWorkspaceManager
 	protected readonly WorkspaceManagerTriggers _triggers;
 
 	/// <summary>
-	/// The <see cref="IWorkspace"/>s stored by this manager.
-	/// </summary>
-	protected readonly List<IWorkspace> _workspaces = new();
-
-	/// <summary>
 	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
 	/// The workspaces will have been created prior to <see cref="Initialize"/>.
 	/// </summary>
@@ -85,13 +80,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null)
 	{
-		if (_initialized)
-		{
-			return CreateWorkspace(name, createLayoutEngines);
-		}
-
-		_workspacesToCreate.Add(new(name ?? $"Workspace {_workspaces.Count + 1}", createLayoutEngines));
-		return null;
+		_context.Store.Dispatch(new AddWorkspaceTransform(name, createLayoutEngines));
 	}
 
 	public void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine)
@@ -100,7 +89,8 @@ internal class WorkspaceManager : IWorkspaceManager
 		_proxyLayoutEngines.Add(proxyLayoutEngine);
 	}
 
-	public bool Contains(IWorkspace workspace) => _workspaces.Contains(workspace);
+	public bool Contains(IWorkspace workspace) =>
+		_context.Store.Pick(new GetAllWorkspacesPicker()).Any(w => w.Id == workspace.Id);
 
 	public IEnumerator<IWorkspace> GetEnumerator() => _workspaces.GetEnumerator();
 
@@ -129,90 +119,16 @@ internal class WorkspaceManager : IWorkspaceManager
 		}
 	}
 
-	private Workspace? CreateWorkspace(
-		string? name = null,
-		IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null
-	)
-	{
-		CreateLeafLayoutEngine[] engineCreators = createLayoutEngines?.ToArray() ?? CreateLayoutEngines();
+	public bool Remove(IWorkspace workspace) =>
+		_context.Store.Dispatch(new RemoveWorkspaceByIdTransform(workspace.Id)).IsSuccessful;
 
-		if (engineCreators.Length == 0)
-		{
-			Logger.Error("No layout engines were provided");
-			return null;
-		}
-
-		// Create the layout engines.
-		ILayoutEngine[] layoutEngines = new ILayoutEngine[engineCreators.Length];
-		for (int i = 0; i < engineCreators.Length; i++)
-		{
-			layoutEngines[i] = engineCreators[i](new LayoutEngineIdentity());
-		}
-
-		// Set up the proxies.
-		for (int engineIdx = 0; engineIdx < engineCreators.Length; engineIdx++)
-		{
-			ILayoutEngine currentEngine = layoutEngines[engineIdx];
-			foreach (CreateProxyLayoutEngine createProxyLayoutEngineFn in _proxyLayoutEngines)
-			{
-				ILayoutEngine proxy = createProxyLayoutEngineFn(currentEngine);
-				layoutEngines[engineIdx] = proxy;
-				currentEngine = proxy;
-			}
-		}
-
-		// Create the workspace.
-		Workspace workspace =
-			new(_context, _internalContext, _triggers, name ?? $"Workspace {_workspaces.Count + 1}", layoutEngines);
-		_workspaces.Add(workspace);
-		WorkspaceAdded?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
-		return workspace;
-	}
-
-	public bool Remove(IWorkspace workspace)
-	{
-		Logger.Debug($"Removing workspace {workspace}");
-
-		if (_workspaces.Count - 1 < _context.MonitorManager.Length)
-		{
-			Logger.Debug($"There must be at least {_context.MonitorManager.Length} workspaces.");
-			return false;
-		}
-
-		bool wasFound = _workspaces.Remove(workspace);
-
-		if (!wasFound)
-		{
-			Logger.Debug($"Workspace {workspace} was not found");
-			return false;
-		}
-
-		// TODO: Make a single transform.
-		_context.Butler.MergeWorkspaceWindows(workspace, _workspaces[^1]);
-		_context.Butler.Activate(_workspaces[^1]);
-		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });
-
-		return wasFound;
-	}
-
-	public bool Remove(string workspaceName)
-	{
-		Logger.Debug($"Trying to remove workspace {workspaceName}");
-
-		IWorkspace? workspace = _workspaces.Find(w => w.Name == workspaceName);
-		if (workspace == null)
-		{
-			Logger.Debug($"Workspace {workspaceName} not found");
-			return false;
-		}
-
-		return Remove(workspace);
-	}
+	public bool Remove(string workspaceName) =>
+		_context.Store.Dispatch(new RemoveWorkspaceByNameTransform(workspaceName)).IsSuccessful;
 
 	public IWorkspace? TryGet(string workspaceName)
 	{
-		Logger.Debug($"Trying to get workspace {workspaceName}");
-		return _workspaces.Find(w => w.Name == workspaceName);
+		_context.Store.Pick(new GetWorkspaceByNamePicker(workspaceName));
+		// TODO
 	}
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

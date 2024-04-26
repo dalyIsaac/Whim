@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -9,25 +8,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
-	private readonly WorkspaceManagerTriggers _triggers;
 
-	private string _name;
+	public uint Id { get; }
+
 	public string Name
 	{
-		get => _name;
-		set
-		{
-			string oldName = _name;
-			_name = value;
-			_triggers.WorkspaceRenamed(
-				new WorkspaceRenamedEventArgs()
-				{
-					Workspace = this,
-					PreviousName = oldName,
-					CurrentName = _name
-				}
-			);
-		}
+		get => _context.Store.Pick(new GetWorkspaceByIdPicker(Id))!.Value.Name;
+		set => _context.Store.Dispatch(new SetWorkspaceNameTransform(Id, value));
 	}
 
 	public IWindow? LastFocusedWindow { get; private set; }
@@ -52,25 +39,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// </summary>
 	private readonly Dictionary<HWND, IWindowState> _windowStates = new();
 
-	public Workspace(
-		IContext context,
-		IInternalContext internalContext,
-		WorkspaceManagerTriggers triggers,
-		string name,
-		IEnumerable<ILayoutEngine> layoutEngines
-	)
+	public Workspace(IContext context, IInternalContext internalContext, uint id)
 	{
 		_context = context;
 		_internalContext = internalContext;
-		_triggers = triggers;
-
-		_name = name;
-		_layoutEngines = layoutEngines.ToArray();
-
-		if (_layoutEngines.Length == 0)
-		{
-			throw new ArgumentException("At least one layout engine must be provided.");
-		}
+		Id = id;
 	}
 
 	public void WindowFocused(IWindow? window)

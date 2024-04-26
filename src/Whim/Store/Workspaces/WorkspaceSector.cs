@@ -15,6 +15,10 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 
+	public event EventHandler<WorkspaceRemovedEventArgs>? WorkspaceRemoved;
+
+	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
+
 	// TODO: Add to StoreTests
 	public override void Initialize() { }
 
@@ -26,6 +30,12 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 			{
 				case WorkspaceAddedEventArgs args:
 					WorkspaceAdded?.Invoke(this, args);
+					break;
+				case WorkspaceRemovedEventArgs args:
+					WorkspaceRemoved?.Invoke(this, args);
+					break;
+				case WorkspaceRenamedEventArgs args:
+					WorkspaceRenamed?.Invoke(this, args);
 					break;
 				default:
 					break;
