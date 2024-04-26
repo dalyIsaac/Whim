@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 
 namespace Whim;
@@ -7,7 +8,7 @@ public record ImmutableWorkspace
 	/// <summary>
 	/// The unique id of the workspace.
 	/// </summary>
-	public uint Id { get; }
+	public Guid Id { get; }
 
 	/// <summary>
 	/// The name of the workspace.
@@ -34,7 +35,7 @@ public record ImmutableWorkspace
 	/// </summary>
 	public ImmutableList<ILayoutEngine> LayoutEngines { get; init; } = ImmutableList<ILayoutEngine>.Empty;
 
-	internal ImmutableWorkspace(int id, string name)
+	internal ImmutableWorkspace(Guid id, string name)
 	{
 		Name = name;
 	}

@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Whim;
 
 internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents
 {
+	public HashSet<Guid> WorkspacesToLayout { get; set; } = new();
+
 	public ImmutableList<ImmutableWorkspace> Workspaces { get; set; } = ImmutableList<ImmutableWorkspace>.Empty;
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =

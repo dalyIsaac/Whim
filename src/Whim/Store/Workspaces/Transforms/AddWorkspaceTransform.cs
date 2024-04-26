@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DotNext;
@@ -49,9 +50,8 @@ public record AddWorkspaceTransform(
 			}
 		}
 
-		ImmutableWorkspace workspace = new(slice.IdCount, Name ?? $"Workspace {slice.Workspaces.Count + 1}");
+		ImmutableWorkspace workspace = new(Guid.NewGuid(), Name ?? $"Workspace {slice.Workspaces.Count + 1}");
 
-		slice.IdCount++;
 		slice.Workspaces = slice.Workspaces.Add(workspace);
 		slice.MutableWorkspaces = slice.MutableWorkspaces.Add(new Workspace(ctx, internalCtx, workspace.Id));
 
