@@ -31,6 +31,12 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public override void DispatchEvents()
 	{
+		foreach (Guid workspaceId in WorkspacesToLayout)
+		{
+			// TODO: DoLayout
+		}
+		WorkspacesToLayout.Clear();
+
 		foreach (EventArgs eventArgs in _events)
 		{
 			switch (eventArgs)

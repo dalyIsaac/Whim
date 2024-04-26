@@ -1,3 +1,4 @@
+using System;
 using DotNext;
 
 namespace Whim;
@@ -38,7 +39,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 /// Removes the first workspace which matches the <paramref name="Id"/>.
 /// </summary>
 /// <param name="Id"></param>
-public record RemoveWorkspaceByIdTransform(uint Id) : BaseRemoveWorkspaceTransform()
+public record RemoveWorkspaceByIdTransform(Guid Id) : BaseRemoveWorkspaceTransform()
 {
 	/// <inheritdoc />
 	public override bool ShouldRemove(ImmutableWorkspace workspace) => workspace.Id == Id;

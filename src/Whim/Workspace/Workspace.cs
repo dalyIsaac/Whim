@@ -9,7 +9,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	public uint Id { get; }
+	public Guid Id { get; }
 
 	public string Name
 	{
@@ -39,7 +39,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	/// </summary>
 	private readonly Dictionary<HWND, IWindowState> _windowStates = new();
 
-	public Workspace(IContext context, IInternalContext internalContext, uint id)
+	public Workspace(IContext context, IInternalContext internalContext, Guid id)
 	{
 		_context = context;
 		_internalContext = internalContext;

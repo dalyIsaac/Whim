@@ -11,7 +11,7 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// The unique id of the workspace.
 	/// </summary>
-	uint Id { get; }
+	Guid Id { get; }
 
 	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the

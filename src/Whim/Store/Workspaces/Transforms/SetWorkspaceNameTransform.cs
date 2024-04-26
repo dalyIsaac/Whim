@@ -1,3 +1,4 @@
+using System;
 using DotNext;
 
 namespace Whim;
@@ -11,7 +12,7 @@ namespace Whim;
 /// <param name="Name">
 /// The new name of the workspace.
 /// </param>
-public record SetWorkspaceNameTransform(uint Id, string Name) : Transform
+public record SetWorkspaceNameTransform(Guid Id, string Name) : Transform
 {
 	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
 	{
