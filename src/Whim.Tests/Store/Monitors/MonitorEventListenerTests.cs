@@ -119,23 +119,6 @@ public class MonitorEventListenerTests
 		ctx.Store.Received(1).Dispatch(new MonitorsChangedTransform());
 	}
 
-	[Theory, AutoSubstituteData]
-	internal void MouseHook_MouseLeftButtonUp(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given the listener is initialized
-		MonitorEventListener listener = new(ctx, internalCtx);
-		listener.Initialize();
-
-		// When MouseHook.MouseLeftButtonUp is triggered
-		internalCtx.MouseHook.MouseLeftButtonUp += Raise.Event<EventHandler<MouseEventArgs>>(
-			ctx.Store.MonitorEvents,
-			new MouseEventArgs(new Point<int>(0, 0))
-		);
-
-		// Then a dispatch to the store was triggered
-		ctx.Store.Received(1).Dispatch(Arg.Any<MouseLeftButtonUpTransform>());
-	}
-
 	[SuppressMessage("Usage", "NS5000:Received check.")]
 	[Theory, AutoSubstituteData]
 	internal void Dispose_Success(IContext ctx, IInternalContext internalCtx)

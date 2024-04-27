@@ -8,7 +8,7 @@ public class Store : IStore
 {
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
-	private readonly StoreEventListener _storeListener;
+	private readonly RootEventListener _storeListener;
 
 	private bool _disposedValue;
 
@@ -33,6 +33,7 @@ public class Store : IStore
 	public void Initialize()
 	{
 		_root.Initialize();
+		_storeListener.Initialize();
 	}
 
 	/// <inheritdoc />

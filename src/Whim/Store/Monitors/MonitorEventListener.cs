@@ -21,7 +21,6 @@ internal class MonitorEventListener : IDisposable
 		_internalCtx.WindowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_MonitorsChanged;
 		_internalCtx.WindowMessageMonitor.DpiChanged += WindowMessageMonitor_MonitorsChanged;
 		_internalCtx.WindowMessageMonitor.SessionChanged += WindowMessageMonitor_SessionChanged;
-		_internalCtx.MouseHook.MouseLeftButtonUp += MouseHook_MouseLeftButtonUp;
 	}
 
 	private void WindowMessageMonitor_MonitorsChanged(object? sender, WindowMessageMonitorEventArgs e)
@@ -41,11 +40,6 @@ internal class MonitorEventListener : IDisposable
 		});
 	}
 
-	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)
-	{
-		_ctx.Store.Dispatch(new MouseLeftButtonUpTransform(e.Point));
-	}
-
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
@@ -57,7 +51,6 @@ internal class MonitorEventListener : IDisposable
 				_internalCtx.WindowMessageMonitor.WorkAreaChanged -= WindowMessageMonitor_MonitorsChanged;
 				_internalCtx.WindowMessageMonitor.DpiChanged -= WindowMessageMonitor_MonitorsChanged;
 				_internalCtx.WindowMessageMonitor.SessionChanged -= WindowMessageMonitor_SessionChanged;
-				_internalCtx.MouseHook.MouseLeftButtonUp -= MouseHook_MouseLeftButtonUp;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
