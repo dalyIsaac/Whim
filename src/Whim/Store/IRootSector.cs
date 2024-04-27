@@ -6,7 +6,7 @@ public interface IRootSector
 	public IMonitorSector Monitors { get; }
 
 	/// <inheritdoc cref="WorkspaceSector" />
-	public WorkspaceSector Workspaces { get; }
+	public IWorkspaceSector Workspaces { get; }
 
 	/// <inheritdoc cref="MapSector" />
 	public MapSector Maps { get; }
