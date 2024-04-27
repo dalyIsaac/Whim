@@ -21,7 +21,7 @@ public class WindowFocusedTransformTests
 		monitor2.Handle.Returns((HMONITOR)2);
 
 		ImmutableArray<IMonitor> monitors = ImmutableArray.Create(monitor0, monitor1, monitor2);
-		ctx.Store.MonitorSlice.Monitors = monitors;
+		ctx.Store.Monitors.Monitors = monitors;
 		return monitors;
 	}
 
@@ -38,8 +38,8 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor indices are updated.
-		Assert.Equal(1, ctx.Store.MonitorSlice.ActiveMonitorIndex);
-		Assert.Equal(1, ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex);
+		Assert.Equal(1, ctx.Store.Monitors.ActiveMonitorIndex);
+		Assert.Equal(1, ctx.Store.Monitors.LastWhimActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -60,8 +60,8 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is updated based on MonitorFromWindow
-		Assert.Equal(2, ctx.Store.MonitorSlice.ActiveMonitorIndex);
-		Assert.Equal(2, ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex);
+		Assert.Equal(2, ctx.Store.Monitors.ActiveMonitorIndex);
+		Assert.Equal(2, ctx.Store.Monitors.LastWhimActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -78,8 +78,8 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is not updated.
-		Assert.Equal(-1, ctx.Store.MonitorSlice.ActiveMonitorIndex);
-		Assert.Equal(-1, ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex);
+		Assert.Equal(-1, ctx.Store.Monitors.ActiveMonitorIndex);
+		Assert.Equal(-1, ctx.Store.Monitors.LastWhimActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -100,7 +100,7 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is updated
-		Assert.Equal(2, ctx.Store.MonitorSlice.ActiveMonitorIndex);
-		Assert.Equal(-1, ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex);
+		Assert.Equal(2, ctx.Store.Monitors.ActiveMonitorIndex);
+		Assert.Equal(-1, ctx.Store.Monitors.LastWhimActiveMonitorIndex);
 	}
 }

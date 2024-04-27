@@ -57,7 +57,7 @@ public class MonitorEventListenerTests
 
 		// When WindowMessageMonitor.DisplayChanged is triggered
 		internalCtx.WindowMessageMonitor.DisplayChanged += Raise.Event<EventHandler<WindowMessageMonitorEventArgs>>(
-			ctx.Store.MonitorSlice,
+			ctx.Store.Monitors,
 			_windowMessageArgs
 		);
 
@@ -74,7 +74,7 @@ public class MonitorEventListenerTests
 
 		// When WindowMessageMonitor.WorkAreaChanged is triggered
 		internalCtx.WindowMessageMonitor.WorkAreaChanged += Raise.Event<EventHandler<WindowMessageMonitorEventArgs>>(
-			ctx.Store.MonitorSlice,
+			ctx.Store.Monitors,
 			_windowMessageArgs
 		);
 
@@ -91,7 +91,7 @@ public class MonitorEventListenerTests
 
 		// When WindowMessageMonitor.DpiChanged is triggered
 		internalCtx.WindowMessageMonitor.DpiChanged += Raise.Event<EventHandler<WindowMessageMonitorEventArgs>>(
-			ctx.Store.MonitorSlice,
+			ctx.Store.Monitors,
 			_windowMessageArgs
 		);
 
@@ -110,7 +110,7 @@ public class MonitorEventListenerTests
 
 		// When WindowMessageMonitor.SessionChanged is triggered
 		internalCtx.WindowMessageMonitor.SessionChanged += Raise.Event<EventHandler<WindowMessageMonitorEventArgs>>(
-			ctx.Store.MonitorSlice,
+			ctx.Store.Monitors,
 			_windowMessageArgs
 		);
 		await Task.Delay(5100);
@@ -128,7 +128,7 @@ public class MonitorEventListenerTests
 
 		// When MouseHook.MouseLeftButtonUp is triggered
 		internalCtx.MouseHook.MouseLeftButtonUp += Raise.Event<EventHandler<MouseEventArgs>>(
-			ctx.Store.MonitorSlice,
+			ctx.Store.Monitors,
 			new MouseEventArgs(new Point<int>(0, 0))
 		);
 

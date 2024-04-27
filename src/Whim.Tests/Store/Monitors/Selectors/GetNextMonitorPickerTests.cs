@@ -11,7 +11,7 @@ public class GetNextMonitorPickerTests
 	public void CannotFindMonitor(IContext ctx, IMonitor monitor1, IMonitor monitor2, IMonitor unknownMonitor)
 	{
 		// Given
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor1, monitor2);
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor1, monitor2);
 		GetNextMonitorPicker sut = new(unknownMonitor, GetFirst: true);
 
 		// When
@@ -34,13 +34,13 @@ public class GetNextMonitorPickerTests
 	)
 	{
 		// Given
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor0, monitor1, monitor2);
-		GetNextMonitorPicker sut = new(ctx.Store.MonitorSlice.Monitors[startIdx]);
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor0, monitor1, monitor2);
+		GetNextMonitorPicker sut = new(ctx.Store.Monitors.Monitors[startIdx]);
 
 		// When
 		Result<IMonitor> result = ctx.Store.Pick(sut);
 
 		// Then
-		Assert.Equal(ctx.Store.MonitorSlice.Monitors[endIdx], result.Value);
+		Assert.Equal(ctx.Store.Monitors.Monitors[endIdx], result.Value);
 	}
 }

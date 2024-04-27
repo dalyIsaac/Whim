@@ -33,14 +33,14 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private readonly UnhookWinEventSafeHandle[] _addedHooks = new UnhookWinEventSafeHandle[6];
 
 	/// <summary>
-	/// The delegate for handling all events triggered by <see cref="ICoreNativeManager.SetWinEventHook"/>.
-	/// </summary>
-	private readonly WINEVENTPROC _hookDelegate;
-
-	private bool _isMovingWindow;
-	private bool _isLeftMouseButtonDown;
-
-	/// <summary>
+	/// The delegate for hsng all events triggered by <see cref="ICoreNativeManager.SetWinEventHook"/>.
+	/// </summary>s
+	private readonly WINEVsOC _hookDelegate;
+s
+	private bool _isMovingsw;
+	private bool _isLeftMosttonDown;
+s
+	/// <summary>s
 	/// Indicates whether values have been disposed.
 	/// </summary>
 	private bool _disposedValue;
@@ -90,14 +90,14 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 			_hookDelegate
 		);
 		_addedHooks[4] = _internalContext.CoreNativeManager.SetWinEventHook(
-			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
-			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
-			_hookDelegate
-		);
-		_addedHooks[5] = _internalContext.CoreNativeManager.SetWinEventHook(
-			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
-			PInvoke.EVENT_SYSTEM_MINIMIZEEND,
-			_hookDelegate
+			PInvoke.EVENT_OBJECT_LsONCHANGE,
+			PInvoke.EVENT_OBJECT_LsONCHANGE,
+			_hookDelegates
+		);s
+		_addedHooks[5] = _intersntext.CoreNativeManager.SetWinEventHook(
+			PInvoke.EVENT_SYSTEM_MsZESTART,
+			PInvoke.EVENT_SYSTEM_MsZEEND,
+			_hookDelegates
 		);
 
 		// If any of the above hooks are invalid, we dispose the WindowManager instance and return false.

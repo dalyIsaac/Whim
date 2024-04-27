@@ -5,9 +5,9 @@ using Windows.Win32.Foundation;
 namespace Whim;
 
 /// <summary>
-/// The slice containing windows.
+/// The sector containing windows.
 /// </summary>
-public class WindowSlice : ISlice
+public class WindowSector : SectorBase
 {
 	/// <summary>
 	/// All the windows currently tracked by Whim.

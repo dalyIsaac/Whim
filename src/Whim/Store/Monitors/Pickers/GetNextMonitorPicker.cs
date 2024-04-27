@@ -15,7 +15,7 @@ public record GetNextMonitorPicker(IMonitor Monitor, bool GetFirst = false) : Pi
 {
 	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx)
 	{
-		ImmutableArray<IMonitor> monitors = ctx.Store.MonitorSlice.Monitors;
+		ImmutableArray<IMonitor> monitors = ctx.Store.Monitors.Monitors;
 
 		int idx = monitors.IndexOf(Monitor);
 		if (idx == -1)

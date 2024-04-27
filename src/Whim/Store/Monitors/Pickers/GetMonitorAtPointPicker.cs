@@ -18,16 +18,16 @@ public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = fa
 	internal override Result<int> Execute(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug($"Getting monitor at point {Point}");
-		MonitorSlice slice = ctx.Store.MonitorSlice;
+		MonitorSector sector = ctx.Store.Monitors;
 
 		HMONITOR hmonitor = internalCtx.CoreNativeManager.MonitorFromPoint(
 			Point.ToSystemPoint(),
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
 
-		for (int idx = 0; idx < slice.Monitors.Length; idx += 1)
+		for (int idx = 0; idx < sector.Monitors.Length; idx += 1)
 		{
-			IMonitor m = slice.Monitors[idx];
+			IMonitor m = sector.Monitors[idx];
 			if (m.Handle == hmonitor)
 			{
 				return Result.FromValue(idx);
@@ -63,12 +63,12 @@ public record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) 
 			return Result.FromException<IMonitor>(idxResult.Error!);
 		}
 
-		MonitorSlice slice = ctx.Store.MonitorSlice;
-		if (idxVal > slice.Monitors.Length)
+		MonitorSector sector = ctx.Store.Monitors;
+		if (idxVal > sector.Monitors.Length)
 		{
 			return Result.FromException<IMonitor>(new WhimException("Monitor index is invalid"));
 		}
 
-		return Result.FromValue(slice.Monitors[idxVal]);
+		return Result.FromValue(sector.Monitors[idxVal]);
 	}
 }

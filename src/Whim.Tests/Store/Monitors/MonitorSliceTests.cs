@@ -12,7 +12,7 @@ public class MonitorSliceTests
 	internal void Initialize(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorSlice sut = new(ctx, internalCtx);
+		MonitorSector sut = new(ctx, internalCtx);
 
 		// When
 		sut.Initialize();
@@ -26,7 +26,7 @@ public class MonitorSliceTests
 	internal void Dispose(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		MonitorSlice sut = new(ctx, internalCtx);
+		MonitorSector sut = new(ctx, internalCtx);
 
 		// When we initialize and dispose
 		sut.Initialize();

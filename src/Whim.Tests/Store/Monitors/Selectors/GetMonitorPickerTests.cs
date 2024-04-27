@@ -12,8 +12,8 @@ public class GetMonitorPickerTests
 	internal void GetActiveMonitor(IContext ctx, IMonitor monitor)
 	{
 		// Given
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor);
-		ctx.Store.MonitorSlice.ActiveMonitorIndex = 0;
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
+		ctx.Store.Monitors.ActiveMonitorIndex = 0;
 
 		GetActiveMonitorPicker sut = new();
 
@@ -28,8 +28,8 @@ public class GetMonitorPickerTests
 	internal void GetPrimaryMonitor(IContext ctx, IMonitor monitor)
 	{
 		// Given
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor);
-		ctx.Store.MonitorSlice.PrimaryMonitorIndex = 0;
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
+		ctx.Store.Monitors.PrimaryMonitorIndex = 0;
 
 		GetPrimaryMonitorPicker sut = new();
 
@@ -44,8 +44,8 @@ public class GetMonitorPickerTests
 	internal void GetLastWhimActiveMonitor(IContext ctx, IMonitor monitor)
 	{
 		// Given
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor);
-		ctx.Store.MonitorSlice.LastWhimActiveMonitorIndex = 0;
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
+		ctx.Store.Monitors.LastWhimActiveMonitorIndex = 0;
 
 		GetLastWhimActiveMonitorPicker sut = new();
 
@@ -60,7 +60,7 @@ public class GetMonitorPickerTests
 	internal void GetAllMonitors(IContext ctx, IMonitor monitor, IMonitor monitor2)
 	{
 		// Given
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor, monitor2);
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor, monitor2);
 
 		GetAllMonitorsPicker sut = new();
 

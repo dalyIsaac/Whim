@@ -12,8 +12,8 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
 using Xunit;
-
-namespace Whim.Tests;
+s
+namespace Whim.Tess
 
 internal class WindowManagerCustomization : ICustomization
 {
@@ -199,7 +199,7 @@ public class WindowManagerTests
 			() => windowManager.OnWindowFocused(window)
 		);
 
-		// Then
+		// ThensWindows.
 		internalCtx.MonitorManager.Received(1).OnWindowFocused(window);
 		Assert.Equal(window, result.Arguments.Window);
 	}

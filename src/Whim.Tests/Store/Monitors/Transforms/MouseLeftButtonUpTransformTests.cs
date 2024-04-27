@@ -23,7 +23,7 @@ public class MouseLeftButtonUpTransformTests
 		SetMonitorAtPoint(internalCtx, (HMONITOR)2);
 
 		monitor.Handle.Returns((HMONITOR)1);
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor);
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
 
 		Point<int> point = new(10, 10);
 		MouseLeftButtonUpTransform sut = new(point);
@@ -32,7 +32,7 @@ public class MouseLeftButtonUpTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// The active monitor index doesn't update
-		Assert.Equal(-1, ctx.Store.MonitorSlice.ActiveMonitorIndex);
+		Assert.Equal(-1, ctx.Store.Monitors.ActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -42,7 +42,7 @@ public class MouseLeftButtonUpTransformTests
 		SetMonitorAtPoint(internalCtx, (HMONITOR)2);
 
 		monitor.Handle.Returns((HMONITOR)2);
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor);
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
 
 		Point<int> point = new(10, 10);
 		MouseLeftButtonUpTransform sut = new(point);
@@ -51,6 +51,6 @@ public class MouseLeftButtonUpTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// The active monitor index updated
-		Assert.Equal(0, ctx.Store.MonitorSlice.ActiveMonitorIndex);
+		Assert.Equal(0, ctx.Store.Monitors.ActiveMonitorIndex);
 	}
 }

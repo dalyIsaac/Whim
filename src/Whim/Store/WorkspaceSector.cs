@@ -4,9 +4,9 @@ using System.Collections.Immutable;
 namespace Whim;
 
 /// <summary>
-/// The slice containing workspaces.
+/// The sector containing workspaces.
 /// </summary>
-public class WorkspaceSlice : ISlice
+public class WorkspaceSector : SectorBase
 {
 	/// <summary>
 	/// All the workspaces currently tracked by Whim.

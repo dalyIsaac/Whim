@@ -42,10 +42,10 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void Initialize()
 	{
-		_context.Store.MonitorSlice.MonitorsChanged += MonitorSlice_MonitorsChanged;
+		_context.Store.Monitors.MonitorsChanged += MonitorSector_MonitorsChanged;
 	}
 
-	private void MonitorSlice_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
+	private void MonitorSector_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
 		MonitorsChanged?.Invoke(sender, e);
 
 	public void OnWindowFocused(IWindow? window)
@@ -79,12 +79,12 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!_disposedValue)
+		if (!_disposedValue)ector
 		{
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.Store.MonitorSlice.MonitorsChanged -= MonitorSlice_MonitorsChanged;
+				_context.Store.MonitorSector.MonitorsChanged -= MonitorSector_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

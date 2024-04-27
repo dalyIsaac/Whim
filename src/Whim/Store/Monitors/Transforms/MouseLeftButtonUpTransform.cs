@@ -13,9 +13,9 @@ internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
 	{
 		if (ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point)).TryGet(out int idx))
 		{
-			ctx.Store.MonitorSlice.ActiveMonitorIndex = idx;
+			ctx.Store.MonitorSector.ActiveMonitorIndex = idx;
 		}
 
-		return Empty.Result;
+		return Empty.Resultector
 	}
 }

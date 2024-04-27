@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using DotNext;
 
 namespace Whim;
@@ -69,51 +68,21 @@ public abstract record Picker<TResult>()
 }
 
 /// <summary>
-/// A slice of data in Whim's <see cref="Store"/>.
-/// </summary>
-public abstract class ISlice
-{
-	/// <summary>
-	/// Queue of events to dispatch.
-	/// </summary>
-	protected readonly List<EventArgs> _events = new();
-
-	/// <summary>
-	/// Initialize the event listeners.
-	/// </summary>
-	internal abstract void Initialize();
-
-	/// <summary>
-	/// Dispatch the events for the slice.
-	/// </summary>
-	internal abstract void DispatchEvents();
-
-	/// <summary>
-	/// Add the given <paramref name="eventArgs"/> to the queue of events.
-	/// </summary>
-	/// <param name="eventArgs"></param>
-	internal void QueueEvent(EventArgs eventArgs)
-	{
-		_events.Add(eventArgs);
-	}
-}
-
-/// <summary>
 /// Whim's store.
 /// </summary>
 public interface IStore : IDisposable
 {
-	/// <inheritdoc cref="MonitorSlice"/>
-	public MonitorSlice MonitorSlice { get; }
+	/// <inheritdoc cref="MonitorSector"/>
+	public MonitorSector Monitors { get; }
 
-	/// <inheritdoc cref="WorkspaceSlice" />
-	public WorkspaceSlice WorkspaceSlice { get; }
+	/// <inheritdoc cref="WorkspaceSector" />
+	public WorkspaceSector Workspaces { get; }
 
-	/// <inheritdoc cref="MapSlice" />
-	public MapSlice MapSlice { get; }
+	/// <inheritdoc cref="MapSector" />
+	public MapSector Maps { get; }
 
-	/// <inheritdoc cref="WindowSlice" />
-	public WindowSlice WindowSlice { get; }
+	/// <inheritdoc cref="MapSector" />
+	public WindowSector Windows { get; }
 
 	/// <summary>
 	/// Initialize the event listeners.
@@ -161,35 +130,35 @@ public class Store : IStore
 	private bool _disposedValue;
 
 	/// <inheritdoc />
-	public MonitorSlice MonitorSlice { get; }
+	public MonitorSector Monitors { get; }
 
 	/// <inheritdoc />
-	public WorkspaceSlice WorkspaceSlice { get; }
+	public WorkspaceSector Workspaces { get; }
 
 	/// <inheritdoc />
-	public MapSlice MapSlice { get; }
+	public MapSector Maps { get; }
 
 	/// <inheritdoc />
-	public WindowSlice WindowSlice { get; }
+	public WindowSector Windows { get; }
 
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
 		_internalCtx = internalCtx;
 
-		MonitorSlice = new MonitorSlice(ctx, internalCtx);
-		WorkspaceSlice = new WorkspaceSlice();
-		MapSlice = new MapSlice();
-		WindowSlice = new WindowSlice();
+		Monitors = new MonitorSector(ctx, internalCtx);
+		Workspaces = new WorkspaceSector();
+		Maps = new MapSector();
+		Windows = new WindowSector();
 	}
 
 	/// <inheritdoc />
 	public void Initialize()
 	{
-		MonitorSlice.Initialize();
-		WorkspaceSlice.Initialize();
-		MapSlice.Initialize();
-		WindowSlice.Initialize();
+		Monitors.Initialize();
+		Workspaces.Initialize();
+		Maps.Initialize();
+		Windows.Initialize();
 	}
 
 	/// <inheritdoc />
@@ -211,13 +180,13 @@ public class Store : IStore
 	private void DispatchEvents()
 	{
 		Logger.Debug("Dispatching events");
-		MonitorSlice.DispatchEvents();
-		WorkspaceSlice.DispatchEvents();
-		MapSlice.DispatchEvents();
-		WindowSlice.DispatchEvents();
+		Monitors.DispatchEvents();
+		Workspaces.DispatchEvents();
+		Maps.DispatchEvents();
+		Windows.DispatchEvents();
 	}
 
-	/// <inheritdoc cref="WindowSlice" />
+	/// <inheritdoc cref="Windows" />
 	public TResult Pick<TResult>(Picker<TResult> picker)
 	{
 		// TODO: reader-writer lock.
@@ -233,7 +202,7 @@ public class Store : IStore
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				MonitorSlice.Dispose();
+				Monitors.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

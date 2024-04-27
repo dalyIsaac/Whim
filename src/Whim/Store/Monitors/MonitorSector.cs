@@ -4,9 +4,9 @@ using System.Collections.Immutable;
 namespace Whim;
 
 /// <summary>
-/// The slice containing monitors.
+/// The sector containing monitors.
 /// </summary>
-public class MonitorSlice : ISlice, IDisposable
+public class MonitorSector : SectorBase, IDisposable
 {
 	private readonly IContext _ctx;
 	private readonly MonitorEventListener _listener;
@@ -37,7 +37,7 @@ public class MonitorSlice : ISlice, IDisposable
 	/// </summary>
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
-	internal MonitorSlice(IContext ctx, IInternalContext internalCtx)
+	internal MonitorSector(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
 		_listener = new(ctx, internalCtx);

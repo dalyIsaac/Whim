@@ -32,7 +32,7 @@ public class GetMonitorAtPointPickerTests
 			.Returns(foundMonitorHandle);
 
 		monitor.Handle.Returns(monitorHandle);
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor);
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
 	}
 
 	private static readonly IPoint<int> _point = new Point<int>(10, 10);

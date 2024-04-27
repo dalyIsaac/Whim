@@ -4,9 +4,9 @@ using System.Collections.Immutable;
 namespace Whim;
 
 /// <summary>
-/// The slice containing window-workspace and workspace-monitor mappings.
+/// The sector containing window-workspace and workspace-monitor mappings.
 /// </summary>
-public class MapSlice : ISlice
+public class MapSector : SectorBase
 {
 	/// <summary>
 	/// The mappings of windows to workspaces.

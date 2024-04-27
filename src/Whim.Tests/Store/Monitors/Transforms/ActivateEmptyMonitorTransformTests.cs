@@ -16,15 +16,15 @@ public class ActivateEmptyMonitorTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the ActiveMonitorIndex was not updated
-		Assert.Equal(-1, ctx.Store.MonitorSlice.ActiveMonitorIndex);
+		Assert.Equal(-1, ctx.Store.Monitors.ActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void MonitorFound(IContext ctx, IMonitor monitor, IMonitor monitor1)
 	{
 		// Given the store contains multiple monitors
-		ctx.Store.MonitorSlice.Monitors = ImmutableArray.Create(monitor, monitor1);
-		ctx.Store.MonitorSlice.ActiveMonitorIndex = 1;
+		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor, monitor1);
+		ctx.Store.Monitors.ActiveMonitorIndex = 1;
 
 		ActivateEmptyMonitorTransform sut = new(monitor);
 
@@ -32,6 +32,6 @@ public class ActivateEmptyMonitorTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the ActiveMonitorIndex was updated
-		Assert.Equal(0, ctx.Store.MonitorSlice.ActiveMonitorIndex);
+		Assert.Equal(0, ctx.Store.Monitors.ActiveMonitorIndex);
 	}
 }
