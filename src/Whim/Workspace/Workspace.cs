@@ -19,9 +19,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	private bool _disposedValue;
 
-	private bool GetThis(ImmutableWorkspace w, int _) => w.Id == Id;
+	private ImmutableWorkspace GetThis() => _context.Store.Pick(new GetWorkspaceByIdPicker(Id))!.Value;
 
-	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(new GetActiveLayoutEnginePicker(GetThis));
+	public IWindow? LastFocusedWindow => _context.Store.Pick(new GetLastFocusedWindowPicker(GetThis())).Value!;
+
+	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(new GetActiveLayoutEnginePicker(GetThis()));
 
 	/// <summary>
 	/// All the windows in this workspace.
