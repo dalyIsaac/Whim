@@ -118,74 +118,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	public bool TrySetLayoutEngineFromName(string name) =>
-		_context
-			.Store.Dispatch(new ActivateLayoutEngineTransform(GetThis(), (_, idx) => _layoutEngines[idx].Name == name))
-			.IsSuccessful;
+		_context.Store.Dispatch(new ActivateLayoutEngineTransform(GetThis(), (l, _) => l.Name == name)).IsSuccessful;
 
 	public bool AddWindow(IWindow window) =>
 		_context.Store.Dispatch(new AddWindowToWorkspaceTransform(GetThis(), window)).IsSuccessful;
 
-	public bool RemoveWindow(IWindow window)
-	{
-		bool success;
-		Logger.Debug($"Removing window {window} from workspace {Name}");
-
-		if (window.Equals(LastFocusedWindow))
-		{
-			// Find the next window to focus.
-			foreach (IWindow nextWindow in Windows)
-			{
-				if (nextWindow.Equals(window))
-				{
-					continue;
-				}
-
-				if (!nextWindow.IsMinimized)
-				{
-					LastFocusedWindow = nextWindow;
-					break;
-				}
-			}
-
-			// If there are no other windows, set the last focused window to null.
-			if (LastFocusedWindow.Equals(window))
-			{
-				LastFocusedWindow = null;
-			}
-		}
-
-		bool isWindow = _windows.Contains(window);
-		if (!isWindow)
-		{
-			Logger.Error($"Window {window} already does not exist in workspace {Name}");
-			return false;
-		}
-
-		success = true;
-
-		for (int idx = 0; idx < _layoutEngines.Length; idx++)
-		{
-			ILayoutEngine oldEngine = _layoutEngines[idx];
-			ILayoutEngine newEngine = oldEngine.RemoveWindow(window);
-
-			if (newEngine == oldEngine)
-			{
-				Logger.Error($"Window {window} could not be removed from layout engine {oldEngine}");
-				success = false;
-			}
-			else
-			{
-				_layoutEngines[idx] = newEngine;
-			}
-		}
-
-		if (success)
-		{
-			_windows.Remove(window);
-		}
-
-		return success;
-	}
+	public bool RemoveWindow(IWindow window) =>
+		_context.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(GetThis(), window)).IsSuccessful;
 
 	/// <summary>
 	/// Returns the window to process. If the window is null, the last focused window is used.

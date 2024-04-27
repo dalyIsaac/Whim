@@ -21,21 +21,34 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 		MutableRootSector mutableRootSector
 	)
 	{
-		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
+		WorkspaceSector sector = mutableRootSector.Workspaces;
 
-		for (int idx = 0; idx < slice.Workspaces.Count; idx++)
+		if (sector.Workspaces.Count - 1 < mutableRootSector.Monitors.Monitors.Length)
 		{
-			ImmutableWorkspace workspace = slice.Workspaces[idx];
-
-			if (!ShouldRemove(workspace))
-			{
-				continue;
-			}
-
-			return WorkspaceUtils.Remove(ctx, idx);
+			return Result.FromException<Empty>(new WhimException("There must be a workspace for each monitor"));
 		}
 
-		return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
+		int idx = sector.Workspaces.FindIndex(ShouldRemove);
+		if (idx == -1)
+		{
+			return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
+		}
+
+		// Remove the workspace
+		ImmutableWorkspace oldWorkspace = sector.Workspaces[idx];
+		sector.Workspaces = sector.Workspaces.RemoveAt(idx);
+
+		IWorkspace oldMutableWorkspace = sector.MutableWorkspaces[idx];
+		sector.MutableWorkspaces = sector.MutableWorkspaces.RemoveAt(idx);
+
+		// Queue events
+		ctx.Butler.MergeWorkspaceWindows(oldMutableWorkspace, sector.MutableWorkspaces[^1]);
+		ctx.Butler.Activate(sector.MutableWorkspaces[^1]);
+
+		sector.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = oldWorkspace });
+		sector.WorkspacesToLayout.Remove(oldWorkspace.Id);
+
+		return Empty.Result;
 	}
 }
 
