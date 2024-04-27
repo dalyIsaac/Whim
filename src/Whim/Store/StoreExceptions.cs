@@ -8,7 +8,7 @@ internal static partial class StoreExceptions
 
 	public static WhimException WindowNotFound(HWND handle) => new($"Could not find window with handle {handle}");
 
-	public static WhimException MonitorNotFound(IMonitor monitor) => new($"Monitor {monitor} not found.");
+	public static WhimException MonitorNotFound(IMonitor monitor) => new($"Monitor {monitor} not found in store.");
 
 	public static WhimException NoWorkspaceFoundForMonitor(IMonitor monitor) =>
 		new($"No workspace found for monitor {monitor}.");
@@ -41,4 +41,6 @@ internal static partial class StoreExceptions
 		new($"Window {handle} has a visible owner, ignoring.");
 
 	public static WhimException IgnoredByFilter(HWND handle) => new("Window was ignored by filter");
+
+	public static WhimException WorkspaceNotFound() => new($"Workspace not found in store.");
 }

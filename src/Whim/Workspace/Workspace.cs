@@ -148,22 +148,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		bool deferLayout = false
 	)
 	{
-		Logger.Debug($"Moving window {window} in workspace {Name} in direction {edges} by {deltas}");
-		if (GetValidVisibleWindow(window) is not IWindow validWindow)
-		{
-			return false;
-		}
-
-		ILayoutEngine newEngine = ActiveLayoutEngine.MoveWindowEdgesInDirection(edges, deltas, validWindow);
-		bool changed = ActiveLayoutEngine != newEngine;
-		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
-
-		if (!deferLayout)
-		{
-			DoLayout();
-		}
-
-		return changed;
+		Result<bool> result = _context.Store.Dispatch(
+			new MoveWindowEdgesInDirectionTransform(GetThis(), window, edges, deltas)
+		);
+		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
 	}
 
 	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false)

@@ -17,12 +17,14 @@ public record SwapWindowInDirectionTransform(ImmutableWorkspace Workspace, IWind
 	/// <returns></returns>
 	protected override ImmutableWorkspace Operation(IWindow window)
 	{
-		ILayoutEngine newEngine = Workspace
-			.LayoutEngines[Workspace.ActiveLayoutEngineIndex]
-			.SwapWindowInDirection(Direction, window);
-		return Workspace with
-		{
-			LayoutEngines = Workspace.LayoutEngines.SetItem(Workspace.ActiveLayoutEngineIndex, newEngine)
-		};
+		ILayoutEngine oldEngine = Workspace.LayoutEngines[Workspace.ActiveLayoutEngineIndex];
+		ILayoutEngine newEngine = oldEngine.SwapWindowInDirection(Direction, window);
+
+		return oldEngine == newEngine
+			? Workspace
+			: Workspace with
+			{
+				LayoutEngines = Workspace.LayoutEngines.SetItem(Workspace.ActiveLayoutEngineIndex, newEngine)
+			};
 	}
 }

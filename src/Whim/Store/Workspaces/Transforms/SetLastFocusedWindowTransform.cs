@@ -13,5 +13,6 @@ public record SetLastFocusedWindowTransform(ImmutableWorkspace Workspace, IWindo
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	protected override ImmutableWorkspace Operation(IWindow window) => Workspace with { LastFocusedWindow = window };
+	protected override ImmutableWorkspace Operation(IWindow window) =>
+		Workspace.LastFocusedWindow == window ? Workspace : Workspace with { LastFocusedWindow = window };
 }

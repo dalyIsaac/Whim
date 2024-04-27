@@ -34,7 +34,7 @@ public abstract record BaseWorkspaceWindowTransform(
 		int idx = sector.Workspaces.IndexOf(Workspace);
 		if (idx == -1)
 		{
-			return Result.FromException<bool>(WorkspaceUtils.WorkspaceDoesNotExist());
+			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound());
 		}
 
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(Workspace, Window, DefaultToLastFocusedWindow);

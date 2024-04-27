@@ -64,7 +64,4 @@ internal static class WorkspaceUtils
 
 		return Result.FromValue(window);
 	}
-
-	public static WhimException WorkspaceDoesNotExist() =>
-		new("Provided workspace did not exist in collection, could not remove");
 }
