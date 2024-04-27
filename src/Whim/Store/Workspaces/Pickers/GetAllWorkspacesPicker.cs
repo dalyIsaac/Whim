@@ -7,9 +7,10 @@ namespace Whim;
 /// </summary>
 public record GetAllWorkspacesPicker() : Picker<ImmutableList<ImmutableWorkspace>>
 {
-	internal override ImmutableList<ImmutableWorkspace> Execute(IContext ctx, IInternalContext internalCtx)
-	{
-		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
-		return slice.Workspaces;
-	}
+	internal override ImmutableList<ImmutableWorkspace> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IRootSector rootSelector
+	)
+	=> rootSelector.Workspaces.Workspaces;
 }

@@ -16,7 +16,6 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 
 	public bool DoLayout(
 		IWorkspace workspace,
-		WorkspaceManagerTriggers triggers,
 		Dictionary<HWND, IWindowState> windowStates
 	)
 	{

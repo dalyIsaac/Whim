@@ -14,7 +14,11 @@ namespace Whim;
 /// </param>
 public record SetWorkspaceNameTransform(Guid Id, string Name) : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
 		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
 

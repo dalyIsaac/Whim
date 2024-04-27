@@ -6,7 +6,11 @@ namespace Whim;
 /// <param name="Workspace">The workspace to get the active layout engine for.</param>
 public record GetActiveLayoutEnginePicker(ImmutableWorkspace Workspace) : Picker<ILayoutEngine>
 {
-	internal override ILayoutEngine Execute(IContext ctx, IInternalContext internalCtx)
+	internal override ILayoutEngine Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IRootSector rootSelector
+	)
 	{
 		int layoutEngineIdx = Workspace.ActiveLayoutEngineIndex;
 		return Workspace.LayoutEngines[layoutEngineIdx];

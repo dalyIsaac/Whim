@@ -8,6 +8,9 @@ namespace Whim;
 /// <param name="Workspace">The workspace to get the last focused window for.</param>
 public record GetLastFocusedWindowPicker(ImmutableWorkspace Workspace) : Picker<Result<IWindow?>>
 {
-	internal override Result<IWindow?> Execute(IContext ctx, IInternalContext internalCtx) =>
-		Result.FromValue(Workspace.LastFocusedWindow);
+	internal override Result<IWindow?> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IRootSector rootSelector
+	) => Result.FromValue(Workspace.LastFocusedWindow);
 }

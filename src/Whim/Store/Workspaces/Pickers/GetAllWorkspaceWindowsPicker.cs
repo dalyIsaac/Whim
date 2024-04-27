@@ -9,9 +9,13 @@ namespace Whim;
 /// <param name="Workspace"></param>
 public record GetAllWorkspaceWindowsPicker(ImmutableWorkspace Workspace) : Picker<Result<IEnumerable<IWindow>>>
 {
-	internal override Result<IEnumerable<IWindow>> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<IEnumerable<IWindow>> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IRootSector rootSelector
+	)
 	{
-		if (!ctx.Store.WorkspaceSlice.Workspaces.Contains(Workspace))
+		if (!rootSelector.Workspaces.Workspaces.Contains(Workspace))
 		{
 			return Result.FromException<IEnumerable<IWindow>>(WorkspaceUtils.WorkspaceDoesNotExist());
 		}

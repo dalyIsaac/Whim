@@ -13,11 +13,15 @@ namespace Whim;
 /// </param>
 public record CycleLayoutEngineTransform(ImmutableWorkspace Workspace, bool Reverse = false) : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
+		WorkspaceSector sector = mutableRootSector.Workspaces;
 
-		int workspaceIdx = slice.Workspaces.IndexOf(Workspace);
+		int workspaceIdx = sector.Workspaces.IndexOf(Workspace);
 		if (workspaceIdx == -1)
 		{
 			return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
@@ -26,7 +30,7 @@ public record CycleLayoutEngineTransform(ImmutableWorkspace Workspace, bool Reve
 		int delta = Reverse ? -1 : 1;
 		int layoutEngineIdx = (Workspace.ActiveLayoutEngineIndex + delta).Mod(Workspace.LayoutEngines.Count);
 
-		WorkspaceUtils.SetActiveLayoutEngine(slice, workspaceIdx, layoutEngineIdx);
+		WorkspaceUtils.SetActiveLayoutEngine(sector, workspaceIdx, layoutEngineIdx);
 		return Empty.Result;
 	}
 }

@@ -9,17 +9,17 @@ namespace Whim.Tests;
 public class AddWorkspaceTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void NoEngineCreators(IContext ctx)
+	internal void NoEngineCreators(IContext ctx, MutableRootSector mutableRootSector)
 	{
 		// Given no engine creators were provided
-		ctx.Store.WorkspaceSlice.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
+		mutableRootSector.Workspaces.CreateLayoutEngines = Array.Empty<CreateLeafLayoutEngine>;
 		AddWorkspaceTransform sut = new();
 
 		// When the transform is dispatched
 		Result<ImmutableWorkspace>? result = null;
 		CustomAssert.DoesNotRaise<WorkspaceAddedEventArgs>(
-			h => ctx.Store.WorkspaceSlice.WorkspaceAdded += h,
-			h => ctx.Store.WorkspaceSlice.WorkspaceAdded -= h,
+			h => mutableRootSector.Workspaces.WorkspaceAdded += h,
+			h => mutableRootSector.Workspaces.WorkspaceAdded -= h,
 			() =>
 			{
 				result = ctx.Store.Dispatch(sut);
@@ -53,18 +53,19 @@ public class AddWorkspaceTransformTests
 
 	[MemberAutoSubstituteData<StoreCustomization>(nameof(Success_Data))]
 	[Theory]
-	public void Success(
+	internal void Success(
 		string? name,
 		IEnumerable<CreateLeafLayoutEngine>? transformCreators,
 		Func<CreateLeafLayoutEngine[]>? sliceCreators,
 		string expectedName,
-		IContext ctx
+		IContext ctx,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given
 		if (sliceCreators is not null)
 		{
-			ctx.Store.WorkspaceSlice.CreateLayoutEngines = sliceCreators;
+			mutableRootSector.Workspaces.CreateLayoutEngines = sliceCreators;
 		}
 
 		AddWorkspaceTransform sut = new(name, transformCreators);
@@ -72,8 +73,8 @@ public class AddWorkspaceTransformTests
 		// When the transform is dispatched
 		Result<ImmutableWorkspace>? result = null;
 		Assert.Raises<WorkspaceAddedEventArgs>(
-			h => ctx.Store.WorkspaceSlice.WorkspaceAdded += h,
-			h => ctx.Store.WorkspaceSlice.WorkspaceAdded -= h,
+			h => mutableRootSector.Workspaces.WorkspaceAdded += h,
+			h => mutableRootSector.Workspaces.WorkspaceAdded -= h,
 			() =>
 			{
 				result = ctx.Store.Dispatch(sut);
@@ -83,6 +84,6 @@ public class AddWorkspaceTransformTests
 		// Then the worksapce is created
 		Assert.True(result!.Value.IsSuccessful);
 		Assert.Equal(expectedName, result!.Value.Value.Name);
-		Assert.Single(ctx.Store.WorkspaceSlice.Workspaces);
+		Assert.Single(mutableRootSector.Workspaces.Workspaces);
 	}
 }

@@ -14,7 +14,11 @@ namespace Whim;
 public record SetActiveLayoutEngineTransform(ImmutableWorkspace Workspace, Pred<ILayoutEngine> LayoutEnginePredicate)
 	: Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
 		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
 

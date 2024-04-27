@@ -8,10 +8,14 @@ namespace Whim;
 /// <param name="Name"></param>
 public record GetWorkspaceByNamePicker(string Name) : Picker<Result<ImmutableWorkspace>>
 {
-	internal override Result<ImmutableWorkspace> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<ImmutableWorkspace> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IRootSector rootSelector
+	)
 	{
-		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
-		ImmutableWorkspace? workspace = slice.Workspaces.Find(w => w.Name == Name);
+		IWorkspaceSector sector = rootSelector.Workspaces;
+		ImmutableWorkspace? workspace = sector.Workspaces.Find(w => w.Name == Name);
 
 		return workspace is null
 			? Result.FromException<ImmutableWorkspace>(new WhimException($"Workspace with name {Name} not found"))

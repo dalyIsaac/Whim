@@ -21,10 +21,14 @@ public record AddWorkspaceTransform(
 	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines = null
 ) : Transform<ImmutableWorkspace>
 {
-	internal override Result<ImmutableWorkspace> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<ImmutableWorkspace> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
-		CreateLeafLayoutEngine[] engineCreators = CreateLeafLayoutEngines?.ToArray() ?? slice.CreateLayoutEngines();
+		WorkspaceSector sector = mutableRootSector.Workspaces;
+		CreateLeafLayoutEngine[] engineCreators = CreateLeafLayoutEngines?.ToArray() ?? sector.CreateLayoutEngines();
 
 		if (engineCreators.Length == 0)
 		{
@@ -42,7 +46,7 @@ public record AddWorkspaceTransform(
 		for (int engineIdx = 0; engineIdx < engineCreators.Length; engineIdx++)
 		{
 			ILayoutEngine currentEngine = layoutEngines[engineIdx];
-			foreach (CreateProxyLayoutEngine createProxyLayoutEngineFn in slice.ProxyLayoutEngines)
+			foreach (CreateProxyLayoutEngine createProxyLayoutEngineFn in sector.ProxyLayoutEngines)
 			{
 				ILayoutEngine proxy = createProxyLayoutEngineFn(currentEngine);
 				layoutEngines[engineIdx] = proxy;
@@ -50,12 +54,12 @@ public record AddWorkspaceTransform(
 			}
 		}
 
-		ImmutableWorkspace workspace = new(Guid.NewGuid(), Name ?? $"Workspace {slice.Workspaces.Count + 1}");
+		ImmutableWorkspace workspace = new(Guid.NewGuid(), Name ?? $"Workspace {sector.Workspaces.Count + 1}");
 
-		slice.Workspaces = slice.Workspaces.Add(workspace);
-		slice.MutableWorkspaces = slice.MutableWorkspaces.Add(new Workspace(ctx, internalCtx, workspace.Id));
+		sector.Workspaces = sector.Workspaces.Add(workspace);
+		sector.MutableWorkspaces = sector.MutableWorkspaces.Add(new Workspace(ctx, internalCtx, workspace.Id));
 
-		slice.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
+		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
 
 		return Result.FromValue(workspace);
 	}

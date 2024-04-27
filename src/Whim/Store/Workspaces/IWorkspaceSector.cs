@@ -11,7 +11,9 @@ public interface IWorkspaceSector
 	/// <summary>
 	/// All the workspaces currently tracked by Whim.
 	/// </summary>
-	ImmutableList<IWorkspace> Workspaces { get; }
+	ImmutableList<ImmutableWorkspace> Workspaces { get; }
+
+	ImmutableList<IWorkspace> MutableWorkspaces { get; }
 
 	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; }
 

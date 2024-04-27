@@ -4,36 +4,36 @@ namespace Whim;
 
 internal static class WorkspaceUtils
 {
-	public static Result<Empty> Remove(IContext ctx, int idx)
+	public static Result<Empty> Remove(IContext ctx, MutableRootSector mutableRootSector, int idx)
 	{
-		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
+		WorkspaceSector sector = mutableRootSector.Workspaces;
 
-		if (slice.Workspaces.Count - 1 < ctx.Store.MonitorSlice.Monitors.Length)
+		if (sector.Workspaces.Count - 1 < mutableRootSector.Monitors.Monitors.Length)
 		{
 			return Result.FromException<Empty>(new WhimException("There must be a workspace for each monitor"));
 		}
 
-		ImmutableWorkspace oldWorkspace = slice.Workspaces[idx];
-		slice.Workspaces = slice.Workspaces.RemoveAt(idx);
+		ImmutableWorkspace oldWorkspace = sector.Workspaces[idx];
+		sector.Workspaces = sector.Workspaces.RemoveAt(idx);
 
-		IWorkspace oldMutableWorkspace = slice.MutableWorkspaces[idx];
-		slice.MutableWorkspaces = slice.MutableWorkspaces.RemoveAt(idx);
+		IWorkspace oldMutableWorkspace = sector.MutableWorkspaces[idx];
+		sector.MutableWorkspaces = sector.MutableWorkspaces.RemoveAt(idx);
 
-		ctx.Butler.MergeWorkspaceWindows(oldMutableWorkspace, slice.MutableWorkspaces[^1]);
-		ctx.Butler.Activate(slice.MutableWorkspaces[^1]);
+		ctx.Butler.MergeWorkspaceWindows(oldMutableWorkspace, sector.MutableWorkspaces[^1]);
+		ctx.Butler.Activate(sector.MutableWorkspaces[^1]);
 
-		slice.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = oldWorkspace });
-		slice.WorkspacesToLayout.Remove(oldWorkspace.Id);
+		sector.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = oldWorkspace });
+		sector.WorkspacesToLayout.Remove(oldWorkspace.Id);
 
 		return Empty.Result;
 	}
 
-	public static void SetActiveLayoutEngine(WorkspaceSlice slice, int workspaceIdx, int layoutEngineIdx)
+	public static void SetActiveLayoutEngine(WorkspaceSector sector, int workspaceIdx, int layoutEngineIdx)
 	{
-		ImmutableWorkspace workspace = slice.Workspaces[workspaceIdx];
+		ImmutableWorkspace workspace = sector.Workspaces[workspaceIdx];
 
 		int previousLayoutEngineIdx = workspace.ActiveLayoutEngineIndex;
-		slice.Workspaces = slice.Workspaces.SetItem(
+		sector.Workspaces = sector.Workspaces.SetItem(
 			workspaceIdx,
 			workspace with
 			{
@@ -41,8 +41,8 @@ internal static class WorkspaceUtils
 			}
 		);
 
-		slice.WorkspacesToLayout.Add(workspace.Id);
-		slice.QueueEvent(
+		sector.WorkspacesToLayout.Add(workspace.Id);
+		sector.QueueEvent(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
 				Workspace = workspace,
