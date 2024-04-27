@@ -3,10 +3,7 @@ using System.Collections.Immutable;
 
 namespace Whim;
 
-/// <summary>
-/// The sector containing monitors.
-/// </summary>
-public class MonitorSector : SectorBase, IDisposable
+internal class MonitorSector : SectorBase, IDisposable, IMonitorSector
 {
 	private readonly IContext _ctx;
 	private readonly MonitorEventListener _listener;
@@ -15,43 +12,43 @@ public class MonitorSector : SectorBase, IDisposable
 	/// <summary>
 	/// All the monitors currently tracked by Whim.
 	/// </summary>
-	internal ImmutableArray<IMonitor> Monitors { get; set; } = ImmutableArray<IMonitor>.Empty;
+	public ImmutableArray<IMonitor> Monitors { get; set; } = ImmutableArray<IMonitor>.Empty;
 
 	/// <summary>
 	/// The index of the monitor which is currently active, in <see cref="Monitors"/>.
 	/// </summary>
-	internal int ActiveMonitorIndex { get; set; } = -1;
+	public int ActiveMonitorIndex { get; set; } = -1;
 
 	/// <summary>
 	/// The index of the primary monitor, in <see cref="Monitors"/>.
 	/// </summary>
-	internal int PrimaryMonitorIndex { get; set; } = -1;
+	public int PrimaryMonitorIndex { get; set; } = -1;
 
 	/// <summary>
 	/// The index of the last monitor which received an event sent by Windows which Whim did not ignore.
 	/// </summary>
-	internal int LastWhimActiveMonitorIndex { get; set; } = -1;
+	public int LastWhimActiveMonitorIndex { get; set; } = -1;
 
 	/// <summary>
 	/// Event raised when the monitors handled by Whim are changed.
 	/// </summary>
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
-	internal MonitorSector(IContext ctx, IInternalContext internalCtx)
+	public MonitorSector(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
 		_listener = new(ctx, internalCtx);
 	}
 
 	/// <inheritdoc/>
-	internal override void Initialize()
+	public override void Initialize()
 	{
 		_ctx.Store.Dispatch(new MonitorsChangedTransform());
 		_listener.Initialize();
 	}
 
 	/// <inheritdoc/>
-	internal override void DispatchEvents()
+	public override void DispatchEvents()
 	{
 		foreach (EventArgs eventArgs in _events)
 		{

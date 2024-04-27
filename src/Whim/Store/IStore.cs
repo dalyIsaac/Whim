@@ -8,18 +8,6 @@ namespace Whim;
 /// </summary>
 public interface IStore : IDisposable
 {
-	/// <inheritdoc cref="MonitorSector"/>
-	public MonitorSector Monitors { get; }
-
-	/// <inheritdoc cref="WorkspaceSector" />
-	public WorkspaceSector Workspaces { get; }
-
-	/// <inheritdoc cref="MapSector" />
-	public MapSector Maps { get; }
-
-	/// <inheritdoc cref="MapSector" />
-	public WindowSector Windows { get; }
-
 	/// <summary>
 	/// Initialize the event listeners.
 	/// </summary>
