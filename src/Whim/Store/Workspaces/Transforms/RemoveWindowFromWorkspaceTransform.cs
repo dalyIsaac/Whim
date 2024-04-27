@@ -1,5 +1,3 @@
-using DotNext;
-
 namespace Whim;
 
 /// <summary>
@@ -7,52 +5,32 @@ namespace Whim;
 /// </summary>
 /// <param name="Workspace"></param>
 /// <param name="Window"></param>
-public record RemoveWindowFromWorkspaceTransform(ImmutableWorkspace Workspace, IWindow Window) : Transform
+public record RemoveWindowFromWorkspaceTransform(ImmutableWorkspace Workspace, IWindow Window)
+	: BaseWorkspaceWindowTransform(Workspace, Window, false)
 {
-	internal override Result<Empty> Execute(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector
-	)
+	/// <summary>
+	/// Remove the <see cref="Window"/> from the provided <see cref="Workspace"/>
+	/// </summary>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	protected override ImmutableWorkspace Operation(IWindow window)
 	{
-		WorkspaceSector sector = mutableRootSector.Workspaces;
+		ImmutableWorkspace workspace = Workspace with { Windows = Workspace.Windows.Remove(window) };
 
-		int workspaceIdx = sector.Workspaces.IndexOf(Workspace);
-		if (workspaceIdx == -1)
-		{
-			return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
-		}
-
-		ImmutableWorkspace workspace = Workspace;
-
-		if (!workspace.Windows.Contains(Window))
-		{
-			return Result.FromException<Empty>(new WhimException("Window not in workspace"));
-		}
-
-		// Remove the window from the workspace.
-		workspace = workspace with
-		{
-			Windows = workspace.Windows.Remove(Window)
-		};
-
-		workspace = ResetLastFocusedWindow(workspace);
-		workspace = RemoveWindowFromLayoutEngines(workspace);
-
-		// Save the workspace.
-		sector.Workspaces = sector.Workspaces.SetItem(workspaceIdx, workspace);
-
-		return Empty.Result;
+		workspace = ResetLastFocusedWindow(workspace, window);
+		workspace = RemoveWindowFromLayoutEngines(workspace, window);
+		return workspace;
 	}
 
 	/// <summary>
 	/// Reset the last focused window if the removed window was the last focused window.
 	/// </summary>
 	/// <param name="workspace"></param>
+	/// <param name="window"></param>
 	/// <returns></returns>
-	private ImmutableWorkspace ResetLastFocusedWindow(ImmutableWorkspace workspace)
+	private static ImmutableWorkspace ResetLastFocusedWindow(ImmutableWorkspace workspace, IWindow window)
 	{
-		if (!Window.Equals(workspace.LastFocusedWindow))
+		if (!window.Equals(workspace.LastFocusedWindow))
 		{
 			return workspace;
 		}
@@ -60,7 +38,7 @@ public record RemoveWindowFromWorkspaceTransform(ImmutableWorkspace Workspace, I
 		// Find the next window to focus.
 		foreach (IWindow nextWindow in workspace.Windows)
 		{
-			if (nextWindow.Equals(Window))
+			if (nextWindow.Equals(window))
 			{
 				continue;
 			}
@@ -73,7 +51,7 @@ public record RemoveWindowFromWorkspaceTransform(ImmutableWorkspace Workspace, I
 		}
 
 		// If there are no other windows, set the last focused window to null.
-		if (workspace.LastFocusedWindow.Equals(Window))
+		if (workspace.LastFocusedWindow.Equals(window))
 		{
 			workspace = workspace with { LastFocusedWindow = null };
 		}
@@ -81,13 +59,13 @@ public record RemoveWindowFromWorkspaceTransform(ImmutableWorkspace Workspace, I
 		return workspace;
 	}
 
-	private ImmutableWorkspace RemoveWindowFromLayoutEngines(ImmutableWorkspace workspace)
+	private static ImmutableWorkspace RemoveWindowFromLayoutEngines(ImmutableWorkspace workspace, IWindow window)
 	{
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
 		{
 			workspace = workspace with
 			{
-				LayoutEngines = workspace.LayoutEngines.SetItem(idx, workspace.LayoutEngines[idx].RemoveWindow(Window))
+				LayoutEngines = workspace.LayoutEngines.SetItem(idx, workspace.LayoutEngines[idx].RemoveWindow(window))
 			};
 		}
 

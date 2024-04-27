@@ -137,23 +137,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
-		Logger.Debug($"Swapping window {window} in workspace {Name} in direction {direction}");
-
-		if (GetValidVisibleWindow(window) is not IWindow validWindow)
-		{
-			return false;
-		}
-
-		ILayoutEngine newEngine = ActiveLayoutEngine.SwapWindowInDirection(direction, validWindow);
-		bool changed = ActiveLayoutEngine != newEngine;
-		_layoutEngines[_activeLayoutEngineIndex] = newEngine;
-
-		if (!deferLayout)
-		{
-			DoLayout();
-		}
-
-		return changed;
+		Result<bool> result = _context.Store.Dispatch(new SwapWindowInDirectionTransform(GetThis(), window, direction));
+		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
 	}
 
 	public bool MoveWindowEdgesInDirection(

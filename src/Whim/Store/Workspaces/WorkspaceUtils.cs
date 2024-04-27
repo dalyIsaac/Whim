@@ -34,10 +34,23 @@ internal static class WorkspaceUtils
 	/// </summary>
 	/// <param name="workspace"></param>
 	/// <param name="window"></param>
+	/// <param name="defaultToLastFocusedWindow"></param>
 	/// <returns></returns>
-	public static Result<IWindow> GetValidWorkspaceWindow(ImmutableWorkspace workspace, IWindow? window)
+	public static Result<IWindow> GetValidWorkspaceWindow(
+		ImmutableWorkspace workspace,
+		IWindow? window,
+		bool defaultToLastFocusedWindow
+	)
 	{
-		window ??= workspace.LastFocusedWindow;
+		if (window == null)
+		{
+			if (!defaultToLastFocusedWindow)
+			{
+				return Result.FromException<IWindow>(new WhimException("No window provided"));
+			}
+
+			window = workspace.LastFocusedWindow;
+		}
 
 		if (window == null)
 		{
