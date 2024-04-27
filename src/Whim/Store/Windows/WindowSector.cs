@@ -9,7 +9,7 @@ internal class WindowSector : SectorBase, IWindowSector
 	/// <summary>
 	/// All the windows currently tracked by Whim.
 	/// </summary>
-	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
+	public ImmutableDictionary<HWND, IWindow> Windows { get; set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
 	// TODO: Add to StoreTests
 	public override void Initialize() { }
