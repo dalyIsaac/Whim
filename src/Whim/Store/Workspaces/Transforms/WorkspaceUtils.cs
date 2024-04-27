@@ -4,7 +4,42 @@ namespace Whim;
 
 internal static class WorkspaceUtils
 {
-	public static Result<Empty> Remove(IContext ctx, MutableRootSector mutableRootSector, int idx)
+	public static Result<Empty> AddWindow(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		int workspaceIdx,
+		IWindow window
+	)
+	{
+		if (workspaceIdx == -1)
+		{
+			return Result.FromException<Empty>(WorkspaceDoesNotExist());
+		}
+
+		WorkspaceSector sector = mutableRootSector.Workspaces;
+		ImmutableWorkspace workspace = sector.Workspaces[workspaceIdx];
+
+		if (workspace.Windows.Contains(window))
+		{
+			return Empty.Result;
+		}
+
+		workspace = workspace with { Windows = workspace.Windows.Add(window) };
+
+		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
+		{
+			workspace = workspace with
+			{
+				LayoutEngines = workspace.LayoutEngines.SetItem(idx, workspace.LayoutEngines[idx].AddWindow(window))
+			};
+		}
+
+		sector.Workspaces = sector.Workspaces.SetItem(workspaceIdx, workspace);
+
+		return Empty.Result;
+	}
+
+	public static Result<Empty> RemoveWorkspace(IContext ctx, MutableRootSector mutableRootSector, int idx)
 	{
 		WorkspaceSector sector = mutableRootSector.Workspaces;
 

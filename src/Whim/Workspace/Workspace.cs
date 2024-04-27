@@ -103,10 +103,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
-		_context.Store.Dispatch(new SetActiveLayoutEngineTransform(GetThis, (_, idx) => idx == nextIdx)).IsSuccessful;
+		_context.Store.Dispatch(new SetActiveLayoutEngineTransform(GetThis(), (_, idx) => idx == nextIdx)).IsSuccessful;
 
 	public void CycleLayoutEngine(bool reverse = false) =>
-		_context.Store.Dispatch(new CycleLayoutEngineTransform(GetThis, reverse));
+		_context.Store.Dispatch(new CycleLayoutEngineTransform(GetThis(), reverse));
 
 	public void ActivatePreviouslyActiveLayoutEngine() => TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
 
@@ -117,23 +117,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			)
 			.IsSuccessful;
 
-	public bool AddWindow(IWindow window)
-	{
-		Logger.Debug($"Adding window {window} to workspace {Name}");
-
-		if (_windows.Contains(window))
-		{
-			Logger.Error($"Window {window} already exists in workspace {Name}");
-			return false;
-		}
-
-		_windows.Add(window);
-		for (int i = 0; i < _layoutEngines.Length; i++)
-		{
-			_layoutEngines[i] = _layoutEngines[i].AddWindow(window);
-		}
-		return true;
-	}
+	public bool AddWindow(IWindow window) =>
+		_context.Store.Dispatch(new AddWindowToWorkspaceTransform(GetThis(), window)).IsSuccessful;
 
 	public bool RemoveWindow(IWindow window)
 	{
