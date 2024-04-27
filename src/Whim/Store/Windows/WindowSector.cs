@@ -4,10 +4,7 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-/// <summary>
-/// The sector containing windows.
-/// </summary>
-public class WindowSector : SectorBase
+internal class WindowSector : SectorBase, IWindowSector
 {
 	/// <summary>
 	/// All the windows currently tracked by Whim.
@@ -15,9 +12,9 @@ public class WindowSector : SectorBase
 	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
 	// TODO: Add to StoreTests
-	internal override void Initialize() { }
+	public override void Initialize() { }
 
-	internal override void DispatchEvents()
+	public override void DispatchEvents()
 	{
 		foreach (EventArgs eventArgs in _events)
 		{

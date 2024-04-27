@@ -12,5 +12,5 @@ public interface IRootSector
 	public MapSector Maps { get; }
 
 	/// <inheritdoc cref="MapSector" />
-	public WindowSector Windows { get; }
+	public IWindowSector Windows { get; }
 }
