@@ -103,18 +103,23 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
-		_context.Store.Dispatch(new SetActiveLayoutEngineTransform(GetThis(), (_, idx) => idx == nextIdx)).IsSuccessful;
+		_context.Store.Dispatch(new ActivateLayoutEngineTransform(GetThis(), (_, idx) => idx == nextIdx)).IsSuccessful;
 
 	public void CycleLayoutEngine(bool reverse = false) =>
 		_context.Store.Dispatch(new CycleLayoutEngineTransform(GetThis(), reverse));
 
-	public void ActivatePreviouslyActiveLayoutEngine() => TrySetLayoutEngineFromIndex(_prevLayoutEngineIndex);
+	public void ActivatePreviouslyActiveLayoutEngine()
+	{
+		ImmutableWorkspace workspace = GetThis();
+
+		_context.Store.Dispatch(
+			new ActivateLayoutEngineTransform(workspace, (_, idx) => idx == workspace.PreviousLayoutEngineIndex)
+		);
+	}
 
 	public bool TrySetLayoutEngineFromName(string name) =>
 		_context
-			.Store.Dispatch(
-				new SetActiveLayoutEngineTransform(GetWorkspace, (_, idx) => _layoutEngines[idx].Name == name)
-			)
+			.Store.Dispatch(new ActivateLayoutEngineTransform(GetThis(), (_, idx) => _layoutEngines[idx].Name == name))
 			.IsSuccessful;
 
 	public bool AddWindow(IWindow window) =>

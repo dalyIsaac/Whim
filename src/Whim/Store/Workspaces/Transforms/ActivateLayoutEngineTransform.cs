@@ -11,7 +11,7 @@ namespace Whim;
 /// <param name="LayoutEnginePredicate">
 /// A predicate which determines which layout engine should be activated.
 /// </param>
-public record SetActiveLayoutEngineTransform(ImmutableWorkspace Workspace, Pred<ILayoutEngine> LayoutEnginePredicate)
+public record ActivateLayoutEngineTransform(ImmutableWorkspace Workspace, Pred<ILayoutEngine> LayoutEnginePredicate)
 	: Transform
 {
 	internal override Result<Empty> Execute(
@@ -20,9 +20,9 @@ public record SetActiveLayoutEngineTransform(ImmutableWorkspace Workspace, Pred<
 		MutableRootSector mutableRootSector
 	)
 	{
-		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
+		WorkspaceSector sector = mutableRootSector.Workspaces;
 
-		int workspaceIdx = slice.Workspaces.IndexOf(Workspace);
+		int workspaceIdx = sector.Workspaces.IndexOf(Workspace);
 		if (workspaceIdx == -1)
 		{
 			return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
@@ -34,7 +34,7 @@ public record SetActiveLayoutEngineTransform(ImmutableWorkspace Workspace, Pred<
 			return Result.FromException<Empty>(new WhimException("Provided layout engine not found"));
 		}
 
-		WorkspaceUtils.SetActiveLayoutEngine(slice, workspaceIdx, layoutEngineIdx);
+		WorkspaceUtils.SetActiveLayoutEngine(sector, workspaceIdx, layoutEngineIdx);
 		return Empty.Result;
 	}
 }
