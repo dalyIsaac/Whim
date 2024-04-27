@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Whim;
@@ -29,6 +30,11 @@ public record ImmutableWorkspace
 	/// The last focused window in the workspace.
 	/// </summary>
 	internal IWindow? LastFocusedWindow { get; init; }
+
+	/// <summary>
+	/// All the windows in the workspace.
+	/// </summary>
+	internal ImmutableHashSet<IWindow> Windows { get; init; } = ImmutableHashSet<IWindow>.Empty;
 
 	/// <summary>
 	/// All the layout engines currently in the workspace.

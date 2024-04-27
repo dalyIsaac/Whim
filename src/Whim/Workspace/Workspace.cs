@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -25,12 +26,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(new GetActiveLayoutEnginePicker(GetThis()));
 
-	/// <summary>
-	/// All the windows in this workspace.
-	/// </summary>
-	private readonly HashSet<IWindow> _windows = new();
-
-	public IEnumerable<IWindow> Windows => _windows;
+	public IEnumerable<IWindow> Windows => _context.Store.Pick(new GetAllWorkspaceWindowsPicker(GetThis())).Value!;
 
 	/// <summary>
 	/// Map of window handles to their current <see cref="IWindowState"/>.
@@ -46,10 +42,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void WindowFocused(IWindow? window)
 	{
-		if (window != null && _windows.Contains(window))
+		if (window != null && Windows.Contains(window))
 		{
-			LastFocusedWindow = window;
-			Logger.Debug($"Focused window {window} in workspace {Name}");
+			_context.Store.Dispatch(new SetLastFocusedWindowTransform(GetThis(), window));
 		}
 	}
 
