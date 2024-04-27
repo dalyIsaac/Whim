@@ -8,10 +8,10 @@ namespace Whim.Tests;
 public class GetNextMonitorPickerTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void CannotFindMonitor(IContext ctx, IMonitor monitor1, IMonitor monitor2, IMonitor unknownMonitor)
+	internal void CannotFindMonitor(IContext ctx, MutableRootSector mutableRootSector, IMonitor monitor1, IMonitor monitor2, IMonitor unknownMonitor)
 	{
 		// Given
-		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor1, monitor2);
+		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor1, monitor2);
 		GetNextMonitorPicker sut = new(unknownMonitor, GetFirst: true);
 
 		// When
@@ -24,23 +24,24 @@ public class GetNextMonitorPickerTests
 	[InlineAutoSubstituteData<StoreCustomization>(0, 1)]
 	[InlineAutoSubstituteData<StoreCustomization>(2, 0)]
 	[Theory]
-	public void GetNextMonitor(
+	internal void GetNextMonitor(
 		int startIdx,
 		int endIdx,
 		IContext ctx,
+		MutableRootSector mutableRootSector,
 		IMonitor monitor0,
 		IMonitor monitor1,
 		IMonitor monitor2
 	)
 	{
 		// Given
-		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor0, monitor1, monitor2);
-		GetNextMonitorPicker sut = new(ctx.Store.Monitors.Monitors[startIdx]);
+		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor0, monitor1, monitor2);
+		GetNextMonitorPicker sut = new(mutableRootSector.Monitors.Monitors[startIdx]);
 
 		// When
 		Result<IMonitor> result = ctx.Store.Pick(sut);
 
 		// Then
-		Assert.Equal(ctx.Store.Monitors.Monitors[endIdx], result.Value);
+		Assert.Equal(mutableRootSector.Monitors.Monitors[endIdx], result.Value);
 	}
 }

@@ -43,8 +43,8 @@ public class MonitorsChangedTransformTests
 
 	private static Assert.RaisedEvent<MonitorsChangedEventArgs> DispatchTransformEvent(IContext ctx) =>
 		Assert.Raises<MonitorsChangedEventArgs>(
-			h => ctx.Store.Monitors.MonitorsChanged += h,
-			h => ctx.Store.Monitors.MonitorsChanged -= h,
+			h => ctx.Store.MonitorEvents.MonitorsChanged += h,
+			h => ctx.Store.MonitorEvents.MonitorsChanged -= h,
 			() => ctx.Store.Dispatch(new MonitorsChangedTransform())
 		);
 

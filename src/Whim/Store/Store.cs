@@ -10,7 +10,7 @@ public class Store : IStore
 	private readonly IInternalContext _internalCtx;
 	private bool _disposedValue;
 
-	private readonly RootSector _root;
+	internal readonly RootSector _root;
 
 	/// <inheritdoc />
 	public IMonitorSectorEvents MonitorEvents => _root.MutableRootSector.Monitors;

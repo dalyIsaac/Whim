@@ -9,11 +9,11 @@ namespace Whim;
 public class GetMonitorPickerTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetActiveMonitor(IContext ctx, IMonitor monitor)
+	internal void GetActiveMonitor(IContext ctx, MutableRootSector mutableRootSector, IMonitor monitor)
 	{
 		// Given
-		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
-		ctx.Store.Monitors.ActiveMonitorIndex = 0;
+		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor);
+		mutableRootSector.Monitors.ActiveMonitorIndex = 0;
 
 		GetActiveMonitorPicker sut = new();
 
@@ -25,11 +25,11 @@ public class GetMonitorPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetPrimaryMonitor(IContext ctx, IMonitor monitor)
+	internal void GetPrimaryMonitor(IContext ctx, MutableRootSector mutableRootSector, IMonitor monitor)
 	{
 		// Given
-		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
-		ctx.Store.Monitors.PrimaryMonitorIndex = 0;
+		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor);
+		mutableRootSector.Monitors.PrimaryMonitorIndex = 0;
 
 		GetPrimaryMonitorPicker sut = new();
 
@@ -41,11 +41,11 @@ public class GetMonitorPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetLastWhimActiveMonitor(IContext ctx, IMonitor monitor)
+	internal void GetLastWhimActiveMonitor(IContext ctx, MutableRootSector mutableRootSector, IMonitor monitor)
 	{
 		// Given
-		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
-		ctx.Store.Monitors.LastWhimActiveMonitorIndex = 0;
+		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor);
+		mutableRootSector.Monitors.LastWhimActiveMonitorIndex = 0;
 
 		GetLastWhimActiveMonitorPicker sut = new();
 
@@ -57,10 +57,10 @@ public class GetMonitorPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetAllMonitors(IContext ctx, IMonitor monitor, IMonitor monitor2)
+	internal void GetAllMonitors(IContext ctx, MutableRootSector mutableRootSector, IMonitor monitor, IMonitor monitor2)
 	{
 		// Given
-		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor, monitor2);
+		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor, monitor2);
 
 		GetAllMonitorsPicker sut = new();
 

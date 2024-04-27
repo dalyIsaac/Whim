@@ -17,13 +17,13 @@ public class MouseLeftButtonUpTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void NoMonitorAtPoint(IContext ctx, IInternalContext internalCtx, IMonitor monitor)
+	internal void NoMonitorAtPoint(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
 	{
 		// Given there is no monitor at the point
 		SetMonitorAtPoint(internalCtx, (HMONITOR)2);
 
 		monitor.Handle.Returns((HMONITOR)1);
-		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
+		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor);
 
 		Point<int> point = new(10, 10);
 		MouseLeftButtonUpTransform sut = new(point);
@@ -32,17 +32,17 @@ public class MouseLeftButtonUpTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// The active monitor index doesn't update
-		Assert.Equal(-1, ctx.Store.Monitors.ActiveMonitorIndex);
+		Assert.Equal(-1, mutableRootSector.Monitors.ActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MonitorAtPoint(IContext ctx, IInternalContext internalCtx, IMonitor monitor)
+	internal void MonitorAtPoint(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
 	{
 		// Given there is a monitor at the point
 		SetMonitorAtPoint(internalCtx, (HMONITOR)2);
 
 		monitor.Handle.Returns((HMONITOR)2);
-		ctx.Store.Monitors.Monitors = ImmutableArray.Create(monitor);
+		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor);
 
 		Point<int> point = new(10, 10);
 		MouseLeftButtonUpTransform sut = new(point);
@@ -51,6 +51,6 @@ public class MouseLeftButtonUpTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// The active monitor index updated
-		Assert.Equal(0, ctx.Store.Monitors.ActiveMonitorIndex);
+		Assert.Equal(0, mutableRootSector.Monitors.ActiveMonitorIndex);
 	}
 }

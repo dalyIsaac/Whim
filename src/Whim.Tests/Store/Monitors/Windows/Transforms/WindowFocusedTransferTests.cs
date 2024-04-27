@@ -9,7 +9,7 @@ namespace Whim.Tests;
 
 public class WindowFocusedTransformTests
 {
-	private static ImmutableArray<IMonitor> Setup(IContext ctx)
+	private static ImmutableArray<IMonitor> Setup(MutableRootSector mutableRootSector)
 	{
 		IMonitor monitor0 = Substitute.For<IMonitor>();
 		monitor0.Handle.Returns((HMONITOR)0);
@@ -21,15 +21,15 @@ public class WindowFocusedTransformTests
 		monitor2.Handle.Returns((HMONITOR)2);
 
 		ImmutableArray<IMonitor> monitors = ImmutableArray.Create(monitor0, monitor1, monitor2);
-		ctx.Store.Monitors.Monitors = monitors;
+		mutableRootSector.Monitors.Monitors = monitors;
 		return monitors;
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowIsNotNull_WindowIsTrackedByButler(IContext ctx, IWindow window)
+	internal void WindowIsNotNull_WindowIsTrackedByButler(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window is tracked by the butler
-		ImmutableArray<IMonitor> monitors = Setup(ctx);
+		ImmutableArray<IMonitor> monitors = Setup(mutableRootSector);
 		ctx.Butler.Pantry.GetMonitorForWindow(window).Returns(monitors[1]);
 
 		WindowFocusedTransform sut = new(window);
@@ -38,15 +38,15 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor indices are updated.
-		Assert.Equal(1, ctx.Store.Monitors.ActiveMonitorIndex);
-		Assert.Equal(1, ctx.Store.Monitors.LastWhimActiveMonitorIndex);
+		Assert.Equal(1, mutableRootSector.Monitors.ActiveMonitorIndex);
+		Assert.Equal(1, mutableRootSector.Monitors.LastWhimActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowIsNotNull_WindowIsNotTrackedByButler(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowIsNotNull_WindowIsNotTrackedByButler(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window is not tracked by the butler
-		Setup(ctx);
+		Setup(mutableRootSector);
 
 		window.Handle.Returns((HWND)1);
 		ctx.Butler.Pantry.GetMonitorForWindow(window).Returns((IMonitor?)null);
@@ -60,15 +60,15 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is updated based on MonitorFromWindow
-		Assert.Equal(2, ctx.Store.Monitors.ActiveMonitorIndex);
-		Assert.Equal(2, ctx.Store.Monitors.LastWhimActiveMonitorIndex);
+		Assert.Equal(2, mutableRootSector.Monitors.ActiveMonitorIndex);
+		Assert.Equal(2, mutableRootSector.Monitors.LastWhimActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void HandleIsNull(IContext ctx, IInternalContext internalCtx)
+	internal void HandleIsNull(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector)
 	{
 		// Given there is no window and GetForegroundWindow returns null
-		Setup(ctx);
+		Setup(mutableRootSector);
 
 		internalCtx.CoreNativeManager.GetForegroundWindow().Returns((HWND)0);
 
@@ -78,15 +78,15 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is not updated.
-		Assert.Equal(-1, ctx.Store.Monitors.ActiveMonitorIndex);
-		Assert.Equal(-1, ctx.Store.Monitors.LastWhimActiveMonitorIndex);
+		Assert.Equal(-1, mutableRootSector.Monitors.ActiveMonitorIndex);
+		Assert.Equal(-1, mutableRootSector.Monitors.LastWhimActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void ForegroundWindowIsNotNull(IContext ctx, IInternalContext internalCtx)
+	internal void ForegroundWindowIsNotNull(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector)
 	{
 		// Given there is no window and GetForegroundWindow returns a handle
-		Setup(ctx);
+		Setup(mutableRootSector);
 
 		HWND handle = (HWND)2;
 		internalCtx.CoreNativeManager.GetForegroundWindow().Returns(handle);
@@ -100,7 +100,7 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is updated
-		Assert.Equal(2, ctx.Store.Monitors.ActiveMonitorIndex);
-		Assert.Equal(-1, ctx.Store.Monitors.LastWhimActiveMonitorIndex);
+		Assert.Equal(2, mutableRootSector.Monitors.ActiveMonitorIndex);
+		Assert.Equal(-1, mutableRootSector.Monitors.LastWhimActiveMonitorIndex);
 	}
 }

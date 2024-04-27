@@ -11,6 +11,10 @@ internal class StoreCustomization : ICustomization
 		IContext ctx = fixture.Freeze<IContext>();
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
-		ctx.Store.Returns(new Store(ctx, internalCtx));
+		Store store = new(ctx, internalCtx);
+		ctx.Store.Returns(store);
+
+		fixture.Inject(store._root);
+		fixture.Inject(store._root.MutableRootSector);
 	}
 }
