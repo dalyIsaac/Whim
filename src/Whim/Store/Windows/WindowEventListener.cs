@@ -125,7 +125,7 @@ internal class WindowEventListener : IDisposable
 			return;
 		}
 
-		if (!_ctx.Store.WindowSlice.Windows.TryGetValue(hwnd, out IWindow? window))
+		if (!_ctx.Store.Pick(new TryGetWindowPicker(hwnd)).TryGet(out IWindow window))
 		{
 			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
 

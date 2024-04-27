@@ -4,19 +4,23 @@ namespace Whim;
 
 internal record WindowMoveStartedTransform(IWindow Window) : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		WindowSlice slice = ctx.Store.WindowSlice;
+		WindowSector sector = mutableRootSector.Windows;
 
-		slice.IsMovingWindow = true;
+		sector.IsMovingWindow = true;
 
 		IPoint<int>? cursorPoint = null;
-		if (slice.IsLeftMouseButtonDown && internalCtx.CoreNativeManager.GetCursorPos(out IPoint<int> point))
+		if (sector.IsLeftMouseButtonDown && internalCtx.CoreNativeManager.GetCursorPos(out IPoint<int> point))
 		{
 			cursorPoint = point;
 		}
 
-		slice.QueueEvent(
+		sector.QueueEvent(
 			new WindowMoveStartedEventArgs()
 			{
 				Window = Window,

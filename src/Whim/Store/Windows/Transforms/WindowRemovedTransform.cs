@@ -4,16 +4,20 @@ namespace Whim;
 
 internal record WindowRemovedTransform(IWindow Window) : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		WindowSlice slice = ctx.Store.WindowSlice;
+		WindowSector sector = mutableRootSector.Windows;
 
-		slice.Windows = slice.Windows.Remove(Window.Handle);
-		slice.HandledLocationRestoringWindows = slice.HandledLocationRestoringWindows.Remove(Window);
+		sector.Windows = sector.Windows.Remove(Window.Handle);
+		sector.HandledLocationRestoringWindows = sector.HandledLocationRestoringWindows.Remove(Window);
 
 		WindowRemovedEventArgs args = new() { Window = Window };
 		internalCtx.ButlerEventHandlers.OnWindowRemoved(args);
-		slice.QueueEvent(args);
+		sector.QueueEvent(args);
 		return Empty.Result;
 	}
 }

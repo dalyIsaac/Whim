@@ -4,14 +4,18 @@ namespace Whim;
 
 internal record WindowMoveEndedTransform(IWindow Window) : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		WindowSlice slice = ctx.Store.WindowSlice;
+		WindowSector sector = mutableRootSector.Windows;
 
 		IPoint<int>? point = null;
 		Direction? movedEdges = null;
 
-		if (!slice.IsMovingWindow)
+		if (!sector.IsMovingWindow)
 		{
 			return Empty.Result;
 		}
@@ -26,9 +30,9 @@ internal record WindowMoveEndedTransform(IWindow Window) : Transform
 			ctx.Butler.MoveWindowToPoint(Window, point);
 		}
 
-		slice.IsMovingWindow = false;
+		sector.IsMovingWindow = false;
 
-		slice.QueueEvent(
+		sector.QueueEvent(
 			new WindowMoveEndedEventArgs()
 			{
 				Window = Window,

@@ -95,17 +95,14 @@ public class WindowEventListenerTests
 	}
 
 	private static void Setup_EmptyWindowSlice(IContext ctx, IInternalContext internalCtx) =>
-		ctx.Store.WindowSlice.Returns(new WindowSlice(ctx, internalCtx));
+		ctx.Store.Pick(Arg.Any<TryGetWindowPicker>()).Returns(Result.FromException<IWindow>(new WhimException("welp")));
 
 	private static IWindow Setup_FilledWindowSlice(IContext ctx, IInternalContext internalCtx)
 	{
 		IWindow window = Substitute.For<IWindow>();
 		window.Handle.Returns((HWND)1);
 
-		WindowSlice slice = new(ctx, internalCtx);
-		slice.Windows = slice.Windows.Add(window.Handle, window);
-
-		ctx.Store.WindowSlice.Returns(slice);
+		ctx.Store.Pick(Arg.Any<TryGetWindowPicker>()).Returns(Result.FromValue(window));
 
 		return window;
 	}

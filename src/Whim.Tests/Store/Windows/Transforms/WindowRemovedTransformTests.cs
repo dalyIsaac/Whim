@@ -9,6 +9,7 @@ public class WindowRemovedTransformTests
 {
 	private static (Result<Empty>, Assert.RaisedEvent<WindowRemovedEventArgs>) AssertRaises(
 		IContext ctx,
+		MutableRootSector mutableRootSector,
 		WindowRemovedTransform sut
 	)
 	{
@@ -16,8 +17,8 @@ public class WindowRemovedTransformTests
 		Assert.RaisedEvent<WindowRemovedEventArgs> ev;
 
 		ev = Assert.Raises<WindowRemovedEventArgs>(
-			h => ctx.Store.WindowSlice.WindowRemoved += h,
-			h => ctx.Store.WindowSlice.WindowRemoved -= h,
+			h => mutableRootSector.Windows.WindowRemoved += h,
+			h => mutableRootSector.Windows.WindowRemoved -= h,
 			() => result = ctx.Store.Dispatch(sut)
 		);
 
@@ -25,13 +26,18 @@ public class WindowRemovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowRemovedTransform sut = new(window);
 
 		// When
-		(var result, var ev) = AssertRaises(ctx, sut);
+		(var result, var ev) = AssertRaises(ctx, mutableRootSector, sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);

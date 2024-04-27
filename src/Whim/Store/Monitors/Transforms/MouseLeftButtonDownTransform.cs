@@ -9,9 +9,14 @@ internal record MouseLeftButtonDownTransform : Transform
 	/// </summary>
 	/// <param name="ctx"></param>
 	/// <param name="internalCtx"></param>
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	/// <param name="mutableRootSector"></param>
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		ctx.Store.WindowSlice.IsLeftMouseButtonDown = false;
+		mutableRootSector.Windows.IsLeftMouseButtonDown = false;
 		return Empty.Result;
 	}
 }

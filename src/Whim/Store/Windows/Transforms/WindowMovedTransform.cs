@@ -5,15 +5,19 @@ namespace Whim;
 
 internal record WindowMovedTransform(IWindow Window) : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		WindowSlice slice = ctx.Store.WindowSlice;
+		WindowSector sector = mutableRootSector.Windows;
 
-		if (!slice.IsMovingWindow)
+		if (!sector.IsMovingWindow)
 		{
 			if (
 				Window.ProcessFileName == null
-				|| slice.HandledLocationRestoringWindows.Contains(Window)
+				|| sector.HandledLocationRestoringWindows.Contains(Window)
 				|| !ctx.WindowManager.LocationRestoringFilterManager.ShouldBeIgnored(Window)
 			)
 			{
@@ -25,22 +29,22 @@ internal record WindowMovedTransform(IWindow Window) : Transform
 			// Wait, then restore the position.
 			ctx.NativeManager.TryEnqueue(async () =>
 			{
-				await Task.Delay(slice.WindowMovedDelay).ConfigureAwait(true);
+				await Task.Delay(sector.WindowMovedDelay).ConfigureAwait(true);
 				if (ctx.Butler.Pantry.GetWorkspaceForWindow(Window) is IWorkspace workspace)
 				{
-					slice.HandledLocationRestoringWindows.Add(Window);
+					sector.HandledLocationRestoringWindows.Add(Window);
 					workspace.DoLayout();
 				}
 			});
 		}
 
 		IPoint<int>? cursorPoint = null;
-		if (slice.IsLeftMouseButtonDown && internalCtx.CoreNativeManager.GetCursorPos(out IPoint<int> point))
+		if (sector.IsLeftMouseButtonDown && internalCtx.CoreNativeManager.GetCursorPos(out IPoint<int> point))
 		{
 			cursorPoint = point;
 		}
 
-		slice.QueueEvent(
+		sector.QueueEvent(
 			new WindowMovedEventArgs()
 			{
 				Window = Window,

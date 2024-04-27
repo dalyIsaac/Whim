@@ -17,6 +17,9 @@ public class Store : IStore
 	/// <inheritdoc />
 	public IMonitorSectorEvents MonitorEvents => _root.MutableRootSector.Monitors;
 
+	/// <inheritdoc />
+	public IWindowSectorEvents WindowEvents => _root.MutableRootSector.Windows;
+
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
@@ -30,14 +33,6 @@ public class Store : IStore
 	public void Initialize()
 	{
 		_root.Initialize();
-	}
-
-	/// <inheritdoc />
-	public void Dispatch(Transform transform)
-	{
-		// TODO: reader-writer lock.
-		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
-		_root.DispatchEvents();
 	}
 
 	/// <inheritdoc />

@@ -7,6 +7,9 @@ namespace Whim;
 /// </summary>
 public record GetAllWindowsPicker() : Picker<IEnumerable<IWindow>>()
 {
-	internal override IEnumerable<IWindow> Execute(IContext ctx, IInternalContext internalCtx) =>
-		ctx.Store.WindowSlice.Windows.Values;
+	internal override IEnumerable<IWindow> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IRootSector rootSector
+	) => rootSector.Windows.Windows.Values;
 }

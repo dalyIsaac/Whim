@@ -5,9 +5,13 @@ namespace Whim;
 
 internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 {
-	internal override Result<IWindow> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<IWindow> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		WindowSlice slice = ctx.Store.WindowSlice;
+		WindowSector sector = mutableRootSector.Windows;
 
 		// Filter the handle.
 		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
@@ -45,13 +49,13 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 		}
 
 		// Store the window.
-		slice.Windows = slice.Windows.Add(Handle, window);
+		sector.Windows = sector.Windows.Add(Handle, window);
 
 		// Filter the args.
 		WindowAddedEventArgs args = new() { Window = window };
 		internalCtx.ButlerEventHandlers.OnWindowAdded(args);
 
-		slice.QueueEvent(args);
+		sector.QueueEvent(args);
 
 		return Result.FromValue(window);
 	}

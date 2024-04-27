@@ -9,6 +9,7 @@ public class WindowMinimizeStartedTransformTests
 {
 	private static (Result<Empty>, Assert.RaisedEvent<WindowMinimizeStartedEventArgs>) AssertRaises(
 		IContext ctx,
+		MutableRootSector mutableRootSector,
 		WindowMinimizeStartedTransform sut
 	)
 	{
@@ -16,8 +17,8 @@ public class WindowMinimizeStartedTransformTests
 		Assert.RaisedEvent<WindowMinimizeStartedEventArgs> ev;
 
 		ev = Assert.Raises<WindowMinimizeStartedEventArgs>(
-			h => ctx.Store.WindowSlice.WindowMinimizeStarted += h,
-			h => ctx.Store.WindowSlice.WindowMinimizeStarted -= h,
+			h => mutableRootSector.Windows.WindowMinimizeStarted += h,
+			h => mutableRootSector.Windows.WindowMinimizeStarted -= h,
 			() => result = ctx.Store.Dispatch(sut)
 		);
 
@@ -25,13 +26,18 @@ public class WindowMinimizeStartedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void Success(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowMinimizeStartedTransform sut = new(window);
 
 		// When
-		(var result, var ev) = AssertRaises(ctx, sut);
+		(var result, var ev) = AssertRaises(ctx, mutableRootSector, sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);

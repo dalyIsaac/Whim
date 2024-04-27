@@ -4,14 +4,18 @@ namespace Whim;
 
 internal record WindowMinimizeStartedTransform(IWindow Window) : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		WindowSlice slice = ctx.Store.WindowSlice;
+		WindowSector sector = mutableRootSector.Windows;
 
 		WindowMinimizeStartedEventArgs args = new() { Window = Window };
 		internalCtx.ButlerEventHandlers.OnWindowMinimizeStart(args);
 
-		slice.QueueEvent(args);
+		sector.QueueEvent(args);
 		return Empty.Result;
 	}
 }

@@ -10,6 +10,7 @@ public class WindowMoveStartedTransformTests
 {
 	private static (Result<Empty>, Assert.RaisedEvent<WindowMoveStartedEventArgs>) AssertRaises(
 		IContext ctx,
+		MutableRootSector mutableRootSector,
 		WindowMoveStartedTransform sut
 	)
 	{
@@ -17,8 +18,8 @@ public class WindowMoveStartedTransformTests
 		Assert.RaisedEvent<WindowMoveStartedEventArgs> ev;
 
 		ev = Assert.Raises<WindowMoveStartedEventArgs>(
-			h => ctx.Store.WindowSlice.WindowMoveStarted += h,
-			h => ctx.Store.WindowSlice.WindowMoveStarted -= h,
+			h => mutableRootSector.Windows.WindowMoveStarted += h,
+			h => mutableRootSector.Windows.WindowMoveStarted -= h,
 			() => result = ctx.Store.Dispatch(sut)
 		);
 
@@ -26,13 +27,13 @@ public class WindowMoveStartedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void LeftMouseButtonNotDown(IContext ctx, IWindow window)
+	internal void LeftMouseButtonNotDown(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given IsLeftMouseButtonDown is false
 		WindowMoveStartedTransform sut = new(window);
 
 		// When we dispatch the transform
-		(var result, var ev) = AssertRaises(ctx, sut);
+		(var result, var ev) = AssertRaises(ctx, mutableRootSector, sut);
 
 		// Then an event is raised, but with no cursor
 		Assert.True(result.IsSuccessful);
@@ -40,14 +41,14 @@ public class WindowMoveStartedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void LeftMouseButtonDown(IContext ctx, IWindow window)
+	internal void LeftMouseButtonDown(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given IsLeftMouseButtonDown is true
-		ctx.Store.WindowSlice.IsLeftMouseButtonDown = true;
+		mutableRootSector.Windows.IsLeftMouseButtonDown = true;
 		WindowMoveStartedTransform sut = new(window);
 
 		// When we dispatch the transform
-		(var result, var ev) = AssertRaises(ctx, sut);
+		(var result, var ev) = AssertRaises(ctx, mutableRootSector, sut);
 
 		// Then an event is raised, but with no cursor
 		Assert.True(result.IsSuccessful);
@@ -55,10 +56,15 @@ public class WindowMoveStartedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetCursorPos(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void GetCursorPos(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given IsLeftMouseButtonDown is true, and the cursor position can be acquired
-		ctx.Store.WindowSlice.IsLeftMouseButtonDown = true;
+		mutableRootSector.Windows.IsLeftMouseButtonDown = true;
 		WindowMoveStartedTransform sut = new(window);
 
 		internalCtx
@@ -70,7 +76,7 @@ public class WindowMoveStartedTransformTests
 			});
 
 		// When we dispatch the transform
-		(var result, var ev) = AssertRaises(ctx, sut);
+		(var result, var ev) = AssertRaises(ctx, mutableRootSector, sut);
 
 		// Then an event is raised, but with no cursor
 		Assert.True(result.IsSuccessful);

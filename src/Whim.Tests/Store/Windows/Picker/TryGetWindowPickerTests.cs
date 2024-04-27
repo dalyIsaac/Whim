@@ -21,10 +21,10 @@ public class TryGetWindowPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void FoundWindow(IContext ctx, IWindow window)
+	internal void FoundWindow(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window can be found
-		ctx.Store.WindowSlice.Windows = ctx.Store.WindowSlice.Windows.Add(window.Handle, window);
+		mutableRootSector.Windows.Windows = mutableRootSector.Windows.Windows.Add(window.Handle, window);
 		TryGetWindowPicker sut = new(window.Handle);
 
 		// When

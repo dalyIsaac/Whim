@@ -9,7 +9,7 @@ namespace Whim.Tests;
 
 public class WindowMoveEndedTransformTests
 {
-	private static void Setup_GetMovedEdges(IContext ctx, IWindow window)
+	private static void Setup_GetMovedEdges(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		IRectangle<int> originalRect = new Rectangle<int>() { Y = 4, Height = 4 };
 		IRectangle<int> newRect = new Rectangle<int>() { Y = 4, Height = 3 };
@@ -31,6 +31,7 @@ public class WindowMoveEndedTransformTests
 
 	private static (Result<Empty>, Assert.RaisedEvent<WindowMoveEndedEventArgs>) AssertRaises(
 		IContext ctx,
+		MutableRootSector mutableRootSector,
 		WindowMoveEndedTransform sut
 	)
 	{
@@ -38,49 +39,53 @@ public class WindowMoveEndedTransformTests
 		Assert.RaisedEvent<WindowMoveEndedEventArgs> ev;
 
 		ev = Assert.Raises<WindowMoveEndedEventArgs>(
-			h => ctx.Store.WindowSlice.WindowMoveEnded += h,
-			h => ctx.Store.WindowSlice.WindowMoveEnded -= h,
+			h => mutableRootSector.Windows.WindowMoveEnded += h,
+			h => mutableRootSector.Windows.WindowMoveEnded -= h,
 			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return (result!.Value, ev);
 	}
 
-	private static Result<Empty> AssertDoesNotRaise(IContext ctx, WindowMoveEndedTransform sut)
+	private static Result<Empty> AssertDoesNotRaise(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		WindowMoveEndedTransform sut
+	)
 	{
 		Result<Empty>? result = null;
 		CustomAssert.DoesNotRaise<WindowMoveEndedEventArgs>(
-			h => ctx.Store.WindowSlice.WindowMoveEnded += h,
-			h => ctx.Store.WindowSlice.WindowMoveEnded -= h,
+			h => mutableRootSector.Windows.WindowMoveEnded += h,
+			h => mutableRootSector.Windows.WindowMoveEnded -= h,
 			() => result = ctx.Store.Dispatch(sut)
 		);
 		return result!.Value;
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowIsNotMoving(IContext ctx, IWindow window)
+	internal void WindowIsNotMoving(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window is not moving
-		ctx.Store.WindowSlice.IsMovingWindow = false;
+		mutableRootSector.Windows.IsMovingWindow = false;
 		WindowMoveEndedTransform sut = new(window);
 
 		// When we dispatch the transform
-		var result = AssertDoesNotRaise(ctx, sut);
+		var result = AssertDoesNotRaise(ctx, mutableRootSector, sut);
 
 		// Then nothing happens
 		Assert.True(result.IsSuccessful);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void EdgesMoved(IContext ctx, IWindow window)
+	internal void EdgesMoved(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window's edges moved
-		ctx.Store.WindowSlice.IsMovingWindow = true;
-		Setup_GetMovedEdges(ctx, window);
+		mutableRootSector.Windows.IsMovingWindow = true;
+		Setup_GetMovedEdges(ctx, mutableRootSector, window);
 		WindowMoveEndedTransform sut = new(window);
 
 		// When we dispatch the transform
-		(var result, var ev) = AssertRaises(ctx, sut);
+		(var result, var ev) = AssertRaises(ctx, mutableRootSector, sut);
 
 		// Then an event is raised
 		Assert.True(result.IsSuccessful);
@@ -89,10 +94,15 @@ public class WindowMoveEndedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MoveWindowToPoint(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void MoveWindowToPoint(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		IInternalContext internalCtx,
+		IWindow window
+	)
 	{
 		// Given the window
-		ctx.Store.WindowSlice.IsMovingWindow = true;
+		mutableRootSector.Windows.IsMovingWindow = true;
 		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		internalCtx
@@ -106,7 +116,7 @@ public class WindowMoveEndedTransformTests
 		WindowMoveEndedTransform sut = new(window);
 
 		// When we dispatch the transform
-		(var result, var ev) = AssertRaises(ctx, sut);
+		(var result, var ev) = AssertRaises(ctx, mutableRootSector, sut);
 
 		// Then an event is raised
 		Assert.True(result.IsSuccessful);

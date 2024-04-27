@@ -6,10 +6,10 @@ namespace Whim.Tests;
 public class MouseLeftButtonDownTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx)
+	internal void Success(IContext ctx, MutableRootSector mutableRootSector)
 	{
 		// Given the left mouse button is down
-		ctx.Store.WindowSlice.IsLeftMouseButtonDown = true;
+		mutableRootSector.Windows.IsLeftMouseButtonDown = true;
 
 		MouseLeftButtonDownTransform sut = new();
 
@@ -18,6 +18,6 @@ public class MouseLeftButtonDownTransformTests
 
 		// Then the left mouse button is no longer down
 		Assert.True(result.IsSuccessful);
-		Assert.False(ctx.Store.WindowSlice.IsLeftMouseButtonDown);
+		Assert.False(mutableRootSector.Windows.IsLeftMouseButtonDown);
 	}
 }

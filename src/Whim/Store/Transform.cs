@@ -16,7 +16,7 @@ public abstract record Transform<TResult>()
 	/// <param name="ctx">Whim's context.</param>
 	/// <param name="internalCtx">Internal-only parts of Whim's API.</param>
 	/// <param name="rootSector">The root sector.</param>
-	internal abstract Result<Empty> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector);
+	internal abstract Result<TResult> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector);
 }
 
 /// <inheritdoc/>

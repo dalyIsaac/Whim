@@ -11,18 +11,13 @@ public interface IStore : IDisposable
 	/// <inheritdoc cref="IMonitorSectorEvents"/>
 	IMonitorSectorEvents MonitorEvents { get; }
 
+	/// <inheritdoc cref="IWindowSectorEvents"/>
+	IWindowSectorEvents WindowEvents { get; }
+
 	/// <summary>
 	/// Initialize the event listeners.
 	/// </summary>
 	public void Initialize();
-
-	/// <summary>
-	/// Dispatch updates to transform Whim's state.
-	/// </summary>
-	/// <param name="transform">
-	/// The record implementing <see cref="Dispatch"/> to update Whim's state.
-	/// </param>
-	public void Dispatch(Transform transform);
 
 	/// <summary>
 	/// Dispatch updates to transform Whim's state.

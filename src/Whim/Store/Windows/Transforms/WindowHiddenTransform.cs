@@ -14,7 +14,11 @@ namespace Whim;
 /// <param name="Window"></param>
 internal record WindowHiddenTransform(IWindow Window) : WindowRemovedTransform(Window)
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
 		if (ctx.Butler.Pantry.GetMonitorForWindow(Window) == null)
 		{
@@ -22,6 +26,6 @@ internal record WindowHiddenTransform(IWindow Window) : WindowRemovedTransform(W
 			return Empty.Result;
 		}
 
-		return base.Execute(ctx, internalCtx);
+		return base.Execute(ctx, internalCtx, mutableRootSector);
 	}
 }

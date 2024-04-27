@@ -33,14 +33,14 @@ internal class WindowManager : IWindowManager
 
 	public void Initialize()
 	{
-		_context.Store.WindowSlice.WindowAdded += WindowSlice_WindowAdded;
-		_context.Store.WindowSlice.WindowFocused += WindowSlice_WindowFocused;
-		_context.Store.WindowSlice.WindowRemoved += WindowSlice_WindowRemoved;
-		_context.Store.WindowSlice.WindowMoveStarted += WindowSlice_WindowMoveStarted;
-		_context.Store.WindowSlice.WindowMoved += WindowSlice_WindowMoved;
-		_context.Store.WindowSlice.WindowMoveEnded += WindowSlice_WindowMoveEnd;
-		_context.Store.WindowSlice.WindowMinimizeStarted += WindowSlice_WindowMinimizeStarted;
-		_context.Store.WindowSlice.WindowMinimizeEnded += WindowSlice_WindowMinimizeEnded;
+		_context.Store.WindowEvents.WindowAdded += WindowSlice_WindowAdded;
+		_context.Store.WindowEvents.WindowFocused += WindowSlice_WindowFocused;
+		_context.Store.WindowEvents.WindowRemoved += WindowSlice_WindowRemoved;
+		_context.Store.WindowEvents.WindowMoveStarted += WindowSlice_WindowMoveStarted;
+		_context.Store.WindowEvents.WindowMoved += WindowSlice_WindowMoved;
+		_context.Store.WindowEvents.WindowMoveEnded += WindowSlice_WindowMoveEnd;
+		_context.Store.WindowEvents.WindowMinimizeStarted += WindowSlice_WindowMinimizeStarted;
+		_context.Store.WindowEvents.WindowMinimizeEnded += WindowSlice_WindowMinimizeEnded;
 	}
 
 	private void WindowSlice_WindowAdded(object? sender, WindowAddedEventArgs ev) => WindowAdded?.Invoke(sender, ev);
@@ -90,14 +90,14 @@ internal class WindowManager : IWindowManager
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.Store.WindowSlice.WindowAdded -= WindowSlice_WindowAdded;
-				_context.Store.WindowSlice.WindowFocused -= WindowSlice_WindowFocused;
-				_context.Store.WindowSlice.WindowRemoved -= WindowSlice_WindowRemoved;
-				_context.Store.WindowSlice.WindowMoveStarted -= WindowSlice_WindowMoveStarted;
-				_context.Store.WindowSlice.WindowMoved -= WindowSlice_WindowMoved;
-				_context.Store.WindowSlice.WindowMoveEnded -= WindowSlice_WindowMoveEnd;
-				_context.Store.WindowSlice.WindowMinimizeStarted -= WindowSlice_WindowMinimizeStarted;
-				_context.Store.WindowSlice.WindowMinimizeEnded -= WindowSlice_WindowMinimizeEnded;
+				_context.Store.WindowEvents.WindowAdded -= WindowSlice_WindowAdded;
+				_context.Store.WindowEvents.WindowFocused -= WindowSlice_WindowFocused;
+				_context.Store.WindowEvents.WindowRemoved -= WindowSlice_WindowRemoved;
+				_context.Store.WindowEvents.WindowMoveStarted -= WindowSlice_WindowMoveStarted;
+				_context.Store.WindowEvents.WindowMoved -= WindowSlice_WindowMoved;
+				_context.Store.WindowEvents.WindowMoveEnded -= WindowSlice_WindowMoveEnd;
+				_context.Store.WindowEvents.WindowMinimizeStarted -= WindowSlice_WindowMinimizeStarted;
+				_context.Store.WindowEvents.WindowMinimizeEnded -= WindowSlice_WindowMinimizeEnded;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

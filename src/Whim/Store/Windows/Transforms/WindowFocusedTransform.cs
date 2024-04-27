@@ -17,7 +17,7 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		// TODO: Test
 		WindowFocusedEventArgs args = new() { Window = Window };
 		internalCtx.ButlerEventHandlers.OnWindowFocused(args);
-		ctx.Store.WindowSlice.QueueEvent(args);
+		mutableRootSector.Windows.QueueEvent(args);
 
 		return Empty.Result;
 	}

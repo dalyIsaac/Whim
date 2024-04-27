@@ -10,14 +10,19 @@ namespace Whim.Tests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowManagerTests
 {
-	private static void DispatchEvent(IContext ctx, EventArgs ev)
+	private static void DispatchEvent(MutableRootSector mutableRootSector, EventArgs ev)
 	{
-		ctx.Store.WindowSlice.QueueEvent(ev);
-		ctx.Store.WindowSlice.DispatchEvents();
+		mutableRootSector.Windows.QueueEvent(ev);
+		mutableRootSector.Windows.DispatchEvents();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSlice_WindowAdded(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowSlice_WindowAdded(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowManager sut = new(ctx, internalCtx);
@@ -29,12 +34,17 @@ public class WindowManagerTests
 		Assert.Raises<WindowAddedEventArgs>(
 			h => sut.WindowAdded += h,
 			h => sut.WindowAdded -= h,
-			() => DispatchEvent(ctx, new WindowAddedEventArgs() { Window = window })
+			() => DispatchEvent(mutableRootSector, new WindowAddedEventArgs() { Window = window })
 		);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSlice_WindowFocused(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowSlice_WindowFocused(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowManager sut = new(ctx, internalCtx);
@@ -46,12 +56,17 @@ public class WindowManagerTests
 		Assert.Raises<WindowFocusedEventArgs>(
 			h => sut.WindowFocused += h,
 			h => sut.WindowFocused -= h,
-			() => DispatchEvent(ctx, new WindowFocusedEventArgs() { Window = window })
+			() => DispatchEvent(mutableRootSector, new WindowFocusedEventArgs() { Window = window })
 		);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSlice_WindowRemoved(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowSlice_WindowRemoved(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowManager sut = new(ctx, internalCtx);
@@ -63,12 +78,17 @@ public class WindowManagerTests
 		Assert.Raises<WindowRemovedEventArgs>(
 			h => sut.WindowRemoved += h,
 			h => sut.WindowRemoved -= h,
-			() => DispatchEvent(ctx, new WindowRemovedEventArgs() { Window = window })
+			() => DispatchEvent(mutableRootSector, new WindowRemovedEventArgs() { Window = window })
 		);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSlice_WindowMoveStarted(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowSlice_WindowMoveStarted(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowManager sut = new(ctx, internalCtx);
@@ -82,7 +102,7 @@ public class WindowManagerTests
 			h => sut.WindowMoveStart -= h,
 			() =>
 				DispatchEvent(
-					ctx,
+					mutableRootSector,
 					new WindowMoveStartedEventArgs()
 					{
 						Window = window,
@@ -94,7 +114,12 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSlice_WindowMoved(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowSlice_WindowMoved(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowManager sut = new(ctx, internalCtx);
@@ -108,7 +133,7 @@ public class WindowManagerTests
 			h => sut.WindowMoved -= h,
 			() =>
 				DispatchEvent(
-					ctx,
+					mutableRootSector,
 					new WindowMovedEventArgs()
 					{
 						Window = window,
@@ -120,7 +145,12 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSlice_WindowMoveEnd(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowSlice_WindowMoveEnd(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowManager sut = new(ctx, internalCtx);
@@ -134,7 +164,7 @@ public class WindowManagerTests
 			h => sut.WindowMoveEnd -= h,
 			() =>
 				DispatchEvent(
-					ctx,
+					mutableRootSector,
 					new WindowMoveEndedEventArgs()
 					{
 						Window = window,
@@ -146,7 +176,12 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSlice_WindowMinimizeStarted(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowSlice_WindowMinimizeStarted(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowManager sut = new(ctx, internalCtx);
@@ -158,12 +193,17 @@ public class WindowManagerTests
 		Assert.Raises<WindowMinimizeStartedEventArgs>(
 			h => sut.WindowMinimizeStart += h,
 			h => sut.WindowMinimizeStart -= h,
-			() => DispatchEvent(ctx, new WindowMinimizeStartedEventArgs() { Window = window })
+			() => DispatchEvent(mutableRootSector, new WindowMinimizeStartedEventArgs() { Window = window })
 		);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSlice_WindowMinimizeEnded(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void WindowSlice_WindowMinimizeEnded(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given
 		WindowManager sut = new(ctx, internalCtx);
@@ -175,7 +215,7 @@ public class WindowManagerTests
 		Assert.Raises<WindowMinimizeEndedEventArgs>(
 			h => sut.WindowMinimizeEnd += h,
 			h => sut.WindowMinimizeEnd -= h,
-			() => DispatchEvent(ctx, new WindowMinimizeEndedEventArgs() { Window = window })
+			() => DispatchEvent(mutableRootSector, new WindowMinimizeEndedEventArgs() { Window = window })
 		);
 	}
 
@@ -194,12 +234,17 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void CreateWindow_RetrieveExisting(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void CreateWindow_RetrieveExisting(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given the window already exists
 		HWND hwnd = (HWND)1;
 		window.Handle.Returns(hwnd);
-		ctx.Store.WindowSlice.Windows = ctx.Store.WindowSlice.Windows.Add(hwnd, window);
+		mutableRootSector.Windows.Windows = mutableRootSector.Windows.Windows.Add(hwnd, window);
 
 		WindowManager sut = new(ctx, internalCtx);
 

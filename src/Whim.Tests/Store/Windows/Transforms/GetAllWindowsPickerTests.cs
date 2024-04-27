@@ -7,10 +7,10 @@ namespace Whim.Tests;
 public class GetAllWindowsPickerTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void Success(IContext ctx, IWindow window)
+	internal void Success(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the windows in the slice
-		ctx.Store.WindowSlice.Windows = ctx.Store.WindowSlice.Windows.Add((HWND)1, window);
+		mutableRootSector.Windows.Windows = mutableRootSector.Windows.Windows.Add((HWND)1, window);
 		GetAllWindowsPicker sut = new();
 
 		// When

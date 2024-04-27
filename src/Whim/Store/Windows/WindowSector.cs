@@ -12,92 +12,37 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	private readonly WindowEventListener _listener;
 	private bool _disposedValue;
 
-	/// <summary>
-	/// All the windows currently tracked by Whim.
-	/// </summary>
 	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
-	/// <summary>
-	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringFilterManager"/>.
-	/// We maintain a set of the windows that have been handled so that we don't enter an infinite loop of location change events.
-	/// </summary>
 	public ImmutableHashSet<IWindow> HandledLocationRestoringWindows { get; internal set; } =
 		ImmutableHashSet<IWindow>.Empty;
 
-	/// <summary>
-	/// Whether a window is currently moving.
-	/// </summary>
 	public bool IsMovingWindow { get; internal set; }
 
-	/// <summary>
-	/// Whether the user currently has the left mouse button down.
-	/// Used for window movement.
-	/// </summary>
 	public bool IsLeftMouseButtonDown { get; internal set; }
 
-	/// <summary>
-	/// The delay to wait when trying to restore windows from <see cref="IWindowManager.LocationRestoringFilterManager"/>.
-	/// </summary>
 	public int WindowMovedDelay { get; internal set; } = 2000;
 
-	/// <summary>
-	/// Event for when a window is added by the <see cref="IWindowManager"/>.
-	/// </summary>
 	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
-
-	/// <summary>
-	/// Event for when a window is focused.
-	/// </summary>
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
-
-	/// <summary>
-	/// Event for when a window is removed from Whim.
-	/// </summary>
 	public event EventHandler<WindowRemovedEventArgs>? WindowRemoved;
-
-	/// <summary>
-	/// Event for when a window is being moved or resized.
-	/// </summary>
 	public event EventHandler<WindowMoveStartedEventArgs>? WindowMoveStarted;
-
-	/// <summary>
-	/// Event for when a window has changed location, shape, or size.
-	///
-	/// This event is fired when Windows sends the
-	/// <see cref="Windows.Win32.PInvoke.EVENT_SYSTEM_MOVESIZEEND"/> event.
-	/// See https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants for more information.
-	/// </summary>
 	public event EventHandler<WindowMoveEndedEventArgs>? WindowMoveEnded;
-
-	/// <summary>
-	/// Event for when a window has changed location, shape, or size.
-	///
-	/// This event is fired when Windows sends the
-	/// <see cref="Windows.Win32.PInvoke.EVENT_OBJECT_LOCATIONCHANGE"/> event.
-	/// </summary>
-	public event EventHandler<WindowMovedStartedEventArgs>? WindowMoved;
-
-	/// <summary>
-	/// Event for when a window has started being minimized.
-	/// </summary>
+	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
 	public event EventHandler<WindowMinimizeStartedEventArgs>? WindowMinimizeStarted;
-
-	/// <summary>
-	/// Event for when a window has ended being minimized.
-	/// </summary>
 	public event EventHandler<WindowMinimizeEndedEventArgs>? WindowMinimizeEnded;
 
-	internal WindowSlice(IContext ctx, IInternalContext internalCtx)
+	public WindowSector(IContext ctx, IInternalContext internalCtx)
 	{
 		_listener = new WindowEventListener(ctx, internalCtx);
 	}
 
-	internal override void Initialize()
+	public override void Initialize()
 	{
 		_listener.Initialize();
 	}
 
-	internal override void DispatchEvents()
+	public override void DispatchEvents()
 	{
 		foreach (EventArgs eventArgs in _events)
 		{

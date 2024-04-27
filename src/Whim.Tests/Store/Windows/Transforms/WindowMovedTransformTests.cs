@@ -24,6 +24,7 @@ public class WindowMovedTransformTests
 
 	private static (Result<Empty>?, Assert.RaisedEvent<WindowMovedEventArgs>) AssertRaises(
 		IContext ctx,
+		MutableRootSector mutableRootSector,
 		WindowMovedTransform sut
 	)
 	{
@@ -31,21 +32,25 @@ public class WindowMovedTransformTests
 		Assert.RaisedEvent<WindowMovedEventArgs> ev;
 
 		ev = Assert.Raises<WindowMovedEventArgs>(
-			h => ctx.Store.WindowSlice.WindowMoved += h,
-			h => ctx.Store.WindowSlice.WindowMoved -= h,
+			h => ctx.Store.WindowEvents.WindowMoved += h,
+			h => ctx.Store.WindowEvents.WindowMoved -= h,
 			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return (result, ev);
 	}
 
-	private static Result<Empty> AssertDoesNotRaise(IContext ctx, WindowMovedTransform sut)
+	private static Result<Empty> AssertDoesNotRaise(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		WindowMovedTransform sut
+	)
 	{
 		Result<Empty>? result = null;
 
 		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
-			h => ctx.Store.WindowSlice.WindowMoved += h,
-			h => ctx.Store.WindowSlice.WindowMoved -= h,
+			h => ctx.Store.WindowEvents.WindowMoved += h,
+			h => ctx.Store.WindowEvents.WindowMoved -= h,
 			() => result = ctx.Store.Dispatch(sut)
 		);
 
@@ -53,17 +58,17 @@ public class WindowMovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void IsNotMoving_NullProcessFileName(IContext ctx, IWindow window)
+	internal void IsNotMoving_NullProcessFileName(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window is not moving and the process file name is null
-		ctx.Store.WindowSlice.IsMovingWindow = false;
+		mutableRootSector.Windows.IsMovingWindow = false;
 		window.ProcessFileName.ReturnsNull();
 		ctx.WindowManager.LocationRestoringFilterManager.ShouldBeIgnored(window).Returns(true);
 
 		WindowMovedTransform sut = new(window);
 
 		// When we dispatch the transform
-		var result = AssertDoesNotRaise(ctx, sut);
+		var result = AssertDoesNotRaise(ctx, mutableRootSector, sut);
 
 		// Then we get an empty result
 		Assert.True(result.IsSuccessful);
@@ -71,17 +76,17 @@ public class WindowMovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void IsNotMoving_IsHandledLocation(IContext ctx, IWindow window)
+	internal void IsNotMoving_IsHandledLocation(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window is not moving and the window is a handled restoring location window
-		ctx.Store.WindowSlice.IsMovingWindow = false;
-		ctx.Store.WindowSlice.HandledLocationRestoringWindows = ImmutableHashSet.Create(window);
+		mutableRootSector.Windows.IsMovingWindow = false;
+		mutableRootSector.Windows.HandledLocationRestoringWindows = ImmutableHashSet.Create(window);
 		ctx.WindowManager.LocationRestoringFilterManager.ShouldBeIgnored(window).Returns(true);
 
 		WindowMovedTransform sut = new(window);
 
 		// When we dispatch the transform
-		var result = AssertDoesNotRaise(ctx, sut);
+		var result = AssertDoesNotRaise(ctx, mutableRootSector, sut);
 
 		// Then we get an empty result
 		Assert.True(result.IsSuccessful);
@@ -89,16 +94,20 @@ public class WindowMovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void IsNotMoving_IgnoredByLocationRestoringFilter(IContext ctx, IWindow window)
+	internal void IsNotMoving_IgnoredByLocationRestoringFilter(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given the window is not moving and the window is a handled restoring location window
-		ctx.Store.WindowSlice.IsMovingWindow = false;
+		mutableRootSector.Windows.IsMovingWindow = false;
 		ctx.WindowManager.LocationRestoringFilterManager.ShouldBeIgnored(window).Returns(false);
 
 		WindowMovedTransform sut = new(window);
 
 		// When we dispatch the transform
-		var result = AssertDoesNotRaise(ctx, sut);
+		var result = AssertDoesNotRaise(ctx, mutableRootSector, sut);
 
 		// Then we get an empty result
 		Assert.True(result.IsSuccessful);
@@ -106,20 +115,29 @@ public class WindowMovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void IsNotMoving_GetPos(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void IsNotMoving_GetPos(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		IInternalContext internalCtx,
+		IWindow window
+	)
 	{
 		// Given the window is not moving, we don't ignore the window moving event, but we can get the pos
 		NativeManagerUtils.SetupTryEnqueue(ctx);
-		ctx.Store.WindowSlice.IsMovingWindow = false;
-		ctx.Store.WindowSlice.WindowMovedDelay = 0;
-		ctx.Store.WindowSlice.IsLeftMouseButtonDown = true;
+		mutableRootSector.Windows.IsMovingWindow = false;
+		mutableRootSector.Windows.WindowMovedDelay = 0;
+		mutableRootSector.Windows.IsLeftMouseButtonDown = true;
 		ctx.WindowManager.LocationRestoringFilterManager.ShouldBeIgnored(window).Returns(true);
 		Setup_GetCursorPos(internalCtx);
 
 		WindowMovedTransform sut = new(window);
 
 		// When we dispatch the transform
-		(Result<Empty>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(ctx, sut);
+		(Result<Empty>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(
+			ctx,
+			mutableRootSector,
+			sut
+		);
 
 		// Then we get a result
 		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
@@ -130,15 +148,19 @@ public class WindowMovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void IsMoving_NotGetPos(IContext ctx, IWindow window)
+	internal void IsMoving_NotGetPos(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window is moving, but we don't get the cursor point
-		ctx.Store.WindowSlice.IsMovingWindow = true;
+		mutableRootSector.Windows.IsMovingWindow = true;
 
 		WindowMovedTransform sut = new(window);
 
 		// When we dispatch the transform
-		(Result<Empty>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(ctx, sut);
+		(Result<Empty>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(
+			ctx,
+			mutableRootSector,
+			sut
+		);
 
 		// Then
 		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
@@ -148,17 +170,26 @@ public class WindowMovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void IsMoving_GetPos(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void IsMoving_GetPos(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		IInternalContext internalCtx,
+		IWindow window
+	)
 	{
 		// Given the window is moving but we get the cursor point
-		ctx.Store.WindowSlice.IsMovingWindow = true;
-		ctx.Store.WindowSlice.IsLeftMouseButtonDown = true;
+		mutableRootSector.Windows.IsMovingWindow = true;
+		mutableRootSector.Windows.IsLeftMouseButtonDown = true;
 		Setup_GetCursorPos(internalCtx);
 
 		WindowMovedTransform sut = new(window);
 
 		// When we dispatch the transform
-		(Result<Empty>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(ctx, sut);
+		(Result<Empty>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(
+			ctx,
+			mutableRootSector,
+			sut
+		);
 
 		// Then
 		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
