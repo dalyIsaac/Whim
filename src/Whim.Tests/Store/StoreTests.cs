@@ -17,7 +17,7 @@ public class StoreTests
 		// When we initialize
 		sut.Initialize();
 
-		// Then the MonitorSlice has initialized
+		// Then the MonitorSector has initialized
 		internalCtx.WindowMessageMonitor.WorkAreaChanged += Arg.Any<EventHandler<WindowMessageMonitorEventArgs>>();
 	}
 
@@ -31,7 +31,7 @@ public class StoreTests
 		sut.Initialize();
 		sut.Dispose();
 
-		// Then the MonitorSlice has initialized
+		// Then the MonitorSector has initialized
 		internalCtx.WindowMessageMonitor.WorkAreaChanged -= Arg.Any<EventHandler<WindowMessageMonitorEventArgs>>();
 	}
 }

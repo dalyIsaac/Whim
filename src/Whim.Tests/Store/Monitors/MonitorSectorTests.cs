@@ -6,7 +6,7 @@ using Xunit;
 namespace Whim.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-public class MonitorSliceTests
+public class MonitorSectorTests
 {
 	[Theory, AutoSubstituteData]
 	internal void Initialize(IContext ctx, IInternalContext internalCtx)

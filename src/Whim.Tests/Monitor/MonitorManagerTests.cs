@@ -81,7 +81,7 @@ public class MonitorManagerTests
 		// Given
 		MonitorManager sut = new(ctx);
 
-		// When the monitor slice triggers a MonitorsChanged event
+		// When the monitor sector triggers a MonitorsChanged event
 		// Then an MonitorsChanged event from the MonitorManager was triggered
 		sut.Initialize();
 		Assert.Raises<MonitorsChangedEventArgs>(
