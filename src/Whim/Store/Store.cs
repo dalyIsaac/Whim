@@ -4,54 +4,6 @@ using DotNext;
 namespace Whim;
 
 /// <summary>
-/// An empty type for <see cref="Result{T}"/>s which don't return anything.
-/// </summary>
-public record Empty()
-{
-	/// <summary>
-	/// Default placeholder for empty result.
-	/// </summary>
-	public static Result<Empty> Result { get; } = DotNext.Result.FromValue(new Empty());
-}
-
-/// <summary>
-/// Base class for the transform.
-/// </summary>
-public abstract record TransformBase();
-
-/// <summary>
-/// Operation describing how to update the state of the <see cref="Store"/>.
-/// The implementing record should be populated with the payload.
-/// <see cref="Execute"/> will specify how to update the store.
-/// </summary>
-public abstract record Transform() : TransformBase()
-{
-	/// <summary>
-	/// How to update the store.
-	/// </summary>
-	/// <param name="ctx">Whim's context.</param>
-	/// <param name="internalCtx">Internal-only parts of Whim's API.</param>
-	internal abstract Result<Empty> Execute(IContext ctx, IInternalContext internalCtx);
-}
-
-/// <summary>
-/// Operation describing how to update the state of the <see cref="Store"/>.
-/// The implementing record should be populated with the payload.
-/// <see cref="Execute"/> will specify how to update the store.
-/// </summary>
-/// <typeparam name="TResult"></typeparam>
-public abstract record Transform<TResult>()
-{
-	/// <summary>
-	/// How to update the store.
-	/// </summary>
-	/// <param name="ctx">Whim's context.</param>
-	/// <param name="internalCtx">Internal-only parts of Whim's API.</param>
-	/// <returns>A wrapped result.</returns>
-	internal abstract Result<TResult> Execute(IContext ctx, IInternalContext internalCtx);
-}
-
-/// <summary>
 /// Description of how to retrieve data from the <see cref="Store"/>.
 /// The implementing record should be populated with the payload.
 /// </summary>
@@ -65,61 +17,6 @@ public abstract record Picker<TResult>()
 	/// <param name="internalCtx">Internal-only parts of Whim's API.</param>
 	/// <returns></returns>
 	internal abstract TResult Execute(IContext ctx, IInternalContext internalCtx);
-}
-
-/// <summary>
-/// Whim's store.
-/// </summary>
-public interface IStore : IDisposable
-{
-	/// <inheritdoc cref="MonitorSector"/>
-	public MonitorSector Monitors { get; }
-
-	/// <inheritdoc cref="WorkspaceSector" />
-	public WorkspaceSector Workspaces { get; }
-
-	/// <inheritdoc cref="MapSector" />
-	public MapSector Maps { get; }
-
-	/// <inheritdoc cref="MapSector" />
-	public WindowSector Windows { get; }
-
-	/// <summary>
-	/// Initialize the event listeners.
-	/// </summary>
-	public void Initialize();
-
-	/// <summary>
-	/// Dispatch updates to transform Whim's state.
-	/// </summary>
-	/// <param name="transform">
-	/// The record implementing <see cref="Dispatch"/> to update Whim's state.
-	/// </param>
-	public void Dispatch(Transform transform);
-
-	/// <summary>
-	/// Dispatch updates to transform Whim's state.
-	/// </summary>
-	/// <typeparam name="TResult">
-	/// The result from the transform, if it's successful.
-	/// </typeparam>
-	/// <param name="transform">
-	/// The record implementing <see cref="Dispatch"/> to update Whim's state.
-	/// </param>
-	/// <returns></returns>
-	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform);
-
-	/// <summary>
-	/// Entry-point to pick from Whim's state.
-	/// </summary>
-	/// <typeparam name="TResult">
-	/// The type of the resulting data from the store.
-	/// </typeparam>
-	/// <param name="picker">
-	/// The record implementing <see cref="Pick"/> to fetch from Whim's state.
-	/// </param>
-	/// <returns></returns>
-	public TResult Pick<TResult>(Picker<TResult> picker);
 }
 
 /// <inheritdoc />

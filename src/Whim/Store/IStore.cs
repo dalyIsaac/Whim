@@ -1,0 +1,59 @@
+using System;
+using DotNext;
+
+namespace Whim;
+
+/// <summary>
+/// Whim's store.
+/// </summary>
+public interface IStore : IDisposable
+{
+	/// <inheritdoc cref="MonitorSector"/>
+	public MonitorSector Monitors { get; }
+
+	/// <inheritdoc cref="WorkspaceSector" />
+	public WorkspaceSector Workspaces { get; }
+
+	/// <inheritdoc cref="MapSector" />
+	public MapSector Maps { get; }
+
+	/// <inheritdoc cref="MapSector" />
+	public WindowSector Windows { get; }
+
+	/// <summary>
+	/// Initialize the event listeners.
+	/// </summary>
+	public void Initialize();
+
+	/// <summary>
+	/// Dispatch updates to transform Whim's state.
+	/// </summary>
+	/// <param name="transform">
+	/// The record implementing <see cref="Dispatch"/> to update Whim's state.
+	/// </param>
+	public void Dispatch(Transform transform);
+
+	/// <summary>
+	/// Dispatch updates to transform Whim's state.
+	/// </summary>
+	/// <typeparam name="TResult">
+	/// The result from the transform, if it's successful.
+	/// </typeparam>
+	/// <param name="transform">
+	/// The record implementing <see cref="Dispatch"/> to update Whim's state.
+	/// </param>
+	/// <returns></returns>
+	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform);
+
+	/// <summary>
+	/// Entry-point to pick from Whim's state.
+	/// </summary>
+	/// <typeparam name="TResult">
+	/// The type of the resulting data from the store.
+	/// </typeparam>
+	/// <param name="picker">
+	/// The record implementing <see cref="Pick"/> to fetch from Whim's state.
+	/// </param>
+	/// <returns></returns>
+	public TResult Pick<TResult>(Picker<TResult> picker);
+}
