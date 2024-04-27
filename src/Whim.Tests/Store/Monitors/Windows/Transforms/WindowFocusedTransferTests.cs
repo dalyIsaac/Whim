@@ -26,7 +26,11 @@ public class WindowFocusedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowIsNotNull_WindowIsTrackedByButler(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
+	internal void WindowIsNotNull_WindowIsTrackedByButler(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given the window is tracked by the butler
 		ImmutableArray<IMonitor> monitors = Setup(mutableRootSector);
@@ -43,7 +47,12 @@ public class WindowFocusedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowIsNotNull_WindowIsNotTrackedByButler(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IWindow window)
+	internal void WindowIsNotNull_WindowIsNotTrackedByButler(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
 	{
 		// Given the window is not tracked by the butler
 		Setup(mutableRootSector);
@@ -83,7 +92,11 @@ public class WindowFocusedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void ForegroundWindowIsNotNull(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector)
+	internal void ForegroundWindowIsNotNull(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given there is no window and GetForegroundWindow returns a handle
 		Setup(mutableRootSector);

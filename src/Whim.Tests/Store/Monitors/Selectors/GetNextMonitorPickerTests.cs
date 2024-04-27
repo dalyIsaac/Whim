@@ -8,7 +8,13 @@ namespace Whim.Tests;
 public class GetNextMonitorPickerTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void CannotFindMonitor(IContext ctx, MutableRootSector mutableRootSector, IMonitor monitor1, IMonitor monitor2, IMonitor unknownMonitor)
+	internal void CannotFindMonitor(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor1,
+		IMonitor monitor2,
+		IMonitor unknownMonitor
+	)
 	{
 		// Given
 		mutableRootSector.Monitors.Monitors = ImmutableArray.Create(monitor1, monitor2);

@@ -38,7 +38,12 @@ public class GetMonitorAtPointPickerTests
 	private static readonly IPoint<int> _point = new Point<int>(10, 10);
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Index_CannotFindMonitor(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
+	internal void Index_CannotFindMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor
+	)
 	{
 		// Given there is no monitor at the point
 		SetMonitorAtPoint(mutableRootSector, internalCtx, (HMONITOR)2, (HMONITOR)1, monitor);
@@ -52,7 +57,12 @@ public class GetMonitorAtPointPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Index_CannotFindMonitor_GetFirst(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
+	internal void Index_CannotFindMonitor_GetFirst(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor
+	)
 	{
 		// Given there is no monitor at the point
 		SetMonitorAtPoint(mutableRootSector, internalCtx, (HMONITOR)2, (HMONITOR)1, monitor);
@@ -66,7 +76,12 @@ public class GetMonitorAtPointPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Index_FoundMonitor(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
+	internal void Index_FoundMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor
+	)
 	{
 		// Given there is a monitor at the point
 		SetMonitorAtPoint(mutableRootSector, internalCtx, (HMONITOR)1, (HMONITOR)1, monitor);
@@ -80,7 +95,12 @@ public class GetMonitorAtPointPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Monitor_CannotFindMonitor(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
+	internal void Monitor_CannotFindMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor
+	)
 	{
 		// Given there is no monitor at the point
 		SetMonitorAtPoint(mutableRootSector, internalCtx, (HMONITOR)2, (HMONITOR)1, monitor);
@@ -94,7 +114,12 @@ public class GetMonitorAtPointPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Monitor_CannotFindMonitor_GetFirst(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
+	internal void Monitor_CannotFindMonitor_GetFirst(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor
+	)
 	{
 		// Given there is no monitor at the point
 		SetMonitorAtPoint(mutableRootSector, internalCtx, (HMONITOR)2, (HMONITOR)1, monitor);
@@ -108,7 +133,12 @@ public class GetMonitorAtPointPickerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Monitor_FoundMonitor(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
+	internal void Monitor_FoundMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor
+	)
 	{
 		// Given there is a monitor at the point
 		SetMonitorAtPoint(mutableRootSector, internalCtx, (HMONITOR)1, (HMONITOR)1, monitor);

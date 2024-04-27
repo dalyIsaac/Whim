@@ -17,7 +17,12 @@ public class MouseLeftButtonUpTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void NoMonitorAtPoint(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
+	internal void NoMonitorAtPoint(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor
+	)
 	{
 		// Given there is no monitor at the point
 		SetMonitorAtPoint(internalCtx, (HMONITOR)2);
@@ -36,7 +41,12 @@ public class MouseLeftButtonUpTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MonitorAtPoint(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector, IMonitor monitor)
+	internal void MonitorAtPoint(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IMonitor monitor
+	)
 	{
 		// Given there is a monitor at the point
 		SetMonitorAtPoint(internalCtx, (HMONITOR)2);
