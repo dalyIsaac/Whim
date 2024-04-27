@@ -8,6 +8,9 @@ namespace Whim;
 /// </summary>
 public interface IStore : IDisposable
 {
+	/// <inheritdoc cref="IMonitorSectorEvents"/>
+	IMonitorSectorEvents MonitorEvents { get; }
+
 	/// <summary>
 	/// Initialize the event listeners.
 	/// </summary>

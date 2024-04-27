@@ -42,7 +42,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public void Initialize()
 	{
-		_context.Store.Monitors.MonitorsChanged += MonitorSector_MonitorsChanged;
+		_context.Store.MonitorEvents.MonitorsChanged += MonitorSector_MonitorsChanged;
 	}
 
 	private void MonitorSector_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
@@ -84,7 +84,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.Store.Monitors.MonitorsChanged -= MonitorSector_MonitorsChanged;
+				_context.Store.MonitorEvents.MonitorsChanged -= MonitorSector_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

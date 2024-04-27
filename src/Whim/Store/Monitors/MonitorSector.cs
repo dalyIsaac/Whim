@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Whim;
 
-internal class MonitorSector : SectorBase, IDisposable, IMonitorSector
+internal class MonitorSector : SectorBase, IDisposable, IMonitorSector, IMonitorSectorEvents
 {
 	private readonly IContext _ctx;
 	private readonly MonitorEventListener _listener;

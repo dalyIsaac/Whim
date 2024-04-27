@@ -12,6 +12,9 @@ public class Store : IStore
 
 	private readonly RootSector _root;
 
+	/// <inheritdoc />
+	public IMonitorSectorEvents MonitorEvents => _root.MutableRootSector.Monitors;
+
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
