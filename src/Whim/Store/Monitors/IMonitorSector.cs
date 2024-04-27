@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 
 namespace Whim;
@@ -26,4 +27,9 @@ public interface IMonitorSector
 	/// The index of the last monitor which received an event sent by Windows which Whim did not ignore.
 	/// </summary>
 	internal int LastWhimActiveMonitorIndex { get; }
+
+	/// <summary>
+	/// Event raised when the monitors handled by Whim are changed.
+	/// </summary>
+	event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 }

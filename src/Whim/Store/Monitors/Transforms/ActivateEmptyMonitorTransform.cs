@@ -10,9 +10,13 @@ namespace Whim;
 /// </param>
 public record ActivateEmptyMonitorTransform(IMonitor Monitor) : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		MonitorSector sector = ctx.Store.Monitors;
+		MonitorSector sector = mutableRootSector.Monitors;
 
 		if (!sector.Monitors.Contains(Monitor))
 		{

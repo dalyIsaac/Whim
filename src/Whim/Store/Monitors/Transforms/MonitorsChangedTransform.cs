@@ -9,10 +9,14 @@ namespace Whim;
 /// </summary>
 internal record MonitorsChangedTransform : Transform
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
 		Logger.Debug($"Monitors changed");
-		MonitorSector sector = ctx.Store.Monitors;
+		MonitorSector sector = mutableRootSector.Monitors;
 
 		// Get the new monitors.
 		ImmutableArray<IMonitor> previousMonitors = sector.Monitors;

@@ -13,9 +13,9 @@ namespace Whim;
 /// </param>
 public record GetPreviousMonitorPicker(IMonitor Monitor, bool GetFirst = false) : Picker<Result<IMonitor>>()
 {
-	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
 	{
-		ImmutableArray<IMonitor> monitors = ctx.Store.Monitors.Monitors;
+		ImmutableArray<IMonitor> monitors = rootSector.Monitors.Monitors;
 
 		int idx = monitors.IndexOf(Monitor);
 		if (idx == -1)

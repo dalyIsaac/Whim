@@ -7,8 +7,8 @@ namespace Whim;
 /// </summary>
 public record GetActiveMonitorPicker() : Picker<IMonitor>()
 {
-	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
-		ctx.Store.Monitors.Monitors[ctx.Store.Monitors.ActiveMonitorIndex];
+	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector) =>
+		rootSector.Monitors.Monitors[rootSector.Monitors.ActiveMonitorIndex];
 }
 
 /// <summary>
@@ -16,8 +16,8 @@ public record GetActiveMonitorPicker() : Picker<IMonitor>()
 /// </summary>
 public record GetPrimaryMonitorPicker() : Picker<IMonitor>()
 {
-	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
-		ctx.Store.Monitors.Monitors[ctx.Store.Monitors.PrimaryMonitorIndex];
+	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector) =>
+		rootSector.Monitors.Monitors[rootSector.Monitors.PrimaryMonitorIndex];
 }
 
 /// <summary>
@@ -25,8 +25,8 @@ public record GetPrimaryMonitorPicker() : Picker<IMonitor>()
 /// </summary>
 public record GetLastWhimActiveMonitorPicker() : Picker<IMonitor>()
 {
-	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx) =>
-		ctx.Store.Monitors.Monitors[ctx.Store.Monitors.LastWhimActiveMonitorIndex];
+	internal override IMonitor Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector) =>
+		rootSector.Monitors.Monitors[rootSector.Monitors.LastWhimActiveMonitorIndex];
 }
 
 /// <summary>
@@ -34,6 +34,9 @@ public record GetLastWhimActiveMonitorPicker() : Picker<IMonitor>()
 /// </summary>
 public record GetAllMonitorsPicker() : Picker<IReadOnlyList<IMonitor>>()
 {
-	internal override IReadOnlyList<IMonitor> Execute(IContext ctx, IInternalContext internalCtx) =>
-		ctx.Store.Monitors.Monitors;
+	internal override IReadOnlyList<IMonitor> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		IRootSector rootSector
+	) => rootSector.Monitors.Monitors;
 }

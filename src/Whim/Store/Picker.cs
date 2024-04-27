@@ -12,8 +12,9 @@ public abstract record Picker<TResult>()
 	/// </summary>
 	/// <param name="ctx">Whim's context.</param>
 	/// <param name="internalCtx">Internal-only parts of Whim's API.</param>
+	/// <param name="rootSector"></param>
 	/// <returns></returns>
-	internal abstract TResult Execute(IContext ctx, IInternalContext internalCtx);
+	internal abstract TResult Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector);
 }
 
 /// <summary>

@@ -12,8 +12,8 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
 using Xunit;
-s
-namespace Whim.Tess
+
+namespace Whim.Tests;
 
 internal class WindowManagerCustomization : ICustomization
 {

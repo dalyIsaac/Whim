@@ -9,29 +9,14 @@ internal class MonitorSector : SectorBase, IDisposable, IMonitorSector
 	private readonly MonitorEventListener _listener;
 	private bool _disposedValue;
 
-	/// <summary>
-	/// All the monitors currently tracked by Whim.
-	/// </summary>
 	public ImmutableArray<IMonitor> Monitors { get; set; } = ImmutableArray<IMonitor>.Empty;
 
-	/// <summary>
-	/// The index of the monitor which is currently active, in <see cref="Monitors"/>.
-	/// </summary>
 	public int ActiveMonitorIndex { get; set; } = -1;
 
-	/// <summary>
-	/// The index of the primary monitor, in <see cref="Monitors"/>.
-	/// </summary>
 	public int PrimaryMonitorIndex { get; set; } = -1;
 
-	/// <summary>
-	/// The index of the last monitor which received an event sent by Windows which Whim did not ignore.
-	/// </summary>
 	public int LastWhimActiveMonitorIndex { get; set; } = -1;
 
-	/// <summary>
-	/// Event raised when the monitors handled by Whim are changed.
-	/// </summary>
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
 	public MonitorSector(IContext ctx, IInternalContext internalCtx)

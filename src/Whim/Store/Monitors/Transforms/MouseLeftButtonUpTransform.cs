@@ -4,18 +4,17 @@ namespace Whim;
 
 internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
 {
-	/// <summary>
-	/// Set the active monitor based on the user's last mouse click.
-	/// </summary>
-	/// <param name="ctx"></param>
-	/// <param name="internalCtx"></param>
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
 		if (ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point)).TryGet(out int idx))
 		{
-			ctx.Store.MonitorSector.ActiveMonitorIndex = idx;
+			mutableRootSector.Monitors.ActiveMonitorIndex = idx;
 		}
 
-		return Empty.Resultector
+		return Empty.Result;
 	}
 }

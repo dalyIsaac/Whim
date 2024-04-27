@@ -47,7 +47,7 @@ public class Store : IStore
 	{
 		// TODO: reader-writer lock.
 		// don't do a read lock if a transform is currently in progress.
-		return picker.Execute(_ctx, _internalCtx);
+		return picker.Execute(_ctx, _internalCtx, _root);
 	}
 
 	/// <inheritdoc />

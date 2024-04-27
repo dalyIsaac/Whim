@@ -6,9 +6,13 @@ namespace Whim;
 
 internal record WindowFocusedTransform(IWindow? Window) : Transform()
 {
-	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<Empty> Execute(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector
+	)
 	{
-		SetActiveMonitor(ctx, internalCtx);
+		SetActiveMonitor(ctx, internalCtx, mutableRootSector);
 		return Empty.Result;
 	}
 
@@ -17,9 +21,10 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 	/// </summary>
 	/// <param name="ctx"></param>
 	/// <param name="internalCtx"></param>
-	private void SetActiveMonitor(IContext ctx, IInternalContext internalCtx)
+	/// <param name="mutableRootSector"></param>
+	private void SetActiveMonitor(IContext ctx, IInternalContext internalCtx, MutableRootSector mutableRootSector)
 	{
-		MonitorSector sector = ctx.Store.Monitors;
+		MonitorSector sector = mutableRootSector.Monitors;
 
 		// If we know the window, use what the Butler knows instead of Windows.
 		if (Window is not null)

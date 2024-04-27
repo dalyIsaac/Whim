@@ -79,12 +79,12 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!_disposedValue)ector
+		if (!_disposedValue)
 		{
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.Store.MonitorSector.MonitorsChanged -= MonitorSector_MonitorsChanged;
+				_context.Store.Monitors.MonitorsChanged -= MonitorSector_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

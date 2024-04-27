@@ -15,10 +15,10 @@ namespace Whim;
 /// </param>
 public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<Result<int>>
 {
-	internal override Result<int> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<int> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
 	{
 		Logger.Debug($"Getting monitor at point {Point}");
-		MonitorSector sector = ctx.Store.Monitors;
+		IMonitorSector sector = rootSector.Monitors;
 
 		HMONITOR hmonitor = internalCtx.CoreNativeManager.MonitorFromPoint(
 			Point.ToSystemPoint(),
@@ -55,7 +55,7 @@ public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = fa
 /// </param>
 public record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<Result<IMonitor>>
 {
-	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx)
+	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
 	{
 		Result<int> idxResult = ctx.Store.Pick(new GetMonitorIndexAtPointPicker(Point, GetFirst));
 		if (!idxResult.TryGet(out int idxVal))
@@ -63,7 +63,7 @@ public record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) 
 			return Result.FromException<IMonitor>(idxResult.Error!);
 		}
 
-		MonitorSector sector = ctx.Store.Monitors;
+		IMonitorSector sector = rootSector.Monitors;
 		if (idxVal > sector.Monitors.Length)
 		{
 			return Result.FromException<IMonitor>(new WhimException("Monitor index is invalid"));
