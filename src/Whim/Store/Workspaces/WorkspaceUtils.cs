@@ -1,3 +1,5 @@
+using DotNext;
+
 namespace Whim;
 
 internal static class WorkspaceUtils
@@ -24,6 +26,30 @@ internal static class WorkspaceUtils
 				CurrentLayoutEngine = workspace.LayoutEngines[layoutEngineIdx]
 			}
 		);
+	}
+
+	/// <summary>
+	/// Returns the window to process. If the window is null, the last focused window is used.
+	/// If the given window is not null, it is checked that it is in the workspace.
+	/// </summary>
+	/// <param name="workspace"></param>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	public static Result<IWindow> GetValidWorkspaceWindow(ImmutableWorkspace workspace, IWindow? window)
+	{
+		window ??= workspace.LastFocusedWindow;
+
+		if (window == null)
+		{
+			return Result.FromException<IWindow>(new WhimException("No windows in workspace"));
+		}
+
+		if (!workspace.Windows.Contains(window))
+		{
+			return Result.FromException<IWindow>(new WhimException("Window not in workspace"));
+		}
+
+		return Result.FromValue(window);
 	}
 
 	public static WhimException WorkspaceDoesNotExist() =>

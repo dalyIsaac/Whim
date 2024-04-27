@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DotNext;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -126,50 +127,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public bool RemoveWindow(IWindow window) =>
 		_context.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(GetThis(), window)).IsSuccessful;
 
-	/// <summary>
-	/// Returns the window to process. If the window is null, the last focused window is used.
-	/// If the given window is not null, it is checked if it exists in the workspace.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns></returns>
-	private IWindow? GetValidVisibleWindow(IWindow? window)
-	{
-		window ??= LastFocusedWindow;
-
-		if (window == null)
-		{
-			Logger.Error($"Could not find a valid window in workspace {Name} to perform action");
-			return null;
-		}
-
-		if (!_windows.Contains(window))
-		{
-			Logger.Error($"Window {window} does not exist in workspace {Name}");
-			return null;
-		}
-
-		return window;
-	}
-
 	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
-		Logger.Debug($"Focusing window {window} in workspace {Name}");
-
-		if (GetValidVisibleWindow(window) is not IWindow validWindow)
-		{
-			return false;
-		}
-
-		ILayoutEngine oldEngine = ActiveLayoutEngine;
-		_layoutEngines[_activeLayoutEngineIndex] = ActiveLayoutEngine.FocusWindowInDirection(direction, validWindow);
-		bool changed = ActiveLayoutEngine != oldEngine;
-
-		if (!deferLayout)
-		{
-			DoLayout();
-		}
-
-		return changed;
+		Result<bool> result = _context.Store.Dispatch(
+			new FocusWindowInDirectionTransform(GetThis(), window, direction)
+		);
+		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
 	}
 
 	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
