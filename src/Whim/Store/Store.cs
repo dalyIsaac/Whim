@@ -30,14 +30,14 @@ public class Store : IStore
 	public void Dispatch(Transform transform)
 	{
 		// TODO: reader-writer lock.
-		transform.Execute(_ctx, _internalCtx);
+		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
 		_root.DispatchEvents();
 	}
 
 	/// <inheritdoc />
 	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform)
 	{
-		Result<TResult> result = transform.Execute(_ctx, _internalCtx);
+		Result<TResult> result = transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
 		_root.DispatchEvents();
 		return result;
 	}

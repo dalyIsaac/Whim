@@ -2,54 +2,33 @@ using System;
 
 namespace Whim;
 
+/// <inheritdoc/>
 public class RootSector : IRootSector, IDisposable
 {
 	private bool _disposedValue;
 
-	private readonly MonitorSector _monitors;
+	internal MutableRootSector MutableRootSector { get; }
 
-	/// <inheritdoc cref="IMonitorSector"/>
-	public IMonitorSector Monitors => _monitors;
+	/// <inheritdoc/>
+	public IMonitorSector Monitors => MutableRootSector.Monitors;
 
-	private readonly WorkspaceSector _workspaces;
+	/// <inheritdoc/>
+	public IWorkspaceSector Workspaces => MutableRootSector.Workspaces;
 
-	/// <inheritdoc cref="WorkspaceSector" />
-	public IWorkspaceSector Workspaces => _workspaces;
+	/// <inheritdoc/>
+	public IMapSector Maps => MutableRootSector.Maps;
 
-	private readonly MapSector _maps;
-
-	/// <inheritdoc cref="MapSector" />
-	public IMapSector Maps => _maps;
-
-	private readonly WindowSector _windows;
-
-	/// <inheritdoc cref="MapSector" />
-	public IWindowSector Windows => _windows;
+	/// <inheritdoc/>
+	public IWindowSector Windows => MutableRootSector.Windows;
 
 	internal RootSector(IContext ctx, IInternalContext internalCtx)
 	{
-		_monitors = new MonitorSector(ctx, internalCtx);
-		_workspaces = new WorkspaceSector();
-		_maps = new MapSector();
-		_windows = new WindowSector();
+		MutableRootSector = new MutableRootSector(ctx, internalCtx);
 	}
 
-	internal void Initialize()
-	{
-		_monitors.Initialize();
-		_workspaces.Initialize();
-		_maps.Initialize();
-		_windows.Initialize();
-	}
+	internal void Initialize() => MutableRootSector.Initialize();
 
-	internal void DispatchEvents()
-	{
-		Logger.Debug("Dispatching events");
-		_monitors.DispatchEvents();
-		_workspaces.DispatchEvents();
-		_maps.DispatchEvents();
-		_windows.DispatchEvents();
-	}
+	internal void DispatchEvents() => MutableRootSector.DispatchEvents();
 
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
@@ -59,7 +38,7 @@ public class RootSector : IRootSector, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_monitors.Dispose();
+				MutableRootSector.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
