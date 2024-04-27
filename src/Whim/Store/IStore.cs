@@ -40,8 +40,20 @@ public interface IStore : IDisposable
 	/// The type of the resulting data from the store.
 	/// </typeparam>
 	/// <param name="picker">
-	/// The record implementing <see cref="Pick"/> to fetch from Whim's state.
+	/// The record implementing <see cref="Picker{TResult}"/> to fetch from Whim's state.
 	/// </param>
 	/// <returns></returns>
 	public TResult Pick<TResult>(Picker<TResult> picker);
+
+	/// <summary>
+	/// Entry-point to pick from Whim's state.
+	/// </summary>
+	/// <typeparam name="TResult">
+	/// The type of the resulting data from the store.
+	/// </typeparam>
+	/// <param name="picker">
+	/// Pure picker to fetch from Whim's state.
+	/// </param>
+	/// <returns></returns>
+	public TResult Pick<TResult>(PurePicker<TResult> picker);
 }

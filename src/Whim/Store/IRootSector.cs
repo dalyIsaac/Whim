@@ -9,7 +9,7 @@ public interface IRootSector
 	public IWorkspaceSector Workspaces { get; }
 
 	/// <inheritdoc cref="MapSector" />
-	public MapSector Maps { get; }
+	public IMapSector Maps { get; }
 
 	/// <inheritdoc cref="MapSector" />
 	public IWindowSector Windows { get; }

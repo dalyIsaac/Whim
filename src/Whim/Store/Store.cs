@@ -10,36 +10,20 @@ public class Store : IStore
 	private readonly IInternalContext _internalCtx;
 	private bool _disposedValue;
 
-	/// <inheritdoc />
-	public MonitorSector Monitors { get; }
-
-	/// <inheritdoc />
-	public WorkspaceSector Workspaces { get; }
-
-	/// <inheritdoc />
-	public MapSector Maps { get; }
-
-	/// <inheritdoc />
-	public WindowSector Windows { get; }
+	private readonly RootSector _root;
 
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
 		_internalCtx = internalCtx;
 
-		Monitors = new MonitorSector(ctx, internalCtx);
-		Workspaces = new WorkspaceSector();
-		Maps = new MapSector();
-		Windows = new WindowSector();
+		_root = new RootSector(ctx, internalCtx);
 	}
 
 	/// <inheritdoc />
 	public void Initialize()
 	{
-		Monitors.Initialize();
-		Workspaces.Initialize();
-		Maps.Initialize();
-		Windows.Initialize();
+		_root.Initialize();
 	}
 
 	/// <inheritdoc />
@@ -47,32 +31,30 @@ public class Store : IStore
 	{
 		// TODO: reader-writer lock.
 		transform.Execute(_ctx, _internalCtx);
-		DispatchEvents();
+		_root.DispatchEvents();
 	}
 
 	/// <inheritdoc />
 	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform)
 	{
 		Result<TResult> result = transform.Execute(_ctx, _internalCtx);
-		DispatchEvents();
+		_root.DispatchEvents();
 		return result;
 	}
 
-	private void DispatchEvents()
-	{
-		Logger.Debug("Dispatching events");
-		Monitors.DispatchEvents();
-		Workspaces.DispatchEvents();
-		Maps.DispatchEvents();
-		Windows.DispatchEvents();
-	}
-
-	/// <inheritdoc cref="Windows" />
+	/// <inheritdoc />
 	public TResult Pick<TResult>(Picker<TResult> picker)
 	{
 		// TODO: reader-writer lock.
 		// don't do a read lock if a transform is currently in progress.
 		return picker.Execute(_ctx, _internalCtx);
+	}
+
+	/// <inheritdoc />
+	public TResult Pick<TResult>(PurePicker<TResult> picker)
+	{
+		// TODO: reader-writer lock
+		return picker(_root);
 	}
 
 	/// <inheritdoc/>
@@ -83,7 +65,7 @@ public class Store : IStore
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				Monitors.Dispose();
+				_root.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

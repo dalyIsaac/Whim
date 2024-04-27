@@ -25,7 +25,7 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		if (Window is not null)
 		{
 			Logger.Debug($"Focusing window {Window}");
-ector
+
 			if (ctx.Butler.Pantry.GetMonitorForWindow(Window) is IMonitor monitor)
 			{
 				Logger.Debug($"Setting active monitor to {monitor}");
