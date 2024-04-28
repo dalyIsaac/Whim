@@ -1,4 +1,5 @@
 using System;
+using DotNext;
 
 namespace Whim;
 
@@ -13,8 +14,11 @@ namespace Whim;
 internal record MinimizeWindowStartTransform(Guid WorkspaceId, IWindow Window)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
 {
-	/// <inheritdoc/>
-	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window)
+	private protected override Result<ImmutableWorkspace> WindowOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace,
+		IWindow window
+	)
 	{
 		// If the window is already in the workspace, minimize it in just the active layout engine.
 		// If it isn't, then we assume it was provided during startup and minimize it in all layouts.

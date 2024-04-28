@@ -12,33 +12,15 @@ namespace Whim;
 /// <param name="Name">
 /// The new name of the workspace.
 /// </param>
-public record SetWorkspaceNameTransform(Guid Id, string Name) : Transform
+public record SetWorkspaceNameTransform(Guid Id, string Name) : BaseWorkspaceTransform(Id)
 {
-	internal override Result<Empty> Execute(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector
+	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace
 	)
 	{
-		WorkspaceSlice slice = ctx.Store.WorkspaceSlice;
-
-		for (int idx = 0; idx < slice.Workspaces.Count; idx++)
-		{
-			ImmutableWorkspace workspace = slice.Workspaces[idx];
-
-			if (workspace.Id != Id)
-			{
-				continue;
-			}
-
-			ImmutableWorkspace newWorkspace = workspace with { Name = Name };
-			slice.Workspaces = slice.Workspaces.SetItem(idx, newWorkspace);
-			slice.QueueEvent(
-				new WorkspaceRenamedEventArgs() { PreviousName = workspace.Name, Workspace = newWorkspace }
-			);
-			return Empty.Result;
-		}
-
-		return Result.FromException<Empty>(new WhimException($"Workspace with id {Id} not found"));
+		ImmutableWorkspace newWorkspace = workspace with { Name = Name };
+		sector.QueueEvent(new WorkspaceRenamedEventArgs() { PreviousName = workspace.Name, Workspace = newWorkspace });
+		return newWorkspace;
 	}
 }

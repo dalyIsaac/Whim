@@ -1,29 +1,21 @@
+using System;
 using DotNext;
 
 namespace Whim;
 
 /// <summary>
-/// Adds the given <paramref name="Window"/> to the provided <paramref name="Workspace"/>
+/// Adds the given <paramref name="Window"/> to the workspace with the given <paramref name="WorkspaceId"/>
 /// </summary>
-/// <param name="Workspace"></param>
+/// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
-public record AddWindowToWorkspaceTransform(ImmutableWorkspace Workspace, IWindow Window) : Transform
+public record AddWindowToWorkspaceTransform(Guid WorkspaceId, IWindow Window) : BaseWorkspaceTransform(WorkspaceId)
 {
-	internal override Result<Empty> Execute(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector
+	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace
 	)
 	{
-		WorkspaceSector sector = mutableRootSector.Workspaces;
-
-		int workspaceIdx = sector.Workspaces.IndexOf(Workspace);
-		if (workspaceIdx == -1)
-		{
-			return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
-		}
-
-		ImmutableWorkspace workspace = Workspace with { Windows = Workspace.Windows.Add(Window) };
+		workspace = workspace with { Windows = workspace.Windows.Add(Window) };
 
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
 		{
@@ -33,8 +25,6 @@ public record AddWindowToWorkspaceTransform(ImmutableWorkspace Workspace, IWindo
 			};
 		}
 
-		sector.Workspaces = sector.Workspaces.SetItem(workspaceIdx, workspace);
-
-		return Empty.Result;
+		return workspace;
 	}
 }

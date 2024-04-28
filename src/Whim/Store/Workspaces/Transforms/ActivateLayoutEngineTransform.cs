@@ -1,40 +1,31 @@
+using System;
 using DotNext;
 
 namespace Whim;
 
 /// <summary>
-/// Set the active layout engine in the <paramref name="Workspace"/>.
+/// Set the active layout engine in the workspace specified by <paramref name="WorkspaceId"/>
 /// </summary>
-/// <param name="Workspace">
-/// The workspace to set the active layout engine for.
+/// <param name="WorkspaceId">
+/// The id of the workspace.
 /// </param>
 /// <param name="LayoutEnginePredicate">
 /// A predicate which determines which layout engine should be activated.
 /// </param>
-public record ActivateLayoutEngineTransform(ImmutableWorkspace Workspace, Pred<ILayoutEngine> LayoutEnginePredicate)
-	: Transform
+public record ActivateLayoutEngineTransform(Guid WorkspaceId, Pred<ILayoutEngine> LayoutEnginePredicate)
+	: BaseWorkspaceTransform(WorkspaceId)
 {
-	internal override Result<Empty> Execute(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector
+	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace
 	)
 	{
-		WorkspaceSector sector = mutableRootSector.Workspaces;
-
-		int workspaceIdx = sector.Workspaces.IndexOf(Workspace);
-		if (workspaceIdx == -1)
-		{
-			return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
-		}
-
-		int layoutEngineIdx = Workspace.LayoutEngines.GetMatchingIndex(LayoutEnginePredicate);
+		int layoutEngineIdx = workspace.LayoutEngines.GetMatchingIndex(LayoutEnginePredicate);
 		if (layoutEngineIdx == -1)
 		{
-			return Result.FromException<Empty>(new WhimException("Provided layout engine not found"));
+			return Result.FromException<ImmutableWorkspace>(new WhimException("Provided layout engine not found"));
 		}
 
-		WorkspaceUtils.SetActiveLayoutEngine(sector, workspaceIdx, layoutEngineIdx);
-		return Empty.Result;
+		return WorkspaceUtils.SetActiveLayoutEngine(sector, workspace, layoutEngineIdx);
 	}
 }

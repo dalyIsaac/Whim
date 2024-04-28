@@ -1,4 +1,5 @@
 using System;
+using DotNext;
 
 namespace Whim;
 
@@ -10,7 +11,9 @@ namespace Whim;
 public record SetLastFocusedWindowTransform(Guid WorkspaceId, IWindow Window)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, false)
 {
-	/// <inheritdoc/>
-	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window) =>
-		workspace.LastFocusedWindow == window ? workspace : workspace with { LastFocusedWindow = window };
+	private protected override Result<ImmutableWorkspace> WindowOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace,
+		IWindow window
+	) => workspace.LastFocusedWindow == window ? workspace : workspace with { LastFocusedWindow = window };
 }

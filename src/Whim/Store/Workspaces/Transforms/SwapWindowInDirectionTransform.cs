@@ -1,4 +1,5 @@
 using System;
+using DotNext;
 
 namespace Whim;
 
@@ -12,8 +13,11 @@ namespace Whim;
 public record SwapWindowInDirectionTransform(Guid WorkspaceId, IWindow? Window, Direction Direction)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
 {
-	/// <inheritdoc/>
-	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window)
+	private protected override Result<ImmutableWorkspace> WindowOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace,
+		IWindow window
+	)
 	{
 		ILayoutEngine oldEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
 		ILayoutEngine newEngine = oldEngine.SwapWindowInDirection(Direction, window);

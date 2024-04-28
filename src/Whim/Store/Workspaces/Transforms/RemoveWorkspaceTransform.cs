@@ -38,9 +38,6 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 		ImmutableWorkspace oldWorkspace = sector.Workspaces[idx];
 		sector.Workspaces = sector.Workspaces.RemoveAt(idx);
 
-		IWorkspace oldMutableWorkspace = sector.MutableWorkspaces[idx];
-		sector.MutableWorkspaces = sector.MutableWorkspaces.RemoveAt(idx);
-
 		// Queue events
 		ctx.Butler.MergeWorkspaceWindows(oldMutableWorkspace, sector.MutableWorkspaces[^1]);
 		ctx.Butler.Activate(sector.MutableWorkspaces[^1]);

@@ -27,8 +27,11 @@ public record MoveWindowEdgesInDirectionTransform(
 	IPoint<int> Deltas
 ) : BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
 {
-	/// <inheritdoc/>
-	protected override Result<ImmutableWorkspace> Operation(ImmutableWorkspace workspace, IWindow window)
+	private protected override Result<Result<ImmutableWorkspace>> WindowOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace,
+		IWindow window
+	)
 	{
 		// Get the containing monitor.
 		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.GetMonitorForWindow(window));

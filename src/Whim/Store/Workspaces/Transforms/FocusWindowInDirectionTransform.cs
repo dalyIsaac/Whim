@@ -1,4 +1,5 @@
 using System;
+using DotNext;
 
 namespace Whim;
 
@@ -14,8 +15,11 @@ namespace Whim;
 public record FocusWindowInDirectionTransform(Guid WorkspaceId, IWindow? Window, Direction Direction)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
 {
-	/// <inheritdoc/>
-	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window)
+	private protected override Result<ImmutableWorkspace> WindowOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace,
+		IWindow window
+	)
 	{
 		ILayoutEngine layoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
 		ILayoutEngine newLayoutEngine = layoutEngine.FocusWindowInDirection(Direction, window);

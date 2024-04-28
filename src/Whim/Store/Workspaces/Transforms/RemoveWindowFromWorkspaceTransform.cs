@@ -1,4 +1,5 @@
 using System;
+using DotNext;
 
 namespace Whim;
 
@@ -10,8 +11,11 @@ namespace Whim;
 public record RemoveWindowFromWorkspaceTransform(Guid WorkspaceId, IWindow Window)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, false)
 {
-	/// <inheritdoc />
-	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window)
+	private protected override Result<ImmutableWorkspace> WindowOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace,
+		IWindow window
+	)
 	{
 		workspace = workspace with { Windows = workspace.Windows.Remove(window) };
 

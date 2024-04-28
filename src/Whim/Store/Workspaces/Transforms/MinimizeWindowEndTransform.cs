@@ -1,4 +1,5 @@
 using System;
+using DotNext;
 
 namespace Whim;
 
@@ -13,7 +14,11 @@ namespace Whim;
 internal record MinimizeWindowEndTransform(Guid WorkspaceId, IWindow Window)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
 {
-	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window) =>
+	private protected override Result<ImmutableWorkspace> WindowOperation(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace,
+		IWindow window
+	) =>
 		workspace with
 		{
 			Windows = workspace.Windows.Add(window),

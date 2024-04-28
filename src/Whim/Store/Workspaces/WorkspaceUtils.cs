@@ -4,20 +4,15 @@ namespace Whim;
 
 internal static class WorkspaceUtils
 {
-	public static void SetActiveLayoutEngine(WorkspaceSector sector, int workspaceIdx, int layoutEngineIdx)
+	public static ImmutableWorkspace SetActiveLayoutEngine(
+		WorkspaceSector sector,
+		ImmutableWorkspace workspace,
+		int layoutEngineIdx
+	)
 	{
-		ImmutableWorkspace workspace = sector.Workspaces[workspaceIdx];
-
 		int previousLayoutEngineIdx = workspace.ActiveLayoutEngineIndex;
-		sector.Workspaces = sector.Workspaces.SetItem(
-			workspaceIdx,
-			workspace with
-			{
-				ActiveLayoutEngineIndex = layoutEngineIdx
-			}
-		);
+		workspace = workspace with { ActiveLayoutEngineIndex = layoutEngineIdx };
 
-		sector.WorkspacesToLayout.Add(workspace.Id);
 		sector.QueueEvent(
 			new ActiveLayoutEngineChangedEventArgs()
 			{
@@ -26,6 +21,8 @@ internal static class WorkspaceUtils
 				CurrentLayoutEngine = workspace.LayoutEngines[layoutEngineIdx]
 			}
 		);
+
+		return workspace;
 	}
 
 	/// <summary>

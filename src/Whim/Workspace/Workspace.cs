@@ -83,10 +83,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void ActivatePreviouslyActiveLayoutEngine()
 	{
-		ImmutableWorkspace workspace = Id;
-
+		ImmutableWorkspace workspace = _context.Store.Pick(new GetWorkspaceByIdPicker(Id))!.Value;
 		_context.Store.Dispatch(
-			new ActivateLayoutEngineTransform(workspace, (_, idx) => idx == workspace.PreviousLayoutEngineIndex)
+			new ActivateLayoutEngineTransform(Id, (_, idx) => idx == workspace.PreviousLayoutEngineIndex)
 		);
 	}
 
