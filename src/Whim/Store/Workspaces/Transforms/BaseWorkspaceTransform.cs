@@ -11,8 +11,15 @@ namespace Whim;
 /// <param name="DefaultToLastFocusedWindow">
 /// If <paramref name="Window"/> is <c>null</c>, try to use the last focused window.
 /// </param>
-public abstract record BaseWorkspaceWindowTransform(Guid WorkspaceId, IWindow? Window, bool DefaultToLastFocusedWindow)
-	: Transform<bool>
+/// <param name="SkipDoLayout">
+/// If <c>true</c>, do not perform a workspace layout.
+/// </param>
+public abstract record BaseWorkspaceWindowTransform(
+	Guid WorkspaceId,
+	IWindow? Window,
+	bool DefaultToLastFocusedWindow,
+	bool SkipDoLayout = false
+) : Transform<bool>
 {
 	/// <summary>
 	/// The operation to execute.
@@ -63,7 +70,11 @@ public abstract record BaseWorkspaceWindowTransform(Guid WorkspaceId, IWindow? W
 		}
 
 		sector.Workspaces = sector.Workspaces.SetItem(workspaceIdx, newWorkspace);
-		sector.WorkspacesToLayout.Add(workspace.Id);
+
+		if (SkipDoLayout == false)
+		{
+			sector.WorkspacesToLayout.Add(workspace.Id);
+		}
 
 		return Result.FromValue(true);
 	}

@@ -47,27 +47,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		}
 	}
 
-	public void MinimizeWindowStart(IWindow window)
-	{
-		Logger.Debug($"Minimizing window {window} in workspace {Name}");
-
-		// If the window is already in the workspace, minimize it in just the active layout engine.
-		// If it isn't, then we assume it was provided during startup and minimize it in all layouts.
-		if (_windows.Contains(window))
-		{
-			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex]
-				.MinimizeWindowStart(window);
-		}
-		else
-		{
-			_windows.Add(window);
-
-			for (int idx = 0; idx < _layoutEngines.Length; idx++)
-			{
-				_layoutEngines[idx] = _layoutEngines[idx].MinimizeWindowStart(window);
-			}
-		}
-	}
+	public void MinimizeWindowStart(IWindow window) =>
+		_context.Store.Dispatch(new MinimizeWindowStartTransform(Id, window));
 
 	public void MinimizeWindowEnd(IWindow window)
 	{
