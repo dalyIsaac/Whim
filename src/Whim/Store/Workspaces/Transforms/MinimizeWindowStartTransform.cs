@@ -11,7 +11,7 @@ namespace Whim;
 /// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
 internal record MinimizeWindowStartTransform(Guid WorkspaceId, IWindow Window)
-	: BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
+	: BaseWorkspaceWindowTransform(WorkspaceId, Window, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
 {
 	/// <inheritdoc/>
 	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window)
