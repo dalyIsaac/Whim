@@ -14,7 +14,7 @@ namespace Whim;
 /// </param>
 /// <param name="CreateLeafLayoutEngines">
 /// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
-/// use the <see cref="WorkspaceSlice.CreateLayoutEngines"/> function.
+/// use the <see cref="WorkspaceSector.CreateLayoutEngines"/> function.
 /// </param>
 public record AddWorkspaceTransform(
 	string? Name = null,
@@ -55,10 +55,7 @@ public record AddWorkspaceTransform(
 		}
 
 		ImmutableWorkspace workspace = new(Guid.NewGuid(), Name ?? $"Workspace {sector.Workspaces.Count + 1}");
-
 		sector.Workspaces = sector.Workspaces.Add(workspace);
-		sector.MutableWorkspaces = sector.MutableWorkspaces.Add(new Workspace(ctx, internalCtx, workspace.Id));
-
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
 
 		return Result.FromValue(workspace);

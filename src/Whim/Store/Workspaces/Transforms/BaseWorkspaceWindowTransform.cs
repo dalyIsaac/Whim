@@ -23,7 +23,9 @@ public abstract record BaseWorkspaceWindowTransform(
 ) : BaseWorkspaceTransform(WorkspaceId, SkipDoLayout)
 {
 	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
-		WorkspaceSector sector,
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceSector workspaceSector,
 		ImmutableWorkspace workspace
 	)
 	{
@@ -33,26 +35,24 @@ public abstract record BaseWorkspaceWindowTransform(
 			return Result.FromException<ImmutableWorkspace>(result.Error!);
 		}
 
-		return WindowOperation(sector, workspace, validWindow);
+		return WindowOperation(ctx, internalCtx, workspaceSector, workspace, validWindow);
 	}
 
 	/// <summary>
 	/// The operation to execute.
 	/// </summary>
-	/// <param name="sector">
-	/// The workspace sector.
-	/// </param>
-	/// <param name="workspace">
-	/// The workspace.
-	/// </param>
-	/// <param name="window">
-	/// A window in the workspace.
-	/// </param>
+	/// <param name="ctx"></param>
+	/// <param name="internalCtx"></param>
+	/// <param name="workspaceSector"></param>
+	/// <param name="workspace"></param>
+	/// <param name="window"></param>
 	/// <returns>
 	/// The updated workspace.
 	/// </returns>
 	private protected abstract Result<ImmutableWorkspace> WindowOperation(
-		WorkspaceSector sector,
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceSector workspaceSector,
 		ImmutableWorkspace workspace,
 		IWindow window
 	);

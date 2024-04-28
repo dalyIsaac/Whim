@@ -27,7 +27,9 @@ public record MoveWindowEdgesInDirectionTransform(
 	IPoint<int> Deltas
 ) : BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
 {
-	private protected override Result<Result<ImmutableWorkspace>> WindowOperation(
+	private protected override Result<ImmutableWorkspace> WindowOperation(
+		IContext ctx,
+		IInternalContext internalCtx,
 		WorkspaceSector sector,
 		ImmutableWorkspace workspace,
 		IWindow window

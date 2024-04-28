@@ -16,27 +16,29 @@ namespace Whim;
 public record FocusWindowTransform(Guid WorkspaceId, IWindow? Window = null) : BaseWorkspaceTransform(WorkspaceId)
 {
 	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+		IContext ctx,
+		IInternalContext internalCtx,
 		WorkspaceSector sector,
 		ImmutableWorkspace workspace
 	)
 	{
-		IWindow lastFocusedWindow = Window ?? workspace.LastFocusedWindow;
+		IWindow? lastFocusedWindow = Window ?? workspace.LastFocusedWindow;
 		if (lastFocusedWindow != null && !lastFocusedWindow.IsMinimized)
 		{
 			lastFocusedWindow.Focus();
+			return workspace;
 		}
-		else
+
+		Logger.Debug($"No windows in workspace {workspace.Name} to focus, focusing desktop");
+
+		// Get the bounds of the monitor for this workspace.
+		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.GetMonitorForWorkspace(this);
+		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			Logger.Debug($"No windows in workspace {workspace.Name} to focus, focusing desktop");
-
-			// Get the bounds of the monitor for this workspace.
-			Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.GetMonitorForWorkspace(this);
-			if (!monitorResult.TryGet(out IMonitor monitor))
-			{
-				return Result.FromException<ImmutableWorkspace>(monitorResult.Error!);
-			}
-
-			ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));
+			return Result.FromException<ImmutableWorkspace>(monitorResult.Error!);
 		}
+
+		_context.Butler.FocusMonitorDesktop(monitor);
+		return workspace;
 	}
 }

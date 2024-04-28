@@ -15,6 +15,8 @@ internal record MinimizeWindowEndTransform(Guid WorkspaceId, IWindow Window)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(
+		IContext ctx,
+		IInternalContext internalCtx,
 		WorkspaceSector sector,
 		ImmutableWorkspace workspace,
 		IWindow window

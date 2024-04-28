@@ -15,6 +15,8 @@ namespace Whim;
 public record SetWorkspaceNameTransform(Guid Id, string Name) : BaseWorkspaceTransform(Id)
 {
 	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+		IContext ctx,
+		IInternalContext internalCtx,
 		WorkspaceSector sector,
 		ImmutableWorkspace workspace
 	)

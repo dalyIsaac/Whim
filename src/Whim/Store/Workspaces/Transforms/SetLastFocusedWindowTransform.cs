@@ -12,6 +12,8 @@ internal record SetLastFocusedWindowTransform(Guid WorkspaceId, IWindow Window)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, false)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(
+		IContext ctx,
+		IInternalContext internalCtx,
 		WorkspaceSector sector,
 		ImmutableWorkspace workspace,
 		IWindow window

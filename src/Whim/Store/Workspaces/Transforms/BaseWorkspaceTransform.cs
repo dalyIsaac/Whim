@@ -13,17 +13,17 @@ public abstract record BaseWorkspaceTransform(Guid WorkspaceId, bool SkipDoLayou
 	/// <summary>
 	/// The operation to execute.
 	/// </summary>
-	/// <param name="sector">
-	/// The workspace sector.
-	/// </param>
-	/// <param name="workspace">
-	/// The workspace.
-	/// </param>
+	/// <param name="ctx"></param>
+	/// <param name="internalCtx"></param>
+	/// <param name="workspaceSector"></param>
+	/// <param name="workspace"></param>
 	/// <returns>
 	/// The updated workspace.
 	/// </returns>
 	private protected abstract Result<ImmutableWorkspace> WorkspaceOperation(
-		WorkspaceSector sector,
+		IContext ctx,
+		IInternalContext internalCtx,
+		WorkspaceSector workspaceSector,
 		ImmutableWorkspace workspace
 	);
 
@@ -48,7 +48,7 @@ public abstract record BaseWorkspaceTransform(Guid WorkspaceId, bool SkipDoLayou
 
 		ImmutableWorkspace workspace = sector.Workspaces[workspaceIdx];
 
-		Result<ImmutableWorkspace> newWorkspaceResult = WorkspaceOperation(sector, workspace);
+		Result<ImmutableWorkspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, sector, workspace);
 		if (!newWorkspaceResult.TryGet(out ImmutableWorkspace newWorkspace))
 		{
 			return Result.FromException<bool>(newWorkspaceResult.Error!);
