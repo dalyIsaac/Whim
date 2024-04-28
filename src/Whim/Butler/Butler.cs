@@ -11,7 +11,6 @@ internal partial class Butler : IButler, IInternalButler
 
 	private readonly IButlerChores _chores;
 	private bool _initialized;
-	internal readonly ButlerEventHandlers EventHandlers;
 
 	private IButlerPantry _pantry;
 	public IButlerPantry Pantry
@@ -36,7 +35,6 @@ internal partial class Butler : IButler, IInternalButler
 
 		_pantry = new ButlerPantry(_context);
 		_chores = new ButlerChores(_context, _internalContext);
-		EventHandlers = new ButlerEventHandlers(_context, _internalContext, _pantry, _chores);
 	}
 
 	public event EventHandler<RouteEventArgs>? WindowRouted;
