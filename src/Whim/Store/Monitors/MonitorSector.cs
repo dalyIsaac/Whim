@@ -17,6 +17,10 @@ internal class MonitorSector : SectorBase, IDisposable, IMonitorSector, IMonitor
 
 	public int LastWhimActiveMonitorIndex { get; set; } = -1;
 
+	public int MonitorsChangingTasks { get; set; }
+
+	public int MonitorsChangedDelay { init; get; } = 3 * 1000;
+
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
 	public MonitorSector(IContext ctx, IInternalContext internalCtx)
