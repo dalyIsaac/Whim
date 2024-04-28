@@ -12,8 +12,20 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 		MutableRootSector mutableRootSector
 	)
 	{
-		WindowSector sector = mutableRootSector.Windows;
+		Result<IWindow> windowResult = GetWindow(ctx, internalCtx);
+		if (!windowResult.TryGet(out IWindow window))
+		{
+			return windowResult;
+		}
 
+		UpdateWindowSector(mutableRootSector, window);
+		UpdateMapSector(ctx, internalCtx, mutableRootSector, window);
+
+		return Result.FromValue(window);
+	}
+
+	private Result<IWindow> GetWindow(IContext ctx, IInternalContext internalCtx)
+	{
 		// Filter the handle.
 		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
 		{
@@ -49,18 +61,14 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 			return Result.FromException<IWindow>(new WhimException("Window was ignored by filter"));
 		}
 
-		// Store the window.
-		sector.Windows = sector.Windows.Add(Handle, window);
-
-		// Update the map.
-		UpdateMap(ctx, internalCtx, mutableRootSector, window);
-
-		// Filter the args.
-		WindowAddedEventArgs args = new() { Window = window };
-
-		sector.QueueEvent(args);
-
 		return Result.FromValue(window);
+	}
+
+	private static void UpdateWindowSector(MutableRootSector mutableRootSector, IWindow window)
+	{
+		WindowSector sector = mutableRootSector.Windows;
+		sector.Windows = sector.Windows.Add(window.Handle, window);
+		sector.QueueEvent(new WindowAddedEventArgs() { Window = window });
 	}
 
 	/// <summary>
@@ -70,7 +78,7 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 	/// <param name="internalCtx"></param>
 	/// <param name="mutableRootSector"></param>
 	/// <param name="window"></param>
-	private static void UpdateMap(
+	private static void UpdateMapSector(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector,
