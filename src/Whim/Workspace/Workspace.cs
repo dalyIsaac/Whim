@@ -23,7 +23,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public IWindow? LastFocusedWindow => _context.Store.Pick(new GetLastFocusedWindowPicker(Id)).Value!;
 
-	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(new GetActiveLayoutEnginePicker(Id));
+	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(new GetActiveLayoutEnginePicker(Id)).Value!;
 
 	public IEnumerable<IWindow> Windows => _context.Store.Pick(new GetAllWorkspaceWindowsPicker(Id)).Value!;
 
@@ -50,15 +50,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public void MinimizeWindowStart(IWindow window) =>
 		_context.Store.Dispatch(new MinimizeWindowStartTransform(Id, window));
 
-	public void MinimizeWindowEnd(IWindow window)
-	{
-		Logger.Debug($"Minimizing window {window} in workspace {Name}");
-		_windows.Add(window);
-
-		// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
-		// Whim starting up.
-		_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex].MinimizeWindowEnd(window);
-	}
+	public void MinimizeWindowEnd(IWindow window) =>
+		_context.Store.Dispatch(new MinimizeWindowEndTransform(Id, window));
 
 	public void FocusLastFocusedWindow()
 	{
