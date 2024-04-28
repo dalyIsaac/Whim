@@ -6,13 +6,17 @@ namespace Whim;
 /// <summary>
 /// The sector containing window-workspace and workspace-monitor mappings.
 /// </summary>
-internal class MapSector : SectorBase, IMapSector
+internal class MapSector : SectorBase, IMapSector, IMapSectorEvents
 {
 	public ImmutableDictionary<IWindow, IWorkspace> WindowWorkspaceMap { get; set; } =
 		ImmutableDictionary<IWindow, IWorkspace>.Empty;
 
 	public ImmutableDictionary<IMonitor, IWorkspace> MonitorWorkspaceMap { get; set; } =
 		ImmutableDictionary<IMonitor, IWorkspace>.Empty;
+
+	public event EventHandler<RouteEventArgs>? WindowRouted;
+
+	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
 	// TODO: Add to StoreTests
 	public override void Initialize() { }
@@ -23,7 +27,14 @@ internal class MapSector : SectorBase, IMapSector
 		{
 			switch (eventArgs)
 			{
-				// TODO
+				case RouteEventArgs args:
+					WindowRouted?.Invoke(this, args);
+					break;
+
+				case MonitorWorkspaceChangedEventArgs args:
+					MonitorWorkspaceChanged?.Invoke(this, args);
+					break;
+
 				default:
 					break;
 			}
