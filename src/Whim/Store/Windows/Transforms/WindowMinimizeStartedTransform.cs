@@ -10,12 +10,22 @@ internal record WindowMinimizeStartedTransform(IWindow Window) : Transform
 		MutableRootSector mutableRootSector
 	)
 	{
-		WindowSector sector = mutableRootSector.Windows;
+		UpdateMapSector(ctx, Window);
 
-		WindowMinimizeStartedEventArgs args = new() { Window = Window };
-		internalCtx.ButlerEventHandlers.OnWindowMinimizeStart(args);
+		mutableRootSector.Windows.QueueEvent(new WindowMinimizeStartedEventArgs() { Window = Window });
 
-		sector.QueueEvent(args);
 		return Empty.Result;
+	}
+
+	private static void UpdateMapSector(IContext ctx, IWindow window)
+	{
+		if (!ctx.Store.Pick(MapPickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
+		{
+			Logger.Error($"Window {window} was not found in any workspace");
+			return;
+		}
+
+		workspace.MinimizeWindowStart(window);
+		workspace.DoLayout();
 	}
 }

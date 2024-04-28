@@ -28,21 +28,6 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		_chores = chores;
 	}
 
-	public void OnWindowMinimizeStart(WindowEventArgs args)
-	{
-		IWindow window = args.Window;
-		Logger.Debug($"Window minimize start: {window}");
-
-		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace workspace)
-		{
-			Logger.Error($"Window {window} was not found in any workspace");
-			return;
-		}
-
-		workspace.MinimizeWindowStart(window);
-		workspace.DoLayout();
-	}
-
 	public void OnWindowMinimizeEnd(WindowEventArgs args)
 	{
 		IWindow window = args.Window;
