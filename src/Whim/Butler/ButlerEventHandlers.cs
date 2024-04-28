@@ -28,35 +28,6 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		_chores = chores;
 	}
 
-	public void OnWindowFocused(WindowFocusedEventArgs args)
-	{
-		IWindow? window = args.Window;
-		Logger.Debug($"Window focused: {window}");
-
-		foreach (IWorkspace workspace in _context.WorkspaceManager)
-		{
-			((IInternalWorkspace)workspace).WindowFocused(window);
-		}
-
-		if (window is null)
-		{
-			return;
-		}
-
-		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace workspaceForWindow)
-		{
-			Logger.Debug($"Window {window} was not found in any workspace");
-			return;
-		}
-
-		if (_pantry.GetMonitorForWorkspace(workspaceForWindow) is null)
-		{
-			Logger.Debug($"Window {window} is not in an active workspace");
-			_chores.Activate(workspaceForWindow);
-			return;
-		}
-	}
-
 	public void OnWindowMinimizeStart(WindowEventArgs args)
 	{
 		IWindow window = args.Window;
