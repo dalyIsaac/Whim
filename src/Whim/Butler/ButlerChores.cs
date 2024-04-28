@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Whim;
 
 internal class ButlerChores : IButlerChores
@@ -19,18 +17,7 @@ internal class ButlerChores : IButlerChores
 	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false) =>
 		_context.Store.Dispatch(new ActivateAdjacentTransform(monitor, reverse, skipActive));
 
-	public void LayoutAllActiveWorkspaces()
-	{
-		Logger.Debug("Layout all active workspaces");
-
-		// For each workspace which is active in a monitor, do a layout.
-		// Convert to an array to prevent enumeration modification during execution.
-		IWorkspace[] workspaces = _context.Butler.Pantry.GetAllActiveWorkspaces().ToArray();
-		foreach (IWorkspace workspace in workspaces)
-		{
-			workspace.DoLayout();
-		}
-	}
+	public void LayoutAllActiveWorkspaces() => _context.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
 
 	public void FocusMonitorDesktop(IMonitor monitor) =>
 		_context.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));
