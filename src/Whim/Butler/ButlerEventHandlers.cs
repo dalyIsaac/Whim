@@ -28,21 +28,6 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		_chores = chores;
 	}
 
-	public void OnWindowMinimizeEnd(WindowEventArgs args)
-	{
-		IWindow window = args.Window;
-		Logger.Debug($"Window minimize end: {window}");
-
-		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace workspace)
-		{
-			Logger.Error($"Window {window} was not found in any workspace");
-			return;
-		}
-
-		workspace.MinimizeWindowEnd(window);
-		workspace.DoLayout();
-	}
-
 	public void OnMonitorsChanged(MonitorsChangedEventArgs e)
 	{
 		Logger.Debug($"Monitors changed: {e}");
