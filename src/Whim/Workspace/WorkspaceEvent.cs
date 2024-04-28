@@ -31,3 +31,7 @@ public class WorkspaceRenamedEventArgs : ImmutableWorkspaceEventArgs
 	/// </summary>
 	public required string PreviousName { get; init; }
 }
+
+public class WorkspaceLayoutStartedEventArgs : ImmutableWorkspaceEventArgs { }
+
+public class WorkspaceLayoutCompletedEventArgs : ImmutableWorkspaceEventArgs { }

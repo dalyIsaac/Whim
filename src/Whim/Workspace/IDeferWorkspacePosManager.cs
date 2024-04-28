@@ -11,6 +11,7 @@ internal interface IDeferWorkspacePosManager
 	/// <summary>
 	/// Sets the position of all the windows in a workspace at once.
 	/// </summary>
+	/// <param name="workspaceSector"></param>
 	/// <param name="workspace"></param>
 	/// <param name="windowStates">
 	/// The window states dictionary to populate with the new window states.
@@ -19,5 +20,9 @@ internal interface IDeferWorkspacePosManager
 	/// <returns>
 	/// Whether a layout was performed.
 	/// </returns>
-	bool DoLayout(IWorkspace workspace, WorkspaceManagerTriggers triggers, Dictionary<HWND, IWindowState> windowStates);
+	bool DoLayout(
+		WorkspaceSector workspaceSector,
+		ImmutableWorkspace workspace,
+		Dictionary<HWND, IWindowState> windowStates
+	);
 }

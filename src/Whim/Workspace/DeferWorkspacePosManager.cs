@@ -3,7 +3,7 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
+internal class DeferWorkspacePosManager
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
@@ -14,13 +14,11 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		_internalContext = internalContext;
 	}
 
-	public bool DoLayout(
-		IWorkspace workspace,
-		Dictionary<HWND, IWindowState> windowStates
-	)
+	public bool DoLayout(IWorkspace workspace, Dictionary<HWND, IWindowState> windowStates)
 	{
 		Logger.Debug($"Layout {workspace}");
 
+		// TODO: Not sure if this is still needed.
 		if (GarbageCollect(workspace))
 		{
 			Logger.Debug($"Garbage collected windows, skipping layout for workspace {workspace}");
@@ -35,7 +33,9 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		}
 
 		Logger.Debug($"Starting layout for workspace {workspace}");
-		triggers.WorkspaceLayoutStarted(new WorkspaceEventArgs() { Workspace = workspace });
+
+		// NOTE: These need to be immediate.
+		workspaceSector.TriggerWorkspaceLayoutStarted(workspace);
 
 		// Execute the layout task, and update the window states before the completed event.
 		SetWindowPos(workspace, monitor, windowStates);
@@ -44,14 +44,19 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		return true;
 	}
 
-	private void SetWindowPos(IWorkspace workspace, IMonitor monitor, Dictionary<HWND, IWindowState> windowStates)
+	private void SetWindowPos(
+		ImmutableWorkspace workspace,
+		IMonitor monitor,
+		Dictionary<HWND, IWindowState> windowStates
+	)
 	{
 		Logger.Debug($"Setting window positions for workspace {workspace}");
 
 		List<WindowPosState> windowStatesList = new();
 		windowStates.Clear();
 
-		foreach (IWindowState loc in workspace.ActiveLayoutEngine.DoLayout(monitor.WorkingArea, monitor))
+		ILayoutEngine activeLayoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
+		foreach (IWindowState loc in activeLayoutEngine.DoLayout(monitor.WorkingArea, monitor))
 		{
 			windowStatesList.Add(new(loc, (HWND)1, null));
 			windowStates.Add(loc.Window.Handle, loc);
@@ -65,10 +70,9 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 	/// Garbage collects windows that are no longer valid.
 	/// </summary>
 	/// <returns></returns>
-	private bool GarbageCollect(IWorkspace workspace)
+	private void GarbageCollect(ImmutableWorkspace workspace)
 	{
 		List<IWindow> garbageWindows = new();
-		bool garbageCollected = false;
 
 		foreach (IWindow window in workspace.Windows)
 		{
@@ -87,7 +91,6 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 			if (removeWindow)
 			{
 				garbageWindows.Add(window);
-				garbageCollected = true;
 			}
 		}
 
@@ -96,7 +99,5 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		{
 			_context.Store.Dispatch(new WindowRemovedTransform(window));
 		}
-
-		return garbageCollected;
 	}
 }
