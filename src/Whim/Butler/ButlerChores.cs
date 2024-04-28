@@ -1,5 +1,4 @@
 using System.Linq;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -17,27 +16,8 @@ internal class ButlerChores : IButlerChores
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>
 		_context.Store.Dispatch(new ActivateWorkspaceTransform(workspace, monitor));
 
-	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false)
-	{
-		Logger.Debug("Activating next workspace");
-
-		monitor ??= _context.MonitorManager.ActiveMonitor;
-		IWorkspace? currentWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
-		if (currentWorkspace == null)
-		{
-			Logger.Debug($"No workspace found for monitor {monitor}");
-			return;
-		}
-
-		IWorkspace? nextWorkspace = _context.Butler.Pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
-		if (nextWorkspace == null)
-		{
-			Logger.Debug($"No next workspace found for monitor {monitor}");
-			return;
-		}
-
-		Activate(nextWorkspace, monitor);
-	}
+	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false) =>
+		_context.Store.Dispatch(new ActivateAdjacentTransform(monitor, reverse, skipActive));
 
 	public void LayoutAllActiveWorkspaces()
 	{
