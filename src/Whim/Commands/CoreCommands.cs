@@ -319,7 +319,7 @@ internal class CoreCommands : PluginCommands
 			IWorkspace[] workspaces = context.WorkspaceManager.ToArray();
 			if (Index <= workspaces.Length)
 			{
-				context.Butler.Activate(workspaces[Index - 1]);
+				context.Store.Dispatch(new ActivateWorkspaceTransform(workspaces[Index - 1]));
 			}
 		}
 	}

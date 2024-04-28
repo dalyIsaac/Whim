@@ -133,7 +133,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 				return;
 			}
 
-			_context.Butler.FocusMonitorDesktop(monitor);
+			_context.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));
 		}
 	}
 

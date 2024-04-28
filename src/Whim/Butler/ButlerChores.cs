@@ -14,83 +14,8 @@ internal class ButlerChores : IButlerChores
 		_internalContext = internalContext;
 	}
 
-	public void Activate(IWorkspace workspace, IMonitor? monitor = null)
-	{
-		Logger.Debug($"Activating workspace {workspace} in monitor {monitor}");
-
-		if (!_context.WorkspaceManager.Contains(workspace))
-		{
-			Logger.Error($"Workspace {workspace} is not tracked");
-			return;
-		}
-
-		if (monitor is null)
-		{
-			monitor = _context.MonitorManager.ActiveMonitor;
-		}
-		else if (!_context.MonitorManager.Contains(monitor))
-		{
-			Logger.Error($"Workspace {monitor} is not tracked");
-			return;
-		}
-
-		// Get the old workspace for the event.
-		IWorkspace? oldWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
-
-		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
-
-		if (monitor.Equals(loserMonitor))
-		{
-			Logger.Debug("Workspace is already activated");
-			return;
-		}
-
-		// Update the active monitor. Having this line before the old workspace is deactivated
-		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
-		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
-		_context.Butler.Pantry.SetMonitorWorkspace(monitor, workspace);
-
-		(IWorkspace workspace, IMonitor monitor)? layoutOldWorkspace = null;
-		if (loserMonitor != null && oldWorkspace != null && !loserMonitor.Equals(monitor))
-		{
-			_context.Butler.Pantry.SetMonitorWorkspace(loserMonitor, oldWorkspace);
-			layoutOldWorkspace = (oldWorkspace, loserMonitor);
-		}
-
-		if (layoutOldWorkspace is (IWorkspace, IMonitor) oldWorkspaceValue)
-		{
-			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
-			oldWorkspace?.DoLayout();
-			_internalContext.Butler.TriggerMonitorWorkspaceChanged(
-				new MonitorWorkspaceChangedEventArgs()
-				{
-					Monitor = oldWorkspaceValue.monitor,
-					PreviousWorkspace = workspace,
-					CurrentWorkspace = oldWorkspaceValue.workspace
-				}
-			);
-		}
-		else
-		{
-			oldWorkspace?.Deactivate();
-
-			// Temporarily focus the monitor's desktop HWND, to prevent another window from being focused.
-			FocusMonitorDesktop(monitor);
-		}
-
-		// Layout the new workspace.
-		workspace.DoLayout();
-		workspace.FocusLastFocusedWindow();
-		_internalContext.Butler.TriggerMonitorWorkspaceChanged(
-			new MonitorWorkspaceChangedEventArgs()
-			{
-				Monitor = monitor,
-				PreviousWorkspace = oldWorkspace,
-				CurrentWorkspace = workspace
-			}
-		);
-	}
+	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>
+		_context.Store.Dispatch(new ActivateWorkspaceTransform(workspace, monitor));
 
 	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false)
 	{
@@ -127,13 +52,8 @@ internal class ButlerChores : IButlerChores
 		}
 	}
 
-	public void FocusMonitorDesktop(IMonitor monitor)
-	{
-		HWND desktop = _internalContext.CoreNativeManager.GetDesktopWindow();
-		_internalContext.CoreNativeManager.SetForegroundWindow(desktop);
-		_context.Store.Dispatch(new WindowFocusedTransform(null));
-		_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
-	}
+	public void FocusMonitorDesktop(IMonitor monitor) =>
+		_context.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)
 	{
