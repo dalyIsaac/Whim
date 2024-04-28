@@ -8,7 +8,7 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
-public record SetLastFocusedWindowTransform(Guid WorkspaceId, IWindow Window)
+internal record SetLastFocusedWindowTransform(Guid WorkspaceId, IWindow Window)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, false)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(

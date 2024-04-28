@@ -53,27 +53,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public void MinimizeWindowEnd(IWindow window) =>
 		_context.Store.Dispatch(new MinimizeWindowEndTransform(Id, window));
 
-	public void FocusLastFocusedWindow()
-	{
-		Logger.Debug($"Focusing last focused window in workspace {Name}");
-		if (LastFocusedWindow != null && !LastFocusedWindow.IsMinimized)
-		{
-			LastFocusedWindow.Focus();
-		}
-		else
-		{
-			Logger.Debug($"No windows in workspace {Name} to focus, focusing desktop");
-
-			// Get the bounds of the monitor for this workspace.
-			if (_context.Store.Pick(Pickers.GetMonitorForWorkspace(this)).TryGet(out IMonitor? monitor))
-			{
-				Logger.Debug($"No active monitors found for workspace {Name}.");
-				return;
-			}
-
-			_context.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));
-		}
-	}
+	public void FocusLastFocusedWindow() => _context.Store.Dispatch(new FocusWindowTransform(Id));
 
 	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
 		_context.Store.Dispatch(new ActivateLayoutEngineTransform(Id, (_, idx) => idx == nextIdx)).IsSuccessful;
