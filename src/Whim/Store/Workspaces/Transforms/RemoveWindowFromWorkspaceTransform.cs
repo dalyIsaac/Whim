@@ -1,21 +1,19 @@
+using System;
+
 namespace Whim;
 
 /// <summary>
-/// Remove the <paramref name="Window"/> from the provided <paramref name="Workspace"/>
+/// Remove the <paramref name="Window"/> from the workspace with the given <paramref name="WorkspaceId"/>.
 /// </summary>
-/// <param name="Workspace"></param>
+/// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
-public record RemoveWindowFromWorkspaceTransform(ImmutableWorkspace Workspace, IWindow Window)
-	: BaseWorkspaceWindowTransform(Workspace, Window, false)
+public record RemoveWindowFromWorkspaceTransform(Guid WorkspaceId, IWindow Window)
+	: BaseWorkspaceWindowTransform(WorkspaceId, Window, false)
 {
-	/// <summary>
-	/// Remove the <see cref="Window"/> from the provided <see cref="Workspace"/>
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns></returns>
-	protected override ImmutableWorkspace Operation(IWindow window)
+	/// <inheritdoc />
+	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window)
 	{
-		ImmutableWorkspace workspace = Workspace with { Windows = Workspace.Windows.Remove(window) };
+		workspace = workspace with { Windows = workspace.Windows.Remove(window) };
 
 		workspace = ResetLastFocusedWindow(workspace, window);
 		workspace = RemoveWindowFromLayoutEngines(workspace, window);

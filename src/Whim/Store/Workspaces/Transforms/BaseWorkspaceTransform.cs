@@ -1,3 +1,4 @@
+using System;
 using DotNext;
 
 namespace Whim;
@@ -5,53 +6,64 @@ namespace Whim;
 /// <summary>
 /// Base transform for a window operation in a given workspace.
 /// </summary>
-/// <param name="Workspace"></param>
+/// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
 /// <param name="DefaultToLastFocusedWindow">
 /// If <paramref name="Window"/> is <c>null</c>, try to use the last focused window.
 /// </param>
-public abstract record BaseWorkspaceWindowTransform(
-	ImmutableWorkspace Workspace,
-	IWindow? Window,
-	bool DefaultToLastFocusedWindow
-) : Transform<bool>
+public abstract record BaseWorkspaceWindowTransform(Guid WorkspaceId, IWindow? Window, bool DefaultToLastFocusedWindow)
+	: Transform<bool>
 {
 	/// <summary>
 	/// The operation to execute.
 	/// </summary>
+	/// <param name="workspace">
+	/// The workspace.
+	/// </param>
 	/// <param name="window">
 	/// A window in the workspace.
 	/// </param>
 	/// <returns>
 	/// The updated workspace.
 	/// </returns>
-	protected abstract ImmutableWorkspace Operation(IWindow window);
+	protected abstract ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window);
 
 	internal override Result<bool> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		WorkspaceSector sector = rootSector.Workspaces;
 
-		int idx = sector.Workspaces.IndexOf(Workspace);
-		if (idx == -1)
+		int workspaceIdx = -1;
+		for (int idx = 0; idx < sector.Workspaces.Count; idx++)
+		{
+			if (sector.Workspaces[idx].Id == WorkspaceId)
+			{
+				workspaceIdx = idx;
+				break;
+			}
+		}
+
+		if (workspaceIdx == -1)
 		{
 			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound());
 		}
 
-		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(Workspace, Window, DefaultToLastFocusedWindow);
+		ImmutableWorkspace workspace = sector.Workspaces[workspaceIdx];
+
+		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(workspace, Window, DefaultToLastFocusedWindow);
 		if (!result.TryGet(out IWindow validWindow))
 		{
 			return Result.FromException<bool>(result.Error!);
 		}
 
-		ImmutableWorkspace newWorkspace = Operation(validWindow);
+		ImmutableWorkspace newWorkspace = Operation(workspace, validWindow);
 
-		if (newWorkspace == Workspace)
+		if (newWorkspace == workspace)
 		{
 			return Result.FromValue(false);
 		}
 
-		sector.Workspaces = sector.Workspaces.SetItem(idx, newWorkspace);
-		sector.WorkspacesToLayout.Add(Workspace.Id);
+		sector.Workspaces = sector.Workspaces.SetItem(workspaceIdx, newWorkspace);
+		sector.WorkspacesToLayout.Add(workspace.Id);
 
 		return Result.FromValue(true);
 	}

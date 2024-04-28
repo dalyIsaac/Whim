@@ -21,13 +21,11 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	private bool _disposedValue;
 
-	private ImmutableWorkspace GetThis() => _context.Store.Pick(new GetWorkspaceByIdPicker(Id))!.Value;
+	public IWindow? LastFocusedWindow => _context.Store.Pick(new GetLastFocusedWindowPicker(Id)).Value!;
 
-	public IWindow? LastFocusedWindow => _context.Store.Pick(new GetLastFocusedWindowPicker(GetThis())).Value!;
+	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(new GetActiveLayoutEnginePicker(Id));
 
-	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(new GetActiveLayoutEnginePicker(GetThis()));
-
-	public IEnumerable<IWindow> Windows => _context.Store.Pick(new GetAllWorkspaceWindowsPicker(GetThis())).Value!;
+	public IEnumerable<IWindow> Windows => _context.Store.Pick(new GetAllWorkspaceWindowsPicker(Id)).Value!;
 
 	/// <summary>
 	/// Map of window handles to their current <see cref="IWindowState"/>.
@@ -45,7 +43,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		if (window != null && Windows.Contains(window))
 		{
-			_context.Store.Dispatch(new SetLastFocusedWindowTransform(GetThis(), window));
+			_context.Store.Dispatch(new SetLastFocusedWindowTransform(Id, window));
 		}
 	}
 
@@ -104,14 +102,14 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
-		_context.Store.Dispatch(new ActivateLayoutEngineTransform(GetThis(), (_, idx) => idx == nextIdx)).IsSuccessful;
+		_context.Store.Dispatch(new ActivateLayoutEngineTransform(Id, (_, idx) => idx == nextIdx)).IsSuccessful;
 
 	public void CycleLayoutEngine(bool reverse = false) =>
-		_context.Store.Dispatch(new CycleLayoutEngineTransform(GetThis(), reverse));
+		_context.Store.Dispatch(new CycleLayoutEngineTransform(Id, reverse));
 
 	public void ActivatePreviouslyActiveLayoutEngine()
 	{
-		ImmutableWorkspace workspace = GetThis();
+		ImmutableWorkspace workspace = Id;
 
 		_context.Store.Dispatch(
 			new ActivateLayoutEngineTransform(workspace, (_, idx) => idx == workspace.PreviousLayoutEngineIndex)
@@ -119,25 +117,23 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	}
 
 	public bool TrySetLayoutEngineFromName(string name) =>
-		_context.Store.Dispatch(new ActivateLayoutEngineTransform(GetThis(), (l, _) => l.Name == name)).IsSuccessful;
+		_context.Store.Dispatch(new ActivateLayoutEngineTransform(Id, (l, _) => l.Name == name)).IsSuccessful;
 
 	public bool AddWindow(IWindow window) =>
-		_context.Store.Dispatch(new AddWindowToWorkspaceTransform(GetThis(), window)).IsSuccessful;
+		_context.Store.Dispatch(new AddWindowToWorkspaceTransform(Id, window)).IsSuccessful;
 
 	public bool RemoveWindow(IWindow window) =>
-		_context.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(GetThis(), window)).IsSuccessful;
+		_context.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(Id, window)).IsSuccessful;
 
 	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
-		Result<bool> result = _context.Store.Dispatch(
-			new FocusWindowInDirectionTransform(GetThis(), window, direction)
-		);
+		Result<bool> result = _context.Store.Dispatch(new FocusWindowInDirectionTransform(Id, window, direction));
 		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
 	}
 
 	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
 	{
-		Result<bool> result = _context.Store.Dispatch(new SwapWindowInDirectionTransform(GetThis(), window, direction));
+		Result<bool> result = _context.Store.Dispatch(new SwapWindowInDirectionTransform(Id, window, direction));
 		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
 	}
 
@@ -149,7 +145,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	)
 	{
 		Result<bool> result = _context.Store.Dispatch(
-			new MoveWindowEdgesInDirectionTransform(GetThis(), window, edges, deltas)
+			new MoveWindowEdgesInDirectionTransform(Id, window, edges, deltas)
 		);
 		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
 	}

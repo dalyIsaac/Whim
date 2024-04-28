@@ -1,36 +1,34 @@
+using System;
+
 namespace Whim;
 
 /// <summary>
-/// Focus the <paramref name="Window"/> in the provided <paramref name="Workspace"/>
+/// Focus the <paramref name="Window"/> in the workspace with the given <paramref name="WorkspaceId"/>
 /// in the provided <paramref name="Direction"/>.
 ///
 /// Returns whether the active layout engine changed.
 /// </summary>
-/// <param name="Workspace"></param>
+/// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
 /// <param name="Direction"></param>
-public record FocusWindowInDirectionTransform(ImmutableWorkspace Workspace, IWindow? Window, Direction Direction)
-	: BaseWorkspaceWindowTransform(Workspace, Window, true)
+public record FocusWindowInDirectionTransform(Guid WorkspaceId, IWindow? Window, Direction Direction)
+	: BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
 {
-	/// <summary>
-	/// Focus the <paramref name="window"/> in the provided workspace.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns></returns>
-	protected override ImmutableWorkspace Operation(IWindow window)
+	/// <inheritdoc/>
+	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window)
 	{
-		ILayoutEngine layoutEngine = Workspace.LayoutEngines[Workspace.ActiveLayoutEngineIndex];
+		ILayoutEngine layoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
 		ILayoutEngine newLayoutEngine = layoutEngine.FocusWindowInDirection(Direction, window);
 
 		if (newLayoutEngine == layoutEngine)
 		{
 			Logger.Debug("Window already in focus");
-			return Workspace;
+			return workspace;
 		}
 
-		return Workspace with
+		return workspace with
 		{
-			LayoutEngines = Workspace.LayoutEngines.SetItem(Workspace.ActiveLayoutEngineIndex, newLayoutEngine)
+			LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine)
 		};
 	}
 }

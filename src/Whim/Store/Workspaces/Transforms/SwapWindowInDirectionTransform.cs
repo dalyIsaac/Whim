@@ -1,30 +1,28 @@
+using System;
+
 namespace Whim;
 
 /// <summary>
-/// Swap the <paramref name="Window"/> in the provided <paramref name="Direction"/> for the provided
-/// <paramref name="Workspace"/>
+/// Swap the <paramref name="Window"/> in the provided <paramref name="Direction"/> for the workspace
+/// with the given <paramref name="WorkspaceId"/>
 /// </summary>
-/// <param name="Workspace"></param>
+/// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
 /// <param name="Direction"></param>
-public record SwapWindowInDirectionTransform(ImmutableWorkspace Workspace, IWindow? Window, Direction Direction)
-	: BaseWorkspaceWindowTransform(Workspace, Window, true)
+public record SwapWindowInDirectionTransform(Guid WorkspaceId, IWindow? Window, Direction Direction)
+	: BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
 {
-	/// <summary>
-	/// Swap the <paramref name="window"/> in the provided <see cref="Direction"/>
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns></returns>
-	protected override ImmutableWorkspace Operation(IWindow window)
+	/// <inheritdoc/>
+	protected override ImmutableWorkspace Operation(ImmutableWorkspace workspace, IWindow window)
 	{
-		ILayoutEngine oldEngine = Workspace.LayoutEngines[Workspace.ActiveLayoutEngineIndex];
+		ILayoutEngine oldEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
 		ILayoutEngine newEngine = oldEngine.SwapWindowInDirection(Direction, window);
 
 		return oldEngine == newEngine
-			? Workspace
-			: Workspace with
+			? workspace
+			: workspace with
 			{
-				LayoutEngines = Workspace.LayoutEngines.SetItem(Workspace.ActiveLayoutEngineIndex, newEngine)
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newEngine)
 			};
 	}
 }

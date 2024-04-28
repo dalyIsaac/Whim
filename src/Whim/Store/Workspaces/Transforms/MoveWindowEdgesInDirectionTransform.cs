@@ -1,11 +1,13 @@
+using System;
 using DotNext;
 
 namespace Whim;
 
 /// <summary>
-/// Moves the given <paramref name="Window"/> by the given <paramref name="PixelsDeltas"/>.
+/// Change the <paramref name="Window"/>'s <paramref name="Edges"/> direction by
+/// the specified <paramref name="Deltas"/> for the workspace with given <paramref name="WorkspaceId"/>.
 /// </summary>
-/// <param name="Workspace"></param>
+/// <param name="WorkspaceId"></param>
 /// <param name="Window">
 /// The window to change the edge of. If null, the currently focused window is used.
 /// </param>
@@ -19,14 +21,14 @@ namespace Whim;
 /// unit square.
 /// </param>
 public record MoveWindowEdgesInDirectionTransform(
-	ImmutableWorkspace Workspace,
+	Guid WorkspaceId,
 	IWindow? Window,
 	Direction Edges,
 	IPoint<int> Deltas
-) : BaseWorkspaceWindowTransform(Workspace, Window, true)
+) : BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
 {
 	/// <inheritdoc/>
-	protected override Result<ImmutableWorkspace> Operation(IWindow window)
+	protected override Result<ImmutableWorkspace> Operation(ImmutableWorkspace workspace, IWindow window)
 	{
 		// Get the containing monitor.
 		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.GetMonitorForWindow(window));
@@ -37,14 +39,14 @@ public record MoveWindowEdgesInDirectionTransform(
 
 		IPoint<double> normalized = monitor.WorkingArea.NormalizeDeltaPoint(PixelsDeltas);
 
-		ILayoutEngine oldEngine = Workspace.LayoutEngines[Workspace.ActiveLayoutEngineIndex];
+		ILayoutEngine oldEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
 		ILayoutEngine newEngine = oldEngine.MoveWindowEdgesInDirection(Edges, Deltas, window);
 
 		return oldEngine == newEngine
-			? Workspace
-			: Workspace with
+			? workspace
+			: workspace with
 			{
-				LayoutEngines = Workspace.LayoutEngines.SetItem(Workspace.ActiveLayoutEngineIndex, newEngine)
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newEngine)
 			};
 	}
 }

@@ -13,8 +13,6 @@ public interface IWorkspaceSector
 	/// </summary>
 	ImmutableList<ImmutableWorkspace> Workspaces { get; }
 
-	ImmutableList<IWorkspace> MutableWorkspaces { get; }
-
 	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; }
 
 	ImmutableList<CreateProxyLayoutEngine> ProxyLayoutEngines { get; }

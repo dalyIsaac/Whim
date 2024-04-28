@@ -1,16 +1,13 @@
-using DotNext;
+using System;
 
 namespace Whim;
 
 /// <summary>
 /// Get the last focused window in the provided workspace.
 /// </summary>
-/// <param name="Workspace">The workspace to get the last focused window for.</param>
-public record GetLastFocusedWindowPicker(ImmutableWorkspace Workspace) : Picker<Result<IWindow?>>
+/// <param name="WorkspaceId">The workspace to get the last focused window for.</param>
+public record GetLastFocusedWindowPicker(Guid WorkspaceId) : BaseWorkspacePicker<IWindow?>(WorkspaceId)
 {
-	internal override Result<IWindow?> Execute(
-		IContext ctx,
-		IInternalContext internalCtx,
-		IRootSector rootSelector
-	) => Result.FromValue(Workspace.LastFocusedWindow);
+	/// <inheritdoc/>
+	protected override IWindow? Operation(ImmutableWorkspace workspace) => workspace.LastFocusedWindow;
 }
