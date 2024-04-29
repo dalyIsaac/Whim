@@ -22,43 +22,8 @@ internal class ButlerChores : IButlerChores
 	public void FocusMonitorDesktop(IMonitor monitor) =>
 		_context.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));
 
-	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)
-	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
-
-		if (window == null)
-		{
-			Logger.Error("No window was found");
-			return false;
-		}
-
-		Logger.Debug("Moving window {window} in direction {edges} by {pixelsDeltas}");
-
-		// Get the containing workspace.
-		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
-		if (workspace == null)
-		{
-			Logger.Error($"Could not find workspace for window {window}");
-			return false;
-		}
-
-		// Get the containing monitor.
-		IMonitor? monitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
-		if (monitor == null)
-		{
-			Logger.Error($"Could not find monitor for workspace {workspace}");
-			return false;
-		}
-
-		Logger.Debug($"Moving window {window} to workspace {workspace}");
-
-		// Normalize `pixelsDeltas` into the unit square.
-		IPoint<double> normalized = monitor.WorkingArea.NormalizeDeltaPoint(pixelsDeltas);
-
-		Logger.Debug($"Normalized point: {normalized}");
-		workspace.MoveWindowEdgesInDirection(edges, normalized, window, deferLayout: false);
-		return true;
-	}
+	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
+		_context.Store.Dispatch(new MoveWindowEdgesInDirectionTransform(edges, pixelsDeltas, window)).IsSuccessful;
 
 	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false)
 	{

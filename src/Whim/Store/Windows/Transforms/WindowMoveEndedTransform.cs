@@ -23,7 +23,7 @@ internal record WindowMoveEndedTransform(IWindow Window) : Transform
 		if (WindowUtils.GetMovedEdges(ctx, Window) is (Direction, IPoint<int>) moved)
 		{
 			movedEdges = moved.MovedEdges;
-			ctx.Butler.MoveWindowEdgesInDirection(moved.MovedEdges, moved.MovedPoint, Window);
+			ctx.Store.Dispatch(new MoveWindowEdgesInDirectionTransform(moved.MovedEdges, moved.MovedPoint, Window));
 		}
 		else if (internalCtx.CoreNativeManager.GetCursorPos(out point))
 		{

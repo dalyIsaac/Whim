@@ -82,9 +82,11 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
 				callback: () =>
-					_context.Butler.MoveWindowEdgesInDirection(
-						Direction.Left,
-						new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
+					_context.Store.Dispatch(
+						new MoveWindowEdgesInDirectionTransform(
+							Direction.Left,
+							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
+						)
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_H)
 			)
@@ -92,9 +94,11 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
 				callback: () =>
-					_context.Butler.MoveWindowEdgesInDirection(
-						Direction.Left,
-						new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
+					_context.Store.Dispatch(
+						new MoveWindowEdgesInDirectionTransform(
+							Direction.Left,
+							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
+						)
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_J)
 			)
@@ -102,9 +106,11 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
 				callback: () =>
-					_context.Butler.MoveWindowEdgesInDirection(
-						Direction.Right,
-						new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
+					_context.Store.Dispatch(
+						new MoveWindowEdgesInDirectionTransform(
+							Direction.Right,
+							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
+						)
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_K)
 			)
@@ -112,9 +118,11 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
 				callback: () =>
-					_context.Butler.MoveWindowEdgesInDirection(
-						Direction.Right,
-						new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
+					_context.Store.Dispatch(
+						new MoveWindowEdgesInDirectionTransform(
+							Direction.Right,
+							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
+						)
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_L)
 			)
@@ -122,9 +130,11 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_up",
 				title: "Move the current window's top edge up",
 				callback: () =>
-					_context.Butler.MoveWindowEdgesInDirection(
-						Direction.Up,
-						new Point<int>() { Y = -MoveWindowEdgeDelta }
+					_context.Store.Dispatch(
+						new MoveWindowEdgesInDirectionTransform(
+							Direction.Up,
+							new Point<int>() { Y = -MoveWindowEdgeDelta }
+						)
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_U)
 			)
@@ -132,9 +142,11 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_down",
 				title: "Move the current window's top edge down",
 				callback: () =>
-					_context.Butler.MoveWindowEdgesInDirection(
-						Direction.Up,
-						new Point<int>() { Y = MoveWindowEdgeDelta }
+					_context.Store.Dispatch(
+						new MoveWindowEdgesInDirectionTransform(
+							Direction.Up,
+							new Point<int>() { Y = MoveWindowEdgeDelta }
+						)
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_I)
 			)
@@ -142,9 +154,11 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
 				callback: () =>
-					_context.Butler.MoveWindowEdgesInDirection(
-						Direction.Down,
-						new Point<int>() { Y = -MoveWindowEdgeDelta }
+					_context.Store.Dispatch(
+						new MoveWindowEdgesInDirectionTransform(
+							Direction.Down,
+							new Point<int>() { Y = -MoveWindowEdgeDelta }
+						)
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_O)
 			)
@@ -152,9 +166,11 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
 				callback: () =>
-					_context.Butler.MoveWindowEdgesInDirection(
-						Direction.Down,
-						new Point<int>() { Y = MoveWindowEdgeDelta }
+					_context.Store.Dispatch(
+						new MoveWindowEdgesInDirectionTransform(
+							Direction.Down,
+							new Point<int>() { Y = MoveWindowEdgeDelta }
+						)
 					),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_P)
 			)
