@@ -25,42 +25,8 @@ internal class ButlerChores : IButlerChores
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
 		_context.Store.Dispatch(new MoveWindowEdgesInDirectionTransform(edges, pixelsDeltas, window)).IsSuccessful;
 
-	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false)
-	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
-		Logger.Debug($"Moving window {window} to next workspace");
-
-		if (window == null)
-		{
-			Logger.Error("No window was found");
-			return;
-		}
-
-		// Find the current workspace for the window.
-		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace currentWorkspace)
-		{
-			Logger.Error($"Window {window} was not found in any workspace");
-			return;
-		}
-
-		// Get the adjacent workspace for the current workspace.
-		IWorkspace? nextWorkspace = _context.Butler.Pantry.GetAdjacentWorkspace(currentWorkspace, reverse, skipActive);
-		if (nextWorkspace == null)
-		{
-			Logger.Debug($"No next workspace found");
-			return;
-		}
-
-		_context.Butler.Pantry.SetWindowWorkspace(window, nextWorkspace);
-
-		currentWorkspace.RemoveWindow(window);
-		nextWorkspace.AddWindow(window);
-
-		currentWorkspace.DoLayout();
-		nextWorkspace.DoLayout();
-
-		window.Focus();
-	}
+	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false) =>
+		_context.Store.Dispatch(new MoveWindowToAdjacentWorkspaceTransform(window, reverse, skipActive));
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
 	{
