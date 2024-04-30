@@ -64,7 +64,7 @@ The `bar:height` key is a special key that is used to communicate to Whim the de
 Notes:
 
 - The corresponding style must not contain any property other than `Height`.
-- This setting is overwritten if `Height` is explicitly set in <xref:Whim.Bar.BarConfig>.
+- This setting is overwritten if `Height` is explicitly set in <xref:Whim.Bar.BarConfig> - this may be required in some monitor configurations - tracked in [#887](https://github.com/dalyIsaac/Whim/issues/887)
 - The actual height of the bar may differ from the specified one due to overflowing elements.
 
 > [!NOTE]
