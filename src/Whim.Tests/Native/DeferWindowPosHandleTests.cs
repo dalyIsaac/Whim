@@ -171,6 +171,43 @@ public class DeferWindowPosHandleTests
 	}
 
 	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
+	internal void Dispose_ForceTwoPasses(
+		IContext ctx,
+		IInternalContext internalCtx,
+		WindowPosState windowPosState1,
+		WindowPosState windowPosState2
+	)
+	{
+		// Given multiple windows, and a monitor which has a scale factor == 100
+		int monitorScaleFactor = 100;
+		int numPasses = 2;
+
+		using DeferWindowPosHandle handle = new(ctx, internalCtx);
+		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
+
+		IMonitor monitor1 = Substitute.For<IMonitor>();
+		monitor1.ScaleFactor.Returns(100);
+		IMonitor monitor2 = Substitute.For<IMonitor>();
+		monitor2.ScaleFactor.Returns(monitorScaleFactor);
+
+		ctx.MonitorManager.GetEnumerator().Returns((_) => new List<IMonitor>() { monitor1, monitor2 }.GetEnumerator());
+
+		// When disposing
+		handle.DeferWindowPos(windowPosState1.WindowState, windowPosState1.HwndInsertAfter, windowPosState1.Flags);
+		handle.DeferWindowPos(
+			windowPosState2.WindowState,
+			windowPosState2.HwndInsertAfter,
+			windowPosState2.Flags,
+			forceTwoPasses: true
+		);
+		handle.Dispose();
+
+		// Then the windows are laid out twice
+		AssertSetWindowPos(internalCtx, windowPosState1, expectedCallCount: numPasses);
+		AssertSetWindowPos(internalCtx, windowPosState2, expectedCallCount: numPasses);
+	}
+
+	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
 	internal void Dispose_NoWindowOffset(IContext ctx, IInternalContext internalCtx, WindowPosState windowPosState)
 	{
 		// Given a window with no offset

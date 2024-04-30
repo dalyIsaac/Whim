@@ -79,7 +79,7 @@ public class BarPlugin : IBarPlugin
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
 			barWindow.UpdateRect();
-			deferPosHandle.DeferWindowPos(barWindow.WindowState);
+			deferPosHandle.DeferWindowPos(barWindow.WindowState, forceTwoPasses: true);
 			_context.NativeManager.SetWindowCorners(
 				barWindow.WindowState.Window.Handle,
 				DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND

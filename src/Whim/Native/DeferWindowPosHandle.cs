@@ -23,6 +23,8 @@ public sealed class DeferWindowPosHandle : IDisposable
 	private readonly List<WindowPosState> _windowStates = new();
 	private readonly List<WindowPosState> _minimizedWindowStates = new();
 
+	private bool forceTwoPasses;
+
 	/// <summary>
 	/// The default flags to use when setting the window position.
 	/// </summary>
@@ -80,13 +82,25 @@ public sealed class DeferWindowPosHandle : IDisposable
 	/// The flags to use when setting the window position. This overrides the default flags Whim sets,
 	/// except when the window is maximized or minimized.
 	/// </param>
+	/// <param name="forceTwoPasses">
+	/// Window scaling can be finicky. Whim will set a window's position twice for windows in monitors
+	/// with non-100% scaling. Regardless of this, some windows need this even for windows with
+	/// 100% scaling.
+	/// </param>
 	public void DeferWindowPos(
 		IWindowState windowState,
 		HWND? hwndInsertAfter = null,
-		SET_WINDOW_POS_FLAGS? flags = null
+		SET_WINDOW_POS_FLAGS? flags = null,
+		bool forceTwoPasses = false
 	)
 	{
 		Logger.Debug($"Adding window {windowState.Window} after {hwndInsertAfter} with flags {flags}");
+
+		if (forceTwoPasses)
+		{
+			this.forceTwoPasses = true;
+		}
+
 		// We use HWND_BOTTOM, as modifying the Z-order of a window
 		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
 		// causes the relevant window to be focused, when the user hasn't
@@ -136,7 +150,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		int numPasses = 1;
 		foreach (IMonitor monitor in _context.MonitorManager)
 		{
-			if (monitor.ScaleFactor != 100)
+			if (monitor.ScaleFactor != 100 || forceTwoPasses)
 			{
 				numPasses = 2;
 				break;
