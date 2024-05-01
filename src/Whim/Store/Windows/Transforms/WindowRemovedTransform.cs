@@ -26,7 +26,7 @@ internal record WindowRemovedTransform(IWindow Window) : Transform
 
 	private static Result<Empty> UpdateMapSector(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
-		if (!ctx.Store.Pick(MapPickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
+		if (!ctx.Store.Pick(Pickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
 		{
 			return Result.FromException<Empty>(new WhimException($"Window {window} was not found in any workspace"));
 		}

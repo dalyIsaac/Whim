@@ -14,7 +14,7 @@ public record MergeWorkspaceWindowsTransform(IWorkspace Source, IWorkspace Targe
 		MapSector sector = rootSector.Maps;
 
 		// Remove the workspace from the monitor map.
-		IMonitor? monitor = ctx.Store.Pick(MapPickers.GetMonitorForWorkspace(Source)).OrDefault();
+		IMonitor? monitor = ctx.Store.Pick(Pickers.GetMonitorForWorkspace(Source)).OrDefault();
 		if (monitor != null)
 		{
 			sector.MonitorWorkspaceMap = sector.MonitorWorkspaceMap.SetItem(monitor, Target);

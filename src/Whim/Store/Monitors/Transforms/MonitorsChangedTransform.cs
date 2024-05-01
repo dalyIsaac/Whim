@@ -87,7 +87,7 @@ internal record MonitorsChangedTransform : Transform
 		monitorSector.MonitorsChangingTasks++;
 
 		// Deactivate all workspaces.
-		foreach (IWorkspace visibleWorkspace in ctx.Store.Pick(MapPickers.GetAllActiveWorkspaces))
+		foreach (IWorkspace visibleWorkspace in ctx.Store.Pick(Pickers.GetAllActiveWorkspaces))
 		{
 			visibleWorkspace.Deactivate();
 		}
@@ -97,7 +97,7 @@ internal record MonitorsChangedTransform : Transform
 		{
 			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.Remove(monitor);
 
-			if (!ctx.Store.Pick(MapPickers.GetWorkspaceForMonitor(monitor)).TryGet(out IWorkspace workspace))
+			if (!ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(monitor)).TryGet(out IWorkspace workspace))
 			{
 				Logger.Error($"Could not find workspace for monitor {monitor}");
 				continue;
@@ -113,7 +113,7 @@ internal record MonitorsChangedTransform : Transform
 			IWorkspace? workspace = null;
 			foreach (IWorkspace w in ctx.WorkspaceManager)
 			{
-				if (!ctx.Store.Pick(MapPickers.GetMonitorForWorkspace(w)).IsSuccessful)
+				if (!ctx.Store.Pick(Pickers.GetMonitorForWorkspace(w)).IsSuccessful)
 				{
 					workspace = w;
 					mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor, w);

@@ -36,10 +36,10 @@ public record ActivateWorkspaceTransform(IWorkspace Workspace, IMonitor? Monitor
 		}
 
 		// Get the old workspace for the event.
-		IWorkspace? oldWorkspace = ctx.Store.Pick(MapPickers.GetWorkspaceForMonitor(targetMonitor)).OrDefault();
+		IWorkspace? oldWorkspace = ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(targetMonitor)).OrDefault();
 
 		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = ctx.Store.Pick(MapPickers.GetMonitorForWorkspace(Workspace)).OrDefault();
+		IMonitor? loserMonitor = ctx.Store.Pick(Pickers.GetMonitorForWorkspace(Workspace)).OrDefault();
 
 		if (targetMonitor.Equals(loserMonitor))
 		{

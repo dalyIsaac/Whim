@@ -18,7 +18,7 @@ internal record WindowMinimizeEndedTransform(IWindow Window) : Transform
 
 	private static void UpdateMapSector(IContext ctx, IWindow window)
 	{
-		if (!ctx.Store.Pick(MapPickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
+		if (!ctx.Store.Pick(Pickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
 		{
 			Logger.Error($"Window {window} was not found in any workspace");
 			return;

@@ -7,7 +7,7 @@ namespace Whim;
 /// <summary>
 /// Pure pickers for <see cref="IMapSector"/>.
 /// </summary>
-public static class MapPickers
+public static partial class Pickers
 {
 	/// <summary>
 	/// Gets all the workspaces which are active on any monitor.

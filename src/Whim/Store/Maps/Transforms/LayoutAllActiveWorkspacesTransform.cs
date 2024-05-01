@@ -10,7 +10,7 @@ public record LayoutAllActiveWorkspacesTransform() : Transform
 {
 	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
-		foreach (IWorkspace workspace in ctx.Store.Pick(MapPickers.GetAllActiveWorkspaces))
+		foreach (IWorkspace workspace in ctx.Store.Pick(Pickers.GetAllActiveWorkspaces))
 		{
 			workspace.DoLayout();
 		}

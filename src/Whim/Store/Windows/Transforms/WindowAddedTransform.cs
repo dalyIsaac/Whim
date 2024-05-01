@@ -146,7 +146,7 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 		else if (ctx.RouterManager.RouterOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
 			workspace = internalCtx.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
-				? ctx.Store.Pick(MapPickers.GetWorkspaceForMonitor(lastWhimActiveMonitor)).OrDefault()
+				? ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(lastWhimActiveMonitor)).OrDefault()
 				: ctx.WorkspaceManager.ActiveWorkspace;
 		}
 
@@ -169,7 +169,7 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 
 		if (internalCtx.MonitorManager.GetMonitorByHandle(hmonitor) is IMonitor monitor)
 		{
-			return ctx.Store.Pick(MapPickers.GetWorkspaceForMonitor(monitor)).OrDefault();
+			return ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(monitor)).OrDefault();
 		}
 
 		return null;

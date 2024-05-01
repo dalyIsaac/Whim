@@ -94,13 +94,13 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			return;
 		}
 
-		if (!ctx.Store.Pick(MapPickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspaceForWindow))
+		if (!ctx.Store.Pick(Pickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspaceForWindow))
 		{
 			Logger.Debug($"Window {window} was not found in any workspace");
 			return;
 		}
 
-		if (ctx.Store.Pick(MapPickers.GetMonitorForWorkspace(workspaceForWindow)).IsSuccessful)
+		if (ctx.Store.Pick(Pickers.GetMonitorForWorkspace(workspaceForWindow)).IsSuccessful)
 		{
 			Logger.Debug($"Window {window} is in an active workspace");
 			return;

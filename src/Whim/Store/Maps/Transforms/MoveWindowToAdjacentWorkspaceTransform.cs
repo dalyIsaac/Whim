@@ -43,7 +43,7 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 		// Get the adjacent workspace for the current workspace.
 		if (
 			!ctx
-				.Store.Pick(MapPickers.GetAdjacentWorkspace(currentWorkspace, Reverse, SkipActive))
+				.Store.Pick(Pickers.GetAdjacentWorkspace(currentWorkspace, Reverse, SkipActive))
 				.TryGet(out IWorkspace? nextWorkspace)
 		)
 		{

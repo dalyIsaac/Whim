@@ -21,14 +21,14 @@ public record ActivateAdjacentTransform(IMonitor? Monitor = null, bool Reverse =
 	{
 		IMonitor targetMonitor = Monitor ?? ctx.MonitorManager.ActiveMonitor;
 
-		Result<IWorkspace> currentWorkspaceResult = ctx.Store.Pick(MapPickers.GetWorkspaceForMonitor(targetMonitor));
+		Result<IWorkspace> currentWorkspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(targetMonitor));
 		if (!currentWorkspaceResult.TryGet(out IWorkspace currentWorkspace))
 		{
 			return Result.FromException<Empty>(currentWorkspaceResult.Error!);
 		}
 
 		Result<IWorkspace> nextWorkspaceResult = ctx.Store.Pick(
-			MapPickers.GetAdjacentWorkspace(currentWorkspace, Reverse, SkipActive)
+			Pickers.GetAdjacentWorkspace(currentWorkspace, Reverse, SkipActive)
 		);
 		if (!nextWorkspaceResult.TryGet(out IWorkspace? nextWorkspace))
 		{
