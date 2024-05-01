@@ -4,14 +4,18 @@ using DotNext;
 namespace Whim;
 
 /// <summary>
-/// Gets the monitor after the given monitor.
+/// Gets the monitor before the given monitor.
 /// </summary>
 /// <param name="Monitor"></param>
+/// <param name="Reverse">
+/// When <see langword="true"/>, gets the previous monitor, otherwise gets the next monitor. Defaults to <see langword="true" />.
+/// </param>
 /// <param name="GetFirst">
 /// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
 /// result.
 /// </param>
-public record GetNextMonitorPicker(IMonitor Monitor, bool GetFirst = false) : Picker<Result<IMonitor>>()
+public record GetAdjacentMonitorPicker(IMonitor Monitor, bool Reverse = true, bool GetFirst = false)
+	: Picker<Result<IMonitor>>()
 {
 	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
 	{
@@ -28,6 +32,7 @@ public record GetNextMonitorPicker(IMonitor Monitor, bool GetFirst = false) : Pi
 			return Result.FromException<IMonitor>(new WhimException($"Monitor {Monitor} not found."));
 		}
 
-		return Result.FromValue(monitors[(idx + 1).Mod(monitors.Length)]);
+		int delta = Reverse ? -1 : 1;
+		return Result.FromValue(monitors[(idx + delta).Mod(monitors.Length)]);
 	}
 }
