@@ -40,54 +40,8 @@ internal class ButlerChores : IButlerChores
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point) =>
 		_context.Store.Dispatch(new MoveWindowToPointTransform(window, point));
 
-	public void MoveWindowToWorkspace(IWorkspace targetWorkspace, IWindow? window = null)
-	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
-		Logger.Debug($"Moving window {window} to workspace {targetWorkspace}");
-
-		if (window == null)
-		{
-			Logger.Error("No window was found");
-			return;
-		}
-
-		Logger.Debug($"Moving window {window} to workspace {targetWorkspace}");
-
-		// Find the current workspace for the window.
-		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace oldWorkspace)
-		{
-			Logger.Error($"Window {window} was not found in any workspace");
-			return;
-		}
-
-		if (oldWorkspace.Equals(targetWorkspace))
-		{
-			Logger.Error($"Window {window} is already on workspace {targetWorkspace}");
-			return;
-		}
-
-		_context.Butler.Pantry.SetWindowWorkspace(window, targetWorkspace);
-
-		oldWorkspace.RemoveWindow(window);
-		targetWorkspace.AddWindow(window);
-
-		// If both workspaces are visible, activate both
-		// Otherwise, only layout the new workspace.
-		if (
-			_context.Butler.Pantry.GetMonitorForWorkspace(oldWorkspace) is not null
-			&& _context.Butler.Pantry.GetMonitorForWorkspace(targetWorkspace) is not null
-		)
-		{
-			targetWorkspace.DoLayout();
-			oldWorkspace.DoLayout();
-		}
-		else
-		{
-			Activate(targetWorkspace);
-		}
-
-		window.Focus();
-	}
+	public void MoveWindowToWorkspace(IWorkspace targetWorkspace, IWindow? window = null) =>
+		_context.Store.Dispatch(new MoveWindowToWorkspaceTransform(targetWorkspace, window));
 
 	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target)
 	{
