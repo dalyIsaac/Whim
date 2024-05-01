@@ -31,27 +31,11 @@ internal class ButlerChores : IButlerChores
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null) =>
 		_context.Store.Dispatch(new MoveWindowToMonitorTransform(monitor, window));
 
-	public void MoveWindowToPreviousMonitor(IWindow? window = null)
-	{
-		Logger.Debug($"Moving window {window} to previous monitor");
+	public void MoveWindowToPreviousMonitor(IWindow? window = null) =>
+		_context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(window, Reverse: true));
 
-		// Get the previous monitor.
-		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
-		IMonitor previousMonitor = _context.MonitorManager.GetPreviousMonitor(monitor);
-
-		MoveWindowToMonitor(previousMonitor, window);
-	}
-
-	public void MoveWindowToNextMonitor(IWindow? window = null)
-	{
-		Logger.Debug($"Moving window {window} to next monitor");
-
-		// Get the next monitor.
-		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
-		IMonitor nextMonitor = _context.MonitorManager.GetNextMonitor(monitor);
-
-		MoveWindowToMonitor(nextMonitor, window);
-	}
+	public void MoveWindowToNextMonitor(IWindow? window = null) =>
+		_context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(window, Reverse: false));
 
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point)
 	{
