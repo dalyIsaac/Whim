@@ -3,12 +3,10 @@ namespace Whim;
 internal class ButlerChores : IButlerChores
 {
 	private readonly IContext _context;
-	private readonly IInternalContext _internalContext;
 
-	public ButlerChores(IContext context, IInternalContext internalContext)
+	public ButlerChores(IContext context)
 	{
 		_context = context;
-		_internalContext = internalContext;
 	}
 
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>
