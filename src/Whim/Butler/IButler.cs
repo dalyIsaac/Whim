@@ -10,16 +10,6 @@ namespace Whim;
 public interface IButler : IButlerChores
 {
 	/// <summary>
-	/// The pantry is responsible for mapping <see cref="IWindow"/>s to <see cref="IWorkspace"/>s
-	/// to <see cref="IMonitor"/>s.
-	///
-	/// The pantry can only be set prior to <see cref="Initialize"/>.
-	///
-	/// Defaults to <see cref="ButlerPantry"/>.
-	/// </summary>
-	IButlerPantry Pantry { get; set; }
-
-	/// <summary>
 	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
 	/// </summary>
 	event EventHandler<RouteEventArgs>? WindowRouted;

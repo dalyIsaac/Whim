@@ -11,28 +11,10 @@ internal partial class Butler : IButler
 
 	private bool _initialized;
 
-	private IButlerPantry _pantry;
-	public IButlerPantry Pantry
-	{
-		get => _pantry;
-		set
-		{
-			if (_initialized)
-			{
-				Logger.Error("Cannot set the pantry after initialization.");
-				return;
-			}
-
-			_pantry = value;
-		}
-	}
-
 	public Butler(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
 		_internalContext = internalContext;
-
-		_pantry = new ButlerPantry(_context);
 	}
 
 	public event EventHandler<RouteEventArgs>? WindowRouted;
