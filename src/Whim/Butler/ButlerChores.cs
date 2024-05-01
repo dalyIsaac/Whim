@@ -43,47 +43,9 @@ internal class ButlerChores : IButlerChores
 	public void MoveWindowToWorkspace(IWorkspace targetWorkspace, IWindow? window = null) =>
 		_context.Store.Dispatch(new MoveWindowToWorkspaceTransform(targetWorkspace, window));
 
-	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target)
-	{
-		_context.Butler.Pantry.MergeWorkspaceWindows(source, target);
+	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target) =>
+		_context.Store.Dispatch(new MergeWorkspaceWindowsTransform(source, target));
 
-		foreach (IWindow window in source.Windows)
-		{
-			target.AddWindow(window);
-		}
-	}
-
-	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false)
-	{
-		// Get the current monitor.
-		workspace ??= _context.WorkspaceManager.ActiveWorkspace;
-		IMonitor? currentMonitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
-
-		if (currentMonitor == null)
-		{
-			Logger.Error($"Workspace {workspace} was not found in any monitor");
-			return;
-		}
-
-		// Get the next monitor.
-		IMonitor nextMonitor = reverse
-			? _context.MonitorManager.GetPreviousMonitor(currentMonitor)
-			: _context.MonitorManager.GetNextMonitor(currentMonitor);
-
-		if (currentMonitor.Equals(nextMonitor))
-		{
-			Logger.Error($"Monitor {currentMonitor} is already the {(!reverse ? "next" : "previous")} monitor");
-			return;
-		}
-
-		// Get workspace on next monitor.
-		IWorkspace? nextWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(nextMonitor);
-		if (nextWorkspace == null)
-		{
-			Logger.Error($"Monitor {nextMonitor} was not found to correspond to any workspace");
-			return;
-		}
-
-		Activate(nextWorkspace, currentMonitor);
-	}
+	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false) =>
+		_context.Store.Dispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace, reverse));
 }
