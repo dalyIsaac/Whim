@@ -28,40 +28,8 @@ internal class ButlerChores : IButlerChores
 	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false) =>
 		_context.Store.Dispatch(new MoveWindowToAdjacentWorkspaceTransform(window, reverse, skipActive));
 
-	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null)
-	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
-		Logger.Debug($"Moving window {window} to monitor {monitor}");
-
-		if (window == null)
-		{
-			Logger.Error("No window was found");
-			return;
-		}
-
-		Logger.Debug($"Moving window {window} to monitor {monitor}");
-		IMonitor? oldMonitor = _context.Butler.Pantry.GetMonitorForWindow(window);
-		if (oldMonitor == null)
-		{
-			Logger.Error($"Window {window} was not found in any monitor");
-			return;
-		}
-
-		if (oldMonitor.Equals(monitor))
-		{
-			Logger.Error($"Window {window} is already on monitor {monitor}");
-			return;
-		}
-
-		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
-		if (workspace == null)
-		{
-			Logger.Error($"Monitor {monitor} was not found in any workspace");
-			return;
-		}
-
-		MoveWindowToWorkspace(workspace, window);
-	}
+	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null) =>
+		_context.Store.Dispatch(new MoveWindowToMonitorTransform(monitor, window));
 
 	public void MoveWindowToPreviousMonitor(IWindow? window = null)
 	{
