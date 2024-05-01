@@ -37,49 +37,8 @@ internal class ButlerChores : IButlerChores
 	public void MoveWindowToNextMonitor(IWindow? window = null) =>
 		_context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(window, Reverse: false));
 
-	public void MoveWindowToPoint(IWindow window, IPoint<int> point)
-	{
-		Logger.Debug($"Moving window {window} to point {point}");
-
-		// Get the monitor.
-		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);
-
-		// Get the target workspace.
-		IWorkspace? targetWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(targetMonitor);
-		if (targetWorkspace == null)
-		{
-			Logger.Error($"Monitor {targetMonitor} was not found to correspond to any workspace");
-			return;
-		}
-
-		// Get the old workspace.
-		IWorkspace? oldWorkspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
-		if (oldWorkspace == null)
-		{
-			Logger.Error($"Window {window} was not found in any workspace");
-			return;
-		}
-
-		// Normalize `point` into the unit square.
-		IPoint<double> normalized = targetMonitor.WorkingArea.NormalizeAbsolutePoint(point);
-
-		Logger.Debug(
-			$"Moving window {window} to workspace {targetWorkspace} in monitor {targetMonitor} at normalized point {normalized}"
-		);
-
-		// If the window is being moved to a different workspace, remove it from the current workspace.
-		if (!targetWorkspace.Equals(oldWorkspace))
-		{
-			_context.Butler.Pantry.SetWindowWorkspace(window, targetWorkspace);
-			oldWorkspace.RemoveWindow(window);
-			oldWorkspace.DoLayout();
-		}
-
-		targetWorkspace.MoveWindowToPoint(window, normalized, deferLayout: false);
-
-		// Trigger layouts.
-		window.Focus();
-	}
+	public void MoveWindowToPoint(IWindow window, IPoint<int> point) =>
+		_context.Store.Dispatch(new MoveWindowToPointTransform(window, point));
 
 	public void MoveWindowToWorkspace(IWorkspace targetWorkspace, IWindow? window = null)
 	{
