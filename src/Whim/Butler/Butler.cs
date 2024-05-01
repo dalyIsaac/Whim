@@ -4,7 +4,7 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal partial class Butler : IButler, IInternalButler
+internal partial class Butler : IButler
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;

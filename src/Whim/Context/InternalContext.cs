@@ -12,8 +12,6 @@ internal class InternalContext : IInternalContext
 
 	public IWindowMessageMonitor WindowMessageMonitor { get; }
 
-	public IInternalButler Butler => (IInternalButler)_context.Butler;
-
 	public IInternalMonitorManager MonitorManager => (IInternalMonitorManager)_context.MonitorManager;
 
 	public IKeybindHook KeybindHook { get; }
@@ -23,8 +21,6 @@ internal class InternalContext : IInternalContext
 	public IDeferWindowPosManager DeferWindowPosManager { get; }
 
 	public IDeferWorkspacePosManager DeferWorkspacePosManager { get; }
-
-	public IButlerEventHandlers ButlerEventHandlers => ((Butler)_context.Butler).EventHandlers;
 
 	public InternalContext(IContext context)
 	{
