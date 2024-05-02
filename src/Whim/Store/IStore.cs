@@ -14,6 +14,9 @@ public interface IStore : IDisposable
 	/// <inheritdoc cref="IWindowSectorEvents"/>
 	IWindowSectorEvents WindowEvents { get; }
 
+	/// <inheritdoc cref="IMapSectorEvents"/>
+	IMapSectorEvents MapEvents { get; }
+
 	/// <summary>
 	/// Initialize the event listeners.
 	/// </summary>

@@ -177,13 +177,13 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "move_window_to_previous_monitor",
 				title: "Move the window to the previous monitor",
-				callback: () => _context.Butler.MoveWindowToPreviousMonitor(),
+				callback: () => _context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true)),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "move_window_to_next_monitor",
 				title: "Move the window to the next monitor",
-				callback: () => _context.Butler.MoveWindowToNextMonitor(),
+				callback: () => _context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: false)),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
@@ -316,8 +316,7 @@ internal class CoreCommands : PluginCommands
 				? _context.MonitorManager.GetNextMonitor(active)
 				: _context.MonitorManager.GetPreviousMonitor(active);
 
-			IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
-			if (workspace == null)
+			if (!_context.Store.Pick(Pickers.GetWorkspaceForMonitor(monitor)).TryGet(out IWorkspace workspace))
 			{
 				Logger.Error($"Could not find workspace for monitor {monitor}");
 				return;

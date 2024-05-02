@@ -27,7 +27,7 @@ internal record WindowMoveEndedTransform(IWindow Window) : Transform
 		}
 		else if (internalCtx.CoreNativeManager.GetCursorPos(out point))
 		{
-			ctx.Butler.MoveWindowToPoint(Window, point);
+			ctx.Store.Dispatch(new MoveWindowToPointTransform(Window, point));
 		}
 
 		sector.IsMovingWindow = false;

@@ -29,8 +29,7 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		}
 
 		// Get the monitor for this workspace
-		IMonitor? monitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
-		if (monitor == null)
+		if (!_context.Store.Pick(Pickers.GetMonitorForWorkspace(workspace)).TryGet(out IMonitor monitor))
 		{
 			Logger.Debug($"No active monitors found for workspace {workspace}.");
 			return;

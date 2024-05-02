@@ -20,12 +20,12 @@ internal record WindowHiddenTransform(IWindow Window) : WindowRemovedTransform(W
 		MutableRootSector mutableRootSector
 	)
 	{
-		if (ctx.Butler.Pantry.GetMonitorForWindow(Window) == null)
+		if (ctx.Store.Pick(Pickers.GetMonitorForWindow(Window)).IsSuccessful)
 		{
-			Logger.Debug($"Window {Window} is not tracked in a monitor, ignoring event");
-			return Empty.Result;
+			return base.Execute(ctx, internalCtx, mutableRootSector);
 		}
 
-		return base.Execute(ctx, internalCtx, mutableRootSector);
+		Logger.Debug($"Window {Window} is not tracked in a monitor, ignoring event");
+		return Empty.Result;
 	}
 }

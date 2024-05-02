@@ -35,6 +35,8 @@ public record ActivateWorkspaceTransform(IWorkspace Workspace, IMonitor? Monitor
 			);
 		}
 
+		MapSector mapsSector = rootSector.Maps;
+
 		// Get the old workspace for the event.
 		IWorkspace? oldWorkspace = ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(targetMonitor)).OrDefault();
 
@@ -50,12 +52,12 @@ public record ActivateWorkspaceTransform(IWorkspace Workspace, IMonitor? Monitor
 		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
-		ctx.Butler.Pantry.SetMonitorWorkspace(targetMonitor, Workspace);
+		mapsSector.MonitorWorkspaceMap = mapsSector.MonitorWorkspaceMap.SetItem(targetMonitor, Workspace);
 
 		(IWorkspace workspace, IMonitor monitor)? layoutOldWorkspace = null;
 		if (loserMonitor != null && oldWorkspace != null && !loserMonitor.Equals(targetMonitor))
 		{
-			ctx.Butler.Pantry.SetMonitorWorkspace(loserMonitor, oldWorkspace);
+			mapsSector.MonitorWorkspaceMap = mapsSector.MonitorWorkspaceMap.SetItem(loserMonitor, oldWorkspace);
 			layoutOldWorkspace = (oldWorkspace, loserMonitor);
 		}
 
@@ -63,7 +65,7 @@ public record ActivateWorkspaceTransform(IWorkspace Workspace, IMonitor? Monitor
 		{
 			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
 			oldWorkspace?.DoLayout();
-			rootSector.Maps.QueueEvent(
+			mapsSector.QueueEvent(
 				new MonitorWorkspaceChangedEventArgs()
 				{
 					Monitor = oldWorkspaceValue.monitor,
@@ -84,7 +86,7 @@ public record ActivateWorkspaceTransform(IWorkspace Workspace, IMonitor? Monitor
 		Workspace.DoLayout();
 		Workspace.FocusLastFocusedWindow();
 
-		rootSector.Maps.QueueEvent(
+		mapsSector.QueueEvent(
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = targetMonitor,

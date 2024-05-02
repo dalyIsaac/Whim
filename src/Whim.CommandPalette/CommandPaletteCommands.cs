@@ -132,7 +132,7 @@ public class CommandPaletteCommands : PluginCommands
 					new Command(
 						identifier: $"{PluginName}.activate_workspace.{workspace.Name}",
 						title: workspace.Name,
-						callback: () => _context.Butler.Activate(workspace)
+						callback: () => _context.Store.Dispatch(new ActivateWorkspaceTransform(workspace))
 					)
 				);
 			}
@@ -184,7 +184,7 @@ public class CommandPaletteCommands : PluginCommands
 			{
 				foreach (IWindow window in windows)
 				{
-					_context.Butler.MoveWindowToWorkspace(workspace, window);
+					_context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace, window));
 				}
 			}
 		);
@@ -216,7 +216,7 @@ public class CommandPaletteCommands : PluginCommands
 		new Command(
 			identifier: $"{PluginName}.move_window_to_workspace.{workspace.Name}",
 			title: $"Move window to workspace \"{workspace.Name}\"",
-			callback: () => _context.Butler.MoveWindowToWorkspace(workspace)
+			callback: () => _context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace))
 		);
 
 	/// <summary>
@@ -252,16 +252,15 @@ public class CommandPaletteCommands : PluginCommands
 			title: window.Title,
 			callback: () =>
 			{
-				IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
-				if (workspace == null)
+				if (!_context.Store.Pick(Pickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
 				{
 					return;
 				}
 
-				if (_context.Butler.Pantry.GetMonitorForWorkspace(workspace) is null)
+				if (!_context.Store.Pick(Pickers.GetMonitorForWorkspace(workspace)).IsSuccessful)
 				{
 					// The workspace is not active, and is not visible.
-					_context.Butler.Activate(workspace);
+					_context.Store.Dispatch(new ActivateWorkspaceTransform(workspace));
 				}
 
 				FocusWindow(window);

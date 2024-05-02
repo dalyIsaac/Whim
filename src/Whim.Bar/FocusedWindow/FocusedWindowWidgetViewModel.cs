@@ -85,7 +85,7 @@ internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposabl
 			return;
 		}
 
-		IMonitor? monitor = _context.Butler.Pantry.GetMonitorForWindow(e.Window);
+		IMonitor? monitor = _context.Store.Pick(Pickers.GetMonitorForWindow(e.Window)).OrDefault();
 		if (_monitor.Equals(monitor))
 		{
 			Title = _getTitle(e.Window);

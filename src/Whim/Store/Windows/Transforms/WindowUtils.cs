@@ -11,8 +11,7 @@ internal static class WindowUtils
 	public static (Direction MovedEdges, IPoint<int> MovedPoint)? GetMovedEdges(IContext ctx, IWindow window)
 	{
 		Logger.Debug("Trying to move window edges in direction of mouse movement");
-		IWorkspace? workspace = ctx.Butler.Pantry.GetWorkspaceForWindow(window);
-		if (workspace is null)
+		if (!ctx.Store.Pick(Pickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
 		{
 			Logger.Debug($"Could not find workspace for window {window}, failed to move window edges");
 			return null;

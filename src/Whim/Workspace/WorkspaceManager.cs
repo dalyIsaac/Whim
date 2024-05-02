@@ -61,7 +61,9 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			IMonitor activeMonitor = _context.MonitorManager.ActiveMonitor;
 			Logger.Debug($"Getting active workspace for monitor {activeMonitor}");
-			return _context.Butler.Pantry.GetWorkspaceForMonitor(activeMonitor) ?? _workspaces[0];
+			return _context.Store.Pick(Pickers.GetWorkspaceForMonitor(activeMonitor)).TryGet(out IWorkspace workspace)
+				? workspace
+				: _workspaces[0];
 		}
 	}
 
@@ -122,7 +124,7 @@ internal class WorkspaceManager : IWorkspaceManager
 				(idx < _workspaces.Count ? _workspaces[idx] : CreateWorkspace($"Workspace {idx + 1}"))
 				?? throw new InvalidOperationException($"Could not create workspace");
 
-			_context.Butler.Activate(workspace, monitor);
+			_context.Store.Dispatch(new ActivateWorkspaceTransform(workspace, monitor));
 			idx++;
 		}
 	}
@@ -185,6 +187,7 @@ internal class WorkspaceManager : IWorkspaceManager
 			return false;
 		}
 
+		// TODO: Make a single transform.
 		_context.Butler.MergeWorkspaceWindows(workspace, _workspaces[^1]);
 		_context.Butler.Activate(_workspaces[^1]);
 		WorkspaceRemoved?.Invoke(this, new WorkspaceEventArgs() { Workspace = workspace });

@@ -35,7 +35,7 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		{
 			Logger.Debug($"Focusing window {Window}");
 
-			if (ctx.Butler.Pantry.GetMonitorForWindow(Window) is IMonitor monitor)
+			if (ctx.Store.Pick(Pickers.GetMonitorForWindow(Window)).TryGet(out IMonitor monitor))
 			{
 				Logger.Debug($"Setting active monitor to {monitor}");
 				int idx = sector.Monitors.IndexOf(monitor);
@@ -82,7 +82,7 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		}
 	}
 
-	private void UpdateMapSector(IContext ctx, IWindow? window)
+	private static void UpdateMapSector(IContext ctx, IWindow? window)
 	{
 		foreach (IWorkspace workspace in ctx.WorkspaceManager)
 		{
@@ -106,6 +106,6 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			return;
 		}
 
-		_chores.Activate(workspaceForWindow);
+		ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceForWindow));
 	}
 }

@@ -48,12 +48,12 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		_monitor = monitor;
 		ToggleDirectionCommand = new ToggleDirectionCommand(this);
 
-		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
+		_context.Store.MapEvents.MonitorWorkspaceChanged += MapEvents_MonitorWorkspaceChanged;
 		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
 		_plugin.AddWindowDirectionChanged += Plugin_AddWindowDirectionChanged;
 	}
 
-	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
+	private void MapEvents_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
 	{
 		if (e.Monitor.Equals(_monitor))
 		{
@@ -63,7 +63,8 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
 	{
-		if (e.Workspace == _context.Butler.Pantry.GetWorkspaceForMonitor(_monitor))
+		IWorkspace? workspace = _context.Store.Pick(Pickers.GetWorkspaceForMonitor(_monitor)).OrDefault();
+		if (e.Workspace.Equals(workspace))
 		{
 			OnPropertyChanged(string.Empty);
 		}
@@ -123,7 +124,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.Butler.MonitorWorkspaceChanged -= Butler_MonitorWorkspaceChanged;
+				_context.Store.MapEvents.MonitorWorkspaceChanged -= MapEvents_MonitorWorkspaceChanged;
 				_context.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
 			}
 

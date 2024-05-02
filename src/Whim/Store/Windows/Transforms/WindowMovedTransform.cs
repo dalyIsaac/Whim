@@ -30,7 +30,7 @@ internal record WindowMovedTransform(IWindow Window) : Transform
 			ctx.NativeManager.TryEnqueue(async () =>
 			{
 				await Task.Delay(sector.WindowMovedDelay).ConfigureAwait(true);
-				if (ctx.Butler.Pantry.GetWorkspaceForWindow(Window) is IWorkspace workspace)
+				if (ctx.Store.Pick(Pickers.GetWorkspaceForWindow(Window)).TryGet(out IWorkspace workspace))
 				{
 					sector.HandledLocationRestoringWindows.Add(Window);
 					workspace.DoLayout();

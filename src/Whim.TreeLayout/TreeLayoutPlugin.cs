@@ -40,7 +40,11 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	/// <inheritdoc />
 	public Direction? GetAddWindowDirection(IMonitor monitor)
 	{
-		ILayoutEngine? layoutEngine = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;
+		ILayoutEngine? layoutEngine = _context
+			.Store.Pick(Pickers.GetWorkspaceForMonitor(monitor))
+			.OrDefault()
+			?.ActiveLayoutEngine;
+
 		if (layoutEngine?.GetLayoutEngine<TreeLayoutEngine>() is not TreeLayoutEngine treeLayoutEngine)
 		{
 			return null;
@@ -64,7 +68,11 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 	/// <inheritdoc />
 	public void SetAddWindowDirection(IMonitor monitor, Direction direction)
 	{
-		ILayoutEngine? layoutEngine = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;
+		ILayoutEngine? layoutEngine = _context
+			.Store.Pick(Pickers.GetWorkspaceForMonitor(monitor))
+			.OrDefault()
+			?.ActiveLayoutEngine;
+
 		if (layoutEngine?.GetLayoutEngine<TreeLayoutEngine>() is not TreeLayoutEngine treeLayoutEngine)
 		{
 			return;

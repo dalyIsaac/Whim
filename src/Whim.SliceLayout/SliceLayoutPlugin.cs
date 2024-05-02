@@ -83,8 +83,7 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 			return null;
 		}
 
-		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
-		if (workspace is null)
+		if (!_context.Store.Pick(Pickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
 		{
 			Logger.Debug("Window is not in a workspace");
 			return null;

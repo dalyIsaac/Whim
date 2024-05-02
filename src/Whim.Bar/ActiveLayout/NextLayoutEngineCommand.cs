@@ -31,7 +31,7 @@ internal class NextLayoutEngineCommand : System.Windows.Input.ICommand
 	public void Execute(object? parameter)
 	{
 		Logger.Debug("Switching to next layout engine");
-		if (_context.Butler.Pantry.GetWorkspaceForMonitor(_viewModel.Monitor) is IWorkspace workspace)
+		if (_context.Store.Pick(Pickers.GetWorkspaceForMonitor(_viewModel.Monitor)).TryGet(out IWorkspace workspace))
 		{
 			workspace.CycleLayoutEngine(false);
 		}
