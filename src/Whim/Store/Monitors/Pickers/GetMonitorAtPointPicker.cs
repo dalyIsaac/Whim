@@ -39,7 +39,7 @@ public record GetMonitorIndexAtPointPicker(IPoint<int> Point, bool GetFirst = fa
 			return Result.FromValue(0);
 		}
 
-		return Result.FromException<int>(new WhimException($"No monitor found at point {Point}"));
+		return Result.FromException<int>(StoreExceptions.NoMonitorFoundAtPoint(Point));
 	}
 }
 
@@ -66,7 +66,7 @@ public record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) 
 		IMonitorSector sector = rootSector.Monitors;
 		if (idxVal > sector.Monitors.Length)
 		{
-			return Result.FromException<IMonitor>(new WhimException("Monitor index is invalid"));
+			return Result.FromException<IMonitor>(StoreExceptions.InvalidMonitorIndex(idxVal));
 		}
 
 		return Result.FromValue(sector.Monitors[idxVal]);

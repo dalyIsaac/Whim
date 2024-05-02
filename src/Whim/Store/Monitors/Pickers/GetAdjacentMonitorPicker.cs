@@ -29,7 +29,7 @@ public record GetAdjacentMonitorPicker(IMonitor Monitor, bool Reverse = true, bo
 				return Result.FromValue(monitors[0]);
 			}
 
-			return Result.FromException<IMonitor>(new WhimException($"Monitor {Monitor} not found."));
+			return Result.FromException<IMonitor>(StoreExceptions.MonitorNotFound(Monitor));
 		}
 
 		int delta = Reverse ? -1 : 1;

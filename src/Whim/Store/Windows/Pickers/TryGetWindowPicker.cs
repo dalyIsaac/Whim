@@ -13,6 +13,6 @@ public record TryGetWindowPicker(HWND Handle) : Picker<Result<IWindow>>
 	{
 		return rootSector.Windows.Windows.TryGetValue(Handle, out IWindow? window)
 			? Result.FromValue(window)
-			: Result.FromException<IWindow>(new WhimException($"Could not find window with handle {Handle}"));
+			: Result.FromException<IWindow>(StoreExceptions.WindowNotFound(Handle));
 	}
 }

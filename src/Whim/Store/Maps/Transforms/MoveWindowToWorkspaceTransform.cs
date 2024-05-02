@@ -19,25 +19,25 @@ public record MoveWindowToWorkspaceTransform(IWorkspace TargetWorkspace, IWindow
 
 		if (window == null)
 		{
-			return Result.FromException<Empty>(new WhimException("No window was found"));
+			return Result.FromException<Empty>(StoreExceptions.NoValidWindow());
 		}
 
 		Logger.Debug($"Moving window {window} to workspace {TargetWorkspace}");
 
 		// Find the current workspace for the window.
-		if (ctx.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace oldWorkspace)
+		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForWindow(window));
+		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
-			return Result.FromException<Empty>(new WhimException($"Window {window} was not found in any workspace"));
+			return Result.FromException<Empty>(oldWorkspaceResult.Error!);
 		}
 
 		if (oldWorkspace.Equals(TargetWorkspace))
 		{
-			return Result.FromException<Empty>(
-				new WhimException($"Window {window} is already on workspace {TargetWorkspace}")
-			);
+			Logger.Debug($"Window {window} is already on workspace {TargetWorkspace}");
+			return Empty.Result;
 		}
 
-		ctx.Butler.Pantry.SetWindowWorkspace(window, TargetWorkspace);
+		rootSector.Maps.WindowWorkspaceMap = rootSector.Maps.WindowWorkspaceMap.SetItem(window, TargetWorkspace);
 
 		oldWorkspace.RemoveWindow(window);
 		TargetWorkspace.AddWindow(window);
@@ -45,8 +45,8 @@ public record MoveWindowToWorkspaceTransform(IWorkspace TargetWorkspace, IWindow
 		// If both workspaces are visible, activate both
 		// Otherwise, only layout the new workspace.
 		if (
-			ctx.Butler.Pantry.GetMonitorForWorkspace(oldWorkspace) is not null
-			&& ctx.Butler.Pantry.GetMonitorForWorkspace(TargetWorkspace) is not null
+			ctx.Store.Pick(Pickers.GetMonitorForWorkspace(oldWorkspace)).IsSuccessful
+			&& ctx.Store.Pick(Pickers.GetMonitorForWorkspace(TargetWorkspace)).IsSuccessful
 		)
 		{
 			TargetWorkspace.DoLayout();

@@ -18,19 +18,17 @@ public record MoveWindowToPointTransform(IWindow Window, IPoint<int> Point) : Tr
 		IMonitor targetMonitor = ctx.MonitorManager.GetMonitorAtPoint(Point);
 
 		// Get the target workspace.
-		IWorkspace? targetWorkspace = ctx.Butler.Pantry.GetWorkspaceForMonitor(targetMonitor);
-		if (targetWorkspace == null)
+		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(targetMonitor));
+		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))
 		{
-			return Result.FromException<Empty>(
-				new WhimException($"Monitor {targetMonitor} was not found to correspond to any workspace")
-			);
+			return Result.FromException<Empty>(targetWorkspaceResult.Error!);
 		}
 
 		// Get the old workspace.
-		IWorkspace? oldWorkspace = ctx.Butler.Pantry.GetWorkspaceForWindow(Window);
-		if (oldWorkspace == null)
+		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForWindow(Window));
+		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
-			return Result.FromException<Empty>(new WhimException($"Window {Window} was not found in any workspace"));
+			return Result.FromException<Empty>(oldWorkspaceResult.Error!);
 		}
 
 		// Normalize `point` into the unit square.
@@ -43,7 +41,7 @@ public record MoveWindowToPointTransform(IWindow Window, IPoint<int> Point) : Tr
 		// If the window is being moved to a different workspace, remove it from the current workspace.
 		if (!targetWorkspace.Equals(oldWorkspace))
 		{
-			ctx.Butler.Pantry.SetWindowWorkspace(Window, targetWorkspace);
+			rootSector.Maps.WindowWorkspaceMap = rootSector.Maps.WindowWorkspaceMap.SetItem(Window, targetWorkspace);
 			oldWorkspace.RemoveWindow(Window);
 			oldWorkspace.DoLayout();
 		}

@@ -15,13 +15,11 @@ public record SwapWorkspaceWithAdjacentMonitorTransform(IWorkspace? Workspace = 
 	{
 		// Get the current monitor.
 		IWorkspace? workspace = Workspace ?? ctx.WorkspaceManager.ActiveWorkspace;
-		IMonitor? currentMonitor = ctx.Butler.Pantry.GetMonitorForWorkspace(workspace);
 
-		if (currentMonitor == null)
+		Result<IMonitor> currentMonitorResult = ctx.Store.Pick(Pickers.GetMonitorForWorkspace(workspace));
+		if (!currentMonitorResult.TryGet(out IMonitor currentMonitor))
 		{
-			return Result.FromException<Empty>(
-				new WhimException($"Workspace {workspace} was not found in any monitor")
-			);
+			return Result.FromException<Empty>(currentMonitorResult.Error!);
 		}
 
 		// Get the next monitor.
@@ -31,18 +29,15 @@ public record SwapWorkspaceWithAdjacentMonitorTransform(IWorkspace? Workspace = 
 
 		if (currentMonitor.Equals(nextMonitor))
 		{
-			return Result.FromException<Empty>(
-				new WhimException($"Monitor {currentMonitor} is already the {(!Reverse ? "next" : "previous")} monitor")
-			);
+			Logger.Debug($"Monitor {currentMonitor} is already the {(!Reverse ? "next" : "previous")} monitor");
+			return Empty.Result;
 		}
 
 		// Get workspace on next monitor.
-		IWorkspace? nextWorkspace = ctx.Butler.Pantry.GetWorkspaceForMonitor(nextMonitor);
-		if (nextWorkspace == null)
+		Result<IWorkspace> nextWorkspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(nextMonitor));
+		if (!nextWorkspaceResult.TryGet(out IWorkspace nextWorkspace))
 		{
-			return Result.FromException<Empty>(
-				new WhimException($"Monitor {nextMonitor} was not found to correspond to any workspace")
-			);
+			return Result.FromException<Empty>(nextWorkspaceResult.Error!);
 		}
 
 		ctx.Store.Dispatch(new ActivateWorkspaceTransform(nextWorkspace, currentMonitor));

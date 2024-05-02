@@ -26,7 +26,7 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 
 		if (window == null)
 		{
-			return Result.FromException<Empty>(new WhimException("No window was found"));
+			return Result.FromException<Empty>(StoreExceptions.NoValidWindow());
 		}
 
 		MapSector sector = rootSector.Maps;
@@ -37,7 +37,7 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 			|| currentWorkspace == null
 		)
 		{
-			return Result.FromException<Empty>(new WhimException($"Window {window} was not found in any workspace"));
+			return Result.FromException<Empty>(StoreExceptions.NoWorkspaceFoundForWindow(window));
 		}
 
 		// Get the adjacent workspace for the current workspace.

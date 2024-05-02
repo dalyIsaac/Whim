@@ -25,7 +25,7 @@ public static partial class Pickers
 		(IRootSector rootSector) =>
 			rootSector.Maps.MonitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? workspace)
 				? Result.FromValue(workspace)
-				: Result.FromException<IWorkspace>(new WhimException("No workspace found for given monitor."));
+				: Result.FromException<IWorkspace>(StoreExceptions.NoWorkspaceFoundForMonitor(monitor));
 
 	/// <summary>
 	/// Retrieves the workspace for the given window.
@@ -36,7 +36,7 @@ public static partial class Pickers
 		(IRootSector rootSector) =>
 			rootSector.Maps.WindowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace)
 				? Result.FromValue(workspace)
-				: Result.FromException<IWorkspace>(new WhimException("No workspace found for given window."));
+				: Result.FromException<IWorkspace>(StoreExceptions.NoWorkspaceFoundForWindow(window));
 
 	/// <summary>
 	/// Retrieves the monitor for the given workspace.
@@ -56,7 +56,7 @@ public static partial class Pickers
 				}
 			}
 
-			return Result.FromException<IMonitor>(new WhimException("No monitor found for given workspace."));
+			return Result.FromException<IMonitor>(StoreExceptions.NoMonitorFoundForWorkspace(searchWorkspace));
 		};
 
 	/// <summary>
@@ -72,7 +72,7 @@ public static partial class Pickers
 				return GetMonitorForWorkspace(workspace)(rootSector);
 			}
 
-			return Result.FromException<IMonitor>(new WhimException("No monitor found for given window."));
+			return Result.FromException<IMonitor>(StoreExceptions.NoMonitorFoundForWindow(window));
 		};
 
 	/// <summary>
@@ -114,6 +114,6 @@ public static partial class Pickers
 				nextIdx = (nextIdx + delta).Mod(workspaces.Count);
 			}
 
-			return Result.FromException<IWorkspace>(new WhimException("No adjacent workspace found."));
+			return Result.FromException<IWorkspace>(StoreExceptions.NoAdjacentWorkspaceFound(workspace));
 		};
 }

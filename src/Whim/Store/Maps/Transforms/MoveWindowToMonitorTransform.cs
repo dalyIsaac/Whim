@@ -19,25 +19,26 @@ public record MoveWindowToMonitorTransform(IMonitor Monitor, IWindow? Window = n
 
 		if (window == null)
 		{
-			return Result.FromException<Empty>(new WhimException("No window was found"));
+			return Result.FromException<Empty>(StoreExceptions.NoValidWindow());
 		}
 
 		Logger.Debug($"Moving window {Window} to monitor {Monitor}");
-		IMonitor? oldMonitor = ctx.Butler.Pantry.GetMonitorForWindow(window);
-		if (oldMonitor == null)
+		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(Pickers.GetMonitorForWindow(window));
+		if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 		{
-			return Result.FromException<Empty>(new WhimException($"Window {Window} was not found in any Monitor"));
+			return Result.FromException<Empty>(oldMonitorResult.Error!);
 		}
 
 		if (oldMonitor.Equals(Monitor))
 		{
-			return Result.FromException<Empty>(new WhimException($"Window {Window} is already on monitor {Monitor}"));
+			Logger.Debug($"Window {Window} is already on monitor {Monitor}");
+			return Empty.Result;
 		}
 
-		IWorkspace? workspace = ctx.Butler.Pantry.GetWorkspaceForMonitor(Monitor);
-		if (workspace == null)
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(Monitor));
+		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Empty>(new WhimException($"Monitor {Monitor} was not found in any workspace"));
+			return Result.FromException<Empty>(workspaceResult.Error!);
 		}
 
 		return ctx.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace, window));

@@ -29,24 +29,22 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 		// Filter the handle.
 		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
 		{
-			return Result.FromException<IWindow>(new WhimException($"Window {Handle} is a splash screen, ignoring"));
+			return Result.FromException<IWindow>(StoreExceptions.WindowIsSplashScreen(Handle));
 		}
 
 		if (internalCtx.CoreNativeManager.IsCloakedWindow(Handle))
 		{
-			return Result.FromException<IWindow>(new WhimException($"Window {Handle} is cloaked, ignoring"));
+			return Result.FromException<IWindow>(StoreExceptions.WindowIsCloaked(Handle));
 		}
 
 		if (!internalCtx.CoreNativeManager.IsStandardWindow(Handle))
 		{
-			return Result.FromException<IWindow>(
-				new WhimException($"Window {Handle} is not a standard window, ignoring")
-			);
+			return Result.FromException<IWindow>(StoreExceptions.WindowIsNotStandard(Handle));
 		}
 
 		if (!internalCtx.CoreNativeManager.HasNoVisibleOwner(Handle))
 		{
-			return Result.FromException<IWindow>(new WhimException($"Window {Handle} has a visible owner, ignoring"));
+			return Result.FromException<IWindow>(StoreExceptions.WindowHasNoVisibleOwner(Handle));
 		}
 
 		Result<IWindow> windowResult = Window.CreateWindow(ctx, internalCtx, Handle);
@@ -58,7 +56,7 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 		// Filter the window.
 		if (ctx.FilterManager.ShouldBeIgnored(window))
 		{
-			return Result.FromException<IWindow>(new WhimException("Window was ignored by filter"));
+			return Result.FromException<IWindow>(StoreExceptions.IgnoredByFilter(Handle));
 		}
 
 		return Result.FromValue(window);

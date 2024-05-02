@@ -26,9 +26,10 @@ internal record WindowRemovedTransform(IWindow Window) : Transform
 
 	private static Result<Empty> UpdateMapSector(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
-		if (!ctx.Store.Pick(Pickers.GetWorkspaceForWindow(window)).TryGet(out IWorkspace workspace))
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForWindow(window));
+		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Empty>(new WhimException($"Window {window} was not found in any workspace"));
+			return Result.FromException<Empty>(workspaceResult.Error!);
 		}
 
 		MapSector sector = mutableRootSector.Maps;

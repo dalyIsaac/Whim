@@ -19,6 +19,7 @@ public record ActivateAdjacentTransform(IMonitor? Monitor = null, bool Reverse =
 {
 	internal override Result<Empty> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
+		MapSector mapSector = rootSector.Maps;
 		IMonitor targetMonitor = Monitor ?? ctx.MonitorManager.ActiveMonitor;
 
 		Result<IWorkspace> currentWorkspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(targetMonitor));

@@ -23,21 +23,21 @@ public record MoveWindowEdgesInDirectionTransform(Direction Edges, IPoint<int> P
 
 		if (window == null)
 		{
-			return Result.FromException<Empty>(new WhimException("No window was found"));
+			return Result.FromException<Empty>(StoreExceptions.NoValidWindow());
 		}
 
 		// Get the containing workspace.
-		IWorkspace? workspace = ctx.Butler.Pantry.GetWorkspaceForWindow(window);
-		if (workspace == null)
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.GetWorkspaceForWindow(window));
+		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Empty>(new WhimException($"Could not find workspace for window {window}"));
+			return Result.FromException<Empty>(workspaceResult.Error!);
 		}
 
 		// Get the containing monitor.
-		IMonitor? monitor = ctx.Butler.Pantry.GetMonitorForWorkspace(workspace);
-		if (monitor == null)
+		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.GetMonitorForWindow(window));
+		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			return Result.FromException<Empty>(new WhimException($"Could not find monitor for workspace {workspace}"));
+			return Result.FromException<Empty>(monitorResult.Error!);
 		}
 
 		Logger.Debug($"Moving window {window} to workspace {workspace}");
