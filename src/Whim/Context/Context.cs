@@ -50,7 +50,7 @@ internal class Context : IContext
 
 		Store = new Store(this, _internalContext);
 
-		Butler = new Butler(this, _internalContext);
+		Butler = new Butler(this);
 
 		NativeManager = new NativeManager(this, _internalContext);
 
@@ -104,7 +104,7 @@ internal class Context : IContext
 		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
 
-		Butler.Initialize();
+		Store.Dispatch(new InitializeMapTransform());
 
 		PluginManager.PostInitialize();
 		_internalContext.PostInitialize();

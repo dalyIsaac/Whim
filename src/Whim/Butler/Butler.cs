@@ -1,20 +1,14 @@
 using System;
-using System.Collections.Generic;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
 internal partial class Butler : IButler
 {
 	private readonly IContext _context;
-	private readonly IInternalContext _internalContext;
 
-	private bool _initialized;
-
-	public Butler(IContext context, IInternalContext internalContext)
+	public Butler(IContext context)
 	{
 		_context = context;
-		_internalContext = internalContext;
 	}
 
 	public event EventHandler<RouteEventArgs>? WindowRouted;
@@ -25,64 +19,6 @@ internal partial class Butler : IButler
 
 	public void TriggerMonitorWorkspaceChanged(MonitorWorkspaceChangedEventArgs args) =>
 		MonitorWorkspaceChanged?.Invoke(this, args);
-
-	public void Initialize()
-	{
-		_initialized = true;
-
-		// Add the saved windows at their saved locations inside their saved workspaces.
-		// Other windows are routed to the monitor they're on.
-		List<HWND> processedWindows = new();
-
-		// Route windows to their saved workspaces.
-		foreach (
-			SavedWorkspace savedWorkspace in _internalContext.CoreSavedStateManager.SavedState?.Workspaces ?? new()
-		)
-		{
-			IWorkspace? workspace = _context.WorkspaceManager.TryGet(savedWorkspace.Name);
-			if (workspace == null)
-			{
-				Logger.Debug($"Could not find workspace {savedWorkspace.Name}");
-				continue;
-			}
-
-			foreach (SavedWindow savedWindow in savedWorkspace.Windows)
-			{
-				HWND hwnd = (HWND)savedWindow.Handle;
-				if (!_context.WindowManager.CreateWindow(hwnd).TryGet(out IWindow window))
-				{
-					Logger.Debug($"Could not find window with handle {savedWindow.Handle}");
-					continue;
-				}
-
-				_pantry.SetWindowWorkspace(window, workspace);
-				workspace.MoveWindowToPoint(window, savedWindow.Rectangle.Center, deferLayout: false);
-				processedWindows.Add(hwnd);
-
-				// Fire the window added event.
-				_context.Store.Dispatch(new WindowAddedTransform(window.Handle));
-			}
-		}
-
-		// Route the rest of the windows to the monitor they're on.
-		// Don't route to the active workspace while we're adding all the windows.
-		RouterOptions routerOptions = _context.RouterManager.RouterOptions;
-		_context.RouterManager.RouterOptions = RouterOptions.RouteToLaunchedWorkspace;
-
-		// Add all existing windows.
-		foreach (HWND hwnd in _internalContext.CoreNativeManager.GetAllWindows())
-		{
-			if (processedWindows.Contains(hwnd))
-			{
-				continue;
-			}
-
-			_context.Store.Dispatch(new WindowAddedTransform(hwnd));
-		}
-
-		// Restore the route to active workspace setting.
-		_context.RouterManager.RouterOptions = routerOptions;
-	}
 
 	#region Chores
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>

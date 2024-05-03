@@ -60,12 +60,12 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor)
 	{
-		return _context.Store.Pick(new GetPreviousMonitorPicker(monitor, GetFirst: true)).Value;
+		return _context.Store.Pick(new GetAdjacentMonitorPicker(monitor, Reverse: false, GetFirst: true)).Value;
 	}
 
 	public IMonitor GetNextMonitor(IMonitor monitor)
 	{
-		return _context.Store.Pick(new GetNextMonitorPicker(monitor, GetFirst: true)).Value;
+		return _context.Store.Pick(new GetAdjacentMonitorPicker(monitor, Reverse: false, GetFirst: true)).Value;
 	}
 
 	// TODO: Remove when removing butler.

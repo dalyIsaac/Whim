@@ -4,7 +4,7 @@ using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
-internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
+internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOptions = null) : Transform<IWindow>()
 {
 	internal override Result<IWindow> Execute(
 		IContext ctx,
@@ -76,7 +76,7 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 	/// <param name="internalCtx"></param>
 	/// <param name="mutableRootSector"></param>
 	/// <param name="window"></param>
-	private static void UpdateMapSector(
+	private void UpdateMapSector(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector,
@@ -128,20 +128,22 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 	/// <param name="internalCtx"></param>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private static IWorkspace? TryGetWorkspaceFromRouter(IContext ctx, IInternalContext internalCtx, IWindow window)
+	private IWorkspace? TryGetWorkspaceFromRouter(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		IWorkspace? workspace = null;
+
+		RouterOptions routerOptions = CustomRouterOptions ?? ctx.RouterManager.RouterOptions;
 
 		// RouteWindow takes precedence over RouterOptions.
 		if (ctx.RouterManager.RouteWindow(window) is IWorkspace routedWorkspace)
 		{
 			workspace = routedWorkspace;
 		}
-		else if (ctx.RouterManager.RouterOptions == RouterOptions.RouteToActiveWorkspace)
+		else if (routerOptions == RouterOptions.RouteToActiveWorkspace)
 		{
 			workspace = ctx.WorkspaceManager.ActiveWorkspace;
 		}
-		else if (ctx.RouterManager.RouterOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
+		else if (routerOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
 			workspace = internalCtx.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
 				? ctx.Store.Pick(Pickers.GetWorkspaceForMonitor(lastWhimActiveMonitor)).OrDefault()

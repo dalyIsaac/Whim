@@ -18,9 +18,4 @@ public interface IButler : IButlerChores
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
 	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
-	/// <summary>
-	/// Initialize the windows and workspaces.
-	/// </summary>
-	void Initialize();
 }
