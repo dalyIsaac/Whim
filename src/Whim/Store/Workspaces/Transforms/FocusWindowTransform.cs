@@ -32,13 +32,13 @@ public record FocusWindowTransform(Guid WorkspaceId, IWindow? Window = null) : B
 		Logger.Debug($"No windows in workspace {workspace.Name} to focus, focusing desktop");
 
 		// Get the bounds of the monitor for this workspace.
-		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.GetMonitorForWorkspace(this);
+		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.GetMonitorForWorkspace(workspace));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
 			return Result.FromException<ImmutableWorkspace>(monitorResult.Error!);
 		}
 
-		_context.Butler.FocusMonitorDesktop(monitor);
+		ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));
 		return workspace;
 	}
 }
