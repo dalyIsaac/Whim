@@ -1,5 +1,4 @@
 using DotNext;
-using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
@@ -26,12 +25,7 @@ public class WindowMinimizeEndedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void Success(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
 		WindowMinimizeEndedTransform sut = new(window);
@@ -42,8 +36,5 @@ public class WindowMinimizeEndedTransformTests
 		// Then
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
-		internalCtx
-			.ButlerEventHandlers.Received(1)
-			.OnWindowMinimizeEnd(Arg.Is<WindowMinimizeEndedEventArgs>(a => a.Window == window));
 	}
 }

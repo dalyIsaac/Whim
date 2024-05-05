@@ -127,7 +127,7 @@ public class MonitorManagerTests
 		var _ = sut.GetPreviousMonitor(monitor);
 
 		// Then
-		ctx.Store.Received(1).Pick(new GetPreviousMonitorPicker(monitor, true));
+		ctx.Store.Received(1).Pick(new GetAdjacentMonitorPicker(monitor, Reverse: true, GetFirst: true));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -140,7 +140,7 @@ public class MonitorManagerTests
 		var _ = sut.GetNextMonitor(monitor);
 
 		// Then
-		ctx.Store.Received(requiredNumberOfCalls: 1).Pick(new GetNextMonitorPicker(monitor, true));
+		ctx.Store.Received(requiredNumberOfCalls: 1).Pick(new GetAdjacentMonitorPicker(monitor, Reverse: false, GetFirst: true));
 	}
 
 	[Theory, AutoSubstituteData]

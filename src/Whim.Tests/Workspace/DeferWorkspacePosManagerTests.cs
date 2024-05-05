@@ -26,11 +26,11 @@ public class DeferWorkspacePosManagerTests
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
-		sut.DoLayout(workspace, triggers, windowStates);
+		bool result = sut.DoLayout(workspace, triggers, windowStates);
 
 		// Then
 		ctx.Store.Received(1).Dispatch(Arg.Any<WindowRemovedTransform>());
-		ctx.Butler.Pantry.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
+		Assert.False(result);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -51,11 +51,11 @@ public class DeferWorkspacePosManagerTests
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
-		sut.DoLayout(workspace, triggers, windowStates);
+		bool result = sut.DoLayout(workspace, triggers, windowStates);
 
 		// Then
 		ctx.Store.Received(1).Dispatch(Arg.Any<WindowRemovedTransform>());
-		ctx.Butler.Pantry.DidNotReceive().GetMonitorForWorkspace(Arg.Any<IWorkspace>());
+		Assert.False(result);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -68,12 +68,11 @@ public class DeferWorkspacePosManagerTests
 	{
 		// Given the workspace has no monitor
 		Dictionary<HWND, IWindowState> windowStates = new();
-		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
-		sut.DoLayout(workspace, triggers, windowStates);
+		bool result = sut.DoLayout(workspace, triggers, windowStates);
 
 		// Then
 		triggers.WorkspaceLayoutStarted.DidNotReceive().Invoke(Arg.Any<WorkspaceEventArgs>());
@@ -85,6 +84,7 @@ public class DeferWorkspacePosManagerTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
+		MutableRootSector rootSector,
 		IWorkspace workspace,
 		IMonitor monitor,
 		IWindow window,
@@ -94,7 +94,7 @@ public class DeferWorkspacePosManagerTests
 		// Given the workspace has a monitor
 		Dictionary<HWND, IWindowState> windowStatesDict = new() { { (HWND)3, Substitute.For<IWindowState>() }, };
 
-		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(monitor);
+		rootSector.Maps.MonitorWorkspaceMap = rootSector.Maps.MonitorWorkspaceMap.SetItem(monitor, workspace);
 
 		window.Handle.Returns((HWND)1);
 		window2.Handle.Returns((HWND)2);
@@ -119,7 +119,7 @@ public class DeferWorkspacePosManagerTests
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);
 
 		// When
-		sut.DoLayout(workspace, triggers, windowStatesDict);
+		bool result = sut.DoLayout(workspace, triggers, windowStatesDict);
 
 		// Then
 		triggers.WorkspaceLayoutStarted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());

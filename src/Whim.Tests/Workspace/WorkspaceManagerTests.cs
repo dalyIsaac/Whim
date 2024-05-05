@@ -42,13 +42,8 @@ public class WorkspaceManagerCustomization : ICustomization
 		fixture.Inject(monitors);
 
 		IContext ctx = fixture.Freeze<IContext>();
-		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
 		MonitorManagerUtils.SetupMonitors(ctx, monitors);
-
-		Butler butler = new(ctx, internalCtx);
-		ctx.Butler.Returns(butler);
-		internalCtx.ButlerEventHandlers.Returns(butler.EventHandlers);
 
 		// Don't route things.
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns((IWorkspace?)null);
@@ -196,7 +191,6 @@ public class WorkspaceManagerTests
 		workspaceManager.Add("john");
 		workspaceManager.Add("jane");
 		workspaceManager.Initialize();
-		ctx.Butler.Initialize();
 
 		// Then we will have two workspaces
 		IWorkspace[] workspaces = workspaceManager.ToArray();

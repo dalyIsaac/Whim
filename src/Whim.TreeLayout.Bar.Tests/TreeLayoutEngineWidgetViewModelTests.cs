@@ -192,7 +192,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 		plugin.GetAddWindowDirection(monitor).Returns(Direction.Down);
 
 		// When
-		ctx.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
+		ctx.Store.MapEvents.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = monitor,
@@ -216,7 +216,9 @@ public class TreeLayoutEngineWidgetViewModelTests
 			h => viewModel.PropertyChanged += h,
 			h => viewModel.PropertyChanged -= h,
 			() =>
-				ctx.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
+				ctx.Store.MapEvents.MonitorWorkspaceChanged += Raise.Event<
+					EventHandler<MonitorWorkspaceChangedEventArgs>
+				>(
 					new MonitorWorkspaceChangedEventArgs()
 					{
 						Monitor = Substitute.For<IMonitor>(),
@@ -294,7 +296,9 @@ public class TreeLayoutEngineWidgetViewModelTests
 		viewModel.Dispose();
 
 		// Then
-		ctx.Butler.Received(1).MonitorWorkspaceChanged -= Arg.Any<EventHandler<MonitorWorkspaceChangedEventArgs>>();
+		ctx.Store.MapEvents.Received(1).MonitorWorkspaceChanged -= Arg.Any<
+			EventHandler<MonitorWorkspaceChangedEventArgs>
+		>();
 		ctx.WorkspaceManager.Received(1).ActiveLayoutEngineChanged -= Arg.Any<
 			EventHandler<ActiveLayoutEngineChangedEventArgs>
 		>();

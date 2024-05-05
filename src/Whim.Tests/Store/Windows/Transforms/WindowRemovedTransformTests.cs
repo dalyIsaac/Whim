@@ -1,9 +1,8 @@
 using DotNext;
-using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class WindowRemovedTransformTests
 {
@@ -26,12 +25,7 @@ public class WindowRemovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void Success(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
 		WindowRemovedTransform sut = new(window);
@@ -42,8 +36,5 @@ public class WindowRemovedTransformTests
 		// Then
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
-		internalCtx
-			.ButlerEventHandlers.Received(1)
-			.OnWindowRemoved(Arg.Is<WindowRemovedEventArgs>(a => a.Window == window));
 	}
 }

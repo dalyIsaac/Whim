@@ -28,13 +28,15 @@ public class WindowFocusedTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void WindowIsNotNull_WindowIsTrackedByButler(
 		IContext ctx,
-		MutableRootSector mutableRootSector,
-		IWindow window
+		MutableRootSector root,
+		IWindow window,
+		IWorkspace workspace
 	)
 	{
 		// Given the window is tracked by the butler
-		ImmutableArray<IMonitor> monitors = Setup(mutableRootSector);
-		ctx.Butler.Pantry.GetMonitorForWindow(window).Returns(monitors[1]);
+		ImmutableArray<IMonitor> monitors = Setup(root);
+		root.Maps.MonitorWorkspaceMap = root.Maps.MonitorWorkspaceMap.SetItem(monitors[1], workspace);
+		root.Maps.WindowWorkspaceMap = root.Maps.WindowWorkspaceMap.SetItem(window, workspace);
 
 		WindowFocusedTransform sut = new(window);
 
@@ -42,8 +44,8 @@ public class WindowFocusedTransformTests
 		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor indices are updated.
-		Assert.Equal(1, mutableRootSector.Monitors.ActiveMonitorIndex);
-		Assert.Equal(1, mutableRootSector.Monitors.LastWhimActiveMonitorIndex);
+		Assert.Equal(1, root.Monitors.ActiveMonitorIndex);
+		Assert.Equal(1, root.Monitors.LastWhimActiveMonitorIndex);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -58,7 +60,6 @@ public class WindowFocusedTransformTests
 		Setup(mutableRootSector);
 
 		window.Handle.Returns((HWND)1);
-		ctx.Butler.Pantry.GetMonitorForWindow(window).Returns((IMonitor?)null);
 		internalCtx
 			.CoreNativeManager.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
 			.Returns((HMONITOR)2);

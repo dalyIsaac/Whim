@@ -15,11 +15,6 @@ internal partial class Butler : IButler
 
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
-	public void TriggerWindowRouted(RouteEventArgs args) => WindowRouted?.Invoke(this, args);
-
-	public void TriggerMonitorWorkspaceChanged(MonitorWorkspaceChangedEventArgs args) =>
-		MonitorWorkspaceChanged?.Invoke(this, args);
-
 	#region Chores
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>
 		_context.Store.Dispatch(new ActivateWorkspaceTransform(workspace, monitor));

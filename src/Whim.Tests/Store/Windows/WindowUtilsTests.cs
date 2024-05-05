@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using AutoFixture;
+using DotNext;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 internal class WindowUtilCustomization : ICustomization
 {
@@ -33,12 +34,10 @@ public class WindowUtilsTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void Butler_DoesNotContainWorkspaceForWindow(IContext ctx, IWindow window)
 	{
-		// Given the butler doesn't contain the window
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
-
+		// Given the map doesn't contain the window
 		// When we get the moved edges
 		var result = WindowUtils.GetMovedEdges(ctx, window);
 
@@ -46,11 +45,17 @@ public class WindowUtilsTests
 		Assert.Null(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Workspace_DoesNotContainWindow(IContext ctx, IWindow window, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Workspace_DoesNotContainWindow(
+		IContext ctx,
+		MutableRootSector rootSector,
+		IWindow window,
+		IWorkspace workspace
+	)
 	{
 		// Given the workspace doesn't contain the window
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		rootSector.Maps.WindowWorkspaceMap = rootSector.Maps.WindowWorkspaceMap.SetItem(window, workspace);
+
 		workspace.TryGetWindowState(window).ReturnsNull();
 
 		// When we get the moved edges
@@ -61,10 +66,16 @@ public class WindowUtilsTests
 	}
 
 	[Theory, AutoSubstituteData<WindowUtilCustomization>]
-	public void NativeManager_DoesNotHaveWindowRectangle(IContext ctx, IWindow window, IWorkspace workspace)
+	internal void NativeManager_DoesNotHaveWindowRectangle(
+		IContext ctx,
+		MutableRootSector rootSector,
+		IWindow window,
+		IWorkspace workspace
+	)
 	{
 		// Given we can't get the window position from the native manager
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		rootSector.Maps.WindowWorkspaceMap = rootSector.Maps.WindowWorkspaceMap.SetItem(window, workspace);
+
 		Setup_TryGetWindowState(window, workspace);
 		ctx.NativeManager.DwmGetWindowRectangle((HWND)1).ReturnsNull();
 
@@ -188,7 +199,8 @@ public class WindowUtilsTests
 	)
 	{
 		// Given the new window position
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		ctx.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(workspace));
+
 		Setup_TryGetWindowState(window, workspace, originalRect);
 		ctx.NativeManager.DwmGetWindowRectangle((HWND)1).Returns(newRect);
 

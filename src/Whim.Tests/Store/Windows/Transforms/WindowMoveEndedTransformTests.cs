@@ -15,7 +15,10 @@ public class WindowMoveEndedTransformTests
 		IRectangle<int> newRect = new Rectangle<int>() { Y = 4, Height = 3 };
 
 		IWorkspace workspace = Substitute.For<IWorkspace>();
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		mutableRootSector.Maps.WindowWorkspaceMap = mutableRootSector.Maps.WindowWorkspaceMap.SetItem(
+			window,
+			workspace
+		);
 		workspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -103,7 +106,6 @@ public class WindowMoveEndedTransformTests
 	{
 		// Given the window
 		mutableRootSector.Windows.IsMovingWindow = true;
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		internalCtx
 			.CoreNativeManager.GetCursorPos(out _)

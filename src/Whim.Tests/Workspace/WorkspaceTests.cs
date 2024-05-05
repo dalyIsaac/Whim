@@ -9,11 +9,7 @@ using Xunit;
 
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
@@ -47,13 +43,15 @@ public class WorkspaceCustomization : ICustomization
 	}
 }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceTests
 {
+	private static void AssertFocusMonitorDesktop(IInternalContext internalCtx) =>
+		internalCtx.CoreNativeManager.Received(1).SetForegroundWindow(Arg.Any<HWND>());
+
+	private static void AssertDidNotFocusMonitorDesktop(IInternalContext internalCtx) =>
+		internalCtx.CoreNativeManager.DidNotReceive().SetForegroundWindow(Arg.Any<HWND>());
+
 	[System.Diagnostics.CodeAnalysis.SuppressMessage(
 		"Style",
 		"IDE0017:Simplify object initialization",
@@ -427,7 +425,7 @@ public class WorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then the monitor is focused
-		ctx.Butler.Received(1).FocusMonitorDesktop(monitor);
+		AssertFocusMonitorDesktop(internalCtx);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -445,7 +443,7 @@ public class WorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then
-		ctx.Butler.DidNotReceive().FocusMonitorDesktop(Arg.Any<IMonitor>());
+		AssertDidNotFocusMonitorDesktop(internalCtx);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceCustomization>]
@@ -465,8 +463,8 @@ public class WorkspaceTests
 		// When FocusLastFocusedWindow is called
 		workspace.FocusLastFocusedWindow();
 
-		// Then
-		ctx.Butler.Received(1).FocusMonitorDesktop(monitor);
+		// Then the monitor is focused
+		AssertFocusMonitorDesktop(internalCtx);
 	}
 	#endregion
 
@@ -707,7 +705,6 @@ public class WorkspaceTests
 		workspace.WindowFocused(window);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-		ctx.Butler.ClearReceivedCalls();
 		internalCtx.CoreNativeManager.ClearReceivedCalls();
 
 		// When RemoveWindow is called
@@ -743,7 +740,6 @@ public class WorkspaceTests
 		window2.IsMinimized.Returns(true);
 
 		ILayoutEngine givenEngine = workspace.ActiveLayoutEngine;
-		ctx.Butler.ClearReceivedCalls();
 		internalCtx.CoreNativeManager.ClearReceivedCalls();
 
 		// When RemoveWindow is called

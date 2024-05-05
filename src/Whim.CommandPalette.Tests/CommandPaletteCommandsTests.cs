@@ -72,7 +72,7 @@ public class CommandPaletteCommandsTests
 		activeWorkspaceCommand.TryExecute();
 
 		// Verify that the workspace was activated.
-		wrapper.Context.Butler.Received(1).Activate(wrapper.OtherWorkspace, null);
+		wrapper.Context.Store.Received(1).Dispatch(new ActivateWorkspaceTransform(wrapper.OtherWorkspace, null));
 	}
 
 	[Fact]
@@ -167,7 +167,7 @@ public class CommandPaletteCommandsTests
 		command.TryExecute();
 
 		// Verify that MoveWindowToWorkspace was called with the workspace.
-		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace, null);
+		wrapper.Context.Store.Received(1).Dispatch(new MoveWindowToWorkspaceTransform(wrapper.Workspace, null));
 	}
 
 	[Fact]
@@ -201,8 +201,12 @@ public class CommandPaletteCommandsTests
 
 		// Then
 		command.TryExecute();
-		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[0]);
-		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[1]);
+		wrapper
+			.Context.Store.Received(1)
+			.Dispatch(new MoveWindowToWorkspaceTransform(wrapper.Workspace, wrapper.Windows[0]));
+		wrapper
+			.Context.Store.Received(1)
+			.Dispatch(new MoveWindowToWorkspaceTransform(wrapper.Workspace, wrapper.Windows[1]));
 	}
 
 	[Fact]

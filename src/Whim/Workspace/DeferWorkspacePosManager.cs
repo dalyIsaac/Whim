@@ -14,7 +14,7 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		_internalContext = internalContext;
 	}
 
-	public void DoLayout(
+	public bool DoLayout(
 		IWorkspace workspace,
 		WorkspaceManagerTriggers triggers,
 		Dictionary<HWND, IWindowState> windowStates
@@ -25,14 +25,14 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		if (GarbageCollect(workspace))
 		{
 			Logger.Debug($"Garbage collected windows, skipping layout for workspace {workspace}");
-			return;
+			return false;
 		}
 
 		// Get the monitor for this workspace
 		if (!_context.Store.Pick(Pickers.GetMonitorForWorkspace(workspace)).TryGet(out IMonitor monitor))
 		{
 			Logger.Debug($"No active monitors found for workspace {workspace}.");
-			return;
+			return false;
 		}
 
 		Logger.Debug($"Starting layout for workspace {workspace}");
@@ -42,6 +42,7 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 		SetWindowPos(workspace, monitor, windowStates);
 
 		triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = workspace });
+		return true;
 	}
 
 	private void SetWindowPos(IWorkspace workspace, IMonitor monitor, Dictionary<HWND, IWindowState> windowStates)

@@ -17,5 +17,8 @@ internal interface IDeferWorkspacePosManager
 	/// The window states dictionary to populate with the new window states.
 	/// The old window states should be removed from this dictionary.
 	/// </param>
-	void DoLayout(IWorkspace workspace, WorkspaceManagerTriggers triggers, Dictionary<HWND, IWindowState> windowStates);
+	/// <returns>
+	/// Whether a layout was performed.
+	/// </returns>
+	bool DoLayout(IWorkspace workspace, WorkspaceManagerTriggers triggers, Dictionary<HWND, IWindowState> windowStates);
 }

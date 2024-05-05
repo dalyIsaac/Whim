@@ -1,6 +1,4 @@
 using DotNext;
-using NSubstitute;
-using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Xunit;
 
@@ -44,15 +42,9 @@ public class WindowHiddenTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Failed(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void Failed(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		ctx.Butler.Pantry.GetMonitorForWindow(window).ReturnsNull();
 		WindowHiddenTransform sut = new(window);
 
 		// When
@@ -60,20 +52,27 @@ public class WindowHiddenTransformTests
 
 		// Then
 		Assert.True(result.IsSuccessful);
-		internalCtx.ButlerEventHandlers.DidNotReceive().OnWindowRemoved(Arg.Any<WindowRemovedEventArgs>());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void Success(
 		IContext ctx,
-		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector,
-		IWindow window,
-		IMonitor monitor
+		IMonitor monitor,
+		IWorkspace workspace,
+		IWindow window
 	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
+		mutableRootSector.Maps.WindowWorkspaceMap = mutableRootSector.Maps.WindowWorkspaceMap.SetItem(
+			window,
+			workspace
+		);
+
 		WindowHiddenTransform sut = new(window);
 
 		// When
@@ -82,8 +81,5 @@ public class WindowHiddenTransformTests
 		// Then
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
-		internalCtx
-			.ButlerEventHandlers.Received(1)
-			.OnWindowRemoved(Arg.Is<WindowRemovedEventArgs>(a => a.Window == window));
 	}
 }
