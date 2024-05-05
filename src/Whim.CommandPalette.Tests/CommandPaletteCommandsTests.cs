@@ -1,3 +1,4 @@
+using DotNext;
 using FluentAssertions;
 using NSubstitute;
 using Whim.TestUtils;
@@ -341,7 +342,9 @@ public class CommandPaletteCommandsTests
 		// Given the window is not in a workspace.
 		Wrapper wrapper = new();
 		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+		wrapper
+			.Context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>())
+			.Returns(Result.FromException<IWorkspace>(new Exception("Not found")));
 
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
@@ -362,8 +365,13 @@ public class CommandPaletteCommandsTests
 		// Given the window is in a workspace.
 		Wrapper wrapper = new();
 		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-		wrapper.Context.Butler.Pantry.GetMonitorForWorkspace(wrapper.Workspace).Returns(Substitute.For<IMonitor>());
+
+		wrapper
+			.Context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>())
+			.Returns(Result.FromValue(wrapper.Workspace));
+		wrapper
+			.Context.Store.Pick(Arg.Any<PurePicker<Result<IMonitor>>>())
+			.Returns(Result.FromValue(Substitute.For<IMonitor>()));
 
 		window.IsMinimized.Returns(isMinimized);
 
@@ -386,8 +394,13 @@ public class CommandPaletteCommandsTests
 		// Given the window is in a workspace.
 		Wrapper wrapper = new();
 		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-		wrapper.Context.Butler.Pantry.GetMonitorForWorkspace(wrapper.Workspace).Returns((IMonitor?)null);
+
+		wrapper
+			.Context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>())
+			.Returns(Result.FromValue(wrapper.Workspace));
+		wrapper
+			.Context.Store.Pick(Arg.Any<PurePicker<Result<IMonitor>>>())
+			.Returns(Result.FromException<IMonitor>(new Exception("Not found")));
 
 		window.IsMinimized.Returns(isMinimized);
 

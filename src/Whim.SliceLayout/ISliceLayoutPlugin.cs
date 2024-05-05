@@ -55,7 +55,10 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// The window to promote. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
 	/// is used.
 	/// </param>
-	void PromoteWindowInStack(IWindow? window = null);
+	/// <returns>
+	/// Whether the <see cref="SliceLayoutEngine"/> will attempt to promote the window.
+	/// </returns>
+	bool PromoteWindowInStack(IWindow? window = null);
 
 	/// <summary>
 	/// Demotes the given window in the stack.
@@ -64,7 +67,10 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// The window to demote. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
 	/// is used.
 	/// </param>
-	void DemoteWindowInStack(IWindow? window = null);
+	/// <returns>
+	/// Whether the <see cref="SliceLayoutEngine"/> will attempt to demote the window.
+	/// </returns>
+	bool DemoteWindowInStack(IWindow? window = null);
 
 	/// <summary>
 	/// Promotes the focus to the next slice with a lower order - see <see cref="SliceArea.Order"/>.
@@ -73,7 +79,10 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// The current window. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
 	/// is used.
 	/// </param>
-	void PromoteFocusInStack(IWindow? window = null);
+	/// <returns>
+	/// Whether the <see cref="SliceLayoutEngine"/> will attempt to promote the focus.
+	/// </returns>
+	bool PromoteFocusInStack(IWindow? window = null);
 
 	/// <summary>
 	/// Demotes the focus to the next slice with a higher order - see <see cref="SliceArea.Order"/>.
@@ -82,5 +91,8 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// The current window. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
 	/// is used.
 	/// </param>
-	void DemoteFocusInStack(IWindow? window = null);
+	/// <returns>
+	/// Whether the <see cref="SliceLayoutEngine"/> will attempt to demote the focus.
+	/// </returns>
+	bool DemoteFocusInStack(IWindow? window = null);
 }

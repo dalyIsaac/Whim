@@ -7,7 +7,7 @@ namespace Whim.TreeLayout.Tests;
 
 public class TreeLayoutPluginTests
 {
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void Name(IContext ctx)
 	{
 		// Given
@@ -20,7 +20,7 @@ public class TreeLayoutPluginTests
 		Assert.Equal("whim.tree_layout", name);
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void PluginCommands(IContext ctx)
 	{
 		// Given
@@ -33,7 +33,7 @@ public class TreeLayoutPluginTests
 		Assert.NotEmpty(commands.Commands);
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void PreInitialize(IContext ctx)
 	{
 		// Given
@@ -46,7 +46,7 @@ public class TreeLayoutPluginTests
 		CustomAssert.NoContextCalls(ctx);
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void PostInitialize(IContext ctx)
 	{
 		// Given
@@ -60,7 +60,7 @@ public class TreeLayoutPluginTests
 	}
 
 	#region GetAddWindowDirection
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void GetAddWindowDirection_Monitor_NoLayoutEngine(IContext ctx, IMonitor monitor)
 	{
 		// Given
@@ -73,16 +73,20 @@ public class TreeLayoutPluginTests
 		Assert.Null(direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Monitor_IsNotTreeLayoutEngine(
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetAddWindowDirection_Monitor_IsNotTreeLayoutEngine(
 		IContext ctx,
 		IMonitor monitor,
 		IWorkspace workspace,
-		ILayoutEngine layoutEngine
+		ILayoutEngine layoutEngine,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
 		workspace.ActiveLayoutEngine.Returns(layoutEngine);
 
 		TreeLayoutPlugin plugin = new(ctx);
@@ -94,11 +98,19 @@ public class TreeLayoutPluginTests
 		Assert.Null(direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Monitor_LazyInit(IContext ctx, IMonitor monitor, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetAddWindowDirection_Monitor_LazyInit(
+		IContext ctx,
+		IMonitor monitor,
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -113,11 +125,19 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Right, direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Monitor_AlreadyInit(IContext ctx, IMonitor monitor, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetAddWindowDirection_Monitor_AlreadyInit(
+		IContext ctx,
+		IMonitor monitor,
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -134,7 +154,7 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Left, direction);
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void GetAddWindowDirection_Engine_LazyInit(IContext ctx)
 	{
 		// Given
@@ -148,7 +168,7 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Right, direction);
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void GetAddWindowDirection_Engine_AlreadyInit(IContext ctx)
 	{
 		// Given
@@ -166,8 +186,8 @@ public class TreeLayoutPluginTests
 	#endregion
 
 	#region SetAddWindowDirection
-	[Theory, AutoSubstituteData]
-	public void SetAddWindowDirection_NoLayoutEngine(IContext ctx, IMonitor monitor)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void SetAddWindowDirection_NoLayoutEngine(IContext ctx, IMonitor monitor)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -180,16 +200,20 @@ public class TreeLayoutPluginTests
 		Assert.Null(direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SetAddWindowDirection_NotTreeLayoutEngine(
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void SetAddWindowDirection_NotTreeLayoutEngine(
 		IContext ctx,
 		IMonitor monitor,
 		IWorkspace workspace,
-		ILayoutEngine layoutEngine
+		ILayoutEngine layoutEngine,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -203,11 +227,19 @@ public class TreeLayoutPluginTests
 		Assert.Null(direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SetAddWindowDirection_DirectionNotSet(IContext ctx, IMonitor monitor, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void SetAddWindowDirection_DirectionNotSet(
+		IContext ctx,
+		IMonitor monitor,
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -232,11 +264,19 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Up, direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SetAddWindowDirection_DirectionAlreadySet(IContext ctx, IMonitor monitor, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void SetAddWindowDirection_DirectionAlreadySet(
+		IContext ctx,
+		IMonitor monitor,
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
 
 		TreeLayoutPlugin plugin = new(ctx);
 
@@ -263,7 +303,7 @@ public class TreeLayoutPluginTests
 	}
 	#endregion
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void LoadState(IContext ctx)
 	{
 		// Given
@@ -276,7 +316,7 @@ public class TreeLayoutPluginTests
 		CustomAssert.NoContextCalls(ctx);
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void SaveState(IContext ctx)
 	{
 		// Given

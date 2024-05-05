@@ -5,17 +5,25 @@ using Xunit;
 
 namespace Whim.Bar.Tests;
 
-public class WorkspaceWidgetViewModelCustomization : ICustomization
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+internal class WorkspaceWidgetViewModelCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
-		IContext context = fixture.Freeze<IContext>();
+		IContext ctx = fixture.Freeze<IContext>();
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
 		// The workspace manager should have a single workspace
 		using IWorkspace workspace = fixture.Create<IWorkspace>();
-		context.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
+		ctx.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
 
-		fixture.Inject(context);
+		Store store = new(ctx, internalCtx);
+		ctx.Store.Returns(store);
+
+		fixture.Inject(store._root);
+		fixture.Inject(store._root.MutableRootSector);
+
+		fixture.Inject(ctx);
 	}
 }
 
@@ -38,14 +46,12 @@ public class WorkspaceWidgetViewModelTests
 		// Then
 		Assert.Single(viewModel.Workspaces);
 		Assert.Equal(workspace, viewModel.Workspaces[0].Workspace);
-		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(workspace);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
 	public void WorkspaceManager_WorkspaceAdded(IContext context, IMonitor monitor, IWorkspace addedWorkspace)
 	{
 		// Given
-		IWorkspace workspace = context.WorkspaceManager.First();
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// When
@@ -56,8 +62,6 @@ public class WorkspaceWidgetViewModelTests
 
 		// Then
 		Assert.Equal(2, viewModel.Workspaces.Count);
-		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(workspace);
-		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(addedWorkspace);
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
@@ -128,15 +132,20 @@ public class WorkspaceWidgetViewModelTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_MonitorWorkspaceChanged_Activate(
+	internal void WorkspaceManager_MonitorWorkspaceChanged_Activate(
 		IContext context,
 		IMonitor monitor,
-		IWorkspace addedWorkspace
+		IWorkspace addedWorkspace,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given
 		IWorkspace workspace = context.WorkspaceManager.First();
-		context.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
+
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// Add workspace
@@ -168,16 +177,21 @@ public class WorkspaceWidgetViewModelTests
 	}
 
 	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor(
+	internal void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor(
 		IContext context,
 		IMonitor monitor,
 		IWorkspace addedWorkspace,
-		IMonitor otherMonitor
+		IMonitor otherMonitor,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given
 		IWorkspace workspace = context.WorkspaceManager.First();
-		context.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			otherMonitor,
+			workspace
+		);
+
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);
 
 		// Add workspace

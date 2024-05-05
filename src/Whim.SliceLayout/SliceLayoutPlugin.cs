@@ -52,16 +52,16 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 	public JsonElement? SaveState() => null;
 
 	/// <inheritdoc />
-	public void PromoteWindowInStack(IWindow? window = null) => ChangeWindowRank(window, promote: true);
+	public bool PromoteWindowInStack(IWindow? window = null) => ChangeWindowRank(window, promote: true);
 
 	/// <inheritdoc />
-	public void DemoteWindowInStack(IWindow? window = null) => ChangeWindowRank(window, promote: false);
+	public bool DemoteWindowInStack(IWindow? window = null) => ChangeWindowRank(window, promote: false);
 
-	private void ChangeWindowRank(IWindow? window, bool promote)
+	private bool ChangeWindowRank(IWindow? window, bool promote)
 	{
 		if (GetWindowWithRankDelta(window, promote) is not (IWindow definedWindow, IWorkspace workspace))
 		{
-			return;
+			return false;
 		}
 
 		workspace.PerformCustomLayoutEngineAction(
@@ -71,6 +71,8 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 				Window = definedWindow
 			}
 		);
+
+		return true;
 	}
 
 	private (IWindow, IWorkspace)? GetWindowWithRankDelta(IWindow? window, bool promote)
@@ -93,16 +95,16 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 	}
 
 	/// <inheritdoc />
-	public void PromoteFocusInStack(IWindow? window = null) => FocusWindowRank(window, promote: true);
+	public bool PromoteFocusInStack(IWindow? window = null) => FocusWindowRank(window, promote: true);
 
 	/// <inheritdoc />
-	public void DemoteFocusInStack(IWindow? window = null) => FocusWindowRank(window, promote: false);
+	public bool DemoteFocusInStack(IWindow? window = null) => FocusWindowRank(window, promote: false);
 
-	private void FocusWindowRank(IWindow? window, bool promote)
+	private bool FocusWindowRank(IWindow? window, bool promote)
 	{
 		if (GetWindowWithRankDelta(window, promote) is not (IWindow definedWindow, IWorkspace workspace))
 		{
-			return;
+			return false;
 		}
 
 		workspace.PerformCustomLayoutEngineAction(
@@ -112,5 +114,6 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 				Window = definedWindow
 			}
 		);
+		return true;
 	}
 }

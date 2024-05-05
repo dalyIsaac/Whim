@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using NSubstitute;
 using Whim.CommandPalette;
@@ -6,11 +7,13 @@ using Xunit;
 
 namespace Whim.TreeLayout.CommandPalette.Tests;
 
-public class TreeLayoutCommandPaletteCommandsCustomization : ICustomization
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+internal class TreeLayoutCommandPaletteCommandsCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
 		IContext ctx = fixture.Freeze<IContext>();
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 		IMonitor monitor = fixture.Freeze<IMonitor>();
 
 		ctx.MonitorManager.ActiveMonitor.Returns(monitor);
@@ -24,6 +27,13 @@ public class TreeLayoutCommandPaletteCommandsCustomization : ICustomization
 		TreeLayoutCommandPalettePluginCommands commands =
 			new(ctx, treeLayoutCommandPalettePlugin, treeLayoutPlugin, commandPalettePlugin);
 		fixture.Inject(commands);
+
+		// Set up the store.
+		Store store = new(ctx, internalCtx);
+		ctx.Store.Returns(store);
+
+		fixture.Inject(store._root);
+		fixture.Inject(store._root.MutableRootSector);
 	}
 }
 
@@ -102,16 +112,19 @@ public class TreeLayoutCommandPaletteCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
-	public void SetDirectionCommand_FailsWhenNoActiveTreeLayoutEngine(
+	internal void SetDirectionCommand_FailsWhenNoActiveTreeLayoutEngine(
 		TreeLayoutCommandPalettePluginCommands commands,
 		ITreeLayoutPlugin treeLayoutPlugin,
 		IMonitor monitor,
-		IContext ctx,
-		IWorkspace workspace
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
 		workspace.ActiveLayoutEngine.Returns((ILayoutEngine?)null);
 
 		// When

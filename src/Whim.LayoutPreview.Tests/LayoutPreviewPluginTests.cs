@@ -7,11 +7,13 @@ using Xunit;
 
 namespace Whim.LayoutPreview.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class LayoutPreviewPluginCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
 		IContext ctx = fixture.Freeze<IContext>();
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
 		IWorkspace workspace = fixture.Freeze<IWorkspace>();
 
@@ -27,7 +29,15 @@ public class LayoutPreviewPluginCustomization : ICustomization
 		);
 
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitor);
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns(workspace);
+
+		Store store = new(ctx, internalCtx);
+		ctx.Store.Returns(store);
+
+		fixture.Inject(store._root);
+		fixture.Inject(store._root.MutableRootSector);
+
+		store._root.MutableRootSector.Maps.MonitorWorkspaceMap =
+			store._root.MutableRootSector.Maps.MonitorWorkspaceMap.SetItem(monitor, workspace);
 	}
 }
 
@@ -197,7 +207,6 @@ public class LayoutPreviewPluginTests
 				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
 
 		workspace.ActiveLayoutEngine.ClearReceivedCalls();
 
@@ -207,7 +216,6 @@ public class LayoutPreviewPluginTests
 
 		// Then
 		ctx.MonitorManager.Received(1).GetMonitorAtPoint(Arg.Any<IPoint<int>>());
-		ctx.Butler.Pantry.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
 		Assert.Empty(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Null(plugin.DraggedWindow);
 	}
@@ -233,7 +241,6 @@ public class LayoutPreviewPluginTests
 
 		// Then
 		ctx.MonitorManager.Received(1).GetMonitorAtPoint(Arg.Any<IPoint<int>>());
-		ctx.Butler.Pantry.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
 		Assert.Single(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Equal(window, plugin.DraggedWindow);
 	}

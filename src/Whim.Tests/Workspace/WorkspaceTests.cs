@@ -9,6 +9,11 @@ using Xunit;
 
 namespace Whim.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+	"Reliability",
+	"CA2000:Dispose objects before losing scope",
+	Justification = "Unnecessary for tests"
+)]
 public class WorkspaceCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
@@ -32,6 +37,13 @@ public class WorkspaceCustomization : ICustomization
 				WorkspaceRenamed = Substitute.For<Action<WorkspaceRenamedEventArgs>>(),
 			};
 		fixture.Inject(triggers);
+
+		// Set up the store.
+		Store store = new(ctx, internalCtx);
+		ctx.Store.Returns(store);
+
+		fixture.Inject(store._root);
+		fixture.Inject(store._root.MutableRootSector);
 	}
 }
 
@@ -124,8 +136,6 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
-
 		Workspace workspace =
 			new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine, layoutEngine2 });
 		ILayoutEngine activeLayoutEngine = workspace.ActiveLayoutEngine;
@@ -197,7 +207,6 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns(null as IMonitor);
 		layoutEngine.Name.Returns("Layout");
 
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
@@ -398,6 +407,7 @@ public class WorkspaceTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
+		MutableRootSector mutableRootSector,
 		ILayoutEngine layoutEngine,
 		IWindow window,
 		IMonitor monitor
@@ -405,7 +415,7 @@ public class WorkspaceTests
 	{
 		// Given the window is in the workspace
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ctx.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.Add(monitor, workspace);
 
 		workspace.AddWindow(window);
 		window.IsMinimized.Returns(true);
@@ -430,7 +440,6 @@ public class WorkspaceTests
 	{
 		// Given there are no windows in the workspace, and the workspace is not on a monitor
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ctx.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns((IMonitor?)null);
 
 		// When FocusLastFocusedWindow is called
 		workspace.FocusLastFocusedWindow();
@@ -444,13 +453,14 @@ public class WorkspaceTests
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceManagerTriggers triggers,
+		MutableRootSector mutableRootSector,
 		ILayoutEngine layoutEngine,
 		IMonitor monitor
 	)
 	{
 		// Given there are no windows in the workspace, and the workspace is on a monitor
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
-		ctx.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.Add(monitor, workspace);
 
 		// When FocusLastFocusedWindow is called
 		workspace.FocusLastFocusedWindow();
@@ -1161,8 +1171,6 @@ public class WorkspaceTests
 	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetMonitorForWorkspace(Arg.Any<IWorkspace>()).Returns((IMonitor?)null);
-
 		Workspace workspace = new(ctx, internalCtx, triggers, "Workspace", new ILayoutEngine[] { layoutEngine });
 		workspace.AddWindow(window);
 

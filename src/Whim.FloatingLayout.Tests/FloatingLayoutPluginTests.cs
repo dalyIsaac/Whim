@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AutoFixture;
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
@@ -128,7 +129,7 @@ public class FloatingLayoutPluginTests
 				WindowSize = WindowSize.Normal
 			};
 
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(activeWorkspace));
 		activeWorkspace.TryGetWindowState(window).Returns(windowState);
 		context.MonitorManager.GetMonitorAtPoint(rect).Returns(monitor);
 
@@ -164,7 +165,9 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		FloatingLayoutPlugin plugin = CreateSut(context);
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+		context
+			.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>())
+			.Returns(Result.FromException<IWorkspace>(new Exception("welp")));
 
 		// When
 		plugin.MarkWindowAsFloating(window);
@@ -183,7 +186,9 @@ public class FloatingLayoutPluginTests
 		// Given
 		FloatingLayoutPlugin plugin = CreateSut(context);
 
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
+		context
+			.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>())
+			.Returns(Result.FromException<IWorkspace>(new Exception("welp")));
 		activeWorkspace.LastFocusedWindow.Returns(window);
 
 		// When
@@ -197,7 +202,7 @@ public class FloatingLayoutPluginTests
 	public void MarkWindowAsFloating_NoWindowState(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(activeWorkspace));
 		activeWorkspace.TryGetWindowState(window).Returns((IWindowState?)null);
 
 		FloatingLayoutPlugin plugin = CreateSut(context);
@@ -213,7 +218,7 @@ public class FloatingLayoutPluginTests
 	public void MarkWindowAsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(activeWorkspace));
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -257,7 +262,7 @@ public class FloatingLayoutPluginTests
 	public void MarkWindowAsDocked_WindowIsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(activeWorkspace));
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -299,7 +304,7 @@ public class FloatingLayoutPluginTests
 	public void ToggleWindowFloating_ToFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(activeWorkspace));
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -325,7 +330,7 @@ public class FloatingLayoutPluginTests
 	public void ToggleWindowFloating_ToDocked(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(activeWorkspace));
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -405,7 +410,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(activeWorkspace));
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(
@@ -450,7 +455,7 @@ public class FloatingLayoutPluginTests
 		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
 		layoutEngine2.Identity.Returns(new LayoutEngineIdentity());
 
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(activeWorkspace));
 		activeWorkspace
 			.TryGetWindowState(window)
 			.Returns(

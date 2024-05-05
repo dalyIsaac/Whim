@@ -8,8 +8,8 @@ namespace Whim.SliceLayout.Tests;
 
 public class SliceLayoutPluginTests
 {
-	[Theory, AutoSubstituteData]
-	public void Name(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Name(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
@@ -21,8 +21,8 @@ public class SliceLayoutPluginTests
 		Assert.Equal("whim.slice_layout", name);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PluginCommands(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PluginCommands(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
@@ -34,8 +34,8 @@ public class SliceLayoutPluginTests
 		Assert.NotEmpty(commands.Commands);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PreInitialize(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PreInitialize(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
@@ -47,8 +47,8 @@ public class SliceLayoutPluginTests
 		CustomAssert.NoContextCalls(ctx);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PostInitialize(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PostInitialize(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
@@ -60,8 +60,8 @@ public class SliceLayoutPluginTests
 		CustomAssert.NoContextCalls(ctx);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void LoadState(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void LoadState(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
@@ -73,8 +73,8 @@ public class SliceLayoutPluginTests
 		CustomAssert.NoContextCalls(ctx);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SaveState(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void SaveState(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
@@ -87,47 +87,55 @@ public class SliceLayoutPluginTests
 	}
 
 	#region PromoteWindowInStack
-	[Theory, AutoSubstituteData]
-	public void PromoteWindowInStack_NoWindow(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PromoteWindowInStack_NoWindow(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.ReturnsNull();
 
 		// When
-		plugin.PromoteWindowInStack();
+		bool result = plugin.PromoteWindowInStack();
 
 		// Then nothing
-		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		Assert.False(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PromoteWindowInStack_NoWorkspace(IContext ctx, IWindow window)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PromoteWindowInStack_NoWorkspace(IContext ctx, IWindow window)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		// When
-		plugin.PromoteWindowInStack(window);
+		bool result = plugin.PromoteWindowInStack(window);
 
 		// Then nothing
 		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
 		activeWorkspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
 		activeWorkspace.DidNotReceive().DoLayout();
+		Assert.False(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PromoteWindowInStack(IContext ctx, IWindow window, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PromoteWindowInStack(
+		IContext ctx,
+		IWindow window,
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		mutableRootSector.Maps.WindowWorkspaceMap = mutableRootSector.Maps.WindowWorkspaceMap.SetItem(
+			window,
+			workspace
+		);
 
 		// When
-		plugin.PromoteWindowInStack(window);
+		bool result = plugin.PromoteWindowInStack(window);
 
 		// Then
 		workspace
@@ -141,47 +149,55 @@ public class SliceLayoutPluginTests
 	#endregion
 
 	#region DemoteWindowInStack
-	[Theory, AutoSubstituteData]
-	public void DemoteWindowInStack_NoWindow(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DemoteWindowInStack_NoWindow(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.ReturnsNull();
 
 		// When
-		plugin.DemoteWindowInStack();
+		bool result = plugin.DemoteWindowInStack();
 
 		// Then nothing
-		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		Assert.False(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void DemoteWindowInStack_NoWorkspace(IContext ctx, IWindow window)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DemoteWindowInStack_NoWorkspace(IContext ctx, IWindow window)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		// When
-		plugin.DemoteWindowInStack(window);
+		bool result = plugin.DemoteWindowInStack(window);
 
 		// Then nothing
 		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
 		activeWorkspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
 		activeWorkspace.DidNotReceive().DoLayout();
+		Assert.False(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void DemoteWindowInStack(IContext ctx, IWindow window, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DemoteWindowInStack(
+		IContext ctx,
+		IWindow window,
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		mutableRootSector.Maps.WindowWorkspaceMap = mutableRootSector.Maps.WindowWorkspaceMap.SetItem(
+			window,
+			workspace
+		);
 
 		// When
-		plugin.DemoteWindowInStack(window);
+		bool result = plugin.DemoteWindowInStack(window);
 
 		// Then
 		workspace
@@ -191,6 +207,7 @@ public class SliceLayoutPluginTests
 					action.Name == plugin.DemoteWindowActionName && action.Window == window
 				)
 			);
+		Assert.True(result);
 	}
 	#endregion
 
@@ -212,46 +229,54 @@ public class SliceLayoutPluginTests
 	}
 
 	#region PromoteFocusInStack
-	[Theory, AutoSubstituteData]
-	public void PromoteFocusInStack_NoWindow(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PromoteFocusInStack_NoWindow(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.ReturnsNull();
 
 		// When
-		plugin.PromoteFocusInStack();
+		bool result = plugin.PromoteFocusInStack();
 
 		// Then nothing
-		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		Assert.False(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PromoteFocusInStack_NoWorkspace(IContext ctx, IWindow window)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PromoteFocusInStack_NoWorkspace(IContext ctx, IWindow window)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		// When
-		plugin.PromoteFocusInStack(window);
+		bool result = plugin.PromoteFocusInStack(window);
 
 		// Then nothing
 		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
 			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		Assert.False(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PromoteFocusInStack(IContext ctx, IWindow window, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PromoteFocusInStack(
+		IContext ctx,
+		IWindow window,
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		mutableRootSector.Maps.WindowWorkspaceMap = mutableRootSector.Maps.WindowWorkspaceMap.SetItem(
+			window,
+			workspace
+		);
 
 		// When
-		plugin.PromoteFocusInStack(window);
+		bool result = plugin.PromoteFocusInStack(window);
 
 		// Then
 		workspace
@@ -261,50 +286,59 @@ public class SliceLayoutPluginTests
 					action.Name == plugin.PromoteFocusActionName && action.Window == window
 				)
 			);
+		Assert.True(result);
 	}
 	#endregion
 
 	#region DemoteFocusInStack
-	[Theory, AutoSubstituteData]
-	public void DemoteFocusInStack_NoWindow(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DemoteFocusInStack_NoWindow(IContext ctx)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.ReturnsNull();
 
 		// When
-		plugin.DemoteFocusInStack();
+		bool result = plugin.DemoteFocusInStack();
 
 		// Then nothing
-		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		Assert.False(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void DemoteFocusInStack_NoWorkspace(IContext ctx, IWindow window)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DemoteFocusInStack_NoWorkspace(IContext ctx, IWindow window)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		// When
-		plugin.DemoteFocusInStack(window);
+		bool result = plugin.DemoteFocusInStack(window);
 
 		// Then nothing
 		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
 			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		Assert.False(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void DemoteFocusInStack(IContext ctx, IWindow window, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DemoteFocusInStack(
+		IContext ctx,
+		IWindow window,
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
+	)
 	{
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		mutableRootSector.Maps.WindowWorkspaceMap = mutableRootSector.Maps.WindowWorkspaceMap.SetItem(
+			window,
+			workspace
+		);
 
 		// When
-		plugin.DemoteFocusInStack(window);
+		bool result = plugin.DemoteFocusInStack(window);
 
 		// Then
 		workspace
@@ -314,6 +348,7 @@ public class SliceLayoutPluginTests
 					action.Name == plugin.DemoteFocusActionName && action.Window == window
 				)
 			);
+		Assert.True(result);
 	}
 	#endregion
 }

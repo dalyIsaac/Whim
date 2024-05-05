@@ -1,3 +1,4 @@
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
@@ -10,33 +11,35 @@ public class NextLayoutEngineCommandTests
 	private static ActiveLayoutWidgetViewModel CreateSut(IContext context, IMonitor monitor) => new(context, monitor);
 
 	[Theory, AutoSubstituteData]
-	public void Execute(IContext context, IMonitor monitor)
+	public void Execute_CycleLayoutEngine(IContext context, IMonitor monitor, IWorkspace workspace)
 	{
-		// Given
+		// Given the picker returns a workspace.
 		ActiveLayoutWidgetViewModel viewModel = CreateSut(context, monitor);
 		NextLayoutEngineCommand command = new(context, viewModel);
+
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromValue(workspace));
 
 		// When
 		command.Execute(null);
 
 		// Then
-		context.Butler.Pantry.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
-		context.Butler.Pantry.GetWorkspaceForMonitor(monitor)!.Received(1).CycleLayoutEngine(false);
+		workspace.Received(1).CycleLayoutEngine(false);
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Execute_NoWorkspaceForMonitor(IContext context, IMonitor monitor)
+	public void Execute_NoWorkspaceForMonitor(IContext context, IMonitor monitor, IWorkspace workspace)
 	{
-		// Given
+		// Given the picker doesn't return a workspace
 		ActiveLayoutWidgetViewModel viewModel = CreateSut(context, monitor);
 		NextLayoutEngineCommand command = new(context, viewModel);
-		context.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns((IWorkspace?)null);
+
+		context.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>()).Returns(Result.FromException<IWorkspace>(new Exception("welp")));
 
 		// When
 		command.Execute(null);
 
 		// Then
-		context.Butler.Pantry.Received(1).GetWorkspaceForMonitor(Arg.Any<IMonitor>());
+		workspace.DidNotReceive().CycleLayoutEngine(false);
 	}
 
 	[Theory, AutoSubstituteData]

@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Whim.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class DeferWindowPosManagerCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
@@ -24,6 +25,13 @@ public class DeferWindowPosManagerCustomization : ICustomization
 
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 		internalCtx.DeferWindowPosManager.ParallelOptions.Returns(new ParallelOptions { MaxDegreeOfParallelism = 1 });
+
+		IContext ctx = fixture.Freeze<IContext>();
+		Store store = new(ctx, internalCtx);
+		ctx.Store.Returns(store);
+
+		fixture.Inject(store._root);
+		fixture.Inject(store._root.MutableRootSector);
 	}
 }
 
@@ -42,10 +50,10 @@ public class DeferWindowPosManagerTests
 		// Given no windows are provided
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		// When RecoverLayout is called
-		manager.RecoverLayout();
+		bool didPerformLayout = manager.RecoverLayout();
 
-		// Then no calls to Butler.Pantry.GetWorkspaceForWindow are made
-		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		// Then no layout is performed
+		Assert.False(didPerformLayout);
 	}
 
 	[Theory, AutoSubstituteData<DeferWindowPosManagerCustomization>]
@@ -54,7 +62,8 @@ public class DeferWindowPosManagerTests
 		IInternalContext internalCtx,
 		WindowPosState windowPosState,
 		WindowPosState minimizedWindowPosState,
-		IWorkspace workspace
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given a window is provided, and a workspace is found for it
@@ -62,14 +71,18 @@ public class DeferWindowPosManagerTests
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState }, new() { minimizedWindowPosState });
 
-		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns(workspace);
+		mutableRootSector.Maps.WindowWorkspaceMap = mutableRootSector.Maps.WindowWorkspaceMap.Add(
+			windowPosState.WindowState.Window,
+			workspace
+		);
 
 		// When RecoverLayout is called
-		manager.RecoverLayout();
+		bool didPerformLayout = manager.RecoverLayout();
 
 		// Then DoLayout is called on the workspace
 		workspace.Received(1).DoLayout();
 		ctx.MonitorManager.DidNotReceive().GetEnumerator();
+		Assert.True(didPerformLayout);
 	}
 
 	[Theory, AutoSubstituteData<DeferWindowPosManagerCustomization>]
@@ -79,23 +92,26 @@ public class DeferWindowPosManagerTests
 		WindowPosState windowPosState1,
 		WindowPosState windowPosState2,
 		WindowPosState minimizedWindowPosState,
-		IWorkspace workspace
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given two windows are provided for the same workspace
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState1, windowPosState2 }, new() { minimizedWindowPosState });
 
-		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState1.WindowState.Window).Returns(workspace);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState2.WindowState.Window).Returns(workspace);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(minimizedWindowPosState.WindowState.Window).Returns(workspace);
+		mutableRootSector.Maps.WindowWorkspaceMap = mutableRootSector
+			.Maps.WindowWorkspaceMap.Add(windowPosState1.WindowState.Window, workspace)
+			.Add(windowPosState2.WindowState.Window, workspace)
+			.Add(minimizedWindowPosState.WindowState.Window, workspace);
 
 		// When RecoverLayout is called
-		manager.RecoverLayout();
+		bool didPerformLayout = manager.RecoverLayout();
 
 		// Then DoLayout is called on the workspace once
 		workspace.Received(1).DoLayout();
 		ctx.MonitorManager.DidNotReceive().GetEnumerator();
+		Assert.True(didPerformLayout);
 	}
 
 	[Theory, AutoSubstituteData<DeferWindowPosManagerCustomization>]
@@ -110,14 +126,14 @@ public class DeferWindowPosManagerTests
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState }, new());
 
-		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns((IWorkspace?)null);
 		ctx.FilterManager.ShouldBeIgnored(windowPosState.WindowState.Window).Returns(true);
 
 		// When RecoverLayout is called
-		manager.RecoverLayout();
+		bool didPerformLayout = manager.RecoverLayout();
 
 		// Then the DeferWindowPosHandle is called
 		ctx.MonitorManager.Received(1).GetEnumerator();
+		Assert.True(didPerformLayout);
 	}
 
 	[Theory, AutoSubstituteData<DeferWindowPosManagerCustomization>]
@@ -132,13 +148,13 @@ public class DeferWindowPosManagerTests
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
 		manager.DeferLayout(new() { windowPosState }, new());
 
-		ctx.Butler.Pantry.GetWorkspaceForWindow(windowPosState.WindowState.Window).Returns((IWorkspace?)null);
 		ctx.FilterManager.ShouldBeIgnored(windowPosState.WindowState.Window).Returns(false);
 
 		// When RecoverLayout is called
-		manager.RecoverLayout();
+		bool didPerformLayout = manager.RecoverLayout();
 
 		// Then the DeferWindowPosHandle is not called
 		ctx.MonitorManager.DidNotReceive().GetEnumerator();
+		Assert.True(didPerformLayout);
 	}
 }

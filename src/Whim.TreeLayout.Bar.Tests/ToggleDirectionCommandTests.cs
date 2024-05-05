@@ -11,6 +11,8 @@ public class ToggleDirectionCommandCustomization : ICustomization
 	public void Customize(IFixture fixture)
 	{
 		IContext ctx = fixture.Freeze<IContext>();
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
+
 		IMonitor monitor = fixture.Freeze<IMonitor>();
 		IWorkspace workspace = fixture.Freeze<IWorkspace>();
 		ILayoutEngine treeLayoutEngine = fixture.Freeze<ILayoutEngine>();
@@ -19,8 +21,16 @@ public class ToggleDirectionCommandCustomization : ICustomization
 		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
 		fixture.Inject(viewModel);
 
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
+
+		Store store = new(ctx, internalCtx);
+		ctx.Store.Returns(store);
+
+		fixture.Inject(store._root);
+		fixture.Inject(store._root.MutableRootSector);
+
+		store._root.MutableRootSector.Maps.MonitorWorkspaceMap =
+			store._root.MutableRootSector.Maps.MonitorWorkspaceMap.SetItem(monitor, workspace);
 	}
 }
 

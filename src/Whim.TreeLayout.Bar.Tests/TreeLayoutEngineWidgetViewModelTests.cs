@@ -6,14 +6,26 @@ using Xunit;
 
 namespace Whim.TreeLayout.Bar.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+	"Reliability",
+	"CA2000:Dispose objects before losing scope",
+	Justification = "Unnecessary for tests"
+)]
 public class TreeLayoutEngineWidgetViewModelCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
 		IContext ctx = fixture.Freeze<IContext>();
+		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 		IMonitor monitor = fixture.Freeze<IMonitor>();
 
 		ctx.MonitorManager.ActiveMonitor.Returns(monitor);
+
+		Store store = new(ctx, internalCtx);
+		ctx.Store.Returns(store);
+
+		fixture.Inject(store._root);
+		fixture.Inject(store._root.MutableRootSector);
 	}
 }
 
@@ -216,18 +228,22 @@ public class TreeLayoutEngineWidgetViewModelTests
 	}
 
 	[Theory, AutoSubstituteData<TreeLayoutEngineWidgetViewModelCustomization>]
-	public void Butler_ActiveLayoutEngineChanged_Success(
+	internal void Butler_ActiveLayoutEngineChanged_Success(
 		IContext ctx,
 		ITreeLayoutPlugin plugin,
 		IMonitor monitor,
-		IWorkspace workspace
+		IWorkspace workspace,
+		MutableRootSector mutableRootSector
 	)
 	{
 		// Given
 		plugin.GetAddWindowDirection(monitor).Returns(Direction.Right);
 		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
 
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
+		mutableRootSector.Maps.MonitorWorkspaceMap = mutableRootSector.Maps.MonitorWorkspaceMap.SetItem(
+			monitor,
+			workspace
+		);
 		plugin.GetAddWindowDirection(monitor).Returns(Direction.Down);
 
 		// When

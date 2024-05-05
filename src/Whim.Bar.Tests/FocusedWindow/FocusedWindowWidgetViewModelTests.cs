@@ -1,3 +1,4 @@
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
@@ -13,14 +14,13 @@ public class FocusedWindowWidgetViewModelTests
 	[Theory, AutoSubstituteData]
 	public void Title_SameMonitor(IContext context, IMonitor monitor, IWindow window)
 	{
-		// Given
+		// Given a window and the picker returning the monitor
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
-
 		window.Title.Returns("title");
 
-		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IMonitor>>>()).Returns(Result.FromValue(monitor));
 
-		// When
+		// When the focused window changes to a window in the monitor from the view model...
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
@@ -33,22 +33,24 @@ public class FocusedWindowWidgetViewModelTests
 			}
 		);
 
-		// Then
+		// Then the title is the title of the window.
 		Assert.Equal("title", viewModel.Title);
 	}
 
 	[Theory, AutoSubstituteData]
 	public void Title_DifferentMonitor(IContext context, IMonitor monitor, IWindow window, IWindow otherWindow)
 	{
-		// Given
+		// Given the windows and the picker returning an error
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
 		otherWindow.Title.Returns("other title");
 
-		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
+		context
+			.Store.Pick(Arg.Any<PurePicker<Result<IMonitor>>>())
+			.Returns(Result.FromException<IMonitor>(new Exception("welp")));
 
-		// When
+		// When the focused window changes to a window in a different monitor from the view model...
 		context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
 			context.WindowManager,
 			new WindowFocusedEventArgs() { Window = window }
@@ -65,7 +67,7 @@ public class FocusedWindowWidgetViewModelTests
 			}
 		);
 
-		// Then
+		// Then the title is null.
 		Assert.Null(viewModel.Title);
 	}
 
@@ -91,11 +93,11 @@ public class FocusedWindowWidgetViewModelTests
 	[Theory, AutoSubstituteData]
 	public void WindowManager_WindowFocused_SameMonitor(IContext context, IMonitor monitor, IWindow window)
 	{
-		// Given
+		// Given a window
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
-		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
+		context.Store.Pick(Arg.Any<PurePicker<Result<IMonitor>>>()).Returns(Result.FromValue(monitor));
 
 		// When
 		Assert.PropertyChanged(
@@ -123,7 +125,9 @@ public class FocusedWindowWidgetViewModelTests
 		// Given
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
-		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
+		context
+			.Store.Pick(Arg.Any<PurePicker<Result<IMonitor>>>())
+			.Returns(Result.FromException<IMonitor>(new Exception("welp")));
 
 		window.Title.Returns("title");
 		otherWindow.Title.Returns("other title");
@@ -150,25 +154,17 @@ public class FocusedWindowWidgetViewModelTests
 	[Theory, AutoSubstituteData]
 	public void WindowManager_WindowFocused_WindowIsNull(IContext context, IMonitor monitor, IWindow window)
 	{
-		// Given
+		// Given the received window is null
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
-		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 
-		// When
-		Assert.PropertyChanged(
-			viewModel,
-			nameof(viewModel.Title),
-			() =>
-				context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
-					context.WindowManager,
-					new WindowFocusedEventArgs() { Window = window }
-				)
+		context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
+			context.WindowManager,
+			new WindowFocusedEventArgs() { Window = window }
 		);
 
-		Assert.Equal("title", viewModel.Title);
-
+		// When
 		Assert.PropertyChanged(
 			viewModel,
 			nameof(viewModel.Title),
