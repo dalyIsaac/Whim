@@ -56,6 +56,20 @@ public static partial class Pickers
 	}
 
 	/// <summary>
+	/// Get the active workspace.
+	/// </summary>
+	/// <returns></returns>
+	public static PurePicker<ImmutableWorkspace> GetActiveWorkspace() =>
+		(IRootSector rootSector) => rootSector.Workspaces.Workspaces[rootSector.Workspaces.ActiveWorkspaceIndex];
+
+	/// <summary>
+	/// Get the id of the active workspace.
+	/// </summary>
+	/// <returns></returns>
+	public static PurePicker<Guid> GetActiveWorkspaceId() =>
+		(IRootSector rootSector) => rootSector.Workspaces.Workspaces[rootSector.Workspaces.ActiveWorkspaceIndex].Id;
+
+	/// <summary>
 	/// Get the active layout engine in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId"></param>

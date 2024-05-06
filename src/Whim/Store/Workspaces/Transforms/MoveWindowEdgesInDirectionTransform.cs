@@ -8,17 +8,17 @@ namespace Whim;
 /// the specified <paramref name="Deltas"/> for the workspace with given <paramref name="WorkspaceId"/>.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-/// <param name="Window">
-/// The window to change the edge of. If null, the currently focused window is used.
-/// </param>
 /// <param name="Edges">
 /// The edges to change.
 /// </param>
 /// <param name="Deltas">
 /// The deltas (in pixels) to change the given <paramref name="Edges"/> by. When a value is
 /// positive, then the edge will move in the direction of the <paramref name="Edges"/>.
-/// The <paramref name="PixelsDeltas"/> are in the coordinate space of the monitors, not the
+/// The <paramref name="Deltas"/> are in the coordinate space of the monitors, not the
 /// unit square.
+/// </param>
+/// <param name="Window">
+/// The window to change the edge of. If null, the currently focused window is used.
 /// </param>
 public record MoveWindowEdgesInDirectionTransform(
 	Guid WorkspaceId,
@@ -39,13 +39,13 @@ public record MoveWindowEdgesInDirectionTransform(
 		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.GetMonitorForWindow(window));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			return Result.FromException<Empty>(monitorResult.Error!);
+			return Result.FromException<ImmutableWorkspace>(monitorResult.Error!);
 		}
 
-		IPoint<double> normalized = monitor.WorkingArea.NormalizeDeltaPoint(PixelsDeltas);
+		IPoint<double> normalized = monitor.WorkingArea.NormalizeDeltaPoint(Deltas);
 
 		ILayoutEngine oldEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
-		ILayoutEngine newEngine = oldEngine.MoveWindowEdgesInDirection(Edges, Deltas, window);
+		ILayoutEngine newEngine = oldEngine.MoveWindowEdgesInDirection(Edges, normalized, window);
 
 		return oldEngine == newEngine
 			? workspace

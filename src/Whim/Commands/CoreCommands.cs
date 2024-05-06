@@ -82,96 +82,54 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
 				callback: () =>
-					_context.Store.Dispatch(
-						new MoveWindowEdgesInDirectionTransform(
-							Direction.Left,
-							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
-						)
-					),
+					MoveWindowEdgesInDirection(Direction.Left, new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_H)
 			)
 			.Add(
 				identifier: "move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
 				callback: () =>
-					_context.Store.Dispatch(
-						new MoveWindowEdgesInDirectionTransform(
-							Direction.Left,
-							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
-						)
-					),
+					MoveWindowEdgesInDirection(Direction.Left, new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_J)
 			)
 			.Add(
 				identifier: "move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
 				callback: () =>
-					_context.Store.Dispatch(
-						new MoveWindowEdgesInDirectionTransform(
-							Direction.Right,
-							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
-						)
-					),
+					MoveWindowEdgesInDirection(Direction.Right, new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_K)
 			)
 			.Add(
 				identifier: "move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
 				callback: () =>
-					_context.Store.Dispatch(
-						new MoveWindowEdgesInDirectionTransform(
-							Direction.Right,
-							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
-						)
-					),
+					MoveWindowEdgesInDirection(Direction.Right, new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_L)
 			)
 			.Add(
 				identifier: "move_window_top_edge_up",
 				title: "Move the current window's top edge up",
-				callback: () =>
-					_context.Store.Dispatch(
-						new MoveWindowEdgesInDirectionTransform(
-							Direction.Up,
-							new Point<int>() { Y = -MoveWindowEdgeDelta }
-						)
-					),
+				callback: () => MoveWindowEdgesInDirection(Direction.Up, new Point<int>() { Y = -MoveWindowEdgeDelta }),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_U)
 			)
 			.Add(
 				identifier: "move_window_top_edge_down",
 				title: "Move the current window's top edge down",
-				callback: () =>
-					_context.Store.Dispatch(
-						new MoveWindowEdgesInDirectionTransform(
-							Direction.Up,
-							new Point<int>() { Y = MoveWindowEdgeDelta }
-						)
-					),
+				callback: () => MoveWindowEdgesInDirection(Direction.Up, new Point<int>() { Y = MoveWindowEdgeDelta }),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_I)
 			)
 			.Add(
 				identifier: "move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
 				callback: () =>
-					_context.Store.Dispatch(
-						new MoveWindowEdgesInDirectionTransform(
-							Direction.Down,
-							new Point<int>() { Y = -MoveWindowEdgeDelta }
-						)
-					),
+					MoveWindowEdgesInDirection(Direction.Down, new Point<int>() { Y = -MoveWindowEdgeDelta }),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_O)
 			)
 			.Add(
 				identifier: "move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
 				callback: () =>
-					_context.Store.Dispatch(
-						new MoveWindowEdgesInDirectionTransform(
-							Direction.Down,
-							new Point<int>() { Y = MoveWindowEdgeDelta }
-						)
-					),
+					MoveWindowEdgesInDirection(Direction.Down, new Point<int>() { Y = MoveWindowEdgeDelta }),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_P)
 			)
 			.Add(
@@ -307,6 +265,20 @@ internal class CoreCommands : PluginCommands
 	/// </summary>
 	internal Action SwapWindowInDirection(Direction direction) =>
 		() => _context.WorkspaceManager.ActiveWorkspace.SwapWindowInDirection(direction);
+
+	internal Action MoveWindowEdgesInDirection(Direction edges, IPoint<int> deltas) =>
+		() =>
+		{
+			ImmutableWorkspace workspace = _context.Store.Pick(Pickers.GetActiveWorkspace());
+			_context.Store.Dispatch(
+				new MoveWindowEdgesInDirectionTransform(
+					WorkspaceId: workspace.Id,
+					Window: workspace.LastFocusedWindow,
+					Edges: edges,
+					Deltas: deltas
+				)
+			);
+		};
 
 	internal Action FocusMonitorInDirection(bool getNext) =>
 		() =>
