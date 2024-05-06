@@ -1,45 +1,47 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Whim;
 
+/// <summary>
+/// Workspaces contain windows to be organized by layout engines.
+/// </summary>
 public record ImmutableWorkspace
 {
 	/// <summary>
 	/// The unique id of the workspace.
 	/// </summary>
-	internal Guid Id { get; }
+	public Guid Id { get; }
 
 	/// <summary>
 	/// The name of the workspace.
 	/// </summary>
-	internal string Name { get; init; }
+	public string Name { get; init; }
 
 	/// <summary>
 	/// The index of the layout engine in <see cref="LayoutEngines"/> which is currently active.
 	/// </summary>
-	internal int ActiveLayoutEngineIndex { get; init; }
+	public int ActiveLayoutEngineIndex { get; init; }
 
 	/// <summary>
 	/// The index of the layout engine in <see cref="LayoutEngines"/> which was previously active.
 	/// </summary>
-	internal int PreviousLayoutEngineIndex { get; init; }
+	public int PreviousLayoutEngineIndex { get; init; }
 
 	/// <summary>
-	/// The last focused window in the workspace.
+	/// The index of the last focused window in the workspace.
 	/// </summary>
-	internal IWindow? LastFocusedWindow { get; init; }
+	public int? LastFocusedWindowIndex { get; init; }
 
 	/// <summary>
 	/// All the windows in the workspace.
 	/// </summary>
-	internal ImmutableHashSet<IWindow> Windows { get; init; } = ImmutableHashSet<IWindow>.Empty;
+	public ImmutableHashSet<IWindow> Windows { get; init; } = ImmutableHashSet<IWindow>.Empty;
 
 	/// <summary>
 	/// All the layout engines currently in the workspace.
 	/// </summary>
-	internal ImmutableList<ILayoutEngine> LayoutEngines { get; init; } = ImmutableList<ILayoutEngine>.Empty;
+	public ImmutableList<ILayoutEngine> LayoutEngines { get; init; } = ImmutableList<ILayoutEngine>.Empty;
 
 	internal ImmutableWorkspace(Guid id, string name)
 	{
