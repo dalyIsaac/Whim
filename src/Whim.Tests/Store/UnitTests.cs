@@ -12,8 +12,7 @@ public class UnitTests
 		Result<Unit> result = Unit.Result;
 
 		// Then
-		Assert.True(result.IsSuccess);
-		Assert.True(result.Value is Unit);
+		Assert.True(result.IsSuccessful);
 		Assert.Equal(Unit.Result, result);
 	}
 }
