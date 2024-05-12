@@ -103,7 +103,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 		foreach (Monitor monitor in _monitors)
 		{
-			if (monitor._hmonitor.Equals(hMONITOR))
+			if (monitor.Handle == hMONITOR)
 			{
 				Logger.Debug($"Setting active monitor to {monitor}");
 				ActiveMonitor = monitor;
@@ -248,7 +248,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 			// Try find the monitor in the list of existing monitors. If we can find it, update
 			// its properties.
-			Monitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
+			Monitor? monitor = _monitors.FirstOrDefault(m => m.Handle == hmonitor);
 
 			if (monitor is null)
 			{
@@ -273,7 +273,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
 
-		IMonitor? monitor = _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
+		IMonitor? monitor = _monitors.FirstOrDefault(m => m.Handle == hmonitor);
 		if (monitor == null)
 		{
 			Logger.Error($"No monitor found at point {point}");
@@ -311,7 +311,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		return _monitors[(index + 1).Mod(_monitors.Length)];
 	}
 
-	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) => _monitors.FirstOrDefault(m => m._hmonitor == hmonitor);
+	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) => _monitors.FirstOrDefault(m => m.Handle == hmonitor);
 
 	protected virtual void Dispose(bool disposing)
 	{

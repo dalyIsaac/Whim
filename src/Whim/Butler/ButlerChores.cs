@@ -40,7 +40,7 @@ internal class ButlerChores : IButlerChores
 		// Find the monitor which just lost `workspace`.
 		IMonitor? loserMonitor = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
 
-		if (monitor.Equals(loserMonitor))
+		if (monitor.Handle == loserMonitor?.Handle)
 		{
 			Logger.Debug("Workspace is already activated");
 			return;
@@ -52,7 +52,7 @@ internal class ButlerChores : IButlerChores
 		_context.Butler.Pantry.SetMonitorWorkspace(monitor, workspace);
 
 		(IWorkspace workspace, IMonitor monitor)? layoutOldWorkspace = null;
-		if (loserMonitor != null && oldWorkspace != null && !loserMonitor.Equals(monitor))
+		if (loserMonitor != null && oldWorkspace != null && loserMonitor.Handle != monitor.Handle)
 		{
 			_context.Butler.Pantry.SetMonitorWorkspace(loserMonitor, oldWorkspace);
 			layoutOldWorkspace = (oldWorkspace, loserMonitor);
@@ -229,7 +229,7 @@ internal class ButlerChores : IButlerChores
 			return;
 		}
 
-		if (oldMonitor.Equals(monitor))
+		if (oldMonitor.Handle == monitor.Handle)
 		{
 			Logger.Error($"Window {window} is already on monitor {monitor}");
 			return;
@@ -387,7 +387,7 @@ internal class ButlerChores : IButlerChores
 			? _context.MonitorManager.GetPreviousMonitor(currentMonitor)
 			: _context.MonitorManager.GetNextMonitor(currentMonitor);
 
-		if (currentMonitor.Equals(nextMonitor))
+		if (currentMonitor.Handle == nextMonitor.Handle)
 		{
 			Logger.Error($"Monitor {currentMonitor} is already the {(!reverse ? "next" : "previous")} monitor");
 			return;

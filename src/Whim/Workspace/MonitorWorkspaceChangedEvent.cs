@@ -35,7 +35,7 @@ public class MonitorWorkspaceChangedEventArgs : EventArgs
 			return false;
 		}
 
-		return other.Monitor.Equals(Monitor)
+		return other.Monitor.Handle == Monitor.Handle
 			&& other.PreviousWorkspace == PreviousWorkspace
 			&& other.CurrentWorkspace == CurrentWorkspace;
 	}
