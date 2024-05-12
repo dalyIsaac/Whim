@@ -5,6 +5,7 @@ namespace Whim;
 
 /// <summary>
 /// Whim's store.
+/// WARNING: Currently non-functional - use managers instead.
 /// </summary>
 public interface IStore : IDisposable
 {
