@@ -112,7 +112,6 @@ public static class CustomAssert
 		Assert.Empty(internalCtx.CoreSavedStateManager.ReceivedCalls());
 		Assert.Empty(internalCtx.CoreNativeManager.ReceivedCalls());
 		Assert.Empty(internalCtx.WindowMessageMonitor.ReceivedCalls());
-		Assert.Empty(internalCtx.MonitorManager.ReceivedCalls());
 		Assert.Empty(internalCtx.WindowManager.ReceivedCalls());
 		Assert.Empty(internalCtx.KeybindHook.ReceivedCalls());
 		Assert.Empty(internalCtx.MouseHook.ReceivedCalls());

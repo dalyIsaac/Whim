@@ -20,14 +20,9 @@ internal class WindowManagerCustomization : ICustomization
 	public void Customize(IFixture fixture)
 	{
 		IWorkspaceManager workspaceManager = Substitute.For<IWorkspaceManager>();
-		IMonitorManager monitorManager = Substitute.For<IMonitorManager, IInternalMonitorManager>();
 
 		IContext context = fixture.Freeze<IContext>();
 		context.WorkspaceManager.Returns(workspaceManager);
-		context.MonitorManager.Returns(monitorManager);
-
-		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-		internalCtx.MonitorManager.Returns((IInternalMonitorManager)monitorManager);
 	}
 }
 
@@ -200,7 +195,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).OnWindowFocused(window);
+		ctx.Store.Received(1).Dispatch(new WindowFocusedTransform(window));
 		Assert.Equal(window, result.Arguments.Window);
 	}
 
@@ -570,7 +565,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).OnWindowFocused(Arg.Any<IWindow>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<WindowFocusedTransform>());
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
@@ -598,7 +593,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).OnWindowFocused(Arg.Any<IWindow>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<WindowFocusedTransform>());
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
@@ -741,7 +736,7 @@ public class WindowManagerTests
 		// Given
 		IContext ctx = Substitute.For<IContext>();
 		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager>());
-		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
+
 		IInternalContext internalCtx = Substitute.For<IInternalContext>();
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 
@@ -1389,7 +1384,7 @@ public class WindowManagerTests
 	{
 		// Given
 		IContext ctx = Substitute.For<IContext>();
-		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
+
 		IInternalContext internalCtx = Substitute.For<IInternalContext>();
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 

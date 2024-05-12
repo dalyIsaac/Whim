@@ -322,7 +322,7 @@ public class ButlerChoresTests
 		internalCtx.CoreNativeManager.Received(1).GetDesktopWindow();
 		internalCtx.CoreNativeManager.Received(1).SetForegroundWindow(Arg.Any<HWND>());
 		internalCtx.WindowManager.Received(1).OnWindowFocused(null);
-		internalCtx.MonitorManager.Received(1).ActivateEmptyMonitor(monitor);
+		ctx.Store.Received(1).Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 	}
 
 	#region ActivateAdjacent

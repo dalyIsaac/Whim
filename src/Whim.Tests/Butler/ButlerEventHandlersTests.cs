@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using DotNext;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
@@ -121,16 +122,16 @@ public class ButlerEventHandlersTests
 		IButlerPantry pantry,
 		IButlerChores chores,
 		IWindow window,
-		IWorkspace lastTrackedActiveWorkspace
+		IWorkspace lastTrackedActiveWorkspace,
+		IMonitor lastWhimActiveMonitor
 	)
 	{
 		// Given the router options are set to RouteToLastTrackedActiveWorkspace and the last tracked active workspace is in the workspace manager
 		ctx.RouterManager.RouteWindow(window).ReturnsNull();
 		ctx.RouterManager.RouterOptions.Returns(RouterOptions.RouteToLastTrackedActiveWorkspace);
-		internalCtx.MonitorManager.LastWhimActiveMonitor.Returns(Substitute.For<IMonitor>());
-		pantry
-			.GetWorkspaceForMonitor(internalCtx.MonitorManager.LastWhimActiveMonitor)
-			.Returns(lastTrackedActiveWorkspace);
+
+		ctx.Store.Pick(Pickers.GetLastWhimActiveMonitor()).Returns(lastWhimActiveMonitor);
+		pantry.GetWorkspaceForMonitor(lastWhimActiveMonitor).Returns(lastTrackedActiveWorkspace);
 		ctx.WorkspaceManager.Contains(lastTrackedActiveWorkspace).Returns(true);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
@@ -161,7 +162,8 @@ public class ButlerEventHandlersTests
 		internalCtx
 			.CoreNativeManager.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
 			.Returns((HMONITOR)1);
-		internalCtx.MonitorManager.GetMonitorByHandle((HMONITOR)1).ReturnsNull();
+		ctx.Store.Pick(Pickers.GetMonitorByHandle((HMONITOR)1))
+			.Returns(Result.FromException<IMonitor>(new Exception("welp")));
 		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, chores);
@@ -197,7 +199,7 @@ public class ButlerEventHandlersTests
 		internalCtx
 			.CoreNativeManager.MonitorFromWindow(window.Handle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
 			.Returns((HMONITOR)1);
-		internalCtx.MonitorManager.GetMonitorByHandle((HMONITOR)1).Returns(monitor);
+		ctx.Store.Pick(Pickers.GetMonitorByHandle((HMONITOR)1)).Returns(Result.FromValue(monitor));
 		pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
 		ButlerEventHandlers sut = new(ctx, internalCtx, pantry, Substitute.For<IButlerChores>());
