@@ -255,23 +255,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		return currentMonitors.OrderBy(m => m.WorkingArea.X).ThenBy(m => m.WorkingArea.Y).ToArray();
 	}
 
-	public IMonitor GetMonitorAtPoint(IPoint<int> point)
-	{
-		Logger.Debug($"Getting monitor at point {point}");
-		HMONITOR hmonitor = _internalContext.CoreNativeManager.MonitorFromPoint(
-			point.ToSystemPoint(),
-			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
-		);
-
-		IMonitor? monitor = _monitors.FirstOrDefault(m => m.Handle == hmonitor);
-		if (monitor == null)
-		{
-			Logger.Error($"No monitor found at point {point}");
-			return _monitors[0];
-		}
-
-		return monitor;
-	}
+	public IMonitor GetMonitorAtPoint(IPoint<int> point) => _context.Store.Pick(Pickers.GetMonitorAtPoint(point)).Value;
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor) =>
 		_context.Store.Pick(Pickers.GetAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;

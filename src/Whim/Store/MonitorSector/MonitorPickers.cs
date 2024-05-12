@@ -98,4 +98,47 @@ public static partial class Pickers
 			int delta = reverse ? -1 : 1;
 			return Result.FromValue(monitors[(monitorIdx + delta).Mod(monitors.Length)]);
 		};
+
+	/// <summary>
+	/// Get the monitor at the point <paramref name="point"/>
+	/// </summary>
+	/// <param name="point">
+	/// The point to get the monitor for.
+	/// </param>
+	/// <param name="getFirst">
+	/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
+	/// result.
+	/// </param>
+	/// <returns></returns>
+	public static Picker<Result<IMonitor>> GetMonitorAtPoint(IPoint<int> point, bool getFirst = false) =>
+		new GetMonitorAtPointPicker(point, getFirst);
+}
+
+internal record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<Result<IMonitor>>
+{
+	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
+	{
+		IMonitorSector sector = rootSector.MonitorSector;
+
+		HMONITOR hmonitor = internalCtx.CoreNativeManager.MonitorFromPoint(
+			Point.ToSystemPoint(),
+			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
+		);
+
+		for (int idx = 0; idx < sector.Monitors.Length; idx += 1)
+		{
+			IMonitor m = sector.Monitors[idx];
+			if (m.Handle == hmonitor)
+			{
+				return Result.FromValue(m);
+			}
+		}
+
+		if (GetFirst)
+		{
+			return Result.FromValue(sector.Monitors[0]);
+		}
+
+		return Result.FromException<IMonitor>(StoreExceptions.NoMonitorFoundAtPoint(Point));
+	}
 }
