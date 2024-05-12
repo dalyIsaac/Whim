@@ -58,7 +58,7 @@ public static partial class Pickers
 	/// The handle of the monitor to use as a reference. Defaults to the current active monitor.
 	/// </param>
 	/// <param name="reverse">
-	/// When <see langword="true"/>, gets the previous monitor, otherwise gets the next monitor. Defaults to <see langword="true" />.
+	/// When <see langword="true"/>, gets the previous monitor, otherwise gets the next monitor. Defaults to <see langword="false" />.
 	/// </param>
 	/// <param name="getFirst">
 	/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
@@ -67,7 +67,7 @@ public static partial class Pickers
 	/// <returns></returns>
 	public static PurePicker<Result<IMonitor>> GetAdjacentMonitor(
 		HMONITOR handle = default,
-		bool reverse = true,
+		bool reverse = false,
 		bool getFirst = false
 	) =>
 		(rootSector) =>

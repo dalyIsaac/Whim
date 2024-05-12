@@ -1,6 +1,7 @@
 using System.Collections;
 using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Tests;
@@ -32,6 +33,19 @@ public class MonitorManagerTests
 
 		// Then
 		ctx.Store.Received(1).Pick(Pickers.GetPrimaryMonitor());
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void LastWhimActiveMonitor(IContext ctx)
+	{
+		// Given
+		MonitorManager sut = new(ctx);
+
+		// When
+		var _ = sut.LastWhimActiveMonitor;
+
+		// Then
+		ctx.Store.Received(1).Pick(Pickers.GetLastWhimActiveMonitor());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -75,6 +89,19 @@ public class MonitorManagerTests
 			h => sut.MonitorsChanged -= h,
 			() => ctx.Store.Dispatch(new MonitorsChangedTransform())
 		);
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void ActivateEmptyMonitor(IContext ctx, IMonitor monitor)
+	{
+		// Given
+		MonitorManager sut = new(ctx);
+
+		// When
+		sut.ActivateEmptyMonitor(monitor);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
