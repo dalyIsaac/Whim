@@ -28,23 +28,24 @@ public static partial class Pickers
 	/// <summary>
 	/// Get the currently active monitor.
 	/// </summary>
-	public static PurePicker<IMonitor> GetActiveMonitor =>
+	public static PurePicker<IMonitor> GetActiveMonitor() =>
 		rootSector => GetMonitorByHandle(rootSector.MonitorSector.ActiveMonitorHandle)(rootSector).Value;
 
 	/// <summary>
 	/// Get the primary monitor.
 	/// </summary>
-	public static PurePicker<IMonitor> GetPrimaryMonitor =>
+	public static PurePicker<IMonitor> GetPrimaryMonitor() =>
 		rootSector => GetMonitorByHandle(rootSector.MonitorSector.PrimaryMonitorHandle)(rootSector).Value;
 
 	/// <summary>
 	/// Get the last <see cref="IMonitor"/> which received an event sent by Windows which Whim did not ignore.
 	/// </summary>
-	public static PurePicker<IMonitor> GetLastWhimActiveMonitor =>
+	public static PurePicker<IMonitor> GetLastWhimActiveMonitor() =>
 		rootSector => GetMonitorByHandle(rootSector.MonitorSector.LastWhimActiveMonitorHandle)(rootSector).Value;
 
 	/// <summary>
 	/// Get all the <see cref="IMonitor"/>s tracked by Whim.
 	/// </summary>
-	public static PurePicker<IEnumerable<IMonitor>> GetAllMonitors => rootSector => rootSector.MonitorSector.Monitors;
+	public static PurePicker<IReadOnlyList<IMonitor>> GetAllMonitors() =>
+		rootSector => rootSector.MonitorSector.Monitors;
 }

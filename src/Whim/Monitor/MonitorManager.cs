@@ -25,15 +25,15 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	private Monitor[] _monitors = Array.Empty<Monitor>();
 	private bool _disposedValue;
 
-	public IMonitor ActiveMonitor { get; private set; }
+	public IMonitor ActiveMonitor => _context.Store.Pick(Pickers.GetActiveMonitor());
 
-	public IMonitor PrimaryMonitor { get; private set; }
+	public IMonitor PrimaryMonitor => _context.Store.Pick(Pickers.GetPrimaryMonitor());
 
-	public IMonitor LastWhimActiveMonitor { get; set; }
+	public IMonitor LastWhimActiveMonitor => _context.Store.Pick(Pickers.GetLastWhimActiveMonitor());
 
-	public int Length => _monitors.Length;
+	public int Length => _context.Store.Pick(Pickers.GetAllMonitors()).Count;
 
-	public IEnumerator<IMonitor> GetEnumerator() => _monitors.AsEnumerable().GetEnumerator();
+	public IEnumerator<IMonitor> GetEnumerator() => _context.Store.Pick(Pickers.GetAllMonitors()).GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
