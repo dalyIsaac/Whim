@@ -1,4 +1,5 @@
 using System.Linq;
+using DotNext;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -26,9 +27,9 @@ internal class ButlerChores : IButlerChores
 
 		if (monitor is null)
 		{
-			monitor = _context.MonitorManager.ActiveMonitor;
+			monitor = _context.Store.Pick(Pickers.GetActiveMonitor());
 		}
-		else if (!_context.MonitorManager.Contains(monitor))
+		else if (!_context.Store.Pick(Pickers.GetMonitorByHandle(monitor.Handle)).IsSuccessful)
 		{
 			Logger.Error($"Workspace {monitor} is not tracked");
 			return;
@@ -96,7 +97,7 @@ internal class ButlerChores : IButlerChores
 	{
 		Logger.Debug("Activating next workspace");
 
-		monitor ??= _context.MonitorManager.ActiveMonitor;
+		monitor ??= _context.Store.Pick(Pickers.GetActiveMonitor());
 		IWorkspace? currentWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
 		if (currentWorkspace == null)
 		{
@@ -250,8 +251,10 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug($"Moving window {window} to previous monitor");
 
 		// Get the previous monitor.
-		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
-		IMonitor previousMonitor = _context.MonitorManager.GetPreviousMonitor(monitor);
+		IMonitor monitor = _context.Store.Pick(Pickers.GetActiveMonitor());
+		IMonitor previousMonitor = _context
+			.Store.Pick(Pickers.GetAdjacentMonitor(monitor.Handle, reverse: true, getFirst: true))
+			.Value;
 
 		MoveWindowToMonitor(previousMonitor, window);
 	}
@@ -261,8 +264,10 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug($"Moving window {window} to next monitor");
 
 		// Get the next monitor.
-		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
-		IMonitor nextMonitor = _context.MonitorManager.GetNextMonitor(monitor);
+		IMonitor monitor = _context.Store.Pick(Pickers.GetActiveMonitor());
+		IMonitor nextMonitor = _context
+			.Store.Pick(Pickers.GetAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true))
+			.Value;
 
 		MoveWindowToMonitor(nextMonitor, window);
 	}
@@ -272,7 +277,11 @@ internal class ButlerChores : IButlerChores
 		Logger.Debug($"Moving window {window} to point {point}");
 
 		// Get the monitor.
-		IMonitor targetMonitor = _context.MonitorManager.GetMonitorAtPoint(point);
+		Result<IMonitor> monitorAtPoint = _context.Store.Pick(Pickers.GetMonitorAtPoint(point));
+		if (monitorAtPoint.TryGet(out IMonitor targetMonitor) == false)
+		{
+			return;
+		}
 
 		// Get the target workspace.
 		IWorkspace? targetWorkspace = _context.Butler.Pantry.GetWorkspaceForMonitor(targetMonitor);
@@ -383,9 +392,13 @@ internal class ButlerChores : IButlerChores
 		}
 
 		// Get the next monitor.
-		IMonitor nextMonitor = reverse
-			? _context.MonitorManager.GetPreviousMonitor(currentMonitor)
-			: _context.MonitorManager.GetNextMonitor(currentMonitor);
+		Result<IMonitor> nextMonitorResult = _context.Store.Pick(
+			Pickers.GetAdjacentMonitor(currentMonitor.Handle, reverse)
+		);
+		if (nextMonitorResult.TryGet(out IMonitor nextMonitor) == false)
+		{
+			return;
+		}
 
 		if (currentMonitor.Handle == nextMonitor.Handle)
 		{

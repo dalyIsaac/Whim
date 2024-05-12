@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DotNext;
 using NSubstitute;
 
 namespace Whim.TestUtils;
@@ -22,6 +23,11 @@ public static class MonitorManagerUtils
 			ctx.MonitorManager.GetPreviousMonitor(monitors[activeMonitorIndex])
 				.Returns(monitors[(activeMonitorIndex - 1).Mod(monitors.Length)]);
 			ctx.MonitorManager.GetNextMonitor(monitors[activeMonitorIndex]);
+		}
+
+		foreach (IMonitor monitor in monitors)
+		{
+			ctx.Store.Pick(Pickers.GetMonitorByHandle(monitor.Handle)).Returns(Result.FromValue(monitor));
 		}
 	}
 }

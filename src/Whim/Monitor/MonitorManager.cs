@@ -45,7 +45,8 @@ internal class MonitorManager : IMonitorManager
 	private void MonitorSector_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
 		MonitorsChanged?.Invoke(sender, e);
 
-	public IMonitor GetMonitorAtPoint(IPoint<int> point) => _context.Store.Pick(Pickers.GetMonitorAtPoint(point)).Value;
+	public IMonitor GetMonitorAtPoint(IPoint<int> point) =>
+		_context.Store.Pick(Pickers.GetMonitorAtPoint(point, getFirst: true)).Value;
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor) =>
 		_context.Store.Pick(Pickers.GetAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
