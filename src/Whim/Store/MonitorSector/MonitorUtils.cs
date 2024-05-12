@@ -49,4 +49,7 @@ internal static class MonitorUtils
 
 		return currentMonitors.OrderBy(m => m.WorkingArea.X).ThenBy(m => m.WorkingArea.Y).ToArray().ToImmutableArray();
 	}
+
+	public static HMONITOR OrActiveMonitor(this HMONITOR handle, IRootSector rootSector) =>
+		handle == default ? rootSector.MonitorSector.ActiveMonitorHandle : handle;
 }

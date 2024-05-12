@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using DotNext;
 using Windows.Win32.Graphics.Gdi;
 
@@ -49,4 +50,52 @@ public static partial class Pickers
 	/// </summary>
 	public static PurePicker<IReadOnlyList<IMonitor>> GetAllMonitors() =>
 		static (rootSector) => rootSector.MonitorSector.Monitors;
+
+	/// <summary>
+	/// Gets the monitor before the given monitor.
+	/// </summary>
+	/// <param name="handle">
+	/// The handle of the monitor to use as a reference. Defaults to the current active monitor.
+	/// </param>
+	/// <param name="reverse">
+	/// When <see langword="true"/>, gets the previous monitor, otherwise gets the next monitor. Defaults to <see langword="true" />.
+	/// </param>
+	/// <param name="getFirst">
+	/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
+	/// result.
+	/// </param>
+	/// <returns></returns>
+	public static PurePicker<Result<IMonitor>> GetAdjacentMonitor(
+		HMONITOR handle = default,
+		bool reverse = true,
+		bool getFirst = false
+	) =>
+		(rootSector) =>
+		{
+			handle = handle.OrActiveMonitor(rootSector);
+			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
+
+			int monitorIdx = -1;
+			for (int idx = 0; idx < monitors.Length; idx++)
+			{
+				if (handle == monitors[idx].Handle)
+				{
+					monitorIdx = idx;
+					break;
+				}
+			}
+
+			if (monitorIdx == -1)
+			{
+				if (getFirst)
+				{
+					return Result.FromValue(monitors[0]);
+				}
+
+				return Result.FromException<IMonitor>(StoreExceptions.MonitorNotFound(handle));
+			}
+
+			int delta = reverse ? -1 : 1;
+			return Result.FromValue(monitors[(monitorIdx + delta).Mod(monitors.Length)]);
+		};
 }

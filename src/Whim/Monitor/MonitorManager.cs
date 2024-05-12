@@ -273,33 +273,11 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		return monitor;
 	}
 
-	public IMonitor GetPreviousMonitor(IMonitor monitor)
-	{
-		Logger.Debug($"Getting previous monitor for {monitor}");
+	public IMonitor GetPreviousMonitor(IMonitor monitor) =>
+		_context.Store.Pick(Pickers.GetAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
 
-		int index = Array.IndexOf(_monitors, monitor);
-		if (index == -1)
-		{
-			Logger.Error($"Monitor {monitor} not found.");
-			return _monitors[0];
-		}
-
-		return _monitors[(index - 1).Mod(_monitors.Length)];
-	}
-
-	public IMonitor GetNextMonitor(IMonitor monitor)
-	{
-		Logger.Debug($"Getting next monitor for {monitor}");
-
-		int index = Array.IndexOf(_monitors, monitor);
-		if (index == -1)
-		{
-			Logger.Error($"Monitor {monitor} not found.");
-			return _monitors[0];
-		}
-
-		return _monitors[(index + 1).Mod(_monitors.Length)];
-	}
+	public IMonitor GetNextMonitor(IMonitor monitor) =>
+		_context.Store.Pick(Pickers.GetAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
 
 	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) => _monitors.FirstOrDefault(m => m.Handle == hmonitor);
 
