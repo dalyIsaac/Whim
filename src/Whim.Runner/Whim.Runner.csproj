@@ -29,7 +29,7 @@
     <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <UseWinUI>true</UseWinUI>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <WinUISDKReferences>false</WinUISDKReferences>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <WindowsPackageType>None</WindowsPackageType>
@@ -159,7 +159,7 @@
   <Target Name="CopyBarAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
-      <BarDestinationFile Include="@(BarSourceFile->'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <BarDestinationFile Include="@(BarSourceFile-&gt;'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(BarSourceFile)" DestinationFiles="@(BarDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.Bar\" SkipUnchangedFiles="true" />
@@ -168,7 +168,7 @@
   <Target Name="CopyCommandPaletteAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <CommandPaletteSourceFile Include="$(SolutionDir)\src\Whim.CommandPalette\$(OutDir)\Whim.CommandPalette\**\*" />
-      <CommandPaletteDestinationFile Include="@(CommandPaletteSourceFile->'$(TargetDir)plugins\Whim.CommandPalette\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <CommandPaletteDestinationFile Include="@(CommandPaletteSourceFile-&gt;'$(TargetDir)plugins\Whim.CommandPalette\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(CommandPaletteSourceFile)" DestinationFiles="@(CommandPaletteDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.CommandPalette\$(OutDir)Whim.CommandPalette.dll" DestinationFolder="$(TargetDir)plugins\Whim.CommandPalette\" SkipUnchangedFiles="true" />
@@ -181,7 +181,7 @@
   <Target Name="CopyFocusIndicatorAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <FocusIndicatorSourceFile Include="$(SolutionDir)\src\Whim.FocusIndicator\$(OutDir)\Whim.FocusIndicator\**\*" />
-      <FocusIndicatorDestinationFile Include="@(FocusIndicatorSourceFile->'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <FocusIndicatorDestinationFile Include="@(FocusIndicatorSourceFile-&gt;'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(FocusIndicatorSourceFile)" DestinationFiles="@(FocusIndicatorDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(OutDir)Whim.FocusIndicator.dll" DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" SkipUnchangedFiles="true" />
@@ -194,7 +194,7 @@
   <Target Name="CopyLayoutPreviewAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <LayoutPreviewSourceFile Include="$(SolutionDir)\src\Whim.LayoutPreview\$(OutDir)\Whim.LayoutPreview\**\*" />
-      <LayoutPreviewDestinationFile Include="@(LayoutPreviewSourceFile->'$(TargetDir)plugins\Whim.LayoutPreview\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <LayoutPreviewDestinationFile Include="@(LayoutPreviewSourceFile-&gt;'$(TargetDir)plugins\Whim.LayoutPreview\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(LayoutPreviewSourceFile)" DestinationFiles="@(LayoutPreviewDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.LayoutPreview\$(OutDir)Whim.LayoutPreview.dll" DestinationFolder="$(TargetDir)plugins\Whim.LayoutPreview\" SkipUnchangedFiles="true" />
@@ -211,7 +211,7 @@
   <Target Name="CopyTreeLayoutBarAfterBuild" AfterTargets="Build;Publish;CopyBarAfterBuild;CopyTreeLayoutAfterBuild">
     <ItemGroup>
       <TreeLayoutBarSourceFile Include="$(SolutionDir)\src\Whim.TreeLayout.Bar\$(OutDir)\Whim.TreeLayout.Bar\**\*" />
-      <TreeLayoutBarDestinationFile Include="@(TreeLayoutBarSourceFile->'$(TargetDir)plugins\Whim.TreeLayout.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <TreeLayoutBarDestinationFile Include="@(TreeLayoutBarSourceFile-&gt;'$(TargetDir)plugins\Whim.TreeLayout.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(TreeLayoutBarSourceFile)" DestinationFiles="@(TreeLayoutBarDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout.Bar\$(OutDir)Whim.TreeLayout.Bar.dll" DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.Bar\" SkipUnchangedFiles="true" />
@@ -224,7 +224,7 @@
   <Target Name="CopyUpdaterAfterBuild" AfterTargets="Build;Publish">
     <ItemGroup>
       <UpdaterSourceFile Include="$(SolutionDir)\src\Whim.Updater\$(OutDir)\Whim.Updater\**\*" />
-      <UpdaterDestinationFile Include="@(UpdaterSourceFile->'$(TargetDir)plugins\Whim.Updater\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <UpdaterDestinationFile Include="@(UpdaterSourceFile-&gt;'$(TargetDir)plugins\Whim.Updater\%(RecursiveDir)%(Filename)%(Extension)')" />
     </ItemGroup>
     <Copy SourceFiles="@(UpdaterSourceFile)" DestinationFiles="@(UpdaterDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.Updater\$(OutDir)Whim.Updater.dll" DestinationFolder="$(TargetDir)plugins\Whim.Updater\" SkipUnchangedFiles="true" />
