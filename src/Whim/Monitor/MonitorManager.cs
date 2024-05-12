@@ -72,51 +72,6 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	private void MonitorSector_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
 		MonitorsChanged?.Invoke(sender, e);
 
-	public void OnWindowFocused(IWindow? window)
-	{
-		// If we know the window, use what the Butler knows instead of Windows.
-		if (window is not null)
-		{
-			Logger.Debug($"Focusing window {window}");
-			if (_context.Butler.Pantry.GetMonitorForWindow(window) is IMonitor monitor)
-			{
-				Logger.Debug($"Setting active monitor to {monitor}");
-				ActiveMonitor = monitor;
-				LastWhimActiveMonitor = monitor;
-				return;
-			}
-		}
-
-		HWND hwnd = window?.Handle ?? _internalContext.CoreNativeManager.GetForegroundWindow();
-		Logger.Debug($"Focusing hwnd {hwnd}");
-
-		if (hwnd.IsNull)
-		{
-			Logger.Debug($"Hwnd is desktop window, ignoring");
-			return;
-		}
-
-		HMONITOR hMONITOR = _internalContext.CoreNativeManager.MonitorFromWindow(
-			hwnd,
-			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
-		);
-
-		foreach (Monitor monitor in _monitors)
-		{
-			if (monitor.Handle == hMONITOR)
-			{
-				Logger.Debug($"Setting active monitor to {monitor}");
-				ActiveMonitor = monitor;
-
-				if (window is not null)
-				{
-					LastWhimActiveMonitor = monitor;
-				}
-				break;
-			}
-		}
-	}
-
 	public void ActivateEmptyMonitor(IMonitor monitor) =>
 		_context.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 
