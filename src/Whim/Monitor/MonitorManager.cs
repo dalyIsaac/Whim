@@ -117,18 +117,8 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		}
 	}
 
-	public void ActivateEmptyMonitor(IMonitor monitor)
-	{
-		Logger.Debug($"Activating empty monitor {monitor}");
-
-		if (!_monitors.Contains(monitor))
-		{
-			Logger.Error($"Monitor {monitor} not found.");
-			return;
-		}
-
-		ActiveMonitor = monitor;
-	}
+	public void ActivateEmptyMonitor(IMonitor monitor) =>
+		_context.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 
 	private void WindowMessageMonitor_SessionChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{

@@ -16,7 +16,7 @@ internal record MonitorsChangedTransform : Transform
 	)
 	{
 		Logger.Debug($"Monitors changed");
-		MonitorSector sector = mutableRootSector.Monitors;
+		MonitorSector sector = mutableRootSector.MonitorSector;
 
 		// Get the new monitors.
 		ImmutableArray<IMonitor> previousMonitors = sector.Monitors;
