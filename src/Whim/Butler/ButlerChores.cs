@@ -132,7 +132,7 @@ internal class ButlerChores : IButlerChores
 		HWND desktop = _internalContext.CoreNativeManager.GetDesktopWindow();
 		_internalContext.CoreNativeManager.SetForegroundWindow(desktop);
 		_internalContext.WindowManager.OnWindowFocused(null);
-		_internalContext.MonitorManager.ActivateEmptyMonitor(monitor);
+		_context.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 	}
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null)

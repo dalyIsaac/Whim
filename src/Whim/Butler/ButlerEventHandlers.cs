@@ -46,9 +46,7 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		}
 		else if (_context.RouterManager.RouterOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
-			workspace = _internalContext.MonitorManager.LastWhimActiveMonitor is IMonitor lastWhimActiveMonitor
-				? _pantry.GetWorkspaceForMonitor(lastWhimActiveMonitor)
-				: _context.WorkspaceManager.ActiveWorkspace;
+			workspace = _pantry.GetWorkspaceForMonitor(_context.Store.Pick(Pickers.GetLastWhimActiveMonitor()));
 		}
 
 		// Check the workspace exists. If it doesn't, clear the workspace.
@@ -66,7 +64,7 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 				MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 			);
 
-			if (_internalContext.MonitorManager.GetMonitorByHandle(hmonitor) is IMonitor monitor)
+			if (_context.Store.Pick(Pickers.GetMonitorByHandle(hmonitor)).TryGet(out IMonitor monitor))
 			{
 				workspace = _pantry.GetWorkspaceForMonitor(monitor);
 			}

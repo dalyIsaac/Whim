@@ -17,8 +17,6 @@ internal interface IInternalContext : IDisposable
 
 	IWindowMessageMonitor WindowMessageMonitor { get; }
 
-	IInternalMonitorManager MonitorManager { get; }
-
 	IInternalWindowManager WindowManager { get; }
 
 	IKeybindHook KeybindHook { get; }

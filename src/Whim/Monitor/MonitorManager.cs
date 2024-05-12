@@ -1,15 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
 /// <summary>
 /// Implementation of <see cref="IMonitorManager"/>.
 /// </summary>
-internal class MonitorManager : IInternalMonitorManager, IMonitorManager
+internal class MonitorManager : IMonitorManager
 {
 	private readonly IContext _context;
 
@@ -18,8 +16,6 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	public IMonitor ActiveMonitor => _context.Store.Pick(Pickers.GetActiveMonitor());
 
 	public IMonitor PrimaryMonitor => _context.Store.Pick(Pickers.GetPrimaryMonitor());
-
-	public IMonitor LastWhimActiveMonitor => _context.Store.Pick(Pickers.GetLastWhimActiveMonitor());
 
 	public int Length => _context.Store.Pick(Pickers.GetAllMonitors()).Count;
 
@@ -48,9 +44,6 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	private void MonitorSector_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
 		MonitorsChanged?.Invoke(sender, e);
-
-	public void ActivateEmptyMonitor(IMonitor monitor) =>
-		_context.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point) => _context.Store.Pick(Pickers.GetMonitorAtPoint(point)).Value;
 
