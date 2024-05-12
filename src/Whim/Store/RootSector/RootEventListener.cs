@@ -30,7 +30,8 @@ internal class RootEventListener : IDisposable
 
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e)
 	{
-		_ctx.Store.Dispatch(new MouseLeftButtonDownTransform());
+		// TODO
+		//_ctx.Store.Dispatch(new MouseLeftButtonDownTransform());
 	}
 
 	protected virtual void Dispose(bool disposing)
