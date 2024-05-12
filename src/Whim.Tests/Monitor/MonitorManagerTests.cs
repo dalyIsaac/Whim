@@ -90,33 +90,6 @@ public class MonitorManagerTests
 		ctx.Store.Received(1).Pick(Pickers.GetMonitorAtPoint(point, true));
 	}
 
-	[Theory, AutoSubstituteData]
-	internal void GetPreviousMonitor(IContext ctx, IMonitor monitor)
-	{
-		// Given
-		MonitorManager sut = new(ctx);
-
-		// When
-		var _ = sut.GetPreviousMonitor(monitor);
-
-		// Then
-		ctx.Store.Received(1).Pick(Pickers.GetAdjacentMonitor(monitor.Handle, reverse: true, getFirst: true));
-	}
-
-	[Theory, AutoSubstituteData]
-	internal void GetNextMonitor(IContext ctx, IMonitor monitor)
-	{
-		// Given
-		MonitorManager sut = new(ctx);
-
-		// When
-		var _ = sut.GetNextMonitor(monitor);
-
-		// Then
-		ctx.Store.Received(requiredNumberOfCalls: 1)
-			.Pick(Pickers.GetAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true));
-	}
-
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void Dispose(IContext ctx)
 	{

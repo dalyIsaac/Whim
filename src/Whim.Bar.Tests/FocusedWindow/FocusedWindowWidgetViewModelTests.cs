@@ -1,5 +1,6 @@
 using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Bar.Tests;
@@ -41,6 +42,7 @@ public class FocusedWindowWidgetViewModelTests
 	public void Title_DifferentMonitor(IContext context, IMonitor monitor, IWindow window, IWindow otherWindow)
 	{
 		// Given
+		monitor.Handle.Returns((HMONITOR)100);
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
@@ -121,6 +123,7 @@ public class FocusedWindowWidgetViewModelTests
 	)
 	{
 		// Given
+		monitor.Handle.Returns((HMONITOR)100);
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
