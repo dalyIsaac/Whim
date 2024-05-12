@@ -6,14 +6,22 @@ internal class MutableRootSector : SectorBase, IDisposable
 {
 	private bool _disposedValue;
 
-	public MutableRootSector(IContext ctx, IInternalContext internalCtx) { }
+	public MonitorSector Monitors { get; }
 
-	public override void Initialize() { }
+	public MutableRootSector(IContext ctx, IInternalContext internalCtx)
+	{
+		Monitors = new MonitorSector(ctx, internalCtx);
+	}
+
+	public override void Initialize()
+	{
+		Monitors.Initialize();
+	}
 
 	public override void DispatchEvents()
 	{
 		Logger.Debug("Dispatching events");
-		// TODO
+		Monitors.DispatchEvents();
 	}
 
 	protected virtual void Dispose(bool disposing)
@@ -23,7 +31,7 @@ internal class MutableRootSector : SectorBase, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				// TODO
+				Monitors.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
