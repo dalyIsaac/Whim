@@ -41,20 +41,18 @@ public class PerformCustomActionTests
 		beforeStates.Should().BeEquivalentTo(afterStates);
 	}
 
-	public static IEnumerable<object[]> PromoteWindowInStack_Data()
-	{
-		// Already highest area
-		yield return new object[] { 0, 0 };
-
-		// Promote to higher area, slice to slice
-		yield return new object[] { 2, 1 };
-
-		// Promote to higher area, overflow to slice
-		yield return new object[] { 5, 3 };
-
-		// Promote to higher area, slice to slice
-		yield return new object[] { 3, 1 };
-	}
+	public static TheoryData<int, int> PromoteWindowInStack_Data =>
+		new()
+		{
+			// Already highest area
+			{ 0, 0 },
+			// Promote to higher area, slice to slice
+			{ 2, 1 },
+			// Promote to higher area, overflow to slice
+			{ 5, 3 },
+			// Promote to higher area, slice to slice
+			{ 3, 1 }
+		};
 
 	[Theory]
 	[MemberAutoSubstituteData(nameof(PromoteWindowInStack_Data))]
@@ -147,20 +145,18 @@ public class PerformCustomActionTests
 		beforeStates.Should().BeEquivalentTo(afterStates);
 	}
 
-	public static IEnumerable<object[]> DemoteWindowInStack_Data()
-	{
-		// Already lowest area
-		yield return new object[] { 5, 5 };
-
-		// Demote to lower area, slice to slice
-		yield return new object[] { 1, 2 };
-
-		// Demote to lower area, slice to overflow
-		yield return new object[] { 3, 4 };
-
-		// Demote to lower area, slice to slice
-		yield return new object[] { 1, 2 };
-	}
+	public static TheoryData<int, int> DemoteWindowInStack_Data =>
+		new()
+		{
+			// Already lowest area
+			{ 5, 5 },
+			// Demote to lower area, slice to slice
+			{ 1, 2 },
+			// Demote to lower area, slice to overflow
+			{ 3, 4 },
+			// Demote to lower area, slice to slice
+			{ 1, 2 },
+		};
 
 	[Theory]
 	[MemberAutoSubstituteData(nameof(DemoteWindowInStack_Data))]

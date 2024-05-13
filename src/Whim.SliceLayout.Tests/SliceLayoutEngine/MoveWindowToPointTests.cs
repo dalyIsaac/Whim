@@ -8,13 +8,14 @@ public class MoveWindowToPointTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
 
-	public static IEnumerable<object[]> MoveWindowToPoint_Data()
-	{
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, 0.7), 4 };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.3, 0.3), 0 };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.3, 0.7), 1 };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 3, new Point<double>(0, 0), 0 };
-	}
+	public static TheoryData<ParentArea, int, int, IPoint<double>, int> MoveWindowToPoint_Data =>
+		new()
+		{
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, 0.7), 4 },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.3, 0.3), 0 },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.3, 0.7), 1 },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 3, new Point<double>(0, 0), 0 }
+		};
 
 	[Theory]
 	[MemberAutoSubstituteData(nameof(MoveWindowToPoint_Data))]
@@ -46,13 +47,14 @@ public class MoveWindowToPointTests
 		Assert.Equal(windows[expectedWindowIdx], windowStates[windowIdx].Window);
 	}
 
-	public static IEnumerable<object[]> MoveWindowToPoint_WindowDoesNotMove_Data()
-	{
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 4, new Point<double>(0.7, 0.7) };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 0, new Point<double>(0.3, 0.3) };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 1, new Point<double>(0.3, 0.7) };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 0, new Point<double>(0, 0) };
-	}
+	public static TheoryData<ParentArea, int, IPoint<double>> MoveWindowToPoint_WindowDoesNotMove_Data =>
+		new()
+		{
+			{ SampleSliceLayouts.CreateNestedLayout(), 4, new Point<double>(0.7, 0.7) },
+			{ SampleSliceLayouts.CreateNestedLayout(), 0, new Point<double>(0.3, 0.3) },
+			{ SampleSliceLayouts.CreateNestedLayout(), 1, new Point<double>(0.3, 0.7) },
+			{ SampleSliceLayouts.CreateNestedLayout(), 0, new Point<double>(0, 0) }
+		};
 
 	[Theory]
 	[MemberAutoSubstituteData(nameof(MoveWindowToPoint_WindowDoesNotMove_Data))]
@@ -82,13 +84,14 @@ public class MoveWindowToPointTests
 		Assert.Equal(windows[windowIdx], windowStates[windowIdx].Window);
 	}
 
-	public static IEnumerable<object[]> MoveWindowToPoint_InvalidPoint_Data()
-	{
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(-0.1, 0.7) };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, -0.1) };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(1.1, 0.7) };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, 1.1) };
-	}
+	public static TheoryData<ParentArea, int, int, IPoint<double>> MoveWindowToPoint_InvalidPoint_Data =>
+		new()
+		{
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(-0.1, 0.7) },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, -0.1) },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(1.1, 0.7) },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, 1.1) }
+		};
 
 	[Theory]
 	[MemberAutoSubstituteData(nameof(MoveWindowToPoint_InvalidPoint_Data))]

@@ -9,89 +9,93 @@ public class GapsLayoutEngineTests
 {
 	private static readonly LayoutEngineIdentity _identity = new();
 
-	public static IEnumerable<object[]> DoLayout_Data()
+	public static TheoryData<GapsConfig, IWindow[], int, IWindowState[]> DoLayout_Data
 	{
-		IWindow window1 = Substitute.For<IWindow>();
-		yield return new object[]
+		get
 		{
-			new GapsConfig() { OuterGap = 10, InnerGap = 5 },
-			new IWindow[] { window1 },
-			100,
-			new IWindowState[]
-			{
-				new WindowState()
-				{
-					Window = window1,
-					Rectangle = new Rectangle<int>()
-					{
-						X = 10 + 5,
-						Y = 10 + 5,
-						Width = 1920 - (10 * 2) - (5 * 2),
-						Height = 1080 - (10 * 2) - (5 * 2)
-					},
-					WindowSize = WindowSize.Normal
-				}
-			}
-		};
+			TheoryData<GapsConfig, IWindow[], int, IWindowState[]> data = new();
 
-		IWindow window2 = Substitute.For<IWindow>();
-		IWindow window3 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig() { OuterGap = 10, InnerGap = 5 },
-			new IWindow[] { window2, window3 },
-			100,
-			new IWindowState[]
-			{
-				new WindowState()
+			IWindow window1 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig() { OuterGap = 10, InnerGap = 5 },
+				new IWindow[] { window1 },
+				100,
+				new IWindowState[]
 				{
-					Window = window2,
-					Rectangle = new Rectangle<int>()
+					new WindowState()
 					{
-						X = 10 + 5,
-						Y = 10 + 5,
-						Width = 960 - 10 - (5 * 2),
-						Height = 1080 - (10 * 2) - (5 * 2)
-					},
-					WindowSize = WindowSize.Normal
-				},
-				new WindowState()
-				{
-					Window = window3,
-					Rectangle = new Rectangle<int>()
-					{
-						X = 960 + 5,
-						Y = 10 + 5,
-						Width = 960 - 10 - (5 * 2),
-						Height = 1080 - (10 * 2) - (5 * 2)
-					},
-					WindowSize = WindowSize.Normal
+						Window = window1,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 10 + 5,
+							Y = 10 + 5,
+							Width = 1920 - (10 * 2) - (5 * 2),
+							Height = 1080 - (10 * 2) - (5 * 2)
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
 
-		IWindow window4 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			new IWindow[] { window4 },
-			150,
-			new IWindowState[]
-			{
-				new WindowState()
+			IWindow window2 = Substitute.For<IWindow>();
+			IWindow window3 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig() { OuterGap = 10, InnerGap = 5 },
+				new IWindow[] { window2, window3 },
+				100,
+				new IWindowState[]
 				{
-					Window = window4,
-					Rectangle = new Rectangle<int>()
+					new WindowState()
 					{
-						X = 15 + 7,
-						Y = 15 + 7,
-						Width = 1920 - (15 * 2) - (7 * 2),
-						Height = 1080 - (15 * 2) - (7 * 2)
+						Window = window2,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 10 + 5,
+							Y = 10 + 5,
+							Width = 960 - 10 - (5 * 2),
+							Height = 1080 - (10 * 2) - (5 * 2)
+						},
+						WindowSize = WindowSize.Normal
 					},
-					WindowSize = WindowSize.Normal
+					new WindowState()
+					{
+						Window = window3,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 960 + 5,
+							Y = 10 + 5,
+							Width = 960 - 10 - (5 * 2),
+							Height = 1080 - (10 * 2) - (5 * 2)
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
+
+			IWindow window4 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				new IWindow[] { window4 },
+				150,
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Window = window4,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 15 + 7,
+							Y = 15 + 7,
+							Width = 1920 - (15 * 2) - (7 * 2),
+							Height = 1080 - (15 * 2) - (7 * 2)
+						},
+						WindowSize = WindowSize.Normal
+					}
+				}
+			);
+
+			return data;
+		}
 	}
 
 	[Theory]
@@ -127,252 +131,251 @@ public class GapsLayoutEngineTests
 		windowStates.Should().Equal(expectedWindowStates);
 	}
 
-	public static IEnumerable<object[]> DoLayout_OutOfBoundsData()
+	public static TheoryData<GapsConfig, IWindow, Rectangle<int>, IWindowState[]> DoLayout_OutOfBoundsData
 	{
-		// A window whose width returned by the layout engine as less than zero should not have the
-		// gap applied in the x direction
-		IWindow window1 = Substitute.For<IWindow>();
-		yield return new object[]
+		get
 		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			window1,
-			new Rectangle<int>()
-			{
-				X = 5,
-				Y = 5,
-				Width = -100,
-				Height = 1080
-			},
-			new IWindowState[]
-			{
-				new WindowState()
-				{
-					Window = window1,
-					Rectangle = new Rectangle<int>()
-					{
-						X = 5,
-						Y = 5,
-						Width = 0,
-						Height = 1080
-					},
-					WindowSize = WindowSize.Normal
-				}
-			}
-		};
+			TheoryData<GapsConfig, IWindow, Rectangle<int>, IWindowState[]> data = new();
 
-		// A window whose width returned by the layout engine as zero should not have the gap applied
-		// in the x direction
-		IWindow window2 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			window2,
-			new Rectangle<int>()
-			{
-				X = 5,
-				Y = 5,
-				Width = 0,
-				Height = 1080
-			},
-			new IWindowState[]
-			{
-				new WindowState()
+			// A window whose width returned by the layout engine as less than zero should not have the
+			// gap applied in the x direction
+			IWindow window1 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				window1,
+				new Rectangle<int>()
 				{
-					Window = window2,
-					Rectangle = new Rectangle<int>()
+					X = 5,
+					Y = 5,
+					Width = -100,
+					Height = 1080
+				},
+				new IWindowState[]
+				{
+					new WindowState()
 					{
-						X = 5,
-						Y = 5,
-						Width = 0,
-						Height = 1080
-					},
-					WindowSize = WindowSize.Normal
+						Window = window1,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 5,
+							Y = 5,
+							Width = 0,
+							Height = 1080
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
 
-		// A window whose width is less than the gap should not have the gap applied in the x direction
-		IWindow window3 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			window3,
-			new Rectangle<int>()
-			{
-				X = 5,
-				Y = 5,
-				Width = 5,
-				Height = 1080
-			},
-			new IWindowState[]
-			{
-				new WindowState()
+			// A window whose width returned by the layout engine as zero should not have the gap applied
+			// in the x direction
+			IWindow window2 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				window2,
+				new Rectangle<int>()
 				{
-					Window = window3,
-					Rectangle = new Rectangle<int>()
+					X = 5,
+					Y = 5,
+					Width = 0,
+					Height = 1080
+				},
+				new IWindowState[]
+				{
+					new WindowState()
 					{
-						X = 5,
-						Y = 5,
-						Width = 5,
-						Height = 1080
-					},
-					WindowSize = WindowSize.Normal
+						Window = window2,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 5,
+							Y = 5,
+							Width = 0,
+							Height = 1080
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
 
-		// A window whose height returned by the layout engine as less than zero should not have the
-		// gap applied in the y direction
-		IWindow window4 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			window4,
-			new Rectangle<int>()
-			{
-				X = 5,
-				Y = 5,
-				Width = 1920,
-				Height = -100
-			},
-			new IWindowState[]
-			{
-				new WindowState()
+			// A window whose width is less than the gap should not have the gap applied in the x direction
+			IWindow window3 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				window3,
+				new Rectangle<int>()
 				{
-					Window = window4,
-					Rectangle = new Rectangle<int>()
+					X = 5,
+					Y = 5,
+					Width = 5,
+					Height = 1080
+				},
+				new IWindowState[]
+				{
+					new WindowState()
 					{
-						X = 5,
-						Y = 5,
-						Width = 1920,
-						Height = 0
-					},
-					WindowSize = WindowSize.Normal
+						Window = window3,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 5,
+							Y = 5,
+							Width = 5,
+							Height = 1080
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
 
-		// A window whose height returned by the layout engine as zero should not have the gap applied
-		// in the y direction
-		IWindow window5 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			window5,
-			new Rectangle<int>()
-			{
-				X = 5,
-				Y = 5,
-				Width = 1920,
-				Height = 0
-			},
-			new IWindowState[]
-			{
-				new WindowState()
+			// A window whose height returned by the layout engine as less than zero should not have the
+			// gap applied in the y direction
+			IWindow window4 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				window4,
+				new Rectangle<int>()
 				{
-					Window = window5,
-					Rectangle = new Rectangle<int>()
+					X = 5,
+					Y = 5,
+					Width = 1920,
+					Height = -100
+				},
+				new IWindowState[]
+				{
+					new WindowState()
 					{
-						X = 5,
-						Y = 5,
-						Width = 1920,
-						Height = 0
-					},
-					WindowSize = WindowSize.Normal
+						Window = window4,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 5,
+							Y = 5,
+							Width = 1920,
+							Height = 0
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
 
-		// A window whose height is less than the gap should not have the gap applied in the y direction
-		IWindow window6 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			window6,
-			new Rectangle<int>()
-			{
-				X = 5,
-				Y = 5,
-				Width = 1920,
-				Height = 5
-			},
-			new IWindowState[]
-			{
-				new WindowState()
+			// A window whose height returned by the layout engine as zero should not have the gap applied
+			// in the y direction
+			IWindow window5 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				window5,
+				new Rectangle<int>()
 				{
-					Window = window6,
-					Rectangle = new Rectangle<int>()
+					X = 5,
+					Y = 5,
+					Width = 1920,
+					Height = 0
+				},
+				new IWindowState[]
+				{
+					new WindowState()
 					{
-						X = 5,
-						Y = 5,
-						Width = 1920,
-						Height = 5
-					},
-					WindowSize = WindowSize.Normal
+						Window = window5,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 5,
+							Y = 5,
+							Width = 1920,
+							Height = 0
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
 
-		// A window whose width and height are less than the gap should not have the gap applied in
-		// either direction
-		IWindow window7 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			window7,
-			new Rectangle<int>()
-			{
-				X = 5,
-				Y = 5,
-				Width = 5,
-				Height = 5
-			},
-			new IWindowState[]
-			{
-				new WindowState()
+			// A window whose height is less than the gap should not have the gap applied in the y direction
+			IWindow window6 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				window6,
+				new Rectangle<int>()
 				{
-					Window = window7,
-					Rectangle = new Rectangle<int>()
+					X = 5,
+					Y = 5,
+					Width = 1920,
+					Height = 5
+				},
+				new IWindowState[]
+				{
+					new WindowState()
 					{
-						X = 5,
-						Y = 5,
-						Width = 5,
-						Height = 5
-					},
-					WindowSize = WindowSize.Normal
+						Window = window6,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 5,
+							Y = 5,
+							Width = 1920,
+							Height = 5
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
 
-		// A window whose width and height are zero should not have the gap applied in either direction
-		IWindow window8 = Substitute.For<IWindow>();
-		yield return new object[]
-		{
-			new GapsConfig { OuterGap = 10, InnerGap = 5 },
-			window8,
-			new Rectangle<int>()
-			{
-				X = 5,
-				Y = 5,
-				Width = 0,
-				Height = 0
-			},
-			new IWindowState[]
-			{
-				new WindowState()
+			// A window whose width and height are less than the gap should not have the gap applied in
+			// either direction
+			IWindow window7 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				window7,
+				new Rectangle<int>()
 				{
-					Window = window8,
-					Rectangle = new Rectangle<int>()
+					X = 5,
+					Y = 5,
+					Width = 5,
+					Height = 5
+				},
+				new IWindowState[]
+				{
+					new WindowState()
 					{
-						X = 5,
-						Y = 5,
-						Width = 0,
-						Height = 0
-					},
-					WindowSize = WindowSize.Normal
+						Window = window7,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 5,
+							Y = 5,
+							Width = 5,
+							Height = 5
+						},
+						WindowSize = WindowSize.Normal
+					}
 				}
-			}
-		};
+			);
+
+			// A window whose width and height are zero should not have the gap applied in either direction
+			IWindow window8 = Substitute.For<IWindow>();
+			data.Add(
+				new GapsConfig { OuterGap = 10, InnerGap = 5 },
+				window8,
+				new Rectangle<int>()
+				{
+					X = 5,
+					Y = 5,
+					Width = 0,
+					Height = 0
+				},
+				new IWindowState[]
+				{
+					new WindowState()
+					{
+						Window = window8,
+						Rectangle = new Rectangle<int>()
+						{
+							X = 5,
+							Y = 5,
+							Width = 0,
+							Height = 0
+						},
+						WindowSize = WindowSize.Normal
+					}
+				}
+			);
+
+			return data;
+		}
 	}
 
 	[Theory]

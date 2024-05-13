@@ -8,26 +8,22 @@ public class FocusWindowInDirectionTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
 
-	public static IEnumerable<object[]> FocusWindowInDirection_Data()
-	{
-		// Nested, share grandparent, right
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Right, 1, 4 };
-
-		// Nested, share grandparent, left
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Left, 4, 1 };
-
-		// Same slice, down
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 0, 1 };
-
-		// Same slice, up
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up, 3, 2 };
-
-		// Last overflow window, top left
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up | Direction.Left, 5, 1 };
-
-		// Slice 1, down across slices
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 3, 4 };
-	}
+	public static TheoryData<ParentArea, int, Direction, int, int> FocusWindowInDirection_Data =>
+		new()
+		{
+			// Nested, share grandparent, right
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Right, 1, 4 },
+			// Nested, share grandparent, left
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Left, 4, 1 },
+			// Same slice, down
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 0, 1 },
+			// Same slice, up
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up, 3, 2 },
+			// Last overflow window, top left
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up | Direction.Left, 5, 1 },
+			// Slice 1, down across slices
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 3, 4 }
+		};
 
 	[Theory]
 	[MemberAutoSubstituteData(nameof(FocusWindowInDirection_Data))]
@@ -60,14 +56,15 @@ public class FocusWindowInDirectionTests
 		Assert.Same(newEngine1, newEngine2);
 	}
 
-	public static IEnumerable<object[]> FocusWindowInDirection_NoWindowInDirection_Data()
-	{
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Left, 1 };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Right, 2 };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up, 0 };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 1 };
-		yield return new object[] { SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 5 };
-	}
+	public static TheoryData<ParentArea, int, Direction, int> FocusWindowInDirection_NoWindowInDirection_Data =>
+		new()
+		{
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Left, 1 },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Right, 2 },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up, 0 },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 1 },
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 5 }
+		};
 
 	[Theory]
 	[MemberAutoSubstituteData(nameof(FocusWindowInDirection_NoWindowInDirection_Data))]
