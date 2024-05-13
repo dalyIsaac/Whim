@@ -8,7 +8,51 @@ using Xunit;
 
 namespace Whim;
 
-public class MonitorPickersTests { }
+public class MonitorPickersTests
+{
+	private static void PopulateMonitors(MutableRootSector mutableRootSector)
+	{
+		IMonitor monitor1 = Substitute.For<IMonitor>();
+		monitor1.Handle.Returns((HMONITOR)1);
+
+		IMonitor monitor2 = Substitute.For<IMonitor>();
+		monitor2.Handle.Returns((HMONITOR)2);
+
+		IMonitor monitor3 = Substitute.For<IMonitor>();
+		monitor3.Handle.Returns((HMONITOR)3);
+
+		mutableRootSector.MonitorSector.Monitors = ImmutableArray.Create(monitor1, monitor2, monitor3);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetMonitorByHandle_Failure(IContext ctx, MutableRootSector mutableRootSector)
+	{
+		// Given the handle does not exist in the monitors
+		PopulateMonitors(mutableRootSector);
+		HMONITOR monitorHandle = (HMONITOR)40;
+
+		// When we get the monitor
+		Result<IMonitor> result = ctx.Store.Pick(Pickers.GetMonitorByHandle(monitorHandle));
+
+		// Then we get an exception
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetMonitorByHandle_Success(IContext ctx, MutableRootSector mutableRootSector)
+	{
+		// Given the handle exists in the monitors
+		PopulateMonitors(mutableRootSector);
+		HMONITOR monitorHandle = (HMONITOR)2;
+
+		// When we get the monitor
+		Result<IMonitor> result = ctx.Store.Pick(Pickers.GetMonitorByHandle(monitorHandle));
+
+		// Then we get the monitor
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(monitorHandle, result.Value.Handle);
+	}
+}
 
 public class GetMonitorAtPointPickerTests
 {
