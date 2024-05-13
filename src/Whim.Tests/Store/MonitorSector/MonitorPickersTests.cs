@@ -21,7 +21,10 @@ public class MonitorPickersTests
 		IMonitor monitor3 = Substitute.For<IMonitor>();
 		monitor3.Handle.Returns((HMONITOR)3);
 
-		mutableRootSector.MonitorSector.Monitors = ImmutableArray.Create(monitor1, monitor2, monitor3);
+		IMonitor monitor4 = Substitute.For<IMonitor>();
+		monitor4.Handle.Returns((HMONITOR)4);
+
+		mutableRootSector.MonitorSector.Monitors = ImmutableArray.Create(monitor1, monitor2, monitor3, monitor4);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -51,6 +54,48 @@ public class MonitorPickersTests
 		// Then we get the monitor
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(monitorHandle, result.Value.Handle);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetActiveMonitor(IContext ctx, MutableRootSector mutableRootSector)
+	{
+		// Given there is an active monitor
+		PopulateMonitors(mutableRootSector);
+		mutableRootSector.MonitorSector.ActiveMonitorHandle = (HMONITOR)2;
+
+		// When we get the monitor
+		IMonitor result = ctx.Store.Pick(Pickers.GetActiveMonitor());
+
+		// Then we get the monitor
+		Assert.Equal((HMONITOR)2, result.Handle);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetPrimaryMonitor(IContext ctx, MutableRootSector mutableRootSector)
+	{
+		// Given there is a primary monitor
+		PopulateMonitors(mutableRootSector);
+		mutableRootSector.MonitorSector.PrimaryMonitorHandle = (HMONITOR)1;
+
+		// When we get the monitor
+		IMonitor result = ctx.Store.Pick(Pickers.GetPrimaryMonitor());
+
+		// Then we get the monitor
+		Assert.Equal((HMONITOR)1, result.Handle);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetLastWhimActiveMonitor(IContext ctx, MutableRootSector mutableRootSector)
+	{
+		// Given there is an active monitor
+		PopulateMonitors(mutableRootSector);
+		mutableRootSector.MonitorSector.LastWhimActiveMonitorHandle = (HMONITOR)2;
+
+		// When we get the monitor
+		IMonitor result = ctx.Store.Pick(Pickers.GetLastWhimActiveMonitor());
+
+		// Then we get the monitor
+		Assert.Equal((HMONITOR)2, result.Handle);
 	}
 }
 
