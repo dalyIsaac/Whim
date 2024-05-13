@@ -23,10 +23,8 @@ internal class RootEventListener : IDisposable
 		_internalCtx.MouseHook.MouseLeftButtonDown += MouseHook_MouseLeftButtonDown;
 	}
 
-	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e)
-	{
+	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e) =>
 		_ctx.Store.Dispatch(new MouseLeftButtonUpTransform(e.Point));
-	}
 
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e)
 	{
