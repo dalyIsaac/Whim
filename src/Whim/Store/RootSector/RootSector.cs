@@ -13,6 +13,9 @@ public class RootSector : IRootSector, IDisposable
 	/// <inheritdoc/>
 	public IMonitorSector MonitorSector => MutableRootSector.MonitorSector;
 
+	/// <inheritdoc/>
+	public IWindowSector WindowSector => MutableRootSector.WindowSector;
+
 	internal RootSector(IContext ctx, IInternalContext internalCtx)
 	{
 		MutableRootSector = new MutableRootSector(ctx, internalCtx);

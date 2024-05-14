@@ -6,5 +6,8 @@ namespace Whim;
 public interface IRootSector
 {
 	/// <inheritdoc cref="IMonitorSector"/>
-	public IMonitorSector MonitorSector { get; }
+	IMonitorSector MonitorSector { get; }
+
+	/// <inheritdoc cref="IWindowSector"/>
+	IWindowSector WindowSector { get; }
 }
