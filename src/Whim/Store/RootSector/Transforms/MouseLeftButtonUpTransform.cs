@@ -10,7 +10,7 @@ internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
 		MutableRootSector mutableRootSector
 	)
 	{
-		if (ctx.Store.Pick(Pickers.GetMonitorAtPoint(Point)).TryGet(out IMonitor monitor))
+		if (ctx.Store.Pick(Pickers.PickMonitorAtPoint(Point)).TryGet(out IMonitor monitor))
 		{
 			mutableRootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 		}

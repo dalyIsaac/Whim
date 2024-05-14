@@ -27,7 +27,7 @@ public static class MonitorManagerUtils
 
 		foreach (IMonitor monitor in monitors)
 		{
-			ctx.Store.Pick(Pickers.GetMonitorByHandle(monitor.Handle)).Returns(Result.FromValue(monitor));
+			ctx.Store.Pick(Pickers.PickMonitorByHandle(monitor.Handle)).Returns(Result.FromValue(monitor));
 		}
 	}
 }

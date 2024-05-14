@@ -19,7 +19,7 @@ public class MonitorManagerTests
 		var _ = sut.ActiveMonitor;
 
 		// Then
-		ctx.Store.Received(1).Pick(Pickers.GetActiveMonitor());
+		ctx.Store.Received(1).Pick(Pickers.PickActiveMonitor());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -32,7 +32,7 @@ public class MonitorManagerTests
 		var _ = sut.PrimaryMonitor;
 
 		// Then
-		ctx.Store.Received(1).Pick(Pickers.GetPrimaryMonitor());
+		ctx.Store.Received(1).Pick(Pickers.PickPrimaryMonitor());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -45,7 +45,7 @@ public class MonitorManagerTests
 		var _ = sut.LastWhimActiveMonitor;
 
 		// Then
-		ctx.Store.Received(1).Pick(Pickers.GetLastWhimActiveMonitor());
+		ctx.Store.Received(1).Pick(Pickers.PickLastWhimActiveMonitor());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -58,7 +58,7 @@ public class MonitorManagerTests
 		var _ = sut.Length;
 
 		// Then
-		ctx.Store.Received(1).Pick(Pickers.GetAllMonitors());
+		ctx.Store.Received(1).Pick(Pickers.PickAllMonitors());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -72,7 +72,7 @@ public class MonitorManagerTests
 		((IEnumerable)sut).GetEnumerator();
 
 		// Then
-		ctx.Store.Received(2).Pick(Pickers.GetAllMonitors());
+		ctx.Store.Received(2).Pick(Pickers.PickAllMonitors());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -114,7 +114,7 @@ public class MonitorManagerTests
 		var _ = sut.GetMonitorAtPoint(point);
 
 		// Then
-		ctx.Store.Received(1).Pick(Pickers.GetMonitorAtPoint(point, true));
+		ctx.Store.Received(1).Pick(Pickers.PickMonitorAtPoint(point, true));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

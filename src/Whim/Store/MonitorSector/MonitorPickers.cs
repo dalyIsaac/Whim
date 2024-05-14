@@ -12,7 +12,7 @@ public static partial class Pickers
 	/// </summary>
 	/// <param name="handle"></param>
 	/// <returns></returns>
-	public static PurePicker<Result<IMonitor>> GetMonitorByHandle(HMONITOR handle) =>
+	public static PurePicker<Result<IMonitor>> PickMonitorByHandle(HMONITOR handle) =>
 		(rootSector) =>
 		{
 			foreach (IMonitor m in rootSector.MonitorSector.Monitors)
@@ -29,26 +29,26 @@ public static partial class Pickers
 	/// <summary>
 	/// Get the currently active monitor.
 	/// </summary>
-	public static PurePicker<IMonitor> GetActiveMonitor() =>
-		static (rootSector) => GetMonitorByHandle(rootSector.MonitorSector.ActiveMonitorHandle)(rootSector).Value;
+	public static PurePicker<IMonitor> PickActiveMonitor() =>
+		static (rootSector) => PickMonitorByHandle(rootSector.MonitorSector.ActiveMonitorHandle)(rootSector).Value;
 
 	/// <summary>
 	/// Get the primary monitor.
 	/// </summary>
-	public static PurePicker<IMonitor> GetPrimaryMonitor() =>
-		static (rootSector) => GetMonitorByHandle(rootSector.MonitorSector.PrimaryMonitorHandle)(rootSector).Value;
+	public static PurePicker<IMonitor> PickPrimaryMonitor() =>
+		static (rootSector) => PickMonitorByHandle(rootSector.MonitorSector.PrimaryMonitorHandle)(rootSector).Value;
 
 	/// <summary>
 	/// Get the last <see cref="IMonitor"/> which received an event sent by Windows which Whim did not ignore.
 	/// </summary>
-	public static PurePicker<IMonitor> GetLastWhimActiveMonitor() =>
+	public static PurePicker<IMonitor> PickLastWhimActiveMonitor() =>
 		static (rootSector) =>
-			GetMonitorByHandle(rootSector.MonitorSector.LastWhimActiveMonitorHandle)(rootSector).Value;
+			PickMonitorByHandle(rootSector.MonitorSector.LastWhimActiveMonitorHandle)(rootSector).Value;
 
 	/// <summary>
 	/// Get all the <see cref="IMonitor"/>s tracked by Whim.
 	/// </summary>
-	public static PurePicker<IReadOnlyList<IMonitor>> GetAllMonitors() =>
+	public static PurePicker<IReadOnlyList<IMonitor>> PickAllMonitors() =>
 		static (rootSector) => rootSector.MonitorSector.Monitors;
 
 	/// <summary>
@@ -65,7 +65,7 @@ public static partial class Pickers
 	/// result.
 	/// </param>
 	/// <returns></returns>
-	public static PurePicker<Result<IMonitor>> GetAdjacentMonitor(
+	public static PurePicker<Result<IMonitor>> PickAdjacentMonitor(
 		HMONITOR handle = default,
 		bool reverse = false,
 		bool getFirst = false
@@ -110,7 +110,7 @@ public static partial class Pickers
 	/// result.
 	/// </param>
 	/// <returns></returns>
-	public static Picker<Result<IMonitor>> GetMonitorAtPoint(IPoint<int> point, bool getFirst = false) =>
+	public static Picker<Result<IMonitor>> PickMonitorAtPoint(IPoint<int> point, bool getFirst = false) =>
 		new GetMonitorAtPointPicker(point, getFirst);
 }
 

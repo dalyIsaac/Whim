@@ -28,28 +28,28 @@ public class MonitorPickersTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetMonitorByHandle_Failure(IContext ctx, MutableRootSector root)
+	internal void PickMonitorByHandle_Failure(IContext ctx, MutableRootSector root)
 	{
 		// Given the handle does not exist in the monitors
 		PopulateMonitors(root);
 		HMONITOR monitorHandle = (HMONITOR)40;
 
 		// When we get the monitor
-		Result<IMonitor> result = ctx.Store.Pick(Pickers.GetMonitorByHandle(monitorHandle));
+		Result<IMonitor> result = ctx.Store.Pick(Pickers.PickMonitorByHandle(monitorHandle));
 
 		// Then we get an exception
 		Assert.False(result.IsSuccessful);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetMonitorByHandle_Success(IContext ctx, MutableRootSector root)
+	internal void PickMonitorByHandle_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given the handle exists in the monitors
 		PopulateMonitors(root);
 		HMONITOR monitorHandle = (HMONITOR)2;
 
 		// When we get the monitor
-		Result<IMonitor> result = ctx.Store.Pick(Pickers.GetMonitorByHandle(monitorHandle));
+		Result<IMonitor> result = ctx.Store.Pick(Pickers.PickMonitorByHandle(monitorHandle));
 
 		// Then we get the monitor
 		Assert.True(result.IsSuccessful);
@@ -57,42 +57,42 @@ public class MonitorPickersTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetActiveMonitor(IContext ctx, MutableRootSector root)
+	internal void PickActiveMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given there is an active monitor
 		PopulateMonitors(root);
 		root.MonitorSector.ActiveMonitorHandle = (HMONITOR)2;
 
 		// When we get the monitor
-		IMonitor result = ctx.Store.Pick(Pickers.GetActiveMonitor());
+		IMonitor result = ctx.Store.Pick(Pickers.PickActiveMonitor());
 
 		// Then we get the monitor
 		Assert.Equal((HMONITOR)2, result.Handle);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetPrimaryMonitor(IContext ctx, MutableRootSector root)
+	internal void PickPrimaryMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given there is a primary monitor
 		PopulateMonitors(root);
 		root.MonitorSector.PrimaryMonitorHandle = (HMONITOR)1;
 
 		// When we get the monitor
-		IMonitor result = ctx.Store.Pick(Pickers.GetPrimaryMonitor());
+		IMonitor result = ctx.Store.Pick(Pickers.PickPrimaryMonitor());
 
 		// Then we get the monitor
 		Assert.Equal((HMONITOR)1, result.Handle);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetLastWhimActiveMonitor(IContext ctx, MutableRootSector root)
+	internal void PickLastWhimActiveMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given there is an active monitor
 		PopulateMonitors(root);
 		root.MonitorSector.LastWhimActiveMonitorHandle = (HMONITOR)2;
 
 		// When we get the monitor
-		IMonitor result = ctx.Store.Pick(Pickers.GetLastWhimActiveMonitor());
+		IMonitor result = ctx.Store.Pick(Pickers.PickLastWhimActiveMonitor());
 
 		// Then we get the monitor
 		Assert.Equal((HMONITOR)2, result.Handle);
@@ -101,14 +101,14 @@ public class MonitorPickersTests
 	[InlineAutoSubstituteData<StoreCustomization>(true)]
 	[InlineAutoSubstituteData<StoreCustomization>(false)]
 	[Theory]
-	internal void GetAdjacentMonitor_GetFirst(bool reverse, IContext ctx, MutableRootSector root)
+	internal void PickAdjacentMonitor_GetFirst(bool reverse, IContext ctx, MutableRootSector root)
 	{
 		// Given the handle does not exist in the monitors
 		PopulateMonitors(root);
 		HMONITOR unknownHandle = (HMONITOR)40;
 
 		// When
-		Result<IMonitor> result = ctx.Store.Pick(Pickers.GetAdjacentMonitor(unknownHandle, reverse, getFirst: true));
+		Result<IMonitor> result = ctx.Store.Pick(Pickers.PickAdjacentMonitor(unknownHandle, reverse, getFirst: true));
 
 		// Then
 		Assert.Equal(root.MonitorSector.Monitors[0].Handle, result.Value.Handle);
@@ -119,7 +119,7 @@ public class MonitorPickersTests
 	[InlineAutoSubstituteData<StoreCustomization>(false, 0, 1)]
 	[InlineAutoSubstituteData<StoreCustomization>(false, 3, 0)]
 	[Theory]
-	internal void GetAdjacentMonitor_DoNotGetFirst(
+	internal void PickAdjacentMonitor_DoNotGetFirst(
 		bool reverse,
 		int startIdx,
 		int endIdx,
@@ -132,7 +132,7 @@ public class MonitorPickersTests
 
 		// When
 		Result<IMonitor> result = ctx.Store.Pick(
-			Pickers.GetAdjacentMonitor(root.MonitorSector.Monitors[startIdx].Handle, reverse)
+			Pickers.PickAdjacentMonitor(root.MonitorSector.Monitors[startIdx].Handle, reverse)
 		);
 
 		// Then
