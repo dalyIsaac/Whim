@@ -11,7 +11,7 @@ internal record WindowAddedTransform(HWND Handle) : Transform<IWindow>()
 		MutableRootSector mutableRootSector
 	)
 	{
-		WindowSector sector = mutableRootSector.Windows;
+		WindowSector sector = mutableRootSector.WindowSector;
 
 		// Filter the handle.
 		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))

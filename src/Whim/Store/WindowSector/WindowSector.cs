@@ -14,8 +14,7 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 
 	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
-	public ImmutableHashSet<IWindow> HandledLocationRestoringWindows { get; internal set; } =
-		ImmutableHashSet<IWindow>.Empty;
+	public ImmutableHashSet<HWND> HandledLocationRestoringWindows { get; internal set; } = ImmutableHashSet<HWND>.Empty;
 
 	public bool IsMovingWindow { get; internal set; }
 

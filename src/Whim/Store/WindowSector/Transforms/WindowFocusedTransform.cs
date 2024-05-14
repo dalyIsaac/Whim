@@ -4,6 +4,7 @@ using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
+// TODO: Make HWND
 internal record WindowFocusedTransform(IWindow? Window) : Transform()
 {
 	internal override Result<Unit> Execute(

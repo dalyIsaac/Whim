@@ -17,7 +17,7 @@ public interface IWindowSector
 	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringFilterManager"/>.
 	/// We maintain a set of the windows that have been handled so that we don't enter an infinite loop of location change events.
 	/// </summary>
-	ImmutableHashSet<IWindow> HandledLocationRestoringWindows { get; }
+	ImmutableHashSet<HWND> HandledLocationRestoringWindows { get; }
 
 	/// <summary>
 	/// Whether a window is currently moving.

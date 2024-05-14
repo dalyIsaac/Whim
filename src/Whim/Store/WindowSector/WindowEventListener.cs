@@ -125,18 +125,20 @@ internal class WindowEventListener : IDisposable
 			return;
 		}
 
-		if (!_ctx.Store.Pick(new TryGetWindowPicker(hwnd)).TryGet(out IWindow window))
+		if (!_ctx.Store.Pick(Pickers.PickWindowByHandle(hwnd)).IsSuccessful)
 		{
 			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
 
 			Result<IWindow> windowResult = _ctx.Store.Dispatch(new WindowAddedTransform(hwnd));
-			if (!windowResult.TryGet(out window))
+			if (!windowResult.IsSuccessful
 			{
 				return;
 			}
 		}
 
-		Logger.Debug($"Windows event 0x{eventType:X4} for {window}");
+		// TODO: I don't think the window is actually needed here.
+
+		Logger.Debug($"Windows event 0x{eventType:X4} for {hwnd}");
 		switch (eventType)
 		{
 			// `EVENT_OBJECT_SHOW` is handled by the code above to `AddWindow`.
@@ -144,14 +146,14 @@ internal class WindowEventListener : IDisposable
 				break;
 			case PInvoke.EVENT_SYSTEM_FOREGROUND:
 			case PInvoke.EVENT_OBJECT_UNCLOAKED:
-				_ctx.Store.Dispatch(new WindowFocusedTransform(window));
+				_ctx.Store.Dispatch(new WindowFocusedTransform(hwnd));
 				break;
 			case PInvoke.EVENT_OBJECT_HIDE:
-				_ctx.Store.Dispatch(new WindowHiddenTransform(window));
+				_ctx.Store.Dispatch(new WindowHiddenTransform(hwnd));
 				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
-				_ctx.Store.Dispatch(new WindowRemovedTransform(window));
+				_ctx.Store.Dispatch(new WindowRemovedTransform(hwnd));
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
 				_ctx.Store.Dispatch(new WindowMoveStartedTransform(window));
