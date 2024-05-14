@@ -130,7 +130,7 @@ internal class WindowEventListener : IDisposable
 			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
 
 			Result<IWindow> windowResult = _ctx.Store.Dispatch(new WindowAddedTransform(hwnd));
-			if (!windowResult.IsSuccessful
+			if (!windowResult.IsSuccessful)
 			{
 				return;
 			}
