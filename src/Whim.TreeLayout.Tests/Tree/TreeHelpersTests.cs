@@ -318,321 +318,262 @@ public class TreeHelpersTests
 	#endregion
 
 	#region GetDirectionToPoint
-	public static IEnumerable<object[]> GetDirectionToPoint_UnitSquareData()
-	{
-		// Top left corner boundary
-		yield return new object[] { Rectangle.UnitSquare<double>(), new Point<double>(), Direction.Up };
-
-		yield return new object[]
+	public static TheoryData<Rectangle<double>, Point<double>, Direction> GetDirectionToPoint_UnitSquareData =>
+		new()
 		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.1, Y = 0 },
-			Direction.Up
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0, Y = 0.1 },
-			Direction.Left
-		};
-
-		// Top right corner boundary
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 1, Y = 0 },
-			Direction.Up
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.9, Y = 0 },
-			Direction.Up
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 1, Y = 0.1 },
-			Direction.Right
-		};
-
-		// Middle
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.5, Y = 0.5 },
-			Direction.Up
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.5, Y = 0.4 },
-			Direction.Up
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.5, Y = 0.6 },
-			Direction.Down
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.4, Y = 0.5 },
-			Direction.Left
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.6, Y = 0.5 },
-			Direction.Right
-		};
-
-		// Bottom left corner boundary
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0, Y = 1 },
-			Direction.Left
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0, Y = 0.9 },
-			Direction.Left
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.1, Y = 1 },
-			Direction.Down
-		};
-
-		// Bottom right corner boundary
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 1, Y = 1 },
-			Direction.Right
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 1, Y = 0.9 },
-			Direction.Right
-		};
-
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.9, Y = 1 },
-			Direction.Down
-		};
-
-		// Middle of the top triangle
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.5, Y = 0.25 },
-			Direction.Up
-		};
-
-		// Middle of the bottom triangle
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.5, Y = 0.75 },
-			Direction.Down
-		};
-
-		// Middle of the left triangle
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.25, Y = 0.5 },
-			Direction.Left
-		};
-
-		// Middle of the right triangle
-		yield return new object[]
-		{
-			Rectangle.UnitSquare<double>(),
-			new Point<double>() { X = 0.75, Y = 0.5 },
-			Direction.Right
-		};
-	}
-
-	public static IEnumerable<object[]> GetDirectionToPoint_NonUnitSquareData()
-	{
-		yield return new object[]
-		{
-			new Rectangle<double>()
+			// Top left corner boundary
+			{ Rectangle.UnitSquare<double>(), new Point<double>(), Direction.Up },
 			{
-				X = 1,
-				Y = 1,
-				Width = 2,
-				Height = 2
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.1, Y = 0 },
+				Direction.Up
 			},
-			new Point<double>() { X = 1.5, Y = 1.5 },
-			Direction.Up
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0, Y = 0.1 },
+				Direction.Left
+			},
+			// Top right corner boundary
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 1, Y = 0 },
+				Direction.Up
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.9, Y = 0 },
+				Direction.Up
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 1, Y = 0.1 },
+				Direction.Right
+			},
+			// Middle
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.5, Y = 0.5 },
+				Direction.Up
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.5, Y = 0.4 },
+				Direction.Up
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.5, Y = 0.6 },
+				Direction.Down
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.4, Y = 0.5 },
+				Direction.Left
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.6, Y = 0.5 },
+				Direction.Right
+			},
+			// Bottom left corner boundary
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0, Y = 1 },
+				Direction.Left
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0, Y = 0.9 },
+				Direction.Left
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.1, Y = 1 },
+				Direction.Down
+			},
+			// Bottom right corner boundary
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 1, Y = 1 },
+				Direction.Right
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 1, Y = 0.9 },
+				Direction.Right
+			},
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.9, Y = 1 },
+				Direction.Down
+			},
+			// Middle of the top triangle
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.5, Y = 0.25 },
+				Direction.Up
+			},
+			// Middle of the bottom triangle
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.5, Y = 0.75 },
+				Direction.Down
+			},
+			// Middle of the left triangle
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.25, Y = 0.5 },
+				Direction.Left
+			},
+			// Middle of the right triangle
+			{
+				Rectangle.UnitSquare<double>(),
+				new Point<double>() { X = 0.75, Y = 0.5 },
+				Direction.Right
+			}
 		};
 
-		yield return new object[]
+	public static TheoryData<Rectangle<double>, Point<double>, Direction> GetDirectionToPoint_NonUnitSquareData =>
+		new()
 		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 2,
-				Height = 2
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 2,
+					Height = 2
+				},
+				new Point<double>() { X = 1.5, Y = 1.5 },
+				Direction.Up
 			},
-			new Point<double>() { X = 1.5, Y = 2 },
-			Direction.Left
+			{
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 2,
+					Height = 2
+				},
+				new Point<double>() { X = 1.5, Y = 2 },
+				Direction.Left
+			},
+			{
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 2,
+					Height = 2
+				},
+				new Point<double>() { X = 2.5, Y = 2.75 },
+				Direction.Down
+			},
+			{
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 2,
+					Height = 2
+				},
+				new Point<double>() { X = 2.5, Y = 2.5 },
+				Direction.Right
+			},
 		};
 
-		yield return new object[]
+	public static TheoryData<Rectangle<double>, Point<double>, Direction> GetDirectionToPoint_NonSquareData =>
+		new()
 		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 2,
-				Height = 2
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 2,
+					Height = 1
+				},
+				new Point<double>() { X = 2.0, Y = 1.25 },
+				Direction.Up
 			},
-			new Point<double>() { X = 2.5, Y = 2.75 },
-			Direction.Down
-		};
-
-		yield return new object[]
-		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 2,
-				Height = 2
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 2,
+					Height = 1
+				},
+				new Point<double>() { X = 1.5, Y = 1.5 },
+				Direction.Left
 			},
-			new Point<double>() { X = 2.5, Y = 2.5 },
-			Direction.Right
-		};
-	}
-
-	public static IEnumerable<object[]> GetDirectionToPoint_NonSquareData()
-	{
-		yield return new object[]
-		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 2,
-				Height = 1
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 2,
+					Height = 1
+				},
+				new Point<double>() { X = 2.0, Y = 1.75 },
+				Direction.Down
 			},
-			new Point<double>() { X = 2.0, Y = 1.25 },
-			Direction.Up
-		};
-
-		yield return new object[]
-		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 2,
-				Height = 1
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 2,
+					Height = 1
+				},
+				new Point<double>() { X = 2.5, Y = 1.5 },
+				Direction.Right
 			},
-			new Point<double>() { X = 1.5, Y = 1.5 },
-			Direction.Left
-		};
-
-		yield return new object[]
-		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 2,
-				Height = 1
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 1,
+					Height = 2
+				},
+				new Point<double>() { X = 1.5, Y = 1.5 },
+				Direction.Up
 			},
-			new Point<double>() { X = 2.0, Y = 1.75 },
-			Direction.Down
-		};
-
-		yield return new object[]
-		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 2,
-				Height = 1
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 1,
+					Height = 2
+				},
+				new Point<double>() { X = 1.25, Y = 2.5 },
+				Direction.Left
 			},
-			new Point<double>() { X = 2.5, Y = 1.5 },
-			Direction.Right
-		};
-
-		yield return new object[]
-		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 1,
-				Height = 2
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 1,
+					Height = 2
+				},
+				new Point<double>() { X = 1.25, Y = 2.75 },
+				Direction.Down
 			},
-			new Point<double>() { X = 1.5, Y = 1.5 },
-			Direction.Up
-		};
-
-		yield return new object[]
-		{
-			new Rectangle<double>()
 			{
-				X = 1,
-				Y = 1,
-				Width = 1,
-				Height = 2
-			},
-			new Point<double>() { X = 1.25, Y = 2.5 },
-			Direction.Left
+				new Rectangle<double>()
+				{
+					X = 1,
+					Y = 1,
+					Width = 1,
+					Height = 2
+				},
+				new Point<double>() { X = 1.75, Y = 2.5 },
+				Direction.Right
+			}
 		};
-
-		yield return new object[]
-		{
-			new Rectangle<double>()
-			{
-				X = 1,
-				Y = 1,
-				Width = 1,
-				Height = 2
-			},
-			new Point<double>() { X = 1.25, Y = 2.75 },
-			Direction.Down
-		};
-
-		yield return new object[]
-		{
-			new Rectangle<double>()
-			{
-				X = 1,
-				Y = 1,
-				Width = 1,
-				Height = 2
-			},
-			new Point<double>() { X = 1.75, Y = 2.5 },
-			Direction.Right
-		};
-	}
 
 	[Theory]
 	[MemberData(nameof(GetDirectionToPoint_UnitSquareData))]

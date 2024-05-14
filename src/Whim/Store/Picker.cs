@@ -25,3 +25,8 @@ public abstract record Picker<TResult>()
 /// <param name="rootSector"></param>
 /// <returns></returns>
 public delegate TResult PurePicker<TResult>(IRootSector rootSector);
+
+/// <summary>
+/// Pickers to get data from the store.
+/// </summary>
+public static partial class Pickers { }

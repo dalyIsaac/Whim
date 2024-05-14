@@ -4,6 +4,7 @@ using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Tests;
@@ -23,6 +24,8 @@ public class ButlerChoresCustomization : ICustomization
 				Height = 1080
 			}
 		);
+		monitor1.Handle.Returns((HMONITOR)1);
+
 		IMonitor monitor2 = Substitute.For<IMonitor>();
 		monitor2.WorkingArea.Returns(
 			new Rectangle<int>()
@@ -33,6 +36,7 @@ public class ButlerChoresCustomization : ICustomization
 				Height = 720
 			}
 		);
+		monitor2.Handle.Returns((HMONITOR)2);
 
 		IMonitor[] monitors = new[] { monitor1, monitor2 };
 		fixture.Inject(monitors);

@@ -40,7 +40,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
 			IMonitor? monitorForWorkspace = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
-			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor.Equals(monitorForWorkspace)));
+			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor.Handle == monitorForWorkspace?.Handle));
 		}
 	}
 
@@ -52,7 +52,9 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		}
 
 		IMonitor? monitorForWorkspace = _context.Butler.Pantry.GetMonitorForWorkspace(args.Workspace);
-		Workspaces.Add(new WorkspaceModel(_context, this, args.Workspace, Monitor.Equals(monitorForWorkspace)));
+		Workspaces.Add(
+			new WorkspaceModel(_context, this, args.Workspace, Monitor.Handle == monitorForWorkspace?.Handle)
+		);
 	}
 
 	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
@@ -68,7 +70,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
 	{
-		if (!args.Monitor.Equals(Monitor))
+		if (args.Monitor.Handle != Monitor.Handle)
 		{
 			return;
 		}

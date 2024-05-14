@@ -1,6 +1,7 @@
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Bar.Tests;
@@ -135,6 +136,8 @@ public class WorkspaceWidgetViewModelTests
 	)
 	{
 		// Given
+		monitor.Handle.Returns((HMONITOR)100);
+
 		IWorkspace workspace = context.WorkspaceManager.First();
 		context.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);
@@ -176,6 +179,8 @@ public class WorkspaceWidgetViewModelTests
 	)
 	{
 		// Given
+		monitor.Handle.Returns((HMONITOR)100);
+
 		IWorkspace workspace = context.WorkspaceManager.First();
 		context.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
 		WorkspaceWidgetViewModel viewModel = new(context, monitor);

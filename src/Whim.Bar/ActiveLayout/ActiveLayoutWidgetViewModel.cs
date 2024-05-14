@@ -48,7 +48,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
 	{
-		if (e.Monitor.Equals(Monitor))
+		if (e.Monitor.Handle == Monitor.Handle)
 		{
 			OnPropertyChanged(nameof(ActiveLayoutEngine));
 		}

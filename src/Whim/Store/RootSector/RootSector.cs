@@ -6,15 +6,24 @@ namespace Whim;
 public class RootSector : IRootSector, IDisposable
 {
 	private bool _disposedValue;
+	private readonly RootEventListener _listener;
 
 	internal MutableRootSector MutableRootSector { get; }
+
+	/// <inheritdoc/>
+	public IMonitorSector MonitorSector => MutableRootSector.MonitorSector;
 
 	internal RootSector(IContext ctx, IInternalContext internalCtx)
 	{
 		MutableRootSector = new MutableRootSector(ctx, internalCtx);
+		_listener = new(ctx, internalCtx);
 	}
 
-	internal void Initialize() => MutableRootSector.Initialize();
+	internal void Initialize()
+	{
+		MutableRootSector.Initialize();
+		_listener.Initialize();
+	}
 
 	internal void DispatchEvents() => MutableRootSector.DispatchEvents();
 
@@ -26,6 +35,7 @@ public class RootSector : IRootSector, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
+				_listener.Dispose();
 				MutableRootSector.Dispose();
 			}
 

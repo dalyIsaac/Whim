@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using DotNext;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;

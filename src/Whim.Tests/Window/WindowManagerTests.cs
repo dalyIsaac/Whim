@@ -20,14 +20,9 @@ internal class WindowManagerCustomization : ICustomization
 	public void Customize(IFixture fixture)
 	{
 		IWorkspaceManager workspaceManager = Substitute.For<IWorkspaceManager>();
-		IMonitorManager monitorManager = Substitute.For<IMonitorManager, IInternalMonitorManager>();
 
 		IContext context = fixture.Freeze<IContext>();
 		context.WorkspaceManager.Returns(workspaceManager);
-		context.MonitorManager.Returns(monitorManager);
-
-		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-		internalCtx.MonitorManager.Returns((IInternalMonitorManager)monitorManager);
 	}
 }
 
@@ -200,7 +195,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).OnWindowFocused(window);
+		ctx.Store.Received(1).Dispatch(new WindowFocusedTransform(window));
 		Assert.Equal(window, result.Arguments.Window);
 	}
 
@@ -570,7 +565,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).OnWindowFocused(Arg.Any<IWindow>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<WindowFocusedTransform>());
 	}
 
 	[InlineAutoSubstituteData<WindowManagerCustomization>(PInvoke.EVENT_SYSTEM_FOREGROUND)]
@@ -598,7 +593,7 @@ public class WindowManagerTests
 		);
 
 		// Then
-		internalCtx.MonitorManager.Received(1).OnWindowFocused(Arg.Any<IWindow>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<WindowFocusedTransform>());
 	}
 
 	[Theory, AutoSubstituteData<WindowManagerCustomization>]
@@ -741,7 +736,7 @@ public class WindowManagerTests
 		// Given
 		IContext ctx = Substitute.For<IContext>();
 		ctx.WorkspaceManager.Returns(Substitute.For<IWorkspaceManager>());
-		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
+
 		IInternalContext internalCtx = Substitute.For<IInternalContext>();
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 
@@ -1303,80 +1298,66 @@ public class WindowManagerTests
 			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow>());
 	}
 
-	public static IEnumerable<object[]> MoveEdgesSuccessData()
-	{
-		// Move left edge to the left
-		yield return new object[]
+	public static TheoryData<Rectangle<int>, Rectangle<int>, Direction, Point<int>> MoveEdgesSuccessData =>
+		new()
 		{
-			new Rectangle<int>() { X = 4, Width = 4 },
-			new Rectangle<int>() { X = 3, Width = 5 },
-			Direction.Left,
-			new Point<int>() { X = -1, Y = 0 }
+			// Move left edge to the left
+			{
+				new Rectangle<int>() { X = 4, Width = 4 },
+				new Rectangle<int>() { X = 3, Width = 5 },
+				Direction.Left,
+				new Point<int>() { X = -1, Y = 0 }
+			},
+			// Move left edge to the right
+			{
+				new Rectangle<int>() { X = 4, Width = 4 },
+				new Rectangle<int>() { X = 5, Width = 3 },
+				Direction.Left,
+				new Point<int>() { X = 1, Y = 0 }
+			},
+			// Move right edge to the right
+			{
+				new Rectangle<int>() { X = 4, Width = 4 },
+				new Rectangle<int>() { X = 4, Width = 5 },
+				Direction.Right,
+				new Point<int>() { X = 1, Y = 0 }
+			},
+			// Move right edge to the left
+			{
+				new Rectangle<int>() { X = 4, Width = 4 },
+				new Rectangle<int>() { X = 4, Width = 3 },
+				Direction.Right,
+				new Point<int>() { X = -1, Y = 0 }
+			},
+			// Move top edge up
+			{
+				new Rectangle<int>() { Y = 4, Height = 4 },
+				new Rectangle<int>() { Y = 3, Height = 5 },
+				Direction.Up,
+				new Point<int>() { X = 0, Y = -1 }
+			},
+			// Move top edge down
+			{
+				new Rectangle<int>() { Y = 4, Height = 4 },
+				new Rectangle<int>() { Y = 5, Height = 3 },
+				Direction.Up,
+				new Point<int>() { X = 0, Y = 1 }
+			},
+			// Move bottom edge down
+			{
+				new Rectangle<int>() { Y = 4, Height = 4 },
+				new Rectangle<int>() { Y = 4, Height = 5 },
+				Direction.Down,
+				new Point<int>() { X = 0, Y = 1 }
+			},
+			// Move bottom edge up
+			{
+				new Rectangle<int>() { Y = 4, Height = 4 },
+				new Rectangle<int>() { Y = 4, Height = 3 },
+				Direction.Down,
+				new Point<int>() { X = 0, Y = -1 }
+			}
 		};
-
-		// Move left edge to the right
-		yield return new object[]
-		{
-			new Rectangle<int>() { X = 4, Width = 4 },
-			new Rectangle<int>() { X = 5, Width = 3 },
-			Direction.Left,
-			new Point<int>() { X = 1, Y = 0 }
-		};
-
-		// Move right edge to the right
-		yield return new object[]
-		{
-			new Rectangle<int>() { X = 4, Width = 4 },
-			new Rectangle<int>() { X = 4, Width = 5 },
-			Direction.Right,
-			new Point<int>() { X = 1, Y = 0 }
-		};
-
-		// Move right edge to the left
-		yield return new object[]
-		{
-			new Rectangle<int>() { X = 4, Width = 4 },
-			new Rectangle<int>() { X = 4, Width = 3 },
-			Direction.Right,
-			new Point<int>() { X = -1, Y = 0 }
-		};
-
-		// Move top edge up
-		yield return new object[]
-		{
-			new Rectangle<int>() { Y = 4, Height = 4 },
-			new Rectangle<int>() { Y = 3, Height = 5 },
-			Direction.Up,
-			new Point<int>() { X = 0, Y = -1 }
-		};
-
-		// Move top edge down
-		yield return new object[]
-		{
-			new Rectangle<int>() { Y = 4, Height = 4 },
-			new Rectangle<int>() { Y = 5, Height = 3 },
-			Direction.Up,
-			new Point<int>() { X = 0, Y = 1 }
-		};
-
-		// Move bottom edge down
-		yield return new object[]
-		{
-			new Rectangle<int>() { Y = 4, Height = 4 },
-			new Rectangle<int>() { Y = 4, Height = 5 },
-			Direction.Down,
-			new Point<int>() { X = 0, Y = 1 }
-		};
-
-		// Move bottom edge up
-		yield return new object[]
-		{
-			new Rectangle<int>() { Y = 4, Height = 4 },
-			new Rectangle<int>() { Y = 4, Height = 3 },
-			Direction.Down,
-			new Point<int>() { X = 0, Y = -1 }
-		};
-	}
 
 	[Theory]
 	[MemberData(nameof(MoveEdgesSuccessData))]
@@ -1389,7 +1370,7 @@ public class WindowManagerTests
 	{
 		// Given
 		IContext ctx = Substitute.For<IContext>();
-		ctx.MonitorManager.Returns(Substitute.For<IMonitorManager, IInternalMonitorManager>());
+
 		IInternalContext internalCtx = Substitute.For<IInternalContext>();
 		IWorkspace workspace = Substitute.For<IWorkspace>();
 

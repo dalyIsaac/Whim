@@ -1,5 +1,7 @@
 using System;
+using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Tests;
@@ -32,6 +34,8 @@ public class MonitorWorkspaceChangedEventTests
 	public void Equals_DifferentMonitor(IMonitor aMonitor, IWorkspace workspace, IMonitor bMonitor)
 	{
 		// Given
+		aMonitor.Handle.Returns((HMONITOR)1);
+		bMonitor.Handle.Returns((HMONITOR)2);
 		MonitorWorkspaceChangedEventArgs a = new() { Monitor = aMonitor, CurrentWorkspace = workspace };
 		MonitorWorkspaceChangedEventArgs b = new() { Monitor = bMonitor, CurrentWorkspace = workspace };
 

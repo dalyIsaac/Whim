@@ -379,7 +379,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	public void OnWindowFocused(IWindow? window)
 	{
 		Logger.Debug($"Window focused: {window}");
-		_internalContext.MonitorManager.OnWindowFocused(window);
+		_context.Store.Dispatch(new WindowFocusedTransform(window));
 
 		WindowFocusedEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowFocused(args);
