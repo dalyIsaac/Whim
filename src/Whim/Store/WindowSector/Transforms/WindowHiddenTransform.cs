@@ -1,5 +1,4 @@
 using DotNext;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -12,10 +11,8 @@ namespace Whim;
 /// For example, Discord will hide its window when it is minimized.
 /// We only care about the hide event if the workspace is active.
 /// </summary>
-/// <param name="Handle">
-/// The <see cref="HWND"/> handle of the window.
-/// </param>
-internal record WindowHiddenTransform(HWND Handle) : WindowRemovedTransform(Handle)
+/// <param name="Window"></param>
+internal record WindowHiddenTransform(IWindow Window) : WindowRemovedTransform(Window)
 {
 	internal override Result<Unit> Execute(
 		IContext ctx,
@@ -23,10 +20,9 @@ internal record WindowHiddenTransform(HWND Handle) : WindowRemovedTransform(Hand
 		MutableRootSector mutableRootSector
 	)
 	{
-		IWindow window = WindowUtils.GetWindow(mutableRootSector, Handle)!;
-		if (ctx.Butler.Pantry.GetMonitorForWindow(window) == null)
+		if (ctx.Butler.Pantry.GetMonitorForWindow(Window) == null)
 		{
-			Logger.Debug($"Window {window} is not tracked in a monitor, ignoring event");
+			Logger.Debug($"Window {Window} is not tracked in a monitor, ignoring event");
 			return Unit.Result;
 		}
 

@@ -4,7 +4,7 @@ using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
-internal record WindowFocusedTransform(HWND Handle = default) : Transform()
+internal record WindowFocusedTransform(IWindow? Window) : Transform()
 {
 	internal override Result<Unit> Execute(
 		IContext ctx,
@@ -13,6 +13,12 @@ internal record WindowFocusedTransform(HWND Handle = default) : Transform()
 	)
 	{
 		SetActiveMonitor(ctx, internalCtx, mutableRootSector);
+
+		// TODO: Test
+		WindowFocusedEventArgs args = new() { Window = Window };
+		internalCtx.ButlerEventHandlers.OnWindowFocused(args);
+		mutableRootSector.WindowSector.QueueEvent(args);
+
 		return Unit.Result;
 	}
 
@@ -27,7 +33,6 @@ internal record WindowFocusedTransform(HWND Handle = default) : Transform()
 		MonitorSector monitorSector = root.MonitorSector;
 
 		// If we know the window, use what the Butler knows instead of Windows.
-		IWindow? Window = Handle != default ? WindowUtils.GetWindow(root, Handle) : null;
 		if (Window is not null)
 		{
 			Logger.Debug($"Focusing window {Window}");
@@ -41,7 +46,7 @@ internal record WindowFocusedTransform(HWND Handle = default) : Transform()
 		}
 
 		// We don't know the window, so get the foreground window.
-		HWND hwnd = Handle == default ? internalCtx.CoreNativeManager.GetForegroundWindow() : Handle;
+		HWND hwnd = Window?.Handle ?? internalCtx.CoreNativeManager.GetForegroundWindow();
 		Logger.Debug($"Focusing hwnd {hwnd}");
 
 		if (hwnd.IsNull)

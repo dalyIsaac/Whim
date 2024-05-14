@@ -1,9 +1,8 @@
 using DotNext;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal record WindowRemovedTransform(HWND Handle) : Transform
+internal record WindowRemovedTransform(IWindow Window) : Transform
 {
 	internal override Result<Unit> Execute(
 		IContext ctx,
@@ -13,14 +12,16 @@ internal record WindowRemovedTransform(HWND Handle) : Transform
 	{
 		WindowSector windowSector = mutableRootSector.WindowSector;
 
-		if (!windowSector.Windows.TryGetValue(Handle, out IWindow? removedWindow))
+		if (!windowSector.Windows.TryGetValue(Window.Handle, out IWindow? removedWindow))
 		{
-			Logger.Debug($"Window {Handle} was not tracked, ignoring event");
+			Logger.Debug($"Window {Window} was not tracked, ignoring event");
 			return Unit.Result;
 		}
 
-		windowSector.Windows = windowSector.Windows.Remove(Handle);
-		windowSector.HandledLocationRestoringWindows = windowSector.HandledLocationRestoringWindows.Remove(Handle);
+		windowSector.Windows = windowSector.Windows.Remove(Window.Handle);
+		windowSector.HandledLocationRestoringWindows = windowSector.HandledLocationRestoringWindows.Remove(
+			Window.Handle
+		);
 
 		WindowRemovedEventArgs args = new() { Window = removedWindow };
 		internalCtx.ButlerEventHandlers.OnWindowRemoved(args);
