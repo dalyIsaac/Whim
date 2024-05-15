@@ -71,8 +71,7 @@ internal partial class Butler : IButler, IInternalButler
 			foreach (SavedWindow savedWindow in savedWorkspace.Windows)
 			{
 				HWND hwnd = (HWND)savedWindow.Handle;
-				IWindow? window = _context.WindowManager.CreateWindow(hwnd);
-				if (window == null)
+				if (!_context.WindowManager.CreateWindow(hwnd).TryGet(out IWindow window))
 				{
 					Logger.Debug($"Could not find window with handle {savedWindow.Handle}");
 					continue;
