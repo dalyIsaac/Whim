@@ -33,8 +33,8 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window, System.IDispos
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "BarWindow");
 
 		IWindow window =
-			_context.WindowManager.CreateWindow(this.GetHandle())
-			?? throw new BarException("Window was unexpectedly null");
+			_context.WindowManager.CreateWindow(this.GetHandle()).OrInvoke(() =>
+			throw new BarException("Window was unexpectedly null"));
 
 		WindowState = new WindowState()
 		{

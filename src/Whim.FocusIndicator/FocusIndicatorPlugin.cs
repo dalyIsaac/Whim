@@ -64,7 +64,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		Hide();
 	}
 
-	private void WindowManager_WindowMoveStart(object? sender, WindowMovedEventArgs e) => Hide();
+	private void WindowManager_WindowMoveStart(object? sender, WindowMoveStartedEventArgs e) => Hide();
 
 	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
 	{
