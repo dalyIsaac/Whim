@@ -91,6 +91,22 @@ public class MonitorsChangedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MonitorsAdded_Initialization(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given we have no monitors
+
+		// When we add monitors
+		MonitorTestUtils.SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
+		var raisedEvent = DispatchTransformEvent(ctx);
+
+		// Then the resulting event will have a monitor added, and the other monitors in the sector will be set.
+		Assert.Equal(2, raisedEvent.Arguments.AddedMonitors.Count());
+
+		Assert.Equal((HMONITOR)2, ctx.Store.Pick(Pickers.PickLastWhimActiveMonitor()).Handle);
+		Assert.Equal((HMONITOR)2, ctx.Store.Pick(Pickers.PickActiveMonitor()).Handle);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void MonitorsUnchanged(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given there are no changes in the monitors.
