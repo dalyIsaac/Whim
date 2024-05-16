@@ -12,6 +12,7 @@ public class MutableRootSectorTests
 	{
 		// Given
 		MutableRootSector sut = new(ctx, internalCtx);
+		CaptureWinEventProc.Create(internalCtx);
 
 		// When
 		sut.Initialize();

@@ -121,7 +121,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
+		WindowMoveStartedEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -241,7 +241,7 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
+		WindowMoveEndedEventArgs e =
 			new()
 			{
 				Window = Substitute.For<IWindow>(),
