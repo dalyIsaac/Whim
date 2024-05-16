@@ -70,9 +70,9 @@ public class LayoutPreviewPluginTests
 		plugin.PreInitialize();
 
 		// Then
-		ctx.WindowManager.Received(1).WindowMoveStart += Arg.Any<EventHandler<WindowMovedEventArgs>>();
+		ctx.WindowManager.Received(1).WindowMoveStart += Arg.Any<EventHandler<WindowMoveStartedEventArgs>>();
 		ctx.WindowManager.Received(1).WindowMoved += Arg.Any<EventHandler<WindowMovedEventArgs>>();
-		ctx.WindowManager.Received(1).WindowMoveEnd += Arg.Any<EventHandler<WindowMovedEventArgs>>();
+		ctx.WindowManager.Received(1).WindowMoveEnd += Arg.Any<EventHandler<WindowMoveEndedEventArgs>>();
 		ctx.WindowManager.Received(1).WindowRemoved += Arg.Any<EventHandler<WindowEventArgs>>();
 		ctx.FilterManager.Received(1).AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
@@ -131,7 +131,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoveStart += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoveStart += Raise.Event<EventHandler<WindowMoveStartedEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
@@ -251,7 +251,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoveEnd += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoveEnd += Raise.Event<EventHandler<WindowMoveEndedEventArgs>>(ctx.WindowManager, e);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
@@ -271,7 +271,7 @@ public class LayoutPreviewPluginTests
 				MovedEdges = null
 			};
 
-		WindowEventArgs removeArgs = new() { Window = removedWindow };
+		WindowEventArgs removeArgs = new WindowRemovedEventArgs() { Window = removedWindow };
 
 		// When
 		plugin.PreInitialize();
@@ -296,7 +296,7 @@ public class LayoutPreviewPluginTests
 				MovedEdges = null
 			};
 
-		WindowEventArgs removeArgs = new() { Window = movedWindow };
+		WindowEventArgs removeArgs = new WindowRemovedEventArgs() { Window = movedWindow };
 
 		// When
 		plugin.PreInitialize();

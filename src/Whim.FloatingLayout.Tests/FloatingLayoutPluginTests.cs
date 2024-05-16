@@ -137,7 +137,7 @@ public class FloatingLayoutPluginTests
 		// When
 		plugin.PreInitialize();
 		plugin.MarkWindowAsFloating(window);
-		context.WindowManager.WindowRemoved += Raise.EventWith(new WindowEventArgs() { Window = window });
+		context.WindowManager.WindowRemoved += Raise.EventWith(new WindowRemovedEventArgs() { Window = window } as WindowEventArgs);
 
 		// Then nothing
 		Assert.Empty(plugin.FloatingWindows);
