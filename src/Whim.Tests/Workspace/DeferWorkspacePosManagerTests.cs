@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -43,7 +44,9 @@ public class DeferWorkspacePosManagerTests
 		// Given the window is not tracked by the WindowManager
 		Dictionary<HWND, IWindowState> windowStates = new();
 		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
-		internalCtx.WindowManager.HandleWindowMap.ContainsKey(Arg.Any<HWND>()).Returns(false);
+		ctx.Store.Pick(Arg.Any<PurePicker<Result<IWindow>>>())
+			.Returns(Result.FromException<IWindow>(new WhimException("welp")));
+
 		workspace.Windows.Returns(new List<IWindow>() { Substitute.For<IWindow>() });
 
 		DeferWorkspacePosManager sut = new(ctx, internalCtx);

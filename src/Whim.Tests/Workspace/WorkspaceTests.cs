@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AutoFixture;
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -12,13 +13,14 @@ public class WorkspaceCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
+		IContext ctx = fixture.Freeze<IContext>();
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
 		// Assume windows are valid windows.
 		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
 
 		// Assume windows are managed.
-		internalCtx.WindowManager.HandleWindowMap.ContainsKey(Arg.Any<HWND>()).Returns(true);
+		ctx.Store.Pick(Arg.Any<PurePicker<Result<IWindow>>>()).Returns(Result.FromValue(Substitute.For<IWindow>()));
 
 		// Set up the triggers.
 		WorkspaceManagerTriggers triggers =
