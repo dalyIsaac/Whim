@@ -131,7 +131,10 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoveStart += Raise.Event<EventHandler<WindowMoveStartedEventArgs>>(ctx.WindowManager, e);
+		ctx.WindowManager.WindowMoveStart += Raise.Event<EventHandler<WindowMoveStartedEventArgs>>(
+			ctx.WindowManager,
+			e
+		);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
