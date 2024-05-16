@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using DotNext;
+using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -66,6 +67,13 @@ internal record MonitorsChangedTransform : Transform
 		if (addedMonitors.Count != 0 || removedMonitors.Count != 0)
 		{
 			internalCtx.ButlerEventHandlers.OnMonitorsChanged(args);
+		}
+
+		// Make sure the other monitor handles are set if they're unset.
+		if (sector.ActiveMonitorHandle == (HMONITOR)0)
+		{
+			sector.ActiveMonitorHandle = sector.PrimaryMonitorHandle;
+			sector.LastWhimActiveMonitorHandle = sector.PrimaryMonitorHandle;
 		}
 
 		sector.QueueEvent(args);
