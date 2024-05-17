@@ -4,7 +4,7 @@ using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class WindowRemovedTransformTests
 {
@@ -24,6 +24,40 @@ public class WindowRemovedTransformTests
 		);
 
 		return (result!.Value, ev);
+	}
+
+	private static Result<Unit> AssertDoesNotRaise(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		WindowRemovedTransform sut
+	)
+	{
+		Result<Unit>? result = null;
+		CustomAssert.DoesNotRaise<WindowRemovedEventArgs>(
+			h => mutableRootSector.WindowSector.WindowRemoved += h,
+			h => mutableRootSector.WindowSector.WindowRemoved -= h,
+			() => result = ctx.Store.Dispatch(sut)
+		);
+		return result!.Value;
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowNotTracked(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given the window is not tracked
+		WindowRemovedTransform sut = new(window);
+
+		// When
+		var result = AssertDoesNotRaise(ctx, mutableRootSector, sut);
+
+		// Then
+		Assert.True(result.IsSuccessful);
+		internalCtx.ButlerEventHandlers.DidNotReceive().OnWindowRemoved(Arg.Any<WindowRemovedEventArgs>());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
