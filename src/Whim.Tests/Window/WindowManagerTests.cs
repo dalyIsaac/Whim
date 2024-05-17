@@ -268,4 +268,98 @@ public class WindowManagerTests
 		// Then
 		ctx.Store.Received(2).Pick(Pickers.PickAllWindows());
 	}
+
+	[Theory, AutoSubstituteData]
+	internal void OnWindowAdded(IContext ctx, IInternalContext internalCtx, IWindow window)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When
+		Assert.Raises<WindowAddedEventArgs>(
+			h => sut.WindowAdded += h,
+			h => sut.WindowAdded -= h,
+			() => sut.OnWindowAdded(window)
+		);
+
+		// Then
+		internalCtx
+			.ButlerEventHandlers.Received(1)
+			.OnWindowAdded(Arg.Is<WindowAddedEventArgs>(e => e.Window == window));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void AddWindow(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		HWND hwnd = (HWND)2;
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When
+		sut.AddWindow(hwnd);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new WindowAddedTransform(hwnd));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void OnWindowFocused(IContext ctx, IInternalContext internalCtx, IWindow window)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When
+		sut.OnWindowFocused(window);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new WindowFocusedTransform(window));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void OnWindowRemoved(IContext ctx, IInternalContext internalCtx, IWindow window)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When
+		sut.OnWindowRemoved(window);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new WindowRemovedTransform(window));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void Initialize_Dispose(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When
+		sut.Initialize();
+		sut.Dispose();
+
+		// Then
+#pragma warning disable NS5000 // Received check.
+		ctx.Store.WindowEvents.Received(1).WindowAdded += Arg.Any<EventHandler<WindowAddedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowFocused += Arg.Any<EventHandler<WindowFocusedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowRemoved += Arg.Any<EventHandler<WindowRemovedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowMoveStarted += Arg.Any<EventHandler<WindowMoveStartedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowMoved += Arg.Any<EventHandler<WindowMovedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowMoveEnded += Arg.Any<EventHandler<WindowMoveEndedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowMinimizeStarted += Arg.Any<
+			EventHandler<WindowMinimizeStartedEventArgs>
+		>();
+		ctx.Store.WindowEvents.Received(1).WindowMinimizeEnded += Arg.Any<EventHandler<WindowMinimizeEndedEventArgs>>();
+
+		ctx.Store.WindowEvents.Received(1).WindowAdded -= Arg.Any<EventHandler<WindowAddedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowFocused -= Arg.Any<EventHandler<WindowFocusedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowRemoved -= Arg.Any<EventHandler<WindowRemovedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowMoveStarted -= Arg.Any<EventHandler<WindowMoveStartedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowMoved -= Arg.Any<EventHandler<WindowMovedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowMoveEnded -= Arg.Any<EventHandler<WindowMoveEndedEventArgs>>();
+		ctx.Store.WindowEvents.Received(1).WindowMinimizeStarted -= Arg.Any<
+			EventHandler<WindowMinimizeStartedEventArgs>
+		>();
+#pragma warning restore NS5000 // Received check.
+	}
 }
