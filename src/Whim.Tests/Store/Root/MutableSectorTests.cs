@@ -12,7 +12,7 @@ public class MutableRootSectorTests
 	{
 		// Given
 		MutableRootSector sut = new(ctx, internalCtx);
-		CaptureWinEventProc.Create(internalCtx);
+		var capture = CaptureWinEventProc.Create(internalCtx);
 
 		// When
 		sut.Initialize();
@@ -21,5 +21,6 @@ public class MutableRootSectorTests
 		// Then
 		internalCtx.WindowMessageMonitor.DisplayChanged += Arg.Any<EventHandler<WindowMessageMonitorEventArgs>>();
 		internalCtx.WindowMessageMonitor.DisplayChanged -= Arg.Any<EventHandler<WindowMessageMonitorEventArgs>>();
+		Assert.Equal(6, capture.Handles.Count);
 	}
 }

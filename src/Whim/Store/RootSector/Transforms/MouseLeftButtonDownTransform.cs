@@ -16,7 +16,6 @@ internal record MouseLeftButtonDownTransform : Transform
 		MutableRootSector mutableRootSector
 	)
 	{
-		// TODO: test
 		mutableRootSector.WindowSector.IsLeftMouseButtonDown = true;
 		return Unit.Result;
 	}

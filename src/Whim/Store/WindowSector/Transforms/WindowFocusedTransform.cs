@@ -14,7 +14,6 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 	{
 		SetActiveMonitor(ctx, internalCtx, mutableRootSector);
 
-		// TODO: Test
 		WindowFocusedEventArgs args = new() { Window = Window };
 		internalCtx.ButlerEventHandlers.OnWindowFocused(args);
 		mutableRootSector.WindowSector.QueueEvent(args);

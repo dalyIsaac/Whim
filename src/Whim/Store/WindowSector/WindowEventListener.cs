@@ -77,7 +77,7 @@ internal class WindowEventListener : IDisposable
 		}
 	}
 
-	// TODO: Make private
+	// TODO: Make private in threading ticket
 	internal void WinEventProcWrapper(
 		HWINEVENTHOOK hWinEventHook,
 		uint eventType,
