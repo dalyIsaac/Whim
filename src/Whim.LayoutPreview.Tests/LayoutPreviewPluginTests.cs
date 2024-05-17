@@ -73,7 +73,7 @@ public class LayoutPreviewPluginTests
 		ctx.WindowManager.Received(1).WindowMoveStart += Arg.Any<EventHandler<WindowMoveStartedEventArgs>>();
 		ctx.WindowManager.Received(1).WindowMoved += Arg.Any<EventHandler<WindowMovedEventArgs>>();
 		ctx.WindowManager.Received(1).WindowMoveEnd += Arg.Any<EventHandler<WindowMoveEndedEventArgs>>();
-		ctx.WindowManager.Received(1).WindowRemoved += Arg.Any<EventHandler<WindowEventArgs>>();
+		ctx.WindowManager.Received(1).WindowRemoved += Arg.Any<EventHandler<WindowRemovedEventArgs>>();
 		ctx.FilterManager.Received(1).AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
@@ -279,7 +279,10 @@ public class LayoutPreviewPluginTests
 		// When
 		plugin.PreInitialize();
 		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
-		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(ctx.WindowManager, removeArgs);
+		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowRemovedEventArgs>>(
+			ctx.WindowManager,
+			removeArgs
+		);
 
 		// Then
 		Assert.Equal(movedWindow, plugin.DraggedWindow);
@@ -304,7 +307,10 @@ public class LayoutPreviewPluginTests
 		// When
 		plugin.PreInitialize();
 		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
-		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowEventArgs>>(ctx.WindowManager, removeArgs);
+		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowRemovedEventArgs>>(
+			ctx.WindowManager,
+			removeArgs
+		);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);

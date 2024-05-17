@@ -11,14 +11,14 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	public event EventHandler<WindowEventArgs>? WindowAdded;
+	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
-	public event EventHandler<WindowEventArgs>? WindowRemoved;
+	public event EventHandler<WindowRemovedEventArgs>? WindowRemoved;
 	public event EventHandler<WindowMoveStartedEventArgs>? WindowMoveStart;
 	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
 	public event EventHandler<WindowMoveEndedEventArgs>? WindowMoveEnd;
-	public event EventHandler<WindowEventArgs>? WindowMinimizeStart;
-	public event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
+	public event EventHandler<WindowMinimizeStartedEventArgs>? WindowMinimizeStart;
+	public event EventHandler<WindowMinimizeEndedEventArgs>? WindowMinimizeEnd;
 
 	/// <summary>
 	/// Indicates whether values have been disposed.
@@ -90,7 +90,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	// TODO: Remove with the butler
 	public void OnWindowAdded(IWindow window)
 	{
-		WindowEventArgs args = new WindowAddedEventArgs() { Window = window };
+		WindowAddedEventArgs args = new() { Window = window };
 		_internalContext.ButlerEventHandlers.OnWindowAdded(args);
 		WindowAdded?.Invoke(this, args);
 	}

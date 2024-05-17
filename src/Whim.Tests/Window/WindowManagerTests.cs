@@ -1,121 +1,271 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using AutoFixture;
-using FluentAssertions;
 using NSubstitute;
-using NSubstitute.ReceivedExtensions;
 using Whim.TestUtils;
-using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.UI.Accessibility;
 using Xunit;
 
 namespace Whim.Tests;
 
-internal class WindowManagerCustomization : ICustomization
-{
-	public void Customize(IFixture fixture)
-	{
-		IWorkspaceManager workspaceManager = Substitute.For<IWorkspaceManager>();
-
-		IContext context = fixture.Freeze<IContext>();
-		context.WorkspaceManager.Returns(workspaceManager);
-	}
-}
-
-internal class WindowManagerSubscriber
-{
-	public WindowEventArgs? WindowAddedArgs { get; private set; }
-	public WindowFocusedEventArgs? WindowFocusedArgs { get; private set; }
-	public WindowEventArgs? WindowRemovedArgs { get; private set; }
-	public WindowEventArgs? WindowMoveStartArgs { get; private set; }
-	public WindowEventArgs? WindowMovedArgs { get; private set; }
-	public WindowEventArgs? WindowMoveEndArgs { get; private set; }
-	public WindowEventArgs? WindowMinimizeStartArgs { get; private set; }
-	public WindowEventArgs? WindowMinimizeEndArgs { get; private set; }
-
-	public WindowManagerSubscriber(WindowManager windowManager)
-	{
-		windowManager.WindowAdded += (sender, args) => WindowAddedArgs = args;
-		windowManager.WindowFocused += (sender, args) => WindowFocusedArgs = args;
-		windowManager.WindowRemoved += (sender, args) => WindowRemovedArgs = args;
-		windowManager.WindowMoveStart += (sender, args) => WindowMoveStartArgs = args;
-		windowManager.WindowMoved += (sender, args) => WindowMovedArgs = args;
-		windowManager.WindowMoveEnd += (sender, args) => WindowMoveEndArgs = args;
-		windowManager.WindowMinimizeStart += (sender, args) => WindowMinimizeStartArgs = args;
-		windowManager.WindowMinimizeEnd += (sender, args) => WindowMinimizeEndArgs = args;
-	}
-}
-
-internal class WindowManagerFakeSafeHandle : UnhookWinEventSafeHandle
-{
-	public bool HasDisposed { get; set; }
-
-	private bool _isInvalid;
-	public override bool IsInvalid => _isInvalid;
-
-	public WindowManagerFakeSafeHandle(bool isInvalid, bool isClosed)
-		: base(default, default)
-	{
-		_isInvalid = isInvalid;
-
-		if (isClosed)
-		{
-			Close();
-		}
-	}
-
-	public void MarkAsInvalid() => _isInvalid = true;
-
-	protected override bool ReleaseHandle()
-	{
-		return true;
-	}
-
-	protected override void Dispose(bool disposing)
-	{
-		HasDisposed = true;
-		base.Dispose(disposing);
-	}
-}
-
-/// <summary>
-/// Captures the <see cref="WINEVENTPROC"/> passed to <see cref="CoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>,
-/// and stores the <see cref="WindowManagerFakeSafeHandle"/> returned by <see cref="CoreNativeManager.SetWinEventHook(uint, uint, WINEVENTPROC)"/>.
-/// </summary>
-internal class CaptureWinEventProc
-{
-	public WINEVENTPROC? WinEventProc { get; private set; }
-	public List<WindowManagerFakeSafeHandle> Handles { get; } = new();
-
-	public static CaptureWinEventProc Create(
-		IInternalContext internalCtx,
-		bool isInvalid = false,
-		bool isClosed = false
-	)
-	{
-		CaptureWinEventProc capture = new();
-		internalCtx
-			.CoreNativeManager.SetWinEventHook(Arg.Any<uint>(), Arg.Any<uint>(), Arg.Any<WINEVENTPROC>())
-			.Returns(callInfo =>
-			{
-				capture.WinEventProc = callInfo.ArgAt<WINEVENTPROC>(2);
-				capture.Handles.Add(new WindowManagerFakeSafeHandle(isInvalid, isClosed));
-				return capture.Handles[^1];
-			});
-		return capture;
-	}
-}
-
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowManagerTests
 {
-	// TODO
+	private static void DispatchEvent(MutableRootSector mutableRootSector, EventArgs ev)
+	{
+		mutableRootSector.WindowSector.QueueEvent(ev);
+		mutableRootSector.WindowSector.DispatchEvents();
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowSector_WindowAdded(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When the WindowSector receives a WindowAddedTransform
+		sut.Initialize();
+
+		// Then the WindowManager receives an event
+		Assert.Raises<WindowAddedEventArgs>(
+			h => sut.WindowAdded += h,
+			h => sut.WindowAdded -= h,
+			() => DispatchEvent(mutableRootSector, new WindowAddedEventArgs() { Window = window })
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowSector_WindowFocused(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When the WindowSector receives a WindowFocusedTransform
+		sut.Initialize();
+
+		// Then the WindowManager receives an event
+		Assert.Raises<WindowFocusedEventArgs>(
+			h => sut.WindowFocused += h,
+			h => sut.WindowFocused -= h,
+			() => DispatchEvent(mutableRootSector, new WindowFocusedEventArgs() { Window = window })
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowSector_WindowRemoved(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When the WindowSector receives a WindowRemovedTransform
+		sut.Initialize();
+
+		// Then the WindowManager receives an event
+		Assert.Raises<WindowRemovedEventArgs>(
+			h => sut.WindowRemoved += h,
+			h => sut.WindowRemoved -= h,
+			() => DispatchEvent(mutableRootSector, new WindowRemovedEventArgs() { Window = window })
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowSector_WindowMoveStarted(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When the WindowSector receives a WindowMoveStartedTransform
+		sut.Initialize();
+
+		// Then the WindowManager receives an event
+		Assert.Raises<WindowMoveStartedEventArgs>(
+			h => sut.WindowMoveStart += h,
+			h => sut.WindowMoveStart -= h,
+			() =>
+				DispatchEvent(
+					mutableRootSector,
+					new WindowMoveStartedEventArgs()
+					{
+						Window = window,
+						MovedEdges = Direction.None,
+						CursorDraggedPoint = new Point<int>()
+					}
+				)
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowSector_WindowMoved(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When the WindowSector receives a WindowMovedTransform
+		sut.Initialize();
+
+		// Then the WindowManager receives an event
+		Assert.Raises<WindowMovedEventArgs>(
+			h => sut.WindowMoved += h,
+			h => sut.WindowMoved -= h,
+			() =>
+				DispatchEvent(
+					mutableRootSector,
+					new WindowMovedEventArgs()
+					{
+						Window = window,
+						MovedEdges = Direction.None,
+						CursorDraggedPoint = new Point<int>()
+					}
+				)
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowSector_WindowMoveEnd(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When the WindowSector receives a WindowMoveEndTransform
+		sut.Initialize();
+
+		// Then the WindowManager receives an event
+		Assert.Raises<WindowMoveEndedEventArgs>(
+			h => sut.WindowMoveEnd += h,
+			h => sut.WindowMoveEnd -= h,
+			() =>
+				DispatchEvent(
+					mutableRootSector,
+					new WindowMoveEndedEventArgs()
+					{
+						Window = window,
+						MovedEdges = Direction.None,
+						CursorDraggedPoint = new Point<int>()
+					}
+				)
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowSector_WindowMinimizeStarted(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When the WindowSector receives a WindowMinimizeStartedTransform
+		sut.Initialize();
+
+		// Then the WindowManager receives an event
+		Assert.Raises<WindowMinimizeStartedEventArgs>(
+			h => sut.WindowMinimizeStart += h,
+			h => sut.WindowMinimizeStart -= h,
+			() => DispatchEvent(mutableRootSector, new WindowMinimizeStartedEventArgs() { Window = window })
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowSector_WindowMinimizeEnded(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When the WindowSector receives a WindowMinimizeEndedTransform
+		sut.Initialize();
+
+		// Then the WindowManager receives an event
+		Assert.Raises<WindowMinimizeEndedEventArgs>(
+			h => sut.WindowMinimizeEnd += h,
+			h => sut.WindowMinimizeEnd -= h,
+			() => DispatchEvent(mutableRootSector, new WindowMinimizeEndedEventArgs() { Window = window })
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void CreateWindow_Success(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given window creation succeeds
+		HWND hwnd = (HWND)1;
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When we try create a window
+		var result = sut.CreateWindow(hwnd);
+
+		// Then it succeeds
+		Assert.True(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void CreateWindow_RetrieveExisting(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector mutableRootSector,
+		IWindow window
+	)
+	{
+		// Given the window already exists
+		HWND hwnd = (HWND)1;
+		window.Handle.Returns(hwnd);
+		mutableRootSector.WindowSector.Windows = mutableRootSector.WindowSector.Windows.Add(hwnd, window);
+
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When we try create a window
+		var result = sut.CreateWindow(hwnd);
+
+		// Then it succeeds
+		Assert.True(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void GetEnumerator(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		WindowManager sut = new(ctx, internalCtx);
+
+		// When
+		sut.GetEnumerator();
+		((IEnumerable)sut).GetEnumerator();
+
+		// Then
+		ctx.Store.Received(2).Pick(Pickers.PickAllWindows());
+	}
 }
