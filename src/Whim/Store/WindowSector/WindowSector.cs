@@ -43,8 +43,10 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 
 	public override void DispatchEvents()
 	{
-		foreach (EventArgs eventArgs in _events)
+		// Use index access to prevent the list from being modified during enumeration.
+		for (int idx = 0; idx < _events.Count; idx++)
 		{
+			EventArgs eventArgs = _events[idx];
 			switch (eventArgs)
 			{
 				case WindowAddedEventArgs args:
