@@ -22,6 +22,9 @@ public class Store : IStore
 	/// <inheritdoc />
 	public IWindowSectorEvents WindowEvents => _root.MutableRootSector.WindowSector;
 
+	/// <inheritdoc />
+	public IMapSectorEvents MapEvents => _root.MutableRootSector.MapSector;
+
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;

@@ -7,20 +7,21 @@ internal class MutableRootSector : SectorBase, IDisposable
 	private bool _disposedValue;
 
 	public MonitorSector MonitorSector { get; }
-
-	// TODO: Test WindowSector
 	public WindowSector WindowSector { get; }
+	public MapSector MapSector { get; }
 
 	public MutableRootSector(IContext ctx, IInternalContext internalCtx)
 	{
 		MonitorSector = new MonitorSector(ctx, internalCtx);
 		WindowSector = new WindowSector(ctx, internalCtx);
+		MapSector = new MapSector();
 	}
 
 	public override void Initialize()
 	{
 		MonitorSector.Initialize();
 		WindowSector.Initialize();
+		MapSector.Initialize();
 	}
 
 	public override void DispatchEvents()
@@ -28,6 +29,7 @@ internal class MutableRootSector : SectorBase, IDisposable
 		Logger.Debug("Dispatching events");
 		MonitorSector.DispatchEvents();
 		WindowSector.DispatchEvents();
+		MapSector.DispatchEvents();
 	}
 
 	protected virtual void Dispose(bool disposing)

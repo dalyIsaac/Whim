@@ -10,4 +10,7 @@ public interface IRootSector
 
 	/// <inheritdoc cref="IWindowSector"/>
 	IWindowSector WindowSector { get; }
+
+	/// <inheritdoc cref="IMapSector"/>
+	IMapSector MapSector { get; }
 }

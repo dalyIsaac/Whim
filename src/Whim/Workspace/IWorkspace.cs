@@ -1,3 +1,4 @@
+global using WorkspaceId = System.Guid;
 using System;
 using System.Collections.Generic;
 
@@ -8,6 +9,11 @@ namespace Whim;
 /// </summary>
 public interface IWorkspace : IDisposable
 {
+	/// <summary>
+	/// The id of the workspace.
+	/// </summary>
+	WorkspaceId WorkspaceId { get; }
+
 	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the
 	/// <see cref="IWorkspaceManager.WorkspaceRenamed"/> event is triggered.
