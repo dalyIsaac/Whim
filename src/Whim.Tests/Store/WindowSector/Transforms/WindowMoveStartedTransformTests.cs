@@ -4,7 +4,7 @@ using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class WindowMoveStartedTransformTests
 {

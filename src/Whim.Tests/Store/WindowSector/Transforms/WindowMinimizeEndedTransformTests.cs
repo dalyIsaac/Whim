@@ -3,7 +3,7 @@ using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class WindowMinimizeEndedTransformTests
 {
