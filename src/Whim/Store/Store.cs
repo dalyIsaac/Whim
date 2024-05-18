@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNext;
 
 namespace Whim;
@@ -8,6 +10,7 @@ public class Store : IStore
 {
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
+	private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 
 	private bool _disposedValue;
 
@@ -33,27 +36,80 @@ public class Store : IStore
 		_root.Initialize();
 	}
 
+	private Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
+		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
+
 	/// <inheritdoc />
 	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform)
 	{
-		Result<TResult> result = transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
-		_root.DispatchEvents();
-		return result;
+		if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
+		{
+			return Task.Run(() =>
+			{
+				try
+				{
+					_lock.EnterWriteLock();
+					return DispatchFn(transform);
+				}
+				finally
+				{
+					_lock.ExitWriteLock();
+					_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
+				}
+			}).Result;
+		}
+
+		return DispatchFn(transform);
 	}
+
+	private TResult PickFn<TResult>(Picker<TResult> picker) => picker.Execute(_ctx, _internalCtx, _root);
 
 	/// <inheritdoc />
 	public TResult Pick<TResult>(Picker<TResult> picker)
 	{
-		// TODO: reader-writer lock.
-		// don't do a read lock if a transform is currently in progress.
-		return picker.Execute(_ctx, _internalCtx, _root);
+		if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
+		{
+			return Task.Run(() =>
+			{
+				try
+				{
+					_lock.EnterReadLock();
+					return PickFn(picker);
+				}
+				finally
+				{
+					_lock.ExitReadLock();
+					_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
+				}
+			}).Result;
+		}
+
+		return PickFn(picker);
 	}
+
+	private TResult PurePickFn<TResult>(PurePicker<TResult> picker) => picker(_root);
 
 	/// <inheritdoc />
 	public TResult Pick<TResult>(PurePicker<TResult> picker)
 	{
-		// TODO: reader-writer lock
-		return picker(_root);
+		if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
+		{
+			return Task.Run(() =>
+			{
+				try
+				{
+					_lock.EnterReadLock();
+					return PurePickFn(picker);
+				}
+				finally
+				{
+					_lock.ExitReadLock();
+					_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
+				}
+			}).Result;
+		}
+
+		return PurePickFn(picker);
 	}
 
 	/// <inheritdoc/>
@@ -65,6 +121,7 @@ public class Store : IStore
 			{
 				// dispose managed state (managed objects)
 				_root.Dispose();
+				_lock.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
