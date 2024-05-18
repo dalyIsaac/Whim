@@ -123,7 +123,6 @@ public class WindowMovedTransformTests
 	)
 	{
 		// Given the window is not moving, we don't ignore the window moving event, but we can get the pos
-		NativeManagerUtils.SetupTryEnqueue(ctx);
 		mutableRootSector.WindowSector.IsMovingWindow = false;
 		mutableRootSector.WindowSector.WindowMovedDelay = 0;
 		mutableRootSector.WindowSector.IsLeftMouseButtonDown = true;
@@ -135,8 +134,9 @@ public class WindowMovedTransformTests
 		// When we dispatch the transform
 		(Result<Unit>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(ctx, mutableRootSector, sut);
 
-		// Then we get a result
-		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		// Then we get a resulting window, a NativeManager.TryEnqueue to restore a window's position, and a second TryEnqueue
+		// to dispatch the events.
+		ctx.NativeManager.Received(2).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 		Assert.True(result!.Value.IsSuccessful);
 		Assert.Equal(new Point<int>(1, 2), ev.Arguments.CursorDraggedPoint);
 		Assert.Equal(window, ev.Arguments.Window);
@@ -154,8 +154,8 @@ public class WindowMovedTransformTests
 		// When we dispatch the transform
 		(Result<Unit>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(ctx, mutableRootSector, sut);
 
-		// Then
-		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		// Then we get no resulting windows, and a TryEnqueue to dispatch the events.
+		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 		Assert.True(result!.Value.IsSuccessful);
 		Assert.Null(ev.Arguments.CursorDraggedPoint);
 		Assert.Equal(window, ev.Arguments.Window);
@@ -179,8 +179,8 @@ public class WindowMovedTransformTests
 		// When we dispatch the transform
 		(Result<Unit>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(ctx, mutableRootSector, sut);
 
-		// Then
-		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		// Then we get a resulting window, and a TryEnqueue to dispatch the events.
+		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 		Assert.True(result!.Value.IsSuccessful);
 		Assert.Equal(new Point<int>(1, 2), ev.Arguments.CursorDraggedPoint);
 		Assert.Equal(window, ev.Arguments.Window);
