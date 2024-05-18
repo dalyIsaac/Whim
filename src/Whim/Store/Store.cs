@@ -42,7 +42,7 @@ public class Store : IStore
 	/// <inheritdoc />
 	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform)
 	{
-		if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
+		if (_internalCtx.CoreNativeManager.IsStaThread())
 		{
 			return Task.Run(() =>
 			{

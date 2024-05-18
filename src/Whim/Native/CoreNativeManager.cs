@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
@@ -340,4 +341,6 @@ internal class CoreNativeManager : ICoreNativeManager
 		int cy,
 		SET_WINDOW_POS_FLAGS uFlags
 	) => PInvoke.SetWindowPos(hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
+
+	public bool IsStaThread() => Thread.CurrentThread.GetApartmentState() == ApartmentState.STA;
 }
