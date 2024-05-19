@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using DotNext;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
@@ -59,13 +61,27 @@ public class WindowHiddenTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window, IMonitor monitor)
+	internal void Success(
+		IContext ctx,
+		MutableRootSector rootSector,
+		IWindow window,
+		IMonitor monitor,
+		IWorkspace workspace
+	)
 	{
-		// Given the window is inside the sector
+		// Given the window is inside the window sector,
 		window.Handle.Returns((HWND)2);
-
-		ctx.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
+
+		// and has a monitor - window mapping
+		Guid workspaceId = Guid.NewGuid();
+		workspace.Id.Returns(workspaceId);
+
+		MapSector mapSector = rootSector.MapSector;
+		mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspaceId);
+		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor.Handle, workspaceId);
+
+		ctx.WorkspaceManager.GetEnumerator().Returns(_ => new List<IWorkspace>() { workspace }.GetEnumerator());
 
 		WindowHiddenTransform sut = new(window);
 

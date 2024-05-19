@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
@@ -91,7 +92,7 @@ public class WindowRemovedTransformTests
 		// ...and inside the MapSector
 		Guid workspaceId = Guid.NewGuid();
 		workspace.Id.Returns(workspaceId);
-		ctx.WorkspaceManager.GetEnumerator().Returns(new[] { workspace }.GetEnumerator());
+		ctx.WorkspaceManager.GetEnumerator().Returns(_ => new List<IWorkspace>() { workspace }.GetEnumerator());
 
 		mutableRootSector.MapSector.WindowWorkspaceMap = mutableRootSector.MapSector.WindowWorkspaceMap.Add(
 			window.Handle,

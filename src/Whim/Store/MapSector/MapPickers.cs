@@ -130,8 +130,15 @@ internal record GetWorkspaceByWindowPicker(HWND WindowHandle) : Picker<Result<IW
 {
 	internal override Result<IWorkspace> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
 	{
-		WorkspaceId workspaceId = rootSector.MapSector.WindowWorkspaceMap[WindowHandle];
-		return ctx.Store.Pick(Pickers.PickWorkspaceById(workspaceId));
+		foreach ((HWND windowHandle, WorkspaceId workspaceId) in rootSector.MapSector.WindowWorkspaceMap)
+		{
+			if (windowHandle == WindowHandle)
+			{
+				return ctx.Store.Pick(Pickers.PickWorkspaceById(workspaceId));
+			}
+		}
+
+		return Result.FromException<IWorkspace>(StoreExceptions.WindowNotFound(WindowHandle));
 	}
 }
 
