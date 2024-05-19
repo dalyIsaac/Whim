@@ -27,42 +27,4 @@ internal class ButlerPantry : IButlerPantry
 
 	public IWorkspace? GetWorkspaceForWindow(IWindow window) =>
 		_ctx.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle)).OrDefault();
-
-	public bool RemoveMonitor(IMonitor monitor) => _monitorWorkspaceMap.Remove(monitor);
-
-	public bool RemoveWindow(IWindow window)
-	{
-		Logger.Debug($"Removing window {window}");
-		return _windowWorkspaceMap.Remove(window);
-	}
-
-	public void MergeWorkspaceWindows(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget)
-	{
-		Logger.Debug($"Removing workspace {workspaceToDelete} and moving windows to {workspaceMergeTarget}");
-
-		// Remove the workspace from the monitor map.
-		IMonitor? monitor = GetMonitorForWorkspace(workspaceToDelete);
-		if (monitor != null)
-		{
-			_monitorWorkspaceMap[monitor] = workspaceMergeTarget;
-		}
-
-		// Remap windows to the first workspace which isn't active.
-		foreach (IWindow window in workspaceToDelete.Windows)
-		{
-			_windowWorkspaceMap[window] = workspaceMergeTarget;
-		}
-	}
-
-	public void SetWindowWorkspace(IWindow window, IWorkspace workspace)
-	{
-		Logger.Debug($"Setting window {window} to workspace {workspace}");
-		_windowWorkspaceMap[window] = workspace;
-	}
-
-	public void SetMonitorWorkspace(IMonitor monitor, IWorkspace workspace)
-	{
-		Logger.Debug($"Setting workspace {workspace} to monitor {monitor}");
-		_monitorWorkspaceMap[monitor] = workspace;
-	}
 }

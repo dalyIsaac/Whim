@@ -4,6 +4,9 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
+/// <summary>
+/// Initializes the map with the saved workspaces, and adds windows.
+/// </summary>
 internal record InitializeMapTransform : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)

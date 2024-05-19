@@ -56,39 +56,4 @@ public interface IButlerPantry
 	/// <param name="window"></param>
 	/// <returns><see langword="null"/> if the window is not in a workspace.</returns>
 	IWorkspace? GetWorkspaceForWindow(IWindow window);
-
-	/// <summary>
-	/// Moves all the windows from <paramref name="workspaceToDelete"/> to <paramref name="workspaceMergeTarget"/>.
-	/// </summary>
-	/// <param name="workspaceToDelete"></param>
-	/// <param name="workspaceMergeTarget"></param>
-	void MergeWorkspaceWindows(IWorkspace workspaceToDelete, IWorkspace workspaceMergeTarget);
-
-	/// <summary>
-	/// Removes the given window from the pantry.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <returns></returns>
-	bool RemoveWindow(IWindow window);
-
-	/// <summary>
-	/// Removes the given monitor from the pantry.
-	/// </summary>
-	/// <param name="monitor"></param>
-	/// <returns></returns>
-	bool RemoveMonitor(IMonitor monitor);
-
-	/// <summary>
-	/// Maps the given <paramref name="workspace"/> to the given <paramref name="monitor"/>.
-	/// </summary>
-	/// <param name="monitor"></param>
-	/// <param name="workspace"></param>
-	void SetMonitorWorkspace(IMonitor monitor, IWorkspace workspace);
-
-	/// <summary>
-	/// Maps the given <paramref name="window"/> to the given <paramref name="workspace"/>.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <param name="workspace"></param>
-	void SetWindowWorkspace(IWindow window, IWorkspace workspace);
 }

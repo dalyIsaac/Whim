@@ -13,11 +13,9 @@ public interface IButler : IButlerChores
 	/// The pantry is responsible for mapping <see cref="IWindow"/>s to <see cref="IWorkspace"/>s
 	/// to <see cref="IMonitor"/>s.
 	///
-	/// The pantry can only be set prior to <see cref="Initialize"/>.
-	///
 	/// Defaults to <see cref="ButlerPantry"/>.
 	/// </summary>
-	IButlerPantry Pantry { get; set; }
+	IButlerPantry Pantry { get; }
 
 	/// <summary>
 	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
@@ -28,9 +26,4 @@ public interface IButler : IButlerChores
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
 	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
-	/// <summary>
-	/// Initialize the windows and workspaces.
-	/// </summary>
-	void Initialize();
 }

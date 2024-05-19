@@ -10,6 +10,8 @@ namespace Whim;
 /// </summary>
 internal class MapSector : SectorBase, IMapSector, IMapSectorEvents
 {
+	private readonly IContext _ctx;
+
 	public ImmutableDictionary<HWND, WorkspaceId> WindowWorkspaceMap { get; set; } =
 		ImmutableDictionary<HWND, WorkspaceId>.Empty;
 
@@ -20,8 +22,16 @@ internal class MapSector : SectorBase, IMapSector, IMapSectorEvents
 
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
+	public MapSector(IContext ctx)
+	{
+		_ctx = ctx;
+	}
+
 	// TODO: Add to StoreTests
-	public override void Initialize() { }
+	public override void Initialize()
+	{
+		_ctx.Store.Dispatch(new InitializeMapTransform());
+	}
 
 	public override void DispatchEvents()
 	{
