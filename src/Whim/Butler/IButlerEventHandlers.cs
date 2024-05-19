@@ -12,5 +12,4 @@ internal interface IButlerEventHandlers
 	void OnWindowFocused(WindowFocusedEventArgs args);
 	void OnWindowMinimizeStart(WindowEventArgs args);
 	void OnWindowMinimizeEnd(WindowEventArgs args);
-	void OnMonitorsChanged(MonitorsChangedEventArgs args);
 }
