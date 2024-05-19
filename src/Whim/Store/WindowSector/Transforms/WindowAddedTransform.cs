@@ -146,7 +146,7 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		else if (routerOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
 			workspace = ctx
-				.Store.Pick(Pickers.PickWorkspaceForMonitor(rootSector.MonitorSector.LastWhimActiveMonitorHandle))
+				.Store.Pick(Pickers.PickWorkspaceByMonitor(rootSector.MonitorSector.LastWhimActiveMonitorHandle))
 				.Value!;
 		}
 
@@ -167,6 +167,6 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
 
-		return ctx.Store.Pick(Pickers.PickWorkspaceForMonitor(hmonitor)).OrDefault();
+		return ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(hmonitor)).OrDefault();
 	}
 }

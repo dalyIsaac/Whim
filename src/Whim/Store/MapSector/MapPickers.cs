@@ -19,20 +19,22 @@ public static partial class Pickers
 	public static Picker<IEnumerable<IWorkspace>> PickAllActiveWorkspaces() => new GetAllActiveWorkspacesPicker();
 
 	/// <summary>
-	/// Retrieves the workspace for the given monitor.
+	/// Retrieves the workspace shown on the given monitor.
 	/// </summary>
-	/// <param name="monitorHandle"></param>
+	/// <param name="monitorHandle">
+	/// The handle of the monitor to get the workspace for.
+	/// </param>
 	/// <returns></returns>
-	public static Picker<Result<IWorkspace>> PickWorkspaceForMonitor(HMONITOR monitorHandle) =>
-		new GetWorkspaceForMonitorPicker(monitorHandle);
+	public static Picker<Result<IWorkspace>> PickWorkspaceByMonitor(HMONITOR monitorHandle) =>
+		new GetWorkspaceByMonitorPicker(monitorHandle);
 
 	/// <summary>
 	/// Retrieves the workspace for the given window.
 	/// </summary>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	public static Picker<Result<IWorkspace>> PickWorkspaceForWindow(HWND window) =>
-		new GetWorkspaceForWindowPicker(window);
+	public static Picker<Result<IWorkspace>> PickWorkspaceByWindow(HWND window) =>
+		new GetWorkspaceByWindowPicker(window);
 
 	/// <summary>
 	/// Retrieves the monitor for the given workspace.
@@ -41,10 +43,10 @@ public static partial class Pickers
 	/// The ID of the workspace to get the monitor for.
 	/// </param>
 	/// <returns></returns>
-	public static PurePicker<Result<IMonitor>> PickMonitorForWorkspace(WorkspaceId searchWorkspaceId) =>
+	public static PurePicker<Result<IMonitor>> PickMonitorByWorkspace(WorkspaceId searchWorkspaceId) =>
 		(IRootSector rootSector) =>
 		{
-			HMONITOR monitorHandle = rootSector.MapSector.GetMonitorForWorkspace(searchWorkspaceId);
+			HMONITOR monitorHandle = rootSector.MapSector.GetMonitorByWorkspace(searchWorkspaceId);
 
 			if (monitorHandle == default)
 			{
@@ -57,14 +59,16 @@ public static partial class Pickers
 	/// <summary>
 	/// Retrieves the monitor for the given window.
 	/// </summary>
-	/// <param name="windowHandle"></param>
+	/// <param name="windowHandle">
+	/// The handle of the window to get the monitor for.
+	/// </param>
 	/// <returns></returns>
-	public static PurePicker<Result<IMonitor>> PickMonitorForWindow(HWND windowHandle) =>
+	public static PurePicker<Result<IMonitor>> PickMonitorByWindow(HWND windowHandle) =>
 		(IRootSector rootSector) =>
 		{
 			if (rootSector.MapSector.WindowWorkspaceMap.TryGetValue(windowHandle, out WorkspaceId workspaceId))
 			{
-				return PickMonitorForWorkspace(workspaceId)(rootSector);
+				return PickMonitorByWorkspace(workspaceId)(rootSector);
 			}
 
 			return Result.FromException<IMonitor>(StoreExceptions.NoMonitorFoundForWindow(windowHandle));
@@ -109,7 +113,7 @@ internal record GetAllActiveWorkspacesPicker : Picker<IEnumerable<IWorkspace>>
 	}
 }
 
-internal record GetWorkspaceForMonitorPicker(HMONITOR MonitorHandle) : Picker<Result<IWorkspace>>
+internal record GetWorkspaceByMonitorPicker(HMONITOR MonitorHandle) : Picker<Result<IWorkspace>>
 {
 	internal override Result<IWorkspace> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
 	{
@@ -122,7 +126,7 @@ internal record GetWorkspaceForMonitorPicker(HMONITOR MonitorHandle) : Picker<Re
 	}
 }
 
-internal record GetWorkspaceForWindowPicker(HWND WindowHandle) : Picker<Result<IWorkspace>>
+internal record GetWorkspaceByWindowPicker(HWND WindowHandle) : Picker<Result<IWorkspace>>
 {
 	internal override Result<IWorkspace> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
 	{
@@ -160,7 +164,7 @@ internal record GetAdjacentWorkspacePicker(WorkspaceId WorkspaceId, bool Reverse
 		while (idx != nextIdx)
 		{
 			IWorkspace nextWorkspace = workspaces[nextIdx];
-			Result<IMonitor> monitorResult = Pickers.PickMonitorForWorkspace(nextWorkspace.Id)(rootSector);
+			Result<IMonitor> monitorResult = Pickers.PickMonitorByWorkspace(nextWorkspace.Id)(rootSector);
 
 			if (!monitorResult.IsSuccessful || !SkipActive)
 			{

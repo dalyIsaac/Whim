@@ -281,7 +281,7 @@ public class ButlerChoresTests
 	internal void Activate_MultipleMonitors(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given there are two workspaces and monitors
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -334,7 +334,7 @@ public class ButlerChoresTests
 	internal void ActivateAdjacent_UseActiveMonitor(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given no arguments are provided
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -352,7 +352,7 @@ public class ButlerChoresTests
 	internal void ActivateAdjacent_UseProvidedMonitor(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given a monitor is provided
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -372,7 +372,7 @@ public class ButlerChoresTests
 		// Given there is only a single monitor and workspace...
 		IMonitor[] monitors = new[] { ctx.MonitorManager.ActiveMonitor };
 		SetupMonitors(ctx, monitors);
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(1);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(1);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -395,7 +395,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given a fake monitor is provided
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -431,7 +431,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given we have activated the first and second workspace
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(3);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		butlerChores.Activate(workspaces[firstActivatedIdx], monitors[0]);
@@ -457,7 +457,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given there are no free workspaces
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -478,7 +478,7 @@ public class ButlerChoresTests
 	internal void MoveWindowToAdjacentWorkspace_WindowIsNull(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the provided window is null, and workspaces' last focused window are null
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		foreach (IWorkspace workspace in workspaces)
 		{
 			workspace.LastFocusedWindow.Returns((IWindow?)null);
@@ -505,7 +505,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given the provided window is not contained in any workspace
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		// When MoveWindowToAdjacentWorkspace is called
@@ -531,7 +531,7 @@ public class ButlerChoresTests
 		IMonitor[] monitors = new[] { ctx.MonitorManager.ActiveMonitor };
 		SetupMonitors(ctx, monitors);
 
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(1);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(1);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
 
@@ -570,7 +570,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given we have activated the first and second workspace, and the window is added to the first workspace
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(3);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		butlerChores.Activate(workspaces[firstActivatedIdx], monitors[0]);
@@ -608,7 +608,7 @@ public class ButlerChoresTests
 		// Given there is only a single monitor and workspace...
 		IMonitor[] monitors = new[] { ctx.MonitorManager.ActiveMonitor };
 		SetupMonitors(ctx, monitors);
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(1);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(1);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -631,7 +631,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given a fake monitor is provided
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -656,7 +656,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given there are two workspaces and monitors
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -690,7 +690,7 @@ public class ButlerChoresTests
 	internal void LayoutAllActiveWorkspaces(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -709,7 +709,7 @@ public class ButlerChoresTests
 	internal void MoveWindowToWorkspace_NoWindow(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -729,7 +729,7 @@ public class ButlerChoresTests
 	internal void MoveWindowToWorkspace_CannotFindWindow(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given there are 3 workspaces
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(3);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 		ClearWorkspaceReceivedCalls(workspaces);
 		workspaces[2].ClearReceivedCalls();
@@ -746,7 +746,7 @@ public class ButlerChoresTests
 	internal void MoveWindowToWorkspace_SameWorkspace(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given there are 3 workspaces
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(3);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		// and the window is added
@@ -773,7 +773,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given there are 3 workspaces
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(3);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		butlerChores.Activate(workspaces[0], monitors[0]);
@@ -806,7 +806,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given there are 3 workspaces
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(3);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		butlerChores.Activate(workspaces[0], monitors[0]);
@@ -835,7 +835,7 @@ public class ButlerChoresTests
 	internal void MoveWindowToMonitor_NoWindow(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given there are 2 workspaces
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -860,7 +860,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given there are 2 workspaces
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -883,7 +883,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given there are 2 workspaces, and the window has been added
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -908,7 +908,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given there are 2 workspaces, and the window has been added
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -933,7 +933,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ActivateWorkspacesOnMonitors(butlerChores, workspaces, monitors);
@@ -959,7 +959,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 		ctx.MonitorManager.GetPreviousMonitor(monitors[0]).Returns(monitors[1]);
 
@@ -985,7 +985,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 		ctx.MonitorManager.GetNextMonitor(monitors[0]).Returns(monitors[1]);
 
@@ -1062,7 +1062,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		IWorkspace activeWorkspace = workspaces[0];
 		IWorkspace targetWorkspace = workspaces[1];
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
@@ -1148,7 +1148,7 @@ public class ButlerChoresTests
 	internal void MoveWindowEdgesInDirection_NoWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		workspaces[0].LastFocusedWindow.Returns((IWindow?)null);
@@ -1170,7 +1170,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		workspaces[1].LastFocusedWindow.Returns(window);
@@ -1193,7 +1193,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
 
 		ctx.RouterManager.RouteWindow(window).Returns(workspaces[1]);
@@ -1217,7 +1217,7 @@ public class ButlerChoresTests
 	)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		ButlerChores butlerChores = CreateSut(ctx, internalCtx, workspaces);
 
 		ctx.Butler.Pantry.SetMonitorWorkspace(monitors[0], workspaces[0]);

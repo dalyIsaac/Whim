@@ -276,7 +276,7 @@ public class WorkspaceManagerTests
 	internal void Remove_Workspace_RequireAtLeastNWorkspace(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the workspace manager has two workspaces and there are two monitors
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When a workspace is removed
@@ -308,7 +308,7 @@ public class WorkspaceManagerTests
 	internal void Remove_Workspace_Success(IContext ctx, IInternalContext internalCtx, IWindow window)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		MonitorManagerUtils.SetupMonitors(ctx, new[] { ctx.MonitorManager.ActiveMonitor });
 		workspaces[0].Windows.Returns(new[] { window });
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
@@ -330,7 +330,7 @@ public class WorkspaceManagerTests
 	internal void Remove_String_NotFound(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When a workspace is removed, it returns false, as the workspace was not found
@@ -341,7 +341,7 @@ public class WorkspaceManagerTests
 	internal void Remove_String_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(3);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(3);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 		workspaces[0].Name.Returns("workspace");
 
@@ -394,7 +394,7 @@ public class WorkspaceManagerTests
 	internal void GetEnumerator(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
@@ -414,7 +414,7 @@ public class WorkspaceManagerTests
 	internal void IEnumerable_GetEnumerator(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When enumerating the workspaces, then the workspaces are returned
@@ -464,7 +464,7 @@ public class WorkspaceManagerTests
 	internal void DoesDispose(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		// When the workspace manager is disposed
@@ -572,7 +572,7 @@ public class WorkspaceManagerTests
 	internal void ActiveWorkspace_CannotFindMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		ctx.MonitorManager.ActiveMonitor.Returns(Substitute.For<IMonitor>());
@@ -588,7 +588,7 @@ public class WorkspaceManagerTests
 	internal void ActiveWorkspace_CanFindMonitor(IContext ctx, IInternalContext internalCtx, IMonitor[] monitors)
 	{
 		// Given
-		IWorkspace[] workspaces = WorkspaceUtils.CreateWorkspaces(2);
+		IWorkspace[] workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2);
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx, workspaces);
 
 		workspaceManager.Initialize();

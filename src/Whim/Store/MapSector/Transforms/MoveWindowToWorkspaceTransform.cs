@@ -39,7 +39,7 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 		Logger.Debug($"Moving window {windowHandle} to workspace {TargetWorkspaceId}");
 
 		// Find the current workspace for the window.
-		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceForWindow(windowHandle));
+		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(windowHandle));
 		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
 			return Result.FromException<Unit>(oldWorkspaceResult.Error!);
@@ -62,8 +62,8 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 		// If both workspaces are visible, activate both
 		// Otherwise, only layout the new workspace.
 		if (
-			ctx.Store.Pick(Pickers.PickMonitorForWorkspace(oldWorkspace.Id)).IsSuccessful
-			&& ctx.Store.Pick(Pickers.PickMonitorForWorkspace(targetWorkspace.Id)).IsSuccessful
+			ctx.Store.Pick(Pickers.PickMonitorByWorkspace(oldWorkspace.Id)).IsSuccessful
+			&& ctx.Store.Pick(Pickers.PickMonitorByWorkspace(targetWorkspace.Id)).IsSuccessful
 		)
 		{
 			targetWorkspace.DoLayout();

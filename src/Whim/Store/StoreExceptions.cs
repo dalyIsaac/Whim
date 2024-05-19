@@ -9,10 +9,13 @@ internal static class StoreExceptions
 	public static Exception MonitorNotFound(HMONITOR handle) =>
 		new WhimException($"Monitor with handle {handle} not found.");
 
+	public static Exception WindowNotFound(HWND handle) => new WhimException($"Window with handle {handle} not found.");
+
+	public static Exception WorkspaceNotFound(WorkspaceId workspaceId) =>
+		new WhimException($"Workspace {workspaceId} not found.");
+
 	public static Exception NoMonitorFoundAtPoint(IPoint<int> point) =>
 		new WhimException($"No monitor found at point {point}.");
-
-	public static Exception WindowNotFound(HWND handle) => new WhimException($"Window with handle {handle} not found.");
 
 	public static Exception NoMonitorFoundForWorkspace(WorkspaceId workspaceId) =>
 		new WhimException($"No monitor found for workspace {workspaceId}.");
@@ -27,7 +30,4 @@ internal static class StoreExceptions
 		new WhimException($"No workspace found for window {windowHandle}.");
 
 	public static Exception NoValidWindow() => new WhimException("No valid window found.");
-
-	public static Exception WorkspaceNotFound(WorkspaceId workspaceId) =>
-		new WhimException($"Workspace {workspaceId} not found.");
 }

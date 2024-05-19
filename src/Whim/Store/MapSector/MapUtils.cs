@@ -4,7 +4,7 @@ namespace Whim;
 
 internal static class MapUtils
 {
-	public static HMONITOR GetMonitorForWorkspace(this IMapSector sector, WorkspaceId workspaceId)
+	public static HMONITOR GetMonitorByWorkspace(this IMapSector sector, WorkspaceId workspaceId)
 	{
 		foreach ((HMONITOR monitor, WorkspaceId workspace) in sector.MonitorWorkspaceMap)
 		{

@@ -32,7 +32,7 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 
 		Logger.Debug($"Moving window {windowHandle} to monitor {MonitorHandle}");
 
-		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(Pickers.PickMonitorForWindow(WindowHandle));
+		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(Pickers.PickMonitorByWindow(WindowHandle));
 		if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 		{
 			return Result.FromException<Unit>(oldMonitorResult.Error!);
@@ -44,7 +44,7 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 			return Unit.Result;
 		}
 
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceForMonitor(MonitorHandle));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(MonitorHandle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
 			return Result.FromException<Unit>(workspaceResult.Error!);

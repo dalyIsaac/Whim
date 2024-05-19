@@ -28,7 +28,7 @@ public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, Work
 		}
 
 		// Remove the workspace from the monitor map.
-		HMONITOR monitor = sector.GetMonitorForWorkspace(SourceWorkspaceId);
+		HMONITOR monitor = sector.GetMonitorByWorkspace(SourceWorkspaceId);
 		if (monitor != default)
 		{
 			sector.MonitorWorkspaceMap = sector.MonitorWorkspaceMap.SetItem(monitor, TargetWorkspaceId);

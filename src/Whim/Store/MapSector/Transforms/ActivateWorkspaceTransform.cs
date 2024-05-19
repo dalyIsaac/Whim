@@ -38,10 +38,10 @@ public record ActivateWorkspaceTransform(WorkspaceId WorkspaceId, HMONITOR Monit
 		}
 
 		// Get the old workspace for the event.
-		IWorkspace? oldWorkspace = ctx.Store.Pick(Pickers.PickWorkspaceForMonitor(targetMonitorHandle)).OrDefault();
+		IWorkspace? oldWorkspace = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(targetMonitorHandle)).OrDefault();
 
 		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = ctx.Store.Pick(Pickers.PickMonitorForWorkspace(WorkspaceId)).OrDefault();
+		IMonitor? loserMonitor = ctx.Store.Pick(Pickers.PickMonitorByWorkspace(WorkspaceId)).OrDefault();
 
 		if (targetMonitorHandle == loserMonitor?.Handle)
 		{
