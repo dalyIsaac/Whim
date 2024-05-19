@@ -6,7 +6,7 @@ using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
-namespace Whim;
+namespace Whim.Tests;
 
 public class MonitorPickersTests
 {

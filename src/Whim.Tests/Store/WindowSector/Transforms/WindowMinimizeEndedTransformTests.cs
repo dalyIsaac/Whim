@@ -1,7 +1,7 @@
-using DotNext;
-using NSubstitute;
 using System;
 using System.Collections.Generic;
+using DotNext;
+using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
