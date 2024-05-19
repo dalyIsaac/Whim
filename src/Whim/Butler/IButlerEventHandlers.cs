@@ -8,5 +8,4 @@ internal interface IButlerEventHandlers
 	int MonitorsChangedDelay { get; }
 	bool AreMonitorsChanging { get; }
 	void OnWindowAdded(WindowEventArgs args);
-	void OnWindowMinimizeEnd(WindowEventArgs args);
 }
