@@ -1,93 +1,34 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Whim;
 
 internal class ButlerPantry : IButlerPantry
 {
-	private readonly IContext _context;
-	private readonly Dictionary<IWindow, IWorkspace> _windowWorkspaceMap = new();
-	private readonly Dictionary<IMonitor, IWorkspace> _monitorWorkspaceMap = new();
+	private readonly IContext _ctx;
 
 	public ButlerPantry(IContext context)
 	{
-		_context = context;
+		_ctx = context;
 	}
 
-	public IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse = false, bool skipActive = false)
-	{
-		IWorkspace[] workspaces = _context.WorkspaceManager.ToArray();
+	public IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse = false, bool skipActive = false) =>
+		_ctx.Store.Pick(Pickers.PickAdjacentWorkspace(workspace.Id, reverse, skipActive)).OrDefault();
 
-		int idx = Array.IndexOf(workspaces, workspace);
-		int delta = reverse ? -1 : 1;
-		int nextIdx = (idx + delta).Mod(workspaces.Length);
+	public IEnumerable<IWorkspace> GetAllActiveWorkspaces() => _ctx.Store.Pick(Pickers.PickAllActiveWorkspaces());
 
-		while (idx != nextIdx)
-		{
-			IWorkspace nextWorkspace = workspaces[nextIdx];
-			IMonitor? monitor = GetMonitorForWorkspace(nextWorkspace);
+	public IMonitor? GetMonitorForWindow(IWindow window) =>
+		_ctx.Store.Pick(Pickers.PickMonitorByWindow(window.Handle)).OrDefault();
 
-			if (monitor == null || !skipActive)
-			{
-				return nextWorkspace;
-			}
+	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace) =>
+		_ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspace.Id)).OrDefault();
 
-			nextIdx = (nextIdx + delta).Mod(workspaces.Length);
-		}
+	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor) =>
+		_ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(monitor.Handle)).OrDefault();
 
-		return null;
-	}
+	public IWorkspace? GetWorkspaceForWindow(IWindow window) =>
+		_ctx.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle)).OrDefault();
 
-	public IEnumerable<IWorkspace> GetAllActiveWorkspaces()
-	{
-		Logger.Debug("Getting all active workspaces");
-		return _monitorWorkspaceMap.Values;
-	}
-
-	public IMonitor? GetMonitorForWindow(IWindow window)
-	{
-		Logger.Debug($"Getting monitor for window: {window}");
-		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace)
-			? GetMonitorForWorkspace(workspace)
-			: null;
-	}
-
-	public IMonitor? GetMonitorForWorkspace(IWorkspace workspace)
-	{
-		Logger.Debug($"Getting monitor for workspace {workspace}");
-
-		// Linear search for the monitor that contains the workspace.
-		foreach ((IMonitor m, IWorkspace w) in _monitorWorkspaceMap)
-		{
-			if (w.Equals(workspace))
-			{
-				Logger.Debug($"Found monitor {m} for workspace {workspace}");
-				return m;
-			}
-		}
-
-		Logger.Debug($"Could not find monitor for workspace {workspace}");
-		return null;
-	}
-
-	public IWorkspace? GetWorkspaceForMonitor(IMonitor monitor)
-	{
-		Logger.Debug($"Getting workspace for monitor {monitor}");
-		return _monitorWorkspaceMap.TryGetValue(monitor, out IWorkspace? workspace) ? workspace : null;
-	}
-
-	public IWorkspace? GetWorkspaceForWindow(IWindow window)
-	{
-		Logger.Debug($"Getting workspace for window {window}");
-		return _windowWorkspaceMap.TryGetValue(window, out IWorkspace? workspace) ? workspace : null;
-	}
-
-	public bool RemoveMonitor(IMonitor monitor)
-	{
-		Logger.Debug($"Removing monitor {monitor}");
-		return _monitorWorkspaceMap.Remove(monitor);
-	}
+	public bool RemoveMonitor(IMonitor monitor) => _monitorWorkspaceMap.Remove(monitor);
 
 	public bool RemoveWindow(IWindow window)
 	{
