@@ -92,24 +92,6 @@ internal class ButlerEventHandlers : IButlerEventHandlers
 		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
-	public void OnWindowRemoved(WindowEventArgs args)
-	{
-		IWindow window = args.Window;
-		Logger.Debug($"Window removed: {window}");
-
-		if (_pantry.GetWorkspaceForWindow(window) is not IWorkspace workspace)
-		{
-			Logger.Error($"Window {window} was not found in any workspace");
-			return;
-		}
-
-		_pantry.RemoveWindow(window);
-		workspace.RemoveWindow(window);
-
-		_internalContext.Butler.TriggerWindowRouted(RouteEventArgs.WindowRemoved(window, workspace));
-		workspace.DoLayout();
-	}
-
 	public void OnWindowMinimizeStart(WindowEventArgs args)
 	{
 		IWindow window = args.Window;
