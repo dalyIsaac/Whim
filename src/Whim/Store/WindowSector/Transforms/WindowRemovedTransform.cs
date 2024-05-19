@@ -10,51 +10,42 @@ internal record WindowRemovedTransform(IWindow Window) : Transform
 		MutableRootSector mutableRootSector
 	)
 	{
-		Result<Unit> windowSectorResult = UpdateWindowSector(mutableRootSector);
-		if (!windowSectorResult.IsSuccessful)
-		{
-			return windowSectorResult;
-		}
-
-		return UpdateMapSector(ctx, mutableRootSector);
-	}
-
-	private Result<Unit> UpdateWindowSector(MutableRootSector mutableRootSector)
-	{
 		WindowSector windowSector = mutableRootSector.WindowSector;
+		MapSector mapSector = mutableRootSector.MapSector;
 
-		if (!windowSector.Windows.TryGetValue(Window.Handle, out IWindow? removedWindow))
+		if (!windowSector.Windows.ContainsKey(Window.Handle))
 		{
 			Logger.Debug($"Window {Window} was not tracked, ignoring event");
 			return Unit.Result;
 		}
 
-		windowSector.Windows = windowSector.Windows.Remove(Window.Handle);
-		windowSector.HandledLocationRestoringWindows = windowSector.HandledLocationRestoringWindows.Remove(
-			Window.Handle
-		);
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(Window.Handle));
+		if (!workspaceResult.TryGet(out IWorkspace workspace))
+		{
+			return Unit.Result;
+		}
 
-		windowSector.QueueEvent(new WindowRemovedEventArgs() { Window = removedWindow });
+		UpdateWindowSector(mutableRootSector.WindowSector);
+		UpdateMapSector(mapSector, workspace);
 
 		return Unit.Result;
 	}
 
-	private Result<Unit> UpdateMapSector(IContext ctx, MutableRootSector rootSector)
+	private void UpdateWindowSector(WindowSector windowSector)
 	{
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(Window.Handle));
-		if (!workspaceResult.TryGet(out IWorkspace workspace))
-		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
-		}
+		windowSector.Windows = windowSector.Windows.Remove(Window.Handle);
+		windowSector.HandledLocationRestoringWindows = windowSector.HandledLocationRestoringWindows.Remove(
+			Window.Handle
+		);
+		windowSector.QueueEvent(new WindowRemovedEventArgs() { Window = Window });
+	}
 
-		MapSector sector = rootSector.MapSector;
-
-		sector.WindowWorkspaceMap = sector.WindowWorkspaceMap.Remove(Window.Handle);
+	private void UpdateMapSector(MapSector mapSector, IWorkspace workspace)
+	{
+		mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.Remove(Window.Handle);
 		workspace.RemoveWindow(Window);
 
-		sector.QueueEvent(RouteEventArgs.WindowRemoved(Window, workspace));
+		mapSector.QueueEvent(RouteEventArgs.WindowRemoved(Window, workspace));
 		workspace.DoLayout();
-
-		return Unit.Result;
 	}
 }

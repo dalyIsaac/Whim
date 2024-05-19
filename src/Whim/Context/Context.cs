@@ -49,7 +49,7 @@ internal class Context : IContext
 		_internalContext = new InternalContext(this);
 
 		Store = new Store(this, _internalContext);
-		Butler = new Butler(this, _internalContext);
+		Butler = new Butler(this);
 
 		NativeManager = new NativeManager(this, _internalContext);
 

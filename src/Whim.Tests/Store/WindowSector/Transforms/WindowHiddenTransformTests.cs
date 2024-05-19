@@ -45,12 +45,7 @@ public class WindowHiddenTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Failed(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void Failed(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
 		ctx.Butler.Pantry.GetMonitorForWindow(window).ReturnsNull();
@@ -61,17 +56,10 @@ public class WindowHiddenTransformTests
 
 		// Then
 		Assert.True(result.IsSuccessful);
-		internalCtx.ButlerEventHandlers.DidNotReceive().OnWindowRemoved(Arg.Any<WindowRemovedEventArgs>());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector rootSector,
-		IWindow window,
-		IMonitor monitor
-	)
+	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window, IMonitor monitor)
 	{
 		// Given the window is inside the sector
 		window.Handle.Returns((HWND)2);
@@ -87,8 +75,5 @@ public class WindowHiddenTransformTests
 		// Then
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
-		internalCtx
-			.ButlerEventHandlers.Received(1)
-			.OnWindowRemoved(Arg.Is<WindowRemovedEventArgs>(a => a.Window == window));
 	}
 }
