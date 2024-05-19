@@ -13,10 +13,9 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 	)
 	{
 		SetActiveMonitor(ctx, internalCtx, mutableRootSector);
+		UpdateMapSector(ctx, Window);
 
-		WindowFocusedEventArgs args = new() { Window = Window };
-		internalCtx.ButlerEventHandlers.OnWindowFocused(args);
-		mutableRootSector.WindowSector.QueueEvent(args);
+		mutableRootSector.WindowSector.QueueEvent(new WindowFocusedEventArgs() { Window = Window });
 
 		return Unit.Result;
 	}
@@ -75,5 +74,32 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			}
 			break;
 		}
+	}
+
+	private static void UpdateMapSector(IContext ctx, IWindow? window)
+	{
+		foreach (IWorkspace workspace in ctx.WorkspaceManager)
+		{
+			((IInternalWorkspace)workspace).WindowFocused(window);
+		}
+
+		if (window is null)
+		{
+			return;
+		}
+
+		if (!ctx.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle)).TryGet(out IWorkspace workspaceForWindow))
+		{
+			Logger.Debug($"Window {window} was not found in any workspace");
+			return;
+		}
+
+		if (ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspaceForWindow.Id)).IsSuccessful)
+		{
+			Logger.Debug($"Window {window} is in an active workspace");
+			return;
+		}
+
+		ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceForWindow.Id));
 	}
 }
