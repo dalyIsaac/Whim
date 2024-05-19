@@ -20,9 +20,9 @@ internal record WindowHiddenTransform(IWindow Window) : WindowRemovedTransform(W
 		MutableRootSector mutableRootSector
 	)
 	{
-		if (ctx.Butler.Pantry.GetMonitorForWindow(Window) == null)
+		if (ctx.Store.Pick(Pickers.PickWorkspaceByWindow(Window.Handle)).IsSuccessful == false)
 		{
-			Logger.Debug($"Window {Window} is not tracked in a monitor, ignoring event");
+			Logger.Debug($"Window {Window} is not tracked in a workspace, ignoring event");
 			return Unit.Result;
 		}
 
