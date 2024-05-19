@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -12,8 +13,8 @@ internal class MapSector : SectorBase, IMapSector, IMapSectorEvents
 	public ImmutableDictionary<HWND, WorkspaceId> WindowWorkspaceMap { get; set; } =
 		ImmutableDictionary<HWND, WorkspaceId>.Empty;
 
-	public ImmutableDictionary<IMonitor, WorkspaceId> MonitorWorkspaceMap { get; set; } =
-		ImmutableDictionary<IMonitor, WorkspaceId>.Empty;
+	public ImmutableDictionary<HMONITOR, WorkspaceId> MonitorWorkspaceMap { get; set; } =
+		ImmutableDictionary<HMONITOR, WorkspaceId>.Empty;
 
 	public event EventHandler<RouteEventArgs>? WindowRouted;
 

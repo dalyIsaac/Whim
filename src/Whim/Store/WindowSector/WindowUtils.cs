@@ -1,6 +1,8 @@
+using Windows.Win32.Foundation;
+
 namespace Whim;
 
-internal class WindowUtils
+internal static class WindowUtils
 {
 	/// <summary>
 	/// Tries to move the given window's edges in the direction of the mouse movement.
@@ -76,5 +78,15 @@ internal class WindowUtils
 		}
 
 		return (movedEdges, new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, });
+	}
+
+	public static HWND OrLastFocusedWindow(this HWND handle, IContext ctx)
+	{
+		if (handle == default)
+		{
+			return ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Handle ?? default;
+		}
+
+		return handle;
 	}
 }

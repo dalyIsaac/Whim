@@ -12,7 +12,7 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// The id of the workspace.
 	/// </summary>
-	WorkspaceId WorkspaceId { get; }
+	WorkspaceId Id { get; }
 
 	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the

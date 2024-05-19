@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -16,5 +17,5 @@ public interface IMapSector
 	/// <summary>
 	/// The mappings of monitors to workspaces.
 	/// </summary>
-	ImmutableDictionary<IMonitor, WorkspaceId> MonitorWorkspaceMap { get; }
+	ImmutableDictionary<HMONITOR, WorkspaceId> MonitorWorkspaceMap { get; }
 }
