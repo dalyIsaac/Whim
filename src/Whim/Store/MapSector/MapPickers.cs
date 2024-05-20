@@ -166,6 +166,8 @@ internal record GetAdjacentWorkspacePicker(WorkspaceId WorkspaceId, bool Reverse
 			return Result.FromException<IWorkspace>(StoreExceptions.WorkspaceNotFound(WorkspaceId));
 		}
 
+		WorkspaceId activeWorkspaceId = ctx.WorkspaceManager.ActiveWorkspace.Id;
+
 		int delta = Reverse ? -1 : 1;
 		int nextIdx = (idx + delta).Mod(workspaces.Length);
 		while (idx != nextIdx)
@@ -173,7 +175,7 @@ internal record GetAdjacentWorkspacePicker(WorkspaceId WorkspaceId, bool Reverse
 			IWorkspace nextWorkspace = workspaces[nextIdx];
 			Result<IMonitor> monitorResult = Pickers.PickMonitorByWorkspace(nextWorkspace.Id)(rootSector);
 
-			if (!monitorResult.IsSuccessful || !SkipActive)
+			if (monitorResult.IsSuccessful && (!SkipActive || nextWorkspace.Id != activeWorkspaceId))
 			{
 				return Result.FromValue(nextWorkspace);
 			}
