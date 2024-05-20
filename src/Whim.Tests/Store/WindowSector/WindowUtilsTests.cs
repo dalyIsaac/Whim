@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using AutoFixture;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;

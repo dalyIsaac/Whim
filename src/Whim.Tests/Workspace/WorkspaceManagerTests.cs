@@ -7,7 +7,6 @@ using AutoFixture;
 using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
-using Windows.Win32.Foundation;
 using Xunit;
 
 namespace Whim.Tests;
