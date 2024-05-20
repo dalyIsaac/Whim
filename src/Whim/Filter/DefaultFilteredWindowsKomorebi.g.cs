@@ -36,7 +36,7 @@ internal static class DefaultFilteredWindowsKomorebi
 	/// <param name="filterManager"></param>
 	public static void LoadWindowsIgnoredByKomorebi(IFilterManager filterManager)
 	{
-		// 1Password
+		// Guitar Rig 7
 		filterManager.AddProcessFileNameFilter("Guitar Rig 7.exe");
 
 		// 1Password
