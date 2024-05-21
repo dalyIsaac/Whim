@@ -65,8 +65,8 @@ internal static class MapTestUtils
 	public static void PopulateWindowWorkspaceMap(
 		IContext ctx,
 		MutableRootSector rootSector,
-		IWorkspace workspace,
-		IWindow window
+		IWindow window,
+		IWorkspace workspace
 	)
 	{
 		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.SetItem(

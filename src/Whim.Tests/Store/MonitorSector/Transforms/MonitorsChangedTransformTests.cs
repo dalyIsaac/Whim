@@ -1,4 +1,5 @@
 using System.Linq;
+using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -56,6 +57,8 @@ public class MonitorsChangedTransformTests
 			internalCtx,
 			new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup }
 		);
+		internalCtx.CoreNativeManager.IsStaThread().Returns(true);
+
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// When a monitor is removed
@@ -75,6 +78,8 @@ public class MonitorsChangedTransformTests
 		// Given we've populated monitors
 		MonitorTestUtils.SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
+
+		internalCtx.CoreNativeManager.IsStaThread().Returns(true);
 
 		// When a monitor is added
 		MonitorTestUtils.SetupMultipleMonitors(
@@ -114,6 +119,8 @@ public class MonitorsChangedTransformTests
 			internalCtx,
 			new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup }
 		);
+
+		internalCtx.CoreNativeManager.IsStaThread().Returns(true);
 
 		// When we dispatch the same transform twice, the first from a clean store
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
