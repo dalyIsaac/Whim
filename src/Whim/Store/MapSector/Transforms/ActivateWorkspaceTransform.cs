@@ -54,23 +54,18 @@ public record ActivateWorkspaceTransform(WorkspaceId WorkspaceId, HMONITOR Monit
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
 		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(targetMonitorHandle, WorkspaceId);
 
-		(IWorkspace workspace, IMonitor monitor)? layoutOldWorkspace = null;
 		if (loserMonitor != null && oldWorkspace != null && loserMonitor.Handle != targetMonitorHandle)
 		{
-			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(loserMonitor.Handle, oldWorkspace.Id);
-			layoutOldWorkspace = (oldWorkspace, loserMonitor);
-		}
-
-		if (layoutOldWorkspace is (IWorkspace, IMonitor) oldWorkspaceValue)
-		{
 			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
-			oldWorkspace?.DoLayout();
+			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(loserMonitor.Handle, oldWorkspace.Id);
+
+			oldWorkspace!.DoLayout();
 			mapSector.QueueEvent(
 				new MonitorWorkspaceChangedEventArgs()
 				{
-					Monitor = oldWorkspaceValue.monitor,
+					Monitor = loserMonitor,
 					PreviousWorkspace = workspace,
-					CurrentWorkspace = oldWorkspaceValue.workspace
+					CurrentWorkspace = oldWorkspace
 				}
 			);
 		}

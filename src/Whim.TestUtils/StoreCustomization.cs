@@ -17,7 +17,11 @@ public class StoreCustomization : ICustomization
 		fixture.Inject(store._root);
 		fixture.Inject(store._root.MutableRootSector);
 
-		internalCtx.CoreNativeManager.IsStaThread().Returns(true);
+		// First IsStaThread() returns true, then all further calls return false.
+		// This is to ensure that the first Dispatch runs in a Task.
+		// All further calls will run in the same thread.
+		internalCtx.CoreNativeManager.IsStaThread().Returns(_ => true, _ => false);
+
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 	}
 }

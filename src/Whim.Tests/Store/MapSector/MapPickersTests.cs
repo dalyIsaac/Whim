@@ -1,101 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.MapTestUtils;
 
 namespace Whim.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MapPickersTests
 {
-	private static IWorkspace CreateWorkspace()
-	{
-		IWorkspace workspace = Substitute.For<IWorkspace>();
-		workspace.Id.Returns(Guid.NewGuid());
-		return workspace;
-	}
-
-	private static IMonitor CreateMonitor(HMONITOR handle)
-	{
-		IMonitor monitor = Substitute.For<IMonitor>();
-		monitor.Handle.Returns(handle);
-		return monitor;
-	}
-
-	private static IWindow CreateWindow(HWND handle)
-	{
-		IWindow window = Substitute.For<IWindow>();
-		window.Handle.Returns(handle);
-		return window;
-	}
-
-	private static void AddWorkspaceToManager(IContext ctx, IWorkspace workspace)
-	{
-		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
-		workspaces.Add(workspace);
-
-		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
-	}
-
-	private static void PopulateWindowWorkspaceMap(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IWorkspace workspace,
-		IWindow window
-	)
-	{
-		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.SetItem(
-			window.Handle,
-			workspace.Id
-		);
-		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
-
-		AddWorkspaceToManager(ctx, workspace);
-	}
-
-	private static void PopulateMonitorWorkspaceMap(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IMonitor monitor,
-		IWorkspace workspace
-	)
-	{
-		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.SetItem(
-			monitor.Handle,
-			workspace.Id
-		);
-		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
-
-		AddWorkspaceToManager(ctx, workspace);
-	}
-
-	private static void PopulateThreeWayMap(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IMonitor monitor,
-		IWorkspace workspace,
-		IWindow window
-	)
-	{
-		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.SetItem(
-			monitor.Handle,
-			workspace.Id
-		);
-		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.SetItem(
-			window.Handle,
-			workspace.Id
-		);
-		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
-
-		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
-
-		AddWorkspaceToManager(ctx, workspace);
-	}
-
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void PickAllActiveWorkspaces(IContext ctx, MutableRootSector root)
 	{
