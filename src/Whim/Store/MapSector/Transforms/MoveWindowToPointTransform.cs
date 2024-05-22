@@ -44,7 +44,7 @@ public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) :
 		IWindow window = rootSector.WindowSector.Windows[WindowHandle];
 
 		// If the window is being moved to a different workspace, remove it from the current workspace.
-		if (!targetWorkspace.Equals(oldWorkspace))
+		if (targetWorkspace.Id != oldWorkspace.Id)
 		{
 			rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.SetItem(
 				WindowHandle,

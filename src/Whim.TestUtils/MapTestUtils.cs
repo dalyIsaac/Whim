@@ -44,6 +44,10 @@ internal static class MapTestUtils
 	{
 		IMonitor monitor = Substitute.For<IMonitor>();
 		monitor.Handle.Returns(handle);
+		monitor.WorkingArea.X.Returns(0);
+		monitor.WorkingArea.Y.Returns(0);
+		monitor.WorkingArea.Width.Returns(1920);
+		monitor.WorkingArea.Height.Returns(1080);
 		return monitor;
 	}
 
