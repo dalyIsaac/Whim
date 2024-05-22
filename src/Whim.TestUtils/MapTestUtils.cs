@@ -62,6 +62,11 @@ internal static class MapTestUtils
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
 	}
 
+	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)
+	{
+		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
+	}
+
 	public static void PopulateWindowWorkspaceMap(
 		IContext ctx,
 		MutableRootSector rootSector,
@@ -73,7 +78,7 @@ internal static class MapTestUtils
 			window.Handle,
 			workspace.Id
 		);
-		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
+		AddWindowToSector(rootSector, window);
 
 		AddWorkspaceToManager(ctx, workspace);
 	}
