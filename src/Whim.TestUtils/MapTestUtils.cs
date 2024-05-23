@@ -125,4 +125,9 @@ internal static class MapTestUtils
 
 		AddWorkspaceToManager(ctx, workspace);
 	}
+
+	public static void SetupMonitorAtPoint(IContext ctx, IPoint<int> point, IMonitor monitor)
+	{
+		ctx.MonitorManager.GetMonitorAtPoint(point).Returns(monitor);
+	}
 }

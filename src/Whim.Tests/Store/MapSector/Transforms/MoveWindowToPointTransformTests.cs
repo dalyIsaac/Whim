@@ -10,11 +10,6 @@ namespace Whim.Tests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MoveWindowToPointTransformTests
 {
-	private static void SetupMonitorAtPoint(IContext ctx, IPoint<int> point, IMonitor monitor)
-	{
-		ctx.MonitorManager.GetMonitorAtPoint(point).Returns(monitor);
-	}
-
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoWorkspaceForMonitor(IContext ctx)
 	{
