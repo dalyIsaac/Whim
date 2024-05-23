@@ -36,9 +36,6 @@ internal static class DefaultFilteredWindowsKomorebi
 	/// <param name="filterManager"></param>
 	public static void LoadWindowsIgnoredByKomorebi(IFilterManager filterManager)
 	{
-		// Guitar Rig 7
-		filterManager.AddProcessFileNameFilter("Guitar Rig 7.exe");
-
 		// 1Password
 		filterManager.AddProcessFileNameFilter("1Password.exe");
 
@@ -99,6 +96,9 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Google Drive
 		filterManager.AddProcessFileNameFilter("GoogleDriveFS.exe");
 
+		// Guitar Rig 7
+		filterManager.AddProcessFileNameFilter("Guitar Rig 7.exe");
+
 		// IntelliJ IDEA
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
@@ -122,6 +122,7 @@ internal static class DefaultFilteredWindowsKomorebi
 
 		// Microsoft Outlook
 		// filterManager.Add((window) => window.WindowClass.StartsWith("_WwB") || window.WindowClass.EndsWith("_WwB"));  // duplicate rule
+		filterManager.AddWindowClassFilter("MsoSplash");
 
 		// Microsoft PC Manager
 		filterManager.AddProcessFileNameFilter("MSPCManager.exe");
@@ -248,8 +249,14 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Wox
 		filterManager.Add((window) => window.Title.StartsWith("Hotkey sink") || window.Title.EndsWith("Hotkey sink"));
 
+		// Zebar
+		filterManager.AddProcessFileNameFilter("Zebar.exe");
+
 		// Zoom
 		filterManager.AddProcessFileNameFilter("Zoom.exe");
+
+		// komorebi-gui
+		filterManager.AddProcessFileNameFilter("komorebi-gui.exe");
 
 		// paint.net
 		filterManager.AddProcessFileNameFilter("paintdotnet.exe");
