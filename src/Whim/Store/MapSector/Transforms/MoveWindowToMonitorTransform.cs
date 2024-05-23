@@ -19,20 +19,21 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 	{
 		MapSector mapSector = rootSector.MapSector;
 
-		HWND windowHandle = WindowHandle;
+		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
 		{
-			if (ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow == null)
-			{
-				return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
-			}
-
-			windowHandle = ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Handle;
+			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
 		}
 
 		Logger.Debug($"Moving window {windowHandle} to monitor {MonitorHandle}");
 
-		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(Pickers.PickMonitorByWindow(WindowHandle));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(MonitorHandle));
+		if (!workspaceResult.TryGet(out IWorkspace workspace))
+		{
+			return Result.FromException<Unit>(workspaceResult.Error!);
+		}
+
+		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(Pickers.PickMonitorByWindow(windowHandle));
 		if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 		{
 			return Result.FromException<Unit>(oldMonitorResult.Error!);
@@ -42,12 +43,6 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 		{
 			Logger.Debug($"Window {WindowHandle} is already on monitor {MonitorHandle}");
 			return Unit.Result;
-		}
-
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(MonitorHandle));
-		if (!workspaceResult.TryGet(out IWorkspace workspace))
-		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
 		}
 
 		return ctx.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id, windowHandle));
