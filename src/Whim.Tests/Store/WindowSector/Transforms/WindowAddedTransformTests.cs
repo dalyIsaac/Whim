@@ -1,14 +1,58 @@
+using System.Collections.Generic;
 using System.ComponentModel;
+using DotNext;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowAddedTransformTests
 {
+	private static Result<IWindow> AssertDoesNotRaise(
+		IContext ctx,
+		MutableRootSector rootSector,
+		WindowAddedTransform sut
+	)
+	{
+		Result<IWindow>? result = null;
+		CustomAssert.DoesNotRaise<RouteEventArgs>(
+			h => rootSector.MapSector.WindowRouted += h,
+			h => rootSector.MapSector.WindowRouted -= h,
+			() => result = ctx.Store.Dispatch(sut)
+		);
+		return result!.Value;
+	}
+
+	private static (Result<IWindow>, List<RouteEventArgs>) AssertRaises(
+		IContext ctx,
+		MutableRootSector rootSector,
+		WindowAddedTransform sut
+	)
+	{
+		Result<IWindow>? result = null;
+		List<RouteEventArgs> evs = new();
+
+		Assert.Raises<RouteEventArgs>(
+			h =>
+				rootSector.MapSector.WindowRouted += (sender, args) =>
+				{
+					evs.Add(args);
+					h.Invoke(sender, args);
+				},
+			h => rootSector.MapSector.WindowRouted -= h,
+			() => result = ctx.Store.Dispatch(sut)
+		);
+
+		return (result!.Value, evs);
+	}
+
 	private static void Setup(
 		IContext ctx,
 		IInternalContext internalCtx,
@@ -56,7 +100,8 @@ public class WindowAddedTransformTests
 		bool cannotCreateWindow,
 		bool shouldBeIgnored,
 		IContext ctx,
-		IInternalContext internalCtx
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
 	)
 	{
 		// Given the handle fails
@@ -75,25 +120,204 @@ public class WindowAddedTransformTests
 		WindowAddedTransform sut = new(hwnd);
 
 		// When we dispatch the transform
-		var result = ctx.Store.Dispatch(sut);
+		var result = AssertDoesNotRaise(ctx, rootSector, sut);
 
 		// Then we received an error
 		Assert.False(result.IsSuccessful);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, IInternalContext internalCtx)
+	internal void Success_RoutedToWorkspace(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
-		// Given the handle succeeds
+		// Given the window is routed to a workspace
 		HWND hwnd = (HWND)1;
+		IWorkspace workspace = CreateWorkspace();
+
 		Setup(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
+
 		WindowAddedTransform sut = new(hwnd);
 
-		// When we dispatch the transform
-		var result = ctx.Store.Dispatch(sut);
+		// When
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
 
-		// Then we receive the window
+		// Then
 		Assert.True(result.IsSuccessful);
-		Assert.IsAssignableFrom<IWindow>(result.Value);
+
+		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
+		Assert.Single(evs);
+		workspace.Received(1).DoLayout();
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success_RoutedToActiveWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
+	)
+	{
+		// Given the window is routed to an active workspace
+		HWND hwnd = (HWND)1;
+		IWorkspace workspace = CreateWorkspace();
+
+		Setup(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace);
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
+
+		WindowAddedTransform sut = new(hwnd, RouterOptions.RouteToActiveWorkspace);
+
+		// When
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
+
+		// Then
+		Assert.True(result.IsSuccessful);
+
+		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
+		Assert.Single(evs);
+		workspace.Received(1).DoLayout();
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success_RoutedToLastTrackedActiveWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
+	)
+	{
+		// Given the window is routed to last tracked active workspace
+		HWND hwnd = (HWND)1;
+		HMONITOR monitorHandle = (HMONITOR)1;
+		IWorkspace workspace = CreateWorkspace();
+
+		Setup(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		ctx.RouterManager.RouterOptions.Returns(RouterOptions.RouteToLastTrackedActiveWorkspace);
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
+
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor(monitorHandle), workspace);
+		rootSector.MonitorSector.LastWhimActiveMonitorHandle = monitorHandle;
+
+		WindowAddedTransform sut = new(hwnd);
+
+		// When
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
+
+		// Then
+		Assert.True(result.IsSuccessful);
+
+		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
+		Assert.Single(evs);
+		workspace.Received(1).DoLayout();
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success_WorkspaceFromWindow(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	{
+		// Given the window has a workspace
+		HWND hwnd = (HWND)1;
+		HMONITOR monitorHandle = (HMONITOR)1;
+		IWorkspace workspace = CreateWorkspace();
+
+		Setup(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
+
+		internalCtx
+			.CoreNativeManager.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
+			.Returns(monitorHandle);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor(monitorHandle), workspace);
+
+		WindowAddedTransform sut = new(hwnd, RouterOptions.RouteToLaunchedWorkspace);
+
+		// When
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
+
+		// Then
+		Assert.True(result.IsSuccessful);
+
+		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
+		Assert.Single(evs);
+		workspace.Received(1).DoLayout();
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success_ActiveWorkspace(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	{
+		// Given the window is not routed, so we use the active workspace
+		HWND hwnd = (HWND)1;
+		IWorkspace workspace = CreateWorkspace();
+
+		Setup(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace);
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
+
+		WindowAddedTransform sut = new(hwnd, RouterOptions.RouteToLaunchedWorkspace);
+
+		// When
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
+
+		// Then
+		Assert.True(result.IsSuccessful);
+
+		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
+		Assert.Single(evs);
+		workspace.Received(1).DoLayout();
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success_WindowMinimized(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	{
+		// Given the window is minimized
+		HWND hwnd = (HWND)1;
+		IWorkspace workspace = CreateWorkspace();
+
+		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
+
+		Setup(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
+
+		WindowAddedTransform sut = new(hwnd);
+
+		// When
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
+
+		// Then
+		Assert.True(result.IsSuccessful);
+
+		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
+		Assert.Single(evs);
+		workspace.Received(1).DoLayout();
+		workspace.Received(1).MinimizeWindowStart(Arg.Any<IWindow>());
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success_WindowAdded(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	{
+		// Given the window is not minimized
+		HWND hwnd = (HWND)1;
+		IWorkspace workspace = CreateWorkspace();
+
+		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)false);
+
+		Setup(ctx, internalCtx, hwnd);
+		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
+
+		WindowAddedTransform sut = new(hwnd);
+
+		// When
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
+
+		// Then
+		Assert.True(result.IsSuccessful);
+
+		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
+		Assert.Single(evs);
+		workspace.Received(1).DoLayout();
+		workspace.Received(1).AddWindow(Arg.Any<IWindow>());
 	}
 }

@@ -118,7 +118,6 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 
 		workspace.DoLayout();
 		window.Focus();
-		Logger.Debug($"Window {window} added to workspace {workspace.Name}");
 	}
 
 	/// <summary>
