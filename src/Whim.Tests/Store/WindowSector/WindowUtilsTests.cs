@@ -61,7 +61,7 @@ public class WindowUtilsTests
 	)
 	{
 		// Given we can't get the window position from the native manager
-		MapTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
+		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
 		Setup_TryGetWindowState(window, workspace);
 		ctx.NativeManager.DwmGetWindowRectangle(window.Handle).ReturnsNull();
 
@@ -186,7 +186,7 @@ public class WindowUtilsTests
 	)
 	{
 		// Given the new window position
-		MapTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
+		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
 		Setup_TryGetWindowState(window, workspace, originalRect);
 		ctx.NativeManager.DwmGetWindowRectangle(window.Handle).Returns(newRect);
 

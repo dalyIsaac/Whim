@@ -47,7 +47,7 @@ public class WindowMinimizeStartedTransformTests
 	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window, IWorkspace workspace)
 	{
 		// Given the window is in a workspace
-		MapTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
+		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
 		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.Add(
 			window.Handle,
 			workspace.Id

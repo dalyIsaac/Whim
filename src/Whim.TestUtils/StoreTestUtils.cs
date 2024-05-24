@@ -7,7 +7,7 @@ using Windows.Win32.Graphics.Gdi;
 
 namespace Whim.TestUtils;
 
-internal static class MapTestUtils
+internal static class StoreTestUtils
 {
 	public static void SetupWindowWorkspaceMapping(
 		IContext ctx,

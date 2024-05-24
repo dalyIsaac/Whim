@@ -5,7 +5,7 @@ using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
-using static Whim.TestUtils.MapTestUtils;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
