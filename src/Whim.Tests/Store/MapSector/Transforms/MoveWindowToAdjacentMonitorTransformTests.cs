@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Threading;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;

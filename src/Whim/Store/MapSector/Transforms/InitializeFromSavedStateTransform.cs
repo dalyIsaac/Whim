@@ -5,13 +5,14 @@ using Windows.Win32.Foundation;
 namespace Whim;
 
 /// <summary>
-/// Initializes the map with the saved workspaces, and adds windows.
+/// Initializes the state with the saved workspaces, and adds windows.
 /// </summary>
-internal record InitializeMapTransform : Transform
+internal record InitializeFromSavedStateTransform : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		MapSector mapSector = rootSector.MapSector;
+		WindowSector windowSector = rootSector.WindowSector;
 
 		// Add the saved windows at their saved locations inside their saved workspaces.
 		// Other windows are routed to the monitor they're on.
@@ -37,11 +38,12 @@ internal record InitializeMapTransform : Transform
 				}
 
 				mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspace.Id);
+				windowSector.Windows = windowSector.Windows.Add(window.Handle, window);
+
 				workspace.MoveWindowToPoint(window, savedWindow.Rectangle.Center, deferLayout: false);
 				processedWindows.Add(hwnd);
 
-				// Fire the window added event.
-				ctx.Store.Dispatch(new WindowAddedTransform(window.Handle));
+				windowSector.QueueEvent(new WindowAddedEventArgs() { Window = window });
 			}
 		}
 
