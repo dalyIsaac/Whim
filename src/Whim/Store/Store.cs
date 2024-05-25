@@ -82,7 +82,6 @@ public class Store : IStore
 				finally
 				{
 					_lock.ExitReadLock();
-					_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
 				}
 			}).Result;
 		}
@@ -107,7 +106,6 @@ public class Store : IStore
 				finally
 				{
 					_lock.ExitReadLock();
-					_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
 				}
 			}).Result;
 		}

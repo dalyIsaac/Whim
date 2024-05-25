@@ -33,10 +33,18 @@ internal static class StoreTestUtils
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => new List<IWorkspace>() { workspace }.GetEnumerator());
 	}
 
+	private static int _workspaceCounter = 1;
+
 	public static IWorkspace CreateWorkspace()
 	{
 		IWorkspace workspace = Substitute.For<IWorkspace, IInternalWorkspace>();
-		workspace.Id.Returns(Guid.NewGuid());
+		
+		byte[] bytes = new byte[16];
+		BitConverter.GetBytes(_workspaceCounter).CopyTo( bytes, 0 );
+		Guid workspaceId = new(bytes);
+		workspace.Id.Returns(workspaceId);
+		_workspaceCounter++;
+		
 		return workspace;
 	}
 
