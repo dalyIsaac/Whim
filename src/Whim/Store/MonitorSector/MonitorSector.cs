@@ -11,7 +11,7 @@ internal class MonitorSector : SectorBase, IDisposable, IMonitorSector, IMonitor
 	private bool _disposedValue;
 
 	public int MonitorsChangingTasks { get; set; }
-	public int MonitorsChangedDelay { get; init; } = 3 * 1000;
+	public int MonitorsChangedDelay { get; set; } = 3 * 1000;
 	public ImmutableArray<IMonitor> Monitors { get; set; } = ImmutableArray<IMonitor>.Empty;
 	public HMONITOR ActiveMonitorHandle { get; set; }
 	public HMONITOR PrimaryMonitorHandle { get; set; }

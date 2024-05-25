@@ -67,7 +67,7 @@ public class ActivateWorkspaceTransformTests
 	{
 		// Given the monitor doesn't exist
 		IWorkspace workspace = CreateWorkspace();
-		AddWorkspaceToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, workspace);
 
 		ActivateWorkspaceTransform sut = new(workspace.Id);
 
@@ -146,7 +146,7 @@ public class ActivateWorkspaceTransformTests
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
-		AddWorkspaceToManager(ctx, workspace3);
+		AddWorkspacesToManager(ctx, workspace3);
 
 		ActivateWorkspaceTransform sut = new(workspace3.Id, monitor1.Handle);
 

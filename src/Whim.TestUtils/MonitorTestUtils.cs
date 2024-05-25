@@ -6,7 +6,7 @@ using NSubstitute;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 
-namespace Whim;
+namespace Whim.TestUtils;
 
 internal static class MonitorTestUtils
 {

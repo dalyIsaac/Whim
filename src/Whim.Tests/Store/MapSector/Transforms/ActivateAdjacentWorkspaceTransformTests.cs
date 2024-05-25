@@ -50,7 +50,7 @@ public class ActivateAdjacentWorkspaceTransformTests
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace1);
-		AddWorkspaceToManager(ctx, workspace2);
+		AddWorkspacesToManager(ctx, workspace2);
 
 		ActivateAdjacentWorkspaceTransform sut = new(monitor.Handle);
 

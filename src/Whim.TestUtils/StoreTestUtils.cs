@@ -58,10 +58,10 @@ internal static class StoreTestUtils
 		return window;
 	}
 
-	public static void AddWorkspaceToManager(IContext ctx, IWorkspace workspace)
+	public static void AddWorkspacesToManager(IContext ctx, params IWorkspace[] newWorkspaces)
 	{
 		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
-		workspaces.Add(workspace);
+		workspaces.AddRange(newWorkspaces);
 
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
 	}
@@ -84,7 +84,7 @@ internal static class StoreTestUtils
 		);
 		AddWindowToSector(rootSector, window);
 
-		AddWorkspaceToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, workspace);
 	}
 
 	public static void PopulateMonitorWorkspaceMap(
@@ -100,7 +100,7 @@ internal static class StoreTestUtils
 		);
 		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
 
-		AddWorkspaceToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, workspace);
 	}
 
 	public static void PopulateThreeWayMap(
@@ -123,7 +123,7 @@ internal static class StoreTestUtils
 
 		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
 
-		AddWorkspaceToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, workspace);
 	}
 
 	public static void SetupMonitorAtPoint(IContext ctx, IPoint<int> point, IMonitor monitor)

@@ -36,7 +36,7 @@ public class MergeWorkspaceWIndowsTransformTests
 		IWorkspace workspace = CreateWorkspace();
 		Guid targetWorkspaceId = Guid.NewGuid();
 
-		AddWorkspaceToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, workspace);
 
 		MergeWorkspaceWindowsTransform sut = new(workspace.Id, targetWorkspaceId);
 
@@ -63,8 +63,7 @@ public class MergeWorkspaceWIndowsTransformTests
 
 		sourceWorkspace.Windows.Returns(new List<IWindow>() { window1, window2, window3 });
 
-		AddWorkspaceToManager(ctx, sourceWorkspace);
-		AddWorkspaceToManager(ctx, targetWorkspace);
+		AddWorkspacesToManager(ctx, sourceWorkspace, targetWorkspace);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, sourceWorkspace);
 

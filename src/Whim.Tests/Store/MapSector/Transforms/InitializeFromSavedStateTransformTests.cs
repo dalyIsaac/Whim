@@ -128,8 +128,7 @@ public class InitializeFromSavedStateTransformTests
 		workspace2.Name.Returns(savedWorkspace2.Name);
 
 		AddWorkspacesToSavedState(internalCtx, savedWorkspace1, savedWorkspace2);
-		AddWorkspaceToManager(ctx, workspace1);
-		AddWorkspaceToManager(ctx, workspace2);
+		AddWorkspacesToManager(ctx, workspace1, workspace2);
 
 		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace1);
 		ctx.WorkspaceManager.TryGet(savedWorkspace1.Name).Returns(workspace1);

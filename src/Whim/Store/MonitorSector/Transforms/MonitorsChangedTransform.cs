@@ -148,9 +148,6 @@ internal record MonitorsChangedTransform : Transform
 
 		// Hack to only accept window events after Windows has been given a chance to stop moving
 		// windows around after a monitor change.
-		// TODO: Change
-		// NOTE: ButlerEventHandlersTests has a test for this which only runs locally - it is
-		// turned off in CI as it has proved flaky when running on GitHub Actions.
 		ctx.NativeManager.TryEnqueue(async () =>
 		{
 			await Task.Delay(monitorSector.MonitorsChangedDelay).ConfigureAwait(true);
