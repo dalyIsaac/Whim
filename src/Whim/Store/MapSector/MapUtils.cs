@@ -4,11 +4,11 @@ namespace Whim;
 
 internal static class MapUtils
 {
-	public static HMONITOR GetMonitorByWorkspace(this IMapSector sector, WorkspaceId workspaceId)
+	public static HMONITOR GetMonitorByWorkspace(this IMapSector sector, WorkspaceId searchWorkspaceId)
 	{
 		foreach ((HMONITOR monitor, WorkspaceId workspace) in sector.MonitorWorkspaceMap)
 		{
-			if (workspace.Equals(workspaceId))
+			if (workspace.Equals(searchWorkspaceId))
 			{
 				return monitor;
 			}
