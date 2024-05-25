@@ -36,12 +36,7 @@ public class WindowUtilsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Workspace_DoesNotContainWindow(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IWindow window,
-		IWorkspace workspace
-	)
+	internal void Workspace_DoesNotContainWindow(IContext ctx, IWindow window)
 	{
 		// Given the workspace doesn't contain the window
 
@@ -76,19 +71,23 @@ public class WindowUtilsTests
 	[InlineAutoSubstituteData<StoreCustomization>(1, 0, 1, 0)]
 	[InlineAutoSubstituteData<StoreCustomization>(0, 1, 1, 0)]
 	[InlineAutoSubstituteData<StoreCustomization>(1, 1, 1, 1)]
-	public void MoveTooManyEdges(
+	internal void MoveTooManyEdges(
 		int newX,
 		int newY,
 		int newWidth,
 		int newHeight,
 		IContext ctx,
+		MutableRootSector rootSector,
 		IWindow window,
 		IWorkspace workspace
 	)
 	{
 		// Given the new window position
+		window.Handle.Returns((HWND)1);
+		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
 		Setup_TryGetWindowState(window, workspace);
-		ctx.NativeManager.DwmGetWindowRectangle((HWND)1).Returns(new Rectangle<int>(newX, newY, newWidth, newHeight));
+		ctx.NativeManager.DwmGetWindowRectangle(window.Handle)
+			.Returns(new Rectangle<int>(newX, newY, newWidth, newHeight));
 
 		// When we get the moved edges
 		var result = WindowUtils.GetMovedEdges(ctx, window);
