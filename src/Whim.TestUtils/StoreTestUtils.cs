@@ -38,13 +38,13 @@ internal static class StoreTestUtils
 	public static IWorkspace CreateWorkspace()
 	{
 		IWorkspace workspace = Substitute.For<IWorkspace, IInternalWorkspace>();
-		
+
 		byte[] bytes = new byte[16];
-		BitConverter.GetBytes(_workspaceCounter).CopyTo( bytes, 0 );
+		BitConverter.GetBytes(_workspaceCounter).CopyTo(bytes, 0);
 		Guid workspaceId = new(bytes);
 		workspace.Id.Returns(workspaceId);
 		_workspaceCounter++;
-		
+
 		return workspace;
 	}
 
