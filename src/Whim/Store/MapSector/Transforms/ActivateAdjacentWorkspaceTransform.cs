@@ -15,14 +15,16 @@ namespace Whim;
 /// <param name="SkipActive">
 /// When <see langword="true"/>, skips all workspaces that are active on any other monitor. Defaults to <see langword="false"/>.
 /// </param>
-public record ActivateAdjacentTransform(HMONITOR MonitorHandle = default, bool Reverse = false, bool SkipActive = false)
-	: Transform
+public record ActivateAdjacentWorkspaceTransform(
+	HMONITOR MonitorHandle = default,
+	bool Reverse = false,
+	bool SkipActive = false
+) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		MapSector mapSector = rootSector.MapSector;
-		HMONITOR targetMonitorHandle =
-			MonitorHandle == default ? rootSector.MonitorSector.ActiveMonitorHandle : MonitorHandle;
+		HMONITOR targetMonitorHandle = MonitorHandle.OrActiveMonitor(rootSector);
 
 		if (!mapSector.MonitorWorkspaceMap.TryGetValue(targetMonitorHandle, out WorkspaceId currentWorkspaceId))
 		{

@@ -29,7 +29,9 @@ internal partial class Butler : IButler, IInternalButler
 		_context.Store.Dispatch(new ActivateWorkspaceTransform(workspace.Id, monitor?.Handle ?? default));
 
 	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false) =>
-		_context.Store.Dispatch(new ActivateAdjacentTransform(monitor?.Handle ?? default, reverse, skipActive));
+		_context.Store.Dispatch(
+			new ActivateAdjacentWorkspaceTransform(monitor?.Handle ?? default, reverse, skipActive)
+		);
 
 	public void LayoutAllActiveWorkspaces() => _context.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
 

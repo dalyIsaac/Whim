@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using DotNext;
-using FluentAssertions;
 using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
