@@ -41,8 +41,6 @@ public record SwapWorkspaceWithAdjacentMonitorTransform(WorkspaceId WorkspaceId 
 			return Result.FromException<Unit>(nextWorkspaceResult.Error!);
 		}
 
-		ctx.Store.Dispatch(new ActivateWorkspaceTransform(nextWorkspace.Id, currentMonitor.Handle));
-
-		return Unit.Result;
+		return ctx.Store.Dispatch(new ActivateWorkspaceTransform(nextWorkspace.Id, currentMonitor.Handle));
 	}
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DotNext;
+using FluentAssertions;
 using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
@@ -128,6 +129,9 @@ public class ActivateWorkspaceTransformTests
 		Assert.Same(workspace1, evs[1].PreviousWorkspace);
 		Assert.Same(workspace3, evs[1].CurrentWorkspace);
 		Assert.Same(monitor1, evs[1].Monitor);
+
+		Assert.Equal(workspace3.Id, rootSector.MapSector.MonitorWorkspaceMap[monitor1.Handle]);
+		Assert.Equal(workspace1.Id, rootSector.MapSector.MonitorWorkspaceMap[monitor3.Handle]);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
