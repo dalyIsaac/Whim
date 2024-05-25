@@ -97,6 +97,15 @@ public class MonitorsChangedTransformTests
 		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)2]);
 		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)1]);
 		Assert.DoesNotContain((HMONITOR)3, rootSector.MapSector.MonitorWorkspaceMap.Keys);
+
+		workspaces[0].Received(1).Deactivate();
+		workspaces[0].Received(2).DoLayout();
+
+		workspaces[1].Received(2).Deactivate();
+		workspaces[1].Received(1).DoLayout();
+
+		workspaces[2].Received(1).Deactivate();
+		workspaces[2].Received(2).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -125,6 +134,15 @@ public class MonitorsChangedTransformTests
 		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)2]);
 		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)1]);
 		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)3]);
+
+		workspaces[0].Received(1).Deactivate();
+		workspaces[0].Received(2).DoLayout();
+
+		workspaces[1].Received(1).Deactivate();
+		workspaces[1].Received(2).DoLayout();
+
+		workspaces[2].DidNotReceive().Deactivate();
+		workspaces[2].Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -145,6 +163,12 @@ public class MonitorsChangedTransformTests
 
 		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)2]);
 		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)1]);
+
+		workspaces[0].DidNotReceive().Deactivate();
+		workspaces[0].Received(1).DoLayout();
+
+		workspaces[1].DidNotReceive().Deactivate();
+		workspaces[1].Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -172,5 +196,14 @@ public class MonitorsChangedTransformTests
 		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)2]);
 		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)1]);
 		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)3]);
+
+		workspaces[0].DidNotReceive().Deactivate();
+		workspaces[0].Received(1).DoLayout();
+
+		workspaces[1].DidNotReceive().Deactivate();
+		workspaces[1].Received(1).DoLayout();
+
+		workspaces[2].DidNotReceive().Deactivate();
+		workspaces[2].Received(1).DoLayout();
 	}
 }

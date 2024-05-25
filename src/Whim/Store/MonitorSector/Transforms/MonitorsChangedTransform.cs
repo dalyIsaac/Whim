@@ -103,15 +103,13 @@ internal record MonitorsChangedTransform : Transform
 		// If a monitor was removed, remove the workspace from the map.
 		foreach (IMonitor monitor in removedMonitors)
 		{
-			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.Remove(monitor.Handle);
-
 			if (!ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(monitor.Handle)).TryGet(out IWorkspace workspace))
 			{
-				Logger.Error($"Could not find workspace for monitor {monitor}");
 				continue;
 			}
 
 			workspace.Deactivate();
+			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.Remove(monitor.Handle);
 		}
 
 		// If a monitor was added, set it to an inactive workspace.

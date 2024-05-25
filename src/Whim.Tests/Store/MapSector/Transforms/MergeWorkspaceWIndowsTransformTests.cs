@@ -8,7 +8,7 @@ using Windows.Win32.Graphics.Gdi;
 using Xunit;
 using static Whim.TestUtils.StoreTestUtils;
 
-namespace Whim;
+namespace Whim.Tests;
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MergeWorkspaceWIndowsTransformTests
