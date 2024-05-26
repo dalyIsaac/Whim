@@ -63,13 +63,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public void CycleLayoutEngine(bool reverse = false) =>
 		_context.Store.Dispatch(new CycleLayoutEngineTransform(Id, reverse));
 
-	public void ActivatePreviouslyActiveLayoutEngine()
-	{
-		ImmutableWorkspace workspace = ImmutableWorkspace;
+	public void ActivatePreviouslyActiveLayoutEngine() =>
 		_context.Store.Dispatch(
-			new ActivateLayoutEngineTransform(Id, (_, idx) => idx == workspace.PreviousLayoutEngineIndex)
+			new ActivateLayoutEngineTransform(Id, (_, idx) => idx == ImmutableWorkspace.PreviousLayoutEngineIndex)
 		);
-	}
 
 	public bool TrySetLayoutEngineFromName(string name) =>
 		_context.Store.Dispatch(new ActivateLayoutEngineTransform(Id, (l, _) => l.Name == name)).IsSuccessful;
@@ -95,13 +92,12 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		IPoint<double> deltas,
 		IWindow? window = null,
 		bool deferLayout = false
-	)
-	{
-		Result<bool> result = _context.Store.Dispatch(
-			new MoveWindowEdgesInDirectionTransform(Id, window, edges, deltas)
-		);
-		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
-	}
+	) =>
+		_context
+			.Store.Dispatch(
+				new MoveWindowEdgesInDirectionWorkspaceTransform(Id, edges, deltas, window?.Handle ?? default)
+			)
+			.TryGet(out bool isChanged) && isChanged;
 
 	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false) =>
 		_context
@@ -152,6 +148,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			.Store.Dispatch(new PerformCustomLayoutEnginePayloadActionTransform<T>(Id, action))
 			.TryGet(out bool isChanged) && isChanged;
 
+	// TODO: Remove entirely
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
