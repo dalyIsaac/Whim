@@ -45,15 +45,15 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	{
 		if (window != null && Windows.Contains(window))
 		{
-			_context.Store.Dispatch(new SetLastFocusedWindowTransform(Id, window));
+			_context.Store.Dispatch(new SetLastFocusedWindowTransform(Id, window.Handle));
 		}
 	}
 
 	public void MinimizeWindowStart(IWindow window) =>
-		_context.Store.Dispatch(new MinimizeWindowStartTransform(Id, window));
+		_context.Store.Dispatch(new MinimizeWindowStartTransform(Id, window.Handle));
 
 	public void MinimizeWindowEnd(IWindow window) =>
-		_context.Store.Dispatch(new MinimizeWindowEndTransform(Id, window));
+		_context.Store.Dispatch(new MinimizeWindowEndTransform(Id, window.Handle));
 
 	public void FocusLastFocusedWindow() => _context.Store.Dispatch(new FocusWindowTransform(Id));
 
@@ -78,19 +78,17 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_context.Store.Dispatch(new AddWindowToWorkspaceTransform(Id, window)).IsSuccessful;
 
 	public bool RemoveWindow(IWindow window) =>
-		_context.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(Id, window)).IsSuccessful;
+		_context.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(Id, window.Handle)).IsSuccessful;
 
-	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
-	{
-		Result<bool> result = _context.Store.Dispatch(new FocusWindowInDirectionTransform(Id, window, direction));
-		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
-	}
+	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>
+		_context
+			.Store.Dispatch(new FocusWindowInDirectionTransform(Id, window?.Handle ?? default, direction))
+			.TryGet(out bool isChanged) && isChanged;
 
-	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false)
-	{
-		Result<bool> result = _context.Store.Dispatch(new SwapWindowInDirectionTransform(Id, window, direction));
-		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
-	}
+	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>
+		_context
+			.Store.Dispatch(new SwapWindowInDirectionTransform(Id, window?.Handle ?? default, direction))
+			.TryGet(out bool isChanged) && isChanged;
 
 	public bool MoveWindowEdgesInDirection(
 		Direction edges,
