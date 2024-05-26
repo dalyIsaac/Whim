@@ -153,43 +153,9 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 			}
 		);
 
-	public bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action)
-	{
-		Logger.Debug($"Attempting to perform custom layout engine action {action.Name} for workspace {Name}");
-
-		bool doLayout = false;
-
-		// Update the layout engine for a given index can change ActiveLayoutEngine, which breaks the
-		// doLayout test.
-		ILayoutEngine prevActiveLayoutEngine = ActiveLayoutEngine;
-
-		for (int idx = 0; idx < _layoutEngines.Length; idx++)
-		{
-			ILayoutEngine oldEngine = _layoutEngines[idx];
-			ILayoutEngine newEngine = oldEngine.PerformCustomAction(action);
-
-			if (newEngine.Equals(oldEngine))
-			{
-				Logger.Debug($"Layout engine {oldEngine} could not perform action {action.Name}");
-			}
-			else
-			{
-				_layoutEngines[idx] = newEngine;
-
-				if (oldEngine == prevActiveLayoutEngine)
-				{
-					doLayout = true;
-				}
-			}
-		}
-
-		if (doLayout && !action.DeferLayout)
-		{
-			DoLayout();
-		}
-
-		return doLayout;
-	}
+	public bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action) =>
+		_context.Store.Dispatch(new PerformCustomLayoutEngineActionTransform<T>(Id, action)).TryGet(out bool isChanged)
+		&& isChanged;
 
 	protected virtual void Dispose(bool disposing)
 	{
