@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DotNext;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -137,7 +136,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_internalContext.DeferWorkspacePosManager.DoLayout(this, _triggers, _windowStates);
 	}
 
-	public bool ContainsWindow(IWindow window) => _windows.Contains(window);
+	public bool ContainsWindow(IWindow window) => ImmutableWorkspace.WindowHandles.Contains(window.Handle);
 
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
 		_context.Store.Dispatch(new PerformCustomLayoutEngineActionTransform(Id, action)).TryGet(out bool isChanged)
