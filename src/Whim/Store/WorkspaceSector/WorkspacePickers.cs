@@ -80,7 +80,7 @@ public static partial class Pickers
 			BaseWorkspacePicker(
 				workspaceId,
 				rootSector,
-				workspace => workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex]
+				static workspace => workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex]
 			);
 
 	/// <summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNext;
@@ -39,6 +40,7 @@ public class Store : IStore
 		_root.Initialize();
 	}
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
 		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
 
@@ -65,6 +67,7 @@ public class Store : IStore
 		return DispatchFn(transform);
 	}
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private TResult PickFn<TResult>(Picker<TResult> picker) => picker.Execute(_ctx, _internalCtx, _root);
 
 	/// <inheritdoc />
