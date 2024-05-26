@@ -144,18 +144,13 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	public bool ContainsWindow(IWindow window) => _windows.Contains(window);
 
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
-		PerformCustomLayoutEngineAction(
-			new LayoutEngineCustomAction<IWindow?>()
-			{
-				Name = action.Name,
-				Payload = action.Window,
-				Window = action.Window
-			}
-		);
+		_context.Store.Dispatch(new PerformCustomLayoutEngineActionTransform(Id, action)).TryGet(out bool isChanged)
+		&& isChanged;
 
 	public bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action) =>
-		_context.Store.Dispatch(new PerformCustomLayoutEngineActionTransform<T>(Id, action)).TryGet(out bool isChanged)
-		&& isChanged;
+		_context
+			.Store.Dispatch(new PerformCustomLayoutEnginePayloadActionTransform<T>(Id, action))
+			.TryGet(out bool isChanged) && isChanged;
 
 	protected virtual void Dispose(bool disposing)
 	{
