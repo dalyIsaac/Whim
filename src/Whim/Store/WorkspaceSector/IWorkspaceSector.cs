@@ -9,9 +9,14 @@ namespace Whim;
 public interface IWorkspaceSector
 {
 	/// <summary>
+	/// The order of the workspaces in the sector.
+	/// </summary>
+	ImmutableArray<WorkspaceId> WorkspaceOrder { get; }
+
+	/// <summary>
 	/// All the workspaces currently tracked by Whim.
 	/// </summary>
-	ImmutableList<ImmutableWorkspace> Workspaces { get; }
+	ImmutableDictionary<WorkspaceId, ImmutableWorkspace> Workspaces { get; }
 
 	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; }
 

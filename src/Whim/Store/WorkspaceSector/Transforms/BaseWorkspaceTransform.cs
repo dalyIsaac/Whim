@@ -1,4 +1,3 @@
-using System;
 using DotNext;
 
 namespace Whim;
@@ -8,7 +7,7 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="SkipDoLayout"></param>
-public abstract record BaseWorkspaceTransform(Guid WorkspaceId, bool SkipDoLayout = false) : Transform<bool>
+public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool SkipDoLayout = false) : Transform<bool>
 {
 	/// <summary>
 	/// The operation to execute.
@@ -29,24 +28,12 @@ public abstract record BaseWorkspaceTransform(Guid WorkspaceId, bool SkipDoLayou
 
 	internal override Result<bool> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
-		WorkspaceSector sector = rootSector.Workspaces;
+		WorkspaceSector sector = rootSector.WorkspaceSector;
 
-		int workspaceIdx = -1;
-		for (int idx = 0; idx < sector.Workspaces.Count; idx++)
+		if (!sector.Workspaces.TryGetValue(WorkspaceId, out ImmutableWorkspace? workspace))
 		{
-			if (sector.Workspaces[idx].Id == WorkspaceId)
-			{
-				workspaceIdx = idx;
-				break;
-			}
+			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound(WorkspaceId));
 		}
-
-		if (workspaceIdx == -1)
-		{
-			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound());
-		}
-
-		ImmutableWorkspace workspace = sector.Workspaces[workspaceIdx];
 
 		Result<ImmutableWorkspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, sector, workspace);
 		if (!newWorkspaceResult.TryGet(out ImmutableWorkspace newWorkspace))
@@ -59,9 +46,9 @@ public abstract record BaseWorkspaceTransform(Guid WorkspaceId, bool SkipDoLayou
 			return Result.FromValue(false);
 		}
 
-		sector.Workspaces = sector.Workspaces.SetItem(workspaceIdx, newWorkspace);
+		sector.Workspaces = sector.Workspaces.SetItem(workspace.Id, newWorkspace);
 
-		if (SkipDoLayout == false)
+		if (!SkipDoLayout)
 		{
 			sector.WorkspacesToLayout.Add(workspace.Id);
 		}

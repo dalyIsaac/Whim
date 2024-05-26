@@ -13,3 +13,25 @@ public class WorkspaceEventArgs : EventArgs
 	/// </summary>
 	public required IWorkspace Workspace { get; init; }
 }
+
+// TODO: Make WorkspaceEventArgs the base when Workspace is no longer mutable
+public abstract class ImmutableWorkspaceEventArgs : EventArgs
+{
+	public required ImmutableWorkspace Workspace { get; init; }
+}
+
+public class WorkspaceAddedEventArgs : ImmutableWorkspaceEventArgs { }
+
+public class WorkspaceRemovedEventArgs : ImmutableWorkspaceEventArgs { }
+
+public class WorkspaceRenamedEventArgs : ImmutableWorkspaceEventArgs
+{
+	/// <summary>
+	/// The old name of the workspace.
+	/// </summary>
+	public required string PreviousName { get; init; }
+}
+
+public class WorkspaceLayoutStartedEventArgs : ImmutableWorkspaceEventArgs { }
+
+public class WorkspaceLayoutCompletedEventArgs : ImmutableWorkspaceEventArgs { }

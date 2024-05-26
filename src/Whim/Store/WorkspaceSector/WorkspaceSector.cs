@@ -15,7 +15,10 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 	/// </summary>
 	public HashSet<Guid> WorkspacesToLayout { get; set; } = new();
 
-	public ImmutableList<ImmutableWorkspace> Workspaces { get; set; } = ImmutableList<ImmutableWorkspace>.Empty;
+	public ImmutableArray<WorkspaceId> WorkspaceOrder { get; set; } = ImmutableArray<WorkspaceId>.Empty;
+
+	public ImmutableDictionary<WorkspaceId, ImmutableWorkspace> Workspaces { get; set; } =
+		ImmutableDictionary<WorkspaceId, ImmutableWorkspace>.Empty;
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
 		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
@@ -48,13 +51,10 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public override void DispatchEvents()
 	{
-		for (int idx = 0; idx < Workspaces.Count; idx++)
+		foreach (WorkspaceId id in WorkspacesToLayout)
 		{
-			ImmutableWorkspace workspace = Workspaces[idx];
-
-			if (WorkspacesToLayout.Contains(workspace.Id))
+			if (Workspaces.TryGetValue(id, out ImmutableWorkspace workspace))
 			{
-				// TODO: Get window states
 				_internalCtx.DeferWorkspacePosManager.DoLayout(this, workspace);
 			}
 		}
