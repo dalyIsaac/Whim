@@ -64,7 +64,10 @@ internal interface IDeferWindowPosManager
 	/// Performs layout of all the windows that were deferred, if they have not been laid out in
 	/// after the last call to <see cref="RecoverLayout"/>.
 	/// </summary>
-	void RecoverLayout();
+	/// <returns>
+	/// <see langword="true"/> if layout was performed, <see langword="false"/> otherwise.
+	/// </returns>
+	bool RecoverLayout();
 
 	/// <summary>
 	/// The <see cref="ParallelOptions"/> to use when performing layout.

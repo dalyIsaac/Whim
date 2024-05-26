@@ -57,26 +57,29 @@ internal class DeferWindowPosManager : IDeferWindowPosManager
 		return true;
 	}
 
-	public void RecoverLayout()
+	// TODO: Remove
+	public bool RecoverLayout()
 	{
 		Logger.Debug("Attempting to recover layout");
 
 		if (!CanDoLayout())
 		{
 			Logger.Debug("Cannot recover layout");
-			return;
+			return false;
 		}
 		else if (_deferredWindowStates.Count == 0)
 		{
 			Logger.Debug("No windows to recover layout for");
-			return;
+			return false;
 		}
 
 		List<IWorkspace> deferredWorkspaces = new();
 		List<WindowPosState> deferredWindowStates = new();
 		foreach (WindowPosState windowState in _deferredWindowStates.Values)
 		{
-			IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(windowState.WindowState.Window);
+			IWorkspace? workspace = _context
+				.Store.Pick(Pickers.PickWorkspaceByWindow(windowState.WindowState.Window.Handle))
+				.OrDefault();
 			if (workspace != null && !deferredWorkspaces.Contains(workspace))
 			{
 				deferredWorkspaces.Add(workspace);
@@ -101,5 +104,6 @@ internal class DeferWindowPosManager : IDeferWindowPosManager
 		}
 
 		_deferredWindowStates.Clear();
+		return true;
 	}
 }
