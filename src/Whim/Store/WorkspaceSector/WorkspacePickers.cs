@@ -1,84 +1,81 @@
+using System;
+using System.Collections.Generic;
 using DotNext;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
 public static partial class Pickers
 {
 	/// <summary>
-	/// Get a workspace by its <see cref="WorkspaceId"/>.
+	/// Get the workspace with the provided <paramref name="workspaceId"/>.
 	/// </summary>
 	/// <param name="workspaceId"></param>
-	/// <returns></returns>
-	public static Picker<Result<IWorkspace>> PickWorkspaceById(WorkspaceId workspaceId) =>
-		new WorkspaceByIdPicker(workspaceId);
+	public static PurePicker<Result<ImmutableWorkspace>> PickWorkspaceById(WorkspaceId workspaceId) =>
+		(IRootSector rootSector) => BaseWorkspacePicker(workspaceId, rootSector, workspace => workspace);
 
 	/// <summary>
 	/// Get all workspaces.
 	/// </summary>
 	/// <returns></returns>
-	public static PurePicker<ImmutableList<ImmutableWorkspace>> GetAllWorkspaces() =>
-		static (IRootSector rootSector) => rootSector.Workspaces.Workspaces;
+	public static PurePicker<IEnumerable<ImmutableWorkspace>> PickAllWorkspaces() =>
+		static (IRootSector rootSector) => GetAllActiveWorkspaces(rootSector.WorkspaceSector);
+
+	private static IEnumerable<ImmutableWorkspace> GetAllActiveWorkspaces(IWorkspaceSector workspaceSector)
+	{
+		foreach (WorkspaceId id in workspaceSector.WorkspaceOrder)
+		{
+			yield return workspaceSector.Workspaces[id];
+		}
+	}
 
 	/// <summary>
 	/// Get the workspace with the provided <paramref name="name"/>.
 	/// </summary>
 	/// <param name="name"></param>
-	public static PurePicker<Result<ImmutableWorkspace>> GetWorkspaceByName(string name) =>
+	public static PurePicker<Result<ImmutableWorkspace>> PickWorkspaceByName(string name) =>
 		(IRootSector rootSector) =>
 		{
-			IWorkspaceSector sector = rootSector.Workspaces;
-			ImmutableWorkspace? workspace = sector.Workspaces.Find(w => w.Name == name);
+			foreach (ImmutableWorkspace workspace in rootSector.WorkspaceSector.Workspaces.Values)
+			{
+				if (workspace.Name == name)
+				{
+					return Result.FromValue(workspace);
+				}
+			}
 
-			return workspace is null
-				? Result.FromException<ImmutableWorkspace>(new WhimException($"Workspace with name {name} not found"))
-				: Result.FromValue(workspace);
+			return Result.FromException<ImmutableWorkspace>(new WhimException($"Workspace with name {name} not found"));
 		};
 
 	private static Result<TResult> BaseWorkspacePicker<TResult>(
-		Guid workspaceId,
+		WorkspaceId workspaceId,
 		IRootSector rootSector,
 		Func<ImmutableWorkspace, TResult> operation
-	)
-	{
-		IWorkspaceSector sector = rootSector.Workspaces;
-
-		int workspaceIdx = -1;
-		for (int idx = 0; idx < sector.Workspaces.Count; idx++)
-		{
-			if (sector.Workspaces[idx].Id == workspaceId)
-			{
-				workspaceIdx = idx;
-				break;
-			}
-		}
-
-		if (workspaceIdx == -1)
-		{
-			return Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound());
-		}
-
-		return Result.FromValue(operation(sector.Workspaces[workspaceIdx]));
-	}
+	) =>
+		rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out ImmutableWorkspace? workspace)
+			? Result.FromValue(operation(workspace))
+			: Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
 
 	/// <summary>
 	/// Get the active workspace.
 	/// </summary>
 	/// <returns></returns>
-	public static PurePicker<ImmutableWorkspace> GetActiveWorkspace() =>
-		(IRootSector rootSector) => rootSector.Workspaces.Workspaces[rootSector.Workspaces.ActiveWorkspaceIndex];
+	public static PurePicker<ImmutableWorkspace> PickActiveWorkspace() =>
+		(IRootSector rootSector) => rootSector.WorkspaceSector.Workspaces[rootSector.WorkspaceSector.ActiveWorkspaceId];
 
 	/// <summary>
 	/// Get the id of the active workspace.
 	/// </summary>
 	/// <returns></returns>
-	public static PurePicker<Guid> GetActiveWorkspaceId() =>
-		(IRootSector rootSector) => rootSector.Workspaces.Workspaces[rootSector.Workspaces.ActiveWorkspaceIndex].Id;
+	public static PurePicker<WorkspaceId> PickActiveWorkspaceId() =>
+		(IRootSector rootSector) =>
+			rootSector.WorkspaceSector.Workspaces[rootSector.WorkspaceSector.ActiveWorkspaceId].Id;
 
 	/// <summary>
 	/// Get the active layout engine in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId"></param>
-	public static PurePicker<Result<ILayoutEngine>> GetActiveLayoutEngine(Guid workspaceId) =>
+	public static PurePicker<Result<ILayoutEngine>> PickActiveLayoutEngine(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
 				workspaceId,
@@ -90,38 +87,38 @@ public static partial class Pickers
 	/// Get all the windows in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId"></param>
-	public static PurePicker<Result<IEnumerable<IWindow>>> GetAllWorkspaceWindows(Guid workspaceId) =>
+	public static PurePicker<Result<IEnumerable<IWindow>>> PickAllWorkspaceWindows(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
-			BaseWorkspacePicker(workspaceId, rootSector, workspace => (IEnumerable<IWindow>)workspace.Windows);
+			BaseWorkspacePicker(workspaceId, rootSector, workspace => GetWorkspaceWindows(rootSector, workspace));
+
+	private static IEnumerable<IWindow> GetWorkspaceWindows(IRootSector rootSector, ImmutableWorkspace workspace)
+	{
+		foreach (HWND hwnd in workspace.WindowHandles)
+		{
+			if (PickWindowByHandle(hwnd)(rootSector).TryGet(out IWindow window))
+			{
+				yield return window;
+			}
+		}
+	}
 
 	/// <summary>
 	/// Get the last focused window in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId">The workspace to get the last focused window for.</param>
-	public static PurePicker<Result<IWindow?>> GetLastFocusedWindow(Guid workspaceId) =>
+	public static PurePicker<Result<IWindow>> PickLastFocusedWindow(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
-			BaseWorkspacePicker(workspaceId, rootSector, workspace => workspace.LastFocusedWindow);
-
-	/// <summary>
-	/// Get the workspace with the provided <paramref name="workspaceId"/>.
-	/// </summary>
-	/// <param name="workspaceId"></param>
-	public static PurePicker<Result<ImmutableWorkspace>> GetWorkspaceById(Guid workspaceId) =>
-		(IRootSector rootSector) => BaseWorkspacePicker(workspaceId, rootSector, workspace => workspace);
-}
-
-internal record WorkspaceByIdPicker(WorkspaceId WorkspaceId) : Picker<Result<IWorkspace>>
-{
-	internal override Result<IWorkspace> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
-	{
-		foreach (IWorkspace workspace in ctx.WorkspaceManager)
 		{
-			if (workspace.Id.Equals(WorkspaceId))
+			if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out ImmutableWorkspace? workspace))
 			{
-				return Result.FromValue(workspace);
+				return Result.FromException<IWindow>(StoreExceptions.WorkspaceNotFound(workspaceId));
 			}
-		}
 
-		return Result.FromException<IWorkspace>(StoreExceptions.WorkspaceNotFound(WorkspaceId));
-	}
+			if (workspace.LastFocusedWindowHandle.IsNull)
+			{
+				return Result.FromException<IWindow>(new WhimException("No last focused window in workspace"));
+			}
+
+			return PickWindowByHandle(workspace.LastFocusedWindowHandle)(rootSector);
+		};
 }

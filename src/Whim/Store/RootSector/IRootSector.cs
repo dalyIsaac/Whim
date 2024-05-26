@@ -13,4 +13,7 @@ public interface IRootSector
 
 	/// <inheritdoc cref="IMapSector"/>
 	IMapSector MapSector { get; }
+
+	/// <inheritdoc cref="IWorkspaceSector"/>
+	IWorkspaceSector WorkspaceSector { get; }
 }

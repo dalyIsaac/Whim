@@ -26,7 +26,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 	public ImmutableList<CreateProxyLayoutEngine> ProxyLayoutEngines { get; set; } =
 		ImmutableList<CreateProxyLayoutEngine>.Empty;
 
-	public int ActiveWorkspaceIndex { get; set; }
+	public WorkspaceId ActiveWorkspaceId { get; set; }
 
 	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 

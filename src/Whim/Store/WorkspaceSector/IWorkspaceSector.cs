@@ -23,7 +23,7 @@ public interface IWorkspaceSector
 	ImmutableList<CreateProxyLayoutEngine> ProxyLayoutEngines { get; }
 
 	/// <summary>
-	/// The index of the workspace which is currently active, in <see cref="Workspaces"/>.
+	/// The ID of the workspace which is currently active.
 	/// </summary>
-	int ActiveWorkspaceIndex { get; }
+	WorkspaceId ActiveWorkspaceId { get; }
 }
