@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -10,7 +9,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MergeWorkspaceWIndowsTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]

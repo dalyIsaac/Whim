@@ -1,5 +1,6 @@
 using System;
 using DotNext;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -8,16 +9,18 @@ namespace Whim;
 /// workspace.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-/// <param name="Window"></param>
+/// <param name="WindowHandle">
+/// The handle of the window to operate on.
+/// </param>
 /// <param name="DefaultToLastFocusedWindow">
-/// If <paramref name="Window"/> is <c>null</c>, try to use the last focused window.
+/// If <paramref name="WindowHandle"/> is <c>null</c>, try to use the last focused window.
 /// </param>
 /// <param name="SkipDoLayout">
 /// If <c>true</c>, do not perform a workspace layout.
 /// </param>
 public abstract record BaseWorkspaceWindowTransform(
 	Guid WorkspaceId,
-	IWindow? Window,
+	HWND WindowHandle,
 	bool DefaultToLastFocusedWindow,
 	bool SkipDoLayout = false
 ) : BaseWorkspaceTransform(WorkspaceId, SkipDoLayout)
@@ -29,7 +32,12 @@ public abstract record BaseWorkspaceWindowTransform(
 		ImmutableWorkspace workspace
 	)
 	{
-		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(workspace, Window, DefaultToLastFocusedWindow);
+		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
+			ctx,
+			workspace,
+			WindowHandle,
+			DefaultToLastFocusedWindow
+		);
 		if (!result.TryGet(out IWindow validWindow))
 		{
 			return Result.FromException<ImmutableWorkspace>(result.Error!);

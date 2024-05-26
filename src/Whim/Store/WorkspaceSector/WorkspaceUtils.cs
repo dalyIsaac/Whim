@@ -1,3 +1,6 @@
+using DotNext;
+using Windows.Win32.Foundation;
+
 namespace Whim;
 
 internal static class WorkspaceUtils
@@ -30,36 +33,38 @@ internal static class WorkspaceUtils
 	/// Returns the window to process. If the window is null, the last focused window is used.
 	/// If the given window is not null, it is checked that it is in the workspace.
 	/// </summary>
+	/// <param name="ctx"></param>
 	/// <param name="workspace"></param>
-	/// <param name="window"></param>
+	/// <param name="windowHandle"></param>
 	/// <param name="defaultToLastFocusedWindow"></param>
 	/// <returns></returns>
 	public static Result<IWindow> GetValidWorkspaceWindow(
+		IContext ctx,
 		ImmutableWorkspace workspace,
-		IWindow? window,
+		HWND windowHandle,
 		bool defaultToLastFocusedWindow
 	)
 	{
-		if (window == null)
+		if (windowHandle.IsNull)
 		{
 			if (!defaultToLastFocusedWindow)
 			{
 				return Result.FromException<IWindow>(new WhimException("No window provided"));
 			}
 
-			window = workspace.LastFocusedWindow;
+			windowHandle = workspace.LastFocusedWindowHandle;
 		}
 
-		if (window == null)
+		if (windowHandle.IsNull)
 		{
 			return Result.FromException<IWindow>(new WhimException("No windows in workspace"));
 		}
 
-		if (!workspace.Windows.Contains(window))
+		if (!workspace.WindowHandles.Contains(windowHandle))
 		{
 			return Result.FromException<IWindow>(new WhimException("Window not in workspace"));
 		}
 
-		return Result.FromValue(window);
+		return ctx.Store.Pick(Pickers.PickWindowByHandle(windowHandle));
 	}
 }

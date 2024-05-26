@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using DotNext;
@@ -27,7 +26,7 @@ public record AddWorkspaceTransform(
 		MutableRootSector mutableRootSector
 	)
 	{
-		WorkspaceSector sector = mutableRootSector.Workspaces;
+		WorkspaceSector sector = mutableRootSector.WorkspaceSector;
 		CreateLeafLayoutEngine[] engineCreators = CreateLeafLayoutEngines?.ToArray() ?? sector.CreateLayoutEngines();
 
 		if (engineCreators.Length == 0)
@@ -54,8 +53,8 @@ public record AddWorkspaceTransform(
 			}
 		}
 
-		ImmutableWorkspace workspace = new(Guid.NewGuid(), Name ?? $"Workspace {sector.Workspaces.Count + 1}");
-		sector.Workspaces = sector.Workspaces.Add(workspace);
+		ImmutableWorkspace workspace = new() { Name = Name ?? $"Workspace {sector.Workspaces.Count + 1}" };
+		sector.Workspaces = sector.Workspaces.Add(workspace.Id, workspace);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
 
 		return Result.FromValue(workspace);

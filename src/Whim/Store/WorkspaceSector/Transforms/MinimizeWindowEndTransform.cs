@@ -1,5 +1,6 @@
 using System;
 using DotNext;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -10,9 +11,9 @@ namespace Whim;
 /// Will unminimize a window in the active layout engine.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-/// <param name="Window"></param>
-internal record MinimizeWindowEndTransform(Guid WorkspaceId, IWindow Window)
-	: BaseWorkspaceWindowTransform(WorkspaceId, Window, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
+/// <param name="WindowHandle"></param>
+internal record MinimizeWindowEndTransform(Guid WorkspaceId, HWND WindowHandle)
+	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(
 		IContext ctx,

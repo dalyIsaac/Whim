@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -10,7 +11,7 @@ public record ImmutableWorkspace
 	/// <summary>
 	/// The unique id of the workspace.
 	/// </summary>
-	public WorkspaceId Id { get; internal init; }
+	public WorkspaceId Id { get; internal init; } = WorkspaceId.NewGuid();
 
 	/// <summary>
 	/// The name of the workspace.
@@ -29,13 +30,14 @@ public record ImmutableWorkspace
 
 	/// <summary>
 	/// The index of the last focused window in the workspace.
+	/// WARNING: When the value is 0, it means that no window is focused. Check this with <see cref="HWND.IsNull"/>.
 	/// </summary>
-	public int? LastFocusedWindowIndex { get; internal init; }
+	public HWND LastFocusedWindowHandle { get; internal init; }
 
 	/// <summary>
 	/// All the windows in the workspace.
 	/// </summary>
-	public ImmutableHashSet<IWindow> Windows { get; internal init; } = ImmutableHashSet<IWindow>.Empty;
+	public ImmutableHashSet<HWND> WindowHandles { get; internal init; } = ImmutableHashSet<HWND>.Empty;
 
 	/// <summary>
 	/// All the layout engines currently in the workspace.

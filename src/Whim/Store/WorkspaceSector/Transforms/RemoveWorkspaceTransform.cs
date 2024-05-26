@@ -1,4 +1,3 @@
-using System;
 using DotNext;
 
 namespace Whim;
@@ -15,37 +14,47 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 	/// <returns></returns>
 	public abstract bool ShouldRemove(ImmutableWorkspace workspace);
 
-	internal override Result<Empty> Execute(
+	internal override Result<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
 	)
 	{
-		WorkspaceSector sector = mutableRootSector.Workspaces;
+		WorkspaceSector sector = mutableRootSector.WorkspaceSector;
 
-		if (sector.Workspaces.Count - 1 < mutableRootSector.Monitors.Monitors.Length)
+		if (sector.Workspaces.Count - 1 < mutableRootSector.MonitorSector.Monitors.Length)
 		{
-			return Result.FromException<Empty>(new WhimException("There must be a workspace for each monitor"));
+			return Result.FromException<Unit>(new WhimException("There must be a workspace for each monitor"));
 		}
 
-		int idx = sector.Workspaces.FindIndex(ShouldRemove);
-		if (idx == -1)
+		ImmutableWorkspace? workspaceToRemove = null;
+		foreach (ImmutableWorkspace workspace in sector.Workspaces.Values)
 		{
-			return Result.FromException<Empty>(WorkspaceUtils.WorkspaceDoesNotExist());
+			if (ShouldRemove(workspace))
+			{
+				workspaceToRemove = workspace;
+				break;
+			}
+		}
+
+		if (workspaceToRemove is null)
+		{
+			return Result.FromException<Unit>(new WhimException("No matching workspace found"));
 		}
 
 		// Remove the workspace
-		ImmutableWorkspace oldWorkspace = sector.Workspaces[idx];
-		sector.Workspaces = sector.Workspaces.RemoveAt(idx);
+		sector.WorkspaceOrder = sector.WorkspaceOrder.Remove(workspaceToRemove.Id);
+		sector.Workspaces = sector.Workspaces.Remove(workspaceToRemove.Id);
 
 		// Queue events
-		ctx.Butler.MergeWorkspaceWindows(oldMutableWorkspace, sector.MutableWorkspaces[^1]);
-		ctx.Butler.Activate(sector.MutableWorkspaces[^1]);
+		WorkspaceId targetWorkspaceId = sector.WorkspaceOrder[^1];
+		ctx.Store.Dispatch(new MergeWorkspaceWindowsTransform(workspaceToRemove.Id, targetWorkspaceId));
+		ctx.Store.Dispatch(new ActivateWorkspaceTransform(targetWorkspaceId));
 
-		sector.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = oldWorkspace });
-		sector.WorkspacesToLayout.Remove(oldWorkspace.Id);
+		sector.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = workspaceToRemove });
+		sector.WorkspacesToLayout.Remove(workspaceToRemove.Id);
 
-		return Empty.Result;
+		return Unit.Result;
 	}
 }
 
@@ -53,7 +62,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 /// Removes the first workspace which matches the <paramref name="Id"/>.
 /// </summary>
 /// <param name="Id"></param>
-public record RemoveWorkspaceByIdTransform(Guid Id) : BaseRemoveWorkspaceTransform()
+public record RemoveWorkspaceByIdTransform(WorkspaceId Id) : BaseRemoveWorkspaceTransform()
 {
 	/// <inheritdoc />
 	public override bool ShouldRemove(ImmutableWorkspace workspace) => workspace.Id == Id;
