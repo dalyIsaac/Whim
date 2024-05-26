@@ -108,6 +108,7 @@ public static partial class Pickers
 	/// <param name="workspaceId">The workspace to get the last focused window for.</param>
 	public static PurePicker<Result<IWindow>> PickLastFocusedWindow(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
+		// This doesn't use BaseWorkspacePicker because it uses the Result from PickWindowByHandle.
 		{
 			if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out ImmutableWorkspace? workspace))
 			{

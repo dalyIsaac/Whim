@@ -8,7 +8,7 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
-public record RemoveWindowFromWorkspaceTransform(Guid WorkspaceId, IWindow Window)
+public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Window)
 	: BaseWorkspaceWindowTransform(WorkspaceId, Window, false)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(
@@ -34,7 +34,7 @@ public record RemoveWindowFromWorkspaceTransform(Guid WorkspaceId, IWindow Windo
 	/// <returns></returns>
 	private static ImmutableWorkspace ResetLastFocusedWindow(ImmutableWorkspace workspace, IWindow window)
 	{
-		if (!window.Equals(workspace.LastFocusedWindow))
+		if (!window.Handle.Equals(workspace.LastFocusedWindowHandle))
 		{
 			return workspace;
 		}
