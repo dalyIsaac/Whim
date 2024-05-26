@@ -1,27 +1,28 @@
-using System;
 using DotNext;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
 /// <summary>
-/// Remove the <paramref name="Window"/> from the workspace with the given <paramref name="WorkspaceId"/>.
+/// Remove the window for the given <paramref name="WindowHandle"/> from the workspace with the
+/// given <paramref name="WorkspaceId"/>.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-/// <param name="Window"></param>
-public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Window)
-	: BaseWorkspaceWindowTransform(WorkspaceId, Window, false)
+/// <param name="WindowHandle"></param>
+public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND WindowHandle)
+	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, false)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		ImmutableWorkspace workspace,
 		IWindow window
 	)
 	{
-		workspace = workspace with { Windows = workspace.Windows.Remove(window) };
+		workspace = workspace with { WindowHandles = workspace.WindowHandles.Remove(window.Handle) };
 
-		workspace = ResetLastFocusedWindow(workspace, window);
+		workspace = ResetLastFocusedWindow(internalCtx, workspace, window);
 		workspace = RemoveWindowFromLayoutEngines(workspace, window);
 		return workspace;
 	}
@@ -29,10 +30,15 @@ public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWindo
 	/// <summary>
 	/// Reset the last focused window if the removed window was the last focused window.
 	/// </summary>
+	/// <param name="internalCtx"></param>
 	/// <param name="workspace"></param>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private static ImmutableWorkspace ResetLastFocusedWindow(ImmutableWorkspace workspace, IWindow window)
+	private static ImmutableWorkspace ResetLastFocusedWindow(
+		IInternalContext internalCtx,
+		ImmutableWorkspace workspace,
+		IWindow window
+	)
 	{
 		if (!window.Handle.Equals(workspace.LastFocusedWindowHandle))
 		{
@@ -40,24 +46,24 @@ public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWindo
 		}
 
 		// Find the next window to focus.
-		foreach (IWindow nextWindow in workspace.Windows)
+		foreach (HWND nextWindowHandle in workspace.WindowHandles)
 		{
-			if (nextWindow.Equals(window))
+			if (nextWindowHandle.Equals(window))
 			{
 				continue;
 			}
 
-			if (!nextWindow.IsMinimized)
+			if (!nextWindowHandle.IsMinimized(internalCtx))
 			{
-				workspace = workspace with { LastFocusedWindow = nextWindow };
+				workspace = workspace with { LastFocusedWindowHandle = nextWindowHandle };
 				break;
 			}
 		}
 
 		// If there are no other windows, set the last focused window to null.
-		if (workspace.LastFocusedWindow.Equals(window))
+		if (workspace.LastFocusedWindowHandle.Equals(window.Handle))
 		{
-			workspace = workspace with { LastFocusedWindow = null };
+			workspace = workspace with { LastFocusedWindowHandle = default };
 		}
 
 		return workspace;

@@ -41,11 +41,11 @@ internal class Window : IWindow
 
 	public required string? ProcessFilePath { get; init; }
 
-	public bool IsFocused => _internalContext.CoreNativeManager.GetForegroundWindow() == Handle;
+	public bool IsFocused => Handle.IsFocused(_internalContext);
 
-	public bool IsMinimized => _internalContext.CoreNativeManager.IsWindowMinimized(Handle);
+	public bool IsMinimized => Handle.IsMinimized(_internalContext);
 
-	public bool IsMaximized => _internalContext.CoreNativeManager.IsWindowMaximized(Handle);
+	public bool IsMaximized => Handle.IsMaximized(_internalContext);
 
 	public void BringToTop()
 	{

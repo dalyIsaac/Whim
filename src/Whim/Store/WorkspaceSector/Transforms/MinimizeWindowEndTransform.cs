@@ -18,13 +18,13 @@ internal record MinimizeWindowEndTransform(Guid WorkspaceId, HWND WindowHandle)
 	private protected override Result<ImmutableWorkspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		ImmutableWorkspace workspace,
 		IWindow window
 	) =>
 		workspace with
 		{
-			Windows = workspace.Windows.Add(window),
+			WindowHandles = workspace.WindowHandles.Add(window.Handle),
 
 			// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
 			// Whim starting up.

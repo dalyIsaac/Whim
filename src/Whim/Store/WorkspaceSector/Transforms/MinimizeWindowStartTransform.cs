@@ -1,5 +1,6 @@
 using System;
 using DotNext;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -10,21 +11,21 @@ namespace Whim;
 /// Will minimize a window in the active layout engine.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-/// <param name="Window"></param>
-internal record MinimizeWindowStartTransform(Guid WorkspaceId, IWindow Window)
-	: BaseWorkspaceWindowTransform(WorkspaceId, Window, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
+/// <param name="WindowHandle"></param>
+internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle)
+	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		ImmutableWorkspace workspace,
 		IWindow window
 	)
 	{
 		// If the window is already in the workspace, minimize it in just the active layout engine.
 		// If it isn't, then we assume it was provided during startup and minimize it in all layouts.
-		if (workspace.Windows.Contains(window))
+		if (workspace.WindowHandles.Contains(window.Handle))
 		{
 			// _layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex]
 			// 	.MinimizeWindowStart(window);
@@ -38,7 +39,7 @@ internal record MinimizeWindowStartTransform(Guid WorkspaceId, IWindow Window)
 			};
 		}
 
-		workspace = workspace with { Windows = workspace.Windows.Add(window) };
+		workspace = workspace with { WindowHandles = workspace.WindowHandles.Add(window.Handle) };
 
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
 		{

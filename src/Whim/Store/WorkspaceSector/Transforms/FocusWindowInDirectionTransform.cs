@@ -1,24 +1,25 @@
 using System;
 using DotNext;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
 /// <summary>
-/// Focus the <paramref name="Window"/> in the workspace with the given <paramref name="WorkspaceId"/>
+/// Focus the <paramref name="WindowHandle"/> in the workspace with the given <paramref name="WorkspaceId"/>
 /// in the provided <paramref name="Direction"/>.
 ///
 /// Returns whether the active layout engine changed.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-/// <param name="Window"></param>
+/// <param name="WindowHandle"></param>
 /// <param name="Direction"></param>
-public record FocusWindowInDirectionTransform(Guid WorkspaceId, IWindow? Window, Direction Direction)
-	: BaseWorkspaceWindowTransform(WorkspaceId, Window, true)
+public record FocusWindowInDirectionTransform(Guid WorkspaceId, HWND WindowHandle, Direction Direction)
+	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, true)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		ImmutableWorkspace workspace,
 		IWindow window
 	)

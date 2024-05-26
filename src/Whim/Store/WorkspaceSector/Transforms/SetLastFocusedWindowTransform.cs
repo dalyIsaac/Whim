@@ -1,5 +1,6 @@
 using System;
 using DotNext;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -7,15 +8,21 @@ namespace Whim;
 /// Set the last focused window in the workspace with given <paramref name="WorkspaceId"/>.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-/// <param name="Window"></param>
-internal record SetLastFocusedWindowTransform(Guid WorkspaceId, IWindow Window)
-	: BaseWorkspaceWindowTransform(WorkspaceId, Window, false)
+/// <param name="WindowHandle"></param>
+internal record SetLastFocusedWindowTransform(Guid WorkspaceId, HWND WindowHandle)
+	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, false)
 {
 	private protected override Result<ImmutableWorkspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		ImmutableWorkspace workspace,
 		IWindow window
-	) => workspace.LastFocusedWindow == window ? workspace : workspace with { LastFocusedWindow = window };
+	) =>
+		workspace.LastFocusedWindowHandle == window.Handle
+			? workspace
+			: workspace with
+			{
+				LastFocusedWindowHandle = window.Handle
+			};
 }
