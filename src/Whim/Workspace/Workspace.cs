@@ -103,37 +103,10 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		return result.IsSuccessful && result.TryGet(out bool isChanged) && isChanged;
 	}
 
-	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false)
-	{
-		Logger.Debug($"Moving window {window} to point {point} in workspace {Name}");
-
-		ILayoutEngine oldEngine = ActiveLayoutEngine;
-
-		if (_windows.Contains(window))
-		{
-			// The window is already in the workspace, so move it in just the active layout engine
-			_layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex]
-				.MoveWindowToPoint(window, point);
-		}
-		else
-		{
-			// The window is new to the workspace, so add it to all layout engines
-			_windows.Add(window);
-
-			for (int idx = 0; idx < _layoutEngines.Length; idx++)
-			{
-				_layoutEngines[idx] = _layoutEngines[idx].MoveWindowToPoint(window, point);
-			}
-		}
-
-		bool changed = ActiveLayoutEngine != oldEngine;
-		if (!deferLayout)
-		{
-			DoLayout();
-		}
-
-		return changed;
-	}
+	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false) =>
+		_context
+			.Store.Dispatch(new MoveWindowToPointInWorkspaceTransform(Id, window.Handle, point))
+			.TryGet(out bool isChanged) && isChanged;
 
 	public override string ToString() => Name;
 
