@@ -28,7 +28,7 @@ public abstract record BaseWorkspaceWindowTransform(
 	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector workspaceSector,
+		MutableRootSector rootSector,
 		ImmutableWorkspace workspace
 	)
 	{
@@ -43,7 +43,7 @@ public abstract record BaseWorkspaceWindowTransform(
 			return Result.FromException<ImmutableWorkspace>(result.Error!);
 		}
 
-		return WindowOperation(ctx, internalCtx, workspaceSector, workspace, validWindow);
+		return WindowOperation(ctx, internalCtx, rootSector, workspace, validWindow);
 	}
 
 	/// <summary>
@@ -51,7 +51,7 @@ public abstract record BaseWorkspaceWindowTransform(
 	/// </summary>
 	/// <param name="ctx"></param>
 	/// <param name="internalCtx"></param>
-	/// <param name="workspaceSector"></param>
+	/// <param name="rootSector"></param>
 	/// <param name="workspace"></param>
 	/// <param name="window"></param>
 	/// <returns>
@@ -60,7 +60,7 @@ public abstract record BaseWorkspaceWindowTransform(
 	private protected abstract Result<ImmutableWorkspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector workspaceSector,
+		MutableRootSector rootSector,
 		ImmutableWorkspace workspace,
 		IWindow window
 	);

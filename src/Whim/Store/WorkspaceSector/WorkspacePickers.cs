@@ -87,11 +87,11 @@ public static partial class Pickers
 	/// Get all the windows in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId"></param>
-	public static PurePicker<Result<IEnumerable<IWindow>>> PickAllWorkspaceWindows(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<IEnumerable<IWindow>>> PickAllWindowsInWorkspace(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(workspaceId, rootSector, workspace => GetWorkspaceWindows(rootSector, workspace));
 
-	private static IEnumerable<IWindow> GetWorkspaceWindows(IRootSector rootSector, ImmutableWorkspace workspace)
+	internal static IEnumerable<IWindow> GetWorkspaceWindows(IRootSector rootSector, ImmutableWorkspace workspace)
 	{
 		foreach (HWND hwnd in workspace.WindowHandles)
 		{

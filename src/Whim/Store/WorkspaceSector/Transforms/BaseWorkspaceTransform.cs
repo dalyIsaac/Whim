@@ -14,7 +14,7 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 	/// </summary>
 	/// <param name="ctx"></param>
 	/// <param name="internalCtx"></param>
-	/// <param name="workspaceSector"></param>
+	/// <param name="rootSector"></param>
 	/// <param name="workspace"></param>
 	/// <returns>
 	/// The updated workspace.
@@ -22,7 +22,7 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 	private protected abstract Result<ImmutableWorkspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector workspaceSector,
+		MutableRootSector rootSector,
 		ImmutableWorkspace workspace
 	);
 
@@ -35,7 +35,7 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound(WorkspaceId));
 		}
 
-		Result<ImmutableWorkspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, sector, workspace);
+		Result<ImmutableWorkspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, rootSector, workspace);
 		if (!newWorkspaceResult.TryGet(out ImmutableWorkspace newWorkspace))
 		{
 			return Result.FromException<bool>(newWorkspaceResult.Error!);
