@@ -2,11 +2,16 @@ using System;
 
 namespace Whim;
 
-internal partial class Butler : IButler, IInternalButler
+internal partial class Butler : IButler
 {
 	private readonly IContext _context;
+	private bool _disposedValue;
 
 	public IButlerPantry Pantry { get; }
+
+	public event EventHandler<RouteEventArgs>? WindowRouted;
+
+	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
 	public Butler(IContext context)
 	{
@@ -15,14 +20,16 @@ internal partial class Butler : IButler, IInternalButler
 		Pantry = new ButlerPantry(_context);
 	}
 
-	public event EventHandler<RouteEventArgs>? WindowRouted;
+	public void Initialize()
+	{
+		_context.Store.MapEvents.WindowRouted += ForwardWindowRouted;
+		_context.Store.MapEvents.MonitorWorkspaceChanged += ForwardMonitorWorkspaceChanged;
+	}
 
-	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
+	private void ForwardWindowRouted(object? sender, RouteEventArgs e) => WindowRouted?.Invoke(this, e);
 
-	public void TriggerWindowRouted(RouteEventArgs args) => WindowRouted?.Invoke(this, args);
-
-	public void TriggerMonitorWorkspaceChanged(MonitorWorkspaceChangedEventArgs args) =>
-		MonitorWorkspaceChanged?.Invoke(this, args);
+	private void ForwardMonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e) =>
+		MonitorWorkspaceChanged?.Invoke(this, e);
 
 	#region Chores
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>
@@ -70,5 +77,30 @@ internal partial class Butler : IButler, IInternalButler
 
 	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false) =>
 		_context.Store.Dispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace?.Id ?? default, reverse));
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
+		{
+			if (disposing)
+			{
+				// dispose managed state (managed objects)
+
+				_context.Store.MapEvents.WindowRouted -= WindowRouted;
+				_context.Store.MapEvents.MonitorWorkspaceChanged -= MonitorWorkspaceChanged;
+			}
+
+			// free unmanaged resources (unmanaged objects) and override finalizer
+			// set large fields to null
+			_disposedValue = true;
+		}
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
 	#endregion
 }

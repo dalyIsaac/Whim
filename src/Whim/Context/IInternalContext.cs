@@ -7,8 +7,6 @@ namespace Whim;
 /// </summary>
 internal interface IInternalContext : IDisposable
 {
-	IInternalButler Butler { get; }
-
 	ICoreSavedStateManager CoreSavedStateManager { get; }
 
 	ICoreNativeManager CoreNativeManager { get; }
