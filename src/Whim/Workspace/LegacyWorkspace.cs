@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal partial record Workspace : IInternalWorkspace
+public partial record Workspace : IInternalWorkspace
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
@@ -29,11 +28,6 @@ internal partial record Workspace : IInternalWorkspace
 	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(Pickers.PickActiveLayoutEngine(Id)).Value!;
 
 	public IEnumerable<IWindow> Windows => _context.Store.Pick(Pickers.PickAllWindowsInWorkspace(Id)).Value!;
-
-	/// <summary>
-	/// Map of window handles to their current <see cref="IWindowState"/>.
-	/// </summary>
-	private readonly Dictionary<HWND, IWindowState> _windowStates = new();
 
 	public Workspace(IContext context, IInternalContext internalContext, Guid id)
 	{

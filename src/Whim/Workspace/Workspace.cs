@@ -6,7 +6,7 @@ namespace Whim;
 /// <summary>
 /// Workspaces contain windows to be organized by layout engines.
 /// </summary>
-internal partial record Workspace : IWorkspace
+public sealed partial record Workspace : IWorkspace
 {
 	/// <summary>
 	/// The unique id of the workspace.
@@ -41,12 +41,30 @@ internal partial record Workspace : IWorkspace
 	public HWND LastFocusedWindowHandle { get; internal init; }
 
 	/// <summary>
-	/// All the windows in the workspace.
-	/// </summary>
-	public ImmutableHashSet<HWND> WindowHandles { get; internal init; } = ImmutableHashSet<HWND>.Empty;
-
-	/// <summary>
 	/// All the layout engines currently in the workspace.
 	/// </summary>
 	public ImmutableList<ILayoutEngine> LayoutEngines { get; internal init; } = ImmutableList<ILayoutEngine>.Empty;
+
+	/// <summary>
+	/// Map of windows to their <see cref="IWindowState"/>s.
+	/// </summary>
+	public ImmutableDictionary<HWND, IWindowState> WindowStates { get; internal init; } =
+		ImmutableDictionary<HWND, IWindowState>.Empty;
+
+	/// <summary>
+	/// Internal-only implementation of a copy constructor.
+	/// </summary>
+	/// <param name="workspace"></param>
+	internal Workspace(Workspace workspace)
+	{
+		_context = workspace._context;
+		_internalContext = workspace._internalContext;
+		Id = workspace.Id;
+		BackingName = workspace.BackingName;
+		ActiveLayoutEngineIndex = workspace.ActiveLayoutEngineIndex;
+		PreviousLayoutEngineIndex = workspace.PreviousLayoutEngineIndex;
+		LastFocusedWindowHandle = workspace.LastFocusedWindowHandle;
+		LayoutEngines = workspace.LayoutEngines;
+		WindowStates = workspace.WindowStates;
+	}
 }
