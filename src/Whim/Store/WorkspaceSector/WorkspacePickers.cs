@@ -11,17 +11,17 @@ public static partial class Pickers
 	/// Get the workspace with the provided <paramref name="workspaceId"/>.
 	/// </summary>
 	/// <param name="workspaceId"></param>
-	public static PurePicker<Result<ImmutableWorkspace>> PickWorkspaceById(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<IWorkspace>> PickWorkspaceById(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) => BaseWorkspacePicker(workspaceId, rootSector, workspace => workspace);
 
 	/// <summary>
 	/// Get all workspaces.
 	/// </summary>
 	/// <returns></returns>
-	public static PurePicker<IEnumerable<ImmutableWorkspace>> PickAllWorkspaces() =>
+	public static PurePicker<IEnumerable<IWorkspace>> PickAllWorkspaces() =>
 		static (IRootSector rootSector) => GetAllActiveWorkspaces(rootSector.WorkspaceSector);
 
-	private static IEnumerable<ImmutableWorkspace> GetAllActiveWorkspaces(IWorkspaceSector workspaceSector)
+	private static IEnumerable<IWorkspace> GetAllActiveWorkspaces(IWorkspaceSector workspaceSector)
 	{
 		foreach (WorkspaceId id in workspaceSector.WorkspaceOrder)
 		{
@@ -33,10 +33,10 @@ public static partial class Pickers
 	/// Get the workspace with the provided <paramref name="name"/>.
 	/// </summary>
 	/// <param name="name"></param>
-	public static PurePicker<Result<ImmutableWorkspace>> PickWorkspaceByName(string name) =>
+	public static PurePicker<Result<IWorkspace>> PickWorkspaceByName(string name) =>
 		(IRootSector rootSector) =>
 		{
-			foreach (ImmutableWorkspace workspace in rootSector.WorkspaceSector.Workspaces.Values)
+			foreach (IWorkspace workspace in rootSector.WorkspaceSector.Workspaces.Values)
 			{
 				if (workspace.Name == name)
 				{
@@ -44,15 +44,15 @@ public static partial class Pickers
 				}
 			}
 
-			return Result.FromException<ImmutableWorkspace>(new WhimException($"Workspace with name {name} not found"));
+			return Result.FromException<IWorkspace>(new WhimException($"Workspace with name {name} not found"));
 		};
 
 	private static Result<TResult> BaseWorkspacePicker<TResult>(
 		WorkspaceId workspaceId,
 		IRootSector rootSector,
-		Func<ImmutableWorkspace, TResult> operation
+		Func<IWorkspace, TResult> operation
 	) =>
-		rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out ImmutableWorkspace? workspace)
+		rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace)
 			? Result.FromValue(operation(workspace))
 			: Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
 
@@ -60,7 +60,7 @@ public static partial class Pickers
 	/// Get the active workspace.
 	/// </summary>
 	/// <returns></returns>
-	public static PurePicker<ImmutableWorkspace> PickActiveWorkspace() =>
+	public static PurePicker<IWorkspace> PickActiveWorkspace() =>
 		(IRootSector rootSector) => rootSector.WorkspaceSector.Workspaces[rootSector.WorkspaceSector.ActiveWorkspaceId];
 
 	/// <summary>
@@ -91,9 +91,9 @@ public static partial class Pickers
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(workspaceId, rootSector, workspace => GetWorkspaceWindows(rootSector, workspace));
 
-	internal static IEnumerable<IWindow> GetWorkspaceWindows(IRootSector rootSector, ImmutableWorkspace workspace)
+	internal static IEnumerable<IWindow> GetWorkspaceWindows(IRootSector rootSector, IWorkspace workspace)
 	{
-		foreach (HWND hwnd in workspace.WindowHandles)
+		foreach (HWND hwnd in workspace.WindowStates.Keys)
 		{
 			if (PickWindowByHandle(hwnd)(rootSector).TryGet(out IWindow window))
 			{
@@ -110,7 +110,7 @@ public static partial class Pickers
 		(IRootSector rootSector) =>
 		// This doesn't use BaseWorkspacePicker because it uses the Result from PickWindowByHandle.
 		{
-			if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out ImmutableWorkspace? workspace))
+			if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 			{
 				return Result.FromException<IWindow>(StoreExceptions.WorkspaceNotFound(workspaceId));
 			}
