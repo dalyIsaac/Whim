@@ -6,7 +6,7 @@ namespace Whim;
 /// <summary>
 /// Workspaces contain windows to be organized by layout engines.
 /// </summary>
-public record ImmutableWorkspace
+internal partial record Workspace : IWorkspace
 {
 	/// <summary>
 	/// The unique id of the workspace.
@@ -16,7 +16,13 @@ public record ImmutableWorkspace
 	/// <summary>
 	/// The name of the workspace.
 	/// </summary>
-	public string Name { get; internal init; } = string.Empty;
+	/// <remarks>
+	/// Until the legacy <see cref="Workspace"/> implementation is removed, this is called
+	/// <c>BackingName</c> to avoid confusion with <see cref="Name"/>.
+	/// Once the legacy <see cref="Workspace"/> implementation is removed, this will be
+	/// called <c>Name</c>.
+	/// </remarks>
+	public string BackingName { get; internal init; } = string.Empty;
 
 	/// <summary>
 	/// The index of the layout engine in <see cref="LayoutEngines"/> which is currently active.

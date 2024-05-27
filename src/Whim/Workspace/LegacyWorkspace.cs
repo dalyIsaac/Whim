@@ -5,18 +5,20 @@ using Windows.Win32.Foundation;
 
 namespace Whim;
 
-internal class Workspace : IWorkspace, IInternalWorkspace
+internal partial record Workspace : IInternalWorkspace
 {
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	public WorkspaceId Id { get; }
-
-	private ImmutableWorkspace ImmutableWorkspace => _context.Store.Pick(Pickers.PickWorkspaceById(Id))!.Value!;
+	/// <summary>
+	/// The latest instance of <see cref="IWorkspace"/> for the given <see cref="WorkspaceId"/>.
+	/// This is used for compatibility with the old <see cref="Workspace"/> implementation.
+	/// </summary>
+	private Workspace LatestWorkspace => _context.Store.Pick(Pickers.PickWorkspaceById(Id))!.Value!;
 
 	public string Name
 	{
-		get => ImmutableWorkspace.Name;
+		get => LatestWorkspace.Name;
 		set => _context.Store.Dispatch(new SetWorkspaceNameTransform(Id, value));
 	}
 
@@ -64,7 +66,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 
 	public void ActivatePreviouslyActiveLayoutEngine() =>
 		_context.Store.Dispatch(
-			new ActivateLayoutEngineTransform(Id, (_, idx) => idx == ImmutableWorkspace.PreviousLayoutEngineIndex)
+			new ActivateLayoutEngineTransform(Id, (_, idx) => idx == LatestWorkspace.PreviousLayoutEngineIndex)
 		);
 
 	public bool TrySetLayoutEngineFromName(string name) =>
@@ -136,7 +138,7 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 		_internalContext.DeferWorkspacePosManager.DoLayout(this, _triggers, _windowStates);
 	}
 
-	public bool ContainsWindow(IWindow window) => ImmutableWorkspace.WindowHandles.Contains(window.Handle);
+	public bool ContainsWindow(IWindow window) => LatestWorkspace.WindowHandles.Contains(window.Handle);
 
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
 		_context.Store.Dispatch(new PerformCustomLayoutEngineActionTransform(Id, action)).TryGet(out bool isChanged)
