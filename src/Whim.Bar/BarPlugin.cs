@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Windows.Win32.Graphics.Dwm;
@@ -44,7 +44,7 @@ public class BarPlugin : IBarPlugin
 		foreach (IMonitor monitor in _context.MonitorManager)
 		{
 			BarWindow barWindow = new(_context, _barConfig, monitor);
-			_monitorBarMap.Add(monitor, barWindow);
+			_monitorBarMap[monitor] = barWindow;
 		}
 
 		ShowAll();

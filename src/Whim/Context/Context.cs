@@ -95,14 +95,14 @@ internal class Context : IContext
 		// Initialize the managers.
 		Logger.Debug("Initializing...");
 		_internalContext.PreInitialize();
-		Store.Initialize();
 		PluginManager.PreInitialize();
 
 		NotificationManager.Initialize();
 		MonitorManager.Initialize();
-		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
+		WindowManager.Initialize();
 
+		Store.Initialize();
 		Butler.Initialize();
 
 		WindowManager.PostInitialize();
